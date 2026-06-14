@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-14 (PH-S159 ✅ · §5.12 **10** відкритих PH-S160…S169 · rust_ratio **92.42%** · stretch **96%**) · VDT
+**Оновлено:** 2026-06-14 (PH-S160 ✅ · §5.12 **9** відкритих PH-S161…S169 · rust_ratio **92.45%** · stretch **96%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -120,11 +120,12 @@
 **PH-S157 ✅ (code):** `src/pool/topology_graph.rs` — force layout + heatmap HTML у Rust; `GET /api/v1/topology/graph`; slim `topology_graph.js` (SVG paint only); **rust_ratio 92.33%**; `topology_graph.js` **−173 LOC**.
 **PH-S158 ✅ (code):** `poolai-e2e-stand` — Rust stand start/restart/stop; slim `bin/e2e-playwright.sh`; **rust_ratio 92.42%**.
 **PH-S159 ✅ (ops):** `poolai-loc-audit` — CI stretch gate warn **93%**, stretch **96%**; default `--warn-below 0.93`; FM replenish PH-S166…S169; **rust_ratio 92.42%** ≥91%.
-**Vision ✅:** next **PH-S160** · replenish **10** відкритих (PH-S160…S169) · rev **93**.
+**PH-S160 ✅ (code):** `poolai-ui-core/theme.rs` — `normalize_theme` + token map; `admin_layout` injects `window.__poolaiAdminThemesRust`; wasm `normalizeTheme`; `admin_theme.js` **−29 LOC** (DOM glue only); `cargo test-ci`.
+**Vision ✅:** next **PH-S161** · **9** відкритих (PH-S161…S169) · rev **94**.
 **PH-S113 ✅ (docs):** `docs/vision/` — L4 Lib roots + L5 Workspace; nodes `Cargo.toml`, `.cargo/config.toml`, `src/lib.rs`, `poolai-solana-adapter`.
 **PH-S114 ✅ (docs):** Galaxy map pan/zoom — `#map-world` transform; wheel ~6%/крок (тачпад), кнопки 16%; drag pan; dblclick focus.
 **PH-S115 ✅ (docs):** folder-colored edges + cluster layout (сітка за `src/*/`); **⊟ Folders** collapse (5+); **◎ Sprint** dim; manifest **rev 38**; `file_list.csv` + README/INDEX sync.
-**Черга:** §5.12 **10** відкритих — **PH-S160** (наступний) … **PH-S169**. Maintain S160…S165 · post-S159 replenish S166…S169 · baseline **92.42%** · spirit **96%**.
+**Черга:** §5.12 **9** відкритих — **PH-S161** (наступний) … **PH-S169**. Maintain S161…S165 · replenish S166…S169 · baseline **92.45%** · spirit **96%**.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

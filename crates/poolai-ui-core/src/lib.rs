@@ -10,4 +10,5 @@ pub mod lease;
 pub mod ml;
 pub mod pricing;
 pub mod table;
+pub mod theme;
 pub mod validate;

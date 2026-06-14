@@ -10,8 +10,8 @@
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **10** — PH-S160…S169 (maintain + post-S159 replenish) |
-| **Закрито PH-S128…S159** | Galaxy wire + ratio band A–F (audit, API→Rust, ui-core/wasm, slim e2e, CI stretch gate) |
+| **Відкрито** | **9** — PH-S161…S169 (maintain + replenish) |
+| **Закрито PH-S128…S160** | Galaxy wire + ratio band A–F + admin theme Rust |
 | **Після S169** | replenish §5.12 (≤10) · formal 90–95%, hold **96%** spirit |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
 
@@ -63,9 +63,9 @@
 | # | Sprint | Тема | Ratio / acceptance |
 |---|--------|------|-------------------|
 | — | **PH-S159** ✅ | **96%** stretch gate | CI warn **93%**; stretch **96%**; replenish post-S159 |
-| 1 | **PH-S160** | Admin theme → Rust | slim `admin_theme.js` |
-| 2 | **PH-S161** | Admin modal a11y → wasm | slim `admin_modal_a11y.js` |
-| 3 | **PH-S162** | Auth i18n subset Rust | slim `i18n_core.js` auth |
+| — | **PH-S160** ✅ | Admin theme → Rust | `theme.rs` + wasm `normalizeTheme`; slim `admin_theme.js` |
+| 1 | **PH-S161** | Admin modal a11y → wasm | slim `admin_modal_a11y.js` |
+| 2 | **PH-S162** | Auth i18n subset Rust | slim `i18n_core.js` auth |
 | 4 | **PH-S163** | Galaxy trust metrics wire | Prometheus §6.5 |
 | 5 | **PH-S164** | Verify sampling apply | §6.1 HTTP stub |
 | 6 | **PH-S165** | **96%** hold gate | `--min-ratio 0.95`; replenish |

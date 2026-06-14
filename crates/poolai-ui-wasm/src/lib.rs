@@ -15,6 +15,7 @@ use poolai_ui_core::table::{
     build_csv, build_json_export, compare_sort_values, empty_state_html, form_field_html,
     highlight_query_html, render_table_html, row_matches_query,
 };
+use poolai_ui_core::theme::normalize_theme;
 use serde_json::Value;
 use wasm_bindgen::prelude::*;
 
@@ -28,6 +29,12 @@ pub fn format_usd_micro_wasm(usd_micro: f64) -> String {
 #[wasm_bindgen(js_name = formatUnixSecs)]
 pub fn format_unix_secs_wasm(secs: f64) -> String {
     format_unix_secs(Some(secs))
+}
+
+/// Admin theme: maps stored name to `dark` | `light` | `high-contrast`.
+#[wasm_bindgen(js_name = normalizeTheme)]
+pub fn normalize_theme_wasm(name: &str) -> String {
+    normalize_theme(name).to_string()
 }
 
 /// Jobs lease badge: returns `"active"`, `"expired"`, or `"none"`.
@@ -163,7 +170,7 @@ pub fn collect_ml_sparkline_series_wasm(rows_json: &str) -> JsValue {
 /// POC version string for smoke checks in browser devtools.
 #[wasm_bindgen(js_name = poolaiUiWasmVersion)]
 pub fn poolai_ui_wasm_version() -> String {
-    "poolai-ui-wasm/0.1.0-ph-s155".to_string()
+    "poolai-ui-wasm/0.1.0-ph-s160".to_string()
 }
 
 fn empty_as_none(s: &str) -> Option<&str> {
@@ -204,6 +211,13 @@ mod tests {
             "2024-06-13T12:00:00Z"
         );
         assert_eq!(escape_html_wasm("a<b>"), "a&lt;b&gt;");
+    }
+
+    #[test]
+    fn normalize_theme_wasm_matches_core() {
+        assert_eq!(normalize_theme_wasm("light"), "light");
+        assert_eq!(normalize_theme_wasm("high-contrast"), "high-contrast");
+        assert_eq!(normalize_theme_wasm("unknown"), "dark");
     }
 
     #[test]

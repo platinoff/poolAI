@@ -1596,7 +1596,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "0c5a550f",
-  "last_sprint_closed": "PH-S159",
+  "last_sprint_closed": "PH-S160",
   "layers": [
     {
       "id": "L0",
@@ -1629,7 +1629,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S160",
+  "next_sprint": "PH-S161",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7001,6 +7001,14 @@
     },
     {
       "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_theme_rs",
+      "label": "theme.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/theme.rs",
+      "sprints": ["PH-S160"]
+    },
+    {
+      "auto_synced": true,
       "id": "src_ui_admin_modal_a11y_js",
       "label": "admin_modal_a11y.js",
       "layer": "L3",
@@ -7011,10 +7019,14 @@
       "id": "src_ui_admin_theme_js",
       "label": "admin_theme.js",
       "layer": "L3",
-      "path": "src/ui/admin_theme.js"
+      "path": "src/ui/admin_theme.js",
+      "sprints": [
+        "PH-S153",
+        "PH-S160"
+      ]
     }
   ],
-  "revision": 93,
+  "revision": 94,
   "updated_at": "2026-06-14",
   "vision_ui_rev": 54
 }

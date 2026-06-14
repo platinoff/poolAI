@@ -85,7 +85,7 @@ import init, {
   emptyStateHtml, renderTableHtml, formFieldHtml, buildTableCsv, buildTableJson,
   compareSortValues, rowMatchesQuery, highlightQueryHtml,
   parseMlNumeric, formatMlMetricSummary, metricPointValues, chartScale,
-  flattenMlStepRows, collectMlSparklineSeries,
+  flattenMlStepRows, collectMlSparklineSeries, normalizeTheme,
 } from '/ui/wasm/poolai_ui_wasm.js';
 window.poolaiUiWasm = {
   ready: false, failed: false,
@@ -94,7 +94,7 @@ window.poolaiUiWasm = {
   emptyStateHtml, renderTableHtml, formFieldHtml, buildTableCsv, buildTableJson,
   compareSortValues, rowMatchesQuery, highlightQueryHtml,
   parseMlNumeric, formatMlMetricSummary, metricPointValues, chartScale,
-  flattenMlStepRows, collectMlSparklineSeries,
+  flattenMlStepRows, collectMlSparklineSeries, normalizeTheme,
 };
 try {
   await init();
@@ -141,6 +141,7 @@ pub fn admin_layout_with_module_script(
     let modal_js = include_str!("../admin_modal_a11y.js");
     let charts_js = include_str!("../admin_charts.js");
     let i18n_patch = poolai_ui_core::i18n::admin_jobs_grid_patch_script();
+    let theme_patch = poolai_ui_core::theme::admin_theme_patch_script();
     let module_block = if module_script.is_empty() {
         String::new()
     } else {
@@ -208,6 +209,7 @@ pub fn admin_layout_with_module_script(
   <div id="admin-aria-live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
   
   <script>{i18n_patch}</script>
+  <script>{theme_patch}</script>
   <script>{i18n_js}</script>
   <script>{theme_js}</script>
   <script>{common_js}</script>
@@ -250,6 +252,7 @@ pub fn admin_layout_with_module_script(
         base_css = base_css,
         body = body_html,
         i18n_patch = i18n_patch,
+        theme_patch = theme_patch,
         i18n_js = i18n_js,
         common_js = common_js,
         charts_js = charts_js,
@@ -258,6 +261,16 @@ pub fn admin_layout_with_module_script(
     );
 
     Html(html)
+}
+
+#[test]
+fn admin_layout_injects_rust_theme_patch_ph_s160() {
+    let patch = poolai_ui_core::theme::admin_theme_patch_script();
+    assert!(patch.contains("window.__poolaiAdminThemesRust="));
+    assert!(patch.contains(r#""high-contrast""#));
+    assert!(patch.contains("\"surfaceSecondary\":\"#1e2329\""));
+    let html = admin_layout("admin.test.page", "Test", "<p>body</p>", "");
+    assert!(html.0.contains("window.__poolaiAdminThemesRust="));
 }
 
 #[test]
@@ -337,7 +350,8 @@ fn admin_common_ph_s14_high_contrast_theme() {
     let js = include_str!("../admin_theme.js");
     assert!(js.contains("'high-contrast'"));
     assert!(js.contains("function poolaiNormalizeTheme"));
-    assert!(js.contains("POOLAI_UI_THEMES['high-contrast']") || js.contains("'high-contrast': {"));
+    assert!(js.contains("__poolaiAdminThemesRust"));
+    assert!(!js.contains("const POOLAI_UI_THEMES"));
 }
 
 #[test]
