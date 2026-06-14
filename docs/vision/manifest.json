@@ -1562,11 +1562,29 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_i18n_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "src_pool_topology_graph_rs",
+      "kind": "implements",
+      "to": "src_network_api_topology_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "src_ui_topology_graph_js",
+      "kind": "implements",
+      "to": "src_pool_topology_graph_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "src_ui_admin_topology_rs",
+      "kind": "implements",
+      "to": "src_ui_topology_graph_js"
     }
   ],
   "galaxy_background": "vision2.png",
-  "git_head": "3e1b4a28",
-  "last_sprint_closed": "PH-S155",
+  "git_head": "81900062",
+  "last_sprint_closed": "PH-S157",
   "layers": [
     {
       "id": "L0",
@@ -5271,7 +5289,10 @@
       "id": "src_network_api_topology_rs",
       "label": "topology.rs",
       "layer": "L3",
-      "path": "src/network/api/topology.rs"
+      "path": "src/network/api/topology.rs",
+      "sprints": [
+        "PH-S157"
+      ]
     },
     {
       "auto_synced": true,
@@ -5881,7 +5902,10 @@
       "id": "src_ui_admin_topology_rs",
       "label": "topology.rs",
       "layer": "L3",
-      "path": "src/ui/admin/topology.rs"
+      "path": "src/ui/admin/topology.rs",
+      "sprints": [
+        "PH-S157"
+      ]
     },
     {
       "auto_synced": true,

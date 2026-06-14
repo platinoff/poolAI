@@ -1,5 +1,5 @@
 {
-  "revision": 43,
+  "revision": 44,
   "updated_at": "2026-06-14",
   "active_sprint": "PH-S158",
   "ui_version": 4,
@@ -308,6 +308,8 @@
       "code_globs": [
         "src/bin/poolai_loc_audit.rs",
         "src/bin/poolai_http_stand_smoke.rs",
+        "src/pool/topology_graph.rs",
+        "src/network/api/topology.rs",
         "src/grid/galaxy_trust_score.rs",
         "src/grid/galaxy_verify_sampling.rs",
         "crates/poolai-ui-core/**",
