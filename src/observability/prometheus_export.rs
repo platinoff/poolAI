@@ -19,9 +19,9 @@ use std::sync::OnceLock;
 use crate::core::state::ApiContext;
 use crate::grid::galaxy_locality::{last_shard_local_hit_ratio_bps, METRIC_SHARD_LOCAL_HIT_RATIO};
 use crate::grid::galaxy_prefetch_metrics::{
-    prefetch_hot_skip_total, prefetch_plan_total, prefetch_planned_shards_total,
-    METRIC_PREFETCH_HOT_SKIP_TOTAL, METRIC_PREFETCH_PLANNED_SHARDS_TOTAL,
-    METRIC_PREFETCH_PLAN_TOTAL,
+    prefetch_bytes_total, prefetch_hot_skip_total, prefetch_plan_total,
+    prefetch_planned_shards_total, METRIC_PREFETCH_BYTES_TOTAL, METRIC_PREFETCH_HOT_SKIP_TOTAL,
+    METRIC_PREFETCH_PLANNED_SHARDS_TOTAL, METRIC_PREFETCH_PLAN_TOTAL,
 };
 use crate::grid::galaxy_pricing_oracle::{
     forced_fallback_total, fresh_served_total, last_market_min_usd_micro, last_quote_usd_micro,
@@ -81,6 +81,7 @@ pub struct PoolAiPrometheus {
     galaxy_prefetch_plan_total: IntGauge,
     galaxy_prefetch_planned_shards_total: IntGauge,
     galaxy_prefetch_hot_skip_total: IntGauge,
+    galaxy_prefetch_bytes_total: IntGauge,
     galaxy_verification_mismatch_total: IntGauge,
     galaxy_verification_match_total: IntGauge,
     galaxy_verification_sample_total: IntGauge,
@@ -347,6 +348,15 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_prefetch_hot_skip_total.clone()))
         .expect("register galaxy_prefetch_hot_skip_total");
 
+    let galaxy_prefetch_bytes_total = IntGauge::with_opts(Opts::new(
+        METRIC_PREFETCH_BYTES_TOTAL,
+        "Galaxy estimated prefetch bytes scheduled in plans (PH-S184 stub)",
+    ))
+    .expect(METRIC_PREFETCH_BYTES_TOTAL);
+    registry
+        .register(Box::new(galaxy_prefetch_bytes_total.clone()))
+        .expect("register galaxy_prefetch_bytes_total");
+
     let galaxy_verification_mismatch_total = IntGauge::with_opts(Opts::new(
         METRIC_VERIFICATION_MISMATCH_TOTAL,
         "Galaxy verification digest mismatches on grid result path (PH-S175)",
@@ -438,6 +448,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_prefetch_plan_total,
         galaxy_prefetch_planned_shards_total,
         galaxy_prefetch_hot_skip_total,
+        galaxy_prefetch_bytes_total,
         galaxy_verification_mismatch_total,
         galaxy_verification_match_total,
         galaxy_verification_sample_total,
@@ -496,6 +507,8 @@ pub fn refresh_galaxy_prefetch_gauges() {
         .set(prefetch_planned_shards_total() as i64);
     prom.galaxy_prefetch_hot_skip_total
         .set(prefetch_hot_skip_total() as i64);
+    prom.galaxy_prefetch_bytes_total
+        .set(prefetch_bytes_total() as i64);
 }
 
 /// Mirror in-process verification counters into Prometheus gauges (scrape snapshot).
@@ -828,6 +841,21 @@ mod tests {
         assert!(body.contains(METRIC_PREFETCH_PLAN_TOTAL));
         assert!(body.contains(METRIC_PREFETCH_PLANNED_SHARDS_TOTAL));
         assert!(body.contains(METRIC_PREFETCH_HOT_SKIP_TOTAL));
+        assert!(body.contains(METRIC_PREFETCH_BYTES_TOTAL));
+    }
+
+    #[test]
+    fn galaxy_prefetch_bytes_gauge_reflects_counter_ph_s184() {
+        use crate::grid::galaxy_prefetch_metrics::{
+            record_prefetch_plan, reset_prefetch_metrics_for_test,
+        };
+        reset_prefetch_metrics_for_test();
+        record_prefetch_plan(2, 2, 16_777_216);
+        init_prometheus();
+        refresh_galaxy_prefetch_gauges();
+        let body = encode_metrics_text().expect("encode");
+        assert!(body.contains(&format!("{METRIC_PREFETCH_BYTES_TOTAL} 16777216")));
+        reset_prefetch_metrics_for_test();
     }
 
     #[test]
@@ -836,12 +864,13 @@ mod tests {
             record_prefetch_plan, reset_prefetch_metrics_for_test,
         };
         reset_prefetch_metrics_for_test();
-        record_prefetch_plan(2, 1);
+        record_prefetch_plan(2, 1, 4_194_304);
         refresh_galaxy_prefetch_gauges();
         let body = encode_metrics_text().expect("encode");
         assert!(body.contains(&format!("{METRIC_PREFETCH_PLAN_TOTAL} 1")));
         assert!(body.contains(&format!("{METRIC_PREFETCH_PLANNED_SHARDS_TOTAL} 1")));
         assert!(body.contains(&format!("{METRIC_PREFETCH_HOT_SKIP_TOTAL} 1")));
+        assert!(body.contains(&format!("{METRIC_PREFETCH_BYTES_TOTAL} 4194304")));
         reset_prefetch_metrics_for_test();
     }
 

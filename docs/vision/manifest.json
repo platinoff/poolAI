@@ -1716,7 +1716,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "76f6dd3d",
-  "last_sprint_closed": "PH-S183",
+  "last_sprint_closed": "PH-S184",
   "layers": [
     {
       "id": "L0",
@@ -1749,7 +1749,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S184",
+  "next_sprint": "PH-S185",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7220,14 +7220,16 @@
       "id": "src_grid_galaxy_prefetch_metrics_rs",
       "label": "galaxy_prefetch_metrics.rs",
       "layer": "L3",
-      "path": "src/grid/galaxy_prefetch_metrics.rs"
+      "path": "src/grid/galaxy_prefetch_metrics.rs",
+      "sprints": ["PH-S167", "PH-S184"]
     },
     {
       "auto_synced": true,
       "id": "tests_galaxy_prefetch_metrics_integration_rs",
       "label": "galaxy_prefetch_metrics_integration.rs",
       "layer": "L3",
-      "path": "tests/galaxy_prefetch_metrics_integration.rs"
+      "path": "tests/galaxy_prefetch_metrics_integration.rs",
+      "sprints": ["PH-S167", "PH-S184"]
     },
     {
       "auto_synced": true,
@@ -7362,7 +7364,7 @@
       "sprints": ["PH-S181"]
     }
   ],
-  "revision": 120,
+  "revision": 121,
   "updated_at": "2026-06-14",
   "vision_ui_rev": 54
 }

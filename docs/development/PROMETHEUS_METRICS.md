@@ -57,6 +57,7 @@ scrape_configs:
 | `galaxy_pricing_market_min_usd_micro` | gauge | Galaxy pricing last observed market min micro-USD (PH-S181) |
 | `galaxy_trust_score` | gauge | Galaxy last observed grid result trust score 0..=100 (PH-S182) |
 | `galaxy_shard_local_hit_ratio` | gauge | Galaxy last top-ranked shard local hit ratio basis points 0-10000 (PH-S183) |
+| `galaxy_prefetch_bytes_total` | gauge | Galaxy estimated prefetch bytes scheduled in plans (PH-S184 stub) |
 | `galaxy_verification_mismatch_total` | gauge | Galaxy verification digest mismatches on grid result path (PH-S175) |
 | `galaxy_verification_sample_total` | gauge | Galaxy verification samples scheduled on grid result path (PH-S177) |
 | `galaxy_verification_match_total` | gauge | Galaxy verification digest matches on grid result path (PH-S180) |
@@ -64,7 +65,7 @@ scrape_configs:
 | `galaxy_settlement_pending_verification_total` | gauge | Galaxy settlement holds pending verification on grid result path (PH-S178) |
 | `galaxy_replication_strict_total` | gauge | Galaxy replication strict tier grid job ingests (PH-S179) |
 
-**Queued (FM §5.12 PH-S184…S187):** settlement cleared, prefetch egress metrics — див. [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12. Vision UX band PH-S188…S191 — окремо в FM §5.12.
+**Queued (FM §5.12 PH-S185…S187):** settlement cleared, cross region egress metrics — див. [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12. Vision UX band PH-S188…S191 — окремо в FM §5.12.
 | `galaxy_trust_payout_eligible_total` | gauge | Galaxy trust gate edge payout-eligible results (PH-S137 stub; PH-S163 grid wire) |
 | `galaxy_trust_payout_held_total` | gauge | Galaxy trust gate edge payout-held results (PH-S137 stub; PH-S163 grid wire) |
 | `process_*` | various | `prometheus` process collector when available |
@@ -81,4 +82,4 @@ Prometheus alert rules live in your monitoring stack (Prometheus / Alertmanager 
 - [`../performance/BENCHMARKS.md`](../performance/BENCHMARKS.md) — load baselines
 - [`../performance/PROFILING.md`](../performance/PROFILING.md) — hot-path profiling
 
-**Last updated:** 2026-06-14 (PH-S183 shard local hit ratio metrics).
+**Last updated:** 2026-06-14 (PH-S184 prefetch bytes total metrics).

@@ -623,7 +623,7 @@ Coordinator і worker збирають **locality telemetry** (агрегаці�
 
 **Зв’язок з `network_profile`:** `latency_ms_p50`, `region`, `bandwidth_mbps` — вхідні для `latency_factor`; нормативний wire contract — **§8.1**; **locality subset** (`region`, `latency_ms_p50`) — обов’язковий для PH-S61/PH-S128 scheduling (`src/grid/galaxy_locality.rs`).
 
-**Метрики (Prometheus, §5.12 PH-S183…S185):** `galaxy_shard_local_hit_ratio` (PH-S183 ✅), `galaxy_prefetch_bytes_total`, `galaxy_cross_region_egress_mb`.
+**Метрики (Prometheus, §5.12 PH-S183…S185):** `galaxy_shard_local_hit_ratio` (PH-S183 ✅), `galaxy_prefetch_bytes_total` (PH-S184 ✅), `galaxy_cross_region_egress_mb`.
 
 ### 5.4 Keep hot layers local (PH-S61)
 

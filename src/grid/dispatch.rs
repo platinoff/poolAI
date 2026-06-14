@@ -12,7 +12,10 @@ use chrono::Utc;
 use serde::{Deserialize, Serialize};
 
 use crate::core::error::AppError;
-use crate::grid::galaxy_prefetch_metrics::record_prefetch_plan;
+use crate::grid::galaxy_prefetch_metrics::{
+    record_prefetch_plan, DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM,
+    DEFAULT_PREFETCH_BYTES_PER_SHARD_VRAM,
+};
 use crate::grid::galaxy_replay_metrics::evaluate_result_replay_pending;
 use crate::grid::galaxy_replication::{
     replication_tier_from_policy, ReplicationTierConfig, REPLICATION_STANDARD, REPLICATION_STRICT,
@@ -190,7 +193,13 @@ pub fn plan_prefetch(
             target_tier,
         })
         .collect();
-    record_prefetch_plan(required_shard_ids.len(), items.len());
+    let bytes_per_shard = if gpu_capable {
+        DEFAULT_PREFETCH_BYTES_PER_SHARD_VRAM
+    } else {
+        DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM
+    };
+    let prefetch_bytes = items.len() as u64 * bytes_per_shard;
+    record_prefetch_plan(required_shard_ids.len(), items.len(), prefetch_bytes);
     PrefetchPlan {
         items,
         trigger,
@@ -757,8 +766,9 @@ mod tests {
     #[test]
     fn plan_prefetch_records_metrics_ph_s167() {
         use crate::grid::galaxy_prefetch_metrics::{
-            prefetch_hot_skip_total, prefetch_plan_total, prefetch_planned_shards_total,
-            reset_prefetch_metrics_for_test,
+            prefetch_bytes_total, prefetch_hot_skip_total, prefetch_plan_total,
+            prefetch_planned_shards_total, reset_prefetch_metrics_for_test,
+            DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM,
         };
         reset_prefetch_metrics_for_test();
         let inventory = SeedInventoryEntry {
@@ -780,6 +790,7 @@ mod tests {
         assert_eq!(prefetch_plan_total(), 1);
         assert_eq!(prefetch_planned_shards_total(), 1);
         assert_eq!(prefetch_hot_skip_total(), 1);
+        assert_eq!(prefetch_bytes_total(), DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM);
         reset_prefetch_metrics_for_test();
     }
 

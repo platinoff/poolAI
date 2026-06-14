@@ -8,7 +8,8 @@ use poolai::grid::dispatch::{
     plan_prefetch, PrefetchPolicyConfig, PrefetchTrigger, SeedInventoryEntry, SeedInventoryHotTier,
 };
 use poolai::grid::galaxy_prefetch_metrics::{
-    reset_prefetch_metrics_for_test, METRIC_PREFETCH_HOT_SKIP_TOTAL,
+    reset_prefetch_metrics_for_test, DEFAULT_PREFETCH_BYTES_PER_SHARD_VRAM,
+    METRIC_PREFETCH_BYTES_TOTAL, METRIC_PREFETCH_HOT_SKIP_TOTAL,
     METRIC_PREFETCH_PLANNED_SHARDS_TOTAL, METRIC_PREFETCH_PLAN_TOTAL,
 };
 use poolai::observability::{self, metrics_handler};
@@ -74,5 +75,10 @@ async fn plan_prefetch_counters_visible_on_metrics_scrape() {
     assert!(body.contains(&format!("{METRIC_PREFETCH_PLAN_TOTAL} 1")));
     assert!(body.contains(&format!("{METRIC_PREFETCH_PLANNED_SHARDS_TOTAL} 2")));
     assert!(body.contains(&format!("{METRIC_PREFETCH_HOT_SKIP_TOTAL} 1")));
+    assert!(body.contains(METRIC_PREFETCH_BYTES_TOTAL));
+    assert!(body.contains(&format!(
+        "{METRIC_PREFETCH_BYTES_TOTAL} {}",
+        2 * DEFAULT_PREFETCH_BYTES_PER_SHARD_VRAM
+    )));
     reset_prefetch_metrics_for_test();
 }
