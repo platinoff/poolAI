@@ -3,10 +3,12 @@
 //! Provides theme customization support for the PoolAI dashboard.
 //! Supports light/dark themes and custom color schemes.
 //!
-//! Structural design tokens (spacing, typography, shadows) live in [`DESIGN_TOKENS_CSS`].
+//! Structural design tokens (spacing, typography, shadows) from [`poolai_ui_core::design_tokens`] (PH-S166).
 
-/// Shared structural CSS variables (PH-S09 design system).
-pub const DESIGN_TOKENS_CSS: &str = include_str!("design_tokens.css");
+/// Shared structural CSS variables (PH-S166 — generated in poolai-ui-core).
+pub fn design_tokens_css() -> String {
+    poolai_ui_core::design_tokens::design_tokens_css()
+}
 
 /// Theme configuration
 #[derive(Debug, Clone)]
@@ -237,7 +239,7 @@ impl Theme {
     color: var(--primary);
   }}
 "#,
-            design_tokens = DESIGN_TOKENS_CSS,
+            design_tokens = design_tokens_css(),
             theme_vars = self.to_css_variables(),
         )
     }
@@ -249,8 +251,9 @@ mod tests {
 
     #[test]
     fn design_tokens_include_spacing_scale() {
-        assert!(DESIGN_TOKENS_CSS.contains("--spacing-1: 4px"));
-        assert!(DESIGN_TOKENS_CSS.contains("--font-size-base: 16px"));
+        let css = design_tokens_css();
+        assert!(css.contains("--spacing-1: 4px"));
+        assert!(css.contains("--font-size-base: 16px"));
     }
 
     #[test]

@@ -6,14 +6,19 @@
 
 | File | Role |
 |------|------|
-| `src/ui/design_tokens.css` | Canonical spacing, typography, radius, shadows, z-index |
-| `src/ui/admin_styles.css` | Admin colors, layout, components |
-| `src/ui/themes.rs` | Dashboard theme colors + includes `design_tokens.css` |
+| `crates/poolai-ui-core/src/design_tokens.rs` | **Canonical** structural CSS vars + admin default `:root` colors (PH-S166) |
+| `src/ui/design_tokens.css` | Docs pointer only — not included in bundles |
+| `src/ui/admin_styles.css` | Admin layout, components (no `:root` color block) |
+| `src/ui/themes.rs` | Dashboard theme colors + `design_tokens_css()` from ui-core |
 
 Admin pages load tokens via `admin_layout`:
 
 ```rust
-concat!(include_str!("../design_tokens.css"), include_str!("../admin_styles.css"))
+format!(
+    "{}{}",
+    poolai_ui_core::design_tokens::admin_base_css(),
+    include_str!("../admin_styles.css"),
+)
 ```
 
 ## CSS classes

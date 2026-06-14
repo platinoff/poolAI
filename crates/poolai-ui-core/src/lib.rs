@@ -4,6 +4,7 @@
 //! and `src/ui/admin_charts.js`. Browser WASM exports: `crates/poolai-ui-wasm` (PH-S147).
 
 pub mod api_error;
+pub mod design_tokens;
 pub mod format;
 pub mod i18n;
 pub mod lease;

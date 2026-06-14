@@ -1604,11 +1604,17 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_theme_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_design_tokens_rs"
     }
   ],
   "galaxy_background": "vision2.png",
-  "git_head": "b4595e8a",
-  "last_sprint_closed": "PH-S165",
+  "git_head": "e8991343",
+  "last_sprint_closed": "PH-S166",
   "layers": [
     {
       "id": "L0",
@@ -1641,7 +1647,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S166",
+  "next_sprint": "PH-S167",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7086,9 +7092,16 @@
       "label": "galaxy_verify_sampling_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_verify_sampling_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_design_tokens_rs",
+      "label": "design_tokens.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/design_tokens.rs"
     }
   ],
-  "revision": 101,
+  "revision": 103,
   "updated_at": "2026-06-14",
   "vision_ui_rev": 54
 }

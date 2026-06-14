@@ -6,42 +6,7 @@
   padding: 0;
 }
 
-:root {
-  /* Main UI Design System Variables */
-  --bg: #0f1216;
-  --surface: #171b22;
-  --surface-secondary: #1e2329;
-  --text: #e8e8e8;
-  --text-muted: #a8b0bf;
-  --primary: #67e480;
-  --primary-hover: #50fa7b;
-  --link: #77c7ff;
-  --link-hover: #8bd5ff;
-  --border: #262b36;
-  --danger: #c62828;
-  --danger-hover: #e53935;
-  --warning: #ffb86c;
-  --info: #8be9fd;
-  --success: #50fa7b;
-
-  /* Structural tokens: design_tokens.css (included before this file in admin_layout) */
-
-  /* Admin-specific variables */
-  --admin-sidebar-width: 260px;
-  
-  /* Backward compatibility aliases */
-  --admin-bg: var(--bg);
-  --admin-surface: var(--surface);
-  --admin-surface-secondary: var(--surface-secondary);
-  --admin-border: var(--border);
-  --admin-text: var(--text);
-  --admin-text-muted: var(--text-muted);
-  --admin-primary: var(--primary);
-  --admin-primary-hover: var(--primary-hover);
-  --admin-danger: var(--danger);
-  --admin-warning: var(--warning);
-  --admin-info: var(--info);
-}
+/* Default admin palette + structural tokens: poolai-ui-core/design_tokens.rs (PH-S166) */
 
 body {
   font-family: 'Segoe UI', Arial, sans-serif;
