@@ -89,10 +89,7 @@ async fn grid_envelope_response_includes_verify_sample_rate_header() {
     let app = grid_app();
     let job_id = format!(
         "ph-s164-header-{}",
-        std::time::SystemTime::now()
-            .elapsed()
-            .unwrap()
-            .as_nanos()
+        std::time::SystemTime::now().elapsed().unwrap().as_nanos()
     );
 
     let (status, headers, body) = request_json(
