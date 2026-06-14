@@ -1,6 +1,6 @@
 # Galaxy Grid — роадмеп розробки (PoolAI)
 
-**Оновлено:** 2026-06-14 · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**5** відкритих PH-S177…S181)
+**Оновлено:** 2026-06-14 · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**5** відкритих PH-S178…S182)
 
 Операційний зріз сесій: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) · старт наступної: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)
 
@@ -10,9 +10,9 @@
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **5** — PH-S177…S181 |
-| **Закрито PH-S128…S176** | Galaxy wire + ratio hold + pricing/verification/replay metrics band |
-| **Після S181** | replenish §5.12 (≤10) |
+| **Відкрито** | **5** — PH-S178…S182 |
+| **Закрито PH-S128…S177** | Galaxy wire + ratio hold + verification/replay metrics band |
+| **Після S182** | replenish §5.12 (≤10) |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
 
 ---
@@ -58,16 +58,16 @@
 
 ---
 
-## 3. Черга §5.12 (post-S176 replenish S177…S181)
+## 3. Черга §5.12 (post-S177 replenish S178…S182)
 
 | # | Sprint | Тема | Acceptance |
 |---|--------|------|------------|
-| — | **PH-S176** ✅ | Replay pending metrics | §6.3 replay pending gauge |
-| 1 | **PH-S177** | Verification sample total metrics | §6.2 sample counter |
-| 2 | **PH-S178** | Settlement pending_verification metrics | §6.4 grid result path |
-| 3 | **PH-S179** | Replication strict tier metrics | §6.3 grid job ingest |
-| 4 | **PH-S180** | Verification match metrics | §6.2 match counter |
-| 5 | **PH-S181** | Pricing market min usd_micro metrics | §4.2 market min gauge |
+| — | **PH-S177** ✅ | Verification sample total metrics | §6.2 sample counter |
+| 1 | **PH-S178** | Settlement pending_verification metrics | §6.4 grid result path |
+| 2 | **PH-S179** | Replication strict tier metrics | §6.3 grid job ingest |
+| 3 | **PH-S180** | Verification match metrics | §6.2 match counter |
+| 4 | **PH-S181** | Pricing market min usd_micro metrics | §4.2 market min gauge |
+| 5 | **PH-S182** | Trust score metrics | §6.2 trust score gauge |
 
 Повна таблиця — FM **§5.12** · [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md).
 
