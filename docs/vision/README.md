@@ -113,4 +113,4 @@ http://127.0.0.1:8765/docs/vision/index.html
 | **PH-S190** | Overview LOD + minimap (hub labels без zoom) | `vision.js`, `vision.css` |
 | **PH-S191** | Sprint queue panel + `feed.json` RSS + Cursor post-push hook | `poolai-vision-sync`, `manifest.json`, `.cursor/hooks` |
 
-Канон черги: [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 · наступний код-спринт **PH-S186** (metrics), vision band **після S187**.
+Канон черги: [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 · наступний код-спринт **PH-S187** (metrics), vision band **після S187**.

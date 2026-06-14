@@ -843,7 +843,7 @@ elif verdict == rejected:
 | `galaxy_replication_strict_total` | ✅ `/metrics` | PH-S179 |
 | `galaxy_pricing_market_min_usd_micro` | ✅ `/metrics` | PH-S181 |
 | `galaxy_trust_score` | ✅ `/metrics` | PH-S182 |
-| `galaxy_verification_sample_scheduled_total` | in-process (PH-S164); `/metrics` черга | PH-S186 |
+| `galaxy_verification_sample_scheduled_total` | ✅ `/metrics` | PH-S164, PH-S186 |
 | `galaxy_settlement_cleared_total` | черга | PH-S187 |
 
 **Логи / audit:** `verification_sample_enqueued`, `verification_mismatch`, `replay_verdict`, `replication_quorum_ok|fail`.

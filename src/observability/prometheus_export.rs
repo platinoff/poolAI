@@ -53,6 +53,9 @@ use crate::grid::galaxy_verification_metrics::{
     METRIC_VERIFICATION_MATCH_TOTAL, METRIC_VERIFICATION_MISMATCH_TOTAL,
     METRIC_VERIFICATION_SAMPLE_TOTAL,
 };
+use crate::grid::galaxy_verify_sampling::{
+    verify_sample_scheduled_total, METRIC_VERIFY_SAMPLE_SCHEDULED_TOTAL,
+};
 
 /// Lazily initialized Prometheus registry and metric handles.
 pub struct PoolAiPrometheus {
@@ -89,6 +92,7 @@ pub struct PoolAiPrometheus {
     galaxy_verification_mismatch_total: IntGauge,
     galaxy_verification_match_total: IntGauge,
     galaxy_verification_sample_total: IntGauge,
+    galaxy_verification_sample_scheduled_total: IntGauge,
     galaxy_replay_pending: IntGauge,
     galaxy_settlement_pending_verification_total: IntGauge,
     galaxy_replication_strict_total: IntGauge,
@@ -397,6 +401,15 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_verification_sample_total.clone()))
         .expect("register galaxy_verification_sample_total");
 
+    let galaxy_verification_sample_scheduled_total = IntGauge::with_opts(Opts::new(
+        METRIC_VERIFY_SAMPLE_SCHEDULED_TOTAL,
+        "Galaxy verification stub samples scheduled on grid result path (PH-S164; PH-S186 /metrics)",
+    ))
+    .expect(METRIC_VERIFY_SAMPLE_SCHEDULED_TOTAL);
+    registry
+        .register(Box::new(galaxy_verification_sample_scheduled_total.clone()))
+        .expect("register galaxy_verification_sample_scheduled_total");
+
     let galaxy_replay_pending = IntGauge::with_opts(Opts::new(
         METRIC_REPLAY_PENDING,
         "Galaxy replay verifications pending coordinator verdict (PH-S176)",
@@ -466,6 +479,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_verification_mismatch_total,
         galaxy_verification_match_total,
         galaxy_verification_sample_total,
+        galaxy_verification_sample_scheduled_total,
         galaxy_replay_pending,
         galaxy_settlement_pending_verification_total,
         galaxy_replication_strict_total,
@@ -536,6 +550,8 @@ pub fn refresh_galaxy_verification_gauges() {
         .set(verification_match_total() as i64);
     prom.galaxy_verification_sample_total
         .set(verification_sample_total() as i64);
+    prom.galaxy_verification_sample_scheduled_total
+        .set(verify_sample_scheduled_total() as i64);
     prom.galaxy_replay_pending.set(replay_pending() as i64);
     prom.galaxy_settlement_pending_verification_total
         .set(settlement_pending_verification_total() as i64);
@@ -951,6 +967,23 @@ mod tests {
         assert!(body.contains(METRIC_VERIFICATION_SAMPLE_TOTAL));
         assert!(body.contains(&format!("{METRIC_VERIFICATION_SAMPLE_TOTAL} 1")));
         reset_verification_sample_metrics_for_test();
+    }
+
+    #[test]
+    fn galaxy_verification_sample_scheduled_gauge_reflects_counter_ph_s186() {
+        use crate::grid::galaxy_verify_sampling::{
+            record_verify_sampling_verdict, reset_verify_sampling_metrics_for_test,
+            VerifySamplingVerdict,
+        };
+
+        reset_verify_sampling_metrics_for_test();
+        init_prometheus();
+        record_verify_sampling_verdict(VerifySamplingVerdict::SampleScheduled);
+        refresh_galaxy_verification_gauges();
+        let body = encode_metrics_text().expect("encode");
+        assert!(body.contains(METRIC_VERIFY_SAMPLE_SCHEDULED_TOTAL));
+        assert!(body.contains(&format!("{METRIC_VERIFY_SAMPLE_SCHEDULED_TOTAL} 1")));
+        reset_verify_sampling_metrics_for_test();
     }
 
     #[test]

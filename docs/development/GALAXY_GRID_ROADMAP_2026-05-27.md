@@ -1,6 +1,6 @@
 # Galaxy Grid — роадмеп розробки (PoolAI)
 
-**Оновлено:** 2026-06-14 · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**6** відкритих PH-S186…S191)
+**Оновлено:** 2026-06-14 · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**5** відкритих PH-S187…S191)
 
 Операційний зріз сесій: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) · старт наступної: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)
 
@@ -10,7 +10,7 @@
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **6** — PH-S186…S191 (metrics + vision UX) |
+| **Відкрито** | **5** — PH-S187…S191 (metrics + vision UX) |
 | **Закрито PH-S128…S177** | Galaxy wire + ratio hold + verification/replay metrics band |
 | **Після S187** | replenish §5.12 (≤10) |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
@@ -58,7 +58,7 @@
 
 ---
 
-## 3. Черга §5.12 (PH-S186…S191)
+## 3. Черга §5.12 (PH-S187…S191)
 
 ### Metrics band (S182…S187)
 
@@ -69,8 +69,8 @@
 | — | **PH-S183** ✅ | Shard local hit ratio metrics | §5.3 locality gauge |
 | — | **PH-S184** ✅ | Prefetch bytes total metrics | §5.5 plan_prefetch path |
 | — | **PH-S185** ✅ | Cross region egress mb metrics | §5.3 rank/prefetch stub |
-| 1 | **PH-S186** | Verification sample scheduled /metrics | §6.2 PH-S164 counter export |
-| 2 | **PH-S187** | Settlement cleared total metrics | §6.4 Cleared grid result path |
+| — | **PH-S186** ✅ | Verification sample scheduled /metrics | §6.2 PH-S164 counter export |
+| 1 | **PH-S187** | Settlement cleared total metrics | §6.4 Cleared grid result path |
 
 ### Vision UX band (S188…S191)
 

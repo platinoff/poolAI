@@ -1716,7 +1716,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "76f6dd3d",
-  "last_sprint_closed": "PH-S185",
+  "last_sprint_closed": "PH-S186",
   "layers": [
     {
       "id": "L0",
@@ -1749,7 +1749,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S186",
+  "next_sprint": "PH-S187",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -2256,7 +2256,8 @@
       ],
       "sprints": [
         "PH-S142",
-        "PH-S164"
+        "PH-S164",
+        "PH-S186"
       ]
     },
     {
@@ -5596,7 +5597,8 @@
       ],
       "sprints": [
         "PH-S07",
-        "PH-S127"
+        "PH-S127",
+        "PH-S186"
       ]
     },
     {
@@ -7046,6 +7048,14 @@
       "sprints": ["PH-S185"]
     },
     {
+      "auto_synced": true,
+      "id": "tests_galaxy_verification_sample_scheduled_integration_rs",
+      "label": "galaxy_verification_sample_scheduled_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_verification_sample_scheduled_integration.rs",
+      "sprints": ["PH-S186"]
+    },
+    {
       "id": "tests_discovery_network_profile_integration_rs",
       "label": "discovery_network_profile_integration.rs",
       "layer": "L3",
@@ -7373,7 +7383,7 @@
       "sprints": ["PH-S181"]
     }
   ],
-  "revision": 122,
+  "revision": 123,
   "updated_at": "2026-06-14",
   "vision_ui_rev": 54
 }
