@@ -212,8 +212,11 @@ export POOLAI_BASE_URL=http://127.0.0.1:8080
 # Coordinator уже на :8080 (run-poolai single --bg)
 cargo run --bin poolai-http-stand-smoke
 
-# Після bin/e2e-playwright.sh --start (POOLAI_GALAXY_PRICING_FALLBACK_JSON у stand.env):
+# RAID restart only (PH-S156; replaces Playwright jobs_raid):
 export POOLAI_E2E_STAND_ROOT=/tmp/poolai-e2e-NNN   # шлях з логу --start
+cargo run --bin poolai-http-stand-smoke -- --raid-restart
+
+# Full suite incl. raid restart:
 cargo run --bin poolai-http-stand-smoke -- --raid
 
 # JSON звіт на stdout:
@@ -223,8 +226,9 @@ cargo run --bin poolai-http-stand-smoke -- --json
 | Env | Призначення |
 |-----|-------------|
 | `POOLAI_BASE_URL` | Base URL stand (default `http://127.0.0.1:8080`) |
-| `POOLAI_E2E_STAND_ROOT` | Каталог e2e stand з `restart.sh` (для `--raid`) |
-| `POOLAI_STAND_SMOKE_RAID=1` | Альтернатива прапорцю `--raid` |
+| `POOLAI_E2E_STAND_ROOT` | Каталог e2e stand з `restart.sh` (для `--raid-restart` / `--raid`) |
+| `POOLAI_STAND_SMOKE_RAID_RESTART=1` | Альтернатива прапорцю `--raid-restart` |
+| `POOLAI_STAND_SMOKE_RAID=1` | Альтернатива прапорцю `--raid` (full suite + raid) |
 
 ---
 
@@ -274,4 +278,4 @@ bash bin/build-ui-wasm.sh
 | OOM при тестах Windows | `.\bin\poolai-msys.ps1 -lc 'cargo test-ci'` з `-j 1` (див. README) |
 | Admin 404 / порожній API | Запуск з `enterprise` (лаунчер робить це за замовчуванням) |
 
-**Last updated:** 2026-06-13 (PH-S145 poolai-http-stand-smoke)
+**Last updated:** 2026-06-14 (PH-S156 `--raid-restart`)

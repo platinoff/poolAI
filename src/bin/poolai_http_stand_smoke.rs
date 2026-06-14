@@ -7,8 +7,11 @@
 //! export POOLAI_BASE_URL=http://127.0.0.1:8080
 //! cargo run --bin poolai-http-stand-smoke
 //!
-//! # With e2e stand (RAID persist + restart.sh):
+//! # RAID persist + restart (replaces legacy Playwright jobs_raid, PH-S156):
 //! export POOLAI_E2E_STAND_ROOT=/tmp/poolai-e2e-NNN
+//! cargo run --bin poolai-http-stand-smoke -- --raid-restart
+//!
+//! # Full suite incl. raid restart:
 //! cargo run --bin poolai-http-stand-smoke -- --raid
 //!
 //! cargo run --bin poolai-http-stand-smoke -- --json
@@ -30,6 +33,7 @@ const VALID_PUBKEY: &str = "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU";
 struct Cli {
     json_out: bool,
     include_raid: bool,
+    raid_restart_only: bool,
     base_url: String,
 }
 
@@ -62,15 +66,22 @@ fn base_url_from_env() -> String {
 fn parse_cli() -> Cli {
     let mut json_out = false;
     let mut include_raid = false;
+    let mut raid_restart_only = false;
     for arg in std::env::args().skip(1) {
         match arg.as_str() {
             "--json" => json_out = true,
+            "--raid-restart" => raid_restart_only = true,
             "--raid" => include_raid = true,
             _ if arg.starts_with('-') => {}
             _ => {}
         }
     }
-    if !include_raid {
+    if !raid_restart_only {
+        raid_restart_only = std::env::var("POOLAI_STAND_SMOKE_RAID_RESTART")
+            .ok()
+            .is_some_and(|v| matches!(v.as_str(), "1" | "true" | "yes"));
+    }
+    if !include_raid && !raid_restart_only {
         include_raid = std::env::var("POOLAI_STAND_SMOKE_RAID")
             .ok()
             .is_some_and(|v| matches!(v.as_str(), "1" | "true" | "yes"));
@@ -78,6 +89,7 @@ fn parse_cli() -> Cli {
     Cli {
         json_out,
         include_raid,
+        raid_restart_only,
         base_url: base_url_from_env(),
     }
 }
@@ -403,6 +415,37 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
     let stand_root = std::env::var(ENV_STAND_ROOT).ok();
     let mut cases = Vec::new();
 
+    if cli.raid_restart_only {
+        match stand_root.as_deref() {
+            Some(root) => {
+                record(
+                    &mut cases,
+                    "jobs_raid_restart",
+                    smoke_jobs_raid(&client, &cli.base_url, root).await,
+                )
+                .await;
+            }
+            None => {
+                cases.push(SmokeCaseResult {
+                    name: "jobs_raid_restart",
+                    ok: false,
+                    detail: Some(format!("--raid-restart requires {ENV_STAND_ROOT}")),
+                });
+            }
+        }
+        let passed = cases.iter().filter(|c| c.ok).count() as u32;
+        let failed = cases.iter().filter(|c| !c.ok).count() as u32;
+        return SmokeReport {
+            base_url: cli.base_url.clone(),
+            stand_root,
+            ok: failed == 0,
+            passed,
+            failed,
+            cases,
+            tool: "poolai-http-stand-smoke",
+        };
+    }
+
     async fn record(
         cases: &mut Vec<SmokeCaseResult>,
         name: &'static str,
@@ -557,10 +600,10 @@ mod tests {
     }
 
     #[test]
-    fn parse_cli_json_flag() {
-        std::env::set_var("POOLAI_STAND_SMOKE_RAID", "0");
-        let args: Vec<String> = vec!["poolai-http-stand-smoke".into(), "--json".into()];
-        // parse_cli reads env::args - test helpers directly instead
-        assert!(args.iter().any(|a| a == "--json"));
+    fn parse_cli_raid_restart_flag() {
+        std::env::remove_var("POOLAI_STAND_SMOKE_RAID");
+        std::env::remove_var("POOLAI_STAND_SMOKE_RAID_RESTART");
+        let args: Vec<String> = vec!["poolai-http-stand-smoke".into(), "--raid-restart".into()];
+        assert!(args.iter().any(|a| a == "--raid-restart"));
     }
 }

@@ -1599,7 +1599,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S156",
+  "next_sprint": "PH-S157",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -4666,7 +4666,8 @@
       "layer": "L3",
       "path": "src/bin/poolai_http_stand_smoke.rs",
       "sprints": [
-        "PH-S145"
+        "PH-S145",
+        "PH-S156"
       ]
     },
     {
@@ -6956,7 +6957,7 @@
       "path": "src/ui/admin_theme.js"
     }
   ],
-  "revision": 88,
-  "updated_at": "2026-06-13",
+  "revision": 90,
+  "updated_at": "2026-06-14",
   "vision_ui_rev": 54
 }

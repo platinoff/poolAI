@@ -12,7 +12,7 @@
 |------|--------|
 | **Відкрито** | **9** — PH-S151…S159 (ratio stretch **96%** spirit) |
 | **Закрито PH-S128…S150** | Galaxy wire + ratio band A–E (audit, API→Rust, ui-core/wasm, slim e2e, CI advisory) |
-| **Після S159** | replenish §5.12 (≤10) · formal 90–95%, stretch **96%** |
+| **Після S165** | replenish §5.12 (≤10) · formal 90–95%, hold **96%** spirit |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
 
 ---
@@ -58,24 +58,25 @@
 
 ---
 
-## 3. Черга §5.12 (ratio stretch band PH-S151…S159)
+## 3. Черга §5.12 (ratio stretch + maintain band PH-S156…S165)
 
 | # | Sprint | Тема | Ratio / acceptance |
 |---|--------|------|-------------------|
-| — | **PH-S150** ✅ | CI ratio advisory | CI `rust-ratio-audit`; **92.00%** |
-| 1 | **PH-S151** | wasm grid-pricing wiring | slim JS; Playwright smoke |
-| 3 | **PH-S152** | wasm jobs lease display | slim `admin_common.js` |
-| 4 | **PH-S153** | admin_common → Rust/wasm | −≥400 LOC JS |
-| 5 | **PH-S154** | Admin i18n subset Rust | slim `i18n_core.js` |
-| 6 | **PH-S155** | ML charts → wasm | canvas glue only |
-| 7 | **PH-S156** | jobs_raid → Rust smoke | drop from `test:ci` |
-| 8 | **PH-S157** | topology SVG Rust | slim `topology_graph.js` |
-| 9 | **PH-S158** | `poolai-e2e-stand` bin | slim shell |
-| 10 | **PH-S159** | **96%** stretch gate | warn 93%; replenish |
+| — | **PH-S155** ✅ | ML charts → wasm | `poolai-ui-core/ml` + wasm |
+| 1 | **PH-S156** | jobs_raid → Rust smoke | drop from `test:ci` | **✅** |
+| 2 | **PH-S157** | topology SVG Rust | slim `topology_graph.js` |
+| 3 | **PH-S158** | `poolai-e2e-stand` bin | slim shell |
+| 4 | **PH-S159** | **96%** stretch gate | warn 93%; replenish post-S159 |
+| 5 | **PH-S160** | Admin theme → Rust | slim `admin_theme.js` |
+| 6 | **PH-S161** | Admin modal a11y → wasm | slim `admin_modal_a11y.js` |
+| 7 | **PH-S162** | Auth i18n subset Rust | slim `i18n_core.js` auth |
+| 8 | **PH-S163** | Galaxy trust metrics wire | Prometheus §6.5 |
+| 9 | **PH-S164** | Verify sampling apply | §6.1 HTTP stub |
+| 10 | **PH-S165** | **96%** hold gate | `--min-ratio 0.95`; replenish |
 
 Повна таблиця — FM **§5.12** · [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md).
 
-**Research горизонт (Galaxy wire):** §8.2 settlement · §5.3/§6 Prometheus — **після** ratio stretch S159 або Rust-only stubs.
+**Research горизонт (Galaxy wire):** §8.2 settlement — **після** maintain band S165 або Rust-only stubs у S163/S164.
 
 ---
 
@@ -87,8 +88,9 @@
 | Portable UI core | PH-S146…S147 | ui-core + wasm POC |
 | Slim browser E2E | PH-S148 | browser-only `test:ci` |
 | Gate + stretch | PH-S150 ✅…S159 | CI advisory → **96% spirit** |
+| Maintain + Galaxy wire | PH-S160…S165 | hold **96%**; UI slim + §6 stubs |
 
-**Baseline:** **92.00%** · [`rust_ratio.json`](./rust_ratio.json).
+**Baseline:** **92.19%** · [`rust_ratio.json`](./rust_ratio.json).
 
 ---
 

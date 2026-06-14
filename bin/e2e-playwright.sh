@@ -170,3 +170,8 @@ elif [[ "${CI:-}" == "true" ]]; then
 else
   npm test
 fi
+
+if [[ -n "${POOLAI_E2E_STAND_ROOT:-}" ]]; then
+  echo "==> PH-S156: RAID restart stand smoke (poolai-http-stand-smoke --raid-restart)"
+  cargo run --bin poolai-http-stand-smoke -- --raid-restart
+fi
