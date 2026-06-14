@@ -6,6 +6,10 @@ use chrono::{DateTime, Utc};
 use poolai_ui_core::api_error::{api_error_detail_from_body, format_fetch_error};
 use poolai_ui_core::format::escape_html;
 use poolai_ui_core::lease::lease_state;
+use poolai_ui_core::ml::{
+    chart_scale, collect_ml_sparkline_series, flatten_ml_step_rows, format_ml_metric_summary,
+    metric_point_values, parse_ml_numeric,
+};
 use poolai_ui_core::pricing::{format_unix_secs, format_usd_micro};
 use poolai_ui_core::table::{
     build_csv, build_json_export, compare_sort_values, empty_state_html, form_field_html,
@@ -113,10 +117,53 @@ pub fn highlight_query_html_wasm(original: &str, query: &str) -> String {
     highlight_query_html(original, query)
 }
 
+/// ML charts: `poolaiParseMlNumeric(val)`.
+#[wasm_bindgen(js_name = parseMlNumeric)]
+pub fn parse_ml_numeric_wasm(value: &str) -> Option<f64> {
+    parse_ml_numeric(empty_as_none(value))
+}
+
+/// ML charts: `poolaiFormatMlMetricSummary(output)`.
+#[wasm_bindgen(js_name = formatMlMetricSummary)]
+pub fn format_ml_metric_summary_wasm(output_json: &str) -> String {
+    let output: Value = serde_json::from_str(output_json).unwrap_or(Value::Null);
+    format_ml_metric_summary(&output)
+}
+
+/// ML charts: `poolaiMetricPointValues(data)`.
+#[wasm_bindgen(js_name = metricPointValues)]
+pub fn metric_point_values_wasm(data_json: &str) -> JsValue {
+    let data: Vec<Value> = serde_json::from_str(data_json).unwrap_or_default();
+    serde_wasm_bindgen::to_value(&metric_point_values(&data)).unwrap_or(JsValue::NULL)
+}
+
+/// ML charts: `poolaiChartScale(values, width, height, padding)`.
+#[wasm_bindgen(js_name = chartScale)]
+pub fn chart_scale_wasm(values_json: &str, width: f64, height: f64, padding: f64) -> JsValue {
+    let values: Vec<f64> = serde_json::from_str(values_json).unwrap_or_default();
+    serde_wasm_bindgen::to_value(&chart_scale(&values, width, height, padding))
+        .unwrap_or(JsValue::NULL)
+}
+
+/// ML charts: `poolaiFlattenMlStepRows(pipelines)`.
+#[wasm_bindgen(js_name = flattenMlStepRows)]
+pub fn flatten_ml_step_rows_wasm(pipelines_json: &str) -> JsValue {
+    let pipelines: Vec<Value> = serde_json::from_str(pipelines_json).unwrap_or_default();
+    serde_wasm_bindgen::to_value(&flatten_ml_step_rows(&pipelines)).unwrap_or(JsValue::NULL)
+}
+
+/// ML charts: `poolaiCollectMlSparklineSeries(rows)`.
+#[wasm_bindgen(js_name = collectMlSparklineSeries)]
+pub fn collect_ml_sparkline_series_wasm(rows_json: &str) -> JsValue {
+    let rows: Vec<poolai_ui_core::ml::MlStepRow> =
+        serde_json::from_str(rows_json).unwrap_or_default();
+    serde_wasm_bindgen::to_value(&collect_ml_sparkline_series(&rows)).unwrap_or(JsValue::NULL)
+}
+
 /// POC version string for smoke checks in browser devtools.
 #[wasm_bindgen(js_name = poolaiUiWasmVersion)]
 pub fn poolai_ui_wasm_version() -> String {
-    "poolai-ui-wasm/0.1.0-ph-s153".to_string()
+    "poolai-ui-wasm/0.1.0-ph-s155".to_string()
 }
 
 fn empty_as_none(s: &str) -> Option<&str> {
@@ -170,5 +217,20 @@ mod tests {
     fn table_csv_wasm_roundtrip() {
         let csv = build_table_csv_wasm(r#"["H"]"#, r#"[["x,y"]]"#);
         assert!(csv.contains("\"x,y\""));
+    }
+
+    #[test]
+    fn ml_metric_summary_wasm() {
+        assert_eq!(
+            format_ml_metric_summary_wasm(r#"{"accuracy":"0.9","status":"ok"}"#),
+            "accuracy=0.9"
+        );
+    }
+
+    #[test]
+    fn chart_scale_core_matches_wasm_shape() {
+        let scale = poolai_ui_core::ml::chart_scale(&[1.0, 3.0, 2.0], 100.0, 50.0, 4.0);
+        assert_eq!(scale.points.len(), 3);
+        assert!(scale.polyline.contains(','));
     }
 }

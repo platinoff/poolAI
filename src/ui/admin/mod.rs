@@ -77,13 +77,15 @@ pub fn create_admin_routes() -> Router<ApiContext> {
         .route("/admin/config", get(config::admin_config))
 }
 
-/// Shared ES module bootstrap for `poolai-ui-wasm` (PH-S152/S153).
+/// Shared ES module bootstrap for `poolai-ui-wasm` (PH-S152/S153/S155).
 pub const POOLAI_UI_WASM_MODULE: &str = r#"
 import init, {
   formatUsdMicro, formatUnixSecs, leaseStateLabel, poolaiUiWasmVersion,
   escapeHtml, apiErrorMessageFromBody, apiErrorDetailFromBody, formatFetchError,
   emptyStateHtml, renderTableHtml, formFieldHtml, buildTableCsv, buildTableJson,
   compareSortValues, rowMatchesQuery, highlightQueryHtml,
+  parseMlNumeric, formatMlMetricSummary, metricPointValues, chartScale,
+  flattenMlStepRows, collectMlSparklineSeries,
 } from '/ui/wasm/poolai_ui_wasm.js';
 window.poolaiUiWasm = {
   ready: false, failed: false,
@@ -91,6 +93,8 @@ window.poolaiUiWasm = {
   escapeHtml, apiErrorMessageFromBody, apiErrorDetailFromBody, formatFetchError,
   emptyStateHtml, renderTableHtml, formFieldHtml, buildTableCsv, buildTableJson,
   compareSortValues, rowMatchesQuery, highlightQueryHtml,
+  parseMlNumeric, formatMlMetricSummary, metricPointValues, chartScale,
+  flattenMlStepRows, collectMlSparklineSeries,
 };
 try {
   await init();
@@ -274,7 +278,9 @@ fn admin_charts_layer_exports() {
     assert!(js.contains("function poolaiStartMetricsPolling"));
     assert!(js.contains("function poolaiRenderMlPipelineMetricsPanel"));
     assert!(js.contains("function poolaiFetchMlPipelines"));
-    assert!(js.contains("POOLAI_ML_METRIC_KEYS"));
+    assert!(js.contains("poolaiChartsWasm"));
+    assert!(js.contains("chartScale"));
+    assert!(js.contains("flattenMlStepRows"));
 }
 
 #[tokio::test]

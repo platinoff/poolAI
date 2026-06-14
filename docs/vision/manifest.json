@@ -1566,7 +1566,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "3e1b4a28",
-  "last_sprint_closed": "PH-S154",
+  "last_sprint_closed": "PH-S155",
   "layers": [
     {
       "id": "L0",
@@ -1599,7 +1599,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S155",
+  "next_sprint": "PH-S156",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -6956,7 +6956,7 @@
       "path": "src/ui/admin_theme.js"
     }
   ],
-  "revision": 87,
+  "revision": 88,
   "updated_at": "2026-06-13",
   "vision_ui_rev": 54
 }

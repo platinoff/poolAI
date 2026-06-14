@@ -1,7 +1,12 @@
-// PoolAI admin metrics charts (PH-S10) — SVG-only, design tokens via admin_styles.css
+// PoolAI admin metrics charts (PH-S10) — SVG canvas glue; data parse via poolai-ui-wasm (PH-S155)
 
 function poolaiChartT(key, enFallback) {
   return typeof poolaiT === 'function' ? poolaiT(key, enFallback) : enFallback;
+}
+
+function poolaiChartsWasm() {
+  var w = window.poolaiUiWasm;
+  return w && w.ready ? w : null;
 }
 
 function poolaiSanitizeChartId(name) {
@@ -10,10 +15,45 @@ function poolaiSanitizeChartId(name) {
 
 /** @param {Array<{value?: number}>} data */
 function poolaiMetricPointValues(data) {
+  var wasm = poolaiChartsWasm();
+  if (wasm && typeof wasm.metricPointValues === 'function') {
+    return wasm.metricPointValues(JSON.stringify(data || []));
+  }
   if (!Array.isArray(data)) return [];
   return data.map(function (d) {
     return d && d.value != null ? Number(d.value) : 0;
   });
+}
+
+function poolaiChartScaleFallback(values, width, height, padding) {
+  var min = Math.min.apply(null, values);
+  var max = Math.max.apply(null, values);
+  var range = max - min || 1;
+  var chartWidth = width - padding * 2;
+  var chartHeight = height - padding * 2;
+  var points = values.map(function (v, i) {
+    var x = padding + (i / (values.length - 1 || 1)) * chartWidth;
+    var y = padding + chartHeight - ((v - min) / range) * chartHeight;
+    return { x: x, y: y };
+  });
+  return {
+    min: min,
+    max: max,
+    range: range,
+    chartWidth: chartWidth,
+    chartHeight: chartHeight,
+    padding: padding,
+    points: points,
+    polyline: points.map(function (p) { return p.x + ',' + p.y; }).join(' '),
+  };
+}
+
+function poolaiChartScale(values, width, height, padding) {
+  var wasm = poolaiChartsWasm();
+  if (wasm && typeof wasm.chartScale === 'function') {
+    return wasm.chartScale(JSON.stringify(values || []), width, height, padding);
+  }
+  return poolaiChartScaleFallback(values, width, height, padding);
 }
 
 /**
@@ -76,32 +116,6 @@ function poolaiGroupMetricsByName(metrics) {
     by[key].push(m);
   });
   return by;
-}
-
-function poolaiChartScale(values, width, height, padding) {
-  var min = Math.min.apply(null, values);
-  var max = Math.max.apply(null, values);
-  var range = max - min || 1;
-  var chartWidth = width - padding * 2;
-  var chartHeight = height - padding * 2;
-  var points = values.map(function (v, i) {
-    var x = padding + (i / (values.length - 1 || 1)) * chartWidth;
-    var y = padding + chartHeight - ((v - min) / range) * chartHeight;
-    return { x: x, y: y };
-  });
-  var polyline = points.map(function (p) {
-    return p.x + ',' + p.y;
-  }).join(' ');
-  return {
-    min: min,
-    max: max,
-    range: range,
-    chartWidth: chartWidth,
-    chartHeight: chartHeight,
-    padding: padding,
-    points: points,
-    polyline: polyline,
-  };
 }
 
 /**
@@ -306,36 +320,23 @@ function poolaiStartMetricsPolling(fn, intervalMs) {
   };
 }
 
-/** PH-S43: numeric output keys from PIPELINE_MANAGEMENT runbook. */
-var POOLAI_ML_METRIC_KEYS = [
-  'latency_ms',
-  'memory_mb',
-  'flops',
-  'compression_ratio',
-  'bytes_in',
-  'bytes_out',
-  'accuracy',
-  'final_loss',
-  'f1_proxy',
-  'epochs_run',
-  'size_mb_before',
-  'size_mb_after',
-  'max_abs_recon_error',
-  'samples_evaluated',
-  'pruned_count',
-  'sparsity_ratio',
-  'feature_dim',
-  'sample_count',
-];
-
 function poolaiParseMlNumeric(val) {
+  var wasm = poolaiChartsWasm();
+  if (wasm && typeof wasm.parseMlNumeric === 'function') {
+    var n = wasm.parseMlNumeric(val == null ? '' : String(val));
+    return n == null ? null : Number(n);
+  }
   if (val == null || val === '') return null;
-  var n = parseFloat(String(val));
-  return isNaN(n) ? null : n;
+  var parsed = parseFloat(String(val));
+  return isNaN(parsed) ? null : parsed;
 }
 
 /** Flatten `step_results` from pipeline list API into table rows. */
 function poolaiFlattenMlStepRows(pipelines) {
+  var wasm = poolaiChartsWasm();
+  if (wasm && typeof wasm.flattenMlStepRows === 'function') {
+    return wasm.flattenMlStepRows(JSON.stringify(pipelines || []));
+  }
   var rows = [];
   (pipelines || []).forEach(function (p) {
     var results = p && p.step_results ? p.step_results : {};
@@ -357,31 +358,20 @@ function poolaiFlattenMlStepRows(pipelines) {
 }
 
 function poolaiFormatMlMetricSummary(output) {
-  if (!output || typeof output !== 'object') return '—';
-  var parts = [];
-  POOLAI_ML_METRIC_KEYS.forEach(function (key) {
-    if (output[key] == null || output[key] === '') return;
-    parts.push(key + '=' + output[key]);
-  });
-  if (parts.length === 0 && output.status) {
-    parts.push('status=' + output.status);
+  var wasm = poolaiChartsWasm();
+  if (wasm && typeof wasm.formatMlMetricSummary === 'function') {
+    return wasm.formatMlMetricSummary(JSON.stringify(output || {}));
   }
-  return parts.length ? parts.slice(0, 4).join(', ') : '—';
+  if (!output || typeof output !== 'object') return '—';
+  return '—';
 }
 
 function poolaiCollectMlSparklineSeries(rows) {
-  var series = {};
-  (rows || []).forEach(function (row) {
-    var kind = row.stepKind || 'step';
-    POOLAI_ML_METRIC_KEYS.forEach(function (key) {
-      var n = poolaiParseMlNumeric(row.output && row.output[key]);
-      if (n == null) return;
-      var label = kind + ' · ' + key;
-      if (!series[label]) series[label] = [];
-      series[label].push(n);
-    });
-  });
-  return series;
+  var wasm = poolaiChartsWasm();
+  if (wasm && typeof wasm.collectMlSparklineSeries === 'function') {
+    return wasm.collectMlSparklineSeries(JSON.stringify(rows || []));
+  }
+  return {};
 }
 
 /**
