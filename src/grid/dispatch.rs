@@ -17,6 +17,7 @@ use crate::grid::galaxy_replay_metrics::evaluate_result_replay_pending;
 use crate::grid::galaxy_replication::{
     replication_tier_from_policy, ReplicationTierConfig, REPLICATION_STANDARD, REPLICATION_STRICT,
 };
+use crate::grid::galaxy_replication_metrics::evaluate_job_replication_strict;
 use crate::grid::galaxy_settlement::{resolve_settlement_status, SettlementStatus};
 use crate::grid::galaxy_settlement_metrics::evaluate_result_settlement_pending_verification;
 use crate::grid::galaxy_trust_score::{
@@ -296,11 +297,13 @@ fn ingest_job(
     let row = jobs
         .get(&job_id)?
         .ok_or_else(|| AppError::InternalError("job missing after grid ingest".into()))?;
+    let replication_tier = replication_tier_from_policy(body.verification_policy.as_deref());
+    evaluate_job_replication_strict(replication_tier);
     Ok(GridIngestOutcome {
         kind: GridIngestKind::Job {
             job_id,
             status: row.status,
-            replication_tier: replication_tier_from_policy(body.verification_policy.as_deref()),
+            replication_tier,
         },
     })
 }
@@ -464,6 +467,32 @@ mod tests {
             } => assert_eq!(replication_tier, REPLICATION_STRICT),
             other => panic!("expected Job kind, got {other:?}"),
         }
+    }
+
+    #[test]
+    fn ingest_job_wire_records_replication_strict_metric_ph_s179() {
+        use crate::grid::galaxy_replication_metrics::{
+            replication_metrics_test_lock, replication_strict_total,
+            reset_replication_strict_metrics_for_test,
+        };
+
+        let _lock = replication_metrics_test_lock();
+        reset_replication_strict_metrics_for_test();
+        let jobs = JobStore::open_for_test(None);
+        let memory = MemoryShardStore::open_for_test(None);
+        let env = GridEnvelope::new(
+            GridMessage::Job(GridJobBody {
+                job_id: "grid-job-strict-metric".into(),
+                task_kind: "inference".into(),
+                verification_policy: Some("replication_strict".into()),
+                input_artifact_ids: vec![],
+                deadline: None,
+            }),
+            None,
+        );
+        ingest_envelope(env, &jobs, &memory).expect("ingest");
+        assert_eq!(replication_strict_total(), 1);
+        reset_replication_strict_metrics_for_test();
     }
 
     #[test]

@@ -839,6 +839,7 @@ elif verdict == rejected:
 | `galaxy_verification_mismatch_total` | ✅ `/metrics` | PH-S175 |
 | `galaxy_replay_pending` | ✅ `/metrics` | PH-S176 |
 | `galaxy_settlement_pending_verification_total` | ✅ `/metrics` | PH-S178 |
+| `galaxy_replication_strict_total` | ✅ `/metrics` | PH-S179 |
 | `galaxy_trust_score` | черга | PH-S182 |
 | `galaxy_verification_sample_scheduled_total` | in-process (PH-S164); `/metrics` черга | PH-S186 |
 | `galaxy_settlement_cleared_total` | черга | PH-S187 |

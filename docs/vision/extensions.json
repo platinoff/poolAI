@@ -1,7 +1,7 @@
 {
   "revision": 62,
   "updated_at": "2026-06-14",
-  "active_sprint": "PH-S179",
+  "active_sprint": "PH-S180",
   "ui_version": 4,
   "extension_policy": {
     ".md": {
@@ -312,7 +312,8 @@
         "src/pool/topology_graph.rs",
         "src/network/api/topology.rs",
         "src/grid/galaxy_trust_score.rs",
-        "src/grid/galaxy_settlement_metrics.rs",
+        "src/grid/galaxy_replication_metrics.rs",
+        "tests/galaxy_replication_strict_integration.rs",
         "tests/galaxy_settlement_pending_verification_integration.rs",
         "src/grid/galaxy_verify_sampling.rs",
         "crates/poolai-ui-core/src/design_tokens.rs",

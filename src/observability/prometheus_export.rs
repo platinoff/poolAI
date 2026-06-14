@@ -33,6 +33,9 @@ use crate::grid::galaxy_pricing_provider_metrics::{
     METRIC_PROVIDER_ERRORS_TOTAL,
 };
 use crate::grid::galaxy_replay_metrics::{replay_pending, METRIC_REPLAY_PENDING};
+use crate::grid::galaxy_replication_metrics::{
+    replication_strict_total, METRIC_REPLICATION_STRICT_TOTAL,
+};
 use crate::grid::galaxy_settlement_metrics::{
     settlement_pending_verification_total, METRIC_SETTLEMENT_PENDING_VERIFICATION_TOTAL,
 };
@@ -76,6 +79,7 @@ pub struct PoolAiPrometheus {
     galaxy_verification_sample_total: IntGauge,
     galaxy_replay_pending: IntGauge,
     galaxy_settlement_pending_verification_total: IntGauge,
+    galaxy_replication_strict_total: IntGauge,
 }
 
 static PROMETHEUS: OnceLock<PoolAiPrometheus> = OnceLock::new();
@@ -347,6 +351,15 @@ fn build_prometheus() -> PoolAiPrometheus {
         ))
         .expect("register galaxy_settlement_pending_verification_total");
 
+    let galaxy_replication_strict_total = IntGauge::with_opts(Opts::new(
+        METRIC_REPLICATION_STRICT_TOTAL,
+        "Galaxy replication strict tier grid job ingests (PH-S179)",
+    ))
+    .expect(METRIC_REPLICATION_STRICT_TOTAL);
+    registry
+        .register(Box::new(galaxy_replication_strict_total.clone()))
+        .expect("register galaxy_replication_strict_total");
+
     #[cfg(target_os = "linux")]
     {
         let collector = prometheus::process_collector::ProcessCollector::for_self();
@@ -383,6 +396,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_verification_sample_total,
         galaxy_replay_pending,
         galaxy_settlement_pending_verification_total,
+        galaxy_replication_strict_total,
     }
 }
 
@@ -439,6 +453,13 @@ pub fn refresh_galaxy_verification_gauges() {
         .set(settlement_pending_verification_total() as i64);
 }
 
+/// Mirror in-process replication tier counters into Prometheus gauges (scrape snapshot).
+pub fn refresh_galaxy_replication_gauges() {
+    let prom = init_prometheus();
+    prom.galaxy_replication_strict_total
+        .set(replication_strict_total() as i64);
+}
+
 /// Record a secret rotation attempt (called from `security::secret_rotation`).
 pub fn record_secret_rotation(kind: &str, success: bool) {
     let prom = init_prometheus();
@@ -467,6 +488,7 @@ pub async fn refresh_scrape_gauges(ctx: &ApiContext) {
     refresh_galaxy_trust_gauges();
     refresh_galaxy_prefetch_gauges();
     refresh_galaxy_verification_gauges();
+    refresh_galaxy_replication_gauges();
     prom.uptime_seconds
         .set(crate::version::get_uptime_seconds() as i64);
     prom.build_info.set(1);
@@ -773,5 +795,21 @@ mod tests {
         assert!(body.contains(METRIC_SETTLEMENT_PENDING_VERIFICATION_TOTAL));
         assert!(body.contains(&format!("{METRIC_SETTLEMENT_PENDING_VERIFICATION_TOTAL} 1")));
         reset_settlement_pending_verification_metrics_for_test();
+    }
+
+    #[test]
+    fn galaxy_replication_strict_gauge_reflects_counter_ph_s179() {
+        use crate::grid::galaxy_replication_metrics::{
+            record_replication_strict_ingest, reset_replication_strict_metrics_for_test,
+        };
+
+        reset_replication_strict_metrics_for_test();
+        init_prometheus();
+        record_replication_strict_ingest();
+        refresh_galaxy_replication_gauges();
+        let body = encode_metrics_text().expect("encode");
+        assert!(body.contains(METRIC_REPLICATION_STRICT_TOTAL));
+        assert!(body.contains(&format!("{METRIC_REPLICATION_STRICT_TOTAL} 1")));
+        reset_replication_strict_metrics_for_test();
     }
 }

@@ -14,6 +14,7 @@ pub mod galaxy_pricing_oracle;
 pub mod galaxy_pricing_provider_metrics;
 pub mod galaxy_replay_metrics;
 pub mod galaxy_replication;
+pub mod galaxy_replication_metrics;
 pub mod galaxy_settlement;
 pub mod galaxy_settlement_metrics;
 pub mod galaxy_trust_score;
