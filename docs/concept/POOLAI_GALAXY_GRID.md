@@ -837,7 +837,7 @@ elif verdict == rejected:
 
 **Roadmap (не PH-S62):** ZK / TEE attestation, signed capability documents, on-chain fraud proof — окремий спринт після стабільного baseline.
 
-**Код-орієнтири (наявне):** `complete_task` + lease CAS (концепт §4.3); `raid_artifact_probe` у `virtual_node_executor`; distributed RAID replication — FM-008 (інфра, не edge logic).
+**Код-орієнтири (наявне):** `complete_task` + lease CAS (концепт §4.3); `raid_artifact_probe` у `virtual_node_executor`; distributed RAID replication — FM-008 (інфра, не edge logic). **Replication tiers (PH-S171):** `src/grid/galaxy_replication.rs` — `replication_strict` 3-of-3 config + quorum stub on grid job ingest.
 
 ## 7. On-chain події, settlement та аудит
 

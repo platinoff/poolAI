@@ -1622,6 +1622,12 @@
       "from": "galaxy_grid",
       "kind": "implements",
       "to": "src_grid_galaxy_settlement_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_replication_rs"
     }
   ],
   "galaxy_background": "vision2.png",
@@ -1659,7 +1665,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S171",
+  "next_sprint": "PH-S172",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7139,9 +7145,16 @@
       "label": "galaxy_settlement.rs",
       "layer": "L3",
       "path": "src/grid/galaxy_settlement.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_replication_rs",
+      "label": "galaxy_replication.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_replication.rs"
     }
   ],
-  "revision": 106,
+  "revision": 107,
   "updated_at": "2026-06-14",
   "vision_ui_rev": 54
 }
