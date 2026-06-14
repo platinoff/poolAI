@@ -85,7 +85,7 @@ flowchart TB
 | **E — gate** | PH-S150 ✅ | CI advisory якщо ratio <88%; target 93%; stretch 96% spirit | стабільно 90–95% |
 | **F — stretch 96%** | PH-S151…S159 ✅ | wasm wiring, slim JS/i18n/charts, Rust stand/e2e bins; CI warn **93%** | **→96% spirit** |
 
-**Черга §5.12 (10 відкритих):** PH-S172…S176 — post-S171 replenish; replenish після S176.
+**Черга §5.12 (10 відкритих):** PH-S173…S177 — post-S172 replenish; replenish після S177.
 
 ---
 
@@ -121,11 +121,12 @@ flowchart TB
 | 26 | **PH-S169** | Locality stale profile penalty | `stale_network_profile_penalty` stub | **✅** |
 | 27 | **PH-S170** | Galaxy settlement pending_verification stub | `SettlementStatus` on grid result | **✅** |
 | 28 | **PH-S171** | Galaxy replication strict tier stub | §6.3 `replication_strict` config | **✅** |
-| 29 | **PH-S172** | Galaxy pricing provider catalog metrics stub | §4.2 provider hits | відкрито |
+| 29 | **PH-S172** | Galaxy pricing provider catalog metrics stub | §4.2 catalog hits | **✅** |
 | 30 | **PH-S173** | Galaxy pricing provider errors metrics stub | §4.2 provider fetch fail | відкрито |
 | 31 | **PH-S174** | Galaxy pricing quote usd_micro metrics stub | §4.2 last quote gauge | відкрито |
 | 32 | **PH-S175** | Galaxy verification mismatch metrics stub | §6.2 mismatch counter | відкрито |
 | 33 | **PH-S176** | Galaxy replay pending metrics stub | §6.3 replay pending gauge | відкрито |
+| 34 | **PH-S177** | Galaxy verification sample total metrics stub | §6.2 sample counter | відкрито |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 

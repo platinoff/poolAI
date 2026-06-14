@@ -1628,6 +1628,12 @@
       "from": "galaxy_grid",
       "kind": "implements",
       "to": "src_grid_galaxy_replication_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_pricing_provider_metrics_rs"
     }
   ],
   "galaxy_background": "vision2.png",
@@ -1665,7 +1671,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S172",
+  "next_sprint": "PH-S173",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7152,9 +7158,23 @@
       "label": "galaxy_replication.rs",
       "layer": "L3",
       "path": "src/grid/galaxy_replication.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_pricing_provider_metrics_rs",
+      "label": "galaxy_pricing_provider_metrics.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_pricing_provider_metrics.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_pricing_provider_catalog_metrics_integration_rs",
+      "label": "galaxy_pricing_provider_catalog_metrics_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_pricing_provider_catalog_metrics_integration.rs"
     }
   ],
-  "revision": 107,
+  "revision": 108,
   "updated_at": "2026-06-14",
   "vision_ui_rev": 54
 }
