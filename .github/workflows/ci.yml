@@ -199,7 +199,7 @@ jobs:
         run: cargo run --bin poolai-openapi-gap-audit
 
   rust-ratio-audit:
-    name: Rust LOC ratio advisory (PH-S150)
+    name: Rust LOC ratio stretch gate (PH-S159)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -221,10 +221,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-rust-ratio-
 
-      - name: Product code Rust share (advisory)
+      - name: Product code Rust share (stretch advisory)
         run: >
           cargo run --bin poolai-loc-audit --
-          --warn-below 0.88
+          --warn-below 0.93
           --target 0.93
           --stretch 0.96
           --advisory

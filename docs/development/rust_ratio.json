@@ -1,20 +1,20 @@
 {
   "generated_at": "2026-06-14",
-  "sprint": "PH-S150",
+  "sprint": "PH-S159",
   "formal_band_min": 0.9,
   "formal_band_max": 0.95,
-  "warn_below": 0.88,
+  "warn_below": 0.93,
   "target_ratio": 0.93,
   "stretch_spirit": 0.96,
   "advisory_mode": false,
   "min_ratio": 0.91,
-  "rust_loc": 109320,
+  "rust_loc": 109834,
   "non_rust_product_loc": 8968,
-  "product_loc_total": 118288,
-  "rust_ratio": 0.9241850399026106,
-  "rust_ratio_pct": 92.41850399026106,
+  "product_loc_total": 118802,
+  "rust_ratio": 0.9245130553357688,
+  "rust_ratio_pct": 92.45130553357687,
   "in_formal_band": true,
-  "below_warn_threshold": false,
+  "below_warn_threshold": true,
   "below_target": true,
   "below_stretch_spirit": true,
   "meets_min_ratio": true,
@@ -40,8 +40,8 @@
       "loc": 3393
     },
     "rust_src": {
-      "files": 231,
-      "loc": 83567
+      "files": 232,
+      "loc": 84081
     },
     "rust_tests": {
       "files": 112,
@@ -59,6 +59,6 @@
   "notes": [
     "Denominator: product code only (strategy §1); docs/yaml/png excluded",
     "GitHub Languages bar is heuristic; this report uses git-tracked LOC buckets",
-    "PH-S150: CI --advisory warns below warn_below; stretch spirit documented via --stretch"
+    "PH-S159: CI --advisory warns below 93%; stretch spirit 96% via --stretch"
   ]
 }

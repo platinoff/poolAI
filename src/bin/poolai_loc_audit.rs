@@ -1,10 +1,10 @@
-//! LOC ratio baseline audit (PH-S143, PH-S150 CI advisory) per
+//! LOC ratio baseline audit (PH-S143, PH-S150 advisory, PH-S159 stretch gate) per
 //! [`docs/development/RUST_RATIO_STRATEGY_2026-06-13.md`].
 //!
 //! ```text
 //! cargo run --bin poolai-loc-audit
 //! cargo run --bin poolai-loc-audit -- --output docs/development/rust_ratio.json
-//! cargo run --bin poolai-loc-audit -- --warn-below 0.88 --target 0.93 --stretch 0.96 --advisory
+//! cargo run --bin poolai-loc-audit -- --warn-below 0.93 --target 0.93 --stretch 0.96 --advisory
 //! cargo run --bin poolai-loc-audit -- --min-ratio 0.91
 //! ```
 
@@ -18,10 +18,10 @@ use std::process::{Command, ExitCode};
 const DEFAULT_OUTPUT: &str = "docs/development/rust_ratio.json";
 const FORMAL_BAND_MIN: f64 = 0.90;
 const FORMAL_BAND_MAX: f64 = 0.95;
-const DEFAULT_WARN_BELOW: f64 = 0.88;
+const DEFAULT_WARN_BELOW: f64 = 0.93;
 const DEFAULT_TARGET: f64 = 0.93;
 const DEFAULT_STRETCH: f64 = 0.96;
-const SPRINT: &str = "PH-S150";
+const SPRINT: &str = "PH-S159";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize)]
 #[serde(rename_all = "snake_case")]
@@ -74,7 +74,7 @@ struct AuditConfig {
     warn_below: f64,
     target: f64,
     stretch: f64,
-    /// When true, ratio below `warn_below` prints a warning but exits 0 (PH-S150 CI advisory).
+    /// When true, ratio below `warn_below` prints a warning but exits 0 (PH-S159 CI stretch advisory).
     advisory: bool,
     /// Optional regression floor (e.g. 0.91 after PH-S148 baseline).
     min_ratio: Option<f64>,
@@ -265,7 +265,7 @@ fn print_help() {
            --target RATIO        stretch-band target (default {DEFAULT_TARGET})\n\
            --stretch RATIO       spirit goal (default {DEFAULT_STRETCH})\n\
            --min-ratio RATIO     fail if ratio below floor (regression gate)\n\
-           --advisory            warn below --warn-below but exit 0 (PH-S150 CI)\n\
+           --advisory            warn below --warn-below but exit 0 (PH-S159 CI)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -347,7 +347,7 @@ fn build_report(
         notes: vec![
             "Denominator: product code only (strategy §1); docs/yaml/png excluded",
             "GitHub Languages bar is heuristic; this report uses git-tracked LOC buckets",
-            "PH-S150: CI --advisory warns below warn_below; stretch spirit documented via --stretch",
+            "PH-S159: CI --advisory warns below 93%; stretch spirit 96% via --stretch",
         ],
     })
 }
@@ -396,7 +396,7 @@ fn emit_threshold_messages(report: &RustRatioReport) {
     }
     if report.below_target {
         eprintln!(
-            "note: ratio {:.2}% is below PH-S150 target {:.0}% (stretch band toward 96% spirit)",
+            "note: ratio {:.2}% is below PH-S159 target {:.0}% (stretch band toward 96% spirit)",
             report.rust_ratio_pct,
             report.target_ratio * 100.0
         );
@@ -425,6 +425,10 @@ fn exit_for_thresholds(report: &RustRatioReport) -> ExitCode {
             report.min_ratio.unwrap_or(0.0) * 100.0
         );
         return ExitCode::from(1);
+    }
+    // Explicit --min-ratio regression gate: meeting the floor passes even below warn_below.
+    if report.meets_min_ratio == Some(true) {
+        return ExitCode::SUCCESS;
     }
     if report.below_warn_threshold && !report.advisory_mode {
         eprintln!(
@@ -563,6 +567,29 @@ mod tests {
         )
         .expect("report");
         assert_eq!(report.meets_min_ratio, Some(false));
+    }
+
+    #[test]
+    fn min_ratio_gate_passes_despite_warn_below() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let root = dir.path();
+        let files = vec!["src/a.rs".to_string(), "src/ui/x.js".to_string()];
+        fs::create_dir_all(root.join("src")).unwrap();
+        fs::write(root.join("src/a.rs"), "line\n".repeat(9)).unwrap();
+        fs::create_dir_all(root.join("src/ui")).unwrap();
+        fs::write(root.join("src/ui/x.js"), "a\n").unwrap();
+        let report = build_report(
+            root,
+            &files,
+            AuditConfig {
+                min_ratio: Some(0.5),
+                ..AuditConfig::default()
+            },
+        )
+        .expect("report");
+        assert_eq!(report.meets_min_ratio, Some(true));
+        assert!(report.below_warn_threshold);
+        assert_eq!(exit_for_thresholds(&report), ExitCode::SUCCESS);
     }
 
     #[test]

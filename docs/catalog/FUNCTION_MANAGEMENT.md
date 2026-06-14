@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-14 (PH-S158 ✅ · §5.12 **9** відкритих PH-S159…S165 · rust_ratio **92.42%** · stretch **96%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-14 (PH-S159 ✅ · §5.12 **10** відкритих PH-S160…S169 · rust_ratio **92.42%** · stretch **96%**) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -358,21 +358,25 @@ FM-xxx (з таблиці нижче)
 | 91 | **PH-S156** | `jobs_raid` e2e → Rust stand smoke (tests) | PH-S145 | `poolai-http-stand-smoke --raid-restart`; прибрати `jobs_raid` з `test:ci` | **✅** |
 | 92 | **PH-S157** | topology SVG from Rust (code) | `topology.rs` | masked topology data з Rust; slim `topology_graph.js` | **✅** |
 | 93 | **PH-S158** | `poolai-e2e-stand` Rust bin (code) | PH-S145 | stand start/restart/env у Rust bin; slim `bin/e2e-playwright.sh` | **✅** |
-| 94 | **PH-S159** | Ratio **96%** stretch CI gate (ops) | PH-S150…S158 | `poolai-loc-audit` warn **93%**, stretch **96%**; FM replenish post-S159 band | відкрито |
+| 94 | **PH-S159** | Ratio **96%** stretch CI gate (ops) | PH-S150…S158 | `poolai-loc-audit` warn **93%**, stretch **96%**; FM replenish post-S159 band | **✅** |
 | 95 | **PH-S160** | Admin theme normalize → Rust (code) | PH-S153 `admin_theme.js` | `poolaiNormalizeTheme` + token map у `poolai-ui-core`; slim `admin_theme.js` | відкрито |
 | 96 | **PH-S161** | Admin modal a11y → wasm (code) | PH-S153 `admin_modal_a11y.js` | focus-trap / modal helpers у ui-core/wasm; slim modal JS | відкрито |
 | 97 | **PH-S162** | Auth i18n subset Rust (code) | PH-S154 pattern | login/dashboard shell keys у `i18n.rs`; slim `i18n_core.js` auth block | відкрито |
 | 98 | **PH-S163** | Galaxy trust metrics wire (code) | PH-S137, Galaxy §6.5 | trust gate Prometheus на grid result path; unit tests | відкрито |
 | 99 | **PH-S164** | Verify sampling env apply (code) | PH-S142, Galaxy §6.1 | `galaxy_verify_sampling` у HTTP/grid middleware stub; tests | відкрито |
 | 100 | **PH-S165** | Ratio **96%** hold band gate (ops) | PH-S159…S164 | CI `--min-ratio 0.95`; maintain spirit **96%**; replenish §5.12 next band | відкрито |
+| 101 | **PH-S166** | Design tokens CSS → Rust (code) | PH-S160, `design_tokens.css` | CSS var map у `poolai-ui-core`; slim `design_tokens.css` / `admin_styles.css` | відкрито |
+| 102 | **PH-S167** | Galaxy prefetch metrics stub (code) | PH-S129, Galaxy §5.5 | Prometheus counters on `plan_prefetch`; unit tests; no live enqueue | відкрито |
+| 103 | **PH-S168** | Galaxy pricing cache age /metrics (code) | PH-S89, Galaxy §4.2 | `galaxy_pricing_cache_age_seconds` gauge on GET /metrics; unit tests | відкрито |
+| 104 | **PH-S169** | Locality stale profile penalty stub (code) | Galaxy §8.1 | `stale_network_profile_penalty` у `galaxy_locality.rs`; unit tests | відкрито |
 
-**Відкритих у §5.12:** **9** (PH-S159…S165). **Закрито смуга:** PH-S128…S158 ✅. Vision rev **92**. **Baseline:** rust_ratio **92.42%** → **stretch spirit 96%** ([`rust_ratio.json`](../development/rust_ratio.json), [`RUST_RATIO_STRATEGY_2026-06-13.md`](../development/RUST_RATIO_STRATEGY_2026-06-13.md)).
+**Відкритих у §5.12:** **10** (PH-S160…S169). **Закрито смуга:** PH-S128…S159 ✅. Vision rev **93**. **Baseline:** rust_ratio **92.42%** → **stretch spirit 96%** ([`rust_ratio.json`](../development/rust_ratio.json), [`RUST_RATIO_STRATEGY_2026-06-13.md`](../development/RUST_RATIO_STRATEGY_2026-06-13.md)).
 
-**Rust ratio:** формальна смуга **90–95%**; **spirit 96%** — PH-S157…S159 закривають stretch band; PH-S160…S165 — maintain + Galaxy wire stubs; replenish після S165.
+**Rust ratio:** формальна смуга **90–95%**; **spirit 96%** — PH-S159 ✅ stretch CI gate (warn **93%**); PH-S160…S165 maintain + Galaxy wire stubs; PH-S166…S169 post-S159 replenish; replenish після S169.
 
-### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S165)
+### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S169)
 
-Рядки **PH-S150…S165** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
+Рядки **PH-S150…S169** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 
@@ -487,7 +491,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **PH-S159** · черга **9** відкритих (PH-S159…S165) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S160** · черга **10** відкритих (PH-S160…S169) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

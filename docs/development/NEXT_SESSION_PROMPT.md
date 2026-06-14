@@ -1,39 +1,42 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-14 · PH-S158 ✅ · vision **rev 92** · **9** відкритих (PH-S159…S165) · **stretch spirit 96%**
+**Оновлено:** 2026-06-14 · PH-S159 ✅ · vision **rev 93** · **10** відкритих (PH-S160…S169) · **stretch spirit 96%**
 
-| **← наступний** | **PH-S159** — Ratio **96%** stretch CI gate |
-| **Відкритих** | **9** (PH-S159…S165) |
+| **← наступний** | **PH-S160** — Admin theme normalize → Rust |
+| **Відкритих** | **10** (PH-S160…S169) |
 | **VDT** | один PH-S* = 1 commit |
 
 ---
 
-## Зріз §5.12 (9 відкритих: stretch S159 + maintain S160…S165)
+## Зріз §5.12 (10 відкритих: maintain S160…S165 + replenish S166…S169)
 
 ### Закрито недавно ✅
 
 | Sprint | Scope | Зріз |
 |--------|-------|------|
+| PH-S159 | Ratio **96%** stretch CI gate | CI `--warn-below 0.93`; stretch **96%**; replenish S166…S169 |
 | PH-S158 | `poolai-e2e-stand` | Rust stand start/restart/stop; slim `e2e-playwright.sh` |
 | PH-S157 | topology SVG Rust | `GET /topology/graph`; slim `topology_graph.js` |
-| PH-S156 | jobs_raid → Rust smoke | `--raid-restart` |
-
-### Відкрито — stretch (PH-S159)
-
-| # | Sprint | Scope | Acceptance |
-|---|--------|-------|------------|
-| 1 | **PH-S159** | **96%** stretch gate | warn **93%**; stretch **96%**; replenish post-S159 |
 
 ### Відкрито — maintain (PH-S160…S165)
 
 | # | Sprint | Scope |
 |---|--------|-------|
-| 2 | **PH-S160** | Admin theme → Rust |
-| 3 | **PH-S161** | Admin modal a11y → wasm |
-| 4 | **PH-S162** | Auth i18n subset Rust |
-| 5 | **PH-S163** | Galaxy trust metrics wire |
-| 6 | **PH-S164** | Verify sampling apply |
-| 7 | **PH-S165** | **96%** hold gate |
+| 1 | **PH-S160** | Admin theme → Rust |
+| 2 | **PH-S161** | Admin modal a11y → wasm |
+| 3 | **PH-S162** | Auth i18n subset Rust |
+| 4 | **PH-S163** | Galaxy trust metrics wire |
+| 5 | **PH-S164** | Verify sampling apply |
+| 6 | **PH-S165** | **96%** hold gate |
+
+### Відкрито — post-S159 replenish (PH-S166…S169)
+
+| # | Sprint | Scope |
+|---|--------|-------|
+| 7 | **PH-S166** | Design tokens CSS → Rust |
+| 8 | **PH-S167** | Galaxy prefetch metrics stub |
+| 9 | **PH-S168** | Galaxy pricing cache age /metrics |
+| 10 | **PH-S169** | Locality stale profile penalty stub |
 
 ---
 
@@ -50,23 +53,22 @@ export K8S_OPENAPI_ENABLED_VERSION=1.28
 
 ---
 
-## PH-S159 — scope
+## PH-S160 — scope
 
-- `poolai-loc-audit` warn **93%**, stretch **96%** у CI/docs
-- FM replenish post-S159 band
-- Acceptance: `cargo test-ci`; loc-audit; FM/HANDOFF/NEXT/vision; push
+- `poolaiNormalizeTheme` + token map у `poolai-ui-core`; slim `admin_theme.js`
+- Acceptance: `cargo test-ci`; Playwright admin smoke; FM/HANDOFF/NEXT/vision; push
 
 ---
 
-## Copy-paste — PH-S159
+## Copy-paste — PH-S160
 
 ```
-PoolAI — спринт PH-S159 (один PH-S*, VDT ітераційно).
+PoolAI — спринт PH-S160 (один PH-S*, VDT ітераційно).
 HANDOFF: docs/development/HANDOFF_NEW_SESSION.md
 FM §5.12: docs/catalog/FUNCTION_MANAGEMENT.md
 
-Спринт PH-S159 — 96% stretch CI gate
-Scope: poolai-loc-audit warn 93% / stretch 96%; CI + docs; replenish §5.12
+Спринт PH-S160 — Admin theme normalize → Rust
+Scope: poolaiNormalizeTheme + token map у poolai-ui-core; slim admin_theme.js
 
-Acceptance: cargo fmt; cargo test-ci; loc-audit; FM/HANDOFF/NEXT/vision; git push main
+Acceptance: cargo fmt; cargo test-ci; FM/HANDOFF/NEXT/vision; git push main
 ```

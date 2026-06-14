@@ -1,6 +1,6 @@
 # Galaxy Grid — роадмеп розробки (PoolAI)
 
-**Оновлено:** 2026-06-13 · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**9** відкритих PH-S151…S159)
+**Оновлено:** 2026-06-14 · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**10** відкритих PH-S160…S169)
 
 Операційний зріз сесій: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) · старт наступної: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)
 
@@ -10,9 +10,9 @@
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **9** — PH-S151…S159 (ratio stretch **96%** spirit) |
-| **Закрито PH-S128…S150** | Galaxy wire + ratio band A–E (audit, API→Rust, ui-core/wasm, slim e2e, CI advisory) |
-| **Після S165** | replenish §5.12 (≤10) · formal 90–95%, hold **96%** spirit |
+| **Відкрито** | **10** — PH-S160…S169 (maintain + post-S159 replenish) |
+| **Закрито PH-S128…S159** | Galaxy wire + ratio band A–F (audit, API→Rust, ui-core/wasm, slim e2e, CI stretch gate) |
+| **Після S169** | replenish §5.12 (≤10) · formal 90–95%, hold **96%** spirit |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
 
 ---
@@ -58,21 +58,21 @@
 
 ---
 
-## 3. Черга §5.12 (ratio stretch + maintain band PH-S156…S165)
+## 3. Черга §5.12 (maintain S160…S165 + replenish S166…S169)
 
 | # | Sprint | Тема | Ratio / acceptance |
 |---|--------|------|-------------------|
-| — | **PH-S155** ✅ | ML charts → wasm | `poolai-ui-core/ml` + wasm |
-| 1 | **PH-S156** | jobs_raid → Rust smoke | drop from `test:ci` | **✅** |
-| 2 | **PH-S157** | topology SVG Rust | slim `topology_graph.js` | **✅** |
-| 3 | **PH-S158** | `poolai-e2e-stand` bin | slim shell | **✅** |
-| 4 | **PH-S159** | **96%** stretch gate | warn 93%; replenish post-S159 |
-| 5 | **PH-S160** | Admin theme → Rust | slim `admin_theme.js` |
-| 6 | **PH-S161** | Admin modal a11y → wasm | slim `admin_modal_a11y.js` |
-| 7 | **PH-S162** | Auth i18n subset Rust | slim `i18n_core.js` auth |
-| 8 | **PH-S163** | Galaxy trust metrics wire | Prometheus §6.5 |
-| 9 | **PH-S164** | Verify sampling apply | §6.1 HTTP stub |
-| 10 | **PH-S165** | **96%** hold gate | `--min-ratio 0.95`; replenish |
+| — | **PH-S159** ✅ | **96%** stretch gate | CI warn **93%**; stretch **96%**; replenish post-S159 |
+| 1 | **PH-S160** | Admin theme → Rust | slim `admin_theme.js` |
+| 2 | **PH-S161** | Admin modal a11y → wasm | slim `admin_modal_a11y.js` |
+| 3 | **PH-S162** | Auth i18n subset Rust | slim `i18n_core.js` auth |
+| 4 | **PH-S163** | Galaxy trust metrics wire | Prometheus §6.5 |
+| 5 | **PH-S164** | Verify sampling apply | §6.1 HTTP stub |
+| 6 | **PH-S165** | **96%** hold gate | `--min-ratio 0.95`; replenish |
+| 7 | **PH-S166** | Design tokens CSS → Rust | slim `design_tokens.css` |
+| 8 | **PH-S167** | Galaxy prefetch metrics stub | §5.5 Prometheus |
+| 9 | **PH-S168** | Galaxy pricing cache age /metrics | §4.2 gauge |
+| 10 | **PH-S169** | Locality stale profile penalty | §8.1 stub |
 
 Повна таблиця — FM **§5.12** · [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md).
 
@@ -87,8 +87,8 @@
 | Audit + dedupe | PH-S143…S145 | baseline + API→Rust |
 | Portable UI core | PH-S146…S147 | ui-core + wasm POC |
 | Slim browser E2E | PH-S148 | browser-only `test:ci` |
-| Gate + stretch | PH-S150 ✅…S159 | CI advisory → **96% spirit** |
-| Maintain + Galaxy wire | PH-S160…S165 | hold **96%**; UI slim + §6 stubs |
+| Gate + stretch | PH-S150 ✅…S159 ✅ | CI stretch warn **93%** → **96% spirit** |
+| Maintain + Galaxy wire | PH-S160…S169 | hold **96%**; UI slim + §5–§6 stubs |
 
 **Baseline:** **92.19%** · [`rust_ratio.json`](./rust_ratio.json).
 

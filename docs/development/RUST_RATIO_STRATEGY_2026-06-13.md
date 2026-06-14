@@ -16,7 +16,7 @@
 
 **Орієнтовний зріз (2026-06-13, PH-S150):** **`92.00%`** Rust LOC (`cargo run --bin poolai-loc-audit` → [`rust_ratio.json`](./rust_ratio.json)). Non-Rust «шум»: **`i18n_core.js`** (~2k LOC), **`admin_common.js`**, **`admin_charts.js`**, browser-only `e2e/tests/`, ops shell.
 
-**Audit:** `cargo run --bin poolai-loc-audit` — звіт `docs/development/rust_ratio.json` для FM §5.13 / PH-S151…S159 gates. CI advisory (PH-S150): `cargo run --bin poolai-loc-audit -- --warn-below 0.88 --target 0.93 --stretch 0.96 --advisory`.
+**Audit:** `cargo run --bin poolai-loc-audit` — звіт `docs/development/rust_ratio.json` для FM §5.13 / PH-S151…S169 gates. CI stretch advisory (PH-S159): `cargo run --bin poolai-loc-audit -- --warn-below 0.93 --target 0.93 --stretch 0.96 --advisory`.
 
 ---
 
@@ -83,9 +83,9 @@ flowchart TB
 | **C — UI core** | PH-S146…S147 | shared Rust crate + wasm32 POC для admin helpers | +2–4% |
 | **D — slim e2e** | PH-S148 | `e2e/` лише smoke/admin/a11y/visual; прибрати API specs з `test:ci` | +1–2% |
 | **E — gate** | PH-S150 ✅ | CI advisory якщо ratio <88%; target 93%; stretch 96% spirit | стабільно 90–95% |
-| **F — stretch 96%** | PH-S151…S159 | wasm wiring, slim JS/i18n/charts, Rust stand/e2e bins | **→96% spirit** |
+| **F — stretch 96%** | PH-S151…S159 ✅ | wasm wiring, slim JS/i18n/charts, Rust stand/e2e bins; CI warn **93%** | **→96% spirit** |
 
-**Черга §5.12 (10 відкритих):** PH-S156…S165 — replenish після S165.
+**Черга §5.12 (10 відкритих):** PH-S160…S169 — maintain + post-S159 replenish; replenish після S169.
 
 ---
 
@@ -108,13 +108,17 @@ flowchart TB
 | 13 | **PH-S156** | jobs_raid → Rust smoke | drop `jobs_raid` from `test:ci` | **✅** |
 | 14 | **PH-S157** | topology SVG Rust | slim `topology_graph.js` | **✅** |
 | 15 | **PH-S158** | `poolai-e2e-stand` bin | Rust stand lifecycle; slim shell | **✅** |
-| 16 | **PH-S159** | Ratio **96%** stretch gate | warn 93%; stretch 96%; replenish post-S159 | відкрито |
+| 16 | **PH-S159** | Ratio **96%** stretch gate | warn 93%; stretch 96%; replenish post-S159 | **✅** |
 | 17 | **PH-S160** | Admin theme → Rust | slim `admin_theme.js` | відкрито |
 | 18 | **PH-S161** | Admin modal a11y → wasm | slim `admin_modal_a11y.js` | відкрито |
 | 19 | **PH-S162** | Auth i18n subset Rust | slim `i18n_core.js` auth block | відкрито |
 | 20 | **PH-S163** | Galaxy trust metrics wire | Prometheus on grid result path | відкрито |
 | 21 | **PH-S164** | Verify sampling env apply | `galaxy_verify_sampling` HTTP stub | відкрито |
 | 22 | **PH-S165** | Ratio **96%** hold gate | CI `--min-ratio 0.95`; replenish next band | відкрито |
+| 23 | **PH-S166** | Design tokens CSS → Rust | slim `design_tokens.css` / `admin_styles.css` | відкрито |
+| 24 | **PH-S167** | Galaxy prefetch metrics stub | Prometheus on `plan_prefetch` | відкрито |
+| 25 | **PH-S168** | Galaxy pricing cache age /metrics | `galaxy_pricing_cache_age_seconds` gauge | відкрито |
+| 26 | **PH-S169** | Locality stale profile penalty | `galaxy_locality.rs` stub | відкрито |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 
