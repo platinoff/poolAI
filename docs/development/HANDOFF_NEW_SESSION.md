@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-14 (PH-S156 ✅ · §5.12 **10** відкритих PH-S157…S165 · rust_ratio **92.19%** · stretch **96%**) · VDT
+**Оновлено:** 2026-06-14 (PH-S157 ✅ · §5.12 **10** відкритих PH-S158…S165 · rust_ratio **92.33%** · stretch **96%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -117,11 +117,12 @@
 **PH-S154 ✅ (code):** `crates/poolai-ui-core/src/i18n.rs` — admin jobs + grid-pricing EN/UK subset (48 keys); `admin_layout` injects `window.__poolaiAdminI18nRust` before `i18n_core.js`; `i18n_core.js` **−103 LOC** admin block; `jobs.rs` / `grid_pricing.rs` parity tests; **rust_ratio 92.15%** ≥91%.
 **PH-S155 ✅ (code):** `crates/poolai-ui-core/src/ml.rs` — chart scale, ML step flatten, sparkline series, metric summary (PH-S43 keys); wasm exports (`parseMlNumeric`, `chartScale`, `flattenMlStepRows`, …); `admin_charts.js` canvas/SVG glue + thin wasm wrappers; **rust_ratio 92.19%** ≥91%.
 **PH-S156 ✅ (code/e2e):** `poolai-http-stand-smoke --raid-restart` — POST job → `restart.sh` → GET persisted (заміна Playwright `jobs_raid`); `e2e/package.json` `test:ci` без `jobs_raid`; `bin/e2e-playwright.sh --start` запускає Rust stand smoke; [`E2E_PLAYWRIGHT.md`](./E2E_PLAYWRIGHT.md) sync.
-**Vision ✅:** next **PH-S157** · replenish **10** відкритих (PH-S157…S165) · rev **90**.
+**PH-S157 ✅ (code):** `src/pool/topology_graph.rs` — force layout + heatmap HTML у Rust; `GET /api/v1/topology/graph`; slim `topology_graph.js` (SVG paint only); **rust_ratio 92.33%**; `topology_graph.js` **−173 LOC**.
+**Vision ✅:** next **PH-S158** · replenish **10** відкритих (PH-S158…S165) · rev **91**.
 **PH-S113 ✅ (docs):** `docs/vision/` — L4 Lib roots + L5 Workspace; nodes `Cargo.toml`, `.cargo/config.toml`, `src/lib.rs`, `poolai-solana-adapter`.
 **PH-S114 ✅ (docs):** Galaxy map pan/zoom — `#map-world` transform; wheel ~6%/крок (тачпад), кнопки 16%; drag pan; dblclick focus.
 **PH-S115 ✅ (docs):** folder-colored edges + cluster layout (сітка за `src/*/`); **⊟ Folders** collapse (5+); **◎ Sprint** dim; manifest **rev 38**; `file_list.csv` + README/INDEX sync.
-**Черга:** §5.12 **10** відкритих — **PH-S157** (наступний) … **PH-S165**. Stretch S157…S159 · maintain S160…S165 · [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md) · baseline **92.19%** · spirit **96%**.
+**Черга:** §5.12 **10** відкритих — **PH-S158** (наступний) … **PH-S165**. Stretch S158…S159 · maintain S160…S165 · baseline **92.33%** · spirit **96%**.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

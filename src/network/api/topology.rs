@@ -6,17 +6,26 @@
 //! - Node resource information
 
 use axum::{
-    extract::{Path, State},
+    extract::{Path, Query, State},
     routing::get,
     Json, Router,
 };
+use serde::Deserialize;
 use serde::Serialize;
 use std::collections::HashMap;
 
 use crate::core::error::{AppError, ErrorContext};
 use crate::core::state::ApiContext;
 use crate::network::api::common::HttpAppError;
+use crate::pool::topology_graph::{compute_topology_graph_layout, TopologyGraphLayout};
 use crate::services::topology_service::{TopologyNotReady, TopologyService};
+
+#[derive(Debug, Deserialize)]
+struct TopologyGraphQuery {
+    width: Option<u32>,
+    height: Option<u32>,
+    iterations: Option<u32>,
+}
 
 /// Topology response
 #[derive(Serialize)]
@@ -69,10 +78,33 @@ struct AllNodesResourcesResponse {
 /// Create topology routes
 pub fn create_topology_routes() -> Router<ApiContext> {
     Router::new()
+        .route("/topology/graph", get(topology_graph_handler))
         .route("/topology", get(topology_handler))
         .route("/topology/latency", get(latency_matrix_handler))
         .route("/topology/nodes", get(all_nodes_resources_handler))
         .route("/topology/nodes/{node_id}", get(node_resources_handler))
+}
+
+/// Handler for GET /api/v1/topology/graph (PH-S157)
+async fn topology_graph_handler(
+    State(ctx): State<ApiContext>,
+    Query(query): Query<TopologyGraphQuery>,
+) -> Result<Json<TopologyGraphLayout>, HttpAppError> {
+    match TopologyService::get_snapshot(&ctx).await {
+        Ok(topology) => Ok(Json(compute_topology_graph_layout(
+            &topology.node_resources,
+            &topology.latency_matrix,
+            query.width,
+            query.height,
+            query.iterations,
+        ))),
+        Err(TopologyNotReady) => Err(HttpAppError::new(AppError::SubsystemUnavailable(
+            "Topology manager not initialized".to_string(),
+        ))
+        .with_context(
+            ErrorContext::new("topology_graph").with_resource("topology_manager", "default"),
+        )),
+    }
 }
 
 /// Handler for GET /api/v1/topology

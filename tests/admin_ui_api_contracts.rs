@@ -658,6 +658,58 @@ mod attached_managers {
     }
 
     #[tokio::test]
+    async fn topology_graph_json_shape_when_manager_attached() {
+        let state = Arc::new(AppState::default());
+        let topology = Arc::new(TokioRwLock::new(TopologyManager::new(None)));
+        {
+            let guard = topology.read().await;
+            guard.test_add_node("graph-a", "127.0.0.1:1").await;
+            guard.test_add_node("graph-b", "127.0.0.1:2").await;
+            guard.test_update_latency("graph-a", "graph-b", 8.5).await;
+        }
+        state
+            .attach_topology_manager_for_test(topology)
+            .expect("attach topology manager");
+        let app = Router::new()
+            .nest("/api/v1", create_api_routes())
+            .with_state(state);
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/api/v1/topology/graph?width=640&height=360")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        let v: Value = serde_json::from_slice(&body).expect("topology graph JSON");
+        let o = v.as_object().expect("topology graph object");
+        for key in ["width", "height", "nodes", "links", "heatmap_html", "empty"] {
+            assert!(o.contains_key(key), "topology graph missing `{key}`: {o:?}");
+        }
+        let nodes = o
+            .get("nodes")
+            .and_then(|x| x.as_array())
+            .expect("nodes array");
+        assert_eq!(nodes.len(), 2);
+        let links = o
+            .get("links")
+            .and_then(|x| x.as_array())
+            .expect("links array");
+        assert_eq!(links.len(), 1);
+        assert!(
+            o.get("heatmap_html")
+                .and_then(|x| x.as_str())
+                .is_some_and(|h| h.contains("topology-heatmap-table")),
+            "expected heatmap HTML"
+        );
+    }
+
+    #[tokio::test]
     async fn topology_node_detail_json_shape_when_manager_attached() {
         let state = Arc::new(AppState::default());
         let topology = Arc::new(TokioRwLock::new(TopologyManager::new(None)));

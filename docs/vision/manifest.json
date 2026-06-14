@@ -1599,7 +1599,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S157",
+  "next_sprint": "PH-S158",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -5941,10 +5941,23 @@
     },
     {
       "auto_synced": true,
+      "id": "src_pool_topology_graph_rs",
+      "label": "topology_graph.rs",
+      "layer": "L3",
+      "path": "src/pool/topology_graph.rs",
+      "sprints": [
+        "PH-S157"
+      ]
+    },
+    {
+      "auto_synced": true,
       "id": "src_ui_topology_graph_js",
       "label": "topology_graph.js",
       "layer": "L3",
-      "path": "src/ui/topology_graph.js"
+      "path": "src/ui/topology_graph.js",
+      "sprints": [
+        "PH-S157"
+      ]
     },
     {
       "auto_synced": true,
@@ -6957,7 +6970,7 @@
       "path": "src/ui/admin_theme.js"
     }
   ],
-  "revision": 90,
+  "revision": 91,
   "updated_at": "2026-06-14",
   "vision_ui_rev": 54
 }

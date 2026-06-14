@@ -1497,6 +1497,37 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /topology/graph:
+    get:
+      tags:
+        - Topology
+      summary: Topology graph layout for admin SVG (PH-S157)
+      operationId: getTopologyGraphLayout
+      parameters:
+        - name: width
+          in: query
+          schema:
+            type: integer
+            minimum: 320
+        - name: height
+          in: query
+          schema:
+            type: integer
+            minimum: 200
+        - name: iterations
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Precomputed force-layout nodes/links + heatmap HTML
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TopologyGraphLayoutResponse'
+        '503':
+          description: Topology service not ready
+
   /topology:
     get:
       tags:
@@ -6925,6 +6956,63 @@ components:
           type: integer
         subsystems:
           $ref: '#/components/schemas/AdminSubsystemFlags'
+
+    TopologyGraphLayoutResponse:
+      type: object
+      description: Precomputed topology graph layout for admin SVG (PH-S157)
+      properties:
+        width:
+          type: integer
+        height:
+          type: integer
+        nodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/TopologyGraphNode'
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/TopologyGraphLink'
+        heatmap_html:
+          type: string
+        empty:
+          type: boolean
+
+    TopologyGraphNode:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        x:
+          type: number
+          format: double
+        y:
+          type: number
+          format: double
+        radius:
+          type: number
+          format: double
+        load:
+          type: number
+          format: float
+
+    TopologyGraphLink:
+      type: object
+      properties:
+        from:
+          type: string
+        to:
+          type: string
+        latency:
+          type: number
+          format: double
+        stroke:
+          type: string
+        stroke_width:
+          type: number
+          format: double
 
     TopologyOverviewResponse:
       type: object

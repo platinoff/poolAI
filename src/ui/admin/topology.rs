@@ -254,22 +254,34 @@ pub async fn admin_topology() -> axum::response::Html<String> {
       }}
     }}
 
-    function renderTopologyVisualizations() {{
+    async function fetchTopologyGraphLayout() {{
+      const wrap = document.getElementById('topology-graph-wrap');
+      const width = wrap ? Math.max(320, wrap.clientWidth - 32) : 640;
+      const response = await fetch('/api/v1/topology/graph?width=' + encodeURIComponent(width) + '&height=360');
+      if (!response.ok) throw new Error('Failed to load topology graph layout');
+      return await response.json();
+    }}
+
+    async function renderTopologyVisualizations() {{
       if (typeof PoolAiTopologyGraph === 'undefined') return;
       const svg = document.getElementById('topology-graph-svg');
       const heatmap = document.getElementById('topology-latency-heatmap');
-      const wrap = document.getElementById('topology-graph-wrap');
-      const width = wrap ? Math.max(320, wrap.clientWidth - 32) : 640;
-      PoolAiTopologyGraph.render(svg, topologyNodesCache, topologyLatencyCache, {{
-        width: width,
-        height: 360,
-        graphTitle: T('admin.topo.graphTitle', 'Cluster topology graph'),
-        emptyLabel: T('admin.topo.noNodes', 'No nodes found'),
-        onNodeClick: function (nodeId) {{ viewNodeResources(nodeId); }},
-      }});
-      PoolAiTopologyGraph.renderLatencyHeatmap(heatmap, topologyNodesCache, topologyLatencyCache);
-      if (!Object.keys(topologyNodesCache).length) {{
-        heatmap.innerHTML = '<p class="muted">' + escapeHtml(T('admin.topo.noNodes', 'No nodes found')) + '</p>';
+      try {{
+        const layout = await fetchTopologyGraphLayout();
+        PoolAiTopologyGraph.renderLayout(svg, layout, {{
+          graphTitle: T('admin.topo.graphTitle', 'Cluster topology graph'),
+          emptyLabel: T('admin.topo.noNodes', 'No nodes found'),
+          onNodeClick: function (nodeId) {{ viewNodeResources(nodeId); }},
+        }});
+        if (layout.heatmap_html) {{
+          heatmap.innerHTML = layout.heatmap_html;
+        }} else if (!Object.keys(topologyNodesCache).length) {{
+          heatmap.innerHTML = '<p class="muted">' + escapeHtml(T('admin.topo.noNodes', 'No nodes found')) + '</p>';
+        }} else {{
+          heatmap.innerHTML = '';
+        }}
+      }} catch (error) {{
+        console.error('Error rendering topology graph:', error);
       }}
     }}
 
@@ -348,6 +360,8 @@ mod fm037_tests {
         assert!(html.contains("id=\"topology-latency-heatmap\""));
         assert!(html.contains("PoolAiTopologyGraph"));
         assert!(html.contains("renderTopologyVisualizations"));
+        assert!(html.contains("fetchTopologyGraphLayout"));
+        assert!(html.contains("/api/v1/topology/graph"));
         assert!(html.contains("connectTopologyWebSocket"));
         assert!(html.contains("subscribe_topology"));
     }

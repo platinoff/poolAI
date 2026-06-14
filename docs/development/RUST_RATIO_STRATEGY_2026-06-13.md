@@ -106,7 +106,7 @@ flowchart TB
 | 11 | **PH-S154** | Admin i18n subset Rust | slim `i18n_core.js` admin keys | **✅** |
 | 12 | **PH-S155** | ML charts → wasm | admin_charts canvas-only glue | **✅** |
 | 13 | **PH-S156** | jobs_raid → Rust smoke | drop `jobs_raid` from `test:ci` | **✅** |
-| 14 | **PH-S157** | topology SVG Rust | slim `topology_graph.js` | відкрито |
+| 14 | **PH-S157** | topology SVG Rust | slim `topology_graph.js` | **✅** |
 | 15 | **PH-S158** | `poolai-e2e-stand` bin | Rust stand lifecycle; slim shell | відкрито |
 | 16 | **PH-S159** | Ratio **96%** stretch gate | warn 93%; stretch 96%; replenish post-S159 | відкрито |
 | 17 | **PH-S160** | Admin theme → Rust | slim `admin_theme.js` | відкрито |

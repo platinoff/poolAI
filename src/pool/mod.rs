@@ -9,6 +9,7 @@
 pub mod discovery_integration;
 pub mod placement;
 pub mod topology;
+pub mod topology_graph;
 pub mod worker;
 
 use crate::core::discovery_handle::SharedDiscoverySlot;
