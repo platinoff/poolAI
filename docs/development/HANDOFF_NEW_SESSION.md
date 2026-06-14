@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-14 (PH-S175 ✅ · §5.12 **5** відкритих PH-S176…S180 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
+**Оновлено:** 2026-06-14 (PH-S176 ✅ · §5.12 **5** відкритих PH-S177…S181 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -136,11 +136,12 @@
 **PH-S173 ✅ (code):** `galaxy_pricing_provider_metrics.rs` — `galaxy_pricing_provider_errors_total` on live provider HTTP fetch fail in `fetch_live_provider_quotes`; `/metrics` via `refresh_galaxy_pricing_gauges`; `tests/galaxy_pricing_provider_errors_integration.rs`; `cargo test-ci`.
 **PH-S174 ✅ (code):** `galaxy_pricing_oracle.rs` — `galaxy_pricing_quote_usd_micro` gauge on last served quote in `try_quote`; `/metrics` via `refresh_galaxy_pricing_gauges`; `tests/galaxy_pricing_quote_usd_micro_integration.rs`; `cargo test-ci`.
 **PH-S175 ✅ (code):** `galaxy_verification_metrics.rs` — `galaxy_verification_mismatch_total` on grid result `metrics.verification_verdict: mismatch`; `/metrics` via `refresh_galaxy_verification_gauges`; `tests/galaxy_verification_mismatch_integration.rs`; `cargo test-ci`.
-**Vision ✅:** next **PH-S176** · **5** відкритих (PH-S176…S180) · rev **111**.
+**PH-S176 ✅ (code):** `galaxy_replay_metrics.rs` — `galaxy_replay_pending` gauge on grid result mismatch / replay flags; `/metrics` via `refresh_galaxy_verification_gauges`; `tests/galaxy_replay_pending_integration.rs`; `cargo test-ci`.
+**Vision ✅:** next **PH-S177** · **5** відкритих (PH-S177…S181) · rev **112**.
 **PH-S113 ✅ (docs):** `docs/vision/` — L4 Lib roots + L5 Workspace; nodes `Cargo.toml`, `.cargo/config.toml`, `src/lib.rs`, `poolai-solana-adapter`.
 **PH-S114 ✅ (docs):** Galaxy map pan/zoom — `#map-world` transform; wheel ~6%/крок (тачпад), кнопки 16%; drag pan; dblclick focus.
 **PH-S115 ✅ (docs):** folder-colored edges + cluster layout (сітка за `src/*/`); **⊟ Folders** collapse (5+); **◎ Sprint** dim; manifest **rev 38**; `file_list.csv` + README/INDEX sync.
-**Черга:** §5.12 **5** відкритих — **PH-S176** (наступний) … **PH-S180**. Post-S175 replenish · baseline **92.78%** · hold **95%** · spirit **96%**.
+**Черга:** §5.12 **5** відкритих — **PH-S177** (наступний) … **PH-S181**. Post-S176 replenish · baseline **92.78%** · hold **95%** · spirit **96%**.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

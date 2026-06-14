@@ -55,6 +55,7 @@ scrape_configs:
 | `galaxy_pricing_provider_errors_total` | gauge | Galaxy pricing live provider HTTP fetch failures (PH-S173) |
 | `galaxy_pricing_quote_usd_micro` | gauge | Galaxy pricing last served PoolAI quote micro-USD (PH-S174) |
 | `galaxy_verification_mismatch_total` | gauge | Galaxy verification digest mismatches on grid result path (PH-S175) |
+| `galaxy_replay_pending` | gauge | Galaxy replay verifications pending coordinator verdict (PH-S176) |
 | `galaxy_trust_payout_eligible_total` | gauge | Galaxy trust gate edge payout-eligible results (PH-S137 stub; PH-S163 grid wire) |
 | `galaxy_trust_payout_held_total` | gauge | Galaxy trust gate edge payout-held results (PH-S137 stub; PH-S163 grid wire) |
 | `process_*` | various | `prometheus` process collector when available |
@@ -71,4 +72,4 @@ Prometheus alert rules live in your monitoring stack (Prometheus / Alertmanager 
 - [`../performance/BENCHMARKS.md`](../performance/BENCHMARKS.md) — load baselines
 - [`../performance/PROFILING.md`](../performance/PROFILING.md) — hot-path profiling
 
-**Last updated:** 2026-06-14 (PH-S175 verification mismatch metric).
+**Last updated:** 2026-06-14 (PH-S176 replay pending gauge).

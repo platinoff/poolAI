@@ -85,7 +85,7 @@ flowchart TB
 | **E — gate** | PH-S150 ✅ | CI advisory якщо ratio <88%; target 93%; stretch 96% spirit | стабільно 90–95% |
 | **F — stretch 96%** | PH-S151…S159 ✅ | wasm wiring, slim JS/i18n/charts, Rust stand/e2e bins; CI warn **93%** | **→96% spirit** |
 
-**Черга §5.12 (10 відкритих):** PH-S176…S180 — post-S175 replenish; replenish після S180.
+**Черга §5.12 (10 відкритих):** PH-S177…S181 — post-S176 replenish; replenish після S181.
 
 ---
 
@@ -125,11 +125,12 @@ flowchart TB
 | 30 | **PH-S173** | Galaxy pricing provider errors metrics stub | §4.2 provider fetch fail | **✅** |
 | 31 | **PH-S174** | Galaxy pricing quote usd_micro metrics stub | §4.2 last quote gauge | **✅** |
 | 32 | **PH-S175** | Galaxy verification mismatch metrics stub | §6.2 mismatch counter | **✅** |
-| 33 | **PH-S176** | Galaxy replay pending metrics stub | §6.3 replay pending gauge | відкрито |
+| 33 | **PH-S176** | Galaxy replay pending metrics stub | §6.3 replay pending gauge | **✅** |
 | 34 | **PH-S177** | Galaxy verification sample total metrics stub | §6.2 sample counter | відкрито |
 | 35 | **PH-S178** | Galaxy settlement pending_verification metrics stub | §6.4 grid result path | відкрито |
 | 36 | **PH-S179** | Galaxy replication strict tier metrics stub | §6.3 grid job ingest | відкрито |
 | 37 | **PH-S180** | Galaxy verification match metrics stub | §6.2 match counter | відкрито |
+| 38 | **PH-S181** | Galaxy pricing market min usd_micro metrics stub | §4.2 market min gauge | відкрито |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 
