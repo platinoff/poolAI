@@ -22,7 +22,9 @@ use crate::grid::galaxy_trust_score::{
     clamp_trust_score, evaluate_result_settlement_gate, SettlementGateVerdict, TrustScore,
     TrustScoreGateConfig,
 };
-use crate::grid::galaxy_verification_metrics::evaluate_result_verification_mismatch;
+use crate::grid::galaxy_verification_metrics::{
+    evaluate_result_verification_mismatch, evaluate_result_verification_sample,
+};
 use crate::grid::galaxy_verify_sampling::{
     evaluate_result_verify_sampling, VerifySamplingConfig, VerifySamplingVerdict,
 };
@@ -343,6 +345,10 @@ fn ingest_result(
     );
     let verification_sample =
         evaluate_result_verify_sampling(source_peer_id, &job_id, &VerifySamplingConfig::from_env());
+    evaluate_result_verification_sample(
+        body.metrics.as_ref(),
+        verification_sample == VerifySamplingVerdict::SampleScheduled,
+    );
     let settlement_status = resolve_settlement_status(settlement_gate, verification_sample);
     evaluate_result_replay_pending(body.metrics.as_ref(), settlement_status);
     Ok(GridIngestOutcome {
@@ -884,11 +890,15 @@ mod tests {
 
     #[test]
     fn ingest_result_wire_applies_verify_sampling_from_env() {
+        use crate::grid::galaxy_verification_metrics::{
+            reset_verification_sample_metrics_for_test, verification_sample_total,
+        };
         use crate::grid::galaxy_verify_sampling::{
             reset_verify_sampling_metrics_for_test, verify_sample_scheduled_total,
         };
 
         reset_verify_sampling_metrics_for_test();
+        reset_verification_sample_metrics_for_test();
         std::env::set_var(
             crate::grid::galaxy_verify_sampling::ENV_VERIFY_BASE_SAMPLE_RATE,
             "1",
@@ -939,8 +949,58 @@ mod tests {
             }
         );
         assert_eq!(verify_sample_scheduled_total(), 1);
+        assert_eq!(verification_sample_total(), 1);
         std::env::remove_var(crate::grid::galaxy_verify_sampling::ENV_VERIFY_BASE_SAMPLE_RATE);
         reset_verify_sampling_metrics_for_test();
+        reset_verification_sample_metrics_for_test();
+    }
+
+    #[test]
+    fn ingest_result_wire_records_verification_sample_metric_ph_s177() {
+        use crate::grid::galaxy_verification_metrics::{
+            reset_verification_sample_metrics_for_test, verification_metrics_test_lock,
+            verification_sample_total,
+        };
+
+        let _lock = verification_metrics_test_lock();
+        reset_verification_sample_metrics_for_test();
+        let jobs = JobStore::open_for_test(None);
+        let memory = MemoryShardStore::open_for_test(None);
+        jobs.push(JobRecord {
+            spec: JobSpec {
+                id: JobId::new("grid-verify-sample-metric"),
+                kind: JobKind::Inference,
+                resources: Default::default(),
+                priority: 0,
+                max_duration_secs: None,
+                input_artifact_ids: vec![],
+                verification_policy: None,
+                deadline: None,
+            },
+            status: JobStatus::Scheduled,
+            created_at: Utc::now(),
+            worker_id: None,
+            vm_id: None,
+            lease_owner: None,
+            lease_epoch: None,
+            lease_expires_at: None,
+        })
+        .expect("push");
+
+        let env = GridEnvelope::new(
+            GridMessage::Result(crate::grid::GridResultBody {
+                job_id: "grid-verify-sample-metric".into(),
+                status: GridResultStatus::Completed,
+                output_artifact_ids: vec![],
+                proof: None,
+                metrics: Some(serde_json::json!({ "verification_sample": true })),
+                lease_epoch: None,
+            }),
+            Some("peer-local".into()),
+        );
+        ingest_envelope(env, &jobs, &memory).expect("ingest");
+        assert_eq!(verification_sample_total(), 1);
+        reset_verification_sample_metrics_for_test();
     }
 
     #[test]
@@ -1001,9 +1061,11 @@ mod tests {
     #[test]
     fn ingest_result_wire_records_verification_mismatch_metric_ph_s175() {
         use crate::grid::galaxy_verification_metrics::{
-            reset_verification_mismatch_metrics_for_test, verification_mismatch_total,
+            reset_verification_mismatch_metrics_for_test, verification_metrics_test_lock,
+            verification_mismatch_total,
         };
 
+        let _lock = verification_metrics_test_lock();
         reset_verification_mismatch_metrics_for_test();
         let jobs = JobStore::open_for_test(None);
         let memory = MemoryShardStore::open_for_test(None);

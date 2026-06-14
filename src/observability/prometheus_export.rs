@@ -38,7 +38,8 @@ use crate::grid::galaxy_trust_score::{
     METRIC_PAYOUT_HELD_TOTAL,
 };
 use crate::grid::galaxy_verification_metrics::{
-    verification_mismatch_total, METRIC_VERIFICATION_MISMATCH_TOTAL,
+    verification_mismatch_total, verification_sample_total, METRIC_VERIFICATION_MISMATCH_TOTAL,
+    METRIC_VERIFICATION_SAMPLE_TOTAL,
 };
 
 /// Lazily initialized Prometheus registry and metric handles.
@@ -69,6 +70,7 @@ pub struct PoolAiPrometheus {
     galaxy_prefetch_planned_shards_total: IntGauge,
     galaxy_prefetch_hot_skip_total: IntGauge,
     galaxy_verification_mismatch_total: IntGauge,
+    galaxy_verification_sample_total: IntGauge,
     galaxy_replay_pending: IntGauge,
 }
 
@@ -312,6 +314,15 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_verification_mismatch_total.clone()))
         .expect("register galaxy_verification_mismatch_total");
 
+    let galaxy_verification_sample_total = IntGauge::with_opts(Opts::new(
+        METRIC_VERIFICATION_SAMPLE_TOTAL,
+        "Galaxy verification samples scheduled on grid result path (PH-S177)",
+    ))
+    .expect(METRIC_VERIFICATION_SAMPLE_TOTAL);
+    registry
+        .register(Box::new(galaxy_verification_sample_total.clone()))
+        .expect("register galaxy_verification_sample_total");
+
     let galaxy_replay_pending = IntGauge::with_opts(Opts::new(
         METRIC_REPLAY_PENDING,
         "Galaxy replay verifications pending coordinator verdict (PH-S176)",
@@ -354,6 +365,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_prefetch_planned_shards_total,
         galaxy_prefetch_hot_skip_total,
         galaxy_verification_mismatch_total,
+        galaxy_verification_sample_total,
         galaxy_replay_pending,
     }
 }
@@ -404,6 +416,8 @@ pub fn refresh_galaxy_verification_gauges() {
     let prom = init_prometheus();
     prom.galaxy_verification_mismatch_total
         .set(verification_mismatch_total() as i64);
+    prom.galaxy_verification_sample_total
+        .set(verification_sample_total() as i64);
     prom.galaxy_replay_pending.set(replay_pending() as i64);
 }
 
@@ -692,6 +706,22 @@ mod tests {
         assert!(body.contains(METRIC_VERIFICATION_MISMATCH_TOTAL));
         assert!(body.contains(&format!("{METRIC_VERIFICATION_MISMATCH_TOTAL} 1")));
         reset_verification_mismatch_metrics_for_test();
+    }
+
+    #[test]
+    fn galaxy_verification_sample_gauge_reflects_counter_ph_s177() {
+        use crate::grid::galaxy_verification_metrics::{
+            record_verification_sample, reset_verification_sample_metrics_for_test,
+        };
+
+        reset_verification_sample_metrics_for_test();
+        init_prometheus();
+        record_verification_sample();
+        refresh_galaxy_verification_gauges();
+        let body = encode_metrics_text().expect("encode");
+        assert!(body.contains(METRIC_VERIFICATION_SAMPLE_TOTAL));
+        assert!(body.contains(&format!("{METRIC_VERIFICATION_SAMPLE_TOTAL} 1")));
+        reset_verification_sample_metrics_for_test();
     }
 
     #[test]
