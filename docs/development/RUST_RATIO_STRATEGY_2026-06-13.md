@@ -85,7 +85,7 @@ flowchart TB
 | **E — gate** | PH-S150 ✅ | CI advisory якщо ratio <88%; target 93%; stretch 96% spirit | стабільно 90–95% |
 | **F — stretch 96%** | PH-S151…S159 ✅ | wasm wiring, slim JS/i18n/charts, Rust stand/e2e bins; CI warn **93%** | **→96% spirit** |
 
-**Черга §5.12 (10 відкритих):** PH-S182…S187 — post-S181 replenish; replenish після S187.
+**Черга §5.12 (9 відкритих):** PH-S183…S187 metrics replenish; PH-S188…S191 vision UX band; replenish після S191.
 
 ---
 
@@ -131,12 +131,17 @@ flowchart TB
 | 36 | **PH-S179** | Galaxy replication strict tier metrics stub | §6.3 grid job ingest | **✅** |
 | 37 | **PH-S180** | Galaxy verification match metrics stub | §6.2 match counter | **✅** |
 | 38 | **PH-S181** | Galaxy pricing market min usd_micro metrics stub | §4.2 market min gauge | **✅** |
-| 39 | **PH-S182** | Galaxy trust score metrics stub | §6.2 trust score gauge | відкрито |
+| 39 | **PH-S182** | Galaxy trust score metrics stub | §6.2 trust score gauge | **✅** |
+| 40 | **PH-S183** | Galaxy shard local hit ratio metrics stub | §5.3 locality gauge | відкрито |
 | 40 | **PH-S183** | Galaxy shard local hit ratio metrics stub | §5.3 locality rank | відкрито |
 | 41 | **PH-S184** | Galaxy prefetch bytes total metrics stub | §5.5 plan_prefetch | відкрито |
 | 42 | **PH-S185** | Galaxy cross region egress mb metrics stub | §5.3 rank/prefetch | відкрито |
 | 43 | **PH-S186** | Galaxy verification sample scheduled /metrics export | §6.2 PH-S164 export | відкрито |
 | 44 | **PH-S187** | Galaxy settlement cleared total metrics stub | §6.4 Cleared path | відкрито |
+| 45 | **PH-S188** | Vision map filters UX | docs/vision filters | відкрито |
+| 46 | **PH-S189** | Vision Eco/FX/Ms hover trace | docs/vision Ms mode | відкрито |
+| 47 | **PH-S190** | Vision overview LOD + minimap | docs/vision map zoom | відкрито |
+| 48 | **PH-S191** | Vision sprint queue + feed + Cursor hook | FM §5.12 parse + hooks | відкрито |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 

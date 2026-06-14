@@ -1716,7 +1716,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "76f6dd3d",
-  "last_sprint_closed": "PH-S181",
+  "last_sprint_closed": "PH-S182",
   "layers": [
     {
       "id": "L0",
@@ -1749,7 +1749,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S182",
+  "next_sprint": "PH-S183",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -2238,7 +2238,8 @@
       "sprints": [
         "PH-S130",
         "PH-S137",
-        "PH-S163"
+        "PH-S163",
+        "PH-S182"
       ]
     },
     {
@@ -7179,7 +7180,8 @@
       "id": "tests_galaxy_trust_metrics_integration_rs",
       "label": "galaxy_trust_metrics_integration.rs",
       "layer": "L3",
-      "path": "tests/galaxy_trust_metrics_integration.rs"
+      "path": "tests/galaxy_trust_metrics_integration.rs",
+      "sprints": ["PH-S163", "PH-S182"]
     },
     {
       "auto_synced": true,
@@ -7349,7 +7351,7 @@
       "sprints": ["PH-S181"]
     }
   ],
-  "revision": 118,
+  "revision": 119,
   "updated_at": "2026-06-14",
   "vision_ui_rev": 54
 }

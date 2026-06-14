@@ -1,7 +1,7 @@
 {
-  "revision": 62,
+  "revision": 63,
   "updated_at": "2026-06-14",
-  "active_sprint": "PH-S182",
+  "active_sprint": "PH-S183",
   "ui_version": 4,
   "extension_policy": {
     ".md": {
@@ -67,7 +67,7 @@
       "extensions": [".rs", ".md", ".toml"]
     },
     "docs_vision_meta": {
-      "sprints": ["PH-S63", "PH-S64"],
+      "sprints": ["PH-S63", "PH-S64", "PH-S188", "PH-S189", "PH-S190", "PH-S191"],
       "docs": ["docs/vision/**", ".cursor/rules/docs-vision.mdc"],
       "extensions": [".svg", ".html", ".json", ".md", ".mdc"]
     },
@@ -291,6 +291,13 @@
         "docs/vision/extensions.json"
       ]
     },
+    "vision_ux_band": {
+      "sprints": ["PH-S188", "PH-S189", "PH-S190", "PH-S191"],
+      "docs": ["docs/vision/**", "docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/NEXT_SESSION_PROMPT.md"],
+      "code_globs": ["docs/vision/vision.js", "docs/vision/vision.css", "docs/vision/index.html", "src/bin/poolai_vision_sync.rs", ".cursor/hooks/**"],
+      "extensions": [".js", ".css", ".html", ".json", ".rs", ".md", ".mdc"],
+      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/vision/manifest.json", "docs/vision/extensions.json", "docs/vision/README.md"]
+    },
     "galaxy_grid_roadmap_doc": {
       "sprints": ["PH-S*"],
       "docs": ["docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md", "docs/INDEX_2026-03-17.md", "docs/development/README.md"],
@@ -298,7 +305,7 @@
       "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md"]
     },
     "rust_ratio_stretch_band": {
-      "sprints": ["PH-S150", "PH-S151", "PH-S152", "PH-S153", "PH-S154", "PH-S155", "PH-S156", "PH-S157", "PH-S158", "PH-S159", "PH-S160", "PH-S161", "PH-S162", "PH-S163", "PH-S164", "PH-S165", "PH-S166", "PH-S167", "PH-S168", "PH-S169", "PH-S170", "PH-S171", "PH-S172", "PH-S173", "PH-S174", "PH-S175", "PH-S176", "PH-S177", "PH-S178", "PH-S179", "PH-S180", "PH-S181", "PH-S182", "PH-S183", "PH-S184", "PH-S185", "PH-S186", "PH-S187"],
+      "sprints": ["PH-S150", "PH-S151", "PH-S152", "PH-S153", "PH-S154", "PH-S155", "PH-S156", "PH-S157", "PH-S158", "PH-S159", "PH-S160", "PH-S161", "PH-S162", "PH-S163", "PH-S164", "PH-S165", "PH-S166", "PH-S167", "PH-S168", "PH-S169", "PH-S170", "PH-S171", "PH-S172", "PH-S173", "PH-S174", "PH-S175", "PH-S176", "PH-S177", "PH-S178", "PH-S179", "PH-S180", "PH-S181", "PH-S182", "PH-S183", "PH-S184", "PH-S185", "PH-S186", "PH-S187", "PH-S188", "PH-S189", "PH-S190", "PH-S191"],
       "docs": [
         "docs/development/RUST_RATIO_STRATEGY_2026-06-13.md",
         "docs/development/rust_ratio.json",

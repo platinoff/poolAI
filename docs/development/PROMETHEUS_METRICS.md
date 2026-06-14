@@ -55,6 +55,7 @@ scrape_configs:
 | `galaxy_pricing_provider_errors_total` | gauge | Galaxy pricing live provider HTTP fetch failures (PH-S173) |
 | `galaxy_pricing_quote_usd_micro` | gauge | Galaxy pricing last served PoolAI quote micro-USD (PH-S174) |
 | `galaxy_pricing_market_min_usd_micro` | gauge | Galaxy pricing last observed market min micro-USD (PH-S181) |
+| `galaxy_trust_score` | gauge | Galaxy last observed grid result trust score 0..=100 (PH-S182) |
 | `galaxy_verification_mismatch_total` | gauge | Galaxy verification digest mismatches on grid result path (PH-S175) |
 | `galaxy_verification_sample_total` | gauge | Galaxy verification samples scheduled on grid result path (PH-S177) |
 | `galaxy_verification_match_total` | gauge | Galaxy verification digest matches on grid result path (PH-S180) |
@@ -62,7 +63,7 @@ scrape_configs:
 | `galaxy_settlement_pending_verification_total` | gauge | Galaxy settlement holds pending verification on grid result path (PH-S178) |
 | `galaxy_replication_strict_total` | gauge | Galaxy replication strict tier grid job ingests (PH-S179) |
 
-**Queued (FM §5.12 PH-S182…S187):** settlement cleared, trust score, locality/prefetch egress metrics — див. [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12.
+**Queued (FM §5.12 PH-S183…S187):** settlement cleared, locality/prefetch egress metrics — див. [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12. Vision UX band PH-S188…S191 — окремо в FM §5.12.
 | `galaxy_trust_payout_eligible_total` | gauge | Galaxy trust gate edge payout-eligible results (PH-S137 stub; PH-S163 grid wire) |
 | `galaxy_trust_payout_held_total` | gauge | Galaxy trust gate edge payout-held results (PH-S137 stub; PH-S163 grid wire) |
 | `process_*` | various | `prometheus` process collector when available |
@@ -79,4 +80,4 @@ Prometheus alert rules live in your monitoring stack (Prometheus / Alertmanager 
 - [`../performance/BENCHMARKS.md`](../performance/BENCHMARKS.md) — load baselines
 - [`../performance/PROFILING.md`](../performance/PROFILING.md) — hot-path profiling
 
-**Last updated:** 2026-06-14 (PH-S181 pricing market min usd_micro metrics).
+**Last updated:** 2026-06-14 (PH-S182 trust score gauge metrics).

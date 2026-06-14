@@ -5,7 +5,8 @@ use axum::http::{Request, StatusCode};
 use axum::{body::Body, routing::get, Router};
 use poolai::core::state::ApiContext;
 use poolai::grid::galaxy_trust_score::{
-    reset_settlement_gate_metrics_for_test, METRIC_PAYOUT_ELIGIBLE_TOTAL, METRIC_PAYOUT_HELD_TOTAL,
+    reset_last_trust_score_for_test, reset_settlement_gate_metrics_for_test,
+    METRIC_PAYOUT_ELIGIBLE_TOTAL, METRIC_PAYOUT_HELD_TOTAL, METRIC_TRUST_SCORE,
 };
 use poolai::network::api::create_api_routes;
 use poolai::observability::{self, metrics_handler};
@@ -110,6 +111,7 @@ fn result_envelope(
 async fn grid_result_path_increments_trust_metrics_on_scrape() {
     let _lock = trust_metrics_lock();
     reset_settlement_gate_metrics_for_test();
+    reset_last_trust_score_for_test();
     let app = trust_app();
     let job_id = format!(
         "ph-s163-trust-{}",
@@ -143,6 +145,8 @@ async fn grid_result_path_increments_trust_metrics_on_scrape() {
     let metrics_after_held = get_metrics_text(&app).await;
     assert!(metrics_after_held.contains(METRIC_PAYOUT_HELD_TOTAL));
     assert!(metrics_after_held.contains(&format!("{METRIC_PAYOUT_HELD_TOTAL} 1")));
+    assert!(metrics_after_held.contains(METRIC_TRUST_SCORE));
+    assert!(metrics_after_held.contains(&format!("{METRIC_TRUST_SCORE} 15")));
 
     let job_id2 = format!("{job_id}-b");
     let (job2_status, _) = request_json(
@@ -168,6 +172,8 @@ async fn grid_result_path_increments_trust_metrics_on_scrape() {
     let metrics_final = get_metrics_text(&app).await;
     assert!(metrics_final.contains(&format!("{METRIC_PAYOUT_HELD_TOTAL} 1")));
     assert!(metrics_final.contains(&format!("{METRIC_PAYOUT_ELIGIBLE_TOTAL} 1")));
+    assert!(metrics_final.contains(&format!("{METRIC_TRUST_SCORE} 90")));
 
     reset_settlement_gate_metrics_for_test();
+    reset_last_trust_score_for_test();
 }

@@ -1,6 +1,6 @@
 # Galaxy Grid — роадмеп розробки (PoolAI)
 
-**Оновлено:** 2026-06-14 · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**10** відкритих PH-S182…S187)
+**Оновлено:** 2026-06-14 · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**9** відкритих PH-S183…S191)
 
 Операційний зріз сесій: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) · старт наступної: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)
 
@@ -10,7 +10,7 @@
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **10** — PH-S182…S187 |
+| **Відкрито** | **9** — PH-S183…S191 (metrics + vision UX) |
 | **Закрито PH-S128…S177** | Galaxy wire + ratio hold + verification/replay metrics band |
 | **Після S187** | replenish §5.12 (≤10) |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
@@ -58,17 +58,28 @@
 
 ---
 
-## 3. Черга §5.12 (post-S181 replenish S182…S187)
+## 3. Черга §5.12 (PH-S183…S191)
+
+### Metrics band (S182…S187)
 
 | # | Sprint | Тема | Acceptance |
 |---|--------|------|------------|
 | — | **PH-S181** ✅ | Pricing market min usd_micro metrics | §4.2 market min gauge |
-| 1 | **PH-S182** | Trust score metrics | §6.2 trust score gauge |
-| 2 | **PH-S183** | Shard local hit ratio metrics | §5.3 locality rank stub |
-| 3 | **PH-S184** | Prefetch bytes total metrics | §5.5 `plan_prefetch` path |
-| 4 | **PH-S185** | Cross region egress mb metrics | §5.3 rank/prefetch stub |
-| 5 | **PH-S186** | Verification sample scheduled /metrics | §6.2 PH-S164 counter export |
-| 6 | **PH-S187** | Settlement cleared total metrics | §6.4 Cleared grid result path |
+| — | **PH-S182** ✅ | Trust score metrics | §6.2 trust score gauge |
+| 1 | **PH-S183** | Shard local hit ratio metrics | §5.3 locality gauge |
+| 2 | **PH-S184** | Prefetch bytes total metrics | §5.5 `plan_prefetch` path |
+| 3 | **PH-S185** | Cross region egress mb metrics | §5.3 rank/prefetch stub |
+| 4 | **PH-S186** | Verification sample scheduled /metrics | §6.2 PH-S164 counter export |
+| 5 | **PH-S187** | Settlement cleared total metrics | §6.4 Cleared grid result path |
+
+### Vision UX band (S188…S191)
+
+| # | Sprint | Тема | Acceptance |
+|---|--------|------|------------|
+| 7 | **PH-S188** | Map filters UX | independent layer/type toggles; LAYERS/TYPES select-all |
+| 8 | **PH-S189** | Eco/FX/**Ms** hover trace | tri-mode; 1-hop edge highlight on mouse |
+| 9 | **PH-S190** | Overview LOD + minimap | hub labels at low zoom; viewport inset |
+| 10 | **PH-S191** | Sprint queue + feed + Cursor hook | `sprint_queue`/`feed.json`; Queue panel; post-push notify |
 
 Повна таблиця — FM **§5.12** · [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md).
 

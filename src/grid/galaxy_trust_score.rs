@@ -2,6 +2,7 @@
 //!
 //! Pure gate sketch on the grid result path per `docs/concept/POOLAI_GALAXY_GRID.md` §6.5.
 //! Settlement verdict counters mirrored on `GET /metrics` (PH-S137 stub; PH-S163 grid result wire).
+//! Last observed `trust_score` gauge on grid result path (PH-S182).
 
 use std::sync::atomic::{AtomicU64, Ordering};
 
@@ -41,8 +42,12 @@ pub const METRIC_PAYOUT_ELIGIBLE_TOTAL: &str = "galaxy_trust_payout_eligible_tot
 /// In-process counter for edge results held pending verification (PH-S137).
 pub const METRIC_PAYOUT_HELD_TOTAL: &str = "galaxy_trust_payout_held_total";
 
+/// Last observed grid result `trust_score` on 0..=100 scale (PH-S182 `/metrics` gauge).
+pub const METRIC_TRUST_SCORE: &str = "galaxy_trust_score";
+
 static PAYOUT_ELIGIBLE_TOTAL: AtomicU64 = AtomicU64::new(0);
 static PAYOUT_HELD_TOTAL: AtomicU64 = AtomicU64::new(0);
+static LAST_TRUST_SCORE: AtomicU64 = AtomicU64::new(0);
 
 /// Gate configuration (env-backed stub).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -116,9 +121,25 @@ pub fn evaluate_result_settlement_gate(
 ) -> SettlementGateVerdict {
     let origin = infer_worker_origin(source_peer_id);
     let score = trust_score.unwrap_or(DEFAULT_TRUST_SCORE);
+    observe_last_trust_score(score);
     let verdict = evaluate_settlement_gate(origin, score, config);
     record_settlement_gate_verdict(verdict);
     verdict
+}
+
+/// Observe last grid result trust score for Prometheus gauge (PH-S182).
+pub fn observe_last_trust_score(score: TrustScore) {
+    LAST_TRUST_SCORE.store(u64::from(score), Ordering::Relaxed);
+}
+
+/// Last observed grid result trust score (0..=100) since process start.
+pub fn last_trust_score() -> u64 {
+    LAST_TRUST_SCORE.load(Ordering::Relaxed)
+}
+
+#[cfg(any(test, feature = "test-utils"))]
+pub fn reset_last_trust_score_for_test() {
+    LAST_TRUST_SCORE.store(0, Ordering::Relaxed);
 }
 
 /// Record settlement gate verdict for Prometheus scrape (grid result path only).
@@ -236,5 +257,24 @@ mod tests {
         assert_eq!(payout_eligible_total(), 2);
         assert_eq!(payout_held_total(), 1);
         reset_settlement_gate_metrics_for_test();
+    }
+
+    #[test]
+    fn observe_last_trust_score_stores_effective_score() {
+        reset_last_trust_score_for_test();
+        observe_last_trust_score(72);
+        assert_eq!(last_trust_score(), 72);
+        reset_last_trust_score_for_test();
+    }
+
+    #[test]
+    fn evaluate_result_settlement_gate_observes_trust_score() {
+        reset_last_trust_score_for_test();
+        let cfg = TrustScoreGateConfig::default_stub();
+        evaluate_result_settlement_gate(Some("tg-obs"), Some(88), &cfg);
+        assert_eq!(last_trust_score(), 88);
+        evaluate_result_settlement_gate(Some("tg-obs"), None, &cfg);
+        assert_eq!(last_trust_score(), u64::from(DEFAULT_TRUST_SCORE));
+        reset_last_trust_score_for_test();
     }
 }
