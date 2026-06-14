@@ -33,6 +33,9 @@ use crate::grid::galaxy_pricing_provider_metrics::{
     METRIC_PROVIDER_ERRORS_TOTAL,
 };
 use crate::grid::galaxy_replay_metrics::{replay_pending, METRIC_REPLAY_PENDING};
+use crate::grid::galaxy_settlement_metrics::{
+    settlement_pending_verification_total, METRIC_SETTLEMENT_PENDING_VERIFICATION_TOTAL,
+};
 use crate::grid::galaxy_trust_score::{
     payout_eligible_total, payout_held_total, METRIC_PAYOUT_ELIGIBLE_TOTAL,
     METRIC_PAYOUT_HELD_TOTAL,
@@ -72,6 +75,7 @@ pub struct PoolAiPrometheus {
     galaxy_verification_mismatch_total: IntGauge,
     galaxy_verification_sample_total: IntGauge,
     galaxy_replay_pending: IntGauge,
+    galaxy_settlement_pending_verification_total: IntGauge,
 }
 
 static PROMETHEUS: OnceLock<PoolAiPrometheus> = OnceLock::new();
@@ -332,6 +336,17 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_replay_pending.clone()))
         .expect("register galaxy_replay_pending");
 
+    let galaxy_settlement_pending_verification_total = IntGauge::with_opts(Opts::new(
+        METRIC_SETTLEMENT_PENDING_VERIFICATION_TOTAL,
+        "Galaxy settlement holds pending verification on grid result path (PH-S178)",
+    ))
+    .expect(METRIC_SETTLEMENT_PENDING_VERIFICATION_TOTAL);
+    registry
+        .register(Box::new(
+            galaxy_settlement_pending_verification_total.clone(),
+        ))
+        .expect("register galaxy_settlement_pending_verification_total");
+
     #[cfg(target_os = "linux")]
     {
         let collector = prometheus::process_collector::ProcessCollector::for_self();
@@ -367,6 +382,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_verification_mismatch_total,
         galaxy_verification_sample_total,
         galaxy_replay_pending,
+        galaxy_settlement_pending_verification_total,
     }
 }
 
@@ -419,6 +435,8 @@ pub fn refresh_galaxy_verification_gauges() {
     prom.galaxy_verification_sample_total
         .set(verification_sample_total() as i64);
     prom.galaxy_replay_pending.set(replay_pending() as i64);
+    prom.galaxy_settlement_pending_verification_total
+        .set(settlement_pending_verification_total() as i64);
 }
 
 /// Record a secret rotation attempt (called from `security::secret_rotation`).
@@ -738,5 +756,22 @@ mod tests {
         assert!(body.contains(METRIC_REPLAY_PENDING));
         assert!(body.contains(&format!("{METRIC_REPLAY_PENDING} 1")));
         reset_replay_pending_metrics_for_test();
+    }
+
+    #[test]
+    fn galaxy_settlement_pending_verification_gauge_reflects_counter_ph_s178() {
+        use crate::grid::galaxy_settlement_metrics::{
+            record_settlement_pending_verification,
+            reset_settlement_pending_verification_metrics_for_test,
+        };
+
+        reset_settlement_pending_verification_metrics_for_test();
+        init_prometheus();
+        record_settlement_pending_verification();
+        refresh_galaxy_verification_gauges();
+        let body = encode_metrics_text().expect("encode");
+        assert!(body.contains(METRIC_SETTLEMENT_PENDING_VERIFICATION_TOTAL));
+        assert!(body.contains(&format!("{METRIC_SETTLEMENT_PENDING_VERIFICATION_TOTAL} 1")));
+        reset_settlement_pending_verification_metrics_for_test();
     }
 }
