@@ -23,9 +23,10 @@ use crate::grid::galaxy_prefetch_metrics::{
     METRIC_PREFETCH_PLAN_TOTAL,
 };
 use crate::grid::galaxy_pricing_oracle::{
-    forced_fallback_total, fresh_served_total, last_quote_usd_micro, pricing_cache_age_seconds,
-    stale_served_total, METRIC_CACHE_AGE_SECONDS, METRIC_FORCED_FALLBACK_TOTAL,
-    METRIC_FRESH_SERVED_TOTAL, METRIC_QUOTE_USD_MICRO, METRIC_STALE_SERVED_TOTAL,
+    forced_fallback_total, fresh_served_total, last_market_min_usd_micro, last_quote_usd_micro,
+    pricing_cache_age_seconds, stale_served_total, METRIC_CACHE_AGE_SECONDS,
+    METRIC_FORCED_FALLBACK_TOTAL, METRIC_FRESH_SERVED_TOTAL, METRIC_MARKET_MIN_USD_MICRO,
+    METRIC_QUOTE_USD_MICRO, METRIC_STALE_SERVED_TOTAL,
 };
 use crate::grid::galaxy_pricing_provider_metrics::{
     provider_catalog_hits_total, provider_catalog_lookups_total, provider_errors_total,
@@ -68,6 +69,7 @@ pub struct PoolAiPrometheus {
     galaxy_pricing_forced_fallback_total: IntGauge,
     galaxy_pricing_cache_age_seconds: IntGauge,
     galaxy_pricing_quote_usd_micro: IntGauge,
+    galaxy_pricing_market_min_usd_micro: IntGauge,
     galaxy_pricing_provider_catalog_lookups_total: IntGauge,
     galaxy_pricing_provider_catalog_hits_total: IntGauge,
     galaxy_pricing_provider_errors_total: IntGauge,
@@ -241,6 +243,15 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_pricing_quote_usd_micro.clone()))
         .expect("register galaxy_pricing_quote_usd_micro");
 
+    let galaxy_pricing_market_min_usd_micro = IntGauge::with_opts(Opts::new(
+        METRIC_MARKET_MIN_USD_MICRO,
+        "Galaxy pricing last observed market min micro-USD (PH-S181)",
+    ))
+    .expect(METRIC_MARKET_MIN_USD_MICRO);
+    registry
+        .register(Box::new(galaxy_pricing_market_min_usd_micro.clone()))
+        .expect("register galaxy_pricing_market_min_usd_micro");
+
     let galaxy_pricing_provider_catalog_lookups_total = IntGauge::with_opts(Opts::new(
         METRIC_PROVIDER_CATALOG_LOOKUPS_TOTAL,
         "Galaxy pricing provider catalog allow-list lookups (PH-S172)",
@@ -395,6 +406,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_pricing_forced_fallback_total,
         galaxy_pricing_cache_age_seconds,
         galaxy_pricing_quote_usd_micro,
+        galaxy_pricing_market_min_usd_micro,
         galaxy_pricing_provider_catalog_lookups_total,
         galaxy_pricing_provider_catalog_hits_total,
         galaxy_pricing_provider_errors_total,
@@ -425,6 +437,8 @@ pub fn refresh_galaxy_pricing_gauges() {
         .set(pricing_cache_age_seconds() as i64);
     prom.galaxy_pricing_quote_usd_micro
         .set(last_quote_usd_micro() as i64);
+    prom.galaxy_pricing_market_min_usd_micro
+        .set(last_market_min_usd_micro() as i64);
     prom.galaxy_pricing_provider_catalog_lookups_total
         .set(provider_catalog_lookups_total() as i64);
     prom.galaxy_pricing_provider_catalog_hits_total
@@ -627,6 +641,22 @@ mod tests {
         let body = encode_metrics_text().expect("encode");
         assert!(body.contains(&format!("{METRIC_QUOTE_USD_MICRO} 450000")));
         reset_last_quote_usd_micro_for_test();
+    }
+
+    #[test]
+    fn galaxy_pricing_market_min_usd_micro_gauge_reflects_last_observed_ph_s181() {
+        use crate::grid::galaxy_pricing_oracle::{
+            observe_last_market_min_usd_micro, reset_last_market_min_usd_micro_for_test,
+        };
+
+        reset_last_market_min_usd_micro_for_test();
+        init_prometheus();
+        observe_last_market_min_usd_micro(500_000);
+        refresh_galaxy_pricing_gauges();
+        let body = encode_metrics_text().expect("encode");
+        assert!(body.contains(METRIC_MARKET_MIN_USD_MICRO));
+        assert!(body.contains(&format!("{METRIC_MARKET_MIN_USD_MICRO} 500000")));
+        reset_last_market_min_usd_micro_for_test();
     }
 
     #[test]

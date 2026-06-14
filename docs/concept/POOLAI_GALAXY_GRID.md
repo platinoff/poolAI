@@ -400,7 +400,7 @@ poolai_quote_usd_micro = floor(market_min_usd_micro × 9_000 / 10_000)   // −1
 - Метрики (in-process + Prometheus, PH-S81/S83/S91/S127/S168): `galaxy_pricing_fresh_served`, `galaxy_pricing_stale_served`, `galaxy_pricing_forced_fallback_total`, `galaxy_pricing_cache_age_seconds` — atomics у `galaxy_pricing_oracle.rs`; gauges на `GET /metrics` через [`prometheus_export.rs`](../../src/observability/prometheus_export.rs) (`refresh_galaxy_pricing_gauges`).
 - Env catalog (PH-S92): `GalaxyPricingProviderCatalog` у `galaxy_pricing_oracle.rs` — `parse_pricing_providers_json`, `bundled_pricing_provider_catalog`, `pricing_provider_catalog_from_env`.
 - API metadata (PH-S89): `GET /api/v1/grid/pricing` → `l1_cache` on L1 hits (`cache_age_secs`, `cache_ttl_secs`, `max_stale_secs`, fresh/stale until timestamps).
-- Метрики (Prometheus, roadmap): `galaxy_pricing_provider_errors_total`, `galaxy_pricing_quote_usd_micro`, `galaxy_pricing_market_min_usd_micro` (PH-S181 queue).
+- Метрики (Prometheus, roadmap): `galaxy_pricing_provider_errors_total`, `galaxy_pricing_quote_usd_micro`, `galaxy_pricing_market_min_usd_micro` (PH-S181 ✅).
 - Alert: усі providers fail &gt; 15 хв **і** L2 не заданий → сторінка ops.
 
 **Rust reference (oracle + HTTP, PH-S68…S92):**
@@ -841,6 +841,7 @@ elif verdict == rejected:
 | `galaxy_replay_pending` | ✅ `/metrics` | PH-S176 |
 | `galaxy_settlement_pending_verification_total` | ✅ `/metrics` | PH-S178 |
 | `galaxy_replication_strict_total` | ✅ `/metrics` | PH-S179 |
+| `galaxy_pricing_market_min_usd_micro` | ✅ `/metrics` | PH-S181 |
 | `galaxy_trust_score` | черга | PH-S182 |
 | `galaxy_verification_sample_scheduled_total` | in-process (PH-S164); `/metrics` черга | PH-S186 |
 | `galaxy_settlement_cleared_total` | черга | PH-S187 |

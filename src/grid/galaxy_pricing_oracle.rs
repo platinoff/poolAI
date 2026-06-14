@@ -63,10 +63,14 @@ pub const METRIC_CACHE_AGE_SECONDS: &str = "galaxy_pricing_cache_age_seconds";
 /// Last served PoolAI quote in micro-USD (§4.2, PH-S174 `/metrics` gauge).
 pub const METRIC_QUOTE_USD_MICRO: &str = "galaxy_pricing_quote_usd_micro";
 
+/// Last observed market min in micro-USD (§4.2, PH-S181 `/metrics` gauge).
+pub const METRIC_MARKET_MIN_USD_MICRO: &str = "galaxy_pricing_market_min_usd_micro";
+
 static FRESH_SERVED_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 static L1_CACHE_AGE_OBSERVED_SECS: AtomicU64 = AtomicU64::new(0);
 static LAST_QUOTE_USD_MICRO: AtomicU64 = AtomicU64::new(0);
+static LAST_MARKET_MIN_USD_MICRO: AtomicU64 = AtomicU64::new(0);
 
 /// Env: JSON map for L2 fallback floor quotes in micro-USD (§4.2.4).
 /// Example:
@@ -288,6 +292,26 @@ pub fn last_quote_usd_micro() -> u64 {
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_last_quote_usd_micro_for_test() {
     LAST_QUOTE_USD_MICRO.store(0, Ordering::Relaxed);
+}
+
+/// Observe last served market min for Prometheus gauge (PH-S181).
+pub fn observe_last_market_min_usd_micro(usd_micro: u64) {
+    LAST_MARKET_MIN_USD_MICRO.store(usd_micro, Ordering::Relaxed);
+}
+
+/// Last observed market min in micro-USD since process start (mirrored on `GET /metrics`).
+pub fn last_market_min_usd_micro() -> u64 {
+    LAST_MARKET_MIN_USD_MICRO.load(Ordering::Relaxed)
+}
+
+#[cfg(any(test, feature = "test-utils"))]
+pub fn reset_last_market_min_usd_micro_for_test() {
+    LAST_MARKET_MIN_USD_MICRO.store(0, Ordering::Relaxed);
+}
+
+fn observe_served_quote_metrics(quote: &GalaxyPricingQuote) {
+    observe_last_quote_usd_micro(quote.poolai_quote_usd_micro);
+    observe_last_market_min_usd_micro(quote.market_min_usd_micro);
 }
 
 fn serve_l1_cache_quote(
@@ -834,14 +858,14 @@ impl GalaxyPricingOracle {
                 .l2_fallback_quote(now_secs, key)
                 .ok_or(GalaxyPricingUnavailable)?;
             record_forced_fallback(quote.unit_key);
-            observe_last_quote_usd_micro(quote.poolai_quote_usd_micro);
+            observe_served_quote_metrics(&quote);
             return Ok(quote);
         }
         if let Some((entry, freshness)) = self.lookup(now_secs, &key) {
             if freshness == CacheFreshness::Fresh || freshness == CacheFreshness::Stale {
                 observe_l1_cache_age_secs(now_secs.saturating_sub(entry.quote.cached_at_secs));
                 let quote = serve_l1_cache_quote(entry, freshness);
-                observe_last_quote_usd_micro(quote.poolai_quote_usd_micro);
+                observe_served_quote_metrics(&quote);
                 return Ok(quote);
             }
         }
@@ -849,7 +873,7 @@ impl GalaxyPricingOracle {
             .refresh_from_providers(now_secs, key.clone(), providers)
             .or_else(|| self.l2_fallback_quote(now_secs, key))
             .ok_or(GalaxyPricingUnavailable)?;
-        observe_last_quote_usd_micro(quote.poolai_quote_usd_micro);
+        observe_served_quote_metrics(&quote);
         Ok(quote)
     }
 
@@ -1184,6 +1208,27 @@ mod tests {
             .expect("provider refresh quote");
         assert_eq!(last_quote_usd_micro(), 450_000);
         reset_last_quote_usd_micro_for_test();
+    }
+
+    #[test]
+    fn try_quote_observes_last_market_min_usd_micro_ph_s181() {
+        reset_last_market_min_usd_micro_for_test();
+        let mut oracle = GalaxyPricingOracle::new(GalaxyPricingConfig {
+            cache_ttl_secs: 300,
+            max_stale_secs: 3600,
+            force_fallback: false,
+        });
+        let key = GalaxyPricingCacheKey {
+            task_profile: "inference:text".into(),
+            model_profile: "market-min-metric".into(),
+            unit_key: GalaxyPriceUnitKey::InferenceBlendedToken,
+        };
+        assert_eq!(last_market_min_usd_micro(), 0);
+        oracle
+            .try_quote(10_000, key, &mock_us_blended())
+            .expect("provider refresh quote");
+        assert_eq!(last_market_min_usd_micro(), 500_000);
+        reset_last_market_min_usd_micro_for_test();
     }
 
     #[test]

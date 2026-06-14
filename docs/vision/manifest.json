@@ -1706,11 +1706,17 @@
       "from": "galaxy_grid",
       "kind": "implements",
       "to": "tests_galaxy_verification_match_integration_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "tests_galaxy_pricing_market_min_usd_micro_integration_rs"
     }
   ],
   "galaxy_background": "vision2.png",
-  "git_head": "51482690",
-  "last_sprint_closed": "PH-S180",
+  "git_head": "76f6dd3d",
+  "last_sprint_closed": "PH-S181",
   "layers": [
     {
       "id": "L0",
@@ -1743,7 +1749,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S181",
+  "next_sprint": "PH-S182",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7333,9 +7339,17 @@
       "layer": "L3",
       "path": "tests/galaxy_verification_match_integration.rs",
       "sprints": ["PH-S180"]
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_pricing_market_min_usd_micro_integration_rs",
+      "label": "galaxy_pricing_market_min_usd_micro_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_pricing_market_min_usd_micro_integration.rs",
+      "sprints": ["PH-S181"]
     }
   ],
-  "revision": 117,
+  "revision": 118,
   "updated_at": "2026-06-14",
   "vision_ui_rev": 54
 }
