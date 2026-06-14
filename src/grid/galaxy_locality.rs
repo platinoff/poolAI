@@ -2,6 +2,7 @@
 //! and scheduler ranking stub per `docs/concept/POOLAI_GALAXY_GRID.md` §5.1–5.2.
 //! Stale `network_profile` penalty stub (PH-S169, §8.1). No prefetch wire (PH-S129).
 //! Last observed `shard_local_hit_ratio` gauge on rank path (PH-S183).
+//! Last observed `cross_region_egress_mb` gauge on rank/prefetch path (PH-S185).
 
 use std::sync::atomic::{AtomicU64, Ordering};
 
@@ -75,7 +76,14 @@ pub const DEFAULT_STALE_PROFILE_PENALTY: f64 = 0.05;
 /// Last observed shard local hit ratio in basis points 0..=10_000 (PH-S183 `/metrics` gauge).
 pub const METRIC_SHARD_LOCAL_HIT_RATIO: &str = "galaxy_shard_local_hit_ratio";
 
+/// Last observed cross-region egress in whole MB (PH-S185 `/metrics` gauge).
+pub const METRIC_CROSS_REGION_EGRESS_MB: &str = "galaxy_cross_region_egress_mb";
+
+/// Stub MB per cold shard on prefetch plan path when no task egress wire (PH-S185).
+pub const DEFAULT_PREFETCH_CROSS_REGION_EGRESS_MB_PER_SHARD: f64 = 50.0;
+
 static LAST_SHARD_LOCAL_HIT_RATIO_BPS: AtomicU64 = AtomicU64::new(0);
+static LAST_CROSS_REGION_EGRESS_MB: AtomicU64 = AtomicU64::new(0);
 
 /// Ranked worker for scheduler stub (locality first; pricing/queue_depth — future wire).
 #[derive(Debug, Clone, PartialEq)]
@@ -204,6 +212,7 @@ pub fn rank_workers_by_locality_with_weights(
                 &worker.seed_inventory.shard_ids,
                 &task.required_shard_ids,
             ));
+            observe_last_cross_region_egress_mb(effective_cross_region_egress_mb(worker, task));
         }
     }
     ranked
@@ -224,6 +233,28 @@ pub fn last_shard_local_hit_ratio_bps() -> u64 {
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_last_shard_local_hit_ratio_for_test() {
     LAST_SHARD_LOCAL_HIT_RATIO_BPS.store(0, Ordering::Relaxed);
+}
+
+/// Observe last cross-region egress MB for Prometheus gauge (PH-S185).
+pub fn observe_last_cross_region_egress_mb(egress_mb: f64) {
+    let mb = egress_mb.max(0.0).round() as u64;
+    LAST_CROSS_REGION_EGRESS_MB.store(mb, Ordering::Relaxed);
+}
+
+/// Last observed cross-region egress in whole MB since process start.
+pub fn last_cross_region_egress_mb() -> u64 {
+    LAST_CROSS_REGION_EGRESS_MB.load(Ordering::Relaxed)
+}
+
+#[cfg(any(test, feature = "test-utils"))]
+pub fn reset_last_cross_region_egress_mb_for_test() {
+    LAST_CROSS_REGION_EGRESS_MB.store(0, Ordering::Relaxed);
+}
+
+#[cfg(any(test, feature = "test-utils"))]
+pub fn reset_locality_metrics_for_test() {
+    reset_last_shard_local_hit_ratio_for_test();
+    reset_last_cross_region_egress_mb_for_test();
 }
 
 /// Pick highest-scoring worker (scheduler stub only — no prefetch / lease wire).
@@ -414,5 +445,15 @@ mod tests {
         let _ = rank_workers_by_locality(&[partial, full], &job);
         assert_eq!(last_shard_local_hit_ratio_bps(), 10_000);
         reset_last_shard_local_hit_ratio_for_test();
+    }
+
+    #[test]
+    fn rank_workers_by_locality_observes_cross_region_egress_mb_ph_s185() {
+        reset_last_cross_region_egress_mb_for_test();
+        let job = task(&["w:emb-1"], "inference:text", 200.0, Some("eu-west"));
+        let remote = worker("remote", "us-east", 40, &[]);
+        let _ = rank_workers_by_locality(&[remote], &job);
+        assert_eq!(last_cross_region_egress_mb(), 200);
+        reset_last_cross_region_egress_mb_for_test();
     }
 }

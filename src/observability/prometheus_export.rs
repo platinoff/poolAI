@@ -17,7 +17,10 @@ use prometheus::{
 use std::sync::OnceLock;
 
 use crate::core::state::ApiContext;
-use crate::grid::galaxy_locality::{last_shard_local_hit_ratio_bps, METRIC_SHARD_LOCAL_HIT_RATIO};
+use crate::grid::galaxy_locality::{
+    last_cross_region_egress_mb, last_shard_local_hit_ratio_bps, METRIC_CROSS_REGION_EGRESS_MB,
+    METRIC_SHARD_LOCAL_HIT_RATIO,
+};
 use crate::grid::galaxy_prefetch_metrics::{
     prefetch_bytes_total, prefetch_hot_skip_total, prefetch_plan_total,
     prefetch_planned_shards_total, METRIC_PREFETCH_BYTES_TOTAL, METRIC_PREFETCH_HOT_SKIP_TOTAL,
@@ -78,6 +81,7 @@ pub struct PoolAiPrometheus {
     galaxy_trust_payout_held_total: IntGauge,
     galaxy_trust_score: IntGauge,
     galaxy_shard_local_hit_ratio: IntGauge,
+    galaxy_cross_region_egress_mb: IntGauge,
     galaxy_prefetch_plan_total: IntGauge,
     galaxy_prefetch_planned_shards_total: IntGauge,
     galaxy_prefetch_hot_skip_total: IntGauge,
@@ -321,6 +325,15 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_shard_local_hit_ratio.clone()))
         .expect("register galaxy_shard_local_hit_ratio");
 
+    let galaxy_cross_region_egress_mb = IntGauge::with_opts(Opts::new(
+        METRIC_CROSS_REGION_EGRESS_MB,
+        "Galaxy last observed cross-region egress whole MB on rank/prefetch path (PH-S185)",
+    ))
+    .expect(METRIC_CROSS_REGION_EGRESS_MB);
+    registry
+        .register(Box::new(galaxy_cross_region_egress_mb.clone()))
+        .expect("register galaxy_cross_region_egress_mb");
+
     let galaxy_prefetch_plan_total = IntGauge::with_opts(Opts::new(
         METRIC_PREFETCH_PLAN_TOTAL,
         "Galaxy prefetch plans computed (PH-S167)",
@@ -445,6 +458,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_trust_payout_held_total,
         galaxy_trust_score,
         galaxy_shard_local_hit_ratio,
+        galaxy_cross_region_egress_mb,
         galaxy_prefetch_plan_total,
         galaxy_prefetch_planned_shards_total,
         galaxy_prefetch_hot_skip_total,
@@ -496,6 +510,8 @@ pub fn refresh_galaxy_locality_gauges() {
     let prom = init_prometheus();
     prom.galaxy_shard_local_hit_ratio
         .set(last_shard_local_hit_ratio_bps() as i64);
+    prom.galaxy_cross_region_egress_mb
+        .set(last_cross_region_egress_mb() as i64);
 }
 
 /// Mirror in-process prefetch plan counters into Prometheus gauges (scrape snapshot).
@@ -800,6 +816,21 @@ mod tests {
         refresh_galaxy_locality_gauges();
         let body = encode_metrics_text().expect("encode");
         assert!(body.contains(METRIC_SHARD_LOCAL_HIT_RATIO));
+        assert!(body.contains(METRIC_CROSS_REGION_EGRESS_MB));
+    }
+
+    #[test]
+    fn galaxy_cross_region_egress_mb_gauge_reflects_last_observed_ph_s185() {
+        use crate::grid::galaxy_locality::{
+            observe_last_cross_region_egress_mb, reset_last_cross_region_egress_mb_for_test,
+        };
+        reset_last_cross_region_egress_mb_for_test();
+        observe_last_cross_region_egress_mb(120.0);
+        init_prometheus();
+        refresh_galaxy_locality_gauges();
+        let body = encode_metrics_text().expect("encode");
+        assert!(body.contains(&format!("{METRIC_CROSS_REGION_EGRESS_MB} 120")));
+        reset_last_cross_region_egress_mb_for_test();
     }
 
     #[test]

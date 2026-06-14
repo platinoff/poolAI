@@ -12,6 +12,9 @@ use chrono::Utc;
 use serde::{Deserialize, Serialize};
 
 use crate::core::error::AppError;
+use crate::grid::galaxy_locality::{
+    observe_last_cross_region_egress_mb, DEFAULT_PREFETCH_CROSS_REGION_EGRESS_MB_PER_SHARD,
+};
 use crate::grid::galaxy_prefetch_metrics::{
     record_prefetch_plan, DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM,
     DEFAULT_PREFETCH_BYTES_PER_SHARD_VRAM,
@@ -200,6 +203,11 @@ pub fn plan_prefetch(
     };
     let prefetch_bytes = items.len() as u64 * bytes_per_shard;
     record_prefetch_plan(required_shard_ids.len(), items.len(), prefetch_bytes);
+    if !items.is_empty() {
+        observe_last_cross_region_egress_mb(
+            DEFAULT_PREFETCH_CROSS_REGION_EGRESS_MB_PER_SHARD * items.len() as f64,
+        );
+    }
     PrefetchPlan {
         items,
         trigger,
@@ -791,7 +799,12 @@ mod tests {
         assert_eq!(prefetch_planned_shards_total(), 1);
         assert_eq!(prefetch_hot_skip_total(), 1);
         assert_eq!(prefetch_bytes_total(), DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM);
+        use crate::grid::galaxy_locality::{
+            last_cross_region_egress_mb, reset_last_cross_region_egress_mb_for_test,
+        };
+        assert_eq!(last_cross_region_egress_mb(), 50);
         reset_prefetch_metrics_for_test();
+        reset_last_cross_region_egress_mb_for_test();
     }
 
     #[test]
