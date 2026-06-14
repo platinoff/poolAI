@@ -28,7 +28,7 @@ cd /s/rust/poolAI
 # Варіант A: poolai вже на :8080
 bash bin/e2e-playwright.sh
 
-# Варіант B: збірка + старт + тести
+# Варіант B: збірка + старт + тести (PH-S158: stand via `poolai-e2e-stand`)
 bash bin/e2e-playwright.sh --start
 # GitHub Actions (CI=true): debug, `CARGO_BUILD_JOBS=1`, features без `ml`; `npm run test:ci` (smoke+admin+a11y+visual) + Rust `poolai-http-stand-smoke --raid-restart` (PH-S156).
 # Windows + AV: виключення для `target/` і `~/.cargo`; локально `export CARGO_BUILD_JOBS=1` перед `--start`.

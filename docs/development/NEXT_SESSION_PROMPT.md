@@ -1,45 +1,43 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-14 · PH-S157 ✅ · vision **rev 91** · **10** відкритих (PH-S158…S165) · **stretch spirit 96%**
+**Оновлено:** 2026-06-14 · PH-S158 ✅ · vision **rev 92** · **9** відкритих (PH-S159…S165) · **stretch spirit 96%**
 
-| **← наступний** | **PH-S158** — `poolai-e2e-stand` bin |
-| **Відкритих** | **10** (PH-S158…S165) |
-| **Ratio spirit** | формально **90–95%** · орієнтир **96%** — [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md) |
-| **VDT** | [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · один PH-S* = 1 commit |
+| **← наступний** | **PH-S159** — Ratio **96%** stretch CI gate |
+| **Відкритих** | **9** (PH-S159…S165) |
+| **VDT** | один PH-S* = 1 commit |
 
 ---
 
-## Зріз §5.12 (10 відкритих: stretch S158…S159 + maintain S160…S165)
+## Зріз §5.12 (9 відкритих: stretch S159 + maintain S160…S165)
 
 ### Закрито недавно ✅
 
 | Sprint | Scope | Зріз |
 |--------|-------|------|
-| PH-S157 | topology SVG Rust | `topology_graph.rs` layout; `GET /topology/graph`; slim JS |
-| PH-S156 | jobs_raid → Rust smoke | `--raid-restart` stand smoke; `test:ci` browser-only |
-| PH-S155 | ML charts → wasm | `poolai-ui-core/ml` + wasm |
+| PH-S158 | `poolai-e2e-stand` | Rust stand start/restart/stop; slim `e2e-playwright.sh` |
+| PH-S157 | topology SVG Rust | `GET /topology/graph`; slim `topology_graph.js` |
+| PH-S156 | jobs_raid → Rust smoke | `--raid-restart` |
 
-### Відкрито — stretch band (PH-S158…S159)
+### Відкрито — stretch (PH-S159)
 
-| # | Sprint | Scope | Acceptance | Ratio |
-|---|--------|-------|------------|-------|
-| 1 | **PH-S158** | `poolai-e2e-stand` bin | Rust stand start/restart; slim `e2e-playwright.sh` | −shell |
-| 2 | **PH-S159** | **96%** stretch gate | warn **93%**; stretch **96%**; replenish post-S159 | **96%** |
+| # | Sprint | Scope | Acceptance |
+|---|--------|-------|------------|
+| 1 | **PH-S159** | **96%** stretch gate | warn **93%**; stretch **96%**; replenish post-S159 |
 
-### Відкрито — maintain band (PH-S160…S165)
+### Відкрито — maintain (PH-S160…S165)
 
-| # | Sprint | Scope | Acceptance | Ratio |
-|---|--------|-------|------------|-------|
-| 3 | **PH-S160** | Admin theme → Rust | `poolaiNormalizeTheme` у ui-core; slim `admin_theme.js` | −JS |
-| 4 | **PH-S161** | Admin modal a11y → wasm | focus-trap helpers wasm; slim `admin_modal_a11y.js` | −JS |
-| 5 | **PH-S162** | Auth i18n subset Rust | auth/dashboard keys у `i18n.rs`; slim auth block | −JS |
-| 6 | **PH-S163** | Galaxy trust metrics wire | Prometheus на grid result; unit tests | +Rust |
-| 7 | **PH-S164** | Verify sampling apply | `galaxy_verify_sampling` HTTP/grid stub; tests | +Rust |
-| 8 | **PH-S165** | **96%** hold gate | CI `--min-ratio 0.95`; replenish next band | **96%** |
+| # | Sprint | Scope |
+|---|--------|-------|
+| 2 | **PH-S160** | Admin theme → Rust |
+| 3 | **PH-S161** | Admin modal a11y → wasm |
+| 4 | **PH-S162** | Auth i18n subset Rust |
+| 5 | **PH-S163** | Galaxy trust metrics wire |
+| 6 | **PH-S164** | Verify sampling apply |
+| 7 | **PH-S165** | **96%** hold gate |
 
 ---
 
-## S0 (на початку сесії)
+## S0
 
 ```bash
 git fetch origin
@@ -52,42 +50,23 @@ export K8S_OPENAPI_ENABLED_VERSION=1.28
 
 ---
 
-## PH-S158 — scope підказка
+## PH-S159 — scope
 
-| Файл | Дія |
-|------|-----|
-| `src/bin/poolai_e2e_stand.rs` (новий) | Rust stand start/restart |
-| `bin/e2e-playwright.sh` | slim — delegate stand lifecycle |
-| FM §5.12 / HANDOFF | PH-S158 ✅; NEXT → PH-S159 |
+- `poolai-loc-audit` warn **93%**, stretch **96%** у CI/docs
+- FM replenish post-S159 band
+- Acceptance: `cargo test-ci`; loc-audit; FM/HANDOFF/NEXT/vision; push
 
 ---
 
-## Закриття спринту (канон)
-
-1. `cargo fmt --all`
-2. `K8S_OPENAPI_ENABLED_VERSION=1.28 cargo test-ci`
-3. `cargo run --bin poolai-loc-audit -- --min-ratio 0.91`
-4. FM §5.12 PH-S* ✅ · HANDOFF · цей файл · vision rev++
-5. `git push origin main` (MSYS2)
-
----
-
-## Copy-paste — наступна сесія (PH-S158)
+## Copy-paste — PH-S159
 
 ```
-PoolAI — спринт PH-S158 (один PH-S*, VDT ітераційно).
-
+PoolAI — спринт PH-S159 (один PH-S*, VDT ітераційно).
 HANDOFF: docs/development/HANDOFF_NEW_SESSION.md
 FM §5.12: docs/catalog/FUNCTION_MANAGEMENT.md
 
-Спринт PH-S158 — poolai-e2e-stand bin
-Scope:
-  - src/bin/poolai_e2e_stand.rs — Rust stand start/restart
-  - bin/e2e-playwright.sh — slim stand lifecycle
-  - Rust integration; без Python; без нового Playwright API spec
+Спринт PH-S159 — 96% stretch CI gate
+Scope: poolai-loc-audit warn 93% / stretch 96%; CI + docs; replenish §5.12
 
-Acceptance:
-  - cargo fmt --all; cargo test-ci; poolai-loc-audit --min-ratio 0.91
-  - FM §5.12 PH-S158 ✅; HANDOFF; NEXT → PH-S159; vision rev++
-  - git push origin main (MSYS2)
+Acceptance: cargo fmt; cargo test-ci; loc-audit; FM/HANDOFF/NEXT/vision; git push main
 ```

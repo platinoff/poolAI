@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": false,
   "min_ratio": 0.91,
-  "rust_loc": 108945,
-  "non_rust_product_loc": 9045,
-  "product_loc_total": 117990,
-  "rust_ratio": 0.9233409610983981,
-  "rust_ratio_pct": 92.33409610983982,
+  "rust_loc": 109320,
+  "non_rust_product_loc": 8968,
+  "product_loc_total": 118288,
+  "rust_ratio": 0.9241850399026106,
+  "rust_ratio_pct": 92.41850399026106,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -29,7 +29,7 @@
     },
     "ops_shell": {
       "files": 32,
-      "loc": 2050
+      "loc": 1973
     },
     "rust_benches": {
       "files": 7,
@@ -40,8 +40,8 @@
       "loc": 3393
     },
     "rust_src": {
-      "files": 230,
-      "loc": 83192
+      "files": 231,
+      "loc": 83567
     },
     "rust_tests": {
       "files": 112,

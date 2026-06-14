@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-14 (PH-S157 ✅ · §5.12 **10** відкритих PH-S158…S165 · rust_ratio **92.33%** · stretch **96%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-14 (PH-S158 ✅ · §5.12 **9** відкритих PH-S159…S165 · rust_ratio **92.42%** · stretch **96%**) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -357,7 +357,7 @@ FM-xxx (з таблиці нижче)
 | 90 | **PH-S155** | ML charts data → Rust/wasm (code) | PH-S146 `ml` | `admin_charts.js` — лише canvas glue; metrics parse у wasm | **✅** |
 | 91 | **PH-S156** | `jobs_raid` e2e → Rust stand smoke (tests) | PH-S145 | `poolai-http-stand-smoke --raid-restart`; прибрати `jobs_raid` з `test:ci` | **✅** |
 | 92 | **PH-S157** | topology SVG from Rust (code) | `topology.rs` | masked topology data з Rust; slim `topology_graph.js` | **✅** |
-| 93 | **PH-S158** | `poolai-e2e-stand` Rust bin (code) | PH-S145 | stand start/restart/env у Rust bin; slim `bin/e2e-playwright.sh` | відкрито |
+| 93 | **PH-S158** | `poolai-e2e-stand` Rust bin (code) | PH-S145 | stand start/restart/env у Rust bin; slim `bin/e2e-playwright.sh` | **✅** |
 | 94 | **PH-S159** | Ratio **96%** stretch CI gate (ops) | PH-S150…S158 | `poolai-loc-audit` warn **93%**, stretch **96%**; FM replenish post-S159 band | відкрито |
 | 95 | **PH-S160** | Admin theme normalize → Rust (code) | PH-S153 `admin_theme.js` | `poolaiNormalizeTheme` + token map у `poolai-ui-core`; slim `admin_theme.js` | відкрито |
 | 96 | **PH-S161** | Admin modal a11y → wasm (code) | PH-S153 `admin_modal_a11y.js` | focus-trap / modal helpers у ui-core/wasm; slim modal JS | відкрито |
@@ -366,7 +366,7 @@ FM-xxx (з таблиці нижче)
 | 99 | **PH-S164** | Verify sampling env apply (code) | PH-S142, Galaxy §6.1 | `galaxy_verify_sampling` у HTTP/grid middleware stub; tests | відкрито |
 | 100 | **PH-S165** | Ratio **96%** hold band gate (ops) | PH-S159…S164 | CI `--min-ratio 0.95`; maintain spirit **96%**; replenish §5.12 next band | відкрито |
 
-**Відкритих у §5.12:** **10** (PH-S158…S165). **Закрито смуга:** PH-S128…S157 ✅. Vision rev **91**. **Baseline:** rust_ratio **92.33%** → **stretch spirit 96%** ([`rust_ratio.json`](../development/rust_ratio.json), [`RUST_RATIO_STRATEGY_2026-06-13.md`](../development/RUST_RATIO_STRATEGY_2026-06-13.md)).
+**Відкритих у §5.12:** **9** (PH-S159…S165). **Закрито смуга:** PH-S128…S158 ✅. Vision rev **92**. **Baseline:** rust_ratio **92.42%** → **stretch spirit 96%** ([`rust_ratio.json`](../development/rust_ratio.json), [`RUST_RATIO_STRATEGY_2026-06-13.md`](../development/RUST_RATIO_STRATEGY_2026-06-13.md)).
 
 **Rust ratio:** формальна смуга **90–95%**; **spirit 96%** — PH-S157…S159 закривають stretch band; PH-S160…S165 — maintain + Galaxy wire stubs; replenish після S165.
 
@@ -487,7 +487,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **PH-S158** · черга **10** відкритих (PH-S158…S165) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S159** · черга **9** відкритих (PH-S159…S165) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

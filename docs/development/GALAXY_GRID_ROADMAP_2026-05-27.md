@@ -65,7 +65,7 @@
 | — | **PH-S155** ✅ | ML charts → wasm | `poolai-ui-core/ml` + wasm |
 | 1 | **PH-S156** | jobs_raid → Rust smoke | drop from `test:ci` | **✅** |
 | 2 | **PH-S157** | topology SVG Rust | slim `topology_graph.js` | **✅** |
-| 3 | **PH-S158** | `poolai-e2e-stand` bin | slim shell |
+| 3 | **PH-S158** | `poolai-e2e-stand` bin | slim shell | **✅** |
 | 4 | **PH-S159** | **96%** stretch gate | warn 93%; replenish post-S159 |
 | 5 | **PH-S160** | Admin theme → Rust | slim `admin_theme.js` |
 | 6 | **PH-S161** | Admin modal a11y → wasm | slim `admin_modal_a11y.js` |

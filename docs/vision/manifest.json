@@ -1580,11 +1580,23 @@
       "from": "src_ui_admin_topology_rs",
       "kind": "implements",
       "to": "src_ui_topology_graph_js"
+    },
+    {
+      "auto_synced": true,
+      "from": "bin_e2e_playwright_sh",
+      "kind": "implements",
+      "to": "src_bin_poolai_e2e_stand_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "src_bin_poolai_e2e_stand_rs",
+      "kind": "implements",
+      "to": "src_bin_poolai_http_stand_smoke_rs"
     }
   ],
   "galaxy_background": "vision2.png",
-  "git_head": "81900062",
-  "last_sprint_closed": "PH-S157",
+  "git_head": "6d5455fc",
+  "last_sprint_closed": "PH-S158",
   "layers": [
     {
       "id": "L0",
@@ -1617,7 +1629,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S158",
+  "next_sprint": "PH-S159",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -4690,7 +4702,14 @@
     },
     {
       "auto_synced": true,
-      "id": "crates_poolai_ui_core_Cargo_toml",
+      "id": "src_bin_poolai_e2e_stand_rs",
+      "label": "poolai_e2e_stand.rs",
+      "layer": "L3",
+      "path": "src/bin/poolai_e2e_stand.rs",
+      "sprints": [
+        "PH-S158"
+      ]
+    },
       "label": "poolai-ui-core Cargo.toml",
       "layer": "L3",
       "path": "crates/poolai-ui-core/Cargo.toml",
@@ -6994,7 +7013,7 @@
       "path": "src/ui/admin_theme.js"
     }
   ],
-  "revision": 91,
+  "revision": 92,
   "updated_at": "2026-06-14",
   "vision_ui_rev": 54
 }
