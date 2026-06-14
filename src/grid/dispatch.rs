@@ -13,6 +13,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::core::error::AppError;
 use crate::grid::galaxy_prefetch_metrics::record_prefetch_plan;
+use crate::grid::galaxy_replay_metrics::evaluate_result_replay_pending;
 use crate::grid::galaxy_replication::{
     replication_tier_from_policy, ReplicationTierConfig, REPLICATION_STANDARD, REPLICATION_STRICT,
 };
@@ -343,6 +344,7 @@ fn ingest_result(
     let verification_sample =
         evaluate_result_verify_sampling(source_peer_id, &job_id, &VerifySamplingConfig::from_env());
     let settlement_status = resolve_settlement_status(settlement_gate, verification_sample);
+    evaluate_result_replay_pending(body.metrics.as_ref(), settlement_status);
     Ok(GridIngestOutcome {
         kind: GridIngestKind::Result {
             job_id,
@@ -1042,6 +1044,55 @@ mod tests {
         ingest_envelope(env, &jobs, &memory).expect("ingest");
         assert_eq!(verification_mismatch_total(), 1);
         reset_verification_mismatch_metrics_for_test();
+    }
+
+    #[test]
+    fn ingest_result_wire_records_replay_pending_metric_ph_s176() {
+        use crate::grid::galaxy_replay_metrics::{
+            replay_metrics_test_lock, replay_pending, reset_replay_pending_metrics_for_test,
+        };
+
+        let _lock = replay_metrics_test_lock();
+        reset_replay_pending_metrics_for_test();
+        let jobs = JobStore::open_for_test(None);
+        let memory = MemoryShardStore::open_for_test(None);
+        jobs.push(JobRecord {
+            spec: JobSpec {
+                id: JobId::new("grid-replay-pending"),
+                kind: JobKind::Inference,
+                resources: Default::default(),
+                priority: 0,
+                max_duration_secs: None,
+                input_artifact_ids: vec![],
+                verification_policy: None,
+                deadline: None,
+            },
+            status: JobStatus::Scheduled,
+            created_at: Utc::now(),
+            worker_id: None,
+            vm_id: None,
+            lease_owner: None,
+            lease_epoch: None,
+            lease_expires_at: None,
+        })
+        .expect("push");
+
+        let env = GridEnvelope::new(
+            GridMessage::Result(crate::grid::GridResultBody {
+                job_id: "grid-replay-pending".into(),
+                status: GridResultStatus::Completed,
+                output_artifact_ids: vec![],
+                proof: None,
+                metrics: Some(serde_json::json!({
+                    "verification_verdict": "mismatch"
+                })),
+                lease_epoch: None,
+            }),
+            Some("tg-edge".into()),
+        );
+        ingest_envelope(env, &jobs, &memory).expect("ingest");
+        assert_eq!(replay_pending(), 1);
+        reset_replay_pending_metrics_for_test();
     }
 
     #[test]

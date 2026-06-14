@@ -32,6 +32,7 @@ use crate::grid::galaxy_pricing_provider_metrics::{
     METRIC_PROVIDER_CATALOG_HITS_TOTAL, METRIC_PROVIDER_CATALOG_LOOKUPS_TOTAL,
     METRIC_PROVIDER_ERRORS_TOTAL,
 };
+use crate::grid::galaxy_replay_metrics::{replay_pending, METRIC_REPLAY_PENDING};
 use crate::grid::galaxy_trust_score::{
     payout_eligible_total, payout_held_total, METRIC_PAYOUT_ELIGIBLE_TOTAL,
     METRIC_PAYOUT_HELD_TOTAL,
@@ -68,6 +69,7 @@ pub struct PoolAiPrometheus {
     galaxy_prefetch_planned_shards_total: IntGauge,
     galaxy_prefetch_hot_skip_total: IntGauge,
     galaxy_verification_mismatch_total: IntGauge,
+    galaxy_replay_pending: IntGauge,
 }
 
 static PROMETHEUS: OnceLock<PoolAiPrometheus> = OnceLock::new();
@@ -310,6 +312,15 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_verification_mismatch_total.clone()))
         .expect("register galaxy_verification_mismatch_total");
 
+    let galaxy_replay_pending = IntGauge::with_opts(Opts::new(
+        METRIC_REPLAY_PENDING,
+        "Galaxy replay verifications pending coordinator verdict (PH-S176)",
+    ))
+    .expect(METRIC_REPLAY_PENDING);
+    registry
+        .register(Box::new(galaxy_replay_pending.clone()))
+        .expect("register galaxy_replay_pending");
+
     #[cfg(target_os = "linux")]
     {
         let collector = prometheus::process_collector::ProcessCollector::for_self();
@@ -343,6 +354,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_prefetch_planned_shards_total,
         galaxy_prefetch_hot_skip_total,
         galaxy_verification_mismatch_total,
+        galaxy_replay_pending,
     }
 }
 
@@ -392,6 +404,7 @@ pub fn refresh_galaxy_verification_gauges() {
     let prom = init_prometheus();
     prom.galaxy_verification_mismatch_total
         .set(verification_mismatch_total() as i64);
+    prom.galaxy_replay_pending.set(replay_pending() as i64);
 }
 
 /// Record a secret rotation attempt (called from `security::secret_rotation`).
@@ -679,5 +692,21 @@ mod tests {
         assert!(body.contains(METRIC_VERIFICATION_MISMATCH_TOTAL));
         assert!(body.contains(&format!("{METRIC_VERIFICATION_MISMATCH_TOTAL} 1")));
         reset_verification_mismatch_metrics_for_test();
+    }
+
+    #[test]
+    fn galaxy_replay_pending_gauge_reflects_stub_ph_s176() {
+        use crate::grid::galaxy_replay_metrics::{
+            record_replay_pending_scheduled, reset_replay_pending_metrics_for_test,
+        };
+
+        reset_replay_pending_metrics_for_test();
+        init_prometheus();
+        record_replay_pending_scheduled();
+        refresh_galaxy_verification_gauges();
+        let body = encode_metrics_text().expect("encode");
+        assert!(body.contains(METRIC_REPLAY_PENDING));
+        assert!(body.contains(&format!("{METRIC_REPLAY_PENDING} 1")));
+        reset_replay_pending_metrics_for_test();
     }
 }
