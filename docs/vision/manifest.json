@@ -1640,11 +1640,17 @@
       "from": "galaxy_grid",
       "kind": "implements",
       "to": "tests_galaxy_pricing_provider_errors_integration_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "tests_galaxy_pricing_quote_usd_micro_integration_rs"
     }
   ],
   "galaxy_background": "vision2.png",
-  "git_head": "113c5aca",
-  "last_sprint_closed": "PH-S173",
+  "git_head": "774a85b2",
+  "last_sprint_closed": "PH-S174",
   "layers": [
     {
       "id": "L0",
@@ -1677,7 +1683,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S174",
+  "next_sprint": "PH-S175",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7185,9 +7191,16 @@
       "label": "galaxy_pricing_provider_errors_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_pricing_provider_errors_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_pricing_quote_usd_micro_integration_rs",
+      "label": "galaxy_pricing_quote_usd_micro_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_pricing_quote_usd_micro_integration.rs"
     }
   ],
-  "revision": 109,
+  "revision": 110,
   "updated_at": "2026-06-14",
   "vision_ui_rev": 54
 }

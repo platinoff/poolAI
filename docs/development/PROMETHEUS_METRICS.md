@@ -53,6 +53,7 @@ scrape_configs:
 | `galaxy_pricing_provider_catalog_lookups_total` | gauge | Galaxy pricing provider catalog allow-list lookups (PH-S172) |
 | `galaxy_pricing_provider_catalog_hits_total` | gauge | Galaxy pricing provider catalog allow-list hits (PH-S172) |
 | `galaxy_pricing_provider_errors_total` | gauge | Galaxy pricing live provider HTTP fetch failures (PH-S173) |
+| `galaxy_pricing_quote_usd_micro` | gauge | Galaxy pricing last served PoolAI quote micro-USD (PH-S174) |
 | `galaxy_trust_payout_eligible_total` | gauge | Galaxy trust gate edge payout-eligible results (PH-S137 stub; PH-S163 grid wire) |
 | `galaxy_trust_payout_held_total` | gauge | Galaxy trust gate edge payout-held results (PH-S137 stub; PH-S163 grid wire) |
 | `process_*` | various | `prometheus` process collector when available |
@@ -69,4 +70,4 @@ Prometheus alert rules live in your monitoring stack (Prometheus / Alertmanager 
 - [`../performance/BENCHMARKS.md`](../performance/BENCHMARKS.md) — load baselines
 - [`../performance/PROFILING.md`](../performance/PROFILING.md) — hot-path profiling
 
-**Last updated:** 2026-06-14 (PH-S173 provider fetch errors metric).
+**Last updated:** 2026-06-14 (PH-S174 last quote gauge).

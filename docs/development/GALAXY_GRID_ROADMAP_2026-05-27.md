@@ -1,6 +1,6 @@
 # Galaxy Grid — роадмеп розробки (PoolAI)
 
-**Оновлено:** 2026-06-14 · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**5** відкритих PH-S174…S178)
+**Оновлено:** 2026-06-14 · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**5** відкритих PH-S175…S179)
 
 Операційний зріз сесій: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) · старт наступної: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)
 
@@ -10,9 +10,9 @@
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **5** — PH-S174…S178 |
-| **Закрито PH-S128…S173** | Galaxy wire + ratio hold + admin Rust slim + prefetch + pricing metrics + locality + settlement + replication |
-| **Після S178** | replenish §5.12 (≤10) |
+| **Відкрито** | **5** — PH-S175…S179 |
+| **Закрито PH-S128…S174** | Galaxy wire + ratio hold + admin Rust slim + pricing metrics band |
+| **Після S179** | replenish §5.12 (≤10) |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
 
 ---
@@ -58,16 +58,16 @@
 
 ---
 
-## 3. Черга §5.12 (post-S173 replenish S174…S178)
+## 3. Черга §5.12 (post-S174 replenish S175…S179)
 
 | # | Sprint | Тема | Acceptance |
 |---|--------|------|------------|
-| — | **PH-S173** ✅ | Pricing provider errors metrics | §4.2 provider fetch fail |
-| 1 | **PH-S174** | Pricing quote usd_micro metrics | §4.2 last quote gauge |
-| 2 | **PH-S175** | Verification mismatch metrics | §6.2 mismatch counter |
-| 3 | **PH-S176** | Replay pending metrics | §6.3 replay pending gauge |
-| 4 | **PH-S177** | Verification sample total metrics | §6.2 sample counter |
-| 5 | **PH-S178** | Settlement pending_verification metrics | §6.4 grid result path |
+| — | **PH-S174** ✅ | Pricing quote usd_micro metrics | §4.2 last quote gauge |
+| 1 | **PH-S175** | Verification mismatch metrics | §6.2 mismatch counter |
+| 2 | **PH-S176** | Replay pending metrics | §6.3 replay pending gauge |
+| 3 | **PH-S177** | Verification sample total metrics | §6.2 sample counter |
+| 4 | **PH-S178** | Settlement pending_verification metrics | §6.4 grid result path |
+| 5 | **PH-S179** | Replication strict tier metrics | §6.3 grid job ingest |
 
 Повна таблиця — FM **§5.12** · [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md).
 
