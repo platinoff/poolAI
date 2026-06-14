@@ -6,18 +6,18 @@
   "warn_below": 0.93,
   "target_ratio": 0.95,
   "stretch_spirit": 0.96,
-  "advisory_mode": true,
-  "min_ratio": 0.95,
-  "rust_loc": 111181,
+  "advisory_mode": false,
+  "min_ratio": null,
+  "rust_loc": 111622,
   "non_rust_product_loc": 8692,
-  "product_loc_total": 119873,
-  "rust_ratio": 0.9274899268392381,
-  "rust_ratio_pct": 92.74899268392382,
+  "product_loc_total": 120314,
+  "rust_ratio": 0.9277557059028875,
+  "rust_ratio_pct": 92.77557059028875,
   "in_formal_band": true,
   "below_warn_threshold": true,
   "below_target": true,
   "below_stretch_spirit": true,
-  "meets_min_ratio": false,
+  "meets_min_ratio": null,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -36,16 +36,16 @@
       "loc": 608
     },
     "rust_crates": {
-      "files": 24,
-      "loc": 4007
+      "files": 25,
+      "loc": 4156
     },
     "rust_src": {
-      "files": 233,
-      "loc": 84515
+      "files": 234,
+      "loc": 84735
     },
     "rust_tests": {
-      "files": 114,
-      "loc": 22051
+      "files": 115,
+      "loc": 22123
     },
     "ui_css": {
       "files": 2,

@@ -1,7 +1,7 @@
 {
-  "revision": 51,
+  "revision": 52,
   "updated_at": "2026-06-14",
-  "active_sprint": "PH-S168",
+  "active_sprint": "PH-S169",
   "ui_version": 4,
   "extension_policy": {
     ".md": {
@@ -298,7 +298,7 @@
       "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md"]
     },
     "rust_ratio_stretch_band": {
-      "sprints": ["PH-S150", "PH-S151", "PH-S152", "PH-S153", "PH-S154", "PH-S155", "PH-S156", "PH-S157", "PH-S158", "PH-S159", "PH-S160", "PH-S161", "PH-S162", "PH-S163", "PH-S164", "PH-S165", "PH-S166", "PH-S167", "PH-S168", "PH-S169", "PH-S170", "PH-S171", "PH-S172"],
+      "sprints": ["PH-S150", "PH-S151", "PH-S152", "PH-S153", "PH-S154", "PH-S155", "PH-S156", "PH-S157", "PH-S158", "PH-S159", "PH-S160", "PH-S161", "PH-S162", "PH-S163", "PH-S164", "PH-S165", "PH-S166", "PH-S167", "PH-S168", "PH-S169", "PH-S170", "PH-S171", "PH-S172", "PH-S173"],
       "docs": [
         "docs/development/RUST_RATIO_STRATEGY_2026-06-13.md",
         "docs/development/rust_ratio.json",

@@ -1653,7 +1653,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S168",
+  "next_sprint": "PH-S169",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7119,9 +7119,16 @@
       "label": "galaxy_prefetch_metrics_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_prefetch_metrics_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_pricing_cache_age_integration_rs",
+      "label": "galaxy_pricing_cache_age_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_pricing_cache_age_integration.rs"
     }
   ],
-  "revision": 104,
+  "revision": 105,
   "updated_at": "2026-06-14",
   "vision_ui_rev": 54
 }

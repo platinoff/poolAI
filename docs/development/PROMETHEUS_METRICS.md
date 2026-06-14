@@ -49,6 +49,7 @@ scrape_configs:
 | `galaxy_pricing_fresh_served` | gauge | Galaxy pricing oracle L1 fresh serves (PH-S127) |
 | `galaxy_pricing_stale_served` | gauge | Galaxy pricing oracle L1 stale serves (PH-S127) |
 | `galaxy_pricing_forced_fallback_total` | gauge | Galaxy pricing oracle forced L2 quotes (PH-S127) |
+| `galaxy_pricing_cache_age_seconds` | gauge | Galaxy pricing L1 cache age seconds last observed (PH-S168) |
 | `galaxy_trust_payout_eligible_total` | gauge | Galaxy trust gate edge payout-eligible results (PH-S137 stub; PH-S163 grid wire) |
 | `galaxy_trust_payout_held_total` | gauge | Galaxy trust gate edge payout-held results (PH-S137 stub; PH-S163 grid wire) |
 | `process_*` | various | `prometheus` process collector when available |
@@ -65,4 +66,4 @@ Prometheus alert rules live in your monitoring stack (Prometheus / Alertmanager 
 - [`../performance/BENCHMARKS.md`](../performance/BENCHMARKS.md) — load baselines
 - [`../performance/PROFILING.md`](../performance/PROFILING.md) — hot-path profiling
 
-**Last updated:** 2026-05-29 (PH-S127 galaxy pricing oracle gauges).
+**Last updated:** 2026-06-14 (PH-S168 galaxy pricing cache age gauge).
