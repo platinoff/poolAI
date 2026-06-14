@@ -813,7 +813,7 @@ accept if count(d_i == mode(digests)) >= K
 
 ```
 if origin == telegram_edge and trust_score < min_trust_for_payout:
-    hold payout (pending_verification)
+    hold payout (pending_verification)  # PH-S170 SettlementStatus::PendingVerification
 elif verification_verdict == accepted:
     apply galaxy_fee_split → payout_pubkey
 elif verdict == rejected:

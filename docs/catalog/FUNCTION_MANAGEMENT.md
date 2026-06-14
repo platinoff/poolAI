@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-14 (PH-S169 ✅ · §5.12 **5** відкритих PH-S170…S174 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-14 (PH-S170 ✅ · §5.12 **5** відкритих PH-S171…S175 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -369,17 +369,18 @@ FM-xxx (з таблиці нижче)
 | 102 | **PH-S167** | Galaxy prefetch metrics stub (code) | PH-S129, Galaxy §5.5 | Prometheus counters on `plan_prefetch`; unit + integration tests | **✅** |
 | 103 | **PH-S168** | Galaxy pricing cache age /metrics (code) | PH-S89, Galaxy §4.2 | `galaxy_pricing_cache_age_seconds` gauge on GET /metrics; unit tests | **✅** |
 | 104 | **PH-S169** | Locality stale profile penalty stub (code) | Galaxy §8.1 | `stale_network_profile_penalty` у `galaxy_locality.rs`; unit tests | **✅** |
-| 105 | **PH-S170** | Galaxy settlement pending_verification stub (code) | PH-S165, Galaxy §6.4 | `pending_verification` verdict stub on grid result path; unit tests | відкрито |
+| 105 | **PH-S170** | Galaxy settlement pending_verification stub (code) | PH-S165, Galaxy §6.4 | `pending_verification` verdict stub on grid result path; unit tests | **✅** |
 | 106 | **PH-S171** | Galaxy replication strict tier stub (code) | Galaxy §6.3 | `replication_strict` tier config stub; unit tests | відкрито |
 | 107 | **PH-S172** | Galaxy pricing provider catalog metrics stub (code) | PH-S92, Galaxy §4.2 | Prometheus counters on provider allow-list hits; unit tests | відкрито |
 | 108 | **PH-S173** | Galaxy pricing provider errors metrics stub (code) | PH-S92, Galaxy §4.2 | `galaxy_pricing_provider_errors_total` counter on provider fetch fail; unit tests | відкрито |
 | 109 | **PH-S174** | Galaxy pricing quote usd_micro metrics stub (code) | PH-S89, Galaxy §4.2 | `galaxy_pricing_quote_usd_micro` gauge on last quote; unit tests | відкрито |
+| 110 | **PH-S175** | Galaxy verification mismatch metrics stub (code) | Galaxy §6.2 | `galaxy_verification_mismatch_total` counter stub; unit tests | відкрито |
 
-**Відкритих у §5.12:** **5** (PH-S170…S174). **Закрито смуга:** PH-S128…S169 ✅. Vision rev **105**.
+**Відкритих у §5.12:** **5** (PH-S171…S175). **Закрито смуга:** PH-S128…S170 ✅. Vision rev **106**.
 
-**Rust ratio:** формальна смуга **90–95%**; **hold 95%** — PH-S165 ✅; PH-S170…S174 post-S169 replenish; replenish після S174.
+**Rust ratio:** формальна смуга **90–95%**; **hold 95%** — PH-S165 ✅; PH-S171…S175 post-S170 replenish; replenish після S175.
 
-**Наступна сесія:** **PH-S170** · черга **5** відкритих (PH-S170…S174) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S171** · черга **5** відкритих (PH-S171…S175) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S169)
 
@@ -500,7 +501,7 @@ FM-xxx (з таблиці нижче)
 
 **Baseline:** rust_ratio **92.68%** → **hold 95%** · **stretch spirit 96%** ([`rust_ratio.json`](../development/rust_ratio.json), [`RUST_RATIO_STRATEGY_2026-06-13.md`](../development/RUST_RATIO_STRATEGY_2026-06-13.md)).
 
-**Наступна сесія:** **PH-S170** · черга **5** відкритих (PH-S170…S174) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S171** · черга **5** відкритих (PH-S171…S175) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

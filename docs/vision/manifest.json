@@ -1616,6 +1616,12 @@
       "from": "galaxy_grid",
       "kind": "implements",
       "to": "src_grid_galaxy_prefetch_metrics_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_settlement_rs"
     }
   ],
   "galaxy_background": "vision2.png",
@@ -1653,7 +1659,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S170",
+  "next_sprint": "PH-S171",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7126,9 +7132,16 @@
       "label": "galaxy_pricing_cache_age_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_pricing_cache_age_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_settlement_rs",
+      "label": "galaxy_settlement.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_settlement.rs"
     }
   ],
-  "revision": 105,
+  "revision": 106,
   "updated_at": "2026-06-14",
   "vision_ui_rev": 54
 }

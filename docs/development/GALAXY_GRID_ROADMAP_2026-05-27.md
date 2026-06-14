@@ -1,6 +1,6 @@
 # Galaxy Grid — роадмеп розробки (PoolAI)
 
-**Оновлено:** 2026-06-14 · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**5** відкритих PH-S170…S174)
+**Оновлено:** 2026-06-14 · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**5** відкритих PH-S171…S175)
 
 Операційний зріз сесій: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) · старт наступної: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)
 
@@ -10,9 +10,9 @@
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **5** — PH-S170…S174 |
-| **Закрито PH-S128…S169** | Galaxy wire + ratio hold + admin Rust slim + prefetch + pricing cache age + stale profile penalty |
-| **Після S174** | replenish §5.12 (≤10) |
+| **Відкрито** | **5** — PH-S171…S175 |
+| **Закрито PH-S128…S170** | Galaxy wire + ratio hold + admin Rust slim + prefetch + pricing cache age + stale profile + settlement pending_verification |
+| **Після S175** | replenish §5.12 (≤10) |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
 
 ---
@@ -58,16 +58,16 @@
 
 ---
 
-## 3. Черга §5.12 (post-S169 replenish S170…S174)
+## 3. Черга §5.12 (post-S170 replenish S171…S175)
 
 | # | Sprint | Тема | Acceptance |
 |---|--------|------|------------|
-| — | **PH-S169** ✅ | Locality stale profile penalty | §8.1 `stale_network_profile_penalty` |
-| 1 | **PH-S170** | Settlement pending_verification stub | §6.4 grid result |
-| 2 | **PH-S171** | Replication strict tier stub | §6.3 config |
-| 3 | **PH-S172** | Pricing provider catalog metrics | §4.2 provider hits |
-| 4 | **PH-S173** | Pricing provider errors metrics | §4.2 provider fetch fail |
-| 5 | **PH-S174** | Pricing quote usd_micro metrics | §4.2 last quote gauge |
+| — | **PH-S170** ✅ | Settlement pending_verification stub | §6.3–6.5 `SettlementStatus` on grid result |
+| 1 | **PH-S171** | Replication strict tier stub | §6.3 config |
+| 2 | **PH-S172** | Pricing provider catalog metrics | §4.2 provider hits |
+| 3 | **PH-S173** | Pricing provider errors metrics | §4.2 provider fetch fail |
+| 4 | **PH-S174** | Pricing quote usd_micro metrics | §4.2 last quote gauge |
+| 5 | **PH-S175** | Verification mismatch metrics | §6.2 mismatch counter |
 
 Повна таблиця — FM **§5.12** · [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md).
 
