@@ -1,6 +1,6 @@
 # Galaxy Grid — роадмеп розробки (PoolAI)
 
-**Оновлено:** 2026-06-14 · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**10** відкритих PH-S180…S187)
+**Оновлено:** 2026-06-14 · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**10** відкритих PH-S181…S187)
 
 Операційний зріз сесій: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) · старт наступної: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)
 
@@ -10,7 +10,7 @@
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **10** — PH-S180…S187 |
+| **Відкрито** | **10** — PH-S181…S187 |
 | **Закрито PH-S128…S177** | Galaxy wire + ratio hold + verification/replay metrics band |
 | **Після S187** | replenish §5.12 (≤10) |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
@@ -58,19 +58,18 @@
 
 ---
 
-## 3. Черга §5.12 (post-S179 replenish S180…S187)
+## 3. Черга §5.12 (post-S180 replenish S181…S187)
 
 | # | Sprint | Тема | Acceptance |
 |---|--------|------|------------|
-| — | **PH-S179** ✅ | Replication strict tier metrics | §6.3 grid job ingest |
-| 1 | **PH-S180** | Verification match metrics | §6.2 match counter |
-| 2 | **PH-S181** | Pricing market min usd_micro metrics | §4.2 market min gauge |
-| 3 | **PH-S182** | Trust score metrics | §6.2 trust score gauge |
-| 4 | **PH-S183** | Shard local hit ratio metrics | §5.3 locality rank stub |
-| 5 | **PH-S184** | Prefetch bytes total metrics | §5.5 `plan_prefetch` path |
-| 6 | **PH-S185** | Cross region egress mb metrics | §5.3 rank/prefetch stub |
-| 7 | **PH-S186** | Verification sample scheduled /metrics | §6.2 PH-S164 counter export |
-| 8 | **PH-S187** | Settlement cleared total metrics | §6.4 Cleared grid result path |
+| — | **PH-S180** ✅ | Verification match metrics | §6.2 match counter |
+| 1 | **PH-S181** | Pricing market min usd_micro metrics | §4.2 market min gauge |
+| 2 | **PH-S182** | Trust score metrics | §6.2 trust score gauge |
+| 3 | **PH-S183** | Shard local hit ratio metrics | §5.3 locality rank stub |
+| 4 | **PH-S184** | Prefetch bytes total metrics | §5.5 `plan_prefetch` path |
+| 5 | **PH-S185** | Cross region egress mb metrics | §5.3 rank/prefetch stub |
+| 6 | **PH-S186** | Verification sample scheduled /metrics | §6.2 PH-S164 counter export |
+| 7 | **PH-S187** | Settlement cleared total metrics | §6.4 Cleared grid result path |
 
 Повна таблиця — FM **§5.12** · [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md).
 

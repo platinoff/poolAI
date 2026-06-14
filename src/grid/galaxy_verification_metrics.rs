@@ -1,6 +1,6 @@
-//! Galaxy Grid verification metrics stubs (PH-S175 / PH-S177, §6.2).
+//! Galaxy Grid verification metrics stubs (PH-S175 / PH-S177 / PH-S180, §6.2).
 //!
-//! Counters for grid result verification sample + mismatch; no live checker wire.
+//! Counters for grid result verification sample, mismatch, and match; no live checker wire.
 
 use std::sync::atomic::{AtomicU64, Ordering};
 
@@ -10,8 +10,12 @@ pub const METRIC_VERIFICATION_SAMPLE_TOTAL: &str = "galaxy_verification_sample_t
 /// In-process counter for verification digest mismatches (mirrored on `GET /metrics`).
 pub const METRIC_VERIFICATION_MISMATCH_TOTAL: &str = "galaxy_verification_mismatch_total";
 
+/// In-process counter for verification digest matches (mirrored on `GET /metrics`).
+pub const METRIC_VERIFICATION_MATCH_TOTAL: &str = "galaxy_verification_match_total";
+
 static SAMPLE_TOTAL: AtomicU64 = AtomicU64::new(0);
 static MISMATCH_TOTAL: AtomicU64 = AtomicU64::new(0);
+static MATCH_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// Record one verification sample on the grid result path.
 pub fn record_verification_sample() {
@@ -41,10 +45,25 @@ pub fn reset_verification_mismatch_metrics_for_test() {
     MISMATCH_TOTAL.store(0, Ordering::Relaxed);
 }
 
+/// Record one verification match on the grid result path.
+pub fn record_verification_match() {
+    MATCH_TOTAL.fetch_add(1, Ordering::Relaxed);
+}
+
+pub fn verification_match_total() -> u64 {
+    MATCH_TOTAL.load(Ordering::Relaxed)
+}
+
+#[cfg(any(test, feature = "test-utils"))]
+pub fn reset_verification_match_metrics_for_test() {
+    MATCH_TOTAL.store(0, Ordering::Relaxed);
+}
+
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_verification_metrics_for_test() {
     reset_verification_sample_metrics_for_test();
     reset_verification_mismatch_metrics_for_test();
+    reset_verification_match_metrics_for_test();
 }
 
 /// Grid result path stub: increment sample counter when stub selects edge sample or explicit flag.
@@ -73,6 +92,18 @@ pub fn evaluate_result_verification_mismatch(metrics: Option<&serde_json::Value>
         record_verification_mismatch();
     }
     is_mismatch
+}
+
+/// Grid result path stub: read optional `metrics.verification_verdict`; increment on `match` (PH-S180).
+pub fn evaluate_result_verification_match(metrics: Option<&serde_json::Value>) -> bool {
+    let is_match = metrics
+        .and_then(|m| m.get("verification_verdict"))
+        .and_then(|v| v.as_str())
+        .is_some_and(|s| s.eq_ignore_ascii_case("match"));
+    if is_match {
+        record_verification_match();
+    }
+    is_match
 }
 
 #[cfg(test)]
@@ -136,6 +167,26 @@ mod tests {
             "verification_verdict": "match"
         }))));
         assert_eq!(verification_mismatch_total(), 1);
+
+        reset_verification_metrics_for_test();
+    }
+
+    #[test]
+    fn evaluate_result_verification_match_increments_counter_ph_s180() {
+        let _lock = verification_metrics_test_lock();
+        reset_verification_metrics_for_test();
+        assert!(!evaluate_result_verification_match(None));
+        assert_eq!(verification_match_total(), 0);
+
+        assert!(evaluate_result_verification_match(Some(&json!({
+            "verification_verdict": "match"
+        }))));
+        assert_eq!(verification_match_total(), 1);
+
+        assert!(!evaluate_result_verification_match(Some(&json!({
+            "verification_verdict": "mismatch"
+        }))));
+        assert_eq!(verification_match_total(), 1);
 
         reset_verification_metrics_for_test();
     }

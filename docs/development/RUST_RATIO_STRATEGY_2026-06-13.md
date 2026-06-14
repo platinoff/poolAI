@@ -85,7 +85,7 @@ flowchart TB
 | **E — gate** | PH-S150 ✅ | CI advisory якщо ratio <88%; target 93%; stretch 96% spirit | стабільно 90–95% |
 | **F — stretch 96%** | PH-S151…S159 ✅ | wasm wiring, slim JS/i18n/charts, Rust stand/e2e bins; CI warn **93%** | **→96% spirit** |
 
-**Черга §5.12 (10 відкритих):** PH-S180…S187 — post-S179 replenish; replenish після S187.
+**Черга §5.12 (10 відкритих):** PH-S181…S187 — post-S180 replenish; replenish після S187.
 
 ---
 
@@ -129,7 +129,7 @@ flowchart TB
 | 34 | **PH-S177** | Galaxy verification sample total metrics stub | §6.2 sample counter | **✅** |
 | 35 | **PH-S178** | Galaxy settlement pending_verification metrics stub | §6.4 grid result path | **✅** |
 | 36 | **PH-S179** | Galaxy replication strict tier metrics stub | §6.3 grid job ingest | **✅** |
-| 37 | **PH-S180** | Galaxy verification match metrics stub | §6.2 match counter | відкрито |
+| 37 | **PH-S180** | Galaxy verification match metrics stub | §6.2 match counter | **✅** |
 | 38 | **PH-S181** | Galaxy pricing market min usd_micro metrics stub | §4.2 market min gauge | відкрито |
 | 39 | **PH-S182** | Galaxy trust score metrics stub | §6.2 trust score gauge | відкрито |
 | 40 | **PH-S183** | Galaxy shard local hit ratio metrics stub | §5.3 locality rank | відкрито |

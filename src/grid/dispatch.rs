@@ -25,7 +25,8 @@ use crate::grid::galaxy_trust_score::{
     TrustScoreGateConfig,
 };
 use crate::grid::galaxy_verification_metrics::{
-    evaluate_result_verification_mismatch, evaluate_result_verification_sample,
+    evaluate_result_verification_match, evaluate_result_verification_mismatch,
+    evaluate_result_verification_sample,
 };
 use crate::grid::galaxy_verify_sampling::{
     evaluate_result_verify_sampling, VerifySamplingConfig, VerifySamplingVerdict,
@@ -342,6 +343,7 @@ fn ingest_result(
     jobs.force_status(&job_id, status)?;
     let trust_score = trust_score_from_result_metrics(body.metrics.as_ref());
     evaluate_result_verification_mismatch(body.metrics.as_ref());
+    evaluate_result_verification_match(body.metrics.as_ref());
     let settlement_gate = evaluate_result_settlement_gate(
         source_peer_id,
         trust_score,
@@ -1137,6 +1139,56 @@ mod tests {
         ingest_envelope(env, &jobs, &memory).expect("ingest");
         assert_eq!(verification_mismatch_total(), 1);
         reset_verification_mismatch_metrics_for_test();
+    }
+
+    #[test]
+    fn ingest_result_wire_records_verification_match_metric_ph_s180() {
+        use crate::grid::galaxy_verification_metrics::{
+            reset_verification_match_metrics_for_test, verification_match_total,
+            verification_metrics_test_lock,
+        };
+
+        let _lock = verification_metrics_test_lock();
+        reset_verification_match_metrics_for_test();
+        let jobs = JobStore::open_for_test(None);
+        let memory = MemoryShardStore::open_for_test(None);
+        jobs.push(JobRecord {
+            spec: JobSpec {
+                id: JobId::new("grid-verify-match"),
+                kind: JobKind::Inference,
+                resources: Default::default(),
+                priority: 0,
+                max_duration_secs: None,
+                input_artifact_ids: vec![],
+                verification_policy: None,
+                deadline: None,
+            },
+            status: JobStatus::Scheduled,
+            created_at: Utc::now(),
+            worker_id: None,
+            vm_id: None,
+            lease_owner: None,
+            lease_epoch: None,
+            lease_expires_at: None,
+        })
+        .expect("push");
+
+        let env = GridEnvelope::new(
+            GridMessage::Result(crate::grid::GridResultBody {
+                job_id: "grid-verify-match".into(),
+                status: GridResultStatus::Completed,
+                output_artifact_ids: vec![],
+                proof: None,
+                metrics: Some(serde_json::json!({
+                    "verification_verdict": "match"
+                })),
+                lease_epoch: None,
+            }),
+            Some("tg-edge".into()),
+        );
+        ingest_envelope(env, &jobs, &memory).expect("ingest");
+        assert_eq!(verification_match_total(), 1);
+        reset_verification_match_metrics_for_test();
     }
 
     #[test]

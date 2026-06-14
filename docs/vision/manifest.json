@@ -1700,11 +1700,17 @@
       "from": "galaxy_grid",
       "kind": "implements",
       "to": "tests_galaxy_replication_strict_integration_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "tests_galaxy_verification_match_integration_rs"
     }
   ],
   "galaxy_background": "vision2.png",
-  "git_head": "9064b93d",
-  "last_sprint_closed": "PH-S179",
+  "git_head": "51482690",
+  "last_sprint_closed": "PH-S180",
   "layers": [
     {
       "id": "L0",
@@ -1737,7 +1743,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S180",
+  "next_sprint": "PH-S181",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7319,9 +7325,17 @@
       "layer": "L3",
       "path": "tests/galaxy_replication_strict_integration.rs",
       "sprints": ["PH-S179"]
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_verification_match_integration_rs",
+      "label": "galaxy_verification_match_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_verification_match_integration.rs",
+      "sprints": ["PH-S180"]
     }
   ],
-  "revision": 116,
+  "revision": 117,
   "updated_at": "2026-06-14",
   "vision_ui_rev": 54
 }
