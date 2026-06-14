@@ -85,7 +85,7 @@ flowchart TB
 | **E — gate** | PH-S150 ✅ | CI advisory якщо ratio <88%; target 93%; stretch 96% spirit | стабільно 90–95% |
 | **F — stretch 96%** | PH-S151…S159 ✅ | wasm wiring, slim JS/i18n/charts, Rust stand/e2e bins; CI warn **93%** | **→96% spirit** |
 
-**Черга §5.12 (10 відкритих):** PH-S169…S173 — post-S168 replenish; replenish після S173.
+**Черга §5.12 (10 відкритих):** PH-S170…S174 — post-S169 replenish; replenish після S174.
 
 ---
 
@@ -118,11 +118,12 @@ flowchart TB
 | 23 | **PH-S166** | Design tokens CSS → Rust | `design_tokens.rs`; slim CSS `:root` | **✅** |
 | 24 | **PH-S167** | Galaxy prefetch metrics stub | Prometheus on `plan_prefetch` | **✅** |
 | 25 | **PH-S168** | Galaxy pricing cache age /metrics | `galaxy_pricing_cache_age_seconds` gauge | **✅** |
-| 26 | **PH-S169** | Locality stale profile penalty | `galaxy_locality.rs` stub | відкрито |
+| 26 | **PH-S169** | Locality stale profile penalty | `stale_network_profile_penalty` stub | **✅** |
 | 27 | **PH-S170** | Galaxy settlement pending_verification stub | §6.4 grid result path | відкрито |
 | 28 | **PH-S171** | Galaxy replication strict tier stub | §6.3 config stub | відкрито |
 | 29 | **PH-S172** | Galaxy pricing provider catalog metrics stub | §4.2 provider hits | відкрито |
 | 30 | **PH-S173** | Galaxy pricing provider errors metrics stub | §4.2 provider fetch fail | відкрито |
+| 31 | **PH-S174** | Galaxy pricing quote usd_micro metrics stub | §4.2 last quote gauge | відкрито |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 

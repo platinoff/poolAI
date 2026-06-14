@@ -890,13 +890,13 @@ On-chain події потрібні, коли вони:
 | `white_ip_only` | лише pinned peers | hardened `local_srv` |
 | `lan_only` | без WAN (LAN FM-003) | dev stand, blocked multi-host |
 
-**Locality subset (PH-S128 implemented):** мінімальний wire для `locality_score` — лише `region` + `latency_ms_p50`. Rust mirror: `LocalityNetworkProfile` у `src/grid/galaxy_locality.rs`. Решта полів — advisory для prefetch/SmallWorld; не блокує PH-S128 stub.
+**Locality subset (PH-S128 implemented):** мінімальний wire для `locality_score` — `region` + `latency_ms_p50` + optional `profile_age_secs` freshness (PH-S169). Rust mirror: `LocalityNetworkProfile` у `src/grid/galaxy_locality.rs`. Решта полів — advisory для prefetch/SmallWorld; не блокує PH-S128 stub.
 
 **SmallWorld consumption (high level, не дублювати RAID docs):**
 
 1. **Hop routing:** `topology_ring` + `region` → short-path до seed provider з мінімальним hop-count.
 2. **Egress guardrail:** `egress_policy` + `bandwidth_mbps` → чи дозволений cross-region shard pull (§5.2 re-migrate).
-3. **Stale profile:** якщо `last_measured_at` відсутній або >24h — coordinator знижує пріоритет worker у `rank_workers_by_locality` (майбутній wire; не PH-S132).
+3. **Stale profile:** якщо `last_measured_at` відсутній або >24h — coordinator знижує пріоритет worker у `rank_workers_by_locality` (**PH-S169** `stale_network_profile_penalty` у `galaxy_locality.rs`).
 
 **Зберігання:** in-memory на discovery peer row + optional JSON у worker heartbeat metadata; повна персистенція — майбутній спринт (не PH-S132).
 
