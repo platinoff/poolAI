@@ -1607,8 +1607,8 @@
     }
   ],
   "galaxy_background": "vision2.png",
-  "git_head": "c5c707a6",
-  "last_sprint_closed": "PH-S161",
+  "git_head": "6dbc3c42",
+  "last_sprint_closed": "PH-S165",
   "layers": [
     {
       "id": "L0",
@@ -1641,7 +1641,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S165",
+  "next_sprint": "PH-S166",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7088,7 +7088,7 @@
       "path": "tests/galaxy_verify_sampling_integration.rs"
     }
   ],
-  "revision": 100,
+  "revision": 101,
   "updated_at": "2026-06-14",
   "vision_ui_rev": 54
 }

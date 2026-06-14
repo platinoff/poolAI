@@ -1,10 +1,10 @@
-//! LOC ratio baseline audit (PH-S143, PH-S150 advisory, PH-S159 stretch gate) per
+//! LOC ratio baseline audit (PH-S143, PH-S150 advisory, PH-S159 stretch, PH-S165 hold gate) per
 //! [`docs/development/RUST_RATIO_STRATEGY_2026-06-13.md`].
 //!
 //! ```text
 //! cargo run --bin poolai-loc-audit
 //! cargo run --bin poolai-loc-audit -- --output docs/development/rust_ratio.json
-//! cargo run --bin poolai-loc-audit -- --warn-below 0.93 --target 0.93 --stretch 0.96 --advisory
+//! cargo run --bin poolai-loc-audit -- --warn-below 0.93 --target 0.95 --stretch 0.96 --min-ratio 0.95 --advisory
 //! cargo run --bin poolai-loc-audit -- --min-ratio 0.91
 //! ```
 
@@ -19,9 +19,9 @@ const DEFAULT_OUTPUT: &str = "docs/development/rust_ratio.json";
 const FORMAL_BAND_MIN: f64 = 0.90;
 const FORMAL_BAND_MAX: f64 = 0.95;
 const DEFAULT_WARN_BELOW: f64 = 0.93;
-const DEFAULT_TARGET: f64 = 0.93;
+const DEFAULT_TARGET: f64 = 0.95;
 const DEFAULT_STRETCH: f64 = 0.96;
-const SPRINT: &str = "PH-S159";
+const SPRINT: &str = "PH-S165";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize)]
 #[serde(rename_all = "snake_case")]
@@ -76,7 +76,7 @@ struct AuditConfig {
     stretch: f64,
     /// When true, ratio below `warn_below` prints a warning but exits 0 (PH-S159 CI stretch advisory).
     advisory: bool,
-    /// Optional regression floor (e.g. 0.91 after PH-S148 baseline).
+    /// Optional hold/regression floor (PH-S165: 0.95 hold band top with `--advisory` in CI).
     min_ratio: Option<f64>,
 }
 
@@ -264,8 +264,8 @@ fn print_help() {
            --warn-below RATIO    advisory floor (default {DEFAULT_WARN_BELOW})\n\
            --target RATIO        stretch-band target (default {DEFAULT_TARGET})\n\
            --stretch RATIO       spirit goal (default {DEFAULT_STRETCH})\n\
-           --min-ratio RATIO     fail if ratio below floor (regression gate)\n\
-           --advisory            warn below --warn-below but exit 0 (PH-S159 CI)\n\
+           --min-ratio RATIO     hold/regression floor (fail unless --advisory)\n\
+           --advisory            warn below floors but exit 0 (PH-S165 CI hold gate)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -347,7 +347,7 @@ fn build_report(
         notes: vec![
             "Denominator: product code only (strategy §1); docs/yaml/png excluded",
             "GitHub Languages bar is heuristic; this report uses git-tracked LOC buckets",
-            "PH-S159: CI --advisory warns below 93%; stretch spirit 96% via --stretch",
+            "PH-S165: CI --min-ratio 0.95 hold band (advisory); stretch spirit 96% via --stretch",
         ],
     })
 }
@@ -374,7 +374,10 @@ fn print_summary(report: &RustRatioReport) {
     );
     println!("  in_formal_band:        {}", report.in_formal_band);
     if report.advisory_mode {
-        println!("  advisory_mode:         true (warn below floor, exit 0)");
+        println!("  advisory_mode:         true (warn below floors, exit 0)");
+    }
+    if let Some(floor) = report.min_ratio {
+        println!("  hold_floor (--min-ratio): {:.0}%", floor * 100.0);
     }
     if let Some(ok) = report.meets_min_ratio {
         println!("  meets_min_ratio:       {ok}");
@@ -394,9 +397,20 @@ fn emit_threshold_messages(report: &RustRatioReport) {
         eprintln!("warning: {msg}");
         gh_annotation("warning", "Rust ratio advisory floor", &msg);
     }
+    if let Some(false) = report.meets_min_ratio {
+        let msg = format!(
+            "Rust product-code ratio {:.2}% is below hold floor {:.0}% (--min-ratio)",
+            report.rust_ratio_pct,
+            report.min_ratio.unwrap_or(0.0) * 100.0
+        );
+        if report.advisory_mode {
+            eprintln!("warning: {msg}");
+            gh_annotation("warning", "Rust ratio hold band", &msg);
+        }
+    }
     if report.below_target {
         eprintln!(
-            "note: ratio {:.2}% is below PH-S159 target {:.0}% (stretch band toward 96% spirit)",
+            "note: ratio {:.2}% is below PH-S165 hold target {:.0}% (formal band top; stretch spirit 96%)",
             report.rust_ratio_pct,
             report.target_ratio * 100.0
         );
@@ -419,15 +433,19 @@ fn emit_threshold_messages(report: &RustRatioReport) {
 
 fn exit_for_thresholds(report: &RustRatioReport) -> ExitCode {
     if let Some(false) = report.meets_min_ratio {
-        eprintln!(
-            "error: rust ratio {:.2}% is below --min-ratio floor {:.2}%",
+        let msg = format!(
+            "rust ratio {:.2}% is below --min-ratio hold floor {:.0}%",
             report.rust_ratio_pct,
             report.min_ratio.unwrap_or(0.0) * 100.0
         );
-        return ExitCode::from(1);
-    }
-    // Explicit --min-ratio regression gate: meeting the floor passes even below warn_below.
-    if report.meets_min_ratio == Some(true) {
+        if report.advisory_mode {
+            // Hold-band advisory: surfaced in emit_threshold_messages; exit 0 below.
+        } else {
+            eprintln!("error: {msg}");
+            return ExitCode::from(1);
+        }
+    } else if report.meets_min_ratio == Some(true) {
+        // Explicit --min-ratio gate met: pass even below warn_below.
         return ExitCode::SUCCESS;
     }
     if report.below_warn_threshold && !report.advisory_mode {
@@ -567,6 +585,30 @@ mod tests {
         )
         .expect("report");
         assert_eq!(report.meets_min_ratio, Some(false));
+        assert_eq!(exit_for_thresholds(&report), ExitCode::from(1));
+    }
+
+    #[test]
+    fn min_ratio_hold_advisory_exits_zero() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let root = dir.path();
+        let files = vec!["src/a.rs".to_string(), "src/ui/x.js".to_string()];
+        fs::create_dir_all(root.join("src")).unwrap();
+        fs::write(root.join("src/a.rs"), "line\n").unwrap();
+        fs::create_dir_all(root.join("src/ui")).unwrap();
+        fs::write(root.join("src/ui/x.js"), "a\nb\nc\n").unwrap();
+        let report = build_report(
+            root,
+            &files,
+            AuditConfig {
+                min_ratio: Some(0.95),
+                advisory: true,
+                ..AuditConfig::default()
+            },
+        )
+        .expect("report");
+        assert_eq!(report.meets_min_ratio, Some(false));
+        assert_eq!(exit_for_thresholds(&report), ExitCode::SUCCESS);
     }
 
     #[test]
