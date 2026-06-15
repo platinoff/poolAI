@@ -68,6 +68,10 @@
   const WATCH_INTERVAL_ECO_MS = 4000;
   const STAR_COUNT_FX = 48;
   const STAR_FRAME_MS = 50;
+  const VISION_MODES = ["eco", "fx", "ms"];
+  const MAP_PREFS_MODE_KEY = "visionMode";
+  const MAP_PREFS_MODE_PIN_KEY = "visionModePinned";
+  /** @deprecated legacy boolean — migrated on load */
   const MAP_PREFS_ECO_KEY = "visionEco";
   const MAP_PREFS_ECO_PIN_KEY = "visionEcoPinned";
 
@@ -83,10 +87,12 @@
   let watchTimer = null;
   let autoReloadEnabled = true;
   let reloadInFlight = false;
-  /** Low GPU: no starfield rAF, no blur/glow/edge animation, throttled labels. */
-  let visionEco = true;
-  /** User explicitly toggled Eco/FX — do not auto-switch on reload. */
-  let visionEcoPinned = false;
+  /** Tri-mode: eco (low GPU) → fx (glow) → ms (1-hop hover trace). PH-S189 */
+  let visionMode = "eco";
+  /** User explicitly cycled mode — do not auto-switch on reload. */
+  let visionModePinned = false;
+  /** Hovered node id for Ms-mode 1-hop trace. */
+  let hoverTraceId = null;
   let starfieldStop = null;
   let labelZoomRaf = null;
   let lastLabelZoomScale = 0;
@@ -96,6 +102,8 @@
   let adjacency = null;
   let constellationHubIdSet = new Set();
   let activeTreeFileEl = null;
+  let collapsedPanels = new Set();
+  let openFilterDrop = null;
   let mapNodesBound = false;
   /** Live git HEAD from __watch (falls back to manifest.git_head). */
   let headerGitHead = null;
@@ -173,13 +181,23 @@
       if (typeof p.mapSprintFocus === "boolean") {
         mapSprintFocus = p.mapSprintFocus;
       }
-      if (typeof p[MAP_PREFS_ECO_KEY] === "boolean") {
-        visionEco = p[MAP_PREFS_ECO_KEY];
+      if (
+        typeof p[MAP_PREFS_MODE_KEY] === "string" &&
+        VISION_MODES.includes(p[MAP_PREFS_MODE_KEY])
+      ) {
+        visionMode = p[MAP_PREFS_MODE_KEY];
+      } else if (typeof p[MAP_PREFS_ECO_KEY] === "boolean") {
+        visionMode = p[MAP_PREFS_ECO_KEY] ? "eco" : "fx";
       }
-      if (typeof p[MAP_PREFS_ECO_PIN_KEY] === "boolean") {
-        visionEcoPinned = p[MAP_PREFS_ECO_PIN_KEY];
+      if (typeof p[MAP_PREFS_MODE_PIN_KEY] === "boolean") {
+        visionModePinned = p[MAP_PREFS_MODE_PIN_KEY];
+      } else if (typeof p[MAP_PREFS_ECO_PIN_KEY] === "boolean") {
+        visionModePinned = p[MAP_PREFS_ECO_PIN_KEY];
       }
       expandedClusters = new Set(p.expandedClusters || []);
+      if (Array.isArray(p.collapsedPanels)) {
+        collapsedPanels = new Set(p.collapsedPanels);
+      }
     } catch (_) {
       /* ignore */
     }
@@ -193,8 +211,11 @@
           autoCollapseDense,
           mapSprintFocus,
           expandedClusters: Array.from(expandedClusters),
-          [MAP_PREFS_ECO_KEY]: visionEco,
-          [MAP_PREFS_ECO_PIN_KEY]: visionEcoPinned,
+          collapsedPanels: Array.from(collapsedPanels),
+          [MAP_PREFS_MODE_KEY]: visionMode,
+          [MAP_PREFS_MODE_PIN_KEY]: visionModePinned,
+          [MAP_PREFS_ECO_KEY]: visionMode === "eco",
+          [MAP_PREFS_ECO_PIN_KEY]: visionModePinned,
         })
       );
     } catch (_) {
@@ -537,7 +558,7 @@
     const svg = document.getElementById("map-svg");
     if (!svg || !manifest) return;
     const scaleDelta = Math.abs(mapView.scale - lastLabelZoomScale);
-    if (visionEco && scaleDelta < 0.08 && lastLabelZoomScale > 0) {
+    if (isLowGpuMode() && scaleDelta < 0.08 && lastLabelZoomScale > 0) {
       return;
     }
     lastLabelZoomScale = mapView.scale;
@@ -563,7 +584,7 @@
       }
       el.classList.toggle("auto-leaf", nodeIsAutoSynced(n) && !hub);
     });
-    if (!visionEco || mapView.scale >= LABEL_ZOOM_NORMAL) {
+    if (!isLowGpuMode() || mapView.scale >= LABEL_ZOOM_NORMAL) {
       declutterNodeLabels(svg);
     }
   }
@@ -592,41 +613,111 @@
     });
   }
 
+  function isVisionEco() {
+    return visionMode === "eco";
+  }
+
+  function isVisionMs() {
+    return visionMode === "ms";
+  }
+
+  /** Eco + Ms share low-GPU rendering (Ms keeps edges for hover trace). */
+  function isLowGpuMode() {
+    return visionMode === "eco" || visionMode === "ms";
+  }
+
   function watchIntervalMs() {
-    return visionEco ? WATCH_INTERVAL_ECO_MS : WATCH_INTERVAL_MS;
+    return isLowGpuMode() ? WATCH_INTERVAL_ECO_MS : WATCH_INTERVAL_MS;
   }
 
-  function resolveVisionEcoDefault() {
-    if (visionEcoPinned || !manifest) return;
-    visionEco = manifest.nodes.length >= MAP_DENSE_NODE_THRESHOLD;
+  function resolveVisionModeDefault() {
+    if (visionModePinned || !manifest) return;
+    if (manifest.nodes.length >= MAP_DENSE_NODE_THRESHOLD) {
+      visionMode = "eco";
+    }
   }
 
-  function applyVisionEco() {
-    document.body.classList.toggle("vision-eco", visionEco);
+  function applyVisionMode() {
+    document.body.classList.toggle("vision-eco", isVisionEco());
+    document.body.classList.toggle("vision-ms", isVisionMs());
     const svg = document.getElementById("map-svg");
-    if (svg) svg.classList.toggle("map-fx-off", visionEco);
+    if (svg) svg.classList.toggle("map-fx-off", isLowGpuMode());
     const btn = document.getElementById("btn-eco");
     if (btn) {
-      btn.classList.toggle("on", visionEco);
-      btn.textContent = visionEco ? "Eco" : "FX";
-      btn.title = visionEco
-        ? "Eco ON — low GPU (starfield off, no blur/glow). Click for FX."
-        : "FX ON — full visuals. Click for Eco (saves GPU).";
+      btn.classList.toggle("on", isVisionEco());
+      btn.classList.toggle("fx", visionMode === "fx");
+      btn.classList.toggle("ms", isVisionMs());
+      btn.textContent =
+        visionMode === "eco" ? "Eco" : visionMode === "fx" ? "FX" : "Ms";
+      btn.title =
+        visionMode === "eco"
+          ? "Eco — low GPU. Click → FX."
+          : visionMode === "fx"
+            ? "FX — full glow. Click → Ms (hover trace)."
+            : "Ms — 1-hop edge highlight on hover. Click → Eco.";
     }
+    if (!isVisionMs()) hoverTraceId = null;
     restartStarfield();
     if (autoReloadEnabled) startAutoReload();
+    updateMapHoverTrace();
   }
 
-  function toggleVisionEco() {
-    visionEco = !visionEco;
-    visionEcoPinned = true;
+  function cycleVisionMode() {
+    const idx = VISION_MODES.indexOf(visionMode);
+    visionMode = VISION_MODES[(idx + 1) % VISION_MODES.length];
+    visionModePinned = true;
     saveMapPrefs();
-    applyVisionEco();
+    applyVisionMode();
     if (manifest) renderMap();
   }
 
+  function computeOneHopHighlight(centerId) {
+    const adj = adjacency || buildAdjacency();
+    const litNodes = new Set([centerId]);
+    const litEdges = new Set();
+    (adj.get(centerId) || []).forEach((v) => {
+      litNodes.add(v);
+      litEdges.add(edgeKey(centerId, v));
+    });
+    return { nodes: litNodes, edges: litEdges };
+  }
+
+  function clearMapHoverTraceClasses() {
+    document.querySelectorAll("#map-svg .node").forEach((el) => {
+      el.classList.remove("trace-center", "trace-lit", "trace-dim");
+    });
+    document.querySelectorAll("#map-svg .edge").forEach((el) => {
+      el.classList.remove("trace-edge", "trace-dim", "edge-reveal");
+    });
+  }
+
+  function updateMapHoverTrace() {
+    if (!isVisionMs() || !hoverTraceId) {
+      clearMapHoverTraceClasses();
+      return;
+    }
+    const trace = computeOneHopHighlight(hoverTraceId);
+    const hasSel = !!selectedId;
+    document.querySelectorAll("#map-svg .node").forEach((el) => {
+      const id = el.dataset.id;
+      const onTrace = trace.nodes.has(id);
+      el.classList.toggle("trace-center", id === hoverTraceId);
+      el.classList.toggle("trace-lit", onTrace && id !== hoverTraceId);
+      el.classList.toggle("trace-dim", !hasSel && !onTrace);
+    });
+    document.querySelectorAll("#map-svg .edge").forEach((el) => {
+      const from = el.dataset.from;
+      const to = el.dataset.to;
+      const key = el.dataset.edgeKey || edgeKey(from, to);
+      const onTrace = trace.edges.has(key);
+      el.classList.toggle("trace-edge", onTrace);
+      el.classList.toggle("edge-reveal", onTrace);
+      el.classList.toggle("trace-dim", !hasSel && !onTrace);
+    });
+  }
+
   function mapEdgeSparse(e) {
-    if (!visionEco || !manifest) return false;
+    if (!isVisionEco() || !manifest) return false;
     if (manifest.nodes.length < MAP_DENSE_NODE_THRESHOLD) return false;
     if (CONSTELLATION_HUB_IDS.has(e.from) || CONSTELLATION_HUB_IDS.has(e.to)) {
       return false;
@@ -722,6 +813,10 @@
       g.classList.add("label-hover");
       const n = nodeById(g.dataset.id);
       const pos = nodePositions.get(g.dataset.id);
+      if (isVisionMs()) {
+        hoverTraceId = g.dataset.id;
+        updateMapHoverTrace();
+      }
       if (!n || !pos) return;
       let t = g.querySelector("text");
       if (!t && g._labelEl) {
@@ -743,6 +838,10 @@
       if (!g || (ev.relatedTarget && g.contains(ev.relatedTarget))) return;
       if (hoverNode === g) hoverNode = null;
       g.classList.remove("label-hover");
+      if (isVisionMs() && hoverTraceId === g.dataset.id) {
+        hoverTraceId = null;
+        updateMapHoverTrace();
+      }
       scheduleMapLabelZoom();
     });
   }
@@ -1194,10 +1293,136 @@
       btn.classList.toggle("on", on);
       btn.setAttribute("aria-pressed", on ? "true" : "false");
     });
-    const dock = document.getElementById("map-filter-dock");
-    if (dock) {
-      dock.classList.toggle("filters-active", hasActiveMapFilters());
+    const bar = document.getElementById("map-filter-bar");
+    if (bar) {
+      const layerActive =
+        !!mapLayerFocus ||
+        (enabledLayers !== null && enabledLayers.size < allLayerIds().length);
+      const extActive =
+        enabledExts !== null && enabledExts.size < MAP_EXT_BUCKETS.length;
+      bar.classList.toggle("filters-active-layers", layerActive);
+      bar.classList.toggle("filters-active-exts", extActive);
     }
+    document.querySelectorAll(".map-filter-drop-btn").forEach((btn) => {
+      const drop = btn.dataset.drop;
+      let active = false;
+      if (drop === "layers") {
+        active =
+          !!mapLayerFocus ||
+          (enabledLayers !== null && enabledLayers.size < allLayerIds().length);
+      } else if (drop === "exts") {
+        active =
+          enabledExts !== null && enabledExts.size < MAP_EXT_BUCKETS.length;
+      }
+      btn.classList.toggle("filters-active", active);
+    });
+  }
+
+  function closeMapFilterDrops(except) {
+    document.querySelectorAll(".map-filter-drop-menu").forEach((menu) => {
+      if (except && menu.id === except) return;
+      menu.hidden = true;
+    });
+    document.querySelectorAll(".map-filter-drop-btn").forEach((btn) => {
+      if (except && btn.getAttribute("aria-controls") === except) return;
+      btn.setAttribute("aria-expanded", "false");
+    });
+    if (!except) openFilterDrop = null;
+  }
+
+  function toggleMapFilterDrop(menuId) {
+    const menu = document.getElementById(menuId);
+    const btn = document.querySelector(
+      '.map-filter-drop-btn[aria-controls="' + menuId + '"]'
+    );
+    if (!menu || !btn) return;
+    const open = menu.hidden;
+    closeMapFilterDrops(open ? menuId : null);
+    menu.hidden = !open;
+    btn.setAttribute("aria-expanded", open ? "true" : "false");
+    openFilterDrop = open ? menuId : null;
+  }
+
+  let mapFilterDropBound = false;
+
+  function initMapFilterDropdowns() {
+    if (mapFilterDropBound) return;
+    mapFilterDropBound = true;
+    const layersBtn = document.getElementById("map-filter-layers-btn");
+    const extsBtn = document.getElementById("map-filter-exts-btn");
+    if (layersBtn) {
+      layersBtn.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        toggleMapFilterDrop("map-filter-layers-menu");
+      });
+    }
+    if (extsBtn) {
+      extsBtn.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        toggleMapFilterDrop("map-filter-exts-menu");
+      });
+    }
+    document.addEventListener("click", (ev) => {
+      if (!ev.target.closest(".map-filter-drop")) {
+        closeMapFilterDrops();
+      }
+    });
+    document.addEventListener("keydown", (ev) => {
+      if (ev.key === "Escape" && openFilterDrop) {
+        closeMapFilterDrops();
+      }
+    });
+  }
+
+  function syncPanelCollapseLayout() {
+    document.querySelectorAll(".panel[data-panel]").forEach((panel) => {
+      const id = panel.dataset.panel;
+      const collapsed = collapsedPanels.has(id);
+      panel.classList.toggle("panel-collapsed", collapsed);
+      panel.querySelectorAll(".btn-panel-collapse").forEach((btn) => {
+        btn.textContent = collapsed ? "+" : "−";
+        btn.title = collapsed
+          ? "Expand " + (panel.querySelector("h2 > span")?.textContent || id)
+          : "Collapse to title bar";
+      });
+    });
+    const row = document.querySelector(".diagram-row");
+    if (row) {
+      const spec = ["layers", "map", "links"].map((id) => {
+        if (collapsedPanels.has(id)) {
+          return "minmax(52px, 72px)";
+        }
+        if (id === "map") return "minmax(0, 1fr)";
+        if (id === "layers") return "minmax(110px, 22%)";
+        return "minmax(130px, 24%)";
+      });
+      row.style.gridTemplateColumns = spec.join(" ");
+    }
+    window.dispatchEvent(new Event("resize"));
+  }
+
+  function togglePanelCollapse(panelId) {
+    if (fullscreenPanel) exitPanelFullscreen();
+    if (collapsedPanels.has(panelId)) collapsedPanels.delete(panelId);
+    else collapsedPanels.add(panelId);
+    saveMapPrefs();
+    syncPanelCollapseLayout();
+  }
+
+  function initPanelCollapse() {
+    document.querySelectorAll(".btn-panel-collapse").forEach((btn) => {
+      btn.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        const panel =
+          btn.closest(".panel") ||
+          document.querySelector(
+            '.panel[data-panel="' + (btn.dataset.panel || "map") + '"]'
+          );
+        if (!panel || !panel.dataset.panel) return;
+        togglePanelCollapse(panel.dataset.panel);
+      });
+    });
+    syncPanelCollapseLayout();
   }
 
   function updateMapFilters() {
@@ -1386,7 +1611,7 @@
     const dense = manifest.nodes.length >= MAP_DENSE_NODE_THRESHOLD;
     const minDot = dense ? 20 : 28;
     const minHub = dense ? 36 : 44;
-    const passes = dense ? (visionEco ? 4 : 8) : 8;
+    const passes = dense ? (isLowGpuMode() ? 4 : 8) : 8;
     for (let pass = 0; pass < passes; pass++) {
       for (let i = 0; i < ids.length; i++) {
         for (let j = i + 1; j < ids.length; j++) {
@@ -1518,7 +1743,7 @@
         <stop offset="100%" stop-color="#182830" stop-opacity="0.2"/>
       </linearGradient>
       ${
-        visionEco
+        isLowGpuMode()
           ? ""
           : `<filter id="nodeGlow" x="-50%" y="-50%" width="200%" height="200%">
         <feGaussianBlur stdDeviation="2" result="b"/>
@@ -1667,7 +1892,7 @@
       "map-dense",
       manifest.nodes.length >= MAP_DENSE_NODE_THRESHOLD
     );
-    svg.classList.toggle("map-fx-off", visionEco);
+    svg.classList.toggle("map-fx-off", isLowGpuMode());
 
     applyMapTransform();
     bindMapNavigation(svg);
@@ -1788,6 +2013,7 @@
       );
     });
     syncMapSelectionCallout();
+    updateMapHoverTrace();
   }
 
   function relatedEdges(nodeId) {
@@ -2007,6 +2233,7 @@
       );
       fullscreenPanel = null;
     }
+    syncPanelCollapseLayout();
     if (panel.querySelector("#link-graph") && selectedId) {
       const n = nodeById(selectedId);
       if (n) renderLinkGraph(n);
@@ -2032,6 +2259,10 @@
     });
     document.addEventListener("keydown", (ev) => {
       if (ev.key === "Escape") {
+        if (openFilterDrop) {
+          closeMapFilterDrops();
+          return;
+        }
         if (document.body.classList.contains("sidebar-overlay-open")) {
           document.body.classList.remove("sidebar-overlay-open");
           return;
@@ -2126,7 +2357,7 @@
   function initStarfield() {
     const canvas = document.getElementById("starfield");
     if (!canvas) return;
-    if (visionEco) return;
+    if (isLowGpuMode()) return;
 
     const ctx = canvas.getContext("2d", { alpha: true });
     let w = 0;
@@ -2297,14 +2528,15 @@
 
     updateHeaderMeta(manifest, headerGitHead);
 
-    resolveVisionEcoDefault();
-    applyVisionEco();
+    resolveVisionModeDefault();
+    applyVisionMode();
     saveMapPrefs();
 
     syncLayerGeometry(manifest);
     renderLayers(manifest);
     renderMapFilterDock();
     syncMapToolbar();
+    syncPanelCollapseLayout();
     renderMap();
 
     const tree = document.getElementById("file-tree");
@@ -2461,19 +2693,21 @@
   document.getElementById("btn-reload").addEventListener("click", () => reloadAll(true));
   document.getElementById("btn-auto").addEventListener("click", toggleAutoReload);
   const btnEco = document.getElementById("btn-eco");
-  if (btnEco) btnEco.addEventListener("click", toggleVisionEco);
+  if (btnEco) btnEco.addEventListener("click", cycleVisionMode);
 
   initGalaxyBackdrop();
   initPanelFullscreen();
+  initPanelCollapse();
+  initMapFilterDropdowns();
   initSidebarOverlayBackdrop();
   loadMapPrefs();
   if (
     window.matchMedia("(prefers-reduced-motion: reduce)").matches &&
-    !visionEcoPinned
+    !visionModePinned
   ) {
-    visionEco = true;
+    visionMode = "eco";
   }
-  applyVisionEco();
+  applyVisionMode();
   initMapToolbar();
   reloadAll(false)
     .then(() => startAutoReload())

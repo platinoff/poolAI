@@ -85,7 +85,7 @@ flowchart TB
 | **E — gate** | PH-S150 ✅ | CI advisory якщо ratio <88%; target 93%; stretch 96% spirit | стабільно 90–95% |
 | **F — stretch 96%** | PH-S151…S159 ✅ | wasm wiring, slim JS/i18n/charts, Rust stand/e2e bins; CI warn **93%** | **→96% spirit** |
 
-**Черга §5.12 (3 відкритих):** PH-S189…S191 vision UX band; replenish після S191.
+**Черга §5.12 (10 відкритих):** PH-S191…S200 vision + code-first band; replenish після S200.
 
 ---
 
@@ -138,9 +138,18 @@ flowchart TB
 | 43 | **PH-S186** | Galaxy verification sample scheduled /metrics export | §6.2 PH-S164 export | **✅** |
 | 44 | **PH-S187** | Galaxy settlement cleared total metrics stub | §6.4 Cleared path | **✅** |
 | 45 | **PH-S188** | Vision map filters UX | docs/vision filters | **✅** |
-| 46 | **PH-S189** | Vision Eco/FX/Ms hover trace | docs/vision Ms mode | відкрито |
-| 47 | **PH-S190** | Vision overview LOD + minimap | docs/vision map zoom | відкрито |
-| 48 | **PH-S191** | Vision sprint queue + feed + Cursor hook | FM §5.12 parse + hooks | відкрито |
+| 46 | **PH-S189** | Vision Eco/FX/Ms hover trace | docs/vision Ms mode | **✅** |
+| 47 | **PH-S190** | Vision filter dropdowns + panel collapse | docs/vision layout | **✅** |
+| 48 | **PH-S191** | Vision sprint queue panel | FM §5.12 parse | відкрито |
+| 49 | **PH-S192** | Vision overview LOD + minimap | docs/vision | відкрито |
+| 50 | **PH-S193** | Dashboard shell formatters → wasm | poolai-ui-core | відкрито |
+| 51 | **PH-S194** | Galaxy fee split result counter | §4.1 stub | відкрито |
+| 52 | **PH-S195** | Galaxy seed_inventory GET | §5.5 wire | відкрито |
+| 53 | **PH-S196** | Stand smoke lease renew | poolai-http-stand-smoke | відкрито |
+| 54 | **PH-S197** | updates-compat wasm | admin UI | відкрито |
+| 55 | **PH-S198** | Topology Rust labels slim | PH-S157 | відкрито |
+| 56 | **PH-S199** | Vision feed.json RSS | docs/vision | відкрито |
+| 57 | **PH-S200** | Cursor post-push hook | VDT ops | відкрито |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 

@@ -207,69 +207,98 @@ button.btn-eco.on {
   color: var(--accent);
 }
 
-button.btn-eco:not(.on) {
+button.btn-eco.fx {
   border-color: rgba(196, 165, 255, 0.45);
   color: var(--accent-2);
 }
 
-/* Eco — lower GPU: no blur, no starfield rAF, no SVG glow/edge animation */
-body.vision-eco #starfield {
+button.btn-eco.ms {
+  border-color: rgba(120, 220, 180, 0.55);
+  color: #7ee8b8;
+}
+
+/* Eco / Ms — lower GPU: no blur, no starfield rAF, no SVG glow/edge animation */
+body.vision-eco #starfield,
+body.vision-ms #starfield {
   display: none;
 }
 
 body.vision-eco header,
 body.vision-eco .panel,
 body.vision-eco .map-filter-group,
-body.vision-eco .sidebar {
+body.vision-eco .sidebar,
+body.vision-ms header,
+body.vision-ms .panel,
+body.vision-ms .map-filter-group,
+body.vision-ms .sidebar {
   backdrop-filter: none;
 }
 
-body.vision-eco header {
+body.vision-eco header,
+body.vision-ms header {
   background: rgba(10, 14, 24, 0.94);
 }
 
-body.vision-eco .panel {
+body.vision-eco .panel,
+body.vision-ms .panel {
   background: rgba(18, 26, 42, 0.94);
 }
 
-body.vision-eco .map-filter-group {
+body.vision-eco .map-filter-group,
+body.vision-ms .map-filter-group {
   background: rgba(12, 18, 30, 0.92);
 }
 
-body.vision-eco #map-svg .node circle {
+body.vision-eco #map-svg .node circle,
+body.vision-ms #map-svg .node circle {
   transition: r 0.12s, fill 0.12s;
 }
 
 body.vision-eco #map-svg .node:hover circle,
 body.vision-eco #map-svg .node.selected circle,
-body.vision-eco #map-svg .node.constellation-lit circle {
+body.vision-eco #map-svg .node.constellation-lit circle,
+body.vision-ms #map-svg .node:hover circle,
+body.vision-ms #map-svg .node.selected circle,
+body.vision-ms #map-svg .node.constellation-lit circle,
+body.vision-ms #map-svg .node.trace-center circle,
+body.vision-ms #map-svg .node.trace-lit circle {
   filter: none;
 }
 
-body.vision-eco #map-svg .edge.constellation-pipe {
+body.vision-eco #map-svg .edge.constellation-pipe,
+body.vision-ms #map-svg .edge.constellation-pipe {
   animation: none;
   filter: none;
   stroke-dasharray: 6 4;
 }
 
-body.vision-eco #map-svg .map-selection-callout rect {
+body.vision-eco #map-svg .map-selection-callout rect,
+body.vision-ms #map-svg .map-selection-callout rect {
   filter: none;
 }
 
-body.vision-eco #map-svg .node text {
+body.vision-eco #map-svg .node text,
+body.vision-ms #map-svg .node text {
   filter: none;
 }
 
-body.vision-eco #map-svg {
+body.vision-eco #map-svg,
+body.vision-ms #map-svg {
   shape-rendering: optimizeSpeed;
 }
 
-body.vision-eco button:hover {
+body.vision-eco button:hover,
+body.vision-ms button:hover {
   box-shadow: none;
 }
 
 body.vision-eco #map-svg.map-dense .edge.edge-sparse:not(.edge-reveal) {
   display: none;
+}
+
+/* Ms — show sparse edges when hover trace reveals them */
+body.vision-ms #map-svg.map-dense .edge.edge-sparse:not(.edge-reveal):not(.trace-edge) {
+  opacity: 0.12;
 }
 
 .auto-toast {
@@ -494,6 +523,51 @@ body.sidebar-collapsed .sidebar-title span { display: none; }
   min-width: 0;
 }
 
+.panel-head-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.btn-panel-collapse {
+  padding: 2px 7px;
+  font-size: 0.85rem;
+  line-height: 1;
+  font-weight: 700;
+  opacity: 0.75;
+  min-width: 22px;
+}
+
+.btn-panel-collapse:hover {
+  opacity: 1;
+}
+
+.panel.panel-collapsed .panel-body,
+.panel.panel-collapsed .legend-bar {
+  display: none !important;
+}
+
+.panel.panel-collapsed {
+  min-height: 0;
+  align-self: start;
+}
+
+.panel.panel-collapsed h2 {
+  border-bottom: none;
+}
+
+.panel.panel-collapsed .btn-panel-collapse {
+  opacity: 1;
+  color: var(--accent);
+}
+
+.preview-panel.panel-collapsed {
+  flex: 0 0 auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+}
+
 .btn-panel-fs {
   padding: 2px 7px;
   font-size: 0.72rem;
@@ -713,23 +787,77 @@ body.panel-fs-active.sidebar-overlay-open .sidebar-overlay-backdrop {
 }
 
 .map-wrap .map-toolbar,
-.map-wrap .map-filter-dock,
+.map-wrap .map-filter-bar,
 .map-wrap .map-controls,
 .map-wrap .map-hint {
   z-index: 3;
 }
 
-.map-filter-dock {
+.map-filter-bar {
   position: absolute;
   top: 8px;
   right: 8px;
   left: auto;
   z-index: 3;
   display: flex;
-  flex-direction: column;
-  gap: 5px;
-  max-width: min(340px, 46%);
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+  max-width: min(280px, 52%);
   pointer-events: auto;
+}
+
+.map-filter-drop {
+  position: relative;
+}
+
+.map-filter-drop-btn {
+  font-size: 0.62rem;
+  padding: 3px 8px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.55);
+  color: var(--muted);
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.map-filter-drop-btn:hover {
+  border-color: rgba(126, 184, 255, 0.45);
+  color: var(--accent);
+}
+
+.map-filter-drop-btn.filters-active {
+  border-color: rgba(126, 184, 255, 0.55);
+  color: var(--accent);
+  background: rgba(126, 184, 255, 0.12);
+}
+
+.map-filter-drop-btn[aria-expanded="true"] {
+  border-color: rgba(126, 184, 255, 0.65);
+  color: #fff;
+}
+
+.map-filter-drop-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 6;
+  min-width: 200px;
+  max-width: min(320px, 78vw);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
+}
+
+.map-filter-drop-menu[hidden] {
+  display: none !important;
+}
+
+/* legacy id hook — chips host */
+.map-filter-dock {
+  display: none;
 }
 
 .map-filter-group {
@@ -776,12 +904,14 @@ body.panel-fs-active.sidebar-overlay-open .sidebar-overlay-backdrop {
   color: var(--text);
 }
 
-.map-filter-dock.filters-active .map-filter-bulk-btn {
-  border-color: rgba(126, 184, 255, 0.25);
+.map-filter-drop-btn.filters-active,
+.map-filter-bar.filters-active-layers .map-filter-drop-btn[data-drop="layers"],
+.map-filter-bar.filters-active-exts .map-filter-drop-btn[data-drop="exts"] {
+  border-color: rgba(126, 184, 255, 0.55);
 }
 
-.map-filter-dock.filters-active .map-filter-group {
-  border-color: rgba(126, 184, 255, 0.35);
+.map-filter-bar .map-filter-group {
+  border-color: rgba(126, 184, 255, 0.2);
 }
 
 .map-filter-label {
@@ -842,19 +972,15 @@ body.panel-fs-active.sidebar-overlay-open .sidebar-overlay-backdrop {
   box-shadow: 0 0 0 1px rgba(126, 184, 255, 0.55);
 }
 
-body.panel-fs-active .panel[data-panel="map"].panel-fullscreen .map-filter-dock {
+body.panel-fs-active .panel[data-panel="map"].panel-fullscreen .map-filter-bar {
   top: 10px;
   right: 10px;
-  left: 10px;
-  max-width: none;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: 8px 12px;
-  padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid rgba(126, 184, 255, 0.2);
-  background: rgba(4, 8, 14, 0.82);
+  left: auto;
+  max-width: min(320px, 42%);
+}
+
+body.panel-fs-active .panel[data-panel="map"].panel-fullscreen .map-filter-drop-menu {
+  max-width: min(360px, 90vw);
 }
 
 body.panel-fs-active .panel[data-panel="map"].panel-fullscreen .map-filter-group {
@@ -1009,13 +1135,20 @@ body.panel-fs-active .panel[data-panel="map"].panel-fullscreen .map-hint {
 .map-controls button {
   width: 28px;
   height: 28px;
+  padding: 0;
   border: 1px solid var(--border);
-  border-radius: 4px;
+  border-radius: 6px;
   background: rgba(0, 0, 0, 0.55);
   color: var(--text);
   font-size: 1rem;
   line-height: 1;
   cursor: pointer;
+}
+
+.map-controls .btn-panel-collapse {
+  font-weight: 700;
+  font-size: 0.95rem;
+  border-color: rgba(126, 184, 255, 0.35);
 }
 
 .map-controls button:hover {
@@ -1107,6 +1240,34 @@ body.panel-fs-active .panel[data-panel="map"].panel-fullscreen .map-hint {
 #map-svg .edge.constellation-pipe.edge-mixed,
 #map-svg .edge.constellation-pipe.edge-other {
   stroke: rgba(196, 165, 255, 0.95);
+}
+
+/* Ms-mode 1-hop hover trace (PH-S189) */
+body.vision-ms #map-svg .node.trace-dim circle {
+  opacity: 0.18;
+}
+body.vision-ms #map-svg .node.trace-dim text {
+  opacity: 0.12;
+}
+body.vision-ms #map-svg .node.trace-center circle {
+  stroke: #fff;
+  stroke-width: 2.5;
+}
+body.vision-ms #map-svg .node.trace-lit circle {
+  stroke: rgba(126, 232, 184, 0.95);
+  stroke-width: 2;
+}
+body.vision-ms #map-svg .node.trace-lit text {
+  opacity: 0.9;
+  fill: #c8f5e0;
+}
+body.vision-ms #map-svg .edge.trace-edge {
+  stroke-width: 2.2;
+  opacity: 0.95;
+  stroke: rgba(126, 232, 184, 0.9);
+}
+body.vision-ms #map-svg .edge.trace-dim {
+  opacity: 0.06;
 }
 
 @keyframes constellation-flow {

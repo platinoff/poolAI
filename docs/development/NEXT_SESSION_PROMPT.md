@@ -1,30 +1,37 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-14 · PH-S188 ✅ · vision **rev 125** · **3** відкритих (PH-S189…S191) · **hold 95%** · **stretch spirit 96%**
+**Оновлено:** 2026-06-15 · PH-S190 ✅ · vision **rev 127** · **10** відкритих (PH-S191…S200) · **hold 95%** · **stretch spirit 96%**
 
-| **← наступний** | **PH-S189** — Vision Eco/FX/Ms hover trace |
-| **Відкритих** | **3** (PH-S189…S191) |
+| **← наступний** | **PH-S191** — Vision sprint queue panel |
+| **Відкритих** | **10** (PH-S191…S200) |
 | **VDT** | один PH-S* = 1 commit (code) + docs sync |
 
 ---
 
-## Зріз §5.12 (3 відкритих: PH-S189…S191)
+## Зріз §5.12 (10 відкритих: PH-S191…S200)
 
 ### Закрито недавно ✅
 
 | Sprint | Scope | Зріз |
 |--------|-------|------|
-| PH-S188 | Vision map filters UX | independent toggles; All/None; decouple 3D stack ↔ map chips |
-| PH-S187 | Galaxy settlement cleared total metrics stub | Cleared path → `galaxy_settlement_cleared_total` |
-| PH-S186 | Galaxy verification sample scheduled /metrics export | PH-S164 counter → `GET /metrics` |
+| PH-S190 | Vision filter dropdowns + panel collapse | Layers/Types dropdown; − strip collapse; grid auto-fill |
+| PH-S189 | Vision Eco/FX/Ms hover trace | tri-mode; 1-hop hover highlight |
+| PH-S188 | Vision map filters UX | independent toggles; All/None |
 
-### Відкрито — vision UX band (PH-S189…S191)
+### Відкрито — vision + code band (PH-S191…S200)
 
 | # | Sprint | Scope |
 |---|--------|-------|
-| 1 | **PH-S189** | Vision Eco/FX/**Ms** hover trace — 1-hop edge highlight on mouse |
-| 2 | **PH-S190** | Vision overview LOD + minimap — readable map without zoom |
-| 3 | **PH-S191** | Vision sprint queue panel + `feed.json` RSS + Cursor post-push hook |
+| 1 | **PH-S191** | Vision sprint queue panel — Rust parse FM §5.12 |
+| 2 | **PH-S192** | Vision overview LOD + minimap |
+| 3 | **PH-S193** | Dashboard shell formatters → wasm |
+| 4 | **PH-S194** | Galaxy fee split result counter stub |
+| 5 | **PH-S195** | Galaxy seed_inventory GET stub |
+| 6 | **PH-S196** | Stand smoke jobs lease renew |
+| 7 | **PH-S197** | Admin updates-compat wasm wiring |
+| 8 | **PH-S198** | Topology graph Rust labels slim |
+| 9 | **PH-S199** | Vision feed.json RSS ticker |
+| 10 | **PH-S200** | Cursor post-push PH-S* hook |
 
 ---
 
@@ -41,22 +48,22 @@ export K8S_OPENAPI_ENABLED_VERSION=1.28
 
 ---
 
-## PH-S189 — scope
+## PH-S191 — scope
 
-- Tri-mode **Eco→FX→Ms**; hover 1-hop edge/node highlight; `localStorage`; rev++
+- `poolai-vision-sync` або vision panel: parse FM §5.12 → `sprint_queue` UI; rev++
 - Acceptance: manual vision check; FM/HANDOFF/NEXT/vision; push
 
 ---
 
-## Copy-paste — PH-S189
+## Copy-paste — PH-S191
 
 ```
-PoolAI — спринт PH-S189 (один PH-S*, VDT ітераційно).
+PoolAI — спринт PH-S191 (один PH-S*, VDT ітераційно).
 HANDOFF: docs/development/HANDOFF_NEW_SESSION.md
 FM §5.12: docs/catalog/FUNCTION_MANAGEMENT.md
 
-Спринт PH-S189 — Vision Eco/FX/Ms hover trace
-Scope: tri-mode Eco→FX→Ms; hover 1-hop edge/node highlight; localStorage; rev++
+Спринт PH-S191 — Vision sprint queue panel
+Scope: Rust parse FM §5.12 → sprint_queue panel in docs/vision; rev++
 
 Acceptance: vision manual check; FM/HANDOFF/NEXT/vision; git push main
 ```

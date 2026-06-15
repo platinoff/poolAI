@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PoolAI Galaxy Starwalker Vision</title>
-  <link rel="stylesheet" href="vision.css?v=54" />
+  <link rel="stylesheet" href="vision.css?v=56" />
 </head>
 <body>
   <div id="galaxy-backdrop" class="galaxy-backdrop" aria-hidden="true">
@@ -16,7 +16,7 @@
     <h1>PoolAI Galaxy Starwalker Vision</h1>
     <span class="meta" id="meta-rev">…</span>
     <span class="meta-trail" id="meta-trail" aria-label="Git HEAD and next sprint"></span>
-    <button type="button" id="btn-eco" class="btn-eco on" title="Eco ON — low GPU">Eco</button>
+    <button type="button" id="btn-eco" class="btn-eco on" title="Eco — low GPU. Click → FX → Ms">Eco</button>
     <button type="button" id="btn-auto" class="btn-auto on" title="Auto-reload when vision files change">Auto</button>
     <button type="button" id="btn-reload" title="Reload manifest.json">↻ Reload</button>
   </header>
@@ -31,53 +31,64 @@
     <div class="main-col">
       <div class="diagram-row">
         <section class="panel" data-panel="layers" aria-label="Layer stack">
-          <h2><span>Layers</span><button type="button" class="btn-panel-fs" title="Fullscreen (Esc)">⛶</button></h2>
+          <h2><span>Layers</span><span class="panel-head-actions"><button type="button" class="btn-panel-collapse" title="Collapse to title bar">−</button><button type="button" class="btn-panel-fs" title="Fullscreen (Esc)">⛶</button></span></h2>
           <div class="panel-body" id="graph-3d">
             <div class="layer-stack" id="layer-stack"></div>
           </div>
           <div class="legend-bar" id="layer-legend" aria-label="Layer legend"></div>
         </section>
         <section class="panel" data-panel="map" aria-label="Interactive map">
-          <h2><span>Galaxy map</span><button type="button" class="btn-panel-fs" title="Fullscreen (Esc)">⛶</button></h2>
+          <h2><span>Galaxy map</span><span class="panel-head-actions"><button type="button" class="btn-panel-collapse" title="Collapse to title bar">−</button><button type="button" class="btn-panel-fs" title="Fullscreen (Esc)">⛶</button></span></h2>
           <div class="panel-body map-wrap">
             <img class="galaxy-bg" src="" alt="" />
             <div class="map-toolbar" aria-label="Map filters">
               <button type="button" id="btn-map-sprint" class="btn-map-toggle" title="Dim nodes outside active sprint (PH-S*)">◎ Sprint</button>
               <button type="button" id="btn-map-clusters" class="btn-map-toggle on" title="Collapse dense folders">⊟ Folders</button>
             </div>
-            <div class="map-filter-dock" id="map-filter-dock" aria-label="Layer and file-type filters">
-              <div class="map-filter-group" data-group="layers">
-                <div class="map-filter-head">
-                  <span class="map-filter-label">Layers</span>
-                  <span class="map-filter-bulk">
-                    <button type="button" class="map-filter-bulk-btn" id="map-layers-all" title="Show all layers on map">All</button>
-                    <button type="button" class="map-filter-bulk-btn" id="map-layers-none" title="Hide all layers on map">None</button>
-                  </span>
+            <div class="map-filter-bar" id="map-filter-bar" aria-label="Layer and file-type filters">
+              <div class="map-filter-drop">
+                <button type="button" class="map-filter-drop-btn" id="map-filter-layers-btn" data-drop="layers" aria-expanded="false" aria-controls="map-filter-layers-menu">Layers ▾</button>
+                <div class="map-filter-drop-menu" id="map-filter-layers-menu" hidden>
+                  <div class="map-filter-group" data-group="layers">
+                    <div class="map-filter-head">
+                      <span class="map-filter-label">Layers</span>
+                      <span class="map-filter-bulk">
+                        <button type="button" class="map-filter-bulk-btn" id="map-layers-all" title="Show all layers on map">All</button>
+                        <button type="button" class="map-filter-bulk-btn" id="map-layers-none" title="Hide all layers on map">None</button>
+                      </span>
+                    </div>
+                    <div class="map-filter-chips" id="map-layer-chips"></div>
+                  </div>
                 </div>
-                <div class="map-filter-chips" id="map-layer-chips"></div>
               </div>
-              <div class="map-filter-group" data-group="ext">
-                <div class="map-filter-head">
-                  <span class="map-filter-label">Types</span>
-                  <span class="map-filter-bulk">
-                    <button type="button" class="map-filter-bulk-btn" id="map-exts-all" title="Show all file types on map">All</button>
-                    <button type="button" class="map-filter-bulk-btn" id="map-exts-none" title="Hide all file types on map">None</button>
-                  </span>
+              <div class="map-filter-drop">
+                <button type="button" class="map-filter-drop-btn" id="map-filter-exts-btn" data-drop="exts" aria-expanded="false" aria-controls="map-filter-exts-menu">Types ▾</button>
+                <div class="map-filter-drop-menu" id="map-filter-exts-menu" hidden>
+                  <div class="map-filter-group" data-group="ext">
+                    <div class="map-filter-head">
+                      <span class="map-filter-label">Types</span>
+                      <span class="map-filter-bulk">
+                        <button type="button" class="map-filter-bulk-btn" id="map-exts-all" title="Show all file types on map">All</button>
+                        <button type="button" class="map-filter-bulk-btn" id="map-exts-none" title="Hide all file types on map">None</button>
+                      </span>
+                    </div>
+                    <div class="map-filter-chips" id="map-ext-chips"></div>
+                  </div>
                 </div>
-                <div class="map-filter-chips" id="map-ext-chips"></div>
               </div>
             </div>
-            <div class="map-controls" aria-label="Map zoom">
+            <div class="map-controls" aria-label="Map zoom and panel">
+              <button type="button" class="btn-panel-collapse map-panel-collapse" data-panel="map" title="Collapse Galaxy map">−</button>
               <button type="button" id="map-zoom-in" title="Zoom in">+</button>
               <button type="button" id="map-zoom-out" title="Zoom out">−</button>
               <button type="button" id="map-zoom-reset" title="Reset view">⌂</button>
             </div>
-            <span class="map-hint">Eco=GPU save · Layers/Types All/None · Shift+layer solo · Esc reset</span>
+            <span class="map-hint">Eco→FX→Ms · Layers/Types All/None · Shift+layer solo · Esc reset</span>
             <svg id="map-svg" viewBox="0 0 900 520" role="img" aria-label="Documentation graph"></svg>
           </div>
         </section>
         <section class="panel" data-panel="links" aria-label="Links">
-          <h2><span>Links</span><button type="button" class="btn-panel-fs" title="Fullscreen (Esc)">⛶</button></h2>
+          <h2><span>Links</span><span class="panel-head-actions"><button type="button" class="btn-panel-collapse" title="Collapse to title bar">−</button><button type="button" class="btn-panel-fs" title="Fullscreen (Esc)">⛶</button></span></h2>
           <div class="panel-body">
             <svg id="link-graph" aria-label="Neighbour graph"></svg>
             <ul class="links-list" id="links-list"></ul>
@@ -86,7 +97,7 @@
         </section>
       </div>
       <section class="panel preview-panel" data-panel="preview" aria-label="Document preview">
-        <h2><span>Preview</span><button type="button" class="btn-panel-fs" title="Fullscreen (Esc)">⛶</button></h2>
+        <h2><span>Preview</span><span class="panel-head-actions"><button type="button" class="btn-panel-collapse" title="Collapse to title bar">−</button><button type="button" class="btn-panel-fs" title="Fullscreen (Esc)">⛶</button></span></h2>
         <div class="panel-body">
           <p id="doc-hint">Select a file in the sidebar or on the map.</p>
           <pre id="doc-preview"></pre>
@@ -94,6 +105,6 @@
       </section>
     </div>
   </div>
-  <script src="vision.js?v=54"></script>
+  <script src="vision.js?v=56"></script>
 </body>
 </html>

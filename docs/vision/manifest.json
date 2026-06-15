@@ -1716,7 +1716,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "76f6dd3d",
-  "last_sprint_closed": "PH-S188",
+  "last_sprint_closed": "PH-S190",
   "layers": [
     {
       "id": "L0",
@@ -1749,7 +1749,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S189",
+  "next_sprint": "PH-S191",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7392,7 +7392,7 @@
       "sprints": ["PH-S181"]
     }
   ],
-  "revision": 125,
-  "updated_at": "2026-06-14",
-  "vision_ui_rev": 54
+  "revision": 127,
+  "updated_at": "2026-06-15",
+  "vision_ui_rev": 56
 }

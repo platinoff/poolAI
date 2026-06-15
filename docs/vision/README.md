@@ -91,7 +91,9 @@ http://127.0.0.1:8765/docs/vision/index.html
 | **Galaxy map filters** | **Layers** (L0–L5) + **Types** (md/rs/ts/…) chips — незалежні toggle на map; **All**/**None** для кожної групи; **Shift+layer** = solo; **Esc** = скинути map filters (окремо від 3D stack) |
 | **Fullscreen map** | dock Layers/Types розгортається зверху; Sprint/Folders — знизу ліворуч |
 | **◎ Sprint** | тьмяні вузли/ребра поза `active_sprint` з `extensions.json` |
-| **Eco / FX / Ms** | кнопка **Eco** у шапці — low GPU (starfield off); **FX** — glow; **Ms** (mouse trace) — **PH-S189**; auto Eco ON на карті 600+ вузлів |
+| **Eco / FX / Ms** | кнопка у шапці циклічно **Eco→FX→Ms** — low GPU / glow / **1-hop hover trace**; `localStorage` `visionMode` |
+| **Layers / Types** | **dropdown** меню (клік → chips + All/None); не перекриває карту (PH-S190 ✅) |
+| **Panel collapse** | **−** у заголовку або біля zoom — панель → смуга з назвою; решта auto-fill (PH-S190 ✅) |
 | **Клік по вузлу** | миттєва підсвітка (без повного re-render); preview файлу — async fetch |
 | **Layers (3D stack)** | клік по шару L0–L5 — фокус tier у stack/legend (PH-S188: окремо від map filters); повторний клік або Esc — скинути stack focus |
 | **Вузол на map** | клік — повна назва у callout; pipeline-ребра до hub-файлів (`galaxy_grid`, `fm`, …) як сузір’я |
@@ -109,8 +111,10 @@ http://127.0.0.1:8765/docs/vision/index.html
 | Sprint | Scope | Файли |
 |--------|-------|-------|
 | **PH-S188** ✅ | Map filters — independent layer/type toggles; **LAYERS**/**TYPES** All/None; decouple 3D stack ↔ chips | `vision.js`, `vision.css`, `index.html` |
-| **PH-S189** | **Eco / FX / Ms** tri-mode; hover 1-hop edge/node highlight | `vision.js`, `index.html` |
-| **PH-S190** | Overview LOD + minimap (hub labels без zoom) | `vision.js`, `vision.css` |
-| **PH-S191** | Sprint queue panel + `feed.json` RSS + Cursor post-push hook | `poolai-vision-sync`, `manifest.json`, `.cursor/hooks` |
+| **PH-S190** ✅ | Filter **dropdowns** + panel **−** collapse strip | `vision.js`, `vision.css`, `index.html` |
+| **PH-S191** | Sprint queue panel (Rust parse FM §5.12) | `poolai-vision-sync`, `manifest.json` |
+| **PH-S192** | Overview LOD + minimap | `vision.js`, `vision.css` |
+| **PH-S199** | `feed.json` RSS ticker | `docs/vision/` |
+| **PH-S200** | Cursor post-push hook | `.cursor/hooks` |
 
-Канон черги: [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 · наступний спринт **PH-S189** (vision Eco/FX/Ms hover trace).
+Канон черги: [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 · наступний спринт **PH-S191** (vision sprint queue panel).
