@@ -216,6 +216,9 @@ cargo run --bin poolai-http-stand-smoke
 export POOLAI_E2E_STAND_ROOT=/tmp/poolai-e2e-NNN   # шлях з логу --start
 cargo run --bin poolai-http-stand-smoke -- --raid-restart
 
+# Job lease renew suite (PH-S196; replaces Playwright jobs_lease):
+cargo run --bin poolai-http-stand-smoke -- --lease-renew
+
 # Full suite incl. raid restart:
 cargo run --bin poolai-http-stand-smoke -- --raid
 
@@ -228,6 +231,7 @@ cargo run --bin poolai-http-stand-smoke -- --json
 | `POOLAI_BASE_URL` | Base URL stand (default `http://127.0.0.1:8080`) |
 | `POOLAI_E2E_STAND_ROOT` | Каталог e2e stand з `restart.sh` (для `--raid-restart` / `--raid`) |
 | `POOLAI_STAND_SMOKE_RAID_RESTART=1` | Альтернатива прапорцю `--raid-restart` |
+| `POOLAI_STAND_SMOKE_LEASE_RENEW=1` | Альтернатива прапорцю `--lease-renew` |
 | `POOLAI_STAND_SMOKE_RAID=1` | Альтернатива прапорцю `--raid` (full suite + raid) |
 
 ---

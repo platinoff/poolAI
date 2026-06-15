@@ -7,8 +7,8 @@ alwaysApply: false
 # Cursor Environment Baseline
 
 - Keep Cursor workflows aligned with the installed local stack before making automation changes.
-- Baseline for this machine (verified 2026-05-05):
-  - `cursor`: 3.2.21
+- Baseline for this machine (verified 2026-06-15):
+  - `cursor`: 3.7.36
   - `rustc`: 1.92.0
   - `cargo`: 1.92.0
   - `git`: 2.54.0.windows.1
@@ -24,5 +24,6 @@ alwaysApply: false
 
 ## Cursor release alignment (latest known)
 
-- Account for Cursor 3.x agent-first workflows (Agents Window, tiled layout, improved diff-to-file navigation).
+- Account for Cursor 3.7.x agent-first workflows (Agents Window, tiled layout, improved diff-to-file navigation, subagent/Task tool).
 - Prefer rules that are resilient to UI updates: focus on repository conventions, not fragile UI click paths.
+- Skills live under user `~/.cursor/skills-cursor/`; repo rules under `.cursor/rules/` — do not duplicate skill content in rules.

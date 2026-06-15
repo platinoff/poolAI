@@ -11,6 +11,9 @@
 //! export POOLAI_E2E_STAND_ROOT=/tmp/poolai-e2e-NNN
 //! cargo run --bin poolai-http-stand-smoke -- --raid-restart
 //!
+//! # Job lease renew suite (replaces legacy Playwright jobs_lease, PH-S196):
+//! cargo run --bin poolai-http-stand-smoke -- --lease-renew
+//!
 //! # Full suite incl. raid restart:
 //! cargo run --bin poolai-http-stand-smoke -- --raid
 //!
@@ -34,6 +37,7 @@ struct Cli {
     json_out: bool,
     include_raid: bool,
     raid_restart_only: bool,
+    lease_renew_only: bool,
     base_url: String,
 }
 
@@ -67,17 +71,24 @@ fn parse_cli() -> Cli {
     let mut json_out = false;
     let mut include_raid = false;
     let mut raid_restart_only = false;
+    let mut lease_renew_only = false;
     for arg in std::env::args().skip(1) {
         match arg.as_str() {
             "--json" => json_out = true,
             "--raid-restart" => raid_restart_only = true,
             "--raid" => include_raid = true,
+            "--lease-renew" => lease_renew_only = true,
             _ if arg.starts_with('-') => {}
             _ => {}
         }
     }
     if !raid_restart_only {
         raid_restart_only = std::env::var("POOLAI_STAND_SMOKE_RAID_RESTART")
+            .ok()
+            .is_some_and(|v| matches!(v.as_str(), "1" | "true" | "yes"));
+    }
+    if !lease_renew_only {
+        lease_renew_only = std::env::var("POOLAI_STAND_SMOKE_LEASE_RENEW")
             .ok()
             .is_some_and(|v| matches!(v.as_str(), "1" | "true" | "yes"));
     }
@@ -90,6 +101,7 @@ fn parse_cli() -> Cli {
         json_out,
         include_raid,
         raid_restart_only,
+        lease_renew_only,
         base_url: base_url_from_env(),
     }
 }
@@ -171,7 +183,7 @@ async fn create_unbound_job(client: &Client, base: &str, artifact: &str) -> Resu
         .ok_or_else(|| format!("create job missing id: {body}"))
 }
 
-async fn smoke_jobs_lease(client: &Client, base: &str) -> Result<(), String> {
+async fn smoke_jobs_lease_acquire(client: &Client, base: &str) -> Result<(), String> {
     let id = create_unbound_job(client, base, "smoke-lease-acquire").await?;
     let acquire = client
         .post(api_url(base, &format!("/api/v1/jobs/{id}/lease")))
@@ -187,10 +199,73 @@ async fn smoke_jobs_lease(client: &Client, base: &str) -> Result<(), String> {
     if job.get("status").and_then(|v| v.as_str()) != Some("leased") {
         return Err(format!("expected leased: {job}"));
     }
+    if job.get("lease_owner").and_then(|v| v.as_str()) != Some("stand-smoke-worker") {
+        return Err(format!("unexpected lease_owner: {job}"));
+    }
+    if job.get("lease_epoch").and_then(|v| v.as_u64()) != Some(1) {
+        return Err(format!("expected lease_epoch 1: {job}"));
+    }
+    if job
+        .get("lease_expires_at")
+        .and_then(|v| v.as_str())
+        .is_none()
+    {
+        return Err(format!("missing lease_expires_at: {job}"));
+    }
+    Ok(())
+}
+
+async fn smoke_jobs_lease_conflict(client: &Client, base: &str) -> Result<(), String> {
+    let id = create_unbound_job(client, base, "smoke-lease-conflict").await?;
+    let first = client
+        .post(api_url(base, &format!("/api/v1/jobs/{id}/lease")))
+        .json(&json!({ "lease_owner": "stand-smoke-a" }))
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+    if first.status() != StatusCode::OK {
+        return Err(format!("first acquire status {}", first.status()));
+    }
+    let second = client
+        .post(api_url(base, &format!("/api/v1/jobs/{id}/lease")))
+        .json(&json!({ "lease_owner": "stand-smoke-b" }))
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+    if second.status() != StatusCode::CONFLICT {
+        return Err(format!("second acquire status {}", second.status()));
+    }
+    let err: Value = second.json().await.map_err(|e| e.to_string())?;
+    if err.pointer("/error/code").and_then(|v| v.as_str()) != Some("lease_already_active") {
+        return Err(format!("expected lease_already_active: {err}"));
+    }
+    Ok(())
+}
+
+async fn smoke_jobs_lease_renew_extends(client: &Client, base: &str) -> Result<(), String> {
+    let id = create_unbound_job(client, base, "smoke-lease-renew").await?;
+    let acquired = client
+        .post(api_url(base, &format!("/api/v1/jobs/{id}/lease")))
+        .json(&json!({ "lease_owner": "stand-smoke-renew" }))
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+    if acquired.status() != StatusCode::OK {
+        return Err(format!("lease acquire status {}", acquired.status()));
+    }
+    let acquired_body: Value = acquired.json().await.map_err(|e| e.to_string())?;
+    let job = acquired_body
+        .get("job")
+        .ok_or("lease response missing job")?;
     let epoch = job
         .get("lease_epoch")
         .and_then(|v| v.as_u64())
         .ok_or("missing lease_epoch")?;
+    let expires_before = job
+        .get("lease_expires_at")
+        .and_then(|v| v.as_str())
+        .ok_or("missing lease_expires_at")?
+        .to_string();
     let renew = client
         .post(api_url(base, &format!("/api/v1/jobs/{id}/lease/renew")))
         .json(&json!({ "lease_epoch": epoch }))
@@ -199,6 +274,113 @@ async fn smoke_jobs_lease(client: &Client, base: &str) -> Result<(), String> {
         .map_err(|e| e.to_string())?;
     if renew.status() != StatusCode::OK {
         return Err(format!("lease renew status {}", renew.status()));
+    }
+    let renewed_body: Value = renew.json().await.map_err(|e| e.to_string())?;
+    let renewed_job = renewed_body
+        .get("job")
+        .ok_or("renew response missing job")?;
+    if renewed_job.get("lease_epoch").and_then(|v| v.as_u64()) != Some(epoch) {
+        return Err(format!("epoch changed on renew: {renewed_job}"));
+    }
+    let expires_after = renewed_job
+        .get("lease_expires_at")
+        .and_then(|v| v.as_str())
+        .ok_or("renew missing lease_expires_at")?;
+    if expires_after == expires_before {
+        return Err("lease_expires_at unchanged after renew".into());
+    }
+    Ok(())
+}
+
+async fn smoke_jobs_lease_renew_stale_epoch(client: &Client, base: &str) -> Result<(), String> {
+    let id = create_unbound_job(client, base, "smoke-lease-renew-reject").await?;
+    let acquired = client
+        .post(api_url(base, &format!("/api/v1/jobs/{id}/lease")))
+        .json(&json!({ "lease_owner": "stand-smoke-cas" }))
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+    if acquired.status() != StatusCode::OK {
+        return Err(format!("lease acquire status {}", acquired.status()));
+    }
+    let epoch = acquired
+        .json::<Value>()
+        .await
+        .map_err(|e| e.to_string())?
+        .pointer("/job/lease_epoch")
+        .and_then(|v| v.as_u64())
+        .ok_or("missing lease_epoch")?;
+    let stale_epoch = epoch.saturating_sub(1);
+    let rejected = client
+        .post(api_url(base, &format!("/api/v1/jobs/{id}/lease/renew")))
+        .json(&json!({ "lease_epoch": stale_epoch }))
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+    if rejected.status() != StatusCode::CONFLICT {
+        return Err(format!("stale renew status {}", rejected.status()));
+    }
+    let err: Value = rejected.json().await.map_err(|e| e.to_string())?;
+    if err.pointer("/error/code").and_then(|v| v.as_str()) != Some("lease_epoch_rejected") {
+        return Err(format!("expected lease_epoch_rejected: {err}"));
+    }
+    Ok(())
+}
+
+async fn smoke_jobs_lease_renew_no_acquire(client: &Client, base: &str) -> Result<(), String> {
+    let id = create_unbound_job(client, base, "smoke-renew-no-acquire").await?;
+    let renew = client
+        .post(api_url(base, &format!("/api/v1/jobs/{id}/lease/renew")))
+        .json(&json!({ "lease_epoch": 1 }))
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+    if renew.status() != StatusCode::BAD_REQUEST {
+        return Err(format!("renew without acquire status {}", renew.status()));
+    }
+    let err: Value = renew.json().await.map_err(|e| e.to_string())?;
+    let msg = err
+        .pointer("/error/message")
+        .and_then(|v| v.as_str())
+        .or_else(|| err.get("message").and_then(|v| v.as_str()))
+        .unwrap_or("");
+    if !msg.to_ascii_lowercase().contains("acquire lease") {
+        return Err(format!("expected acquire lease message: {err}"));
+    }
+    Ok(())
+}
+
+async fn smoke_jobs_lease_renew_expired(client: &Client, base: &str) -> Result<(), String> {
+    let id = create_unbound_job(client, base, "smoke-lease-expired").await?;
+    let acquired = client
+        .post(api_url(base, &format!("/api/v1/jobs/{id}/lease")))
+        .json(&json!({ "lease_owner": "stand-smoke-expired" }))
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+    if acquired.status() != StatusCode::OK {
+        return Err(format!("lease acquire status {}", acquired.status()));
+    }
+    let epoch = acquired
+        .json::<Value>()
+        .await
+        .map_err(|e| e.to_string())?
+        .pointer("/job/lease_epoch")
+        .and_then(|v| v.as_u64())
+        .ok_or("missing lease_epoch")?;
+    tokio::time::sleep(Duration::from_millis(2600)).await;
+    let expired = client
+        .post(api_url(base, &format!("/api/v1/jobs/{id}/lease/renew")))
+        .json(&json!({ "lease_epoch": epoch }))
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+    if expired.status() != StatusCode::CONFLICT {
+        return Err(format!("expired renew status {}", expired.status()));
+    }
+    let err: Value = expired.json().await.map_err(|e| e.to_string())?;
+    if err.pointer("/error/code").and_then(|v| v.as_str()) != Some("lease_expired") {
+        return Err(format!("expected lease_expired: {err}"));
     }
     Ok(())
 }
@@ -446,6 +628,56 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
         };
     }
 
+    if cli.lease_renew_only {
+        record(
+            &mut cases,
+            "jobs_lease_acquire",
+            smoke_jobs_lease_acquire(&client, &cli.base_url).await,
+        )
+        .await;
+        record(
+            &mut cases,
+            "jobs_lease_conflict",
+            smoke_jobs_lease_conflict(&client, &cli.base_url).await,
+        )
+        .await;
+        record(
+            &mut cases,
+            "jobs_lease_renew_extends",
+            smoke_jobs_lease_renew_extends(&client, &cli.base_url).await,
+        )
+        .await;
+        record(
+            &mut cases,
+            "jobs_lease_renew_stale_epoch",
+            smoke_jobs_lease_renew_stale_epoch(&client, &cli.base_url).await,
+        )
+        .await;
+        record(
+            &mut cases,
+            "jobs_lease_renew_no_acquire",
+            smoke_jobs_lease_renew_no_acquire(&client, &cli.base_url).await,
+        )
+        .await;
+        record(
+            &mut cases,
+            "jobs_lease_renew_expired",
+            smoke_jobs_lease_renew_expired(&client, &cli.base_url).await,
+        )
+        .await;
+        let passed = cases.iter().filter(|c| c.ok).count() as u32;
+        let failed = cases.iter().filter(|c| !c.ok).count() as u32;
+        return SmokeReport {
+            base_url: cli.base_url.clone(),
+            stand_root,
+            ok: failed == 0,
+            passed,
+            failed,
+            cases,
+            tool: "poolai-http-stand-smoke",
+        };
+    }
+
     async fn record(
         cases: &mut Vec<SmokeCaseResult>,
         name: &'static str,
@@ -475,12 +707,6 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
         &mut cases,
         "grid_pricing",
         smoke_grid_pricing(&client, &cli.base_url).await,
-    )
-    .await;
-    record(
-        &mut cases,
-        "jobs_lease",
-        smoke_jobs_lease(&client, &cli.base_url).await,
     )
     .await;
     record(
@@ -603,7 +829,14 @@ mod tests {
     fn parse_cli_raid_restart_flag() {
         std::env::remove_var("POOLAI_STAND_SMOKE_RAID");
         std::env::remove_var("POOLAI_STAND_SMOKE_RAID_RESTART");
+        std::env::remove_var("POOLAI_STAND_SMOKE_LEASE_RENEW");
         let args: Vec<String> = vec!["poolai-http-stand-smoke".into(), "--raid-restart".into()];
         assert!(args.iter().any(|a| a == "--raid-restart"));
+    }
+
+    #[test]
+    fn parse_cli_lease_renew_flag_recognized() {
+        let args: Vec<String> = vec!["poolai-http-stand-smoke".into(), "--lease-renew".into()];
+        assert!(args.iter().any(|a| a == "--lease-renew"));
     }
 }

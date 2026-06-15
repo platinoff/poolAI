@@ -1,8 +1,8 @@
 # Cursor Configuration Status
 
-**Оновлено:** 2026-05-27
+**Оновлено:** 2026-06-15
 
-**Статус:** ✅ VDT agent roles + §5.12 sync; slim `alwaysApply` (roles + VDT + runtime-stack)
+**Статус:** ✅ VDT agent roles + §5.12 sync; Cursor **3.7.36** baseline; slim `alwaysApply` (roles + VDT + runtime-stack)
 
 ---
 
@@ -31,4 +31,4 @@ git add -f .cursor/rules/poolai-agent-roles.mdc .cursor/rules/virtual-developmen
 
 ---
 
-**Наступна ітерація розробки:** `docs/development/NEXT_SESSION_PROMPT.md` (PH-S81+).
+**Наступна ітерація розробки:** `docs/development/NEXT_SESSION_PROMPT.md` (PH-S197).

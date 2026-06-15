@@ -1,5 +1,10 @@
 # Cursor Agent Configuration Changelog
 
+## 2026-06-15 — Cursor 3.7.36 baseline
+
+- Оновлено **`.cursor/rules/cursor-environment-baseline.mdc`**: `cursor` **3.7.36** (було 3.2.21); нотатка про subagent/Task tool і user skills path.
+- Перевірено: `hooks.json` — `hooks: {}` (канон без stop-hook); MSYS2 bash для `cargo`/`git` без змін.
+
 ## 2026-05-20 — Runtime stack policy (block Python)
 
 - Додано **`.cursor/rules/runtime-stack-policy.mdc`** (`alwaysApply: true`) — Rust primary; заборона Python runtime; dev-only `bin/openapi-gap-audit.py`.

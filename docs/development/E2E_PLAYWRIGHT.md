@@ -30,7 +30,7 @@ bash bin/e2e-playwright.sh
 
 # Варіант B: збірка + старт + тести (PH-S158: stand via `poolai-e2e-stand`)
 bash bin/e2e-playwright.sh --start
-# GitHub Actions (CI=true): debug, `CARGO_BUILD_JOBS=1`, features без `ml`; `npm run test:ci` (smoke+admin+a11y+visual) + Rust `poolai-http-stand-smoke --raid-restart` (PH-S156).
+# GitHub Actions (CI=true): debug, `CARGO_BUILD_JOBS=1`, features без `ml`; `npm run test:ci` (smoke+admin+a11y+visual) + Rust `poolai-http-stand-smoke --raid-restart` (PH-S156) + `--lease-renew` (PH-S196).
 # Windows + AV: виключення для `target/` і `~/.cargo`; локально `export CARGO_BUILD_JOBS=1` перед `--start`.
 
 # PH-S11: оновити visual baselines
@@ -67,10 +67,12 @@ bash bin/e2e-playwright.sh --start --update-snapshots
 
 **PH-S156 ✅:** `jobs_raid` прибрано з `test:ci`; `bin/e2e-playwright.sh --start` запускає `poolai-http-stand-smoke --raid-restart` після browser gate.
 
+**PH-S196 ✅:** `bin/e2e-playwright.sh --start` також запускає `poolai-http-stand-smoke --lease-renew` (заміна archived `jobs_lease.spec.ts` на live stand); CI wire — `tests/jobs_api_contracts.rs`.
+
 **PH-S86 ✅ (archived):** `grid_pricing.spec.ts` → `e2e/archive/api-smoke/`; канон — `tests/grid_pricing_integration.rs` (PH-S144).
 
 **PH-S107 ✅ (archived):** `jobs_lease.spec.ts` → `e2e/archive/api-smoke/`; канон — `tests/jobs_api_contracts.rs` (PH-S144).
 
 **PH-S148 ✅:** `npm run test:ci` — лише `smoke admin a11y visual` (browser/UI); API-only TS patterns не повертаються з archive.
 
-**Last updated:** 2026-06-14 (PH-S156 Rust stand smoke `--raid-restart`).
+**Last updated:** 2026-06-15 (PH-S196 Rust stand smoke `--lease-renew`).

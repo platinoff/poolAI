@@ -94,4 +94,6 @@ fi
 if [[ -n "${POOLAI_E2E_STAND_ROOT:-}" ]]; then
   echo "==> PH-S156: RAID restart stand smoke (poolai-http-stand-smoke --raid-restart)"
   cargo run --bin poolai-http-stand-smoke -- --raid-restart
+  echo "==> PH-S196: Job lease renew stand smoke (poolai-http-stand-smoke --lease-renew)"
+  cargo run --bin poolai-http-stand-smoke -- --lease-renew
 fi
