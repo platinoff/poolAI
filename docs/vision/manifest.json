@@ -1716,7 +1716,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "76f6dd3d",
-  "last_sprint_closed": "PH-S192",
+  "last_sprint_closed": "PH-S193",
   "layers": [
     {
       "id": "L0",
@@ -1749,7 +1749,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S193",
+  "next_sprint": "PH-S194",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7429,7 +7429,7 @@
       ]
     }
   ],
-  "revision": 130,
+  "revision": 131,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -8578,9 +8578,9 @@
       "acceptance": "login/dashboard wasm formatters; slim JS glue; `cargo test-ci",
       "deps": "PH-S151, `poolai-ui-core",
       "id": "PH-S193",
-      "open": true,
+      "open": false,
       "row": 128,
-      "status": "open",
+      "status": "closed",
       "title": "Dashboard shell formatters → wasm (code)"
     },
     {
@@ -8647,7 +8647,7 @@
       "title": "Cursor post-push PH-S* hook (ops)"
     }
   ],
-  "sprint_queue_open_count": 8,
+  "sprint_queue_open_count": 7,
   "updated_at": "2026-06-15",
   "vision_ui_rev": 58
 }

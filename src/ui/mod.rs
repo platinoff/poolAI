@@ -844,6 +844,7 @@ fn layout(
 
   <div id="aria_live_region" aria-live="polite" aria-atomic="true" style="position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;"></div>
 
+  {wasm_module}
   <script>
   {script}
   </script>
@@ -875,14 +876,48 @@ fn layout(
         nav_admin_mobile = nav_admin_mobile,
         style_select = style_select,
         high_contrast_value = high_contrast_value,
-        main_content_id = main_content_id
+        main_content_id = main_content_id,
+        wasm_module = ui_wasm_module_block(),
     );
 
     Html(html)
 }
 
+fn ui_wasm_module_block() -> String {
+    format!(
+        r#"<script type="module">
+{module}
+</script>"#,
+        module = wasm_static::POOLAI_UI_WASM_MODULE
+    )
+}
+
 fn common_js() -> &'static str {
     r#"
+function poolaiUiWasmCall(name) {
+  const w = window.poolaiUiWasm;
+  return w && w.ready && typeof w[name] === 'function' ? w[name] : null;
+}
+
+function formatIsoDatetime(iso) {
+  const fn = poolaiUiWasmCall('formatIsoDatetime');
+  if (fn && iso) {
+    const out = fn(String(iso));
+    if (out && out !== '—') return out;
+  }
+  if (!iso) return '';
+  try { return new Date(iso).toLocaleString(); } catch (e) { return String(iso); }
+}
+
+function formatLocaleTimeHms(iso) {
+  const fn = poolaiUiWasmCall('formatLocaleTimeHms');
+  if (fn && iso) {
+    const out = fn(String(iso));
+    if (out) return out;
+  }
+  try { return new Date(iso).toLocaleTimeString(); } catch (e) { return ''; }
+}
+
 // Token management
 function getToken() {
   return localStorage.getItem('poolai_token');
@@ -1352,6 +1387,8 @@ function showErrorBoundary(containerId, error, retryFn = null, suggestions = nul
 }
 
 function escapeHtml(text) {
+  const fn = poolaiUiWasmCall('escapeHtml');
+  if (fn) return fn(String(text ?? ''));
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
@@ -1359,6 +1396,11 @@ function escapeHtml(text) {
 
 /** Read user-facing message from API JSON: legacy flat `error` string or structured `{ error: { code, message } }`. */
 function apiErrorMessageFromBody(payload) {
+  const fn = poolaiUiWasmCall('apiErrorMessageFromBody');
+  if (fn) {
+    const msg = fn(JSON.stringify(payload || {}));
+    return msg || null;
+  }
   if (!payload || typeof payload !== 'object') return null;
   const e = payload.error;
   if (typeof e === 'string') return e;
@@ -1646,6 +1688,8 @@ function filterTable(table, query, options = {}) {
 }
 
 function escapeRegex(str) {
+  const fn = poolaiUiWasmCall('escapeRegex');
+  if (fn) return fn(String(str));
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
@@ -2184,7 +2228,7 @@ function setUpdated() {
   const el = document.getElementById('last_updated');
   if (!el) return;
   const p = typeof poolaiT === 'function' ? poolaiT('dash.updatedPrefix', 'Updated: ') : 'Updated: ';
-  el.textContent = p + new Date().toLocaleTimeString();
+  el.textContent = p + formatLocaleTimeHms(new Date().toISOString());
 }
 
 function renderJsonPre(containerId, data) {
@@ -3574,15 +3618,6 @@ async fn login_page() -> Html<String> {
       const alert = document.getElementById('alert');
       if (alert) alert.style.display = 'none';
     }
-
-    function apiErrMsg(p) {
-      if (!p || typeof p !== 'object') return null;
-      const e = p.error;
-      if (typeof e === 'string') return e;
-      if (e && typeof e === 'object' && typeof e.message === 'string') return e.message;
-      if (typeof p.message === 'string') return p.message;
-      return null;
-    }
     
     async function handleLogin(event) {
       event.preventDefault();
@@ -3604,7 +3639,7 @@ async fn login_page() -> Html<String> {
         
         if (!res.ok) {
           const data = await res.json();
-          throw new Error(apiErrMsg(data) || poolaiT('auth.loginFailed', 'Login failed'));
+          throw new Error(apiErrorMessageFromBody(data) || poolaiT('auth.loginFailed', 'Login failed'));
         }
         
         const data = await res.json();
@@ -3799,6 +3834,7 @@ async fn login_page() -> Html<String> {
       </div>
     </div>
   </div>
+  {wasm_module}
   <script>
     {auth_dash_patch}
     {i18n_js}
@@ -3830,7 +3866,8 @@ async fn login_page() -> Html<String> {
         auth_dash_patch = auth_dash_patch,
         i18n_js = i18n_js,
         common_js = common_js(),
-        login_js = login_js
+        login_js = login_js,
+        wasm_module = ui_wasm_module_block()
     );
     Html(html)
 }
@@ -4885,12 +4922,7 @@ async fn raid_page() -> Html<String> {
           const td = document.createElement('td');
           let v = artifact ? artifact[k] : null;
           if (k === 'stored_at' && v) {
-            try {
-              const date = new Date(v);
-              v = date.toLocaleString();
-            } catch (e) {
-              // Keep original value
-            }
+            v = formatIsoDatetime(v);
           }
           td.textContent = (typeof v === 'object') ? JSON.stringify(v) : String(v ?? '');
           tr.appendChild(td);
@@ -5233,6 +5265,23 @@ mod dashboard_a11y_tests {
         let html = raid_page().await.0;
         assert!(html.contains("id=\"createArtifactModal\""));
         assert!(html.contains("aria-modal=\"false\" aria-hidden=\"true\""));
+    }
+
+    #[tokio::test]
+    async fn dashboard_shell_includes_ui_wasm_module() {
+        let html = workers_page().await.0;
+        assert!(html.contains(r#"type="module""#));
+        assert!(html.contains("poolai-ui-wasm-ready"));
+        assert!(html.contains("formatLocaleTimeHms"));
+        assert!(html.contains("poolaiUiWasmCall"));
+    }
+
+    #[tokio::test]
+    async fn login_page_includes_ui_wasm_module() {
+        let html = super::login_page().await.0;
+        assert!(html.contains(r#"type="module""#));
+        assert!(html.contains("formatIsoDatetime"));
+        assert!(!html.contains("function apiErrMsg"));
     }
 
     #[tokio::test]

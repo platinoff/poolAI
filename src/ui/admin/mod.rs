@@ -77,37 +77,7 @@ pub fn create_admin_routes() -> Router<ApiContext> {
         .route("/admin/config", get(config::admin_config))
 }
 
-/// Shared ES module bootstrap for `poolai-ui-wasm` (PH-S152/S153/S155).
-pub const POOLAI_UI_WASM_MODULE: &str = r#"
-import init, {
-  formatUsdMicro, formatUnixSecs, leaseStateLabel, poolaiUiWasmVersion,
-  escapeHtml, apiErrorMessageFromBody, apiErrorDetailFromBody, formatFetchError,
-  emptyStateHtml, renderTableHtml, formFieldHtml, buildTableCsv, buildTableJson,
-  compareSortValues, rowMatchesQuery, highlightQueryHtml,
-  parseMlNumeric, formatMlMetricSummary, metricPointValues, chartScale,
-  flattenMlStepRows, collectMlSparklineSeries, normalizeTheme,
-  trapTabAction, modalFocusableSelector, adminDynamicModalHtml,
-} from '/ui/wasm/poolai_ui_wasm.js';
-window.poolaiUiWasm = {
-  ready: false, failed: false,
-  formatUsdMicro, formatUnixSecs, leaseStateLabel,
-  escapeHtml, apiErrorMessageFromBody, apiErrorDetailFromBody, formatFetchError,
-  emptyStateHtml, renderTableHtml, formFieldHtml, buildTableCsv, buildTableJson,
-  compareSortValues, rowMatchesQuery, highlightQueryHtml,
-  parseMlNumeric, formatMlMetricSummary, metricPointValues, chartScale,
-  flattenMlStepRows, collectMlSparklineSeries, normalizeTheme,
-  trapTabAction, modalFocusableSelector, adminDynamicModalHtml,
-};
-try {
-  await init();
-  window.poolaiUiWasm.ready = true;
-  document.documentElement.dataset.poolaiUiWasm = poolaiUiWasmVersion();
-} catch (err) {
-  window.poolaiUiWasm.failed = true;
-  console.warn('poolai-ui-wasm init failed', err);
-}
-window.dispatchEvent(new Event('poolai-ui-wasm-ready'));
-"#;
+pub use crate::ui::wasm_static::POOLAI_UI_WASM_MODULE;
 
 /// Admin panel layout function - shared across all admin pages
 pub fn admin_layout(

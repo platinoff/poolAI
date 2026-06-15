@@ -13,8 +13,8 @@ use poolai_ui_core::ml::{
 use poolai_ui_core::modal::{admin_dynamic_modal_html, trap_tab_action, MODAL_FOCUSABLE_SELECTOR};
 use poolai_ui_core::pricing::{format_unix_secs, format_usd_micro};
 use poolai_ui_core::table::{
-    build_csv, build_json_export, compare_sort_values, empty_state_html, form_field_html,
-    highlight_query_html, render_table_html, row_matches_query,
+    build_csv, build_json_export, compare_sort_values, empty_state_html, escape_regex,
+    form_field_html, highlight_query_html, render_table_html, row_matches_query,
 };
 use poolai_ui_core::theme::normalize_theme;
 use serde_json::Value;
@@ -79,6 +79,21 @@ pub fn lease_state_label_wasm(expires_at: &str, now_rfc3339: &str) -> String {
 #[wasm_bindgen(js_name = escapeHtml)]
 pub fn escape_html_wasm(s: &str) -> String {
     escape_html(s)
+}
+
+#[wasm_bindgen(js_name = escapeRegex)]
+pub fn escape_regex_wasm(s: &str) -> String {
+    escape_regex(s)
+}
+
+#[wasm_bindgen(js_name = formatIsoDatetime)]
+pub fn format_iso_datetime_wasm(iso: &str) -> String {
+    poolai_ui_core::format::format_iso_datetime_display(empty_as_none(iso))
+}
+
+#[wasm_bindgen(js_name = formatLocaleTimeHms)]
+pub fn format_locale_time_hms_wasm(now_rfc3339: &str) -> String {
+    poolai_ui_core::format::format_locale_time_hms(empty_as_none(now_rfc3339))
 }
 
 #[wasm_bindgen(js_name = apiErrorMessageFromBody)]
@@ -201,7 +216,7 @@ pub fn collect_ml_sparkline_series_wasm(rows_json: &str) -> JsValue {
 /// POC version string for smoke checks in browser devtools.
 #[wasm_bindgen(js_name = poolaiUiWasmVersion)]
 pub fn poolai_ui_wasm_version() -> String {
-    "poolai-ui-wasm/0.1.0-ph-s161".to_string()
+    "poolai-ui-wasm/0.1.0-ph-s193".to_string()
 }
 
 fn empty_as_none(s: &str) -> Option<&str> {
@@ -253,6 +268,24 @@ mod tests {
     #[test]
     fn modal_wasm_html_has_dynamic_id() {
         assert!(admin_dynamic_modal_html_wasm().contains("adminDynamicModal"));
+    }
+
+    #[test]
+    fn escape_regex_wasm_matches_core() {
+        assert_eq!(escape_regex_wasm("a.b*"), r"a\.b\*");
+    }
+
+    #[test]
+    fn format_iso_datetime_wasm_matches_core() {
+        assert_eq!(
+            format_iso_datetime_wasm("2026-06-15T12:00:00Z"),
+            "2026-06-15 12:00:00 UTC"
+        );
+    }
+
+    #[test]
+    fn poolai_ui_wasm_version_ph_s193() {
+        assert!(poolai_ui_wasm_version().contains("ph-s193"));
     }
 
     #[test]
