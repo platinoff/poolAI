@@ -85,7 +85,7 @@ flowchart TB
 | **E — gate** | PH-S150 ✅ | CI advisory якщо ratio <88%; target 93%; stretch 96% spirit | стабільно 90–95% |
 | **F — stretch 96%** | PH-S151…S159 ✅ | wasm wiring, slim JS/i18n/charts, Rust stand/e2e bins; CI warn **93%** | **→96% spirit** |
 
-**Черга §5.12 (10 відкритих):** PH-S191…S200 vision + code-first band; replenish після S200.
+**Черга §5.12 (9 відкритих):** PH-S192…S200 vision + code-first band; replenish після S200.
 
 ---
 
@@ -140,7 +140,7 @@ flowchart TB
 | 45 | **PH-S188** | Vision map filters UX | docs/vision filters | **✅** |
 | 46 | **PH-S189** | Vision Eco/FX/Ms hover trace | docs/vision Ms mode | **✅** |
 | 47 | **PH-S190** | Vision filter dropdowns + panel collapse | docs/vision layout | **✅** |
-| 48 | **PH-S191** | Vision sprint queue panel | FM §5.12 parse | відкрито |
+| 48 | **PH-S191** | Vision sprint queue panel | FM §5.12 parse | **✅** |
 | 49 | **PH-S192** | Vision overview LOD + minimap | docs/vision | відкрито |
 | 50 | **PH-S193** | Dashboard shell formatters → wasm | poolai-ui-core | відкрито |
 | 51 | **PH-S194** | Galaxy fee split result counter | §4.1 stub | відкрито |

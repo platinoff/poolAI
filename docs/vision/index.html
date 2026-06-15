@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PoolAI Galaxy Starwalker Vision</title>
-  <link rel="stylesheet" href="vision.css?v=56" />
+  <link rel="stylesheet" href="vision.css?v=57" />
 </head>
 <body>
   <div id="galaxy-backdrop" class="galaxy-backdrop" aria-hidden="true">
@@ -16,9 +16,11 @@
     <h1>PoolAI Galaxy Starwalker Vision</h1>
     <span class="meta" id="meta-rev">…</span>
     <span class="meta-trail" id="meta-trail" aria-label="Git HEAD and next sprint"></span>
-    <button type="button" id="btn-eco" class="btn-eco on" title="Eco — low GPU. Click → FX → Ms">Eco</button>
-    <button type="button" id="btn-auto" class="btn-auto on" title="Auto-reload when vision files change">Auto</button>
-    <button type="button" id="btn-reload" title="Reload manifest.json">↻ Reload</button>
+    <div class="header-actions" aria-label="Vision controls">
+      <button type="button" id="btn-eco" class="btn-eco on" title="Eco — low GPU. Click → FX → Ms">Eco</button>
+      <button type="button" id="btn-auto" class="btn-auto on" title="Auto-reload when vision files change">Auto</button>
+      <button type="button" id="btn-reload" title="Reload manifest.json">↻ Reload</button>
+    </div>
   </header>
   <div class="workspace">
     <aside class="sidebar" id="sidebar">
@@ -36,6 +38,10 @@
             <div class="layer-stack" id="layer-stack"></div>
           </div>
           <div class="legend-bar" id="layer-legend" aria-label="Layer legend"></div>
+        </section>
+        <section class="panel" data-panel="queue" aria-label="Sprint queue FM §5.12">
+          <h2><span>Sprint queue</span><span class="panel-head-actions"><button type="button" class="btn-panel-collapse" title="Collapse to title bar">−</button><button type="button" class="btn-panel-fs" title="Fullscreen (Esc)">⛶</button></span></h2>
+          <div class="panel-body sprint-queue-body" id="sprint-queue" aria-live="polite"></div>
         </section>
         <section class="panel" data-panel="map" aria-label="Interactive map">
           <h2><span>Galaxy map</span><span class="panel-head-actions"><button type="button" class="btn-panel-collapse" title="Collapse to title bar">−</button><button type="button" class="btn-panel-fs" title="Fullscreen (Esc)">⛶</button></span></h2>
@@ -105,6 +111,6 @@
       </section>
     </div>
   </div>
-  <script src="vision.js?v=56"></script>
+  <script src="vision.js?v=57"></script>
 </body>
 </html>

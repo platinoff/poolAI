@@ -28,8 +28,8 @@
   const CLUSTER_COLLAPSE_MIN = 3;
   const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
   /** Leaf labels (auto-synced / dense map) appear above this zoom. */
-  const LABEL_ZOOM_LEAF = 1.45;
-  const LABEL_ZOOM_NORMAL = 1.05;
+  const LABEL_ZOOM_LEAF = 1.55;
+  const LABEL_ZOOM_NORMAL = 1.15;
   const MAP_DENSE_NODE_THRESHOLD = 80;
   const CONSTELLATION_HUB_IDS = new Set([
     "galaxy_grid",
@@ -103,6 +103,8 @@
   let constellationHubIdSet = new Set();
   let activeTreeFileEl = null;
   let collapsedPanels = new Set();
+  const DIAGRAM_PANELS = ["layers", "queue", "map", "links"];
+  const PANEL_COLLAPSED_W = "40px";
   let openFilterDrop = null;
   let mapNodesBound = false;
   /** Live git HEAD from __watch (falls back to manifest.git_head). */
@@ -1386,18 +1388,26 @@
           : "Collapse to title bar";
       });
     });
+
     const row = document.querySelector(".diagram-row");
     if (row) {
-      const spec = ["layers", "map", "links"].map((id) => {
-        if (collapsedPanels.has(id)) {
-          return "minmax(52px, 72px)";
-        }
-        if (id === "map") return "minmax(0, 1fr)";
-        if (id === "layers") return "minmax(110px, 22%)";
-        return "minmax(130px, 24%)";
+      const expanded = DIAGRAM_PANELS.filter((id) => !collapsedPanels.has(id));
+      const specs = DIAGRAM_PANELS.map((id) => {
+        if (collapsedPanels.has(id)) return PANEL_COLLAPSED_W;
+        if (expanded.length === 1 && expanded[0] === id) return "minmax(0, 1fr)";
+        if (id === "map") return "minmax(0, 2.2fr)";
+        if (id === "queue") return "minmax(120px, 18%)";
+        if (id === "layers") return "minmax(100px, 16%)";
+        return "minmax(130px, 20%)";
       });
-      row.style.gridTemplateColumns = spec.join(" ");
+      row.style.gridTemplateColumns = specs.join(" ");
     }
+
+    const mainCol = document.querySelector(".main-col");
+    if (mainCol) {
+      mainCol.classList.toggle("preview-collapsed", collapsedPanels.has("preview"));
+    }
+
     window.dispatchEvent(new Event("resize"));
   }
 
@@ -2079,8 +2089,12 @@
         l.node.label.length > 14
           ? l.node.label.slice(0, 12) + "…"
           : l.node.label;
-      t.textContent = lbl;
-      svg.appendChild(t);
+      if (links.length <= 5) {
+        t.textContent = lbl;
+        svg.appendChild(t);
+      } else {
+        dot.setAttribute("title", lbl);
+      }
     });
 
     const center = document.createElementNS(ns, "circle");
@@ -2136,6 +2150,60 @@
       li.addEventListener("click", () => selectNode(l.node));
       ul.appendChild(li);
     });
+  }
+
+  function renderSprintQueue(manifest) {
+    const box = document.getElementById("sprint-queue");
+    if (!box) return;
+    const queue =
+      manifest && Array.isArray(manifest.sprint_queue) ? manifest.sprint_queue : [];
+    if (!queue.length) {
+      box.innerHTML =
+        '<p class="sprint-queue-empty" style="color:var(--muted);margin:0">Run <code>poolai-vision-sync</code> to load FM §5.12.</p>';
+      return;
+    }
+    const openCount =
+      manifest.sprint_queue_open_count != null
+        ? manifest.sprint_queue_open_count
+        : queue.filter((e) => e.open).length;
+    const nextId = manifest.next_sprint || null;
+    const openOnly = queue.filter((e) => e.open);
+    const show = openOnly.length ? openOnly : queue.slice(-12);
+    let html =
+      '<div class="sprint-queue-meta"><span><strong>' +
+      escapeHtml(String(openCount)) +
+      "</strong> open</span>";
+    if (manifest.last_sprint_closed) {
+      html +=
+        '<span>last <strong>' +
+        escapeHtml(String(manifest.last_sprint_closed)) +
+        "</strong></span>";
+    }
+    html += '</div><ul class="sprint-queue-list">';
+    show.forEach((entry) => {
+      const id = entry.id || "";
+      const cls = [
+        "sprint-queue-item",
+        entry.open ? "open" : "closed",
+        nextId && id === nextId ? "next" : "",
+      ]
+        .filter(Boolean)
+        .join(" ");
+      html +=
+        '<li class="' +
+        cls +
+        '" title="' +
+        escapeHtml((entry.acceptance || entry.deps || "").slice(0, 200)) +
+        '"><span class="sprint-queue-id">' +
+        escapeHtml(id) +
+        '</span><span class="sprint-queue-title">' +
+        escapeHtml(entry.title || "") +
+        '</span><span class="sprint-queue-status">' +
+        escapeHtml(entry.status || (entry.open ? "open" : "closed")) +
+        "</span></li>";
+    });
+    html += "</ul>";
+    box.innerHTML = html;
   }
 
   function renderSprintChips(node) {
@@ -2537,6 +2605,7 @@
     renderMapFilterDock();
     syncMapToolbar();
     syncPanelCollapseLayout();
+    renderSprintQueue(manifest);
     renderMap();
 
     const tree = document.getElementById("file-tree");

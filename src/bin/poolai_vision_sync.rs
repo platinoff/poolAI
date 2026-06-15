@@ -12,6 +12,18 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, ExitCode};
 
 const MANIFEST_REL: &str = "docs/vision/manifest.json";
+const FM_REL: &str = "docs/catalog/FUNCTION_MANAGEMENT.md";
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct SprintQueueEntry {
+    row: u32,
+    id: String,
+    title: String,
+    deps: String,
+    acceptance: String,
+    status: String,
+    open: bool,
+}
 
 const SKIP_PREFIXES: &[&str] = &[
     "target/",
@@ -279,6 +291,165 @@ fn sync_manifest(manifest: &mut Value, paths: &[String]) -> (usize, usize) {
     (added_nodes, added_edges)
 }
 
+fn strip_md_cell(raw: &str) -> String {
+    raw.trim()
+        .trim_matches('`')
+        .replace("**", "")
+        .trim()
+        .to_string()
+}
+
+fn sprint_status_from_cell(cell: &str) -> (String, bool) {
+    let plain = strip_md_cell(cell).to_ascii_lowercase();
+    if plain.contains('✅') || plain.contains("closed") {
+        return ("closed".to_string(), false);
+    }
+    if plain.contains("blocked") {
+        return ("blocked".to_string(), false);
+    }
+    if plain.contains("deferred") {
+        return ("deferred".to_string(), false);
+    }
+    if plain.contains("відкрито") || plain == "open" {
+        return ("open".to_string(), true);
+    }
+    ("open".to_string(), true)
+}
+
+/// Parse FM §5.12 research backlog table rows (`| N | **PH-Snnn** | … |`).
+fn parse_fm_sprint_queue_section(section: &str) -> Vec<SprintQueueEntry> {
+    let mut out = Vec::new();
+    for line in section.lines() {
+        let trimmed = line.trim();
+        if !trimmed.starts_with('|') || !trimmed.contains("PH-S") {
+            continue;
+        }
+        let cells: Vec<&str> = trimmed.split('|').map(str::trim).collect();
+        // leading/trailing empty from split
+        if cells.len() < 7 {
+            continue;
+        }
+        let row = match cells[1].parse::<u32>() {
+            Ok(n) => n,
+            Err(_) => continue,
+        };
+        let id_cell = cells[2];
+        let Some(id) = id_cell
+            .strip_prefix("**")
+            .and_then(|s| s.strip_suffix("**"))
+            .filter(|s| s.starts_with("PH-S"))
+        else {
+            continue;
+        };
+        let title = strip_md_cell(cells[3]);
+        let deps = strip_md_cell(cells[4]);
+        let acceptance = strip_md_cell(cells[5]);
+        let (status, open) = sprint_status_from_cell(cells[6]);
+        out.push(SprintQueueEntry {
+            row,
+            id: id.to_string(),
+            title,
+            deps,
+            acceptance,
+            status,
+            open,
+        });
+    }
+    out
+}
+
+fn extract_fm_section_512(content: &str) -> Option<&str> {
+    let start = content.find("### 5.12")?;
+    let rest = &content[start..];
+    let end = rest[10..]
+        .find("\n### 5.")
+        .map(|i| 10 + i)
+        .unwrap_or(rest.len());
+    Some(&rest[..end])
+}
+
+fn parse_fm_sprint_queue(content: &str) -> Vec<SprintQueueEntry> {
+    let Some(section) = extract_fm_section_512(content) else {
+        return Vec::new();
+    };
+    parse_fm_sprint_queue_section(section)
+}
+
+fn sprint_queue_json(entries: &[SprintQueueEntry]) -> Value {
+    Value::Array(
+        entries
+            .iter()
+            .map(|e| {
+                json!({
+                    "row": e.row,
+                    "id": e.id,
+                    "title": e.title,
+                    "deps": e.deps,
+                    "acceptance": e.acceptance,
+                    "status": e.status,
+                    "open": e.open,
+                })
+            })
+            .collect(),
+    )
+}
+
+fn derive_sprint_meta(entries: &[SprintQueueEntry]) -> (Option<String>, Option<String>, u32) {
+    let open_count = entries.iter().filter(|e| e.open).count() as u32;
+    let next_sprint = entries.iter().find(|e| e.open).map(|e| e.id.clone());
+    let last_closed = entries
+        .iter()
+        .filter(|e| !e.open && e.status == "closed")
+        .map(|e| e.id.clone())
+        .last();
+    (next_sprint, last_closed, open_count)
+}
+
+fn bump_manifest_revision(manifest: &mut Value) {
+    let rev = manifest
+        .get("revision")
+        .and_then(Value::as_u64)
+        .unwrap_or(0)
+        + 1;
+    manifest["revision"] = json!(rev);
+    manifest["auto_sync_at"] = json!(today_iso());
+}
+
+fn sync_fm_sprint_queue(manifest: &mut Value, root: &Path) -> bool {
+    let fm_path = root.join(FM_REL);
+    let content = match fs::read_to_string(&fm_path) {
+        Ok(c) => c,
+        Err(e) => {
+            eprintln!("warn: read {}: {e}", fm_path.display());
+            return false;
+        }
+    };
+    let entries = parse_fm_sprint_queue(&content);
+    if entries.is_empty() {
+        return false;
+    }
+    let queue = sprint_queue_json(&entries);
+    let (next_sprint, last_closed, open_count) = derive_sprint_meta(&entries);
+    let prev_next = manifest.get("next_sprint").and_then(Value::as_str);
+    let prev_last = manifest.get("last_sprint_closed").and_then(Value::as_str);
+    let changed = manifest.get("sprint_queue") != Some(&queue)
+        || manifest
+            .get("sprint_queue_open_count")
+            .and_then(Value::as_u64)
+            != Some(u64::from(open_count))
+        || prev_next != next_sprint.as_deref()
+        || prev_last != last_closed.as_deref();
+    manifest["sprint_queue"] = queue;
+    manifest["sprint_queue_open_count"] = json!(open_count);
+    if let Some(ns) = next_sprint {
+        manifest["next_sprint"] = json!(ns);
+    }
+    if let Some(lc) = last_closed {
+        manifest["last_sprint_closed"] = json!(lc);
+    }
+    changed
+}
+
 fn today_iso() -> String {
     std::env::var("SOURCE_DATE_EPOCH")
         .ok()
@@ -324,15 +495,24 @@ fn main() -> ExitCode {
     };
 
     let (added_nodes, added_edges) = sync_manifest(&mut manifest, &paths);
+    let queue_changed = sync_fm_sprint_queue(&mut manifest, &root);
+    if queue_changed && added_nodes == 0 && added_edges == 0 {
+        bump_manifest_revision(&mut manifest);
+    }
     println!(
-        "vision sync: +{added_nodes} nodes, +{added_edges} edges (revision {})",
+        "vision sync: +{added_nodes} nodes, +{added_edges} edges, sprint_queue {} (revision {})",
+        if queue_changed {
+            "updated"
+        } else {
+            "unchanged"
+        },
         manifest
             .get("revision")
             .and_then(Value::as_u64)
             .unwrap_or(0)
     );
 
-    if added_nodes == 0 && added_edges == 0 {
+    if added_nodes == 0 && added_edges == 0 && !queue_changed {
         return ExitCode::SUCCESS;
     }
 
@@ -365,6 +545,29 @@ mod tests {
         assert_eq!(infer_layer("docs/openapi.yaml"), "L2");
         assert_eq!(infer_layer("docs/concept/POOLAI_GALAXY_GRID.md"), "L0");
         assert_eq!(infer_layer("src/grid/dispatch.rs"), "L3");
+    }
+
+    #[test]
+    fn parse_fm_sprint_queue_open_and_closed() {
+        let sample = r###"
+### 5.12 Research backlog PH-S65+ (Galaxy wire / ops, 2026-05-27)
+
+| 125 | **PH-S190** | Vision filter dropdowns | PH-S188 | dropdown menus | **✅** |
+| 126 | **PH-S191** | Vision sprint queue panel | FM §5.12 | sprint_queue panel | відкрито |
+| 127 | **PH-S192** | Vision overview LOD | PH-S115 | minimap | відкрито |
+
+### 5.13 Rust ratio band
+"###;
+        let entries = parse_fm_sprint_queue(sample);
+        assert_eq!(entries.len(), 3);
+        assert!(!entries[0].open);
+        assert_eq!(entries[0].id, "PH-S190");
+        assert!(entries[1].open);
+        assert_eq!(entries[1].id, "PH-S191");
+        let (next, last, open) = derive_sprint_meta(&entries);
+        assert_eq!(next.as_deref(), Some("PH-S191"));
+        assert_eq!(last.as_deref(), Some("PH-S190"));
+        assert_eq!(open, 2);
     }
 
     #[test]

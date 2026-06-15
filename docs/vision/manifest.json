@@ -1716,7 +1716,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "76f6dd3d",
-  "last_sprint_closed": "PH-S190",
+  "last_sprint_closed": "PH-S191",
   "layers": [
     {
       "id": "L0",
@@ -1749,7 +1749,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S191",
+  "next_sprint": "PH-S192",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -4721,7 +4721,12 @@
       "label": "vision.js",
       "layer": "L1",
       "path": "docs/vision/vision.js",
-      "sprints": ["PH-S63", "PH-S64", "PH-S115", "PH-S188"]
+      "sprints": [
+        "PH-S63",
+        "PH-S64",
+        "PH-S115",
+        "PH-S188"
+      ]
     },
     {
       "auto_synced": true,
@@ -7030,7 +7035,9 @@
       "label": "galaxy_locality_rank_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_locality_rank_integration.rs",
-      "sprints": ["PH-S138"]
+      "sprints": [
+        "PH-S138"
+      ]
     },
     {
       "auto_synced": true,
@@ -7038,7 +7045,9 @@
       "label": "galaxy_shard_local_hit_ratio_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_shard_local_hit_ratio_integration.rs",
-      "sprints": ["PH-S183"]
+      "sprints": [
+        "PH-S183"
+      ]
     },
     {
       "auto_synced": true,
@@ -7046,7 +7055,9 @@
       "label": "galaxy_cross_region_egress_mb_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_cross_region_egress_mb_integration.rs",
-      "sprints": ["PH-S185"]
+      "sprints": [
+        "PH-S185"
+      ]
     },
     {
       "auto_synced": true,
@@ -7054,7 +7065,9 @@
       "label": "galaxy_verification_sample_scheduled_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_verification_sample_scheduled_integration.rs",
-      "sprints": ["PH-S186"]
+      "sprints": [
+        "PH-S186"
+      ]
     },
     {
       "id": "tests_discovery_network_profile_integration_rs",
@@ -7212,7 +7225,10 @@
       "label": "galaxy_trust_metrics_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_trust_metrics_integration.rs",
-      "sprints": ["PH-S163", "PH-S182"]
+      "sprints": [
+        "PH-S163",
+        "PH-S182"
+      ]
     },
     {
       "auto_synced": true,
@@ -7241,7 +7257,10 @@
       "label": "galaxy_prefetch_metrics.rs",
       "layer": "L3",
       "path": "src/grid/galaxy_prefetch_metrics.rs",
-      "sprints": ["PH-S167", "PH-S184"]
+      "sprints": [
+        "PH-S167",
+        "PH-S184"
+      ]
     },
     {
       "auto_synced": true,
@@ -7249,7 +7268,10 @@
       "label": "galaxy_prefetch_metrics_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_prefetch_metrics_integration.rs",
-      "sprints": ["PH-S167", "PH-S184"]
+      "sprints": [
+        "PH-S167",
+        "PH-S184"
+      ]
     },
     {
       "auto_synced": true,
@@ -7341,7 +7363,10 @@
       "label": "galaxy_settlement_metrics.rs",
       "layer": "L3",
       "path": "src/grid/galaxy_settlement_metrics.rs",
-      "sprints": ["PH-S178", "PH-S187"]
+      "sprints": [
+        "PH-S178",
+        "PH-S187"
+      ]
     },
     {
       "auto_synced": true,
@@ -7349,7 +7374,9 @@
       "label": "galaxy_settlement_pending_verification_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_settlement_pending_verification_integration.rs",
-      "sprints": ["PH-S178"]
+      "sprints": [
+        "PH-S178"
+      ]
     },
     {
       "auto_synced": true,
@@ -7357,7 +7384,9 @@
       "label": "galaxy_settlement_cleared_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_settlement_cleared_integration.rs",
-      "sprints": ["PH-S187"]
+      "sprints": [
+        "PH-S187"
+      ]
     },
     {
       "auto_synced": true,
@@ -7365,7 +7394,9 @@
       "label": "galaxy_replication_metrics.rs",
       "layer": "L3",
       "path": "src/grid/galaxy_replication_metrics.rs",
-      "sprints": ["PH-S179"]
+      "sprints": [
+        "PH-S179"
+      ]
     },
     {
       "auto_synced": true,
@@ -7373,7 +7404,9 @@
       "label": "galaxy_replication_strict_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_replication_strict_integration.rs",
-      "sprints": ["PH-S179"]
+      "sprints": [
+        "PH-S179"
+      ]
     },
     {
       "auto_synced": true,
@@ -7381,7 +7414,9 @@
       "label": "galaxy_verification_match_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_verification_match_integration.rs",
-      "sprints": ["PH-S180"]
+      "sprints": [
+        "PH-S180"
+      ]
     },
     {
       "auto_synced": true,
@@ -7389,10 +7424,1230 @@
       "label": "galaxy_pricing_market_min_usd_micro_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_pricing_market_min_usd_micro_integration.rs",
-      "sprints": ["PH-S181"]
+      "sprints": [
+        "PH-S181"
+      ]
     }
   ],
-  "revision": 127,
+  "revision": 129,
+  "sprint_queue": [
+    {
+      "acceptance": "OpenAPI + handler; reject/upgrade response",
+      "deps": "Galaxy §9.3",
+      "id": "PH-S65",
+      "open": false,
+      "row": 1,
+      "status": "closed",
+      "title": "Worker register: `protocol_version` + compat negotiation"
+    },
+    {
+      "acceptance": "verify artifact + signature; unit tests",
+      "deps": "Galaxy §9.2, SECURITY_HARDENING",
+      "id": "PH-S66",
+      "open": false,
+      "row": 2,
+      "status": "closed",
+      "title": "poolai verify-release` CLI (signed manifest)"
+    },
+    {
+      "acceptance": "galaxy_fee_split`, grid dispatch, virtual nodes",
+      "deps": "FUNCTIONALITY_DIGEST",
+      "id": "PH-S67",
+      "open": false,
+      "row": 3,
+      "status": "closed",
+      "title": "DIGEST: Galaxy Grid modules zріз"
+    },
+    {
+      "acceptance": "unit keys + env `POOLAI_GALAXY_PRICE_*`; tests",
+      "deps": "POOLAI_GALAXY_GRID.md` §4.2",
+      "id": "PH-S68",
+      "open": false,
+      "row": 4,
+      "status": "closed",
+      "title": "Pricing oracle Rust stub (concept S59)"
+    },
+    {
+      "acceptance": "checklist items linked; no duplicate prose",
+      "deps": "docs/security/",
+      "id": "PH-S69",
+      "open": false,
+      "row": 5,
+      "status": "closed",
+      "title": "SECURITY_HARDENING ↔ Galaxy §9 signed releases"
+    },
+    {
+      "acceptance": "add stale/canonical note, avoid conflicting active queue",
+      "deps": "NEXT_STEPS_ARCHITECT_2026-01-16.md`, VDT §research",
+      "id": "PH-S70",
+      "open": false,
+      "row": 6,
+      "status": "closed",
+      "title": "Legacy architect checklist hygiene (canonical pointer)"
+    },
+    {
+      "acceptance": "short runbook pointer to `poolai-verify-release` usage",
+      "deps": "SECURITY_HARDENING.md`, Galaxy §9.2",
+      "id": "PH-S71",
+      "open": false,
+      "row": 7,
+      "status": "closed",
+      "title": "Signed release verification quickstart for operators"
+    },
+    {
+      "acceptance": "cross-link compat matrix + rollout guardrails in security docs",
+      "deps": "Galaxy §9.3, FM PH-S65",
+      "id": "PH-S72",
+      "open": false,
+      "row": 8,
+      "status": "closed",
+      "title": "Protocol compatibility ops checklist links"
+    },
+    {
+      "acceptance": "short operator checklist for `compat_status`/403/426 triage links",
+      "deps": "SECURITY_HARDENING.md`, Galaxy §9.3",
+      "id": "PH-S73",
+      "open": false,
+      "row": 9,
+      "status": "closed",
+      "title": "Protocol reject troubleshooting pointer (docs)"
+    },
+    {
+      "acceptance": "align cross-links to signed advisory/update policy sections",
+      "deps": "Galaxy §9.6, `docs/security/",
+      "id": "PH-S74",
+      "open": false,
+      "row": 10,
+      "status": "closed",
+      "title": "Security docs link hygiene for release advisories"
+    },
+    {
+      "acceptance": "add `POOLAI_GALAXY_PRICING_FALLBACK_JSON` parsing + fallback quote path + unit tests",
+      "deps": "Galaxy §4.2.4, `src/grid/galaxy_pricing_oracle.rs",
+      "id": "PH-S75",
+      "open": false,
+      "row": 11,
+      "status": "closed",
+      "title": "Pricing oracle L2 configured fallback (code)"
+    },
+    {
+      "acceptance": "add short action list linked to signed advisory/update policy docs",
+      "deps": "Galaxy §9.6, `docs/security/SECURITY_HARDENING.md",
+      "id": "PH-S76",
+      "open": false,
+      "row": 12,
+      "status": "closed",
+      "title": "Release advisory operator actions pointer"
+    },
+    {
+      "acceptance": "normalize Galaxy §9.2/§9.3/§9.6 links and remove duplicates",
+      "deps": "docs/security/*`, FM §5.12",
+      "id": "PH-S77",
+      "open": false,
+      "row": 13,
+      "status": "closed",
+      "title": "Security docs canonical pointer cleanup"
+    },
+    {
+      "acceptance": "read-only `GET /api/v1/grid/pricing` (task/model/unit) wired to oracle cache/fallback path + endpoint tests + OpenAPI sync + gap-audit 0",
+      "deps": "Galaxy §4.2.3, future wire note",
+      "id": "PH-S78",
+      "open": false,
+      "row": 14,
+      "status": "closed",
+      "title": "Grid pricing API snapshot wire (code)"
+    },
+    {
+      "acceptance": "initialize API oracle via `GalaxyPricingOracle::from_env()` so `POOLAI_GALAXY_PRICING_FALLBACK_JSON` is applied on `/api/v1/grid/pricing`; `cargo test-ci` + openapi-gap 0",
+      "deps": "src/network/api/grid.rs`, Galaxy §4.2.4",
+      "id": "PH-S79",
+      "open": false,
+      "row": 15,
+      "status": "closed",
+      "title": "Grid pricing API env fallback wire fix (code)"
+    },
+    {
+      "acceptance": "when L1+L2 unavailable return `503 pricing_unavailable` on new priced jobs/API; unit tests",
+      "deps": "Galaxy §4.2.4, `galaxy_pricing_oracle.rs",
+      "id": "PH-S80",
+      "open": false,
+      "row": 16,
+      "status": "closed",
+      "title": "Pricing oracle L3 hard stop (code)"
+    },
+    {
+      "acceptance": "POOLAI_GALAXY_PRICING_FORCE_FALLBACK=1` always L2 path + log metric; unit tests",
+      "deps": "Galaxy §4.2.4, `galaxy_pricing_oracle.rs",
+      "id": "PH-S81",
+      "open": false,
+      "row": 17,
+      "status": "closed",
+      "title": "Pricing oracle `FORCE_FALLBACK` env wire (code)"
+    },
+    {
+      "acceptance": "/ui/admin/*` read-only panel calling `GET /api/v1/grid/pricing`; Playwright smoke",
+      "deps": "Galaxy §4.2.3, `src/ui/",
+      "id": "PH-S82",
+      "open": false,
+      "row": 18,
+      "status": "closed",
+      "title": "Admin UI grid pricing snapshot panel"
+    },
+    {
+      "acceptance": "expose `galaxy_pricing_stale_served` counter on L1 stale path; unit or integration test",
+      "deps": "Galaxy §4.2.4, observability",
+      "id": "PH-S83",
+      "open": false,
+      "row": 19,
+      "status": "closed",
+      "title": "Galaxy pricing stale-served metric (code)"
+    },
+    {
+      "acceptance": "mark `GET /api/v1/grid/pricing` implemented (PH-S78/S79); remove stale «майбутній wire»",
+      "deps": "POOLAI_GALAXY_GRID.md",
+      "id": "PH-S84",
+      "open": false,
+      "row": 20,
+      "status": "closed",
+      "title": "Galaxy §4.2.3 wire note sync (docs)"
+    },
+    {
+      "acceptance": "sample manifest/sig paths for local verify; no duplicate Galaxy prose",
+      "deps": "SECURITY_HARDENING`, `RUN_LOCAL.md",
+      "id": "PH-S85",
+      "open": false,
+      "row": 21,
+      "status": "closed",
+      "title": "verify-release dev fixtures + RUN_LOCAL pointer (docs)"
+    },
+    {
+      "acceptance": "Playwright hits `/api/v1/grid/pricing` with env fallback JSON on dev stand",
+      "deps": "e2e/`, PH-S78 API",
+      "id": "PH-S86",
+      "open": false,
+      "row": 22,
+      "status": "closed",
+      "title": "Grid pricing E2E smoke"
+    },
+    {
+      "acceptance": "step-8 security row links to Galaxy hub in SECURITY_HARDENING",
+      "deps": "INDEX_2026-03-17.md`, `docs/security/",
+      "id": "PH-S87",
+      "open": false,
+      "row": 23,
+      "status": "closed",
+      "title": "INDEX security docs cross-link (docs)"
+    },
+    {
+      "acceptance": "operator-facing minimal manifest example for `poolai-verify-release",
+      "deps": "Galaxy §9.2, `docs/development/",
+      "id": "PH-S88",
+      "open": false,
+      "row": 24,
+      "status": "closed",
+      "title": "Release manifest sample JSON (docs)"
+    },
+    {
+      "acceptance": "distinguish fresh vs stale cache hits in quote metadata or metrics; tests",
+      "deps": "Galaxy §4.2.3–4.2.4",
+      "id": "PH-S89",
+      "open": false,
+      "row": 25,
+      "status": "closed",
+      "title": "Pricing oracle L1 stale TTL metric (code)"
+    },
+    {
+      "acceptance": "poolai-agent-roles.mdc`; slim VDT; session-iteration globs; §5.11→§5.12; git-commit-msys",
+      "deps": ".cursor/rules/`, `.cursor/README.md",
+      "id": "PH-S90",
+      "open": false,
+      "row": 26,
+      "status": "closed",
+      "title": "Cursor rules: VDT agent roles + §5.12 sync"
+    },
+    {
+      "acceptance": "galaxy_pricing_fresh_served` counter + log on L1 fresh path; unit tests",
+      "deps": "Galaxy §4.2.3/§4.2.5, `galaxy_pricing_oracle.rs",
+      "id": "PH-S91",
+      "open": false,
+      "row": 27,
+      "status": "closed",
+      "title": "Pricing oracle fresh-served metric (code)"
+    },
+    {
+      "acceptance": "parse `POOLAI_GALAXY_PRICING_PROVIDERS` allow-list JSON; no live HTTP fetch; unit tests",
+      "deps": "Galaxy §4.2.5, `galaxy_pricing_oracle.rs",
+      "id": "PH-S92",
+      "open": false,
+      "row": 28,
+      "status": "closed",
+      "title": "Pricing providers env catalog stub (code)"
+    },
+    {
+      "acceptance": "read-only `/ui/admin/updates-compat`: protocol version, verify-release pointer, compat matrix links; i18n EN/UK; Playwright smoke",
+      "deps": "Galaxy §9.8, `src/ui/",
+      "id": "PH-S93",
+      "open": false,
+      "row": 29,
+      "status": "closed",
+      "title": "Admin UI updates & compatibility panel (code)"
+    },
+    {
+      "acceptance": "optional `lease_owner` / `lease_epoch` / `lease_expires_at` on `JobRecord` + POST/GET jobs API; backward compatible JSON/SQLite; unit + contract tests",
+      "deps": "Galaxy §4.3.1, `src/job/",
+      "id": "PH-S94",
+      "open": false,
+      "row": 30,
+      "status": "closed",
+      "title": "Job lease fields wire stub (code)"
+    },
+    {
+      "acceptance": "optional `lease_epoch` on PATCH; `409 lease_epoch_rejected` on mismatch; backward compatible omit; unit + contract tests",
+      "deps": "Galaxy §4.3.1, `src/job/`, `src/network/api/jobs.rs",
+      "id": "PH-S95",
+      "open": false,
+      "row": 31,
+      "status": "closed",
+      "title": "PATCH jobs lease epoch CAS stub (code)"
+    },
+    {
+      "acceptance": "read-only `lease_owner` / `lease_epoch` / `lease_expires_at` in jobs table; i18n EN/UK; Playwright smoke (`admin.spec.ts`)",
+      "deps": "Galaxy §4.3.1, `src/ui/admin/jobs.rs",
+      "id": "PH-S96",
+      "open": false,
+      "row": 32,
+      "status": "closed",
+      "title": "Admin jobs UI lease columns (code)"
+    },
+    {
+      "acceptance": "POOLAI_JOB_LEASE_TTL_SECS` parse + default 90s; HANDOFF §2a; unit tests (no renew wire)",
+      "deps": "Galaxy §4.3.1, `src/job/lease_config.rs",
+      "id": "PH-S97",
+      "open": false,
+      "row": 33,
+      "status": "closed",
+      "title": "Job lease TTL env default stub (code)"
+    },
+    {
+      "acceptance": "schedule + `POST /jobs/{id}/lease`; `JobLeaseConfig` TTL; OpenAPI; unit + contract tests",
+      "deps": "Galaxy §4.3.1, `src/job/lease_acquire.rs",
+      "id": "PH-S98",
+      "open": false,
+      "row": 34,
+      "status": "closed",
+      "title": "Lease acquire at schedule / explicit API (code)"
+    },
+    {
+      "acceptance": "POST /jobs/{id}/lease/renew`; extends TTL; epoch CAS; OpenAPI; tests",
+      "deps": "Galaxy §4.3.1, `lease_acquire.rs",
+      "id": "PH-S99",
+      "open": false,
+      "row": 35,
+      "status": "closed",
+      "title": "Lease renew / heartbeat wire (code)"
+    },
+    {
+      "acceptance": "Leased` status + `allows_transition`; backward compatible JSON/SQLite; acquire → `Leased",
+      "deps": "Galaxy §4.3.2",
+      "id": "PH-S100",
+      "open": false,
+      "row": 36,
+      "status": "closed",
+      "title": "JobStatus::Leased` + lifecycle (code)"
+    },
+    {
+      "acceptance": "detect expired leased jobs; requeue + rebind sketch in scheduler/store; tests",
+      "deps": "Galaxy §4.3",
+      "id": "PH-S101",
+      "open": false,
+      "row": 37,
+      "status": "closed",
+      "title": "Failover / re-migrate stub (code)"
+    },
+    {
+      "acceptance": "L1 refresh from `POOLAI_GALAXY_PRICING_PROVIDERS` endpoints; `POOLAI_GALAXY_PRICING_TIMEOUT_MS`; API integration + tests",
+      "deps": "Galaxy §4.2.5",
+      "id": "PH-S102",
+      "open": false,
+      "row": 38,
+      "status": "closed",
+      "title": "Live pricing provider HTTP fetch (code)"
+    },
+    {
+      "acceptance": "middleware on selected wire routes (`/grid/*`, register/heartbeat remote, virtual-nodes); protocol headers + reject unsupported",
+      "deps": "Galaxy §9.8",
+      "id": "PH-S103",
+      "open": false,
+      "row": 39,
+      "status": "closed",
+      "title": "X-PoolAI-Protocol` middleware (code)"
+    },
+    {
+      "acceptance": "Migrating` enum + lifecycle transitions (`Leased/Executing ↔ Migrating`); OpenAPI + contract tests",
+      "deps": "Galaxy §4.3.2",
+      "id": "PH-S104",
+      "open": false,
+      "row": 40,
+      "status": "closed",
+      "title": "JobStatus::Migrating` + lifecycle (code)"
+    },
+    {
+      "acceptance": "read-only badge from `lease_expires_at`; i18n EN/UK; Playwright smoke",
+      "deps": "Galaxy §4.3.1, `src/ui/admin/jobs.rs",
+      "id": "PH-S105",
+      "open": false,
+      "row": 41,
+      "status": "closed",
+      "title": "Admin jobs lease active/expired badge (code)"
+    },
+    {
+      "acceptance": "POST renew to coordinator when payload has active `job_id` + `lease_epoch`; parser + HTTP renew stub tests; no full failover",
+      "deps": "Galaxy §4.3.1, `src/bin/poolai-worker.rs",
+      "id": "PH-S106",
+      "open": false,
+      "row": 42,
+      "status": "closed",
+      "title": "poolai-worker` lease renew client stub (code)"
+    },
+    {
+      "acceptance": "Playwright acquire + renew path; `jobs_lease.spec.ts`; `npm run test:ci",
+      "deps": "e2e/`, PH-S98–S99 API",
+      "id": "PH-S107",
+      "open": false,
+      "row": 43,
+      "status": "closed",
+      "title": "Jobs lease E2E smoke (e2e)"
+    },
+    {
+      "acceptance": "grid Job ingest + `schedule_with_grid_peer` → `leased` + lease fields when peer binds; unit tests",
+      "deps": "src/grid/dispatch.rs`, `src/job/",
+      "id": "PH-S108",
+      "open": false,
+      "row": 44,
+      "status": "closed",
+      "title": "Grid ingest sets Leased on acquire (code)"
+    },
+    {
+      "acceptance": "§4.3 table PH-S94…S108; смуга 10/10 ✅; roadmap replenish",
+      "deps": "POOLAI_GALAXY_GRID.md`, INDEX, DIGEST",
+      "id": "PH-S109",
+      "open": false,
+      "row": 45,
+      "status": "closed",
+      "title": "Galaxy §4.3 lease wire docs sync (docs)"
+    },
+    {
+      "acceptance": "GridResultBody.lease_epoch`; `check_grid_result_lease_epoch`; `409 lease_epoch_rejected`; unit tests",
+      "deps": "src/grid/dispatch.rs`, Galaxy §4.3.1",
+      "id": "PH-S110",
+      "open": false,
+      "row": 46,
+      "status": "closed",
+      "title": "Grid result ingest lease_epoch CAS (code)"
+    },
+    {
+      "acceptance": "POOLAI_JOB_LEASE_RENEW_INTERVAL_SECS` optional override; unit tests",
+      "deps": "src/job/lease_config.rs`, §4.3.1",
+      "id": "PH-S111",
+      "open": false,
+      "row": 47,
+      "status": "closed",
+      "title": "Job lease renew interval env (code)"
+    },
+    {
+      "acceptance": "Playwright grid envelope Job → `leased` + lease fields",
+      "deps": "e2e/`, PH-S108",
+      "id": "PH-S112",
+      "open": false,
+      "row": 48,
+      "status": "closed",
+      "title": "Grid Job envelope E2E smoke (e2e)"
+    },
+    {
+      "acceptance": "Cargo.toml` / `.cargo/config.toml` L5; `src/lib.rs` + crates L4; manifest nodes + edges",
+      "deps": "docs/vision/`, manifest",
+      "id": "PH-S113",
+      "open": false,
+      "row": 49,
+      "status": "closed",
+      "title": "Vision L4/L5 workspace + lib layers (docs)"
+    },
+    {
+      "acceptance": "wheel zoom, drag pan, +/- reset, dblclick focus node; map transform not browser zoom",
+      "deps": "docs/vision/vision.js",
+      "id": "PH-S114",
+      "open": false,
+      "row": 50,
+      "status": "closed",
+      "title": "Vision map pan/zoom navigation (docs)"
+    },
+    {
+      "acceptance": "orthogonal paths via folder hub; `edge-docs` / `edge-code` / `edge-toml` / `edge-mixed",
+      "deps": "docs/vision/vision.js",
+      "id": "PH-S115",
+      "open": false,
+      "row": 51,
+      "status": "closed",
+      "title": "Vision folder-colored edge routing (docs)"
+    },
+    {
+      "acceptance": "ticker from `JobLeaseConfig.lease_renew_interval_secs` while task active",
+      "deps": "src/bin/poolai-worker.rs`, PH-S111",
+      "id": "PH-S116",
+      "open": false,
+      "row": 52,
+      "status": "closed",
+      "title": "Worker periodic lease renew loop (code)"
+    },
+    {
+      "acceptance": "Playwright stale epoch → `409 lease_epoch_rejected` on grid Result",
+      "deps": "e2e/`, PH-S110",
+      "id": "PH-S117",
+      "open": false,
+      "row": 53,
+      "status": "closed",
+      "title": "Grid result lease_epoch E2E (e2e)"
+    },
+    {
+      "acceptance": "renew w/o acquire 400; expired TTL 409; wrong owner 409; `POOLAI_JOB_LEASE_TTL_SECS=2` on e2e stand",
+      "deps": "e2e/`, PH-S107",
+      "id": "PH-S118",
+      "open": false,
+      "row": 54,
+      "status": "closed",
+      "title": "Jobs lease negative paths E2E (e2e)"
+    },
+    {
+      "acceptance": "#epoch` display; owner/epoch/col tooltips; i18n EN/UK; Playwright PH-S96 extended",
+      "deps": "src/ui/admin/jobs.rs",
+      "id": "PH-S119",
+      "open": false,
+      "row": 55,
+      "status": "closed",
+      "title": "Admin jobs lease column polish (code)"
+    },
+    {
+      "acceptance": "manifest nodes/edges; DIGEST § Solana modules; FM-033 crosslink",
+      "deps": "docs/vision/`, DIGEST",
+      "id": "PH-S120",
+      "open": false,
+      "row": 56,
+      "status": "closed",
+      "title": "Solana adapter vision + digest crosslink (docs)"
+    },
+    {
+      "acceptance": "§4.3.1.1 worker lease renew vs discovery heartbeat; env + payload + `LeaseRenewGuard",
+      "deps": "POOLAI_GALAXY_GRID.md",
+      "id": "PH-S121",
+      "open": false,
+      "row": 57,
+      "status": "closed",
+      "title": "Galaxy §4.3 worker heartbeat wire note (docs)"
+    },
+    {
+      "acceptance": "lease_epoch` on grid result body + examples; gap audit 0",
+      "deps": "docs/openapi.yaml`, gap audit",
+      "id": "PH-S122",
+      "open": false,
+      "row": 58,
+      "status": "closed",
+      "title": "OpenAPI jobs lease schemas audit (docs)"
+    },
+    {
+      "acceptance": "force fallback env → snapshot stable quote",
+      "deps": "e2e/tests/grid_pricing.spec.ts",
+      "id": "PH-S123",
+      "open": false,
+      "row": 59,
+      "status": "closed",
+      "title": "Grid pricing E2E negative fallback (e2e)"
+    },
+    {
+      "acceptance": "span attributes for acquire/renew/reject paths",
+      "deps": "FM-038, HANDOFF",
+      "id": "PH-S124",
+      "open": false,
+      "row": 60,
+      "status": "closed",
+      "title": "OTel lease span attrs docs (docs)"
+    },
+    {
+      "acceptance": "Eco GPU mode; instant select (no full re-render); Layers/Types fullscreen dock; bottom toolbar layout",
+      "deps": "docs/vision/",
+      "id": "PH-S125",
+      "open": false,
+      "row": 61,
+      "status": "closed",
+      "title": "Vision Galaxy map Eco + click perf (docs)"
+    },
+    {
+      "acceptance": "spans on acquire/renew/reject (`job.lease.*` attrs); `cargo test --features otel`; cross-link OPENTELEMETRY_TRACING",
+      "deps": "FM-038, `src/job/`, `src/observability/",
+      "id": "PH-S126",
+      "open": false,
+      "row": 62,
+      "status": "closed",
+      "title": "OTel lease span instrumentation (code)"
+    },
+    {
+      "acceptance": "export `galaxy_pricing_*_served` + `forced_fallback_total` on `GET /metrics`; unit test",
+      "deps": "Galaxy §4.2, `galaxy_pricing_oracle.rs`, FM-043",
+      "id": "PH-S127",
+      "open": false,
+      "row": 63,
+      "status": "closed",
+      "title": "Pricing oracle Prometheus export (code)"
+    },
+    {
+      "acceptance": "locality_score(worker, task)` pure fn + unit tests; no prefetch wire",
+      "deps": "Galaxy §5.1–5.2, `src/grid/",
+      "id": "PH-S128",
+      "open": false,
+      "row": 64,
+      "status": "closed",
+      "title": "Locality score scheduler stub (code)"
+    },
+    {
+      "acceptance": "SeedInventoryEntry` DTO + noop prefetch hook; unit tests",
+      "deps": "Galaxy §5.5, `src/grid/dispatch.rs",
+      "id": "PH-S129",
+      "open": false,
+      "row": 65,
+      "status": "closed",
+      "title": "Seed inventory + prefetch policy stub (code)"
+    },
+    {
+      "acceptance": "trust_score` 0–100 gate sketch on grid result path; unit tests",
+      "deps": "Galaxy §6.5, `src/grid/",
+      "id": "PH-S130",
+      "open": false,
+      "row": 66,
+      "status": "closed",
+      "title": "Edge trust_score settlement gate stub (code)"
+    },
+    {
+      "acceptance": "POST /api/v1/virtual-nodes/telegram/wallet` stub + OpenAPI; contract test",
+      "deps": "Galaxy §3.2, `virtual_nodes.rs",
+      "id": "PH-S131",
+      "open": false,
+      "row": 67,
+      "status": "closed",
+      "title": "Telegram wallet bind API stub (code)"
+    },
+    {
+      "acceptance": "§8.1 schema for `network_profile`; DIGEST row; locality subset cross-link",
+      "deps": "Galaxy §8 TBD #1",
+      "id": "PH-S132",
+      "open": false,
+      "row": 68,
+      "status": "closed",
+      "title": "network_profile contract docs (docs)"
+    },
+    {
+      "acceptance": "Playwright PATCH `migrating` ↔ `executing` roundtrip; `npm run test:ci",
+      "deps": "PH-S104, `e2e/",
+      "id": "PH-S133",
+      "open": false,
+      "row": 69,
+      "status": "closed",
+      "title": "Job Migrating lifecycle E2E (e2e)"
+    },
+    {
+      "acceptance": "Playwright register-remote with `X-PoolAI-Protocol`; unsupported → 403",
+      "deps": "PH-S103, `e2e/",
+      "id": "PH-S134",
+      "open": false,
+      "row": 70,
+      "status": "closed",
+      "title": "Protocol middleware E2E smoke (e2e)"
+    },
+    {
+      "acceptance": "GET /api/v1/virtual-nodes/telegram/wallets/{telegram_user_id}`; OpenAPI; integration test",
+      "deps": "Galaxy §3.2, PH-S131",
+      "id": "PH-S135",
+      "open": false,
+      "row": 71,
+      "status": "closed",
+      "title": "Telegram wallet GET lookup API (code)"
+    },
+    {
+      "acceptance": "PrefetchPolicyMode` + `POOLAI_GALAXY_*` from_env; unit tests; no enqueue wire",
+      "deps": "Galaxy §5.6, `dispatch.rs",
+      "id": "PH-S136",
+      "open": false,
+      "row": 72,
+      "status": "closed",
+      "title": "Prefetch policy env wire stub (code)"
+    },
+    {
+      "acceptance": "Prometheus counters `payout_held` / `payout_eligible`; unit test",
+      "deps": "Galaxy §6.5, `galaxy_trust_score.rs",
+      "id": "PH-S137",
+      "open": false,
+      "row": 73,
+      "status": "closed",
+      "title": "Trust gate settlement metrics stub (code)"
+    },
+    {
+      "acceptance": "tests/` multi-worker `rank_workers_by_locality` fixture; `cargo test-ci",
+      "deps": "PH-S128, `galaxy_locality.rs",
+      "id": "PH-S138",
+      "open": false,
+      "row": 74,
+      "status": "closed",
+      "title": "Locality rank integration test (tests)"
+    },
+    {
+      "acceptance": "Playwright POST wallet OK + invalid pubkey 400; `npm run test:ci",
+      "deps": "PH-S131, `e2e/",
+      "id": "PH-S139",
+      "open": false,
+      "row": 75,
+      "status": "closed",
+      "title": "Telegram wallet bind E2E (e2e)"
+    },
+    {
+      "acceptance": "parse `metadata.network_profile`; Rust integration test; no new Playwright",
+      "deps": "Galaxy §8.1, discovery",
+      "id": "PH-S140",
+      "open": false,
+      "row": 76,
+      "status": "closed",
+      "title": "network_profile register-remote stub (code)"
+    },
+    {
+      "acceptance": "migrating` status badge + i18n EN/UK; Playwright smoke; `test:ci",
+      "deps": "PH-S104, `jobs.rs",
+      "id": "PH-S141",
+      "open": false,
+      "row": 77,
+      "status": "closed",
+      "title": "Admin jobs migrating badge UI (code)"
+    },
+    {
+      "acceptance": "POOLAI_GALAXY_VERIFY_BASE_SAMPLE_RATE` parser + unit tests; no live sampling wire",
+      "deps": "Galaxy §6.1, `src/grid/",
+      "id": "PH-S142",
+      "open": false,
+      "row": 78,
+      "status": "closed",
+      "title": "Verification sample rate env stub (code)"
+    },
+    {
+      "acceptance": "poolai-loc-audit` bin + `rust_ratio.json` (91.48%); FM sync",
+      "deps": "[`RUST_RATIO_STRATEGY_2026-06-13.md`](../development/RUST_RATIO_STRATEGY_2026-06-13.md)",
+      "id": "PH-S143",
+      "open": false,
+      "row": 79,
+      "status": "closed",
+      "title": "LOC ratio baseline audit (code)"
+    },
+    {
+      "acceptance": "API specs → `tests/*_integration.rs`; `cargo test-ci`; no new TS API specs",
+      "deps": "PH-S133…S139 legacy e2e",
+      "id": "PH-S144",
+      "open": false,
+      "row": 80,
+      "status": "closed",
+      "title": "Playwright API → Rust migration (tests)"
+    },
+    {
+      "acceptance": "Rust HTTP stand smoke bin; doc in RUN_LOCAL",
+      "deps": "PH-S144, stand env",
+      "id": "PH-S145",
+      "open": false,
+      "row": 81,
+      "status": "closed",
+      "title": "poolai-http-stand-smoke` bin (code)"
+    },
+    {
+      "acceptance": "validators/formatters з admin JS → crate + unit tests",
+      "deps": "src/ui/`, ratio strategy",
+      "id": "PH-S146",
+      "open": false,
+      "row": 82,
+      "status": "closed",
+      "title": "poolai-ui-core` shared crate (code)"
+    },
+    {
+      "acceptance": "one wasm module + portability §2 docs sync",
+      "deps": "PH-S146, portability",
+      "id": "PH-S147",
+      "open": false,
+      "row": 83,
+      "status": "closed",
+      "title": "wasm32 admin core POC (code)"
+    },
+    {
+      "acceptance": "test:ci` без API TS patterns; ratio ≥90%",
+      "deps": "PH-S144",
+      "id": "PH-S148",
+      "open": false,
+      "row": 84,
+      "status": "closed",
+      "title": "Slim `e2e/` browser-only (e2e)"
+    },
+    {
+      "acceptance": "CI job `rust-ratio-audit`; `--warn-below 0.88` `--target 0.93` `--stretch 0.96` `--advisory`; `rust_ratio.json` 92.00%",
+      "deps": "PH-S143 audit",
+      "id": "PH-S150",
+      "open": false,
+      "row": 85,
+      "status": "closed",
+      "title": "Ratio CI advisory (ops)"
+    },
+    {
+      "acceptance": "/ui/admin/grid-pricing` → wasm formatters; `/ui/wasm/*` static; Playwright smoke",
+      "deps": "PH-S147",
+      "id": "PH-S151",
+      "open": false,
+      "row": 86,
+      "status": "closed",
+      "title": "wasm grid-pricing panel wiring (code)"
+    },
+    {
+      "acceptance": "admin jobs panel: wasm `leaseStateLabel`; shared `POOLAI_UI_WASM_MODULE`; Playwright smoke",
+      "deps": "PH-S151, `jobs.rs",
+      "id": "PH-S152",
+      "open": false,
+      "row": 87,
+      "status": "closed",
+      "title": "wasm jobs lease display (code)"
+    },
+    {
+      "acceptance": "api_error`, `format`, table helpers → Rust/wasm; −≥400 LOC JS",
+      "deps": "PH-S146",
+      "id": "PH-S153",
+      "open": false,
+      "row": 88,
+      "status": "closed",
+      "title": "poolai-ui-core` → admin_common slim (code)"
+    },
+    {
+      "acceptance": "grid-pricing + jobs lease EN/UK keys у Rust templates; slim `i18n_core.js` admin block",
+      "deps": "PH-S153",
+      "id": "PH-S154",
+      "open": false,
+      "row": 89,
+      "status": "closed",
+      "title": "Admin i18n subset in Rust (code)"
+    },
+    {
+      "acceptance": "admin_charts.js` — лише canvas glue; metrics parse у wasm",
+      "deps": "PH-S146 `ml",
+      "id": "PH-S155",
+      "open": false,
+      "row": 90,
+      "status": "closed",
+      "title": "ML charts data → Rust/wasm (code)"
+    },
+    {
+      "acceptance": "poolai-http-stand-smoke --raid-restart`; прибрати `jobs_raid` з `test:ci",
+      "deps": "PH-S145",
+      "id": "PH-S156",
+      "open": false,
+      "row": 91,
+      "status": "closed",
+      "title": "jobs_raid` e2e → Rust stand smoke (tests)"
+    },
+    {
+      "acceptance": "masked topology data з Rust; slim `topology_graph.js",
+      "deps": "topology.rs",
+      "id": "PH-S157",
+      "open": false,
+      "row": 92,
+      "status": "closed",
+      "title": "topology SVG from Rust (code)"
+    },
+    {
+      "acceptance": "stand start/restart/env у Rust bin; slim `bin/e2e-playwright.sh",
+      "deps": "PH-S145",
+      "id": "PH-S158",
+      "open": false,
+      "row": 93,
+      "status": "closed",
+      "title": "poolai-e2e-stand` Rust bin (code)"
+    },
+    {
+      "acceptance": "poolai-loc-audit` warn 93%, stretch 96%; FM replenish post-S159 band",
+      "deps": "PH-S150…S158",
+      "id": "PH-S159",
+      "open": false,
+      "row": 94,
+      "status": "closed",
+      "title": "Ratio 96% stretch CI gate (ops)"
+    },
+    {
+      "acceptance": "poolaiNormalizeTheme` + token map у `poolai-ui-core`; slim `admin_theme.js",
+      "deps": "PH-S153 `admin_theme.js",
+      "id": "PH-S160",
+      "open": false,
+      "row": 95,
+      "status": "closed",
+      "title": "Admin theme normalize → Rust (code)"
+    },
+    {
+      "acceptance": "focus-trap / modal helpers у ui-core/wasm; slim modal JS",
+      "deps": "PH-S153 `admin_modal_a11y.js",
+      "id": "PH-S161",
+      "open": false,
+      "row": 96,
+      "status": "closed",
+      "title": "Admin modal a11y → wasm (code)"
+    },
+    {
+      "acceptance": "login/dashboard shell keys у `i18n.rs`; slim `i18n_core.js` auth block",
+      "deps": "PH-S154 pattern",
+      "id": "PH-S162",
+      "open": false,
+      "row": 97,
+      "status": "closed",
+      "title": "Auth i18n subset Rust (code)"
+    },
+    {
+      "acceptance": "trust gate Prometheus на grid result path; unit tests",
+      "deps": "PH-S137, Galaxy §6.5",
+      "id": "PH-S163",
+      "open": false,
+      "row": 98,
+      "status": "closed",
+      "title": "Galaxy trust metrics wire (code)"
+    },
+    {
+      "acceptance": "galaxy_verify_sampling` у HTTP/grid middleware stub; tests",
+      "deps": "PH-S142, Galaxy §6.1",
+      "id": "PH-S164",
+      "open": false,
+      "row": 99,
+      "status": "closed",
+      "title": "Verify sampling env apply (code)"
+    },
+    {
+      "acceptance": "CI `--min-ratio 0.95` advisory hold; target 95%; spirit 96%; replenish §5.12",
+      "deps": "PH-S159…S164",
+      "id": "PH-S165",
+      "open": false,
+      "row": 100,
+      "status": "closed",
+      "title": "Ratio 96% hold band gate (ops)"
+    },
+    {
+      "acceptance": "design_tokens.rs` + `admin_base_css()`; slim `design_tokens.css` / `admin_styles.css` `:root",
+      "deps": "PH-S160, `design_tokens.css",
+      "id": "PH-S166",
+      "open": false,
+      "row": 101,
+      "status": "closed",
+      "title": "Design tokens CSS → Rust (code)"
+    },
+    {
+      "acceptance": "Prometheus counters on `plan_prefetch`; unit + integration tests",
+      "deps": "PH-S129, Galaxy §5.5",
+      "id": "PH-S167",
+      "open": false,
+      "row": 102,
+      "status": "closed",
+      "title": "Galaxy prefetch metrics stub (code)"
+    },
+    {
+      "acceptance": "galaxy_pricing_cache_age_seconds` gauge on GET /metrics; unit tests",
+      "deps": "PH-S89, Galaxy §4.2",
+      "id": "PH-S168",
+      "open": false,
+      "row": 103,
+      "status": "closed",
+      "title": "Galaxy pricing cache age /metrics (code)"
+    },
+    {
+      "acceptance": "stale_network_profile_penalty` у `galaxy_locality.rs`; unit tests",
+      "deps": "Galaxy §8.1",
+      "id": "PH-S169",
+      "open": false,
+      "row": 104,
+      "status": "closed",
+      "title": "Locality stale profile penalty stub (code)"
+    },
+    {
+      "acceptance": "pending_verification` verdict stub on grid result path; unit tests",
+      "deps": "PH-S165, Galaxy §6.4",
+      "id": "PH-S170",
+      "open": false,
+      "row": 105,
+      "status": "closed",
+      "title": "Galaxy settlement pending_verification stub (code)"
+    },
+    {
+      "acceptance": "replication_strict` tier config stub; unit tests",
+      "deps": "Galaxy §6.3",
+      "id": "PH-S171",
+      "open": false,
+      "row": 106,
+      "status": "closed",
+      "title": "Galaxy replication strict tier stub (code)"
+    },
+    {
+      "acceptance": "Prometheus counters on provider allow-list hits; unit tests",
+      "deps": "PH-S92, Galaxy §4.2",
+      "id": "PH-S172",
+      "open": false,
+      "row": 107,
+      "status": "closed",
+      "title": "Galaxy pricing provider catalog metrics stub (code)"
+    },
+    {
+      "acceptance": "galaxy_pricing_provider_errors_total` counter on provider fetch fail; unit tests",
+      "deps": "PH-S92, Galaxy §4.2",
+      "id": "PH-S173",
+      "open": false,
+      "row": 108,
+      "status": "closed",
+      "title": "Galaxy pricing provider errors metrics stub (code)"
+    },
+    {
+      "acceptance": "galaxy_pricing_quote_usd_micro` gauge on last quote; unit tests",
+      "deps": "PH-S89, Galaxy §4.2",
+      "id": "PH-S174",
+      "open": false,
+      "row": 109,
+      "status": "closed",
+      "title": "Galaxy pricing quote usd_micro metrics stub (code)"
+    },
+    {
+      "acceptance": "galaxy_verification_mismatch_total` counter stub; unit tests",
+      "deps": "Galaxy §6.2",
+      "id": "PH-S175",
+      "open": false,
+      "row": 110,
+      "status": "closed",
+      "title": "Galaxy verification mismatch metrics stub (code)"
+    },
+    {
+      "acceptance": "galaxy_replay_pending` gauge stub; unit tests",
+      "deps": "Galaxy §6.3",
+      "id": "PH-S176",
+      "open": false,
+      "row": 111,
+      "status": "closed",
+      "title": "Galaxy replay pending metrics stub (code)"
+    },
+    {
+      "acceptance": "galaxy_verification_sample_total` counter stub; unit tests",
+      "deps": "Galaxy §6.2",
+      "id": "PH-S177",
+      "open": false,
+      "row": 112,
+      "status": "closed",
+      "title": "Galaxy verification sample total metrics stub (code)"
+    },
+    {
+      "acceptance": "galaxy_settlement_pending_verification_total` counter on grid result path; unit tests",
+      "deps": "PH-S170, Galaxy §6.4",
+      "id": "PH-S178",
+      "open": false,
+      "row": 113,
+      "status": "closed",
+      "title": "Galaxy settlement pending_verification metrics stub (code)"
+    },
+    {
+      "acceptance": "galaxy_replication_strict_total` counter on grid job ingest; unit tests",
+      "deps": "PH-S171, Galaxy §6.3",
+      "id": "PH-S179",
+      "open": false,
+      "row": 114,
+      "status": "closed",
+      "title": "Galaxy replication strict tier metrics stub (code)"
+    },
+    {
+      "acceptance": "galaxy_verification_match_total` counter on grid result path; unit tests",
+      "deps": "Galaxy §6.2",
+      "id": "PH-S180",
+      "open": false,
+      "row": 115,
+      "status": "closed",
+      "title": "Galaxy verification match metrics stub (code)"
+    },
+    {
+      "acceptance": "galaxy_pricing_market_min_usd_micro` gauge stub; unit tests",
+      "deps": "PH-S89, Galaxy §4.2",
+      "id": "PH-S181",
+      "open": false,
+      "row": 116,
+      "status": "closed",
+      "title": "Galaxy pricing market min usd_micro metrics stub (code)"
+    },
+    {
+      "acceptance": "galaxy_trust_score` gauge on grid result path; unit tests",
+      "deps": "Galaxy §6.2",
+      "id": "PH-S182",
+      "open": false,
+      "row": 117,
+      "status": "closed",
+      "title": "Galaxy trust score metrics stub (code)"
+    },
+    {
+      "acceptance": "galaxy_shard_local_hit_ratio` gauge on locality rank stub; unit tests",
+      "deps": "Galaxy §5.3",
+      "id": "PH-S183",
+      "open": false,
+      "row": 118,
+      "status": "closed",
+      "title": "Galaxy shard local hit ratio metrics stub (code)"
+    },
+    {
+      "acceptance": "galaxy_prefetch_bytes_total` counter on `plan_prefetch`; unit tests",
+      "deps": "Galaxy §5.5 PH-S129",
+      "id": "PH-S184",
+      "open": false,
+      "row": 119,
+      "status": "closed",
+      "title": "Galaxy prefetch bytes total metrics stub (code)"
+    },
+    {
+      "acceptance": "galaxy_cross_region_egress_mb` gauge stub on rank/prefetch path; unit tests",
+      "deps": "Galaxy §5.3",
+      "id": "PH-S185",
+      "open": false,
+      "row": 120,
+      "status": "closed",
+      "title": "Galaxy cross region egress mb metrics stub (code)"
+    },
+    {
+      "acceptance": "galaxy_verification_sample_scheduled_total` on `GET /metrics`; unit tests",
+      "deps": "PH-S164, Galaxy §6.2",
+      "id": "PH-S186",
+      "open": false,
+      "row": 121,
+      "status": "closed",
+      "title": "Galaxy verification sample scheduled /metrics export (code)"
+    },
+    {
+      "acceptance": "galaxy_settlement_cleared_total` counter on grid result Cleared path; unit tests",
+      "deps": "PH-S170, Galaxy §6.4",
+      "id": "PH-S187",
+      "open": false,
+      "row": 122,
+      "status": "closed",
+      "title": "Galaxy settlement cleared total metrics stub (code)"
+    },
+    {
+      "acceptance": "незалежні layer/type toggle; LAYERS/TYPES select-all/none; decouple 3D stack ↔ chips; `vision.js` + README; rev++",
+      "deps": "docs/vision/vision.js`, PH-S115 filters",
+      "id": "PH-S188",
+      "open": false,
+      "row": 123,
+      "status": "closed",
+      "title": "Vision map filters UX (docs/vision)"
+    },
+    {
+      "acceptance": "tri-mode Eco→FX→Ms; hover 1-hop edge/node highlight; `localStorage`; rev++",
+      "deps": "PH-S188, `docs/vision/README.md` Eco/FX",
+      "id": "PH-S189",
+      "open": false,
+      "row": 124,
+      "status": "closed",
+      "title": "Vision Eco/FX/Ms hover trace (docs/vision)"
+    },
+    {
+      "acceptance": "Layers/Types dropdown menus; − collapse → title strip; grid auto-fill; `localStorage`; rev++",
+      "deps": "PH-S188 filters, PH-S115 layout",
+      "id": "PH-S190",
+      "open": false,
+      "row": 125,
+      "status": "closed",
+      "title": "Vision filter dropdowns + panel collapse (docs/vision)"
+    },
+    {
+      "acceptance": "Rust parse FM §5.12 → `sprint_queue` panel; rev++",
+      "deps": "FM §5.12, `poolai-vision-sync",
+      "id": "PH-S191",
+      "open": false,
+      "row": 126,
+      "status": "closed",
+      "title": "Vision sprint queue panel (docs/vision)"
+    },
+    {
+      "acceptance": "map-overview` при low zoom; hub-only labels; viewport inset minimap; rev++",
+      "deps": "PH-S115 map zoom",
+      "id": "PH-S192",
+      "open": true,
+      "row": 127,
+      "status": "open",
+      "title": "Vision overview LOD + minimap (docs/vision)"
+    },
+    {
+      "acceptance": "login/dashboard wasm formatters; slim JS glue; `cargo test-ci",
+      "deps": "PH-S151, `poolai-ui-core",
+      "id": "PH-S193",
+      "open": true,
+      "row": 128,
+      "status": "open",
+      "title": "Dashboard shell formatters → wasm (code)"
+    },
+    {
+      "acceptance": "galaxy_fee_split_applied_total` on grid result path; unit tests",
+      "deps": "PH-S58, Galaxy §4.1",
+      "id": "PH-S194",
+      "open": true,
+      "row": 129,
+      "status": "open",
+      "title": "Galaxy fee split result counter stub (code)"
+    },
+    {
+      "acceptance": "read-only `GET /api/v1/grid/seed-inventory`; OpenAPI; integration test",
+      "deps": "PH-S129, Galaxy §5.5",
+      "id": "PH-S195",
+      "open": true,
+      "row": 130,
+      "status": "open",
+      "title": "Galaxy seed_inventory GET stub (code)"
+    },
+    {
+      "acceptance": "poolai-http-stand-smoke --lease-renew`; slim Playwright lease",
+      "deps": "PH-S156, PH-S99",
+      "id": "PH-S196",
+      "open": true,
+      "row": 131,
+      "status": "open",
+      "title": "Stand smoke jobs lease renew (tests)"
+    },
+    {
+      "acceptance": "/ui/admin/updates-compat` → wasm labels; Playwright smoke",
+      "deps": "PH-S151, PH-S93",
+      "id": "PH-S197",
+      "open": true,
+      "row": 132,
+      "status": "open",
+      "title": "Admin updates-compat wasm wiring (code)"
+    },
+    {
+      "acceptance": "hub labels у `topology_graph.rs`; −LOC `topology_graph.js",
+      "deps": "PH-S157",
+      "id": "PH-S198",
+      "open": true,
+      "row": 133,
+      "status": "open",
+      "title": "Topology graph Rust labels slim (code)"
+    },
+    {
+      "acceptance": "feed.json` + RSS ticker panel; rev++",
+      "deps": "PH-S191 queue",
+      "id": "PH-S199",
+      "open": true,
+      "row": 134,
+      "status": "open",
+      "title": "Vision feed.json RSS ticker (docs/vision)"
+    },
+    {
+      "acceptance": "post-push notify after PH-S* close; docs sync pointer",
+      "deps": "VDT, `.cursor/hooks",
+      "id": "PH-S200",
+      "open": true,
+      "row": 135,
+      "status": "open",
+      "title": "Cursor post-push PH-S* hook (ops)"
+    }
+  ],
+  "sprint_queue_open_count": 9,
   "updated_at": "2026-06-15",
-  "vision_ui_rev": 56
+  "vision_ui_rev": 57
 }
