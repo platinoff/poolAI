@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PoolAI Galaxy Starwalker Vision</title>
-  <link rel="stylesheet" href="vision.css?v=53" />
+  <link rel="stylesheet" href="vision.css?v=54" />
 </head>
 <body>
   <div id="galaxy-backdrop" class="galaxy-backdrop" aria-hidden="true">
@@ -47,11 +47,23 @@
             </div>
             <div class="map-filter-dock" id="map-filter-dock" aria-label="Layer and file-type filters">
               <div class="map-filter-group" data-group="layers">
-                <span class="map-filter-label">Layers</span>
+                <div class="map-filter-head">
+                  <span class="map-filter-label">Layers</span>
+                  <span class="map-filter-bulk">
+                    <button type="button" class="map-filter-bulk-btn" id="map-layers-all" title="Show all layers on map">All</button>
+                    <button type="button" class="map-filter-bulk-btn" id="map-layers-none" title="Hide all layers on map">None</button>
+                  </span>
+                </div>
                 <div class="map-filter-chips" id="map-layer-chips"></div>
               </div>
               <div class="map-filter-group" data-group="ext">
-                <span class="map-filter-label">Types</span>
+                <div class="map-filter-head">
+                  <span class="map-filter-label">Types</span>
+                  <span class="map-filter-bulk">
+                    <button type="button" class="map-filter-bulk-btn" id="map-exts-all" title="Show all file types on map">All</button>
+                    <button type="button" class="map-filter-bulk-btn" id="map-exts-none" title="Hide all file types on map">None</button>
+                  </span>
+                </div>
                 <div class="map-filter-chips" id="map-ext-chips"></div>
               </div>
             </div>
@@ -60,7 +72,7 @@
               <button type="button" id="map-zoom-out" title="Zoom out">−</button>
               <button type="button" id="map-zoom-reset" title="Reset view">⌂</button>
             </div>
-            <span class="map-hint">Eco=GPU save · Layers/Types · Shift+layer solo · Esc reset</span>
+            <span class="map-hint">Eco=GPU save · Layers/Types All/None · Shift+layer solo · Esc reset</span>
             <svg id="map-svg" viewBox="0 0 900 520" role="img" aria-label="Documentation graph"></svg>
           </div>
         </section>
@@ -82,6 +94,6 @@
       </section>
     </div>
   </div>
-  <script src="vision.js?v=53"></script>
+  <script src="vision.js?v=54"></script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 # Galaxy Grid — роадмеп розробки (PoolAI)
 
-**Оновлено:** 2026-06-14 · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**4** відкритих PH-S188…S191)
+**Оновлено:** 2026-06-14 · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**3** відкритих PH-S189…S191)
 
 Операційний зріз сесій: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) · старт наступної: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)
 
@@ -10,7 +10,7 @@
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **4** — PH-S188…S191 (vision UX) |
+| **Відкрито** | **3** — PH-S189…S191 (vision UX) |
 | **Закрито PH-S128…S177** | Galaxy wire + ratio hold + verification/replay metrics band |
 | **Після S187** | replenish §5.12 (≤10) |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
@@ -58,7 +58,7 @@
 
 ---
 
-## 3. Черга §5.12 (PH-S188…S191)
+## 3. Черга §5.12 (PH-S189…S191)
 
 ### Metrics band (S182…S187) ✅
 
@@ -76,7 +76,7 @@
 
 | # | Sprint | Тема | Acceptance |
 |---|--------|------|------------|
-| 7 | **PH-S188** | Map filters UX | independent layer/type toggles; LAYERS/TYPES select-all |
+| 7 | **PH-S188** ✅ | Map filters UX | independent layer/type toggles; LAYERS/TYPES select-all |
 | 8 | **PH-S189** | Eco/FX/**Ms** hover trace | tri-mode; 1-hop edge highlight on mouse |
 | 9 | **PH-S190** | Overview LOD + minimap | hub labels at low zoom; viewport inset |
 | 10 | **PH-S191** | Sprint queue + feed + Cursor hook | `sprint_queue`/`feed.json`; Queue panel; post-push notify |

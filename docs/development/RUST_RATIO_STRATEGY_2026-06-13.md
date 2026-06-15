@@ -85,7 +85,7 @@ flowchart TB
 | **E — gate** | PH-S150 ✅ | CI advisory якщо ratio <88%; target 93%; stretch 96% spirit | стабільно 90–95% |
 | **F — stretch 96%** | PH-S151…S159 ✅ | wasm wiring, slim JS/i18n/charts, Rust stand/e2e bins; CI warn **93%** | **→96% spirit** |
 
-**Черга §5.12 (4 відкритих):** PH-S188…S191 vision UX band; replenish після S191.
+**Черга §5.12 (3 відкритих):** PH-S189…S191 vision UX band; replenish після S191.
 
 ---
 
@@ -137,7 +137,7 @@ flowchart TB
 | 42 | **PH-S185** | Galaxy cross region egress mb metrics stub | §5.3 rank/prefetch | **✅** |
 | 43 | **PH-S186** | Galaxy verification sample scheduled /metrics export | §6.2 PH-S164 export | **✅** |
 | 44 | **PH-S187** | Galaxy settlement cleared total metrics stub | §6.4 Cleared path | **✅** |
-| 45 | **PH-S188** | Vision map filters UX | docs/vision filters | відкрито |
+| 45 | **PH-S188** | Vision map filters UX | docs/vision filters | **✅** |
 | 46 | **PH-S189** | Vision Eco/FX/Ms hover trace | docs/vision Ms mode | відкрито |
 | 47 | **PH-S190** | Vision overview LOD + minimap | docs/vision map zoom | відкрито |
 | 48 | **PH-S191** | Vision sprint queue + feed + Cursor hook | FM §5.12 parse + hooks | відкрито |

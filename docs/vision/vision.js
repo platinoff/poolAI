@@ -57,8 +57,10 @@
     { id: "toml", label: "toml" },
     { id: "other", label: "·" },
   ];
-  /** Single-layer solo focus from Layers panel (overrides chip toggles until cleared). */
+  /** Single-layer solo focus on map (Shift+layer chip); independent of 3D stack. */
   let mapLayerFocus = null;
+  /** 3D stack / legend tier focus — decoupled from map filter chips (PH-S188). */
+  let stackLayerFocus = null;
   let expandedClusters = new Set();
   let clusterLabelPositions = [];
 
@@ -140,11 +142,10 @@
   }
 
   function hasActiveMapFilters() {
-    const layers = allLayerIds();
     return (
       !!mapLayerFocus ||
-      (enabledLayers && enabledLayers.size < layers.length) ||
-      (enabledExts && enabledExts.size < MAP_EXT_BUCKETS.length)
+      enabledLayers !== null ||
+      enabledExts !== null
     );
   }
 
@@ -972,12 +973,12 @@
         el.textContent = layer.id + " · " + layer.name;
         el.setAttribute("role", "button");
         el.setAttribute("tabindex", "0");
-        el.title = "Click: highlight this tier on the galaxy map";
-        el.addEventListener("click", () => setMapLayerFocus(layer.id));
+        el.title = "Click: focus this tier in the layer stack";
+        el.addEventListener("click", () => setStackLayerFocus(layer.id));
         el.addEventListener("keydown", (ev) => {
           if (ev.key === "Enter" || ev.key === " ") {
             ev.preventDefault();
-            setMapLayerFocus(layer.id);
+            setStackLayerFocus(layer.id);
           }
         });
         stack.appendChild(el);
@@ -991,18 +992,18 @@
         chip.type = "button";
         chip.className = "legend-chip";
         chip.dataset.layer = layer.id;
-        chip.title = "Click: highlight this tier on the galaxy map";
+        chip.title = "Click: focus this tier in the layer stack";
         const swatch = document.createElement("i");
         swatch.className = "legend-swatch legend-swatch-" + layer.id;
         chip.appendChild(swatch);
         chip.appendChild(
           document.createTextNode(layer.id + " " + layer.name)
         );
-        chip.addEventListener("click", () => setMapLayerFocus(layer.id));
+        chip.addEventListener("click", () => setStackLayerFocus(layer.id));
         chip.addEventListener("keydown", (ev) => {
           if (ev.key === "Enter" || ev.key === " ") {
             ev.preventDefault();
-            setMapLayerFocus(layer.id);
+            setStackLayerFocus(layer.id);
           }
         });
         legend.appendChild(chip);
@@ -1016,13 +1017,17 @@
     document.querySelectorAll(".layer-plane, .legend-chip").forEach((el) => {
       const lid = el.dataset.layer;
       if (!lid) return;
-      const on = mapLayerFocus
-        ? lid === mapLayerFocus
-        : isLayerHighlighted(lid);
-      el.classList.toggle("highlight", on && (!!mapLayerFocus || !enabledLayers));
-      el.classList.toggle("filter-off", !on);
+      const on = !stackLayerFocus || lid === stackLayerFocus;
+      el.classList.toggle("highlight", on);
+      el.classList.toggle("filter-off", !!stackLayerFocus && lid !== stackLayerFocus);
       el.setAttribute("aria-pressed", on ? "true" : "false");
     });
+  }
+
+  function setStackLayerFocus(layerId) {
+    if (stackLayerFocus === layerId) stackLayerFocus = null;
+    else stackLayerFocus = layerId;
+    syncLayerStackHighlight();
   }
 
   function setMapLayerFocus(layerId) {
@@ -1030,19 +1035,40 @@
       mapLayerFocus = null;
     } else {
       mapLayerFocus = layerId;
-      enabledLayers = null;
     }
-    syncLayerStackHighlight();
+    syncMapFilterDock();
+    updateMapFilters();
+  }
+
+  function setMapLayersAll() {
+    mapLayerFocus = null;
+    enabledLayers = null;
+    syncMapFilterDock();
+    updateMapFilters();
+  }
+
+  function setMapLayersNone() {
+    mapLayerFocus = null;
+    enabledLayers = new Set();
+    syncMapFilterDock();
+    updateMapFilters();
+  }
+
+  function setMapExtsAll() {
+    enabledExts = null;
+    syncMapFilterDock();
+    updateMapFilters();
+  }
+
+  function setMapExtsNone() {
+    enabledExts = new Set();
     syncMapFilterDock();
     updateMapFilters();
   }
 
   function highlightLayer(layerId) {
-    mapLayerFocus = layerId || null;
-    if (layerId) enabledLayers = null;
+    stackLayerFocus = layerId || null;
     syncLayerStackHighlight();
-    syncMapFilterDock();
-    updateMapFilters();
   }
 
   function toggleLayerChip(layerId) {
@@ -1051,9 +1077,7 @@
     if (!enabledLayers) enabledLayers = new Set(all);
     if (enabledLayers.has(layerId)) enabledLayers.delete(layerId);
     else enabledLayers.add(layerId);
-    if (enabledLayers.size === 0) enabledLayers = new Set(all);
     if (enabledLayers.size === all.length) enabledLayers = null;
-    syncLayerStackHighlight();
     syncMapFilterDock();
     updateMapFilters();
   }
@@ -1064,15 +1088,48 @@
     }
     if (enabledExts.has(extId)) enabledExts.delete(extId);
     else enabledExts.add(extId);
-    if (enabledExts.size === 0) {
-      enabledExts = new Set(MAP_EXT_BUCKETS.map((b) => b.id));
-    }
     if (enabledExts.size === MAP_EXT_BUCKETS.length) enabledExts = null;
     syncMapFilterDock();
     updateMapFilters();
   }
 
+  let mapFilterBulkBound = false;
+
+  function bindMapFilterBulkActions() {
+    if (mapFilterBulkBound) return;
+    mapFilterBulkBound = true;
+    const layersAll = document.getElementById("map-layers-all");
+    const layersNone = document.getElementById("map-layers-none");
+    const extsAll = document.getElementById("map-exts-all");
+    const extsNone = document.getElementById("map-exts-none");
+    if (layersAll) {
+      layersAll.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        setMapLayersAll();
+      });
+    }
+    if (layersNone) {
+      layersNone.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        setMapLayersNone();
+      });
+    }
+    if (extsAll) {
+      extsAll.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        setMapExtsAll();
+      });
+    }
+    if (extsNone) {
+      extsNone.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        setMapExtsNone();
+      });
+    }
+  }
+
   function renderMapFilterDock() {
+    bindMapFilterBulkActions();
     const layerHost = document.getElementById("map-layer-chips");
     const extHost = document.getElementById("map-ext-chips");
     if (!layerHost || !extHost || !manifest) return;
@@ -1983,16 +2040,13 @@
           mapLayerFocus = null;
           enabledLayers = null;
           enabledExts = null;
-          syncLayerStackHighlight();
           syncMapFilterDock();
           updateMapFilters();
           return;
         }
-        if (mapLayerFocus) {
-          mapLayerFocus = null;
+        if (stackLayerFocus) {
+          stackLayerFocus = null;
           syncLayerStackHighlight();
-          syncMapFilterDock();
-          updateMapFilters();
           return;
         }
         exitPanelFullscreen();

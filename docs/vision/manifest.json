@@ -1716,7 +1716,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "76f6dd3d",
-  "last_sprint_closed": "PH-S187",
+  "last_sprint_closed": "PH-S188",
   "layers": [
     {
       "id": "L0",
@@ -1749,7 +1749,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S188",
+  "next_sprint": "PH-S189",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -4720,7 +4720,8 @@
       "id": "docs_vision_vision_js",
       "label": "vision.js",
       "layer": "L1",
-      "path": "docs/vision/vision.js"
+      "path": "docs/vision/vision.js",
+      "sprints": ["PH-S63", "PH-S64", "PH-S115", "PH-S188"]
     },
     {
       "auto_synced": true,
@@ -7391,7 +7392,7 @@
       "sprints": ["PH-S181"]
     }
   ],
-  "revision": 124,
+  "revision": 125,
   "updated_at": "2026-06-14",
   "vision_ui_rev": 54
 }

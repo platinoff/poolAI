@@ -734,14 +734,50 @@ body.panel-fs-active.sidebar-overlay-open .sidebar-overlay-backdrop {
 
 .map-filter-group {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px 6px;
+  flex-direction: column;
+  gap: 4px;
   padding: 4px 8px;
   border-radius: 6px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(0, 0, 0, 0.52);
   backdrop-filter: blur(4px);
+}
+
+.map-filter-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  width: 100%;
+}
+
+.map-filter-bulk {
+  display: inline-flex;
+  gap: 3px;
+  margin-left: auto;
+}
+
+.map-filter-bulk-btn {
+  font-size: 0.55rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+  background: rgba(12, 16, 24, 0.85);
+  color: var(--muted);
+  cursor: pointer;
+  line-height: 1.3;
+}
+
+.map-filter-bulk-btn:hover {
+  border-color: var(--border-bright);
+  color: var(--text);
+}
+
+.map-filter-dock.filters-active .map-filter-bulk-btn {
+  border-color: rgba(126, 184, 255, 0.25);
 }
 
 .map-filter-dock.filters-active .map-filter-group {
