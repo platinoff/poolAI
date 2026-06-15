@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PoolAI Galaxy Starwalker Vision</title>
-  <link rel="stylesheet" href="vision.css?v=57" />
+  <link rel="stylesheet" href="vision.css?v=58" />
 </head>
 <body>
   <div id="galaxy-backdrop" class="galaxy-backdrop" aria-hidden="true">
@@ -33,18 +33,18 @@
     <div class="main-col">
       <div class="diagram-row">
         <section class="panel" data-panel="layers" aria-label="Layer stack">
-          <h2><span>Layers</span><span class="panel-head-actions"><button type="button" class="btn-panel-collapse" title="Collapse to title bar">−</button><button type="button" class="btn-panel-fs" title="Fullscreen (Esc)">⛶</button></span></h2>
+          <h2><span data-short="Ly">Layers</span><span class="panel-head-actions"><button type="button" class="btn-panel-collapse" title="Collapse to title bar">−</button><button type="button" class="btn-panel-fs" title="Fullscreen (Esc)">⛶</button></span></h2>
           <div class="panel-body" id="graph-3d">
             <div class="layer-stack" id="layer-stack"></div>
           </div>
           <div class="legend-bar" id="layer-legend" aria-label="Layer legend"></div>
         </section>
         <section class="panel" data-panel="queue" aria-label="Sprint queue FM §5.12">
-          <h2><span>Sprint queue</span><span class="panel-head-actions"><button type="button" class="btn-panel-collapse" title="Collapse to title bar">−</button><button type="button" class="btn-panel-fs" title="Fullscreen (Esc)">⛶</button></span></h2>
+          <h2><span data-short="Queue">Sprint queue</span><span class="panel-head-actions"><button type="button" class="btn-panel-collapse" title="Collapse to title bar">−</button><button type="button" class="btn-panel-fs" title="Fullscreen (Esc)">⛶</button></span></h2>
           <div class="panel-body sprint-queue-body" id="sprint-queue" aria-live="polite"></div>
         </section>
         <section class="panel" data-panel="map" aria-label="Interactive map">
-          <h2><span>Galaxy map</span><span class="panel-head-actions"><button type="button" class="btn-panel-collapse" title="Collapse to title bar">−</button><button type="button" class="btn-panel-fs" title="Fullscreen (Esc)">⛶</button></span></h2>
+          <h2><span data-short="Map">Galaxy map</span><span class="panel-head-actions"><button type="button" class="btn-panel-collapse" title="Collapse to title bar">−</button><button type="button" class="btn-panel-fs" title="Fullscreen (Esc)">⛶</button></span></h2>
           <div class="panel-body map-wrap">
             <img class="galaxy-bg" src="" alt="" />
             <div class="map-toolbar" aria-label="Map filters">
@@ -90,11 +90,14 @@
               <button type="button" id="map-zoom-reset" title="Reset view">⌂</button>
             </div>
             <span class="map-hint">Eco→FX→Ms · Layers/Types All/None · Shift+layer solo · Esc reset</span>
+            <aside class="map-minimap" id="map-minimap" aria-label="Map minimap — click to pan">
+              <svg id="map-minimap-svg" viewBox="0 0 900 580" role="img" aria-hidden="true"></svg>
+            </aside>
             <svg id="map-svg" viewBox="0 0 900 520" role="img" aria-label="Documentation graph"></svg>
           </div>
         </section>
         <section class="panel" data-panel="links" aria-label="Links">
-          <h2><span>Links</span><span class="panel-head-actions"><button type="button" class="btn-panel-collapse" title="Collapse to title bar">−</button><button type="button" class="btn-panel-fs" title="Fullscreen (Esc)">⛶</button></span></h2>
+          <h2><span data-short="Links">Links</span><span class="panel-head-actions"><button type="button" class="btn-panel-collapse" title="Collapse to title bar">−</button><button type="button" class="btn-panel-fs" title="Fullscreen (Esc)">⛶</button></span></h2>
           <div class="panel-body">
             <svg id="link-graph" aria-label="Neighbour graph"></svg>
             <ul class="links-list" id="links-list"></ul>
@@ -103,7 +106,7 @@
         </section>
       </div>
       <section class="panel preview-panel" data-panel="preview" aria-label="Document preview">
-        <h2><span>Preview</span><span class="panel-head-actions"><button type="button" class="btn-panel-collapse" title="Collapse to title bar">−</button><button type="button" class="btn-panel-fs" title="Fullscreen (Esc)">⛶</button></span></h2>
+        <h2><span data-short="Preview">Preview</span><span class="panel-head-actions"><button type="button" class="btn-panel-collapse" title="Collapse to title bar">−</button><button type="button" class="btn-panel-fs" title="Fullscreen (Esc)">⛶</button></span></h2>
         <div class="panel-body">
           <p id="doc-hint">Select a file in the sidebar or on the map.</p>
           <pre id="doc-preview"></pre>
@@ -111,6 +114,6 @@
       </section>
     </div>
   </div>
-  <script src="vision.js?v=57"></script>
+  <script src="vision.js?v=58"></script>
 </body>
 </html>

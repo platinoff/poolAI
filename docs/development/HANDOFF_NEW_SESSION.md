@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-15 (PH-S191 ✅ · §5.12 **9** відкритих PH-S192…S200 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
+**Оновлено:** 2026-06-15 (PH-S192 ✅ · §5.12 **8** відкритих PH-S193…S200 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -146,11 +146,10 @@
 **PH-S183 ✅ (code):** `galaxy_locality.rs` — `galaxy_shard_local_hit_ratio` gauge on `rank_workers_by_locality` top worker; `/metrics` via `refresh_galaxy_locality_gauges`; `tests/galaxy_shard_local_hit_ratio_integration.rs`; `cargo test-ci`.
 **PH-S184 ✅ (code):** `galaxy_prefetch_metrics.rs` — `galaxy_prefetch_bytes_total` counter on `plan_prefetch`; `/metrics` via `refresh_galaxy_prefetch_gauges`; extended `tests/galaxy_prefetch_metrics_integration.rs`; `cargo test-ci`.
 **PH-S188 ✅ (vision):** independent map layer/type filters; LAYERS/TYPES All/None; 3D stack decoupled; rev **125**.
-**PH-S191 ✅ (vision):** `poolai-vision-sync` — Rust parse FM §5.12 → `manifest.sprint_queue`; **Sprint queue** panel; collapse grid auto-fill (4-col); map-hint bottom; link labels declutter; rev **129** · UI **v57**.
-**PH-S190 ✅ (vision):** `vision.js` / `vision.css` / `index.html` — Layers/Types **dropdown** filters; panel **−** collapse → title strip; diagram-row auto-fill; `localStorage`; rev **127**.
-**PH-S189 ✅ (vision):** tri-mode **Eco→FX→Ms**; Ms 1-hop hover trace; rev **126**.
-**Vision ✅:** next **PH-S192** · **9** відкритих (S192…S200) · rev **129**.
-**Черга:** §5.12 **9** відкритих — **PH-S192** (наступний) … **PH-S200**. Vision + code-first S192…S200 · baseline **92.78%** · hold **95%** · spirit **96%**.
+**PH-S192 ✅ (vision):** `map-overview` LOD (hub nodes/edges/labels at low zoom); **minimap** inset (viewport rect, click-to-pan); collapsed panel `data-short` titles; sprint-queue layout; rev **130** · UI **v58**.
+**PH-S191 ✅ (vision):** `poolai-vision-sync` — Rust parse FM §5.12 → `manifest.sprint_queue`; **Sprint queue** panel; rev **129** · UI **v57**.
+**Vision ✅:** next **PH-S193** · **8** відкритих (S193…S200) · rev **130**.
+**Черга:** §5.12 **8** відкритих — **PH-S193** (наступний) … **PH-S200**. Vision + code-first S193…S200 · baseline **92.78%** · hold **95%** · spirit **96%**.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

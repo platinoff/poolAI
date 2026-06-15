@@ -30,6 +30,8 @@
   /** Leaf labels (auto-synced / dense map) appear above this zoom. */
   const LABEL_ZOOM_LEAF = 1.55;
   const LABEL_ZOOM_NORMAL = 1.15;
+  /** Below this scale: overview LOD (hub nodes/edges, hub-only labels). PH-S192 */
+  const MAP_OVERVIEW_ZOOM = 0.98;
   const MAP_DENSE_NODE_THRESHOLD = 80;
   const CONSTELLATION_HUB_IDS = new Set([
     "galaxy_grid",
@@ -107,6 +109,7 @@
   const PANEL_COLLAPSED_W = "40px";
   let openFilterDrop = null;
   let mapNodesBound = false;
+  let minimapBound = false;
   /** Live git HEAD from __watch (falls back to manifest.git_head). */
   let headerGitHead = null;
 
@@ -494,7 +497,26 @@
     return CLUSTER_COLLAPSE_MIN;
   }
 
+  function isMapOverviewMode() {
+    const dense =
+      manifest && manifest.nodes.length >= MAP_DENSE_NODE_THRESHOLD;
+    const threshold = dense ? 1.05 : MAP_OVERVIEW_ZOOM;
+    return mapView.scale <= threshold;
+  }
+
+  function isMapOverviewHub(n, pos) {
+    if (!n) return false;
+    if (n.id === "galaxy_grid") return true;
+    if (CONSTELLATION_HUB_IDS.has(n.id)) return true;
+    if (pos && pos.clusterHub) return true;
+    if (nodeDegree(n.id) >= 5) return true;
+    return nodeVisualWeight(n) >= 0.82;
+  }
+
   function shouldShowNodeLabel(n, pos) {
+    if (isMapOverviewMode()) {
+      return isMapOverviewHub(n, pos);
+    }
     if (pos && pos.clusterHub) return true;
     if (CONSTELLATION_HUB_IDS.has(n.id)) return true;
     if (nodeDegree(n.id) >= 4) return true;
@@ -589,6 +611,91 @@
     if (!isLowGpuMode() || mapView.scale >= LABEL_ZOOM_NORMAL) {
       declutterNodeLabels(svg);
     }
+    updateMapOverviewLod();
+  }
+
+  function updateMapOverviewLod() {
+    const svg = document.getElementById("map-svg");
+    const wrap = svg && svg.closest(".map-wrap");
+    if (!svg) return;
+    const overview = isMapOverviewMode();
+    svg.classList.toggle("map-overview", overview);
+    if (wrap) wrap.classList.toggle("map-overview", overview);
+    if (!manifest) return;
+    document.querySelectorAll("#map-svg .node").forEach((el) => {
+      const n = nodeById(el.dataset.id);
+      const pos = nodePositions.get(el.dataset.id);
+      el.classList.toggle("overview-hidden", overview && !isMapOverviewHub(n, pos));
+    });
+    document.querySelectorAll("#map-svg .cluster-label").forEach((el) => {
+      el.classList.toggle("overview-hidden", overview);
+    });
+    document.querySelectorAll("#map-svg .edge").forEach((el) => {
+      const from = nodeById(el.dataset.from);
+      const to = nodeById(el.dataset.to);
+      const pf = nodePositions.get(el.dataset.from);
+      const pt = nodePositions.get(el.dataset.to);
+      const hubEdge = isMapOverviewHub(from, pf) && isMapOverviewHub(to, pt);
+      el.classList.toggle("overview-hidden", overview && !hubEdge);
+    });
+    updateMinimapViewport();
+  }
+
+  function updateMinimapViewport() {
+    const vp = document.getElementById("minimap-viewport");
+    if (!vp) return;
+    const s = mapView.scale;
+    vp.setAttribute("x", String(-mapView.tx / s));
+    vp.setAttribute("y", String(-mapView.ty / s));
+    vp.setAttribute("width", String(MAP_W / s));
+    vp.setAttribute("height", String(MAP_H / s));
+  }
+
+  function renderMinimap() {
+    const mini = document.getElementById("map-minimap-svg");
+    if (!mini || !manifest) return;
+    const ns = "http://www.w3.org/2000/svg";
+    while (mini.firstChild) mini.removeChild(mini.firstChild);
+    mini.setAttribute("viewBox", "0 0 " + MAP_W + " " + MAP_H);
+
+    const dense = manifest.nodes.length >= MAP_DENSE_NODE_THRESHOLD;
+    const nodesG = document.createElementNS(ns, "g");
+    nodesG.setAttribute("class", "minimap-nodes");
+    manifest.nodes.forEach((n) => {
+      const pos = nodePositions.get(n.id);
+      if (!pos || pos.collapsedHidden) return;
+      const hub = isMapOverviewHub(n, pos);
+      if (dense && !hub) return;
+      const dot = document.createElementNS(ns, "circle");
+      dot.setAttribute("cx", String(pos.x));
+      dot.setAttribute("cy", String(pos.y));
+      dot.setAttribute("r", hub ? "3" : "1.6");
+      dot.setAttribute("fill", LAYER_COLORS[n.layer] || "#666");
+      dot.dataset.id = n.id;
+      nodesG.appendChild(dot);
+    });
+    mini.appendChild(nodesG);
+
+    const vp = document.createElementNS(ns, "rect");
+    vp.setAttribute("id", "minimap-viewport");
+    vp.setAttribute("class", "minimap-viewport");
+    vp.setAttribute("fill", "none");
+    mini.appendChild(vp);
+    updateMinimapViewport();
+    bindMinimap(mini);
+  }
+
+  function bindMinimap(svg) {
+    if (minimapBound) return;
+    minimapBound = true;
+    svg.addEventListener("click", (ev) => {
+      const rect = svg.getBoundingClientRect();
+      const mx = ((ev.clientX - rect.left) / rect.width) * MAP_W;
+      const my = ((ev.clientY - rect.top) / rect.height) * MAP_H;
+      mapView.tx = MAP_W / 2 - mx * mapView.scale;
+      mapView.ty = MAP_H / 2 - my * mapView.scale;
+      applyMapTransform();
+    });
   }
 
   function applyMapTransform() {
@@ -605,6 +712,7 @@
         ")"
     );
     scheduleMapLabelZoom();
+    updateMinimapViewport();
   }
 
   function scheduleMapLabelZoom() {
@@ -1387,6 +1495,15 @@
           ? "Expand " + (panel.querySelector("h2 > span")?.textContent || id)
           : "Collapse to title bar";
       });
+      const titleSpan = panel.querySelector("h2 > span[data-short]");
+      if (titleSpan) {
+        if (!titleSpan.dataset.fullTitle) {
+          titleSpan.dataset.fullTitle = titleSpan.textContent;
+        }
+        titleSpan.textContent = collapsed
+          ? titleSpan.dataset.short
+          : titleSpan.dataset.fullTitle;
+      }
     });
 
     const row = document.querySelector(".diagram-row");
@@ -1907,6 +2024,7 @@
     applyMapTransform();
     bindMapNavigation(svg);
     bindMapNodeEvents(svg);
+    renderMinimap();
     updateMapSelection();
     updateMapLayerFocus();
   }

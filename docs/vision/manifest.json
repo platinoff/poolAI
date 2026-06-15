@@ -1716,7 +1716,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "76f6dd3d",
-  "last_sprint_closed": "PH-S191",
+  "last_sprint_closed": "PH-S192",
   "layers": [
     {
       "id": "L0",
@@ -1749,7 +1749,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S192",
+  "next_sprint": "PH-S193",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7429,7 +7429,7 @@
       ]
     }
   ],
-  "revision": 129,
+  "revision": 130,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -8569,9 +8569,9 @@
       "acceptance": "map-overview` при low zoom; hub-only labels; viewport inset minimap; rev++",
       "deps": "PH-S115 map zoom",
       "id": "PH-S192",
-      "open": true,
+      "open": false,
       "row": 127,
-      "status": "open",
+      "status": "closed",
       "title": "Vision overview LOD + minimap (docs/vision)"
     },
     {
@@ -8647,7 +8647,7 @@
       "title": "Cursor post-push PH-S* hook (ops)"
     }
   ],
-  "sprint_queue_open_count": 9,
+  "sprint_queue_open_count": 8,
   "updated_at": "2026-06-15",
-  "vision_ui_rev": 57
+  "vision_ui_rev": 58
 }

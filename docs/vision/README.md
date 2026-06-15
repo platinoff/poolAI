@@ -113,10 +113,10 @@ http://127.0.0.1:8765/docs/vision/index.html
 | **PH-S188** ✅ | Map filters — independent layer/type toggles; **LAYERS**/**TYPES** All/None; decouple 3D stack ↔ chips | `vision.js`, `vision.css`, `index.html` |
 | **PH-S190** ✅ | Filter **dropdowns** + panel **−** collapse strip | `vision.js`, `vision.css`, `index.html` |
 | **PH-S191** ✅ | Sprint queue panel (Rust parse FM §5.12) | `poolai-vision-sync`, `manifest.json`, `vision.js` |
-| **PH-S192** | Overview LOD + minimap | `vision.js`, `vision.css` |
+| **PH-S192** ✅ | Overview LOD + minimap | `vision.js`, `vision.css`, `index.html` |
 | **PH-S199** | `feed.json` RSS ticker | `docs/vision/` |
 | **PH-S200** | Cursor post-push hook | `.cursor/hooks` |
 
-Канон черги: [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 · наступний спринт **PH-S192** (vision overview LOD + minimap).
+Канон черги: [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 · наступний спринт **PH-S193** (dashboard wasm formatters).
 
-**Sprint queue (PH-S191):** `cargo run --bin poolai-vision-sync` парсить FM §5.12 → `manifest.sprint_queue`; панель **Sprint queue** у UI показує відкриті PH-S* (next підсвічено).
+**Overview LOD (PH-S192):** при low zoom (scale ≤1.05 на dense map) — hub-only nodes/labels; **minimap** inset (правий нижній кут, click-to-pan).
