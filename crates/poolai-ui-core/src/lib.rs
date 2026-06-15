@@ -13,4 +13,5 @@ pub mod modal;
 pub mod pricing;
 pub mod table;
 pub mod theme;
+pub mod updates_compat;
 pub mod validate;

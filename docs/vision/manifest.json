@@ -1722,7 +1722,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "76f6dd3d",
-  "last_sprint_closed": "PH-S196",
+  "last_sprint_closed": "PH-S197",
   "layers": [
     {
       "id": "L0",
@@ -1755,7 +1755,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S197",
+  "next_sprint": "PH-S198",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7449,7 +7449,7 @@
       "path": "tests/galaxy_fee_split_applied_integration.rs"
     }
   ],
-  "revision": 134,
+  "revision": 135,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -8634,9 +8634,9 @@
       "acceptance": "/ui/admin/updates-compat` → wasm labels; Playwright smoke",
       "deps": "PH-S151, PH-S93",
       "id": "PH-S197",
-      "open": true,
+      "open": false,
       "row": 132,
-      "status": "open",
+      "status": "closed",
       "title": "Admin updates-compat wasm wiring (code)"
     },
     {

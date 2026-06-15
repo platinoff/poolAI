@@ -1,4 +1,4 @@
-//! UI i18n subsets moved from `i18n_core.js` (PH-S154 admin jobs/grid; PH-S162 auth/dash shell).
+//! UI i18n subsets moved from `i18n_core.js` (PH-S154 admin jobs/grid; PH-S162 auth/dash shell; PH-S197 updates-compat).
 //!
 //! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154).
 //! Auth + dashboard shell: `window.__poolaiAuthDashI18nRust` on login, dashboard layout, admin layout (PH-S162).
@@ -168,6 +168,100 @@ pub const ADMIN_JOBS_GRID_UK: &[I18nRow<'_>] = &[
     ("admin.gridPricing.col.updated", "Оновлено"),
     ("admin.gridPricing.col.source", "Джерело"),
     ("admin.gridPricing.col.freshness", "Свіжість"),
+];
+
+/// English updates & compatibility admin keys (PH-S197; moved from `i18n_core.js`).
+pub const ADMIN_UPDATES_COMPAT_EN: &[I18nRow<'_>] = &[
+    ("admin.page.updatesCompat", "Updates & compatibility"),
+    ("admin.updatesCompat.section", "Updates & compatibility"),
+    (
+        "admin.updatesCompat.hint",
+        "Read-only Galaxy governance pointers. Policy prose lives in docs — not duplicated here.",
+    ),
+    ("admin.updatesCompat.protocolTitle", "Protocol version"),
+    (
+        "admin.updatesCompat.protocolHint",
+        "Coordinator wire baseline (PH-S65 protocol_compat). Workers send protocol_version on POST /api/v1/discovery/register-remote.",
+    ),
+    ("admin.updatesCompat.col.coordinator", "Coordinator protocol"),
+    ("admin.updatesCompat.col.build", "Coordinator build"),
+    ("admin.updatesCompat.col.env", "Env override"),
+    (
+        "admin.updatesCompat.col.negotiation",
+        "Default negotiation (no worker version)",
+    ),
+    (
+        "admin.updatesCompat.compatStatusHint",
+        "Registration may return compat_status with HTTP 403/426 when the worker is outside the matrix window.",
+    ),
+    ("admin.updatesCompat.verifyTitle", "Verify signed release"),
+    (
+        "admin.updatesCompat.verifyHint",
+        "Operator quickstart — poolai-verify-release (PH-S66/S85). See SECURITY_HARDENING for the full checklist.",
+    ),
+    ("admin.updatesCompat.link.security", "SECURITY_HARDENING.md"),
+    (
+        "admin.updatesCompat.link.verifyQuickstart",
+        "Verify-release quickstart (PH-S71)",
+    ),
+    ("admin.updatesCompat.link.manifest", "RELEASE_MANIFEST_SAMPLE.md"),
+    ("admin.updatesCompat.link.fixtures", "Dev fixtures README"),
+    ("admin.updatesCompat.matrixTitle", "Protocol compatibility matrix"),
+    (
+        "admin.updatesCompat.matrixHint",
+        "Canonical compat matrix and negotiation rules — Galaxy §9.3. Implementation: src/grid/protocol_compat.rs.",
+    ),
+    (
+        "admin.updatesCompat.link.matrix",
+        "Galaxy §9.3 compat matrix (docs)",
+    ),
+];
+
+/// Ukrainian updates & compatibility admin keys (PH-S197).
+pub const ADMIN_UPDATES_COMPAT_UK: &[I18nRow<'_>] = &[
+    ("admin.page.updatesCompat", "Оновлення та сумісність"),
+    ("admin.updatesCompat.section", "Оновлення та сумісність"),
+    (
+        "admin.updatesCompat.hint",
+        "Read-only вказівники Galaxy governance. Повна політика — у docs, без дублювання тут.",
+    ),
+    ("admin.updatesCompat.protocolTitle", "Версія протоколу"),
+    (
+        "admin.updatesCompat.protocolHint",
+        "Базовий wire coordinator (PH-S65 protocol_compat). Воркери надсилають protocol_version на POST /api/v1/discovery/register-remote.",
+    ),
+    ("admin.updatesCompat.col.coordinator", "Протокол coordinator"),
+    ("admin.updatesCompat.col.build", "Збірка coordinator"),
+    ("admin.updatesCompat.col.env", "Env override"),
+    (
+        "admin.updatesCompat.col.negotiation",
+        "Negotiation за замовчуванням (без версії воркера)",
+    ),
+    (
+        "admin.updatesCompat.compatStatusHint",
+        "Реєстрація може повернути compat_status з HTTP 403/426, якщо воркер поза вікном матриці.",
+    ),
+    ("admin.updatesCompat.verifyTitle", "Перевірка підписаного релізу"),
+    (
+        "admin.updatesCompat.verifyHint",
+        "Operator quickstart — poolai-verify-release (PH-S66/S85). Повний чекліст — SECURITY_HARDENING.",
+    ),
+    ("admin.updatesCompat.link.security", "SECURITY_HARDENING.md"),
+    (
+        "admin.updatesCompat.link.verifyQuickstart",
+        "Verify-release quickstart (PH-S71)",
+    ),
+    ("admin.updatesCompat.link.manifest", "RELEASE_MANIFEST_SAMPLE.md"),
+    ("admin.updatesCompat.link.fixtures", "Dev fixtures README"),
+    ("admin.updatesCompat.matrixTitle", "Матриця сумісності протоколу"),
+    (
+        "admin.updatesCompat.matrixHint",
+        "Канонічна матриця та правила negotiation — Galaxy §9.3. Код: src/grid/protocol_compat.rs.",
+    ),
+    (
+        "admin.updatesCompat.link.matrix",
+        "Galaxy §9.3 compat matrix (docs)",
+    ),
 ];
 
 /// English auth keys (login, OAuth, bootstrap banner, lang toggle).
@@ -390,9 +484,13 @@ fn rows_to_map(rows: &[I18nRow<'_>]) -> BTreeMap<String, String> {
 
 /// `{"en":{...},"uk":{...}}` patch object for `window.__poolaiAdminI18nRust`.
 pub fn admin_jobs_grid_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut en = rows_to_map(ADMIN_JOBS_GRID_EN);
+    merge_rows(&mut en, ADMIN_UPDATES_COMPAT_EN);
+    let mut uk = rows_to_map(ADMIN_JOBS_GRID_UK);
+    merge_rows(&mut uk, ADMIN_UPDATES_COMPAT_UK);
     let mut root = BTreeMap::new();
-    root.insert("en".into(), rows_to_map(ADMIN_JOBS_GRID_EN));
-    root.insert("uk".into(), rows_to_map(ADMIN_JOBS_GRID_UK));
+    root.insert("en".into(), en);
+    root.insert("uk".into(), uk);
     root
 }
 
@@ -465,9 +563,16 @@ mod tests {
     #[test]
     fn patch_has_matching_en_uk_key_counts() {
         assert_eq!(ADMIN_JOBS_GRID_EN.len(), ADMIN_JOBS_GRID_UK.len());
+        assert_eq!(ADMIN_UPDATES_COMPAT_EN.len(), ADMIN_UPDATES_COMPAT_UK.len());
         let patch = admin_jobs_grid_patch();
-        assert_eq!(patch["en"].len(), ADMIN_JOBS_GRID_EN.len());
-        assert_eq!(patch["uk"].len(), ADMIN_JOBS_GRID_UK.len());
+        assert_eq!(
+            patch["en"].len(),
+            ADMIN_JOBS_GRID_EN.len() + ADMIN_UPDATES_COMPAT_EN.len()
+        );
+        assert_eq!(
+            patch["uk"].len(),
+            ADMIN_JOBS_GRID_UK.len() + ADMIN_UPDATES_COMPAT_UK.len()
+        );
     }
 
     #[test]
@@ -476,6 +581,7 @@ mod tests {
         assert!(json.contains(r#""admin.jobs.leaseState.active""#));
         assert!(json.contains(r#""admin.gridPricing.col.price""#));
         assert!(json.contains(r#""admin.jobs.status.migrating""#));
+        assert!(json.contains(r#""admin.updatesCompat.section""#));
     }
 
     #[test]

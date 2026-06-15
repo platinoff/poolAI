@@ -17,6 +17,7 @@ use poolai_ui_core::table::{
     form_field_html, highlight_query_html, render_table_html, row_matches_query,
 };
 use poolai_ui_core::theme::normalize_theme;
+use poolai_ui_core::updates_compat::{compat_status_label, protocol_version_label};
 use serde_json::Value;
 use wasm_bindgen::prelude::*;
 
@@ -74,6 +75,18 @@ pub fn lease_state_label_wasm(expires_at: &str, now_rfc3339: &str) -> String {
     let now = parse_rfc3339_utc(now_rfc3339).unwrap_or_else(fallback_now_utc);
     let state = lease_state(empty_as_none(expires_at), now);
     state.as_str().to_string()
+}
+
+/// Updates & compatibility: human label for `compat_status` wire value.
+#[wasm_bindgen(js_name = compatStatusLabel)]
+pub fn compat_status_label_wasm(status: &str) -> String {
+    compat_status_label(status).to_string()
+}
+
+/// Updates & compatibility: normalize protocol version for admin display.
+#[wasm_bindgen(js_name = protocolVersionLabel)]
+pub fn protocol_version_label_wasm(raw: &str) -> String {
+    protocol_version_label(raw)
 }
 
 #[wasm_bindgen(js_name = escapeHtml)]

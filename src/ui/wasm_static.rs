@@ -15,7 +15,8 @@ use crate::core::state::ApiContext;
 /// Shared ES module bootstrap for `poolai-ui-wasm` (PH-S152/S153/S155/S193).
 pub const POOLAI_UI_WASM_MODULE: &str = r#"
 import init, {
-  formatUsdMicro, formatUnixSecs, leaseStateLabel, poolaiUiWasmVersion,
+  formatUsdMicro, formatUnixSecs, leaseStateLabel, compatStatusLabel, protocolVersionLabel,
+  poolaiUiWasmVersion,
   escapeHtml, escapeRegex, formatIsoDatetime, formatLocaleTimeHms,
   apiErrorMessageFromBody, apiErrorDetailFromBody, formatFetchError,
   emptyStateHtml, renderTableHtml, formFieldHtml, buildTableCsv, buildTableJson,
@@ -26,7 +27,7 @@ import init, {
 } from '/ui/wasm/poolai_ui_wasm.js';
 window.poolaiUiWasm = {
   ready: false, failed: false,
-  formatUsdMicro, formatUnixSecs, leaseStateLabel,
+  formatUsdMicro, formatUnixSecs, leaseStateLabel, compatStatusLabel, protocolVersionLabel,
   escapeHtml, escapeRegex, formatIsoDatetime, formatLocaleTimeHms,
   apiErrorMessageFromBody, apiErrorDetailFromBody, formatFetchError,
   emptyStateHtml, renderTableHtml, formFieldHtml, buildTableCsv, buildTableJson,
