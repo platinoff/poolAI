@@ -1716,7 +1716,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "76f6dd3d",
-  "last_sprint_closed": "PH-S193",
+  "last_sprint_closed": "PH-S194",
   "layers": [
     {
       "id": "L0",
@@ -1749,7 +1749,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S194",
+  "next_sprint": "PH-S195",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7429,7 +7429,7 @@
       ]
     }
   ],
-  "revision": 131,
+  "revision": 132,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -8587,9 +8587,9 @@
       "acceptance": "galaxy_fee_split_applied_total` on grid result path; unit tests",
       "deps": "PH-S58, Galaxy §4.1",
       "id": "PH-S194",
-      "open": true,
+      "open": false,
       "row": 129,
-      "status": "open",
+      "status": "closed",
       "title": "Galaxy fee split result counter stub (code)"
     },
     {
@@ -8647,7 +8647,7 @@
       "title": "Cursor post-push PH-S* hook (ops)"
     }
   ],
-  "sprint_queue_open_count": 7,
+  "sprint_queue_open_count": 6,
   "updated_at": "2026-06-15",
   "vision_ui_rev": 58
 }

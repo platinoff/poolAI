@@ -106,7 +106,8 @@
   let activeTreeFileEl = null;
   let collapsedPanels = new Set();
   const DIAGRAM_PANELS = ["layers", "queue", "map", "links"];
-  const PANEL_COLLAPSED_W = "40px";
+  const ALL_PANELS = [...DIAGRAM_PANELS, "preview"];
+  const panelAnchors = new Map();
   let openFilterDrop = null;
   let mapNodesBound = false;
   let minimapBound = false;
@@ -1484,16 +1485,64 @@
     });
   }
 
+  function rememberPanelAnchor(panel) {
+    const id = panel.dataset.panel;
+    if (!id || panelAnchors.has(id)) return;
+    const dock = document.getElementById("panel-dock");
+    if (dock && panel.parentElement === dock) return;
+    panelAnchors.set(id, { parent: panel.parentElement });
+  }
+
+  function restorePanelFromDock(panel) {
+    const id = panel.dataset.panel;
+    const anchor = panelAnchors.get(id);
+    if (!anchor || !anchor.parent) return;
+    if (panel.parentElement === anchor.parent) return;
+
+    if (id === "preview") {
+      const row = document.querySelector(".diagram-row");
+      const after = row ? row.nextElementSibling : null;
+      if (after !== panel) anchor.parent.insertBefore(panel, after);
+      return;
+    }
+
+    const parent = anchor.parent;
+    const myIdx = DIAGRAM_PANELS.indexOf(id);
+    let insertBefore = null;
+    for (let i = myIdx + 1; i < DIAGRAM_PANELS.length; i++) {
+      const sib = parent.querySelector('.panel[data-panel="' + DIAGRAM_PANELS[i] + '"]');
+      if (sib) {
+        insertBefore = sib;
+        break;
+      }
+    }
+    parent.insertBefore(panel, insertBefore);
+  }
+
+  function columnSpecForPanel(id, expanded) {
+    if (expanded.length === 1) return "minmax(0, 1fr)";
+    if (id === "map") return "minmax(0, 2.2fr)";
+    if (id === "queue") return "minmax(120px, 18%)";
+    if (id === "layers") return "minmax(100px, 16%)";
+    return "minmax(130px, 20%)";
+  }
+
   function syncPanelCollapseLayout() {
-    document.querySelectorAll(".panel[data-panel]").forEach((panel) => {
-      const id = panel.dataset.panel;
+    const dock = document.getElementById("panel-dock");
+    const row = document.querySelector(".diagram-row");
+    const mainCol = document.querySelector(".main-col");
+
+    ALL_PANELS.forEach((id) => {
+      const panel = document.querySelector('.panel[data-panel="' + id + '"]');
+      if (!panel) return;
       const collapsed = collapsedPanels.has(id);
       panel.classList.toggle("panel-collapsed", collapsed);
+      panel.classList.toggle("panel-docked", collapsed);
       panel.querySelectorAll(".btn-panel-collapse").forEach((btn) => {
         btn.textContent = collapsed ? "+" : "−";
         btn.title = collapsed
-          ? "Expand " + (panel.querySelector("h2 > span")?.textContent || id)
-          : "Collapse to title bar";
+          ? "Restore " + (panel.querySelector("h2 > span")?.textContent || id)
+          : "Collapse to dock bar";
       });
       const titleSpan = panel.querySelector("h2 > span[data-short]");
       if (titleSpan) {
@@ -1504,25 +1553,32 @@
           ? titleSpan.dataset.short
           : titleSpan.dataset.fullTitle;
       }
+
+      if (collapsed && dock) {
+        rememberPanelAnchor(panel);
+        if (panel.parentElement !== dock) dock.appendChild(panel);
+      } else {
+        restorePanelFromDock(panel);
+      }
     });
 
-    const row = document.querySelector(".diagram-row");
-    if (row) {
-      const expanded = DIAGRAM_PANELS.filter((id) => !collapsedPanels.has(id));
-      const specs = DIAGRAM_PANELS.map((id) => {
-        if (collapsedPanels.has(id)) return PANEL_COLLAPSED_W;
-        if (expanded.length === 1 && expanded[0] === id) return "minmax(0, 1fr)";
-        if (id === "map") return "minmax(0, 2.2fr)";
-        if (id === "queue") return "minmax(120px, 18%)";
-        if (id === "layers") return "minmax(100px, 16%)";
-        return "minmax(130px, 20%)";
-      });
-      row.style.gridTemplateColumns = specs.join(" ");
+    if (dock) {
+      dock.hidden = dock.childElementCount === 0;
+    }
+    if (mainCol) {
+      mainCol.classList.toggle("has-panel-dock", dock && !dock.hidden);
+      mainCol.classList.toggle("preview-collapsed", collapsedPanels.has("preview"));
     }
 
-    const mainCol = document.querySelector(".main-col");
-    if (mainCol) {
-      mainCol.classList.toggle("preview-collapsed", collapsedPanels.has("preview"));
+    if (row) {
+      const expanded = DIAGRAM_PANELS.filter((id) => !collapsedPanels.has(id));
+      if (expanded.length) {
+        row.style.gridTemplateColumns = expanded
+          .map((id) => columnSpecForPanel(id, expanded))
+          .join(" ");
+      } else {
+        row.style.gridTemplateColumns = "1fr";
+      }
     }
 
     window.dispatchEvent(new Event("resize"));
@@ -1537,18 +1593,24 @@
   }
 
   function initPanelCollapse() {
+    document.querySelectorAll(".panel[data-panel]").forEach(rememberPanelAnchor);
     document.querySelectorAll(".btn-panel-collapse").forEach((btn) => {
       btn.addEventListener("click", (ev) => {
         ev.stopPropagation();
-        const panel =
-          btn.closest(".panel") ||
-          document.querySelector(
-            '.panel[data-panel="' + (btn.dataset.panel || "map") + '"]'
-          );
+        const panel = btn.closest(".panel");
         if (!panel || !panel.dataset.panel) return;
         togglePanelCollapse(panel.dataset.panel);
       });
     });
+    const dock = document.getElementById("panel-dock");
+    if (dock) {
+      dock.addEventListener("click", (ev) => {
+        const panel = ev.target.closest(".panel.panel-docked");
+        if (!panel || !panel.dataset.panel) return;
+        if (ev.target.closest(".btn-panel-collapse")) return;
+        togglePanelCollapse(panel.dataset.panel);
+      });
+    }
     syncPanelCollapseLayout();
   }
 

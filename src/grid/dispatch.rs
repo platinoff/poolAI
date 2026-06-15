@@ -12,6 +12,7 @@ use chrono::Utc;
 use serde::{Deserialize, Serialize};
 
 use crate::core::error::AppError;
+use crate::grid::galaxy_fee_split_metrics::evaluate_result_fee_split;
 use crate::grid::galaxy_locality::{
     observe_last_cross_region_egress_mb, DEFAULT_PREFETCH_CROSS_REGION_EGRESS_MB_PER_SHARD,
 };
@@ -377,6 +378,7 @@ fn ingest_result(
     let settlement_status = resolve_settlement_status(settlement_gate, verification_sample);
     evaluate_result_settlement_pending_verification(settlement_status);
     evaluate_result_settlement_cleared(settlement_status);
+    evaluate_result_fee_split(body.metrics.as_ref());
     evaluate_result_replay_pending(body.metrics.as_ref(), settlement_status);
     Ok(GridIngestOutcome {
         kind: GridIngestKind::Result {

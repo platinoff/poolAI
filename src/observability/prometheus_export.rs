@@ -17,6 +17,9 @@ use prometheus::{
 use std::sync::OnceLock;
 
 use crate::core::state::ApiContext;
+use crate::grid::galaxy_fee_split_metrics::{
+    fee_split_applied_total, METRIC_FEE_SPLIT_APPLIED_TOTAL,
+};
 use crate::grid::galaxy_locality::{
     last_cross_region_egress_mb, last_shard_local_hit_ratio_bps, METRIC_CROSS_REGION_EGRESS_MB,
     METRIC_SHARD_LOCAL_HIT_RATIO,
@@ -97,6 +100,7 @@ pub struct PoolAiPrometheus {
     galaxy_replay_pending: IntGauge,
     galaxy_settlement_pending_verification_total: IntGauge,
     galaxy_settlement_cleared_total: IntGauge,
+    galaxy_fee_split_applied_total: IntGauge,
     galaxy_replication_strict_total: IntGauge,
 }
 
@@ -441,6 +445,15 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_settlement_cleared_total.clone()))
         .expect("register galaxy_settlement_cleared_total");
 
+    let galaxy_fee_split_applied_total = IntGauge::with_opts(Opts::new(
+        METRIC_FEE_SPLIT_APPLIED_TOTAL,
+        "Galaxy fee split applied on grid result path (PH-S194)",
+    ))
+    .expect(METRIC_FEE_SPLIT_APPLIED_TOTAL);
+    registry
+        .register(Box::new(galaxy_fee_split_applied_total.clone()))
+        .expect("register galaxy_fee_split_applied_total");
+
     let galaxy_replication_strict_total = IntGauge::with_opts(Opts::new(
         METRIC_REPLICATION_STRICT_TOTAL,
         "Galaxy replication strict tier grid job ingests (PH-S179)",
@@ -494,6 +507,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_replay_pending,
         galaxy_settlement_pending_verification_total,
         galaxy_settlement_cleared_total,
+        galaxy_fee_split_applied_total,
         galaxy_replication_strict_total,
     }
 }
@@ -569,6 +583,8 @@ pub fn refresh_galaxy_verification_gauges() {
         .set(settlement_pending_verification_total() as i64);
     prom.galaxy_settlement_cleared_total
         .set(settlement_cleared_total() as i64);
+    prom.galaxy_fee_split_applied_total
+        .set(fee_split_applied_total() as i64);
 }
 
 /// Mirror in-process replication tier counters into Prometheus gauges (scrape snapshot).
@@ -1047,6 +1063,22 @@ mod tests {
         assert!(body.contains(METRIC_SETTLEMENT_CLEARED_TOTAL));
         assert!(body.contains(&format!("{METRIC_SETTLEMENT_CLEARED_TOTAL} 1")));
         reset_settlement_cleared_metrics_for_test();
+    }
+
+    #[test]
+    fn galaxy_fee_split_applied_gauge_reflects_counter_ph_s194() {
+        use crate::grid::galaxy_fee_split_metrics::{
+            record_fee_split_applied, reset_fee_split_metrics_for_test,
+        };
+
+        reset_fee_split_metrics_for_test();
+        init_prometheus();
+        record_fee_split_applied();
+        refresh_galaxy_verification_gauges();
+        let body = encode_metrics_text().expect("encode");
+        assert!(body.contains(METRIC_FEE_SPLIT_APPLIED_TOTAL));
+        assert!(body.contains(&format!("{METRIC_FEE_SPLIT_APPLIED_TOTAL} 1")));
+        reset_fee_split_metrics_for_test();
     }
 
     #[test]

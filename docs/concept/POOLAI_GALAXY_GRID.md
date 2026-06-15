@@ -845,6 +845,7 @@ elif verdict == rejected:
 | `galaxy_trust_score` | ✅ `/metrics` | PH-S182 |
 | `galaxy_verification_sample_scheduled_total` | ✅ `/metrics` | PH-S164, PH-S186 |
 | `galaxy_settlement_cleared_total` | ✅ `/metrics` | PH-S187 |
+| `galaxy_fee_split_applied_total` | ✅ `/metrics` | PH-S194 |
 
 **Логи / audit:** `verification_sample_enqueued`, `verification_mismatch`, `replay_verdict`, `replication_quorum_ok|fail`.
 

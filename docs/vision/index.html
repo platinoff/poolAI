@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PoolAI Galaxy Starwalker Vision</title>
-  <link rel="stylesheet" href="vision.css?v=58" />
+  <link rel="stylesheet" href="vision.css?v=61" />
 </head>
 <body>
   <div id="galaxy-backdrop" class="galaxy-backdrop" aria-hidden="true">
@@ -31,6 +31,7 @@
       <div class="sidebar-body" id="file-tree"></div>
     </aside>
     <div class="main-col">
+      <div class="panel-dock" id="panel-dock" hidden aria-label="Collapsed panels — click to restore"></div>
       <div class="diagram-row">
         <section class="panel" data-panel="layers" aria-label="Layer stack">
           <h2><span data-short="Ly">Layers</span><span class="panel-head-actions"><button type="button" class="btn-panel-collapse" title="Collapse to title bar">−</button><button type="button" class="btn-panel-fs" title="Fullscreen (Esc)">⛶</button></span></h2>
@@ -83,13 +84,14 @@
                 </div>
               </div>
             </div>
-            <div class="map-controls" aria-label="Map zoom and panel">
-              <button type="button" class="btn-panel-collapse map-panel-collapse" data-panel="map" title="Collapse Galaxy map">−</button>
-              <button type="button" id="map-zoom-in" title="Zoom in">+</button>
-              <button type="button" id="map-zoom-out" title="Zoom out">−</button>
-              <button type="button" id="map-zoom-reset" title="Reset view">⌂</button>
+            <div class="map-bottom-bar" aria-label="Map navigation">
+              <div class="map-controls" aria-label="Map zoom">
+                <button type="button" id="map-zoom-in" title="Zoom in">+</button>
+                <button type="button" id="map-zoom-out" title="Zoom out">−</button>
+                <button type="button" id="map-zoom-reset" title="Reset view">⌂</button>
+              </div>
+              <span class="map-hint">Eco→FX→Ms · Layers/Types All/None · Shift+layer solo · Esc reset</span>
             </div>
-            <span class="map-hint">Eco→FX→Ms · Layers/Types All/None · Shift+layer solo · Esc reset</span>
             <aside class="map-minimap" id="map-minimap" aria-label="Map minimap — click to pan">
               <svg id="map-minimap-svg" viewBox="0 0 900 580" role="img" aria-hidden="true"></svg>
             </aside>
@@ -114,6 +116,6 @@
       </section>
     </div>
   </div>
-  <script src="vision.js?v=58"></script>
+  <script src="vision.js?v=61"></script>
 </body>
 </html>

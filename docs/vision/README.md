@@ -115,9 +115,10 @@ http://127.0.0.1:8765/docs/vision/index.html
 | **PH-S191** ✅ | Sprint queue panel (Rust parse FM §5.12) | `poolai-vision-sync`, `manifest.json`, `vision.js` |
 | **PH-S192** ✅ | Overview LOD + minimap | `vision.js`, `vision.css`, `index.html` |
 | **PH-S193** ✅ | Dashboard wasm formatters | `poolai-ui-core`, `poolai-ui-wasm`, `src/ui/mod.rs` |
+| **PH-S194** ✅ (vision UX rev 132) | Panel dock bar + map bottom bar | `vision.js`, `vision.css`, `index.html` v61 |
 | **PH-S199** | `feed.json` RSS ticker | `docs/vision/` |
 | **PH-S200** | Cursor post-push hook | `.cursor/hooks` |
 
-Канон черги: [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 · наступний спринт **PH-S194** (Galaxy fee split counter stub).
+Канон черги: [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 · наступний спринт **PH-S195** (seed_inventory GET).
 
 **Overview LOD (PH-S192):** при low zoom (scale ≤1.05 на dense map) — hub-only nodes/labels; **minimap** inset (правий нижній кут, click-to-pan).
