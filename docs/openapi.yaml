@@ -716,6 +716,23 @@ paths:
                   code: pricing_unavailable
                   message: grid pricing unavailable; configure POOLAI_GALAXY_PRICING_FALLBACK_JSON
 
+  /grid/seed-inventory:
+    get:
+      tags:
+        - Grid
+      summary: List coordinator seed inventory snapshot
+      description: |
+        Read-only stub listing worker `seed_inventory` rows for Galaxy locality / prefetch discovery (§5.5).
+        Coordinator-side snapshot; no live worker poll wire in PH-S195.
+      operationId: getGridSeedInventory
+      responses:
+        '200':
+          description: Seed inventory snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GridSeedInventoryResponse'
+
   /discovery/grid/envelope:
     post:
       tags:
@@ -6046,6 +6063,68 @@ components:
         l1_cache:
           $ref: '#/components/schemas/GridPricingCacheMetadata'
           description: Present when source is cache; omitted for oracle/L2 paths.
+
+    SeedInventoryHotTier:
+      type: object
+      properties:
+        ram_bytes_used:
+          type: integer
+          format: int64
+          minimum: 0
+        vram_bytes_used:
+          type: integer
+          format: int64
+          minimum: 0
+        profiles:
+          type: array
+          items:
+            type: string
+
+    SeedInventoryEntry:
+      type: object
+      properties:
+        shard_ids:
+          type: array
+          items:
+            type: string
+        hot_tier:
+          $ref: '#/components/schemas/SeedInventoryHotTier'
+        local_replica_regions:
+          type: array
+          items:
+            type: string
+        last_inventory_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    SeedInventoryPeerSnapshot:
+      type: object
+      required:
+        - peer_id
+        - seed_inventory
+      properties:
+        peer_id:
+          type: string
+        seed_inventory:
+          $ref: '#/components/schemas/SeedInventoryEntry'
+
+    GridSeedInventoryResponse:
+      type: object
+      required:
+        - ok
+        - entries
+        - generated_at
+      properties:
+        ok:
+          type: boolean
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/SeedInventoryPeerSnapshot'
+        generated_at:
+          type: string
+          format: date-time
 
     MemoryShardRef:
       type: object

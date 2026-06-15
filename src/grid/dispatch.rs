@@ -75,6 +75,45 @@ pub struct SeedInventoryHotTier {
     pub profiles: Vec<String>,
 }
 
+/// One worker peer row in coordinator seed inventory read model (PH-S195).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SeedInventoryPeerSnapshot {
+    pub peer_id: String,
+    pub seed_inventory: SeedInventoryEntry,
+}
+
+/// Read-only coordinator stub inventory for discovery / prefetch planning (Galaxy §5.5).
+pub fn coordinator_seed_inventory_snapshot() -> Vec<SeedInventoryPeerSnapshot> {
+    vec![
+        SeedInventoryPeerSnapshot {
+            peer_id: "srv1-worker-a".into(),
+            seed_inventory: SeedInventoryEntry {
+                shard_ids: vec!["w:emb-1".into(), "w:ckpt-7".into()],
+                hot_tier: SeedInventoryHotTier {
+                    ram_bytes_used: 3_221_225_472,
+                    vram_bytes_used: 0,
+                    profiles: vec!["inference:text".into()],
+                },
+                local_replica_regions: vec!["eu-west".into()],
+                last_inventory_at: Some("2026-05-27T10:00:00Z".into()),
+            },
+        },
+        SeedInventoryPeerSnapshot {
+            peer_id: "srv2-worker-b".into(),
+            seed_inventory: SeedInventoryEntry {
+                shard_ids: vec!["w:ckpt-7".into()],
+                hot_tier: SeedInventoryHotTier {
+                    ram_bytes_used: 1_073_741_824,
+                    vram_bytes_used: 2_147_483_648,
+                    profiles: vec!["inference:text".into(), "inference:gpu".into()],
+                },
+                local_replica_regions: vec!["us-east".into()],
+                last_inventory_at: Some("2026-05-27T10:05:00Z".into()),
+            },
+        },
+    ]
+}
+
 /// Prefetch destination tier (concept ?5.5).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -731,6 +770,17 @@ mod tests {
         );
         let shard = memory.get("w:1").expect("get").expect("row");
         assert_eq!(shard.artifact_id, "art-1");
+    }
+
+    #[test]
+    fn coordinator_seed_inventory_snapshot_has_two_peers_ph_s195() {
+        let rows = coordinator_seed_inventory_snapshot();
+        assert_eq!(rows.len(), 2);
+        assert_eq!(rows[0].peer_id, "srv1-worker-a");
+        assert!(rows[0]
+            .seed_inventory
+            .shard_ids
+            .contains(&"w:emb-1".to_string()));
     }
 
     #[test]

@@ -21,7 +21,10 @@ use crate::grid::galaxy_pricing_oracle::{
     GalaxyPricingProviderCatalog, GalaxyPricingProviderEntry, GalaxyPricingQuote,
     MockProviderQuote, PRICING_UNAVAILABLE_ERROR_CODE,
 };
-use crate::grid::{ingest_envelope, GridEnvelope, GridIngestKind, GridIngestOutcome};
+use crate::grid::{
+    coordinator_seed_inventory_snapshot, ingest_envelope, GridEnvelope, GridIngestKind,
+    GridIngestOutcome,
+};
 use crate::job::{JobStatus, JobStore};
 use crate::memory::MemoryShardStore;
 use crate::network::api::common::HttpAppError;
@@ -54,6 +57,7 @@ pub fn create_grid_routes() -> Router<ApiContext> {
     Router::new()
         .route("/grid/envelope", post(ingest_grid_envelope))
         .route("/grid/pricing", get(get_grid_pricing_snapshot))
+        .route("/grid/seed-inventory", get(get_grid_seed_inventory))
 }
 
 pub async fn ingest_grid_envelope_handler(
@@ -68,6 +72,26 @@ async fn ingest_grid_envelope(
     envelope: Json<GridEnvelope>,
 ) -> Result<(StatusCode, Json<GridIngestResponse>), HttpAppError> {
     ingest_grid_envelope_handler(envelope).await
+}
+
+#[derive(Debug, Serialize)]
+struct GridSeedInventoryResponse {
+    ok: bool,
+    entries: Vec<crate::grid::SeedInventoryPeerSnapshot>,
+    generated_at: String,
+}
+
+async fn get_grid_seed_inventory(
+    State(_ctx): State<ApiContext>,
+) -> Result<(StatusCode, Json<GridSeedInventoryResponse>), HttpAppError> {
+    Ok((
+        StatusCode::OK,
+        Json(GridSeedInventoryResponse {
+            ok: true,
+            entries: coordinator_seed_inventory_snapshot(),
+            generated_at: chrono::Utc::now().to_rfc3339(),
+        }),
+    ))
 }
 
 #[derive(Debug, Deserialize)]

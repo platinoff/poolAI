@@ -1712,11 +1712,17 @@
       "from": "galaxy_grid",
       "kind": "implements",
       "to": "tests_galaxy_pricing_market_min_usd_micro_integration_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_fee_split_metrics_rs"
     }
   ],
   "galaxy_background": "vision2.png",
   "git_head": "76f6dd3d",
-  "last_sprint_closed": "PH-S194",
+  "last_sprint_closed": "PH-S195",
   "layers": [
     {
       "id": "L0",
@@ -1749,7 +1755,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S195",
+  "next_sprint": "PH-S196",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7427,9 +7433,23 @@
       "sprints": [
         "PH-S181"
       ]
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_fee_split_metrics_rs",
+      "label": "galaxy_fee_split_metrics.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_fee_split_metrics.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_fee_split_applied_integration_rs",
+      "label": "galaxy_fee_split_applied_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_fee_split_applied_integration.rs"
     }
   ],
-  "revision": 132,
+  "revision": 133,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -8596,9 +8616,9 @@
       "acceptance": "read-only `GET /api/v1/grid/seed-inventory`; OpenAPI; integration test",
       "deps": "PH-S129, Galaxy §5.5",
       "id": "PH-S195",
-      "open": true,
+      "open": false,
       "row": 130,
-      "status": "open",
+      "status": "closed",
       "title": "Galaxy seed_inventory GET stub (code)"
     },
     {
@@ -8647,7 +8667,7 @@
       "title": "Cursor post-push PH-S* hook (ops)"
     }
   ],
-  "sprint_queue_open_count": 6,
+  "sprint_queue_open_count": 5,
   "updated_at": "2026-06-15",
   "vision_ui_rev": 58
 }

@@ -687,7 +687,7 @@ if not all_required_ready and policy.strict_locality:
 | `strict_locality` | job не стартує без required hot/local |
 | `best_effort` (default) | старт з remote fetch + metric `hot_tier_hit_ratio` low |
 
-**Існуючий код (орієнтир):** `ingest_envelope` + `emit_seed_provided` (`src/grid/dispatch.rs`); memory HTTP `src/memory/` — PH-S61 політика; **PH-S129 stub:** `SeedInventoryEntry`, `plan_prefetch`, `noop_prefetch_hook` у `dispatch.rs`.
+**Існуючий код (орієнтир):** `ingest_envelope` + `emit_seed_provided` (`src/grid/dispatch.rs`); memory HTTP `src/memory/` — PH-S61 політика; **PH-S129 stub:** `SeedInventoryEntry`, `plan_prefetch`, `noop_prefetch_hook` у `dispatch.rs`; **PH-S195 ✅:** read-only `GET /api/v1/grid/seed-inventory` coordinator snapshot.
 
 ### 5.6 Ops notes (coordinator / worker)
 
