@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-15 (PH-S197 ✅ · §5.12 **3** відкритих PH-S198…S200 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-15 (PH-S198 ✅ · §5.12 **2** відкритих PH-S199…S200 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -397,15 +397,15 @@ FM-xxx (з таблиці нижче)
 | 130 | **PH-S195** | Galaxy seed_inventory GET stub (code) | PH-S129, Galaxy §5.5 | read-only `GET /api/v1/grid/seed-inventory`; OpenAPI; integration test | **✅** |
 | 131 | **PH-S196** | Stand smoke jobs lease renew (tests) | PH-S156, PH-S99 | `poolai-http-stand-smoke --lease-renew`; slim Playwright lease | **✅** |
 | 132 | **PH-S197** | Admin updates-compat wasm wiring (code) | PH-S151, PH-S93 | `/ui/admin/updates-compat` → wasm labels; Playwright smoke | **✅** |
-| 133 | **PH-S198** | Topology graph Rust labels slim (code) | PH-S157 | hub labels у `topology_graph.rs`; −LOC `topology_graph.js` | відкрито |
+| 133 | **PH-S198** | Topology graph Rust labels slim (code) | PH-S157 | hub labels у `topology_graph.rs`; −LOC `topology_graph.js` | **✅** |
 | 134 | **PH-S199** | Vision feed.json RSS ticker (docs/vision) | PH-S191 queue | `feed.json` + RSS ticker panel; rev++ | відкрито |
 | 135 | **PH-S200** | Cursor post-push PH-S* hook (ops) | VDT, `.cursor/hooks` | post-push notify after PH-S* close; docs sync pointer | відкрито |
 
-**Відкритих у §5.12:** **3** (PH-S198…S200). **Закрито смуга:** PH-S128…S197 ✅. Vision rev **135**.
+**Відкритих у §5.12:** **2** (PH-S199…S200). **Закрито смуга:** PH-S128…S198 ✅. Vision rev **136**.
 
-**Rust ratio:** формальна смуга **90–95%**; **hold 95%** — PH-S165 ✅; replenish **S198…S200** (vision + code-first).
+**Rust ratio:** формальна смуга **90–95%**; **hold 95%** — PH-S165 ✅; replenish **S199…S200** (vision + code-first).
 
-**Наступна сесія:** **PH-S198** · черга **3** відкритих (PH-S198…S200) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S199** · черга **2** відкритих (PH-S199…S200) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S169)
 
@@ -526,7 +526,7 @@ FM-xxx (з таблиці нижче)
 
 **Baseline:** rust_ratio **92.68%** → **hold 95%** · **stretch spirit 96%** ([`rust_ratio.json`](../development/rust_ratio.json), [`RUST_RATIO_STRATEGY_2026-06-13.md`](../development/RUST_RATIO_STRATEGY_2026-06-13.md)).
 
-**Наступна сесія:** **PH-S198** · черга **3** відкритих (PH-S198…S200) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S199** · черга **2** відкритих (PH-S199…S200) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

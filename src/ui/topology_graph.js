@@ -1,5 +1,6 @@
 /**
- * FM-037 / PH-S157 — topology SVG paint from Rust layout JSON (`GET /api/v1/topology/graph`).
+ * FM-037 / PH-S157 / PH-S198 — topology SVG paint from Rust layout JSON (`GET /api/v1/topology/graph`).
+ * Labels + anchor coords come from Rust (`label`, `label_x`, `label_y`, `is_hub`).
  */
 (function (global) {
   'use strict';
@@ -31,11 +32,16 @@
       return layout;
     }
 
+    const nodeById = Object.create(null);
+    layout.nodes.forEach(function (n) {
+      nodeById[n.id] = n;
+    });
+
     const gLinks = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     gLinks.setAttribute('class', 'topology-graph-links');
     (layout.links || []).forEach(function (link) {
-      const from = layout.nodes.find(function (n) { return n.id === link.from; });
-      const to = layout.nodes.find(function (n) { return n.id === link.to; });
+      const from = nodeById[link.from];
+      const to = nodeById[link.to];
       if (!from || !to) return;
       const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
       line.setAttribute('x1', String(from.x));
@@ -53,7 +59,7 @@
     gNodes.setAttribute('class', 'topology-graph-nodes');
     layout.nodes.forEach(function (n) {
       const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      g.setAttribute('class', 'topology-graph-node');
+      g.setAttribute('class', 'topology-graph-node' + (n.is_hub ? ' topology-graph-node--hub' : ''));
       g.style.cursor = 'pointer';
       const r = n.radius || 10;
       const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -64,12 +70,12 @@
       circle.setAttribute('stroke', 'var(--surface-secondary, #1e2329)');
       circle.setAttribute('stroke-width', '2');
       const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      label.setAttribute('x', String(n.x));
-      label.setAttribute('y', String(n.y + r + 14));
+      label.setAttribute('x', String(n.label_x));
+      label.setAttribute('y', String(n.label_y));
       label.setAttribute('text-anchor', 'middle');
       label.setAttribute('fill', 'var(--text, #e8e8e8)');
       label.setAttribute('font-size', '11');
-      label.textContent = n.label || n.id;
+      label.textContent = n.label;
       g.appendChild(circle);
       g.appendChild(label);
       if (typeof opts.onNodeClick === 'function') {

@@ -1,6 +1,7 @@
-//! FM-037 / PH-S157 — cluster topology graph layout (force layout + heatmap HTML).
+//! FM-037 / PH-S157 / PH-S198 — cluster topology graph layout (force layout + heatmap HTML).
 //!
 //! Parity with legacy `topology_graph.js` build/layout/color; browser JS only paints SVG from JSON.
+//! PH-S198: hub label text + label anchor coords computed in Rust.
 
 use crate::pool::topology::NodeResources;
 use poolai_ui_core::format::escape_html;
@@ -10,6 +11,8 @@ use std::collections::HashMap;
 const DEFAULT_WIDTH: u32 = 640;
 const DEFAULT_HEIGHT: u32 = 360;
 const DEFAULT_ITERATIONS: u32 = 80;
+const LABEL_OFFSET_Y: f64 = 14.0;
+const MAX_HUB_LABEL_LEN: usize = 14;
 
 #[derive(Debug, Clone, Serialize)]
 pub struct TopologyGraphNodeDto {
@@ -19,6 +22,9 @@ pub struct TopologyGraphNodeDto {
     pub y: f64,
     pub radius: f64,
     pub load: f32,
+    pub label_x: f64,
+    pub label_y: f64,
+    pub is_hub: bool,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -97,17 +103,26 @@ pub fn compute_topology_graph_layout(
         .fold(0.0, f64::max)
         .max(1.0);
 
+    let degrees = node_link_degrees(&sim_links, &sim_nodes);
+    let max_degree = degrees.values().copied().max().unwrap_or(0);
+
     let nodes = sim_nodes
         .iter()
         .map(|n| {
             let radius = 10.0 + f64::min(14.0, n.load as f64 * 18.0);
+            let degree = *degrees.get(&n.id).unwrap_or(&0);
+            let is_hub = max_degree >= 2 && degree == max_degree;
+            let label = topology_hub_label(&n.id, degree, max_degree);
             TopologyGraphNodeDto {
                 id: n.id.clone(),
-                label: n.label.clone(),
+                label,
                 x: n.x,
                 y: n.y,
                 radius,
                 load: n.load,
+                label_x: n.x,
+                label_y: n.y + radius + LABEL_OFFSET_Y,
+                is_hub,
             }
         })
         .collect();
@@ -187,6 +202,46 @@ fn build_graph(
     }
 
     (nodes, links)
+}
+
+/// Short display id for topology tables and graph labels (PH-S198).
+pub fn short_topology_node_id(node_id: &str) -> String {
+    let id = node_id.trim();
+    if id.is_empty() {
+        return "—".to_string();
+    }
+    let base = id
+        .rsplit(':')
+        .next()
+        .and_then(|s| s.rsplit('/').next())
+        .unwrap_or(id)
+        .trim();
+    let base = base.strip_prefix("node-").unwrap_or(base);
+    if base.len() <= MAX_HUB_LABEL_LEN {
+        base.to_string()
+    } else {
+        format!("{}…", &base[..MAX_HUB_LABEL_LEN.saturating_sub(1)])
+    }
+}
+
+/// Hub-aware SVG label: highest-degree nodes (degree ≥ 2) get a `hub·` prefix.
+pub fn topology_hub_label(node_id: &str, degree: usize, max_degree: usize) -> String {
+    let short = short_topology_node_id(node_id);
+    if max_degree >= 2 && degree == max_degree {
+        format!("hub·{short}")
+    } else {
+        short
+    }
+}
+
+fn node_link_degrees(links: &[SimLink], nodes: &[SimNode]) -> HashMap<String, usize> {
+    let mut degrees: HashMap<String, usize> =
+        nodes.iter().map(|n| (n.id.clone(), 0_usize)).collect();
+    for link in links {
+        *degrees.entry(link.from.clone()).or_insert(0) += 1;
+        *degrees.entry(link.to.clone()).or_insert(0) += 1;
+    }
+    degrees
 }
 
 fn layout_graph(
@@ -316,12 +371,18 @@ fn render_latency_heatmap_html(
     let mut html =
         String::from("<table class=\"admin-table topology-heatmap-table\"><thead><tr><th></th>");
     for id in &node_ids {
-        html.push_str(&format!("<th scope=\"col\">{}</th>", escape_html(id)));
+        html.push_str(&format!(
+            "<th scope=\"col\">{}</th>",
+            escape_html(&short_topology_node_id(id))
+        ));
     }
     html.push_str("</tr></thead><tbody>");
 
     for row in &node_ids {
-        html.push_str(&format!("<tr><th scope=\"row\">{}</th>", escape_html(row)));
+        html.push_str(&format!(
+            "<tr><th scope=\"row\">{}</th>",
+            escape_html(&short_topology_node_id(row))
+        ));
         for col in &node_ids {
             if row == col {
                 html.push_str("<td class=\"topo-heat-diagonal\">—</td>");
@@ -408,5 +469,36 @@ mod tests {
         let high = latency_color(99.0, 100.0);
         assert_ne!(low, high);
         assert!(high.contains("rgb("));
+    }
+
+    #[test]
+    fn short_topology_node_id_truncates_long_ids() {
+        assert_eq!(short_topology_node_id("node-a"), "a");
+        assert_eq!(
+            short_topology_node_id("cluster/coordinator-hub-east-1"),
+            "coordinator-h…"
+        );
+    }
+
+    #[test]
+    fn topology_hub_label_marks_max_degree_hub() {
+        assert_eq!(topology_hub_label("node-a", 2, 2), "hub·a");
+        assert_eq!(topology_hub_label("node-b", 1, 2), "b");
+    }
+
+    #[test]
+    fn layout_includes_rust_hub_label_coords() {
+        let nodes = sample_nodes();
+        let mut latency = HashMap::new();
+        latency.insert("node-a:node-b".to_string(), 12.5);
+        latency.insert("node-b:node-c".to_string(), 4.0);
+        latency.insert("node-a:node-c".to_string(), 8.0);
+
+        let layout =
+            compute_topology_graph_layout(&nodes, &latency, Some(640), Some(360), Some(40));
+        let hub = layout.nodes.iter().find(|n| n.is_hub).expect("hub node");
+        assert!(hub.label.starts_with("hub·"));
+        assert_eq!(hub.label_x, hub.x);
+        assert!((hub.label_y - (hub.y + hub.radius + LABEL_OFFSET_Y)).abs() < f64::EPSILON);
     }
 }

@@ -1722,7 +1722,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "76f6dd3d",
-  "last_sprint_closed": "PH-S197",
+  "last_sprint_closed": "PH-S198",
   "layers": [
     {
       "id": "L0",
@@ -1755,7 +1755,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S198",
+  "next_sprint": "PH-S199",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7449,7 +7449,7 @@
       "path": "tests/galaxy_fee_split_applied_integration.rs"
     }
   ],
-  "revision": 135,
+  "revision": 136,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -8643,9 +8643,9 @@
       "acceptance": "hub labels у `topology_graph.rs`; −LOC `topology_graph.js",
       "deps": "PH-S157",
       "id": "PH-S198",
-      "open": true,
+      "open": false,
       "row": 133,
-      "status": "open",
+      "status": "closed",
       "title": "Topology graph Rust labels slim (code)"
     },
     {

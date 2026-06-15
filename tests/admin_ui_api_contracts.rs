@@ -696,6 +696,11 @@ mod attached_managers {
             .and_then(|x| x.as_array())
             .expect("nodes array");
         assert_eq!(nodes.len(), 2);
+        let first = nodes.first().expect("node");
+        assert!(first.get("label").and_then(|x| x.as_str()).is_some());
+        assert!(first.get("label_x").and_then(|x| x.as_f64()).is_some());
+        assert!(first.get("label_y").and_then(|x| x.as_f64()).is_some());
+        assert!(first.get("is_hub").and_then(|x| x.as_bool()).is_some());
         let links = o
             .get("links")
             .and_then(|x| x.as_array())

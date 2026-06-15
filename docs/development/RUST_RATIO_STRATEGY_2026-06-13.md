@@ -85,7 +85,7 @@ flowchart TB
 | **E — gate** | PH-S150 ✅ | CI advisory якщо ratio <88%; target 93%; stretch 96% spirit | стабільно 90–95% |
 | **F — stretch 96%** | PH-S151…S159 ✅ | wasm wiring, slim JS/i18n/charts, Rust stand/e2e bins; CI warn **93%** | **→96% spirit** |
 
-**Черга §5.12 (3 відкритих):** PH-S198…S200 vision + code-first band; replenish після S200.
+**Черга §5.12 (2 відкритих):** PH-S199…S200 vision + code-first band; replenish після S200.
 
 ---
 
@@ -147,7 +147,7 @@ flowchart TB
 | 52 | **PH-S195** | Galaxy seed_inventory GET | §5.5 wire | **✅** |
 | 53 | **PH-S196** | Stand smoke lease renew | poolai-http-stand-smoke | **✅** |
 | 54 | **PH-S197** | updates-compat wasm | admin UI | **✅** |
-| 55 | **PH-S198** | Topology Rust labels slim | PH-S157 | відкрито |
+| 55 | **PH-S198** | Topology Rust labels slim | PH-S157 | **✅** |
 | 56 | **PH-S199** | Vision feed.json RSS | docs/vision | відкрито |
 | 57 | **PH-S200** | Cursor post-push hook | VDT ops | відкрито |
 
