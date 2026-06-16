@@ -86,12 +86,32 @@ pub fn admin_layout(
     body_html: &str,
     script_js: &str,
 ) -> Html<String> {
+    let i18n_patch = poolai_ui_core::i18n::admin_jobs_grid_patch_script();
     admin_layout_with_module_script(
         title_i18n_key,
         title_fallback,
         body_html,
         POOLAI_UI_WASM_MODULE,
         script_js,
+        &i18n_patch,
+    )
+}
+
+/// Jobs admin page layout — slim `admin.jobs.*` Rust i18n patch only (PH-S211).
+pub fn admin_layout_jobs(
+    title_i18n_key: &str,
+    title_fallback: &str,
+    body_html: &str,
+    script_js: &str,
+) -> Html<String> {
+    let i18n_patch = poolai_ui_core::i18n::admin_jobs_patch_script();
+    admin_layout_with_module_script(
+        title_i18n_key,
+        title_fallback,
+        body_html,
+        POOLAI_UI_WASM_MODULE,
+        script_js,
+        &i18n_patch,
     )
 }
 
@@ -102,6 +122,7 @@ pub fn admin_layout_with_module_script(
     body_html: &str,
     module_script: &str,
     script_js: &str,
+    i18n_patch_script: &str,
 ) -> Html<String> {
     let base_css = format!(
         "{}{}",
@@ -113,7 +134,7 @@ pub fn admin_layout_with_module_script(
     let common_js = include_str!("../admin_common.js");
     let modal_js = include_str!("../admin_modal_a11y.js");
     let charts_js = include_str!("../admin_charts.js");
-    let i18n_patch = poolai_ui_core::i18n::admin_jobs_grid_patch_script();
+    let i18n_patch = i18n_patch_script;
     let auth_dash_patch = poolai_ui_core::i18n::auth_dash_shell_patch_script();
     let theme_patch = poolai_ui_core::theme::admin_theme_patch_script();
     let modal_patch = poolai_ui_core::modal::admin_modal_patch_script();

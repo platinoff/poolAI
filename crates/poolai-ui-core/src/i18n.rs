@@ -1,6 +1,6 @@
-//! UI i18n subsets moved from `i18n_core.js` (PH-S154 admin jobs/grid; PH-S162 auth/dash shell; PH-S197 updates-compat; PH-S207 monitoring).
+//! UI i18n subsets moved from `i18n_core.js` (PH-S154 admin jobs/grid; PH-S162 auth/dash shell; PH-S197 updates-compat; PH-S207 monitoring; PH-S211 jobs-only patch).
 //!
-//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154).
+//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs page uses slim `admin_jobs_patch` (PH-S211).
 //! Auth + dashboard shell: `window.__poolaiAuthDashI18nRust` on login, dashboard layout, admin layout (PH-S162).
 
 use std::collections::BTreeMap;
@@ -8,8 +8,9 @@ use std::collections::BTreeMap;
 /// Single locale row: `(i18n key, translated value)`.
 pub type I18nRow<'a> = (&'a str, &'a str);
 
-/// English admin jobs + grid-pricing keys (subset moved from `i18n_core.js`).
-pub const ADMIN_JOBS_GRID_EN: &[I18nRow<'_>] = &[
+/// English admin jobs keys (subset moved from `i18n_core.js`; PH-S211).
+pub const ADMIN_JOBS_EN: &[I18nRow<'_>] = &[
+    ("admin.page.jobs", "Jobs"),
     ("admin.jobs.section", "Jobs"),
     ("admin.jobs.loading", "Loading jobs…"),
     ("admin.jobs.empty", "No jobs yet"),
@@ -68,6 +69,10 @@ pub const ADMIN_JOBS_GRID_EN: &[I18nRow<'_>] = &[
         "admin.jobs.tooltip.statusMigrating",
         "Galaxy re-migrate: worker handoff in progress (PH-S104).",
     ),
+];
+
+/// English grid-pricing keys (subset moved from `i18n_core.js`; PH-S211).
+pub const ADMIN_GRID_PRICING_EN: &[I18nRow<'_>] = &[
     ("admin.gridPricing.section", "Grid pricing"),
     (
         "admin.gridPricing.hint",
@@ -89,8 +94,9 @@ pub const ADMIN_JOBS_GRID_EN: &[I18nRow<'_>] = &[
     ("admin.gridPricing.col.freshness", "Freshness"),
 ];
 
-/// Ukrainian admin jobs + grid-pricing keys.
-pub const ADMIN_JOBS_GRID_UK: &[I18nRow<'_>] = &[
+/// Ukrainian admin jobs keys (PH-S211).
+pub const ADMIN_JOBS_UK: &[I18nRow<'_>] = &[
+    ("admin.page.jobs", "Задачі"),
     ("admin.jobs.section", "Задачі"),
     ("admin.jobs.loading", "Завантаження задач…"),
     ("admin.jobs.empty", "Задач ще немає"),
@@ -149,6 +155,10 @@ pub const ADMIN_JOBS_GRID_UK: &[I18nRow<'_>] = &[
         "admin.jobs.tooltip.statusMigrating",
         "Galaxy re-migrate: передача воркера в процесі (PH-S104).",
     ),
+];
+
+/// Ukrainian grid-pricing keys (PH-S211).
+pub const ADMIN_GRID_PRICING_UK: &[I18nRow<'_>] = &[
     ("admin.gridPricing.section", "Ціни Grid"),
     (
         "admin.gridPricing.hint",
@@ -678,12 +688,32 @@ fn rows_to_map(rows: &[I18nRow<'_>]) -> BTreeMap<String, String> {
         .collect()
 }
 
+/// `{"en":{...},"uk":{...}}` patch — jobs page only (PH-S211).
+pub fn admin_jobs_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_JOBS_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_JOBS_UK));
+    root
+}
+
+/// JSON literal for jobs-only admin patch.
+pub fn admin_jobs_patch_json() -> String {
+    serde_json::to_string(&admin_jobs_patch()).expect("admin jobs i18n patch serializes")
+}
+
+/// Inline script for jobs admin layout (PH-S211).
+pub fn admin_jobs_patch_script() -> String {
+    format!("window.__poolaiAdminI18nRust={};", admin_jobs_patch_json())
+}
+
 /// `{"en":{...},"uk":{...}}` patch object for `window.__poolaiAdminI18nRust`.
 pub fn admin_jobs_grid_patch() -> BTreeMap<String, BTreeMap<String, String>> {
-    let mut en = rows_to_map(ADMIN_JOBS_GRID_EN);
+    let mut en = rows_to_map(ADMIN_JOBS_EN);
+    merge_rows(&mut en, ADMIN_GRID_PRICING_EN);
     merge_rows(&mut en, ADMIN_UPDATES_COMPAT_EN);
     merge_rows(&mut en, ADMIN_MONITORING_EN);
-    let mut uk = rows_to_map(ADMIN_JOBS_GRID_UK);
+    let mut uk = rows_to_map(ADMIN_JOBS_UK);
+    merge_rows(&mut uk, ADMIN_GRID_PRICING_UK);
     merge_rows(&mut uk, ADMIN_UPDATES_COMPAT_UK);
     merge_rows(&mut uk, ADMIN_MONITORING_UK);
     let mut root = BTreeMap::new();
@@ -740,18 +770,32 @@ pub fn auth_dash_shell_patch_script() -> String {
 
 /// Lookup EN string by key (tests / server-side parity).
 pub fn t_en(key: &str) -> Option<&'static str> {
-    ADMIN_JOBS_GRID_EN
-        .iter()
-        .find(|(k, _)| *k == key)
-        .map(|(_, v)| *v)
+    for rows in [
+        ADMIN_JOBS_EN,
+        ADMIN_GRID_PRICING_EN,
+        ADMIN_UPDATES_COMPAT_EN,
+        ADMIN_MONITORING_EN,
+    ] {
+        if let Some((_, v)) = rows.iter().find(|(k, _)| *k == key) {
+            return Some(*v);
+        }
+    }
+    None
 }
 
 /// Lookup UK string by key (tests / server-side parity).
 pub fn t_uk(key: &str) -> Option<&'static str> {
-    ADMIN_JOBS_GRID_UK
-        .iter()
-        .find(|(k, _)| *k == key)
-        .map(|(_, v)| *v)
+    for rows in [
+        ADMIN_JOBS_UK,
+        ADMIN_GRID_PRICING_UK,
+        ADMIN_UPDATES_COMPAT_UK,
+        ADMIN_MONITORING_UK,
+    ] {
+        if let Some((_, v)) = rows.iter().find(|(k, _)| *k == key) {
+            return Some(*v);
+        }
+    }
+    None
 }
 
 #[cfg(test)]
@@ -760,18 +804,34 @@ mod tests {
 
     #[test]
     fn patch_has_matching_en_uk_key_counts() {
-        assert_eq!(ADMIN_JOBS_GRID_EN.len(), ADMIN_JOBS_GRID_UK.len());
+        assert_eq!(ADMIN_JOBS_EN.len(), ADMIN_JOBS_UK.len());
+        assert_eq!(ADMIN_GRID_PRICING_EN.len(), ADMIN_GRID_PRICING_UK.len());
         assert_eq!(ADMIN_UPDATES_COMPAT_EN.len(), ADMIN_UPDATES_COMPAT_UK.len());
         assert_eq!(ADMIN_MONITORING_EN.len(), ADMIN_MONITORING_UK.len());
         let patch = admin_jobs_grid_patch();
         assert_eq!(
             patch["en"].len(),
-            ADMIN_JOBS_GRID_EN.len() + ADMIN_UPDATES_COMPAT_EN.len() + ADMIN_MONITORING_EN.len()
+            ADMIN_JOBS_EN.len()
+                + ADMIN_GRID_PRICING_EN.len()
+                + ADMIN_UPDATES_COMPAT_EN.len()
+                + ADMIN_MONITORING_EN.len()
         );
         assert_eq!(
             patch["uk"].len(),
-            ADMIN_JOBS_GRID_UK.len() + ADMIN_UPDATES_COMPAT_UK.len() + ADMIN_MONITORING_UK.len()
+            ADMIN_JOBS_UK.len()
+                + ADMIN_GRID_PRICING_UK.len()
+                + ADMIN_UPDATES_COMPAT_UK.len()
+                + ADMIN_MONITORING_UK.len()
         );
+    }
+
+    #[test]
+    fn jobs_patch_json_jobs_only_ph_s211() {
+        let json = admin_jobs_patch_json();
+        assert!(json.contains(r#""admin.jobs.leaseState.active""#));
+        assert!(json.contains(r#""admin.page.jobs""#));
+        assert!(!json.contains(r#""admin.gridPricing.col.price""#));
+        assert!(!json.contains(r#""admin.mon.mlTitle""#));
     }
 
     #[test]

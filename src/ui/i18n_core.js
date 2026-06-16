@@ -171,7 +171,6 @@
       'admin.wrk.autoRestart': 'Auto Restart',
       'admin.wrk.resourceMon': 'Resource Monitoring',
 
-      'admin.page.jobs': 'Jobs',
       'admin.page.gridPricing': 'Grid pricing',
 
       'admin.lib.loading': 'Loading libraries…',
@@ -880,7 +879,6 @@
       'admin.wrk.autoRestart': 'Автоперезапуск',
       'admin.wrk.resourceMon': 'Моніторинг ресурсів',
 
-      'admin.page.jobs': 'Задачі',
       'admin.page.gridPricing': 'Ціни Grid',
 
       'admin.lib.loading': 'Завантаження бібліотек…',

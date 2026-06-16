@@ -3,8 +3,9 @@
 //! PH-S141: `migrating` status badge + i18n EN/UK.
 //! PH-S152: lease state badge via shared `poolai-ui-wasm` `leaseStateLabel`; thin JS fallback.
 //! PH-S154: EN/UK lease + table i18n in `poolai-ui-core::i18n` (injected via admin_layout).
+//! PH-S211: jobs page uses slim `admin_layout_jobs` + `admin_jobs_patch`.
 
-use crate::ui::admin::admin_layout;
+use crate::ui::admin::admin_layout_jobs;
 use axum::response::Html;
 
 /// Jobs management page (`/ui/admin/jobs`).
@@ -206,7 +207,7 @@ pub async fn admin_jobs() -> Html<String> {
     }
     "#;
 
-    admin_layout(
+    admin_layout_jobs(
         "admin.page.jobs",
         "Jobs",
         r#"
@@ -226,6 +227,16 @@ pub async fn admin_jobs() -> Html<String> {
         "#,
         script,
     )
+}
+
+#[tokio::test]
+async fn admin_jobs_page_slim_jobs_i18n_patch_ph_s211() {
+    let html = admin_jobs().await.0;
+    assert!(html.contains("window.__poolaiAdminI18nRust="));
+    assert!(html.contains(r#""admin.jobs.leaseState.active""#));
+    assert!(html.contains(r#""admin.page.jobs""#));
+    assert!(!html.contains(r#""admin.gridPricing.col.price""#));
+    assert!(!html.contains(r#""admin.mon.mlTitle""#));
 }
 
 #[tokio::test]
