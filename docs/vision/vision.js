@@ -660,6 +660,45 @@
     vp.setAttribute("y", String(-mapView.ty / s));
     vp.setAttribute("width", String(MAP_W / s));
     vp.setAttribute("height", String(MAP_H / s));
+    updateMinimapSelection();
+  }
+
+  function updateMinimapSelection() {
+    const mini = document.getElementById("map-minimap-svg");
+    if (!mini || !manifest) return;
+    const ring = document.getElementById("minimap-selection-ring");
+    if (!ring) return;
+
+    const dense = manifest.nodes.length >= MAP_DENSE_NODE_THRESHOLD;
+    if (
+      selectedId &&
+      dense &&
+      !mini.querySelector('.minimap-node[data-id="' + selectedId + '"]')
+    ) {
+      renderMinimap();
+      return;
+    }
+
+    mini.querySelectorAll(".minimap-node").forEach((el) => {
+      el.classList.toggle("minimap-selected", el.dataset.id === selectedId);
+    });
+
+    if (!selectedId) {
+      ring.setAttribute("visibility", "hidden");
+      return;
+    }
+    const pos = nodePositions.get(selectedId);
+    if (!pos || pos.collapsedHidden) {
+      ring.setAttribute("visibility", "hidden");
+      return;
+    }
+    const n = nodeById(selectedId);
+    const hub = isMapOverviewHub(n, pos);
+    const r = hub ? 8 : 6;
+    ring.setAttribute("cx", String(pos.x));
+    ring.setAttribute("cy", String(pos.y));
+    ring.setAttribute("r", String(r));
+    ring.setAttribute("visibility", "visible");
   }
 
   function renderMinimap() {
@@ -676,16 +715,25 @@
       const pos = nodePositions.get(n.id);
       if (!pos || pos.collapsedHidden) return;
       const hub = isMapOverviewHub(n, pos);
-      if (dense && !hub) return;
+      const isSel = n.id === selectedId;
+      if (dense && !hub && !isSel) return;
       const dot = document.createElementNS(ns, "circle");
+      dot.setAttribute("class", "minimap-node" + (isSel ? " minimap-selected" : ""));
       dot.setAttribute("cx", String(pos.x));
       dot.setAttribute("cy", String(pos.y));
-      dot.setAttribute("r", hub ? "3" : "1.6");
+      dot.setAttribute("r", isSel ? (hub ? "3.2" : "2.4") : hub ? "3" : "1.6");
       dot.setAttribute("fill", LAYER_COLORS[n.layer] || "#666");
       dot.dataset.id = n.id;
       nodesG.appendChild(dot);
     });
     mini.appendChild(nodesG);
+
+    const ring = document.createElementNS(ns, "circle");
+    ring.setAttribute("id", "minimap-selection-ring");
+    ring.setAttribute("class", "minimap-selection-ring");
+    ring.setAttribute("fill", "none");
+    ring.setAttribute("visibility", "hidden");
+    mini.appendChild(ring);
 
     const vp = document.createElementNS(ns, "rect");
     vp.setAttribute("id", "minimap-viewport");
@@ -2512,6 +2560,7 @@
     syncMapSelectionCallout();
     if (edgeSelectTraceKey) updateMapEdgeSelectTrace();
     else updateMapHoverTrace();
+    updateMinimapSelection();
   }
 
   function relatedEdges(nodeId) {

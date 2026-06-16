@@ -123,6 +123,7 @@ http://127.0.0.1:8765/docs/vision/index.html
 | **PH-S203** ✅ | Keyboard nav linked nodes | `linkedMapNeighbors` + Arrow keys |
 | **PH-S204** ✅ | Edge click neighbor select | `handleMapEdgeClick` + trace |
 | **PH-S205** ✅ | Manifest drift gate | `poolai-vision-sync --check` |
+| **PH-S206** ✅ | Minimap selection ring | `#minimap-selection-ring` + viewport fill |
 
 Канон черги: [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 · наступний спринт **PH-S195** (seed_inventory GET).
 

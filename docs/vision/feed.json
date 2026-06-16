@@ -3,18 +3,9 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S206",
-      "link": "docs/vision/index.html#sprint-queue",
-      "next": true,
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "minimap viewport + selected node ring",
-      "title": "Vision minimap selection ring (docs/vision)"
-    },
-    {
-      "category": "open",
       "id": "PH-S207",
       "link": "docs/vision/index.html#sprint-queue",
+      "next": true,
       "published": "2026-05-28",
       "status": "open",
       "summary": "next admin panel strings → `poolai-ui-core",
@@ -37,6 +28,15 @@
       "status": "open",
       "summary": "keyboard focus-visible on map controls + nodes",
       "title": "Vision map a11y focus ring (docs/vision)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S206",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "minimap viewport + selected node ring",
+      "title": "Vision minimap selection ring (docs/vision)"
     },
     {
       "category": "closed",
@@ -136,15 +136,6 @@
       "status": "closed",
       "summary": "read-only `GET /api/v1/grid/seed-inventory`; OpenAPI; integration test",
       "title": "Galaxy seed_inventory GET stub (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S194",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_fee_split_applied_total` on grid result path; unit tests",
-      "title": "Galaxy fee split result counter stub (code)"
     }
   ],
   "link": "docs/vision/index.html",

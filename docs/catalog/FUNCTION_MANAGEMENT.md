@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-16 (PH-S205 ✅ · §5.12 **4** відкритих PH-S206…S209 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-16 (PH-S206 ✅ · §5.12 **3** відкритих PH-S207…S209 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -405,16 +405,16 @@ FM-xxx (з таблиці нижче)
 | 138 | **PH-S203** | Vision keyboard nav linked nodes (docs/vision) | PH-S199 | Arrow keys cycle 1-hop neighbors on map | **✅** |
 | 139 | **PH-S204** | Vision edge click neighbor select (docs/vision) | PH-S199 | edge click → trace + select endpoint | **✅** |
 | 140 | **PH-S205** | poolai-vision-sync manifest drift gate (ops) | PH-S191 | CI/local check manifest revision vs FM | **✅** |
-| 141 | **PH-S206** | Vision minimap selection ring (docs/vision) | PH-S192 | minimap viewport + selected node ring | відкрито |
+| 141 | **PH-S206** | Vision minimap selection ring (docs/vision) | PH-S192 | minimap viewport + selected node ring | **✅** |
 | 142 | **PH-S207** | Admin i18n slim next panel (code) | PH-S197 | next admin panel strings → `poolai-ui-core` | відкрито |
 | 143 | **PH-S208** | Stand smoke vision revision parity (tests) | PH-S196 | `poolai-http-stand-smoke` checks vision rev header | відкрито |
 | 144 | **PH-S209** | Vision map a11y focus ring (docs/vision) | PH-S194 | keyboard focus-visible on map controls + nodes | відкрито |
 
-**Відкритих у §5.12:** **4** (PH-S206…S209). **Закрито смуга:** PH-S128…S205 ✅. Vision rev **147**.
+**Відкритих у §5.12:** **3** (PH-S207…S209). **Закрито смуга:** PH-S128…S206 ✅. Vision rev **148**.
 
-**Rust ratio:** формальна смуга **90–95%**; **hold 95%** — PH-S165 ✅; replenish **S206…S210** (vision + code-first).
+**Rust ratio:** формальна смуга **90–95%**; **hold 95%** — PH-S165 ✅; replenish **S207…S210** (vision + code-first).
 
-**Наступна сесія:** **PH-S206** · черга **4** відкритих (PH-S206…S209) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S207** · черга **3** відкритих (PH-S207…S209) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S169)
 
@@ -535,7 +535,7 @@ FM-xxx (з таблиці нижче)
 
 **Baseline:** rust_ratio **92.68%** → **hold 95%** · **stretch spirit 96%** ([`rust_ratio.json`](../development/rust_ratio.json), [`RUST_RATIO_STRATEGY_2026-06-13.md`](../development/RUST_RATIO_STRATEGY_2026-06-13.md)).
 
-**Наступна сесія:** **PH-S206** · черга **4** відкритих (PH-S206…S209) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S207** · черга **3** відкритих (PH-S207…S209) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

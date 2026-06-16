@@ -766,7 +766,20 @@ body.sidebar-collapsed .sidebar-title span { display: none; }
 #map-minimap-svg .minimap-viewport {
   stroke: rgba(126, 184, 255, 0.85);
   stroke-width: 1.5;
+  fill: rgba(126, 184, 255, 0.1);
   vector-effect: non-scaling-stroke;
+}
+
+#map-minimap-svg .minimap-selection-ring {
+  stroke: rgba(255, 200, 80, 0.95);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+#map-minimap-svg .minimap-node.minimap-selected {
+  stroke: rgba(255, 200, 80, 0.9);
+  stroke-width: 1.2;
 }
 
 #map-svg.map-overview .node.overview-hidden,
