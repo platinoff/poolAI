@@ -24,20 +24,41 @@ function GetMimeType {
 }
 
 function SendVisionBytes {
-    param($Context, $Body, $ContentType, [switch]$NoCache, [string]$VisionRevision)
+    param(
+        [System.Net.HttpListenerContext]$Context,
+        [byte[]]$Body,
+        [string]$ContentType,
+        [switch]$NoCache,
+        [string]$VisionRevision
+    )
+    $response = $Context.Response
+    $response.StatusCode = 200
+    $response.SendChunked = $false
     if ($ContentType) {
-        $Context.Response.ContentType = $ContentType
+        $response.ContentType = $ContentType
     }
     if ($NoCache) {
-        $Context.Response.Headers.Add('Cache-Control', 'no-cache, no-store, must-revalidate')
-        $Context.Response.Headers.Add('Pragma', 'no-cache')
+        $response.Headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        $response.Headers['Pragma'] = 'no-cache'
     }
     if ($VisionRevision) {
-        $Context.Response.Headers.Add('X-PoolAI-Vision-Revision', $VisionRevision)
+        $response.Headers['X-PoolAI-Vision-Revision'] = $VisionRevision
     }
-    $Context.Response.ContentLength64 = $Body.Length
-    $Context.Response.OutputStream.Write($Body, 0, $Body.Length)
-    $Context.Response.Close()
+    $byteCount = $Body.Length
+    $response.ContentLength64 = $byteCount
+    if ($byteCount -eq 0) {
+        $response.Close()
+        return
+    }
+    $stream = $response.OutputStream
+    try {
+        $stream.Write($Body, 0, $byteCount)
+        $stream.Flush()
+    }
+    finally {
+        $stream.Close()
+        $response.Close()
+    }
 }
 
 function Get-GitHeadShort {
@@ -147,7 +168,17 @@ function StartVisionServerLoop {
         [string]$PlainContentType
     )
     while ($HttpListener.IsListening) {
-        $ctx = $HttpListener.GetContext()
+        $ctx = $null
+        try {
+            $ctx = $HttpListener.GetContext()
+        }
+        catch {
+            if ($HttpListener.IsListening) {
+                Write-Host "vision accept error: $_"
+            }
+            continue
+        }
+        try {
         $path = $ctx.Request.Url.LocalPath.TrimStart('/').TrimEnd('/')
 
         if ($path -eq 'docs/vision/__watch') {
@@ -209,6 +240,19 @@ function StartVisionServerLoop {
             }
         }
         SendVisionBytes -Context $ctx -Body $bytes -ContentType $ctype -NoCache:$noCache -VisionRevision $visionRev
+        }
+        catch {
+            Write-Host "vision request error ($path): $_"
+            try {
+                if ($ctx -and $ctx.Response.OutputStream) {
+                    $ctx.Response.StatusCode = 500
+                    $ctx.Response.Close()
+                }
+            }
+            catch {
+                # response may already be closed
+            }
+        }
     }
 }
 
@@ -232,7 +276,7 @@ catch {
 }
 
 if ($existing) {
-    Write-Host "Port $Port already in use - docs-vision server may be running (OLD bundle — CSS/title may be stale)."
+    Write-Host "Port $Port already in use - docs-vision server may be running (OLD bundle - CSS/title may be stale)."
     Write-Host 'Restart: stop the process on this port, then run this script again (or hard-refresh Ctrl+Shift+R).'
     Write-Host "Simple Browser URL: $Url"
     if (-not $NoBrowser) {
@@ -243,12 +287,12 @@ if ($existing) {
 
 $listener = New-Object System.Net.HttpListener
 $listener.Prefixes.Add("http://127.0.0.1:$Port/")
-Write-Host 'Vision sync: indexing git-tracked files into manifest.json …'
+Write-Host 'Vision sync: indexing git-tracked files into manifest.json ...'
 Invoke-VisionManifestSync -RepoRootPath $RepoRoot
 $listener.Start()
 Write-Host "Serving repo: $RepoRoot"
 Write-Host "Vision UI: $Url"
-Write-Host 'Auto-reload: GET /docs/vision/__watch · manual sync: GET /docs/vision/__sync'
+Write-Host 'Auto-reload: GET /docs/vision/__watch | manual sync: GET /docs/vision/__sync'
 Write-Host 'Stop: Ctrl+C'
 
 if (-not $NoBrowser) {
