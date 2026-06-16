@@ -91,6 +91,8 @@
   let selectedId = null;
   let mapNavNeighborIdx = -1;
   let mapNavNeighborKey = null;
+  let edgeSelectTraceKey = null;
+  let edgeSelectPartnerId = null;
   let fullscreenPanel = null;
   let nodePositions = new Map();
   let watchState = null;
@@ -810,7 +812,51 @@
     });
   }
 
+  function updateMapEdgeSelectTrace() {
+    if (!edgeSelectTraceKey || !selectedId) return;
+    document.querySelectorAll("#map-svg .edge").forEach((el) => {
+      const from = el.dataset.from;
+      const to = el.dataset.to;
+      const key = el.dataset.edgeKey || edgeKey(from, to);
+      const active = key === edgeSelectTraceKey;
+      el.classList.toggle("edge-click-active", active);
+      el.classList.toggle("trace-edge", active);
+      if (active) el.classList.toggle("edge-reveal", true);
+    });
+    document.querySelectorAll("#map-svg .node").forEach((el) => {
+      const id = el.dataset.id;
+      const isEndpoint = id === selectedId;
+      const isPartner = id === edgeSelectPartnerId;
+      el.classList.toggle("trace-center", isEndpoint);
+      el.classList.toggle("trace-lit", isPartner);
+    });
+  }
+
+  function handleMapEdgeClick(edgeEl, ev) {
+    ev.stopPropagation();
+    clearTimeout(clickFocusTimer);
+    clickFocusTimer = null;
+    const from = edgeEl.dataset.from;
+    const to = edgeEl.dataset.to;
+    const pt = mapSvgClientToMap(ev);
+    const endpointId = edgeTraceNodeId(
+      edgeEl,
+      pt ? pt.x : 0,
+      pt ? pt.y : 0
+    );
+    const n = nodeById(endpointId);
+    if (!n || !isNodeOnMap(endpointId)) return;
+    const partnerId = endpointId === from ? to : from;
+    selectNode(n);
+    edgeSelectTraceKey = edgeEl.dataset.edgeKey || edgeKey(from, to);
+    edgeSelectPartnerId = partnerId;
+    hoverTraceId = endpointId;
+    updateMapSelection();
+    focusMapNode(n, { pushHistory: true });
+  }
+
   function updateMapHoverTrace() {
+    if (edgeSelectTraceKey) return;
     if (!isVisionMs() || !hoverTraceId) {
       clearMapHoverTraceClasses();
       return;
@@ -988,6 +1034,11 @@
     let hoverNode = null;
 
     svg.addEventListener("click", (ev) => {
+      const edgeEl = ev.target.closest(".edge");
+      if (edgeEl && svg.contains(edgeEl)) {
+        handleMapEdgeClick(edgeEl, ev);
+        return;
+      }
       const g = ev.target.closest(".node");
       if (!g || !svg.contains(g)) return;
       ev.stopPropagation();
@@ -2459,7 +2510,8 @@
       );
     });
     syncMapSelectionCallout();
-    updateMapHoverTrace();
+    if (edgeSelectTraceKey) updateMapEdgeSelectTrace();
+    else updateMapHoverTrace();
   }
 
   function relatedEdges(nodeId) {
@@ -2941,6 +2993,8 @@
     if (selectedId === node.id) return;
     mapNavNeighborKey = null;
     mapNavNeighborIdx = -1;
+    edgeSelectTraceKey = null;
+    edgeSelectPartnerId = null;
     selectedId = node.id;
 
     if (activeTreeFileEl) activeTreeFileEl.classList.remove("active");

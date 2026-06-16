@@ -3,18 +3,9 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S204",
-      "link": "docs/vision/index.html#sprint-queue",
-      "next": true,
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "edge click → trace + select endpoint",
-      "title": "Vision edge click neighbor select (docs/vision)"
-    },
-    {
-      "category": "open",
       "id": "PH-S205",
       "link": "docs/vision/index.html#sprint-queue",
+      "next": true,
       "published": "2026-05-28",
       "status": "open",
       "summary": "CI/local check manifest revision vs FM",
@@ -55,6 +46,15 @@
       "status": "open",
       "summary": "keyboard focus-visible on map controls + nodes",
       "title": "Vision map a11y focus ring (docs/vision)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S204",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "edge click → trace + select endpoint",
+      "title": "Vision edge click neighbor select (docs/vision)"
     },
     {
       "category": "closed",
@@ -154,15 +154,6 @@
       "status": "closed",
       "summary": "login/dashboard wasm formatters; slim JS glue; `cargo test-ci",
       "title": "Dashboard shell formatters → wasm (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S192",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "map-overview` при low zoom; hub-only labels; viewport inset minimap; rev++",
-      "title": "Vision overview LOD + minimap (docs/vision)"
     }
   ],
   "link": "docs/vision/index.html",

@@ -1294,7 +1294,14 @@ body.panel-fs-active .panel[data-panel="map"].panel-fullscreen .map-hint {
   fill: none;
   stroke-width: 1.2;
   pointer-events: stroke;
+  cursor: pointer;
   transition: stroke 0.2s, stroke-width 0.2s, opacity 0.2s;
+}
+
+#map-svg .edge.edge-click-active {
+  stroke-width: 2.6;
+  opacity: 1;
+  filter: drop-shadow(0 0 4px rgba(167, 139, 250, 0.55));
 }
 
 body.vision-ms #map-svg .edge {
