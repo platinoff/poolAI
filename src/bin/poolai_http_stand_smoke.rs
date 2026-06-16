@@ -18,18 +18,28 @@
 //! cargo run --bin poolai-http-stand-smoke -- --raid
 //!
 //! cargo run --bin poolai-http-stand-smoke -- --json
+//!
+//! # Vision revision parity (PH-S208):
+//! export POOLAI_VISION_BASE_URL=http://127.0.0.1:8765   # open-docs-vision.ps1
+//! cargo run --bin poolai-http-stand-smoke   # checks manifest vs FM + optional HTTP header
 //! ```
 
 use reqwest::{Client, StatusCode};
 use serde::Serialize;
 use serde_json::{json, Value};
-use std::path::Path;
+use std::fs;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 const DEFAULT_BASE: &str = "http://127.0.0.1:8080";
+const DEFAULT_VISION_BASE: &str = "http://127.0.0.1:8765";
 const ENV_BASE: &str = "POOLAI_BASE_URL";
+const ENV_VISION_BASE: &str = "POOLAI_VISION_BASE_URL";
 const ENV_STAND_ROOT: &str = "POOLAI_E2E_STAND_ROOT";
+const MANIFEST_REL: &str = "docs/vision/manifest.json";
+const FM_REL: &str = "docs/catalog/FUNCTION_MANAGEMENT.md";
+const VISION_REV_HEADER: &str = "x-poolai-vision-revision";
 const VALID_PUBKEY: &str = "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU";
 
 #[derive(Debug, Clone)]
@@ -65,6 +75,107 @@ fn base_url_from_env() -> String {
         .ok()
         .filter(|s| !s.trim().is_empty())
         .unwrap_or_else(|| DEFAULT_BASE.to_string())
+}
+
+fn vision_base_url_from_env() -> String {
+    std::env::var(ENV_VISION_BASE)
+        .ok()
+        .filter(|s| !s.trim().is_empty())
+        .unwrap_or_else(|| DEFAULT_VISION_BASE.to_string())
+}
+
+fn repo_root() -> PathBuf {
+    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+}
+
+fn read_manifest_revision(root: &Path) -> Result<u64, String> {
+    let path = root.join(MANIFEST_REL);
+    let raw = fs::read_to_string(&path).map_err(|e| format!("read {}: {e}", path.display()))?;
+    let manifest: Value = serde_json::from_str(&raw).map_err(|e| format!("parse manifest: {e}"))?;
+    manifest
+        .get("revision")
+        .and_then(Value::as_u64)
+        .ok_or_else(|| "manifest missing revision".to_string())
+}
+
+fn extract_fm_section_512(content: &str) -> Option<&str> {
+    let start = content.find("### 5.12")?;
+    let rest = &content[start..];
+    let end = rest[10..]
+        .find("\n### 5.")
+        .map(|i| 10 + i)
+        .unwrap_or(rest.len());
+    Some(&rest[..end])
+}
+
+fn parse_fm_vision_revision(section: &str) -> Option<u64> {
+    for line in section.lines() {
+        let marker = "Vision rev **";
+        let Some(start) = line.find(marker) else {
+            continue;
+        };
+        let rest = &line[start + marker.len()..];
+        let end = rest.find("**")?;
+        return rest[..end].parse().ok();
+    }
+    None
+}
+
+fn read_fm_vision_revision(root: &Path) -> Result<u64, String> {
+    let path = root.join(FM_REL);
+    let content = fs::read_to_string(&path).map_err(|e| format!("read {}: {e}", path.display()))?;
+    let section =
+        extract_fm_section_512(&content).ok_or_else(|| "FM §5.12 section not found".to_string())?;
+    parse_fm_vision_revision(section)
+        .ok_or_else(|| "FM §5.12 missing Vision rev **N** footer".to_string())
+}
+
+async fn smoke_vision_revision_parity(client: &Client) -> Result<(), String> {
+    let root = repo_root();
+    let repo_rev = read_manifest_revision(&root)?;
+    let fm_rev = read_fm_vision_revision(&root)?;
+    if repo_rev != fm_rev {
+        return Err(format!(
+            "repo manifest.revision {repo_rev} != FM Vision rev {fm_rev}"
+        ));
+    }
+
+    let vision_base = vision_base_url_from_env();
+    let url = api_url(&vision_base, "/docs/vision/manifest.json");
+    let resp = match client.get(&url).send().await {
+        Ok(r) => r,
+        Err(e) => {
+            return Err(format!(
+                "vision server unreachable at {url} ({e}); start open-docs-vision.ps1 or set {ENV_VISION_BASE}"
+            ));
+        }
+    };
+    if !resp.status().is_success() {
+        return Err(format!("vision manifest status {}", resp.status()));
+    }
+    let header_rev = resp
+        .headers()
+        .get(VISION_REV_HEADER)
+        .and_then(|v| v.to_str().ok())
+        .ok_or_else(|| format!("missing {VISION_REV_HEADER} header on {url}"))?
+        .parse::<u64>()
+        .map_err(|_| format!("invalid {VISION_REV_HEADER} header"))?;
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    let body_rev = body
+        .get("revision")
+        .and_then(Value::as_u64)
+        .ok_or_else(|| "manifest JSON missing revision".to_string())?;
+    if header_rev != body_rev {
+        return Err(format!(
+            "{VISION_REV_HEADER} {header_rev} != manifest.revision {body_rev}"
+        ));
+    }
+    if body_rev != repo_rev {
+        return Err(format!(
+            "live manifest.revision {body_rev} != repo/FM revision {repo_rev}"
+        ));
+    }
+    Ok(())
 }
 
 fn parse_cli() -> Cli {
@@ -733,6 +844,12 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
         smoke_grid_envelope_lease(&client, &cli.base_url).await,
     )
     .await;
+    record(
+        &mut cases,
+        "vision_revision_parity",
+        smoke_vision_revision_parity(&client).await,
+    )
+    .await;
 
     if cli.include_raid {
         match stand_root.as_deref() {
@@ -838,5 +955,29 @@ mod tests {
     fn parse_cli_lease_renew_flag_recognized() {
         let args: Vec<String> = vec!["poolai-http-stand-smoke".into(), "--lease-renew".into()];
         assert!(args.iter().any(|a| a == "--lease-renew"));
+    }
+
+    #[test]
+    fn parse_fm_vision_revision_footer() {
+        let section = "**Відкритих у §5.12:** **2** (PH-S208…S209). Vision rev **149**.\n";
+        assert_eq!(parse_fm_vision_revision(section), Some(149));
+    }
+
+    #[test]
+    fn read_manifest_revision_from_repo() {
+        let root = repo_root();
+        let rev = read_manifest_revision(&root).expect("manifest revision");
+        assert!(rev > 0);
+    }
+
+    #[test]
+    fn vision_revision_fm_parity_in_repo() {
+        let root = repo_root();
+        let manifest_rev = read_manifest_revision(&root).expect("manifest");
+        let fm_rev = read_fm_vision_revision(&root).expect("fm");
+        assert_eq!(
+            manifest_rev, fm_rev,
+            "run poolai-vision-sync --check before stand smoke"
+        );
     }
 }

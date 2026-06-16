@@ -24,13 +24,16 @@ function GetMimeType {
 }
 
 function SendVisionBytes {
-    param($Context, $Body, $ContentType, [switch]$NoCache)
+    param($Context, $Body, $ContentType, [switch]$NoCache, [string]$VisionRevision)
     if ($ContentType) {
         $Context.Response.ContentType = $ContentType
     }
     if ($NoCache) {
         $Context.Response.Headers.Add('Cache-Control', 'no-cache, no-store, must-revalidate')
         $Context.Response.Headers.Add('Pragma', 'no-cache')
+    }
+    if ($VisionRevision) {
+        $Context.Response.Headers.Add('X-PoolAI-Vision-Revision', $VisionRevision)
     }
     $Context.Response.ContentLength64 = $Body.Length
     $Context.Response.OutputStream.Write($Body, 0, $Body.Length)
@@ -193,7 +196,19 @@ function StartVisionServerLoop {
         $ctype = GetMimeType -Extension $ext
         $bytes = [IO.File]::ReadAllBytes($file)
         $noCache = $ext -in '.html', '.css', '.js', '.json', '.svg'
-        SendVisionBytes -Context $ctx -Body $bytes -ContentType $ctype -NoCache:$noCache
+        $visionRev = ''
+        if ($path -eq 'docs/vision/manifest.json') {
+            try {
+                $manifestJson = [Text.Encoding]::UTF8.GetString($bytes) | ConvertFrom-Json
+                if ($null -ne $manifestJson.revision) {
+                    $visionRev = [string]$manifestJson.revision
+                }
+            }
+            catch {
+                $visionRev = ''
+            }
+        }
+        SendVisionBytes -Context $ctx -Body $bytes -ContentType $ctype -NoCache:$noCache -VisionRevision $visionRev
     }
 }
 
