@@ -3,18 +3,9 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S207",
-      "link": "docs/vision/index.html#sprint-queue",
-      "next": true,
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "next admin panel strings → `poolai-ui-core",
-      "title": "Admin i18n slim next panel (code)"
-    },
-    {
-      "category": "open",
       "id": "PH-S208",
       "link": "docs/vision/index.html#sprint-queue",
+      "next": true,
       "published": "2026-05-28",
       "status": "open",
       "summary": "poolai-http-stand-smoke` checks vision rev header",
@@ -28,6 +19,15 @@
       "status": "open",
       "summary": "keyboard focus-visible on map controls + nodes",
       "title": "Vision map a11y focus ring (docs/vision)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S207",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "next admin panel strings → `poolai-ui-core",
+      "title": "Admin i18n slim next panel (code)"
     },
     {
       "category": "closed",
@@ -127,15 +127,6 @@
       "status": "closed",
       "summary": "poolai-http-stand-smoke --lease-renew`; slim Playwright lease",
       "title": "Stand smoke jobs lease renew (tests)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S195",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "read-only `GET /api/v1/grid/seed-inventory`; OpenAPI; integration test",
-      "title": "Galaxy seed_inventory GET stub (code)"
     }
   ],
   "link": "docs/vision/index.html",

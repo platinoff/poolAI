@@ -1,6 +1,6 @@
 //! Monitoring Dashboard page
 //!
-//! Provides real-time monitoring with alerts and dashboards.
+//! PH-S207: EN/UK i18n subset in `poolai-ui-core::i18n` (injected via admin_layout).
 
 use crate::ui::admin::admin_layout;
 use axum::response::Html;

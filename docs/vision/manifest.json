@@ -1728,7 +1728,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S206",
+  "last_sprint_closed": "PH-S207",
   "layers": [
     {
       "id": "L0",
@@ -1761,7 +1761,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S207",
+  "next_sprint": "PH-S208",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7469,7 +7469,7 @@
       "path": "tests/grid_seed_inventory_integration.rs"
     }
   ],
-  "revision": 148,
+  "revision": 149,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -8744,9 +8744,9 @@
       "acceptance": "next admin panel strings → `poolai-ui-core",
       "deps": "PH-S197",
       "id": "PH-S207",
-      "open": true,
+      "open": false,
       "row": 142,
-      "status": "open",
+      "status": "closed",
       "title": "Admin i18n slim next panel (code)"
     },
     {
@@ -8768,7 +8768,7 @@
       "title": "Vision map a11y focus ring (docs/vision)"
     }
   ],
-  "sprint_queue_open_count": 3,
+  "sprint_queue_open_count": 2,
   "updated_at": "2026-06-15",
   "vision_ui_rev": 58
 }

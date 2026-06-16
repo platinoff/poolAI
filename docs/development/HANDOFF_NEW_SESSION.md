@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-16 (PH-S206 ✅ · §5.12 **3** відкритих PH-S207…S209 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
+**Оновлено:** 2026-06-16 (PH-S207 ✅ · §5.12 **2** відкритих PH-S208…S209 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -157,10 +157,11 @@
 **PH-S204 ✅ (vision):** `docs/vision/vision.js` — edge click → `edgeTraceNodeId` + endpoint select + `edge-click-active` trace; rev **146**.
 **PH-S205 ✅ (ops):** `poolai-vision-sync --check` — manifest vs FM §5.12 drift gate; CI `vision-manifest-drift`; rev **147**.
 **PH-S206 ✅ (vision):** `docs/vision/vision.js` — minimap `#minimap-selection-ring` + selected dot on dense map; viewport fill; rev **148**.
+**PH-S207 ✅ (code/ui):** `admin.mon.*` + `admin.page.monitoring` i18n → `poolai-ui-core`; slim `i18n_core.js`; `cargo test-ci`.
 **PH-S198 ✅ (code):** `topology_graph.rs` — hub labels + `label_x`/`label_y`/`is_hub` in graph JSON; heatmap short ids; slim `topology_graph.js` (SVG paint only); `cargo test-ci`.
 **PH-S194 ✅ (code):** `galaxy_fee_split_applied_total` on grid result wire; `cargo test-ci`.
-**Vision ✅:** next **PH-S207** · **3** відкритих (S207…S209) · rev **148**.
-**Черга:** §5.12 **3** відкритих — **PH-S207** (наступний) … **PH-S209**. Vision + code-first S207…S209 · baseline **92.78%** · hold **95%** · spirit **96%**.
+**Vision ✅:** next **PH-S208** · **2** відкритих (S208…S209) · rev **149**.
+**Черга:** §5.12 **2** відкритих — **PH-S208** (наступний) … **PH-S209**. Vision + code-first · baseline **92.78%** · hold **95%** · spirit **96%**.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

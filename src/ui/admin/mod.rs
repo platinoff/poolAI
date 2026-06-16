@@ -253,6 +253,14 @@ fn admin_layout_injects_rust_theme_patch_ph_s160() {
 }
 
 #[test]
+fn admin_layout_injects_monitoring_i18n_ph_s207() {
+    let patch = poolai_ui_core::i18n::admin_jobs_grid_patch_script();
+    assert!(patch.contains(r#""admin.page.monitoring""#));
+    assert!(patch.contains(r#""admin.mon.mlTitle""#));
+    assert!(patch.contains(r#""admin.mon.createDashBtn""#));
+}
+
+#[test]
 fn admin_layout_injects_rust_i18n_patch_ph_s154() {
     let patch = poolai_ui_core::i18n::admin_jobs_grid_patch_script();
     assert!(patch.contains("window.__poolaiAdminI18nRust="));

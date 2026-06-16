@@ -1,4 +1,4 @@
-//! UI i18n subsets moved from `i18n_core.js` (PH-S154 admin jobs/grid; PH-S162 auth/dash shell; PH-S197 updates-compat).
+//! UI i18n subsets moved from `i18n_core.js` (PH-S154 admin jobs/grid; PH-S162 auth/dash shell; PH-S197 updates-compat; PH-S207 monitoring).
 //!
 //! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154).
 //! Auth + dashboard shell: `window.__poolaiAuthDashI18nRust` on login, dashboard layout, admin layout (PH-S162).
@@ -264,6 +264,202 @@ pub const ADMIN_UPDATES_COMPAT_UK: &[I18nRow<'_>] = &[
     ),
 ];
 
+/// English monitoring admin keys (PH-S207; moved from `i18n_core.js`).
+pub const ADMIN_MONITORING_EN: &[I18nRow<'_>] = &[
+    ("admin.page.monitoring", "Monitoring Dashboard"),
+    ("admin.mon.loading", "Loading monitoring…"),
+    ("admin.mon.errLoad", "Error loading monitoring: "),
+    ("admin.mon.noData", "No data available"),
+    ("admin.mon.noAlerts", "No active alerts"),
+    ("admin.mon.section", "Monitoring"),
+    ("admin.mon.createDashBtn", "Create Dashboard"),
+    ("admin.mon.createRuleBtn", "Create Alert Rule"),
+    (
+        "admin.mon.vizTitle",
+        "Metrics Visualization (Last 24 Hours)",
+    ),
+    ("admin.mon.activeAlertsTitle", "Active Alerts"),
+    ("admin.mon.dashboardsTitle", "Dashboards"),
+    ("admin.mon.alertRulesTitle", "Alert Rules"),
+    ("admin.mon.chartPoints", "{n} points"),
+    ("admin.mon.statMin", "Min:"),
+    ("admin.mon.statMax", "Max:"),
+    ("admin.mon.statAvg", "Avg:"),
+    ("admin.mon.col.severity", "Severity"),
+    ("admin.mon.col.metric", "Metric"),
+    ("admin.mon.col.currentVal", "Current Value"),
+    ("admin.mon.col.threshold", "Threshold"),
+    ("admin.mon.col.triggered", "Triggered"),
+    ("admin.mon.col.statusCol", "Status"),
+    ("admin.mon.col.actions", "Actions"),
+    ("admin.mon.ackBtn", "Acknowledge"),
+    ("admin.mon.statusAck", "Acknowledged"),
+    ("admin.mon.statusActiveLbl", "Active"),
+    ("admin.mon.noDashboards", "No dashboards created"),
+    ("admin.mon.metricsN", "{n} metrics"),
+    ("admin.mon.public", "Public"),
+    ("admin.mon.private", "Private"),
+    ("admin.mon.col.name", "Name"),
+    ("admin.mon.col.description", "Description"),
+    ("admin.mon.col.metrics", "Metrics"),
+    ("admin.mon.col.public", "Public"),
+    ("admin.mon.col.created", "Created"),
+    ("admin.mon.col.operator", "Operator"),
+    ("admin.mon.col.ruleStatus", "Status"),
+    ("admin.mon.enabled", "Enabled"),
+    ("admin.mon.disabled", "Disabled"),
+    ("admin.mon.dashCreatedOk", "Dashboard created successfully"),
+    ("admin.mon.ruleCreatedOk", "Alert rule created successfully"),
+    ("admin.mon.alertAckOk", "Alert acknowledged"),
+    ("admin.mon.creatingDash", "Creating…"),
+    ("admin.mon.creatingRule", "Creating…"),
+    ("admin.mon.modalCreateDash", "Create Dashboard"),
+    ("admin.mon.modalCreateRule", "Create Alert Rule"),
+    ("admin.mon.lbl.dashName", "Dashboard Name"),
+    ("admin.mon.lbl.dashDesc", "Description"),
+    ("admin.mon.lbl.dashMetrics", "Metrics (comma-separated)"),
+    (
+        "admin.mon.hint.dashMetrics",
+        "Enter metric names separated by commas",
+    ),
+    ("admin.mon.lbl.dashLayout", "Layout (JSON, optional)"),
+    ("admin.mon.lbl.dashPublic", "Public Dashboard"),
+    ("admin.mon.lbl.ruleName", "Rule Name"),
+    ("admin.mon.lbl.metricName", "Metric Name"),
+    ("admin.mon.lbl.operator", "Operator"),
+    ("admin.mon.lbl.threshold", "Threshold"),
+    ("admin.mon.lbl.severity", "Severity"),
+    ("admin.mon.op.gt", "Greater than (>)"),
+    ("admin.mon.op.lt", "Less than (<)"),
+    ("admin.mon.op.ge", "Greater or equal (>=)"),
+    ("admin.mon.op.le", "Less or equal (<=)"),
+    ("admin.mon.op.eq", "Equal (==)"),
+    ("admin.mon.lbl.ruleEnabled", "Enabled"),
+    ("admin.mon.mlTitle", "ML Pipeline Step Metrics"),
+    ("admin.mon.mlEmpty", "No ML pipeline step metrics yet"),
+    (
+        "admin.mon.mlEmptyHint",
+        "Run the demo pipeline or execute a pipeline via the AI/ML API.",
+    ),
+    ("admin.mon.mlUnavailable", "ML pipeline API unavailable"),
+    (
+        "admin.mon.mlUnavailableHint",
+        "Build with enterprise + ml features to enable AI/ML pipelines.",
+    ),
+    ("admin.mon.mlDemoBtn", "Run ML Demo"),
+    ("admin.mon.mlDemoRunning", "Running demo…"),
+    ("admin.mon.mlDemoOk", "ML demo pipeline completed"),
+    ("admin.mon.mlCol.pipeline", "Pipeline"),
+    ("admin.mon.mlCol.step", "Step"),
+    ("admin.mon.mlCol.kind", "Kind"),
+    ("admin.mon.mlCol.status", "Status"),
+    ("admin.mon.mlCol.metrics", "Metrics"),
+    ("admin.mon.ph.dashboard", "My Dashboard"),
+    ("admin.mon.ph.dashDesc", "Dashboard description"),
+    (
+        "admin.mon.ph.metricsCsv",
+        "cpu_usage, memory_usage, request_rate",
+    ),
+    ("admin.mon.ph.layoutJson", r#"{"widgets": []}"#),
+    ("admin.mon.ph.ruleName", "high-cpu-alert"),
+    ("admin.mon.ph.metric", "cpu_usage"),
+];
+
+/// Ukrainian monitoring admin keys (PH-S207).
+pub const ADMIN_MONITORING_UK: &[I18nRow<'_>] = &[
+    ("admin.page.monitoring", "Моніторинг"),
+    ("admin.mon.loading", "Завантаження моніторингу…"),
+    ("admin.mon.errLoad", "Помилка завантаження моніторингу: "),
+    ("admin.mon.noData", "Немає даних"),
+    ("admin.mon.noAlerts", "Немає активних сповіщень"),
+    ("admin.mon.section", "Моніторинг"),
+    ("admin.mon.createDashBtn", "Створити дашборд"),
+    ("admin.mon.createRuleBtn", "Створити правило сповіщень"),
+    ("admin.mon.vizTitle", "Візуалізація метрик (останні 24 год)"),
+    ("admin.mon.activeAlertsTitle", "Активні сповіщення"),
+    ("admin.mon.dashboardsTitle", "Дашборди"),
+    ("admin.mon.alertRulesTitle", "Правила сповіщень"),
+    ("admin.mon.chartPoints", "точок: {n}"),
+    ("admin.mon.statMin", "Мін:"),
+    ("admin.mon.statMax", "Макс:"),
+    ("admin.mon.statAvg", "Сер:"),
+    ("admin.mon.col.severity", "Важливість"),
+    ("admin.mon.col.metric", "Метрика"),
+    ("admin.mon.col.currentVal", "Поточне значення"),
+    ("admin.mon.col.threshold", "Поріг"),
+    ("admin.mon.col.triggered", "Час спрацювання"),
+    ("admin.mon.col.statusCol", "Статус"),
+    ("admin.mon.col.actions", "Дії"),
+    ("admin.mon.ackBtn", "Підтвердити"),
+    ("admin.mon.statusAck", "Підтверджено"),
+    ("admin.mon.statusActiveLbl", "Активне"),
+    ("admin.mon.noDashboards", "Дашбордів не створено"),
+    ("admin.mon.metricsN", "Метрик: {n}"),
+    ("admin.mon.public", "Публічний"),
+    ("admin.mon.private", "Приватний"),
+    ("admin.mon.col.name", "Назва"),
+    ("admin.mon.col.description", "Опис"),
+    ("admin.mon.col.metrics", "Метрики"),
+    ("admin.mon.col.public", "Публічний"),
+    ("admin.mon.col.created", "Створено"),
+    ("admin.mon.col.operator", "Оператор"),
+    ("admin.mon.col.ruleStatus", "Статус"),
+    ("admin.mon.enabled", "Увімкнено"),
+    ("admin.mon.disabled", "Вимкнено"),
+    ("admin.mon.dashCreatedOk", "Дашборд створено"),
+    ("admin.mon.ruleCreatedOk", "Правило сповіщень створено"),
+    ("admin.mon.alertAckOk", "Сповіщення підтверджено"),
+    ("admin.mon.creatingDash", "Створення…"),
+    ("admin.mon.creatingRule", "Створення…"),
+    ("admin.mon.modalCreateDash", "Створити дашборд"),
+    ("admin.mon.modalCreateRule", "Створити правило сповіщень"),
+    ("admin.mon.lbl.dashName", "Назва дашборду"),
+    ("admin.mon.lbl.dashDesc", "Опис"),
+    ("admin.mon.lbl.dashMetrics", "Метрики (через кому)"),
+    ("admin.mon.hint.dashMetrics", "Назви метрик через кому"),
+    ("admin.mon.lbl.dashLayout", "Макет (JSON, необов’язково)"),
+    ("admin.mon.lbl.dashPublic", "Публічний дашборд"),
+    ("admin.mon.lbl.ruleName", "Назва правила"),
+    ("admin.mon.lbl.metricName", "Назва метрики"),
+    ("admin.mon.lbl.operator", "Оператор"),
+    ("admin.mon.lbl.threshold", "Поріг"),
+    ("admin.mon.lbl.severity", "Важливість"),
+    ("admin.mon.op.gt", "Більше ніж (>)"),
+    ("admin.mon.op.lt", "Менше ніж (<)"),
+    ("admin.mon.op.ge", "Більше або дорівнює (>=)"),
+    ("admin.mon.op.le", "Менше або дорівнює (<=)"),
+    ("admin.mon.op.eq", "Дорівнює (==)"),
+    ("admin.mon.lbl.ruleEnabled", "Увімкнено"),
+    ("admin.mon.mlTitle", "Метрики кроків ML pipeline"),
+    ("admin.mon.mlEmpty", "Метрик кроків ML pipeline ще немає"),
+    (
+        "admin.mon.mlEmptyHint",
+        "Запустіть demo pipeline або виконайте pipeline через AI/ML API.",
+    ),
+    ("admin.mon.mlUnavailable", "ML pipeline API недоступний"),
+    (
+        "admin.mon.mlUnavailableHint",
+        "Зберіть з features enterprise + ml для AI/ML pipelines.",
+    ),
+    ("admin.mon.mlDemoBtn", "Запустити ML Demo"),
+    ("admin.mon.mlDemoRunning", "Demo виконується…"),
+    ("admin.mon.mlDemoOk", "ML demo pipeline завершено"),
+    ("admin.mon.mlCol.pipeline", "Pipeline"),
+    ("admin.mon.mlCol.step", "Крок"),
+    ("admin.mon.mlCol.kind", "Тип"),
+    ("admin.mon.mlCol.status", "Статус"),
+    ("admin.mon.mlCol.metrics", "Метрики"),
+    ("admin.mon.ph.dashboard", "Мій дашборд"),
+    ("admin.mon.ph.dashDesc", "Опис дашборду"),
+    (
+        "admin.mon.ph.metricsCsv",
+        "cpu_usage, memory_usage, request_rate",
+    ),
+    ("admin.mon.ph.layoutJson", r#"{"widgets": []}"#),
+    ("admin.mon.ph.ruleName", "high-cpu-alert"),
+    ("admin.mon.ph.metric", "cpu_usage"),
+];
+
 /// English auth keys (login, OAuth, bootstrap banner, lang toggle).
 pub const AUTH_SHELL_EN: &[I18nRow<'_>] = &[
     ("auth.pageTitle", "Login - PoolAI"),
@@ -486,8 +682,10 @@ fn rows_to_map(rows: &[I18nRow<'_>]) -> BTreeMap<String, String> {
 pub fn admin_jobs_grid_patch() -> BTreeMap<String, BTreeMap<String, String>> {
     let mut en = rows_to_map(ADMIN_JOBS_GRID_EN);
     merge_rows(&mut en, ADMIN_UPDATES_COMPAT_EN);
+    merge_rows(&mut en, ADMIN_MONITORING_EN);
     let mut uk = rows_to_map(ADMIN_JOBS_GRID_UK);
     merge_rows(&mut uk, ADMIN_UPDATES_COMPAT_UK);
+    merge_rows(&mut uk, ADMIN_MONITORING_UK);
     let mut root = BTreeMap::new();
     root.insert("en".into(), en);
     root.insert("uk".into(), uk);
@@ -564,14 +762,15 @@ mod tests {
     fn patch_has_matching_en_uk_key_counts() {
         assert_eq!(ADMIN_JOBS_GRID_EN.len(), ADMIN_JOBS_GRID_UK.len());
         assert_eq!(ADMIN_UPDATES_COMPAT_EN.len(), ADMIN_UPDATES_COMPAT_UK.len());
+        assert_eq!(ADMIN_MONITORING_EN.len(), ADMIN_MONITORING_UK.len());
         let patch = admin_jobs_grid_patch();
         assert_eq!(
             patch["en"].len(),
-            ADMIN_JOBS_GRID_EN.len() + ADMIN_UPDATES_COMPAT_EN.len()
+            ADMIN_JOBS_GRID_EN.len() + ADMIN_UPDATES_COMPAT_EN.len() + ADMIN_MONITORING_EN.len()
         );
         assert_eq!(
             patch["uk"].len(),
-            ADMIN_JOBS_GRID_UK.len() + ADMIN_UPDATES_COMPAT_UK.len()
+            ADMIN_JOBS_GRID_UK.len() + ADMIN_UPDATES_COMPAT_UK.len() + ADMIN_MONITORING_UK.len()
         );
     }
 
@@ -582,6 +781,8 @@ mod tests {
         assert!(json.contains(r#""admin.gridPricing.col.price""#));
         assert!(json.contains(r#""admin.jobs.status.migrating""#));
         assert!(json.contains(r#""admin.updatesCompat.section""#));
+        assert!(json.contains(r#""admin.mon.mlTitle""#));
+        assert!(json.contains(r#""admin.page.monitoring""#));
     }
 
     #[test]
