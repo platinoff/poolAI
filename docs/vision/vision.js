@@ -795,6 +795,15 @@
     return visionMode === "eco" || visionMode === "ms";
   }
 
+  function prefersReducedMotion() {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }
+
+  /** Eco/Ms + OS reduced-motion skip map glow and edge animation (PH-S212). */
+  function isMapFxOff() {
+    return isLowGpuMode() || prefersReducedMotion();
+  }
+
   function watchIntervalMs() {
     return isLowGpuMode() ? WATCH_INTERVAL_ECO_MS : WATCH_INTERVAL_MS;
   }
@@ -809,8 +818,9 @@
   function applyVisionMode() {
     document.body.classList.toggle("vision-eco", isVisionEco());
     document.body.classList.toggle("vision-ms", isVisionMs());
+    document.body.classList.toggle("vision-reduced-motion", prefersReducedMotion());
     const svg = document.getElementById("map-svg");
-    if (svg) svg.classList.toggle("map-fx-off", isLowGpuMode());
+    if (svg) svg.classList.toggle("map-fx-off", isMapFxOff());
     const btn = document.getElementById("btn-eco");
     if (btn) {
       btn.classList.toggle("on", isVisionEco());
@@ -2482,7 +2492,7 @@
       "map-dense",
       manifest.nodes.length >= MAP_DENSE_NODE_THRESHOLD
     );
-    svg.classList.toggle("map-fx-off", isLowGpuMode());
+    svg.classList.toggle("map-fx-off", isMapFxOff());
 
     applyMapTransform();
     bindMapNavigation(svg);
@@ -3519,6 +3529,14 @@
   ) {
     visionMode = "eco";
   }
+  const reducedMotionMq = window.matchMedia("(prefers-reduced-motion: reduce)");
+  reducedMotionMq.addEventListener("change", () => {
+    if (!visionModePinned && reducedMotionMq.matches) {
+      visionMode = "eco";
+    }
+    applyVisionMode();
+    if (manifest) renderMap();
+  });
   applyVisionMode();
   initMapToolbar();
   initMapKeyboardNav();

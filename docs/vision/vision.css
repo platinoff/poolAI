@@ -1600,6 +1600,38 @@ body.vision-ms #map-svg .edge.trace-dim {
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  #map-svg .node:hover circle,
+  #map-svg .node.selected circle,
+  #map-svg .node.constellation-lit circle,
+  #map-svg .node.layer-focus circle {
+    filter: none;
+  }
+  #map-svg .edge.constellation-pipe {
+    animation: none;
+    filter: none;
+    stroke-dasharray: 6 4;
+  }
+}
+
+body.vision-reduced-motion #map-svg .node:hover circle,
+body.vision-reduced-motion #map-svg .node.selected circle,
+body.vision-reduced-motion #map-svg .node.constellation-lit circle,
+body.vision-reduced-motion #map-svg .node.layer-focus circle,
+#map-svg.map-fx-off .node:hover circle,
+#map-svg.map-fx-off .node.selected circle,
+#map-svg.map-fx-off .node.constellation-lit circle,
+#map-svg.map-fx-off .node.layer-focus circle {
+  filter: none;
+}
+
+body.vision-reduced-motion #map-svg .edge.constellation-pipe,
+#map-svg.map-fx-off .edge.constellation-pipe {
+  animation: none;
+  filter: none;
+  stroke-dasharray: 6 4;
+}
+
 #map-svg .node.layer-dim circle { opacity: 0.2; }
 #map-svg .node.layer-dim text { opacity: 0.25; }
 #map-svg .node.layer-focus circle {

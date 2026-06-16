@@ -3,36 +3,9 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S210",
-      "link": "docs/vision/index.html#sprint-queue",
-      "next": true,
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "poolai-http-stand-smoke` case `grid_seed_inventory",
-      "title": "Stand smoke seed_inventory GET (tests)"
-    },
-    {
-      "category": "open",
-      "id": "PH-S211",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "admin.jobs.*` → `poolai-ui-core`; slim `i18n_core.js",
-      "title": "Admin i18n slim jobs panel (code)"
-    },
-    {
-      "category": "open",
-      "id": "PH-S212",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "prefers-reduced-motion` → skip glow/animation; rev++",
-      "title": "Vision reduced-motion map FX (docs/vision)"
-    },
-    {
-      "category": "open",
       "id": "PH-S213",
       "link": "docs/vision/index.html#sprint-queue",
+      "next": true,
       "published": "2026-05-28",
       "status": "open",
       "summary": "stand smoke checks prefetch counters on `/metrics",
@@ -91,6 +64,33 @@
       "status": "open",
       "summary": "stand smoke trust payout counters on `/metrics",
       "title": "Galaxy trust payout metrics smoke (tests)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S212",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "prefers-reduced-motion` → skip glow/animation; rev++",
+      "title": "Vision reduced-motion map FX (docs/vision)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S211",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "admin.jobs.*` → `poolai-ui-core`; slim `i18n_core.js",
+      "title": "Admin i18n slim jobs panel (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S210",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "poolai-http-stand-smoke` case `grid_seed_inventory",
+      "title": "Stand smoke seed_inventory GET (tests)"
     },
     {
       "category": "closed",
@@ -172,33 +172,6 @@
       "status": "closed",
       "summary": "post-push notify after PH-S* close; docs sync pointer",
       "title": "Cursor post-push PH-S* hook (ops)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S200",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "feed.json` + RSS ticker panel; rev++",
-      "title": "Vision feed.json RSS ticker (docs/vision)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S199",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "planes `pointer-events:none`; edge trace; click focus ~14px; zoom back; sidebar scroll",
-      "title": "Vision map Ms hit-test + focus nav (docs/vision)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S198",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "hub labels у `topology_graph.rs`; −LOC `topology_graph.js",
-      "title": "Topology graph Rust labels slim (code)"
     }
   ],
   "link": "docs/vision/index.html",
