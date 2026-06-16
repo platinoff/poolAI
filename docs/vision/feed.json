@@ -1,0 +1,198 @@
+{
+  "description": "RSS-style ticker of FM §5.12 sprint queue (open + recent closed)",
+  "items": [
+    {
+      "category": "open",
+      "id": "PH-S201",
+      "link": "docs/vision/index.html#sprint-queue",
+      "next": true,
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "post-push notify after PH-S* close; docs sync pointer",
+      "title": "Cursor post-push PH-S* hook (ops)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S202",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "queue card click centers map node",
+      "title": "Vision sprint-queue chip → map focus (docs/vision)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S203",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "Arrow keys cycle 1-hop neighbors on map",
+      "title": "Vision keyboard nav linked nodes (docs/vision)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S204",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "edge click → trace + select endpoint",
+      "title": "Vision edge click neighbor select (docs/vision)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S205",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "CI/local check manifest revision vs FM",
+      "title": "poolai-vision-sync manifest drift gate (ops)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S206",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "minimap viewport + selected node ring",
+      "title": "Vision minimap selection ring (docs/vision)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S207",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "next admin panel strings → `poolai-ui-core",
+      "title": "Admin i18n slim next panel (code)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S208",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "poolai-http-stand-smoke` checks vision rev header",
+      "title": "Stand smoke vision revision parity (tests)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S209",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "keyboard focus-visible on map controls + nodes",
+      "title": "Vision map a11y focus ring (docs/vision)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S200",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "feed.json` + RSS ticker panel; rev++",
+      "title": "Vision feed.json RSS ticker (docs/vision)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S199",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "planes `pointer-events:none`; edge trace; click focus ~14px; zoom back; sidebar scroll",
+      "title": "Vision map Ms hit-test + focus nav (docs/vision)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S198",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "hub labels у `topology_graph.rs`; −LOC `topology_graph.js",
+      "title": "Topology graph Rust labels slim (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S197",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "/ui/admin/updates-compat` → wasm labels; Playwright smoke",
+      "title": "Admin updates-compat wasm wiring (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S196",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "poolai-http-stand-smoke --lease-renew`; slim Playwright lease",
+      "title": "Stand smoke jobs lease renew (tests)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S195",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "read-only `GET /api/v1/grid/seed-inventory`; OpenAPI; integration test",
+      "title": "Galaxy seed_inventory GET stub (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S194",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_fee_split_applied_total` on grid result path; unit tests",
+      "title": "Galaxy fee split result counter stub (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S193",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "login/dashboard wasm formatters; slim JS glue; `cargo test-ci",
+      "title": "Dashboard shell formatters → wasm (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S192",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "map-overview` при low zoom; hub-only labels; viewport inset minimap; rev++",
+      "title": "Vision overview LOD + minimap (docs/vision)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S191",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "Rust parse FM §5.12 → `sprint_queue` panel; rev++",
+      "title": "Vision sprint queue panel (docs/vision)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S190",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "Layers/Types dropdown menus; − collapse → title strip; grid auto-fill; `localStorage`; rev++",
+      "title": "Vision filter dropdowns + panel collapse (docs/vision)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S189",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "tri-mode Eco→FX→Ms; hover 1-hop edge/node highlight; `localStorage`; rev++",
+      "title": "Vision Eco/FX/Ms hover trace (docs/vision)"
+    }
+  ],
+  "link": "docs/vision/index.html",
+  "title": "PoolAI Vision Sprint Feed",
+  "updated_at": "2026-05-28"
+}

@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-15 (PH-S199 ✅ · §5.12 **10** відкритих PH-S200…S209 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
+**Оновлено:** 2026-06-16 (PH-S200 ✅ · §5.12 **9** відкритих PH-S201…S209 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -150,10 +150,11 @@
 **PH-S196 ✅ (code/e2e):** `poolai-http-stand-smoke --lease-renew` — acquire/renew/conflict/expired suite (заміна archived Playwright `jobs_lease`); slim default stand smoke; `bin/e2e-playwright.sh --start` gate; `cargo test-ci`.
 **PH-S197 ✅ (code/ui):** `/ui/admin/updates-compat` — wasm `compatStatusLabel` / `protocolVersionLabel`; updates-compat i18n → `poolai-ui-core`; slim `i18n_core.js`; Playwright PH-S197 gate; `cargo test-ci`.
 **PH-S199 ✅ (vision):** `docs/vision/` — Ms mode planes `pointer-events:none`; `elementsFromPoint` edge/node trace; click focus ~14px label; zoom-back stack (`←`); sidebar `scrollIntoView` + folder expand; rev **137**.
+**PH-S200 ✅ (vision):** `docs/vision/feed.json` — RSS sprint ticker (`poolai-vision-sync` from FM §5.12); header marquee panel; click item → sprint queue; rev **139**.
 **PH-S198 ✅ (code):** `topology_graph.rs` — hub labels + `label_x`/`label_y`/`is_hub` in graph JSON; heatmap short ids; slim `topology_graph.js` (SVG paint only); `cargo test-ci`.
 **PH-S194 ✅ (code):** `galaxy_fee_split_applied_total` on grid result wire; `cargo test-ci`.
-**Vision ✅:** next **PH-S200** · **10** відкритих (S200…S209) · rev **137**.
-**Черга:** §5.12 **10** відкритих — **PH-S200** (наступний) … **PH-S209**. Vision + code-first S200…S209 · baseline **92.78%** · hold **95%** · spirit **96%**.
+**Vision ✅:** next **PH-S201** · **9** відкритих (S201…S209) · rev **139**.
+**Черга:** §5.12 **9** відкритих — **PH-S201** (наступний) … **PH-S209**. Vision + code-first S201…S209 · baseline **92.78%** · hold **95%** · spirit **96%**.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

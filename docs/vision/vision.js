@@ -2556,6 +2556,74 @@
     box.innerHTML = html;
   }
 
+  function scrollToSprintQueue() {
+    const panel = document.querySelector('.panel[data-panel="queue"]');
+    if (!panel) return;
+    const wasCollapsed = panel.classList.contains("collapsed");
+    if (wasCollapsed) {
+      panel.classList.remove("collapsed");
+      syncPanelCollapseLayout();
+    }
+    panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    panel.classList.add("panel-flash");
+    window.setTimeout(() => panel.classList.remove("panel-flash"), 900);
+  }
+
+  function renderRssTicker(feed) {
+    const bar = document.getElementById("rss-ticker");
+    const track = document.getElementById("rss-ticker-track");
+    if (!bar || !track) return;
+    const items = feed && Array.isArray(feed.items) ? feed.items : [];
+    if (!items.length) {
+      bar.hidden = true;
+      track.innerHTML = "";
+      return;
+    }
+    bar.hidden = false;
+    const buildLi = (item) => {
+      const id = item.id || "";
+      const title = item.title || "";
+      const summary = (item.summary || "").slice(0, 80);
+      const cls = [
+        "rss-ticker-item",
+        item.category === "open" ? "open" : "closed",
+        item.next ? "next" : "",
+      ]
+        .filter(Boolean)
+        .join(" ");
+      const hint = summary ? " — " + summary : "";
+      return (
+        '<li class="' +
+        cls +
+        '" title="' +
+        escapeHtml(id + ": " + title + hint) +
+        '"><strong>' +
+        escapeHtml(id) +
+        "</strong><span>" +
+        escapeHtml(title) +
+        "</span></li>"
+      );
+    };
+    const chunk = items.map(buildLi).join("");
+    track.innerHTML = chunk + chunk;
+    track.querySelectorAll(".rss-ticker-item").forEach((el) => {
+      el.addEventListener("click", scrollToSprintQueue);
+      el.style.cursor = "pointer";
+    });
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) {
+      track.innerHTML = chunk;
+    }
+  }
+
+  async function loadFeed() {
+    try {
+      return await loadJson("feed.json");
+    } catch (_) {
+      return null;
+    }
+  }
+
   function renderSprintChips(node) {
     const box = document.getElementById("sprint-chips");
     box.innerHTML = "";
@@ -2959,6 +3027,8 @@
     syncMapToolbar();
     syncPanelCollapseLayout();
     renderSprintQueue(manifest);
+    const feed = await loadFeed();
+    renderRssTicker(feed);
     renderMap();
 
     const tree = document.getElementById("file-tree");

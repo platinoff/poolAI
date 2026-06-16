@@ -1718,11 +1718,17 @@
       "from": "galaxy_grid",
       "kind": "implements",
       "to": "src_grid_galaxy_fee_split_metrics_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_updates_compat_rs"
     }
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S199",
+  "last_sprint_closed": "PH-S200",
   "layers": [
     {
       "id": "L0",
@@ -1755,7 +1761,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S200",
+  "next_sprint": "PH-S201",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7447,9 +7453,23 @@
       "label": "galaxy_fee_split_applied_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_fee_split_applied_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_updates_compat_rs",
+      "label": "updates_compat.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/updates_compat.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_grid_seed_inventory_integration_rs",
+      "label": "grid_seed_inventory_integration.rs",
+      "layer": "L3",
+      "path": "tests/grid_seed_inventory_integration.rs"
     }
   ],
-  "revision": 137,
+  "revision": 139,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -8649,7 +8669,7 @@
       "title": "Topology graph Rust labels slim (code)"
     },
     {
-      "acceptance": "planes pass-through; edge trace; click focus ~14px; zoom back; sidebar scroll",
+      "acceptance": "planes `pointer-events:none`; edge trace; click focus ~14px; zoom back; sidebar scroll",
       "deps": "PH-S189 Ms",
       "id": "PH-S199",
       "open": false,
@@ -8658,12 +8678,12 @@
       "title": "Vision map Ms hit-test + focus nav (docs/vision)"
     },
     {
-      "acceptance": "feed.json + RSS ticker panel; rev++",
+      "acceptance": "feed.json` + RSS ticker panel; rev++",
       "deps": "PH-S191 queue",
       "id": "PH-S200",
-      "open": true,
+      "open": false,
       "row": 135,
-      "status": "open",
+      "status": "closed",
       "title": "Vision feed.json RSS ticker (docs/vision)"
     },
     {
@@ -8721,7 +8741,7 @@
       "title": "Vision minimap selection ring (docs/vision)"
     },
     {
-      "acceptance": "next admin panel strings → poolai-ui-core",
+      "acceptance": "next admin panel strings → `poolai-ui-core",
       "deps": "PH-S197",
       "id": "PH-S207",
       "open": true,
@@ -8730,7 +8750,7 @@
       "title": "Admin i18n slim next panel (code)"
     },
     {
-      "acceptance": "poolai-http-stand-smoke checks vision rev header",
+      "acceptance": "poolai-http-stand-smoke` checks vision rev header",
       "deps": "PH-S196",
       "id": "PH-S208",
       "open": true,
@@ -8748,7 +8768,7 @@
       "title": "Vision map a11y focus ring (docs/vision)"
     }
   ],
-  "sprint_queue_open_count": 10,
+  "sprint_queue_open_count": 9,
   "updated_at": "2026-06-15",
   "vision_ui_rev": 58
 }

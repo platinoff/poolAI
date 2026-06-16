@@ -1,37 +1,36 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-15 · PH-S199 ✅ · vision **rev 137** · **10** відкритих (PH-S200…S209) · **hold 95%** · **stretch spirit 96%**
+**Оновлено:** 2026-06-16 · PH-S200 ✅ · vision **rev 139** · **9** відкритих (PH-S201…S209) · **hold 95%** · **stretch spirit 96%**
 
-| **← наступний** | **PH-S200** — Vision feed.json RSS ticker |
-| **Відкритих** | **10** (PH-S200…S209) |
+| **← наступний** | **PH-S201** — Cursor post-push PH-S* hook |
+| **Відкритих** | **9** (PH-S201…S209) |
 | **VDT** | один PH-S* = 1 commit (code) + docs sync |
 
 ---
 
-## Зріз §5.12 (10 відкритих: PH-S200…S209)
+## Зріз §5.12 (9 відкритих: PH-S201…S209)
 
 ### Закрито недавно ✅
 
 | Sprint | Scope | Зріз |
 |--------|-------|------|
+| PH-S200 | Vision feed.json RSS ticker | `poolai-vision-sync` → `feed.json`; header ticker panel; click → sprint queue |
 | PH-S199 | Vision map Ms hit-test + focus nav | planes pass-through; edge trace; click focus ~14px; zoom back; sidebar scroll |
 | PH-S198 | Topology hub labels Rust | `topology_graph.rs` label coords; slim `topology_graph.js` |
-| PH-S197 | Admin updates-compat wasm | wasm labels; i18n → Rust |
 
-### Відкрито — vision + code band (PH-S200…S209)
+### Відкрито — vision + code band (PH-S201…S209)
 
 | # | Sprint | Scope |
 |---|--------|-------|
-| 1 | **PH-S200** | Vision feed.json RSS ticker |
-| 2 | **PH-S201** | Cursor post-push PH-S* hook |
-| 3 | **PH-S202** | Vision sprint-queue chip → map focus |
-| 4 | **PH-S203** | Vision keyboard nav linked nodes |
-| 5 | **PH-S204** | Vision edge click neighbor select |
-| 6 | **PH-S205** | poolai-vision-sync manifest drift gate |
-| 7 | **PH-S206** | Vision minimap selection ring |
-| 8 | **PH-S207** | Admin i18n slim next panel |
-| 9 | **PH-S208** | Stand smoke vision revision parity |
-| 10 | **PH-S209** | Vision map a11y focus ring |
+| 1 | **PH-S201** | Cursor post-push PH-S* hook |
+| 2 | **PH-S202** | Vision sprint-queue chip → map focus |
+| 3 | **PH-S203** | Vision keyboard nav linked nodes |
+| 4 | **PH-S204** | Vision edge click neighbor select |
+| 5 | **PH-S205** | poolai-vision-sync manifest drift gate |
+| 6 | **PH-S206** | Vision minimap selection ring |
+| 7 | **PH-S207** | Admin i18n slim next panel |
+| 8 | **PH-S208** | Stand smoke vision revision parity |
+| 9 | **PH-S209** | Vision map a11y focus ring |
 
 ---
 
@@ -48,22 +47,22 @@ export K8S_OPENAPI_ENABLED_VERSION=1.28
 
 ---
 
-## PH-S200 — scope
+## PH-S201 — scope
 
-- `docs/vision/feed.json` RSS ticker panel; `cargo test-ci`
+- `.cursor/hooks` post-push notify after PH-S* close; docs sync pointer; `cargo test-ci`
 - Acceptance: FM/HANDOFF/NEXT; push
 
 ---
 
-## Copy-paste — PH-S200
+## Copy-paste — PH-S201
 
 ```
-PoolAI — спринт PH-S200 (один PH-S*, VDT ітераційно).
+PoolAI — спринт PH-S201 (один PH-S*, VDT ітераційно).
 HANDOFF: docs/development/HANDOFF_NEW_SESSION.md
 FM §5.12: docs/catalog/FUNCTION_MANAGEMENT.md
 
-Спринт PH-S200 — Vision feed.json RSS ticker
-Scope: docs/vision/feed.json + index panel; cargo test-ci
+Спринт PH-S201 — Cursor post-push PH-S* hook
+Scope: .cursor/hooks + docs sync pointer; cargo test-ci
 
 Acceptance: cargo test-ci; FM/HANDOFF/NEXT; git push main
 ```

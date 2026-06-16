@@ -137,6 +137,108 @@ header .meta {
   margin-right: 8px;
 }
 
+.rss-ticker {
+  position: relative;
+  z-index: 21;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  padding: 4px 14px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(12, 18, 30, 0.82);
+  backdrop-filter: blur(8px);
+  min-height: 28px;
+  overflow: hidden;
+}
+
+.rss-ticker-label {
+  flex: 0 0 auto;
+  align-self: center;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sprint);
+  padding: 2px 6px;
+  border: 1px solid rgba(167, 139, 250, 0.35);
+  border-radius: 4px;
+  background: rgba(167, 139, 250, 0.08);
+}
+
+.rss-ticker-viewport {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent);
+}
+
+.rss-ticker-track {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  width: max-content;
+  animation: rss-ticker-scroll 48s linear infinite;
+}
+
+.rss-ticker:hover .rss-ticker-track {
+  animation-play-state: paused;
+}
+
+.rss-ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 20px;
+  font-size: 0.72rem;
+  color: var(--muted);
+  white-space: nowrap;
+  border-right: 1px solid rgba(120, 160, 220, 0.12);
+}
+
+.rss-ticker-item strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.rss-ticker-item.open strong {
+  color: var(--sprint);
+}
+
+.rss-ticker-item.next {
+  color: var(--text);
+}
+
+.rss-ticker-item.next strong {
+  color: #c4b5fd;
+}
+
+.rss-ticker-sep {
+  opacity: 0.35;
+  margin: 0 4px;
+}
+
+@keyframes rss-ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rss-ticker-track {
+    animation: none;
+    flex-wrap: wrap;
+    width: 100%;
+    white-space: normal;
+  }
+  .rss-ticker-viewport {
+    mask-image: none;
+    overflow: auto;
+  }
+}
+
 .header-actions {
   display: inline-flex;
   align-items: center;
@@ -1660,6 +1762,12 @@ body.vision-ms #map-svg .edge.trace-dim {
 
 .sprint-queue-item.open .sprint-queue-status {
   color: #a78bfa;
+}
+
+.panel-flash {
+  outline: 1px solid var(--border-bright);
+  box-shadow: 0 0 12px var(--glow);
+  transition: box-shadow 0.3s ease, outline 0.3s ease;
 }
 
 #link-graph {

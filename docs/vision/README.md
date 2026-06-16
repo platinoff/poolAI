@@ -117,7 +117,8 @@ http://127.0.0.1:8765/docs/vision/index.html
 | **PH-S193** ✅ | Dashboard wasm formatters | `poolai-ui-core`, `poolai-ui-wasm`, `src/ui/mod.rs` |
 | **PH-S194** ✅ (vision UX rev 132) | Panel dock bar + map bottom bar | `vision.js`, `vision.css`, `index.html` v61 |
 | **PH-S199** | `feed.json` RSS ticker | `docs/vision/` |
-| **PH-S200** | Cursor post-push hook | `.cursor/hooks` |
+| **PH-S200** ✅ | `feed.json` RSS ticker panel | `poolai-vision-sync`, `feed.json`, `index.html` |
+| **PH-S201** | Cursor post-push hook | `.cursor/hooks` |
 
 Канон черги: [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 · наступний спринт **PH-S195** (seed_inventory GET).
 

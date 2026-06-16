@@ -12,7 +12,9 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, ExitCode};
 
 const MANIFEST_REL: &str = "docs/vision/manifest.json";
+const FEED_REL: &str = "docs/vision/feed.json";
 const FM_REL: &str = "docs/catalog/FUNCTION_MANAGEMENT.md";
+const FEED_CLOSED_CAP: usize = 12;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct SprintQueueEntry {
@@ -186,7 +188,11 @@ fn load_manifest(path: &Path) -> Result<Value, String> {
 }
 
 fn write_manifest(path: &Path, manifest: &Value) -> Result<(), String> {
-    let pretty = serde_json::to_string_pretty(manifest).map_err(|e| format!("serialize: {e}"))?;
+    write_json_file(path, manifest)
+}
+
+fn write_json_file(path: &Path, value: &Value) -> Result<(), String> {
+    let pretty = serde_json::to_string_pretty(value).map_err(|e| format!("serialize: {e}"))?;
     fs::write(path, pretty + "\n").map_err(|e| format!("write {}: {e}", path.display()))
 }
 
@@ -415,21 +421,24 @@ fn bump_manifest_revision(manifest: &mut Value) {
     manifest["auto_sync_at"] = json!(today_iso());
 }
 
-fn sync_fm_sprint_queue(manifest: &mut Value, root: &Path) -> bool {
+fn read_fm_sprint_entries(root: &Path) -> Vec<SprintQueueEntry> {
     let fm_path = root.join(FM_REL);
     let content = match fs::read_to_string(&fm_path) {
         Ok(c) => c,
         Err(e) => {
             eprintln!("warn: read {}: {e}", fm_path.display());
-            return false;
+            return Vec::new();
         }
     };
-    let entries = parse_fm_sprint_queue(&content);
+    parse_fm_sprint_queue(&content)
+}
+
+fn sync_fm_sprint_queue(manifest: &mut Value, entries: &[SprintQueueEntry]) -> bool {
     if entries.is_empty() {
         return false;
     }
-    let queue = sprint_queue_json(&entries);
-    let (next_sprint, last_closed, open_count) = derive_sprint_meta(&entries);
+    let queue = sprint_queue_json(entries);
+    let (next_sprint, last_closed, open_count) = derive_sprint_meta(entries);
     let prev_next = manifest.get("next_sprint").and_then(Value::as_str);
     let prev_last = manifest.get("last_sprint_closed").and_then(Value::as_str);
     let changed = manifest.get("sprint_queue") != Some(&queue)
@@ -446,6 +455,69 @@ fn sync_fm_sprint_queue(manifest: &mut Value, root: &Path) -> bool {
     }
     if let Some(lc) = last_closed {
         manifest["last_sprint_closed"] = json!(lc);
+    }
+    changed
+}
+
+fn feed_item_json(entry: &SprintQueueEntry, next_sprint: Option<&str>) -> Value {
+    let category = if entry.open { "open" } else { "closed" };
+    let mut item = json!({
+        "id": entry.id,
+        "title": entry.title,
+        "category": category,
+        "status": entry.status,
+        "published": today_iso(),
+        "summary": entry.acceptance,
+        "link": "docs/vision/index.html#sprint-queue"
+    });
+    if entry.open && next_sprint == Some(entry.id.as_str()) {
+        item["next"] = json!(true);
+    }
+    item
+}
+
+/// RSS-style sprint feed for the vision ticker (open queue + recent closed).
+fn build_sprint_feed(entries: &[SprintQueueEntry]) -> Value {
+    let (next_sprint, _, _) = derive_sprint_meta(entries);
+    let next_ref = next_sprint.as_deref();
+    let mut items: Vec<Value> = entries
+        .iter()
+        .filter(|e| e.open)
+        .map(|e| feed_item_json(e, next_ref))
+        .collect();
+    let closed_recent: Vec<&SprintQueueEntry> = entries
+        .iter()
+        .filter(|e| !e.open && e.status == "closed")
+        .rev()
+        .take(FEED_CLOSED_CAP)
+        .collect();
+    for entry in closed_recent {
+        items.push(feed_item_json(entry, None));
+    }
+    json!({
+        "updated_at": today_iso(),
+        "title": "PoolAI Vision Sprint Feed",
+        "link": "docs/vision/index.html",
+        "description": "RSS-style ticker of FM §5.12 sprint queue (open + recent closed)",
+        "items": items
+    })
+}
+
+fn sync_sprint_feed(root: &Path, entries: &[SprintQueueEntry]) -> bool {
+    if entries.is_empty() {
+        return false;
+    }
+    let feed = build_sprint_feed(entries);
+    let feed_path = root.join(FEED_REL);
+    let prev = fs::read_to_string(&feed_path)
+        .ok()
+        .and_then(|raw| serde_json::from_str::<Value>(&raw).ok());
+    let changed = prev.as_ref() != Some(&feed);
+    if changed {
+        if let Err(e) = write_json_file(&feed_path, &feed) {
+            eprintln!("warn: write {}: {e}", feed_path.display());
+            return false;
+        }
     }
     changed
 }
@@ -495,13 +567,20 @@ fn main() -> ExitCode {
     };
 
     let (added_nodes, added_edges) = sync_manifest(&mut manifest, &paths);
-    let queue_changed = sync_fm_sprint_queue(&mut manifest, &root);
+    let entries = read_fm_sprint_entries(&root);
+    let queue_changed = sync_fm_sprint_queue(&mut manifest, &entries);
+    let feed_changed = sync_sprint_feed(&root, &entries);
     if queue_changed && added_nodes == 0 && added_edges == 0 {
         bump_manifest_revision(&mut manifest);
     }
     println!(
-        "vision sync: +{added_nodes} nodes, +{added_edges} edges, sprint_queue {} (revision {})",
+        "vision sync: +{added_nodes} nodes, +{added_edges} edges, sprint_queue {}, feed {} (revision {})",
         if queue_changed {
+            "updated"
+        } else {
+            "unchanged"
+        },
+        if feed_changed {
             "updated"
         } else {
             "unchanged"
@@ -512,18 +591,20 @@ fn main() -> ExitCode {
             .unwrap_or(0)
     );
 
-    if added_nodes == 0 && added_edges == 0 && !queue_changed {
+    if added_nodes == 0 && added_edges == 0 && !queue_changed && !feed_changed {
         return ExitCode::SUCCESS;
     }
 
     if dry_run {
-        println!("dry-run: manifest not written");
+        println!("dry-run: manifest/feed not written");
         return ExitCode::SUCCESS;
     }
 
-    if let Err(e) = write_manifest(&manifest_path, &manifest) {
-        eprintln!("error: {e}");
-        return ExitCode::from(2);
+    if queue_changed || added_nodes > 0 || added_edges > 0 {
+        if let Err(e) = write_manifest(&manifest_path, &manifest) {
+            eprintln!("error: {e}");
+            return ExitCode::from(2);
+        }
     }
 
     ExitCode::SUCCESS
@@ -568,6 +649,57 @@ mod tests {
         assert_eq!(next.as_deref(), Some("PH-S191"));
         assert_eq!(last.as_deref(), Some("PH-S190"));
         assert_eq!(open, 2);
+    }
+
+    #[test]
+    fn build_sprint_feed_open_then_recent_closed() {
+        let entries = vec![
+            SprintQueueEntry {
+                row: 1,
+                id: "PH-S198".into(),
+                title: "Topology labels".into(),
+                deps: String::new(),
+                acceptance: "hub labels".into(),
+                status: "closed".into(),
+                open: false,
+            },
+            SprintQueueEntry {
+                row: 2,
+                id: "PH-S199".into(),
+                title: "Map hit-test".into(),
+                deps: String::new(),
+                acceptance: "edge trace".into(),
+                status: "closed".into(),
+                open: false,
+            },
+            SprintQueueEntry {
+                row: 3,
+                id: "PH-S200".into(),
+                title: "Feed ticker".into(),
+                deps: String::new(),
+                acceptance: "feed.json panel".into(),
+                status: "open".into(),
+                open: true,
+            },
+            SprintQueueEntry {
+                row: 4,
+                id: "PH-S201".into(),
+                title: "Post-push hook".into(),
+                deps: String::new(),
+                acceptance: "cursor hooks".into(),
+                status: "open".into(),
+                open: true,
+            },
+        ];
+        let feed = build_sprint_feed(&entries);
+        let items = feed["items"].as_array().unwrap();
+        assert_eq!(items.len(), 4);
+        assert_eq!(items[0]["id"], "PH-S200");
+        assert_eq!(items[0]["category"], "open");
+        assert_eq!(items[0]["next"], true);
+        assert_eq!(items[1]["id"], "PH-S201");
+        assert_eq!(items[2]["id"], "PH-S199");
+        assert_eq!(items[3]["id"], "PH-S198");
     }
 
     #[test]

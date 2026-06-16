@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PoolAI Galaxy Starwalker Vision</title>
-  <link rel="stylesheet" href="vision.css?v=62" />
+  <link rel="stylesheet" href="vision.css?v=63" />
 </head>
 <body>
   <div id="galaxy-backdrop" class="galaxy-backdrop" aria-hidden="true">
@@ -22,6 +22,12 @@
       <button type="button" id="btn-reload" title="Reload manifest.json">↻ Reload</button>
     </div>
   </header>
+  <div id="rss-ticker" class="rss-ticker" aria-label="Sprint feed ticker" hidden>
+    <span class="rss-ticker-label" title="FM §5.12 feed from feed.json">Feed</span>
+    <div class="rss-ticker-viewport" aria-live="polite">
+      <ul class="rss-ticker-track" id="rss-ticker-track"></ul>
+    </div>
+  </div>
   <div class="workspace">
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-head">
@@ -117,6 +123,6 @@
       </section>
     </div>
   </div>
-  <script src="vision.js?v=62"></script>
+  <script src="vision.js?v=63"></script>
 </body>
 </html>
