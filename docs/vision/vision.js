@@ -89,6 +89,8 @@
   let activeQueueSprintId = null;
   let sprintPathSet = null;
   let selectedId = null;
+  let mapNavNeighborIdx = -1;
+  let mapNavNeighborKey = null;
   let fullscreenPanel = null;
   let nodePositions = new Map();
   let watchState = null;
@@ -2475,6 +2477,76 @@
     return out;
   }
 
+  function isNodeOnMap(nodeId) {
+    const pos = nodePositions.get(nodeId);
+    return !!(pos && !pos.collapsedHidden);
+  }
+
+  function linkedMapNeighbors(nodeId) {
+    const seen = new Set();
+    const out = [];
+    relatedEdges(nodeId).forEach((l) => {
+      const id = l.node.id;
+      if (seen.has(id) || !isNodeOnMap(id)) return;
+      seen.add(id);
+      out.push(l.node);
+    });
+    const pos = nodePositions.get(nodeId);
+    if (pos && out.length > 1) {
+      out.sort((a, b) => {
+        const pa = nodePositions.get(a.id);
+        const pb = nodePositions.get(b.id);
+        return (
+          Math.atan2(pa.y - pos.y, pa.x - pos.x) -
+          Math.atan2(pb.y - pos.y, pb.x - pos.x)
+        );
+      });
+    }
+    return out;
+  }
+
+  function shouldHandleMapNavKey(ev) {
+    const key = ev.key;
+    if (
+      key !== "ArrowLeft" &&
+      key !== "ArrowRight" &&
+      key !== "ArrowUp" &&
+      key !== "ArrowDown"
+    ) {
+      return false;
+    }
+    const t = ev.target;
+    if (!t) return true;
+    const tag = (t.tagName || "").toLowerCase();
+    if (tag === "input" || tag === "textarea" || tag === "select") return false;
+    if (t.isContentEditable) return false;
+    if (t.closest && t.closest(".sprint-queue-item[tabindex]")) return false;
+    return true;
+  }
+
+  function navigateMapLinkedNeighbor(ev) {
+    if (!shouldHandleMapNavKey(ev)) return;
+    if (!selectedId) return;
+    const neighbors = linkedMapNeighbors(selectedId);
+    if (!neighbors.length) return;
+    if (mapNavNeighborKey !== selectedId) {
+      mapNavNeighborKey = selectedId;
+      mapNavNeighborIdx = -1;
+    }
+    const step =
+      ev.key === "ArrowLeft" || ev.key === "ArrowUp" ? -1 : 1;
+    mapNavNeighborIdx =
+      (mapNavNeighborIdx + step + neighbors.length) % neighbors.length;
+    const next = neighbors[mapNavNeighborIdx];
+    ev.preventDefault();
+    selectNode(next);
+    focusMapNode(next, { pushHistory: true });
+  }
+
+  function initMapKeyboardNav() {
+    document.addEventListener("keydown", navigateMapLinkedNeighbor);
+  }
+
   function renderLinkGraph(node) {
     const svg = document.getElementById("link-graph");
     const ns = "http://www.w3.org/2000/svg";
@@ -2865,7 +2937,10 @@
   }
 
   function selectNode(node) {
-    if (!node || selectedId === node.id) return;
+    if (!node) return;
+    if (selectedId === node.id) return;
+    mapNavNeighborKey = null;
+    mapNavNeighborIdx = -1;
     selectedId = node.id;
 
     if (activeTreeFileEl) activeTreeFileEl.classList.remove("active");
@@ -3295,6 +3370,7 @@
   }
   applyVisionMode();
   initMapToolbar();
+  initMapKeyboardNav();
   reloadAll(false)
     .then(() => startAutoReload())
     .catch((err) => {

@@ -3,18 +3,9 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S203",
-      "link": "docs/vision/index.html#sprint-queue",
-      "next": true,
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "Arrow keys cycle 1-hop neighbors on map",
-      "title": "Vision keyboard nav linked nodes (docs/vision)"
-    },
-    {
-      "category": "open",
       "id": "PH-S204",
       "link": "docs/vision/index.html#sprint-queue",
+      "next": true,
       "published": "2026-05-28",
       "status": "open",
       "summary": "edge click → trace + select endpoint",
@@ -64,6 +55,15 @@
       "status": "open",
       "summary": "keyboard focus-visible on map controls + nodes",
       "title": "Vision map a11y focus ring (docs/vision)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S203",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "Arrow keys cycle 1-hop neighbors on map",
+      "title": "Vision keyboard nav linked nodes (docs/vision)"
     },
     {
       "category": "closed",
@@ -163,15 +163,6 @@
       "status": "closed",
       "summary": "map-overview` при low zoom; hub-only labels; viewport inset minimap; rev++",
       "title": "Vision overview LOD + minimap (docs/vision)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S191",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "Rust parse FM §5.12 → `sprint_queue` panel; rev++",
-      "title": "Vision sprint queue panel (docs/vision)"
     }
   ],
   "link": "docs/vision/index.html",
