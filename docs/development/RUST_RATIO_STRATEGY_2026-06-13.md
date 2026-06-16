@@ -162,7 +162,7 @@ flowchart TB
 | 67 | **PH-S210** | Stand smoke seed_inventory GET | tests | **✅** |
 | 68 | **PH-S211** | Admin i18n slim jobs panel | code | **✅** |
 | 69 | **PH-S212** | Vision reduced-motion map FX | docs/vision | **✅** |
-| 70 | **PH-S213** | Galaxy prefetch metrics stand smoke | tests | відкрито |
+| 70 | **PH-S213** | Galaxy prefetch metrics stand smoke | tests | **✅** |
 | 71 | **PH-S214** | Admin i18n slim raid panel | code | відкрито |
 | 72 | **PH-S215** | Vision panel collapse focus restore | docs/vision | відкрито |
 | 73 | **PH-S216** | Galaxy pricing fallback metrics smoke | tests | відкрито |

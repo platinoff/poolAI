@@ -1728,7 +1728,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S212",
+  "last_sprint_closed": "PH-S213",
   "layers": [
     {
       "id": "L0",
@@ -1761,7 +1761,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S213",
+  "next_sprint": "PH-S214",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7469,7 +7469,7 @@
       "path": "tests/grid_seed_inventory_integration.rs"
     }
   ],
-  "revision": 154,
+  "revision": 155,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -8798,9 +8798,9 @@
       "acceptance": "stand smoke checks prefetch counters on `/metrics",
       "deps": "PH-S184",
       "id": "PH-S213",
-      "open": true,
+      "open": false,
       "row": 148,
-      "status": "open",
+      "status": "closed",
       "title": "Galaxy prefetch metrics stand smoke (tests)"
     },
     {
@@ -8858,7 +8858,7 @@
       "title": "Galaxy trust payout metrics smoke (tests)"
     }
   ],
-  "sprint_queue_open_count": 7,
+  "sprint_queue_open_count": 6,
   "updated_at": "2026-06-15",
   "vision_ui_rev": 58
 }

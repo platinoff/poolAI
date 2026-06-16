@@ -3,18 +3,9 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S213",
-      "link": "docs/vision/index.html#sprint-queue",
-      "next": true,
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "stand smoke checks prefetch counters on `/metrics",
-      "title": "Galaxy prefetch metrics stand smoke (tests)"
-    },
-    {
-      "category": "open",
       "id": "PH-S214",
       "link": "docs/vision/index.html#sprint-queue",
+      "next": true,
       "published": "2026-05-28",
       "status": "open",
       "summary": "admin.raid.*` → `poolai-ui-core`; slim JS",
@@ -64,6 +55,15 @@
       "status": "open",
       "summary": "stand smoke trust payout counters on `/metrics",
       "title": "Galaxy trust payout metrics smoke (tests)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S213",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "stand smoke checks prefetch counters on `/metrics",
+      "title": "Galaxy prefetch metrics stand smoke (tests)"
     },
     {
       "category": "closed",
@@ -163,15 +163,6 @@
       "status": "closed",
       "summary": "queue card click centers map node",
       "title": "Vision sprint-queue chip → map focus (docs/vision)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S201",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "post-push notify after PH-S* close; docs sync pointer",
-      "title": "Cursor post-push PH-S* hook (ops)"
     }
   ],
   "link": "docs/vision/index.html",

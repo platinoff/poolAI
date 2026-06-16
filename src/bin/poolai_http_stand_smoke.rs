@@ -299,6 +299,39 @@ async fn smoke_grid_seed_inventory(client: &Client, base: &str) -> Result<(), St
     Ok(())
 }
 
+/// PH-S213: live stand exposes Galaxy prefetch counters on Prometheus scrape.
+const GALAXY_PREFETCH_METRICS: &[&str] = &[
+    "galaxy_prefetch_plan_total",
+    "galaxy_prefetch_planned_shards_total",
+    "galaxy_prefetch_hot_skip_total",
+    "galaxy_prefetch_bytes_total",
+];
+
+fn metrics_text_has_prefetch_counters(body: &str) -> Result<(), String> {
+    for name in GALAXY_PREFETCH_METRICS {
+        if !body.contains(name) {
+            return Err(format!("/metrics missing {name}"));
+        }
+        if !body.contains(&format!("# TYPE {name} gauge")) {
+            return Err(format!("/metrics missing TYPE gauge for {name}"));
+        }
+    }
+    Ok(())
+}
+
+async fn smoke_galaxy_prefetch_metrics(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("/metrics request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("/metrics status {}", resp.status()));
+    }
+    let body = resp.text().await.map_err(|e| e.to_string())?;
+    metrics_text_has_prefetch_counters(&body)
+}
+
 async fn smoke_grid_pricing(client: &Client, base: &str) -> Result<(), String> {
     let model = smoke_id("smoke-pricing");
     let url = format!(
@@ -872,6 +905,12 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
     .await;
     record(
         &mut cases,
+        "galaxy_prefetch_metrics",
+        smoke_galaxy_prefetch_metrics(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
         "jobs_migrating",
         smoke_jobs_migrating(&client, &cli.base_url).await,
     )
@@ -1039,6 +1078,25 @@ mod tests {
         let entries = stub["entries"].as_array().expect("entries");
         assert_eq!(entries.len(), 2);
         assert_eq!(entries[0]["peer_id"], "srv1-worker-a");
+    }
+
+    #[test]
+    fn galaxy_prefetch_metrics_export_shape_ph_s213() {
+        let sample = concat!(
+            "# HELP galaxy_prefetch_plan_total Galaxy prefetch plans\n",
+            "# TYPE galaxy_prefetch_plan_total gauge\n",
+            "galaxy_prefetch_plan_total 0\n",
+            "# HELP galaxy_prefetch_planned_shards_total Galaxy prefetch shards\n",
+            "# TYPE galaxy_prefetch_planned_shards_total gauge\n",
+            "galaxy_prefetch_planned_shards_total 0\n",
+            "# HELP galaxy_prefetch_hot_skip_total Galaxy prefetch hot skip\n",
+            "# TYPE galaxy_prefetch_hot_skip_total gauge\n",
+            "galaxy_prefetch_hot_skip_total 0\n",
+            "# HELP galaxy_prefetch_bytes_total Galaxy prefetch bytes\n",
+            "# TYPE galaxy_prefetch_bytes_total gauge\n",
+            "galaxy_prefetch_bytes_total 0\n",
+        );
+        metrics_text_has_prefetch_counters(sample).expect("sample export");
     }
 
     #[test]
