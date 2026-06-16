@@ -85,7 +85,7 @@ flowchart TB
 | **E — gate** | PH-S150 ✅ | CI advisory якщо ratio <88%; target 93%; stretch 96% spirit | стабільно 90–95% |
 | **F — stretch 96%** | PH-S151…S159 ✅ | wasm wiring, slim JS/i18n/charts, Rust stand/e2e bins; CI warn **93%** | **→96% spirit** |
 
-**Черга §5.12 (2 відкритих):** PH-S199…S200 vision + code-first band; replenish після S200.
+**Черга §5.12 (10 відкритих):** PH-S200…S209 vision + code-first band.
 
 ---
 
@@ -148,8 +148,17 @@ flowchart TB
 | 53 | **PH-S196** | Stand smoke lease renew | poolai-http-stand-smoke | **✅** |
 | 54 | **PH-S197** | updates-compat wasm | admin UI | **✅** |
 | 55 | **PH-S198** | Topology Rust labels slim | PH-S157 | **✅** |
-| 56 | **PH-S199** | Vision feed.json RSS | docs/vision | відкрито |
-| 57 | **PH-S200** | Cursor post-push hook | VDT ops | відкрито |
+| 56 | **PH-S199** | Vision map Ms hit-test + focus nav | docs/vision | **✅** |
+| 57 | **PH-S200** | Vision feed.json RSS | docs/vision | відкрито |
+| 58 | **PH-S201** | Cursor post-push hook | VDT ops | відкрито |
+| 59 | **PH-S202** | Vision sprint-queue → map focus | docs/vision | відкрито |
+| 60 | **PH-S203** | Vision keyboard nav nodes | docs/vision | відкрито |
+| 61 | **PH-S204** | Vision edge click select | docs/vision | відкрито |
+| 62 | **PH-S205** | poolai-vision-sync drift gate | ops | відкрито |
+| 63 | **PH-S206** | Vision minimap selection ring | docs/vision | відкрито |
+| 64 | **PH-S207** | Admin i18n slim next panel | code | відкрито |
+| 65 | **PH-S208** | Stand smoke vision rev parity | tests | відкрито |
+| 66 | **PH-S209** | Vision map a11y focus ring | docs/vision | відкрито |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 

@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-15 (PH-S198 ✅ · §5.12 **2** відкритих PH-S199…S200 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-15 (PH-S199 ✅ · §5.12 **10** відкритих PH-S200…S209 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -398,14 +398,23 @@ FM-xxx (з таблиці нижче)
 | 131 | **PH-S196** | Stand smoke jobs lease renew (tests) | PH-S156, PH-S99 | `poolai-http-stand-smoke --lease-renew`; slim Playwright lease | **✅** |
 | 132 | **PH-S197** | Admin updates-compat wasm wiring (code) | PH-S151, PH-S93 | `/ui/admin/updates-compat` → wasm labels; Playwright smoke | **✅** |
 | 133 | **PH-S198** | Topology graph Rust labels slim (code) | PH-S157 | hub labels у `topology_graph.rs`; −LOC `topology_graph.js` | **✅** |
-| 134 | **PH-S199** | Vision feed.json RSS ticker (docs/vision) | PH-S191 queue | `feed.json` + RSS ticker panel; rev++ | відкрито |
-| 135 | **PH-S200** | Cursor post-push PH-S* hook (ops) | VDT, `.cursor/hooks` | post-push notify after PH-S* close; docs sync pointer | відкрито |
+| 134 | **PH-S199** | Vision map Ms hit-test + focus nav (docs/vision) | PH-S189 Ms | planes `pointer-events:none`; edge trace; click focus ~14px; zoom back; sidebar scroll | **✅** |
+| 135 | **PH-S200** | Vision feed.json RSS ticker (docs/vision) | PH-S191 queue | `feed.json` + RSS ticker panel; rev++ | відкрито |
+| 136 | **PH-S201** | Cursor post-push PH-S* hook (ops) | VDT, `.cursor/hooks` | post-push notify after PH-S* close; docs sync pointer | відкрито |
+| 137 | **PH-S202** | Vision sprint-queue chip → map focus (docs/vision) | PH-S199 | queue card click centers map node | відкрито |
+| 138 | **PH-S203** | Vision keyboard nav linked nodes (docs/vision) | PH-S199 | Arrow keys cycle 1-hop neighbors on map | відкрито |
+| 139 | **PH-S204** | Vision edge click neighbor select (docs/vision) | PH-S199 | edge click → trace + select endpoint | відкрито |
+| 140 | **PH-S205** | poolai-vision-sync manifest drift gate (ops) | PH-S191 | CI/local check manifest revision vs FM | відкрито |
+| 141 | **PH-S206** | Vision minimap selection ring (docs/vision) | PH-S192 | minimap viewport + selected node ring | відкрито |
+| 142 | **PH-S207** | Admin i18n slim next panel (code) | PH-S197 | next admin panel strings → `poolai-ui-core` | відкрито |
+| 143 | **PH-S208** | Stand smoke vision revision parity (tests) | PH-S196 | `poolai-http-stand-smoke` checks vision rev header | відкрито |
+| 144 | **PH-S209** | Vision map a11y focus ring (docs/vision) | PH-S194 | keyboard focus-visible on map controls + nodes | відкрито |
 
-**Відкритих у §5.12:** **2** (PH-S199…S200). **Закрито смуга:** PH-S128…S198 ✅. Vision rev **136**.
+**Відкритих у §5.12:** **10** (PH-S200…S209). **Закрито смуга:** PH-S128…S199 ✅. Vision rev **137**.
 
-**Rust ratio:** формальна смуга **90–95%**; **hold 95%** — PH-S165 ✅; replenish **S199…S200** (vision + code-first).
+**Rust ratio:** формальна смуга **90–95%**; **hold 95%** — PH-S165 ✅; replenish **S200…S209** (vision + code-first).
 
-**Наступна сесія:** **PH-S199** · черга **2** відкритих (PH-S199…S200) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S200** · черга **10** відкритих (PH-S200…S209) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S169)
 
@@ -526,7 +535,7 @@ FM-xxx (з таблиці нижче)
 
 **Baseline:** rust_ratio **92.68%** → **hold 95%** · **stretch spirit 96%** ([`rust_ratio.json`](../development/rust_ratio.json), [`RUST_RATIO_STRATEGY_2026-06-13.md`](../development/RUST_RATIO_STRATEGY_2026-06-13.md)).
 
-**Наступна сесія:** **PH-S199** · черга **2** відкритих (PH-S199…S200) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S200** · черга **10** відкритих (PH-S200…S209) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

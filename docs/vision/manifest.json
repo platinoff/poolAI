@@ -1721,8 +1721,8 @@
     }
   ],
   "galaxy_background": "vision2.png",
-  "git_head": "76f6dd3d",
-  "last_sprint_closed": "PH-S198",
+  "git_head": "50ce232f",
+  "last_sprint_closed": "PH-S199",
   "layers": [
     {
       "id": "L0",
@@ -1755,7 +1755,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S199",
+  "next_sprint": "PH-S200",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7449,7 +7449,7 @@
       "path": "tests/galaxy_fee_split_applied_integration.rs"
     }
   ],
-  "revision": 136,
+  "revision": 137,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -8649,25 +8649,106 @@
       "title": "Topology graph Rust labels slim (code)"
     },
     {
-      "acceptance": "feed.json` + RSS ticker panel; rev++",
-      "deps": "PH-S191 queue",
+      "acceptance": "planes pass-through; edge trace; click focus ~14px; zoom back; sidebar scroll",
+      "deps": "PH-S189 Ms",
       "id": "PH-S199",
-      "open": true,
+      "open": false,
       "row": 134,
+      "status": "closed",
+      "title": "Vision map Ms hit-test + focus nav (docs/vision)"
+    },
+    {
+      "acceptance": "feed.json + RSS ticker panel; rev++",
+      "deps": "PH-S191 queue",
+      "id": "PH-S200",
+      "open": true,
+      "row": 135,
       "status": "open",
       "title": "Vision feed.json RSS ticker (docs/vision)"
     },
     {
       "acceptance": "post-push notify after PH-S* close; docs sync pointer",
       "deps": "VDT, `.cursor/hooks",
-      "id": "PH-S200",
+      "id": "PH-S201",
       "open": true,
-      "row": 135,
+      "row": 136,
       "status": "open",
       "title": "Cursor post-push PH-S* hook (ops)"
+    },
+    {
+      "acceptance": "queue card click centers map node",
+      "deps": "PH-S199",
+      "id": "PH-S202",
+      "open": true,
+      "row": 137,
+      "status": "open",
+      "title": "Vision sprint-queue chip → map focus (docs/vision)"
+    },
+    {
+      "acceptance": "Arrow keys cycle 1-hop neighbors on map",
+      "deps": "PH-S199",
+      "id": "PH-S203",
+      "open": true,
+      "row": 138,
+      "status": "open",
+      "title": "Vision keyboard nav linked nodes (docs/vision)"
+    },
+    {
+      "acceptance": "edge click → trace + select endpoint",
+      "deps": "PH-S199",
+      "id": "PH-S204",
+      "open": true,
+      "row": 139,
+      "status": "open",
+      "title": "Vision edge click neighbor select (docs/vision)"
+    },
+    {
+      "acceptance": "CI/local check manifest revision vs FM",
+      "deps": "PH-S191",
+      "id": "PH-S205",
+      "open": true,
+      "row": 140,
+      "status": "open",
+      "title": "poolai-vision-sync manifest drift gate (ops)"
+    },
+    {
+      "acceptance": "minimap viewport + selected node ring",
+      "deps": "PH-S192",
+      "id": "PH-S206",
+      "open": true,
+      "row": 141,
+      "status": "open",
+      "title": "Vision minimap selection ring (docs/vision)"
+    },
+    {
+      "acceptance": "next admin panel strings → poolai-ui-core",
+      "deps": "PH-S197",
+      "id": "PH-S207",
+      "open": true,
+      "row": 142,
+      "status": "open",
+      "title": "Admin i18n slim next panel (code)"
+    },
+    {
+      "acceptance": "poolai-http-stand-smoke checks vision rev header",
+      "deps": "PH-S196",
+      "id": "PH-S208",
+      "open": true,
+      "row": 143,
+      "status": "open",
+      "title": "Stand smoke vision revision parity (tests)"
+    },
+    {
+      "acceptance": "keyboard focus-visible on map controls + nodes",
+      "deps": "PH-S194",
+      "id": "PH-S209",
+      "open": true,
+      "row": 144,
+      "status": "open",
+      "title": "Vision map a11y focus ring (docs/vision)"
     }
   ],
-  "sprint_queue_open_count": 5,
+  "sprint_queue_open_count": 10,
   "updated_at": "2026-06-15",
   "vision_ui_rev": 58
 }

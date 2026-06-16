@@ -23,13 +23,18 @@
   };
 
   let mapView = { tx: 0, ty: 0, scale: 1 };
+  const mapViewStack = [];
   let mapNavBound = false;
+  let mapHoverRaf = 0;
+  let clickFocusTimer = null;
 
   const CLUSTER_COLLAPSE_MIN = 3;
   const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
   /** Leaf labels (auto-synced / dense map) appear above this zoom. */
   const LABEL_ZOOM_LEAF = 1.55;
   const LABEL_ZOOM_NORMAL = 1.15;
+  /** Target on-screen label size when focusing a node (≈14px at 96dpi). */
+  const MAP_FOCUS_LABEL_PX = 14;
   /** Below this scale: overview LOD (hub nodes/edges, hub-only labels). PH-S192 */
   const MAP_OVERVIEW_ZOOM = 0.98;
   const MAP_DENSE_NODE_THRESHOLD = 80;
@@ -872,10 +877,103 @@
     applyMapTransform();
   }
 
-  function focusMapNode(node) {
+  function cloneMapView() {
+    return { tx: mapView.tx, ty: mapView.ty, scale: mapView.scale };
+  }
+
+  function syncMapZoomBackBtn() {
+    const btn = document.getElementById("map-zoom-back");
+    if (!btn) return;
+    btn.disabled = mapViewStack.length === 0;
+  }
+
+  function pushMapViewState() {
+    mapViewStack.push(cloneMapView());
+    if (mapViewStack.length > 24) mapViewStack.shift();
+    syncMapZoomBackBtn();
+  }
+
+  function popMapViewState() {
+    const prev = mapViewStack.pop();
+    if (!prev) return;
+    mapView = prev;
+    applyMapTransform();
+    syncMapZoomBackBtn();
+  }
+
+  function mapSvgClientToMap(ev) {
+    const svg = document.getElementById("map-svg");
+    if (!svg) return null;
+    const rect = svg.getBoundingClientRect();
+    if (!rect.width || !rect.height) return null;
+    return {
+      x: ((ev.clientX - rect.left) / rect.width) * MAP_W,
+      y: ((ev.clientY - rect.top) / rect.height) * MAP_H,
+    };
+  }
+
+  function edgeTraceNodeId(edgeEl, mx, my) {
+    const from = edgeEl.dataset.from;
+    const to = edgeEl.dataset.to;
+    const pf = nodePositions.get(from);
+    const pt = nodePositions.get(to);
+    if (!pf || !pt) return from;
+    const df = (pf.x - mx) ** 2 + (pf.y - my) ** 2;
+    const dt = (pt.x - mx) ** 2 + (pt.y - my) ** 2;
+    return df <= dt ? from : to;
+  }
+
+  function mapHoverTargetFromEvent(ev) {
+    const svg = document.getElementById("map-svg");
+    if (!svg) return null;
+    const stack = document.elementsFromPoint(ev.clientX, ev.clientY);
+    for (const el of stack) {
+      if (!el.closest) continue;
+      const node = el.closest(".node");
+      if (node && svg.contains(node)) return { kind: "node", id: node.dataset.id };
+      const edge = el.closest(".edge");
+      if (edge && svg.contains(edge)) return { kind: "edge", el: edge };
+    }
+    return null;
+  }
+
+  function applyMapHoverTarget(target, ev) {
+    let nextId = null;
+    if (target && target.kind === "node") nextId = target.id;
+    else if (target && target.kind === "edge") {
+      const pt = mapSvgClientToMap(ev);
+      nextId = edgeTraceNodeId(target.el, pt ? pt.x : 0, pt ? pt.y : 0);
+    }
+    if (nextId === hoverTraceId) return;
+    hoverTraceId = nextId;
+    updateMapHoverTrace();
+  }
+
+  function revealTreeFile(el) {
+    if (!el) return;
+    let parent = el.parentElement;
+    while (parent) {
+      if (parent.tagName === "DETAILS") parent.open = true;
+      parent = parent.parentElement;
+    }
+    el.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
+
+  function focusMapNode(node, opts) {
+    const pushHistory = !opts || opts.pushHistory !== false;
     const pos = nodePositions.get(node.id);
     if (!pos) return;
-    mapView.scale = 1.65;
+    if (pushHistory) pushMapViewState();
+    const n = nodeById(node.id) || node;
+    const fs = labelFontSize(n, pos);
+    const svg = document.getElementById("map-svg");
+    const rect = svg ? svg.getBoundingClientRect() : { width: MAP_W };
+    const pxPerSvgUnit = rect.width > 0 ? rect.width / MAP_W : 1;
+    const targetScale = Math.min(
+      MAP_MAX_SCALE,
+      Math.max(MAP_MIN_SCALE, MAP_FOCUS_LABEL_PX / (fs * pxPerSvgUnit))
+    );
+    mapView.scale = targetScale;
     mapView.tx = MAP_W / 2 - pos.x * mapView.scale;
     mapView.ty = MAP_H / 2 - pos.y * mapView.scale;
     applyMapTransform();
@@ -898,12 +996,19 @@
         return;
       }
       selectNode(n);
+      clearTimeout(clickFocusTimer);
+      clickFocusTimer = setTimeout(() => {
+        clickFocusTimer = null;
+        focusMapNode(n, { pushHistory: true });
+      }, 220);
     });
 
     svg.addEventListener("dblclick", (ev) => {
       const g = ev.target.closest(".node");
       if (!g || !svg.contains(g)) return;
       ev.stopPropagation();
+      clearTimeout(clickFocusTimer);
+      clickFocusTimer = null;
       const n = nodeById(g.dataset.id);
       if (!n) return;
       const pos = nodePositions.get(n.id);
@@ -912,11 +1017,64 @@
         saveMapPrefs();
         renderMap();
       }
-      focusMapNode(n);
+      focusMapNode(n, { pushHistory: false });
       selectNode(n);
     });
 
+    svg.addEventListener("mousemove", (ev) => {
+      if (!isVisionMs()) return;
+      if (mapHoverRaf) return;
+      mapHoverRaf = requestAnimationFrame(() => {
+        mapHoverRaf = 0;
+        const target = mapHoverTargetFromEvent(ev);
+        applyMapHoverTarget(target, ev);
+        const nodeEl =
+          target && target.kind === "node"
+            ? svg.querySelector('.node[data-id="' + target.id + '"]')
+            : null;
+        if (nodeEl === hoverNode) return;
+        if (hoverNode) hoverNode.classList.remove("label-hover");
+        hoverNode = nodeEl;
+        if (!hoverNode) {
+          scheduleMapLabelZoom();
+          return;
+        }
+        hoverNode.classList.add("label-hover");
+        const n = nodeById(hoverNode.dataset.id);
+        const pos = nodePositions.get(hoverNode.dataset.id);
+        if (!n || !pos) {
+          scheduleMapLabelZoom();
+          return;
+        }
+        let t = hoverNode.querySelector("text");
+        if (!t && hoverNode._labelEl) {
+          hoverNode.appendChild(hoverNode._labelEl);
+          t = hoverNode._labelEl;
+        }
+        if (t) {
+          t.style.display = "";
+          t.textContent = hoverNode.dataset.fullLabel || n.label;
+          t.setAttribute(
+            "font-size",
+            String(Math.max(labelFontSize(n, pos), 9))
+          );
+        }
+        scheduleMapLabelZoom();
+      });
+    });
+
+    svg.addEventListener("mouseleave", () => {
+      if (hoverNode) hoverNode.classList.remove("label-hover");
+      hoverNode = null;
+      if (isVisionMs()) {
+        hoverTraceId = null;
+        updateMapHoverTrace();
+      }
+      scheduleMapLabelZoom();
+    });
+
     svg.addEventListener("mouseover", (ev) => {
+      if (isVisionMs()) return;
       const g = ev.target.closest(".node");
       if (!g || !svg.contains(g) || g === hoverNode) return;
       if (hoverNode) hoverNode.classList.remove("label-hover");
@@ -924,10 +1082,6 @@
       g.classList.add("label-hover");
       const n = nodeById(g.dataset.id);
       const pos = nodePositions.get(g.dataset.id);
-      if (isVisionMs()) {
-        hoverTraceId = g.dataset.id;
-        updateMapHoverTrace();
-      }
       if (!n || !pos) return;
       let t = g.querySelector("text");
       if (!t && g._labelEl) {
@@ -945,6 +1099,7 @@
     });
 
     svg.addEventListener("mouseout", (ev) => {
+      if (isVisionMs()) return;
       const g = ev.target.closest(".node");
       if (!g || (ev.relatedTarget && g.contains(ev.relatedTarget))) return;
       if (hoverNode === g) hoverNode = null;
@@ -980,7 +1135,13 @@
     let lastY = 0;
 
     wrap.addEventListener("mousedown", (ev) => {
-      if (ev.button !== 0 || ev.target.closest(".node")) return;
+      if (
+        ev.button !== 0 ||
+        ev.target.closest(".node") ||
+        ev.target.closest(".edge")
+      ) {
+        return;
+      }
       dragging = true;
       lastX = ev.clientX;
       lastY = ev.clientY;
@@ -1020,7 +1181,16 @@
     if (zr) {
       zr.addEventListener("click", (ev) => {
         ev.stopPropagation();
+        mapViewStack.length = 0;
+        syncMapZoomBackBtn();
         resetMapView();
+      });
+    }
+    const zb = document.getElementById("map-zoom-back");
+    if (zb) {
+      zb.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        popMapViewState();
       });
     }
   }
@@ -2541,7 +2711,10 @@
     activeTreeFileEl = document.querySelector(
       '.tree-file[data-id="' + node.id + '"]'
     );
-    if (activeTreeFileEl) activeTreeFileEl.classList.add("active");
+    if (activeTreeFileEl) {
+      activeTreeFileEl.classList.add("active");
+      revealTreeFile(activeTreeFileEl);
+    }
 
     highlightLayer(node.layer);
     updateMapSelection();
@@ -2950,6 +3123,7 @@
   initMapFilterDropdowns();
   initSidebarOverlayBackdrop();
   loadMapPrefs();
+  syncMapZoomBackBtn();
   if (
     window.matchMedia("(prefers-reduced-motion: reduce)").matches &&
     !visionModePinned

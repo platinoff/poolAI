@@ -879,7 +879,7 @@ body.panel-fs-active.sidebar-overlay-open .sidebar-overlay-backdrop {
   border-radius: 6px;
   overflow: hidden;
   touch-action: none;
-  cursor: grab;
+  cursor: default;
   background: transparent;
 }
 
@@ -1169,6 +1169,12 @@ body.panel-fs-active .panel[data-panel="map"].panel-fullscreen .map-hint {
   min-height: 220px;
 }
 
+#map-svg .planes,
+#map-svg .plane,
+#map-svg .layer-tier-label {
+  pointer-events: none;
+}
+
 #map-svg .plane { stroke-width: 1.5; transition: opacity 0.25s, stroke-width 0.25s; }
 #map-svg .plane.layer-dim { opacity: 0.14; }
 #map-svg .plane.layer-focus { opacity: 0.92; stroke-width: 2.5; }
@@ -1185,7 +1191,12 @@ body.panel-fs-active .panel[data-panel="map"].panel-fullscreen .map-hint {
 #map-svg .edge {
   fill: none;
   stroke-width: 1.2;
+  pointer-events: stroke;
   transition: stroke 0.2s, stroke-width 0.2s, opacity 0.2s;
+}
+
+body.vision-ms #map-svg .edge {
+  cursor: crosshair;
 }
 
 #map-svg .edge-docs {
@@ -1307,6 +1318,16 @@ body.panel-fs-active .panel[data-panel="map"].panel-fullscreen .map-hint {
 .map-controls button:hover {
   border-color: var(--border-bright);
   background: rgba(30, 40, 60, 0.85);
+}
+
+.map-controls button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.map-controls button:disabled:hover {
+  border-color: var(--border);
+  background: rgba(0, 0, 0, 0.55);
 }
 
 #map-svg .node {
