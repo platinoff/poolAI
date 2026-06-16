@@ -107,5 +107,5 @@
     <text x="0" y="108" fill="#a78bfa">? implements / session-tracks</text>
   </g>
 
-  <text x="600" y="738" text-anchor="middle" fill="#6a7a9a" font-family="Segoe UI, system-ui, sans-serif" font-size="12">PH-S200 done feed.json RSS ticker - PH-S201 next - 9 open S201-S209 - rev 139</text>
+  <text x="600" y="738" text-anchor="middle" fill="#6a7a9a" font-family="Segoe UI, system-ui, sans-serif" font-size="12">PH-S201 done post-push VDT hook - PH-S202 next - 8 open S202-S209 - rev 140</text>
 </svg>

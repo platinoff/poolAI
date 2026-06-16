@@ -73,7 +73,7 @@ cargo fmt --all
 git add README.md Cargo.toml src/ tests/ scripts/ file_list.csv
 git add .gitignore
 git add -f docs/CHANGELOG.md docs/cloud/CLOUD_SDK_STATUS.md docs/concept/poolAI_concept_root.txt docs/README.md docs/INDEX_2026-03-17.md docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md docs/ARCHITECTURE_BEST_PRACTICES.md docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md docs/development/HANDOFF_NEW_SESSION.md docs/development/README.md docs/development/NEXT_STEPS_2026-01-19.md docs/status/STABLE_STATE_SUMMARY.md docs/troubleshooting/GIT_PUSH_FAILED.md
-git add -f .cursor/hooks.json .cursor/CHANGELOG.md .cursor/README.md .cursor/rules/ .cursor/commands/ .cursor/skills/
+git add -f .cursor/hooks.json .cursor/hooks/ .cursor/CHANGELOG.md .cursor/README.md .cursor/rules/ .cursor/commands/ .cursor/skills/
 git status -sb
 git commit -m "type(scope): subject" -m "Summary:" -m "- Зміни: (модулі/файли)" -m "- Перевірки: cargo fmt; (clippy/test — що саме)" -m "- Ризики/нотатки: не стаджити data/audit/*.log.gz; при os error 112 — cargo clean"
 git push origin main

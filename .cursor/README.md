@@ -1,6 +1,6 @@
 # Cursor Agent Configuration (PoolAI)
 
-**Оновлено:** 2026-05-27
+**Оновлено:** 2026-05-27 · hooks **PH-S201** post-push VDT notify
 
 ## Rules (`rules/`)
 
@@ -26,6 +26,12 @@
 ## Skills
 
 - [`skills/poolai-documentation/SKILL.md`](skills/poolai-documentation/SKILL.md) — docs map 1–12
+
+## Hooks (`hooks.json`, PH-S201)
+
+- [`hooks/post-push-ph-s-notify.sh`](hooks/post-push-ph-s-notify.sh) — after successful `git push` with `PH-S*` in commit subject → `additional_context` VDT docs-sync checklist
+- Self-test: `bash .cursor/hooks/post-push-ph-s-notify.sh --self-test`
+- Config: [`hooks.json`](hooks.json) · readme: [`hooks/README.md`](hooks/README.md)
 
 ## Ітераційна сесія
 

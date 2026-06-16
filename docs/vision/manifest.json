@@ -1728,7 +1728,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S200",
+  "last_sprint_closed": "PH-S201",
   "layers": [
     {
       "id": "L0",
@@ -1761,7 +1761,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S201",
+  "next_sprint": "PH-S202",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7469,7 +7469,7 @@
       "path": "tests/grid_seed_inventory_integration.rs"
     }
   ],
-  "revision": 139,
+  "revision": 141,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -8690,9 +8690,9 @@
       "acceptance": "post-push notify after PH-S* close; docs sync pointer",
       "deps": "VDT, `.cursor/hooks",
       "id": "PH-S201",
-      "open": true,
+      "open": false,
       "row": 136,
-      "status": "open",
+      "status": "closed",
       "title": "Cursor post-push PH-S* hook (ops)"
     },
     {
@@ -8768,7 +8768,7 @@
       "title": "Vision map a11y focus ring (docs/vision)"
     }
   ],
-  "sprint_queue_open_count": 9,
+  "sprint_queue_open_count": 8,
   "updated_at": "2026-06-15",
   "vision_ui_rev": 58
 }

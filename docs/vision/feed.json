@@ -3,18 +3,9 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S201",
-      "link": "docs/vision/index.html#sprint-queue",
-      "next": true,
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "post-push notify after PH-S* close; docs sync pointer",
-      "title": "Cursor post-push PH-S* hook (ops)"
-    },
-    {
-      "category": "open",
       "id": "PH-S202",
       "link": "docs/vision/index.html#sprint-queue",
+      "next": true,
       "published": "2026-05-28",
       "status": "open",
       "summary": "queue card click centers map node",
@@ -82,6 +73,15 @@
       "status": "open",
       "summary": "keyboard focus-visible on map controls + nodes",
       "title": "Vision map a11y focus ring (docs/vision)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S201",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "post-push notify after PH-S* close; docs sync pointer",
+      "title": "Cursor post-push PH-S* hook (ops)"
     },
     {
       "category": "closed",
@@ -181,15 +181,6 @@
       "status": "closed",
       "summary": "Layers/Types dropdown menus; − collapse → title strip; grid auto-fill; `localStorage`; rev++",
       "title": "Vision filter dropdowns + panel collapse (docs/vision)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S189",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "tri-mode Eco→FX→Ms; hover 1-hop edge/node highlight; `localStorage`; rev++",
-      "title": "Vision Eco/FX/Ms hover trace (docs/vision)"
     }
   ],
   "link": "docs/vision/index.html",

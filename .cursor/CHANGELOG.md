@@ -1,5 +1,11 @@
 # Cursor Agent Configuration Changelog
 
+## 2026-06-16 — PH-S201 post-push VDT hook
+
+- **`hooks.json`**: `postToolUse` → `.cursor/hooks/post-push-ph-s-notify.sh` (Shell matcher).
+- Після успішного `git push`, якщо subject містить `PH-S*` — `additional_context` з чеклістом FM/HANDOFF/NEXT/vision.
+- Додано [`.cursor/hooks/README.md`](hooks/README.md); self-test: `bash .cursor/hooks/post-push-ph-s-notify.sh --self-test`.
+
 ## 2026-06-15 — Cursor 3.7.36 baseline
 
 - Оновлено **`.cursor/rules/cursor-environment-baseline.mdc`**: `cursor` **3.7.36** (було 3.2.21); нотатка про subagent/Task tool і user skills path.
