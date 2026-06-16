@@ -3,18 +3,9 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S202",
-      "link": "docs/vision/index.html#sprint-queue",
-      "next": true,
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "queue card click centers map node",
-      "title": "Vision sprint-queue chip → map focus (docs/vision)"
-    },
-    {
-      "category": "open",
       "id": "PH-S203",
       "link": "docs/vision/index.html#sprint-queue",
+      "next": true,
       "published": "2026-05-28",
       "status": "open",
       "summary": "Arrow keys cycle 1-hop neighbors on map",
@@ -73,6 +64,15 @@
       "status": "open",
       "summary": "keyboard focus-visible on map controls + nodes",
       "title": "Vision map a11y focus ring (docs/vision)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S202",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "queue card click centers map node",
+      "title": "Vision sprint-queue chip → map focus (docs/vision)"
     },
     {
       "category": "closed",
@@ -172,15 +172,6 @@
       "status": "closed",
       "summary": "Rust parse FM §5.12 → `sprint_queue` panel; rev++",
       "title": "Vision sprint queue panel (docs/vision)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S190",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "Layers/Types dropdown menus; − collapse → title strip; grid auto-fill; `localStorage`; rev++",
-      "title": "Vision filter dropdowns + panel collapse (docs/vision)"
     }
   ],
   "link": "docs/vision/index.html",

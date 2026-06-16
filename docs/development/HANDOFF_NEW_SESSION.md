@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-16 (PH-S201 ✅ · §5.12 **8** відкритих PH-S202…S209 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
+**Оновлено:** 2026-06-16 (PH-S202 ✅ · §5.12 **7** відкритих PH-S203…S209 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -152,10 +152,11 @@
 **PH-S199 ✅ (vision):** `docs/vision/` — Ms mode planes `pointer-events:none`; `elementsFromPoint` edge/node trace; click focus ~14px label; zoom-back stack (`←`); sidebar `scrollIntoView` + folder expand; rev **137**.
 **PH-S200 ✅ (vision):** `docs/vision/feed.json` — RSS sprint ticker (`poolai-vision-sync` from FM §5.12); header marquee panel; click item → sprint queue; rev **139**.
 **PH-S201 ✅ (ops):** `.cursor/hooks/post-push-ph-s-notify.sh` — `postToolUse` after successful `git push` + `PH-S*` in commit subject → VDT docs-sync `additional_context`; self-test `--self-test`.
+**PH-S202 ✅ (vision):** `docs/vision/vision.js` — sprint queue card click → `pickMapNodeForSprint` + `focusMapNode`; `map-linked` / `queue-active` chips; rev **142**.
 **PH-S198 ✅ (code):** `topology_graph.rs` — hub labels + `label_x`/`label_y`/`is_hub` in graph JSON; heatmap short ids; slim `topology_graph.js` (SVG paint only); `cargo test-ci`.
 **PH-S194 ✅ (code):** `galaxy_fee_split_applied_total` on grid result wire; `cargo test-ci`.
-**Vision ✅:** next **PH-S202** · **8** відкритих (S202…S209) · rev **140**.
-**Черга:** §5.12 **8** відкритих — **PH-S202** (наступний) … **PH-S209**. Vision + code-first S202…S209 · baseline **92.78%** · hold **95%** · spirit **96%**.
+**Vision ✅:** next **PH-S203** · **7** відкритих (S203…S209) · rev **142**.
+**Черга:** §5.12 **7** відкритих — **PH-S203** (наступний) … **PH-S209**. Vision + code-first S203…S209 · baseline **92.78%** · hold **95%** · spirit **96%**.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

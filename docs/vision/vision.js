@@ -86,6 +86,7 @@
   let extensions = null;
   let activeSprint = null;
   let nextSprint = null;
+  let activeQueueSprintId = null;
   let sprintPathSet = null;
   let selectedId = null;
   let fullscreenPanel = null;
@@ -1238,6 +1239,89 @@
       return path.startsWith(glob.slice(0, -3));
     }
     return globToRegExp(glob).test(path);
+  }
+
+  function nodesForSprint(sprintId) {
+    if (!manifest || !sprintId) return [];
+    const paths = buildSprintPathSet(extensions, sprintId);
+    const out = [];
+    manifest.nodes.forEach((n) => {
+      if (n.sprints && n.sprints.some((t) => sprintTokenMatches(t, sprintId))) {
+        out.push(n);
+      } else if (paths.has(n.path)) {
+        out.push(n);
+      }
+    });
+    return out;
+  }
+
+  function pickMapNodeForSprint(sprintId) {
+    const candidates = nodesForSprint(sprintId);
+    if (!candidates.length) return null;
+    const onMap = candidates.filter((n) => nodePositions.has(n.id));
+    const pool = onMap.length ? onMap : candidates;
+    const priority = ["galaxy_grid", "fm", "handoff", "next_session"];
+    for (let i = 0; i < priority.length; i++) {
+      const hit = pool.find((n) => n.id === priority[i]);
+      if (hit && nodePositions.has(hit.id)) return hit;
+    }
+    pool.sort((a, b) => {
+      const la = a.layer || "L9";
+      const lb = b.layer || "L9";
+      if (la !== lb) return la.localeCompare(lb);
+      return (a.path || "").localeCompare(b.path || "");
+    });
+    return pool.find((n) => nodePositions.has(n.id)) || pool[0];
+  }
+
+  function ensureMapPanelVisible() {
+    const mapPanel = document.querySelector('.panel[data-panel="map"]');
+    if (!mapPanel) return;
+    if (mapPanel.classList.contains("collapsed")) {
+      mapPanel.classList.remove("collapsed");
+      syncPanelCollapseLayout();
+    }
+  }
+
+  function setActiveQueueSprint(sprintId) {
+    activeQueueSprintId = sprintId || null;
+    const box = document.getElementById("sprint-queue");
+    if (!box) return;
+    box.querySelectorAll(".sprint-queue-item").forEach((li) => {
+      li.classList.toggle(
+        "queue-active",
+        li.dataset.sprintId === activeQueueSprintId
+      );
+    });
+  }
+
+  function focusSprintOnMap(sprintId) {
+    if (!sprintId) return;
+    const node = pickMapNodeForSprint(sprintId);
+    setActiveQueueSprint(sprintId);
+    if (!node) return;
+    ensureMapPanelVisible();
+    selectNode(node);
+    focusMapNode(node, { pushHistory: true });
+  }
+
+  function bindSprintQueueItems(box) {
+    if (!box) return;
+    box.querySelectorAll(".sprint-queue-item").forEach((li) => {
+      const sprintId = li.dataset.sprintId || "";
+      const hasMap = li.classList.contains("map-linked");
+      if (!hasMap) return;
+      li.setAttribute("role", "button");
+      li.setAttribute("tabindex", "0");
+      const activate = () => focusSprintOnMap(sprintId);
+      li.addEventListener("click", activate);
+      li.addEventListener("keydown", (ev) => {
+        if (ev.key === "Enter" || ev.key === " ") {
+          ev.preventDefault();
+          activate();
+        }
+      });
+    });
   }
 
   function buildSprintPathSet(ext, sprint) {
@@ -2532,18 +2616,26 @@
     html += '</div><ul class="sprint-queue-list">';
     show.forEach((entry) => {
       const id = entry.id || "";
+      const mapNode = pickMapNodeForSprint(id);
       const cls = [
         "sprint-queue-item",
         entry.open ? "open" : "closed",
         nextId && id === nextId ? "next" : "",
+        mapNode ? "map-linked" : "no-map",
+        activeQueueSprintId === id ? "queue-active" : "",
       ]
         .filter(Boolean)
         .join(" ");
+      const mapHint = mapNode
+        ? " · click → map: " + (mapNode.label || mapNode.path)
+        : " · no map node";
       html +=
         '<li class="' +
         cls +
+        '" data-sprint-id="' +
+        escapeHtml(id) +
         '" title="' +
-        escapeHtml((entry.acceptance || entry.deps || "").slice(0, 200)) +
+        escapeHtml((entry.acceptance || entry.deps || "").slice(0, 200) + mapHint) +
         '"><span class="sprint-queue-id">' +
         escapeHtml(id) +
         '</span><span class="sprint-queue-title">' +
@@ -2554,6 +2646,7 @@
     });
     html += "</ul>";
     box.innerHTML = html;
+    bindSprintQueueItems(box);
   }
 
   function scrollToSprintQueue() {
@@ -3026,10 +3119,10 @@
     renderMapFilterDock();
     syncMapToolbar();
     syncPanelCollapseLayout();
-    renderSprintQueue(manifest);
     const feed = await loadFeed();
     renderRssTicker(feed);
     renderMap();
+    renderSprintQueue(manifest);
 
     const tree = document.getElementById("file-tree");
     tree.innerHTML = "";

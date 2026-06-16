@@ -119,7 +119,8 @@ http://127.0.0.1:8765/docs/vision/index.html
 | **PH-S199** | `feed.json` RSS ticker | `docs/vision/` |
 | **PH-S200** ✅ | `feed.json` RSS ticker panel | `poolai-vision-sync`, `feed.json`, `index.html` |
 | **PH-S201** ✅ | Cursor post-push hook | `.cursor/hooks/post-push-ph-s-notify.sh` |
-| **PH-S202** | Sprint queue → map focus | `docs/vision/vision.js` |
+| **PH-S202** ✅ | Sprint queue → map focus | `vision.js` `focusSprintOnMap` |
+| **PH-S203** | Keyboard nav linked nodes | `docs/vision/vision.js` |
 
 Канон черги: [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 · наступний спринт **PH-S195** (seed_inventory GET).
 
