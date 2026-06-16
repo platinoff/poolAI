@@ -3,6 +3,7 @@
 //! ```text
 //! cargo run --bin poolai-vision-sync
 //! cargo run --bin poolai-vision-sync -- --dry-run
+//! cargo run --bin poolai-vision-sync -- --check
 //! ```
 
 use serde_json::{json, Value};
@@ -14,6 +15,7 @@ use std::process::{Command, ExitCode};
 const MANIFEST_REL: &str = "docs/vision/manifest.json";
 const FEED_REL: &str = "docs/vision/feed.json";
 const FM_REL: &str = "docs/catalog/FUNCTION_MANAGEMENT.md";
+const EXTENSIONS_REL: &str = "docs/vision/extensions.json";
 const FEED_CLOSED_CAP: usize = 12;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -545,9 +547,148 @@ fn iso_from_epoch(epoch: i64) -> String {
     format!("{y:04}-{m:02}-{d:02}")
 }
 
+/// Parse `Vision rev **N**` from FM §5.12 footer line.
+fn parse_fm_vision_revision(section: &str) -> Option<u64> {
+    for line in section.lines() {
+        let marker = "Vision rev **";
+        let Some(start) = line.find(marker) else {
+            continue;
+        };
+        let rest = &line[start + marker.len()..];
+        let end = rest.find("**")?;
+        return rest[..end].parse().ok();
+    }
+    None
+}
+
+fn manifest_revision(manifest: &Value) -> u64 {
+    manifest
+        .get("revision")
+        .and_then(Value::as_u64)
+        .unwrap_or(0)
+}
+
+/// Compare on-disk manifest sprint metadata with FM §5.12 (+ optional extensions active_sprint).
+fn collect_manifest_fm_drift(
+    manifest: &Value,
+    entries: &[SprintQueueEntry],
+    fm_section: &str,
+    extensions: Option<&Value>,
+) -> Vec<String> {
+    let mut errors = Vec::new();
+    if entries.is_empty() {
+        errors.push("FM §5.12 sprint queue parse returned no rows".to_string());
+        return errors;
+    }
+
+    let expected_queue = sprint_queue_json(entries);
+    if manifest.get("sprint_queue") != Some(&expected_queue) {
+        errors.push(
+            "manifest.sprint_queue differs from FM §5.12 (run poolai-vision-sync)".to_string(),
+        );
+    }
+
+    let (next_sprint, last_closed, open_count) = derive_sprint_meta(entries);
+    let manifest_next = manifest.get("next_sprint").and_then(Value::as_str);
+    if manifest_next != next_sprint.as_deref() {
+        errors.push(format!(
+            "manifest.next_sprint={manifest_next:?} expected {:?}",
+            next_sprint
+        ));
+    }
+    let manifest_last = manifest.get("last_sprint_closed").and_then(Value::as_str);
+    if manifest_last != last_closed.as_deref() {
+        errors.push(format!(
+            "manifest.last_sprint_closed={manifest_last:?} expected {:?}",
+            last_closed
+        ));
+    }
+    let manifest_open = manifest
+        .get("sprint_queue_open_count")
+        .and_then(Value::as_u64);
+    if manifest_open != Some(u64::from(open_count)) {
+        errors.push(format!(
+            "manifest.sprint_queue_open_count={manifest_open:?} expected {open_count}"
+        ));
+    }
+
+    if let Some(fm_rev) = parse_fm_vision_revision(fm_section) {
+        let manifest_rev = manifest_revision(manifest);
+        if fm_rev != manifest_rev {
+            errors.push(format!(
+                "FM Vision rev {fm_rev} != manifest.revision {manifest_rev}"
+            ));
+        }
+    } else {
+        errors.push("FM §5.12 missing Vision rev **N** footer".to_string());
+    }
+
+    if let Some(ext) = extensions {
+        let active = ext.get("active_sprint").and_then(Value::as_str);
+        if active != next_sprint.as_deref() {
+            errors.push(format!(
+                "extensions.active_sprint={active:?} expected {:?}",
+                next_sprint
+            ));
+        }
+    }
+
+    errors
+}
+
+fn run_drift_check(root: &Path) -> ExitCode {
+    let manifest_path = root.join(MANIFEST_REL);
+    let fm_path = root.join(FM_REL);
+    let extensions_path = root.join(EXTENSIONS_REL);
+
+    let manifest = match load_manifest(&manifest_path) {
+        Ok(m) => m,
+        Err(e) => {
+            eprintln!("error: {e}");
+            return ExitCode::from(2);
+        }
+    };
+    let fm_content = match fs::read_to_string(&fm_path) {
+        Ok(c) => c,
+        Err(e) => {
+            eprintln!("error: read {}: {e}", fm_path.display());
+            return ExitCode::from(2);
+        }
+    };
+    let fm_section = extract_fm_section_512(&fm_content).unwrap_or("");
+    let entries = parse_fm_sprint_queue(&fm_content);
+    let extensions = fs::read_to_string(&extensions_path)
+        .ok()
+        .and_then(|raw| serde_json::from_str::<Value>(&raw).ok());
+
+    let errors = collect_manifest_fm_drift(&manifest, &entries, fm_section, extensions.as_ref());
+    if errors.is_empty() {
+        let rev = manifest_revision(&manifest);
+        let next = manifest
+            .get("next_sprint")
+            .and_then(Value::as_str)
+            .unwrap_or("?");
+        println!("vision drift check: ok (revision {rev}, next {next})");
+        return ExitCode::SUCCESS;
+    }
+
+    eprintln!("vision drift check: {} issue(s)", errors.len());
+    for err in &errors {
+        eprintln!("  - {err}");
+    }
+    eprintln!("hint: cargo run --bin poolai-vision-sync");
+    ExitCode::from(1)
+}
+
 fn main() -> ExitCode {
     let dry_run = std::env::args().any(|a| a == "--dry-run");
+    let check_only = std::env::args().any(|a| a == "--check");
     let root = repo_root();
+
+    if check_only {
+        return run_drift_check(&root);
+    }
+
     let manifest_path = root.join(MANIFEST_REL);
 
     let paths = match git_tracked_files(&root) {
@@ -718,5 +859,59 @@ mod tests {
         assert!(e >= 1);
         let nodes = manifest["nodes"].as_array().unwrap();
         assert!(nodes.iter().any(|n| n["path"] == "docs/openapi.yaml"));
+    }
+
+    #[test]
+    fn parse_fm_vision_revision_footer() {
+        let section = "**Відкритих у §5.12:** **5** (PH-S205…S209). Vision rev **146**.\n";
+        assert_eq!(parse_fm_vision_revision(section), Some(146));
+    }
+
+    #[test]
+    fn drift_check_ok_when_manifest_matches_fm() {
+        let sample = r###"
+### 5.12 Research backlog
+
+| 139 | **PH-S204** | Edge click | PH-S199 | edge trace | **✅** |
+| 140 | **PH-S205** | Drift gate | PH-S191 | CI check | відкрито |
+
+**Відкритих у §5.12:** **1** (PH-S205). Vision rev **42**.
+"###;
+        let entries = parse_fm_sprint_queue(sample);
+        let queue = sprint_queue_json(&entries);
+        let manifest = json!({
+            "revision": 42,
+            "next_sprint": "PH-S205",
+            "last_sprint_closed": "PH-S204",
+            "sprint_queue_open_count": 1,
+            "sprint_queue": queue
+        });
+        let ext = json!({ "active_sprint": "PH-S205" });
+        let section = extract_fm_section_512(sample).unwrap();
+        let errors = collect_manifest_fm_drift(&manifest, &entries, section, Some(&ext));
+        assert!(errors.is_empty(), "{errors:?}");
+    }
+
+    #[test]
+    fn drift_check_fails_on_revision_mismatch() {
+        let sample = r###"
+### 5.12 Research backlog
+
+| 140 | **PH-S205** | Drift gate | PH-S191 | CI check | відкрито |
+
+**Відкритих у §5.12:** **1** (PH-S205). Vision rev **99**.
+"###;
+        let entries = parse_fm_sprint_queue(sample);
+        let queue = sprint_queue_json(&entries);
+        let manifest = json!({
+            "revision": 42,
+            "next_sprint": "PH-S205",
+            "last_sprint_closed": null,
+            "sprint_queue_open_count": 1,
+            "sprint_queue": queue
+        });
+        let section = extract_fm_section_512(sample).unwrap();
+        let errors = collect_manifest_fm_drift(&manifest, &entries, section, None);
+        assert!(errors.iter().any(|e| e.contains("Vision rev")));
     }
 }

@@ -1,7 +1,7 @@
 {
   "revision": 76,
   "updated_at": "2026-06-16",
-  "active_sprint": "PH-S205",
+  "active_sprint": "PH-S206",
   "ui_version": 4,
   "extension_policy": {
     ".md": {
@@ -292,7 +292,7 @@
       ]
     },
     "vision_ux_band": {
-      "sprints": ["PH-S188", "PH-S189", "PH-S190", "PH-S191", "PH-S200", "PH-S201", "PH-S202", "PH-S203", "PH-S204"],
+      "sprints": ["PH-S188", "PH-S189", "PH-S190", "PH-S191", "PH-S200", "PH-S201", "PH-S202", "PH-S203", "PH-S204", "PH-S205"],
       "docs": ["docs/vision/**", "docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/NEXT_SESSION_PROMPT.md"],
       "code_globs": ["docs/vision/vision.js", "docs/vision/vision.css", "docs/vision/index.html", "src/bin/poolai_vision_sync.rs", ".cursor/hooks/**"],
       "extensions": [".js", ".css", ".html", ".json", ".rs", ".md", ".mdc"],

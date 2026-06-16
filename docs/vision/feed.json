@@ -3,18 +3,9 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S205",
-      "link": "docs/vision/index.html#sprint-queue",
-      "next": true,
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "CI/local check manifest revision vs FM",
-      "title": "poolai-vision-sync manifest drift gate (ops)"
-    },
-    {
-      "category": "open",
       "id": "PH-S206",
       "link": "docs/vision/index.html#sprint-queue",
+      "next": true,
       "published": "2026-05-28",
       "status": "open",
       "summary": "minimap viewport + selected node ring",
@@ -46,6 +37,15 @@
       "status": "open",
       "summary": "keyboard focus-visible on map controls + nodes",
       "title": "Vision map a11y focus ring (docs/vision)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S205",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "CI/local check manifest revision vs FM",
+      "title": "poolai-vision-sync manifest drift gate (ops)"
     },
     {
       "category": "closed",
@@ -145,15 +145,6 @@
       "status": "closed",
       "summary": "galaxy_fee_split_applied_total` on grid result path; unit tests",
       "title": "Galaxy fee split result counter stub (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S193",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "login/dashboard wasm formatters; slim JS glue; `cargo test-ci",
-      "title": "Dashboard shell formatters → wasm (code)"
     }
   ],
   "link": "docs/vision/index.html",

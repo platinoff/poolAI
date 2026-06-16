@@ -198,6 +198,32 @@ jobs:
       - name: Axum routes vs docs/openapi.yaml
         run: cargo run --bin poolai-openapi-gap-audit
 
+  vision-manifest-drift:
+    name: Vision manifest FM drift gate (PH-S205)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        timeout-minutes: 5
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-vision-drift-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-vision-drift-
+
+      - name: manifest.json vs FM §5.12
+        run: cargo run --bin poolai-vision-sync -- --check
+
   rust-ratio-audit:
     name: Rust LOC ratio hold gate (PH-S165)
     runs-on: ubuntu-latest
