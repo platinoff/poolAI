@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PoolAI Galaxy Starwalker Vision</title>
-  <link rel="stylesheet" href="vision.css?v=66" />
+  <link rel="stylesheet" href="vision.css?v=67" />
 </head>
 <body>
   <div id="galaxy-backdrop" class="galaxy-backdrop" aria-hidden="true">
@@ -97,12 +97,12 @@
                 <button type="button" id="map-zoom-reset" title="Reset view">⌂</button>
                 <button type="button" id="map-zoom-back" title="Back to previous view" disabled aria-label="Back to previous view">←</button>
               </div>
-              <span class="map-hint">click edge · ←→↑↓ neighbors · Eco→FX→Ms · Esc reset</span>
+              <span class="map-hint">Tab focus · click edge · ←→↑↓ neighbors · Eco→FX→Ms · Esc reset</span>
             </div>
             <aside class="map-minimap" id="map-minimap" aria-label="Map minimap — viewport inset and selection ring; click to pan">
               <svg id="map-minimap-svg" viewBox="0 0 900 580" role="img" aria-hidden="true"></svg>
             </aside>
-            <svg id="map-svg" viewBox="0 0 900 520" role="img" aria-label="Documentation graph"></svg>
+            <svg id="map-svg" viewBox="0 0 900 520" role="group" aria-label="Documentation graph — Tab to nodes and controls, arrow keys for linked neighbors"></svg>
           </div>
         </section>
         <section class="panel" data-panel="links" aria-label="Links">
@@ -123,6 +123,6 @@
       </section>
     </div>
   </div>
-  <script src="vision.js?v=67"></script>
+  <script src="vision.js?v=68"></script>
 </body>
 </html>

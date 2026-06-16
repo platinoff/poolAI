@@ -1056,6 +1056,16 @@
     el.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }
 
+  function focusMapNodeEl(nodeId) {
+    if (!nodeId) return;
+    const el = document.querySelector(
+      '#map-svg .node[data-id="' + nodeId.replace(/"/g, "") + '"]'
+    );
+    if (el && typeof el.focus === "function") {
+      el.focus({ preventScroll: true });
+    }
+  }
+
   function focusMapNode(node, opts) {
     const pushHistory = !opts || opts.pushHistory !== false;
     const pos = nodePositions.get(node.id);
@@ -1121,6 +1131,32 @@
       }
       focusMapNode(n, { pushHistory: false });
       selectNode(n);
+    });
+
+    svg.addEventListener("focusin", (ev) => {
+      const g = ev.target.closest(".node");
+      if (!g || !svg.contains(g)) return;
+      const n = nodeById(g.dataset.id);
+      if (!n || selectedId === n.id) return;
+      selectNode(n);
+    });
+
+    svg.addEventListener("keydown", (ev) => {
+      const g = ev.target.closest(".node");
+      if (!g || !svg.contains(g)) return;
+      if (ev.key !== "Enter" && ev.key !== " ") return;
+      ev.preventDefault();
+      const n = nodeById(g.dataset.id);
+      if (!n) return;
+      const pos = nodePositions.get(n.id);
+      if (pos && pos.clusterHub && !ev.shiftKey) {
+        toggleCluster(n.layer, pos.cluster);
+        return;
+      }
+      selectNode(n);
+      clearTimeout(clickFocusTimer);
+      clickFocusTimer = null;
+      focusMapNode(n, { pushHistory: true });
     });
 
     svg.addEventListener("mousemove", (ev) => {
@@ -2411,6 +2447,9 @@
       const fullLabel = mapNodeFullLabel(n, pos);
       g.dataset.shortLabel = shortLabel;
       g.dataset.fullLabel = fullLabel;
+      g.setAttribute("role", "button");
+      g.setAttribute("tabindex", selectedId === n.id ? "0" : "-1");
+      g.setAttribute("aria-label", fullLabel);
       const text = document.createElementNS(ns, "text");
       text.setAttribute("x", pos.x);
       text.setAttribute("y", pos.y + r + (r <= 5 ? 8 : 11));
@@ -2426,7 +2465,14 @@
         g._labelEl = text;
       }
       if (pos.clusterHub) {
-        g.setAttribute("title", "Click: expand folder · Shift+click: open file");
+        g.setAttribute(
+          "title",
+          "Click: expand folder · Shift+click: open file"
+        );
+        g.setAttribute(
+          "aria-label",
+          fullLabel + " — folder; Enter expand, Shift+Enter open"
+        );
       }
       nodesG.appendChild(g);
     });
@@ -2514,6 +2560,7 @@
           !onPipe &&
           !el.classList.contains("sprint-dim")
       );
+      el.setAttribute("tabindex", isSel ? "0" : "-1");
       const text = el.querySelector("text");
       if (text) {
         const shortL = el.dataset.shortLabel || "";
@@ -2642,6 +2689,7 @@
     ev.preventDefault();
     selectNode(next);
     focusMapNode(next, { pushHistory: true });
+    focusMapNodeEl(next.id);
   }
 
   function initMapKeyboardNav() {

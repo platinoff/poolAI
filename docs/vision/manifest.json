@@ -1728,7 +1728,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S208",
+  "last_sprint_closed": "PH-S209",
   "layers": [
     {
       "id": "L0",
@@ -1761,7 +1761,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S209",
+  "next_sprint": "PH-S210",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7469,7 +7469,7 @@
       "path": "tests/grid_seed_inventory_integration.rs"
     }
   ],
-  "revision": 150,
+  "revision": 151,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -8762,13 +8762,103 @@
       "acceptance": "keyboard focus-visible on map controls + nodes",
       "deps": "PH-S194",
       "id": "PH-S209",
-      "open": true,
+      "open": false,
       "row": 144,
-      "status": "open",
+      "status": "closed",
       "title": "Vision map a11y focus ring (docs/vision)"
+    },
+    {
+      "acceptance": "poolai-http-stand-smoke` case `grid_seed_inventory",
+      "deps": "PH-S195",
+      "id": "PH-S210",
+      "open": true,
+      "row": 145,
+      "status": "open",
+      "title": "Stand smoke seed_inventory GET (tests)"
+    },
+    {
+      "acceptance": "admin.jobs.*` → `poolai-ui-core`; slim `i18n_core.js",
+      "deps": "PH-S207",
+      "id": "PH-S211",
+      "open": true,
+      "row": 146,
+      "status": "open",
+      "title": "Admin i18n slim jobs panel (code)"
+    },
+    {
+      "acceptance": "prefers-reduced-motion` → skip glow/animation; rev++",
+      "deps": "PH-S209",
+      "id": "PH-S212",
+      "open": true,
+      "row": 147,
+      "status": "open",
+      "title": "Vision reduced-motion map FX (docs/vision)"
+    },
+    {
+      "acceptance": "stand smoke checks prefetch counters on `/metrics",
+      "deps": "PH-S184",
+      "id": "PH-S213",
+      "open": true,
+      "row": 148,
+      "status": "open",
+      "title": "Galaxy prefetch metrics stand smoke (tests)"
+    },
+    {
+      "acceptance": "admin.raid.*` → `poolai-ui-core`; slim JS",
+      "deps": "PH-S207",
+      "id": "PH-S214",
+      "open": true,
+      "row": 149,
+      "status": "open",
+      "title": "Admin i18n slim raid panel (code)"
+    },
+    {
+      "acceptance": "collapse/Esc returns focus to panel toggle; rev++",
+      "deps": "PH-S209",
+      "id": "PH-S215",
+      "open": true,
+      "row": 150,
+      "status": "open",
+      "title": "Vision panel collapse focus restore (docs/vision)"
+    },
+    {
+      "acceptance": "stand smoke `galaxy_pricing_forced_fallback_total",
+      "deps": "PH-S168",
+      "id": "PH-S216",
+      "open": true,
+      "row": 151,
+      "status": "open",
+      "title": "Galaxy pricing fallback metrics smoke (tests)"
+    },
+    {
+      "acceptance": "grid-pricing strings → `poolai-ui-core",
+      "deps": "PH-S207",
+      "id": "PH-S217",
+      "open": true,
+      "row": 152,
+      "status": "open",
+      "title": "Admin i18n slim grid-pricing panel (code)"
+    },
+    {
+      "acceptance": "aria-live` region for selected node label; rev++",
+      "deps": "PH-S209",
+      "id": "PH-S218",
+      "open": true,
+      "row": 153,
+      "status": "open",
+      "title": "Vision map aria-live selection (docs/vision)"
+    },
+    {
+      "acceptance": "stand smoke trust payout counters on `/metrics",
+      "deps": "PH-S182",
+      "id": "PH-S219",
+      "open": true,
+      "row": 154,
+      "status": "open",
+      "title": "Galaxy trust payout metrics smoke (tests)"
     }
   ],
-  "sprint_queue_open_count": 1,
+  "sprint_queue_open_count": 10,
   "updated_at": "2026-06-15",
   "vision_ui_rev": 58
 }

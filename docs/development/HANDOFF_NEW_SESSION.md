@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-16 (PH-S208 ✅ · §5.12 **1** відкритий PH-S209 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
+**Оновлено:** 2026-06-16 (PH-S209 ✅ · §5.12 **10** відкритих PH-S210…S219 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -159,10 +159,11 @@
 **PH-S206 ✅ (vision):** `docs/vision/vision.js` — minimap `#minimap-selection-ring` + selected dot on dense map; viewport fill; rev **148**.
 **PH-S207 ✅ (code/ui):** `admin.mon.*` + `admin.page.monitoring` i18n → `poolai-ui-core`; slim `i18n_core.js`; `cargo test-ci`.
 **PH-S208 ✅ (code/tests):** `poolai-http-stand-smoke` — `vision_revision_parity` (FM/manifest + `X-PoolAI-Vision-Revision` header); `open-docs-vision.ps1` header; rev **150**.
+**PH-S209 ✅ (vision):** `docs/vision/` — `:focus-visible` on map controls + filter chips; roving `tabindex` on SVG nodes; Enter/Space activate; arrow nav syncs focus; rev **151**.
 **PH-S198 ✅ (code):** `topology_graph.rs` — hub labels + `label_x`/`label_y`/`is_hub` in graph JSON; heatmap short ids; slim `topology_graph.js` (SVG paint only); `cargo test-ci`.
 **PH-S194 ✅ (code):** `galaxy_fee_split_applied_total` on grid result wire; `cargo test-ci`.
-**Vision ✅:** next **PH-S209** · **1** відкритий (S209) · rev **150**.
-**Черга:** §5.12 **1** відкритий — **PH-S209**. Vision a11y focus ring · baseline **92.78%** · hold **95%** · spirit **96%**.
+**Vision ✅:** next **PH-S210** · **10** відкритих (S210…S219) · rev **151**.
+**Черга:** §5.12 **10** відкритих — **PH-S210…S219**. Stand smoke + i18n slim + vision a11y · baseline **92.78%** · hold **95%** · spirit **96%**.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

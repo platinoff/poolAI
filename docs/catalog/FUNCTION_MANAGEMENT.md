@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-16 (PH-S208 ✅ · §5.12 **1** відкритий PH-S209 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-16 (PH-S209 ✅ · §5.12 **10** відкритих PH-S210…S219 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -408,13 +408,23 @@ FM-xxx (з таблиці нижче)
 | 141 | **PH-S206** | Vision minimap selection ring (docs/vision) | PH-S192 | minimap viewport + selected node ring | **✅** |
 | 142 | **PH-S207** | Admin i18n slim next panel (code) | PH-S197 | next admin panel strings → `poolai-ui-core` | **✅** |
 | 143 | **PH-S208** | Stand smoke vision revision parity (tests) | PH-S196 | `poolai-http-stand-smoke` checks vision rev header | **✅** |
-| 144 | **PH-S209** | Vision map a11y focus ring (docs/vision) | PH-S194 | keyboard focus-visible on map controls + nodes | відкрито |
+| 144 | **PH-S209** | Vision map a11y focus ring (docs/vision) | PH-S194 | keyboard focus-visible on map controls + nodes | **✅** |
+| 145 | **PH-S210** | Stand smoke seed_inventory GET (tests) | PH-S195 | `poolai-http-stand-smoke` case `grid_seed_inventory` | відкрито |
+| 146 | **PH-S211** | Admin i18n slim jobs panel (code) | PH-S207 | `admin.jobs.*` → `poolai-ui-core`; slim `i18n_core.js` | відкрито |
+| 147 | **PH-S212** | Vision reduced-motion map FX (docs/vision) | PH-S209 | `prefers-reduced-motion` → skip glow/animation; rev++ | відкрито |
+| 148 | **PH-S213** | Galaxy prefetch metrics stand smoke (tests) | PH-S184 | stand smoke checks prefetch counters on `/metrics` | відкрито |
+| 149 | **PH-S214** | Admin i18n slim raid panel (code) | PH-S207 | `admin.raid.*` → `poolai-ui-core`; slim JS | відкрито |
+| 150 | **PH-S215** | Vision panel collapse focus restore (docs/vision) | PH-S209 | collapse/Esc returns focus to panel toggle; rev++ | відкрито |
+| 151 | **PH-S216** | Galaxy pricing fallback metrics smoke (tests) | PH-S168 | stand smoke `galaxy_pricing_forced_fallback_total` | відкрито |
+| 152 | **PH-S217** | Admin i18n slim grid-pricing panel (code) | PH-S207 | grid-pricing strings → `poolai-ui-core` | відкрито |
+| 153 | **PH-S218** | Vision map aria-live selection (docs/vision) | PH-S209 | `aria-live` region for selected node label; rev++ | відкрито |
+| 154 | **PH-S219** | Galaxy trust payout metrics smoke (tests) | PH-S182 | stand smoke trust payout counters on `/metrics` | відкрито |
 
-**Відкритих у §5.12:** **1** (PH-S209). **Закрито смуга:** PH-S128…S208 ✅. Vision rev **150**.
+**Відкритих у §5.12:** **10** (PH-S210…S219). **Закрито смуга:** PH-S128…S209 ✅. Vision rev **151**.
 
-**Rust ratio:** формальна смуга **90–95%**; **hold 95%** — PH-S165 ✅; replenish **S209…S210** (vision + code-first).
+**Rust ratio:** формальна смуга **90–95%**; **hold 95%** — PH-S165 ✅; replenish **S210…S219** (code-first + vision a11y).
 
-**Наступна сесія:** **PH-S209** · черга **1** відкритий (PH-S209) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S210** · черга **10** відкритих (PH-S210…S219) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S169)
 
@@ -535,7 +545,7 @@ FM-xxx (з таблиці нижче)
 
 **Baseline:** rust_ratio **92.68%** → **hold 95%** · **stretch spirit 96%** ([`rust_ratio.json`](../development/rust_ratio.json), [`RUST_RATIO_STRATEGY_2026-06-13.md`](../development/RUST_RATIO_STRATEGY_2026-06-13.md)).
 
-**Наступна сесія:** **PH-S209** · черга **1** відкритий (PH-S209) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S210** · черга **10** відкритих (PH-S210…S219) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

@@ -1452,6 +1452,34 @@ body.vision-ms #map-svg .edge {
   background: rgba(0, 0, 0, 0.55);
 }
 
+.map-wrap .btn-map-toggle:focus-visible,
+.map-wrap .map-filter-drop-btn:focus-visible,
+.map-wrap .map-filter-bulk-btn:focus-visible,
+.map-wrap .map-filter-chip:focus-visible,
+.map-wrap .map-controls button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 1px rgba(6, 10, 18, 0.85);
+}
+
+#map-svg .node:focus {
+  outline: none;
+}
+
+#map-svg .node:focus-visible circle {
+  stroke: var(--accent);
+  stroke-width: 3;
+  stroke-dasharray: 5 3;
+  filter: url(#nodeGlowStrong);
+}
+
+#map-svg .node:focus-visible.selected circle {
+  stroke: #fff;
+  stroke-width: 2.5;
+  stroke-dasharray: none;
+  filter: url(#nodeGlowStrong);
+}
+
 #map-svg .node {
   cursor: pointer;
   transition: transform 0.15s ease;

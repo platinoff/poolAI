@@ -85,7 +85,7 @@ flowchart TB
 | **E — gate** | PH-S150 ✅ | CI advisory якщо ratio <88%; target 93%; stretch 96% spirit | стабільно 90–95% |
 | **F — stretch 96%** | PH-S151…S159 ✅ | wasm wiring, slim JS/i18n/charts, Rust stand/e2e bins; CI warn **93%** | **→96% spirit** |
 
-**Черга §5.12 (10 відкритих):** PH-S200…S209 vision + code-first band.
+**Черга §5.12 (10 відкритих):** PH-S210…S219 code-first + vision a11y band.
 
 ---
 
@@ -158,7 +158,17 @@ flowchart TB
 | 63 | **PH-S206** | Vision minimap selection ring | docs/vision | відкрито |
 | 64 | **PH-S207** | Admin i18n slim next panel | code | відкрито |
 | 65 | **PH-S208** | Stand smoke vision rev parity | tests | відкрито |
-| 66 | **PH-S209** | Vision map a11y focus ring | docs/vision | відкрито |
+| 66 | **PH-S209** | Vision map a11y focus ring | docs/vision | **✅** |
+| 67 | **PH-S210** | Stand smoke seed_inventory GET | tests | відкрито |
+| 68 | **PH-S211** | Admin i18n slim jobs panel | code | відкрито |
+| 69 | **PH-S212** | Vision reduced-motion map FX | docs/vision | відкрито |
+| 70 | **PH-S213** | Galaxy prefetch metrics stand smoke | tests | відкрито |
+| 71 | **PH-S214** | Admin i18n slim raid panel | code | відкрито |
+| 72 | **PH-S215** | Vision panel collapse focus restore | docs/vision | відкрито |
+| 73 | **PH-S216** | Galaxy pricing fallback metrics smoke | tests | відкрито |
+| 74 | **PH-S217** | Admin i18n slim grid-pricing panel | code | відкрито |
+| 75 | **PH-S218** | Vision map aria-live selection | docs/vision | відкрито |
+| 76 | **PH-S219** | Galaxy trust payout metrics smoke | tests | відкрито |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 

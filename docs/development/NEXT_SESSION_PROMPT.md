@@ -1,28 +1,37 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-16 · PH-S208 ✅ · vision **rev 150** · **1** відкритий (PH-S209) · **hold 95%** · **stretch spirit 96%**
+**Оновлено:** 2026-06-16 · PH-S209 ✅ · vision **rev 151** · **10** відкритих (PH-S210…S219) · **hold 95%** · **stretch spirit 96%**
 
-| **← наступний** | **PH-S209** — Vision map a11y focus ring |
-| **Відкритих** | **1** (PH-S209) |
+| **← наступний** | **PH-S210** — Stand smoke seed_inventory GET |
+| **Відкритих** | **10** (PH-S210…S219) |
 | **VDT** | один PH-S* = 1 commit (code) + docs sync |
 
 ---
 
-## Зріз §5.12 (1 відкритий: PH-S209)
+## Зріз §5.12 (10 відкритих: PH-S210…S219)
 
 ### Закрито недавно ✅
 
 | Sprint | Scope | Зріз |
 |--------|-------|------|
+| PH-S209 | Vision map a11y focus ring | `:focus-visible` controls + nodes; roving tabindex |
 | PH-S208 | Stand smoke vision revision parity | `X-PoolAI-Vision-Revision` + FM/manifest |
 | PH-S207 | Admin i18n slim monitoring panel | `admin.mon.*` → `poolai-ui-core` |
-| PH-S206 | Vision minimap selection ring | `#minimap-selection-ring` |
 
-### Відкрито
+### Відкрито — code-first + vision a11y band (PH-S210…S219)
 
-| Sprint | Scope |
-|--------|-------|
-| **PH-S209** | Vision map a11y focus ring |
+| # | Sprint | Scope |
+|---|--------|-------|
+| 1 | **PH-S210** | Stand smoke seed_inventory GET |
+| 2 | **PH-S211** | Admin i18n slim jobs panel |
+| 3 | **PH-S212** | Vision reduced-motion map FX |
+| 4 | **PH-S213** | Galaxy prefetch metrics stand smoke |
+| 5 | **PH-S214** | Admin i18n slim raid panel |
+| 6 | **PH-S215** | Vision panel collapse focus restore |
+| 7 | **PH-S216** | Galaxy pricing fallback metrics smoke |
+| 8 | **PH-S217** | Admin i18n slim grid-pricing panel |
+| 9 | **PH-S218** | Vision map aria-live selection |
+| 10 | **PH-S219** | Galaxy trust payout metrics smoke |
 
 ---
 
@@ -39,22 +48,20 @@ export K8S_OPENAPI_ENABLED_VERSION=1.28
 
 ---
 
-## PH-S209 — scope
+## PH-S210 — scope
 
-- `docs/vision/vision.js` / `vision.css` — keyboard focus-visible on map controls + nodes
+- `src/bin/poolai_http_stand_smoke.rs` — case `grid_seed_inventory` for `GET /api/v1/grid/seed-inventory`
 - Acceptance: FM/HANDOFF/NEXT; `cargo test-ci`; push
 
 ---
 
-## Copy-paste — PH-S209
+## Copy-paste — PH-S210
 
 ```
-PoolAI — спринт PH-S209 (один PH-S*, VDT ітераційно).
-HANDOFF: docs/development/HANDOFF_NEW_SESSION.md
-FM §5.12: docs/catalog/FUNCTION_MANAGEMENT.md
+PoolAI VDT · один PH-S* · main · MSYS2 PATH · git-push.md
 
-Спринт PH-S209 — Vision map a11y focus ring
-Scope: docs/vision focus-visible ring; cargo test-ci
+S0: git fetch · HANDOFF · FM §5.12 · df -h /s
 
-Acceptance: cargo test-ci; FM/HANDOFF/NEXT; git push main
+PH-S210 — Stand smoke seed_inventory GET (tests)
+Scope: poolai-http-stand-smoke grid_seed_inventory case; cargo test-ci; FM/HANDOFF/NEXT; vision-sync if FM rev changes; commit+push
 ```
