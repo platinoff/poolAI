@@ -255,6 +255,50 @@ async fn smoke_health(client: &Client, base: &str) -> Result<(), String> {
     Ok(())
 }
 
+async fn smoke_grid_seed_inventory(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/api/v1/grid/seed-inventory"))
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("grid seed-inventory status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    if body.get("ok").and_then(|v| v.as_bool()) != Some(true) {
+        return Err(format!("grid seed-inventory body: {body}"));
+    }
+    if body.get("generated_at").and_then(|v| v.as_str()).is_none() {
+        return Err(format!("grid seed-inventory missing generated_at: {body}"));
+    }
+    let entries = body
+        .get("entries")
+        .and_then(Value::as_array)
+        .ok_or_else(|| format!("grid seed-inventory missing entries: {body}"))?;
+    if entries.len() != 2 {
+        return Err(format!(
+            "grid seed-inventory expected 2 entries, got {}: {body}",
+            entries.len()
+        ));
+    }
+    if entries[0].get("peer_id").and_then(|v| v.as_str()) != Some("srv1-worker-a") {
+        return Err(format!("grid seed-inventory first peer_id: {}", entries[0]));
+    }
+    if entries[0].pointer("/seed_inventory/shard_ids") != Some(&json!(["w:emb-1", "w:ckpt-7"])) {
+        return Err(format!(
+            "grid seed-inventory first shard_ids: {}",
+            entries[0]
+        ));
+    }
+    if entries[1].get("peer_id").and_then(|v| v.as_str()) != Some("srv2-worker-b") {
+        return Err(format!(
+            "grid seed-inventory second peer_id: {}",
+            entries[1]
+        ));
+    }
+    Ok(())
+}
+
 async fn smoke_grid_pricing(client: &Client, base: &str) -> Result<(), String> {
     let model = smoke_id("smoke-pricing");
     let url = format!(
@@ -822,6 +866,12 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
     .await;
     record(
         &mut cases,
+        "grid_seed_inventory",
+        smoke_grid_seed_inventory(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
         "jobs_migrating",
         smoke_jobs_migrating(&client, &cli.base_url).await,
     )
@@ -968,6 +1018,27 @@ mod tests {
         let root = repo_root();
         let rev = read_manifest_revision(&root).expect("manifest revision");
         assert!(rev > 0);
+    }
+
+    #[test]
+    fn grid_seed_inventory_stub_shape() {
+        let stub = json!({
+            "ok": true,
+            "generated_at": "2026-05-27T10:00:00Z",
+            "entries": [
+                {
+                    "peer_id": "srv1-worker-a",
+                    "seed_inventory": {
+                        "shard_ids": ["w:emb-1", "w:ckpt-7"],
+                        "hot_tier": { "ram_bytes_used": 3_221_225_472u64 }
+                    }
+                },
+                { "peer_id": "srv2-worker-b" }
+            ]
+        });
+        let entries = stub["entries"].as_array().expect("entries");
+        assert_eq!(entries.len(), 2);
+        assert_eq!(entries[0]["peer_id"], "srv1-worker-a");
     }
 
     #[test]
