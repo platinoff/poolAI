@@ -1,9 +1,9 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-16 · PH-S242 ✅ · replenish §5.12 · vision **rev 192** (after sync) · **10** відкритих (PH-S243…S252) · **hold 95%** · **stretch spirit 96%**
+**Оновлено:** 2026-06-17 · PH-S243 ✅ · vision **rev 193** (after sync) · **9** відкритих (PH-S244…S252) · **hold 95%** · **stretch spirit 96%**
 
-| **← наступний** | **PH-S243** — Admin i18n slim admin chrome shell |
-| **Відкритих** | **10** (PH-S243…S252) |
+| **← наступний** | **PH-S244** — Galaxy pricing stale served metrics stand smoke |
+| **Відкритих** | **9** (PH-S244…S252) |
 
 ---
 
@@ -11,8 +11,7 @@
 
 | Sprint | Scope | Type |
 |--------|-------|------|
-| **PH-S243** ← | admin chrome → `auth_dash_shell_patch` | code |
-| PH-S244 | `galaxy_pricing_stale_served` stand smoke | tests |
+| **PH-S244** ← | `galaxy_pricing_stale_served` stand smoke | tests |
 | PH-S245 | `admin.status.*` slim patch | code |
 | PH-S246 | `err.hint*` + access keys slim | code |
 | PH-S247 | pricing provider metrics stand smoke | tests |
@@ -24,20 +23,19 @@
 
 ---
 
-## PH-S243 — scope
+## PH-S244 — scope
 
-- `admin.brand`, `admin.skipMain`, `admin.skipNav`, `admin.lang.label`, `admin.logout`, `admin.browserSuffix` → `auth_dash_shell_patch` (`ADMIN_CHROME_*`)
-- Remove from `i18n_core.js`; extend auth_dash tests
-- Pattern: PH-S242 nav shell audit
-- Acceptance: `cargo test ph_s243`; FM/HANDOFF/NEXT; `poolai-vision-sync --check`; commit+push
+- `poolai-http-stand-smoke` — `galaxy_pricing_stale_served` on live `/metrics` (PH-S127 gauge export)
+- Pattern: PH-S241 fresh served stand smoke
+- Acceptance: `cargo test ph_s244`; FM/HANDOFF/NEXT; `poolai-vision-sync --check`; commit+push
 
 ---
 
-## Copy-paste — PH-S243
+## Copy-paste — PH-S244
 
 ```
-PH-S243 — Admin i18n slim admin chrome shell (code)
-Scope: admin chrome keys → auth_dash patch; cargo test ph_s243; FM/HANDOFF/NEXT; commit+push
+PH-S244 — Galaxy pricing stale served metrics stand smoke (tests)
+Scope: galaxy_pricing_stale_served on live /metrics; cargo test ph_s244; FM/HANDOFF/NEXT; commit+push
 ```
 
 ---

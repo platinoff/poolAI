@@ -1827,6 +1827,26 @@ pub const ADMIN_NAV_UK: &[I18nRow<'_>] = &[
     ("admin.nav.config", "Конфігурація"),
 ];
 
+/// English admin chrome shell keys (PH-S243; merged into auth_dash shell patch).
+pub const ADMIN_CHROME_EN: &[I18nRow<'_>] = &[
+    ("admin.brand", "PoolAI Admin"),
+    ("admin.skipMain", "Skip to main content"),
+    ("admin.skipNav", "Skip to navigation"),
+    ("admin.lang.label", "Language"),
+    ("admin.logout", "Log out"),
+    ("admin.browserSuffix", " - PoolAI Admin"),
+];
+
+/// Ukrainian admin chrome shell keys (PH-S243).
+pub const ADMIN_CHROME_UK: &[I18nRow<'_>] = &[
+    ("admin.brand", "PoolAI Адмін"),
+    ("admin.skipMain", "Перейти до основного вмісту"),
+    ("admin.skipNav", "Перейти до навігації"),
+    ("admin.lang.label", "Мова"),
+    ("admin.logout", "Вийти"),
+    ("admin.browserSuffix", " — PoolAI Адмін"),
+];
+
 /// English dashboard shell keys (nav, theme, search, titles).
 pub const DASH_SHELL_EN: &[I18nRow<'_>] = &[
     ("dash.brand", "PoolAI UI"),
@@ -2314,15 +2334,17 @@ pub fn admin_table_patch_script() -> String {
     )
 }
 
-/// `{"en":{...},"uk":{...}}` patch for auth + dashboard + admin nav shell keys (PH-S162, PH-S242).
+/// `{"en":{...},"uk":{...}}` patch for auth + dashboard + admin nav/chrome shell keys (PH-S162, PH-S242, PH-S243).
 pub fn auth_dash_shell_patch() -> BTreeMap<String, BTreeMap<String, String>> {
     let mut en = BTreeMap::new();
     merge_rows(&mut en, AUTH_SHELL_EN);
     merge_rows(&mut en, ADMIN_NAV_EN);
+    merge_rows(&mut en, ADMIN_CHROME_EN);
     merge_rows(&mut en, DASH_SHELL_EN);
     let mut uk = BTreeMap::new();
     merge_rows(&mut uk, AUTH_SHELL_UK);
     merge_rows(&mut uk, ADMIN_NAV_UK);
+    merge_rows(&mut uk, ADMIN_CHROME_UK);
     merge_rows(&mut uk, DASH_SHELL_UK);
     let mut root = BTreeMap::new();
     root.insert("en".into(), en);
@@ -2701,9 +2723,11 @@ mod tests {
     fn auth_dash_patch_has_matching_en_uk_key_counts() {
         assert_eq!(AUTH_SHELL_EN.len(), AUTH_SHELL_UK.len());
         assert_eq!(ADMIN_NAV_EN.len(), ADMIN_NAV_UK.len());
+        assert_eq!(ADMIN_CHROME_EN.len(), ADMIN_CHROME_UK.len());
         assert_eq!(DASH_SHELL_EN.len(), DASH_SHELL_UK.len());
         let patch = auth_dash_shell_patch();
-        let expected = AUTH_SHELL_EN.len() + ADMIN_NAV_EN.len() + DASH_SHELL_EN.len();
+        let expected =
+            AUTH_SHELL_EN.len() + ADMIN_NAV_EN.len() + ADMIN_CHROME_EN.len() + DASH_SHELL_EN.len();
         assert_eq!(patch["en"].len(), expected);
         assert_eq!(patch["uk"].len(), expected);
     }
@@ -2714,7 +2738,17 @@ mod tests {
         assert!(json.contains(r#""admin.nav.dashboard""#));
         assert!(json.contains(r#""admin.nav.jobs""#));
         assert!(json.contains(r#""admin.nav.config""#));
-        assert!(!json.contains(r#""admin.brand""#));
+    }
+
+    #[test]
+    fn auth_dash_patch_json_contains_admin_chrome_keys_ph_s243() {
+        let json = auth_dash_shell_patch_json();
+        assert!(json.contains(r#""admin.brand""#));
+        assert!(json.contains(r#""admin.skipMain""#));
+        assert!(json.contains(r#""admin.skipNav""#));
+        assert!(json.contains(r#""admin.lang.label""#));
+        assert!(json.contains(r#""admin.logout""#));
+        assert!(json.contains(r#""admin.browserSuffix""#));
     }
 
     #[test]

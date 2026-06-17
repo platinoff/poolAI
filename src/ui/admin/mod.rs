@@ -679,6 +679,28 @@ fn i18n_core_js_has_no_admin_nav_keys_ph_s242() {
 }
 
 #[test]
+fn admin_layout_injects_admin_chrome_via_auth_dash_ph_s243() {
+    let patch = poolai_ui_core::i18n::auth_dash_shell_patch_script();
+    assert!(patch.contains(r#""admin.brand""#));
+    assert!(patch.contains(r#""admin.skipMain""#));
+    assert!(patch.contains(r#""admin.logout""#));
+    let html = admin_layout("admin.test.page", "Test", "<p>body</p>", "");
+    assert!(html.0.contains(r#""admin.browserSuffix""#));
+    assert!(html.0.contains(r#"data-i18n="admin.brand""#));
+}
+
+#[test]
+fn i18n_core_js_has_no_admin_chrome_keys_ph_s243() {
+    let js = include_str!("../i18n_core.js");
+    assert!(!js.contains("'admin.brand'"));
+    assert!(!js.contains("'admin.skipMain'"));
+    assert!(!js.contains("'admin.skipNav'"));
+    assert!(!js.contains("'admin.lang.label'"));
+    assert!(!js.contains("'admin.logout'"));
+    assert!(!js.contains("'admin.browserSuffix'"));
+}
+
+#[test]
 fn admin_layout_injects_rust_auth_dash_i18n_patch_ph_s162() {
     let patch = poolai_ui_core::i18n::auth_dash_shell_patch_script();
     assert!(patch.contains("window.__poolaiAuthDashI18nRust="));

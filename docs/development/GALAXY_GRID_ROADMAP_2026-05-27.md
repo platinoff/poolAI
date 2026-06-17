@@ -1,32 +1,31 @@
 # Galaxy Grid roadmap (зріз)
 
-**Оновлено:** 2026-06-16 · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**10** відкритих PH-S243…S252)
+**Оновлено:** 2026-06-17 · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**9** відкритих PH-S244…S252)
 
 | Зріз | Значення |
 |------|----------|
 | **Wire band** | PH-S65…S187 ✅ |
 | **Vision UX** | PH-S188…S233 ✅ |
 | **Ops / stand smoke** | PH-S196…S235 ✅ · band S244…S250 (pricing/settlement/locality) — **відкрито** |
-| **Admin i18n slim** | PH-S207…S242 ✅ · band S243…S246, S248, S252 — **відкрито** |
+| **Admin i18n slim** | PH-S207…S243 ✅ · band S245…S246, S248, S252 — **відкрито** |
 | **Docs sync** | PH-S251 — roadmap + README + INDEX zriz |
 | **Rust ratio** | **92.78%** hold **95%** · spirit **96%** |
 
 ---
 
-## 3. Черга §5.12 (PH-S243…S252)
+## 3. Черга §5.12 (PH-S244…S252)
 
 | # | Sprint | Тема | Acceptance |
 |---|--------|------|------------|
-| 1 | **PH-S243** | Admin chrome shell i18n | `admin.brand` / skip / lang / logout / browserSuffix → `auth_dash_shell_patch` |
-| 2 | **PH-S244** | Pricing stale metrics smoke | `galaxy_pricing_stale_served` on live `/metrics` |
-| 3 | **PH-S245** | Admin status keys slim | `admin.status.*` + `admin.na` + `admin.btn.edit` patch |
-| 4 | **PH-S246** | Admin err hint keys slim | `err.hint*` + insufficientAdmin + accessRequired |
-| 5 | **PH-S247** | Pricing provider metrics smoke | catalog lookups/hits + provider errors on `/metrics` |
-| 6 | **PH-S248** | VM modal i18n slim | `vm.*` modal keys out of `i18n_core.js` |
-| 7 | **PH-S249** | Settlement metrics smoke | settlement pending + cleared on `/metrics` |
-| 8 | **PH-S250** | Shard locality metrics smoke | `galaxy_shard_local_hit_ratio` on `/metrics` |
-| 9 | **PH-S251** | Docs roadmap sync | GALAXY_GRID_ROADMAP + README + INDEX sprint zriz |
-| 10 | **PH-S252** | UI confirm modal slim | `ui.confirm*` + modal glue keys patch |
+| 1 | **PH-S244** | Pricing stale metrics smoke | `galaxy_pricing_stale_served` on live `/metrics` |
+| 2 | **PH-S245** | Admin status keys slim | `admin.status.*` + `admin.na` + `admin.btn.edit` patch |
+| 3 | **PH-S246** | Admin err hint keys slim | `err.hint*` + insufficientAdmin + accessRequired |
+| 4 | **PH-S247** | Pricing provider metrics smoke | catalog lookups/hits + provider errors on `/metrics` |
+| 5 | **PH-S248** | VM modal i18n slim | `vm.*` modal keys out of `i18n_core.js` |
+| 6 | **PH-S249** | Settlement metrics smoke | settlement pending + cleared on `/metrics` |
+| 7 | **PH-S250** | Shard locality metrics smoke | `galaxy_shard_local_hit_ratio` on `/metrics` |
+| 8 | **PH-S251** | Docs roadmap sync | GALAXY_GRID_ROADMAP + README + INDEX sprint zriz |
+| 9 | **PH-S252** | UI confirm modal slim | `ui.confirm*` + modal glue keys patch |
 
 Повна таблиця — FM **§5.12** · [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md) · [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md).
 

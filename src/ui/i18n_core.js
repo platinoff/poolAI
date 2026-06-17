@@ -9,14 +9,7 @@
 
   var STRINGS = {
     en: {
-      // auth.* + dash.* + admin.nav.* shell → poolai-ui-core i18n.rs (PH-S162, PH-S242)
-
-      'admin.brand': 'PoolAI Admin',
-      'admin.skipMain': 'Skip to main content',
-      'admin.skipNav': 'Skip to navigation',
-      'admin.lang.label': 'Language',
-      'admin.logout': 'Log out',
-      'admin.browserSuffix': ' - PoolAI Admin',
+      // auth.* + dash.* + admin.nav.* + admin chrome shell → poolai-ui-core i18n.rs (PH-S162, PH-S242, PH-S243)
 
       'err.insufficientAdmin': 'Insufficient permissions. Admin role required.',
       'admin.status.active': 'Active',
@@ -230,14 +223,7 @@
         'Are you sure you want to delete artifact "{name}" ({id})? This action cannot be undone.',
     },
     uk: {
-      // auth.* + dash.* + admin.nav.* shell → poolai-ui-core i18n.rs (PH-S162, PH-S242)
-
-      'admin.brand': 'PoolAI Адмін',
-      'admin.skipMain': 'Перейти до основного вмісту',
-      'admin.skipNav': 'Перейти до навігації',
-      'admin.lang.label': 'Мова',
-      'admin.logout': 'Вийти',
-      'admin.browserSuffix': ' — PoolAI Адмін',
+      // auth.* + dash.* + admin.nav.* + admin chrome shell → poolai-ui-core i18n.rs (PH-S162, PH-S242, PH-S243)
 
       'err.insufficientAdmin': 'Недостатньо прав. Потрібна роль Admin.',
       'admin.status.active': 'Активний',
@@ -462,7 +448,7 @@
   }
 
   // PH-S162: auth + dash shell EN/UK → poolai-ui-core i18n.rs (layout + login inject).
-  // PH-S242: admin.nav.* merged in same auth_dash patch (not in STRINGS core).
+  // PH-S242: admin.nav.*; PH-S243: admin chrome keys — same auth_dash patch (not in STRINGS core).
   var rustAuthDash = typeof window !== 'undefined' && window.__poolaiAuthDashI18nRust;
   if (rustAuthDash) {
     if (rustAuthDash.en) Object.assign(STRINGS.en, rustAuthDash.en);

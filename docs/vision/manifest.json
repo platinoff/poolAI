@@ -1830,7 +1830,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S242",
+  "last_sprint_closed": "PH-S243",
   "layers": [
     {
       "id": "L0",
@@ -1863,7 +1863,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S243",
+  "next_sprint": "PH-S244",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7719,7 +7719,7 @@
       "path": "docs/vision/vision.svg"
     }
   ],
-  "revision": 192,
+  "revision": 193,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -9318,9 +9318,9 @@
       "acceptance": "admin.brand` / skip / lang / logout / browserSuffix → auth_dash",
       "deps": "PH-S242",
       "id": "PH-S243",
-      "open": true,
+      "open": false,
       "row": 178,
-      "status": "open",
+      "status": "closed",
       "title": "Admin i18n slim admin chrome shell (code)"
     },
     {
@@ -9405,7 +9405,7 @@
       "title": "Admin shared ui.confirm slim patch (code)"
     }
   ],
-  "sprint_queue_open_count": 10,
+  "sprint_queue_open_count": 9,
   "updated_at": "2026-06-16",
   "vision_ui_rev": 59
 }
