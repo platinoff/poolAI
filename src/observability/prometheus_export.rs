@@ -65,12 +65,13 @@ use crate::grid::galaxy_trust_score::{
     METRIC_PAYOUT_HELD_TOTAL, METRIC_TRUST_SCORE,
 };
 use crate::grid::galaxy_verification_metrics::{
-    verification_match_total, verification_mismatch_total, verification_sample_total,
-    METRIC_VERIFICATION_MATCH_TOTAL, METRIC_VERIFICATION_MISMATCH_TOTAL,
-    METRIC_VERIFICATION_SAMPLE_TOTAL,
+    verification_match_total, verification_mismatch_total, verification_sample_completed_total,
+    verification_sample_total, METRIC_VERIFICATION_MATCH_TOTAL, METRIC_VERIFICATION_MISMATCH_TOTAL,
+    METRIC_VERIFICATION_SAMPLE_COMPLETED_TOTAL, METRIC_VERIFICATION_SAMPLE_TOTAL,
 };
 use crate::grid::galaxy_verify_sampling::{
-    verify_sample_scheduled_total, METRIC_VERIFY_SAMPLE_SCHEDULED_TOTAL,
+    verify_sample_scheduled_total, verify_sample_skipped_total,
+    METRIC_VERIFY_SAMPLE_SCHEDULED_TOTAL, METRIC_VERIFY_SAMPLE_SKIPPED_TOTAL,
 };
 
 /// Lazily initialized Prometheus registry and metric handles.
@@ -119,6 +120,8 @@ pub struct PoolAiPrometheus {
     galaxy_verification_match_total: IntGauge,
     galaxy_verification_sample_total: IntGauge,
     galaxy_verification_sample_scheduled_total: IntGauge,
+    galaxy_verification_sample_completed_total: IntGauge,
+    galaxy_verification_sample_skipped_total: IntGauge,
     galaxy_replay_pending: IntGauge,
     galaxy_replay_pending_scheduled_total: IntGauge,
     galaxy_replay_pending_resolved_total: IntGauge,
@@ -530,6 +533,24 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_verification_sample_scheduled_total.clone()))
         .expect("register galaxy_verification_sample_scheduled_total");
 
+    let galaxy_verification_sample_completed_total = IntGauge::with_opts(Opts::new(
+        METRIC_VERIFICATION_SAMPLE_COMPLETED_TOTAL,
+        "Galaxy verification samples completed with verdict on grid result path (PH-S343)",
+    ))
+    .expect(METRIC_VERIFICATION_SAMPLE_COMPLETED_TOTAL);
+    registry
+        .register(Box::new(galaxy_verification_sample_completed_total.clone()))
+        .expect("register galaxy_verification_sample_completed_total");
+
+    let galaxy_verification_sample_skipped_total = IntGauge::with_opts(Opts::new(
+        METRIC_VERIFY_SAMPLE_SKIPPED_TOTAL,
+        "Galaxy verification edge samples skipped by deterministic stub (PH-S345)",
+    ))
+    .expect(METRIC_VERIFY_SAMPLE_SKIPPED_TOTAL);
+    registry
+        .register(Box::new(galaxy_verification_sample_skipped_total.clone()))
+        .expect("register galaxy_verification_sample_skipped_total");
+
     let galaxy_replay_pending = IntGauge::with_opts(Opts::new(
         METRIC_REPLAY_PENDING,
         "Galaxy replay verifications pending coordinator verdict (PH-S176)",
@@ -646,6 +667,8 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_verification_match_total,
         galaxy_verification_sample_total,
         galaxy_verification_sample_scheduled_total,
+        galaxy_verification_sample_completed_total,
+        galaxy_verification_sample_skipped_total,
         galaxy_replay_pending,
         galaxy_replay_pending_scheduled_total,
         galaxy_replay_pending_resolved_total,
@@ -742,6 +765,10 @@ pub fn refresh_galaxy_verification_gauges() {
         .set(verification_sample_total() as i64);
     prom.galaxy_verification_sample_scheduled_total
         .set(verify_sample_scheduled_total() as i64);
+    prom.galaxy_verification_sample_completed_total
+        .set(verification_sample_completed_total() as i64);
+    prom.galaxy_verification_sample_skipped_total
+        .set(verify_sample_skipped_total() as i64);
     prom.galaxy_replay_pending.set(replay_pending() as i64);
     prom.galaxy_replay_pending_scheduled_total
         .set(replay_pending_scheduled_total() as i64);

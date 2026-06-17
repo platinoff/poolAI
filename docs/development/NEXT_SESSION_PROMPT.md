@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-17 (PH-S333…S342 ✅ · vision **rev 218** · **0** відкритих · rust_ratio **94.37%**)
+**Оновлено:** 2026-06-17 (PH-S343…S352 ✅ · vision **rev 219** · **0** відкритих · rust_ratio **94.35%**)
 
 | **← наступний** | replenish §5.13 **або** **`абракадабра`** (drain) |
 | **Відкритих** | **0** |
@@ -30,15 +30,15 @@ S0: git fetch; HANDOFF; FM §5.12; df -h /s
 
 ---
 
-## Закрито (смуга PH-S333…S342)
+## Закрито (смуга PH-S343…S352)
 
-PH-S333 ✅ — `galaxy_replay_pending_scheduled_total` on replay schedule.
-PH-S334 ✅ — `buildMetricHistoryUrlWithHours` wasm; metric history fetch wasm-first.
-PH-S335 ✅ — `galaxy_replay_pending_resolved_total` on replay verdict.
-PH-S336 ✅ — stand smoke replay scheduled + resolved metrics.
-PH-S337 ✅ — `buildMetricsWindowUrlWithHours` wasm; metrics window fetch wasm-first.
-PH-S338…S342 ✅ — loc-audit **94.37%**, docs canon, vision `--check`, INDEX maintain.
+PH-S343 ✅ — `galaxy_verification_sample_completed_total` on verdict path.
+PH-S344 ✅ — `buildMonitoringAlertsUrl` wasm; `poolaiFetchMonitoringAlerts` wasm-first.
+PH-S345 ✅ — `galaxy_verification_sample_skipped_total` on edge NotSelected stub.
+PH-S346 ✅ — stand smoke verification completed + skipped metrics.
+PH-S347 ✅ — `buildAlertRulesUrl` wasm; `poolaiFetchAlertRules` wasm-first.
+PH-S348…S352 ✅ — loc-audit **94.35%**, docs canon, vision `--check`, INDEX maintain.
 
-**rust_ratio:** **94.37%** (formal 90–95% ✅; hold 95% advisory).
+**rust_ratio:** **94.35%** (formal 90–95% ✅; hold 95% advisory).
 
 **BLOCKED / Deferred:** FM-003 LAN · FM-041 Cloud SDK live.

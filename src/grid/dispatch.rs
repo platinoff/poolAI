@@ -40,7 +40,7 @@ use crate::grid::galaxy_trust_score::{
 };
 use crate::grid::galaxy_verification_metrics::{
     evaluate_result_verification_match, evaluate_result_verification_mismatch,
-    evaluate_result_verification_sample,
+    evaluate_result_verification_sample, evaluate_result_verification_sample_completed,
 };
 use crate::grid::galaxy_verify_sampling::{
     evaluate_result_verify_sampling, VerifySamplingConfig, VerifySamplingVerdict,
@@ -560,6 +560,7 @@ fn ingest_result(
     let trust_score = trust_score_from_result_metrics(body.metrics.as_ref());
     evaluate_result_verification_mismatch(body.metrics.as_ref());
     evaluate_result_verification_match(body.metrics.as_ref());
+    evaluate_result_verification_sample_completed(body.metrics.as_ref());
     let settlement_gate = evaluate_result_settlement_gate(
         source_peer_id,
         trust_score,

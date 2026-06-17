@@ -969,12 +969,28 @@ fn admin_charts_metrics_window_url_with_hours_wasm_first_ph_s337() {
     assert!(js.contains("wasm.buildMetricsWindowUrlWithHours"));
 }
 
+#[test]
+fn admin_charts_monitoring_alerts_url_wasm_first_ph_s344() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("wasm.buildMonitoringAlertsUrl"));
+    assert!(js.contains("poolaiFetchMonitoringAlerts"));
+}
+
+#[test]
+fn admin_charts_alert_rules_url_wasm_first_ph_s347() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("wasm.buildAlertRulesUrl"));
+    assert!(js.contains("poolaiFetchAlertRules"));
+}
+
 #[tokio::test]
 async fn admin_monitoring_ph_s43_ml_metrics_panel() {
     let html = monitoring::admin_monitoring().await.0;
     assert!(html.contains("id=\"ml-demo-btn\""));
     assert!(html.contains("runMlPipelineDemo"));
     assert!(html.contains("poolaiFetchMlPipelines"));
+    assert!(html.contains("poolaiFetchMonitoringAlerts"));
+    assert!(html.contains("poolaiFetchAlertRules"));
     assert!(html.contains("poolaiRenderMlPipelineMetricsPanel"));
     assert!(html.contains("ml-pipeline-metrics-panel"));
 }

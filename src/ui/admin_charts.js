@@ -539,6 +539,41 @@ async function poolaiFetchMlPipelines() {
   }
 }
 
+/** @param {{ limit?: number, acknowledged?: boolean }} [opts] */
+async function poolaiFetchMonitoringAlerts(opts) {
+  opts = opts || {};
+  var limit = opts.limit != null ? opts.limit : 20;
+  try {
+    var wasm = poolaiChartsWasm();
+    var url =
+      wasm && typeof wasm.buildMonitoringAlertsUrl === 'function'
+        ? wasm.buildMonitoringAlertsUrl(
+            limit,
+            opts.acknowledged != null ? opts.acknowledged : null,
+          )
+        : '/api/enterprise/monitoring/alerts?limit=' + limit;
+    var data = await fetchJson(url);
+    return data || [];
+  } catch (e) {
+    console.warn('poolaiFetchMonitoringAlerts:', e);
+    return [];
+  }
+}
+
+async function poolaiFetchAlertRules() {
+  try {
+    var wasm = poolaiChartsWasm();
+    var url =
+      wasm && typeof wasm.buildAlertRulesUrl === 'function'
+        ? wasm.buildAlertRulesUrl()
+        : '/api/enterprise/monitoring/alert-rules';
+    return (await fetchJson(url)) || [];
+  } catch (e) {
+    console.warn('poolaiFetchAlertRules:', e);
+    return [];
+  }
+}
+
 async function poolaiRunMlPipelineDemo() {
   var wasm = poolaiChartsWasm();
   var url =

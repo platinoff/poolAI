@@ -13,9 +13,14 @@ pub const METRIC_VERIFICATION_MISMATCH_TOTAL: &str = "galaxy_verification_mismat
 /// In-process counter for verification digest matches (mirrored on `GET /metrics`).
 pub const METRIC_VERIFICATION_MATCH_TOTAL: &str = "galaxy_verification_match_total";
 
+/// In-process counter for verification samples completed with verdict (PH-S343).
+pub const METRIC_VERIFICATION_SAMPLE_COMPLETED_TOTAL: &str =
+    "galaxy_verification_sample_completed_total";
+
 static SAMPLE_TOTAL: AtomicU64 = AtomicU64::new(0);
 static MISMATCH_TOTAL: AtomicU64 = AtomicU64::new(0);
 static MATCH_TOTAL: AtomicU64 = AtomicU64::new(0);
+static SAMPLE_COMPLETED_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// Record one verification sample on the grid result path.
 pub fn record_verification_sample() {
@@ -59,11 +64,26 @@ pub fn reset_verification_match_metrics_for_test() {
     MATCH_TOTAL.store(0, Ordering::Relaxed);
 }
 
+/// Record one verification sample completed with match or mismatch verdict.
+pub fn record_verification_sample_completed() {
+    SAMPLE_COMPLETED_TOTAL.fetch_add(1, Ordering::Relaxed);
+}
+
+pub fn verification_sample_completed_total() -> u64 {
+    SAMPLE_COMPLETED_TOTAL.load(Ordering::Relaxed)
+}
+
+#[cfg(any(test, feature = "test-utils"))]
+pub fn reset_verification_sample_completed_metrics_for_test() {
+    SAMPLE_COMPLETED_TOTAL.store(0, Ordering::Relaxed);
+}
+
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_verification_metrics_for_test() {
     reset_verification_sample_metrics_for_test();
     reset_verification_mismatch_metrics_for_test();
     reset_verification_match_metrics_for_test();
+    reset_verification_sample_completed_metrics_for_test();
 }
 
 /// Grid result path stub: increment sample counter when stub selects edge sample or explicit flag.
@@ -104,6 +124,18 @@ pub fn evaluate_result_verification_match(metrics: Option<&serde_json::Value>) -
         record_verification_match();
     }
     is_match
+}
+
+/// Grid result path stub: increment when verification verdict is `match` or `mismatch` (PH-S343).
+pub fn evaluate_result_verification_sample_completed(metrics: Option<&serde_json::Value>) -> bool {
+    let completed = metrics
+        .and_then(|m| m.get("verification_verdict"))
+        .and_then(|v| v.as_str())
+        .is_some_and(|s| s.eq_ignore_ascii_case("match") || s.eq_ignore_ascii_case("mismatch"));
+    if completed {
+        record_verification_sample_completed();
+    }
+    completed
 }
 
 #[cfg(test)]
@@ -187,6 +219,30 @@ mod tests {
             "verification_verdict": "mismatch"
         }))));
         assert_eq!(verification_match_total(), 1);
+
+        reset_verification_metrics_for_test();
+    }
+
+    #[test]
+    fn evaluate_result_verification_sample_completed_increments_on_verdict_ph_s343() {
+        let _lock = verification_metrics_test_lock();
+        reset_verification_metrics_for_test();
+        assert!(!evaluate_result_verification_sample_completed(None));
+        assert_eq!(verification_sample_completed_total(), 0);
+
+        assert!(evaluate_result_verification_sample_completed(Some(
+            &json!({
+                "verification_verdict": "match"
+            })
+        )));
+        assert_eq!(verification_sample_completed_total(), 1);
+
+        assert!(evaluate_result_verification_sample_completed(Some(
+            &json!({
+                "verification_verdict": "mismatch"
+            })
+        )));
+        assert_eq!(verification_sample_completed_total(), 2);
 
         reset_verification_metrics_for_test();
     }

@@ -15,7 +15,7 @@ pub async fn admin_monitoring() -> Html<String> {
       adminShowLoading('monitoring-content', T('admin.mon.loading', 'Loading monitoring…'));
       try {
         const [alerts, dashboards, mlPipelines] = await Promise.all([
-          fetchJson('/api/enterprise/monitoring/alerts?limit=20'),
+          poolaiFetchMonitoringAlerts({ limit: 20 }),
           fetchJson('/api/enterprise/monitoring/dashboards'),
           poolaiFetchMlPipelines(),
         ]);
@@ -54,8 +54,7 @@ pub async fn admin_monitoring() -> Html<String> {
     
     async function loadAlertRules() {
       try {
-        const rules = await fetchJson('/api/enterprise/monitoring/alert-rules');
-        return rules;
+        return await poolaiFetchAlertRules();
       } catch (e) {
         console.error('Error loading alert rules:', e);
         return [];

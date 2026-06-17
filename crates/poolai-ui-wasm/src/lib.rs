@@ -8,12 +8,12 @@ use poolai_ui_core::api_error::{api_error_detail_from_body, format_fetch_error};
 use poolai_ui_core::format::escape_html;
 use poolai_ui_core::lease::lease_state;
 use poolai_ui_core::ml::{
-    build_metric_history_url, build_metric_history_url_with_hours, build_metrics_window_url,
-    build_metrics_window_url_with_hours, build_ml_pipeline_demo_url, build_ml_pipelines_url,
-    chart_scale, collect_ml_sparkline_series, flatten_ml_step_rows, format_ml_metric_summary,
-    group_metrics_by_name, metric_point_values, parse_ml_numeric, render_line_chart_empty_html,
-    render_line_chart_html, render_metrics_chart_grid_html, render_sparkline_html,
-    sanitize_chart_id,
+    build_alert_rules_url, build_metric_history_url, build_metric_history_url_with_hours,
+    build_metrics_window_url, build_metrics_window_url_with_hours, build_ml_pipeline_demo_url,
+    build_ml_pipelines_url, build_monitoring_alerts_url, chart_scale, collect_ml_sparkline_series,
+    flatten_ml_step_rows, format_ml_metric_summary, group_metrics_by_name, metric_point_values,
+    parse_ml_numeric, render_line_chart_empty_html, render_line_chart_html,
+    render_metrics_chart_grid_html, render_sparkline_html, sanitize_chart_id,
 };
 use poolai_ui_core::modal::{admin_dynamic_modal_html, trap_tab_action, MODAL_FOCUSABLE_SELECTOR};
 use poolai_ui_core::pricing::{format_unix_secs, format_usd_micro};
@@ -326,6 +326,16 @@ pub fn build_ml_pipelines_url_wasm() -> String {
 #[wasm_bindgen(js_name = buildMlPipelineDemoUrl)]
 pub fn build_ml_pipeline_demo_url_wasm() -> String {
     build_ml_pipeline_demo_url()
+}
+
+#[wasm_bindgen(js_name = buildMonitoringAlertsUrl)]
+pub fn build_monitoring_alerts_url_wasm(limit: u32, acknowledged: Option<bool>) -> String {
+    build_monitoring_alerts_url(limit, acknowledged)
+}
+
+#[wasm_bindgen(js_name = buildAlertRulesUrl)]
+pub fn build_alert_rules_url_wasm() -> String {
+    build_alert_rules_url()
 }
 
 #[wasm_bindgen(js_name = groupMetricsByName)]

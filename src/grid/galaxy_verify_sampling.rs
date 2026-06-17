@@ -18,9 +18,13 @@ pub const ENV_VERIFY_BASE_SAMPLE_RATE: &str = "POOLAI_GALAXY_VERIFY_BASE_SAMPLE_
 pub const DEFAULT_VERIFY_BASE_SAMPLE_RATE: f64 = 0.05;
 
 static VERIFY_SAMPLE_SCHEDULED_TOTAL: AtomicU64 = AtomicU64::new(0);
+static VERIFY_SAMPLE_SKIPPED_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// In-process counter for stub scheduled verification samples (grid result path).
 pub const METRIC_VERIFY_SAMPLE_SCHEDULED_TOTAL: &str = "galaxy_verification_sample_scheduled_total";
+
+/// In-process counter for edge samples not selected by deterministic stub (PH-S345).
+pub const METRIC_VERIFY_SAMPLE_SKIPPED_TOTAL: &str = "galaxy_verification_sample_skipped_total";
 
 /// Coordinator verification sampling policy (env-backed stub).
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -113,14 +117,25 @@ pub fn evaluate_result_verify_sampling(
 
 /// Record stub verdict counter (grid result path only).
 pub fn record_verify_sampling_verdict(verdict: VerifySamplingVerdict) {
-    if verdict == VerifySamplingVerdict::SampleScheduled {
-        VERIFY_SAMPLE_SCHEDULED_TOTAL.fetch_add(1, Ordering::Relaxed);
+    match verdict {
+        VerifySamplingVerdict::SampleScheduled => {
+            VERIFY_SAMPLE_SCHEDULED_TOTAL.fetch_add(1, Ordering::Relaxed);
+        }
+        VerifySamplingVerdict::NotSelected => {
+            VERIFY_SAMPLE_SKIPPED_TOTAL.fetch_add(1, Ordering::Relaxed);
+        }
+        VerifySamplingVerdict::NotApplicable => {}
     }
 }
 
 /// Total stub verification samples scheduled since process start.
 pub fn verify_sample_scheduled_total() -> u64 {
     VERIFY_SAMPLE_SCHEDULED_TOTAL.load(Ordering::Relaxed)
+}
+
+/// Total edge samples skipped by deterministic stub since process start.
+pub fn verify_sample_skipped_total() -> u64 {
+    VERIFY_SAMPLE_SKIPPED_TOTAL.load(Ordering::Relaxed)
 }
 
 /// Format sample rate for the HTTP response header (6 decimal places).
@@ -131,6 +146,7 @@ pub fn format_verify_base_sample_rate_header(rate: f64) -> String {
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_verify_sampling_metrics_for_test() {
     VERIFY_SAMPLE_SCHEDULED_TOTAL.store(0, Ordering::Relaxed);
+    VERIFY_SAMPLE_SKIPPED_TOTAL.store(0, Ordering::Relaxed);
 }
 
 #[cfg(test)]
@@ -215,5 +231,19 @@ mod tests {
     #[test]
     fn format_verify_base_sample_rate_header_six_decimals() {
         assert_eq!(format_verify_base_sample_rate_header(0.05), "0.050000");
+    }
+
+    #[test]
+    fn evaluate_result_verify_sampling_skipped_counter_ph_s345() {
+        reset_verify_sampling_metrics_for_test();
+        let cfg = VerifySamplingConfig {
+            base_sample_rate: 0.0,
+        };
+        assert_eq!(
+            evaluate_result_verify_sampling(Some("tg-edge"), "job-skip", &cfg),
+            VerifySamplingVerdict::NotSelected
+        );
+        assert_eq!(verify_sample_skipped_total(), 1);
+        reset_verify_sampling_metrics_for_test();
     }
 }

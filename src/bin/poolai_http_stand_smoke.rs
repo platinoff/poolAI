@@ -719,6 +719,8 @@ const GALAXY_VERIFICATION_METRICS: &[&str] = &[
     "galaxy_verification_mismatch_total",
     "galaxy_verification_match_total",
     "galaxy_verification_sample_scheduled_total",
+    "galaxy_verification_sample_completed_total",
+    "galaxy_verification_sample_skipped_total",
 ];
 
 fn metrics_text_has_verification_counters(body: &str) -> Result<(), String> {
@@ -1829,6 +1831,12 @@ mod tests {
             "# HELP galaxy_verification_sample_scheduled_total Galaxy verification stub samples scheduled on grid result path (PH-S164; PH-S186 /metrics)\n",
             "# TYPE galaxy_verification_sample_scheduled_total gauge\n",
             "galaxy_verification_sample_scheduled_total 0\n",
+            "# HELP galaxy_verification_sample_completed_total Galaxy verification samples completed with verdict on grid result path (PH-S343)\n",
+            "# TYPE galaxy_verification_sample_completed_total gauge\n",
+            "galaxy_verification_sample_completed_total 0\n",
+            "# HELP galaxy_verification_sample_skipped_total Galaxy verification edge samples skipped by deterministic stub (PH-S345)\n",
+            "# TYPE galaxy_verification_sample_skipped_total gauge\n",
+            "galaxy_verification_sample_skipped_total 0\n",
         );
         metrics_text_has_verification_counters(sample).expect("sample export");
     }

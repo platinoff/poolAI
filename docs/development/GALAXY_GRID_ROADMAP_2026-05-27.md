@@ -1,15 +1,15 @@
 # Galaxy Grid roadmap (зріз)
 
-**Оновлено:** 2026-06-17 · **Канон черги:** FM §5.12 (**0** · PH-S128…S342 ✅) · тригер **`абракадабра`**
+**Оновлено:** 2026-06-17 · **Канон черги:** FM §5.12 (**0** · PH-S343…S352 ✅) · тригер **`абракадабра`**
 
 | Зріз | Значення |
 |------|----------|
-| **Galaxy replay metrics** | PH-S333/S335 scheduled + resolved totals ✅ |
-| **Wasm / admin slim** | PH-S334/S337 metric window URL hours builders |
-| **Docs / ratio** | PH-S338…S342 ✅ |
-| **Rust ratio** | **94.37%** hold **95%** advisory |
+| **Galaxy verification metrics** | PH-S343/S345 completed + skipped totals ✅ |
+| **Wasm / admin slim** | PH-S344/S347 monitoring alerts + alert-rules URL builders |
+| **Docs / ratio** | PH-S348…S352 ✅ |
+| **Rust ratio** | **94.35%** hold **95%** advisory |
 
-**0** відкритих · остання смуга **PH-S333…S342** ✅.
+**0** відкритих · остання смуга **PH-S343…S352** ✅.
 
 ---
 
@@ -30,5 +30,5 @@
 ## 5. Пов’язані документи
 
 - [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md) — концепт v1
-- [`PROMETHEUS_METRICS.md`](./PROMETHEUS_METRICS.md) — stand smoke band PH-S244…S256 + replay scheduled/resolved (S333/S335/S336)
-- [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md) — ratio **94.37%**
+- [`PROMETHEUS_METRICS.md`](./PROMETHEUS_METRICS.md) — stand smoke band PH-S244…S256 + verification completed/skipped (S343/S345/S346)
+- [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md) — ratio **94.35%**

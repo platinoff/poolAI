@@ -1,4 +1,4 @@
-//! ML pipeline metric helpers — parity with `admin_charts.js` (PH-S43, PH-S155, PH-S275, PH-S284, PH-S287, PH-S294, PH-S297, PH-S314, PH-S317, PH-S324, PH-S327, PH-S334, PH-S337).
+//! ML pipeline metric helpers — parity with `admin_charts.js` (PH-S43, PH-S155, PH-S275, PH-S284, PH-S287, PH-S294, PH-S297, PH-S314, PH-S317, PH-S324, PH-S327, PH-S334, PH-S337, PH-S344, PH-S347).
 
 use crate::format::escape_html;
 use chrono::{DateTime, Duration, Utc};
@@ -474,6 +474,20 @@ pub fn build_ml_pipeline_demo_url() -> String {
     "/api/enterprise/ai-ml/pipeline/demo".to_string()
 }
 
+/// Mirrors `poolaiFetchMonitoringAlerts` URL (PH-S344).
+pub fn build_monitoring_alerts_url(limit: u32, acknowledged: Option<bool>) -> String {
+    let mut url = format!("/api/enterprise/monitoring/alerts?limit={limit}");
+    if let Some(ack) = acknowledged {
+        url.push_str(&format!("&acknowledged={ack}"));
+    }
+    url
+}
+
+/// Mirrors `loadAlertRules` fetch URL (PH-S347).
+pub fn build_alert_rules_url() -> String {
+    "/api/enterprise/monitoring/alert-rules".to_string()
+}
+
 /// Mirrors `poolaiRenderMetricsChartGrid` card wrapper (PH-S294).
 pub fn render_metrics_chart_grid_html(title: &str, parts: &[String]) -> String {
     if parts.is_empty() {
@@ -664,6 +678,26 @@ mod tests {
         assert_eq!(
             build_ml_pipeline_demo_url(),
             "/api/enterprise/ai-ml/pipeline/demo"
+        );
+    }
+
+    #[test]
+    fn build_monitoring_alerts_url_ph_s344() {
+        assert_eq!(
+            build_monitoring_alerts_url(20, None),
+            "/api/enterprise/monitoring/alerts?limit=20"
+        );
+        assert_eq!(
+            build_monitoring_alerts_url(5, Some(false)),
+            "/api/enterprise/monitoring/alerts?limit=5&acknowledged=false"
+        );
+    }
+
+    #[test]
+    fn build_alert_rules_url_ph_s347() {
+        assert_eq!(
+            build_alert_rules_url(),
+            "/api/enterprise/monitoring/alert-rules"
         );
     }
 
