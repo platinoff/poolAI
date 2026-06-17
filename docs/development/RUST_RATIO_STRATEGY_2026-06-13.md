@@ -175,7 +175,7 @@ flowchart TB
 | 80 | **PH-S223** | Admin i18n slim libs panel | code | **✅** |
 | 81 | **PH-S224** | Galaxy pricing cache age metrics smoke | tests | **✅** |
 | 82 | **PH-S225** | Galaxy verification sample metrics smoke | tests | **✅** |
-| 83 | **PH-S226** | Vision sprint-queue → map focus | docs/vision | відкрито |
+| 83 | **PH-S226** | Vision sprint-queue → map focus | docs/vision | **✅** |
 | 84 | **PH-S227** | Vision VDT rules docs autosync audit | docs/vision | відкрито |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*

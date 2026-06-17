@@ -1441,13 +1441,16 @@
     return pool.find((n) => nodePositions.has(n.id)) || pool[0];
   }
 
-  function ensureMapPanelVisible() {
-    const mapPanel = document.querySelector('.panel[data-panel="map"]');
-    if (!mapPanel) return;
-    if (mapPanel.classList.contains("collapsed")) {
-      mapPanel.classList.remove("collapsed");
+  function ensurePanelExpanded(panelId) {
+    if (collapsedPanels.has(panelId)) {
+      collapsedPanels.delete(panelId);
+      saveMapPrefs();
       syncPanelCollapseLayout();
     }
+  }
+
+  function ensureMapPanelVisible() {
+    ensurePanelExpanded("map");
   }
 
   function setActiveQueueSprint(sprintId) {
@@ -1480,6 +1483,10 @@
       if (!hasMap) return;
       li.setAttribute("role", "button");
       li.setAttribute("tabindex", "0");
+      li.setAttribute(
+        "aria-label",
+        "Focus sprint " + sprintId + " on documentation map"
+      );
       const activate = () => focusSprintOnMap(sprintId);
       li.addEventListener("click", activate);
       li.addEventListener("keydown", (ev) => {
@@ -1489,6 +1496,20 @@
         }
       });
     });
+  }
+
+  function syncQueueHighlightFromNode(node) {
+    if (!node || !node.sprints || !node.sprints.length) return;
+    for (let i = 0; i < node.sprints.length; i++) {
+      const s = node.sprints[i];
+      const li = document.querySelector(
+        '.sprint-queue-item[data-sprint-id="' + s + '"]'
+      );
+      if (li) {
+        setActiveQueueSprint(s);
+        return;
+      }
+    }
   }
 
   function buildSprintPathSet(ext, sprint) {
@@ -2915,13 +2936,9 @@
   }
 
   function scrollToSprintQueue() {
+    ensurePanelExpanded("queue");
     const panel = document.querySelector('.panel[data-panel="queue"]');
     if (!panel) return;
-    const wasCollapsed = panel.classList.contains("collapsed");
-    if (wasCollapsed) {
-      panel.classList.remove("collapsed");
-      syncPanelCollapseLayout();
-    }
     panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
     panel.classList.add("panel-flash");
     window.setTimeout(() => panel.classList.remove("panel-flash"), 900);
@@ -2942,19 +2959,24 @@
       const id = item.id || "";
       const title = item.title || "";
       const summary = (item.summary || "").slice(0, 80);
+      const mapLinked = !!pickMapNodeForSprint(id);
       const cls = [
         "rss-ticker-item",
         item.category === "open" ? "open" : "closed",
         item.next ? "next" : "",
+        mapLinked ? "map-linked" : "",
       ]
         .filter(Boolean)
         .join(" ");
       const hint = summary ? " — " + summary : "";
+      const mapHint = mapLinked ? " · click → map" : "";
       return (
         '<li class="' +
         cls +
+        '" data-sprint-id="' +
+        escapeHtml(id) +
         '" title="' +
-        escapeHtml(id + ": " + title + hint) +
+        escapeHtml(id + ": " + title + hint + mapHint) +
         '"><strong>' +
         escapeHtml(id) +
         "</strong><span>" +
@@ -2965,7 +2987,14 @@
     const chunk = items.map(buildLi).join("");
     track.innerHTML = chunk + chunk;
     track.querySelectorAll(".rss-ticker-item").forEach((el) => {
-      el.addEventListener("click", scrollToSprintQueue);
+      const sprintId = el.dataset.sprintId || "";
+      el.addEventListener("click", () => {
+        if (sprintId && el.classList.contains("map-linked")) {
+          focusSprintOnMap(sprintId);
+        } else {
+          scrollToSprintQueue();
+        }
+      });
       el.style.cursor = "pointer";
     });
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -3152,6 +3181,7 @@
     highlightLayer(node.layer);
     updateMapSelection();
     announceMapSelection(node);
+    syncQueueHighlightFromNode(node);
 
     const picked = node;
     requestAnimationFrame(() => {

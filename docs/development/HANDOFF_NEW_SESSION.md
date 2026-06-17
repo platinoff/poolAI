@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-16 (PH-S225 ✅ · §5.12 **2** відкритих PH-S226…S227 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
+**Оновлено:** 2026-06-16 (PH-S226 ✅ · §5.12 **1** відкритий PH-S227 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -176,6 +176,7 @@
 **PH-S223 ✅ (code/ui):** `admin_libs_patch` + `admin_layout_libs` — libs slim Rust i18n; `admin.lib.*` removed from `i18n_core.js`.
 **PH-S224 ✅ (code/tests):** `poolai-http-stand-smoke` — `galaxy_pricing_cache_age_metrics` on live `/metrics` (PH-S168 gauge).
 **PH-S225 ✅ (code/tests):** `poolai-http-stand-smoke` — `galaxy_verification_metrics` on live `/metrics` (sample/match/mismatch/scheduled).
+**PH-S226 ✅ (vision):** `docs/vision/vision.js` — `ensurePanelExpanded` for map/queue panels; RSS ticker map-linked → `focusSprintOnMap`; queue `aria-label` + `:focus-visible`; map select syncs `queue-active`; UI cache **v73**; rev **173**.
 **Ops:** `open-docs-vision.ps1` — ASCII Write-Host + robust `SendVisionBytes`; URL `http://127.0.0.1:8765/docs/vision/index.html`.
 **PH-S198 ✅ (code):** `topology_graph.rs` — hub labels + `label_x`/`label_y`/`is_hub` in graph JSON; heatmap short ids; slim `topology_graph.js` (SVG paint only); `cargo test-ci`.
 **PH-S194 ✅ (code):** `galaxy_fee_split_applied_total` on grid result wire; `cargo test-ci`.

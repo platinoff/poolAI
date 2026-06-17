@@ -1828,6 +1828,19 @@ body.vision-reduced-motion #map-svg .edge.constellation-pipe,
   background: rgba(126, 184, 255, 0.08);
 }
 
+.rss-ticker-item.map-linked {
+  text-decoration: underline dotted rgba(126, 184, 255, 0.35);
+}
+
+.rss-ticker-item.map-linked:hover {
+  color: var(--accent, #7eb8ff);
+}
+
+.sprint-queue-item.map-linked:focus-visible {
+  outline: 2px solid var(--accent, #7eb8ff);
+  outline-offset: 2px;
+}
+
 .sprint-queue-item.queue-active {
   border-color: rgba(126, 184, 255, 0.65);
   box-shadow: 0 0 0 1px rgba(126, 184, 255, 0.25);

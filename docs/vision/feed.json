@@ -3,22 +3,22 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S226",
+      "id": "PH-S227",
       "link": "docs/vision/index.html#sprint-queue",
       "next": true,
       "published": "2026-05-28",
       "status": "open",
-      "summary": "queue item click focuses map node",
-      "title": "Vision sprint-queue → map focus (docs/vision)"
-    },
-    {
-      "category": "open",
-      "id": "PH-S227",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
       "summary": "manifest ↔ `.mdc` cross-link drift",
       "title": "Vision VDT rules docs autosync audit (docs/vision)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S226",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "queue/ticker click → map node; panel expand fix",
+      "title": "Vision sprint-queue → map focus (docs/vision)"
     },
     {
       "category": "closed",
@@ -118,15 +118,6 @@
       "status": "closed",
       "summary": "collapse/Esc returns focus to panel toggle; rev++",
       "title": "Vision panel collapse focus restore (docs/vision)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S214",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "admin.raid.*` → `poolai-ui-core`; slim JS",
-      "title": "Admin i18n slim raid panel (code)"
     }
   ],
   "link": "docs/vision/index.html",
