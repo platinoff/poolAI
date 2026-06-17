@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-17 (PH-S343…S352 ✅ · rust_ratio **94.35%**) · VDT
+**Оновлено:** 2026-06-17 (PH-S343…S353 ✅ · rust_ratio **94.35%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -303,9 +303,10 @@
 **PH-S350 ✅ (ops):** `poolai-vision-sync --check` green.
 **PH-S351 ✅ (ops):** hold advisory `--min-ratio 0.95` snapshot **94.35%**.
 **PH-S352 ✅ (docs):** INDEX §7 + rust_ratio pointer **94.35%**.
-**Rules ✅:** тригер **`абракадабра`** у `poolai-session-iteration.mdc` + `virtual-development-team.mdc`.
+**PH-S353 ✅ (code/ui):** `buildMonitoringDashboardsUrl` + `buildMonitoringAlertAcknowledgeUrl` wasm; monitoring POST/ack wasm-first; `build-ui-wasm.sh` Windows cargo PATH.
+**Rules ✅:** тригер **`абракадабра`** · wasm MSYS2 PATH у `poolai-session-iteration.mdc`.
 **§5.12:** **0** відкритих — replenish §5.13 або **`абракадабра`**.
-**Vision ✅:** rev **219** · rust_ratio **94.35%** · hold **95%** advisory.
+**Vision ✅:** rev **220** · rust_ratio **94.35%** · hold **95%** advisory.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

@@ -104,7 +104,8 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 Канонічний префікс (copy-paste на всю сесію):
 
 ```bash
-export PATH="$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"
+export PATH="/c/Users/${USER:-${USERNAME}}/.cargo/bin:$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"
+export RUSTUP_TOOLCHAIN="${RUSTUP_TOOLCHAIN:-stable-x86_64-pc-windows-gnu}"
 export K8S_OPENAPI_ENABLED_VERSION=1.28
 export CARGO_TARGET_DIR=/s/rust/poolAI/target
 cd /s/rust/poolAI || cd "S:/rust/poolAI"
@@ -132,7 +133,8 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 
 1. Після коду: `cargo fmt --all` → **один** `cargo test-ci` (не запускати другий, поки перший не завершився).
 2. Зміни `src/ui/admin_charts.js` (wasm-first) → додати `admin_charts_*_wasm_first_ph_s*` у `src/ui/admin/mod.rs` (рядок `wasm.<fn>` у JS).
-3. UI-only scope без API — Playwright не блокує, якщо `cargo test-ci` green ([`poolai-testing-policy.mdc`](poolai-testing-policy.mdc)).
+3. Після `poolai-ui-core` / `poolai-ui-wasm`: `rustup target add wasm32-unknown-unknown` (разово) → `bash bin/build-ui-wasm.sh` (PATH з `/c/Users/…/.cargo/bin`; `RUSTUP_TOOLCHAIN=stable-x86_64-pc-windows-gnu`).
+4. UI-only scope без API — Playwright не блокує, якщо `cargo test-ci` green ([`poolai-testing-policy.mdc`](poolai-testing-policy.mdc)).
 
 ### Vision (порядок — уникати drift rev)
 
@@ -163,6 +165,8 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 | PowerShell `&&` / `git` у Cursor | MSYS2 bash — див. § «Shell абракадабра» вище |
 | Job scheduler | `src/job/scheduler.rs`, не `src/runtime/scheduler.rs` |
 | Редагування через `python` one-liner | Не використовувати Python у репо; застосовувати вбудовані редактори або канонічний Rust/bash flow |
-| `npm: command not found` у MSYS2 | `export PATH="$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"` |
+| `npm: command not found` у MSYS2 | `export PATH="/c/Users/$USER/.cargo/bin:$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"` |
+| `rustup: command not found` / wasm `can't find crate for core` | PATH → `/c/Users/<user>/.cargo/bin`; `rustup target add wasm32-unknown-unknown`; `RUSTUP_TOOLCHAIN=stable-x86_64-pc-windows-gnu` |
+| `link.exe` / `link: extra operand` у MSYS2 test | `export RUSTUP_TOOLCHAIN=stable-x86_64-pc-windows-gnu` (не MSVC host у bash) |
 | `Could not determine Node.js install directory` | MSYS2: `pacman -S mingw-w64-ucrt-x86_64-nodejs`; перевір `node.exe` у `/ucrt64/bin/` |
 | API-only спринт — чи потрібен Playwright? | Ні — Rust integration test; Playwright лише UI scope |

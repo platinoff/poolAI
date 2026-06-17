@@ -1836,7 +1836,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S352",
+  "last_sprint_closed": "PH-S353",
   "layers": [
     {
       "id": "L0",
@@ -7731,7 +7731,7 @@
       "path": "crates/poolai-ui-core/src/admin_dom.rs"
     }
   ],
-  "revision": 219,
+  "revision": 220,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -10315,6 +10315,15 @@
       "row": 287,
       "status": "closed",
       "title": "Docs INDEX ratio maintain (docs)"
+    },
+    {
+      "acceptance": "buildMonitoringDashboardsUrl` + `buildMonitoringAlertAcknowledgeUrl`; `build-ui-wasm.sh` Windows cargo PATH",
+      "deps": "PH-S347",
+      "id": "PH-S353",
+      "open": false,
+      "row": 288,
+      "status": "closed",
+      "title": "monitoring dashboards/ack URL wasm (code)"
     }
   ],
   "sprint_queue_open_count": 0,

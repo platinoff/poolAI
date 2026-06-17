@@ -981,6 +981,21 @@ fn admin_charts_alert_rules_url_wasm_first_ph_s347() {
     let js = include_str!("../admin_charts.js");
     assert!(js.contains("wasm.buildAlertRulesUrl"));
     assert!(js.contains("poolaiFetchAlertRules"));
+    assert!(js.contains("poolaiAlertRulesUrl"));
+}
+
+#[test]
+fn admin_charts_monitoring_dashboards_url_wasm_first() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("wasm.buildMonitoringDashboardsUrl"));
+    assert!(js.contains("poolaiMonitoringDashboardsUrl"));
+}
+
+#[test]
+fn admin_charts_monitoring_alert_ack_url_wasm_first() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("wasm.buildMonitoringAlertAcknowledgeUrl"));
+    assert!(js.contains("poolaiMonitoringAlertAcknowledgeUrl"));
 }
 
 #[tokio::test]
@@ -991,6 +1006,8 @@ async fn admin_monitoring_ph_s43_ml_metrics_panel() {
     assert!(html.contains("poolaiFetchMlPipelines"));
     assert!(html.contains("poolaiFetchMonitoringAlerts"));
     assert!(html.contains("poolaiFetchAlertRules"));
+    assert!(html.contains("poolaiMonitoringDashboardsUrl"));
+    assert!(html.contains("poolaiMonitoringAlertAcknowledgeUrl"));
     assert!(html.contains("poolaiRenderMlPipelineMetricsPanel"));
     assert!(html.contains("ml-pipeline-metrics-panel"));
 }

@@ -6,7 +6,7 @@ cd "$ROOT"
 
 # Cargo / Rust toolchain (MSYS2 + Windows user profile).
 CARGO_BIN=""
-for d in "${HOME}/.cargo/bin" "/c/Users/${USER:-${USERNAME}}/.cargo/bin"; do
+for d in "${HOME}/.cargo/bin" "/c/Users/${USER:-${USERNAME}}/.cargo/bin" "/c/Users/plati/.cargo/bin"; do
   if [[ -x "$d/cargo" ]]; then
     CARGO_BIN="$d"
     break

@@ -3,6 +3,15 @@
   "items": [
     {
       "category": "closed",
+      "id": "PH-S353",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "buildMonitoringDashboardsUrl` + `buildMonitoringAlertAcknowledgeUrl`; `build-ui-wasm.sh` Windows cargo PATH",
+      "title": "monitoring dashboards/ack URL wasm (code)"
+    },
+    {
+      "category": "closed",
       "id": "PH-S352",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
@@ -99,15 +108,6 @@
       "status": "closed",
       "summary": "INDEX §7 + rust_ratio pointer",
       "title": "Docs INDEX ratio maintain (docs)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S341",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--min-ratio 0.95 --advisory",
-      "title": "Ratio hold advisory snapshot (ops)"
     }
   ],
   "link": "docs/vision/index.html",

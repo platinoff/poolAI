@@ -1,4 +1,4 @@
-//! ML pipeline metric helpers — parity with `admin_charts.js` (PH-S43, PH-S155, PH-S275, PH-S284, PH-S287, PH-S294, PH-S297, PH-S314, PH-S317, PH-S324, PH-S327, PH-S334, PH-S337, PH-S344, PH-S347).
+//! ML pipeline metric helpers — parity with `admin_charts.js` (PH-S43, PH-S155, PH-S275, PH-S284, PH-S287, PH-S294, PH-S297, PH-S314, PH-S317, PH-S324, PH-S327, PH-S334, PH-S337, PH-S344, PH-S347, PH-S353).
 
 use crate::format::escape_html;
 use chrono::{DateTime, Duration, Utc};
@@ -488,6 +488,19 @@ pub fn build_alert_rules_url() -> String {
     "/api/enterprise/monitoring/alert-rules".to_string()
 }
 
+/// Mirrors monitoring dashboards list/create URL.
+pub fn build_monitoring_dashboards_url() -> String {
+    "/api/enterprise/monitoring/dashboards".to_string()
+}
+
+/// Mirrors `acknowledgeAlert` POST URL.
+pub fn build_monitoring_alert_acknowledge_url(alert_id: &str) -> String {
+    format!(
+        "/api/enterprise/monitoring/alerts/{}/acknowledge",
+        encode_uri_component(alert_id)
+    )
+}
+
 /// Mirrors `poolaiRenderMetricsChartGrid` card wrapper (PH-S294).
 pub fn render_metrics_chart_grid_html(title: &str, parts: &[String]) -> String {
     if parts.is_empty() {
@@ -698,6 +711,22 @@ mod tests {
         assert_eq!(
             build_alert_rules_url(),
             "/api/enterprise/monitoring/alert-rules"
+        );
+    }
+
+    #[test]
+    fn build_monitoring_dashboards_url_wasm_glue() {
+        assert_eq!(
+            build_monitoring_dashboards_url(),
+            "/api/enterprise/monitoring/dashboards"
+        );
+    }
+
+    #[test]
+    fn build_monitoring_alert_acknowledge_url_wasm_glue() {
+        assert_eq!(
+            build_monitoring_alert_acknowledge_url("alert/1"),
+            "/api/enterprise/monitoring/alerts/alert%2F1/acknowledge"
         );
     }
 

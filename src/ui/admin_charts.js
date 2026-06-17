@@ -574,6 +574,34 @@ async function poolaiFetchAlertRules() {
   }
 }
 
+function poolaiAlertRulesUrl() {
+  var wasm = poolaiChartsWasm();
+  if (wasm && typeof wasm.buildAlertRulesUrl === 'function') {
+    return wasm.buildAlertRulesUrl();
+  }
+  return '/api/enterprise/monitoring/alert-rules';
+}
+
+function poolaiMonitoringDashboardsUrl() {
+  var wasm = poolaiChartsWasm();
+  if (wasm && typeof wasm.buildMonitoringDashboardsUrl === 'function') {
+    return wasm.buildMonitoringDashboardsUrl();
+  }
+  return '/api/enterprise/monitoring/dashboards';
+}
+
+function poolaiMonitoringAlertAcknowledgeUrl(alertId) {
+  var wasm = poolaiChartsWasm();
+  if (wasm && typeof wasm.buildMonitoringAlertAcknowledgeUrl === 'function') {
+    return wasm.buildMonitoringAlertAcknowledgeUrl(String(alertId || ''));
+  }
+  return (
+    '/api/enterprise/monitoring/alerts/' +
+    encodeURIComponent(String(alertId || '')) +
+    '/acknowledge'
+  );
+}
+
 async function poolaiRunMlPipelineDemo() {
   var wasm = poolaiChartsWasm();
   var url =

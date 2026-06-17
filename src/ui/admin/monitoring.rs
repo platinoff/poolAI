@@ -16,7 +16,7 @@ pub async fn admin_monitoring() -> Html<String> {
       try {
         const [alerts, dashboards, mlPipelines] = await Promise.all([
           poolaiFetchMonitoringAlerts({ limit: 20 }),
-          fetchJson('/api/enterprise/monitoring/dashboards'),
+          fetchJson(poolaiMonitoringDashboardsUrl()),
           poolaiFetchMlPipelines(),
         ]);
         await renderMonitoring(alerts, dashboards, mlPipelines);
@@ -230,7 +230,7 @@ pub async fn admin_monitoring() -> Html<String> {
           is_public: document.getElementById('dashboardIsPublic').checked
         };
         
-        await fetchJson('/api/enterprise/monitoring/dashboards', {
+        await fetchJson(poolaiMonitoringDashboardsUrl(), {
           method: 'POST',
           body: JSON.stringify(payload)
         });
@@ -281,7 +281,7 @@ pub async fn admin_monitoring() -> Html<String> {
           enabled: document.getElementById('alertRuleEnabled').checked
         };
         
-        await fetchJson('/api/enterprise/monitoring/alert-rules', {
+        await fetchJson(poolaiAlertRulesUrl(), {
           method: 'POST',
           body: JSON.stringify(payload)
         });
@@ -306,7 +306,7 @@ pub async fn admin_monitoring() -> Html<String> {
       }
       
       try {
-        await fetchJson(`/api/enterprise/monitoring/alerts/${encodeURIComponent(id)}/acknowledge`, {
+        await fetchJson(poolaiMonitoringAlertAcknowledgeUrl(id), {
           method: 'POST'
         });
         showNotification(T('admin.mon.alertAckOk', 'Alert acknowledged'), 'success');

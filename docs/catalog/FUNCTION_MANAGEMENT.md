@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-17 (PH-S343…S352 ✅ · vision rev **219** · rust_ratio **94.35%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-17 (PH-S343…S353 ✅ · vision rev **220** · rust_ratio **94.35%**) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -552,8 +552,9 @@ FM-xxx (з таблиці нижче)
 | 285 | **PH-S350** | poolai-vision-sync drift gate (ops) | PH-S340 | `--check` green | **✅** |
 | 286 | **PH-S351** | Ratio hold advisory snapshot (ops) | PH-S348 | `--min-ratio 0.95 --advisory` | **✅** |
 | 287 | **PH-S352** | Docs INDEX ratio maintain (docs) | PH-S349 | INDEX §7 + rust_ratio pointer | **✅** |
+| 288 | **PH-S353** | monitoring dashboards/ack URL wasm (code) | PH-S347 | `buildMonitoringDashboardsUrl` + `buildMonitoringAlertAcknowledgeUrl`; `build-ui-wasm.sh` Windows cargo PATH | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S343…S352 ✅. Vision rev **219**. rust_ratio **94.35%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S343…S353 ✅. Vision rev **220**. rust_ratio **94.35%**.
 
 **Наступна сесія:** replenish з **§5.13** · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · або **`абракадабра`** (drain).
 
@@ -561,7 +562,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-06-17):** PH-S343…S352 ✅ закрито · **0** відкритих · replenish §5.13 або **`абракадабра`**.
+**Активна смуга (2026-06-17):** PH-S343…S353 ✅ закрито · **0** відкритих · replenish §5.13 або **`абракадабра`**.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-17 (PH-S343…S352 ✅ · vision **rev 219** · **0** відкритих · rust_ratio **94.35%**)
+**Оновлено:** 2026-06-17 (PH-S353 ✅ · vision **rev 220** · **0** відкритих · rust_ratio **94.35%**)
 
 | **← наступний** | replenish §5.13 **або** **`абракадабра`** (drain) |
 | **Відкритих** | **0** |
@@ -29,6 +29,10 @@ S0: git fetch; HANDOFF; FM §5.12; df -h /s
 ```
 
 ---
+
+## Закрито (PH-S353 wasm follow-up)
+
+PH-S353 ✅ — monitoring dashboards + alert-ack URL wasm; `bash bin/build-ui-wasm.sh` (PATH `/c/Users/…/.cargo/bin`, `wasm32-unknown-unknown`).
 
 ## Закрито (смуга PH-S343…S352)
 
