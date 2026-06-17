@@ -1,6 +1,6 @@
 {
   "generated_at": "2026-06-17",
-  "sprint": "PH-S288",
+  "sprint": "PH-S298",
   "formal_band_min": 0.9,
   "formal_band_max": 0.95,
   "warn_below": 0.93,
@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 121925,
-  "non_rust_product_loc": 7290,
-  "product_loc_total": 129215,
-  "rust_ratio": 0.9435824014239833,
-  "rust_ratio_pct": 94.35824014239833,
+  "rust_loc": 122275,
+  "non_rust_product_loc": 7300,
+  "product_loc_total": 129575,
+  "rust_ratio": 0.943674512831371,
+  "rust_ratio_pct": 94.3674512831371,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -28,37 +28,32 @@
       "loc": 1341
     },
     "ops_shell": {
-      "files": 32,
-      "loc": 1975
+      "files": 42,
+      "loc": 3821
     },
     "rust_benches": {
-      "files": 7,
-      "loc": 608
+      "files": 2,
+      "loc": 312
     },
     "rust_crates": {
-      "files": 27,
-      "loc": 7582
+      "files": 28,
+      "loc": 8456
     },
     "rust_src": {
-      "files": 242,
-      "loc": 90013
+      "files": 198,
+      "loc": 98742
     },
     "rust_tests": {
-      "files": 132,
-      "loc": 23722
+      "files": 52,
+      "loc": 14765
     },
     "ui_css": {
-      "files": 2,
-      "loc": 1034
+      "files": 3,
+      "loc": 892
     },
     "ui_js": {
-      "files": 6,
-      "loc": 1912
+      "files": 12,
+      "loc": 218
     }
-  },
-  "notes": [
-    "Denominator: product code only (strategy §1); docs/yaml/png excluded",
-    "GitHub Languages bar is heuristic; this report uses git-tracked LOC buckets",
-    "PH-S165: CI --min-ratio 0.95 hold band (advisory); stretch spirit 96% via --stretch"
-  ]
+  }
 }

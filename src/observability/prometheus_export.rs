@@ -21,14 +21,15 @@ use crate::grid::galaxy_fee_split_metrics::{
     fee_split_applied_total, METRIC_FEE_SPLIT_APPLIED_TOTAL,
 };
 use crate::grid::galaxy_locality::{
-    last_cross_region_egress_mb, last_shard_local_hit_ratio_bps, METRIC_CROSS_REGION_EGRESS_MB,
-    METRIC_SHARD_LOCAL_HIT_RATIO,
+    last_cross_region_egress_mb, last_shard_local_hit_ratio_bps, locality_rank_ingest_total,
+    METRIC_CROSS_REGION_EGRESS_MB, METRIC_LOCALITY_RANK_INGEST_TOTAL, METRIC_SHARD_LOCAL_HIT_RATIO,
 };
 use crate::grid::galaxy_prefetch_metrics::{
     prefetch_bytes_total, prefetch_enqueue_total, prefetch_hot_skip_total, prefetch_plan_total,
-    prefetch_planned_shards_total, METRIC_PREFETCH_BYTES_TOTAL, METRIC_PREFETCH_ENQUEUE_TOTAL,
-    METRIC_PREFETCH_HOT_SKIP_TOTAL, METRIC_PREFETCH_PLANNED_SHARDS_TOTAL,
-    METRIC_PREFETCH_PLAN_TOTAL,
+    prefetch_planned_shards_total, prefetch_wait_ms_total, METRIC_PREFETCH_BYTES_TOTAL,
+    METRIC_PREFETCH_ENQUEUE_TOTAL, METRIC_PREFETCH_HOT_SKIP_TOTAL,
+    METRIC_PREFETCH_PLANNED_SHARDS_TOTAL, METRIC_PREFETCH_PLAN_TOTAL,
+    METRIC_PREFETCH_WAIT_MS_TOTAL,
 };
 use crate::grid::galaxy_pricing_oracle::{
     forced_fallback_total, fresh_served_total, last_market_min_usd_micro, last_quote_usd_micro,
@@ -95,6 +96,8 @@ pub struct PoolAiPrometheus {
     galaxy_prefetch_hot_skip_total: IntGauge,
     galaxy_prefetch_bytes_total: IntGauge,
     galaxy_prefetch_enqueue_total: IntGauge,
+    galaxy_prefetch_wait_ms_total: IntGauge,
+    galaxy_locality_rank_ingest_total: IntGauge,
     galaxy_verification_mismatch_total: IntGauge,
     galaxy_verification_match_total: IntGauge,
     galaxy_verification_sample_total: IntGauge,
@@ -391,6 +394,24 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_prefetch_enqueue_total.clone()))
         .expect("register galaxy_prefetch_enqueue_total");
 
+    let galaxy_prefetch_wait_ms_total = IntGauge::with_opts(Opts::new(
+        METRIC_PREFETCH_WAIT_MS_TOTAL,
+        "Galaxy prefetch wait stub milliseconds (PH-S293)",
+    ))
+    .expect(METRIC_PREFETCH_WAIT_MS_TOTAL);
+    registry
+        .register(Box::new(galaxy_prefetch_wait_ms_total.clone()))
+        .expect("register galaxy_prefetch_wait_ms_total");
+
+    let galaxy_locality_rank_ingest_total = IntGauge::with_opts(Opts::new(
+        METRIC_LOCALITY_RANK_INGEST_TOTAL,
+        "Galaxy locality rank invocations on grid job ingest (PH-S295)",
+    ))
+    .expect(METRIC_LOCALITY_RANK_INGEST_TOTAL);
+    registry
+        .register(Box::new(galaxy_locality_rank_ingest_total.clone()))
+        .expect("register galaxy_locality_rank_ingest_total");
+
     let galaxy_verification_mismatch_total = IntGauge::with_opts(Opts::new(
         METRIC_VERIFICATION_MISMATCH_TOTAL,
         "Galaxy verification digest mismatches on grid result path (PH-S175)",
@@ -512,6 +533,8 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_prefetch_hot_skip_total,
         galaxy_prefetch_bytes_total,
         galaxy_prefetch_enqueue_total,
+        galaxy_prefetch_wait_ms_total,
+        galaxy_locality_rank_ingest_total,
         galaxy_verification_mismatch_total,
         galaxy_verification_match_total,
         galaxy_verification_sample_total,
@@ -564,6 +587,8 @@ pub fn refresh_galaxy_locality_gauges() {
         .set(last_shard_local_hit_ratio_bps() as i64);
     prom.galaxy_cross_region_egress_mb
         .set(last_cross_region_egress_mb() as i64);
+    prom.galaxy_locality_rank_ingest_total
+        .set(locality_rank_ingest_total() as i64);
 }
 
 /// Mirror in-process prefetch plan counters into Prometheus gauges (scrape snapshot).
@@ -579,6 +604,8 @@ pub fn refresh_galaxy_prefetch_gauges() {
         .set(prefetch_bytes_total() as i64);
     prom.galaxy_prefetch_enqueue_total
         .set(prefetch_enqueue_total() as i64);
+    prom.galaxy_prefetch_wait_ms_total
+        .set(prefetch_wait_ms_total() as i64);
 }
 
 /// Mirror in-process verification counters into Prometheus gauges (scrape snapshot).

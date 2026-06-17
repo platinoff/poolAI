@@ -1,4 +1,4 @@
-//! ML pipeline metric helpers — parity with `admin_charts.js` (PH-S43, PH-S155, PH-S275, PH-S284, PH-S287).
+//! ML pipeline metric helpers — parity with `admin_charts.js` (PH-S43, PH-S155, PH-S275, PH-S284, PH-S287, PH-S294, PH-S297).
 
 use crate::format::escape_html;
 use serde::{Deserialize, Serialize};
@@ -293,7 +293,8 @@ pub fn render_sparkline_html(
     )
 }
 
-fn sanitize_chart_id(name: &str) -> String {
+/// Mirrors JS `poolaiSanitizeChartId` (PH-S297).
+pub fn sanitize_chart_id(name: &str) -> String {
     name.chars()
         .map(|c| {
             if c.is_ascii_alphanumeric() || c == '_' || c == '-' {
@@ -398,6 +399,18 @@ pub fn group_metrics_by_name(data: &[Value]) -> BTreeMap<String, Vec<Value>> {
         by.entry(key).or_default().push(m.clone());
     }
     by
+}
+
+/// Mirrors `poolaiRenderMetricsChartGrid` card wrapper (PH-S294).
+pub fn render_metrics_chart_grid_html(title: &str, parts: &[String]) -> String {
+    if parts.is_empty() {
+        return String::new();
+    }
+    format!(
+        r#"<div class="admin-card"><h3>{}</h3><div class="metrics-charts-grid">{}</div></div>"#,
+        escape_html(title),
+        parts.join("")
+    )
 }
 
 #[cfg(test)]
@@ -520,5 +533,23 @@ mod tests {
         ]);
         assert_eq!(grouped.get("a").map(|v| v.len()), Some(2));
         assert_eq!(grouped.get("b").map(|v| v.len()), Some(1));
+    }
+
+    #[test]
+    fn sanitize_chart_id_ph_s297() {
+        assert_eq!(sanitize_chart_id("cpu.usage"), "cpu_usage");
+        assert_eq!(sanitize_chart_id("a-b_c"), "a-b_c");
+    }
+
+    #[test]
+    fn render_metrics_chart_grid_html_ph_s294() {
+        let html = render_metrics_chart_grid_html(
+            "Metrics",
+            &["<div class=\"metric-chart-container\">x</div>".into()],
+        );
+        assert!(html.contains("admin-card"));
+        assert!(html.contains("metrics-charts-grid"));
+        assert!(html.contains("metric-chart-container"));
+        assert!(render_metrics_chart_grid_html("Empty", &[]).is_empty());
     }
 }

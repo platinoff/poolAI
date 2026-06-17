@@ -28,9 +28,10 @@ pub use dispatch::{
     coordinator_merged_seed_inventory, coordinator_seed_inventory_snapshot, enqueue_prefetch_hook,
     ingest_envelope, ingest_job_locality_rank_stub, ingest_job_prefetch_stub,
     locality_workers_from_seed_snapshots, noop_prefetch_hook, parse_prefetch_policy_mode,
-    plan_prefetch, GridIngestKind, GridIngestOutcome, PrefetchPlan, PrefetchPolicyConfig,
-    PrefetchPolicyMode, PrefetchTrigger, SeedInventoryEntry, SeedInventoryPeerSnapshot,
-    DEFAULT_PREFETCH_DEADLINE_MS, ENV_LOCALITY_MODE, ENV_PREFETCH_DEADLINE_MS,
+    plan_prefetch, wait_prefetch_hook, GridIngestKind, GridIngestOutcome, PrefetchPlan,
+    PrefetchPolicyConfig, PrefetchPolicyMode, PrefetchTrigger, SeedInventoryEntry,
+    SeedInventoryPeerSnapshot, DEFAULT_PREFETCH_DEADLINE_MS, ENV_LOCALITY_MODE,
+    ENV_PREFETCH_DEADLINE_MS,
 };
 pub use envelope::{
     GridEnvelope, GridEnvelopeError, GridJobBody, GridMemoryShardBody, GridMessage,

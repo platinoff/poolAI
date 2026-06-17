@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-17 (PH-S283…S292 ✅ · §5.12 **0** відкритих · rust_ratio **94.36%** · hold **95%** advisory · stretch **96%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-17 (PH-S293…S302 ✅ · §5.12 **0** відкритих · rust_ratio **94.37%** · hold **95%** advisory · stretch **96%**) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -492,8 +492,18 @@ FM-xxx (з таблиці нижче)
 | 225 | **PH-S290** | poolai-vision-sync drift gate (ops) | PH-S280 | `--check` green | **✅** |
 | 226 | **PH-S291** | Ratio hold advisory snapshot (ops) | PH-S288 | `--min-ratio 0.95 --advisory` | **✅** |
 | 227 | **PH-S292** | Docs INDEX ratio maintain (docs) | PH-S289 | INDEX §7 + rust_ratio pointer | **✅** |
+| 228 | **PH-S293** | Galaxy prefetch wait hook stub (code) | PH-S283 | `wait_prefetch_hook` + wait ms metric | **✅** |
+| 229 | **PH-S294** | admin metrics chart grid wasm HTML (code) | PH-S284 | `renderMetricsChartGridHtml` wasm glue | **✅** |
+| 230 | **PH-S295** | Galaxy locality rank ingest metric (code) | PH-S285 | `galaxy_locality_rank_ingest_total` | **✅** |
+| 231 | **PH-S296** | Stand smoke prefetch wait + locality (tests) | PH-S293 | `/metrics` export shape | **✅** |
+| 232 | **PH-S297** | admin_charts sanitizeChartId wasm (code) | PH-S287 | `sanitizeChartId` → wasm | **✅** |
+| 233 | **PH-S298** | Rust ratio loc-audit refresh (ops) | PH-S288 | `rust_ratio.json` sprint zriz | **✅** |
+| 234 | **PH-S299** | Docs canon sync band (docs) | PH-S298 | INDEX/HANDOFF/NEXT/STABLE/GALAXY | **✅** |
+| 235 | **PH-S300** | poolai-vision-sync drift gate (ops) | PH-S290 | `--check` green | **✅** |
+| 236 | **PH-S301** | Ratio hold advisory snapshot (ops) | PH-S298 | `--min-ratio 0.95 --advisory` | **✅** |
+| 237 | **PH-S302** | Docs INDEX ratio maintain (docs) | PH-S299 | INDEX §7 + rust_ratio pointer | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S128…S292 ✅. Vision rev **209**. rust_ratio **94.36%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S128…S302 ✅. Vision rev **210**. rust_ratio **94.37%**.
 
 **Наступна сесія:** replenish з **§5.13** · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
@@ -501,7 +511,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-06-17):** PH-S128…S292 ✅ закрито · **0** відкритих · replenish з §5.13.
+**Активна смуга (2026-06-17):** PH-S128…S302 ✅ закрито · **0** відкритих · replenish з §5.13.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

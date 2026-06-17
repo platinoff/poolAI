@@ -10,6 +10,10 @@ function poolaiChartsWasm() {
 }
 
 function poolaiSanitizeChartId(name) {
+  var wasm = poolaiChartsWasm();
+  if (wasm && typeof wasm.sanitizeChartId === 'function') {
+    return wasm.sanitizeChartId(name == null ? '' : String(name));
+  }
   return String(name || 'metric').replace(/[^a-zA-Z0-9_-]/g, '_');
 }
 
@@ -325,6 +329,10 @@ async function poolaiRenderMetricsChartGrid(metricNames, opts) {
   var title =
     opts.title ||
     poolaiChartT('admin.mon.vizTitle', 'Metrics Visualization (Last 24 Hours)');
+  var wasm = poolaiChartsWasm();
+  if (wasm && typeof wasm.renderMetricsChartGridHtml === 'function') {
+    return wasm.renderMetricsChartGridHtml(title, JSON.stringify(parts));
+  }
   return (
     '<div class="admin-card">' +
     '<h3>' +

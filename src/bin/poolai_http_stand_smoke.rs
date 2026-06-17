@@ -344,6 +344,8 @@ const GALAXY_PREFETCH_METRICS: &[&str] = &[
     "galaxy_prefetch_hot_skip_total",
     "galaxy_prefetch_bytes_total",
     "galaxy_prefetch_enqueue_total",
+    "galaxy_prefetch_wait_ms_total",
+    "galaxy_locality_rank_ingest_total",
 ];
 
 fn metrics_text_has_prefetch_counters(body: &str) -> Result<(), String> {
@@ -1641,6 +1643,12 @@ mod tests {
             "# HELP galaxy_prefetch_enqueue_total Galaxy prefetch enqueue stub\n",
             "# TYPE galaxy_prefetch_enqueue_total gauge\n",
             "galaxy_prefetch_enqueue_total 0\n",
+            "# HELP galaxy_prefetch_wait_ms_total Galaxy prefetch wait stub\n",
+            "# TYPE galaxy_prefetch_wait_ms_total gauge\n",
+            "galaxy_prefetch_wait_ms_total 0\n",
+            "# HELP galaxy_locality_rank_ingest_total Galaxy locality rank ingest\n",
+            "# TYPE galaxy_locality_rank_ingest_total gauge\n",
+            "galaxy_locality_rank_ingest_total 0\n",
         );
         metrics_text_has_prefetch_counters(sample).expect("sample export");
     }

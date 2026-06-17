@@ -10,7 +10,7 @@ use poolai_ui_core::lease::lease_state;
 use poolai_ui_core::ml::{
     chart_scale, collect_ml_sparkline_series, flatten_ml_step_rows, format_ml_metric_summary,
     group_metrics_by_name, metric_point_values, parse_ml_numeric, render_line_chart_html,
-    render_sparkline_html,
+    render_metrics_chart_grid_html, render_sparkline_html, sanitize_chart_id,
 };
 use poolai_ui_core::modal::{admin_dynamic_modal_html, trap_tab_action, MODAL_FOCUSABLE_SELECTOR};
 use poolai_ui_core::pricing::{format_unix_secs, format_usd_micro};
@@ -280,6 +280,17 @@ pub fn render_line_chart_html_wasm(
 pub fn group_metrics_by_name_wasm(metrics_json: &str) -> JsValue {
     let data: Vec<Value> = serde_json::from_str(metrics_json).unwrap_or_default();
     serde_wasm_bindgen::to_value(&group_metrics_by_name(&data)).unwrap_or(JsValue::NULL)
+}
+
+#[wasm_bindgen(js_name = sanitizeChartId)]
+pub fn sanitize_chart_id_wasm(name: &str) -> String {
+    sanitize_chart_id(name)
+}
+
+#[wasm_bindgen(js_name = renderMetricsChartGridHtml)]
+pub fn render_metrics_chart_grid_html_wasm(title: &str, parts_json: &str) -> String {
+    let parts: Vec<String> = serde_json::from_str(parts_json).unwrap_or_default();
+    render_metrics_chart_grid_html(title, &parts)
 }
 
 /// POC version string for smoke checks in browser devtools.

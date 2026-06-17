@@ -3,6 +3,96 @@
   "items": [
     {
       "category": "closed",
+      "id": "PH-S302",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "INDEX §7 + rust_ratio pointer",
+      "title": "Docs INDEX ratio maintain (docs)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S301",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--min-ratio 0.95 --advisory",
+      "title": "Ratio hold advisory snapshot (ops)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S300",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--check` green",
+      "title": "poolai-vision-sync drift gate (ops)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S299",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "INDEX/HANDOFF/NEXT/STABLE/GALAXY",
+      "title": "Docs canon sync band (docs)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S298",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "rust_ratio.json` sprint zriz",
+      "title": "Rust ratio loc-audit refresh (ops)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S297",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "sanitizeChartId` → wasm",
+      "title": "admin_charts sanitizeChartId wasm (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S296",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "/metrics` export shape",
+      "title": "Stand smoke prefetch wait + locality (tests)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S295",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_locality_rank_ingest_total",
+      "title": "Galaxy locality rank ingest metric (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S294",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "renderMetricsChartGridHtml` wasm glue",
+      "title": "admin metrics chart grid wasm HTML (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S293",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "wait_prefetch_hook` + wait ms metric",
+      "title": "Galaxy prefetch wait hook stub (code)"
+    },
+    {
+      "category": "closed",
       "id": "PH-S292",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
@@ -13,96 +103,6 @@
     {
       "category": "closed",
       "id": "PH-S291",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--min-ratio 0.95 --advisory",
-      "title": "Ratio hold advisory snapshot (ops)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S290",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--check` green",
-      "title": "poolai-vision-sync drift gate (ops)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S289",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "INDEX/HANDOFF/NEXT/STABLE/GALAXY",
-      "title": "Docs canon sync band (docs)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S288",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "rust_ratio.json` sprint zriz",
-      "title": "Rust ratio loc-audit refresh (ops)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S287",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "poolaiGroupMetricsByName` → wasm",
-      "title": "admin_charts metric group wasm glue (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S286",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "poolai-http-stand-smoke` ingest + `/metrics",
-      "title": "Stand smoke prefetch enqueue path (tests)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S285",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "rank_workers_by_locality` on grid job `required_shard_ids",
-      "title": "Galaxy locality rank job ingest stub (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S284",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "render_line_chart_html` → wasm; slim `poolaiRenderLineChart",
-      "title": "admin_charts line chart wasm HTML (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S283",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "enqueue_prefetch_hook` + unit test; no live pull",
-      "title": "Galaxy prefetch enqueue wire stub (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S282",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "INDEX §7 + rust_ratio pointer",
-      "title": "Docs INDEX ratio maintain (docs)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S281",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",

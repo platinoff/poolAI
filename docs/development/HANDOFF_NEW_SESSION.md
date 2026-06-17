@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-17 (PH-S283…S292 ✅ · §5.12 **0** відкритих · rust_ratio **94.36%**) · VDT
+**Оновлено:** 2026-06-17 (PH-S293…S302 ✅ · §5.12 **0** відкритих · rust_ratio **94.37%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -243,8 +243,18 @@
 **PH-S290 ✅ (ops):** `poolai-vision-sync --check` green.
 **PH-S291 ✅ (ops):** hold advisory `--min-ratio 0.95` snapshot **94.36%**.
 **PH-S292 ✅ (docs):** INDEX §7 + rust_ratio pointer **94.36%**.
+**PH-S293 ✅ (code):** `wait_prefetch_hook` + `galaxy_prefetch_wait_ms_total`; ingest prefetch path calls wait stub.
+**PH-S294 ✅ (code/ui):** `render_metrics_chart_grid_html` + wasm `renderMetricsChartGridHtml`.
+**PH-S295 ✅ (code):** `galaxy_locality_rank_ingest_total` on `ingest_job_locality_rank_stub`.
+**PH-S296 ✅ (tests):** stand smoke `/metrics` includes wait + locality ingest counters.
+**PH-S297 ✅ (code/ui):** `sanitize_chart_id` + wasm `sanitizeChartId`; charts JS wasm-first.
+**PH-S298 ✅ (ops):** `poolai-loc-audit` → `rust_ratio.json` sprint **PH-S298** (**94.37%**).
+**PH-S299 ✅ (docs):** INDEX/HANDOFF/NEXT/STABLE/GALAXY canon sync.
+**PH-S300 ✅ (ops):** `poolai-vision-sync --check` green.
+**PH-S301 ✅ (ops):** hold advisory `--min-ratio 0.95` snapshot **94.37%**.
+**PH-S302 ✅ (docs):** INDEX §7 + rust_ratio pointer **94.37%**.
 **§5.12:** **0** відкритих — replenish з §5.13.
-**Vision ✅:** rev **209** · rust_ratio **94.36%** · hold **95%** advisory.
+**Vision ✅:** rev **210** · rust_ratio **94.37%** · hold **95%** advisory.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

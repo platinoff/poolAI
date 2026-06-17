@@ -79,11 +79,15 @@ pub const METRIC_SHARD_LOCAL_HIT_RATIO: &str = "galaxy_shard_local_hit_ratio";
 /// Last observed cross-region egress in whole MB (PH-S185 `/metrics` gauge).
 pub const METRIC_CROSS_REGION_EGRESS_MB: &str = "galaxy_cross_region_egress_mb";
 
+/// Locality rank invocations on grid job ingest (PH-S295 stub).
+pub const METRIC_LOCALITY_RANK_INGEST_TOTAL: &str = "galaxy_locality_rank_ingest_total";
+
 /// Stub MB per cold shard on prefetch plan path when no task egress wire (PH-S185).
 pub const DEFAULT_PREFETCH_CROSS_REGION_EGRESS_MB_PER_SHARD: f64 = 50.0;
 
 static LAST_SHARD_LOCAL_HIT_RATIO_BPS: AtomicU64 = AtomicU64::new(0);
 static LAST_CROSS_REGION_EGRESS_MB: AtomicU64 = AtomicU64::new(0);
+static LOCALITY_RANK_INGEST_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// Ranked worker for scheduler stub (locality first; pricing/queue_depth — future wire).
 #[derive(Debug, Clone, PartialEq)]
@@ -251,10 +255,25 @@ pub fn reset_last_cross_region_egress_mb_for_test() {
     LAST_CROSS_REGION_EGRESS_MB.store(0, Ordering::Relaxed);
 }
 
+/// Record one locality rank on grid job ingest (PH-S295 stub).
+pub fn record_locality_rank_ingest() {
+    LOCALITY_RANK_INGEST_TOTAL.fetch_add(1, Ordering::Relaxed);
+}
+
+pub fn locality_rank_ingest_total() -> u64 {
+    LOCALITY_RANK_INGEST_TOTAL.load(Ordering::Relaxed)
+}
+
+#[cfg(any(test, feature = "test-utils"))]
+pub fn reset_locality_rank_ingest_for_test() {
+    LOCALITY_RANK_INGEST_TOTAL.store(0, Ordering::Relaxed);
+}
+
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_locality_metrics_for_test() {
     reset_last_shard_local_hit_ratio_for_test();
     reset_last_cross_region_egress_mb_for_test();
+    reset_locality_rank_ingest_for_test();
 }
 
 /// Pick highest-scoring worker (scheduler stub only — no prefetch / lease wire).

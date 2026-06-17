@@ -1836,7 +1836,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S292",
+  "last_sprint_closed": "PH-S302",
   "layers": [
     {
       "id": "L0",
@@ -7731,7 +7731,7 @@
       "path": "crates/poolai-ui-core/src/admin_dom.rs"
     }
   ],
-  "revision": 209,
+  "revision": 211,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -9773,6 +9773,96 @@
       "id": "PH-S292",
       "open": false,
       "row": 227,
+      "status": "closed",
+      "title": "Docs INDEX ratio maintain (docs)"
+    },
+    {
+      "acceptance": "wait_prefetch_hook` + wait ms metric",
+      "deps": "PH-S283",
+      "id": "PH-S293",
+      "open": false,
+      "row": 228,
+      "status": "closed",
+      "title": "Galaxy prefetch wait hook stub (code)"
+    },
+    {
+      "acceptance": "renderMetricsChartGridHtml` wasm glue",
+      "deps": "PH-S284",
+      "id": "PH-S294",
+      "open": false,
+      "row": 229,
+      "status": "closed",
+      "title": "admin metrics chart grid wasm HTML (code)"
+    },
+    {
+      "acceptance": "galaxy_locality_rank_ingest_total",
+      "deps": "PH-S285",
+      "id": "PH-S295",
+      "open": false,
+      "row": 230,
+      "status": "closed",
+      "title": "Galaxy locality rank ingest metric (code)"
+    },
+    {
+      "acceptance": "/metrics` export shape",
+      "deps": "PH-S293",
+      "id": "PH-S296",
+      "open": false,
+      "row": 231,
+      "status": "closed",
+      "title": "Stand smoke prefetch wait + locality (tests)"
+    },
+    {
+      "acceptance": "sanitizeChartId` → wasm",
+      "deps": "PH-S287",
+      "id": "PH-S297",
+      "open": false,
+      "row": 232,
+      "status": "closed",
+      "title": "admin_charts sanitizeChartId wasm (code)"
+    },
+    {
+      "acceptance": "rust_ratio.json` sprint zriz",
+      "deps": "PH-S288",
+      "id": "PH-S298",
+      "open": false,
+      "row": 233,
+      "status": "closed",
+      "title": "Rust ratio loc-audit refresh (ops)"
+    },
+    {
+      "acceptance": "INDEX/HANDOFF/NEXT/STABLE/GALAXY",
+      "deps": "PH-S298",
+      "id": "PH-S299",
+      "open": false,
+      "row": 234,
+      "status": "closed",
+      "title": "Docs canon sync band (docs)"
+    },
+    {
+      "acceptance": "--check` green",
+      "deps": "PH-S290",
+      "id": "PH-S300",
+      "open": false,
+      "row": 235,
+      "status": "closed",
+      "title": "poolai-vision-sync drift gate (ops)"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory",
+      "deps": "PH-S298",
+      "id": "PH-S301",
+      "open": false,
+      "row": 236,
+      "status": "closed",
+      "title": "Ratio hold advisory snapshot (ops)"
+    },
+    {
+      "acceptance": "INDEX §7 + rust_ratio pointer",
+      "deps": "PH-S299",
+      "id": "PH-S302",
+      "open": false,
+      "row": 237,
       "status": "closed",
       "title": "Docs INDEX ratio maintain (docs)"
     }

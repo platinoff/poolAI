@@ -14,13 +14,13 @@ use serde::{Deserialize, Serialize};
 use crate::core::error::AppError;
 use crate::grid::galaxy_fee_split_metrics::evaluate_result_fee_split;
 use crate::grid::galaxy_locality::{
-    observe_last_cross_region_egress_mb, pick_best_worker_by_locality, LocalityHotTier,
-    LocalityNetworkProfile, LocalitySeedInventory, LocalityTask, LocalityWorker,
+    observe_last_cross_region_egress_mb, pick_best_worker_by_locality, record_locality_rank_ingest,
+    LocalityHotTier, LocalityNetworkProfile, LocalitySeedInventory, LocalityTask, LocalityWorker,
     DEFAULT_PREFETCH_CROSS_REGION_EGRESS_MB_PER_SHARD,
 };
 use crate::grid::galaxy_prefetch_metrics::{
-    record_prefetch_enqueue, record_prefetch_plan, DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM,
-    DEFAULT_PREFETCH_BYTES_PER_SHARD_VRAM,
+    record_prefetch_enqueue, record_prefetch_plan, record_prefetch_wait,
+    DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM, DEFAULT_PREFETCH_BYTES_PER_SHARD_VRAM,
 };
 use crate::grid::galaxy_replay_metrics::evaluate_result_replay_pending;
 use crate::grid::galaxy_replication::{
@@ -157,7 +157,9 @@ pub fn ingest_job_prefetch_stub(required_shard_ids: &[String], gpu_capable: bool
         gpu_capable,
         &config,
     );
-    enqueue_prefetch_hook(&plan)
+    let n = enqueue_prefetch_hook(&plan);
+    wait_prefetch_hook(&plan);
+    n
 }
 
 /// Coordinator worker rows for locality rank stub (PH-S285).
@@ -207,7 +209,10 @@ pub fn ingest_job_locality_rank_stub(
         estimated_cross_region_egress_mb: 0.0,
         source_region: None,
     };
-    pick_best_worker_by_locality(&workers, &task).map(|w| w.worker_id.clone())
+    pick_best_worker_by_locality(&workers, &task).map(|w| {
+        record_locality_rank_ingest();
+        w.worker_id.clone()
+    })
 }
 
 fn grid_job_gpu_capable(task_kind: &str) -> bool {
@@ -371,6 +376,13 @@ pub fn enqueue_prefetch_hook(plan: &PrefetchPlan) -> usize {
     let n = plan.items.len();
     record_prefetch_enqueue(n);
     n
+}
+
+/// Prefetch wait stub (PH-S293): records wait ms metric; no live seed pull wire.
+#[inline]
+pub fn wait_prefetch_hook(plan: &PrefetchPlan) -> u64 {
+    record_prefetch_wait(plan.items.len(), plan.deadline_ms);
+    plan.deadline_ms
 }
 
 /// Outcome of processing one grid envelope.
@@ -1749,22 +1761,51 @@ mod tests {
     }
 
     #[test]
+    fn wait_prefetch_hook_ph_s293() {
+        use crate::grid::galaxy_prefetch_metrics::{
+            prefetch_wait_ms_total, reset_prefetch_metrics_for_test,
+        };
+
+        reset_prefetch_metrics_for_test();
+        let plan = PrefetchPlan {
+            items: vec![PrefetchPlanItem {
+                shard_id: "a".into(),
+                target_tier: PrefetchTargetTier::Ram,
+            }],
+            trigger: PrefetchTrigger::JobAdmitted,
+            deadline_ms: DEFAULT_PREFETCH_DEADLINE_MS,
+            mode: PrefetchPolicyMode::BestEffort,
+        };
+        assert_eq!(wait_prefetch_hook(&plan), DEFAULT_PREFETCH_DEADLINE_MS);
+        assert_eq!(prefetch_wait_ms_total(), DEFAULT_PREFETCH_DEADLINE_MS);
+        reset_prefetch_metrics_for_test();
+    }
+
+    #[test]
     fn ingest_job_locality_rank_stub_ph_s285() {
+        use crate::grid::galaxy_locality::{
+            locality_rank_ingest_total, reset_locality_rank_ingest_for_test,
+        };
+
+        reset_locality_rank_ingest_for_test();
         let picked =
             ingest_job_locality_rank_stub(&["w:emb-1".into(), "w:missing".into()], "inference");
         assert!(picked.is_some());
         assert!(picked.unwrap().starts_with("srv"));
+        assert_eq!(locality_rank_ingest_total(), 1);
+        reset_locality_rank_ingest_for_test();
     }
 
     #[test]
     fn ingest_job_prefetch_enqueue_ph_s286() {
         use crate::grid::galaxy_prefetch_metrics::{
-            prefetch_enqueue_total, reset_prefetch_metrics_for_test,
+            prefetch_enqueue_total, prefetch_wait_ms_total, reset_prefetch_metrics_for_test,
         };
 
         reset_prefetch_metrics_for_test();
         ingest_job_prefetch_stub(&["w:missing-shard".into()], false);
         assert_eq!(prefetch_enqueue_total(), 1);
+        assert_eq!(prefetch_wait_ms_total(), DEFAULT_PREFETCH_DEADLINE_MS);
         reset_prefetch_metrics_for_test();
     }
 }

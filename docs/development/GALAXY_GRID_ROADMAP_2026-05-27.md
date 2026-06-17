@@ -1,6 +1,6 @@
 # Galaxy Grid roadmap (зріз)
 
-**Оновлено:** 2026-06-17 · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**0** відкритих · PH-S128…S292 ✅)
+**Оновлено:** 2026-06-17 · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**0** відкритих · PH-S128…S302 ✅)
 
 | Зріз | Значення |
 |------|----------|
@@ -8,9 +8,9 @@
 | **Vision UX** | PH-S188…S233 ✅ |
 | **Ops / stand smoke** | PH-S196…S256 ✅ |
 | **Admin i18n slim** | PH-S207…S266 ✅ · `i18n_core.js` STRINGS core **empty** |
-| **Wasm / admin slim** | PH-S273…S287 ✅ |
-| **Docs / ratio** | PH-S288…S292 ✅ |
-| **Rust ratio** | **94.36%** hold **95%** advisory · spirit **96%** |
+| **Wasm / admin slim** | PH-S273…S297 ✅ |
+| **Docs / ratio** | PH-S298…S302 ✅ |
+| **Rust ratio** | **94.37%** hold **95%** advisory · spirit **96%** |
 
 ---
 
@@ -18,7 +18,7 @@
 
 **0** відкритих · replenish з §5.13.
 
-Остання смуга **PH-S283…S292** ✅: prefetch enqueue stub, line chart wasm, locality rank ingest, stand smoke enqueue metric, metric group wasm, ratio/docs maintain.
+Остання смуга **PH-S293…S302** ✅: prefetch wait stub, metrics chart grid wasm, locality rank ingest metric, stand smoke wait/locality path, sanitizeChartId wasm, ratio/docs maintain.
 
 ---
 
