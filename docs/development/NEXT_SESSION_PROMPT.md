@@ -1,9 +1,9 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-17 · PH-S244 ✅ · vision **rev 195** (after sync) · **8** відкритих (PH-S245…S252) · **hold 95%** · **stretch spirit 96%**
+**Оновлено:** 2026-06-17 · PH-S245 ✅ · vision **rev 197** (after sync) · **7** відкритих (PH-S246…S252) · **hold 95%** · **stretch spirit 96%**
 
-| **← наступний** | **PH-S245** — Admin shared status keys slim patch |
-| **Відкритих** | **8** (PH-S245…S252) |
+| **← наступний** | **PH-S246** — Admin err hint keys slim patch |
+| **Відкритих** | **7** (PH-S246…S252) |
 
 ---
 
@@ -11,8 +11,7 @@
 
 | Sprint | Scope | Type |
 |--------|-------|------|
-| **PH-S245** ← | `admin.status.*` slim patch | code |
-| PH-S246 | `err.hint*` + access keys slim | code |
+| **PH-S246** ← | `err.hint*` + access keys slim | code |
 | PH-S247 | pricing provider metrics stand smoke | tests |
 | PH-S248 | `vm.*` modal i18n slim | code |
 | PH-S249 | settlement metrics stand smoke | tests |
@@ -22,20 +21,20 @@
 
 ---
 
-## PH-S245 — scope
+## PH-S246 — scope
 
-- `admin.status.active` / `inactive` / `yes` / `no`, `admin.na`, `admin.btn.edit` → slim patch (`admin_status_patch` or shared admin patch)
+- `err.hint403`, `err.hint503.*`, `err.hint404.enterprise`, `err.insufficientAdmin`, `admin.accessRequired` → slim patch
 - Remove from `i18n_core.js`; extend admin layout tests
-- Pattern: PH-S240 table toolbar slim
-- Acceptance: `cargo test ph_s245`; FM/HANDOFF/NEXT; `poolai-vision-sync --check`; commit+push
+- Pattern: PH-S245 status slim
+- Acceptance: `cargo test ph_s246`; FM/HANDOFF/NEXT; `poolai-vision-sync --check`; commit+push
 
 ---
 
-## Copy-paste — PH-S245
+## Copy-paste — PH-S246
 
 ```
-PH-S245 — Admin shared status keys slim patch (code)
-Scope: admin.status.* + admin.na + admin.btn.edit slim patch; cargo test ph_s245; FM/HANDOFF/NEXT; commit+push
+PH-S246 — Admin err hint keys slim patch (code)
+Scope: err.hint* + err.insufficientAdmin + admin.accessRequired slim patch; cargo test ph_s246; FM/HANDOFF/NEXT; commit+push
 ```
 
 ---

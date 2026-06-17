@@ -12,12 +12,6 @@
       // auth.* + dash.* + admin.nav.* + admin chrome shell → poolai-ui-core i18n.rs (PH-S162, PH-S242, PH-S243)
 
       'err.insufficientAdmin': 'Insufficient permissions. Admin role required.',
-      'admin.status.active': 'Active',
-      'admin.status.inactive': 'Inactive',
-      'admin.status.yes': 'Yes',
-      'admin.status.no': 'No',
-      'admin.btn.edit': 'Edit',
-      'admin.na': 'N/A',
       'ui.save': 'Save Changes',
       'ui.upload': 'Upload',
       'ui.register': 'Register',
@@ -226,12 +220,6 @@
       // auth.* + dash.* + admin.nav.* + admin chrome shell → poolai-ui-core i18n.rs (PH-S162, PH-S242, PH-S243)
 
       'err.insufficientAdmin': 'Недостатньо прав. Потрібна роль Admin.',
-      'admin.status.active': 'Активний',
-      'admin.status.inactive': 'Неактивний',
-      'admin.status.yes': 'Так',
-      'admin.status.no': 'Ні',
-      'admin.btn.edit': 'Змінити',
-      'admin.na': 'Н/Д',
       'ui.save': 'Зберегти зміни',
       'ui.upload': 'Завантажити',
       'ui.register': 'Зареєструвати',
@@ -460,6 +448,13 @@
   if (rustAdminTable) {
     if (rustAdminTable.en) Object.assign(STRINGS.en, rustAdminTable.en);
     if (rustAdminTable.uk) Object.assign(STRINGS.uk, rustAdminTable.uk);
+  }
+
+  // PH-S245: admin.status.* / admin.na / admin.btn.edit → poolai-ui-core i18n.rs (all admin layouts).
+  var rustAdminStatus = typeof window !== 'undefined' && window.__poolaiAdminStatusI18nRust;
+  if (rustAdminStatus) {
+    if (rustAdminStatus.en) Object.assign(STRINGS.en, rustAdminStatus.en);
+    if (rustAdminStatus.uk) Object.assign(STRINGS.uk, rustAdminStatus.uk);
   }
 
   function normalizeLang(l) {

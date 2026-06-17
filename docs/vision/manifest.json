@@ -1830,7 +1830,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S244",
+  "last_sprint_closed": "PH-S245",
   "layers": [
     {
       "id": "L0",
@@ -1863,7 +1863,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S245",
+  "next_sprint": "PH-S246",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7719,7 +7719,7 @@
       "path": "docs/vision/vision.svg"
     }
   ],
-  "revision": 195,
+  "revision": 197,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -9336,9 +9336,9 @@
       "acceptance": "admin.status.*` + `admin.na` + `admin.btn.edit` slim patch",
       "deps": "PH-S240",
       "id": "PH-S245",
-      "open": true,
+      "open": false,
       "row": 180,
-      "status": "open",
+      "status": "closed",
       "title": "Admin shared status keys slim patch (code)"
     },
     {
@@ -9405,7 +9405,7 @@
       "title": "Admin shared ui.confirm slim patch (code)"
     }
   ],
-  "sprint_queue_open_count": 8,
+  "sprint_queue_open_count": 7,
   "updated_at": "2026-06-16",
   "vision_ui_rev": 59
 }

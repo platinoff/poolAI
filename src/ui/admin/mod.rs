@@ -407,6 +407,7 @@ pub fn admin_layout_with_module_script(
     let i18n_patch = i18n_patch_script;
     let auth_dash_patch = poolai_ui_core::i18n::auth_dash_shell_patch_script();
     let table_patch = poolai_ui_core::i18n::admin_table_patch_script();
+    let status_patch = poolai_ui_core::i18n::admin_status_patch_script();
     let theme_patch = poolai_ui_core::theme::admin_theme_patch_script();
     let modal_patch = poolai_ui_core::modal::admin_modal_patch_script();
     let module_block = if module_script.is_empty() {
@@ -478,6 +479,7 @@ pub fn admin_layout_with_module_script(
   <script>{i18n_patch}</script>
   <script>{auth_dash_patch}</script>
   <script>{table_patch}</script>
+  <script>{status_patch}</script>
   <script>{theme_patch}</script>
   <script>{modal_patch}</script>
   <script>{i18n_js}</script>
@@ -658,6 +660,35 @@ fn admin_layout_default_patch_excludes_table_ph_s240() {
     let patch = poolai_ui_core::i18n::admin_jobs_grid_patch_script();
     assert!(!patch.contains(r#""admin.table.empty""#));
     assert!(!patch.contains(r#""admin.table.exportCsv""#));
+}
+
+#[test]
+fn admin_layout_injects_rust_status_i18n_patch_ph_s245() {
+    let patch = poolai_ui_core::i18n::admin_status_patch_script();
+    assert!(patch.contains("window.__poolaiAdminStatusI18nRust="));
+    assert!(patch.contains(r#""admin.status.active""#));
+    assert!(patch.contains(r#""admin.na""#));
+    let html = admin_layout("admin.test.page", "Test", "<p>body</p>", "");
+    assert!(html.0.contains("window.__poolaiAdminStatusI18nRust="));
+    assert!(html.0.contains(r#""admin.btn.edit""#));
+}
+
+#[test]
+fn admin_layout_default_patch_excludes_status_ph_s245() {
+    let patch = poolai_ui_core::i18n::admin_jobs_grid_patch_script();
+    assert!(!patch.contains(r#""admin.status.active""#));
+    assert!(!patch.contains(r#""admin.btn.edit""#));
+}
+
+#[test]
+fn i18n_core_js_has_no_admin_status_keys_ph_s245() {
+    let js = include_str!("../i18n_core.js");
+    assert!(!js.contains("'admin.status.active'"));
+    assert!(!js.contains("'admin.status.inactive'"));
+    assert!(!js.contains("'admin.status.yes'"));
+    assert!(!js.contains("'admin.status.no'"));
+    assert!(!js.contains("'admin.btn.edit'"));
+    assert!(!js.contains("'admin.na'"));
 }
 
 #[test]

@@ -194,7 +194,7 @@ flowchart TB
 | 99 | **PH-S242** | Admin i18n nav shell key audit | code | **✅** |
 | 100 | **PH-S243** | Admin i18n slim admin chrome shell | code | **✅** |
 | 101 | **PH-S244** | Galaxy pricing stale served metrics stand smoke | tests | **✅** |
-| 102 | **PH-S245** | Admin shared status keys slim patch | code | відкрито |
+| 102 | **PH-S245** | Admin shared status keys slim patch | code | **✅** |
 | 103 | **PH-S246** | Admin err hint keys slim patch | code | відкрито |
 | 104 | **PH-S247** | Galaxy pricing provider metrics stand smoke | tests | відкрито |
 | 105 | **PH-S248** | Admin vm modal i18n slim | code | відкрито |
