@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-16 (PH-S219 ✅ · §5.12 **0** відкритих · replenish §5.13 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
+**Оновлено:** 2026-06-16 (PH-S220 ✅ · §5.12 **7** відкритих PH-S221…S227 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -170,6 +170,7 @@
 **PH-S217 ✅ (code/ui):** `admin_grid_pricing_patch` + `admin_layout_grid_pricing` — grid-pricing slim Rust i18n; `admin.page.gridPricing` removed from `i18n_core.js`.
 **PH-S218 ✅ (vision):** `docs/vision/` — `#map-selection-live` aria-live region announces selected node label/layer/path; UI cache **v72**; rev **157**.
 **PH-S219 ✅ (code/tests):** `poolai-http-stand-smoke` — `galaxy_trust_payout_metrics` on live `/metrics` (eligible/held/score gauges); `cargo test-ci`.
+**PH-S220 ✅ (code/ui):** `admin_monitoring_patch` + `admin_layout_monitoring` — monitoring slim Rust i18n; removed from fat `admin_jobs_grid_patch`.
 **Ops:** `open-docs-vision.ps1` — ASCII Write-Host + robust `SendVisionBytes`; URL `http://127.0.0.1:8765/docs/vision/index.html`.
 **PH-S198 ✅ (code):** `topology_graph.rs` — hub labels + `label_x`/`label_y`/`is_hub` in graph JSON; heatmap short ids; slim `topology_graph.js` (SVG paint only); `cargo test-ci`.
 **PH-S194 ✅ (code):** `galaxy_fee_split_applied_total` on grid result wire; `cargo test-ci`.

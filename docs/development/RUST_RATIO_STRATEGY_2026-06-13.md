@@ -169,6 +169,14 @@ flowchart TB
 | 74 | **PH-S217** | Admin i18n slim grid-pricing panel | code | **✅** |
 | 75 | **PH-S218** | Vision map aria-live selection | docs/vision | **✅** |
 | 76 | **PH-S219** | Galaxy trust payout metrics smoke | tests | **✅** |
+| 77 | **PH-S220** | Admin i18n slim monitoring panel | code | **✅** |
+| 78 | **PH-S221** | Admin i18n slim updates-compat panel | code | відкрито |
+| 79 | **PH-S222** | Admin i18n slim workers panel | code | відкрито |
+| 80 | **PH-S223** | Admin i18n slim libs panel | code | відкрито |
+| 81 | **PH-S224** | Galaxy pricing cache age metrics smoke | tests | відкрито |
+| 82 | **PH-S225** | Galaxy verification sample metrics smoke | tests | відкрито |
+| 83 | **PH-S226** | Vision sprint-queue → map focus | docs/vision | відкрито |
+| 84 | **PH-S227** | Vision VDT rules docs autosync audit | docs/vision | відкрито |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 

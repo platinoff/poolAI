@@ -1,8 +1,8 @@
 //! Monitoring Dashboard page
 //!
-//! PH-S207: EN/UK i18n subset in `poolai-ui-core::i18n` (injected via admin_layout).
+//! PH-S220: monitoring page uses slim `admin_layout_monitoring` + `admin_monitoring_patch`.
 
-use crate::ui::admin::admin_layout;
+use crate::ui::admin::admin_layout_monitoring;
 use axum::response::Html;
 
 /// Monitoring dashboard page
@@ -321,7 +321,7 @@ pub async fn admin_monitoring() -> Html<String> {
     poolaiStartMetricsPolling(loadMonitoring, 5000);
     "#;
 
-    admin_layout(
+    admin_layout_monitoring(
         "admin.page.monitoring",
         "Monitoring Dashboard",
         r#"
@@ -427,4 +427,14 @@ pub async fn admin_monitoring() -> Html<String> {
         "#,
         script,
     )
+}
+
+#[tokio::test]
+async fn admin_monitoring_page_slim_monitoring_i18n_patch_ph_s220() {
+    let html = admin_monitoring().await.0;
+    assert!(html.contains("window.__poolaiAdminI18nRust="));
+    assert!(html.contains(r#""admin.page.monitoring""#));
+    assert!(html.contains(r#""admin.mon.mlTitle""#));
+    assert!(!html.contains(r#""admin.jobs.leaseState.active""#));
+    assert!(!html.contains(r#""admin.updatesCompat.section""#));
 }

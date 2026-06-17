@@ -151,6 +151,24 @@ pub fn admin_layout_grid_pricing(
     )
 }
 
+/// Monitoring admin page layout — slim `admin.mon.*` Rust i18n patch only (PH-S220).
+pub fn admin_layout_monitoring(
+    title_i18n_key: &str,
+    title_fallback: &str,
+    body_html: &str,
+    script_js: &str,
+) -> Html<String> {
+    let i18n_patch = poolai_ui_core::i18n::admin_monitoring_patch_script();
+    admin_layout_with_module_script(
+        title_i18n_key,
+        title_fallback,
+        body_html,
+        POOLAI_UI_WASM_MODULE,
+        script_js,
+        &i18n_patch,
+    )
+}
+
 /// Like [`admin_layout`] but inserts a `<script type="module">` before the page IIFE (PH-S151 wasm wiring).
 pub fn admin_layout_with_module_script(
     title_i18n_key: &str,
@@ -311,10 +329,18 @@ fn admin_layout_injects_rust_theme_patch_ph_s160() {
 
 #[test]
 fn admin_layout_injects_monitoring_i18n_ph_s207() {
-    let patch = poolai_ui_core::i18n::admin_jobs_grid_patch_script();
+    let patch = poolai_ui_core::i18n::admin_monitoring_patch_script();
     assert!(patch.contains(r#""admin.page.monitoring""#));
     assert!(patch.contains(r#""admin.mon.mlTitle""#));
     assert!(patch.contains(r#""admin.mon.createDashBtn""#));
+    assert!(!patch.contains(r#""admin.jobs.leaseState.active""#));
+}
+
+#[test]
+fn admin_layout_default_patch_excludes_monitoring_ph_s220() {
+    let patch = poolai_ui_core::i18n::admin_jobs_grid_patch_script();
+    assert!(!patch.contains(r#""admin.mon.mlTitle""#));
+    assert!(!patch.contains(r#""admin.page.monitoring""#));
 }
 
 #[test]

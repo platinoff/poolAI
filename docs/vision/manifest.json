@@ -1728,7 +1728,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S219",
+  "last_sprint_closed": "PH-S220",
   "layers": [
     {
       "id": "L0",
@@ -1761,6 +1761,7 @@
       "z": 5
     }
   ],
+  "next_sprint": "PH-S221",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7468,7 +7469,7 @@
       "path": "tests/grid_seed_inventory_integration.rs"
     }
   ],
-  "revision": 166,
+  "revision": 167,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -8855,9 +8856,81 @@
       "row": 154,
       "status": "closed",
       "title": "Galaxy trust payout metrics smoke (tests)"
+    },
+    {
+      "acceptance": "admin.mon.*` → slim `admin_monitoring_patch",
+      "deps": "PH-S207",
+      "id": "PH-S220",
+      "open": false,
+      "row": 155,
+      "status": "closed",
+      "title": "Admin i18n slim monitoring panel (code)"
+    },
+    {
+      "acceptance": "admin.updatesCompat.*` slim patch",
+      "deps": "PH-S207",
+      "id": "PH-S221",
+      "open": true,
+      "row": 156,
+      "status": "open",
+      "title": "Admin i18n slim updates-compat panel (code)"
+    },
+    {
+      "acceptance": "admin.wrk.*` → `poolai-ui-core",
+      "deps": "PH-S207",
+      "id": "PH-S222",
+      "open": true,
+      "row": 157,
+      "status": "open",
+      "title": "Admin i18n slim workers panel (code)"
+    },
+    {
+      "acceptance": "admin.lib.*` → `poolai-ui-core",
+      "deps": "PH-S207",
+      "id": "PH-S223",
+      "open": true,
+      "row": 158,
+      "status": "open",
+      "title": "Admin i18n slim libs panel (code)"
+    },
+    {
+      "acceptance": "galaxy_pricing_cache_age_seconds` on `/metrics",
+      "deps": "PH-S168",
+      "id": "PH-S224",
+      "open": true,
+      "row": 159,
+      "status": "open",
+      "title": "Galaxy pricing cache age metrics smoke (tests)"
+    },
+    {
+      "acceptance": "verification counters on `/metrics",
+      "deps": "PH-S177",
+      "id": "PH-S225",
+      "open": true,
+      "row": 160,
+      "status": "open",
+      "title": "Galaxy verification sample metrics smoke (tests)"
+    },
+    {
+      "acceptance": "queue item click focuses map node",
+      "deps": "PH-S202",
+      "id": "PH-S226",
+      "open": true,
+      "row": 161,
+      "status": "open",
+      "title": "Vision sprint-queue → map focus (docs/vision)"
+    },
+    {
+      "acceptance": "manifest ↔ `.mdc` cross-link drift",
+      "deps": "PH-S205",
+      "id": "PH-S227",
+      "open": true,
+      "row": 162,
+      "status": "open",
+      "title": "Vision VDT rules docs autosync audit (docs/vision)"
     }
   ],
-  "sprint_queue_open_count": 0,
+  "sprint_queue_open_count": 7,
   "updated_at": "2026-06-15",
   "vision_ui_rev": 58
 }

@@ -1,28 +1,33 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-16 · PH-S219 ✅ · vision **rev 166** · **0** відкритих · **replenish §5.13** · **hold 95%** · **stretch spirit 96%**
+**Оновлено:** 2026-06-16 · PH-S220 ✅ · vision **rev 167** · **7** відкритих (PH-S221…S227) · **hold 95%** · **stretch spirit 96%**
 
-| **← наступний** | **replenish §5.13** — нові PH-S* з [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md) |
-| **Відкритих** | **0** (смуга PH-S128…S219 закрита) |
+| **← наступний** | **PH-S221** — Admin i18n slim updates-compat panel |
+| **Відкритих** | **7** (PH-S221…S227) |
 | **VDT** | один PH-S* = 1 commit (code) + docs sync |
 
 ---
 
-## Зріз §5.12 (0 відкритих — replenish)
+## Зріз §5.12 (7 відкритих: PH-S221…S227)
 
 ### Закрито недавно ✅
 
 | Sprint | Scope | Зріз |
 |--------|-------|------|
+| PH-S220 | Admin i18n slim monitoring panel | `admin.mon.*` → `admin_monitoring_patch` |
 | PH-S219 | Galaxy trust payout metrics smoke | trust payout gauges on `/metrics` |
-| PH-S218 | Vision map aria-live selection | `#map-selection-live` on node select |
-| PH-S217 | Admin i18n slim grid-pricing panel | `admin.page.gridPricing` → `poolai-ui-core` |
 
-### Наступний крок
+### Відкрито — i18n slim + stand smoke + vision (PH-S221…S227)
 
-1. `rg "\- \[ \]" docs/development/NEXT_STEPS_ARCHITECT_*.md`
-2. Доповнити FM §5.12 до **≤10** відкритих з **§5.13** / code-first research
-3. Перший новий спринт → `NEXT_SESSION_PROMPT` + vision-sync
+| # | Sprint | Scope |
+|---|--------|-------|
+| 1 | **PH-S221** | Admin i18n slim updates-compat panel |
+| 2 | **PH-S222** | Admin i18n slim workers panel |
+| 3 | **PH-S223** | Admin i18n slim libs panel |
+| 4 | **PH-S224** | Galaxy pricing cache age metrics smoke |
+| 5 | **PH-S225** | Galaxy verification sample metrics smoke |
+| 6 | **PH-S226** | Vision sprint-queue → map focus |
+| 7 | **PH-S227** | Vision VDT rules docs autosync audit |
 
 ---
 
@@ -39,12 +44,20 @@ export K8S_OPENAPI_ENABLED_VERSION=1.28
 
 ---
 
-## Copy-paste — replenish
+## PH-S221 — scope
+
+- `admin.updatesCompat.*` → slim `admin_updates_compat_patch` + `admin_layout_updates_compat` (PH-S211 jobs pattern)
+- Acceptance: FM/HANDOFF/NEXT; `cargo test -p poolai-ui-core i18n`; `cargo test -p poolai --lib --features enterprise admin_updates_compat`; push
+
+---
+
+## Copy-paste — PH-S221
 
 ```
-PoolAI VDT · replenish §5.12 · main · MSYS2 PATH · git-push.md
+PoolAI VDT · один PH-S* · main · MSYS2 PATH · git-push.md
 
 S0: git fetch · HANDOFF · FM §5.12 · df -h /s
 
-Replenish — додати PH-S220+ з §5.13 / research; один спринт за сесію; FM/HANDOFF/NEXT; vision-sync; commit+push
+PH-S221 — Admin i18n slim updates-compat panel (code/ui)
+Scope: admin.updatesCompat.* Rust i18n patch; slim default layout patch; cargo test; FM/HANDOFF/NEXT; vision-sync; commit+push
 ```

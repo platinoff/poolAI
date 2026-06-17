@@ -1,6 +1,6 @@
 //! UI i18n subsets moved from `i18n_core.js` (PH-S154 admin jobs/grid; PH-S162 auth/dash shell; PH-S197 updates-compat; PH-S207 monitoring; PH-S211 jobs-only patch; PH-S214 raid-only patch; PH-S217 grid-pricing-only patch).
 //!
-//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs page uses slim `admin_jobs_patch` (PH-S211); raid page uses `admin_raid_patch` (PH-S214).
+//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs page uses slim `admin_jobs_patch` (PH-S211); raid page uses `admin_raid_patch` (PH-S214); monitoring page uses `admin_monitoring_patch` (PH-S220).
 //! Auth + dashboard shell: `window.__poolaiAuthDashI18nRust` on login, dashboard layout, admin layout (PH-S162).
 
 use std::collections::BTreeMap;
@@ -973,14 +973,32 @@ pub fn admin_grid_pricing_patch_script() -> String {
     )
 }
 
+/// Monitoring admin page — slim `admin.mon.*` patch only (PH-S220).
+pub fn admin_monitoring_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_MONITORING_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_MONITORING_UK));
+    root
+}
+
+pub fn admin_monitoring_patch_json() -> String {
+    serde_json::to_string(&admin_monitoring_patch())
+        .expect("admin monitoring i18n patch serializes")
+}
+
+pub fn admin_monitoring_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminI18nRust={};",
+        admin_monitoring_patch_json()
+    )
+}
+
 /// `{"en":{...},"uk":{...}}` patch object for `window.__poolaiAdminI18nRust`.
 pub fn admin_jobs_grid_patch() -> BTreeMap<String, BTreeMap<String, String>> {
     let mut en = rows_to_map(ADMIN_JOBS_EN);
     merge_rows(&mut en, ADMIN_UPDATES_COMPAT_EN);
-    merge_rows(&mut en, ADMIN_MONITORING_EN);
     let mut uk = rows_to_map(ADMIN_JOBS_UK);
     merge_rows(&mut uk, ADMIN_UPDATES_COMPAT_UK);
-    merge_rows(&mut uk, ADMIN_MONITORING_UK);
     let mut root = BTreeMap::new();
     root.insert("en".into(), en);
     root.insert("uk".into(), uk);
@@ -1076,11 +1094,11 @@ mod tests {
         let patch = admin_jobs_grid_patch();
         assert_eq!(
             patch["en"].len(),
-            ADMIN_JOBS_EN.len() + ADMIN_UPDATES_COMPAT_EN.len() + ADMIN_MONITORING_EN.len()
+            ADMIN_JOBS_EN.len() + ADMIN_UPDATES_COMPAT_EN.len()
         );
         assert_eq!(
             patch["uk"].len(),
-            ADMIN_JOBS_UK.len() + ADMIN_UPDATES_COMPAT_UK.len() + ADMIN_MONITORING_UK.len()
+            ADMIN_JOBS_UK.len() + ADMIN_UPDATES_COMPAT_UK.len()
         );
     }
 
@@ -1135,8 +1153,22 @@ mod tests {
         assert!(!json.contains(r#""admin.gridPricing.col.price""#));
         assert!(json.contains(r#""admin.jobs.status.migrating""#));
         assert!(json.contains(r#""admin.updatesCompat.section""#));
-        assert!(json.contains(r#""admin.mon.mlTitle""#));
+        assert!(!json.contains(r#""admin.mon.mlTitle""#));
+        assert!(!json.contains(r#""admin.page.monitoring""#));
+    }
+
+    #[test]
+    fn monitoring_patch_has_matching_en_uk_key_counts_ph_s220() {
+        assert_eq!(ADMIN_MONITORING_EN.len(), ADMIN_MONITORING_UK.len());
+    }
+
+    #[test]
+    fn monitoring_patch_json_monitoring_only_ph_s220() {
+        let json = admin_monitoring_patch_json();
         assert!(json.contains(r#""admin.page.monitoring""#));
+        assert!(json.contains(r#""admin.mon.mlTitle""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+        assert!(!json.contains(r#""admin.updatesCompat.section""#));
     }
 
     #[test]
