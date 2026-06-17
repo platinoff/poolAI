@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-16 (PH-S217 ✅ · §5.12 **2** відкритих PH-S218…S219 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-16 (PH-S218 ✅ · §5.12 **1** відкритий PH-S219 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -417,14 +417,14 @@ FM-xxx (з таблиці нижче)
 | 150 | **PH-S215** | Vision panel collapse focus restore (docs/vision) | PH-S209 | collapse/Esc returns focus to panel toggle; rev++ | **✅** |
 | 151 | **PH-S216** | Galaxy pricing fallback metrics smoke (tests) | PH-S168 | stand smoke `galaxy_pricing_forced_fallback_total` | **✅** |
 | 152 | **PH-S217** | Admin i18n slim grid-pricing panel (code) | PH-S207 | grid-pricing strings → `poolai-ui-core` | **✅** |
-| 153 | **PH-S218** | Vision map aria-live selection (docs/vision) | PH-S209 | `aria-live` region for selected node label; rev++ | відкрито |
+| 153 | **PH-S218** | Vision map aria-live selection (docs/vision) | PH-S209 | `aria-live` region for selected node label; rev++ | **✅** |
 | 154 | **PH-S219** | Galaxy trust payout metrics smoke (tests) | PH-S182 | stand smoke trust payout counters on `/metrics` | відкрито |
 
-**Відкритих у §5.12:** **2** (PH-S218…S219). **Закрито смуга:** PH-S128…S217 ✅. Vision rev **156**.
+**Відкритих у §5.12:** **1** (PH-S219). **Закрито смуга:** PH-S128…S218 ✅. Vision rev **157**.
 
-**Rust ratio:** формальна смуга **90–95%**; **hold 95%** — PH-S165 ✅; replenish **S218…S219** (code-first + vision a11y).
+**Rust ratio:** формальна смуга **90–95%**; **hold 95%** — PH-S165 ✅; replenish **S219** (code-first + vision a11y).
 
-**Наступна сесія:** **PH-S218** · черга **2** відкритих (PH-S218…S219) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S219** · черга **1** відкритий (PH-S219) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S169)
 

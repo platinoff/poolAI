@@ -294,6 +294,26 @@
     return n.label;
   }
 
+  function layerDisplayName(layerId) {
+    const layers = (manifest && manifest.layers) || [];
+    const found = layers.find((l) => l.id === layerId);
+    return found ? found.name : layerId || "unknown";
+  }
+
+  function announceMapSelection(node) {
+    const live = document.getElementById("map-selection-live");
+    if (!live) return;
+    if (!node) {
+      live.textContent = "";
+      return;
+    }
+    const pos = nodePositions.get(node.id);
+    const label = pos ? mapNodeFullLabel(node, pos) : node.label || node.id;
+    const layer = layerDisplayName(node.layer);
+    const path = node.path || node.id;
+    live.textContent = "Selected " + label + ", layer " + layer + ", " + path;
+  }
+
   function nodeBaseRadius(id, hub) {
     const n = nodeById(id);
     const pos = nodePositions.get(id);
@@ -3131,6 +3151,7 @@
 
     highlightLayer(node.layer);
     updateMapSelection();
+    announceMapSelection(node);
 
     const picked = node;
     requestAnimationFrame(() => {
