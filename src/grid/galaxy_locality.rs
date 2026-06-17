@@ -86,7 +86,8 @@ pub const METRIC_LOCALITY_RANK_INGEST_TOTAL: &str = "galaxy_locality_rank_ingest
 pub const METRIC_LOCALITY_RANK_MISS_TOTAL: &str = "galaxy_locality_rank_miss_total";
 
 /// Locality rank with empty worker inventory on ingest (PH-S315 stub).
-pub const METRIC_LOCALITY_RANK_EMPTY_WORKERS_TOTAL: &str = "galaxy_locality_rank_empty_workers_total";
+pub const METRIC_LOCALITY_RANK_EMPTY_WORKERS_TOTAL: &str =
+    "galaxy_locality_rank_empty_workers_total";
 
 /// Stub MB per cold shard on prefetch plan path when no task egress wire (PH-S185).
 pub const DEFAULT_PREFETCH_CROSS_REGION_EGRESS_MB_PER_SHARD: f64 = 50.0;

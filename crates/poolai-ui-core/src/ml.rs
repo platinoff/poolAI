@@ -594,7 +594,8 @@ mod tests {
 
     #[test]
     fn build_metrics_window_url_ph_s317() {
-        let url = build_metrics_window_url("2026-01-01T00:00:00.000Z", "2026-01-02T00:00:00.000Z", 60);
+        let url =
+            build_metrics_window_url("2026-01-01T00:00:00.000Z", "2026-01-02T00:00:00.000Z", 60);
         assert!(url.starts_with("/api/enterprise/monitoring/metrics?"));
         assert!(!url.contains("metric="));
         assert!(url.contains("limit=60"));

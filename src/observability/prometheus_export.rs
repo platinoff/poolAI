@@ -30,8 +30,8 @@ use crate::grid::galaxy_prefetch_metrics::{
     prefetch_bytes_total, prefetch_complete_total, prefetch_enqueue_total, prefetch_hot_skip_total,
     prefetch_ingest_total, prefetch_plan_total, prefetch_planned_shards_total,
     prefetch_strict_mode_total, prefetch_wait_ms_total, METRIC_PREFETCH_BYTES_TOTAL,
-    METRIC_PREFETCH_COMPLETE_TOTAL, METRIC_PREFETCH_ENQUEUE_TOTAL, METRIC_PREFETCH_INGEST_TOTAL,
-    METRIC_PREFETCH_HOT_SKIP_TOTAL, METRIC_PREFETCH_PLANNED_SHARDS_TOTAL, METRIC_PREFETCH_PLAN_TOTAL,
+    METRIC_PREFETCH_COMPLETE_TOTAL, METRIC_PREFETCH_ENQUEUE_TOTAL, METRIC_PREFETCH_HOT_SKIP_TOTAL,
+    METRIC_PREFETCH_INGEST_TOTAL, METRIC_PREFETCH_PLANNED_SHARDS_TOTAL, METRIC_PREFETCH_PLAN_TOTAL,
     METRIC_PREFETCH_STRICT_MODE_TOTAL, METRIC_PREFETCH_WAIT_MS_TOTAL,
 };
 use crate::grid::galaxy_pricing_oracle::{

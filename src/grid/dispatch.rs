@@ -14,15 +14,15 @@ use serde::{Deserialize, Serialize};
 use crate::core::error::AppError;
 use crate::grid::galaxy_fee_split_metrics::evaluate_result_fee_split;
 use crate::grid::galaxy_locality::{
-    observe_last_cross_region_egress_mb, pick_best_worker_by_locality, record_locality_rank_ingest,
-    record_locality_rank_empty_workers, record_locality_rank_miss, LocalityHotTier,
-    LocalityNetworkProfile, LocalitySeedInventory, LocalityTask, LocalityWorker,
+    observe_last_cross_region_egress_mb, pick_best_worker_by_locality,
+    record_locality_rank_empty_workers, record_locality_rank_ingest, record_locality_rank_miss,
+    LocalityHotTier, LocalityNetworkProfile, LocalitySeedInventory, LocalityTask, LocalityWorker,
     DEFAULT_PREFETCH_CROSS_REGION_EGRESS_MB_PER_SHARD,
 };
 use crate::grid::galaxy_prefetch_metrics::{
-    record_prefetch_complete, record_prefetch_enqueue, record_prefetch_ingest, record_prefetch_plan,
-    record_prefetch_strict_mode, record_prefetch_wait, DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM,
-    DEFAULT_PREFETCH_BYTES_PER_SHARD_VRAM,
+    record_prefetch_complete, record_prefetch_enqueue, record_prefetch_ingest,
+    record_prefetch_plan, record_prefetch_strict_mode, record_prefetch_wait,
+    DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM, DEFAULT_PREFETCH_BYTES_PER_SHARD_VRAM,
 };
 use crate::grid::galaxy_replay_metrics::evaluate_result_replay_pending;
 use crate::grid::galaxy_replication::{
