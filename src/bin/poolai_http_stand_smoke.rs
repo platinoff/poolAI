@@ -553,6 +553,90 @@ async fn smoke_galaxy_pricing_quote_market_metrics(
     metrics_text_has_pricing_quote_market_gauges(&body)
 }
 
+/// PH-S254: live stand exposes Galaxy fee split applied gauge.
+const GALAXY_FEE_SPLIT_APPLIED: &str = "galaxy_fee_split_applied_total";
+
+fn metrics_text_has_fee_split_applied(body: &str) -> Result<(), String> {
+    let name = GALAXY_FEE_SPLIT_APPLIED;
+    if !body.contains(name) {
+        return Err(format!("/metrics missing {name}"));
+    }
+    if !body.contains(&format!("# TYPE {name} gauge")) {
+        return Err(format!("/metrics missing TYPE gauge for {name}"));
+    }
+    Ok(())
+}
+
+async fn smoke_galaxy_fee_split_applied_metrics(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("/metrics request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("/metrics status {}", resp.status()));
+    }
+    let body = resp.text().await.map_err(|e| e.to_string())?;
+    metrics_text_has_fee_split_applied(&body)
+}
+
+/// PH-S255: live stand exposes Galaxy cross-region egress gauge.
+const GALAXY_CROSS_REGION_EGRESS_MB: &str = "galaxy_cross_region_egress_mb";
+
+fn metrics_text_has_cross_region_egress_mb(body: &str) -> Result<(), String> {
+    let name = GALAXY_CROSS_REGION_EGRESS_MB;
+    if !body.contains(name) {
+        return Err(format!("/metrics missing {name}"));
+    }
+    if !body.contains(&format!("# TYPE {name} gauge")) {
+        return Err(format!("/metrics missing TYPE gauge for {name}"));
+    }
+    Ok(())
+}
+
+async fn smoke_galaxy_cross_region_egress_metrics(
+    client: &Client,
+    base: &str,
+) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("/metrics request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("/metrics status {}", resp.status()));
+    }
+    let body = resp.text().await.map_err(|e| e.to_string())?;
+    metrics_text_has_cross_region_egress_mb(&body)
+}
+
+/// PH-S256: live stand exposes Galaxy replay pending gauge.
+const GALAXY_REPLAY_PENDING: &str = "galaxy_replay_pending";
+
+fn metrics_text_has_replay_pending(body: &str) -> Result<(), String> {
+    let name = GALAXY_REPLAY_PENDING;
+    if !body.contains(name) {
+        return Err(format!("/metrics missing {name}"));
+    }
+    if !body.contains(&format!("# TYPE {name} gauge")) {
+        return Err(format!("/metrics missing TYPE gauge for {name}"));
+    }
+    Ok(())
+}
+
+async fn smoke_galaxy_replay_pending_metrics(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("/metrics request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("/metrics status {}", resp.status()));
+    }
+    let body = resp.text().await.map_err(|e| e.to_string())?;
+    metrics_text_has_replay_pending(&body)
+}
+
 /// PH-S249: live stand exposes Galaxy settlement pending + cleared gauges.
 const GALAXY_SETTLEMENT_METRICS: &[&str] = &[
     "galaxy_settlement_pending_verification_total",
@@ -1321,6 +1405,24 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
     .await;
     record(
         &mut cases,
+        "galaxy_fee_split_applied_metrics",
+        smoke_galaxy_fee_split_applied_metrics(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
+        "galaxy_cross_region_egress_metrics",
+        smoke_galaxy_cross_region_egress_metrics(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
+        "galaxy_replay_pending_metrics",
+        smoke_galaxy_replay_pending_metrics(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
         "galaxy_verification_metrics",
         smoke_galaxy_verification_metrics(&client, &cli.base_url).await,
     )
@@ -1606,6 +1708,36 @@ mod tests {
             "galaxy_pricing_market_min_usd_micro 0\n",
         );
         metrics_text_has_pricing_quote_market_gauges(sample).expect("sample export");
+    }
+
+    #[test]
+    fn galaxy_fee_split_applied_metrics_export_shape_ph_s254() {
+        let sample = concat!(
+            "# HELP galaxy_fee_split_applied_total Galaxy fee split applied on grid result path (PH-S194)\n",
+            "# TYPE galaxy_fee_split_applied_total gauge\n",
+            "galaxy_fee_split_applied_total 0\n",
+        );
+        metrics_text_has_fee_split_applied(sample).expect("sample export");
+    }
+
+    #[test]
+    fn galaxy_cross_region_egress_metrics_export_shape_ph_s255() {
+        let sample = concat!(
+            "# HELP galaxy_cross_region_egress_mb Galaxy last observed cross-region egress whole MB on rank/prefetch path (PH-S185)\n",
+            "# TYPE galaxy_cross_region_egress_mb gauge\n",
+            "galaxy_cross_region_egress_mb 0\n",
+        );
+        metrics_text_has_cross_region_egress_mb(sample).expect("sample export");
+    }
+
+    #[test]
+    fn galaxy_replay_pending_metrics_export_shape_ph_s256() {
+        let sample = concat!(
+            "# HELP galaxy_replay_pending Galaxy replay verifications pending coordinator verdict (PH-S176)\n",
+            "# TYPE galaxy_replay_pending gauge\n",
+            "galaxy_replay_pending 0\n",
+        );
+        metrics_text_has_replay_pending(sample).expect("sample export");
     }
 
     #[test]

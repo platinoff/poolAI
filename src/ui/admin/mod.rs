@@ -409,6 +409,8 @@ pub fn admin_layout_with_module_script(
     let table_patch = poolai_ui_core::i18n::admin_table_patch_script();
     let status_patch = poolai_ui_core::i18n::admin_status_patch_script();
     let err_patch = poolai_ui_core::i18n::admin_err_patch_script();
+    let form_patch = poolai_ui_core::i18n::admin_form_patch_script();
+    let ui_toolbar_patch = poolai_ui_core::i18n::admin_ui_toolbar_patch_script();
     let vm_modal_patch = poolai_ui_core::i18n::vm_modal_patch_script();
     let ui_confirm_patch = poolai_ui_core::i18n::admin_ui_confirm_patch_script();
     let theme_patch = poolai_ui_core::theme::admin_theme_patch_script();
@@ -484,6 +486,8 @@ pub fn admin_layout_with_module_script(
   <script>{table_patch}</script>
   <script>{status_patch}</script>
   <script>{err_patch}</script>
+  <script>{form_patch}</script>
+  <script>{ui_toolbar_patch}</script>
   <script>{vm_modal_patch}</script>
   <script>{ui_confirm_patch}</script>
   <script>{theme_patch}</script>
@@ -761,6 +765,37 @@ fn i18n_core_js_has_no_ui_confirm_keys_ph_s252() {
     assert!(!js.contains("'ui.confirmBtn'"));
     assert!(!js.contains("'ui.cancel'"));
     assert!(!js.contains("'ui.closeDialogAria'"));
+}
+
+#[test]
+fn admin_layout_injects_form_and_ui_toolbar_patches_ph_s260() {
+    let form = poolai_ui_core::i18n::admin_form_patch_script();
+    let toolbar = poolai_ui_core::i18n::admin_ui_toolbar_patch_script();
+    assert!(form.contains("window.__poolaiAdminFormI18nRust="));
+    assert!(toolbar.contains("window.__poolaiAdminUiToolbarI18nRust="));
+    let html = admin_layout("admin.test.page", "Test", "<p>body</p>", "");
+    assert!(html.0.contains(r#""ui.save""#));
+    assert!(html.0.contains(r#""ui.searchTableAria""#));
+    assert!(html.0.contains(r#""ui.retry""#));
+}
+
+#[test]
+fn i18n_core_js_has_no_workers_home_form_ui_toolbar_keys_ph_s257_s260() {
+    let js = include_str!("../i18n_core.js");
+    assert!(!js.contains("'workers.empty'"));
+    assert!(!js.contains("'home.apiTitle'"));
+    assert!(!js.contains("'form.fieldRequired'"));
+    assert!(!js.contains("'ui.save'"));
+    assert!(!js.contains("'ui.searchTableAria'"));
+    assert!(!js.contains("'ui.retry'"));
+    assert!(!js.contains("'err.errorPrefix'"));
+}
+
+#[test]
+fn admin_workers_patch_includes_workers_panel_keys_ph_s257() {
+    let json = poolai_ui_core::i18n::admin_workers_patch_json();
+    assert!(json.contains(r#""workers.modalTitle""#));
+    assert!(json.contains(r#""admin.wrk.createBtn""#));
 }
 
 #[test]

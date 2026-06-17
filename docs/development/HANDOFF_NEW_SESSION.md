@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-17 (PH-S253 ✅ · §5.12 **9** відкритих · next **PH-S254**) · VDT
+**Оновлено:** 2026-06-17 (PH-S254…S262 ✅ · §5.12 **0** відкритих · rust_ratio **94.23%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -204,12 +204,17 @@
 **PH-S251 ✅ (docs):** GALAXY_GRID_ROADMAP + README + INDEX sprint zriz; §5.12 band S247…S252 closed.
 **PH-S252 ✅ (code/ui):** `admin_ui_confirm_patch` on admin + dashboard shells; `ui.confirm*` glue removed from `i18n_core.js`; audit tests `ph_s252`.
 **PH-S253 ✅ (code/tests):** `poolai-http-stand-smoke` — `galaxy_pricing_quote_market_metrics` on live `/metrics`; unit test `ph_s253`.
-**Replenish ✅ (2026-06-17):** §5.12 **9** відкритих **PH-S254…S262** — Galaxy `/metrics` stand smoke gaps (quote/market/fee/egress/replay) + i18n slim maintain (workers/home/form/ui) + docs canon (S261) + loc-audit (S262); див. [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md), [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md).
-**Ops:** `open-docs-vision.ps1` — ASCII Write-Host + robust `SendVisionBytes`; URL `http://127.0.0.1:8765/docs/vision/index.html`.
-**PH-S198 ✅ (code):** `topology_graph.rs` — hub labels + `label_x`/`label_y`/`is_hub` in graph JSON; heatmap short ids; slim `topology_graph.js` (SVG paint only); `cargo test-ci`.
-**PH-S194 ✅ (code):** `galaxy_fee_split_applied_total` on grid result wire; `cargo test-ci`.
-**Vision ✅:** next **PH-S254** · **9** відкритих (S254…S262) · rev **202**.
-**Черга:** §5.12 **9** відкритих — **PH-S254…S262**. Stand smoke + i18n slim + docs canon + loc-audit · baseline **92.78%** · hold **95%** · spirit **96%**.
+**PH-S254 ✅ (code/tests):** `galaxy_fee_split_applied_metrics` stand smoke; unit test `ph_s254`.
+**PH-S255 ✅ (code/tests):** `galaxy_cross_region_egress_metrics` stand smoke; unit test `ph_s255`.
+**PH-S256 ✅ (code/tests):** `galaxy_replay_pending_metrics` stand smoke; unit test `ph_s256`.
+**PH-S257 ✅ (code/ui):** `workers.*` → `admin_workers_patch` + `workers_panel_patch`; audit tests `ph_s257`.
+**PH-S258 ✅ (code/ui):** `home.*` → `admin_home_patch` on dashboard layout; audit test `ph_s258`.
+**PH-S259 ✅ (code/ui):** `form.*` + residual `err.*` → `admin_form_patch` / extended `admin_err_patch`.
+**PH-S260 ✅ (code/ui):** `ui.save`/`ui.search*`/`ui.retry*` → `admin_ui_toolbar_patch`; audit tests `ph_s260`.
+**PH-S261 ✅ (docs):** INDEX/STABLE_STATE/GALAXY_ROADMAP/RUST_RATIO sprint zriz; §5.12 band S253…S262 closed.
+**PH-S262 ✅ (ops):** `poolai-loc-audit` → `rust_ratio.json` **94.23%**; hold 95% advisory; stretch 96% spirit.
+**§5.12:** **0** відкритих — replenish з §5.13 на наступній сесії.
+**Vision ✅:** rev **203** · rust_ratio **94.23%** · hold **95%** advisory.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

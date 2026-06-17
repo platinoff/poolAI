@@ -1830,7 +1830,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S253",
+  "last_sprint_closed": "PH-S262",
   "layers": [
     {
       "id": "L0",
@@ -1863,7 +1863,6 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S254",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7719,7 +7718,7 @@
       "path": "docs/vision/vision.svg"
     }
   ],
-  "revision": 202,
+  "revision": 203,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -9417,85 +9416,85 @@
       "acceptance": "galaxy_fee_split_applied_total` on live `/metrics",
       "deps": "PH-S194",
       "id": "PH-S254",
-      "open": true,
+      "open": false,
       "row": 189,
-      "status": "open",
+      "status": "closed",
       "title": "Galaxy fee_split_applied stand smoke (tests)"
     },
     {
       "acceptance": "galaxy_cross_region_egress_mb` on live `/metrics",
       "deps": "PH-S185",
       "id": "PH-S255",
-      "open": true,
+      "open": false,
       "row": 190,
-      "status": "open",
+      "status": "closed",
       "title": "Galaxy cross_region_egress stand smoke (tests)"
     },
     {
       "acceptance": "galaxy_replay_pending` on live `/metrics",
       "deps": "PH-S176",
       "id": "PH-S256",
-      "open": true,
+      "open": false,
       "row": 191,
-      "status": "open",
+      "status": "closed",
       "title": "Galaxy replay_pending stand smoke (tests)"
     },
     {
       "acceptance": "workers.*` keys out of `i18n_core.js",
       "deps": "PH-S222",
       "id": "PH-S257",
-      "open": true,
+      "open": false,
       "row": 192,
-      "status": "open",
+      "status": "closed",
       "title": "Admin i18n workers panel slim patch (code)"
     },
     {
       "acceptance": "home.*` keys out of `i18n_core.js",
       "deps": "PH-S162",
       "id": "PH-S258",
-      "open": true,
+      "open": false,
       "row": 193,
-      "status": "open",
+      "status": "closed",
       "title": "Admin i18n home shell slim patch (code)"
     },
     {
       "acceptance": "form.*` + residual `err.*` out of `i18n_core.js",
       "deps": "PH-S246",
       "id": "PH-S259",
-      "open": true,
+      "open": false,
       "row": 194,
-      "status": "open",
+      "status": "closed",
       "title": "Admin i18n form + err core slim patch (code)"
     },
     {
       "acceptance": "ui.save`/`ui.search*`/`ui.retry*` glue out of `i18n_core.js",
       "deps": "PH-S252",
       "id": "PH-S260",
-      "open": true,
+      "open": false,
       "row": 195,
-      "status": "open",
+      "status": "closed",
       "title": "Admin i18n shared ui toolbar slim patch (code)"
     },
     {
       "acceptance": "INDEX/STABLE_STATE/docs README + GALAXY_ROADMAP zriz",
       "deps": "PH-S256",
       "id": "PH-S261",
-      "open": true,
+      "open": false,
       "row": 196,
-      "status": "open",
+      "status": "closed",
       "title": "Docs canon sync band (docs)"
     },
     {
       "acceptance": "poolai-loc-audit` → `rust_ratio.json`; FM §5.13 advisory",
       "deps": "PH-S165",
       "id": "PH-S262",
-      "open": true,
+      "open": false,
       "row": 197,
-      "status": "open",
+      "status": "closed",
       "title": "Rust ratio loc-audit refresh + hold gate (ops)"
     }
   ],
-  "sprint_queue_open_count": 9,
+  "sprint_queue_open_count": 0,
   "updated_at": "2026-06-16",
   "vision_ui_rev": 59
 }

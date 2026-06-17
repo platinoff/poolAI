@@ -732,6 +732,11 @@ fn layout(
 
     let i18n_js = include_str!("i18n_core.js");
     let auth_dash_patch = poolai_ui_core::i18n::auth_dash_shell_patch_script();
+    let home_patch = poolai_ui_core::i18n::admin_home_patch_script();
+    let workers_panel_patch = poolai_ui_core::i18n::workers_panel_patch_script();
+    let form_patch = poolai_ui_core::i18n::admin_form_patch_script();
+    let err_patch = poolai_ui_core::i18n::admin_err_patch_script();
+    let ui_toolbar_patch = poolai_ui_core::i18n::admin_ui_toolbar_patch_script();
     let vm_modal_patch = poolai_ui_core::i18n::vm_modal_patch_script();
     let ui_confirm_patch = poolai_ui_core::i18n::admin_ui_confirm_patch_script();
     let i18n_boot = r#"
@@ -748,8 +753,18 @@ fn layout(
   });
 })();"#;
     let full_script = format!(
-        "{}\n{}\n{}\n{}\n{}\n{}",
-        auth_dash_patch, vm_modal_patch, ui_confirm_patch, i18n_js, script_js, i18n_boot
+        "{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}",
+        auth_dash_patch,
+        home_patch,
+        workers_panel_patch,
+        form_patch,
+        err_patch,
+        ui_toolbar_patch,
+        vm_modal_patch,
+        ui_confirm_patch,
+        i18n_js,
+        script_js,
+        i18n_boot
     );
 
     let html = format!(
@@ -5230,6 +5245,17 @@ fn dashboard_layout_injects_ui_confirm_patch_ph_s252() {
     assert!(patch.contains("window.__poolaiAdminUiConfirmI18nRust="));
     let html = layout("dash.title.workers", "Workers", "<p>body</p>", "");
     assert!(html.0.contains(r#""ui.confirmBtn""#));
+}
+
+#[test]
+fn dashboard_layout_injects_home_and_workers_panel_patches_ph_s258() {
+    let home = poolai_ui_core::i18n::admin_home_patch_script();
+    let workers = poolai_ui_core::i18n::workers_panel_patch_script();
+    assert!(home.contains("window.__poolaiHomeI18nRust="));
+    assert!(workers.contains("window.__poolaiWorkersPanelI18nRust="));
+    let html = layout("dash.title.home", "Home", "<p>body</p>", "");
+    assert!(html.0.contains(r#""home.apiTitle""#));
+    assert!(html.0.contains(r#""workers.empty""#));
 }
 
 #[test]

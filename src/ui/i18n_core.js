@@ -10,23 +10,14 @@
   var STRINGS = {
     en: {
       // auth.* + dash.* + admin.nav.* + admin chrome shell → poolai-ui-core i18n.rs (PH-S162, PH-S242, PH-S243)
+      // home.* → admin_home_patch (PH-S258)
+      // ui.save / ui.search* / ui.retry* → admin_ui_toolbar_patch (PH-S260)
 
-      'ui.save': 'Save Changes',
       'ui.upload': 'Upload',
       'ui.register': 'Register',
 
       'common.loading': 'Loading…',
       'common.unauthorized': 'Unauthorized — session expired. Please sign in again.',
-
-      'home.apiTitle': 'API',
-      'home.apiBase': 'Base:',
-      'home.uiTitle': 'UI',
-      'home.uiHint': 'Pages under',
-      'home.openDashboard': 'Open read-only dashboard',
-      'home.quickLinks': 'Quick links',
-      'home.notesTitle': 'Notes',
-      'home.notesBody':
-        'Write operations are available for authenticated users with appropriate permissions.',
 
       'ui.create': 'Create',
       'ui.install': 'Install',
@@ -35,20 +26,8 @@
       'ui.uninstall': 'Uninstall',
       'ui.closeNotificationAria': 'Close notification',
       'ui.clearSearchAria': 'Clear search',
-      'ui.searchTableAria': 'Search table',
-      'ui.searchStatusFound': '{visible} of {total} results found',
-      'ui.searchStatusSimple': '{visible} of {total} results',
-      'ui.searchStatusAll': 'All results shown',
-      'ui.searchNoResultsFor': 'No results found for "{query}"',
       'ui.stepOfTotal': 'Step {current} of {total}',
       'ui.tabsAria': 'Tabs',
-      'ui.retry': 'Retry',
-      'ui.retryFailedOpAria': 'Retry the operation that failed',
-      'ui.requestSucceededAfter': 'Request succeeded after {count} {unit}',
-      'ui.retryUnit.one': 'retry',
-      'ui.retryUnit.many': 'retries',
-      'ui.requestRetrying': 'Request failed. Retrying in {seconds}s... ({attempt}/{max})',
-      'ui.requestFailedAllRetries': 'Request failed after all retries',
       'ui.suggestion.checkInternet': 'Check your internet connection',
       'ui.suggestion.verifyServer': 'Verify the server is running',
       'ui.suggestion.refreshPage': 'Try refreshing the page',
@@ -61,68 +40,7 @@
       'ui.installing': 'Installing…',
       'ui.deleting': 'Deleting…',
 
-      'form.fieldRequired': 'This field is required',
-      'form.validNumber': 'Please enter a valid number',
-      'form.valueMin': 'Value must be at least {min}',
-      'form.valueMax': 'Value must be at most {max}',
-      'form.validEmail': 'Please enter a valid email address',
-      'form.invalidFormat': 'Invalid format',
-
-      'err.errorPrefix': 'Error: ',
-      'err.title': 'Error',
-      'err.showDetails': 'Show details',
-      'err.suggestions': 'Suggestions:',
-      'err.insufficientPermissions': 'Insufficient permissions.',
-      'err.insufficientPermissionsAdminOp':
-        'Insufficient permissions. Admin or Operator role required.',
-      'err.fillRequiredFields': 'Please fill in all required fields correctly.',
-      'err.insufficientRole': 'Insufficient permissions. Required role: ',
-      'role.admin': 'Admin',
-      'role.operator': 'Operator',
-      'role.viewer': 'Viewer',
-      'err.selectFileUpload': 'Please select a file to upload.',
-      'err.readFileFailed': 'Error reading file',
-      'err.unauthorized': 'Unauthorized',
-
-      'workers.empty': 'No workers available.',
-      'workers.listAria': 'Workers list',
-      'workers.tableDesc':
-        'Table showing workers: id, health, state, task, metrics, actions',
-      'workers.col.id': 'ID',
-      'workers.col.health': 'Health',
-      'workers.col.state': 'State',
-      'workers.col.task': 'Current task',
-      'workers.col.requests': 'Requests',
-      'workers.col.queue': 'Queue',
-      'workers.col.actions': 'Actions',
-      'workers.healthy': 'Healthy',
-      'workers.unhealthy': 'Unhealthy',
-      'workers.rowAriaPrefix': 'Worker',
-      'workers.deleteAria': 'Delete worker {id}',
-      'workers.permDeleteDesc': 'Permanently delete worker {id}',
-      'workers.noActionsRole': 'No actions available for your role',
-      'workers.createBtn': 'Create Worker',
-      'workers.createBtnAria': 'Create new worker',
-      'workers.modalTitle': 'Create Worker',
-      'workers.label.id': 'Worker ID',
-      'workers.label.maxConcurrent': 'Max concurrent requests',
-      'workers.label.timeout': 'Request timeout (ms)',
-      'workers.label.healthInterval': 'Health check interval (ms)',
-      'workers.label.maxMemory': 'Max memory (MB)',
-      'workers.label.cpuPriority': 'CPU priority (1–10)',
-      'workers.label.gpuDevice': 'GPU device ID (optional)',
-      'workers.label.cacheSize': 'Cache size',
-      'workers.ph.id': 'worker-1',
-      'workers.ph.gpu': 'Leave empty for no GPU',
-      'workers.enableCache': 'Enable caching',
-      'workers.autoRestart': 'Auto restart on failure',
-      'workers.resourceMonitoring': 'Resource monitoring',
-      'workers.creatingSubmit': 'Creating…',
-      'workers.createdOk': 'Worker created successfully',
-      'workers.deletedOk': 'Worker deleted successfully',
-      'workers.deletingLoad': 'Deleting worker…',
-      'workers.confirmDelete':
-        'Are you sure you want to delete worker "{id}"? This action cannot be undone.',
+      // form.* + residual err.* → poolai-ui-core (PH-S259)
 
       'libs.empty': 'No libraries installed.',
       'libs.col.name': 'Name',
@@ -172,23 +90,14 @@
     },
     uk: {
       // auth.* + dash.* + admin.nav.* + admin chrome shell → poolai-ui-core i18n.rs (PH-S162, PH-S242, PH-S243)
+      // home.* → admin_home_patch (PH-S258)
+      // ui.save / ui.search* / ui.retry* → admin_ui_toolbar_patch (PH-S260)
 
-      'ui.save': 'Зберегти зміни',
       'ui.upload': 'Завантажити',
       'ui.register': 'Зареєструвати',
 
       'common.loading': 'Завантаження…',
       'common.unauthorized': 'Неавторизовано — сесію завершено. Увійдіть знову.',
-
-      'home.apiTitle': 'API',
-      'home.apiBase': 'База:',
-      'home.uiTitle': 'UI',
-      'home.uiHint': 'Сторінки під',
-      'home.openDashboard': 'Відкрити панель лише для читання',
-      'home.quickLinks': 'Швидкі посилання',
-      'home.notesTitle': 'Нотатки',
-      'home.notesBody':
-        'Операції запису доступні автентифікованим користувачам з відповідними правами.',
 
       'ui.create': 'Створити',
       'ui.install': 'Встановити',
@@ -197,20 +106,8 @@
       'ui.uninstall': 'Видалити (бібліотеку)',
       'ui.closeNotificationAria': 'Закрити сповіщення',
       'ui.clearSearchAria': 'Очистити пошук',
-      'ui.searchTableAria': 'Пошук у таблиці',
-      'ui.searchStatusFound': 'Знайдено {visible} з {total} результатів',
-      'ui.searchStatusSimple': 'Показано {visible} з {total} результатів',
-      'ui.searchStatusAll': 'Показано всі результати',
-      'ui.searchNoResultsFor': 'За запитом "{query}" нічого не знайдено',
       'ui.stepOfTotal': 'Крок {current} з {total}',
       'ui.tabsAria': 'Вкладки',
-      'ui.retry': 'Повторити',
-      'ui.retryFailedOpAria': 'Повторити операцію, що завершилась помилкою',
-      'ui.requestSucceededAfter': 'Запит успішний після {count} {unit}',
-      'ui.retryUnit.one': 'повтору',
-      'ui.retryUnit.many': 'повторів',
-      'ui.requestRetrying': 'Запит не вдався. Повтор через {seconds} с... ({attempt}/{max})',
-      'ui.requestFailedAllRetries': 'Запит не вдався після всіх повторів',
       'ui.suggestion.checkInternet': 'Перевірте підключення до інтернету',
       'ui.suggestion.verifyServer': 'Переконайтеся, що сервер запущено',
       'ui.suggestion.refreshPage': 'Спробуйте оновити сторінку',
@@ -223,68 +120,7 @@
       'ui.installing': 'Встановлення…',
       'ui.deleting': 'Видалення…',
 
-      'form.fieldRequired': 'Це поле обов’язкове',
-      'form.validNumber': 'Введіть коректне число',
-      'form.valueMin': 'Значення має бути не менше {min}',
-      'form.valueMax': 'Значення має бути не більше {max}',
-      'form.validEmail': 'Введіть коректну адресу електронної пошти',
-      'form.invalidFormat': 'Некоректний формат',
-
-      'err.errorPrefix': 'Помилка: ',
-      'err.title': 'Помилка',
-      'err.showDetails': 'Показати деталі',
-      'err.suggestions': 'Підказки:',
-      'err.insufficientPermissions': 'Недостатньо прав.',
-      'err.insufficientPermissionsAdminOp':
-        'Недостатньо прав. Потрібна роль Admin або Operator.',
-      'err.fillRequiredFields': 'Заповніть усі обов’язкові поля коректно.',
-      'err.insufficientRole': 'Недостатньо прав. Потрібна роль: ',
-      'role.admin': 'Адміністратор',
-      'role.operator': 'Оператор',
-      'role.viewer': 'Спостерігач',
-      'err.selectFileUpload': 'Оберіть файл для завантаження.',
-      'err.readFileFailed': 'Помилка читання файлу',
-      'err.unauthorized': 'Неавторизовано',
-
-      'workers.empty': 'Немає доступних воркерів.',
-      'workers.listAria': 'Список воркерів',
-      'workers.tableDesc':
-        'Таблиця воркерів: id, стан здоров’я, статус, поточне завдання, метрики, дії',
-      'workers.col.id': 'ID',
-      'workers.col.health': 'Здоров’я',
-      'workers.col.state': 'Статус',
-      'workers.col.task': 'Поточне завдання',
-      'workers.col.requests': 'Запити',
-      'workers.col.queue': 'Черга',
-      'workers.col.actions': 'Дії',
-      'workers.healthy': 'OK',
-      'workers.unhealthy': 'Проблема',
-      'workers.rowAriaPrefix': 'Воркер',
-      'workers.deleteAria': 'Видалити воркер {id}',
-      'workers.permDeleteDesc': 'Остаточно видалити воркер {id}',
-      'workers.noActionsRole': 'Для вашої ролі дії недоступні',
-      'workers.createBtn': 'Створити воркер',
-      'workers.createBtnAria': 'Створити нового воркера',
-      'workers.modalTitle': 'Створити воркер',
-      'workers.label.id': 'ID воркера',
-      'workers.label.maxConcurrent': 'Макс. одночасних запитів',
-      'workers.label.timeout': 'Таймаут запиту (мс)',
-      'workers.label.healthInterval': 'Інтервал health-check (мс)',
-      'workers.label.maxMemory': 'Макс. пам’ять (МБ)',
-      'workers.label.cpuPriority': 'Пріоритет CPU (1–10)',
-      'workers.label.gpuDevice': 'ID GPU-пристрою (необов’язково)',
-      'workers.label.cacheSize': 'Розмір кешу',
-      'workers.ph.id': 'worker-1',
-      'workers.ph.gpu': 'Порожньо, якщо без GPU',
-      'workers.enableCache': 'Увімкнути кешування',
-      'workers.autoRestart': 'Автоперезапуск при збої',
-      'workers.resourceMonitoring': 'Моніторинг ресурсів',
-      'workers.creatingSubmit': 'Створення…',
-      'workers.createdOk': 'Воркер успішно створено',
-      'workers.deletedOk': 'Воркер успішно видалено',
-      'workers.deletingLoad': 'Видалення воркера…',
-      'workers.confirmDelete':
-        'Видалити воркера «{id}»? Цю дію не можна скасувати.',
+      // form.* + residual err.* + workers.* → poolai-ui-core (PH-S257…S259)
 
       'libs.empty': 'Бібліотеки не встановлено.',
       'libs.col.name': 'Назва',
@@ -384,6 +220,34 @@
   if (rustUiConfirm) {
     if (rustUiConfirm.en) Object.assign(STRINGS.en, rustUiConfirm.en);
     if (rustUiConfirm.uk) Object.assign(STRINGS.uk, rustUiConfirm.uk);
+  }
+
+  // PH-S257: workers.* panel → poolai-ui-core i18n.rs (admin workers + dashboard /ui/workers).
+  var rustWorkersPanel = typeof window !== 'undefined' && window.__poolaiWorkersPanelI18nRust;
+  if (rustWorkersPanel) {
+    if (rustWorkersPanel.en) Object.assign(STRINGS.en, rustWorkersPanel.en);
+    if (rustWorkersPanel.uk) Object.assign(STRINGS.uk, rustWorkersPanel.uk);
+  }
+
+  // PH-S258: home.* shell → poolai-ui-core i18n.rs (dashboard home).
+  var rustHome = typeof window !== 'undefined' && window.__poolaiHomeI18nRust;
+  if (rustHome) {
+    if (rustHome.en) Object.assign(STRINGS.en, rustHome.en);
+    if (rustHome.uk) Object.assign(STRINGS.uk, rustHome.uk);
+  }
+
+  // PH-S259: form.* validation → poolai-ui-core i18n.rs (admin + dashboard).
+  var rustForm = typeof window !== 'undefined' && window.__poolaiAdminFormI18nRust;
+  if (rustForm) {
+    if (rustForm.en) Object.assign(STRINGS.en, rustForm.en);
+    if (rustForm.uk) Object.assign(STRINGS.uk, rustForm.uk);
+  }
+
+  // PH-S260: ui.save / ui.search* / ui.retry* toolbar glue → poolai-ui-core i18n.rs.
+  var rustUiToolbar = typeof window !== 'undefined' && window.__poolaiAdminUiToolbarI18nRust;
+  if (rustUiToolbar) {
+    if (rustUiToolbar.en) Object.assign(STRINGS.en, rustUiToolbar.en);
+    if (rustUiToolbar.uk) Object.assign(STRINGS.uk, rustUiToolbar.uk);
   }
 
   function normalizeLang(l) {

@@ -1,6 +1,6 @@
 # Rust codebase ratio — стратегія 90–95% (PoolAI)
 
-**Оновлено:** 2026-06-17 · **Канон:** FM **§5.13** · §5.12 **10** відкритих (PH-S253…S262)
+**Оновлено:** 2026-06-17 · **Канон:** FM **§5.13** · §5.12 **0** відкритих (PH-S128…S262 ✅) · rust_ratio **94.23%**
 
 **Мета:** зростання частки **Rust** у виконуваному коді репозиторію до **90–95%** (формально), **96% stretch spirit** (орієнтир replenish PH-S150…S159) — платформа збирається і перевіряється через **`cargo`** без обов'язкового Node на edge.
 
@@ -85,7 +85,7 @@ flowchart TB
 | **E — gate** | PH-S150 ✅ | CI advisory якщо ratio <88%; target 93%; stretch 96% spirit | стабільно 90–95% |
 | **F — stretch 96%** | PH-S151…S159 ✅ | wasm wiring, slim JS/i18n/charts, Rust stand/e2e bins; CI warn **93%** | **→96% spirit** |
 
-**Черга §5.12:** **9** відкритих PH-S254…S262 (replenish 2026-06-17).
+**Черга §5.12:** **0** відкритих · replenish з §5.13. **Зріз:** **94.23%** (PH-S262).
 
 ---
 
@@ -203,15 +203,15 @@ flowchart TB
 | 108 | **PH-S251** | Docs roadmap sync band | docs | **✅** |
 | 109 | **PH-S252** | Admin shared ui.confirm slim patch | code | **✅** |
 | 110 | **PH-S253** | Galaxy pricing quote + market_min stand smoke | tests | **✅** |
-| 111 | **PH-S254** | Galaxy fee_split_applied stand smoke | tests | відкрито |
-| 112 | **PH-S255** | Galaxy cross_region_egress stand smoke | tests | відкрито |
-| 113 | **PH-S256** | Galaxy replay_pending stand smoke | tests | відкрито |
-| 114 | **PH-S257** | Admin i18n workers panel slim patch | code | відкрито |
-| 115 | **PH-S258** | Admin i18n home shell slim patch | code | відкрито |
-| 116 | **PH-S259** | Admin i18n form + err core slim patch | code | відкрито |
-| 117 | **PH-S260** | Admin i18n shared ui toolbar slim patch | code | відкрито |
-| 118 | **PH-S261** | Docs canon sync band | docs | відкрито |
-| 119 | **PH-S262** | Rust ratio loc-audit refresh + hold gate | ops | відкрито |
+| 111 | **PH-S254** | Galaxy fee_split_applied stand smoke | tests | **✅** |
+| 112 | **PH-S255** | Galaxy cross_region_egress stand smoke | tests | **✅** |
+| 113 | **PH-S256** | Galaxy replay_pending stand smoke | tests | **✅** |
+| 114 | **PH-S257** | Admin i18n workers panel slim patch | code | **✅** |
+| 115 | **PH-S258** | Admin i18n home shell slim patch | code | **✅** |
+| 116 | **PH-S259** | Admin i18n form + err core slim patch | code | **✅** |
+| 117 | **PH-S260** | Admin i18n shared ui toolbar slim patch | code | **✅** |
+| 118 | **PH-S261** | Docs canon sync band | docs | **✅** |
+| 119 | **PH-S262** | Rust ratio loc-audit refresh + hold gate | ops | **✅** |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 

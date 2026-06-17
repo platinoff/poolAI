@@ -88,4 +88,4 @@ Prometheus alert rules live in your monitoring stack (Prometheus / Alertmanager 
 
 - [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) — stand smoke band PH-S244…S256 (`poolai-http-stand-smoke`)
 
-**Last updated:** 2026-06-17 (PH-S253 stand smoke ✅; stand smoke gaps S254…S256).
+**Last updated:** 2026-06-17 (PH-S254…S256 stand smoke ✅; Galaxy metrics stand smoke band complete).

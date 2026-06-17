@@ -2,7 +2,7 @@
 //!
 //! UI i18n subsets moved from `i18n_core.js` (PH-S154 admin jobs/grid; PH-S162 auth/dash shell; PH-S197 updates-compat; PH-S207 monitoring; PH-S211 jobs-only patch; PH-S214 raid-only patch; PH-S217 grid-pricing-only patch).
 //!
-//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs — `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); dashboard — `admin_dashboard_patch` (PH-S228); audit — `admin_audit_patch` (PH-S229); tenants — `admin_tenants_patch` (PH-S230); security — `admin_security_patch` (PH-S231); topology — `admin_topology_patch` (PH-S234); instances — `admin_instances_patch` (PH-S236); vm — `admin_vm_patch` (PH-S237); vm modal — `vm_modal_patch` (PH-S248); users — `admin_users_patch` (PH-S238); config — `admin_config_patch` (PH-S239); table toolbar — `admin_table_patch` (PH-S240); shared status — `admin_status_patch` (PH-S245); err hints — `admin_err_patch` (PH-S246); ui.confirm glue — `admin_ui_confirm_patch` (PH-S252); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221); workers — `admin_workers_patch` (PH-S222); libs — `admin_libs_patch` (PH-S223).
+//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs — `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); dashboard — `admin_dashboard_patch` (PH-S228); audit — `admin_audit_patch` (PH-S229); tenants — `admin_tenants_patch` (PH-S230); security — `admin_security_patch` (PH-S231); topology — `admin_topology_patch` (PH-S234); instances — `admin_instances_patch` (PH-S236); vm — `admin_vm_patch` (PH-S237); vm modal — `vm_modal_patch` (PH-S248); users — `admin_users_patch` (PH-S238); config — `admin_config_patch` (PH-S239); table toolbar — `admin_table_patch` (PH-S240); shared status — `admin_status_patch` (PH-S245); err hints — `admin_err_patch` (PH-S246/S259); ui.confirm glue — `admin_ui_confirm_patch` (PH-S252); form — `admin_form_patch` (PH-S259); ui toolbar — `admin_ui_toolbar_patch` (PH-S260); home — `admin_home_patch` (PH-S258); workers panel — `workers_panel_patch` (PH-S257); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221); workers — `admin_workers_patch` (PH-S222/S257); libs — `admin_libs_patch` (PH-S223).
 //! Auth + dashboard shell: `window.__poolaiAuthDashI18nRust` on login, dashboard layout, admin layout (PH-S162).
 
 use std::collections::BTreeMap;
@@ -1797,6 +1797,271 @@ pub const ADMIN_ERR_UK: &[I18nRow<'_>] = &[
     ),
 ];
 
+/// English workers panel keys (PH-S257; moved from `i18n_core.js`).
+pub const WORKERS_PANEL_EN: &[I18nRow<'_>] = &[
+    ("workers.empty", "No workers available."),
+    ("workers.listAria", "Workers list"),
+    (
+        "workers.tableDesc",
+        "Table showing workers: id, health, state, task, metrics, actions",
+    ),
+    ("workers.col.id", "ID"),
+    ("workers.col.health", "Health"),
+    ("workers.col.state", "State"),
+    ("workers.col.task", "Current task"),
+    ("workers.col.requests", "Requests"),
+    ("workers.col.queue", "Queue"),
+    ("workers.col.actions", "Actions"),
+    ("workers.healthy", "Healthy"),
+    ("workers.unhealthy", "Unhealthy"),
+    ("workers.rowAriaPrefix", "Worker"),
+    ("workers.deleteAria", "Delete worker {id}"),
+    ("workers.permDeleteDesc", "Permanently delete worker {id}"),
+    (
+        "workers.noActionsRole",
+        "No actions available for your role",
+    ),
+    ("workers.createBtn", "Create Worker"),
+    ("workers.createBtnAria", "Create new worker"),
+    ("workers.modalTitle", "Create Worker"),
+    ("workers.label.id", "Worker ID"),
+    ("workers.label.maxConcurrent", "Max concurrent requests"),
+    ("workers.label.timeout", "Request timeout (ms)"),
+    ("workers.label.healthInterval", "Health check interval (ms)"),
+    ("workers.label.maxMemory", "Max memory (MB)"),
+    ("workers.label.cpuPriority", "CPU priority (1–10)"),
+    ("workers.label.gpuDevice", "GPU device ID (optional)"),
+    ("workers.label.cacheSize", "Cache size"),
+    ("workers.ph.id", "worker-1"),
+    ("workers.ph.gpu", "Leave empty for no GPU"),
+    ("workers.enableCache", "Enable caching"),
+    ("workers.autoRestart", "Auto restart on failure"),
+    ("workers.resourceMonitoring", "Resource monitoring"),
+    ("workers.creatingSubmit", "Creating…"),
+    ("workers.createdOk", "Worker created successfully"),
+    ("workers.deletedOk", "Worker deleted successfully"),
+    ("workers.deletingLoad", "Deleting worker…"),
+    (
+        "workers.confirmDelete",
+        "Are you sure you want to delete worker \"{id}\"? This action cannot be undone.",
+    ),
+];
+
+/// Ukrainian workers panel keys (PH-S257).
+pub const WORKERS_PANEL_UK: &[I18nRow<'_>] = &[
+    ("workers.empty", "Немає доступних воркерів."),
+    ("workers.listAria", "Список воркерів"),
+    (
+        "workers.tableDesc",
+        "Таблиця воркерів: id, стан здоров’я, статус, поточне завдання, метрики, дії",
+    ),
+    ("workers.col.id", "ID"),
+    ("workers.col.health", "Здоров’я"),
+    ("workers.col.state", "Статус"),
+    ("workers.col.task", "Поточне завдання"),
+    ("workers.col.requests", "Запити"),
+    ("workers.col.queue", "Черга"),
+    ("workers.col.actions", "Дії"),
+    ("workers.healthy", "OK"),
+    ("workers.unhealthy", "Проблема"),
+    ("workers.rowAriaPrefix", "Воркер"),
+    ("workers.deleteAria", "Видалити воркер {id}"),
+    ("workers.permDeleteDesc", "Остаточно видалити воркер {id}"),
+    ("workers.noActionsRole", "Для вашої ролі дії недоступні"),
+    ("workers.createBtn", "Створити воркер"),
+    ("workers.createBtnAria", "Створити нового воркера"),
+    ("workers.modalTitle", "Створити воркер"),
+    ("workers.label.id", "ID воркера"),
+    ("workers.label.maxConcurrent", "Макс. одночасних запитів"),
+    ("workers.label.timeout", "Таймаут запиту (мс)"),
+    ("workers.label.healthInterval", "Інтервал health-check (мс)"),
+    ("workers.label.maxMemory", "Макс. пам’ять (МБ)"),
+    ("workers.label.cpuPriority", "Пріоритет CPU (1–10)"),
+    ("workers.label.gpuDevice", "ID GPU-пристрою (необов’язково)"),
+    ("workers.label.cacheSize", "Розмір кешу"),
+    ("workers.ph.id", "worker-1"),
+    ("workers.ph.gpu", "Порожньо, якщо без GPU"),
+    ("workers.enableCache", "Увімкнути кешування"),
+    ("workers.autoRestart", "Автоперезапуск при збої"),
+    ("workers.resourceMonitoring", "Моніторинг ресурсів"),
+    ("workers.creatingSubmit", "Створення…"),
+    ("workers.createdOk", "Воркер успішно створено"),
+    ("workers.deletedOk", "Воркер успішно видалено"),
+    ("workers.deletingLoad", "Видалення воркера…"),
+    (
+        "workers.confirmDelete",
+        "Видалити воркера «{id}»? Цю дію не можна скасувати.",
+    ),
+];
+
+/// English home shell keys (PH-S258).
+pub const HOME_SHELL_EN: &[I18nRow<'_>] = &[
+    ("home.apiTitle", "API"),
+    ("home.apiBase", "Base:"),
+    ("home.uiTitle", "UI"),
+    ("home.uiHint", "Pages under"),
+    ("home.openDashboard", "Open read-only dashboard"),
+    ("home.quickLinks", "Quick links"),
+    ("home.notesTitle", "Notes"),
+    (
+        "home.notesBody",
+        "Write operations are available for authenticated users with appropriate permissions.",
+    ),
+];
+
+/// Ukrainian home shell keys (PH-S258).
+pub const HOME_SHELL_UK: &[I18nRow<'_>] = &[
+    ("home.apiTitle", "API"),
+    ("home.apiBase", "База:"),
+    ("home.uiTitle", "UI"),
+    ("home.uiHint", "Сторінки під"),
+    ("home.openDashboard", "Відкрити панель лише для читання"),
+    ("home.quickLinks", "Швидкі посилання"),
+    ("home.notesTitle", "Нотатки"),
+    (
+        "home.notesBody",
+        "Операції запису доступні автентифікованим користувачам з відповідними правами.",
+    ),
+];
+
+/// English form validation keys (PH-S259).
+pub const FORM_SHELL_EN: &[I18nRow<'_>] = &[
+    ("form.fieldRequired", "This field is required"),
+    ("form.validNumber", "Please enter a valid number"),
+    ("form.valueMin", "Value must be at least {min}"),
+    ("form.valueMax", "Value must be at most {max}"),
+    ("form.validEmail", "Please enter a valid email address"),
+    ("form.invalidFormat", "Invalid format"),
+];
+
+/// Ukrainian form validation keys (PH-S259).
+pub const FORM_SHELL_UK: &[I18nRow<'_>] = &[
+    ("form.fieldRequired", "Це поле обов’язкове"),
+    ("form.validNumber", "Введіть коректне число"),
+    ("form.valueMin", "Значення має бути не менше {min}"),
+    ("form.valueMax", "Значення має бути не більше {max}"),
+    (
+        "form.validEmail",
+        "Введіть коректну адресу електронної пошти",
+    ),
+    ("form.invalidFormat", "Некоректний формат"),
+];
+
+/// English residual error / role keys (PH-S259; shared via admin_common.js).
+pub const FORM_ERR_RESIDUAL_EN: &[I18nRow<'_>] = &[
+    ("err.errorPrefix", "Error: "),
+    ("err.title", "Error"),
+    ("err.showDetails", "Show details"),
+    ("err.suggestions", "Suggestions:"),
+    ("err.insufficientPermissions", "Insufficient permissions."),
+    (
+        "err.insufficientPermissionsAdminOp",
+        "Insufficient permissions. Admin or Operator role required.",
+    ),
+    (
+        "err.fillRequiredFields",
+        "Please fill in all required fields correctly.",
+    ),
+    (
+        "err.insufficientRole",
+        "Insufficient permissions. Required role: ",
+    ),
+    ("role.admin", "Admin"),
+    ("role.operator", "Operator"),
+    ("role.viewer", "Viewer"),
+    ("err.selectFileUpload", "Please select a file to upload."),
+    ("err.readFileFailed", "Error reading file"),
+    ("err.unauthorized", "Unauthorized"),
+];
+
+/// Ukrainian residual error / role keys (PH-S259).
+pub const FORM_ERR_RESIDUAL_UK: &[I18nRow<'_>] = &[
+    ("err.errorPrefix", "Помилка: "),
+    ("err.title", "Помилка"),
+    ("err.showDetails", "Показати деталі"),
+    ("err.suggestions", "Підказки:"),
+    ("err.insufficientPermissions", "Недостатньо прав."),
+    (
+        "err.insufficientPermissionsAdminOp",
+        "Недостатньо прав. Потрібна роль Admin або Operator.",
+    ),
+    (
+        "err.fillRequiredFields",
+        "Заповніть усі обов’язкові поля коректно.",
+    ),
+    ("err.insufficientRole", "Недостатньо прав. Потрібна роль: "),
+    ("role.admin", "Адміністратор"),
+    ("role.operator", "Оператор"),
+    ("role.viewer", "Спостерігач"),
+    ("err.selectFileUpload", "Оберіть файл для завантаження."),
+    ("err.readFileFailed", "Помилка читання файлу"),
+    ("err.unauthorized", "Неавторизовано"),
+];
+
+/// English shared UI toolbar glue (PH-S260).
+pub const UI_TOOLBAR_EN: &[I18nRow<'_>] = &[
+    ("ui.save", "Save Changes"),
+    ("ui.searchTableAria", "Search table"),
+    ("ui.searchStatusFound", "{visible} of {total} results found"),
+    ("ui.searchStatusSimple", "{visible} of {total} results"),
+    ("ui.searchStatusAll", "All results shown"),
+    ("ui.searchNoResultsFor", "No results found for \"{query}\""),
+    ("ui.retry", "Retry"),
+    ("ui.retryFailedOpAria", "Retry the operation that failed"),
+    ("ui.retryUnit.one", "retry"),
+    ("ui.retryUnit.many", "retries"),
+    (
+        "ui.requestSucceededAfter",
+        "Request succeeded after {count} {unit}",
+    ),
+    (
+        "ui.requestRetrying",
+        "Request failed. Retrying in {seconds}s... ({attempt}/{max})",
+    ),
+    (
+        "ui.requestFailedAllRetries",
+        "Request failed after all retries",
+    ),
+];
+
+/// Ukrainian shared UI toolbar glue (PH-S260).
+pub const UI_TOOLBAR_UK: &[I18nRow<'_>] = &[
+    ("ui.save", "Зберегти зміни"),
+    ("ui.searchTableAria", "Пошук у таблиці"),
+    (
+        "ui.searchStatusFound",
+        "Знайдено {visible} з {total} результатів",
+    ),
+    (
+        "ui.searchStatusSimple",
+        "Показано {visible} з {total} результатів",
+    ),
+    ("ui.searchStatusAll", "Показано всі результати"),
+    (
+        "ui.searchNoResultsFor",
+        "За запитом \"{query}\" нічого не знайдено",
+    ),
+    ("ui.retry", "Повторити"),
+    (
+        "ui.retryFailedOpAria",
+        "Повторити операцію, що завершилась помилкою",
+    ),
+    ("ui.retryUnit.one", "повтору"),
+    ("ui.retryUnit.many", "повторів"),
+    (
+        "ui.requestSucceededAfter",
+        "Запит успішний після {count} {unit}",
+    ),
+    (
+        "ui.requestRetrying",
+        "Запит не вдався. Повтор через {seconds} с... ({attempt}/{max})",
+    ),
+    (
+        "ui.requestFailedAllRetries",
+        "Запит не вдався після всіх повторів",
+    ),
+];
+
 /// English VM modal keys (PH-S248; shared admin + dashboard VM pages).
 pub const VM_MODAL_EN: &[I18nRow<'_>] = &[
     ("vm.createBtn", "Create VM Instance"),
@@ -2425,11 +2690,15 @@ pub fn admin_updates_compat_patch_script() -> String {
     )
 }
 
-/// Workers admin page — slim `admin.wrk.*` patch only (PH-S222).
+/// Workers admin page — slim `admin.wrk.*` + `workers.*` patch (PH-S222, PH-S257).
 pub fn admin_workers_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut en = rows_to_map(ADMIN_WORKERS_EN);
+    merge_rows(&mut en, WORKERS_PANEL_EN);
+    let mut uk = rows_to_map(ADMIN_WORKERS_UK);
+    merge_rows(&mut uk, WORKERS_PANEL_UK);
     let mut root = BTreeMap::new();
-    root.insert("en".into(), rows_to_map(ADMIN_WORKERS_EN));
-    root.insert("uk".into(), rows_to_map(ADMIN_WORKERS_UK));
+    root.insert("en".into(), en);
+    root.insert("uk".into(), uk);
     root
 }
 
@@ -2525,11 +2794,15 @@ pub fn admin_status_patch_script() -> String {
     )
 }
 
-/// Admin error hint / access keys — slim `err.hint*` patch (PH-S246).
+/// Admin error hint / access keys — slim `err.hint*` + residual `err.*` (PH-S246, PH-S259).
 pub fn admin_err_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut en = rows_to_map(ADMIN_ERR_EN);
+    merge_rows(&mut en, FORM_ERR_RESIDUAL_EN);
+    let mut uk = rows_to_map(ADMIN_ERR_UK);
+    merge_rows(&mut uk, FORM_ERR_RESIDUAL_UK);
     let mut root = BTreeMap::new();
-    root.insert("en".into(), rows_to_map(ADMIN_ERR_EN));
-    root.insert("uk".into(), rows_to_map(ADMIN_ERR_UK));
+    root.insert("en".into(), en);
+    root.insert("uk".into(), uk);
     root
 }
 
@@ -2577,6 +2850,79 @@ pub fn admin_ui_confirm_patch_script() -> String {
     format!(
         "window.__poolaiAdminUiConfirmI18nRust={};",
         admin_ui_confirm_patch_json()
+    )
+}
+
+/// Dashboard workers panel — slim `workers.*` patch (PH-S257).
+pub fn workers_panel_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(WORKERS_PANEL_EN));
+    root.insert("uk".into(), rows_to_map(WORKERS_PANEL_UK));
+    root
+}
+
+pub fn workers_panel_patch_json() -> String {
+    serde_json::to_string(&workers_panel_patch()).expect("workers panel i18n patch serializes")
+}
+
+pub fn workers_panel_patch_script() -> String {
+    format!(
+        "window.__poolaiWorkersPanelI18nRust={};",
+        workers_panel_patch_json()
+    )
+}
+
+/// Home shell — slim `home.*` patch (PH-S258).
+pub fn admin_home_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(HOME_SHELL_EN));
+    root.insert("uk".into(), rows_to_map(HOME_SHELL_UK));
+    root
+}
+
+pub fn admin_home_patch_json() -> String {
+    serde_json::to_string(&admin_home_patch()).expect("home i18n patch serializes")
+}
+
+pub fn admin_home_patch_script() -> String {
+    format!("window.__poolaiHomeI18nRust={};", admin_home_patch_json())
+}
+
+/// Shared form validation — slim `form.*` patch (PH-S259).
+pub fn admin_form_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(FORM_SHELL_EN));
+    root.insert("uk".into(), rows_to_map(FORM_SHELL_UK));
+    root
+}
+
+pub fn admin_form_patch_json() -> String {
+    serde_json::to_string(&admin_form_patch()).expect("form i18n patch serializes")
+}
+
+pub fn admin_form_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminFormI18nRust={};",
+        admin_form_patch_json()
+    )
+}
+
+/// Shared UI toolbar glue — slim `ui.save` / `ui.search*` / `ui.retry*` (PH-S260).
+pub fn admin_ui_toolbar_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(UI_TOOLBAR_EN));
+    root.insert("uk".into(), rows_to_map(UI_TOOLBAR_UK));
+    root
+}
+
+pub fn admin_ui_toolbar_patch_json() -> String {
+    serde_json::to_string(&admin_ui_toolbar_patch()).expect("ui toolbar i18n patch serializes")
+}
+
+pub fn admin_ui_toolbar_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminUiToolbarI18nRust={};",
+        admin_ui_toolbar_patch_json()
     )
 }
 
