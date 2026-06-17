@@ -1,25 +1,15 @@
 # Galaxy Grid roadmap (зріз)
 
-**Оновлено:** 2026-06-17 · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**0** відкритих · PH-S128…S312 ✅)
+**Оновлено:** 2026-06-17 · **Канон черги:** FM §5.12 (**0** · PH-S128…S322 ✅) · тригер **`абракадабра`**
 
 | Зріз | Значення |
 |------|----------|
-| **Wire band** | PH-S65…S187 ✅ |
-| **Vision UX** | PH-S188…S233 ✅ |
-| **Ops / stand smoke** | PH-S196…S256 ✅ |
-| **Admin i18n slim** | PH-S207…S266 ✅ · `i18n_core.js` STRINGS core **empty** |
-| **Wasm / admin slim** | PH-S273…S304 ✅ |
-| **Galaxy prefetch/locality** | PH-S303…S307 ✅ |
-| **Docs / ratio** | PH-S308…S312 ✅ |
-| **Rust ratio** | **94.38%** hold **95%** advisory · spirit **96%** |
+| **Galaxy prefetch/locality** | PH-S303…S317 ✅ |
+| **Wasm / admin slim** | PH-S314/S317 URL builders |
+| **Docs / ratio** | PH-S318…S322 ✅ |
+| **Rust ratio** | **94.39%** hold **95%** advisory |
 
----
-
-## 3. Черга §5.12
-
-**0** відкритих · replenish з §5.13.
-
-Остання смуга **PH-S303…S312** ✅: strict prefetch metric, line chart empty wasm, locality rank miss, complete prefetch hook, stand smoke band, ratio/docs maintain.
+**0** відкритих · остання смуга **PH-S313…S322** ✅.
 
 ---
 

@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-17 (PH-S303…S312 ✅ · §5.12 **0** відкритих · rust_ratio **94.38%**) · VDT
+**Оновлено:** 2026-06-17 (PH-S313…S322 ✅ · тригер **абракадабра** · rust_ratio **94.39%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -263,8 +263,19 @@
 **PH-S310 ✅ (ops):** `poolai-vision-sync --check` green.
 **PH-S311 ✅ (ops):** hold advisory `--min-ratio 0.95` snapshot **94.38%**.
 **PH-S312 ✅ (docs):** INDEX §7 + rust_ratio pointer **94.38%**.
-**§5.12:** **0** відкритих — replenish з §5.13.
-**Vision ✅:** rev **212** · rust_ratio **94.38%** · hold **95%** advisory.
+**PH-S313 ✅ (code):** `galaxy_prefetch_ingest_total` on `ingest_job_prefetch_stub`.
+**PH-S314 ✅ (code/ui):** `buildMetricHistoryUrl` wasm; `poolaiFetchMetricHistory` wasm-first.
+**PH-S315 ✅ (code):** `galaxy_locality_rank_empty_workers_total` on empty worker inventory.
+**PH-S316 ✅ (tests):** stand smoke `/metrics` ingest + empty workers counters.
+**PH-S317 ✅ (code/ui):** `buildMetricsWindowUrl` wasm; `poolaiFetchMetricsWindow` wasm-first.
+**PH-S318 ✅ (ops):** `poolai-loc-audit` → `rust_ratio.json` sprint **PH-S318** (**94.39%**).
+**PH-S319 ✅ (docs):** INDEX/HANDOFF/NEXT/STABLE/GALAXY canon sync.
+**PH-S320 ✅ (ops):** `poolai-vision-sync --check` green.
+**PH-S321 ✅ (ops):** hold advisory `--min-ratio 0.95` snapshot **94.39%**.
+**PH-S322 ✅ (docs):** INDEX §7 + rust_ratio pointer **94.39%**.
+**Rules ✅:** тригер **`абракадабра`** у `poolai-session-iteration.mdc` + `virtual-development-team.mdc`.
+**§5.12:** **0** відкритих — replenish §5.13 або **`абракадабра`**.
+**Vision ✅:** rev **214** · rust_ratio **94.39%** · hold **95%** advisory.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

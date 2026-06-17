@@ -1,32 +1,44 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-17 · PH-S303…S312 ✅ · vision **rev 212** · **0** відкритих у §5.12 · rust_ratio **94.38%** · hold **95%** advisory
+**Оновлено:** 2026-06-17 · PH-S313…S322 ✅ · vision **rev 214** · **0** відкритих · rust_ratio **94.39%**
 
-| **← наступний** | replenish з **§5.13** (`RUST_RATIO_STRATEGY`) |
+| **← наступний** | replenish §5.13 **або** **`абракадабра`** (drain) |
 | **Відкритих** | **0** |
 
 ---
 
-## Copy-paste — ітераційна сесія (VDT)
+## Тригер «абракадабра» (drain черги)
+
+Одне слово в новій сесії → повний цикл без підтвердження кожного PH-S*:
 
 ```
-S0: git fetch; HANDOFF; FM §5.12 (0 відкритих); df -h /s
+абракадабра
+```
 
-Replenish §5.12 з §5.13 (max 10) — code-first Rust integration для API
-FM/HANDOFF/NEXT + poolai-vision-sync --check
+Агент: S0 → якщо §5.12 **< 10** → replenish до **10** → drain усіх → vision-sync `--check` → git push + самарі.
+
+Правила: [`.cursor/rules/poolai-session-iteration.mdc`](../.cursor/rules/poolai-session-iteration.mdc) § «Тригер абракадабра».
+
+---
+
+## Copy-paste — одна PH-S* (звичайна ітерація)
+
+```
+S0: git fetch; HANDOFF; FM §5.12; df -h /s
+Один PH-S* з §5.12 → fmt → test-ci → FM/HANDOFF/NEXT → vision-sync --check → push
 ```
 
 ---
 
-## Закрито (смуга PH-S303…S312)
+## Закрито (смуга PH-S313…S322)
 
-PH-S303 ✅ — `galaxy_prefetch_strict_mode_total` on strict locality plans.
-PH-S304 ✅ — `renderLineChartEmptyHtml` wasm; empty state wasm-first.
-PH-S305 ✅ — `galaxy_locality_rank_miss_total` on rank miss ingest path.
-PH-S306 ✅ — stand smoke export includes strict + complete + rank miss metrics.
-PH-S307 ✅ — `complete_prefetch_hook` + `galaxy_prefetch_complete_total`.
-PH-S308…S312 ✅ — loc-audit **94.38%**, docs canon, vision `--check`, INDEX maintain.
+PH-S313 ✅ — `galaxy_prefetch_ingest_total` on prefetch ingest stub.
+PH-S314 ✅ — `buildMetricHistoryUrl` wasm; metric history fetch wasm-first.
+PH-S315 ✅ — `galaxy_locality_rank_empty_workers_total` on empty worker inventory.
+PH-S316 ✅ — stand smoke export includes ingest + empty workers metrics.
+PH-S317 ✅ — `buildMetricsWindowUrl` wasm; metrics window fetch wasm-first.
+PH-S308…S322 ✅ — loc-audit **94.39%**, docs canon, vision `--check`, INDEX maintain.
 
-**rust_ratio:** **94.38%** (formal 90–95% ✅; hold 95% advisory).
+**rust_ratio:** **94.39%** (formal 90–95% ✅; hold 95% advisory).
 
 **BLOCKED / Deferred:** FM-003 LAN · FM-041 Cloud SDK live.

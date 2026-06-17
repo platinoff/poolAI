@@ -262,6 +262,16 @@ flowchart TB
 | 167 | **PH-S310** | poolai-vision-sync drift gate | `--check` green | **✅** |
 | 168 | **PH-S311** | Ratio hold advisory snapshot | **94.38%** advisory | **✅** |
 | 169 | **PH-S312** | Docs INDEX ratio maintain | INDEX §7 pointer | **✅** |
+| 170 | **PH-S313** | Galaxy prefetch ingest metric | `galaxy_prefetch_ingest_total` | **✅** |
+| 171 | **PH-S314** | admin metric history URL wasm | `buildMetricHistoryUrl` | **✅** |
+| 172 | **PH-S315** | Galaxy locality empty workers | `galaxy_locality_rank_empty_workers_total` | **✅** |
+| 173 | **PH-S316** | Stand smoke ingest + empty workers | `/metrics` export | **✅** |
+| 174 | **PH-S317** | admin metrics window URL wasm | `buildMetricsWindowUrl` | **✅** |
+| 175 | **PH-S318** | Rust ratio loc-audit refresh | **94.39%** sprint zriz | **✅** |
+| 176 | **PH-S319** | Docs canon sync band | INDEX/HANDOFF/NEXT | **✅** |
+| 177 | **PH-S320** | poolai-vision-sync drift gate | `--check` green | **✅** |
+| 178 | **PH-S321** | Ratio hold advisory snapshot | **94.39%** advisory | **✅** |
+| 179 | **PH-S322** | Docs INDEX ratio maintain | INDEX §7 pointer | **✅** |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 

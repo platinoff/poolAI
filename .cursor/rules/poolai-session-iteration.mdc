@@ -76,6 +76,20 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 
 **Research replenish:** коли відкритих PH-S* у §5.12 **< 10** — додати code-first **Rust** рядки (орієнтир: [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../../docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md), [`RUST_RATIO_STRATEGY_2026-06-13.md`](../../docs/development/RUST_RATIO_STRATEGY_2026-06-13.md), `rg "TODO|FIXME" src/`), тримати **≤ 10** відкритих. Після S142 — **§5.13** ratio track.
 
+## Тригер «абракадабра» (drain черги)
+
+Коли власник у **новій сесії** пише **`абракадабра`** (синоніми: «дренаж черги», «виконати всі спринти», «поки черга не вільна»):
+
+| Крок | Дія |
+|------|-----|
+| 1 S0 | `git fetch`; HANDOFF; FM **§5.12** (порахувати відкритих) |
+| 2 Research | Якщо відкритих **< 10** → replenish до **10** (§5.12 + §5.13, code-first Rust; див. Research вище) |
+| 3 Drain | Виконати **усі** відкриті PH-S* в одній сесії (код → `cargo fmt` → scope-тести → docs band) |
+| 4 Vision | `cargo run --bin poolai-vision-sync` + `--check` |
+| 5 Git | commit + `git push origin main` + **самарі** в чат |
+
+**Не** підміняє BLOCKED/Deferred (FM-003 LAN, FM-041 Cloud SDK). **Не** `git add -A`. Канон push — [`.cursor/commands/git-push.md`](../commands/git-push.md).
+
 **Не повторювати в наступних спринтах:** вже закриті acceptance з FM (блок «Не повторювати» у `NEXT_SESSION_PROMPT`).
 
 ## Типові помилки

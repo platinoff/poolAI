@@ -347,8 +347,10 @@ const GALAXY_PREFETCH_METRICS: &[&str] = &[
     "galaxy_prefetch_wait_ms_total",
     "galaxy_prefetch_strict_mode_total",
     "galaxy_prefetch_complete_total",
+    "galaxy_prefetch_ingest_total",
     "galaxy_locality_rank_ingest_total",
     "galaxy_locality_rank_miss_total",
+    "galaxy_locality_rank_empty_workers_total",
 ];
 
 fn metrics_text_has_prefetch_counters(body: &str) -> Result<(), String> {
@@ -1655,12 +1657,18 @@ mod tests {
             "# HELP galaxy_prefetch_complete_total Galaxy prefetch complete hook\n",
             "# TYPE galaxy_prefetch_complete_total gauge\n",
             "galaxy_prefetch_complete_total 0\n",
+            "# HELP galaxy_prefetch_ingest_total Galaxy prefetch ingest stub\n",
+            "# TYPE galaxy_prefetch_ingest_total gauge\n",
+            "galaxy_prefetch_ingest_total 0\n",
             "# HELP galaxy_locality_rank_ingest_total Galaxy locality rank ingest\n",
             "# TYPE galaxy_locality_rank_ingest_total gauge\n",
             "galaxy_locality_rank_ingest_total 0\n",
             "# HELP galaxy_locality_rank_miss_total Galaxy locality rank miss\n",
             "# TYPE galaxy_locality_rank_miss_total gauge\n",
             "galaxy_locality_rank_miss_total 0\n",
+            "# HELP galaxy_locality_rank_empty_workers_total Galaxy locality rank empty workers\n",
+            "# TYPE galaxy_locality_rank_empty_workers_total gauge\n",
+            "galaxy_locality_rank_empty_workers_total 0\n",
         );
         metrics_text_has_prefetch_counters(sample).expect("sample export");
     }

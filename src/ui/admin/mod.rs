@@ -893,6 +893,8 @@ fn admin_charts_layer_exports() {
     assert!(js.contains("renderMetricsChartGridHtml"));
     assert!(js.contains("sanitizeChartId"));
     assert!(js.contains("renderLineChartEmptyHtml"));
+    assert!(js.contains("buildMetricHistoryUrl"));
+    assert!(js.contains("buildMetricsWindowUrl"));
 }
 
 #[test]
@@ -929,6 +931,18 @@ fn admin_charts_sanitize_chart_id_wasm_first_ph_s297() {
 fn admin_charts_line_chart_empty_wasm_first_ph_s304() {
     let js = include_str!("../admin_charts.js");
     assert!(js.contains("wasm.renderLineChartEmptyHtml"));
+}
+
+#[test]
+fn admin_charts_metric_history_url_wasm_first_ph_s314() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("wasm.buildMetricHistoryUrl"));
+}
+
+#[test]
+fn admin_charts_metrics_window_url_wasm_first_ph_s317() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("wasm.buildMetricsWindowUrl"));
 }
 
 #[tokio::test]

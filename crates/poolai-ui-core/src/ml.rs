@@ -1,4 +1,4 @@
-//! ML pipeline metric helpers — parity with `admin_charts.js` (PH-S43, PH-S155, PH-S275, PH-S284, PH-S287, PH-S294, PH-S297).
+//! ML pipeline metric helpers — parity with `admin_charts.js` (PH-S43, PH-S155, PH-S275, PH-S284, PH-S287, PH-S294, PH-S297, PH-S314, PH-S317).
 
 use crate::format::escape_html;
 use serde::{Deserialize, Serialize};
@@ -401,6 +401,43 @@ pub fn group_metrics_by_name(data: &[Value]) -> BTreeMap<String, Vec<Value>> {
     by
 }
 
+fn encode_uri_component(raw: &str) -> String {
+    let mut out = String::with_capacity(raw.len());
+    for b in raw.bytes() {
+        match b {
+            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'~' => {
+                out.push(b as char);
+            }
+            _ => out.push_str(&format!("%{b:02X}")),
+        }
+    }
+    out
+}
+
+/// Mirrors `poolaiFetchMetricHistory` URL (PH-S314).
+pub fn build_metric_history_url(
+    metric_name: &str,
+    start_time: &str,
+    end_time: &str,
+    limit: u32,
+) -> String {
+    format!(
+        "/api/enterprise/monitoring/metrics?metric={}&start_time={}&end_time={}&limit={limit}",
+        encode_uri_component(metric_name),
+        encode_uri_component(start_time),
+        encode_uri_component(end_time),
+    )
+}
+
+/// Mirrors `poolaiFetchMetricsWindow` URL (PH-S317).
+pub fn build_metrics_window_url(start_time: &str, end_time: &str, limit: u32) -> String {
+    format!(
+        "/api/enterprise/monitoring/metrics?start_time={}&end_time={}&limit={limit}",
+        encode_uri_component(start_time),
+        encode_uri_component(end_time),
+    )
+}
+
 /// Mirrors `poolaiRenderMetricsChartGrid` card wrapper (PH-S294).
 pub fn render_metrics_chart_grid_html(title: &str, parts: &[String]) -> String {
     if parts.is_empty() {
@@ -540,6 +577,27 @@ mod tests {
         let html = render_line_chart_empty_html("No data");
         assert!(html.contains("muted"));
         assert!(html.contains("No data"));
+    }
+
+    #[test]
+    fn build_metric_history_url_ph_s314() {
+        let url = build_metric_history_url(
+            "cpu.usage",
+            "2026-01-01T00:00:00.000Z",
+            "2026-01-02T00:00:00.000Z",
+            200,
+        );
+        assert!(url.contains("cpu%2Eusage"));
+        assert!(url.contains("start_time="));
+        assert!(url.contains("limit=200"));
+    }
+
+    #[test]
+    fn build_metrics_window_url_ph_s317() {
+        let url = build_metrics_window_url("2026-01-01T00:00:00.000Z", "2026-01-02T00:00:00.000Z", 60);
+        assert!(url.starts_with("/api/enterprise/monitoring/metrics?"));
+        assert!(!url.contains("metric="));
+        assert!(url.contains("limit=60"));
     }
 
     #[test]

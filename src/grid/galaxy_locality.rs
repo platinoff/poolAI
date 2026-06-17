@@ -85,6 +85,9 @@ pub const METRIC_LOCALITY_RANK_INGEST_TOTAL: &str = "galaxy_locality_rank_ingest
 /// Locality rank misses on grid job ingest (PH-S305 stub).
 pub const METRIC_LOCALITY_RANK_MISS_TOTAL: &str = "galaxy_locality_rank_miss_total";
 
+/// Locality rank with empty worker inventory on ingest (PH-S315 stub).
+pub const METRIC_LOCALITY_RANK_EMPTY_WORKERS_TOTAL: &str = "galaxy_locality_rank_empty_workers_total";
+
 /// Stub MB per cold shard on prefetch plan path when no task egress wire (PH-S185).
 pub const DEFAULT_PREFETCH_CROSS_REGION_EGRESS_MB_PER_SHARD: f64 = 50.0;
 
@@ -92,6 +95,7 @@ static LAST_SHARD_LOCAL_HIT_RATIO_BPS: AtomicU64 = AtomicU64::new(0);
 static LAST_CROSS_REGION_EGRESS_MB: AtomicU64 = AtomicU64::new(0);
 static LOCALITY_RANK_INGEST_TOTAL: AtomicU64 = AtomicU64::new(0);
 static LOCALITY_RANK_MISS_TOTAL: AtomicU64 = AtomicU64::new(0);
+static LOCALITY_RANK_EMPTY_WORKERS_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// Ranked worker for scheduler stub (locality first; pricing/queue_depth — future wire).
 #[derive(Debug, Clone, PartialEq)]
@@ -277,6 +281,15 @@ pub fn locality_rank_miss_total() -> u64 {
     LOCALITY_RANK_MISS_TOTAL.load(Ordering::Relaxed)
 }
 
+/// Record locality rank with zero workers on ingest (PH-S315).
+pub fn record_locality_rank_empty_workers() {
+    LOCALITY_RANK_EMPTY_WORKERS_TOTAL.fetch_add(1, Ordering::Relaxed);
+}
+
+pub fn locality_rank_empty_workers_total() -> u64 {
+    LOCALITY_RANK_EMPTY_WORKERS_TOTAL.load(Ordering::Relaxed)
+}
+
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_locality_rank_ingest_for_test() {
     LOCALITY_RANK_INGEST_TOTAL.store(0, Ordering::Relaxed);
@@ -288,11 +301,17 @@ pub fn reset_locality_rank_miss_for_test() {
 }
 
 #[cfg(any(test, feature = "test-utils"))]
+pub fn reset_locality_rank_empty_workers_for_test() {
+    LOCALITY_RANK_EMPTY_WORKERS_TOTAL.store(0, Ordering::Relaxed);
+}
+
+#[cfg(any(test, feature = "test-utils"))]
 pub fn reset_locality_metrics_for_test() {
     reset_last_shard_local_hit_ratio_for_test();
     reset_last_cross_region_egress_mb_for_test();
     reset_locality_rank_ingest_for_test();
     reset_locality_rank_miss_for_test();
+    reset_locality_rank_empty_workers_for_test();
 }
 
 /// Pick highest-scoring worker (scheduler stub only — no prefetch / lease wire).
@@ -501,5 +520,13 @@ mod tests {
         record_locality_rank_miss();
         assert_eq!(locality_rank_miss_total(), 1);
         reset_locality_rank_miss_for_test();
+    }
+
+    #[test]
+    fn record_locality_rank_empty_workers_ph_s315() {
+        reset_locality_rank_empty_workers_for_test();
+        record_locality_rank_empty_workers();
+        assert_eq!(locality_rank_empty_workers_total(), 1);
+        reset_locality_rank_empty_workers_for_test();
     }
 }

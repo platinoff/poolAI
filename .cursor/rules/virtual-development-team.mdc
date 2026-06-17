@@ -47,6 +47,14 @@ flowchart LR
 4. Після закриття §5.12 смуги — replenish з **§5.13** ([`RUST_RATIO_STRATEGY_2026-06-13.md`](../../docs/development/RUST_RATIO_STRATEGY_2026-06-13.md))
 5. Приклад багатоспринтової смуги + docs-sync — [`poolai-session-iteration.mdc`](poolai-session-iteration.mdc) § «Приклад ітерації (PH-S97…S99)»
 
+## Тригер «абракадабра» (drain §5.12)
+
+Промпт власника **`абракадабра`** у новій сесії = повний цикл без окремого підтвердження кожного PH-S*:
+
+**S0** → якщо §5.12 **< 10** відкритих → **replenish до 10** (research + §5.13) → **drain усіх** → **vision-sync `--check`** → **git push + самарі**.
+
+Деталі кроків — [`poolai-session-iteration.mdc`](poolai-session-iteration.mdc) § «Тригер абракадабра».
+
 ## Staging
 
 **Не** `git add -A`. Не стаджити: `data/audit/`, `comitmsg/*.txt`, `bin/commit-*.sh`, чужий шум з інших спринтів.

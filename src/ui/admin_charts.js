@@ -71,15 +71,18 @@ async function poolaiFetchMetricHistory(metricName, opts) {
   try {
     var endTime = new Date().toISOString();
     var startTime = new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
+    var wasm = poolaiChartsWasm();
     var url =
-      '/api/enterprise/monitoring/metrics?metric=' +
-      encodeURIComponent(metricName) +
-      '&start_time=' +
-      encodeURIComponent(startTime) +
-      '&end_time=' +
-      encodeURIComponent(endTime) +
-      '&limit=' +
-      limit;
+      wasm && typeof wasm.buildMetricHistoryUrl === 'function'
+        ? wasm.buildMetricHistoryUrl(metricName, startTime, endTime, limit)
+        : '/api/enterprise/monitoring/metrics?metric=' +
+          encodeURIComponent(metricName) +
+          '&start_time=' +
+          encodeURIComponent(startTime) +
+          '&end_time=' +
+          encodeURIComponent(endTime) +
+          '&limit=' +
+          limit;
     var data = await fetchJson(url);
     return data || [];
   } catch (e) {
@@ -96,13 +99,16 @@ async function poolaiFetchMetricsWindow(opts) {
   try {
     var endTime = new Date().toISOString();
     var startTime = new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
+    var wasm = poolaiChartsWasm();
     var url =
-      '/api/enterprise/monitoring/metrics?start_time=' +
-      encodeURIComponent(startTime) +
-      '&end_time=' +
-      encodeURIComponent(endTime) +
-      '&limit=' +
-      limit;
+      wasm && typeof wasm.buildMetricsWindowUrl === 'function'
+        ? wasm.buildMetricsWindowUrl(startTime, endTime, limit)
+        : '/api/enterprise/monitoring/metrics?start_time=' +
+          encodeURIComponent(startTime) +
+          '&end_time=' +
+          encodeURIComponent(endTime) +
+          '&limit=' +
+          limit;
     var data = await fetchJson(url);
     return data || [];
   } catch (e) {
