@@ -42,11 +42,15 @@ pub const METRIC_PAYOUT_ELIGIBLE_TOTAL: &str = "galaxy_trust_payout_eligible_tot
 /// In-process counter for edge results held pending verification (PH-S137).
 pub const METRIC_PAYOUT_HELD_TOTAL: &str = "galaxy_trust_payout_held_total";
 
+/// In-process counter for local-origin results where trust gate is not applicable (PH-S364).
+pub const METRIC_PAYOUT_NOT_APPLICABLE_TOTAL: &str = "galaxy_trust_payout_not_applicable_total";
+
 /// Last observed grid result `trust_score` on 0..=100 scale (PH-S182 `/metrics` gauge).
 pub const METRIC_TRUST_SCORE: &str = "galaxy_trust_score";
 
 static PAYOUT_ELIGIBLE_TOTAL: AtomicU64 = AtomicU64::new(0);
 static PAYOUT_HELD_TOTAL: AtomicU64 = AtomicU64::new(0);
+static PAYOUT_NOT_APPLICABLE_TOTAL: AtomicU64 = AtomicU64::new(0);
 static LAST_TRUST_SCORE: AtomicU64 = AtomicU64::new(0);
 
 /// Gate configuration (env-backed stub).
@@ -151,8 +155,15 @@ pub fn record_settlement_gate_verdict(verdict: SettlementGateVerdict) {
         SettlementGateVerdict::PayoutHeld => {
             PAYOUT_HELD_TOTAL.fetch_add(1, Ordering::Relaxed);
         }
-        SettlementGateVerdict::NotApplicable => {}
+        SettlementGateVerdict::NotApplicable => {
+            PAYOUT_NOT_APPLICABLE_TOTAL.fetch_add(1, Ordering::Relaxed);
+        }
     }
+}
+
+/// Total local-origin grid results where trust gate is not applicable (PH-S364).
+pub fn payout_not_applicable_total() -> u64 {
+    PAYOUT_NOT_APPLICABLE_TOTAL.load(Ordering::Relaxed)
 }
 
 /// Total edge payout-eligible grid results since process start.
@@ -169,6 +180,7 @@ pub fn payout_held_total() -> u64 {
 pub fn reset_settlement_gate_metrics_for_test() {
     PAYOUT_ELIGIBLE_TOTAL.store(0, Ordering::Relaxed);
     PAYOUT_HELD_TOTAL.store(0, Ordering::Relaxed);
+    PAYOUT_NOT_APPLICABLE_TOTAL.store(0, Ordering::Relaxed);
 }
 
 #[cfg(test)]
@@ -256,6 +268,17 @@ mod tests {
         record_settlement_gate_verdict(SettlementGateVerdict::NotApplicable);
         assert_eq!(payout_eligible_total(), 2);
         assert_eq!(payout_held_total(), 1);
+        assert_eq!(payout_not_applicable_total(), 1);
+        reset_settlement_gate_metrics_for_test();
+    }
+
+    #[test]
+    fn record_settlement_gate_verdict_not_applicable_ph_s364() {
+        reset_settlement_gate_metrics_for_test();
+        record_settlement_gate_verdict(SettlementGateVerdict::NotApplicable);
+        record_settlement_gate_verdict(SettlementGateVerdict::NotApplicable);
+        assert_eq!(payout_not_applicable_total(), 2);
+        assert_eq!(payout_eligible_total(), 0);
         reset_settlement_gate_metrics_for_test();
     }
 

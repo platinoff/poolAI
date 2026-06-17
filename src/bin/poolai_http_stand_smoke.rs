@@ -754,6 +754,7 @@ async fn smoke_galaxy_verification_metrics(client: &Client, base: &str) -> Resul
 const GALAXY_TRUST_PAYOUT_METRICS: &[&str] = &[
     "galaxy_trust_payout_eligible_total",
     "galaxy_trust_payout_held_total",
+    "galaxy_trust_payout_not_applicable_total",
     "galaxy_trust_score",
 ];
 
@@ -1858,6 +1859,9 @@ mod tests {
             "# HELP galaxy_trust_payout_held_total Galaxy trust payout held\n",
             "# TYPE galaxy_trust_payout_held_total gauge\n",
             "galaxy_trust_payout_held_total 0\n",
+            "# HELP galaxy_trust_payout_not_applicable_total Galaxy trust gate local-origin results not applicable (PH-S364)\n",
+            "# TYPE galaxy_trust_payout_not_applicable_total gauge\n",
+            "galaxy_trust_payout_not_applicable_total 0\n",
             "# HELP galaxy_trust_score Galaxy last trust score\n",
             "# TYPE galaxy_trust_score gauge\n",
             "galaxy_trust_score 0\n",

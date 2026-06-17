@@ -12,10 +12,11 @@ use poolai_ui_core::ml::{
     build_metrics_window_url, build_metrics_window_url_with_hours, build_ml_pipeline_demo_url,
     build_ml_pipelines_url, build_monitoring_active_alerts_url,
     build_monitoring_alert_acknowledge_url, build_monitoring_alerts_url,
-    build_monitoring_dashboards_url, chart_scale, collect_ml_sparkline_series,
-    flatten_ml_step_rows, format_ml_metric_summary, group_metrics_by_name, metric_point_values,
-    parse_ml_numeric, render_line_chart_empty_html, render_line_chart_html,
-    render_metrics_chart_grid_html, render_sparkline_html, sanitize_chart_id,
+    build_monitoring_dashboards_url, build_monitoring_metric_latest_url, chart_scale,
+    collect_ml_sparkline_series, flatten_ml_step_rows, format_ml_metric_summary,
+    group_metrics_by_name, metric_point_values, parse_ml_numeric, render_line_chart_empty_html,
+    render_line_chart_html, render_metrics_chart_grid_html, render_sparkline_html,
+    sanitize_chart_id,
 };
 use poolai_ui_core::modal::{admin_dynamic_modal_html, trap_tab_action, MODAL_FOCUSABLE_SELECTOR};
 use poolai_ui_core::pricing::{format_unix_secs, format_usd_micro};
@@ -353,6 +354,11 @@ pub fn build_monitoring_dashboards_url_wasm() -> String {
 #[wasm_bindgen(js_name = buildMonitoringAlertAcknowledgeUrl)]
 pub fn build_monitoring_alert_acknowledge_url_wasm(alert_id: &str) -> String {
     build_monitoring_alert_acknowledge_url(alert_id)
+}
+
+#[wasm_bindgen(js_name = buildMonitoringMetricLatestUrl)]
+pub fn build_monitoring_metric_latest_url_wasm(metric_name: &str, limit: u32) -> String {
+    build_monitoring_metric_latest_url(metric_name, limit)
 }
 
 #[wasm_bindgen(js_name = groupMetricsByName)]

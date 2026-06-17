@@ -62,8 +62,9 @@ use crate::grid::galaxy_settlement_metrics::{
     METRIC_SETTLEMENT_NOT_APPLICABLE_TOTAL, METRIC_SETTLEMENT_PENDING_VERIFICATION_TOTAL,
 };
 use crate::grid::galaxy_trust_score::{
-    last_trust_score, payout_eligible_total, payout_held_total, METRIC_PAYOUT_ELIGIBLE_TOTAL,
-    METRIC_PAYOUT_HELD_TOTAL, METRIC_TRUST_SCORE,
+    last_trust_score, payout_eligible_total, payout_held_total, payout_not_applicable_total,
+    METRIC_PAYOUT_ELIGIBLE_TOTAL, METRIC_PAYOUT_HELD_TOTAL, METRIC_PAYOUT_NOT_APPLICABLE_TOTAL,
+    METRIC_TRUST_SCORE,
 };
 use crate::grid::galaxy_verification_metrics::{
     verification_match_total, verification_mismatch_total, verification_sample_completed_total,
@@ -101,6 +102,7 @@ pub struct PoolAiPrometheus {
     galaxy_pricing_provider_errors_total: IntGauge,
     galaxy_trust_payout_eligible_total: IntGauge,
     galaxy_trust_payout_held_total: IntGauge,
+    galaxy_trust_payout_not_applicable_total: IntGauge,
     galaxy_trust_score: IntGauge,
     galaxy_shard_local_hit_ratio: IntGauge,
     galaxy_cross_region_egress_mb: IntGauge,
@@ -347,6 +349,15 @@ fn build_prometheus() -> PoolAiPrometheus {
     registry
         .register(Box::new(galaxy_trust_payout_held_total.clone()))
         .expect("register galaxy_trust_payout_held_total");
+
+    let galaxy_trust_payout_not_applicable_total = IntGauge::with_opts(Opts::new(
+        METRIC_PAYOUT_NOT_APPLICABLE_TOTAL,
+        "Galaxy trust gate local-origin results not applicable (PH-S364)",
+    ))
+    .expect(METRIC_PAYOUT_NOT_APPLICABLE_TOTAL);
+    registry
+        .register(Box::new(galaxy_trust_payout_not_applicable_total.clone()))
+        .expect("register galaxy_trust_payout_not_applicable_total");
 
     let galaxy_trust_score = IntGauge::with_opts(Opts::new(
         METRIC_TRUST_SCORE,
@@ -670,6 +681,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_pricing_provider_errors_total,
         galaxy_trust_payout_eligible_total,
         galaxy_trust_payout_held_total,
+        galaxy_trust_payout_not_applicable_total,
         galaxy_trust_score,
         galaxy_shard_local_hit_ratio,
         galaxy_cross_region_egress_mb,
@@ -735,6 +747,8 @@ pub fn refresh_galaxy_trust_gauges() {
         .set(payout_eligible_total() as i64);
     prom.galaxy_trust_payout_held_total
         .set(payout_held_total() as i64);
+    prom.galaxy_trust_payout_not_applicable_total
+        .set(payout_not_applicable_total() as i64);
     prom.galaxy_trust_score.set(last_trust_score() as i64);
 }
 

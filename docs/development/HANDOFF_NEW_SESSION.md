@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-17 (PH-S354…S363 ✅ · rust_ratio **94.33%**) · VDT
+**Оновлено:** 2026-06-17 (PH-S364…S373 ✅ · rust_ratio **94.32%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -314,9 +314,19 @@
 **PH-S361 ✅ (ops):** `poolai-vision-sync --check` green.
 **PH-S362 ✅ (ops):** hold advisory `--min-ratio 0.95` snapshot **94.33%**.
 **PH-S363 ✅ (docs):** INDEX §7 + rust_ratio pointer **94.33%**.
+**PH-S364 ✅ (code):** `galaxy_trust_payout_not_applicable_total` on local-origin trust gate path.
+**PH-S365 ✅ (code/ui):** dashboard `buildMonitoringActiveAlertsUrl(5)` wasm-first.
+**PH-S366 ✅ (code/ui):** `buildMonitoringMetricLatestUrl` wasm glue + `poolaiMonitoringMetricLatestUrl`.
+**PH-S367 ✅ (tests):** stand smoke trust not-applicable `/metrics` shape.
+**PH-S368 ✅ (code):** dashboard + metric latest wasm glue tests.
+**PH-S369 ✅ (ops):** `poolai-loc-audit` → **94.32%**.
+**PH-S370 ✅ (docs):** INDEX/HANDOFF/NEXT/STABLE/GALAXY canon sync.
+**PH-S371 ✅ (ops):** `poolai-vision-sync --check` green.
+**PH-S372 ✅ (ops):** hold advisory `--min-ratio 0.95` snapshot **94.32%**.
+**PH-S373 ✅ (docs):** INDEX §7 + rust_ratio pointer **94.32%**.
 **Rules ✅:** тригер **`абракадабра`** · wasm MSYS2 PATH у `poolai-session-iteration.mdc`.
 **§5.12:** **0** відкритих — replenish §5.13 або **`абракадабра`**.
-**Vision ✅:** rev **221** · rust_ratio **94.33%** · hold **95%** advisory.
+**Vision ✅:** rev **222** · rust_ratio **94.32%** · hold **95%** advisory.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

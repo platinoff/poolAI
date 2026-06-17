@@ -612,6 +612,20 @@ function poolaiMonitoringAlertAcknowledgeUrl(alertId) {
   );
 }
 
+function poolaiMonitoringMetricLatestUrl(metricName, limit) {
+  var wasm = poolaiChartsWasm();
+  var lim = limit != null ? limit : 10;
+  if (wasm && typeof wasm.buildMonitoringMetricLatestUrl === 'function') {
+    return wasm.buildMonitoringMetricLatestUrl(String(metricName || ''), lim);
+  }
+  return (
+    '/api/enterprise/monitoring/metrics?metric=' +
+    encodeURIComponent(String(metricName || '')) +
+    '&limit=' +
+    lim
+  );
+}
+
 async function poolaiRunMlPipelineDemo() {
   var wasm = poolaiChartsWasm();
   var url =

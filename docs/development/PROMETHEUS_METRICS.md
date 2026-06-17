@@ -74,6 +74,7 @@ scrape_configs:
 **Queued (FM §5.12 PH-S191…S200):** vision + code-first band — див. [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12.
 | `galaxy_trust_payout_eligible_total` | gauge | Galaxy trust gate edge payout-eligible results (PH-S137 stub; PH-S163 grid wire) |
 | `galaxy_trust_payout_held_total` | gauge | Galaxy trust gate edge payout-held results (PH-S137 stub; PH-S163 grid wire) |
+| `galaxy_trust_payout_not_applicable_total` | gauge | Galaxy trust gate local-origin results not applicable (PH-S364) |
 | `process_*` | various | `prometheus` process collector when available |
 
 JSON metrics for the admin UI remain at **`GET /api/v1/metrics`** — different contract.

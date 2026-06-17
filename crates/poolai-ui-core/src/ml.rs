@@ -415,6 +415,14 @@ fn encode_uri_component(raw: &str) -> String {
     out
 }
 
+/// Mirrors admin contract `GET .../monitoring/metrics?metric=&limit=` (PH-S366).
+pub fn build_monitoring_metric_latest_url(metric_name: &str, limit: u32) -> String {
+    format!(
+        "/api/enterprise/monitoring/metrics?metric={}&limit={limit}",
+        encode_uri_component(metric_name),
+    )
+}
+
 /// Mirrors `poolaiFetchMetricHistory` URL (PH-S314).
 pub fn build_metric_history_url(
     metric_name: &str,
@@ -662,6 +670,15 @@ mod tests {
         assert!(url.starts_with("/api/enterprise/monitoring/metrics?"));
         assert!(!url.contains("metric="));
         assert!(url.contains("limit=60"));
+    }
+
+    #[test]
+    fn build_monitoring_metric_latest_url_ph_s366() {
+        let url = build_monitoring_metric_latest_url("cpu_usage", 10);
+        assert_eq!(
+            url,
+            "/api/enterprise/monitoring/metrics?metric=cpu_usage&limit=10"
+        );
     }
 
     #[test]

@@ -25,7 +25,11 @@ pub async fn admin_dashboard() -> Html<String> {
         renderSystemOverview(overview);
         renderQuickStats(overview);
         const [alerts, audit] = await Promise.all([
-          fetchJson('/api/enterprise/monitoring/alerts?acknowledged=false&limit=5'),
+          fetchJson(
+            (typeof window !== 'undefined' && window.poolaiUiWasm && typeof window.poolaiUiWasm.buildMonitoringActiveAlertsUrl === 'function')
+              ? window.poolaiUiWasm.buildMonitoringActiveAlertsUrl(5)
+              : '/api/enterprise/monitoring/alerts?acknowledged=false&limit=5'
+          ),
           fetchJson('/api/enterprise/audit/events?limit=10')
         ]);
         renderActiveAlerts(alerts);

@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-17 (PH-S363 ✅ · vision **rev 221** · **0** відкритих · rust_ratio **94.33%**)
+**Оновлено:** 2026-06-17 (PH-S373 ✅ · vision **rev 222** · **0** відкритих · rust_ratio **94.32%**)
 
 | **← наступний** | replenish §5.13 **або** **`абракадабра`** (drain) |
 | **Відкритих** | **0** |
@@ -30,15 +30,15 @@ S0: git fetch; HANDOFF; FM §5.12; df -h /s
 
 ---
 
-## Закрито (смуга PH-S354…S363)
+## Закрито (смуга PH-S364…S373)
 
-PH-S354 ✅ — `galaxy_settlement_not_applicable_total` on grid result path.
-PH-S355 ✅ — `buildMonitoringActiveAlertsUrl` wasm; monitoring page `acknowledged: false`.
-PH-S356 ✅ — `galaxy_verification_sample_not_applicable_total` on local origin stub.
-PH-S357 ✅ — stand smoke settlement + verify not-applicable `/metrics` shape.
-PH-S358 ✅ — `admin_charts_*_wasm_first_ph_s353/355` glue tests.
-PH-S359…S363 ✅ — loc-audit **94.33%**, docs canon, vision `--check`, INDEX maintain.
+PH-S364 ✅ — `galaxy_trust_payout_not_applicable_total` on local-origin trust gate.
+PH-S365 ✅ — dashboard `buildMonitoringActiveAlertsUrl` wasm-first.
+PH-S366 ✅ — `buildMonitoringMetricLatestUrl` wasm glue.
+PH-S367 ✅ — stand smoke trust not-applicable `/metrics` shape.
+PH-S368 ✅ — dashboard + metric latest wasm glue tests.
+PH-S369…S373 ✅ — loc-audit **94.32%**, docs canon, vision `--check`, INDEX maintain.
 
-**rust_ratio:** **94.33%** (formal 90–95% ✅; hold 95% advisory).
+**rust_ratio:** **94.32%** (formal 90–95% ✅; hold 95% advisory).
 
 **BLOCKED / Deferred:** FM-003 LAN · FM-041 Cloud SDK live.
