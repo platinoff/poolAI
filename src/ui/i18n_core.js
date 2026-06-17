@@ -11,22 +11,12 @@
     en: {
       // auth.* + dash.* + admin.nav.* + admin chrome shell → poolai-ui-core i18n.rs (PH-S162, PH-S242, PH-S243)
 
-      'err.insufficientAdmin': 'Insufficient permissions. Admin role required.',
       'ui.save': 'Save Changes',
       'ui.upload': 'Upload',
       'ui.register': 'Register',
 
       'common.loading': 'Loading…',
       'common.unauthorized': 'Unauthorized — session expired. Please sign in again.',
-      'admin.accessRequired': 'Admin access required',
-
-      'err.hint403': 'You may need Admin or Operator role, or sign in again.',
-      'err.hint503.generic': 'A subsystem may still be starting or unavailable.',
-      'err.hint503.raid': 'RAID manager is not initialized on this server.',
-      'err.hint503.library': 'Library subsystem may not be initialized.',
-      'err.hint503.vm': 'VM manager may not be attached.',
-      'err.hint404.enterprise':
-        'Build and run the server with the enterprise feature for this API.',
 
       'home.apiTitle': 'API',
       'home.apiBase': 'Base:',
@@ -219,22 +209,12 @@
     uk: {
       // auth.* + dash.* + admin.nav.* + admin chrome shell → poolai-ui-core i18n.rs (PH-S162, PH-S242, PH-S243)
 
-      'err.insufficientAdmin': 'Недостатньо прав. Потрібна роль Admin.',
       'ui.save': 'Зберегти зміни',
       'ui.upload': 'Завантажити',
       'ui.register': 'Зареєструвати',
 
       'common.loading': 'Завантаження…',
       'common.unauthorized': 'Неавторизовано — сесію завершено. Увійдіть знову.',
-      'admin.accessRequired': 'Потрібні права адміністратора',
-
-      'err.hint403': 'Можливо, потрібна роль Admin або Operator, або увійдіть знову.',
-      'err.hint503.generic': 'Підсистема ще стартує або тимчасово недоступна.',
-      'err.hint503.raid': 'RAID-менеджер на цьому сервері не ініціалізовано.',
-      'err.hint503.library': 'Підсистему бібліотек може бути не ініціалізовано.',
-      'err.hint503.vm': 'VM-менеджер може бути не підключено.',
-      'err.hint404.enterprise':
-        'Зберіть і запустіть сервер з функцією enterprise для цього API.',
 
       'home.apiTitle': 'API',
       'home.apiBase': 'База:',
@@ -455,6 +435,13 @@
   if (rustAdminStatus) {
     if (rustAdminStatus.en) Object.assign(STRINGS.en, rustAdminStatus.en);
     if (rustAdminStatus.uk) Object.assign(STRINGS.uk, rustAdminStatus.uk);
+  }
+
+  // PH-S246: err.hint* / err.insufficientAdmin / admin.accessRequired → poolai-ui-core i18n.rs.
+  var rustAdminErr = typeof window !== 'undefined' && window.__poolaiAdminErrI18nRust;
+  if (rustAdminErr) {
+    if (rustAdminErr.en) Object.assign(STRINGS.en, rustAdminErr.en);
+    if (rustAdminErr.uk) Object.assign(STRINGS.uk, rustAdminErr.uk);
   }
 
   function normalizeLang(l) {

@@ -1,9 +1,9 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-17 · PH-S245 ✅ · vision **rev 197** (after sync) · **7** відкритих (PH-S246…S252) · **hold 95%** · **stretch spirit 96%**
+**Оновлено:** 2026-06-17 · PH-S246 ✅ · vision **rev 198** (after sync) · **6** відкритих (PH-S247…S252) · **hold 95%** · **stretch spirit 96%**
 
-| **← наступний** | **PH-S246** — Admin err hint keys slim patch |
-| **Відкритих** | **7** (PH-S246…S252) |
+| **← наступний** | **PH-S247** — Galaxy pricing provider metrics stand smoke |
+| **Відкритих** | **6** (PH-S247…S252) |
 
 ---
 
@@ -11,8 +11,7 @@
 
 | Sprint | Scope | Type |
 |--------|-------|------|
-| **PH-S246** ← | `err.hint*` + access keys slim | code |
-| PH-S247 | pricing provider metrics stand smoke | tests |
+| **PH-S247** ← | pricing provider metrics stand smoke | tests |
 | PH-S248 | `vm.*` modal i18n slim | code |
 | PH-S249 | settlement metrics stand smoke | tests |
 | PH-S250 | shard locality metrics stand smoke | tests |
@@ -21,20 +20,19 @@
 
 ---
 
-## PH-S246 — scope
+## PH-S247 — scope
 
-- `err.hint403`, `err.hint503.*`, `err.hint404.enterprise`, `err.insufficientAdmin`, `admin.accessRequired` → slim patch
-- Remove from `i18n_core.js`; extend admin layout tests
-- Pattern: PH-S245 status slim
-- Acceptance: `cargo test ph_s246`; FM/HANDOFF/NEXT; `poolai-vision-sync --check`; commit+push
+- `poolai-http-stand-smoke` — provider catalog lookups/hits + provider errors on live `/metrics`
+- Pattern: PH-S241/PH-S244 pricing metrics stand smoke
+- Acceptance: `cargo test ph_s247`; FM/HANDOFF/NEXT; `poolai-vision-sync --check`; commit+push
 
 ---
 
-## Copy-paste — PH-S246
+## Copy-paste — PH-S247
 
 ```
-PH-S246 — Admin err hint keys slim patch (code)
-Scope: err.hint* + err.insufficientAdmin + admin.accessRequired slim patch; cargo test ph_s246; FM/HANDOFF/NEXT; commit+push
+PH-S247 — Galaxy pricing provider metrics stand smoke (tests)
+Scope: provider catalog metrics on live /metrics; cargo test ph_s247; FM/HANDOFF/NEXT; commit+push
 ```
 
 ---

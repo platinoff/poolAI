@@ -1830,7 +1830,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S245",
+  "last_sprint_closed": "PH-S246",
   "layers": [
     {
       "id": "L0",
@@ -1863,7 +1863,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S246",
+  "next_sprint": "PH-S247",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7719,7 +7719,7 @@
       "path": "docs/vision/vision.svg"
     }
   ],
-  "revision": 197,
+  "revision": 198,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -9345,9 +9345,9 @@
       "acceptance": "err.hint*` + `err.insufficientAdmin` + `admin.accessRequired",
       "deps": "PH-S245",
       "id": "PH-S246",
-      "open": true,
+      "open": false,
       "row": 181,
-      "status": "open",
+      "status": "closed",
       "title": "Admin err hint keys slim patch (code)"
     },
     {
@@ -9405,7 +9405,7 @@
       "title": "Admin shared ui.confirm slim patch (code)"
     }
   ],
-  "sprint_queue_open_count": 7,
+  "sprint_queue_open_count": 6,
   "updated_at": "2026-06-16",
   "vision_ui_rev": 59
 }

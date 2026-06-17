@@ -1,6 +1,6 @@
 //! UI i18n subsets moved from `i18n_core.js` (PH-S154 admin jobs/grid; PH-S162 auth/dash shell; PH-S197 updates-compat; PH-S207 monitoring; PH-S211 jobs-only patch; PH-S214 raid-only patch; PH-S217 grid-pricing-only patch).
 //!
-//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs — `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); dashboard — `admin_dashboard_patch` (PH-S228); audit — `admin_audit_patch` (PH-S229); tenants — `admin_tenants_patch` (PH-S230); security — `admin_security_patch` (PH-S231); topology — `admin_topology_patch` (PH-S234); instances — `admin_instances_patch` (PH-S236); vm — `admin_vm_patch` (PH-S237); users — `admin_users_patch` (PH-S238); config — `admin_config_patch` (PH-S239); table toolbar — `admin_table_patch` (PH-S240); shared status — `admin_status_patch` (PH-S245); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221); workers — `admin_workers_patch` (PH-S222); libs — `admin_libs_patch` (PH-S223).
+//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs — `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); dashboard — `admin_dashboard_patch` (PH-S228); audit — `admin_audit_patch` (PH-S229); tenants — `admin_tenants_patch` (PH-S230); security — `admin_security_patch` (PH-S231); topology — `admin_topology_patch` (PH-S234); instances — `admin_instances_patch` (PH-S236); vm — `admin_vm_patch` (PH-S237); users — `admin_users_patch` (PH-S238); config — `admin_config_patch` (PH-S239); table toolbar — `admin_table_patch` (PH-S240); shared status — `admin_status_patch` (PH-S245); err hints — `admin_err_patch` (PH-S246); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221); workers — `admin_workers_patch` (PH-S222); libs — `admin_libs_patch` (PH-S223).
 //! Auth + dashboard shell: `window.__poolaiAuthDashI18nRust` on login, dashboard layout, admin layout (PH-S162).
 
 use std::collections::BTreeMap;
@@ -1735,6 +1735,66 @@ pub const ADMIN_STATUS_UK: &[I18nRow<'_>] = &[
     ("admin.na", "Н/Д"),
 ];
 
+/// English admin error hint / access keys (PH-S246; shared via admin_common.js).
+pub const ADMIN_ERR_EN: &[I18nRow<'_>] = &[
+    (
+        "err.insufficientAdmin",
+        "Insufficient permissions. Admin role required.",
+    ),
+    ("admin.accessRequired", "Admin access required"),
+    (
+        "err.hint403",
+        "You may need Admin or Operator role, or sign in again.",
+    ),
+    (
+        "err.hint503.generic",
+        "A subsystem may still be starting or unavailable.",
+    ),
+    (
+        "err.hint503.raid",
+        "RAID manager is not initialized on this server.",
+    ),
+    (
+        "err.hint503.library",
+        "Library subsystem may not be initialized.",
+    ),
+    ("err.hint503.vm", "VM manager may not be attached."),
+    (
+        "err.hint404.enterprise",
+        "Build and run the server with the enterprise feature for this API.",
+    ),
+];
+
+/// Ukrainian admin error hint / access keys (PH-S246).
+pub const ADMIN_ERR_UK: &[I18nRow<'_>] = &[
+    (
+        "err.insufficientAdmin",
+        "Недостатньо прав. Потрібна роль Admin.",
+    ),
+    ("admin.accessRequired", "Потрібні права адміністратора"),
+    (
+        "err.hint403",
+        "Можливо, потрібна роль Admin або Operator, або увійдіть знову.",
+    ),
+    (
+        "err.hint503.generic",
+        "Підсистема ще стартує або тимчасово недоступна.",
+    ),
+    (
+        "err.hint503.raid",
+        "RAID-менеджер на цьому сервері не ініціалізовано.",
+    ),
+    (
+        "err.hint503.library",
+        "Підсистему бібліотек може бути не ініціалізовано.",
+    ),
+    ("err.hint503.vm", "VM-менеджер може бути не підключено."),
+    (
+        "err.hint404.enterprise",
+        "Зберіть і запустіть сервер з функцією enterprise для цього API.",
+    ),
+];
+
 /// English auth keys (login, OAuth, bootstrap banner, lang toggle).
 pub const AUTH_SHELL_EN: &[I18nRow<'_>] = &[
     ("auth.pageTitle", "Login - PoolAI"),
@@ -2373,6 +2433,25 @@ pub fn admin_status_patch_script() -> String {
     )
 }
 
+/// Admin error hint / access keys — slim `err.hint*` patch (PH-S246).
+pub fn admin_err_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_ERR_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_ERR_UK));
+    root
+}
+
+pub fn admin_err_patch_json() -> String {
+    serde_json::to_string(&admin_err_patch()).expect("admin err i18n patch serializes")
+}
+
+pub fn admin_err_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminErrI18nRust={};",
+        admin_err_patch_json()
+    )
+}
+
 /// `{"en":{...},"uk":{...}}` patch for auth + dashboard + admin nav/chrome shell keys (PH-S162, PH-S242, PH-S243).
 pub fn auth_dash_shell_patch() -> BTreeMap<String, BTreeMap<String, String>> {
     let mut en = BTreeMap::new();
@@ -2673,6 +2752,28 @@ mod tests {
     fn status_patch_script_assigns_window_patch_ph_s245() {
         let script = admin_status_patch_script();
         assert!(script.starts_with("window.__poolaiAdminStatusI18nRust="));
+    }
+
+    #[test]
+    fn err_patch_has_matching_en_uk_key_counts_ph_s246() {
+        assert_eq!(ADMIN_ERR_EN.len(), ADMIN_ERR_UK.len());
+    }
+
+    #[test]
+    fn err_patch_json_err_only_ph_s246() {
+        let json = admin_err_patch_json();
+        assert!(json.contains(r#""err.hint403""#));
+        assert!(json.contains(r#""err.hint503.raid""#));
+        assert!(json.contains(r#""err.insufficientAdmin""#));
+        assert!(json.contains(r#""admin.accessRequired""#));
+        assert!(!json.contains(r#""admin.status.active""#));
+        assert!(!json.contains(r#""admin.table.empty""#));
+    }
+
+    #[test]
+    fn err_patch_script_assigns_window_patch_ph_s246() {
+        let script = admin_err_patch_script();
+        assert!(script.starts_with("window.__poolaiAdminErrI18nRust="));
     }
 
     #[test]
