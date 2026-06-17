@@ -23,6 +23,12 @@ pub const METRIC_PREFETCH_ENQUEUE_TOTAL: &str = "galaxy_prefetch_enqueue_total";
 /// Prefetch wait stub milliseconds (deadline × planned shards, PH-S293).
 pub const METRIC_PREFETCH_WAIT_MS_TOTAL: &str = "galaxy_prefetch_wait_ms_total";
 
+/// Prefetch plans under strict locality mode (PH-S303 stub).
+pub const METRIC_PREFETCH_STRICT_MODE_TOTAL: &str = "galaxy_prefetch_strict_mode_total";
+
+/// Prefetch enqueue+wait complete hook invocations (PH-S307 stub).
+pub const METRIC_PREFETCH_COMPLETE_TOTAL: &str = "galaxy_prefetch_complete_total";
+
 /// Default stub bytes per RAM-tier planned shard (4 MiB, Galaxy §5.5).
 pub const DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM: u64 = 4_194_304;
 
@@ -35,6 +41,8 @@ static HOT_SKIP_TOTAL: AtomicU64 = AtomicU64::new(0);
 static PREFETCH_BYTES_TOTAL: AtomicU64 = AtomicU64::new(0);
 static ENQUEUE_TOTAL: AtomicU64 = AtomicU64::new(0);
 static WAIT_MS_TOTAL: AtomicU64 = AtomicU64::new(0);
+static STRICT_MODE_TOTAL: AtomicU64 = AtomicU64::new(0);
+static COMPLETE_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// Record one `plan_prefetch` outcome (no wire enqueue).
 pub fn record_prefetch_plan(required_shards: usize, planned_shards: usize, prefetch_bytes: u64) {
@@ -88,6 +96,26 @@ pub fn prefetch_wait_ms_total() -> u64 {
     WAIT_MS_TOTAL.load(Ordering::Relaxed)
 }
 
+/// Record strict locality prefetch plan (PH-S303).
+pub fn record_prefetch_strict_mode() {
+    STRICT_MODE_TOTAL.fetch_add(1, Ordering::Relaxed);
+}
+
+pub fn prefetch_strict_mode_total() -> u64 {
+    STRICT_MODE_TOTAL.load(Ordering::Relaxed)
+}
+
+/// Record prefetch complete hook (enqueue+wait path, PH-S307).
+pub fn record_prefetch_complete(planned_shards: usize) {
+    if planned_shards > 0 {
+        COMPLETE_TOTAL.fetch_add(1, Ordering::Relaxed);
+    }
+}
+
+pub fn prefetch_complete_total() -> u64 {
+    COMPLETE_TOTAL.load(Ordering::Relaxed)
+}
+
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_prefetch_metrics_for_test() {
     PLAN_TOTAL.store(0, Ordering::Relaxed);
@@ -96,6 +124,8 @@ pub fn reset_prefetch_metrics_for_test() {
     PREFETCH_BYTES_TOTAL.store(0, Ordering::Relaxed);
     ENQUEUE_TOTAL.store(0, Ordering::Relaxed);
     WAIT_MS_TOTAL.store(0, Ordering::Relaxed);
+    STRICT_MODE_TOTAL.store(0, Ordering::Relaxed);
+    COMPLETE_TOTAL.store(0, Ordering::Relaxed);
 }
 
 #[cfg(test)]
@@ -129,5 +159,21 @@ mod tests {
         assert_eq!(prefetch_wait_ms_total(), 30_000);
         record_prefetch_wait(0, 15_000);
         assert_eq!(prefetch_wait_ms_total(), 30_000);
+    }
+
+    #[test]
+    fn record_prefetch_strict_mode_ph_s303() {
+        reset_prefetch_metrics_for_test();
+        record_prefetch_strict_mode();
+        assert_eq!(prefetch_strict_mode_total(), 1);
+    }
+
+    #[test]
+    fn record_prefetch_complete_ph_s307() {
+        reset_prefetch_metrics_for_test();
+        record_prefetch_complete(2);
+        assert_eq!(prefetch_complete_total(), 1);
+        record_prefetch_complete(0);
+        assert_eq!(prefetch_complete_total(), 1);
     }
 }

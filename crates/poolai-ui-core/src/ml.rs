@@ -536,6 +536,13 @@ mod tests {
     }
 
     #[test]
+    fn render_line_chart_empty_html_ph_s304() {
+        let html = render_line_chart_empty_html("No data");
+        assert!(html.contains("muted"));
+        assert!(html.contains("No data"));
+    }
+
+    #[test]
     fn sanitize_chart_id_ph_s297() {
         assert_eq!(sanitize_chart_id("cpu.usage"), "cpu_usage");
         assert_eq!(sanitize_chart_id("a-b_c"), "a-b_c");

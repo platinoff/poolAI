@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-17 (PH-S293…S302 ✅ · §5.12 **0** відкритих · rust_ratio **94.37%**) · VDT
+**Оновлено:** 2026-06-17 (PH-S303…S312 ✅ · §5.12 **0** відкритих · rust_ratio **94.38%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -253,8 +253,18 @@
 **PH-S300 ✅ (ops):** `poolai-vision-sync --check` green.
 **PH-S301 ✅ (ops):** hold advisory `--min-ratio 0.95` snapshot **94.37%**.
 **PH-S302 ✅ (docs):** INDEX §7 + rust_ratio pointer **94.37%**.
+**PH-S303 ✅ (code):** `galaxy_prefetch_strict_mode_total` on strict locality prefetch plans.
+**PH-S304 ✅ (code/ui):** `renderLineChartEmptyHtml` wasm; line chart empty wasm-first.
+**PH-S305 ✅ (code):** `galaxy_locality_rank_miss_total` on locality rank miss.
+**PH-S306 ✅ (tests):** stand smoke `/metrics` strict + complete + rank miss counters.
+**PH-S307 ✅ (code):** `complete_prefetch_hook` + `galaxy_prefetch_complete_total`.
+**PH-S308 ✅ (ops):** `poolai-loc-audit` → `rust_ratio.json` sprint **PH-S308** (**94.38%**).
+**PH-S309 ✅ (docs):** INDEX/HANDOFF/NEXT/STABLE/GALAXY canon sync.
+**PH-S310 ✅ (ops):** `poolai-vision-sync --check` green.
+**PH-S311 ✅ (ops):** hold advisory `--min-ratio 0.95` snapshot **94.38%**.
+**PH-S312 ✅ (docs):** INDEX §7 + rust_ratio pointer **94.38%**.
 **§5.12:** **0** відкритих — replenish з §5.13.
-**Vision ✅:** rev **210** · rust_ratio **94.37%** · hold **95%** advisory.
+**Vision ✅:** rev **212** · rust_ratio **94.38%** · hold **95%** advisory.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

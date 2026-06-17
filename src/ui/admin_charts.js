@@ -135,11 +135,12 @@ function poolaiGroupMetricsByName(metrics) {
 function poolaiRenderLineChart(metricName, data, opts) {
   opts = opts || {};
   if (!data || data.length === 0) {
-    return (
-      '<div class="muted">' +
-      escapeHtml(poolaiChartT('admin.mon.noData', 'No data available')) +
-      '</div>'
-    );
+    var noData = poolaiChartT('admin.mon.noData', 'No data available');
+    var wasmEmpty = poolaiChartsWasm();
+    if (wasmEmpty && typeof wasmEmpty.renderLineChartEmptyHtml === 'function') {
+      return wasmEmpty.renderLineChartEmptyHtml(noData);
+    }
+    return '<div class="muted">' + escapeHtml(noData) + '</div>';
   }
 
   var values = poolaiMetricPointValues(data);

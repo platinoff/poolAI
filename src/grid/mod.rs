@@ -25,8 +25,8 @@ mod map;
 pub mod protocol_compat;
 
 pub use dispatch::{
-    coordinator_merged_seed_inventory, coordinator_seed_inventory_snapshot, enqueue_prefetch_hook,
-    ingest_envelope, ingest_job_locality_rank_stub, ingest_job_prefetch_stub,
+    coordinator_merged_seed_inventory, coordinator_seed_inventory_snapshot, complete_prefetch_hook,
+    enqueue_prefetch_hook, ingest_envelope, ingest_job_locality_rank_stub, ingest_job_prefetch_stub,
     locality_workers_from_seed_snapshots, noop_prefetch_hook, parse_prefetch_policy_mode,
     plan_prefetch, wait_prefetch_hook, GridIngestKind, GridIngestOutcome, PrefetchPlan,
     PrefetchPolicyConfig, PrefetchPolicyMode, PrefetchTrigger, SeedInventoryEntry,

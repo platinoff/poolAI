@@ -15,12 +15,13 @@ use crate::core::error::AppError;
 use crate::grid::galaxy_fee_split_metrics::evaluate_result_fee_split;
 use crate::grid::galaxy_locality::{
     observe_last_cross_region_egress_mb, pick_best_worker_by_locality, record_locality_rank_ingest,
-    LocalityHotTier, LocalityNetworkProfile, LocalitySeedInventory, LocalityTask, LocalityWorker,
-    DEFAULT_PREFETCH_CROSS_REGION_EGRESS_MB_PER_SHARD,
+    record_locality_rank_miss, LocalityHotTier, LocalityNetworkProfile, LocalitySeedInventory,
+    LocalityTask, LocalityWorker, DEFAULT_PREFETCH_CROSS_REGION_EGRESS_MB_PER_SHARD,
 };
 use crate::grid::galaxy_prefetch_metrics::{
-    record_prefetch_enqueue, record_prefetch_plan, record_prefetch_wait,
-    DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM, DEFAULT_PREFETCH_BYTES_PER_SHARD_VRAM,
+    record_prefetch_complete, record_prefetch_enqueue, record_prefetch_plan,
+    record_prefetch_strict_mode, record_prefetch_wait, DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM,
+    DEFAULT_PREFETCH_BYTES_PER_SHARD_VRAM,
 };
 use crate::grid::galaxy_replay_metrics::evaluate_result_replay_pending;
 use crate::grid::galaxy_replication::{
@@ -157,8 +158,7 @@ pub fn ingest_job_prefetch_stub(required_shard_ids: &[String], gpu_capable: bool
         gpu_capable,
         &config,
     );
-    let n = enqueue_prefetch_hook(&plan);
-    wait_prefetch_hook(&plan);
+    let n = complete_prefetch_hook(&plan);
     n
 }
 
@@ -209,10 +209,15 @@ pub fn ingest_job_locality_rank_stub(
         estimated_cross_region_egress_mb: 0.0,
         source_region: None,
     };
-    pick_best_worker_by_locality(&workers, &task).map(|w| {
-        record_locality_rank_ingest();
-        w.worker_id.clone()
-    })
+    pick_best_worker_by_locality(&workers, &task)
+        .map(|w| {
+            record_locality_rank_ingest();
+            w.worker_id.clone()
+        })
+        .or_else(|| {
+            record_locality_rank_miss();
+            None
+        })
 }
 
 fn grid_job_gpu_capable(task_kind: &str) -> bool {
@@ -351,6 +356,9 @@ pub fn plan_prefetch(
     };
     let prefetch_bytes = items.len() as u64 * bytes_per_shard;
     record_prefetch_plan(required_shard_ids.len(), items.len(), prefetch_bytes);
+    if config.mode == PrefetchPolicyMode::StrictLocality && !items.is_empty() {
+        record_prefetch_strict_mode();
+    }
     if !items.is_empty() {
         observe_last_cross_region_egress_mb(
             DEFAULT_PREFETCH_CROSS_REGION_EGRESS_MB_PER_SHARD * items.len() as f64,
@@ -383,6 +391,18 @@ pub fn enqueue_prefetch_hook(plan: &PrefetchPlan) -> usize {
 pub fn wait_prefetch_hook(plan: &PrefetchPlan) -> u64 {
     record_prefetch_wait(plan.items.len(), plan.deadline_ms);
     plan.deadline_ms
+}
+
+/// Prefetch complete stub (PH-S307): enqueue + wait + complete metric; no live seed pull wire.
+#[inline]
+pub fn complete_prefetch_hook(plan: &PrefetchPlan) -> usize {
+    let n = plan.items.len();
+    if n > 0 {
+        record_prefetch_enqueue(n);
+        record_prefetch_wait(n, plan.deadline_ms);
+        record_prefetch_complete(n);
+    }
+    n
 }
 
 /// Outcome of processing one grid envelope.
@@ -1799,13 +1819,62 @@ mod tests {
     #[test]
     fn ingest_job_prefetch_enqueue_ph_s286() {
         use crate::grid::galaxy_prefetch_metrics::{
-            prefetch_enqueue_total, prefetch_wait_ms_total, reset_prefetch_metrics_for_test,
+            prefetch_complete_total, prefetch_enqueue_total, prefetch_wait_ms_total,
+            reset_prefetch_metrics_for_test,
         };
 
         reset_prefetch_metrics_for_test();
         ingest_job_prefetch_stub(&["w:missing-shard".into()], false);
         assert_eq!(prefetch_enqueue_total(), 1);
         assert_eq!(prefetch_wait_ms_total(), DEFAULT_PREFETCH_DEADLINE_MS);
+        assert_eq!(prefetch_complete_total(), 1);
+        reset_prefetch_metrics_for_test();
+    }
+
+    #[test]
+    fn plan_prefetch_strict_mode_ph_s303() {
+        use crate::grid::galaxy_prefetch_metrics::{
+            prefetch_strict_mode_total, reset_prefetch_metrics_for_test,
+        };
+
+        reset_prefetch_metrics_for_test();
+        let inventory = SeedInventoryEntry::default();
+        let config = PrefetchPolicyConfig {
+            mode: PrefetchPolicyMode::StrictLocality,
+            prefetch_deadline_ms: DEFAULT_PREFETCH_DEADLINE_MS,
+        };
+        let _plan = plan_prefetch(
+            &inventory,
+            &["w:cold-shard".into()],
+            PrefetchTrigger::JobAdmitted,
+            false,
+            &config,
+        );
+        assert_eq!(prefetch_strict_mode_total(), 1);
+        reset_prefetch_metrics_for_test();
+    }
+
+    #[test]
+    fn complete_prefetch_hook_ph_s307() {
+        use crate::grid::galaxy_prefetch_metrics::{
+            prefetch_complete_total, prefetch_enqueue_total, prefetch_wait_ms_total,
+            reset_prefetch_metrics_for_test,
+        };
+
+        reset_prefetch_metrics_for_test();
+        let plan = PrefetchPlan {
+            items: vec![PrefetchPlanItem {
+                shard_id: "a".into(),
+                target_tier: PrefetchTargetTier::Ram,
+            }],
+            trigger: PrefetchTrigger::JobAdmitted,
+            deadline_ms: DEFAULT_PREFETCH_DEADLINE_MS,
+            mode: PrefetchPolicyMode::BestEffort,
+        };
+        assert_eq!(complete_prefetch_hook(&plan), 1);
+        assert_eq!(prefetch_enqueue_total(), 1);
+        assert_eq!(prefetch_wait_ms_total(), DEFAULT_PREFETCH_DEADLINE_MS);
+        assert_eq!(prefetch_complete_total(), 1);
         reset_prefetch_metrics_for_test();
     }
 }

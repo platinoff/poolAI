@@ -1,6 +1,6 @@
 # Rust codebase ratio — стратегія 90–95% (PoolAI)
 
-**Оновлено:** 2026-06-17 · **Канон:** FM **§5.13** · §5.12 **0** відкритих (PH-S128…S302 ✅) · rust_ratio **94.37%**
+**Оновлено:** 2026-06-17 · **Канон:** FM **§5.13** · §5.12 **0** відкритих (PH-S128…S312 ✅) · rust_ratio **94.38%**
 
 **Мета:** зростання частки **Rust** у виконуваному коді репозиторію до **90–95%** (формально), **96% stretch spirit** (орієнтир replenish PH-S150…S159) — платформа збирається і перевіряється через **`cargo`** без обов'язкового Node на edge.
 
@@ -85,7 +85,7 @@ flowchart TB
 | **E — gate** | PH-S150 ✅ | CI advisory якщо ratio <88%; target 93%; stretch 96% spirit | стабільно 90–95% |
 | **F — stretch 96%** | PH-S151…S159 ✅ | wasm wiring, slim JS/i18n/charts, Rust stand/e2e bins; CI warn **93%** | **→96% spirit** |
 
-**Черга §5.12:** **0** відкритих · PH-S302 ✅ · replenish §5.13.
+**Черга §5.12:** **0** відкритих · PH-S312 ✅ · replenish §5.13.
 
 ---
 
@@ -252,6 +252,16 @@ flowchart TB
 | 157 | **PH-S300** | poolai-vision-sync drift gate | `--check` green | **✅** |
 | 158 | **PH-S301** | Ratio hold advisory snapshot | **94.37%** advisory | **✅** |
 | 159 | **PH-S302** | Docs INDEX ratio maintain | INDEX §7 pointer | **✅** |
+| 160 | **PH-S303** | Galaxy prefetch strict mode metric | `galaxy_prefetch_strict_mode_total` | **✅** |
+| 161 | **PH-S304** | admin line chart empty wasm | `renderLineChartEmptyHtml` | **✅** |
+| 162 | **PH-S305** | Galaxy locality rank miss metric | `galaxy_locality_rank_miss_total` | **✅** |
+| 163 | **PH-S306** | Stand smoke strict + rank miss | `/metrics` export shape | **✅** |
+| 164 | **PH-S307** | Galaxy complete prefetch hook | `complete_prefetch_hook` | **✅** |
+| 165 | **PH-S308** | Rust ratio loc-audit refresh | **94.38%** sprint zriz | **✅** |
+| 166 | **PH-S309** | Docs canon sync band | INDEX/HANDOFF/NEXT | **✅** |
+| 167 | **PH-S310** | poolai-vision-sync drift gate | `--check` green | **✅** |
+| 168 | **PH-S311** | Ratio hold advisory snapshot | **94.38%** advisory | **✅** |
+| 169 | **PH-S312** | Docs INDEX ratio maintain | INDEX §7 pointer | **✅** |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 
