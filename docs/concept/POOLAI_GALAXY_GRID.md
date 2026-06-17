@@ -401,6 +401,7 @@ poolai_quote_usd_micro = floor(market_min_usd_micro × 9_000 / 10_000)   // −1
 - Env catalog (PH-S92): `GalaxyPricingProviderCatalog` у `galaxy_pricing_oracle.rs` — `parse_pricing_providers_json`, `bundled_pricing_provider_catalog`, `pricing_provider_catalog_from_env`.
 - API metadata (PH-S89): `GET /api/v1/grid/pricing` → `l1_cache` on L1 hits (`cache_age_secs`, `cache_ttl_secs`, `max_stale_secs`, fresh/stale until timestamps).
 - Метрики (Prometheus, roadmap): `galaxy_pricing_provider_errors_total`, `galaxy_pricing_quote_usd_micro`, `galaxy_pricing_market_min_usd_micro` (PH-S181 ✅).
+- **Stand smoke band (PH-S244…S250, §5.12):** `poolai-http-stand-smoke` live `/metrics` parity для stale/provider/settlement/locality gauges — див. [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
 - Alert: усі providers fail &gt; 15 хв **і** L2 не заданий → сторінка ops.
 
 **Rust reference (oracle + HTTP, PH-S68…S92):**

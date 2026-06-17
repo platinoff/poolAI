@@ -7719,7 +7719,7 @@
       "path": "docs/vision/vision.svg"
     }
   ],
-  "revision": 191,
+  "revision": 192,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -9340,9 +9340,72 @@
       "row": 180,
       "status": "open",
       "title": "Admin shared status keys slim patch (code)"
+    },
+    {
+      "acceptance": "err.hint*` + `err.insufficientAdmin` + `admin.accessRequired",
+      "deps": "PH-S245",
+      "id": "PH-S246",
+      "open": true,
+      "row": 181,
+      "status": "open",
+      "title": "Admin err hint keys slim patch (code)"
+    },
+    {
+      "acceptance": "provider catalog + errors gauges on `/metrics",
+      "deps": "PH-S127",
+      "id": "PH-S247",
+      "open": true,
+      "row": 182,
+      "status": "open",
+      "title": "Galaxy pricing provider metrics stand smoke (tests)"
+    },
+    {
+      "acceptance": "vm.*` modal keys out of `i18n_core.js",
+      "deps": "PH-S237",
+      "id": "PH-S248",
+      "open": true,
+      "row": 183,
+      "status": "open",
+      "title": "Admin vm modal i18n slim (code)"
+    },
+    {
+      "acceptance": "settlement pending + cleared on `/metrics",
+      "deps": "PH-S178",
+      "id": "PH-S249",
+      "open": true,
+      "row": 184,
+      "status": "open",
+      "title": "Galaxy settlement metrics stand smoke (tests)"
+    },
+    {
+      "acceptance": "galaxy_shard_local_hit_ratio` on `/metrics",
+      "deps": "PH-S183",
+      "id": "PH-S250",
+      "open": true,
+      "row": 185,
+      "status": "open",
+      "title": "Galaxy shard locality metrics stand smoke (tests)"
+    },
+    {
+      "acceptance": "GALAXY_GRID_ROADMAP + README + INDEX sprint zriz",
+      "deps": "PH-S249",
+      "id": "PH-S251",
+      "open": true,
+      "row": 186,
+      "status": "open",
+      "title": "Docs roadmap sync band (docs)"
+    },
+    {
+      "acceptance": "ui.confirm*` + modal glue keys slim patch",
+      "deps": "PH-S245",
+      "id": "PH-S252",
+      "open": true,
+      "row": 187,
+      "status": "open",
+      "title": "Admin shared ui.confirm slim patch (code)"
     }
   ],
-  "sprint_queue_open_count": 3,
+  "sprint_queue_open_count": 10,
   "updated_at": "2026-06-16",
   "vision_ui_rev": 59
 }

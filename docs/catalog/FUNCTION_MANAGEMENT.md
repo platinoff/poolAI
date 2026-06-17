@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-16 (PH-S242 ✅ · §5.12 **3** відкриті PH-S243…S245 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-16 (PH-S242 ✅ · §5.12 replenish **10** відкритих PH-S243…S252 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -445,10 +445,19 @@ FM-xxx (з таблиці нижче)
 | 178 | **PH-S243** | Admin i18n slim admin chrome shell (code) | PH-S242 | `admin.brand` / skip / lang / logout / browserSuffix → auth_dash | відкрито |
 | 179 | **PH-S244** | Galaxy pricing stale served metrics stand smoke (tests) | PH-S127 | `galaxy_pricing_stale_served` on live `/metrics` | відкрито |
 | 180 | **PH-S245** | Admin shared status keys slim patch (code) | PH-S240 | `admin.status.*` + `admin.na` + `admin.btn.edit` slim patch | відкрито |
+| 181 | **PH-S246** | Admin err hint keys slim patch (code) | PH-S245 | `err.hint*` + `err.insufficientAdmin` + `admin.accessRequired` | відкрито |
+| 182 | **PH-S247** | Galaxy pricing provider metrics stand smoke (tests) | PH-S127 | provider catalog + errors gauges on `/metrics` | відкрито |
+| 183 | **PH-S248** | Admin vm modal i18n slim (code) | PH-S237 | `vm.*` modal keys out of `i18n_core.js` | відкрито |
+| 184 | **PH-S249** | Galaxy settlement metrics stand smoke (tests) | PH-S178 | settlement pending + cleared on `/metrics` | відкрито |
+| 185 | **PH-S250** | Galaxy shard locality metrics stand smoke (tests) | PH-S183 | `galaxy_shard_local_hit_ratio` on `/metrics` | відкрито |
+| 186 | **PH-S251** | Docs roadmap sync band (docs) | PH-S249 | GALAXY_GRID_ROADMAP + README + INDEX sprint zriz | відкрито |
+| 187 | **PH-S252** | Admin shared ui.confirm slim patch (code) | PH-S245 | `ui.confirm*` + modal glue keys slim patch | відкрито |
 
-**Відкритих у §5.12:** **3** (PH-S243…S245). **Закрито смуга:** PH-S128…S242 ✅. Vision rev **191**.
+**Відкритих у §5.12:** **10** (PH-S243…S252). **Закрито смуга:** PH-S128…S242 ✅. Vision rev **192**.
 
-**Наступна сесія:** **PH-S243** · черга **3** відкриті (PH-S243…S245) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S243** · черга **10** відкритих · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+
+**Replenish (2026-06-16):** i18n slim band (S243…S246, S248, S252) + Galaxy `/metrics` stand smoke (S244, S247, S249, S250) + docs sync (S251) — з [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md), [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md) §4.2/§5.3/§6.4, [`RUST_RATIO_STRATEGY_2026-06-13.md`](../development/RUST_RATIO_STRATEGY_2026-06-13.md) post-S242 maintain.
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S169)
 

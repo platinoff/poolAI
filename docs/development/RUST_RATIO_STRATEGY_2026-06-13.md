@@ -195,6 +195,13 @@ flowchart TB
 | 100 | **PH-S243** | Admin i18n slim admin chrome shell | code | відкрито |
 | 101 | **PH-S244** | Galaxy pricing stale served metrics stand smoke | tests | відкрито |
 | 102 | **PH-S245** | Admin shared status keys slim patch | code | відкрито |
+| 103 | **PH-S246** | Admin err hint keys slim patch | code | відкрито |
+| 104 | **PH-S247** | Galaxy pricing provider metrics stand smoke | tests | відкрито |
+| 105 | **PH-S248** | Admin vm modal i18n slim | code | відкрито |
+| 106 | **PH-S249** | Galaxy settlement metrics stand smoke | tests | відкрито |
+| 107 | **PH-S250** | Galaxy shard locality metrics stand smoke | tests | відкрито |
+| 108 | **PH-S251** | Docs roadmap sync band | docs | відкрито |
+| 109 | **PH-S252** | Admin shared ui.confirm slim patch | code | відкрито |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 

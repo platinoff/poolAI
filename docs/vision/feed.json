@@ -30,6 +30,69 @@
       "title": "Admin shared status keys slim patch (code)"
     },
     {
+      "category": "open",
+      "id": "PH-S246",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "err.hint*` + `err.insufficientAdmin` + `admin.accessRequired",
+      "title": "Admin err hint keys slim patch (code)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S247",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "provider catalog + errors gauges on `/metrics",
+      "title": "Galaxy pricing provider metrics stand smoke (tests)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S248",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "vm.*` modal keys out of `i18n_core.js",
+      "title": "Admin vm modal i18n slim (code)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S249",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "settlement pending + cleared on `/metrics",
+      "title": "Galaxy settlement metrics stand smoke (tests)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S250",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "galaxy_shard_local_hit_ratio` on `/metrics",
+      "title": "Galaxy shard locality metrics stand smoke (tests)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S251",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "GALAXY_GRID_ROADMAP + README + INDEX sprint zriz",
+      "title": "Docs roadmap sync band (docs)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S252",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "ui.confirm*` + modal glue keys slim patch",
+      "title": "Admin shared ui.confirm slim patch (code)"
+    },
+    {
       "category": "closed",
       "id": "PH-S242",
       "link": "docs/vision/index.html#sprint-queue",

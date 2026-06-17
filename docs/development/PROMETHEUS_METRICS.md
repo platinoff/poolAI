@@ -86,4 +86,6 @@ Prometheus alert rules live in your monitoring stack (Prometheus / Alertmanager 
 - [`../performance/BENCHMARKS.md`](../performance/BENCHMARKS.md) — load baselines
 - [`../performance/PROFILING.md`](../performance/PROFILING.md) — hot-path profiling
 
-**Last updated:** 2026-06-14 (PH-S185 cross region egress mb metrics).
+- [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) — stand smoke band PH-S244…S250 (`poolai-http-stand-smoke`)
+
+**Last updated:** 2026-06-16 (replenish §5.12 PH-S243…S252; stand smoke band S244…S250).
