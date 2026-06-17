@@ -1830,7 +1830,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S230",
+  "last_sprint_closed": "PH-S231",
   "layers": [
     {
       "id": "L0",
@@ -1863,7 +1863,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S231",
+  "next_sprint": "PH-S232",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -6160,7 +6160,10 @@
       "id": "src_ui_admin_security_rs",
       "label": "security.rs",
       "layer": "L3",
-      "path": "src/ui/admin/security.rs"
+      "path": "src/ui/admin/security.rs",
+      "sprints": [
+        "PH-S231"
+      ]
     },
     {
       "auto_synced": true,
@@ -7288,7 +7291,8 @@
       "path": "crates/poolai-ui-core/src/i18n.rs",
       "sprints": [
         "PH-S154",
-        "PH-S162"
+        "PH-S162",
+        "PH-S231"
       ]
     },
     {
@@ -7697,7 +7701,7 @@
       "path": "docs/vision/vision.svg"
     }
   ],
-  "revision": 179,
+  "revision": 180,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -9185,12 +9189,12 @@
       "title": "Admin i18n slim tenants panel (code)"
     },
     {
-      "acceptance": "admin.sec.*` slim patch",
+      "acceptance": "admin.sec.*` → `admin_security_patch",
       "deps": "PH-S207",
       "id": "PH-S231",
-      "open": true,
+      "open": false,
       "row": 166,
-      "status": "open",
+      "status": "closed",
       "title": "Admin i18n slim security panel (code)"
     },
     {
@@ -9230,7 +9234,7 @@
       "title": "Stand smoke vision rev parity (tests)"
     }
   ],
-  "sprint_queue_open_count": 5,
-  "updated_at": "2026-06-15",
+  "sprint_queue_open_count": 4,
+  "updated_at": "2026-06-16",
   "vision_ui_rev": 58
 }

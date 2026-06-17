@@ -3,18 +3,9 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S231",
-      "link": "docs/vision/index.html#sprint-queue",
-      "next": true,
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "admin.sec.*` slim patch",
-      "title": "Admin i18n slim security panel (code)"
-    },
-    {
-      "category": "open",
       "id": "PH-S232",
       "link": "docs/vision/index.html#sprint-queue",
+      "next": true,
       "published": "2026-05-28",
       "status": "open",
       "summary": "replication counters on `/metrics",
@@ -46,6 +37,15 @@
       "status": "open",
       "summary": "stand checks vision rev vs FM footer",
       "title": "Stand smoke vision rev parity (tests)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S231",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "admin.sec.*` → `admin_security_patch",
+      "title": "Admin i18n slim security panel (code)"
     },
     {
       "category": "closed",
@@ -145,15 +145,6 @@
       "status": "closed",
       "summary": "admin.mon.*` → slim `admin_monitoring_patch",
       "title": "Admin i18n slim monitoring panel (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S219",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "stand smoke trust payout counters on `/metrics",
-      "title": "Galaxy trust payout metrics smoke (tests)"
     }
   ],
   "link": "docs/vision/index.html",

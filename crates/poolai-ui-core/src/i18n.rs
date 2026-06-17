@@ -1,6 +1,6 @@
 //! UI i18n subsets moved from `i18n_core.js` (PH-S154 admin jobs/grid; PH-S162 auth/dash shell; PH-S197 updates-compat; PH-S207 monitoring; PH-S211 jobs-only patch; PH-S214 raid-only patch; PH-S217 grid-pricing-only patch).
 //!
-//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs — `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); dashboard — `admin_dashboard_patch` (PH-S228); audit — `admin_audit_patch` (PH-S229); tenants — `admin_tenants_patch` (PH-S230); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221); workers — `admin_workers_patch` (PH-S222); libs — `admin_libs_patch` (PH-S223).
+//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs — `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); dashboard — `admin_dashboard_patch` (PH-S228); audit — `admin_audit_patch` (PH-S229); tenants — `admin_tenants_patch` (PH-S230); security — `admin_security_patch` (PH-S231); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221); workers — `admin_workers_patch` (PH-S222); libs — `admin_libs_patch` (PH-S223).
 //! Auth + dashboard shell: `window.__poolaiAuthDashI18nRust` on login, dashboard layout, admin layout (PH-S162).
 
 use std::collections::BTreeMap;
@@ -673,10 +673,261 @@ pub const ADMIN_TENANTS_UK: &[I18nRow<'_>] = &[
     ),
 ];
 
-/// Shared tenants keys for default admin layout until PH-S231 (`security.rs`).
-pub const ADMIN_TENANTS_SHARED_EN: &[I18nRow<'_>] = &[("admin.tenants.col.name", "Name")];
+/// English security admin keys (PH-S231; moved from `i18n_core.js`).
+pub const ADMIN_SECURITY_EN: &[I18nRow<'_>] = &[
+    ("admin.page.security", "Security Management"),
+    ("admin.sec.col.name", "Name"),
+    ("admin.sec.tab.oauth", "OAuth2 Providers"),
+    ("admin.sec.tab.saml", "SAML Providers"),
+    ("admin.sec.tab.policies", "Security Policies"),
+    ("admin.sec.tab.rotation", "Secret rotation"),
+    ("admin.sec.rot.loading", "Loading secret rotation status…"),
+    ("admin.sec.rot.heading", "Secret rotation"),
+    ("admin.sec.rot.col.kind", "Secret"),
+    ("admin.sec.rot.col.hooks", "Hooks"),
+    ("admin.sec.rot.col.last", "Last rotated"),
+    ("admin.sec.rot.col.count", "Count"),
+    ("admin.sec.rot.col.grace", "JWT grace"),
+    ("admin.sec.rot.kind.jwt", "JWT signing secret"),
+    ("admin.sec.rot.kind.tls", "TLS certificate"),
+    ("admin.sec.rot.kind.telegram", "Telegram webhook secret"),
+    ("admin.sec.rot.never", "Never"),
+    ("admin.sec.rot.configured", "Configured"),
+    ("admin.sec.rot.notConfigured", "Not configured"),
+    ("admin.sec.rot.reloadJwt", "Reload JWT from env"),
+    ("admin.sec.rot.run", "Run rotation"),
+    (
+        "admin.sec.rot.hint",
+        "Rotation runs registered hooks only; env vars must be set on the coordinator host.",
+    ),
+    ("admin.sec.rot.ok", "Secret rotation completed"),
+    (
+        "admin.sec.rot.partial",
+        "Rotation finished with hook errors",
+    ),
+    ("admin.sec.oauthCreateTitle", "Register OAuth2 Provider"),
+    ("admin.sec.oauthEditTitle", "Edit OAuth2 Provider"),
+    ("admin.sec.loadingOauth", "Loading OAuth2 providers…"),
+    ("admin.sec.loadingSaml", "Loading SAML providers…"),
+    ("admin.sec.loadingPolicies", "Loading security policies…"),
+    ("admin.sec.oauthHeading", "OAuth2 Providers"),
+    ("admin.sec.samlHeading", "SAML Providers"),
+    ("admin.sec.policiesHeading", "Security Policies"),
+    ("admin.sec.registerProv", "Register Provider"),
+    ("admin.sec.createPolicyBtn", "Create Policy"),
+    ("admin.sec.noOAuth", "No OAuth2 providers registered"),
+    ("admin.sec.noSaml", "No SAML providers registered"),
+    ("admin.sec.noPolicies", "No security policies defined"),
+    ("admin.sec.col.clientId", "Client ID"),
+    ("admin.sec.col.authUrl", "Authorization URL"),
+    ("admin.sec.col.entityId", "Entity ID"),
+    ("admin.sec.col.ssoUrl", "SSO URL"),
+    ("admin.sec.col.policyDesc", "Description"),
+    ("admin.sec.col.mfa", "MFA Required"),
+    ("admin.sec.col.sessionTo", "Session Timeout"),
+    ("admin.sec.col.maxFailed", "Max Failed Attempts"),
+    (
+        "admin.sec.oauthRegOk",
+        "OAuth2 provider registered successfully",
+    ),
+    (
+        "admin.sec.oauthUpdOk",
+        "OAuth2 provider updated successfully",
+    ),
+    (
+        "admin.sec.oauthDelOk",
+        "OAuth2 provider deleted successfully",
+    ),
+    (
+        "admin.sec.confirmDelOauth",
+        "Delete OAuth2 provider \"{name}\"? This action cannot be undone.",
+    ),
+    ("admin.sec.errLoadOauth", "Error loading provider: "),
+    (
+        "admin.sec.samlRegOk",
+        "SAML provider registered successfully",
+    ),
+    ("admin.sec.samlUpdOk", "SAML provider updated successfully"),
+    ("admin.sec.samlDelOk", "SAML provider deleted successfully"),
+    (
+        "admin.sec.confirmDelSaml",
+        "Delete SAML provider \"{name}\"? This action cannot be undone.",
+    ),
+    (
+        "admin.sec.policyCreatedOk",
+        "Security policy created successfully",
+    ),
+    (
+        "admin.sec.policyUpdOk",
+        "Security policy updated successfully",
+    ),
+    (
+        "admin.sec.policyDelOk",
+        "Security policy deleted successfully",
+    ),
+    (
+        "admin.sec.confirmDelPolicy",
+        "Delete security policy \"{name}\"? This action cannot be undone.",
+    ),
+    ("admin.sec.errLoadPolicy", "Error loading policy: "),
+    ("admin.sec.registering", "Registering…"),
+    ("admin.sec.updating", "Updating…"),
+    ("admin.sec.creating", "Creating…"),
+    ("admin.sec.samlCreateTitle", "Register SAML Provider"),
+    ("admin.sec.samlEditTitle", "Edit SAML Provider"),
+    ("admin.sec.policyCreateTitle", "Create Security Policy"),
+    ("admin.sec.policyEditTitle", "Edit Security Policy"),
+    ("admin.sec.lbl.providerName", "Provider Name"),
+    ("admin.sec.lbl.clientId", "Client ID"),
+    ("admin.sec.lbl.authUrl", "Authorization URL"),
+    ("admin.sec.lbl.clientSecret", "Client Secret"),
+    ("admin.sec.lbl.tokenUrl", "Token URL"),
+    ("admin.sec.lbl.redirectUri", "Redirect URI"),
+    ("admin.sec.lbl.scopesCsv", "Scopes (comma-separated)"),
+    ("admin.sec.lbl.entityId", "Entity ID"),
+    ("admin.sec.lbl.ssoUrl", "SSO URL"),
+    ("admin.sec.lbl.sloUrl", "SLO URL (optional)"),
+    ("admin.sec.lbl.cert", "X.509 Certificate"),
+    (
+        "admin.sec.lbl.attrMap",
+        "Attribute Mapping (one per line, format: saml_attribute: user_field)",
+    ),
+    ("admin.sec.lbl.policyName", "Policy Name"),
+    ("admin.sec.lbl.policyDesc", "Description"),
+    (
+        "admin.sec.lbl.ipRanges",
+        "Allowed IP Ranges (CIDR, comma-separated)",
+    ),
+    ("admin.sec.lbl.requireMfa", "Require MFA"),
+    ("admin.sec.lbl.sessionTimeout", "Session Timeout (seconds)"),
+    ("admin.sec.lbl.maxFailed", "Max Failed Login Attempts"),
+    ("admin.sec.ph.google", "google"),
+    ("admin.sec.ph.okta", "okta"),
+    ("admin.sec.ph.policy", "strict-policy"),
+    (
+        "admin.sec.ph.policyDesc",
+        "Strict security policy for admin access",
+    ),
+    ("admin.sec.ph.ipRanges", "192.168.1.0/24, 10.0.0.0/8"),
+    ("admin.sec.ph.cert", "-----BEGIN CERTIFICATE-----..."),
+    ("admin.sec.emDash", "—"),
+];
 
-pub const ADMIN_TENANTS_SHARED_UK: &[I18nRow<'_>] = &[("admin.tenants.col.name", "Назва")];
+/// Ukrainian security admin keys (PH-S231).
+pub const ADMIN_SECURITY_UK: &[I18nRow<'_>] = &[
+    ("admin.page.security", "Безпека"),
+    ("admin.sec.col.name", "Назва"),
+    ("admin.sec.tab.oauth", "OAuth2 провайдери"),
+    ("admin.sec.tab.saml", "SAML провайдери"),
+    ("admin.sec.tab.policies", "Політики безпеки"),
+    ("admin.sec.tab.rotation", "Ротація секретів"),
+    ("admin.sec.rot.loading", "Завантаження статусу ротації…"),
+    ("admin.sec.rot.heading", "Ротація секретів"),
+    ("admin.sec.rot.col.kind", "Секрет"),
+    ("admin.sec.rot.col.hooks", "Хуки"),
+    ("admin.sec.rot.col.last", "Остання ротація"),
+    ("admin.sec.rot.col.count", "Лічильник"),
+    ("admin.sec.rot.col.grace", "JWT grace"),
+    ("admin.sec.rot.kind.jwt", "JWT секрет підпису"),
+    ("admin.sec.rot.kind.tls", "TLS сертифікат"),
+    ("admin.sec.rot.kind.telegram", "Telegram webhook секрет"),
+    ("admin.sec.rot.never", "Ніколи"),
+    ("admin.sec.rot.configured", "Налаштовано"),
+    ("admin.sec.rot.notConfigured", "Не налаштовано"),
+    ("admin.sec.rot.reloadJwt", "Перезавантажити JWT з env"),
+    ("admin.sec.rot.run", "Запустити ротацію"),
+    (
+        "admin.sec.rot.hint",
+        "Ротація лише через зареєстровані хуки; змінні середовища на координаторі.",
+    ),
+    ("admin.sec.rot.ok", "Ротацію секрету завершено"),
+    (
+        "admin.sec.rot.partial",
+        "Ротацію завершено з помилками хуків",
+    ),
+    ("admin.sec.oauthCreateTitle", "Реєстрація OAuth2"),
+    ("admin.sec.oauthEditTitle", "Редагування OAuth2"),
+    ("admin.sec.loadingOauth", "Завантаження OAuth2…"),
+    ("admin.sec.loadingSaml", "Завантаження SAML…"),
+    ("admin.sec.loadingPolicies", "Завантаження політик…"),
+    ("admin.sec.oauthHeading", "Провайдери OAuth2"),
+    ("admin.sec.samlHeading", "Провайдери SAML"),
+    ("admin.sec.policiesHeading", "Політики безпеки"),
+    ("admin.sec.registerProv", "Зареєструвати провайдера"),
+    ("admin.sec.createPolicyBtn", "Створити політику"),
+    ("admin.sec.noOAuth", "Провайдерів OAuth2 не зареєстровано"),
+    ("admin.sec.noSaml", "Провайдерів SAML не зареєстровано"),
+    ("admin.sec.noPolicies", "Політик не визначено"),
+    ("admin.sec.col.clientId", "Client ID"),
+    ("admin.sec.col.authUrl", "URL авторизації"),
+    ("admin.sec.col.entityId", "Entity ID"),
+    ("admin.sec.col.ssoUrl", "URL SSO"),
+    ("admin.sec.col.policyDesc", "Опис"),
+    ("admin.sec.col.mfa", "Потрібен MFA"),
+    ("admin.sec.col.sessionTo", "Таймаут сесії"),
+    ("admin.sec.col.maxFailed", "Макс. невдалих спроб"),
+    ("admin.sec.oauthRegOk", "Провайдера OAuth2 зареєстровано"),
+    ("admin.sec.oauthUpdOk", "Провайдера OAuth2 оновлено"),
+    ("admin.sec.oauthDelOk", "Провайдера OAuth2 видалено"),
+    (
+        "admin.sec.confirmDelOauth",
+        "Видалити провайдера OAuth2 «{name}»? Дію не скасувати.",
+    ),
+    (
+        "admin.sec.errLoadOauth",
+        "Помилка завантаження провайдера: ",
+    ),
+    ("admin.sec.samlRegOk", "Провайдера SAML зареєстровано"),
+    ("admin.sec.samlUpdOk", "Провайдера SAML оновлено"),
+    ("admin.sec.samlDelOk", "Провайдера SAML видалено"),
+    (
+        "admin.sec.confirmDelSaml",
+        "Видалити провайдера SAML «{name}»? Дію не скасувати.",
+    ),
+    ("admin.sec.policyCreatedOk", "Політику створено"),
+    ("admin.sec.policyUpdOk", "Політику оновлено"),
+    ("admin.sec.policyDelOk", "Політику видалено"),
+    (
+        "admin.sec.confirmDelPolicy",
+        "Видалити політику «{name}»? Дію не скасувати.",
+    ),
+    ("admin.sec.errLoadPolicy", "Помилка завантаження політики: "),
+    ("admin.sec.registering", "Реєстрація…"),
+    ("admin.sec.updating", "Оновлення…"),
+    ("admin.sec.creating", "Створення…"),
+    ("admin.sec.samlCreateTitle", "Реєстрація SAML"),
+    ("admin.sec.samlEditTitle", "Редагування SAML"),
+    ("admin.sec.policyCreateTitle", "Створити політику безпеки"),
+    ("admin.sec.policyEditTitle", "Редагувати політику"),
+    ("admin.sec.lbl.providerName", "Назва провайдера"),
+    ("admin.sec.lbl.clientId", "Client ID"),
+    ("admin.sec.lbl.authUrl", "URL авторизації"),
+    ("admin.sec.lbl.clientSecret", "Client Secret"),
+    ("admin.sec.lbl.tokenUrl", "URL токена"),
+    ("admin.sec.lbl.redirectUri", "Redirect URI"),
+    ("admin.sec.lbl.scopesCsv", "Scopes (через кому)"),
+    ("admin.sec.lbl.entityId", "Entity ID"),
+    ("admin.sec.lbl.ssoUrl", "URL SSO"),
+    ("admin.sec.lbl.sloUrl", "URL SLO (необов’язково)"),
+    ("admin.sec.lbl.cert", "Сертифікат X.509"),
+    (
+        "admin.sec.lbl.attrMap",
+        "Мапінг атрибутів (рядок: saml: поле_користувача)",
+    ),
+    ("admin.sec.lbl.policyName", "Назва політики"),
+    ("admin.sec.lbl.policyDesc", "Опис"),
+    ("admin.sec.lbl.ipRanges", "Дозволені IP (CIDR, через кому)"),
+    ("admin.sec.lbl.requireMfa", "Вимагати MFA"),
+    ("admin.sec.lbl.sessionTimeout", "Таймаут сесії (с)"),
+    ("admin.sec.lbl.maxFailed", "Макс. невдалих входів"),
+    ("admin.sec.ph.google", "google"),
+    ("admin.sec.ph.okta", "okta"),
+    ("admin.sec.ph.policy", "strict-policy"),
+    ("admin.sec.ph.policyDesc", "Сувора політика для адмінів"),
+    ("admin.sec.ph.ipRanges", "192.168.1.0/24, 10.0.0.0/8"),
+    ("admin.sec.ph.cert", "-----BEGIN CERTIFICATE-----..."),
+    ("admin.sec.emDash", "—"),
+];
 
 /// English monitoring admin keys (PH-S207; moved from `i18n_core.js`).
 pub const ADMIN_MONITORING_EN: &[I18nRow<'_>] = &[
@@ -1336,6 +1587,25 @@ pub fn admin_tenants_patch_script() -> String {
     )
 }
 
+/// Security admin page — slim `admin.sec.*` patch only (PH-S231).
+pub fn admin_security_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_SECURITY_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_SECURITY_UK));
+    root
+}
+
+pub fn admin_security_patch_json() -> String {
+    serde_json::to_string(&admin_security_patch()).expect("admin security i18n patch serializes")
+}
+
+pub fn admin_security_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminI18nRust={};",
+        admin_security_patch_json()
+    )
+}
+
 /// Monitoring admin page — slim `admin.mon.*` patch only (PH-S220).
 pub fn admin_monitoring_patch() -> BTreeMap<String, BTreeMap<String, String>> {
     let mut root = BTreeMap::new();
@@ -1414,12 +1684,8 @@ pub fn admin_libs_patch_script() -> String {
 /// Default admin layout — slim `admin.jobs.*` patch only (PH-S221; updates-compat on dedicated page).
 pub fn admin_jobs_grid_patch() -> BTreeMap<String, BTreeMap<String, String>> {
     let mut root = BTreeMap::new();
-    let mut en = rows_to_map(ADMIN_JOBS_EN);
-    let mut uk = rows_to_map(ADMIN_JOBS_UK);
-    merge_rows(&mut en, ADMIN_TENANTS_SHARED_EN);
-    merge_rows(&mut uk, ADMIN_TENANTS_SHARED_UK);
-    root.insert("en".into(), en);
-    root.insert("uk".into(), uk);
+    root.insert("en".into(), rows_to_map(ADMIN_JOBS_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_JOBS_UK));
     root
 }
 
@@ -1478,6 +1744,7 @@ pub fn t_en(key: &str) -> Option<&'static str> {
         ADMIN_DASHBOARD_EN,
         ADMIN_AUDIT_EN,
         ADMIN_TENANTS_EN,
+        ADMIN_SECURITY_EN,
         ADMIN_MONITORING_EN,
     ] {
         if let Some((_, v)) = rows.iter().find(|(k, _)| *k == key) {
@@ -1496,6 +1763,7 @@ pub fn t_uk(key: &str) -> Option<&'static str> {
         ADMIN_DASHBOARD_UK,
         ADMIN_AUDIT_UK,
         ADMIN_TENANTS_UK,
+        ADMIN_SECURITY_UK,
         ADMIN_MONITORING_UK,
     ] {
         if let Some((_, v)) = rows.iter().find(|(k, _)| *k == key) {
@@ -1589,6 +1857,27 @@ mod tests {
         assert!(json.contains(r#""admin.tenants.section""#));
         assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
         assert!(!json.contains(r#""admin.audit.sectionTitle""#));
+    }
+
+    #[test]
+    fn security_patch_has_matching_en_uk_key_counts_ph_s231() {
+        assert_eq!(ADMIN_SECURITY_EN.len(), ADMIN_SECURITY_UK.len());
+    }
+
+    #[test]
+    fn security_patch_json_security_only_ph_s231() {
+        let json = admin_security_patch_json();
+        assert!(json.contains(r#""admin.page.security""#));
+        assert!(json.contains(r#""admin.sec.tab.oauth""#));
+        assert!(json.contains(r#""admin.sec.col.name""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+        assert!(!json.contains(r#""admin.tenants.section""#));
+    }
+
+    #[test]
+    fn jobs_grid_patch_excludes_tenants_shim_ph_s231() {
+        let json = admin_jobs_grid_patch_json();
+        assert!(!json.contains(r#""admin.tenants.col.name""#));
     }
 
     #[test]

@@ -2,7 +2,7 @@
 //!
 //! Provides OAuth2/SAML providers and security policies management.
 
-use crate::ui::admin::admin_layout;
+use crate::ui::admin::admin_layout_security;
 use axum::response::Html;
 
 /// Security management page
@@ -74,7 +74,7 @@ pub async fn admin_security() -> Html<String> {
             <table class="admin-table">
               <thead>
                 <tr>
-                  <th>${escapeHtml(T('admin.tenants.col.name', 'Name'))}</th>
+                  <th>${escapeHtml(T('admin.sec.col.name', 'Name'))}</th>
                   <th>${escapeHtml(T('admin.sec.col.clientId', 'Client ID'))}</th>
                   <th>${escapeHtml(T('admin.sec.col.authUrl', 'Authorization URL'))}</th>
                   <th>${escapeHtml(T('admin.mon.col.statusCol', 'Status'))}</th>
@@ -282,7 +282,7 @@ pub async fn admin_security() -> Html<String> {
             <table class="admin-table">
               <thead>
                 <tr>
-                  <th>${escapeHtml(T('admin.tenants.col.name', 'Name'))}</th>
+                  <th>${escapeHtml(T('admin.sec.col.name', 'Name'))}</th>
                   <th>${escapeHtml(T('admin.sec.col.entityId', 'Entity ID'))}</th>
                   <th>${escapeHtml(T('admin.sec.col.ssoUrl', 'SSO URL'))}</th>
                   <th>${escapeHtml(T('admin.mon.col.statusCol', 'Status'))}</th>
@@ -507,7 +507,7 @@ pub async fn admin_security() -> Html<String> {
             <table class="admin-table">
               <thead>
                 <tr>
-                  <th>${escapeHtml(T('admin.tenants.col.name', 'Name'))}</th>
+                  <th>${escapeHtml(T('admin.sec.col.name', 'Name'))}</th>
                   <th>${escapeHtml(T('admin.sec.col.policyDesc', 'Description'))}</th>
                   <th>${escapeHtml(T('admin.sec.col.mfa', 'MFA Required'))}</th>
                   <th>${escapeHtml(T('admin.sec.col.sessionTo', 'Session Timeout'))}</th>
@@ -794,7 +794,7 @@ pub async fn admin_security() -> Html<String> {
     loadTabContent('oauth2');
     "#;
 
-    admin_layout(
+    admin_layout_security(
         "admin.page.security",
         "Security Management",
         r#"
@@ -1077,4 +1077,14 @@ pub async fn admin_security() -> Html<String> {
         "#,
         script,
     )
+}
+
+#[tokio::test]
+async fn admin_security_page_slim_security_i18n_patch_ph_s231() {
+    let html = admin_security().await.0;
+    assert!(html.contains("window.__poolaiAdminI18nRust="));
+    assert!(html.contains(r#""admin.page.security""#));
+    assert!(html.contains(r#""admin.sec.tab.oauth""#));
+    assert!(!html.contains(r#""admin.jobs.leaseState.active""#));
+    assert!(!html.contains(r#""admin.tenants.section""#));
 }
