@@ -1830,7 +1830,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S231",
+  "last_sprint_closed": "PH-S232",
   "layers": [
     {
       "id": "L0",
@@ -1863,7 +1863,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S232",
+  "next_sprint": "PH-S233",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -4945,7 +4945,8 @@
       "path": "src/bin/poolai_http_stand_smoke.rs",
       "sprints": [
         "PH-S145",
-        "PH-S156"
+        "PH-S156",
+        "PH-S232"
       ]
     },
     {
@@ -7701,7 +7702,7 @@
       "path": "docs/vision/vision.svg"
     }
   ],
-  "revision": 180,
+  "revision": 181,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -9201,9 +9202,9 @@
       "acceptance": "replication counters on `/metrics",
       "deps": "PH-S127",
       "id": "PH-S232",
-      "open": true,
+      "open": false,
       "row": 167,
-      "status": "open",
+      "status": "closed",
       "title": "Galaxy replication metrics stand smoke (tests)"
     },
     {
@@ -9234,7 +9235,7 @@
       "title": "Stand smoke vision rev parity (tests)"
     }
   ],
-  "sprint_queue_open_count": 4,
+  "sprint_queue_open_count": 3,
   "updated_at": "2026-06-16",
   "vision_ui_rev": 58
 }

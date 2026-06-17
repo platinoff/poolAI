@@ -454,6 +454,33 @@ async fn smoke_galaxy_trust_payout_metrics(client: &Client, base: &str) -> Resul
     metrics_text_has_trust_payout_counters(&body)
 }
 
+/// PH-S232: live stand exposes Galaxy replication strict-tier counter on Prometheus scrape.
+const GALAXY_REPLICATION_STRICT: &str = "galaxy_replication_strict_total";
+
+fn metrics_text_has_replication_strict(body: &str) -> Result<(), String> {
+    let name = GALAXY_REPLICATION_STRICT;
+    if !body.contains(name) {
+        return Err(format!("/metrics missing {name}"));
+    }
+    if !body.contains(&format!("# TYPE {name} gauge")) {
+        return Err(format!("/metrics missing TYPE gauge for {name}"));
+    }
+    Ok(())
+}
+
+async fn smoke_galaxy_replication_metrics(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("/metrics request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("/metrics status {}", resp.status()));
+    }
+    let body = resp.text().await.map_err(|e| e.to_string())?;
+    metrics_text_has_replication_strict(&body)
+}
+
 async fn smoke_grid_pricing(client: &Client, base: &str) -> Result<(), String> {
     let model = smoke_id("smoke-pricing");
     let url = format!(
@@ -1057,6 +1084,12 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
     .await;
     record(
         &mut cases,
+        "galaxy_replication_metrics",
+        smoke_galaxy_replication_metrics(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
         "jobs_migrating",
         smoke_jobs_migrating(&client, &cli.base_url).await,
     )
@@ -1298,6 +1331,16 @@ mod tests {
             "galaxy_trust_score 0\n",
         );
         metrics_text_has_trust_payout_counters(sample).expect("sample export");
+    }
+
+    #[test]
+    fn galaxy_replication_metrics_export_shape_ph_s232() {
+        let sample = concat!(
+            "# HELP galaxy_replication_strict_total Galaxy replication strict tier grid job ingests (PH-S179)\n",
+            "# TYPE galaxy_replication_strict_total gauge\n",
+            "galaxy_replication_strict_total 0\n",
+        );
+        metrics_text_has_replication_strict(sample).expect("sample export");
     }
 
     #[test]

@@ -181,7 +181,7 @@ flowchart TB
 | 86 | **PH-S229** | Admin i18n slim audit panel | code | **✅** |
 | 87 | **PH-S230** | Admin i18n slim tenants panel | code | **✅** |
 | 88 | **PH-S231** | Admin i18n slim security panel | code | **✅** |
-| 89 | **PH-S232** | Galaxy replication metrics stand smoke | tests | відкрито |
+| 89 | **PH-S232** | Galaxy replication metrics stand smoke | tests | **✅** |
 | 90 | **PH-S233** | Vision map sprint chips a11y | docs/vision | відкрито |
 | 91 | **PH-S234** | Admin i18n slim topology panel | code | відкрито |
 | 92 | **PH-S235** | Stand smoke vision rev parity | tests | відкрито |
