@@ -1830,7 +1830,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S239",
+  "last_sprint_closed": "PH-S240",
   "layers": [
     {
       "id": "L0",
@@ -1863,7 +1863,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S240",
+  "next_sprint": "PH-S241",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7719,7 +7719,7 @@
       "path": "docs/vision/vision.svg"
     }
   ],
-  "revision": 188,
+  "revision": 189,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -9291,9 +9291,9 @@
       "acceptance": "admin.table.*` slim patch",
       "deps": "PH-S207",
       "id": "PH-S240",
-      "open": true,
+      "open": false,
       "row": 175,
-      "status": "open",
+      "status": "closed",
       "title": "Admin i18n slim table toolbar (code)"
     },
     {
@@ -9315,7 +9315,7 @@
       "title": "Admin i18n nav shell key audit (code)"
     }
   ],
-  "sprint_queue_open_count": 3,
+  "sprint_queue_open_count": 2,
   "updated_at": "2026-06-16",
   "vision_ui_rev": 59
 }

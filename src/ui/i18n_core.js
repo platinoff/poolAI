@@ -34,16 +34,6 @@
       'admin.logout': 'Log out',
       'admin.browserSuffix': ' - PoolAI Admin',
 
-      'admin.table.empty': 'No data to display',
-      'admin.table.searchPh': 'Filter table…',
-      'admin.table.exportCsv': 'Export CSV',
-      'admin.table.exportJson': 'Export JSON',
-      'admin.table.exportCsvAria': 'Export visible rows as CSV',
-      'admin.table.exportJsonAria': 'Export visible rows as JSON',
-      'admin.table.exportedCsv': 'Table exported as CSV',
-      'admin.table.exportedJson': 'Table exported as JSON',
-      'admin.table.sortedBy': 'Sorted by {column} {direction}',
-
       'err.insufficientAdmin': 'Insufficient permissions. Admin role required.',
       'admin.status.active': 'Active',
       'admin.status.inactive': 'Inactive',
@@ -281,16 +271,6 @@
       'admin.logout': 'Вийти',
       'admin.browserSuffix': ' — PoolAI Адмін',
 
-      'admin.table.empty': 'Немає даних для відображення',
-      'admin.table.searchPh': 'Фільтр таблиці…',
-      'admin.table.exportCsv': 'Експорт CSV',
-      'admin.table.exportJson': 'Експорт JSON',
-      'admin.table.exportCsvAria': 'Експортувати видимі рядки як CSV',
-      'admin.table.exportJsonAria': 'Експортувати видимі рядки як JSON',
-      'admin.table.exportedCsv': 'Таблицю експортовано у CSV',
-      'admin.table.exportedJson': 'Таблицю експортовано у JSON',
-      'admin.table.sortedBy': 'Сортування: {column} {direction}',
-
       'err.insufficientAdmin': 'Недостатньо прав. Потрібна роль Admin.',
       'admin.status.active': 'Активний',
       'admin.status.inactive': 'Неактивний',
@@ -518,6 +498,13 @@
   if (rustAuthDash) {
     if (rustAuthDash.en) Object.assign(STRINGS.en, rustAuthDash.en);
     if (rustAuthDash.uk) Object.assign(STRINGS.uk, rustAuthDash.uk);
+  }
+
+  // PH-S240: admin.table toolbar EN/UK → poolai-ui-core i18n.rs (all admin layouts inject).
+  var rustAdminTable = typeof window !== 'undefined' && window.__poolaiAdminTableI18nRust;
+  if (rustAdminTable) {
+    if (rustAdminTable.en) Object.assign(STRINGS.en, rustAdminTable.en);
+    if (rustAdminTable.uk) Object.assign(STRINGS.uk, rustAdminTable.uk);
   }
 
   function normalizeLang(l) {

@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-16 (PH-S239 ✅ · §5.12 **3** відкриті PH-S240…S242 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
+**Оновлено:** 2026-06-16 (PH-S240 ✅ · §5.12 **2** відкриті PH-S241…S242 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -190,6 +190,7 @@
 **PH-S237 ✅ (code/ui):** `admin_vm_patch` + `admin_layout_vm`; `admin.vmadm.*` + `admin.page.vm` removed from `i18n_core.js`; modal `vm.*` keys remain in core.
 **PH-S238 ✅ (code/ui):** `admin_users_patch` + `admin_layout_users`; `admin.usr.*` + `admin.page.users` removed from `i18n_core.js`; shared `admin.status.*` / `ui.*` remain in core.
 **PH-S239 ✅ (code/ui):** `admin_config_patch` + `admin_layout_config`; `admin.cfg.*` + `admin.page.config` removed from `i18n_core.js`; shared `admin.status.*` / `ui.*` remain in core.
+**PH-S240 ✅ (code/ui):** `admin_table_patch` injected on all admin layouts via `__poolaiAdminTableI18nRust`; `admin.table.*` removed from `i18n_core.js`.
 **Ops:** `open-docs-vision.ps1` — ASCII Write-Host + robust `SendVisionBytes`; URL `http://127.0.0.1:8765/docs/vision/index.html`.
 **PH-S198 ✅ (code):** `topology_graph.rs` — hub labels + `label_x`/`label_y`/`is_hub` in graph JSON; heatmap short ids; slim `topology_graph.js` (SVG paint only); `cargo test-ci`.
 **PH-S194 ✅ (code):** `galaxy_fee_split_applied_total` on grid result wire; `cargo test-ci`.

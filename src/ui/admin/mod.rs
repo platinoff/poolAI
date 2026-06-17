@@ -406,6 +406,7 @@ pub fn admin_layout_with_module_script(
     let charts_js = include_str!("../admin_charts.js");
     let i18n_patch = i18n_patch_script;
     let auth_dash_patch = poolai_ui_core::i18n::auth_dash_shell_patch_script();
+    let table_patch = poolai_ui_core::i18n::admin_table_patch_script();
     let theme_patch = poolai_ui_core::theme::admin_theme_patch_script();
     let modal_patch = poolai_ui_core::modal::admin_modal_patch_script();
     let module_block = if module_script.is_empty() {
@@ -476,6 +477,7 @@ pub fn admin_layout_with_module_script(
   
   <script>{i18n_patch}</script>
   <script>{auth_dash_patch}</script>
+  <script>{table_patch}</script>
   <script>{theme_patch}</script>
   <script>{modal_patch}</script>
   <script>{i18n_js}</script>
@@ -638,6 +640,24 @@ fn admin_layout_injects_rust_i18n_patch_ph_s154() {
     assert!(patch.contains("window.__poolaiAdminI18nRust="));
     assert!(patch.contains(r#""admin.jobs.leaseState.active""#));
     assert!(!patch.contains(r#""admin.gridPricing.section""#));
+}
+
+#[test]
+fn admin_layout_injects_rust_table_i18n_patch_ph_s240() {
+    let patch = poolai_ui_core::i18n::admin_table_patch_script();
+    assert!(patch.contains("window.__poolaiAdminTableI18nRust="));
+    assert!(patch.contains(r#""admin.table.empty""#));
+    assert!(patch.contains(r#""admin.table.sortedBy""#));
+    let html = admin_layout("admin.test.page", "Test", "<p>body</p>", "");
+    assert!(html.0.contains("window.__poolaiAdminTableI18nRust="));
+    assert!(html.0.contains(r#""admin.table.searchPh""#));
+}
+
+#[test]
+fn admin_layout_default_patch_excludes_table_ph_s240() {
+    let patch = poolai_ui_core::i18n::admin_jobs_grid_patch_script();
+    assert!(!patch.contains(r#""admin.table.empty""#));
+    assert!(!patch.contains(r#""admin.table.exportCsv""#));
 }
 
 #[test]

@@ -1,24 +1,23 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-16 · PH-S239 ✅ · vision **rev 188** · **3** відкриті (PH-S240…S242) · **hold 95%** · **stretch spirit 96%**
+**Оновлено:** 2026-06-16 · PH-S240 ✅ · vision **rev 189** · **2** відкриті (PH-S241…S242) · **hold 95%** · **stretch spirit 96%**
 
-| **← наступний** | **PH-S240** — Admin i18n slim table toolbar |
-| **Відкритих** | **3** (PH-S240…S242) |
+| **← наступний** | **PH-S241** — Galaxy pricing fresh served metrics stand smoke |
+| **Відкритих** | **2** (PH-S241…S242) |
 
 ---
 
-## PH-S240 — scope
+## PH-S241 — scope
 
-- `admin.table.*` → `poolai-ui-core` + `admin_table_patch` + wire into default admin layout (or dedicated helper)
-- Remove `admin.table.*` from `i18n_core.js`
-- Pattern: PH-S236…S239 slim panels; table keys shared across many admin pages
+- `poolai-http-stand-smoke` — assert `galaxy_pricing_fresh_served` gauge on live `/metrics`
+- Pattern: PH-S224 cache age / PH-S232 replication stand smoke
 - Acceptance: targeted `cargo test`; FM/HANDOFF/NEXT; push
 
 ---
 
-## Copy-paste — PH-S240
+## Copy-paste — PH-S241
 
 ```
-PH-S240 — Admin i18n slim table toolbar (code)
-Scope: admin.table.* → poolai-ui-core; slim patch on admin layout; cargo test; FM/HANDOFF/NEXT; commit+push
+PH-S241 — Galaxy pricing fresh served metrics stand smoke (tests)
+Scope: poolai-http-stand-smoke galaxy_pricing_fresh_served on /metrics; cargo test; FM/HANDOFF/NEXT; commit+push
 ```

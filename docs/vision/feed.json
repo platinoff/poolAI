@@ -3,18 +3,9 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S240",
-      "link": "docs/vision/index.html#sprint-queue",
-      "next": true,
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "admin.table.*` slim patch",
-      "title": "Admin i18n slim table toolbar (code)"
-    },
-    {
-      "category": "open",
       "id": "PH-S241",
       "link": "docs/vision/index.html#sprint-queue",
+      "next": true,
       "published": "2026-05-28",
       "status": "open",
       "summary": "galaxy_pricing_fresh_served` on live `/metrics",
@@ -28,6 +19,15 @@
       "status": "open",
       "summary": "verify `admin.nav.*` only in auth_dash patch",
       "title": "Admin i18n nav shell key audit (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S240",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "admin.table.*` slim patch",
+      "title": "Admin i18n slim table toolbar (code)"
     },
     {
       "category": "closed",
@@ -127,15 +127,6 @@
       "status": "closed",
       "summary": "admin.audit.*` → `admin_audit_patch",
       "title": "Admin i18n slim audit panel (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S228",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "admin.dash.*` → `admin_dashboard_patch",
-      "title": "Admin i18n slim dashboard panel (code)"
     }
   ],
   "link": "docs/vision/index.html",

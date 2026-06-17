@@ -1,6 +1,6 @@
 //! UI i18n subsets moved from `i18n_core.js` (PH-S154 admin jobs/grid; PH-S162 auth/dash shell; PH-S197 updates-compat; PH-S207 monitoring; PH-S211 jobs-only patch; PH-S214 raid-only patch; PH-S217 grid-pricing-only patch).
 //!
-//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs — `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); dashboard — `admin_dashboard_patch` (PH-S228); audit — `admin_audit_patch` (PH-S229); tenants — `admin_tenants_patch` (PH-S230); security — `admin_security_patch` (PH-S231); topology — `admin_topology_patch` (PH-S234); instances — `admin_instances_patch` (PH-S236); vm — `admin_vm_patch` (PH-S237); users — `admin_users_patch` (PH-S238); config — `admin_config_patch` (PH-S239); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221); workers — `admin_workers_patch` (PH-S222); libs — `admin_libs_patch` (PH-S223).
+//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs — `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); dashboard — `admin_dashboard_patch` (PH-S228); audit — `admin_audit_patch` (PH-S229); tenants — `admin_tenants_patch` (PH-S230); security — `admin_security_patch` (PH-S231); topology — `admin_topology_patch` (PH-S234); instances — `admin_instances_patch` (PH-S236); vm — `admin_vm_patch` (PH-S237); users — `admin_users_patch` (PH-S238); config — `admin_config_patch` (PH-S239); table toolbar — `admin_table_patch` (PH-S240); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221); workers — `admin_workers_patch` (PH-S222); libs — `admin_libs_patch` (PH-S223).
 //! Auth + dashboard shell: `window.__poolaiAuthDashI18nRust` on login, dashboard layout, admin layout (PH-S162).
 
 use std::collections::BTreeMap;
@@ -1683,6 +1683,38 @@ pub const ADMIN_LIBS_UK: &[I18nRow<'_>] = &[
     ("admin.lib.errUpload", "Помилка завантаження: "),
 ];
 
+/// English admin table toolbar keys (PH-S240; shared across admin pages).
+pub const ADMIN_TABLE_EN: &[I18nRow<'_>] = &[
+    ("admin.table.empty", "No data to display"),
+    ("admin.table.searchPh", "Filter table…"),
+    ("admin.table.exportCsv", "Export CSV"),
+    ("admin.table.exportJson", "Export JSON"),
+    ("admin.table.exportCsvAria", "Export visible rows as CSV"),
+    ("admin.table.exportJsonAria", "Export visible rows as JSON"),
+    ("admin.table.exportedCsv", "Table exported as CSV"),
+    ("admin.table.exportedJson", "Table exported as JSON"),
+    ("admin.table.sortedBy", "Sorted by {column} {direction}"),
+];
+
+/// Ukrainian admin table toolbar keys (PH-S240).
+pub const ADMIN_TABLE_UK: &[I18nRow<'_>] = &[
+    ("admin.table.empty", "Немає даних для відображення"),
+    ("admin.table.searchPh", "Фільтр таблиці…"),
+    ("admin.table.exportCsv", "Експорт CSV"),
+    ("admin.table.exportJson", "Експорт JSON"),
+    (
+        "admin.table.exportCsvAria",
+        "Експортувати видимі рядки як CSV",
+    ),
+    (
+        "admin.table.exportJsonAria",
+        "Експортувати видимі рядки як JSON",
+    ),
+    ("admin.table.exportedCsv", "Таблицю експортовано у CSV"),
+    ("admin.table.exportedJson", "Таблицю експортовано у JSON"),
+    ("admin.table.sortedBy", "Сортування: {column} {direction}"),
+];
+
 /// English auth keys (login, OAuth, bootstrap banner, lang toggle).
 pub const AUTH_SHELL_EN: &[I18nRow<'_>] = &[
     ("auth.pageTitle", "Login - PoolAI"),
@@ -2223,6 +2255,25 @@ fn merge_rows(map: &mut BTreeMap<String, String>, rows: &[I18nRow<'_>]) {
     }
 }
 
+/// Admin table toolbar — slim `admin.table.*` patch for all admin layouts (PH-S240).
+pub fn admin_table_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_TABLE_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_TABLE_UK));
+    root
+}
+
+pub fn admin_table_patch_json() -> String {
+    serde_json::to_string(&admin_table_patch()).expect("admin table i18n patch serializes")
+}
+
+pub fn admin_table_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminTableI18nRust={};",
+        admin_table_patch_json()
+    )
+}
+
 /// `{"en":{...},"uk":{...}}` patch for auth + dashboard shell keys (PH-S162).
 pub fn auth_dash_shell_patch() -> BTreeMap<String, BTreeMap<String, String>> {
     let mut en = BTreeMap::new();
@@ -2478,6 +2529,26 @@ mod tests {
         assert!(json.contains(r#""admin.cfg.health.hint""#));
         assert!(!json.contains(r#""admin.usr.section""#));
         assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+    }
+
+    #[test]
+    fn table_patch_has_matching_en_uk_key_counts_ph_s240() {
+        assert_eq!(ADMIN_TABLE_EN.len(), ADMIN_TABLE_UK.len());
+    }
+
+    #[test]
+    fn table_patch_json_table_only_ph_s240() {
+        let json = admin_table_patch_json();
+        assert!(json.contains(r#""admin.table.empty""#));
+        assert!(json.contains(r#""admin.table.sortedBy""#));
+        assert!(!json.contains(r#""admin.cfg.tab.general""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+    }
+
+    #[test]
+    fn table_patch_script_assigns_window_patch_ph_s240() {
+        let script = admin_table_patch_script();
+        assert!(script.starts_with("window.__poolaiAdminTableI18nRust="));
     }
 
     #[test]
