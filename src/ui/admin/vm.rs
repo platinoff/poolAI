@@ -2,7 +2,7 @@
 //!
 //! Provides VM instance lifecycle management.
 
-use crate::ui::admin::admin_layout;
+use super::admin_layout_vm;
 use axum::response::Html;
 
 /// VM management page
@@ -141,7 +141,7 @@ pub async fn admin_vm() -> Html<String> {
     _g.vmAction = vmAction;
     "#;
 
-    admin_layout(
+    admin_layout_vm(
         "admin.page.vm",
         "VM Management",
         r#"
@@ -195,4 +195,19 @@ pub async fn admin_vm() -> Html<String> {
         "#,
         script,
     )
+}
+
+#[cfg(test)]
+mod ph_s237_tests {
+    use super::admin_vm;
+
+    #[tokio::test]
+    async fn admin_vm_page_slim_vm_i18n_patch_ph_s237() {
+        let html = admin_vm().await.0;
+        assert!(html.contains("window.__poolaiAdminI18nRust="));
+        assert!(html.contains(r#""admin.page.vm""#));
+        assert!(html.contains(r#""admin.vmadm.section""#));
+        assert!(!html.contains(r#""admin.inst.title""#));
+        assert!(!html.contains(r#""admin.jobs.leaseState.active""#));
+    }
 }

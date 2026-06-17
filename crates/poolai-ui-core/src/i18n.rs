@@ -1,6 +1,6 @@
 //! UI i18n subsets moved from `i18n_core.js` (PH-S154 admin jobs/grid; PH-S162 auth/dash shell; PH-S197 updates-compat; PH-S207 monitoring; PH-S211 jobs-only patch; PH-S214 raid-only patch; PH-S217 grid-pricing-only patch).
 //!
-//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs — `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); dashboard — `admin_dashboard_patch` (PH-S228); audit — `admin_audit_patch` (PH-S229); tenants — `admin_tenants_patch` (PH-S230); security — `admin_security_patch` (PH-S231); topology — `admin_topology_patch` (PH-S234); instances — `admin_instances_patch` (PH-S236); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221); workers — `admin_workers_patch` (PH-S222); libs — `admin_libs_patch` (PH-S223).
+//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs — `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); dashboard — `admin_dashboard_patch` (PH-S228); audit — `admin_audit_patch` (PH-S229); tenants — `admin_tenants_patch` (PH-S230); security — `admin_security_patch` (PH-S231); topology — `admin_topology_patch` (PH-S234); instances — `admin_instances_patch` (PH-S236); vm — `admin_vm_patch` (PH-S237); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221); workers — `admin_workers_patch` (PH-S222); libs — `admin_libs_patch` (PH-S223).
 //! Auth + dashboard shell: `window.__poolaiAuthDashI18nRust` on login, dashboard layout, admin layout (PH-S162).
 
 use std::collections::BTreeMap;
@@ -1128,6 +1128,42 @@ pub const ADMIN_INSTANCES_UK: &[I18nRow<'_>] = &[
     ("admin.inst.ph.modelId", "ID моделі"),
 ];
 
+/// English VM admin keys (PH-S237; moved from `i18n_core.js`).
+pub const ADMIN_VM_EN: &[I18nRow<'_>] = &[
+    ("admin.page.vm", "VM Management"),
+    ("admin.vmadm.loading", "Loading VM instances…"),
+    ("admin.vmadm.errLoad", "Error loading VM instances: "),
+    ("admin.vmadm.empty", "No VM instances found"),
+    ("admin.vmadm.col.name", "Name"),
+    ("admin.vmadm.col.status", "Status"),
+    ("admin.vmadm.col.resources", "Resources"),
+    ("admin.vmadm.col.actions", "Actions"),
+    ("admin.vmadm.resCpu", "CPU:"),
+    ("admin.vmadm.resMem", "Memory:"),
+    ("admin.vmadm.section", "VM Instances"),
+    ("admin.vmadm.createBtn", "Create VM Instance"),
+    ("admin.vmadm.actionOk", "VM {action} successful"),
+    ("admin.vmadm.creating", "Creating…"),
+];
+
+/// Ukrainian VM admin keys (PH-S237).
+pub const ADMIN_VM_UK: &[I18nRow<'_>] = &[
+    ("admin.page.vm", "Керування VM"),
+    ("admin.vmadm.loading", "Завантаження інстансів VM…"),
+    ("admin.vmadm.errLoad", "Помилка завантаження VM: "),
+    ("admin.vmadm.empty", "Інстансів VM не знайдено"),
+    ("admin.vmadm.col.name", "Назва"),
+    ("admin.vmadm.col.status", "Статус"),
+    ("admin.vmadm.col.resources", "Ресурси"),
+    ("admin.vmadm.col.actions", "Дії"),
+    ("admin.vmadm.resCpu", "CPU:"),
+    ("admin.vmadm.resMem", "Пам’ять:"),
+    ("admin.vmadm.section", "Інстанси VM"),
+    ("admin.vmadm.createBtn", "Створити інстанс VM"),
+    ("admin.vmadm.actionOk", "VM: дія «{action}» виконана"),
+    ("admin.vmadm.creating", "Створення…"),
+];
+
 /// English monitoring admin keys (PH-S207; moved from `i18n_core.js`).
 pub const ADMIN_MONITORING_EN: &[I18nRow<'_>] = &[
     ("admin.page.monitoring", "Monitoring Dashboard"),
@@ -1843,6 +1879,22 @@ pub fn admin_instances_patch_script() -> String {
     )
 }
 
+/// VM admin page — slim `admin.vmadm.*` patch only (PH-S237).
+pub fn admin_vm_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_VM_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_VM_UK));
+    root
+}
+
+pub fn admin_vm_patch_json() -> String {
+    serde_json::to_string(&admin_vm_patch()).expect("admin vm i18n patch serializes")
+}
+
+pub fn admin_vm_patch_script() -> String {
+    format!("window.__poolaiAdminI18nRust={};", admin_vm_patch_json())
+}
+
 /// Monitoring admin page — slim `admin.mon.*` patch only (PH-S220).
 pub fn admin_monitoring_patch() -> BTreeMap<String, BTreeMap<String, String>> {
     let mut root = BTreeMap::new();
@@ -1984,6 +2036,7 @@ pub fn t_en(key: &str) -> Option<&'static str> {
         ADMIN_SECURITY_EN,
         ADMIN_TOPOLOGY_EN,
         ADMIN_INSTANCES_EN,
+        ADMIN_VM_EN,
         ADMIN_MONITORING_EN,
     ] {
         if let Some((_, v)) = rows.iter().find(|(k, _)| *k == key) {
@@ -2005,6 +2058,7 @@ pub fn t_uk(key: &str) -> Option<&'static str> {
         ADMIN_SECURITY_UK,
         ADMIN_TOPOLOGY_UK,
         ADMIN_INSTANCES_UK,
+        ADMIN_VM_UK,
         ADMIN_MONITORING_UK,
     ] {
         if let Some((_, v)) = rows.iter().find(|(k, _)| *k == key) {
@@ -2148,6 +2202,21 @@ mod tests {
         assert!(json.contains(r#""admin.inst.title""#));
         assert!(json.contains(r#""admin.inst.ph.placement""#));
         assert!(!json.contains(r#""admin.topo.title""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+    }
+
+    #[test]
+    fn vm_patch_has_matching_en_uk_key_counts_ph_s237() {
+        assert_eq!(ADMIN_VM_EN.len(), ADMIN_VM_UK.len());
+    }
+
+    #[test]
+    fn vm_patch_json_vm_only_ph_s237() {
+        let json = admin_vm_patch_json();
+        assert!(json.contains(r#""admin.page.vm""#));
+        assert!(json.contains(r#""admin.vmadm.section""#));
+        assert!(json.contains(r#""admin.vmadm.createBtn""#));
+        assert!(!json.contains(r#""admin.inst.title""#));
         assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
     }
 

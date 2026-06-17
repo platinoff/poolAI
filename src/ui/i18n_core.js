@@ -34,7 +34,6 @@
       'admin.logout': 'Log out',
       'admin.browserSuffix': ' - PoolAI Admin',
 
-      'admin.page.vm': 'VM Management',
       'admin.page.users': 'User Management',
       'admin.page.config': 'System Configuration',
 
@@ -58,20 +57,6 @@
       'ui.save': 'Save Changes',
       'ui.upload': 'Upload',
       'ui.register': 'Register',
-
-      'admin.vmadm.loading': 'Loading VM instances…',
-      'admin.vmadm.errLoad': 'Error loading VM instances: ',
-      'admin.vmadm.empty': 'No VM instances found',
-      'admin.vmadm.col.name': 'Name',
-      'admin.vmadm.col.status': 'Status',
-      'admin.vmadm.col.resources': 'Resources',
-      'admin.vmadm.col.actions': 'Actions',
-      'admin.vmadm.resCpu': 'CPU:',
-      'admin.vmadm.resMem': 'Memory:',
-      'admin.vmadm.section': 'VM Instances',
-      'admin.vmadm.createBtn': 'Create VM Instance',
-      'admin.vmadm.actionOk': 'VM {action} successful',
-      'admin.vmadm.creating': 'Creating…',
 
       'admin.usr.loading': 'Loading users…',
       'admin.usr.errLoad': 'Error loading users: ',
@@ -372,7 +357,6 @@
       'admin.logout': 'Вийти',
       'admin.browserSuffix': ' — PoolAI Адмін',
 
-      'admin.page.vm': 'Керування VM',
       'admin.page.users': 'Керування користувачами',
       'admin.page.config': 'Конфігурація системи',
 
@@ -396,20 +380,6 @@
       'ui.save': 'Зберегти зміни',
       'ui.upload': 'Завантажити',
       'ui.register': 'Зареєструвати',
-
-      'admin.vmadm.loading': 'Завантаження інстансів VM…',
-      'admin.vmadm.errLoad': 'Помилка завантаження VM: ',
-      'admin.vmadm.empty': 'Інстансів VM не знайдено',
-      'admin.vmadm.col.name': 'Назва',
-      'admin.vmadm.col.status': 'Статус',
-      'admin.vmadm.col.resources': 'Ресурси',
-      'admin.vmadm.col.actions': 'Дії',
-      'admin.vmadm.resCpu': 'CPU:',
-      'admin.vmadm.resMem': 'Пам’ять:',
-      'admin.vmadm.section': 'Інстанси VM',
-      'admin.vmadm.createBtn': 'Створити інстанс VM',
-      'admin.vmadm.actionOk': 'VM: дія «{action}» виконана',
-      'admin.vmadm.creating': 'Створення…',
 
       'admin.usr.loading': 'Завантаження користувачів…',
       'admin.usr.errLoad': 'Помилка завантаження користувачів: ',

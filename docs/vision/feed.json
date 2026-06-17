@@ -3,18 +3,9 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S237",
-      "link": "docs/vision/index.html#sprint-queue",
-      "next": true,
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "admin.vmadm.*` slim patch",
-      "title": "Admin i18n slim vm panel (code)"
-    },
-    {
-      "category": "open",
       "id": "PH-S238",
       "link": "docs/vision/index.html#sprint-queue",
+      "next": true,
       "published": "2026-05-28",
       "status": "open",
       "summary": "admin.usr.*` slim patch",
@@ -28,6 +19,15 @@
       "status": "open",
       "summary": "admin.cfg.*` slim patch",
       "title": "Admin i18n slim config panel (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S237",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "admin.vmadm.*` slim patch",
+      "title": "Admin i18n slim vm panel (code)"
     },
     {
       "category": "closed",
@@ -127,15 +127,6 @@
       "status": "closed",
       "summary": "queue/ticker click → map node; panel expand fix",
       "title": "Vision sprint-queue → map focus (docs/vision)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S225",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "verification counters on `/metrics",
-      "title": "Galaxy verification sample metrics smoke (tests)"
     }
   ],
   "link": "docs/vision/index.html",
