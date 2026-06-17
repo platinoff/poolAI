@@ -3,11 +3,38 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S242",
+      "id": "PH-S243",
       "link": "docs/vision/index.html#sprint-queue",
       "next": true,
       "published": "2026-05-28",
       "status": "open",
+      "summary": "admin.brand` / skip / lang / logout / browserSuffix → auth_dash",
+      "title": "Admin i18n slim admin chrome shell (code)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S244",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "galaxy_pricing_stale_served` on live `/metrics",
+      "title": "Galaxy pricing stale served metrics stand smoke (tests)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S245",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "admin.status.*` + `admin.na` + `admin.btn.edit` slim patch",
+      "title": "Admin shared status keys slim patch (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S242",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
       "summary": "verify `admin.nav.*` only in auth_dash patch",
       "title": "Admin i18n nav shell key audit (code)"
     },
@@ -109,15 +136,6 @@
       "status": "closed",
       "summary": "admin.sec.*` → `admin_security_patch",
       "title": "Admin i18n slim security panel (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S230",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "admin.tenants.*` → `admin_tenants_patch",
-      "title": "Admin i18n slim tenants panel (code)"
     }
   ],
   "link": "docs/vision/index.html",

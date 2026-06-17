@@ -661,6 +661,24 @@ fn admin_layout_default_patch_excludes_table_ph_s240() {
 }
 
 #[test]
+fn admin_layout_injects_admin_nav_via_auth_dash_ph_s242() {
+    let patch = poolai_ui_core::i18n::auth_dash_shell_patch_script();
+    assert!(patch.contains(r#""admin.nav.dashboard""#));
+    assert!(patch.contains(r#""admin.nav.config""#));
+    let html = admin_layout("admin.test.page", "Test", "<p>body</p>", "");
+    assert!(html.0.contains(r#""admin.nav.jobs""#));
+    assert!(html.0.contains(r#"data-i18n="admin.nav.dashboard""#));
+}
+
+#[test]
+fn i18n_core_js_has_no_admin_nav_keys_ph_s242() {
+    let js = include_str!("../i18n_core.js");
+    assert!(!js.contains("'admin.nav.dashboard'"));
+    assert!(!js.contains("'admin.nav.config'"));
+    assert!(!js.contains("'admin.nav.jobs'"));
+}
+
+#[test]
 fn admin_layout_injects_rust_auth_dash_i18n_patch_ph_s162() {
     let patch = poolai_ui_core::i18n::auth_dash_shell_patch_script();
     assert!(patch.contains("window.__poolaiAuthDashI18nRust="));

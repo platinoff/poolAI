@@ -191,7 +191,10 @@ flowchart TB
 | 96 | **PH-S239** | Admin i18n slim config panel | code | **✅** |
 | 97 | **PH-S240** | Admin i18n slim table toolbar | code | **✅** |
 | 98 | **PH-S241** | Galaxy pricing fresh served metrics stand smoke | tests | **✅** |
-| 99 | **PH-S242** | Admin i18n nav shell key audit | code | відкрито |
+| 99 | **PH-S242** | Admin i18n nav shell key audit | code | **✅** |
+| 100 | **PH-S243** | Admin i18n slim admin chrome shell | code | відкрито |
+| 101 | **PH-S244** | Galaxy pricing stale served metrics stand smoke | tests | відкрито |
+| 102 | **PH-S245** | Admin shared status keys slim patch | code | відкрито |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 

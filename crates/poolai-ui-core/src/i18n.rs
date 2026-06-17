@@ -1787,6 +1787,46 @@ pub const AUTH_SHELL_UK: &[I18nRow<'_>] = &[
     ("auth.lang.uk", "UA"),
 ];
 
+/// English admin sidebar nav labels (PH-S242; merged into auth_dash shell patch).
+pub const ADMIN_NAV_EN: &[I18nRow<'_>] = &[
+    ("admin.nav.dashboard", "Dashboard"),
+    ("admin.nav.tenants", "Tenants"),
+    ("admin.nav.security", "Security"),
+    ("admin.nav.audit", "Audit Logs"),
+    ("admin.nav.monitoring", "Monitoring"),
+    ("admin.nav.vm", "VM Instances"),
+    ("admin.nav.workers", "Workers"),
+    ("admin.nav.jobs", "Jobs"),
+    ("admin.nav.gridPricing", "Grid pricing"),
+    ("admin.nav.updatesCompat", "Updates"),
+    ("admin.nav.libs", "Libraries"),
+    ("admin.nav.raid", "RAID"),
+    ("admin.nav.instances", "Model Instances"),
+    ("admin.nav.topology", "Topology"),
+    ("admin.nav.users", "Users"),
+    ("admin.nav.config", "Configuration"),
+];
+
+/// Ukrainian admin sidebar nav labels (PH-S242).
+pub const ADMIN_NAV_UK: &[I18nRow<'_>] = &[
+    ("admin.nav.dashboard", "Панель"),
+    ("admin.nav.tenants", "Орендарі"),
+    ("admin.nav.security", "Безпека"),
+    ("admin.nav.audit", "Журнал аудиту"),
+    ("admin.nav.monitoring", "Моніторинг"),
+    ("admin.nav.vm", "VM"),
+    ("admin.nav.workers", "Воркери"),
+    ("admin.nav.jobs", "Задачі"),
+    ("admin.nav.gridPricing", "Ціни Grid"),
+    ("admin.nav.updatesCompat", "Оновлення"),
+    ("admin.nav.libs", "Бібліотеки"),
+    ("admin.nav.raid", "RAID"),
+    ("admin.nav.instances", "Інстанси моделей"),
+    ("admin.nav.topology", "Топологія"),
+    ("admin.nav.users", "Користувачі"),
+    ("admin.nav.config", "Конфігурація"),
+];
+
 /// English dashboard shell keys (nav, theme, search, titles).
 pub const DASH_SHELL_EN: &[I18nRow<'_>] = &[
     ("dash.brand", "PoolAI UI"),
@@ -2274,13 +2314,15 @@ pub fn admin_table_patch_script() -> String {
     )
 }
 
-/// `{"en":{...},"uk":{...}}` patch for auth + dashboard shell keys (PH-S162).
+/// `{"en":{...},"uk":{...}}` patch for auth + dashboard + admin nav shell keys (PH-S162, PH-S242).
 pub fn auth_dash_shell_patch() -> BTreeMap<String, BTreeMap<String, String>> {
     let mut en = BTreeMap::new();
     merge_rows(&mut en, AUTH_SHELL_EN);
+    merge_rows(&mut en, ADMIN_NAV_EN);
     merge_rows(&mut en, DASH_SHELL_EN);
     let mut uk = BTreeMap::new();
     merge_rows(&mut uk, AUTH_SHELL_UK);
+    merge_rows(&mut uk, ADMIN_NAV_UK);
     merge_rows(&mut uk, DASH_SHELL_UK);
     let mut root = BTreeMap::new();
     root.insert("en".into(), en);
@@ -2658,11 +2700,21 @@ mod tests {
     #[test]
     fn auth_dash_patch_has_matching_en_uk_key_counts() {
         assert_eq!(AUTH_SHELL_EN.len(), AUTH_SHELL_UK.len());
+        assert_eq!(ADMIN_NAV_EN.len(), ADMIN_NAV_UK.len());
         assert_eq!(DASH_SHELL_EN.len(), DASH_SHELL_UK.len());
         let patch = auth_dash_shell_patch();
-        let expected = AUTH_SHELL_EN.len() + DASH_SHELL_EN.len();
+        let expected = AUTH_SHELL_EN.len() + ADMIN_NAV_EN.len() + DASH_SHELL_EN.len();
         assert_eq!(patch["en"].len(), expected);
         assert_eq!(patch["uk"].len(), expected);
+    }
+
+    #[test]
+    fn auth_dash_patch_json_contains_admin_nav_keys_ph_s242() {
+        let json = auth_dash_shell_patch_json();
+        assert!(json.contains(r#""admin.nav.dashboard""#));
+        assert!(json.contains(r#""admin.nav.jobs""#));
+        assert!(json.contains(r#""admin.nav.config""#));
+        assert!(!json.contains(r#""admin.brand""#));
     }
 
     #[test]

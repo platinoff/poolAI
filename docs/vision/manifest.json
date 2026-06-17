@@ -1830,7 +1830,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S241",
+  "last_sprint_closed": "PH-S242",
   "layers": [
     {
       "id": "L0",
@@ -1863,7 +1863,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S242",
+  "next_sprint": "PH-S243",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7719,7 +7719,7 @@
       "path": "docs/vision/vision.svg"
     }
   ],
-  "revision": 190,
+  "revision": 191,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -9309,13 +9309,40 @@
       "acceptance": "verify `admin.nav.*` only in auth_dash patch",
       "deps": "PH-S162",
       "id": "PH-S242",
-      "open": true,
+      "open": false,
       "row": 177,
-      "status": "open",
+      "status": "closed",
       "title": "Admin i18n nav shell key audit (code)"
+    },
+    {
+      "acceptance": "admin.brand` / skip / lang / logout / browserSuffix → auth_dash",
+      "deps": "PH-S242",
+      "id": "PH-S243",
+      "open": true,
+      "row": 178,
+      "status": "open",
+      "title": "Admin i18n slim admin chrome shell (code)"
+    },
+    {
+      "acceptance": "galaxy_pricing_stale_served` on live `/metrics",
+      "deps": "PH-S127",
+      "id": "PH-S244",
+      "open": true,
+      "row": 179,
+      "status": "open",
+      "title": "Galaxy pricing stale served metrics stand smoke (tests)"
+    },
+    {
+      "acceptance": "admin.status.*` + `admin.na` + `admin.btn.edit` slim patch",
+      "deps": "PH-S240",
+      "id": "PH-S245",
+      "open": true,
+      "row": 180,
+      "status": "open",
+      "title": "Admin shared status keys slim patch (code)"
     }
   ],
-  "sprint_queue_open_count": 1,
+  "sprint_queue_open_count": 3,
   "updated_at": "2026-06-16",
   "vision_ui_rev": 59
 }

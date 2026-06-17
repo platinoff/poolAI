@@ -1,24 +1,24 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-16 · PH-S241 ✅ · vision **rev 190** · **1** відкритий (PH-S242) · **hold 95%** · **stretch spirit 96%**
+**Оновлено:** 2026-06-16 · PH-S242 ✅ · vision **rev 191** · **3** відкриті (PH-S243…S245) · **hold 95%** · **stretch spirit 96%**
 
-| **← наступний** | **PH-S242** — Admin i18n nav shell key audit |
-| **Відкритих** | **1** (PH-S242) |
+| **← наступний** | **PH-S243** — Admin i18n slim admin chrome shell |
+| **Відкритих** | **3** (PH-S243…S245) |
 
 ---
 
-## PH-S242 — scope
+## PH-S243 — scope
 
-- Audit `admin.nav.*` keys — ensure only in `auth_dash_shell_patch` (PH-S162), not duplicated in `i18n_core.js`
-- Add/extend tests in `poolai-ui-core` + admin layout parity
-- Replenish §5.12 when queue closes (≤10 open from §5.13)
+- `admin.brand`, `admin.skipMain`, `admin.skipNav`, `admin.lang.label`, `admin.logout`, `admin.browserSuffix` → `auth_dash_shell_patch`
+- Remove from `i18n_core.js`; extend auth_dash tests
+- Pattern: PH-S242 nav shell audit
 - Acceptance: targeted `cargo test`; FM/HANDOFF/NEXT; push
 
 ---
 
-## Copy-paste — PH-S242
+## Copy-paste — PH-S243
 
 ```
-PH-S242 — Admin i18n nav shell key audit (code)
-Scope: verify admin.nav.* only in auth_dash patch; cargo test; FM/HANDOFF/NEXT; replenish §5.12; commit+push
+PH-S243 — Admin i18n slim admin chrome shell (code)
+Scope: admin chrome keys → auth_dash patch; cargo test; FM/HANDOFF/NEXT; commit+push
 ```

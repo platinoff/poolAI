@@ -9,27 +9,11 @@
 
   var STRINGS = {
     en: {
-      // auth.* + dash.* shell → poolai-ui-core i18n.rs (PH-S162); merged from __poolaiAuthDashI18nRust
+      // auth.* + dash.* + admin.nav.* shell → poolai-ui-core i18n.rs (PH-S162, PH-S242)
 
       'admin.brand': 'PoolAI Admin',
       'admin.skipMain': 'Skip to main content',
       'admin.skipNav': 'Skip to navigation',
-      'admin.nav.dashboard': 'Dashboard',
-      'admin.nav.tenants': 'Tenants',
-      'admin.nav.security': 'Security',
-      'admin.nav.audit': 'Audit Logs',
-      'admin.nav.monitoring': 'Monitoring',
-      'admin.nav.vm': 'VM Instances',
-      'admin.nav.workers': 'Workers',
-      'admin.nav.jobs': 'Jobs',
-      'admin.nav.gridPricing': 'Grid pricing',
-      'admin.nav.updatesCompat': 'Updates',
-      'admin.nav.libs': 'Libraries',
-      'admin.nav.raid': 'RAID',
-      'admin.nav.instances': 'Model Instances',
-      'admin.nav.topology': 'Topology',
-      'admin.nav.users': 'Users',
-      'admin.nav.config': 'Configuration',
       'admin.lang.label': 'Language',
       'admin.logout': 'Log out',
       'admin.browserSuffix': ' - PoolAI Admin',
@@ -246,27 +230,11 @@
         'Are you sure you want to delete artifact "{name}" ({id})? This action cannot be undone.',
     },
     uk: {
-      // auth.* + dash.* shell → poolai-ui-core i18n.rs (PH-S162); merged from __poolaiAuthDashI18nRust
+      // auth.* + dash.* + admin.nav.* shell → poolai-ui-core i18n.rs (PH-S162, PH-S242)
 
       'admin.brand': 'PoolAI Адмін',
       'admin.skipMain': 'Перейти до основного вмісту',
       'admin.skipNav': 'Перейти до навігації',
-      'admin.nav.dashboard': 'Панель',
-      'admin.nav.tenants': 'Орендарі',
-      'admin.nav.security': 'Безпека',
-      'admin.nav.audit': 'Журнал аудиту',
-      'admin.nav.monitoring': 'Моніторинг',
-      'admin.nav.vm': 'VM',
-      'admin.nav.workers': 'Воркери',
-      'admin.nav.jobs': 'Задачі',
-      'admin.nav.gridPricing': 'Ціни Grid',
-      'admin.nav.updatesCompat': 'Оновлення',
-      'admin.nav.libs': 'Бібліотеки',
-      'admin.nav.raid': 'RAID',
-      'admin.nav.instances': 'Інстанси моделей',
-      'admin.nav.topology': 'Топологія',
-      'admin.nav.users': 'Користувачі',
-      'admin.nav.config': 'Конфігурація',
       'admin.lang.label': 'Мова',
       'admin.logout': 'Вийти',
       'admin.browserSuffix': ' — PoolAI Адмін',
@@ -494,6 +462,7 @@
   }
 
   // PH-S162: auth + dash shell EN/UK → poolai-ui-core i18n.rs (layout + login inject).
+  // PH-S242: admin.nav.* merged in same auth_dash patch (not in STRINGS core).
   var rustAuthDash = typeof window !== 'undefined' && window.__poolaiAuthDashI18nRust;
   if (rustAuthDash) {
     if (rustAuthDash.en) Object.assign(STRINGS.en, rustAuthDash.en);
