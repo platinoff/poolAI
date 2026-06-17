@@ -185,7 +185,7 @@ flowchart TB
 | 90 | **PH-S233** | Vision map sprint chips a11y | docs/vision | **✅** |
 | 91 | **PH-S234** | Admin i18n slim topology panel | code | **✅** |
 | 92 | **PH-S235** | Stand smoke vision rev parity | tests | **✅** |
-| 93 | **PH-S236** | Admin i18n slim instances panel | code | відкрито |
+| 93 | **PH-S236** | Admin i18n slim instances panel | code | **✅** |
 | 94 | **PH-S237** | Admin i18n slim vm panel | code | відкрито |
 | 95 | **PH-S238** | Admin i18n slim users panel | code | відкрито |
 | 96 | **PH-S239** | Admin i18n slim config panel | code | відкрито |

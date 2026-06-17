@@ -1,24 +1,24 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-16 · PH-S235 ✅ · vision **rev 184** · **4** відкритих (PH-S236…S239) · **hold 95%** · **stretch spirit 96%**
+**Оновлено:** 2026-06-16 · PH-S236 ✅ · vision **rev 185** · **3** відкритих (PH-S237…S239) · **hold 95%** · **stretch spirit 96%**
 
-| **← наступний** | **PH-S236** — Admin i18n slim instances panel |
-| **Відкритих** | **4** (PH-S236…S239) |
+| **← наступний** | **PH-S237** — Admin i18n slim vm panel |
+| **Відкритих** | **3** (PH-S237…S239) |
 
 ---
 
-## PH-S236 — scope
+## PH-S237 — scope
 
-- `admin.inst.*` → `poolai-ui-core` + `admin_instances_patch` + `admin_layout_instances`
-- Remove `admin.inst.*` + `admin.page.instances` from `i18n_core.js`
-- Pattern: PH-S230…S234 (tenants/security/topology slim panels)
+- `admin.vmadm.*` → `poolai-ui-core` + `admin_vm_patch` + `admin_layout_vm`
+- Remove `admin.vmadm.*` + `admin.page.vm` from `i18n_core.js`
+- Pattern: PH-S236 instances slim panel
 - Acceptance: targeted `cargo test`; FM/HANDOFF/NEXT; push
 
 ---
 
-## Copy-paste — PH-S236
+## Copy-paste — PH-S237
 
 ```
-PH-S236 — Admin i18n slim instances panel (code)
-Scope: admin.inst.* → poolai-ui-core; slim layout; cargo test; FM/HANDOFF/NEXT; commit+push
+PH-S237 — Admin i18n slim vm panel (code)
+Scope: admin.vmadm.* → poolai-ui-core; slim layout; cargo test; FM/HANDOFF/NEXT; commit+push
 ```

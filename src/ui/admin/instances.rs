@@ -1,6 +1,6 @@
 //! Model instances management admin page
 
-use super::admin_layout;
+use super::admin_layout_instances;
 
 /// Admin instances page
 pub async fn admin_instances() -> axum::response::Html<String> {
@@ -275,5 +275,20 @@ pub async fn admin_instances() -> axum::response::Html<String> {
     loadInstances();
   "#;
 
-    admin_layout("admin.page.instances", "Model Instances", body, script)
+    admin_layout_instances("admin.page.instances", "Model Instances", body, &script)
+}
+
+#[cfg(test)]
+mod ph_s236_tests {
+    use super::admin_instances;
+
+    #[tokio::test]
+    async fn admin_instances_page_slim_instances_i18n_patch_ph_s236() {
+        let html = admin_instances().await.0;
+        assert!(html.contains("window.__poolaiAdminI18nRust="));
+        assert!(html.contains(r#""admin.page.instances""#));
+        assert!(html.contains(r#""admin.inst.title""#));
+        assert!(!html.contains(r#""admin.topo.title""#));
+        assert!(!html.contains(r#""admin.jobs.leaseState.active""#));
+    }
 }

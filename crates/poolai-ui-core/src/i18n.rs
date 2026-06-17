@@ -1,6 +1,6 @@
 //! UI i18n subsets moved from `i18n_core.js` (PH-S154 admin jobs/grid; PH-S162 auth/dash shell; PH-S197 updates-compat; PH-S207 monitoring; PH-S211 jobs-only patch; PH-S214 raid-only patch; PH-S217 grid-pricing-only patch).
 //!
-//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs — `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); dashboard — `admin_dashboard_patch` (PH-S228); audit — `admin_audit_patch` (PH-S229); tenants — `admin_tenants_patch` (PH-S230); security — `admin_security_patch` (PH-S231); topology — `admin_topology_patch` (PH-S234); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221); workers — `admin_workers_patch` (PH-S222); libs — `admin_libs_patch` (PH-S223).
+//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs — `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); dashboard — `admin_dashboard_patch` (PH-S228); audit — `admin_audit_patch` (PH-S229); tenants — `admin_tenants_patch` (PH-S230); security — `admin_security_patch` (PH-S231); topology — `admin_topology_patch` (PH-S234); instances — `admin_instances_patch` (PH-S236); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221); workers — `admin_workers_patch` (PH-S222); libs — `admin_libs_patch` (PH-S223).
 //! Auth + dashboard shell: `window.__poolaiAuthDashI18nRust` on login, dashboard layout, admin layout (PH-S162).
 
 use std::collections::BTreeMap;
@@ -1019,6 +1019,115 @@ pub const ADMIN_TOPOLOGY_UK: &[I18nRow<'_>] = &[
     ("admin.topo.lbl.load", "Навантаження:"),
 ];
 
+/// English instances admin keys (PH-S236; moved from `i18n_core.js`).
+pub const ADMIN_INSTANCES_EN: &[I18nRow<'_>] = &[
+    ("admin.page.instances", "Model Instances"),
+    ("admin.inst.title", "Model Instances"),
+    (
+        "admin.inst.intro",
+        "Manage AI model instances, placement, and lifecycle.",
+    ),
+    ("admin.inst.sectionInst", "Instances"),
+    ("admin.inst.createBtn", "Create Instance"),
+    ("admin.inst.sectionPreview", "Placement Preview"),
+    ("admin.inst.modelIdLbl", "Model ID:"),
+    ("admin.inst.previewBtn", "Preview Placement"),
+    ("admin.inst.loadingRow", "Loading…"),
+    ("admin.inst.empty", "No instances found"),
+    (
+        "admin.inst.previewHint",
+        "Enter a model ID and click Preview",
+    ),
+    ("admin.inst.col.instanceId", "Instance ID"),
+    ("admin.inst.col.modelId", "Model ID"),
+    ("admin.inst.col.status", "Status"),
+    ("admin.inst.col.strategy", "Strategy"),
+    ("admin.inst.col.nodes", "Nodes"),
+    ("admin.inst.col.created", "Created"),
+    ("admin.inst.col.actions", "Actions"),
+    ("admin.inst.col.memDelta", "Memory Delta"),
+    ("admin.inst.col.placementErr", "Error"),
+    ("admin.inst.viewBtn", "View"),
+    ("admin.inst.errLoad", "Error loading instances: "),
+    ("admin.inst.needModelId", "Please enter a model ID"),
+    ("admin.inst.previewEmpty", "No placement options available"),
+    (
+        "admin.inst.previewErr",
+        "Error getting placement previews: ",
+    ),
+    ("admin.inst.modalTitle", "Instance Details"),
+    ("admin.inst.modalCreateTitle", "Create Instance"),
+    (
+        "admin.inst.confirmDel",
+        "Are you sure you want to delete instance {id}?",
+    ),
+    ("admin.inst.deletedOk", "Instance deleted successfully"),
+    ("admin.inst.errDel", "Error deleting instance: "),
+    ("admin.inst.createdOk", "Instance created successfully: "),
+    ("admin.inst.errCreate", "Error creating instance: "),
+    ("admin.inst.errLoadOne", "Error loading instance: "),
+    ("admin.inst.lbl.modelId", "Model ID:"),
+    ("admin.inst.lbl.placementJson", "Placement (JSON):"),
+    (
+        "admin.inst.ph.placement",
+        r#"{"model_id": "", "strategy": "Single", "node_ids": ["local"]}"#,
+    ),
+    ("admin.inst.ph.modelId", "Enter model ID"),
+];
+
+/// Ukrainian instances admin keys (PH-S236).
+pub const ADMIN_INSTANCES_UK: &[I18nRow<'_>] = &[
+    ("admin.page.instances", "Інстанси моделей"),
+    ("admin.inst.title", "Інстанси моделей"),
+    (
+        "admin.inst.intro",
+        "Керування інстансами ШІ, розміщенням і життєвим циклом.",
+    ),
+    ("admin.inst.sectionInst", "Інстанси"),
+    ("admin.inst.createBtn", "Створити інстанс"),
+    (
+        "admin.inst.sectionPreview",
+        "Попередній перегляд розміщення",
+    ),
+    ("admin.inst.modelIdLbl", "ID моделі:"),
+    ("admin.inst.previewBtn", "Переглянути розміщення"),
+    ("admin.inst.loadingRow", "Завантаження…"),
+    ("admin.inst.empty", "Інстансів не знайдено"),
+    (
+        "admin.inst.previewHint",
+        "Введіть ID моделі та натисніть перегляд",
+    ),
+    ("admin.inst.col.instanceId", "ID інстансу"),
+    ("admin.inst.col.modelId", "ID моделі"),
+    ("admin.inst.col.status", "Статус"),
+    ("admin.inst.col.strategy", "Стратегія"),
+    ("admin.inst.col.nodes", "Вузли"),
+    ("admin.inst.col.created", "Створено"),
+    ("admin.inst.col.actions", "Дії"),
+    ("admin.inst.col.memDelta", "Δ пам’яті"),
+    ("admin.inst.col.placementErr", "Помилка"),
+    ("admin.inst.viewBtn", "Перегляд"),
+    ("admin.inst.errLoad", "Помилка завантаження інстансів: "),
+    ("admin.inst.needModelId", "Введіть ID моделі"),
+    ("admin.inst.previewEmpty", "Варіантів розміщення немає"),
+    ("admin.inst.previewErr", "Помилка попереднього перегляду: "),
+    ("admin.inst.modalTitle", "Деталі інстансу"),
+    ("admin.inst.modalCreateTitle", "Створити інстанс"),
+    ("admin.inst.confirmDel", "Видалити інстанс {id}?"),
+    ("admin.inst.deletedOk", "Інстанс видалено"),
+    ("admin.inst.errDel", "Помилка видалення: "),
+    ("admin.inst.createdOk", "Інстанс створено: "),
+    ("admin.inst.errCreate", "Помилка створення: "),
+    ("admin.inst.errLoadOne", "Помилка завантаження інстансу: "),
+    ("admin.inst.lbl.modelId", "ID моделі:"),
+    ("admin.inst.lbl.placementJson", "Розміщення (JSON):"),
+    (
+        "admin.inst.ph.placement",
+        r#"{"model_id": "", "strategy": "Single", "node_ids": ["local"]}"#,
+    ),
+    ("admin.inst.ph.modelId", "ID моделі"),
+];
+
 /// English monitoring admin keys (PH-S207; moved from `i18n_core.js`).
 pub const ADMIN_MONITORING_EN: &[I18nRow<'_>] = &[
     ("admin.page.monitoring", "Monitoring Dashboard"),
@@ -1715,6 +1824,25 @@ pub fn admin_topology_patch_script() -> String {
     )
 }
 
+/// Instances admin page — slim `admin.inst.*` patch only (PH-S236).
+pub fn admin_instances_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_INSTANCES_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_INSTANCES_UK));
+    root
+}
+
+pub fn admin_instances_patch_json() -> String {
+    serde_json::to_string(&admin_instances_patch()).expect("admin instances i18n patch serializes")
+}
+
+pub fn admin_instances_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminI18nRust={};",
+        admin_instances_patch_json()
+    )
+}
+
 /// Monitoring admin page — slim `admin.mon.*` patch only (PH-S220).
 pub fn admin_monitoring_patch() -> BTreeMap<String, BTreeMap<String, String>> {
     let mut root = BTreeMap::new();
@@ -1855,6 +1983,7 @@ pub fn t_en(key: &str) -> Option<&'static str> {
         ADMIN_TENANTS_EN,
         ADMIN_SECURITY_EN,
         ADMIN_TOPOLOGY_EN,
+        ADMIN_INSTANCES_EN,
         ADMIN_MONITORING_EN,
     ] {
         if let Some((_, v)) = rows.iter().find(|(k, _)| *k == key) {
@@ -1875,6 +2004,7 @@ pub fn t_uk(key: &str) -> Option<&'static str> {
         ADMIN_TENANTS_UK,
         ADMIN_SECURITY_UK,
         ADMIN_TOPOLOGY_UK,
+        ADMIN_INSTANCES_UK,
         ADMIN_MONITORING_UK,
     ] {
         if let Some((_, v)) = rows.iter().find(|(k, _)| *k == key) {
@@ -2004,6 +2134,21 @@ mod tests {
         assert!(json.contains(r#""admin.topo.graphLegend""#));
         assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
         assert!(!json.contains(r#""admin.sec.tab.oauth""#));
+    }
+
+    #[test]
+    fn instances_patch_has_matching_en_uk_key_counts_ph_s236() {
+        assert_eq!(ADMIN_INSTANCES_EN.len(), ADMIN_INSTANCES_UK.len());
+    }
+
+    #[test]
+    fn instances_patch_json_instances_only_ph_s236() {
+        let json = admin_instances_patch_json();
+        assert!(json.contains(r#""admin.page.instances""#));
+        assert!(json.contains(r#""admin.inst.title""#));
+        assert!(json.contains(r#""admin.inst.ph.placement""#));
+        assert!(!json.contains(r#""admin.topo.title""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
     }
 
     #[test]

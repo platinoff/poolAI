@@ -1830,7 +1830,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S235",
+  "last_sprint_closed": "PH-S236",
   "layers": [
     {
       "id": "L0",
@@ -1863,7 +1863,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S236",
+  "next_sprint": "PH-S237",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -6136,7 +6136,10 @@
       "id": "src_ui_admin_instances_rs",
       "label": "instances.rs",
       "layer": "L3",
-      "path": "src/ui/admin/instances.rs"
+      "path": "src/ui/admin/instances.rs",
+      "sprints": [
+        "PH-S236"
+      ]
     },
     {
       "auto_synced": true,
@@ -7298,7 +7301,8 @@
         "PH-S154",
         "PH-S162",
         "PH-S231",
-        "PH-S234"
+        "PH-S234",
+        "PH-S236"
       ]
     },
     {
@@ -7707,7 +7711,7 @@
       "path": "docs/vision/vision.svg"
     }
   ],
-  "revision": 184,
+  "revision": 185,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -9243,9 +9247,9 @@
       "acceptance": "admin.inst.*` slim patch",
       "deps": "PH-S207",
       "id": "PH-S236",
-      "open": true,
+      "open": false,
       "row": 171,
-      "status": "open",
+      "status": "closed",
       "title": "Admin i18n slim instances panel (code)"
     },
     {
@@ -9276,7 +9280,7 @@
       "title": "Admin i18n slim config panel (code)"
     }
   ],
-  "sprint_queue_open_count": 4,
+  "sprint_queue_open_count": 3,
   "updated_at": "2026-06-16",
   "vision_ui_rev": 59
 }

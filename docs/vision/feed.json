@@ -3,18 +3,9 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S236",
-      "link": "docs/vision/index.html#sprint-queue",
-      "next": true,
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "admin.inst.*` slim patch",
-      "title": "Admin i18n slim instances panel (code)"
-    },
-    {
-      "category": "open",
       "id": "PH-S237",
       "link": "docs/vision/index.html#sprint-queue",
+      "next": true,
       "published": "2026-05-28",
       "status": "open",
       "summary": "admin.vmadm.*` slim patch",
@@ -37,6 +28,15 @@
       "status": "open",
       "summary": "admin.cfg.*` slim patch",
       "title": "Admin i18n slim config panel (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S236",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "admin.inst.*` slim patch",
+      "title": "Admin i18n slim instances panel (code)"
     },
     {
       "category": "closed",
@@ -136,15 +136,6 @@
       "status": "closed",
       "summary": "verification counters on `/metrics",
       "title": "Galaxy verification sample metrics smoke (tests)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S224",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_pricing_cache_age_seconds` on `/metrics",
-      "title": "Galaxy pricing cache age metrics smoke (tests)"
     }
   ],
   "link": "docs/vision/index.html",
