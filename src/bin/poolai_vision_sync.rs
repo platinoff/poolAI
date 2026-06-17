@@ -18,6 +18,15 @@ const FM_REL: &str = "docs/catalog/FUNCTION_MANAGEMENT.md";
 const EXTENSIONS_REL: &str = "docs/vision/extensions.json";
 const FEED_CLOSED_CAP: usize = 12;
 
+const DOCS_VISION_MDC: &str = ".cursor/rules/docs-vision.mdc";
+
+const DOCS_VISION_CANON_PATHS: &[&str] = &[
+    "docs/vision/extensions.json",
+    "docs/vision/vision.svg",
+    "docs/vision/index.html",
+    "docs/vision/README.md",
+];
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct SprintQueueEntry {
     row: u32,
@@ -83,13 +92,21 @@ fn should_index(path: &str) -> bool {
     }
 
     let lower = p.to_ascii_lowercase();
+    let vision_artifact = p.starts_with("docs/vision/")
+        && (lower.ends_with(".html")
+            || lower.ends_with(".css")
+            || lower.ends_with(".svg")
+            || lower.ends_with(".json"));
+
     if !(lower.ends_with(".md")
+        || lower.ends_with(".mdc")
         || lower.ends_with(".rs")
         || lower.ends_with(".ts")
         || lower.ends_with(".yaml")
         || lower.ends_with(".yml")
         || lower.ends_with(".toml")
-        || lower.ends_with(".js"))
+        || lower.ends_with(".js")
+        || vision_artifact)
     {
         return false;
     }
@@ -113,6 +130,7 @@ fn infer_layer(path: &str) -> &'static str {
     if p.starts_with("docs/development/")
         || p.starts_with("docs/vision/")
         || p.starts_with(".cursor/commands/")
+        || p.starts_with(".cursor/rules/")
     {
         return "L1";
     }
@@ -162,6 +180,10 @@ fn hub_links(path: &str) -> Vec<(&'static str, &'static str)> {
         "src/bin/poolai-worker.rs" => vec![("poolai_worker", "implements")],
         "src/bin/poolai_openapi_gap_audit.rs" => vec![("fm", "catalog")],
         "src/bin/poolai_vision_sync.rs" => vec![("handoff", "session-tracks")],
+        DOCS_VISION_MDC => vec![("handoff", "sprint-scope")],
+        p if p.starts_with(".cursor/rules/") && p.ends_with(".mdc") => {
+            vec![("handoff", "session-tracks")]
+        }
         p if p.starts_with("e2e/tests/jobs_lease") => vec![("job_types", "sprint-scope")],
         p if p.starts_with("e2e/tests/grid_") => vec![("grid_dispatch", "sprint-scope")],
         p if p.starts_with("crates/") => vec![("crate_solana", "implements")],
@@ -573,6 +595,103 @@ fn manifest_revision(manifest: &Value) -> u64 {
         .unwrap_or(0)
 }
 
+fn manifest_indexed_paths(manifest: &Value) -> BTreeSet<String> {
+    let mut out = BTreeSet::new();
+    let Some(nodes) = manifest.get("nodes").and_then(Value::as_array) else {
+        return out;
+    };
+    for node in nodes {
+        if let Some(path) = node.get("path").and_then(Value::as_str) {
+            out.insert(normalize_path(path));
+        }
+    }
+    out
+}
+
+fn tracked_vdt_mdc_files(root: &Path) -> Result<Vec<String>, String> {
+    Ok(git_tracked_files(root)?
+        .into_iter()
+        .map(|p| normalize_path(&p))
+        .filter(|p| p.starts_with(".cursor/rules/") && p.ends_with(".mdc"))
+        .collect())
+}
+
+/// PH-S227: manifest nodes ↔ git-tracked VDT `.mdc` rules + `docs-vision.mdc` canon cross-links.
+fn collect_mdc_manifest_drift(
+    root: &Path,
+    manifest: &Value,
+    extensions: Option<&Value>,
+) -> Vec<String> {
+    let mut errors = Vec::new();
+    let indexed = manifest_indexed_paths(manifest);
+
+    let mdc_files = match tracked_vdt_mdc_files(root) {
+        Ok(files) => files,
+        Err(e) => {
+            errors.push(e);
+            return errors;
+        }
+    };
+
+    for mdc in &mdc_files {
+        if !indexed.contains(mdc) {
+            errors.push(format!(
+                "manifest missing node for VDT rule {mdc} (run poolai-vision-sync)"
+            ));
+        }
+    }
+
+    for canon in DOCS_VISION_CANON_PATHS {
+        if !indexed.contains(*canon) {
+            errors.push(format!("manifest missing docs-vision canon path {canon}"));
+        }
+    }
+
+    if let Some(ext) = extensions {
+        let listed = ext
+            .get("extension_policy")
+            .and_then(|p| p.get(".mdc"))
+            .and_then(|m| m.get("vision_files"))
+            .and_then(|v| v.as_array());
+        match listed {
+            Some(files) => {
+                let has_docs_vision = files
+                    .iter()
+                    .filter_map(Value::as_str)
+                    .any(|p| normalize_path(p) == DOCS_VISION_MDC);
+                if !has_docs_vision {
+                    errors.push(format!(
+                        "extensions.extension_policy.mdc.vision_files missing {DOCS_VISION_MDC}"
+                    ));
+                }
+            }
+            None => errors.push("extensions.json missing extension_policy.mdc".to_string()),
+        }
+    }
+
+    let mdc_path = root.join(DOCS_VISION_MDC);
+    let mdc_content = match fs::read_to_string(&mdc_path) {
+        Ok(c) => c,
+        Err(e) => {
+            errors.push(format!("read {DOCS_VISION_MDC}: {e}"));
+            return errors;
+        }
+    };
+
+    if !mdc_content.contains("poolai-vision-sync") {
+        errors.push(format!(
+            "{DOCS_VISION_MDC} should reference poolai-vision-sync (VDT autosync)"
+        ));
+    }
+    for canon in DOCS_VISION_CANON_PATHS {
+        if !mdc_content.contains(canon) {
+            errors.push(format!("{DOCS_VISION_MDC} missing cross-link to {canon}"));
+        }
+    }
+
+    errors
+}
+
 /// Compare on-disk manifest sprint metadata with FM §5.12 (+ optional extensions active_sprint).
 fn collect_manifest_fm_drift(
     manifest: &Value,
@@ -667,6 +786,12 @@ fn run_drift_check(root: &Path) -> ExitCode {
         .and_then(|raw| serde_json::from_str::<Value>(&raw).ok());
 
     let errors = collect_manifest_fm_drift(&manifest, &entries, fm_section, extensions.as_ref());
+    let mut errors: Vec<String> = errors;
+    errors.extend(collect_mdc_manifest_drift(
+        root,
+        &manifest,
+        extensions.as_ref(),
+    ));
     if errors.is_empty() {
         let rev = manifest_revision(&manifest);
         let next = manifest
@@ -918,5 +1043,63 @@ mod tests {
         let section = extract_fm_section_512(sample).unwrap();
         let errors = collect_manifest_fm_drift(&manifest, &entries, section, None);
         assert!(errors.iter().any(|e| e.contains("Vision rev")));
+    }
+
+    #[test]
+    fn mdc_drift_fails_when_vdt_rule_missing_from_manifest() {
+        let root = repo_root();
+        let manifest = json!({
+            "nodes": [
+                { "id": "fm", "path": "docs/catalog/FUNCTION_MANAGEMENT.md", "layer": "L2" }
+            ]
+        });
+        let ext = json!({
+            "extension_policy": {
+                ".mdc": {
+                    "vision_files": [DOCS_VISION_MDC]
+                }
+            }
+        });
+        let errors = collect_mdc_manifest_drift(&root, &manifest, Some(&ext));
+        assert!(
+            errors
+                .iter()
+                .any(|e| e.contains("manifest missing node for VDT rule")),
+            "{errors:?}"
+        );
+    }
+
+    #[test]
+    fn mdc_drift_ok_when_vdt_rules_indexed() {
+        let root = repo_root();
+        let mdc_files = tracked_vdt_mdc_files(&root).expect("git ls-files");
+        assert!(!mdc_files.is_empty(), "expected tracked .mdc rules");
+        let mut nodes: Vec<Value> = mdc_files
+            .iter()
+            .map(|p| {
+                json!({
+                    "id": path_slug(p),
+                    "path": p,
+                    "layer": "L1"
+                })
+            })
+            .collect();
+        for canon in DOCS_VISION_CANON_PATHS {
+            nodes.push(json!({
+                "id": path_slug(canon),
+                "path": canon,
+                "layer": if canon.starts_with("docs/vision/") { "L1" } else { "L2" }
+            }));
+        }
+        let manifest = json!({ "nodes": nodes });
+        let ext = json!({
+            "extension_policy": {
+                ".mdc": {
+                    "vision_files": [DOCS_VISION_MDC]
+                }
+            }
+        });
+        let errors = collect_mdc_manifest_drift(&root, &manifest, Some(&ext));
+        assert!(errors.is_empty(), "{errors:?}");
     }
 }

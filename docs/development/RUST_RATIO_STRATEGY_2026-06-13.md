@@ -176,7 +176,15 @@ flowchart TB
 | 81 | **PH-S224** | Galaxy pricing cache age metrics smoke | tests | **✅** |
 | 82 | **PH-S225** | Galaxy verification sample metrics smoke | tests | **✅** |
 | 83 | **PH-S226** | Vision sprint-queue → map focus | docs/vision | **✅** |
-| 84 | **PH-S227** | Vision VDT rules docs autosync audit | docs/vision | відкрито |
+| 84 | **PH-S227** | Vision VDT rules docs autosync audit | docs/vision | **✅** |
+| 85 | **PH-S228** | Admin i18n slim dashboard panel | code | відкрито |
+| 86 | **PH-S229** | Admin i18n slim audit panel | code | відкрито |
+| 87 | **PH-S230** | Admin i18n slim tenants panel | code | відкрито |
+| 88 | **PH-S231** | Admin i18n slim security panel | code | відкрито |
+| 89 | **PH-S232** | Galaxy replication metrics stand smoke | tests | відкрито |
+| 90 | **PH-S233** | Vision map sprint chips a11y | docs/vision | відкрито |
+| 91 | **PH-S234** | Admin i18n slim topology panel | code | відкрито |
+| 92 | **PH-S235** | Stand smoke vision rev parity | tests | відкрито |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 

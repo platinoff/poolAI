@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-16 (PH-S226 ✅ · §5.12 **1** відкритий PH-S227 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-16 (PH-S227 ✅ · replenish · §5.12 **8** відкритих PH-S228…S235 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -426,13 +426,21 @@ FM-xxx (з таблиці нижче)
 | 159 | **PH-S224** | Galaxy pricing cache age metrics smoke (tests) | PH-S168 | `galaxy_pricing_cache_age_seconds` on `/metrics` | **✅** |
 | 160 | **PH-S225** | Galaxy verification sample metrics smoke (tests) | PH-S177 | verification counters on `/metrics` | **✅** |
 | 161 | **PH-S226** | Vision sprint-queue → map focus (docs/vision) | PH-S202 | queue/ticker click → map node; panel expand fix | **✅** |
-| 162 | **PH-S227** | Vision VDT rules docs autosync audit (docs/vision) | PH-S205 | manifest ↔ `.mdc` cross-link drift | відкрито |
+| 162 | **PH-S227** | Vision VDT rules docs autosync audit (docs/vision) | PH-S205 | manifest ↔ `.mdc` cross-link drift in `--check` | **✅** |
+| 163 | **PH-S228** | Admin i18n slim dashboard panel (code) | PH-S207 | `admin.dash.*` → `poolai-ui-core` | відкрито |
+| 164 | **PH-S229** | Admin i18n slim audit panel (code) | PH-S207 | `admin.audit.*` slim patch | відкрито |
+| 165 | **PH-S230** | Admin i18n slim tenants panel (code) | PH-S207 | `admin.tenants.*` slim patch | відкрито |
+| 166 | **PH-S231** | Admin i18n slim security panel (code) | PH-S207 | `admin.sec.*` slim patch | відкрито |
+| 167 | **PH-S232** | Galaxy replication metrics stand smoke (tests) | PH-S127 | replication counters on `/metrics` | відкрито |
+| 168 | **PH-S233** | Vision map sprint chips a11y (docs/vision) | PH-S226 | `aria-label` on map sprint chips | відкрито |
+| 169 | **PH-S234** | Admin i18n slim topology panel (code) | PH-S207 | `admin.topo.*` slim patch | відкрито |
+| 170 | **PH-S235** | Stand smoke vision rev parity (tests) | PH-S208 | stand checks vision rev vs FM footer | відкрито |
 
-**Відкритих у §5.12:** **1** (PH-S227). **Закрито смуга:** PH-S128…S226 ✅. Vision rev **173** (після sync).
+**Відкритих у §5.12:** **8** (PH-S228…S235). **Закрито смуга:** PH-S128…S227 ✅. Vision rev **176**.
 
-**Rust ratio:** формальна смуга **90–95%**; **hold 95%** — PH-S165 ✅; post-S219 band **S227**.
+**Rust ratio:** формальна смуга **90–95%**; **hold 95%** — PH-S165 ✅; post-S227 band **S228…S235**.
 
-**Наступна сесія:** **PH-S227** · черга **1** відкритий (PH-S227) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S228** · черга **8** відкритих (PH-S228…S235) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S169)
 

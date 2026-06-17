@@ -20,6 +20,17 @@ Cargo.std.toml
 
 # Generated/static audit logs (do not commit/push)
 data/audit/*.log.gz
+data/audit/*.log
+
+# Local one-off git helper scripts (MSYS2 session artifacts; not product)
+bin/commit-*.sh
+bin/fix-commit-*.sh
+bin/do-commit-*.sh
+bin/push-*.sh
+bin/amend-*.sh
+bin/poll-*.sh
+bin/_poll-*.sh
+:-/
 
 # Local multi-node LAN dev stand (bin/run-lan-nodes.*)
 data/lan-stand/

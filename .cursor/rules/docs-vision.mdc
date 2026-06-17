@@ -32,7 +32,8 @@ alwaysApply: false
 3. Додати **edges** `concept-ref` | `implements` | `session-tracks` | `sprint-scope`.
 4. **`extensions.json`:** `active_sprint` = наступний; у `scopes` — `docs`, `code_globs`, `extensions`, `also_update` для закритого спринту.
 5. **`vision.svg`:** оновити footer text (last sprint / next) якщо змінився зріз черги.
-6. **Не** дублювати повний текст концепту в vision — лише посилання та шари.
+6. **`poolai-vision-sync`:** `cargo run --bin poolai-vision-sync` + `--check` (FM §5.12 + manifest ↔ `.mdc` cross-links, PH-S227).
+7. **Не** дублювати повний текст концепту в vision — лише посилання та шари.
 
 ## Актуальність extensions (етеншени)
 

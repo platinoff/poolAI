@@ -1724,11 +1724,113 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_updates_compat_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "_cursor_rules_autonomous_orchestrator_mdc"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "_cursor_rules_ci_scripts_maintenance_mdc"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "_cursor_rules_cursor_environment_baseline_mdc"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "sprint-scope",
+      "to": "_cursor_rules_docs_vision_mdc"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "_cursor_rules_functionality_management_mdc"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "_cursor_rules_git_commit_msys_mdc"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "_cursor_rules_poolai_agent_roles_mdc"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "_cursor_rules_poolai_session_iteration_mdc"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "_cursor_rules_poolai_testing_policy_mdc"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "_cursor_rules_runtime_stack_policy_mdc"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "_cursor_rules_rust_toolchain_baseline_mdc"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "_cursor_rules_virtual_development_team_mdc"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_vision_extensions_json"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_vision_feed_json"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_vision_index_html"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_vision_vision_css"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_vision_vision_svg"
     }
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S226",
+  "last_sprint_closed": "PH-S227",
   "layers": [
     {
       "id": "L0",
@@ -1761,7 +1863,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S227",
+  "next_sprint": "PH-S228",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7467,9 +7569,135 @@
       "label": "grid_seed_inventory_integration.rs",
       "layer": "L3",
       "path": "tests/grid_seed_inventory_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_autonomous_orchestrator_mdc",
+      "label": "autonomous-orchestrator.mdc",
+      "layer": "L1",
+      "path": ".cursor/rules/autonomous-orchestrator.mdc"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_ci_scripts_maintenance_mdc",
+      "label": "ci-scripts-maintenance.mdc",
+      "layer": "L1",
+      "path": ".cursor/rules/ci-scripts-maintenance.mdc"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_cursor_environment_baseline_mdc",
+      "label": "cursor-environment-baseline.mdc",
+      "layer": "L1",
+      "path": ".cursor/rules/cursor-environment-baseline.mdc"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_docs_vision_mdc",
+      "label": "docs-vision.mdc",
+      "layer": "L1",
+      "path": ".cursor/rules/docs-vision.mdc"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_functionality_management_mdc",
+      "label": "functionality-management.mdc",
+      "layer": "L1",
+      "path": ".cursor/rules/functionality-management.mdc"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_git_commit_msys_mdc",
+      "label": "git-commit-msys.mdc",
+      "layer": "L1",
+      "path": ".cursor/rules/git-commit-msys.mdc"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_poolai_agent_roles_mdc",
+      "label": "poolai-agent-roles.mdc",
+      "layer": "L1",
+      "path": ".cursor/rules/poolai-agent-roles.mdc"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_poolai_session_iteration_mdc",
+      "label": "poolai-session-iteration.mdc",
+      "layer": "L1",
+      "path": ".cursor/rules/poolai-session-iteration.mdc"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_poolai_testing_policy_mdc",
+      "label": "poolai-testing-policy.mdc",
+      "layer": "L1",
+      "path": ".cursor/rules/poolai-testing-policy.mdc"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_runtime_stack_policy_mdc",
+      "label": "runtime-stack-policy.mdc",
+      "layer": "L1",
+      "path": ".cursor/rules/runtime-stack-policy.mdc"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_rust_toolchain_baseline_mdc",
+      "label": "rust-toolchain-baseline.mdc",
+      "layer": "L1",
+      "path": ".cursor/rules/rust-toolchain-baseline.mdc"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_virtual_development_team_mdc",
+      "label": "virtual-development-team.mdc",
+      "layer": "L1",
+      "path": ".cursor/rules/virtual-development-team.mdc"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_vision_extensions_json",
+      "label": "extensions.json",
+      "layer": "L1",
+      "path": "docs/vision/extensions.json"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_vision_feed_json",
+      "label": "feed.json",
+      "layer": "L1",
+      "path": "docs/vision/feed.json"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_vision_index_html",
+      "label": "index.html",
+      "layer": "L1",
+      "path": "docs/vision/index.html"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_vision_manifest_json",
+      "label": "manifest.json",
+      "layer": "L1",
+      "path": "docs/vision/manifest.json"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_vision_vision_css",
+      "label": "vision.css",
+      "layer": "L1",
+      "path": "docs/vision/vision.css"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_vision_vision_svg",
+      "label": "vision.svg",
+      "layer": "L1",
+      "path": "docs/vision/vision.svg"
     }
   ],
-  "revision": 173,
+  "revision": 176,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -8921,16 +9149,88 @@
       "title": "Vision sprint-queue → map focus (docs/vision)"
     },
     {
-      "acceptance": "manifest ↔ `.mdc` cross-link drift",
+      "acceptance": "manifest ↔ `.mdc` cross-link drift in `--check",
       "deps": "PH-S205",
       "id": "PH-S227",
-      "open": true,
+      "open": false,
       "row": 162,
-      "status": "open",
+      "status": "closed",
       "title": "Vision VDT rules docs autosync audit (docs/vision)"
+    },
+    {
+      "acceptance": "admin.dash.*` → `poolai-ui-core",
+      "deps": "PH-S207",
+      "id": "PH-S228",
+      "open": true,
+      "row": 163,
+      "status": "open",
+      "title": "Admin i18n slim dashboard panel (code)"
+    },
+    {
+      "acceptance": "admin.audit.*` slim patch",
+      "deps": "PH-S207",
+      "id": "PH-S229",
+      "open": true,
+      "row": 164,
+      "status": "open",
+      "title": "Admin i18n slim audit panel (code)"
+    },
+    {
+      "acceptance": "admin.tenants.*` slim patch",
+      "deps": "PH-S207",
+      "id": "PH-S230",
+      "open": true,
+      "row": 165,
+      "status": "open",
+      "title": "Admin i18n slim tenants panel (code)"
+    },
+    {
+      "acceptance": "admin.sec.*` slim patch",
+      "deps": "PH-S207",
+      "id": "PH-S231",
+      "open": true,
+      "row": 166,
+      "status": "open",
+      "title": "Admin i18n slim security panel (code)"
+    },
+    {
+      "acceptance": "replication counters on `/metrics",
+      "deps": "PH-S127",
+      "id": "PH-S232",
+      "open": true,
+      "row": 167,
+      "status": "open",
+      "title": "Galaxy replication metrics stand smoke (tests)"
+    },
+    {
+      "acceptance": "aria-label` on map sprint chips",
+      "deps": "PH-S226",
+      "id": "PH-S233",
+      "open": true,
+      "row": 168,
+      "status": "open",
+      "title": "Vision map sprint chips a11y (docs/vision)"
+    },
+    {
+      "acceptance": "admin.topo.*` slim patch",
+      "deps": "PH-S207",
+      "id": "PH-S234",
+      "open": true,
+      "row": 169,
+      "status": "open",
+      "title": "Admin i18n slim topology panel (code)"
+    },
+    {
+      "acceptance": "stand checks vision rev vs FM footer",
+      "deps": "PH-S208",
+      "id": "PH-S235",
+      "open": true,
+      "row": 170,
+      "status": "open",
+      "title": "Stand smoke vision rev parity (tests)"
     }
   ],
-  "sprint_queue_open_count": 1,
+  "sprint_queue_open_count": 8,
   "updated_at": "2026-06-15",
   "vision_ui_rev": 58
 }

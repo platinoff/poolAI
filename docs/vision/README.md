@@ -55,7 +55,7 @@ http://127.0.0.1:8765/docs/vision/index.html
 
 **Auto-reload:** кнопка **Auto** у шапці; сервер `GET /docs/vision/__watch` — зміни `manifest.json` / `extensions.json` оновлюють граф без F5; **`git_head`** (короткий hash) оновлює cyan pill у шапці без F5; зміни `index.html` / `vision.css` / `vision.js` — повне перезавантаження сторінки.
 
-**Auto-sync (інкрементальна карта):** `cargo run --bin poolai-vision-sync` або `GET /docs/vision/__sync` — додає нові/змінені git-tracked файли (`docs/`, `src/`, `e2e/`, …) у `manifest.json` з ребрами до hub-вузлів (`galaxy_grid`, `fm`, `handoff`, …). **Drift gate:** `cargo run --bin poolai-vision-sync -- --check` (FM §5.12 vs manifest; CI job `vision-manifest-drift`). `open-docs-vision.ps1` викликає sync при старті; **Reload manifest** у UI — теж через `__sync`.
+**Auto-sync (інкрементальна карта):** `cargo run --bin poolai-vision-sync` або `GET /docs/vision/__sync` — додає нові/змінені git-tracked файли (`docs/`, `src/`, `e2e/`, …) у `manifest.json` з ребрами до hub-вузлів (`galaxy_grid`, `fm`, `handoff`, …). **Drift gate:** `cargo run --bin poolai-vision-sync -- --check` (FM §5.12 vs manifest + **PH-S227** `.mdc` cross-links; CI job `vision-manifest-drift`). `open-docs-vision.ps1` викликає sync при старті; **Reload manifest** у UI — теж через `__sync`.
 
 **Шапка:** `rev N · PH-S*` (закритий спринт) · **git HEAD** pill · `→ PH-S*` (наступний з `manifest.next_sprint`).
 
@@ -123,6 +123,7 @@ http://127.0.0.1:8765/docs/vision/index.html
 | **PH-S203** ✅ | Keyboard nav linked nodes | `linkedMapNeighbors` + Arrow keys |
 | **PH-S204** ✅ | Edge click neighbor select | `handleMapEdgeClick` + trace |
 | **PH-S205** ✅ | Manifest drift gate | `poolai-vision-sync --check` |
+| **PH-S227** ✅ | VDT `.mdc` cross-link drift | `poolai-vision-sync --check` |
 | **PH-S206** ✅ | Minimap selection ring | `#minimap-selection-ring` + viewport fill |
 
 Канон черги: [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 · наступний спринт **PH-S195** (seed_inventory GET).
