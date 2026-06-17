@@ -3,18 +3,9 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S229",
-      "link": "docs/vision/index.html#sprint-queue",
-      "next": true,
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "admin.audit.*` slim patch",
-      "title": "Admin i18n slim audit panel (code)"
-    },
-    {
-      "category": "open",
       "id": "PH-S230",
       "link": "docs/vision/index.html#sprint-queue",
+      "next": true,
       "published": "2026-05-28",
       "status": "open",
       "summary": "admin.tenants.*` slim patch",
@@ -64,6 +55,15 @@
       "status": "open",
       "summary": "stand checks vision rev vs FM footer",
       "title": "Stand smoke vision rev parity (tests)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S229",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "admin.audit.*` → `admin_audit_patch",
+      "title": "Admin i18n slim audit panel (code)"
     },
     {
       "category": "closed",
@@ -163,15 +163,6 @@
       "status": "closed",
       "summary": "aria-live` region for selected node label; rev++",
       "title": "Vision map aria-live selection (docs/vision)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S217",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "grid-pricing strings → `poolai-ui-core",
-      "title": "Admin i18n slim grid-pricing panel (code)"
     }
   ],
   "link": "docs/vision/index.html",

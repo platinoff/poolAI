@@ -178,7 +178,7 @@ flowchart TB
 | 83 | **PH-S226** | Vision sprint-queue → map focus | docs/vision | **✅** |
 | 84 | **PH-S227** | Vision VDT rules docs autosync audit | docs/vision | **✅** |
 | 85 | **PH-S228** | Admin i18n slim dashboard panel | code | **✅** |
-| 86 | **PH-S229** | Admin i18n slim audit panel | code | відкрито |
+| 86 | **PH-S229** | Admin i18n slim audit panel | code | **✅** |
 | 87 | **PH-S230** | Admin i18n slim tenants panel | code | відкрито |
 | 88 | **PH-S231** | Admin i18n slim security panel | code | відкрито |
 | 89 | **PH-S232** | Galaxy replication metrics stand smoke | tests | відкрито |

@@ -2,7 +2,7 @@
 //!
 //! Provides query interface for viewing and filtering audit events.
 
-use crate::ui::admin::admin_layout;
+use crate::ui::admin::admin_layout_audit;
 use axum::response::Html;
 
 /// Audit logs viewer page
@@ -78,7 +78,7 @@ pub async fn admin_audit() -> Html<String> {
     queryAuditLogs();
     "#;
 
-    admin_layout(
+    admin_layout_audit(
         "admin.page.audit",
         "Audit Logs",
         r#"
@@ -108,4 +108,14 @@ pub async fn admin_audit() -> Html<String> {
         "#,
         script,
     )
+}
+
+#[tokio::test]
+async fn admin_audit_page_slim_audit_i18n_patch_ph_s229() {
+    let html = admin_audit().await.0;
+    assert!(html.contains("window.__poolaiAdminI18nRust="));
+    assert!(html.contains(r#""admin.page.audit""#));
+    assert!(html.contains(r#""admin.audit.sectionTitle""#));
+    assert!(!html.contains(r#""admin.jobs.leaseState.active""#));
+    assert!(!html.contains(r#""admin.dash.card.overview""#));
 }

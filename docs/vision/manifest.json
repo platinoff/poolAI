@@ -1830,7 +1830,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S228",
+  "last_sprint_closed": "PH-S229",
   "layers": [
     {
       "id": "L0",
@@ -1863,7 +1863,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S229",
+  "next_sprint": "PH-S230",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7697,7 +7697,7 @@
       "path": "docs/vision/vision.svg"
     }
   ],
-  "revision": 177,
+  "revision": 178,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -9167,12 +9167,12 @@
       "title": "Admin i18n slim dashboard panel (code)"
     },
     {
-      "acceptance": "admin.audit.*` slim patch",
+      "acceptance": "admin.audit.*` → `admin_audit_patch",
       "deps": "PH-S207",
       "id": "PH-S229",
-      "open": true,
+      "open": false,
       "row": 164,
-      "status": "open",
+      "status": "closed",
       "title": "Admin i18n slim audit panel (code)"
     },
     {
@@ -9230,7 +9230,7 @@
       "title": "Stand smoke vision rev parity (tests)"
     }
   ],
-  "sprint_queue_open_count": 7,
+  "sprint_queue_open_count": 6,
   "updated_at": "2026-06-15",
   "vision_ui_rev": 58
 }

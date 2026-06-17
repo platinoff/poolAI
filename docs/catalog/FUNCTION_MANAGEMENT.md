@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-16 (PH-S228 ✅ · §5.12 **7** відкритих PH-S229…S235 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-16 (PH-S229 ✅ · §5.12 **6** відкритих PH-S230…S235 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -428,7 +428,7 @@ FM-xxx (з таблиці нижче)
 | 161 | **PH-S226** | Vision sprint-queue → map focus (docs/vision) | PH-S202 | queue/ticker click → map node; panel expand fix | **✅** |
 | 162 | **PH-S227** | Vision VDT rules docs autosync audit (docs/vision) | PH-S205 | manifest ↔ `.mdc` cross-link drift in `--check` | **✅** |
 | 163 | **PH-S228** | Admin i18n slim dashboard panel (code) | PH-S207 | `admin.dash.*` → `admin_dashboard_patch` | **✅** |
-| 164 | **PH-S229** | Admin i18n slim audit panel (code) | PH-S207 | `admin.audit.*` slim patch | відкрито |
+| 164 | **PH-S229** | Admin i18n slim audit panel (code) | PH-S207 | `admin.audit.*` → `admin_audit_patch` | **✅** |
 | 165 | **PH-S230** | Admin i18n slim tenants panel (code) | PH-S207 | `admin.tenants.*` slim patch | відкрито |
 | 166 | **PH-S231** | Admin i18n slim security panel (code) | PH-S207 | `admin.sec.*` slim patch | відкрито |
 | 167 | **PH-S232** | Galaxy replication metrics stand smoke (tests) | PH-S127 | replication counters on `/metrics` | відкрито |
@@ -436,11 +436,11 @@ FM-xxx (з таблиці нижче)
 | 169 | **PH-S234** | Admin i18n slim topology panel (code) | PH-S207 | `admin.topo.*` slim patch | відкрито |
 | 170 | **PH-S235** | Stand smoke vision rev parity (tests) | PH-S208 | stand checks vision rev vs FM footer | відкрито |
 
-**Відкритих у §5.12:** **7** (PH-S229…S235). **Закрито смуга:** PH-S128…S228 ✅. Vision rev **177**.
+**Відкритих у §5.12:** **6** (PH-S230…S235). **Закрито смуга:** PH-S128…S229 ✅. Vision rev **178**.
 
-**Rust ratio:** формальна смуга **90–95%**; **hold 95%** — PH-S165 ✅; post-S227 band **S229…S235**.
+**Rust ratio:** формальна смуга **90–95%**; **hold 95%** — PH-S165 ✅; post-S227 band **S230…S235**.
 
-**Наступна сесія:** **PH-S229** · черга **7** відкритих (PH-S229…S235) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S230** · черга **6** відкритих (PH-S230…S235) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S169)
 

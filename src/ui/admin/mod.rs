@@ -115,6 +115,24 @@ pub fn admin_layout_dashboard(
     )
 }
 
+/// Audit admin page layout — slim `admin.audit.*` Rust i18n patch only (PH-S229).
+pub fn admin_layout_audit(
+    title_i18n_key: &str,
+    title_fallback: &str,
+    body_html: &str,
+    script_js: &str,
+) -> Html<String> {
+    let i18n_patch = poolai_ui_core::i18n::admin_audit_patch_script();
+    admin_layout_with_module_script(
+        title_i18n_key,
+        title_fallback,
+        body_html,
+        POOLAI_UI_WASM_MODULE,
+        script_js,
+        &i18n_patch,
+    )
+}
+
 /// Jobs admin page layout — slim `admin.jobs.*` Rust i18n patch only (PH-S211).
 pub fn admin_layout_jobs(
     title_i18n_key: &str,
@@ -414,6 +432,7 @@ fn admin_layout_default_patch_excludes_monitoring_ph_s220() {
     assert!(!patch.contains(r#""admin.mon.mlTitle""#));
     assert!(!patch.contains(r#""admin.page.monitoring""#));
     assert!(!patch.contains(r#""admin.dash.card.overview""#));
+    assert!(!patch.contains(r#""admin.audit.sectionTitle""#));
 }
 
 #[test]
@@ -421,6 +440,13 @@ fn admin_layout_default_patch_excludes_dashboard_ph_s228() {
     let patch = poolai_ui_core::i18n::admin_jobs_grid_patch_script();
     assert!(!patch.contains(r#""admin.dash.card.overview""#));
     assert!(!patch.contains(r#""admin.page.dashboard""#));
+}
+
+#[test]
+fn admin_layout_default_patch_excludes_audit_ph_s229() {
+    let patch = poolai_ui_core::i18n::admin_jobs_grid_patch_script();
+    assert!(!patch.contains(r#""admin.audit.sectionTitle""#));
+    assert!(!patch.contains(r#""admin.page.audit""#));
 }
 
 #[test]

@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-16 (PH-S228 ✅ · §5.12 **7** відкритих PH-S229…S235 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
+**Оновлено:** 2026-06-16 (PH-S229 ✅ · §5.12 **6** відкритих PH-S230…S235 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -179,6 +179,7 @@
 **PH-S226 ✅ (vision):** `docs/vision/vision.js` — `ensurePanelExpanded` for map/queue panels; RSS ticker map-linked → `focusSprintOnMap`; queue `aria-label` + `:focus-visible`; map select syncs `queue-active`; UI cache **v73**; rev **173**.
 **PH-S227 ✅ (ops/vision):** `poolai-vision-sync --check` — manifest ↔ `.mdc` VDT rules cross-link drift; index `.mdc` + vision artifacts; rev **176**.
 **PH-S228 ✅ (code/ui):** `admin_dashboard_patch` + `admin_layout_dashboard` — dashboard slim Rust i18n; `admin.dash.*` removed from `i18n_core.js`.
+**PH-S229 ✅ (code/ui):** `admin_audit_patch` + `admin_layout_audit` — audit slim Rust i18n; `admin.audit.*` removed from `i18n_core.js`.
 **Ops:** `open-docs-vision.ps1` — ASCII Write-Host + robust `SendVisionBytes`; URL `http://127.0.0.1:8765/docs/vision/index.html`.
 **PH-S198 ✅ (code):** `topology_graph.rs` — hub labels + `label_x`/`label_y`/`is_hub` in graph JSON; heatmap short ids; slim `topology_graph.js` (SVG paint only); `cargo test-ci`.
 **PH-S194 ✅ (code):** `galaxy_fee_split_applied_total` on grid result wire; `cargo test-ci`.

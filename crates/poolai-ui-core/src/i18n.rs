@@ -1,6 +1,6 @@
 //! UI i18n subsets moved from `i18n_core.js` (PH-S154 admin jobs/grid; PH-S162 auth/dash shell; PH-S197 updates-compat; PH-S207 monitoring; PH-S211 jobs-only patch; PH-S214 raid-only patch; PH-S217 grid-pricing-only patch).
 //!
-//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs — `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); dashboard — `admin_dashboard_patch` (PH-S228); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221); workers — `admin_workers_patch` (PH-S222); libs — `admin_libs_patch` (PH-S223).
+//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs — `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); dashboard — `admin_dashboard_patch` (PH-S228); audit — `admin_audit_patch` (PH-S229); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221); workers — `admin_workers_patch` (PH-S222); libs — `admin_libs_patch` (PH-S223).
 //! Auth + dashboard shell: `window.__poolaiAuthDashI18nRust` on login, dashboard layout, admin layout (PH-S162).
 
 use std::collections::BTreeMap;
@@ -543,6 +543,58 @@ pub const ADMIN_DASHBOARD_UK: &[I18nRow<'_>] = &[
     ("admin.dash.noAlerts", "Немає активних сповіщень"),
     ("admin.dash.noActivity", "Немає недавньої активності"),
     ("admin.dash.errLoad", "Помилка завантаження панелі: "),
+];
+
+/// English audit admin keys (PH-S229; moved from `i18n_core.js`).
+pub const ADMIN_AUDIT_EN: &[I18nRow<'_>] = &[
+    ("admin.page.audit", "Audit Logs"),
+    ("admin.audit.sectionTitle", "Audit Events"),
+    ("admin.audit.searchPh", "Search…"),
+    ("admin.audit.label.search", "Search"),
+    ("admin.audit.label.level", "Level"),
+    ("admin.audit.label.startDate", "Start date"),
+    ("admin.audit.label.endDate", "End date"),
+    ("admin.audit.levelAll", "All Levels"),
+    ("admin.audit.levelInfo", "Info"),
+    ("admin.audit.levelWarning", "Warning"),
+    ("admin.audit.levelError", "Error"),
+    ("admin.audit.levelCritical", "Critical"),
+    ("admin.audit.query", "Query"),
+    ("admin.audit.col.time", "Timestamp"),
+    ("admin.audit.col.level", "Level"),
+    ("admin.audit.col.user", "User"),
+    ("admin.audit.col.action", "Action"),
+    ("admin.audit.col.resource", "Resource"),
+    ("admin.audit.col.result", "Result"),
+    ("admin.audit.empty", "No audit events found"),
+    ("admin.audit.loading", "Loading audit events…"),
+    ("admin.audit.errLoad", "Error loading audit logs: "),
+];
+
+/// Ukrainian audit admin keys (PH-S229).
+pub const ADMIN_AUDIT_UK: &[I18nRow<'_>] = &[
+    ("admin.page.audit", "Журнал аудиту"),
+    ("admin.audit.sectionTitle", "Події аудиту"),
+    ("admin.audit.searchPh", "Пошук…"),
+    ("admin.audit.label.search", "Пошук"),
+    ("admin.audit.label.level", "Рівень"),
+    ("admin.audit.label.startDate", "Дата початку"),
+    ("admin.audit.label.endDate", "Дата кінця"),
+    ("admin.audit.levelAll", "Усі рівні"),
+    ("admin.audit.levelInfo", "Info"),
+    ("admin.audit.levelWarning", "Warning"),
+    ("admin.audit.levelError", "Error"),
+    ("admin.audit.levelCritical", "Critical"),
+    ("admin.audit.query", "Запит"),
+    ("admin.audit.col.time", "Час"),
+    ("admin.audit.col.level", "Рівень"),
+    ("admin.audit.col.user", "Користувач"),
+    ("admin.audit.col.action", "Дія"),
+    ("admin.audit.col.resource", "Ресурс"),
+    ("admin.audit.col.result", "Результат"),
+    ("admin.audit.empty", "Подій аудиту не знайдено"),
+    ("admin.audit.loading", "Завантаження подій аудиту…"),
+    ("admin.audit.errLoad", "Помилка завантаження журналу: "),
 ];
 
 /// English monitoring admin keys (PH-S207; moved from `i18n_core.js`).
@@ -1168,6 +1220,22 @@ pub fn admin_dashboard_patch_script() -> String {
     )
 }
 
+/// Audit admin page — slim `admin.audit.*` patch only (PH-S229).
+pub fn admin_audit_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_AUDIT_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_AUDIT_UK));
+    root
+}
+
+pub fn admin_audit_patch_json() -> String {
+    serde_json::to_string(&admin_audit_patch()).expect("admin audit i18n patch serializes")
+}
+
+pub fn admin_audit_patch_script() -> String {
+    format!("window.__poolaiAdminI18nRust={};", admin_audit_patch_json())
+}
+
 /// Monitoring admin page — slim `admin.mon.*` patch only (PH-S220).
 pub fn admin_monitoring_patch() -> BTreeMap<String, BTreeMap<String, String>> {
     let mut root = BTreeMap::new();
@@ -1304,6 +1372,7 @@ pub fn t_en(key: &str) -> Option<&'static str> {
         ADMIN_GRID_PRICING_EN,
         ADMIN_UPDATES_COMPAT_EN,
         ADMIN_DASHBOARD_EN,
+        ADMIN_AUDIT_EN,
         ADMIN_MONITORING_EN,
     ] {
         if let Some((_, v)) = rows.iter().find(|(k, _)| *k == key) {
@@ -1320,6 +1389,7 @@ pub fn t_uk(key: &str) -> Option<&'static str> {
         ADMIN_GRID_PRICING_UK,
         ADMIN_UPDATES_COMPAT_UK,
         ADMIN_DASHBOARD_UK,
+        ADMIN_AUDIT_UK,
         ADMIN_MONITORING_UK,
     ] {
         if let Some((_, v)) = rows.iter().find(|(k, _)| *k == key) {
@@ -1399,6 +1469,20 @@ mod tests {
         assert!(!json.contains(r#""admin.updatesCompat.section""#));
         assert!(!json.contains(r#""admin.mon.mlTitle""#));
         assert!(!json.contains(r#""admin.page.monitoring""#));
+    }
+
+    #[test]
+    fn audit_patch_has_matching_en_uk_key_counts_ph_s229() {
+        assert_eq!(ADMIN_AUDIT_EN.len(), ADMIN_AUDIT_UK.len());
+    }
+
+    #[test]
+    fn audit_patch_json_audit_only_ph_s229() {
+        let json = admin_audit_patch_json();
+        assert!(json.contains(r#""admin.page.audit""#));
+        assert!(json.contains(r#""admin.audit.sectionTitle""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+        assert!(!json.contains(r#""admin.dash.card.overview""#));
     }
 
     #[test]
