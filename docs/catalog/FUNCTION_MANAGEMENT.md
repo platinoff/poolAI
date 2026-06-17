@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-16 (PH-S232 ✅ · §5.12 **3** відкритих PH-S233…S235 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-16 (PH-S233 ✅ · §5.12 **2** відкритих PH-S234…S235 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -432,13 +432,13 @@ FM-xxx (з таблиці нижче)
 | 165 | **PH-S230** | Admin i18n slim tenants panel (code) | PH-S207 | `admin.tenants.*` → `admin_tenants_patch` | **✅** |
 | 166 | **PH-S231** | Admin i18n slim security panel (code) | PH-S207 | `admin.sec.*` → `admin_security_patch` | **✅** |
 | 167 | **PH-S232** | Galaxy replication metrics stand smoke (tests) | PH-S127 | replication counters on `/metrics` | **✅** |
-| 168 | **PH-S233** | Vision map sprint chips a11y (docs/vision) | PH-S226 | `aria-label` on map sprint chips | відкрито |
+| 168 | **PH-S233** | Vision map sprint chips a11y (docs/vision) | PH-S226 | `aria-label` on map sprint chips | **✅** |
 | 169 | **PH-S234** | Admin i18n slim topology panel (code) | PH-S207 | `admin.topo.*` slim patch | відкрито |
 | 170 | **PH-S235** | Stand smoke vision rev parity (tests) | PH-S208 | stand checks vision rev vs FM footer | відкрито |
 
-**Відкритих у §5.12:** **3** (PH-S233…S235). **Закрито смуга:** PH-S128…S232 ✅. Vision rev **181**.
+**Відкритих у §5.12:** **2** (PH-S234…S235). **Закрито смуга:** PH-S128…S233 ✅. Vision rev **182**.
 
-**Наступна сесія:** **PH-S233** · черга **3** відкритих (PH-S233…S235) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S234** · черга **2** відкритих (PH-S234…S235) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S169)
 

@@ -1102,4 +1102,25 @@ mod tests {
         let errors = collect_mdc_manifest_drift(&root, &manifest, Some(&ext));
         assert!(errors.is_empty(), "{errors:?}");
     }
+
+    #[test]
+    fn vision_js_map_sprint_chips_aria_label_ph_s233() {
+        let js = std::fs::read_to_string("docs/vision/vision.js").expect("vision.js");
+        assert!(
+            js.contains("function bindMapLinkedSprintChip"),
+            "missing bindMapLinkedSprintChip"
+        );
+        assert!(
+            js.contains("sprintMapFocusAriaLabel"),
+            "missing sprintMapFocusAriaLabel"
+        );
+        assert!(
+            js.contains("Focus sprint ") && js.contains(" on documentation map"),
+            "missing map sprint chip aria-label text"
+        );
+        assert!(
+            js.contains("renderSprintChips") && js.contains("bindMapLinkedSprintChip(span, s)"),
+            "renderSprintChips should bind map-linked chips"
+        );
+    }
 }

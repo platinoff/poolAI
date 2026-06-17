@@ -1780,6 +1780,22 @@ body.vision-reduced-motion #map-svg .edge.constellation-pipe,
   color: #c4b5fd;
 }
 
+.sprint-chip.map-linked {
+  cursor: pointer;
+}
+
+.sprint-chip.map-linked:hover {
+  border-color: rgba(126, 184, 255, 0.55);
+  background: rgba(126, 184, 255, 0.12);
+  color: #dbeafe;
+}
+
+.sprint-chip.map-linked:focus-visible,
+.rss-ticker-item.map-linked:focus-visible {
+  outline: 2px solid var(--accent, #7eb8ff);
+  outline-offset: 2px;
+}
+
 .sprint-queue-body {
   padding: 6px 8px 8px;
   overflow: auto;

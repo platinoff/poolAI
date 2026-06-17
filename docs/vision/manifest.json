@@ -1830,7 +1830,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S232",
+  "last_sprint_closed": "PH-S233",
   "layers": [
     {
       "id": "L0",
@@ -1863,7 +1863,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S233",
+  "next_sprint": "PH-S234",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -4839,7 +4839,9 @@
         "PH-S63",
         "PH-S64",
         "PH-S115",
-        "PH-S188"
+        "PH-S188",
+        "PH-S226",
+        "PH-S233"
       ]
     },
     {
@@ -7702,7 +7704,7 @@
       "path": "docs/vision/vision.svg"
     }
   ],
-  "revision": 181,
+  "revision": 182,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -9211,9 +9213,9 @@
       "acceptance": "aria-label` on map sprint chips",
       "deps": "PH-S226",
       "id": "PH-S233",
-      "open": true,
+      "open": false,
       "row": 168,
-      "status": "open",
+      "status": "closed",
       "title": "Vision map sprint chips a11y (docs/vision)"
     },
     {
@@ -9235,7 +9237,7 @@
       "title": "Stand smoke vision rev parity (tests)"
     }
   ],
-  "sprint_queue_open_count": 3,
+  "sprint_queue_open_count": 2,
   "updated_at": "2026-06-16",
-  "vision_ui_rev": 58
+  "vision_ui_rev": 59
 }

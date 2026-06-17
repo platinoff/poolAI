@@ -1475,26 +1475,35 @@
     focusMapNode(node, { pushHistory: true });
   }
 
+  function sprintMapFocusAriaLabel(sprintId) {
+    return "Focus sprint " + sprintId + " on documentation map";
+  }
+
+  /** PH-S233: shared a11y + keyboard for sprint chips linked to a map node. */
+  function bindMapLinkedSprintChip(el, sprintId) {
+    if (!el || !sprintId || !pickMapNodeForSprint(sprintId)) return;
+    el.classList.add("map-linked");
+    el.setAttribute("role", "button");
+    el.setAttribute("tabindex", "0");
+    el.setAttribute("aria-label", sprintMapFocusAriaLabel(sprintId));
+    const activate = (ev) => {
+      if (ev) ev.stopPropagation();
+      focusSprintOnMap(sprintId);
+    };
+    el.addEventListener("click", activate);
+    el.addEventListener("keydown", (ev) => {
+      if (ev.key === "Enter" || ev.key === " ") {
+        ev.preventDefault();
+        activate(ev);
+      }
+    });
+    el.style.cursor = "pointer";
+  }
+
   function bindSprintQueueItems(box) {
     if (!box) return;
-    box.querySelectorAll(".sprint-queue-item").forEach((li) => {
-      const sprintId = li.dataset.sprintId || "";
-      const hasMap = li.classList.contains("map-linked");
-      if (!hasMap) return;
-      li.setAttribute("role", "button");
-      li.setAttribute("tabindex", "0");
-      li.setAttribute(
-        "aria-label",
-        "Focus sprint " + sprintId + " on documentation map"
-      );
-      const activate = () => focusSprintOnMap(sprintId);
-      li.addEventListener("click", activate);
-      li.addEventListener("keydown", (ev) => {
-        if (ev.key === "Enter" || ev.key === " ") {
-          ev.preventDefault();
-          activate();
-        }
-      });
+    box.querySelectorAll(".sprint-queue-item.map-linked").forEach((li) => {
+      bindMapLinkedSprintChip(li, li.dataset.sprintId || "");
     });
   }
 
@@ -2988,14 +2997,13 @@
     track.innerHTML = chunk + chunk;
     track.querySelectorAll(".rss-ticker-item").forEach((el) => {
       const sprintId = el.dataset.sprintId || "";
-      el.addEventListener("click", () => {
-        if (sprintId && el.classList.contains("map-linked")) {
-          focusSprintOnMap(sprintId);
-        } else {
-          scrollToSprintQueue();
-        }
-      });
-      el.style.cursor = "pointer";
+      if (el.classList.contains("map-linked")) {
+        bindMapLinkedSprintChip(el, sprintId);
+      } else {
+        el.setAttribute("aria-label", "Open sprint queue for " + sprintId);
+        el.addEventListener("click", () => scrollToSprintQueue());
+        el.style.cursor = "pointer";
+      }
     });
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) {
@@ -3015,16 +3023,29 @@
     const box = document.getElementById("sprint-chips");
     box.innerHTML = "";
     if (!node.sprints || !node.sprints.length) return;
+    box.setAttribute("role", "list");
+    box.setAttribute("aria-label", "Sprints for selected file");
     node.sprints.slice(0, 12).forEach((s) => {
       const span = document.createElement("span");
       span.className = "sprint-chip";
+      span.setAttribute("role", "listitem");
       span.textContent = s;
+      if (pickMapNodeForSprint(s)) {
+        bindMapLinkedSprintChip(span, s);
+      } else {
+        span.setAttribute("aria-label", "Sprint " + s);
+      }
       box.appendChild(span);
     });
     if (node.sprints.length > 12) {
       const more = document.createElement("span");
       more.className = "sprint-chip";
+      more.setAttribute("role", "listitem");
       more.textContent = "+" + (node.sprints.length - 12);
+      more.setAttribute(
+        "aria-label",
+        node.sprints.length - 12 + " more sprints not shown"
+      );
       box.appendChild(more);
     }
   }
