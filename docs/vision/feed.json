@@ -3,12 +3,48 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S235",
+      "id": "PH-S236",
       "link": "docs/vision/index.html#sprint-queue",
       "next": true,
       "published": "2026-05-28",
       "status": "open",
-      "summary": "stand checks vision rev vs FM footer",
+      "summary": "admin.inst.*` slim patch",
+      "title": "Admin i18n slim instances panel (code)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S237",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "admin.vmadm.*` slim patch",
+      "title": "Admin i18n slim vm panel (code)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S238",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "admin.usr.*` slim patch",
+      "title": "Admin i18n slim users panel (code)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S239",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "admin.cfg.*` slim patch",
+      "title": "Admin i18n slim config panel (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S235",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "stand checks vision rev vs FM footer + extensions",
       "title": "Stand smoke vision rev parity (tests)"
     },
     {
@@ -109,15 +145,6 @@
       "status": "closed",
       "summary": "galaxy_pricing_cache_age_seconds` on `/metrics",
       "title": "Galaxy pricing cache age metrics smoke (tests)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S223",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "admin.lib.*` → `poolai-ui-core",
-      "title": "Admin i18n slim libs panel (code)"
     }
   ],
   "link": "docs/vision/index.html",

@@ -235,7 +235,7 @@ cargo run --bin poolai-http-stand-smoke -- --json
 | `POOLAI_STAND_SMOKE_RAID=1` | Альтернатива прапорцю `--raid` (full suite + raid) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
-Default stand smoke includes **`vision_revision_parity`** (PH-S208): repo `manifest.revision` vs FM §5.12 `Vision rev`, then `GET /docs/vision/manifest.json` with `X-PoolAI-Vision-Revision` header vs JSON body.
+Default stand smoke includes **`vision_revision_parity`** (PH-S208, PH-S235): repo `manifest.revision` vs FM §5.12 `Vision rev`, `extensions.active_sprint` vs `manifest.next_sprint`, then `GET /docs/vision/manifest.json` with `X-PoolAI-Vision-Revision` header vs JSON body.
 
 ---
 

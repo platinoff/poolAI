@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-16 (PH-S234 ✅ · §5.12 **1** відкритий PH-S235 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
+**Оновлено:** 2026-06-16 (PH-S235 ✅ · §5.12 **4** відкритих PH-S236…S239 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -185,6 +185,7 @@
 **PH-S232 ✅ (code/tests):** `poolai-http-stand-smoke` — `galaxy_replication_metrics` on live `/metrics` (`galaxy_replication_strict_total`; PH-S179).
 **PH-S233 ✅ (vision):** `docs/vision/vision.js` — `bindMapLinkedSprintChip` + `aria-label` on links-panel sprint chips, RSS ticker, queue; UI **v74** / CSS **v70**; rev **182**.
 **PH-S234 ✅ (code/ui):** `admin_topology_patch` + `admin_layout_topology`; `admin.topo.*` + `admin.page.topology` removed from `i18n_core.js`; topology page slim Rust i18n patch.
+**PH-S235 ✅ (code/tests):** `poolai-http-stand-smoke` — `assert_vision_repo_parity` (manifest.revision vs FM `Vision rev **N**` + `extensions.active_sprint` vs `manifest.next_sprint`); unit tests `ph_s235`; extends PH-S208 live header check.
 **Ops:** `open-docs-vision.ps1` — ASCII Write-Host + robust `SendVisionBytes`; URL `http://127.0.0.1:8765/docs/vision/index.html`.
 **PH-S198 ✅ (code):** `topology_graph.rs` — hub labels + `label_x`/`label_y`/`is_hub` in graph JSON; heatmap short ids; slim `topology_graph.js` (SVG paint only); `cargo test-ci`.
 **PH-S194 ✅ (code):** `galaxy_fee_split_applied_total` on grid result wire; `cargo test-ci`.

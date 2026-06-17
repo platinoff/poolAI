@@ -1,22 +1,24 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-16 · PH-S234 ✅ · vision **rev 183** · **1** відкритий (PH-S235) · **hold 95%** · **stretch spirit 96%**
+**Оновлено:** 2026-06-16 · PH-S235 ✅ · vision **rev 184** · **4** відкритих (PH-S236…S239) · **hold 95%** · **stretch spirit 96%**
 
-| **← наступний** | **PH-S235** — Stand smoke vision rev parity (tests) |
-| **Відкритих** | **1** (PH-S235) |
+| **← наступний** | **PH-S236** — Admin i18n slim instances panel |
+| **Відкритих** | **4** (PH-S236…S239) |
 
 ---
 
-## PH-S235 — scope
+## PH-S236 — scope
 
-- `poolai-http-stand-smoke` — stand checks vision rev vs FM footer
+- `admin.inst.*` → `poolai-ui-core` + `admin_instances_patch` + `admin_layout_instances`
+- Remove `admin.inst.*` + `admin.page.instances` from `i18n_core.js`
+- Pattern: PH-S230…S234 (tenants/security/topology slim panels)
 - Acceptance: targeted `cargo test`; FM/HANDOFF/NEXT; push
 
 ---
 
-## Copy-paste — PH-S235
+## Copy-paste — PH-S236
 
 ```
-PH-S235 — Stand smoke vision rev parity (tests)
-Scope: poolai-http-stand-smoke vision rev vs FM footer; cargo test; FM/HANDOFF/NEXT; commit+push
+PH-S236 — Admin i18n slim instances panel (code)
+Scope: admin.inst.* → poolai-ui-core; slim layout; cargo test; FM/HANDOFF/NEXT; commit+push
 ```

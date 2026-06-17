@@ -19,9 +19,9 @@
 //!
 //! cargo run --bin poolai-http-stand-smoke -- --json
 //!
-//! # Vision revision parity (PH-S208):
+//! # Vision revision parity (PH-S208, PH-S235):
 //! export POOLAI_VISION_BASE_URL=http://127.0.0.1:8765   # open-docs-vision.ps1
-//! cargo run --bin poolai-http-stand-smoke   # checks manifest vs FM + optional HTTP header
+//! cargo run --bin poolai-http-stand-smoke   # repo manifest vs FM footer + extensions + optional HTTP header
 //! ```
 
 use reqwest::{Client, StatusCode};
@@ -38,6 +38,7 @@ const ENV_BASE: &str = "POOLAI_BASE_URL";
 const ENV_VISION_BASE: &str = "POOLAI_VISION_BASE_URL";
 const ENV_STAND_ROOT: &str = "POOLAI_E2E_STAND_ROOT";
 const MANIFEST_REL: &str = "docs/vision/manifest.json";
+const EXTENSIONS_REL: &str = "docs/vision/extensions.json";
 const FM_REL: &str = "docs/catalog/FUNCTION_MANAGEMENT.md";
 const VISION_REV_HEADER: &str = "x-poolai-vision-revision";
 const VALID_PUBKEY: &str = "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU";
@@ -88,14 +89,57 @@ fn repo_root() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
 }
 
-fn read_manifest_revision(root: &Path) -> Result<u64, String> {
+fn read_manifest_json(root: &Path) -> Result<Value, String> {
     let path = root.join(MANIFEST_REL);
     let raw = fs::read_to_string(&path).map_err(|e| format!("read {}: {e}", path.display()))?;
-    let manifest: Value = serde_json::from_str(&raw).map_err(|e| format!("parse manifest: {e}"))?;
+    serde_json::from_str(&raw).map_err(|e| format!("parse manifest: {e}"))
+}
+
+fn read_manifest_revision(root: &Path) -> Result<u64, String> {
+    let manifest = read_manifest_json(root)?;
     manifest
         .get("revision")
         .and_then(Value::as_u64)
         .ok_or_else(|| "manifest missing revision".to_string())
+}
+
+fn read_manifest_next_sprint(root: &Path) -> Option<String> {
+    read_manifest_json(root).ok().and_then(|manifest| {
+        manifest
+            .get("next_sprint")
+            .and_then(Value::as_str)
+            .map(str::to_owned)
+    })
+}
+
+fn read_extensions_active_sprint(root: &Path) -> Result<Option<String>, String> {
+    let path = root.join(EXTENSIONS_REL);
+    let raw = fs::read_to_string(&path).map_err(|e| format!("read {}: {e}", path.display()))?;
+    let ext: Value = serde_json::from_str(&raw).map_err(|e| format!("parse extensions: {e}"))?;
+    Ok(ext
+        .get("active_sprint")
+        .and_then(Value::as_str)
+        .map(str::to_owned))
+}
+
+fn assert_vision_repo_parity(root: &Path) -> Result<(), String> {
+    let repo_rev = read_manifest_revision(root)?;
+    let fm_rev = read_fm_vision_revision(root)?;
+    if repo_rev != fm_rev {
+        return Err(format!(
+            "repo manifest.revision {repo_rev} != FM Vision rev {fm_rev}"
+        ));
+    }
+    if let Some(next) = read_manifest_next_sprint(root) {
+        let active = read_extensions_active_sprint(root)?
+            .ok_or_else(|| "extensions.json missing active_sprint".to_string())?;
+        if active != next {
+            return Err(format!(
+                "extensions.active_sprint {active:?} != manifest.next_sprint {next:?}"
+            ));
+        }
+    }
+    Ok(())
 }
 
 fn extract_fm_section_512(content: &str) -> Option<&str> {
@@ -132,14 +176,8 @@ fn read_fm_vision_revision(root: &Path) -> Result<u64, String> {
 
 async fn smoke_vision_revision_parity(client: &Client) -> Result<(), String> {
     let root = repo_root();
+    assert_vision_repo_parity(&root)?;
     let repo_rev = read_manifest_revision(&root)?;
-    let fm_rev = read_fm_vision_revision(&root)?;
-    if repo_rev != fm_rev {
-        return Err(format!(
-            "repo manifest.revision {repo_rev} != FM Vision rev {fm_rev}"
-        ));
-    }
-
     let vision_base = vision_base_url_from_env();
     let url = api_url(&vision_base, "/docs/vision/manifest.json");
     let resp = match client.get(&url).send().await {
@@ -1226,9 +1264,9 @@ mod tests {
     }
 
     #[test]
-    fn parse_fm_vision_revision_footer() {
-        let section = "**Відкритих у §5.12:** **2** (PH-S208…S209). Vision rev **149**.\n";
-        assert_eq!(parse_fm_vision_revision(section), Some(149));
+    fn parse_fm_vision_revision_footer_ph_s235() {
+        let section = "**Відкритих у §5.12:** **1** (PH-S235). **Закрито смуга:** PH-S128…S234 ✅. Vision rev **183**.\n";
+        assert_eq!(parse_fm_vision_revision(section), Some(183));
     }
 
     #[test]
@@ -1344,13 +1382,18 @@ mod tests {
     }
 
     #[test]
-    fn vision_revision_fm_parity_in_repo() {
+    fn vision_revision_fm_parity_ph_s235() {
         let root = repo_root();
+        assert_vision_repo_parity(&root)
+            .expect("run poolai-vision-sync --check before stand smoke");
         let manifest_rev = read_manifest_revision(&root).expect("manifest");
         let fm_rev = read_fm_vision_revision(&root).expect("fm");
-        assert_eq!(
-            manifest_rev, fm_rev,
-            "run poolai-vision-sync --check before stand smoke"
-        );
+        assert_eq!(manifest_rev, fm_rev);
+        if let Some(next) = read_manifest_next_sprint(&root) {
+            let active = read_extensions_active_sprint(&root)
+                .expect("extensions")
+                .expect("active_sprint");
+            assert_eq!(active, next);
+        }
     }
 }

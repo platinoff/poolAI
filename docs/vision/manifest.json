@@ -1830,7 +1830,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S234",
+  "last_sprint_closed": "PH-S235",
   "layers": [
     {
       "id": "L0",
@@ -1863,7 +1863,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S235",
+  "next_sprint": "PH-S236",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -4948,7 +4948,8 @@
       "sprints": [
         "PH-S145",
         "PH-S156",
-        "PH-S232"
+        "PH-S232",
+        "PH-S235"
       ]
     },
     {
@@ -7706,7 +7707,7 @@
       "path": "docs/vision/vision.svg"
     }
   ],
-  "revision": 183,
+  "revision": 184,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -9230,16 +9231,52 @@
       "title": "Admin i18n slim topology panel (code)"
     },
     {
-      "acceptance": "stand checks vision rev vs FM footer",
+      "acceptance": "stand checks vision rev vs FM footer + extensions",
       "deps": "PH-S208",
       "id": "PH-S235",
-      "open": true,
+      "open": false,
       "row": 170,
-      "status": "open",
+      "status": "closed",
       "title": "Stand smoke vision rev parity (tests)"
+    },
+    {
+      "acceptance": "admin.inst.*` slim patch",
+      "deps": "PH-S207",
+      "id": "PH-S236",
+      "open": true,
+      "row": 171,
+      "status": "open",
+      "title": "Admin i18n slim instances panel (code)"
+    },
+    {
+      "acceptance": "admin.vmadm.*` slim patch",
+      "deps": "PH-S207",
+      "id": "PH-S237",
+      "open": true,
+      "row": 172,
+      "status": "open",
+      "title": "Admin i18n slim vm panel (code)"
+    },
+    {
+      "acceptance": "admin.usr.*` slim patch",
+      "deps": "PH-S207",
+      "id": "PH-S238",
+      "open": true,
+      "row": 173,
+      "status": "open",
+      "title": "Admin i18n slim users panel (code)"
+    },
+    {
+      "acceptance": "admin.cfg.*` slim patch",
+      "deps": "PH-S207",
+      "id": "PH-S239",
+      "open": true,
+      "row": 174,
+      "status": "open",
+      "title": "Admin i18n slim config panel (code)"
     }
   ],
-  "sprint_queue_open_count": 1,
+  "sprint_queue_open_count": 4,
   "updated_at": "2026-06-16",
   "vision_ui_rev": 59
 }
