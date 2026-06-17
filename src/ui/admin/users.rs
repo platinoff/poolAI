@@ -2,7 +2,7 @@
 //!
 //! Provides user CRUD operations with role-based access control.
 
-use crate::ui::admin::admin_layout;
+use super::admin_layout_users;
 use axum::response::Html;
 
 /// User management page
@@ -208,7 +208,7 @@ pub async fn admin_users() -> Html<String> {
     loadUsers();
     "#;
 
-    admin_layout(
+    admin_layout_users(
         "admin.page.users",
         "User Management",
         r#"
@@ -291,4 +291,19 @@ pub async fn admin_users() -> Html<String> {
         "#,
         script,
     )
+}
+
+#[cfg(test)]
+mod ph_s238_tests {
+    use super::admin_users;
+
+    #[tokio::test]
+    async fn admin_users_page_slim_users_i18n_patch_ph_s238() {
+        let html = admin_users().await.0;
+        assert!(html.contains("window.__poolaiAdminI18nRust="));
+        assert!(html.contains(r#""admin.page.users""#));
+        assert!(html.contains(r#""admin.usr.section""#));
+        assert!(!html.contains(r#""admin.vmadm.section""#));
+        assert!(!html.contains(r#""admin.jobs.leaseState.active""#));
+    }
 }

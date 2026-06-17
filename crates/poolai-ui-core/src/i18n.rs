@@ -1,6 +1,6 @@
 //! UI i18n subsets moved from `i18n_core.js` (PH-S154 admin jobs/grid; PH-S162 auth/dash shell; PH-S197 updates-compat; PH-S207 monitoring; PH-S211 jobs-only patch; PH-S214 raid-only patch; PH-S217 grid-pricing-only patch).
 //!
-//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs — `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); dashboard — `admin_dashboard_patch` (PH-S228); audit — `admin_audit_patch` (PH-S229); tenants — `admin_tenants_patch` (PH-S230); security — `admin_security_patch` (PH-S231); topology — `admin_topology_patch` (PH-S234); instances — `admin_instances_patch` (PH-S236); vm — `admin_vm_patch` (PH-S237); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221); workers — `admin_workers_patch` (PH-S222); libs — `admin_libs_patch` (PH-S223).
+//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs — `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); dashboard — `admin_dashboard_patch` (PH-S228); audit — `admin_audit_patch` (PH-S229); tenants — `admin_tenants_patch` (PH-S230); security — `admin_security_patch` (PH-S231); topology — `admin_topology_patch` (PH-S234); instances — `admin_instances_patch` (PH-S236); vm — `admin_vm_patch` (PH-S237); users — `admin_users_patch` (PH-S238); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221); workers — `admin_workers_patch` (PH-S222); libs — `admin_libs_patch` (PH-S223).
 //! Auth + dashboard shell: `window.__poolaiAuthDashI18nRust` on login, dashboard layout, admin layout (PH-S162).
 
 use std::collections::BTreeMap;
@@ -1164,6 +1164,87 @@ pub const ADMIN_VM_UK: &[I18nRow<'_>] = &[
     ("admin.vmadm.creating", "Створення…"),
 ];
 
+/// English users admin keys (PH-S238; moved from `i18n_core.js`).
+pub const ADMIN_USERS_EN: &[I18nRow<'_>] = &[
+    ("admin.page.users", "User Management"),
+    ("admin.usr.loading", "Loading users…"),
+    ("admin.usr.errLoad", "Error loading users: "),
+    ("admin.usr.empty", "No users found"),
+    ("admin.usr.col.user", "Username"),
+    ("admin.usr.col.role", "Role"),
+    ("admin.usr.col.status", "Status"),
+    ("admin.usr.col.created", "Created"),
+    ("admin.usr.col.actions", "Actions"),
+    ("admin.usr.section", "Users"),
+    ("admin.usr.createBtn", "Create User"),
+    ("admin.usr.createTitle", "Create New User"),
+    ("admin.usr.editTitle", "Edit User"),
+    ("admin.usr.label.user", "Username"),
+    ("admin.usr.ph.user", "newuser"),
+    ("admin.usr.label.pw", "Password"),
+    (
+        "admin.usr.label.pwNew",
+        "New Password (leave empty to keep current)",
+    ),
+    ("admin.usr.label.role", "Role"),
+    ("admin.usr.ph.pw", "Enter password"),
+    ("admin.usr.ph.pwNew", "Enter new password"),
+    ("admin.usr.creating", "Creating…"),
+    ("admin.usr.saving", "Saving…"),
+    ("admin.usr.createSubmit", "Create User"),
+    ("admin.usr.createdOk", "User created successfully"),
+    ("admin.usr.updatedOk", "User updated successfully"),
+    ("admin.usr.loadEditErr", "Error loading user for edit: "),
+    (
+        "admin.usr.confirmDel",
+        "Are you sure you want to delete this user? This action cannot be undone.",
+    ),
+    ("admin.usr.deletedOk", "User deleted successfully"),
+    ("admin.usr.errDel", "Error deleting user: "),
+];
+
+/// Ukrainian users admin keys (PH-S238).
+pub const ADMIN_USERS_UK: &[I18nRow<'_>] = &[
+    ("admin.page.users", "Керування користувачами"),
+    ("admin.usr.loading", "Завантаження користувачів…"),
+    ("admin.usr.errLoad", "Помилка завантаження користувачів: "),
+    ("admin.usr.empty", "Користувачів не знайдено"),
+    ("admin.usr.col.user", "Користувач"),
+    ("admin.usr.col.role", "Роль"),
+    ("admin.usr.col.status", "Статус"),
+    ("admin.usr.col.created", "Створено"),
+    ("admin.usr.col.actions", "Дії"),
+    ("admin.usr.section", "Користувачі"),
+    ("admin.usr.createBtn", "Створити користувача"),
+    ("admin.usr.createTitle", "Новий користувач"),
+    ("admin.usr.editTitle", "Редагувати користувача"),
+    ("admin.usr.label.user", "Ім’я користувача"),
+    ("admin.usr.ph.user", "newuser"),
+    ("admin.usr.label.pw", "Пароль"),
+    (
+        "admin.usr.label.pwNew",
+        "Новий пароль (порожньо — без змін)",
+    ),
+    ("admin.usr.label.role", "Роль"),
+    ("admin.usr.ph.pw", "Введіть пароль"),
+    ("admin.usr.ph.pwNew", "Новий пароль"),
+    ("admin.usr.creating", "Створення…"),
+    ("admin.usr.saving", "Збереження…"),
+    ("admin.usr.createSubmit", "Створити користувача"),
+    ("admin.usr.createdOk", "Користувача створено"),
+    ("admin.usr.updatedOk", "Користувача оновлено"),
+    (
+        "admin.usr.loadEditErr",
+        "Помилка завантаження для редагування: ",
+    ),
+    (
+        "admin.usr.confirmDel",
+        "Видалити цього користувача? Дію не скасувати.",
+    ),
+    ("admin.usr.deletedOk", "Користувача видалено"),
+    ("admin.usr.errDel", "Помилка видалення: "),
+];
+
 /// English monitoring admin keys (PH-S207; moved from `i18n_core.js`).
 pub const ADMIN_MONITORING_EN: &[I18nRow<'_>] = &[
     ("admin.page.monitoring", "Monitoring Dashboard"),
@@ -1895,6 +1976,22 @@ pub fn admin_vm_patch_script() -> String {
     format!("window.__poolaiAdminI18nRust={};", admin_vm_patch_json())
 }
 
+/// Users admin page — slim `admin.usr.*` patch only (PH-S238).
+pub fn admin_users_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_USERS_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_USERS_UK));
+    root
+}
+
+pub fn admin_users_patch_json() -> String {
+    serde_json::to_string(&admin_users_patch()).expect("admin users i18n patch serializes")
+}
+
+pub fn admin_users_patch_script() -> String {
+    format!("window.__poolaiAdminI18nRust={};", admin_users_patch_json())
+}
+
 /// Monitoring admin page — slim `admin.mon.*` patch only (PH-S220).
 pub fn admin_monitoring_patch() -> BTreeMap<String, BTreeMap<String, String>> {
     let mut root = BTreeMap::new();
@@ -2037,6 +2134,7 @@ pub fn t_en(key: &str) -> Option<&'static str> {
         ADMIN_TOPOLOGY_EN,
         ADMIN_INSTANCES_EN,
         ADMIN_VM_EN,
+        ADMIN_USERS_EN,
         ADMIN_MONITORING_EN,
     ] {
         if let Some((_, v)) = rows.iter().find(|(k, _)| *k == key) {
@@ -2059,6 +2157,7 @@ pub fn t_uk(key: &str) -> Option<&'static str> {
         ADMIN_TOPOLOGY_UK,
         ADMIN_INSTANCES_UK,
         ADMIN_VM_UK,
+        ADMIN_USERS_UK,
         ADMIN_MONITORING_UK,
     ] {
         if let Some((_, v)) = rows.iter().find(|(k, _)| *k == key) {
@@ -2217,6 +2316,21 @@ mod tests {
         assert!(json.contains(r#""admin.vmadm.section""#));
         assert!(json.contains(r#""admin.vmadm.createBtn""#));
         assert!(!json.contains(r#""admin.inst.title""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+    }
+
+    #[test]
+    fn users_patch_has_matching_en_uk_key_counts_ph_s238() {
+        assert_eq!(ADMIN_USERS_EN.len(), ADMIN_USERS_UK.len());
+    }
+
+    #[test]
+    fn users_patch_json_users_only_ph_s238() {
+        let json = admin_users_patch_json();
+        assert!(json.contains(r#""admin.page.users""#));
+        assert!(json.contains(r#""admin.usr.section""#));
+        assert!(json.contains(r#""admin.usr.confirmDel""#));
+        assert!(!json.contains(r#""admin.vmadm.section""#));
         assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
     }
 
