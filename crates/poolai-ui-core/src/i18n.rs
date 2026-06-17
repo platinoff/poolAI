@@ -1,6 +1,6 @@
 //! UI i18n subsets moved from `i18n_core.js` (PH-S154 admin jobs/grid; PH-S162 auth/dash shell; PH-S197 updates-compat; PH-S207 monitoring; PH-S211 jobs-only patch; PH-S214 raid-only patch; PH-S217 grid-pricing-only patch).
 //!
-//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs — `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); dashboard — `admin_dashboard_patch` (PH-S228); audit — `admin_audit_patch` (PH-S229); tenants — `admin_tenants_patch` (PH-S230); security — `admin_security_patch` (PH-S231); topology — `admin_topology_patch` (PH-S234); instances — `admin_instances_patch` (PH-S236); vm — `admin_vm_patch` (PH-S237); users — `admin_users_patch` (PH-S238); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221); workers — `admin_workers_patch` (PH-S222); libs — `admin_libs_patch` (PH-S223).
+//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs — `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); dashboard — `admin_dashboard_patch` (PH-S228); audit — `admin_audit_patch` (PH-S229); tenants — `admin_tenants_patch` (PH-S230); security — `admin_security_patch` (PH-S231); topology — `admin_topology_patch` (PH-S234); instances — `admin_instances_patch` (PH-S236); vm — `admin_vm_patch` (PH-S237); users — `admin_users_patch` (PH-S238); config — `admin_config_patch` (PH-S239); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221); workers — `admin_workers_patch` (PH-S222); libs — `admin_libs_patch` (PH-S223).
 //! Auth + dashboard shell: `window.__poolaiAuthDashI18nRust` on login, dashboard layout, admin layout (PH-S162).
 
 use std::collections::BTreeMap;
@@ -1245,6 +1245,116 @@ pub const ADMIN_USERS_UK: &[I18nRow<'_>] = &[
     ("admin.usr.errDel", "Помилка видалення: "),
 ];
 
+/// English config admin keys (PH-S239; moved from `i18n_core.js`).
+pub const ADMIN_CONFIG_EN: &[I18nRow<'_>] = &[
+    ("admin.page.config", "System Configuration"),
+    ("admin.cfg.loading", "Loading configuration…"),
+    ("admin.cfg.unknownTab", "Unknown tab: "),
+    ("admin.cfg.tab.general", "General"),
+    ("admin.cfg.tab.performance", "Performance"),
+    ("admin.cfg.tab.gpu", "GPU"),
+    ("admin.cfg.tab.security", "Security"),
+    ("admin.cfg.tab.monitoring", "Monitoring"),
+    ("admin.cfg.tab.health", "Health"),
+    ("admin.cfg.saveBtn", "Save Configuration"),
+    ("admin.cfg.savedOk", "Configuration saved successfully"),
+    ("admin.cfg.saveErr", "Error saving configuration: "),
+    ("admin.cfg.saving", "Saving…"),
+    ("admin.cfg.gen.systemName", "System Name"),
+    ("admin.cfg.gen.logLevel", "Log Level"),
+    ("admin.cfg.gen.maxWorkers", "Max Workers"),
+    ("admin.cfg.gen.queueSize", "Queue Size"),
+    (
+        "admin.cfg.gen.metricsInterval",
+        "Metrics Interval (seconds)",
+    ),
+    ("admin.cfg.log.trace", "Trace"),
+    ("admin.cfg.log.debug", "Debug"),
+    ("admin.cfg.log.info", "Info"),
+    ("admin.cfg.log.warn", "Warn"),
+    ("admin.cfg.log.error", "Error"),
+    ("admin.cfg.perf.poolMaxWorkers", "Pool Max Workers"),
+    ("admin.cfg.perf.poolQueue", "Pool Queue Size"),
+    ("admin.cfg.perf.autoScaling", "Auto Scaling"),
+    (
+        "admin.cfg.perf.scalingThreshold",
+        "Scaling Threshold (0.0-1.0)",
+    ),
+    ("admin.cfg.perf.requestTimeout", "Request Timeout (seconds)"),
+    ("admin.cfg.https.enable", "Enable HTTPS"),
+    ("admin.cfg.https.certPath", "Certificate Path"),
+    ("admin.cfg.https.keyPath", "Key Path"),
+    (
+        "admin.cfg.mon.metricsInterval",
+        "Metrics Interval (seconds)",
+    ),
+    ("admin.cfg.mon.alertThreshold", "Alert Threshold (0.0-1.0)"),
+    ("admin.cfg.mon.retentionDays", "Retention Days"),
+    ("admin.cfg.mon.detailedLogging", "Detailed Logging"),
+    ("admin.cfg.gpu.enable", "Enable GPU"),
+    ("admin.cfg.gpu.memLimit", "GPU Memory Limit (MB)"),
+    ("admin.cfg.gpu.tempLimit", "Temperature Limit (°C)"),
+    ("admin.cfg.gpu.powerLimit", "Power Limit (Watts)"),
+    ("admin.cfg.gpu.count", "GPU Count"),
+    ("admin.cfg.health.expectedWorkers", "Expected Workers"),
+    (
+        "admin.cfg.health.hint",
+        "Number of workers expected for health checks",
+    ),
+];
+
+/// Ukrainian config admin keys (PH-S239).
+pub const ADMIN_CONFIG_UK: &[I18nRow<'_>] = &[
+    ("admin.page.config", "Конфігурація системи"),
+    ("admin.cfg.loading", "Завантаження конфігурації…"),
+    ("admin.cfg.unknownTab", "Невідома вкладка: "),
+    ("admin.cfg.tab.general", "Загальне"),
+    ("admin.cfg.tab.performance", "Продуктивність"),
+    ("admin.cfg.tab.gpu", "GPU"),
+    ("admin.cfg.tab.security", "Безпека"),
+    ("admin.cfg.tab.monitoring", "Моніторинг"),
+    ("admin.cfg.tab.health", "Здоров’я"),
+    ("admin.cfg.saveBtn", "Зберегти конфігурацію"),
+    ("admin.cfg.savedOk", "Конфігурацію збережено"),
+    ("admin.cfg.saveErr", "Помилка збереження: "),
+    ("admin.cfg.saving", "Збереження…"),
+    ("admin.cfg.gen.systemName", "Назва системи"),
+    ("admin.cfg.gen.logLevel", "Рівень логування"),
+    ("admin.cfg.gen.maxWorkers", "Макс. воркерів"),
+    ("admin.cfg.gen.queueSize", "Розмір черги"),
+    ("admin.cfg.gen.metricsInterval", "Інтервал метрик (с)"),
+    ("admin.cfg.log.trace", "Trace"),
+    ("admin.cfg.log.debug", "Debug"),
+    ("admin.cfg.log.info", "Info"),
+    ("admin.cfg.log.warn", "Warn"),
+    ("admin.cfg.log.error", "Error"),
+    ("admin.cfg.perf.poolMaxWorkers", "Макс. воркерів пулу"),
+    ("admin.cfg.perf.poolQueue", "Черга пулу"),
+    ("admin.cfg.perf.autoScaling", "Автомасштабування"),
+    (
+        "admin.cfg.perf.scalingThreshold",
+        "Поріг масштабування (0.0–1.0)",
+    ),
+    ("admin.cfg.perf.requestTimeout", "Таймаут запиту (с)"),
+    ("admin.cfg.https.enable", "Увімкнути HTTPS"),
+    ("admin.cfg.https.certPath", "Шлях до сертифіката"),
+    ("admin.cfg.https.keyPath", "Шлях до ключа"),
+    ("admin.cfg.mon.metricsInterval", "Інтервал метрик (с)"),
+    ("admin.cfg.mon.alertThreshold", "Поріг сповіщень (0.0–1.0)"),
+    ("admin.cfg.mon.retentionDays", "Днів зберігання"),
+    ("admin.cfg.mon.detailedLogging", "Детальне логування"),
+    ("admin.cfg.gpu.enable", "Увімкнути GPU"),
+    ("admin.cfg.gpu.memLimit", "Ліміт пам’яті GPU (МБ)"),
+    ("admin.cfg.gpu.tempLimit", "Ліміт температури (°C)"),
+    ("admin.cfg.gpu.powerLimit", "Ліміт потужності (Вт)"),
+    ("admin.cfg.gpu.count", "Кількість GPU"),
+    ("admin.cfg.health.expectedWorkers", "Очікувані воркери"),
+    (
+        "admin.cfg.health.hint",
+        "Кількість воркерів для health-check",
+    ),
+];
+
 /// English monitoring admin keys (PH-S207; moved from `i18n_core.js`).
 pub const ADMIN_MONITORING_EN: &[I18nRow<'_>] = &[
     ("admin.page.monitoring", "Monitoring Dashboard"),
@@ -1992,6 +2102,25 @@ pub fn admin_users_patch_script() -> String {
     format!("window.__poolaiAdminI18nRust={};", admin_users_patch_json())
 }
 
+/// Config admin page — slim `admin.cfg.*` patch only (PH-S239).
+pub fn admin_config_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_CONFIG_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_CONFIG_UK));
+    root
+}
+
+pub fn admin_config_patch_json() -> String {
+    serde_json::to_string(&admin_config_patch()).expect("admin config i18n patch serializes")
+}
+
+pub fn admin_config_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminI18nRust={};",
+        admin_config_patch_json()
+    )
+}
+
 /// Monitoring admin page — slim `admin.mon.*` patch only (PH-S220).
 pub fn admin_monitoring_patch() -> BTreeMap<String, BTreeMap<String, String>> {
     let mut root = BTreeMap::new();
@@ -2135,6 +2264,7 @@ pub fn t_en(key: &str) -> Option<&'static str> {
         ADMIN_INSTANCES_EN,
         ADMIN_VM_EN,
         ADMIN_USERS_EN,
+        ADMIN_CONFIG_EN,
         ADMIN_MONITORING_EN,
     ] {
         if let Some((_, v)) = rows.iter().find(|(k, _)| *k == key) {
@@ -2158,6 +2288,7 @@ pub fn t_uk(key: &str) -> Option<&'static str> {
         ADMIN_INSTANCES_UK,
         ADMIN_VM_UK,
         ADMIN_USERS_UK,
+        ADMIN_CONFIG_UK,
         ADMIN_MONITORING_UK,
     ] {
         if let Some((_, v)) = rows.iter().find(|(k, _)| *k == key) {
@@ -2331,6 +2462,21 @@ mod tests {
         assert!(json.contains(r#""admin.usr.section""#));
         assert!(json.contains(r#""admin.usr.confirmDel""#));
         assert!(!json.contains(r#""admin.vmadm.section""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+    }
+
+    #[test]
+    fn config_patch_has_matching_en_uk_key_counts_ph_s239() {
+        assert_eq!(ADMIN_CONFIG_EN.len(), ADMIN_CONFIG_UK.len());
+    }
+
+    #[test]
+    fn config_patch_json_config_only_ph_s239() {
+        let json = admin_config_patch_json();
+        assert!(json.contains(r#""admin.page.config""#));
+        assert!(json.contains(r#""admin.cfg.tab.general""#));
+        assert!(json.contains(r#""admin.cfg.health.hint""#));
+        assert!(!json.contains(r#""admin.usr.section""#));
         assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
     }
 

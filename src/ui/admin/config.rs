@@ -2,7 +2,7 @@
 //!
 //! Provides system configuration interface with tabs for different settings.
 
-use crate::ui::admin::admin_layout;
+use crate::ui::admin::admin_layout_config;
 use axum::response::Html;
 
 /// System configuration page
@@ -327,7 +327,7 @@ pub async fn admin_config() -> Html<String> {
     loadConfigTab('general');
     "#;
 
-    admin_layout(
+    admin_layout_config(
         "admin.page.config",
         "System Configuration",
         r#"
@@ -345,4 +345,20 @@ pub async fn admin_config() -> Html<String> {
         "#,
         script,
     )
+}
+
+#[cfg(test)]
+mod ph_s239_tests {
+    use super::admin_config;
+
+    #[tokio::test]
+    async fn admin_config_page_slim_config_i18n_patch_ph_s239() {
+        let html = admin_config().await.0;
+        assert!(html.contains("window.__poolaiAdminI18nRust="));
+        assert!(html.contains(r#""admin.page.config""#));
+        assert!(html.contains(r#""admin.cfg.tab.general""#));
+        assert!(html.contains(r#""admin.cfg.health.hint""#));
+        assert!(!html.contains(r#""admin.usr.section""#));
+        assert!(!html.contains(r#""admin.jobs.leaseState.active""#));
+    }
 }

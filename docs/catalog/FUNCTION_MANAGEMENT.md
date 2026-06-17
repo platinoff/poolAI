@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-16 (PH-S238 ✅ · §5.12 **1** відкритий PH-S239 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-16 (PH-S239 ✅ · §5.12 **3** відкриті PH-S240…S242 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -438,11 +438,14 @@ FM-xxx (з таблиці нижче)
 | 171 | **PH-S236** | Admin i18n slim instances panel (code) | PH-S207 | `admin.inst.*` slim patch | **✅** |
 | 172 | **PH-S237** | Admin i18n slim vm panel (code) | PH-S207 | `admin.vmadm.*` slim patch | **✅** |
 | 173 | **PH-S238** | Admin i18n slim users panel (code) | PH-S207 | `admin.usr.*` slim patch | **✅** |
-| 174 | **PH-S239** | Admin i18n slim config panel (code) | PH-S207 | `admin.cfg.*` slim patch | відкрито |
+| 174 | **PH-S239** | Admin i18n slim config panel (code) | PH-S207 | `admin.cfg.*` slim patch | **✅** |
+| 175 | **PH-S240** | Admin i18n slim table toolbar (code) | PH-S207 | `admin.table.*` slim patch | відкрито |
+| 176 | **PH-S241** | Galaxy pricing fresh served metrics stand smoke (tests) | PH-S127 | `galaxy_pricing_fresh_served` on live `/metrics` | відкрито |
+| 177 | **PH-S242** | Admin i18n nav shell key audit (code) | PH-S162 | verify `admin.nav.*` only in auth_dash patch | відкрито |
 
-**Відкритих у §5.12:** **1** (PH-S239). **Закрито смуга:** PH-S128…S238 ✅. Vision rev **187**.
+**Відкритих у §5.12:** **3** (PH-S240…S242). **Закрито смуга:** PH-S128…S239 ✅. Vision rev **188**.
 
-**Наступна сесія:** **PH-S239** · черга **1** відкритий (PH-S239) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S240** · черга **3** відкриті (PH-S240…S242) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S169)
 

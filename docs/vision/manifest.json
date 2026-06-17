@@ -1830,7 +1830,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S238",
+  "last_sprint_closed": "PH-S239",
   "layers": [
     {
       "id": "L0",
@@ -1863,7 +1863,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S239",
+  "next_sprint": "PH-S240",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7719,7 +7719,7 @@
       "path": "docs/vision/vision.svg"
     }
   ],
-  "revision": 187,
+  "revision": 188,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -9282,13 +9282,40 @@
       "acceptance": "admin.cfg.*` slim patch",
       "deps": "PH-S207",
       "id": "PH-S239",
-      "open": true,
+      "open": false,
       "row": 174,
-      "status": "open",
+      "status": "closed",
       "title": "Admin i18n slim config panel (code)"
+    },
+    {
+      "acceptance": "admin.table.*` slim patch",
+      "deps": "PH-S207",
+      "id": "PH-S240",
+      "open": true,
+      "row": 175,
+      "status": "open",
+      "title": "Admin i18n slim table toolbar (code)"
+    },
+    {
+      "acceptance": "galaxy_pricing_fresh_served` on live `/metrics",
+      "deps": "PH-S127",
+      "id": "PH-S241",
+      "open": true,
+      "row": 176,
+      "status": "open",
+      "title": "Galaxy pricing fresh served metrics stand smoke (tests)"
+    },
+    {
+      "acceptance": "verify `admin.nav.*` only in auth_dash patch",
+      "deps": "PH-S162",
+      "id": "PH-S242",
+      "open": true,
+      "row": 177,
+      "status": "open",
+      "title": "Admin i18n nav shell key audit (code)"
     }
   ],
-  "sprint_queue_open_count": 1,
+  "sprint_queue_open_count": 3,
   "updated_at": "2026-06-16",
   "vision_ui_rev": 59
 }

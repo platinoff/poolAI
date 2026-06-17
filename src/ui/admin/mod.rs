@@ -241,6 +241,24 @@ pub fn admin_layout_users(
     )
 }
 
+/// Config admin page layout — slim `admin.cfg.*` Rust i18n patch only (PH-S239).
+pub fn admin_layout_config(
+    title_i18n_key: &str,
+    title_fallback: &str,
+    body_html: &str,
+    script_js: &str,
+) -> Html<String> {
+    let i18n_patch = poolai_ui_core::i18n::admin_config_patch_script();
+    admin_layout_with_module_script(
+        title_i18n_key,
+        title_fallback,
+        body_html,
+        POOLAI_UI_WASM_MODULE,
+        script_js,
+        &i18n_patch,
+    )
+}
+
 /// Jobs admin page layout — slim `admin.jobs.*` Rust i18n patch only (PH-S211).
 pub fn admin_layout_jobs(
     title_i18n_key: &str,
@@ -598,6 +616,13 @@ fn admin_layout_default_patch_excludes_users_ph_s238() {
     let patch = poolai_ui_core::i18n::admin_jobs_grid_patch_script();
     assert!(!patch.contains(r#""admin.usr.section""#));
     assert!(!patch.contains(r#""admin.page.users""#));
+}
+
+#[test]
+fn admin_layout_default_patch_excludes_config_ph_s239() {
+    let patch = poolai_ui_core::i18n::admin_jobs_grid_patch_script();
+    assert!(!patch.contains(r#""admin.cfg.tab.general""#));
+    assert!(!patch.contains(r#""admin.page.config""#));
 }
 
 #[test]

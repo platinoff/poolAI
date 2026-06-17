@@ -1,24 +1,24 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-16 · PH-S238 ✅ · vision **rev 187** · **1** відкритий (PH-S239) · **hold 95%** · **stretch spirit 96%**
+**Оновлено:** 2026-06-16 · PH-S239 ✅ · vision **rev 188** · **3** відкриті (PH-S240…S242) · **hold 95%** · **stretch spirit 96%**
 
-| **← наступний** | **PH-S239** — Admin i18n slim config panel |
-| **Відкритих** | **1** (PH-S239) |
-
----
-
-## PH-S239 — scope
-
-- `admin.cfg.*` → `poolai-ui-core` + `admin_config_patch` + `admin_layout_config`
-- Remove `admin.cfg.*` + `admin.page.config` from `i18n_core.js`
-- Pattern: PH-S236…S238 slim panels
-- Acceptance: targeted `cargo test`; FM/HANDOFF/NEXT; push; replenish §5.12 when queue closes
+| **← наступний** | **PH-S240** — Admin i18n slim table toolbar |
+| **Відкритих** | **3** (PH-S240…S242) |
 
 ---
 
-## Copy-paste — PH-S239
+## PH-S240 — scope
+
+- `admin.table.*` → `poolai-ui-core` + `admin_table_patch` + wire into default admin layout (or dedicated helper)
+- Remove `admin.table.*` from `i18n_core.js`
+- Pattern: PH-S236…S239 slim panels; table keys shared across many admin pages
+- Acceptance: targeted `cargo test`; FM/HANDOFF/NEXT; push
+
+---
+
+## Copy-paste — PH-S240
 
 ```
-PH-S239 — Admin i18n slim config panel (code)
-Scope: admin.cfg.* → poolai-ui-core; slim layout; cargo test; FM/HANDOFF/NEXT; commit+push
+PH-S240 — Admin i18n slim table toolbar (code)
+Scope: admin.table.* → poolai-ui-core; slim patch on admin layout; cargo test; FM/HANDOFF/NEXT; commit+push
 ```
