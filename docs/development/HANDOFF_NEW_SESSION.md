@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-17 (PH-S275…S282 ✅ · §5.12 **0** відкритих · rust_ratio **94.36%**) · VDT
+**Оновлено:** 2026-06-17 (PH-S282 ✅ · replenish **PH-S283…S292** · rust_ratio **94.36%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -233,8 +233,8 @@
 **PH-S280 ✅ (ops):** `poolai-vision-sync --check` green.
 **PH-S281 ✅ (ops):** hold advisory `--min-ratio 0.95` snapshot **94.36%**.
 **PH-S282 ✅ (docs):** INDEX §7 + rust_ratio pointer **94.36%**.
-**§5.12:** **0** відкритих — replenish з §5.13.
-**Vision ✅:** rev **207** · rust_ratio **94.36%** · hold **95%** advisory.
+**§5.12:** **10** відкритих (PH-S283…S292) — наступний **PH-S283** (Galaxy prefetch enqueue stub).
+**Vision ✅:** rev **208** · rust_ratio **94.36%** · hold **95%** advisory.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

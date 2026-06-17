@@ -1,6 +1,6 @@
 # PoolAI documentation
 
-**Last updated:** 2026-06-17 (PH-S282 ✅ · §5.12 **0** відкритих · replenish §5.13 · rust_ratio **94.36%**)
+**Last updated:** 2026-06-17 (PH-S282 ✅ · replenish **PH-S283…S292** · rust_ratio **94.36%**)
 
 ## Canonical reading order
 

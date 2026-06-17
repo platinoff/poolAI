@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-17 (PH-S254…S262 ✅ · §5.12 **0** відкритих · rust_ratio **94.23%** · hold **95%** advisory · stretch **96%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-17 (PH-S275…S282 ✅ · §5.12 replenish **PH-S283…S292** · rust_ratio **94.36%** · hold **95%** advisory · stretch **96%**) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -482,16 +482,26 @@ FM-xxx (з таблиці нижче)
 | 215 | **PH-S280** | poolai-vision-sync drift gate (ops) | PH-S270 | `--check` green | **✅** |
 | 216 | **PH-S281** | Ratio hold advisory snapshot (ops) | PH-S278 | `--min-ratio 0.95 --advisory` | **✅** |
 | 217 | **PH-S282** | Docs INDEX ratio maintain (docs) | PH-S279 | INDEX §7 + rust_ratio pointer | **✅** |
+| 218 | **PH-S283** | Galaxy prefetch enqueue wire stub (code) | PH-S276 | `enqueue_prefetch_hook` + unit test; no live pull | відкрито |
+| 219 | **PH-S284** | admin_charts line chart wasm HTML (code) | PH-S275 | `render_line_chart_html` → wasm; slim `poolaiRenderLineChart` | відкрито |
+| 220 | **PH-S285** | Galaxy locality rank job ingest stub (code) | PH-S128 | `rank_workers_by_locality` on grid job `required_shard_ids` | відкрито |
+| 221 | **PH-S286** | Stand smoke prefetch enqueue path (tests) | PH-S283 | `poolai-http-stand-smoke` ingest + `/metrics` | відкрито |
+| 222 | **PH-S287** | admin_charts metric group wasm glue (code) | PH-S155 | `poolaiGroupMetricsByName` → wasm | відкрито |
+| 223 | **PH-S288** | Rust ratio loc-audit refresh (ops) | PH-S278 | `rust_ratio.json` sprint zriz | відкрито |
+| 224 | **PH-S289** | Docs canon sync band (docs) | PH-S288 | INDEX/HANDOFF/NEXT/STABLE/GALAXY | відкрито |
+| 225 | **PH-S290** | poolai-vision-sync drift gate (ops) | PH-S280 | `--check` green | відкрито |
+| 226 | **PH-S291** | Ratio hold advisory snapshot (ops) | PH-S288 | `--min-ratio 0.95 --advisory` | відкрито |
+| 227 | **PH-S292** | Docs INDEX ratio maintain (docs) | PH-S289 | INDEX §7 + rust_ratio pointer | відкрито |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S128…S282 ✅. Vision rev **207**. rust_ratio **94.36%**.
+**Відкритих у §5.12:** **10** (PH-S283…S292). **Закрито смуга:** PH-S128…S282 ✅. Vision rev **208**. rust_ratio **94.36%**.
 
-**Наступна сесія:** replenish з **§5.13** · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S283** · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S262)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-06-17):** PH-S128…S282 ✅ закрито · **0** відкритих · replenish з §5.13.
+**Активна смуга (2026-06-17):** PH-S128…S282 ✅ · **10** відкритих (PH-S283…S292) · Galaxy prefetch enqueue + wasm charts stretch.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 
@@ -606,9 +616,9 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Baseline:** rust_ratio **92.68%** → **hold 95%** · **stretch spirit 96%** ([`rust_ratio.json`](../development/rust_ratio.json), [`RUST_RATIO_STRATEGY_2026-06-13.md`](../development/RUST_RATIO_STRATEGY_2026-06-13.md)).
+**Baseline:** rust_ratio **94.36%** → **hold 95%** advisory · **stretch spirit 96%** ([`rust_ratio.json`](../development/rust_ratio.json), [`RUST_RATIO_STRATEGY_2026-06-13.md`](../development/RUST_RATIO_STRATEGY_2026-06-13.md)).
 
-**Наступна сесія:** **PH-S221** · черга **7** відкритих (PH-S221…S227) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S283** · черга **10** відкритих (PH-S283…S292) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 
