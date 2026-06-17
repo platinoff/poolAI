@@ -487,6 +487,99 @@ async fn smoke_galaxy_pricing_stale_served_metrics(
     metrics_text_has_pricing_stale_served(&body)
 }
 
+/// PH-S247: live stand exposes Galaxy pricing provider catalog + error gauges.
+const GALAXY_PRICING_PROVIDER_METRICS: &[&str] = &[
+    "galaxy_pricing_provider_catalog_lookups_total",
+    "galaxy_pricing_provider_catalog_hits_total",
+    "galaxy_pricing_provider_errors_total",
+];
+
+fn metrics_text_has_pricing_provider_counters(body: &str) -> Result<(), String> {
+    for name in GALAXY_PRICING_PROVIDER_METRICS {
+        if !body.contains(name) {
+            return Err(format!("/metrics missing {name}"));
+        }
+        if !body.contains(&format!("# TYPE {name} gauge")) {
+            return Err(format!("/metrics missing TYPE gauge for {name}"));
+        }
+    }
+    Ok(())
+}
+
+async fn smoke_galaxy_pricing_provider_metrics(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("/metrics request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("/metrics status {}", resp.status()));
+    }
+    let body = resp.text().await.map_err(|e| e.to_string())?;
+    metrics_text_has_pricing_provider_counters(&body)
+}
+
+/// PH-S249: live stand exposes Galaxy settlement pending + cleared gauges.
+const GALAXY_SETTLEMENT_METRICS: &[&str] = &[
+    "galaxy_settlement_pending_verification_total",
+    "galaxy_settlement_cleared_total",
+];
+
+fn metrics_text_has_settlement_counters(body: &str) -> Result<(), String> {
+    for name in GALAXY_SETTLEMENT_METRICS {
+        if !body.contains(name) {
+            return Err(format!("/metrics missing {name}"));
+        }
+        if !body.contains(&format!("# TYPE {name} gauge")) {
+            return Err(format!("/metrics missing TYPE gauge for {name}"));
+        }
+    }
+    Ok(())
+}
+
+async fn smoke_galaxy_settlement_metrics(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("/metrics request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("/metrics status {}", resp.status()));
+    }
+    let body = resp.text().await.map_err(|e| e.to_string())?;
+    metrics_text_has_settlement_counters(&body)
+}
+
+/// PH-S250: live stand exposes Galaxy shard local hit ratio gauge.
+const GALAXY_SHARD_LOCAL_HIT_RATIO: &str = "galaxy_shard_local_hit_ratio";
+
+fn metrics_text_has_shard_local_hit_ratio(body: &str) -> Result<(), String> {
+    let name = GALAXY_SHARD_LOCAL_HIT_RATIO;
+    if !body.contains(name) {
+        return Err(format!("/metrics missing {name}"));
+    }
+    if !body.contains(&format!("# TYPE {name} gauge")) {
+        return Err(format!("/metrics missing TYPE gauge for {name}"));
+    }
+    Ok(())
+}
+
+async fn smoke_galaxy_shard_local_hit_ratio_metrics(
+    client: &Client,
+    base: &str,
+) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("/metrics request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("/metrics status {}", resp.status()));
+    }
+    let body = resp.text().await.map_err(|e| e.to_string())?;
+    metrics_text_has_shard_local_hit_ratio(&body)
+}
+
 /// PH-S225: live stand exposes Galaxy verification counters on Prometheus scrape.
 const GALAXY_VERIFICATION_METRICS: &[&str] = &[
     "galaxy_verification_sample_total",
@@ -1182,6 +1275,12 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
     .await;
     record(
         &mut cases,
+        "galaxy_pricing_provider_metrics",
+        smoke_galaxy_pricing_provider_metrics(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
         "galaxy_verification_metrics",
         smoke_galaxy_verification_metrics(&client, &cli.base_url).await,
     )
@@ -1196,6 +1295,18 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
         &mut cases,
         "galaxy_replication_metrics",
         smoke_galaxy_replication_metrics(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
+        "galaxy_settlement_metrics",
+        smoke_galaxy_settlement_metrics(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
+        "galaxy_shard_local_hit_ratio_metrics",
+        smoke_galaxy_shard_local_hit_ratio_metrics(&client, &cli.base_url).await,
     )
     .await;
     record(
@@ -1426,6 +1537,45 @@ mod tests {
             "galaxy_pricing_stale_served 0\n",
         );
         metrics_text_has_pricing_stale_served(sample).expect("sample export");
+    }
+
+    #[test]
+    fn galaxy_pricing_provider_metrics_export_shape_ph_s247() {
+        let sample = concat!(
+            "# HELP galaxy_pricing_provider_catalog_lookups_total Galaxy pricing provider catalog allow-list lookups (PH-S172)\n",
+            "# TYPE galaxy_pricing_provider_catalog_lookups_total gauge\n",
+            "galaxy_pricing_provider_catalog_lookups_total 0\n",
+            "# HELP galaxy_pricing_provider_catalog_hits_total Galaxy pricing provider catalog allow-list hits (PH-S172)\n",
+            "# TYPE galaxy_pricing_provider_catalog_hits_total gauge\n",
+            "galaxy_pricing_provider_catalog_hits_total 0\n",
+            "# HELP galaxy_pricing_provider_errors_total Galaxy pricing live provider HTTP fetch failures (PH-S173)\n",
+            "# TYPE galaxy_pricing_provider_errors_total gauge\n",
+            "galaxy_pricing_provider_errors_total 0\n",
+        );
+        metrics_text_has_pricing_provider_counters(sample).expect("sample export");
+    }
+
+    #[test]
+    fn galaxy_settlement_metrics_export_shape_ph_s249() {
+        let sample = concat!(
+            "# HELP galaxy_settlement_pending_verification_total Galaxy settlement holds pending verification on grid result path (PH-S178)\n",
+            "# TYPE galaxy_settlement_pending_verification_total gauge\n",
+            "galaxy_settlement_pending_verification_total 0\n",
+            "# HELP galaxy_settlement_cleared_total Galaxy settlement cleared on grid result path (PH-S187)\n",
+            "# TYPE galaxy_settlement_cleared_total gauge\n",
+            "galaxy_settlement_cleared_total 0\n",
+        );
+        metrics_text_has_settlement_counters(sample).expect("sample export");
+    }
+
+    #[test]
+    fn galaxy_shard_local_hit_ratio_metrics_export_shape_ph_s250() {
+        let sample = concat!(
+            "# HELP galaxy_shard_local_hit_ratio Galaxy last observed top-ranked shard local hit ratio basis points 0-10000 (PH-S183)\n",
+            "# TYPE galaxy_shard_local_hit_ratio gauge\n",
+            "galaxy_shard_local_hit_ratio 0\n",
+        );
+        metrics_text_has_shard_local_hit_ratio(sample).expect("sample export");
     }
 
     #[test]

@@ -1,30 +1,25 @@
 # Galaxy Grid roadmap (зріз)
 
-**Оновлено:** 2026-06-17 · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**6** відкритих PH-S247…S252)
+**Оновлено:** 2026-06-17 · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**0** відкритих · replenish §5.13)
 
 | Зріз | Значення |
 |------|----------|
 | **Wire band** | PH-S65…S187 ✅ |
 | **Vision UX** | PH-S188…S233 ✅ |
-| **Ops / stand smoke** | PH-S196…S244 ✅ · band S247…S250 — **відкрито** |
-| **Admin i18n slim** | PH-S207…S246 ✅ · band S248, S252 — **відкрито** |
-| **Docs sync** | PH-S251 — roadmap + README + INDEX zriz |
+| **Ops / stand smoke** | PH-S196…S250 ✅ |
+| **Admin i18n slim** | PH-S207…S252 ✅ |
+| **Docs sync** | PH-S251 ✅ |
 | **Rust ratio** | **92.78%** hold **95%** · spirit **96%** |
 
 ---
 
-## 3. Черга §5.12 (PH-S247…S252)
+## 3. Черга §5.12
 
-| # | Sprint | Тема | Acceptance |
-|---|--------|------|------------|
-| 1 | **PH-S247** | Pricing provider metrics smoke | catalog lookups/hits + provider errors on `/metrics` |
-| 2 | **PH-S248** | VM modal i18n slim | `vm.*` modal keys out of `i18n_core.js` |
-| 3 | **PH-S249** | Settlement metrics smoke | settlement pending + cleared on `/metrics` |
-| 4 | **PH-S250** | Shard locality metrics smoke | `galaxy_shard_local_hit_ratio` on `/metrics` |
-| 5 | **PH-S251** | Docs roadmap sync | GALAXY_GRID_ROADMAP + README + INDEX sprint zriz |
-| 6 | **PH-S252** | UI confirm modal slim | `ui.confirm*` + modal glue keys patch |
+**Відкритих:** **0** (смуга PH-S128…S252 закрита 2026-06-17).
 
-Повна таблиця — FM **§5.12** · [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md) · [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md).
+**Наступна дія:** replenish **≤10** code-first PH-S* з §5.13 · [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md) · [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md).
+
+Повна таблиця — FM **§5.12** · [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
 
 ---
 
@@ -36,5 +31,3 @@
 | Cloud SDK live (AWS/Azure/GCP) | FM-041 Deferred | infra only |
 | ZK / TEE attestation | Galaxy §6.6 | roadmap only |
 | Telegram wallet wire extension | Galaxy §3.2 | post-MVP |
-
-Stand smoke band закриває **Prometheus export parity** для Galaxy pricing / settlement / locality — див. [`PROMETHEUS_METRICS.md`](./PROMETHEUS_METRICS.md), [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md) §4.2 / §5.3 / §6.4.

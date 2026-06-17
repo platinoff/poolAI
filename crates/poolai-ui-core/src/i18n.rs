@@ -1,6 +1,8 @@
 //! UI i18n subsets moved from `i18n_core.js` (PH-S154 admin jobs/grid; PH-S162 auth/dash shell; PH-S197 updates-compat; PH-S207 monitoring; PH-S211 jobs-only patch; PH-S214 raid-only patch; PH-S217 grid-pricing-only patch).
 //!
-//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs — `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); dashboard — `admin_dashboard_patch` (PH-S228); audit — `admin_audit_patch` (PH-S229); tenants — `admin_tenants_patch` (PH-S230); security — `admin_security_patch` (PH-S231); topology — `admin_topology_patch` (PH-S234); instances — `admin_instances_patch` (PH-S236); vm — `admin_vm_patch` (PH-S237); users — `admin_users_patch` (PH-S238); config — `admin_config_patch` (PH-S239); table toolbar — `admin_table_patch` (PH-S240); shared status — `admin_status_patch` (PH-S245); err hints — `admin_err_patch` (PH-S246); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221); workers — `admin_workers_patch` (PH-S222); libs — `admin_libs_patch` (PH-S223).
+//! UI i18n subsets moved from `i18n_core.js` (PH-S154 admin jobs/grid; PH-S162 auth/dash shell; PH-S197 updates-compat; PH-S207 monitoring; PH-S211 jobs-only patch; PH-S214 raid-only patch; PH-S217 grid-pricing-only patch).
+//!
+//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs — `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); dashboard — `admin_dashboard_patch` (PH-S228); audit — `admin_audit_patch` (PH-S229); tenants — `admin_tenants_patch` (PH-S230); security — `admin_security_patch` (PH-S231); topology — `admin_topology_patch` (PH-S234); instances — `admin_instances_patch` (PH-S236); vm — `admin_vm_patch` (PH-S237); vm modal — `vm_modal_patch` (PH-S248); users — `admin_users_patch` (PH-S238); config — `admin_config_patch` (PH-S239); table toolbar — `admin_table_patch` (PH-S240); shared status — `admin_status_patch` (PH-S245); err hints — `admin_err_patch` (PH-S246); ui.confirm glue — `admin_ui_confirm_patch` (PH-S252); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221); workers — `admin_workers_patch` (PH-S222); libs — `admin_libs_patch` (PH-S223).
 //! Auth + dashboard shell: `window.__poolaiAuthDashI18nRust` on login, dashboard layout, admin layout (PH-S162).
 
 use std::collections::BTreeMap;
@@ -1795,6 +1797,96 @@ pub const ADMIN_ERR_UK: &[I18nRow<'_>] = &[
     ),
 ];
 
+/// English VM modal keys (PH-S248; shared admin + dashboard VM pages).
+pub const VM_MODAL_EN: &[I18nRow<'_>] = &[
+    ("vm.createBtn", "Create VM Instance"),
+    ("vm.createBtnAria", "Create new VM instance"),
+    ("vm.modalTitle", "Create VM Instance"),
+    ("vm.label.name", "Instance name"),
+    ("vm.label.cpu", "CPU cores"),
+    ("vm.label.memory", "Memory (MB)"),
+    ("vm.label.gpu", "GPU required"),
+    ("vm.label.isolation", "Isolation type"),
+    ("vm.iso.process", "Process sandbox"),
+    ("vm.iso.hardware", "Hardware VM"),
+    ("vm.ph.name", "my-vm-instance"),
+    ("vm.start", "Start"),
+    ("vm.stop", "Stop"),
+    ("vm.restart", "Restart"),
+    ("vm.startAria", "Start VM instance {id}"),
+    ("vm.stopAria", "Stop VM instance {id}"),
+    ("vm.restartAria", "Restart VM instance {id}"),
+    ("vm.deleteAria", "Delete VM instance {id}"),
+    ("vm.loadingStart", "Starting VM instance…"),
+    ("vm.loadingStop", "Stopping VM instance…"),
+    ("vm.loadingRestart", "Restarting VM instance…"),
+    ("vm.loadingGeneric", "Processing VM instance…"),
+    ("vm.deletingLoad", "Deleting VM instance…"),
+    ("vm.createdOk", "VM instance created successfully"),
+    ("vm.deletedOk", "VM instance deleted successfully"),
+    ("vm.successStart", "VM instance started successfully"),
+    ("vm.successStop", "VM instance stopped successfully"),
+    ("vm.successRestart", "VM instance restarted successfully"),
+    ("vm.successGeneric", "Operation completed successfully"),
+    (
+        "vm.confirmDelete",
+        "Are you sure you want to delete VM instance \"{name}\" ({id})? This action cannot be undone.",
+    ),
+];
+
+/// Ukrainian VM modal keys (PH-S248).
+pub const VM_MODAL_UK: &[I18nRow<'_>] = &[
+    ("vm.createBtn", "Створити інстанс VM"),
+    ("vm.createBtnAria", "Створити новий інстанс VM"),
+    ("vm.modalTitle", "Створити інстанс VM"),
+    ("vm.label.name", "Назва інстансу"),
+    ("vm.label.cpu", "Ядра CPU"),
+    ("vm.label.memory", "Пам’ять (МБ)"),
+    ("vm.label.gpu", "Потрібен GPU"),
+    ("vm.label.isolation", "Тип ізоляції"),
+    ("vm.iso.process", "Пісочниця процесу"),
+    ("vm.iso.hardware", "Апаратна VM"),
+    ("vm.ph.name", "my-vm-instance"),
+    ("vm.start", "Запустити"),
+    ("vm.stop", "Зупинити"),
+    ("vm.restart", "Перезапустити"),
+    ("vm.startAria", "Запустити інстанс VM {id}"),
+    ("vm.stopAria", "Зупинити інстанс VM {id}"),
+    ("vm.restartAria", "Перезапустити інстанс VM {id}"),
+    ("vm.deleteAria", "Видалити інстанс VM {id}"),
+    ("vm.loadingStart", "Запуск інстансу VM…"),
+    ("vm.loadingStop", "Зупинка інстансу VM…"),
+    ("vm.loadingRestart", "Перезапуск інстансу VM…"),
+    ("vm.loadingGeneric", "Обробка інстансу VM…"),
+    ("vm.deletingLoad", "Видалення інстансу VM…"),
+    ("vm.createdOk", "Інстанс VM створено"),
+    ("vm.deletedOk", "Інстанс VM видалено"),
+    ("vm.successStart", "Інстанс VM запущено"),
+    ("vm.successStop", "Інстанс VM зупинено"),
+    ("vm.successRestart", "Інстанс VM перезапущено"),
+    ("vm.successGeneric", "Операцію виконано"),
+    (
+        "vm.confirmDelete",
+        "Видалити інстанс VM «{name}» ({id})? Цю дію не можна скасувати.",
+    ),
+];
+
+/// English shared confirm-dialog / modal glue keys (PH-S252).
+pub const ADMIN_UI_CONFIRM_EN: &[I18nRow<'_>] = &[
+    ("ui.confirmTitle", "Confirm action"),
+    ("ui.confirmBtn", "Confirm"),
+    ("ui.cancel", "Cancel"),
+    ("ui.closeDialogAria", "Close dialog"),
+];
+
+/// Ukrainian shared confirm-dialog / modal glue keys (PH-S252).
+pub const ADMIN_UI_CONFIRM_UK: &[I18nRow<'_>] = &[
+    ("ui.confirmTitle", "Підтвердження"),
+    ("ui.confirmBtn", "Підтвердити"),
+    ("ui.cancel", "Скасувати"),
+    ("ui.closeDialogAria", "Закрити діалог"),
+];
+
 /// English auth keys (login, OAuth, bootstrap banner, lang toggle).
 pub const AUTH_SHELL_EN: &[I18nRow<'_>] = &[
     ("auth.pageTitle", "Login - PoolAI"),
@@ -2452,6 +2544,42 @@ pub fn admin_err_patch_script() -> String {
     )
 }
 
+/// VM create/manage modal keys — slim `vm.*` patch (PH-S248).
+pub fn vm_modal_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(VM_MODAL_EN));
+    root.insert("uk".into(), rows_to_map(VM_MODAL_UK));
+    root
+}
+
+pub fn vm_modal_patch_json() -> String {
+    serde_json::to_string(&vm_modal_patch()).expect("vm modal i18n patch serializes")
+}
+
+pub fn vm_modal_patch_script() -> String {
+    format!("window.__poolaiVmModalI18nRust={};", vm_modal_patch_json())
+}
+
+/// Shared confirm-dialog keys — slim `ui.confirm*` patch (PH-S252).
+pub fn admin_ui_confirm_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_UI_CONFIRM_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_UI_CONFIRM_UK));
+    root
+}
+
+pub fn admin_ui_confirm_patch_json() -> String {
+    serde_json::to_string(&admin_ui_confirm_patch())
+        .expect("admin ui confirm i18n patch serializes")
+}
+
+pub fn admin_ui_confirm_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminUiConfirmI18nRust={};",
+        admin_ui_confirm_patch_json()
+    )
+}
+
 /// `{"en":{...},"uk":{...}}` patch for auth + dashboard + admin nav/chrome shell keys (PH-S162, PH-S242, PH-S243).
 pub fn auth_dash_shell_patch() -> BTreeMap<String, BTreeMap<String, String>> {
     let mut en = BTreeMap::new();
@@ -2774,6 +2902,46 @@ mod tests {
     fn err_patch_script_assigns_window_patch_ph_s246() {
         let script = admin_err_patch_script();
         assert!(script.starts_with("window.__poolaiAdminErrI18nRust="));
+    }
+
+    #[test]
+    fn vm_modal_patch_has_matching_en_uk_key_counts_ph_s248() {
+        assert_eq!(VM_MODAL_EN.len(), VM_MODAL_UK.len());
+    }
+
+    #[test]
+    fn vm_modal_patch_json_vm_only_ph_s248() {
+        let json = vm_modal_patch_json();
+        assert!(json.contains(r#""vm.modalTitle""#));
+        assert!(json.contains(r#""vm.confirmDelete""#));
+        assert!(!json.contains(r#""admin.vmadm.section""#));
+        assert!(!json.contains(r#""raid.modalTitle""#));
+    }
+
+    #[test]
+    fn vm_modal_patch_script_assigns_window_patch_ph_s248() {
+        let script = vm_modal_patch_script();
+        assert!(script.starts_with("window.__poolaiVmModalI18nRust="));
+    }
+
+    #[test]
+    fn ui_confirm_patch_has_matching_en_uk_key_counts_ph_s252() {
+        assert_eq!(ADMIN_UI_CONFIRM_EN.len(), ADMIN_UI_CONFIRM_UK.len());
+    }
+
+    #[test]
+    fn ui_confirm_patch_json_confirm_only_ph_s252() {
+        let json = admin_ui_confirm_patch_json();
+        assert!(json.contains(r#""ui.confirmTitle""#));
+        assert!(json.contains(r#""ui.closeDialogAria""#));
+        assert!(!json.contains(r#""ui.create""#));
+        assert!(!json.contains(r#""vm.modalTitle""#));
+    }
+
+    #[test]
+    fn ui_confirm_patch_script_assigns_window_patch_ph_s252() {
+        let script = admin_ui_confirm_patch_script();
+        assert!(script.starts_with("window.__poolaiAdminUiConfirmI18nRust="));
     }
 
     #[test]

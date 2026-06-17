@@ -1,6 +1,6 @@
 # Rust codebase ratio — стратегія 90–95% (PoolAI)
 
-**Оновлено:** 2026-06-13 · **Канон:** FM **§5.13** · правила [`.cursor/rules/runtime-stack-policy.mdc`](../../.cursor/rules/runtime-stack-policy.mdc), [`.cursor/rules/poolai-testing-policy.mdc`](../../.cursor/rules/poolai-testing-policy.mdc)
+**Оновлено:** 2026-06-17 · **Канон:** FM **§5.13** · §5.12 **0** відкритих (PH-S128…S252 ✅)
 
 **Мета:** зростання частки **Rust** у виконуваному коді репозиторію до **90–95%** (формально), **96% stretch spirit** (орієнтир replenish PH-S150…S159) — платформа збирається і перевіряється через **`cargo`** без обов'язкового Node на edge.
 
@@ -85,7 +85,7 @@ flowchart TB
 | **E — gate** | PH-S150 ✅ | CI advisory якщо ratio <88%; target 93%; stretch 96% spirit | стабільно 90–95% |
 | **F — stretch 96%** | PH-S151…S159 ✅ | wasm wiring, slim JS/i18n/charts, Rust stand/e2e bins; CI warn **93%** | **→96% spirit** |
 
-**Черга §5.12 (10 відкритих):** PH-S210…S219 code-first + vision a11y band.
+**Черга §5.12:** **0** відкритих (PH-S128…S252 ✅ 2026-06-17) — replenish з §5.13.
 
 ---
 
@@ -196,12 +196,12 @@ flowchart TB
 | 101 | **PH-S244** | Galaxy pricing stale served metrics stand smoke | tests | **✅** |
 | 102 | **PH-S245** | Admin shared status keys slim patch | code | **✅** |
 | 103 | **PH-S246** | Admin err hint keys slim patch | code | **✅** |
-| 104 | **PH-S247** | Galaxy pricing provider metrics stand smoke | tests | відкрито |
-| 105 | **PH-S248** | Admin vm modal i18n slim | code | відкрито |
-| 106 | **PH-S249** | Galaxy settlement metrics stand smoke | tests | відкрито |
-| 107 | **PH-S250** | Galaxy shard locality metrics stand smoke | tests | відкрито |
-| 108 | **PH-S251** | Docs roadmap sync band | docs | відкрито |
-| 109 | **PH-S252** | Admin shared ui.confirm slim patch | code | відкрито |
+| 104 | **PH-S247** | Galaxy pricing provider metrics stand smoke | tests | **✅** |
+| 105 | **PH-S248** | Admin vm modal i18n slim | code | **✅** |
+| 106 | **PH-S249** | Galaxy settlement metrics stand smoke | tests | **✅** |
+| 107 | **PH-S250** | Galaxy shard locality metrics stand smoke | tests | **✅** |
+| 108 | **PH-S251** | Docs roadmap sync band | docs | **✅** |
+| 109 | **PH-S252** | Admin shared ui.confirm slim patch | code | **✅** |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 

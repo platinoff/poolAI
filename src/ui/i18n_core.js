@@ -28,15 +28,11 @@
       'home.notesBody':
         'Write operations are available for authenticated users with appropriate permissions.',
 
-      'ui.confirmTitle': 'Confirm action',
-      'ui.confirmBtn': 'Confirm',
-      'ui.cancel': 'Cancel',
       'ui.create': 'Create',
       'ui.install': 'Install',
       'ui.delete': 'Delete',
       'ui.update': 'Update',
       'ui.uninstall': 'Uninstall',
-      'ui.closeDialogAria': 'Close dialog',
       'ui.closeNotificationAria': 'Close notification',
       'ui.clearSearchAria': 'Clear search',
       'ui.searchTableAria': 'Search table',
@@ -153,38 +149,6 @@
       'libs.confirmUninstall':
         'Are you sure you want to uninstall library "{name}"? This action cannot be undone.',
 
-      'vm.createBtn': 'Create VM Instance',
-      'vm.createBtnAria': 'Create new VM instance',
-      'vm.modalTitle': 'Create VM Instance',
-      'vm.label.name': 'Instance name',
-      'vm.label.cpu': 'CPU cores',
-      'vm.label.memory': 'Memory (MB)',
-      'vm.label.gpu': 'GPU required',
-      'vm.label.isolation': 'Isolation type',
-      'vm.iso.process': 'Process sandbox',
-      'vm.iso.hardware': 'Hardware VM',
-      'vm.ph.name': 'my-vm-instance',
-      'vm.start': 'Start',
-      'vm.stop': 'Stop',
-      'vm.restart': 'Restart',
-      'vm.startAria': 'Start VM instance {id}',
-      'vm.stopAria': 'Stop VM instance {id}',
-      'vm.restartAria': 'Restart VM instance {id}',
-      'vm.deleteAria': 'Delete VM instance {id}',
-      'vm.loadingStart': 'Starting VM instance…',
-      'vm.loadingStop': 'Stopping VM instance…',
-      'vm.loadingRestart': 'Restarting VM instance…',
-      'vm.loadingGeneric': 'Processing VM instance…',
-      'vm.deletingLoad': 'Deleting VM instance…',
-      'vm.createdOk': 'VM instance created successfully',
-      'vm.deletedOk': 'VM instance deleted successfully',
-      'vm.successStart': 'VM instance started successfully',
-      'vm.successStop': 'VM instance stopped successfully',
-      'vm.successRestart': 'VM instance restarted successfully',
-      'vm.successGeneric': 'Operation completed successfully',
-      'vm.confirmDelete':
-        'Are you sure you want to delete VM instance "{name}" ({id})? This action cannot be undone.',
-
       'raid.empty': 'No artifacts stored.',
       'raid.col.id': 'ID',
       'raid.col.name': 'Name',
@@ -226,15 +190,11 @@
       'home.notesBody':
         'Операції запису доступні автентифікованим користувачам з відповідними правами.',
 
-      'ui.confirmTitle': 'Підтвердження',
-      'ui.confirmBtn': 'Підтвердити',
-      'ui.cancel': 'Скасувати',
       'ui.create': 'Створити',
       'ui.install': 'Встановити',
       'ui.delete': 'Видалити',
       'ui.update': 'Оновити',
       'ui.uninstall': 'Видалити (бібліотеку)',
-      'ui.closeDialogAria': 'Закрити діалог',
       'ui.closeNotificationAria': 'Закрити сповіщення',
       'ui.clearSearchAria': 'Очистити пошук',
       'ui.searchTableAria': 'Пошук у таблиці',
@@ -351,38 +311,6 @@
       'libs.confirmUninstall':
         'Видалити бібліотеку «{name}»? Цю дію не можна скасувати.',
 
-      'vm.createBtn': 'Створити інстанс VM',
-      'vm.createBtnAria': 'Створити новий інстанс VM',
-      'vm.modalTitle': 'Створити інстанс VM',
-      'vm.label.name': 'Назва інстансу',
-      'vm.label.cpu': 'Ядра CPU',
-      'vm.label.memory': 'Пам’ять (МБ)',
-      'vm.label.gpu': 'Потрібен GPU',
-      'vm.label.isolation': 'Тип ізоляції',
-      'vm.iso.process': 'Пісочниця процесу',
-      'vm.iso.hardware': 'Апаратна VM',
-      'vm.ph.name': 'my-vm-instance',
-      'vm.start': 'Запустити',
-      'vm.stop': 'Зупинити',
-      'vm.restart': 'Перезапустити',
-      'vm.startAria': 'Запустити інстанс VM {id}',
-      'vm.stopAria': 'Зупинити інстанс VM {id}',
-      'vm.restartAria': 'Перезапустити інстанс VM {id}',
-      'vm.deleteAria': 'Видалити інстанс VM {id}',
-      'vm.loadingStart': 'Запуск інстансу VM…',
-      'vm.loadingStop': 'Зупинка інстансу VM…',
-      'vm.loadingRestart': 'Перезапуск інстансу VM…',
-      'vm.loadingGeneric': 'Обробка інстансу VM…',
-      'vm.deletingLoad': 'Видалення інстансу VM…',
-      'vm.createdOk': 'Інстанс VM створено',
-      'vm.deletedOk': 'Інстанс VM видалено',
-      'vm.successStart': 'Інстанс VM запущено',
-      'vm.successStop': 'Інстанс VM зупинено',
-      'vm.successRestart': 'Інстанс VM перезапущено',
-      'vm.successGeneric': 'Операцію виконано',
-      'vm.confirmDelete':
-        'Видалити інстанс VM «{name}» ({id})? Цю дію не можна скасувати.',
-
       'raid.empty': 'Артефактів не збережено.',
       'raid.col.id': 'ID',
       'raid.col.name': 'Назва',
@@ -442,6 +370,20 @@
   if (rustAdminErr) {
     if (rustAdminErr.en) Object.assign(STRINGS.en, rustAdminErr.en);
     if (rustAdminErr.uk) Object.assign(STRINGS.uk, rustAdminErr.uk);
+  }
+
+  // PH-S248: vm.* modal EN/UK → poolai-ui-core i18n.rs (admin + dashboard VM pages).
+  var rustVmModal = typeof window !== 'undefined' && window.__poolaiVmModalI18nRust;
+  if (rustVmModal) {
+    if (rustVmModal.en) Object.assign(STRINGS.en, rustVmModal.en);
+    if (rustVmModal.uk) Object.assign(STRINGS.uk, rustVmModal.uk);
+  }
+
+  // PH-S252: ui.confirm* modal glue → poolai-ui-core i18n.rs (admin + dashboard shells).
+  var rustUiConfirm = typeof window !== 'undefined' && window.__poolaiAdminUiConfirmI18nRust;
+  if (rustUiConfirm) {
+    if (rustUiConfirm.en) Object.assign(STRINGS.en, rustUiConfirm.en);
+    if (rustUiConfirm.uk) Object.assign(STRINGS.uk, rustUiConfirm.uk);
   }
 
   function normalizeLang(l) {

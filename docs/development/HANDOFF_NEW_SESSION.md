@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-17 (PH-S246 ✅ · §5.12 **6** PH-S247…S252 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
+**Оновлено:** 2026-06-17 (PH-S252 ✅ · §5.12 **0** відкритих · replenish §5.13) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -197,7 +197,13 @@
 **PH-S244 ✅ (code/tests):** `poolai-http-stand-smoke` — `galaxy_pricing_stale_served_metrics` on live `/metrics` (PH-S127 gauge export); unit test `ph_s244`.
 **PH-S245 ✅ (code/ui):** `admin_status_patch` injected on all admin layouts via `__poolaiAdminStatusI18nRust`; `admin.status.*` / `admin.na` / `admin.btn.edit` removed from `i18n_core.js`; audit tests `ph_s245`.
 **PH-S246 ✅ (code/ui):** `admin_err_patch` injected on all admin layouts via `__poolaiAdminErrI18nRust`; `err.hint*` / `err.insufficientAdmin` / `admin.accessRequired` removed from `i18n_core.js`; audit tests `ph_s246`.
-**Replenish ✅ (2026-06-16):** §5.12 **6** відкритих **PH-S247…S252** — i18n slim maintain + Galaxy `/metrics` stand smoke + docs sync (S251); див. [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md).
+**PH-S247 ✅ (code/tests):** `poolai-http-stand-smoke` — `galaxy_pricing_provider_metrics` on live `/metrics`; unit test `ph_s247`.
+**PH-S248 ✅ (code/ui):** `vm_modal_patch` on admin + dashboard shells; `vm.*` removed from `i18n_core.js`; audit tests `ph_s248`.
+**PH-S249 ✅ (code/tests):** `poolai-http-stand-smoke` — `galaxy_settlement_metrics` on live `/metrics`; unit test `ph_s249`.
+**PH-S250 ✅ (code/tests):** `poolai-http-stand-smoke` — `galaxy_shard_local_hit_ratio_metrics` on live `/metrics`; unit test `ph_s250`.
+**PH-S251 ✅ (docs):** GALAXY_GRID_ROADMAP + README + INDEX sprint zriz; §5.12 band S247…S252 closed.
+**PH-S252 ✅ (code/ui):** `admin_ui_confirm_patch` on admin + dashboard shells; `ui.confirm*` glue removed from `i18n_core.js`; audit tests `ph_s252`.
+**Replenish:** §5.12 **0** відкритих — наступна сесія replenish з §5.13 ([`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md)); див. [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md).
 **Ops:** `open-docs-vision.ps1` — ASCII Write-Host + robust `SendVisionBytes`; URL `http://127.0.0.1:8765/docs/vision/index.html`.
 **PH-S198 ✅ (code):** `topology_graph.rs` — hub labels + `label_x`/`label_y`/`is_hub` in graph JSON; heatmap short ids; slim `topology_graph.js` (SVG paint only); `cargo test-ci`.
 **PH-S194 ✅ (code):** `galaxy_fee_split_applied_total` on grid result wire; `cargo test-ci`.

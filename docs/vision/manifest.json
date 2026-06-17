@@ -1830,7 +1830,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S246",
+  "last_sprint_closed": "PH-S252",
   "layers": [
     {
       "id": "L0",
@@ -1863,7 +1863,6 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S247",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7719,7 +7718,7 @@
       "path": "docs/vision/vision.svg"
     }
   ],
-  "revision": 198,
+  "revision": 199,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -9354,58 +9353,58 @@
       "acceptance": "provider catalog + errors gauges on `/metrics",
       "deps": "PH-S127",
       "id": "PH-S247",
-      "open": true,
+      "open": false,
       "row": 182,
-      "status": "open",
+      "status": "closed",
       "title": "Galaxy pricing provider metrics stand smoke (tests)"
     },
     {
       "acceptance": "vm.*` modal keys out of `i18n_core.js",
       "deps": "PH-S237",
       "id": "PH-S248",
-      "open": true,
+      "open": false,
       "row": 183,
-      "status": "open",
+      "status": "closed",
       "title": "Admin vm modal i18n slim (code)"
     },
     {
       "acceptance": "settlement pending + cleared on `/metrics",
       "deps": "PH-S178",
       "id": "PH-S249",
-      "open": true,
+      "open": false,
       "row": 184,
-      "status": "open",
+      "status": "closed",
       "title": "Galaxy settlement metrics stand smoke (tests)"
     },
     {
       "acceptance": "galaxy_shard_local_hit_ratio` on `/metrics",
       "deps": "PH-S183",
       "id": "PH-S250",
-      "open": true,
+      "open": false,
       "row": 185,
-      "status": "open",
+      "status": "closed",
       "title": "Galaxy shard locality metrics stand smoke (tests)"
     },
     {
       "acceptance": "GALAXY_GRID_ROADMAP + README + INDEX sprint zriz",
       "deps": "PH-S249",
       "id": "PH-S251",
-      "open": true,
+      "open": false,
       "row": 186,
-      "status": "open",
+      "status": "closed",
       "title": "Docs roadmap sync band (docs)"
     },
     {
       "acceptance": "ui.confirm*` + modal glue keys slim patch",
       "deps": "PH-S245",
       "id": "PH-S252",
-      "open": true,
+      "open": false,
       "row": 187,
-      "status": "open",
+      "status": "closed",
       "title": "Admin shared ui.confirm slim patch (code)"
     }
   ],
-  "sprint_queue_open_count": 6,
+  "sprint_queue_open_count": 0,
   "updated_at": "2026-06-16",
   "vision_ui_rev": 59
 }

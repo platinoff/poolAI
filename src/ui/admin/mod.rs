@@ -409,6 +409,8 @@ pub fn admin_layout_with_module_script(
     let table_patch = poolai_ui_core::i18n::admin_table_patch_script();
     let status_patch = poolai_ui_core::i18n::admin_status_patch_script();
     let err_patch = poolai_ui_core::i18n::admin_err_patch_script();
+    let vm_modal_patch = poolai_ui_core::i18n::vm_modal_patch_script();
+    let ui_confirm_patch = poolai_ui_core::i18n::admin_ui_confirm_patch_script();
     let theme_patch = poolai_ui_core::theme::admin_theme_patch_script();
     let modal_patch = poolai_ui_core::modal::admin_modal_patch_script();
     let module_block = if module_script.is_empty() {
@@ -482,6 +484,8 @@ pub fn admin_layout_with_module_script(
   <script>{table_patch}</script>
   <script>{status_patch}</script>
   <script>{err_patch}</script>
+  <script>{vm_modal_patch}</script>
+  <script>{ui_confirm_patch}</script>
   <script>{theme_patch}</script>
   <script>{modal_patch}</script>
   <script>{i18n_js}</script>
@@ -722,6 +726,41 @@ fn i18n_core_js_has_no_admin_err_keys_ph_s246() {
     assert!(!js.contains("'err.hint503.library'"));
     assert!(!js.contains("'err.hint503.vm'"));
     assert!(!js.contains("'err.hint404.enterprise'"));
+}
+
+#[test]
+fn admin_layout_injects_vm_modal_i18n_patch_ph_s248() {
+    let patch = poolai_ui_core::i18n::vm_modal_patch_script();
+    assert!(patch.contains("window.__poolaiVmModalI18nRust="));
+    assert!(patch.contains(r#""vm.modalTitle""#));
+    let html = admin_layout("admin.test.page", "Test", "<p>body</p>", "");
+    assert!(html.0.contains(r#""vm.confirmDelete""#));
+}
+
+#[test]
+fn i18n_core_js_has_no_vm_modal_keys_ph_s248() {
+    let js = include_str!("../i18n_core.js");
+    assert!(!js.contains("'vm.createBtn'"));
+    assert!(!js.contains("'vm.modalTitle'"));
+    assert!(!js.contains("'vm.confirmDelete'"));
+}
+
+#[test]
+fn admin_layout_injects_ui_confirm_patch_ph_s252() {
+    let patch = poolai_ui_core::i18n::admin_ui_confirm_patch_script();
+    assert!(patch.contains("window.__poolaiAdminUiConfirmI18nRust="));
+    assert!(patch.contains(r#""ui.confirmTitle""#));
+    let html = admin_layout("admin.test.page", "Test", "<p>body</p>", "");
+    assert!(html.0.contains(r#""ui.closeDialogAria""#));
+}
+
+#[test]
+fn i18n_core_js_has_no_ui_confirm_keys_ph_s252() {
+    let js = include_str!("../i18n_core.js");
+    assert!(!js.contains("'ui.confirmTitle'"));
+    assert!(!js.contains("'ui.confirmBtn'"));
+    assert!(!js.contains("'ui.cancel'"));
+    assert!(!js.contains("'ui.closeDialogAria'"));
 }
 
 #[test]

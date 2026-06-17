@@ -732,6 +732,8 @@ fn layout(
 
     let i18n_js = include_str!("i18n_core.js");
     let auth_dash_patch = poolai_ui_core::i18n::auth_dash_shell_patch_script();
+    let vm_modal_patch = poolai_ui_core::i18n::vm_modal_patch_script();
+    let ui_confirm_patch = poolai_ui_core::i18n::admin_ui_confirm_patch_script();
     let i18n_boot = r#"
 (function(){
   if (typeof PoolAiI18n !== 'undefined') {
@@ -746,8 +748,8 @@ fn layout(
   });
 })();"#;
     let full_script = format!(
-        "{}\n{}\n{}\n{}",
-        auth_dash_patch, i18n_js, script_js, i18n_boot
+        "{}\n{}\n{}\n{}\n{}\n{}",
+        auth_dash_patch, vm_modal_patch, ui_confirm_patch, i18n_js, script_js, i18n_boot
     );
 
     let html = format!(
@@ -5212,6 +5214,22 @@ fn dashboard_layout_injects_rust_auth_dash_i18n_patch_ph_s162() {
     let html = layout("dash.title.workers", "Workers", "<p>body</p>", "");
     assert!(html.0.contains("window.__poolaiAuthDashI18nRust="));
     assert!(html.0.contains(r#""auth.lang.en""#) || html.0.contains("auth.lang.en"));
+}
+
+#[test]
+fn dashboard_layout_injects_vm_modal_patch_ph_s248() {
+    let patch = poolai_ui_core::i18n::vm_modal_patch_script();
+    assert!(patch.contains("window.__poolaiVmModalI18nRust="));
+    let html = layout("dash.title.vm", "VM", "<p>body</p>", "");
+    assert!(html.0.contains(r#""vm.createBtn""#));
+}
+
+#[test]
+fn dashboard_layout_injects_ui_confirm_patch_ph_s252() {
+    let patch = poolai_ui_core::i18n::admin_ui_confirm_patch_script();
+    assert!(patch.contains("window.__poolaiAdminUiConfirmI18nRust="));
+    let html = layout("dash.title.workers", "Workers", "<p>body</p>", "");
+    assert!(html.0.contains(r#""ui.confirmBtn""#));
 }
 
 #[test]

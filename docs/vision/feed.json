@@ -2,77 +2,76 @@
   "description": "RSS-style ticker of FM §5.12 sprint queue (open + recent closed)",
   "items": [
     {
-      "category": "open",
-      "id": "PH-S245",
-      "link": "docs/vision/index.html#sprint-queue",
-      "next": true,
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "admin.status.*` + `admin.na` + `admin.btn.edit` slim patch",
-      "title": "Admin shared status keys slim patch (code)"
-    },
-    {
-      "category": "open",
-      "id": "PH-S246",
+      "category": "closed",
+      "id": "PH-S252",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
-      "status": "open",
-      "summary": "err.hint*` + `err.insufficientAdmin` + `admin.accessRequired",
-      "title": "Admin err hint keys slim patch (code)"
+      "status": "closed",
+      "summary": "ui.confirm*` + modal glue keys slim patch",
+      "title": "Admin shared ui.confirm slim patch (code)"
     },
     {
-      "category": "open",
-      "id": "PH-S247",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "provider catalog + errors gauges on `/metrics",
-      "title": "Galaxy pricing provider metrics stand smoke (tests)"
-    },
-    {
-      "category": "open",
-      "id": "PH-S248",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "vm.*` modal keys out of `i18n_core.js",
-      "title": "Admin vm modal i18n slim (code)"
-    },
-    {
-      "category": "open",
-      "id": "PH-S249",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "settlement pending + cleared on `/metrics",
-      "title": "Galaxy settlement metrics stand smoke (tests)"
-    },
-    {
-      "category": "open",
-      "id": "PH-S250",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "galaxy_shard_local_hit_ratio` on `/metrics",
-      "title": "Galaxy shard locality metrics stand smoke (tests)"
-    },
-    {
-      "category": "open",
+      "category": "closed",
       "id": "PH-S251",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
-      "status": "open",
+      "status": "closed",
       "summary": "GALAXY_GRID_ROADMAP + README + INDEX sprint zriz",
       "title": "Docs roadmap sync band (docs)"
     },
     {
-      "category": "open",
-      "id": "PH-S252",
+      "category": "closed",
+      "id": "PH-S250",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
-      "status": "open",
-      "summary": "ui.confirm*` + modal glue keys slim patch",
-      "title": "Admin shared ui.confirm slim patch (code)"
+      "status": "closed",
+      "summary": "galaxy_shard_local_hit_ratio` on `/metrics",
+      "title": "Galaxy shard locality metrics stand smoke (tests)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S249",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "settlement pending + cleared on `/metrics",
+      "title": "Galaxy settlement metrics stand smoke (tests)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S248",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "vm.*` modal keys out of `i18n_core.js",
+      "title": "Admin vm modal i18n slim (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S247",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "provider catalog + errors gauges on `/metrics",
+      "title": "Galaxy pricing provider metrics stand smoke (tests)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S246",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "err.hint*` + `err.insufficientAdmin` + `admin.accessRequired",
+      "title": "Admin err hint keys slim patch (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S245",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "admin.status.*` + `admin.na` + `admin.btn.edit` slim patch",
+      "title": "Admin shared status keys slim patch (code)"
     },
     {
       "category": "closed",
@@ -109,78 +108,6 @@
       "status": "closed",
       "summary": "galaxy_pricing_fresh_served` on live `/metrics",
       "title": "Galaxy pricing fresh served metrics stand smoke (tests)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S240",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "admin.table.*` slim patch",
-      "title": "Admin i18n slim table toolbar (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S239",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "admin.cfg.*` slim patch",
-      "title": "Admin i18n slim config panel (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S238",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "admin.usr.*` slim patch",
-      "title": "Admin i18n slim users panel (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S237",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "admin.vmadm.*` slim patch",
-      "title": "Admin i18n slim vm panel (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S236",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "admin.inst.*` slim patch",
-      "title": "Admin i18n slim instances panel (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S235",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "stand checks vision rev vs FM footer + extensions",
-      "title": "Stand smoke vision rev parity (tests)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S234",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "admin.topo.*` slim patch",
-      "title": "Admin i18n slim topology panel (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S233",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "aria-label` on map sprint chips",
-      "title": "Vision map sprint chips a11y (docs/vision)"
     }
   ],
   "link": "docs/vision/index.html",

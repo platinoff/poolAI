@@ -54,7 +54,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 **Версія в репозиторії:** `0.2.2` (див. `Cargo.toml`). **Робоча гілка:** `main`.
 
-Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S187 ✅. **Rust ratio baseline:** **92.78%** (hold **95%**). **Vision:** manifest rev **198**. **Активна черга:** FM **§5.12** — **6** відкритих **PH-S247…S252** — [`docs/development/NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md), [`GALAXY_GRID_ROADMAP_2026-05-27.md`](docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md), [`RUST_RATIO_STRATEGY_2026-06-13.md`](docs/development/RUST_RATIO_STRATEGY_2026-06-13.md).
+Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S187 ✅. **Rust ratio baseline:** **92.78%** (hold **95%**). **Vision:** manifest rev **199**. **§5.12:** **0** відкритих — смуга PH-S128…S252 ✅ · **replenish** §5.13 — [`docs/development/NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md), [`GALAXY_GRID_ROADMAP_2026-05-27.md`](docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md), [`RUST_RATIO_STRATEGY_2026-06-13.md`](docs/development/RUST_RATIO_STRATEGY_2026-06-13.md).
 
 **Репозиторій:** [github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)
 
@@ -82,15 +82,15 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 ### Next Focus (2026-06-17)
 
-**Закрито:** PH-S128…S246 (admin i18n slim band + Galaxy stand smoke through S244).
+**Закрито:** PH-S128…S252 (admin i18n slim band + Galaxy stand smoke + docs sync).
 
-**Активна черга (FM §5.12):** **6** відкритих — **PH-S247…S252** ([`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md) · [`GALAXY_GRID_ROADMAP_2026-05-27.md`](docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md)).
+**§5.12:** **0** відкритих — **replenish** з §5.13 ([`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md) · [`RUST_RATIO_STRATEGY_2026-06-13.md`](docs/development/RUST_RATIO_STRATEGY_2026-06-13.md)).
 
 **Ops (поза чергою):** **FM-003** LAN §4 **BLOCKED** (2 хости) · **FM-041** Cloud SDK **Deferred**.
 
 **Старт сесії:** [`HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md) · copy-paste — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md) · карта — [`docs/vision/`](docs/vision/) (`.\bin\open-docs-vision.ps1`).
 
-**Наступний спринт:** **PH-S247** — Galaxy pricing provider metrics stand smoke on `/metrics`.
+**Наступний крок:** replenish §5.12 (≤10 PH-S* з §5.13).
 
 **Звірка «не зроблено»:** [`FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.3**.
 
