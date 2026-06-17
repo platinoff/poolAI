@@ -1,6 +1,6 @@
 # Rust codebase ratio — стратегія 90–95% (PoolAI)
 
-**Оновлено:** 2026-06-17 · **Канон:** FM **§5.13** · §5.12 **0** відкритих (PH-S128…S272 ✅) · rust_ratio **94.34%**
+**Оновлено:** 2026-06-17 · **Канон:** FM **§5.13** · §5.12 **0** відкритих (PH-S128…S282 ✅) · rust_ratio **94.36%**
 
 **Мета:** зростання частки **Rust** у виконуваному коді репозиторію до **90–95%** (формально), **96% stretch spirit** (орієнтир replenish PH-S150…S159) — платформа збирається і перевіряється через **`cargo`** без обов'язкового Node на edge.
 
@@ -85,7 +85,7 @@ flowchart TB
 | **E — gate** | PH-S150 ✅ | CI advisory якщо ratio <88%; target 93%; stretch 96% spirit | стабільно 90–95% |
 | **F — stretch 96%** | PH-S151…S159 ✅ | wasm wiring, slim JS/i18n/charts, Rust stand/e2e bins; CI warn **93%** | **→96% spirit** |
 
-**Черга §5.12:** **8** відкритих (S275…S282) · PH-S274 ✅.
+**Черга §5.12:** **0** відкритих · PH-S282 ✅ · replenish §5.13.
 
 ---
 
@@ -224,7 +224,14 @@ flowchart TB
 | 129 | **PH-S272** | Docs INDEX sprint zriz | INDEX §7 ratio | **✅** |
 | 130 | **PH-S273** | admin_common api-error path slim | wasm-first; drop `hintFor503` JS dup | **✅** |
 | 131 | **PH-S274** | admin_common loading/error DOM wasm glue | `adminShowLoading` / inline error | **✅** |
-| 132 | **PH-S275** | admin_charts sparkline wasm-only glue | slim canvas path | відкрито |
+| 132 | **PH-S275** | admin_charts sparkline wasm-only glue | slim canvas path | **✅** |
+| 133 | **PH-S276** | Galaxy prefetch ingest stub | `ingest_job_prefetch_stub` | **✅** |
+| 134 | **PH-S277** | topology_graph.js paint-only audit | JS ≤100 LOC gate | **✅** |
+| 135 | **PH-S278** | Rust ratio loc-audit refresh | **94.36%** sprint zriz | **✅** |
+| 136 | **PH-S279** | Docs canon sync band | INDEX/HANDOFF/NEXT | **✅** |
+| 137 | **PH-S280** | poolai-vision-sync drift gate | `--check` green | **✅** |
+| 138 | **PH-S281** | Ratio hold advisory snapshot | **94.36%** advisory | **✅** |
+| 139 | **PH-S282** | Docs INDEX ratio maintain | INDEX §7 pointer | **✅** |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 

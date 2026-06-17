@@ -38,7 +38,7 @@
 | **Prefetch wire beyond stub** | Galaxy **§5.5** | **metrics ✅** (`galaxy_prefetch_*`, PH-S167/S213); **live prefetch wire** — horizon (PH-S268 doc pointer); replenish §5.13 |
 | Signed capability documents | Galaxy §6.6 / §9 | post-S272 horizon |
 
-**§5.5 prefetch (PH-S268):** Prometheus stubs + stand smoke покривають `plan_prefetch` / bytes / shard locality; повний live prefetch ingest (task-driven seed pull) — наступна code-first смуга з §5.13, не дублювати metrics-only спринти.
+**§5.5 prefetch (PH-S268, PH-S276):** Prometheus stubs + stand smoke + grid job ingest `ingest_job_prefetch_stub` (`required_shard_ids` → `plan_prefetch`); повний live prefetch enqueue (task-driven seed pull) — наступна code-first смуга з §5.13.
 
 ---
 

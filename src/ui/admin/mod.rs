@@ -887,6 +887,13 @@ fn admin_charts_layer_exports() {
     assert!(js.contains("poolaiChartsWasm"));
     assert!(js.contains("chartScale"));
     assert!(js.contains("flattenMlStepRows"));
+    assert!(js.contains("renderSparklineHtml"));
+}
+
+#[test]
+fn admin_charts_sparkline_wasm_first_ph_s275() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("wasm.renderSparklineHtml"));
 }
 
 #[tokio::test]

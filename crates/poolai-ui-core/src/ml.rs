@@ -1,5 +1,6 @@
-//! ML pipeline metric helpers — parity with `admin_charts.js` (PH-S43, PH-S155).
+//! ML pipeline metric helpers — parity with `admin_charts.js` (PH-S43, PH-S155, PH-S275).
 
+use crate::format::escape_html;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::BTreeMap;
@@ -258,6 +259,40 @@ pub fn collect_ml_sparkline_series(rows: &[MlStepRow]) -> BTreeMap<String, Vec<f
     series
 }
 
+/// Mirrors `poolaiRenderSparkline(label, values, opts)` — compact sparkline card HTML (PH-S275).
+pub fn render_sparkline_html(
+    label: &str,
+    values: &[f64],
+    width: f64,
+    height: f64,
+    avg_label: &str,
+) -> String {
+    if values.is_empty() {
+        return String::new();
+    }
+    let scale = chart_scale(values, width, height, 4.0);
+    let avg = values.iter().sum::<f64>() / values.len() as f64;
+    let w = width.round() as u32;
+    let h = height.round() as u32;
+    format!(
+        concat!(
+            r#"<div class="metric-sparkline-card">"#,
+            r#"<div class="metric-sparkline-label">{label}</div>"#,
+            r#"<svg width="{w}" height="{h}" class="metric-sparkline-svg" role="img" aria-label="{label}">"#,
+            r#"<polyline points="{poly}" fill="none" stroke="var(--primary, #67e480)" stroke-width="1.5" />"#,
+            r#"</svg>"#,
+            r#"<div class="metric-sparkline-avg"><span class="metric-sparkline-avg-label">{avg_lbl}</span>"#,
+            r#"<strong>{avg:.1}</strong></div></div>"#
+        ),
+        label = escape_html(label),
+        w = w,
+        h = h,
+        poly = scale.polyline,
+        avg_lbl = escape_html(avg_label),
+        avg = avg
+    )
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -340,5 +375,14 @@ mod tests {
         let series = collect_ml_sparkline_series(&rows);
         assert!(series.contains_key("train · accuracy"));
         assert!(series.contains_key("train · latency_ms"));
+    }
+
+    #[test]
+    fn render_sparkline_html_ph_s275() {
+        let html = render_sparkline_html("cpu", &[1.0, 3.0, 2.0], 200.0, 40.0, "Avg: ");
+        assert!(html.contains("metric-sparkline-card"));
+        assert!(html.contains("metric-sparkline-svg"));
+        assert!(html.contains("<polyline"));
+        assert!(html.contains("Avg:"));
     }
 }

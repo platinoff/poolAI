@@ -9,7 +9,7 @@ use poolai_ui_core::format::escape_html;
 use poolai_ui_core::lease::lease_state;
 use poolai_ui_core::ml::{
     chart_scale, collect_ml_sparkline_series, flatten_ml_step_rows, format_ml_metric_summary,
-    metric_point_values, parse_ml_numeric,
+    metric_point_values, parse_ml_numeric, render_sparkline_html,
 };
 use poolai_ui_core::modal::{admin_dynamic_modal_html, trap_tab_action, MODAL_FOCUSABLE_SELECTOR};
 use poolai_ui_core::pricing::{format_unix_secs, format_usd_micro};
@@ -235,6 +235,18 @@ pub fn collect_ml_sparkline_series_wasm(rows_json: &str) -> JsValue {
     let rows: Vec<poolai_ui_core::ml::MlStepRow> =
         serde_json::from_str(rows_json).unwrap_or_default();
     serde_wasm_bindgen::to_value(&collect_ml_sparkline_series(&rows)).unwrap_or(JsValue::NULL)
+}
+
+#[wasm_bindgen(js_name = renderSparklineHtml)]
+pub fn render_sparkline_html_wasm(
+    label: &str,
+    values_json: &str,
+    width: f64,
+    height: f64,
+    avg_label: &str,
+) -> String {
+    let values: Vec<f64> = serde_json::from_str(values_json).unwrap_or_default();
+    render_sparkline_html(label, &values, width, height, avg_label)
 }
 
 /// POC version string for smoke checks in browser devtools.

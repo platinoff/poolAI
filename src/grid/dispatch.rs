@@ -114,6 +114,55 @@ pub fn coordinator_seed_inventory_snapshot() -> Vec<SeedInventoryPeerSnapshot> {
     ]
 }
 
+/// Merged coordinator seed inventory for prefetch planning (PH-S276 stub).
+pub fn coordinator_merged_seed_inventory() -> SeedInventoryEntry {
+    let snaps = coordinator_seed_inventory_snapshot();
+    let mut shard_ids = Vec::new();
+    let mut ram = 0u64;
+    let mut vram = 0u64;
+    for snap in &snaps {
+        for id in &snap.seed_inventory.shard_ids {
+            if !shard_ids.iter().any(|x| x == id) {
+                shard_ids.push(id.clone());
+            }
+        }
+        ram = ram.saturating_add(snap.seed_inventory.hot_tier.ram_bytes_used);
+        vram = vram.saturating_add(snap.seed_inventory.hot_tier.vram_bytes_used);
+    }
+    SeedInventoryEntry {
+        shard_ids,
+        hot_tier: SeedInventoryHotTier {
+            ram_bytes_used: ram,
+            vram_bytes_used: vram,
+            profiles: Vec::new(),
+        },
+        local_replica_regions: Vec::new(),
+        last_inventory_at: None,
+    }
+}
+
+/// Task-driven prefetch on grid job ingest (PH-S276 stub; no enqueue wire).
+pub fn ingest_job_prefetch_stub(required_shard_ids: &[String], gpu_capable: bool) -> usize {
+    if required_shard_ids.is_empty() {
+        return 0;
+    }
+    let inventory = coordinator_merged_seed_inventory();
+    let config = PrefetchPolicyConfig::from_env();
+    let plan = plan_prefetch(
+        &inventory,
+        required_shard_ids,
+        PrefetchTrigger::JobAdmitted,
+        gpu_capable,
+        &config,
+    );
+    noop_prefetch_hook(&plan)
+}
+
+fn grid_job_gpu_capable(task_kind: &str) -> bool {
+    let k = task_kind.to_ascii_lowercase();
+    k.contains("train") || k.contains("gpu")
+}
+
 /// Prefetch destination tier (concept ?5.5).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -354,6 +403,12 @@ fn ingest_job(
     };
     jobs.push(record)?;
     schedule_with_grid_peer(jobs, source_peer_id)?;
+    if !body.required_shard_ids.is_empty() {
+        ingest_job_prefetch_stub(
+            &body.required_shard_ids,
+            grid_job_gpu_capable(&body.task_kind),
+        );
+    }
     let row = jobs
         .get(&job_id)?
         .ok_or_else(|| AppError::InternalError("job missing after grid ingest".into()))?;
@@ -457,6 +512,7 @@ mod tests {
                 task_kind: "inference".into(),
                 verification_policy: None,
                 input_artifact_ids: vec![],
+                required_shard_ids: vec![],
                 deadline: None,
             }),
             Some("peer-a".into()),
@@ -488,6 +544,7 @@ mod tests {
                 task_kind: "inference".into(),
                 verification_policy: None,
                 input_artifact_ids: vec![],
+                required_shard_ids: vec![],
                 deadline: None,
             }),
             None,
@@ -519,6 +576,7 @@ mod tests {
                 task_kind: "inference".into(),
                 verification_policy: Some("replication_strict".into()),
                 input_artifact_ids: vec![],
+                required_shard_ids: vec![],
                 deadline: None,
             }),
             None,
@@ -549,6 +607,7 @@ mod tests {
                 task_kind: "inference".into(),
                 verification_policy: Some("replication_strict".into()),
                 input_artifact_ids: vec![],
+                required_shard_ids: vec![],
                 deadline: None,
             }),
             None,
@@ -1555,5 +1614,49 @@ mod tests {
             &cfg,
         );
         assert_eq!(plan.deadline_ms, 42_000);
+    }
+
+    #[test]
+    fn ingest_job_prefetch_stub_ph_s276() {
+        use crate::grid::galaxy_prefetch_metrics::{
+            prefetch_plan_total, reset_prefetch_metrics_for_test,
+        };
+
+        reset_prefetch_metrics_for_test();
+        let planned = ingest_job_prefetch_stub(&["w:missing-shard".into()], false);
+        assert_eq!(planned, 1);
+        assert_eq!(prefetch_plan_total(), 1);
+        reset_prefetch_metrics_for_test();
+    }
+
+    #[test]
+    fn ingest_job_with_required_shards_runs_prefetch_stub_ph_s276() {
+        use crate::grid::envelope::{
+            GridEnvelope, GridJobBody, GridMessage, GRID_ENVELOPE_VERSION,
+        };
+        use crate::grid::galaxy_prefetch_metrics::{
+            prefetch_plan_total, reset_prefetch_metrics_for_test,
+        };
+        use crate::job::JobStore;
+
+        reset_prefetch_metrics_for_test();
+        let jobs = JobStore::open_for_test(None);
+        let memory = MemoryShardStore::open_for_test(None);
+        let env = GridEnvelope {
+            v: GRID_ENVELOPE_VERSION,
+            sent_at: Utc::now(),
+            source_peer_id: None,
+            msg: GridMessage::Job(GridJobBody {
+                job_id: "job-prefetch-1".into(),
+                task_kind: "inference".into(),
+                verification_policy: None,
+                input_artifact_ids: vec![],
+                required_shard_ids: vec!["w:missing-shard".into()],
+                deadline: None,
+            }),
+        };
+        ingest_envelope(env, &jobs, &memory).expect("ingest");
+        assert_eq!(prefetch_plan_total(), 1);
+        reset_prefetch_metrics_for_test();
     }
 }

@@ -25,11 +25,11 @@ mod map;
 pub mod protocol_compat;
 
 pub use dispatch::{
-    coordinator_seed_inventory_snapshot, ingest_envelope, noop_prefetch_hook,
-    parse_prefetch_policy_mode, plan_prefetch, GridIngestKind, GridIngestOutcome, PrefetchPlan,
-    PrefetchPolicyConfig, PrefetchPolicyMode, PrefetchTrigger, SeedInventoryEntry,
-    SeedInventoryPeerSnapshot, DEFAULT_PREFETCH_DEADLINE_MS, ENV_LOCALITY_MODE,
-    ENV_PREFETCH_DEADLINE_MS,
+    coordinator_merged_seed_inventory, coordinator_seed_inventory_snapshot, ingest_envelope,
+    ingest_job_prefetch_stub, noop_prefetch_hook, parse_prefetch_policy_mode, plan_prefetch,
+    GridIngestKind, GridIngestOutcome, PrefetchPlan, PrefetchPolicyConfig, PrefetchPolicyMode,
+    PrefetchTrigger, SeedInventoryEntry, SeedInventoryPeerSnapshot, DEFAULT_PREFETCH_DEADLINE_MS,
+    ENV_LOCALITY_MODE, ENV_PREFETCH_DEADLINE_MS,
 };
 pub use envelope::{
     GridEnvelope, GridEnvelopeError, GridJobBody, GridMemoryShardBody, GridMessage,

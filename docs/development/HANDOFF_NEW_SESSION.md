@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-17 (PH-S273…S274 ✅ · §5.12 **8** відкритих · rust_ratio **94.34%**) · VDT
+**Оновлено:** 2026-06-17 (PH-S275…S282 ✅ · §5.12 **0** відкритих · rust_ratio **94.36%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -225,8 +225,16 @@
 **PH-S272 ✅ (docs):** INDEX §7 + ratio pointer **94.34%**.
 **PH-S273 ✅ (code/ui):** `admin_common.js` api-error wasm-first; removed `hintFor503` + JS `err.hint*` dup; audit test `ph_s273`.
 **PH-S274 ✅ (code/ui):** `admin_dom` + wasm `adminLoadingHtml`/`adminInlineErrorHtml`; `adminShowLoading`/`adminShowInlineError` wasm-first glue.
-**§5.12:** **8** відкритих (PH-S275…S282) — наступний **PH-S275**.
-**Vision ✅:** rev **206** · rust_ratio **94.34%** · hold **95%** advisory.
+**PH-S275 ✅ (code/ui):** `render_sparkline_html` + wasm `renderSparklineHtml`; `admin_charts.js` sparkline wasm-first.
+**PH-S276 ✅ (code):** `ingest_job_prefetch_stub` + `required_shard_ids` on `GridJobBody`; grid job ingest calls `plan_prefetch`.
+**PH-S277 ✅ (code):** `topology_graph.js` paint-only audit ≤100 LOC gate test `ph_s277`.
+**PH-S278 ✅ (ops):** `poolai-loc-audit` → `rust_ratio.json` **94.36%** (sprint PH-S278).
+**PH-S279 ✅ (docs):** INDEX/HANDOFF/NEXT/STABLE_STATE canon sync.
+**PH-S280 ✅ (ops):** `poolai-vision-sync --check` green.
+**PH-S281 ✅ (ops):** hold advisory `--min-ratio 0.95` snapshot **94.36%**.
+**PH-S282 ✅ (docs):** INDEX §7 + rust_ratio pointer **94.36%**.
+**§5.12:** **0** відкритих — replenish з §5.13.
+**Vision ✅:** rev **207** · rust_ratio **94.36%** · hold **95%** advisory.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

@@ -501,4 +501,15 @@ mod tests {
         assert_eq!(hub.label_x, hub.x);
         assert!((hub.label_y - (hub.y + hub.radius + LABEL_OFFSET_Y)).abs() < f64::EPSILON);
     }
+
+    #[test]
+    fn topology_graph_js_paint_only_ph_s277() {
+        let js = include_str!("../ui/topology_graph.js");
+        let loc = js.lines().count();
+        assert!(loc <= 100, "topology_graph.js LOC {loc}");
+        assert!(js.contains("PoolAiTopologyGraph"));
+        assert!(js.contains("n.label"));
+        assert!(!js.contains("forceSimulation"));
+        assert!(!js.contains("d3."));
+    }
 }

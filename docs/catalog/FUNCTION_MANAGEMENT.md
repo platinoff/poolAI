@@ -474,24 +474,24 @@ FM-xxx (з таблиці нижче)
 | 207 | **PH-S272** | Docs INDEX sprint zriz (docs) | PH-S267 | INDEX step 8 + §7 ratio pointer | **✅** |
 | 208 | **PH-S273** | admin_common api-error path slim (code) | PH-S153 | wasm-first `formatFetchError`; drop `hintFor503` JS dup | **✅** |
 | 209 | **PH-S274** | admin_common loading/error DOM wasm glue (code) | PH-S273 | `adminShowLoading` / `adminShowInlineError` → wasm | **✅** |
-| 210 | **PH-S275** | admin_charts sparkline wasm-only glue (code) | PH-S155 | slim `admin_charts.js` canvas path | відкрито |
-| 211 | **PH-S276** | Galaxy prefetch wire stub (code) | GALAXY §5.5 | `plan_prefetch` ingest stub + unit test | відкрито |
-| 212 | **PH-S277** | topology_graph.js paint-only audit (code) | PH-S157 | labels via Rust; JS ≤100 LOC gate | відкрито |
-| 213 | **PH-S278** | Rust ratio loc-audit refresh (ops) | PH-S271 | `rust_ratio.json` sprint zriz | відкрито |
-| 214 | **PH-S279** | Docs canon sync band (docs) | PH-S278 | INDEX/HANDOFF/NEXT/STABLE_STATE | відкрито |
-| 215 | **PH-S280** | poolai-vision-sync drift gate (ops) | PH-S270 | `--check` green | відкрито |
-| 216 | **PH-S281** | Ratio hold advisory snapshot (ops) | PH-S278 | `--min-ratio 0.95 --advisory` | відкрито |
-| 217 | **PH-S282** | Docs INDEX ratio maintain (docs) | PH-S279 | INDEX §7 + rust_ratio pointer | відкрито |
+| 210 | **PH-S275** | admin_charts sparkline wasm-only glue (code) | PH-S155 | slim `admin_charts.js` canvas path | **✅** |
+| 211 | **PH-S276** | Galaxy prefetch wire stub (code) | GALAXY §5.5 | `plan_prefetch` ingest stub + unit test | **✅** |
+| 212 | **PH-S277** | topology_graph.js paint-only audit (code) | PH-S157 | labels via Rust; JS ≤100 LOC gate | **✅** |
+| 213 | **PH-S278** | Rust ratio loc-audit refresh (ops) | PH-S271 | `rust_ratio.json` sprint zriz | **✅** |
+| 214 | **PH-S279** | Docs canon sync band (docs) | PH-S278 | INDEX/HANDOFF/NEXT/STABLE_STATE | **✅** |
+| 215 | **PH-S280** | poolai-vision-sync drift gate (ops) | PH-S270 | `--check` green | **✅** |
+| 216 | **PH-S281** | Ratio hold advisory snapshot (ops) | PH-S278 | `--min-ratio 0.95 --advisory` | **✅** |
+| 217 | **PH-S282** | Docs INDEX ratio maintain (docs) | PH-S279 | INDEX §7 + rust_ratio pointer | **✅** |
 
-**Відкритих у §5.12:** **8** (PH-S275…S282). **Закрито смуга:** PH-S128…S274 ✅. Vision rev **206**. rust_ratio **94.34%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S128…S282 ✅. Vision rev **207**. rust_ratio **94.36%**.
 
-**Наступна сесія:** **PH-S275** · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** replenish з **§5.13** · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S262)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-06-17):** PH-S128…S272 ✅ закрито · **0** відкритих · replenish з §5.13.
+**Активна смуга (2026-06-17):** PH-S128…S282 ✅ закрито · **0** відкритих · replenish з §5.13.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

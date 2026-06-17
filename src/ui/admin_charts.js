@@ -244,16 +244,18 @@ function poolaiRenderLineChart(metricName, data, opts) {
 function poolaiRenderSparkline(label, values, opts) {
   opts = opts || {};
   if (!values || values.length === 0) return '';
-
   var width = opts.width != null ? opts.width : 200;
   var height = opts.height != null ? opts.height : 40;
-  var padding = 4;
-  var scale = poolaiChartScale(values, width, height, padding);
+  var avgLabel = poolaiChartT('admin.dash.avg', 'Avg: ');
+  var wasm = poolaiChartsWasm();
+  if (wasm && typeof wasm.renderSparklineHtml === 'function') {
+    return wasm.renderSparklineHtml(label, JSON.stringify(values), width, height, avgLabel);
+  }
+  var scale = poolaiChartScale(values, width, height, 4);
   var avg =
     values.reduce(function (a, b) {
       return a + b;
     }, 0) / values.length;
-
   return (
     '<div class="metric-sparkline-card">' +
     '<div class="metric-sparkline-label">' +
@@ -272,7 +274,7 @@ function poolaiRenderSparkline(label, values, opts) {
     '</svg>' +
     '<div class="metric-sparkline-avg">' +
     '<span class="metric-sparkline-avg-label">' +
-    escapeHtml(poolaiChartT('admin.dash.avg', 'Avg: ')) +
+    escapeHtml(avgLabel) +
     '</span>' +
     '<strong>' +
     avg.toFixed(1) +

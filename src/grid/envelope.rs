@@ -60,6 +60,9 @@ pub struct GridJobBody {
     pub verification_policy: Option<String>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub input_artifact_ids: Vec<String>,
+    /// Shards required before execution (Galaxy §5.5 prefetch stub, PH-S276).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub required_shard_ids: Vec<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub deadline: Option<DateTime<Utc>>,
 }
@@ -182,6 +185,7 @@ mod tests {
                 task_kind: "inference".into(),
                 verification_policy: Some("replicate-3".into()),
                 input_artifact_ids: vec!["art-1".into()],
+                required_shard_ids: vec![],
                 deadline: None,
             }),
             None,

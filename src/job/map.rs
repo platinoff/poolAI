@@ -9,6 +9,7 @@ pub fn job_spec_to_grid_job(spec: &JobSpec) -> GridJobBody {
         task_kind: spec.kind.as_str().to_string(),
         verification_policy: spec.verification_policy.clone(),
         input_artifact_ids: spec.input_artifact_ids.clone(),
+        required_shard_ids: vec![],
         deadline: spec.deadline,
     }
 }

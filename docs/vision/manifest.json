@@ -1836,7 +1836,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S274",
+  "last_sprint_closed": "PH-S282",
   "layers": [
     {
       "id": "L0",
@@ -1869,7 +1869,6 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S275",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7732,7 +7731,7 @@
       "path": "crates/poolai-ui-core/src/admin_dom.rs"
     }
   ],
-  "revision": 206,
+  "revision": 207,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -9619,76 +9618,76 @@
       "acceptance": "slim `admin_charts.js` canvas path",
       "deps": "PH-S155",
       "id": "PH-S275",
-      "open": true,
+      "open": false,
       "row": 210,
-      "status": "open",
+      "status": "closed",
       "title": "admin_charts sparkline wasm-only glue (code)"
     },
     {
       "acceptance": "plan_prefetch` ingest stub + unit test",
       "deps": "GALAXY §5.5",
       "id": "PH-S276",
-      "open": true,
+      "open": false,
       "row": 211,
-      "status": "open",
+      "status": "closed",
       "title": "Galaxy prefetch wire stub (code)"
     },
     {
       "acceptance": "labels via Rust; JS ≤100 LOC gate",
       "deps": "PH-S157",
       "id": "PH-S277",
-      "open": true,
+      "open": false,
       "row": 212,
-      "status": "open",
+      "status": "closed",
       "title": "topology_graph.js paint-only audit (code)"
     },
     {
       "acceptance": "rust_ratio.json` sprint zriz",
       "deps": "PH-S271",
       "id": "PH-S278",
-      "open": true,
+      "open": false,
       "row": 213,
-      "status": "open",
+      "status": "closed",
       "title": "Rust ratio loc-audit refresh (ops)"
     },
     {
       "acceptance": "INDEX/HANDOFF/NEXT/STABLE_STATE",
       "deps": "PH-S278",
       "id": "PH-S279",
-      "open": true,
+      "open": false,
       "row": 214,
-      "status": "open",
+      "status": "closed",
       "title": "Docs canon sync band (docs)"
     },
     {
       "acceptance": "--check` green",
       "deps": "PH-S270",
       "id": "PH-S280",
-      "open": true,
+      "open": false,
       "row": 215,
-      "status": "open",
+      "status": "closed",
       "title": "poolai-vision-sync drift gate (ops)"
     },
     {
       "acceptance": "--min-ratio 0.95 --advisory",
       "deps": "PH-S278",
       "id": "PH-S281",
-      "open": true,
+      "open": false,
       "row": 216,
-      "status": "open",
+      "status": "closed",
       "title": "Ratio hold advisory snapshot (ops)"
     },
     {
       "acceptance": "INDEX §7 + rust_ratio pointer",
       "deps": "PH-S279",
       "id": "PH-S282",
-      "open": true,
+      "open": false,
       "row": 217,
-      "status": "open",
+      "status": "closed",
       "title": "Docs INDEX ratio maintain (docs)"
     }
   ],
-  "sprint_queue_open_count": 8,
+  "sprint_queue_open_count": 0,
   "updated_at": "2026-06-16",
   "vision_ui_rev": 59
 }

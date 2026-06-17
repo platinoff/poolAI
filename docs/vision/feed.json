@@ -2,77 +2,76 @@
   "description": "RSS-style ticker of FM §5.12 sprint queue (open + recent closed)",
   "items": [
     {
-      "category": "open",
-      "id": "PH-S275",
-      "link": "docs/vision/index.html#sprint-queue",
-      "next": true,
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "slim `admin_charts.js` canvas path",
-      "title": "admin_charts sparkline wasm-only glue (code)"
-    },
-    {
-      "category": "open",
-      "id": "PH-S276",
+      "category": "closed",
+      "id": "PH-S282",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
-      "status": "open",
-      "summary": "plan_prefetch` ingest stub + unit test",
-      "title": "Galaxy prefetch wire stub (code)"
+      "status": "closed",
+      "summary": "INDEX §7 + rust_ratio pointer",
+      "title": "Docs INDEX ratio maintain (docs)"
     },
     {
-      "category": "open",
-      "id": "PH-S277",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "labels via Rust; JS ≤100 LOC gate",
-      "title": "topology_graph.js paint-only audit (code)"
-    },
-    {
-      "category": "open",
-      "id": "PH-S278",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "rust_ratio.json` sprint zriz",
-      "title": "Rust ratio loc-audit refresh (ops)"
-    },
-    {
-      "category": "open",
-      "id": "PH-S279",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "INDEX/HANDOFF/NEXT/STABLE_STATE",
-      "title": "Docs canon sync band (docs)"
-    },
-    {
-      "category": "open",
-      "id": "PH-S280",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "--check` green",
-      "title": "poolai-vision-sync drift gate (ops)"
-    },
-    {
-      "category": "open",
+      "category": "closed",
       "id": "PH-S281",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
-      "status": "open",
+      "status": "closed",
       "summary": "--min-ratio 0.95 --advisory",
       "title": "Ratio hold advisory snapshot (ops)"
     },
     {
-      "category": "open",
-      "id": "PH-S282",
+      "category": "closed",
+      "id": "PH-S280",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
-      "status": "open",
-      "summary": "INDEX §7 + rust_ratio pointer",
-      "title": "Docs INDEX ratio maintain (docs)"
+      "status": "closed",
+      "summary": "--check` green",
+      "title": "poolai-vision-sync drift gate (ops)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S279",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "INDEX/HANDOFF/NEXT/STABLE_STATE",
+      "title": "Docs canon sync band (docs)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S278",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "rust_ratio.json` sprint zriz",
+      "title": "Rust ratio loc-audit refresh (ops)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S277",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "labels via Rust; JS ≤100 LOC gate",
+      "title": "topology_graph.js paint-only audit (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S276",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "plan_prefetch` ingest stub + unit test",
+      "title": "Galaxy prefetch wire stub (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S275",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "slim `admin_charts.js` canvas path",
+      "title": "admin_charts sparkline wasm-only glue (code)"
     },
     {
       "category": "closed",
@@ -109,78 +108,6 @@
       "status": "closed",
       "summary": "--min-ratio 0.95` advisory snapshot 94.34%",
       "title": "Rust ratio hold advisory refresh (ops)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S270",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--check` green after FM/HANDOFF",
-      "title": "poolai-vision-sync drift gate (ops)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S269",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "docs/vision/feed.json` sprint zriz",
-      "title": "Vision feed.json refresh (docs/vision)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S268",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "roadmap pointer; metrics ✅; live prefetch TBD",
-      "title": "Galaxy prefetch wire horizon doc (docs)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S267",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "INDEX/HANDOFF/NEXT/STABLE_STATE sync",
-      "title": "Docs canon sync band (docs)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S266",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "STRINGS core 0 inline keys; `rust_ratio.json` refresh",
-      "title": "i18n_core.js near-empty gate + loc-audit (ops)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S265",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "raid.*` keys out of `i18n_core.js",
-      "title": "Dashboard raid panel i18n slim (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S264",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "libs.*` keys out of `i18n_core.js",
-      "title": "Dashboard libs panel i18n slim (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S263",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "common.*` + residual `ui.*` → `admin_ui_common_patch",
-      "title": "Admin i18n residual ui.* + common.* slim patch (code)"
     }
   ],
   "link": "docs/vision/index.html",

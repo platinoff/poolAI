@@ -1,30 +1,30 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-17 · PH-S274 ✅ · vision **rev 206** · **8** відкритих у §5.12 · rust_ratio **94.34%** · hold **95%** advisory
+**Оновлено:** 2026-06-17 · PH-S275…S282 ✅ · vision **rev 207** · **0** відкритих у §5.12 · rust_ratio **94.36%** · hold **95%** advisory
 
-| **← наступний** | **PH-S275** — admin_charts sparkline wasm-only glue |
-| **Відкритих** | **8** (S275…S282) |
+| **← наступний** | replenish з **§5.13** (`RUST_RATIO_STRATEGY`) |
+| **Відкритих** | **0** |
 
 ---
 
 ## Copy-paste — ітераційна сесія (VDT)
 
 ```
-S0: git fetch; HANDOFF; FM §5.12 (8 відкритих); df -h /s
+S0: git fetch; HANDOFF; FM §5.12 (0 відкритих); df -h /s
 
-PH-S275: admin_charts sparkline wasm-only glue
-- scope: admin_charts.js, poolai-ui-wasm, poolai-ui-core/ml
-- cargo fmt --all → cargo test -p poolai-ui-core ml
-- FM/HANDOFF/NEXT + poolai-vision-sync --check
+Replenish §5.12 з §5.13 (max 10) — code-first Rust integration для API
+FM/HANDOFF/NEXT + poolai-vision-sync --check
 ```
 
 ---
 
-## Закрито (смуга post-S272)
+## Закрито (смуга PH-S275…S282)
 
-PH-S273 ✅ — `admin_common.js` api-error path wasm-first; removed `hintFor503` JS duplicate.
-PH-S274 ✅ — `admin_dom` Rust + wasm; `adminShowLoading` / `adminShowInlineError` wasm-first.
+PH-S275 ✅ — sparkline HTML via `poolai-ui-core`/`wasm`; `admin_charts.js` wasm-first.
+PH-S276 ✅ — `ingest_job_prefetch_stub` on grid job ingest (`required_shard_ids`).
+PH-S277 ✅ — `topology_graph.js` ≤100 LOC paint-only gate.
+PH-S278…S282 ✅ — loc-audit **94.36%**, docs canon, vision `--check`, INDEX maintain.
 
-**rust_ratio:** **94.34%** (formal 90–95% ✅; hold 95% advisory).
+**rust_ratio:** **94.36%** (formal 90–95% ✅; hold 95% advisory).
 
 **BLOCKED / Deferred:** FM-003 LAN · FM-041 Cloud SDK live.
