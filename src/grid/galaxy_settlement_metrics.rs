@@ -14,8 +14,12 @@ pub const METRIC_SETTLEMENT_PENDING_VERIFICATION_TOTAL: &str =
 /// In-process counter for settlement cleared on grid result path (mirrored on `GET /metrics`).
 pub const METRIC_SETTLEMENT_CLEARED_TOTAL: &str = "galaxy_settlement_cleared_total";
 
+/// In-process counter for settlement not applicable on grid result path (PH-S354).
+pub const METRIC_SETTLEMENT_NOT_APPLICABLE_TOTAL: &str = "galaxy_settlement_not_applicable_total";
+
 static PENDING_VERIFICATION_TOTAL: AtomicU64 = AtomicU64::new(0);
 static CLEARED_TOTAL: AtomicU64 = AtomicU64::new(0);
+static NOT_APPLICABLE_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// Record one grid result held in pending verification settlement.
 pub fn record_settlement_pending_verification() {
@@ -35,6 +39,20 @@ pub fn settlement_cleared_total() -> u64 {
     CLEARED_TOTAL.load(Ordering::Relaxed)
 }
 
+/// Record one grid result with settlement not applicable (local origin stub).
+pub fn record_settlement_not_applicable() {
+    NOT_APPLICABLE_TOTAL.fetch_add(1, Ordering::Relaxed);
+}
+
+pub fn settlement_not_applicable_total() -> u64 {
+    NOT_APPLICABLE_TOTAL.load(Ordering::Relaxed)
+}
+
+#[cfg(any(test, feature = "test-utils"))]
+pub fn reset_settlement_not_applicable_metrics_for_test() {
+    NOT_APPLICABLE_TOTAL.store(0, Ordering::Relaxed);
+}
+
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_settlement_pending_verification_metrics_for_test() {
     PENDING_VERIFICATION_TOTAL.store(0, Ordering::Relaxed);
@@ -49,6 +67,7 @@ pub fn reset_settlement_cleared_metrics_for_test() {
 pub fn reset_settlement_metrics_for_test() {
     reset_settlement_pending_verification_metrics_for_test();
     reset_settlement_cleared_metrics_for_test();
+    reset_settlement_not_applicable_metrics_for_test();
 }
 
 /// Grid result path stub: increment when settlement resolves to pending verification (PH-S178).
@@ -62,6 +81,13 @@ pub fn evaluate_result_settlement_pending_verification(settlement_status: Settle
 pub fn evaluate_result_settlement_cleared(settlement_status: SettlementStatus) {
     if settlement_status == SettlementStatus::Cleared {
         record_settlement_cleared();
+    }
+}
+
+/// Grid result path stub: increment when settlement is not applicable (PH-S354).
+pub fn evaluate_result_settlement_not_applicable(settlement_status: SettlementStatus) {
+    if settlement_status == SettlementStatus::NotApplicable {
+        record_settlement_not_applicable();
     }
 }
 
@@ -147,5 +173,18 @@ mod tests {
         assert_eq!(settlement_cleared_total(), 1);
 
         reset_settlement_cleared_metrics_for_test();
+    }
+
+    #[test]
+    fn evaluate_result_settlement_not_applicable_increments_ph_s354() {
+        let _lock = settlement_metrics_test_lock();
+        reset_settlement_not_applicable_metrics_for_test();
+        evaluate_result_settlement_not_applicable(SettlementStatus::Cleared);
+        assert_eq!(settlement_not_applicable_total(), 0);
+
+        evaluate_result_settlement_not_applicable(SettlementStatus::NotApplicable);
+        assert_eq!(settlement_not_applicable_total(), 1);
+
+        reset_settlement_not_applicable_metrics_for_test();
     }
 }

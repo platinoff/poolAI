@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-17 (PH-S343…S353 ✅ · vision rev **220** · rust_ratio **94.35%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-17 (PH-S354…S363 ✅ · vision rev **221** · rust_ratio **94.33%**) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -553,8 +553,18 @@ FM-xxx (з таблиці нижче)
 | 286 | **PH-S351** | Ratio hold advisory snapshot (ops) | PH-S348 | `--min-ratio 0.95 --advisory` | **✅** |
 | 287 | **PH-S352** | Docs INDEX ratio maintain (docs) | PH-S349 | INDEX §7 + rust_ratio pointer | **✅** |
 | 288 | **PH-S353** | monitoring dashboards/ack URL wasm (code) | PH-S347 | `buildMonitoringDashboardsUrl` + `buildMonitoringAlertAcknowledgeUrl`; `build-ui-wasm.sh` Windows cargo PATH | **✅** |
+| 289 | **PH-S354** | Galaxy settlement not applicable metric (code) | PH-S178 | `galaxy_settlement_not_applicable_total` on grid result path | **✅** |
+| 290 | **PH-S355** | admin active alerts URL wasm (code) | PH-S344 | `buildMonitoringActiveAlertsUrl` wasm glue | **✅** |
+| 291 | **PH-S356** | Galaxy verify sampling not applicable metric (code) | PH-S345 | `galaxy_verification_sample_not_applicable_total` on local origin | **✅** |
+| 292 | **PH-S357** | Stand smoke settlement + verify not applicable (tests) | PH-S354 | `/metrics` export shape | **✅** |
+| 293 | **PH-S358** | admin monitoring wasm glue tests (code) | PH-S353 | `admin_charts_*_wasm_first_ph_s353/355` gates | **✅** |
+| 294 | **PH-S359** | Rust ratio loc-audit refresh (ops) | PH-S348 | `rust_ratio.json` sprint zriz **94.33%** | **✅** |
+| 295 | **PH-S360** | Docs canon sync band (docs) | PH-S359 | INDEX/HANDOFF/NEXT/STABLE/GALAXY | **✅** |
+| 296 | **PH-S361** | poolai-vision-sync drift gate (ops) | PH-S350 | `--check` green | **✅** |
+| 297 | **PH-S362** | Ratio hold advisory snapshot (ops) | PH-S359 | `--min-ratio 0.95 --advisory` | **✅** |
+| 298 | **PH-S363** | Docs INDEX ratio maintain (docs) | PH-S360 | INDEX §7 + rust_ratio pointer | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S343…S353 ✅. Vision rev **220**. rust_ratio **94.35%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S354…S363 ✅. Vision rev **221**. rust_ratio **94.33%**.
 
 **Наступна сесія:** replenish з **§5.13** · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · або **`абракадабра`** (drain).
 
@@ -562,7 +572,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-06-17):** PH-S343…S353 ✅ закрито · **0** відкритих · replenish §5.13 або **`абракадабра`**.
+**Активна смуга (2026-06-17):** PH-S354…S363 ✅ закрито · **0** відкритих · replenish §5.13 або **`абракадабра`**.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

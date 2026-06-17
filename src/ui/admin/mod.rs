@@ -977,6 +977,13 @@ fn admin_charts_monitoring_alerts_url_wasm_first_ph_s344() {
 }
 
 #[test]
+fn admin_charts_monitoring_active_alerts_url_wasm_first_ph_s355() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("wasm.buildMonitoringActiveAlertsUrl"));
+    assert!(js.contains("acknowledged=false"));
+}
+
+#[test]
 fn admin_charts_alert_rules_url_wasm_first_ph_s347() {
     let js = include_str!("../admin_charts.js");
     assert!(js.contains("wasm.buildAlertRulesUrl"));
@@ -985,14 +992,14 @@ fn admin_charts_alert_rules_url_wasm_first_ph_s347() {
 }
 
 #[test]
-fn admin_charts_monitoring_dashboards_url_wasm_first() {
+fn admin_charts_monitoring_dashboards_url_wasm_first_ph_s353() {
     let js = include_str!("../admin_charts.js");
     assert!(js.contains("wasm.buildMonitoringDashboardsUrl"));
     assert!(js.contains("poolaiMonitoringDashboardsUrl"));
 }
 
 #[test]
-fn admin_charts_monitoring_alert_ack_url_wasm_first() {
+fn admin_charts_monitoring_alert_ack_url_wasm_first_ph_s353() {
     let js = include_str!("../admin_charts.js");
     assert!(js.contains("wasm.buildMonitoringAlertAcknowledgeUrl"));
     assert!(js.contains("poolaiMonitoringAlertAcknowledgeUrl"));
@@ -1005,6 +1012,7 @@ async fn admin_monitoring_ph_s43_ml_metrics_panel() {
     assert!(html.contains("runMlPipelineDemo"));
     assert!(html.contains("poolaiFetchMlPipelines"));
     assert!(html.contains("poolaiFetchMonitoringAlerts"));
+    assert!(html.contains("acknowledged: false"));
     assert!(html.contains("poolaiFetchAlertRules"));
     assert!(html.contains("poolaiMonitoringDashboardsUrl"));
     assert!(html.contains("poolaiMonitoringAlertAcknowledgeUrl"));

@@ -656,6 +656,7 @@ async fn smoke_galaxy_replay_pending_metrics(client: &Client, base: &str) -> Res
 const GALAXY_SETTLEMENT_METRICS: &[&str] = &[
     "galaxy_settlement_pending_verification_total",
     "galaxy_settlement_cleared_total",
+    "galaxy_settlement_not_applicable_total",
 ];
 
 fn metrics_text_has_settlement_counters(body: &str) -> Result<(), String> {
@@ -721,6 +722,7 @@ const GALAXY_VERIFICATION_METRICS: &[&str] = &[
     "galaxy_verification_sample_scheduled_total",
     "galaxy_verification_sample_completed_total",
     "galaxy_verification_sample_skipped_total",
+    "galaxy_verification_sample_not_applicable_total",
 ];
 
 fn metrics_text_has_verification_counters(body: &str) -> Result<(), String> {
@@ -1802,6 +1804,9 @@ mod tests {
             "# HELP galaxy_settlement_cleared_total Galaxy settlement cleared on grid result path (PH-S187)\n",
             "# TYPE galaxy_settlement_cleared_total gauge\n",
             "galaxy_settlement_cleared_total 0\n",
+            "# HELP galaxy_settlement_not_applicable_total Galaxy settlement not applicable on grid result path (PH-S354)\n",
+            "# TYPE galaxy_settlement_not_applicable_total gauge\n",
+            "galaxy_settlement_not_applicable_total 0\n",
         );
         metrics_text_has_settlement_counters(sample).expect("sample export");
     }
@@ -1837,6 +1842,9 @@ mod tests {
             "# HELP galaxy_verification_sample_skipped_total Galaxy verification edge samples skipped by deterministic stub (PH-S345)\n",
             "# TYPE galaxy_verification_sample_skipped_total gauge\n",
             "galaxy_verification_sample_skipped_total 0\n",
+            "# HELP galaxy_verification_sample_not_applicable_total Galaxy verification samples not applicable on local origin path (PH-S356)\n",
+            "# TYPE galaxy_verification_sample_not_applicable_total gauge\n",
+            "galaxy_verification_sample_not_applicable_total 0\n",
         );
         metrics_text_has_verification_counters(sample).expect("sample export");
     }

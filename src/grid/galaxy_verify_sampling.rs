@@ -19,12 +19,17 @@ pub const DEFAULT_VERIFY_BASE_SAMPLE_RATE: f64 = 0.05;
 
 static VERIFY_SAMPLE_SCHEDULED_TOTAL: AtomicU64 = AtomicU64::new(0);
 static VERIFY_SAMPLE_SKIPPED_TOTAL: AtomicU64 = AtomicU64::new(0);
+static VERIFY_SAMPLE_NOT_APPLICABLE_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// In-process counter for stub scheduled verification samples (grid result path).
 pub const METRIC_VERIFY_SAMPLE_SCHEDULED_TOTAL: &str = "galaxy_verification_sample_scheduled_total";
 
 /// In-process counter for edge samples not selected by deterministic stub (PH-S345).
 pub const METRIC_VERIFY_SAMPLE_SKIPPED_TOTAL: &str = "galaxy_verification_sample_skipped_total";
+
+/// In-process counter for verification sampling not applicable (local origin, PH-S356).
+pub const METRIC_VERIFY_SAMPLE_NOT_APPLICABLE_TOTAL: &str =
+    "galaxy_verification_sample_not_applicable_total";
 
 /// Coordinator verification sampling policy (env-backed stub).
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -124,7 +129,9 @@ pub fn record_verify_sampling_verdict(verdict: VerifySamplingVerdict) {
         VerifySamplingVerdict::NotSelected => {
             VERIFY_SAMPLE_SKIPPED_TOTAL.fetch_add(1, Ordering::Relaxed);
         }
-        VerifySamplingVerdict::NotApplicable => {}
+        VerifySamplingVerdict::NotApplicable => {
+            VERIFY_SAMPLE_NOT_APPLICABLE_TOTAL.fetch_add(1, Ordering::Relaxed);
+        }
     }
 }
 
@@ -138,6 +145,11 @@ pub fn verify_sample_skipped_total() -> u64 {
     VERIFY_SAMPLE_SKIPPED_TOTAL.load(Ordering::Relaxed)
 }
 
+/// Total verification samples not applicable (local origin) since process start.
+pub fn verify_sample_not_applicable_total() -> u64 {
+    VERIFY_SAMPLE_NOT_APPLICABLE_TOTAL.load(Ordering::Relaxed)
+}
+
 /// Format sample rate for the HTTP response header (6 decimal places).
 pub fn format_verify_base_sample_rate_header(rate: f64) -> String {
     format!("{rate:.6}")
@@ -147,6 +159,7 @@ pub fn format_verify_base_sample_rate_header(rate: f64) -> String {
 pub fn reset_verify_sampling_metrics_for_test() {
     VERIFY_SAMPLE_SCHEDULED_TOTAL.store(0, Ordering::Relaxed);
     VERIFY_SAMPLE_SKIPPED_TOTAL.store(0, Ordering::Relaxed);
+    VERIFY_SAMPLE_NOT_APPLICABLE_TOTAL.store(0, Ordering::Relaxed);
 }
 
 #[cfg(test)]
@@ -244,6 +257,18 @@ mod tests {
             VerifySamplingVerdict::NotSelected
         );
         assert_eq!(verify_sample_skipped_total(), 1);
+        reset_verify_sampling_metrics_for_test();
+    }
+
+    #[test]
+    fn evaluate_result_verify_sampling_not_applicable_counter_ph_s356() {
+        reset_verify_sampling_metrics_for_test();
+        let cfg = VerifySamplingConfig::default_stub();
+        assert_eq!(
+            evaluate_result_verify_sampling(Some("peer-local"), "job-local", &cfg),
+            VerifySamplingVerdict::NotApplicable
+        );
+        assert_eq!(verify_sample_not_applicable_total(), 1);
         reset_verify_sampling_metrics_for_test();
     }
 }

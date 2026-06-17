@@ -66,6 +66,8 @@ scrape_configs:
 | `galaxy_replay_pending` | gauge | Galaxy replay verifications pending coordinator verdict (PH-S176) |
 | `galaxy_settlement_pending_verification_total` | gauge | Galaxy settlement holds pending verification on grid result path (PH-S178) |
 | `galaxy_settlement_cleared_total` | gauge | Galaxy settlement cleared on grid result path (PH-S187) |
+| `galaxy_settlement_not_applicable_total` | gauge | Galaxy settlement not applicable on grid result path (PH-S354) |
+| `galaxy_verification_sample_not_applicable_total` | gauge | Galaxy verification samples not applicable on local origin path (PH-S356) |
 | `galaxy_fee_split_applied_total` | gauge | Galaxy fee split applied on grid result path (PH-S194) |
 | `galaxy_replication_strict_total` | gauge | Galaxy replication strict tier grid job ingests (PH-S179) |
 

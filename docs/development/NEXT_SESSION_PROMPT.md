@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-17 (PH-S353 ✅ · vision **rev 220** · **0** відкритих · rust_ratio **94.35%**)
+**Оновлено:** 2026-06-17 (PH-S363 ✅ · vision **rev 221** · **0** відкритих · rust_ratio **94.33%**)
 
 | **← наступний** | replenish §5.13 **або** **`абракадабра`** (drain) |
 | **Відкритих** | **0** |
@@ -30,19 +30,15 @@ S0: git fetch; HANDOFF; FM §5.12; df -h /s
 
 ---
 
-## Закрито (PH-S353 wasm follow-up)
+## Закрито (смуга PH-S354…S363)
 
-PH-S353 ✅ — monitoring dashboards + alert-ack URL wasm; `bash bin/build-ui-wasm.sh` (PATH `/c/Users/…/.cargo/bin`, `wasm32-unknown-unknown`).
+PH-S354 ✅ — `galaxy_settlement_not_applicable_total` on grid result path.
+PH-S355 ✅ — `buildMonitoringActiveAlertsUrl` wasm; monitoring page `acknowledged: false`.
+PH-S356 ✅ — `galaxy_verification_sample_not_applicable_total` on local origin stub.
+PH-S357 ✅ — stand smoke settlement + verify not-applicable `/metrics` shape.
+PH-S358 ✅ — `admin_charts_*_wasm_first_ph_s353/355` glue tests.
+PH-S359…S363 ✅ — loc-audit **94.33%**, docs canon, vision `--check`, INDEX maintain.
 
-## Закрито (смуга PH-S343…S352)
-
-PH-S343 ✅ — `galaxy_verification_sample_completed_total` on verdict path.
-PH-S344 ✅ — `buildMonitoringAlertsUrl` wasm; `poolaiFetchMonitoringAlerts` wasm-first.
-PH-S345 ✅ — `galaxy_verification_sample_skipped_total` on edge NotSelected stub.
-PH-S346 ✅ — stand smoke verification completed + skipped metrics.
-PH-S347 ✅ — `buildAlertRulesUrl` wasm; `poolaiFetchAlertRules` wasm-first.
-PH-S348…S352 ✅ — loc-audit **94.35%**, docs canon, vision `--check`, INDEX maintain.
-
-**rust_ratio:** **94.35%** (formal 90–95% ✅; hold 95% advisory).
+**rust_ratio:** **94.33%** (formal 90–95% ✅; hold 95% advisory).
 
 **BLOCKED / Deferred:** FM-003 LAN · FM-041 Cloud SDK live.

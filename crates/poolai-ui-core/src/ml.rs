@@ -483,6 +483,11 @@ pub fn build_monitoring_alerts_url(limit: u32, acknowledged: Option<bool>) -> St
     url
 }
 
+/// Mirrors active (unacknowledged) alerts list URL on monitoring page (PH-S355).
+pub fn build_monitoring_active_alerts_url(limit: u32) -> String {
+    build_monitoring_alerts_url(limit, Some(false))
+}
+
 /// Mirrors `loadAlertRules` fetch URL (PH-S347).
 pub fn build_alert_rules_url() -> String {
     "/api/enterprise/monitoring/alert-rules".to_string()
@@ -703,6 +708,14 @@ mod tests {
         assert_eq!(
             build_monitoring_alerts_url(5, Some(false)),
             "/api/enterprise/monitoring/alerts?limit=5&acknowledged=false"
+        );
+    }
+
+    #[test]
+    fn build_monitoring_active_alerts_url_ph_s355() {
+        assert_eq!(
+            build_monitoring_active_alerts_url(20),
+            "/api/enterprise/monitoring/alerts?limit=20&acknowledged=false"
         );
     }
 

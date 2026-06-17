@@ -32,7 +32,8 @@ use crate::grid::galaxy_replication::{
 use crate::grid::galaxy_replication_metrics::evaluate_job_replication_strict;
 use crate::grid::galaxy_settlement::{resolve_settlement_status, SettlementStatus};
 use crate::grid::galaxy_settlement_metrics::{
-    evaluate_result_settlement_cleared, evaluate_result_settlement_pending_verification,
+    evaluate_result_settlement_cleared, evaluate_result_settlement_not_applicable,
+    evaluate_result_settlement_pending_verification,
 };
 use crate::grid::galaxy_trust_score::{
     clamp_trust_score, evaluate_result_settlement_gate, SettlementGateVerdict, TrustScore,
@@ -575,6 +576,7 @@ fn ingest_result(
     let settlement_status = resolve_settlement_status(settlement_gate, verification_sample);
     evaluate_result_settlement_pending_verification(settlement_status);
     evaluate_result_settlement_cleared(settlement_status);
+    evaluate_result_settlement_not_applicable(settlement_status);
     evaluate_result_fee_split(body.metrics.as_ref());
     evaluate_result_replay_pending(body.metrics.as_ref(), settlement_status);
     Ok(GridIngestOutcome {

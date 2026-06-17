@@ -545,13 +545,23 @@ async function poolaiFetchMonitoringAlerts(opts) {
   var limit = opts.limit != null ? opts.limit : 20;
   try {
     var wasm = poolaiChartsWasm();
-    var url =
-      wasm && typeof wasm.buildMonitoringAlertsUrl === 'function'
-        ? wasm.buildMonitoringAlertsUrl(
-            limit,
-            opts.acknowledged != null ? opts.acknowledged : null,
-          )
-        : '/api/enterprise/monitoring/alerts?limit=' + limit;
+    var url;
+    if (opts.acknowledged === false) {
+      url =
+        wasm && typeof wasm.buildMonitoringActiveAlertsUrl === 'function'
+          ? wasm.buildMonitoringActiveAlertsUrl(limit)
+          : '/api/enterprise/monitoring/alerts?limit=' +
+            limit +
+            '&acknowledged=false';
+    } else {
+      url =
+        wasm && typeof wasm.buildMonitoringAlertsUrl === 'function'
+          ? wasm.buildMonitoringAlertsUrl(
+              limit,
+              opts.acknowledged != null ? opts.acknowledged : null,
+            )
+          : '/api/enterprise/monitoring/alerts?limit=' + limit;
+    }
     var data = await fetchJson(url);
     return data || [];
   } catch (e) {

@@ -15,7 +15,7 @@ pub async fn admin_monitoring() -> Html<String> {
       adminShowLoading('monitoring-content', T('admin.mon.loading', 'Loading monitoring…'));
       try {
         const [alerts, dashboards, mlPipelines] = await Promise.all([
-          poolaiFetchMonitoringAlerts({ limit: 20 }),
+          poolaiFetchMonitoringAlerts({ limit: 20, acknowledged: false }),
           fetchJson(poolaiMonitoringDashboardsUrl()),
           poolaiFetchMlPipelines(),
         ]);
