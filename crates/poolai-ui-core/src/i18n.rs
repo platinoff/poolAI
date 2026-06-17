@@ -1,6 +1,6 @@
-//! UI i18n subsets moved from `i18n_core.js` (PH-S154 admin jobs/grid; PH-S162 auth/dash shell; PH-S197 updates-compat; PH-S207 monitoring; PH-S211 jobs-only patch).
+//! UI i18n subsets moved from `i18n_core.js` (PH-S154 admin jobs/grid; PH-S162 auth/dash shell; PH-S197 updates-compat; PH-S207 monitoring; PH-S211 jobs-only patch; PH-S214 raid-only patch).
 //!
-//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs page uses slim `admin_jobs_patch` (PH-S211).
+//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs page uses slim `admin_jobs_patch` (PH-S211); raid page uses `admin_raid_patch` (PH-S214).
 //! Auth + dashboard shell: `window.__poolaiAuthDashI18nRust` on login, dashboard layout, admin layout (PH-S162).
 
 use std::collections::BTreeMap;
@@ -155,6 +155,231 @@ pub const ADMIN_JOBS_UK: &[I18nRow<'_>] = &[
         "admin.jobs.tooltip.statusMigrating",
         "Galaxy re-migrate: передача воркера в процесі (PH-S104).",
     ),
+];
+
+/// English RAID admin keys (subset moved from `i18n_core.js`; PH-S214).
+pub const ADMIN_RAID_EN: &[I18nRow<'_>] = &[
+    ("admin.page.raid", "RAID Management"),
+    ("admin.raidadm.loading", "Loading RAID admin…"),
+    ("admin.raidadm.loadingArt", "Loading artifacts…"),
+    ("admin.raidadm.errLoad", "Error loading RAID data: "),
+    ("admin.raidadm.unknown", "Unknown"),
+    ("admin.raidadm.strategyTitle", "RAID Strategy Status"),
+    ("admin.raidadm.clusterTitle", "Cluster status"),
+    ("admin.raidadm.raftTitle", "Raft consensus"),
+    ("admin.raidadm.label.cluster", "Cluster:"),
+    ("admin.raidadm.label.nodes", "Nodes:"),
+    ("admin.raidadm.label.artCount", "Artifacts:"),
+    ("admin.raidadm.label.storageUse", "Storage used:"),
+    ("admin.raidadm.label.replStatus", "Replication:"),
+    ("admin.raidadm.label.raftRole", "Role:"),
+    ("admin.raidadm.label.raftTerm", "Term:"),
+    ("admin.raidadm.label.raftLeader", "Leader ID:"),
+    (
+        "admin.raidadm.raftAbsent",
+        "Raft not attached (build without consensus or node not initialized).",
+    ),
+    ("admin.raidadm.label.mode", "Mode:"),
+    ("admin.raidadm.label.init", "Initialized:"),
+    ("admin.raidadm.label.active", "Active:"),
+    ("admin.raidadm.label.rebal", "Rebalancing Enabled:"),
+    ("admin.raidadm.burstTitle", "BurstRAID Metrics"),
+    ("admin.raidadm.label.totalArt", "Total Artifacts:"),
+    ("admin.raidadm.label.artBurst", "Artifacts in Burst:"),
+    ("admin.raidadm.label.repl", "Replication (base / max):"),
+    ("admin.raidadm.label.totalReq", "Total Requests:"),
+    ("admin.raidadm.label.burstRps", "Burst threshold (RPS):"),
+    ("admin.raidadm.label.swRepl", "Base replication:"),
+    (
+        "admin.raidadm.burstInactive",
+        "BurstRAID strategy not active on this node.",
+    ),
+    (
+        "admin.raidadm.swInactive",
+        "SmallWorld strategy not active on this node.",
+    ),
+    ("admin.raidadm.sparkBurstPct", "Burst load %"),
+    ("admin.raidadm.sparkClust", "Avg clustering ×100"),
+    ("admin.raidadm.btn.rebalance", "Rebalance"),
+    ("admin.raidadm.swTitle", "SmallWorld Network Metrics"),
+    ("admin.raidadm.label.totalNodes", "Total Nodes:"),
+    (
+        "admin.raidadm.label.avgClust",
+        "Avg Clustering Coefficient:",
+    ),
+    ("admin.raidadm.label.tgtClust", "Target Clustering:"),
+    (
+        "admin.raidadm.confirmRebal",
+        "Are you sure you want to trigger RAID rebalancing? This may impact system performance.",
+    ),
+    ("admin.raidadm.rebalOk", "Rebalancing triggered successfully"),
+    ("admin.raidadm.emptyArt", "No artifacts found"),
+    ("admin.raidadm.col.id", "ID"),
+    ("admin.raidadm.col.name", "Name"),
+    ("admin.raidadm.col.size", "Size"),
+    ("admin.raidadm.snapshotTitle", "Current Snapshot"),
+    ("admin.raidadm.seq", "Sequence:"),
+    ("admin.raidadm.created", "Created:"),
+    ("admin.raidadm.restoreBtn", "Restore from Snapshot"),
+    ("admin.raidadm.noSnap", "No snapshot available"),
+    ("admin.raidadm.artTitle", "Artifacts"),
+    ("admin.raidadm.section", "RAID Artifacts"),
+    ("admin.raidadm.btn.upload", "Upload Artifact"),
+    ("admin.raidadm.btn.snapshot", "Create Snapshot"),
+    ("admin.raidadm.btn.sync", "Sync Artifacts"),
+    ("admin.raidadm.btn.gc", "Run GC"),
+    ("admin.raidadm.uploadTitle", "Upload Artifact"),
+    ("admin.raidadm.label.artName", "Artifact Name"),
+    ("admin.raidadm.ph.artName", "my-artifact"),
+    ("admin.raidadm.label.artData", "Artifact Data (Base64)"),
+    ("admin.raidadm.ph.b64", "Paste base64-encoded data here"),
+    (
+        "admin.raidadm.hint.b64",
+        "Paste base64-encoded artifact data",
+    ),
+    ("admin.raidadm.uploading", "Uploading…"),
+    ("admin.raidadm.reqNameData", "Name and data are required"),
+    ("admin.raidadm.uploadOk", "Artifact uploaded successfully"),
+    (
+        "admin.raidadm.confirmDelArt",
+        "Delete artifact \"{id}\"? This action cannot be undone.",
+    ),
+    ("admin.raidadm.delOk", "Artifact deleted successfully"),
+    (
+        "admin.raidadm.confirmSnap",
+        "Create a new snapshot? This will capture the current state of all artifacts.",
+    ),
+    ("admin.raidadm.snapOk", "Snapshot created successfully"),
+    ("admin.raidadm.errSnap", "Error creating snapshot: "),
+    (
+        "admin.raidadm.confirmRestore",
+        "Restore from snapshot? This will restore the RAID state from the latest snapshot. This action cannot be undone.",
+    ),
+    ("admin.raidadm.restoring", "Restoring from snapshot…"),
+    ("admin.raidadm.restoreOk", "Restored from snapshot successfully"),
+    ("admin.raidadm.errRestore", "Error restoring from snapshot: "),
+    ("admin.raidadm.syncOk", "Artifacts sync started"),
+    ("admin.raidadm.errSync", "Error syncing artifacts: "),
+    (
+        "admin.raidadm.confirmGc",
+        "Run garbage collection? This will remove old artifacts that are no longer referenced.",
+    ),
+    (
+        "admin.raidadm.gcOk",
+        "Garbage collection completed. Removed {n} artifacts.",
+    ),
+    ("admin.raidadm.errGc", "Error running GC: "),
+];
+
+/// Ukrainian RAID admin keys (PH-S214).
+pub const ADMIN_RAID_UK: &[I18nRow<'_>] = &[
+    ("admin.page.raid", "Керування RAID"),
+    ("admin.raidadm.loading", "Завантаження RAID…"),
+    ("admin.raidadm.loadingArt", "Завантаження артефактів…"),
+    ("admin.raidadm.errLoad", "Помилка завантаження RAID: "),
+    ("admin.raidadm.unknown", "Невідомо"),
+    ("admin.raidadm.strategyTitle", "Статус стратегії RAID"),
+    ("admin.raidadm.clusterTitle", "Статус кластера"),
+    ("admin.raidadm.raftTitle", "Raft консенсус"),
+    ("admin.raidadm.label.cluster", "Кластер:"),
+    ("admin.raidadm.label.nodes", "Вузли:"),
+    ("admin.raidadm.label.artCount", "Артефакти:"),
+    ("admin.raidadm.label.storageUse", "Сховище:"),
+    ("admin.raidadm.label.replStatus", "Реплікація:"),
+    ("admin.raidadm.label.raftRole", "Роль:"),
+    ("admin.raidadm.label.raftTerm", "Термін:"),
+    ("admin.raidadm.label.raftLeader", "ID лідера:"),
+    (
+        "admin.raidadm.raftAbsent",
+        "Raft не підключено (збірка без консенсусу або вузол не ініціалізовано).",
+    ),
+    ("admin.raidadm.label.mode", "Режим:"),
+    ("admin.raidadm.label.init", "Ініціалізовано:"),
+    ("admin.raidadm.label.active", "Активно:"),
+    ("admin.raidadm.label.rebal", "Ребалансування:"),
+    ("admin.raidadm.burstTitle", "Метрики BurstRAID"),
+    ("admin.raidadm.label.totalArt", "Усього артефактів:"),
+    ("admin.raidadm.label.artBurst", "У burst:"),
+    ("admin.raidadm.label.repl", "Реплікація (база / макс):"),
+    ("admin.raidadm.label.totalReq", "Усього запитів:"),
+    ("admin.raidadm.label.burstRps", "Поріг burst (RPS):"),
+    ("admin.raidadm.label.swRepl", "Базова реплікація:"),
+    (
+        "admin.raidadm.burstInactive",
+        "Стратегія BurstRAID не активна на цьому вузлі.",
+    ),
+    (
+        "admin.raidadm.swInactive",
+        "Стратегія SmallWorld не активна на цьому вузлі.",
+    ),
+    ("admin.raidadm.sparkBurstPct", "Навантаження burst %"),
+    ("admin.raidadm.sparkClust", "Середній clustering ×100"),
+    ("admin.raidadm.btn.rebalance", "Ребаланс"),
+    ("admin.raidadm.swTitle", "Мережа SmallWorld"),
+    ("admin.raidadm.label.totalNodes", "Усього вузлів:"),
+    ("admin.raidadm.label.avgClust", "Сер. коеф. кластеризації:"),
+    ("admin.raidadm.label.tgtClust", "Цільовий коеф.:"),
+    (
+        "admin.raidadm.confirmRebal",
+        "Запустити ребалансування RAID? Можливе навантаження на систему.",
+    ),
+    ("admin.raidadm.rebalOk", "Ребалансування запущено"),
+    ("admin.raidadm.emptyArt", "Артефактів не знайдено"),
+    ("admin.raidadm.col.id", "ID"),
+    ("admin.raidadm.col.name", "Назва"),
+    ("admin.raidadm.col.size", "Розмір"),
+    ("admin.raidadm.snapshotTitle", "Поточний знімок"),
+    ("admin.raidadm.seq", "Послідовність:"),
+    ("admin.raidadm.created", "Створено:"),
+    ("admin.raidadm.restoreBtn", "Відновити зі знімка"),
+    ("admin.raidadm.noSnap", "Знімка недоступна"),
+    ("admin.raidadm.artTitle", "Артефакти"),
+    ("admin.raidadm.section", "Артефакти RAID"),
+    ("admin.raidadm.btn.upload", "Завантажити артефакт"),
+    ("admin.raidadm.btn.snapshot", "Створити знімок"),
+    ("admin.raidadm.btn.sync", "Синхронізувати"),
+    ("admin.raidadm.btn.gc", "Збір сміття"),
+    ("admin.raidadm.uploadTitle", "Завантажити артефакт"),
+    ("admin.raidadm.label.artName", "Назва артефакту"),
+    ("admin.raidadm.ph.artName", "my-artifact"),
+    ("admin.raidadm.label.artData", "Дані (Base64)"),
+    ("admin.raidadm.ph.b64", "Вставте дані в Base64"),
+    (
+        "admin.raidadm.hint.b64",
+        "Дані артефакту в кодуванні Base64",
+    ),
+    ("admin.raidadm.uploading", "Завантаження…"),
+    ("admin.raidadm.reqNameData", "Потрібні назва і дані"),
+    ("admin.raidadm.uploadOk", "Артефакт завантажено"),
+    (
+        "admin.raidadm.confirmDelArt",
+        "Видалити артефакт «{id}»? Дію не скасувати.",
+    ),
+    ("admin.raidadm.delOk", "Артефакт видалено"),
+    (
+        "admin.raidadm.confirmSnap",
+        "Створити знімок поточного стану всіх артефактів?",
+    ),
+    ("admin.raidadm.snapOk", "Знімок створено"),
+    ("admin.raidadm.errSnap", "Помилка створення знімка: "),
+    (
+        "admin.raidadm.confirmRestore",
+        "Відновити зі знімка? Стан RAID буде замінено. Дію не скасувати.",
+    ),
+    ("admin.raidadm.restoring", "Відновлення зі знімка…"),
+    ("admin.raidadm.restoreOk", "Відновлено зі знімка"),
+    ("admin.raidadm.errRestore", "Помилка відновлення: "),
+    ("admin.raidadm.syncOk", "Синхронізацію розпочато"),
+    ("admin.raidadm.errSync", "Помилка синхронізації: "),
+    (
+        "admin.raidadm.confirmGc",
+        "Запустити збір сміття? Старі непотрібні артефакти будуть видалені.",
+    ),
+    (
+        "admin.raidadm.gcOk",
+        "Збір сміття завершено. Видалено артефактів: {n}.",
+    ),
+    ("admin.raidadm.errGc", "Помилка GC: "),
 ];
 
 /// Ukrainian grid-pricing keys (PH-S211).
@@ -706,6 +931,24 @@ pub fn admin_jobs_patch_script() -> String {
     format!("window.__poolaiAdminI18nRust={};", admin_jobs_patch_json())
 }
 
+/// `{"en":{...},"uk":{...}}` patch — raid page only (PH-S214).
+pub fn admin_raid_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_RAID_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_RAID_UK));
+    root
+}
+
+/// JSON literal for raid-only admin patch.
+pub fn admin_raid_patch_json() -> String {
+    serde_json::to_string(&admin_raid_patch()).expect("admin raid i18n patch serializes")
+}
+
+/// Inline script for raid admin layout (PH-S214).
+pub fn admin_raid_patch_script() -> String {
+    format!("window.__poolaiAdminI18nRust={};", admin_raid_patch_json())
+}
+
 /// `{"en":{...},"uk":{...}}` patch object for `window.__poolaiAdminI18nRust`.
 pub fn admin_jobs_grid_patch() -> BTreeMap<String, BTreeMap<String, String>> {
     let mut en = rows_to_map(ADMIN_JOBS_EN);
@@ -832,6 +1075,27 @@ mod tests {
         assert!(json.contains(r#""admin.page.jobs""#));
         assert!(!json.contains(r#""admin.gridPricing.col.price""#));
         assert!(!json.contains(r#""admin.mon.mlTitle""#));
+    }
+
+    #[test]
+    fn raid_patch_has_matching_en_uk_key_counts_ph_s214() {
+        assert_eq!(ADMIN_RAID_EN.len(), ADMIN_RAID_UK.len());
+    }
+
+    #[test]
+    fn raid_patch_json_raid_only_ph_s214() {
+        let json = admin_raid_patch_json();
+        assert!(json.contains(r#""admin.page.raid""#));
+        assert!(json.contains(r#""admin.raidadm.section""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+        assert!(!json.contains(r#""admin.gridPricing.col.price""#));
+    }
+
+    #[test]
+    fn raid_patch_script_assigns_window_patch_ph_s214() {
+        let script = admin_raid_patch_script();
+        assert!(script.starts_with("window.__poolaiAdminI18nRust="));
+        assert!(script.ends_with(';'));
     }
 
     #[test]

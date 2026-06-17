@@ -1,8 +1,9 @@
 //! RAID Management page
 //!
 //! Provides artifact storage and replication management.
+//! PH-S214: raid page uses slim `admin_layout_raid` + `admin_raid_patch`.
 
-use crate::ui::admin::admin_layout;
+use crate::ui::admin::admin_layout_raid;
 use axum::response::Html;
 
 /// RAID management page
@@ -495,7 +496,7 @@ pub async fn admin_raid() -> Html<String> {
     setInterval(loadRaidData, 10000);
     "#;
 
-    admin_layout(
+    admin_layout_raid(
         "admin.page.raid",
         "RAID Management",
         r#"
@@ -540,4 +541,14 @@ pub async fn admin_raid() -> Html<String> {
         "#,
         script,
     )
+}
+
+#[tokio::test]
+async fn admin_raid_page_slim_raid_i18n_patch_ph_s214() {
+    let html = admin_raid().await.0;
+    assert!(html.contains("window.__poolaiAdminI18nRust="));
+    assert!(html.contains(r#""admin.page.raid""#));
+    assert!(html.contains(r#""admin.raidadm.section""#));
+    assert!(!html.contains(r#""admin.jobs.leaseState.active""#));
+    assert!(!html.contains(r#""admin.gridPricing.col.price""#));
 }
