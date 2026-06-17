@@ -3,18 +3,9 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S223",
-      "link": "docs/vision/index.html#sprint-queue",
-      "next": true,
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "admin.lib.*` → `poolai-ui-core",
-      "title": "Admin i18n slim libs panel (code)"
-    },
-    {
-      "category": "open",
       "id": "PH-S224",
       "link": "docs/vision/index.html#sprint-queue",
+      "next": true,
       "published": "2026-05-28",
       "status": "open",
       "summary": "galaxy_pricing_cache_age_seconds` on `/metrics",
@@ -46,6 +37,15 @@
       "status": "open",
       "summary": "manifest ↔ `.mdc` cross-link drift",
       "title": "Vision VDT rules docs autosync audit (docs/vision)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S223",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "admin.lib.*` → `poolai-ui-core",
+      "title": "Admin i18n slim libs panel (code)"
     },
     {
       "category": "closed",
@@ -145,15 +145,6 @@
       "status": "closed",
       "summary": "prefers-reduced-motion` → skip glow/animation; rev++",
       "title": "Vision reduced-motion map FX (docs/vision)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S211",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "admin.jobs.*` → `poolai-ui-core`; slim `i18n_core.js",
-      "title": "Admin i18n slim jobs panel (code)"
     }
   ],
   "link": "docs/vision/index.html",

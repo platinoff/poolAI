@@ -205,6 +205,24 @@ pub fn admin_layout_workers(
     )
 }
 
+/// Libraries admin page layout — slim `admin.lib.*` Rust i18n patch only (PH-S223).
+pub fn admin_layout_libs(
+    title_i18n_key: &str,
+    title_fallback: &str,
+    body_html: &str,
+    script_js: &str,
+) -> Html<String> {
+    let i18n_patch = poolai_ui_core::i18n::admin_libs_patch_script();
+    admin_layout_with_module_script(
+        title_i18n_key,
+        title_fallback,
+        body_html,
+        POOLAI_UI_WASM_MODULE,
+        script_js,
+        &i18n_patch,
+    )
+}
+
 /// Like [`admin_layout`] but inserts a `<script type="module">` before the page IIFE (PH-S151 wasm wiring).
 pub fn admin_layout_with_module_script(
     title_i18n_key: &str,

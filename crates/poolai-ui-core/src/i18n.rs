@@ -1,6 +1,6 @@
 //! UI i18n subsets moved from `i18n_core.js` (PH-S154 admin jobs/grid; PH-S162 auth/dash shell; PH-S197 updates-compat; PH-S207 monitoring; PH-S211 jobs-only patch; PH-S214 raid-only patch; PH-S217 grid-pricing-only patch).
 //!
-//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs page uses slim `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221); workers — `admin_workers_patch` (PH-S222).
+//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs — `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221); workers — `admin_workers_patch` (PH-S222); libs — `admin_libs_patch` (PH-S223).
 //! Auth + dashboard shell: `window.__poolaiAuthDashI18nRust` on login, dashboard layout, admin layout (PH-S162).
 
 use std::collections::BTreeMap;
@@ -742,6 +742,93 @@ pub const ADMIN_WORKERS_UK: &[I18nRow<'_>] = &[
     ("admin.wrk.resourceMon", "Моніторинг ресурсів"),
 ];
 
+/// English libraries admin keys (PH-S223; moved from `i18n_core.js`).
+pub const ADMIN_LIBS_EN: &[I18nRow<'_>] = &[
+    ("admin.page.libs", "Library Management"),
+    ("admin.lib.loading", "Loading libraries…"),
+    ("admin.lib.errLoad", "Error loading libraries: "),
+    ("admin.lib.empty", "No libraries found"),
+    ("admin.lib.installed", "Installed"),
+    ("admin.lib.notInstalled", "Not Installed"),
+    (
+        "admin.lib.promptInstall",
+        "Enter version to install (leave empty for latest):",
+    ),
+    (
+        "admin.lib.promptUpdate",
+        "Enter version to update to (leave empty for latest):",
+    ),
+    ("admin.lib.installStart", "Library installation started"),
+    ("admin.lib.errInstall", "Error installing library: "),
+    (
+        "admin.lib.confirmUn",
+        "Uninstall library \"{name}\"? This action cannot be undone.",
+    ),
+    ("admin.lib.uninstOk", "Library uninstalled successfully"),
+    ("admin.lib.updateStart", "Library update started"),
+    ("admin.lib.errUpdate", "Error updating library: "),
+    ("admin.lib.section", "Libraries"),
+    ("admin.lib.uploadBtn", "Upload Library"),
+    ("admin.lib.uploadTitle", "Upload Library"),
+    ("admin.lib.label.name", "Library Name"),
+    ("admin.lib.label.version", "Version"),
+    ("admin.lib.label.file", "Library File (e.g., .zip, .tar.gz)"),
+    ("admin.lib.ph.name", "my-model-lib"),
+    ("admin.lib.ph.version", "1.0.0"),
+    ("admin.lib.uploading", "Uploading…"),
+    (
+        "admin.lib.reqFields",
+        "Name, version, and file are required",
+    ),
+    ("admin.lib.uploadOk", "Library uploaded successfully"),
+    ("admin.lib.errUpload", "Error uploading library: "),
+];
+
+/// Ukrainian libraries admin keys (PH-S223).
+pub const ADMIN_LIBS_UK: &[I18nRow<'_>] = &[
+    ("admin.page.libs", "Керування бібліотеками"),
+    ("admin.lib.loading", "Завантаження бібліотек…"),
+    ("admin.lib.errLoad", "Помилка завантаження бібліотек: "),
+    ("admin.lib.empty", "Бібліотек не знайдено"),
+    ("admin.lib.installed", "Встановлено"),
+    ("admin.lib.notInstalled", "Не встановлено"),
+    (
+        "admin.lib.promptInstall",
+        "Версія для встановлення (порожньо — остання):",
+    ),
+    (
+        "admin.lib.promptUpdate",
+        "Версія для оновлення (порожньо — остання):",
+    ),
+    (
+        "admin.lib.installStart",
+        "Встановлення бібліотеки розпочато",
+    ),
+    ("admin.lib.errInstall", "Помилка встановлення: "),
+    (
+        "admin.lib.confirmUn",
+        "Видалити бібліотеку «{name}»? Дію не скасувати.",
+    ),
+    ("admin.lib.uninstOk", "Бібліотеку видалено"),
+    ("admin.lib.updateStart", "Оновлення бібліотеки розпочато"),
+    ("admin.lib.errUpdate", "Помилка оновлення: "),
+    ("admin.lib.section", "Бібліотеки"),
+    ("admin.lib.uploadBtn", "Завантажити бібліотеку"),
+    ("admin.lib.uploadTitle", "Завантажити бібліотеку"),
+    ("admin.lib.label.name", "Назва бібліотеки"),
+    ("admin.lib.label.version", "Версія"),
+    (
+        "admin.lib.label.file",
+        "Файл бібліотеки (.zip, .tar.gz тощо)",
+    ),
+    ("admin.lib.ph.name", "my-model-lib"),
+    ("admin.lib.ph.version", "1.0.0"),
+    ("admin.lib.uploading", "Завантаження…"),
+    ("admin.lib.reqFields", "Потрібні назва, версія і файл"),
+    ("admin.lib.uploadOk", "Бібліотеку завантажено"),
+    ("admin.lib.errUpload", "Помилка завантаження: "),
+];
+
 /// English auth keys (login, OAuth, bootstrap banner, lang toggle).
 pub const AUTH_SHELL_EN: &[I18nRow<'_>] = &[
     ("auth.pageTitle", "Login - PoolAI"),
@@ -1077,6 +1164,22 @@ pub fn admin_workers_patch_script() -> String {
     )
 }
 
+/// Libraries admin page — slim `admin.lib.*` patch only (PH-S223).
+pub fn admin_libs_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_LIBS_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_LIBS_UK));
+    root
+}
+
+pub fn admin_libs_patch_json() -> String {
+    serde_json::to_string(&admin_libs_patch()).expect("admin libs i18n patch serializes")
+}
+
+pub fn admin_libs_patch_script() -> String {
+    format!("window.__poolaiAdminI18nRust={};", admin_libs_patch_json())
+}
+
 /// Default admin layout — slim `admin.jobs.*` patch only (PH-S221; updates-compat on dedicated page).
 pub fn admin_jobs_grid_patch() -> BTreeMap<String, BTreeMap<String, String>> {
     let mut root = BTreeMap::new();
@@ -1172,6 +1275,7 @@ mod tests {
         assert_eq!(ADMIN_UPDATES_COMPAT_EN.len(), ADMIN_UPDATES_COMPAT_UK.len());
         assert_eq!(ADMIN_MONITORING_EN.len(), ADMIN_MONITORING_UK.len());
         assert_eq!(ADMIN_WORKERS_EN.len(), ADMIN_WORKERS_UK.len());
+        assert_eq!(ADMIN_LIBS_EN.len(), ADMIN_LIBS_UK.len());
         let patch = admin_jobs_grid_patch();
         assert_eq!(patch["en"].len(), ADMIN_JOBS_EN.len());
         assert_eq!(patch["uk"].len(), ADMIN_JOBS_UK.len());
@@ -1244,6 +1348,21 @@ mod tests {
         assert!(json.contains(r#""admin.mon.mlTitle""#));
         assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
         assert!(!json.contains(r#""admin.updatesCompat.section""#));
+    }
+
+    #[test]
+    fn libs_patch_has_matching_en_uk_key_counts_ph_s223() {
+        assert_eq!(ADMIN_LIBS_EN.len(), ADMIN_LIBS_UK.len());
+    }
+
+    #[test]
+    fn libs_patch_json_libs_only_ph_s223() {
+        let json = admin_libs_patch_json();
+        assert!(json.contains(r#""admin.page.libs""#));
+        assert!(json.contains(r#""admin.lib.section""#));
+        assert!(json.contains(r#""admin.lib.uploadBtn""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+        assert!(!json.contains(r#""admin.wrk.loading""#));
     }
 
     #[test]

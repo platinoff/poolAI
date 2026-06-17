@@ -1,8 +1,8 @@
 //! Library Management page
 //!
-//! Provides model library administration.
+//! PH-S223: libs page uses slim `admin_layout_libs` + `admin_libs_patch`.
 
-use crate::ui::admin::admin_layout;
+use crate::ui::admin::admin_layout_libs;
 use axum::response::Html;
 
 /// Library management page
@@ -216,7 +216,7 @@ pub async fn admin_libs() -> Html<String> {
     setInterval(loadLibraries, 10000);
     "#;
 
-    admin_layout(
+    admin_layout_libs(
         "admin.page.libs",
         "Library Management",
         r#"
@@ -257,4 +257,14 @@ pub async fn admin_libs() -> Html<String> {
         "#,
         script,
     )
+}
+
+#[tokio::test]
+async fn admin_libs_page_slim_libs_i18n_patch_ph_s223() {
+    let html = admin_libs().await.0;
+    assert!(html.contains("window.__poolaiAdminI18nRust="));
+    assert!(html.contains(r#""admin.page.libs""#));
+    assert!(html.contains(r#""admin.lib.section""#));
+    assert!(!html.contains(r#""admin.jobs.leaseState.active""#));
+    assert!(!html.contains(r#""admin.wrk.loading""#));
 }
