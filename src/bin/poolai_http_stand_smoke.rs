@@ -389,6 +389,39 @@ async fn smoke_galaxy_pricing_cache_age_metrics(client: &Client, base: &str) -> 
     metrics_text_has_pricing_cache_age(&body)
 }
 
+/// PH-S225: live stand exposes Galaxy verification counters on Prometheus scrape.
+const GALAXY_VERIFICATION_METRICS: &[&str] = &[
+    "galaxy_verification_sample_total",
+    "galaxy_verification_mismatch_total",
+    "galaxy_verification_match_total",
+    "galaxy_verification_sample_scheduled_total",
+];
+
+fn metrics_text_has_verification_counters(body: &str) -> Result<(), String> {
+    for name in GALAXY_VERIFICATION_METRICS {
+        if !body.contains(name) {
+            return Err(format!("/metrics missing {name}"));
+        }
+        if !body.contains(&format!("# TYPE {name} gauge")) {
+            return Err(format!("/metrics missing TYPE gauge for {name}"));
+        }
+    }
+    Ok(())
+}
+
+async fn smoke_galaxy_verification_metrics(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("/metrics request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("/metrics status {}", resp.status()));
+    }
+    let body = resp.text().await.map_err(|e| e.to_string())?;
+    metrics_text_has_verification_counters(&body)
+}
+
 /// PH-S219: live stand exposes Galaxy trust payout counters on Prometheus scrape.
 const GALAXY_TRUST_PAYOUT_METRICS: &[&str] = &[
     "galaxy_trust_payout_eligible_total",
@@ -1012,6 +1045,12 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
     .await;
     record(
         &mut cases,
+        "galaxy_verification_metrics",
+        smoke_galaxy_verification_metrics(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
         "galaxy_trust_payout_metrics",
         smoke_galaxy_trust_payout_metrics(&client, &cli.base_url).await,
     )
@@ -1224,6 +1263,25 @@ mod tests {
             "galaxy_pricing_cache_age_seconds 0\n",
         );
         metrics_text_has_pricing_cache_age(sample).expect("sample export");
+    }
+
+    #[test]
+    fn galaxy_verification_metrics_export_shape_ph_s225() {
+        let sample = concat!(
+            "# HELP galaxy_verification_sample_total Galaxy verification samples scheduled on grid result path (PH-S177)\n",
+            "# TYPE galaxy_verification_sample_total gauge\n",
+            "galaxy_verification_sample_total 0\n",
+            "# HELP galaxy_verification_mismatch_total Galaxy verification digest mismatches on grid result path (PH-S175)\n",
+            "# TYPE galaxy_verification_mismatch_total gauge\n",
+            "galaxy_verification_mismatch_total 0\n",
+            "# HELP galaxy_verification_match_total Galaxy verification digest matches on grid result path (PH-S180)\n",
+            "# TYPE galaxy_verification_match_total gauge\n",
+            "galaxy_verification_match_total 0\n",
+            "# HELP galaxy_verification_sample_scheduled_total Galaxy verification stub samples scheduled on grid result path (PH-S164; PH-S186 /metrics)\n",
+            "# TYPE galaxy_verification_sample_scheduled_total gauge\n",
+            "galaxy_verification_sample_scheduled_total 0\n",
+        );
+        metrics_text_has_verification_counters(sample).expect("sample export");
     }
 
     #[test]

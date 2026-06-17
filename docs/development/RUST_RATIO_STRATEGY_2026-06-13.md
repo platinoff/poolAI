@@ -174,7 +174,7 @@ flowchart TB
 | 79 | **PH-S222** | Admin i18n slim workers panel | code | **✅** |
 | 80 | **PH-S223** | Admin i18n slim libs panel | code | **✅** |
 | 81 | **PH-S224** | Galaxy pricing cache age metrics smoke | tests | **✅** |
-| 82 | **PH-S225** | Galaxy verification sample metrics smoke | tests | відкрито |
+| 82 | **PH-S225** | Galaxy verification sample metrics smoke | tests | **✅** |
 | 83 | **PH-S226** | Vision sprint-queue → map focus | docs/vision | відкрито |
 | 84 | **PH-S227** | Vision VDT rules docs autosync audit | docs/vision | відкрито |
 

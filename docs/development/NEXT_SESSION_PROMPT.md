@@ -1,29 +1,28 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-16 · PH-S224 ✅ · vision **rev 171** · **3** відкритих (PH-S225…S227) · **hold 95%** · **stretch spirit 96%**
+**Оновлено:** 2026-06-16 · PH-S225 ✅ · vision **rev 172** · **2** відкритих (PH-S226…S227) · **hold 95%** · **stretch spirit 96%**
 
-| **← наступний** | **PH-S225** — Galaxy verification sample metrics smoke |
-| **Відкритих** | **3** (PH-S225…S227) |
+| **← наступний** | **PH-S226** — Vision sprint-queue → map focus |
+| **Відкритих** | **2** (PH-S226…S227) |
 | **VDT** | один PH-S* = 1 commit (code) + docs sync |
 
 ---
 
-## Зріз §5.12 (3 відкритих: PH-S225…S227)
+## Зріз §5.12 (2 відкритих: PH-S226…S227)
 
 ### Закрито недавно ✅
 
 | Sprint | Scope | Зріз |
 |--------|-------|------|
-| PH-S224 | Galaxy pricing cache age metrics smoke | `galaxy_pricing_cache_age_seconds` on `/metrics` |
-| PH-S223 | Admin i18n slim libs panel | `admin.lib.*` → `admin_libs_patch` |
+| PH-S225 | Galaxy verification sample metrics smoke | verification gauges on `/metrics` |
+| PH-S224 | Galaxy pricing cache age metrics smoke | `galaxy_pricing_cache_age_seconds` |
 
-### Відкрито (PH-S225…S227)
+### Відкрито
 
 | # | Sprint | Scope |
 |---|--------|-------|
-| 1 | **PH-S225** | Galaxy verification sample metrics smoke |
-| 2 | PH-S226 | Vision sprint-queue → map focus |
-| 3 | PH-S227 | Vision VDT rules docs autosync audit |
+| 1 | **PH-S226** | Vision sprint-queue → map focus |
+| 2 | PH-S227 | Vision VDT rules docs autosync audit |
 
 ---
 
@@ -40,20 +39,20 @@ export K8S_OPENAPI_ENABLED_VERSION=1.28
 
 ---
 
-## PH-S225 — scope
+## PH-S226 — scope
 
-- `poolai-http-stand-smoke` — verification counters on live `/metrics` (PH-S177 pattern)
-- Acceptance: FM/HANDOFF/NEXT; `cargo test --bin poolai-http-stand-smoke ph_s225`; push
+- `docs/vision/vision.js` — click sprint-queue item focuses/selects map node
+- Acceptance: FM/HANDOFF/NEXT; rev++; `poolai-vision-sync --check`; push
 
 ---
 
-## Copy-paste — PH-S225
+## Copy-paste — PH-S226
 
 ```
 PoolAI VDT · один PH-S* · main · MSYS2 PATH · git-push.md
 
 S0: git fetch · HANDOFF · FM §5.12 · df -h /s
 
-PH-S225 — Galaxy verification sample metrics smoke (tests)
-Scope: stand smoke verification counters on /metrics; cargo test; FM/HANDOFF/NEXT; vision-sync; commit+push
+PH-S226 — Vision sprint-queue → map focus (docs/vision)
+Scope: queue click → map node select; rev++; poolai-vision-sync --check; FM/HANDOFF/NEXT; commit+push
 ```
