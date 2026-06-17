@@ -462,18 +462,28 @@ FM-xxx (з таблиці нижче)
 | 195 | **PH-S260** | Admin i18n shared ui toolbar slim patch (code) | PH-S252 | `ui.save`/`ui.search*`/`ui.retry*` glue out of `i18n_core.js` | **✅** |
 | 196 | **PH-S261** | Docs canon sync band (docs) | PH-S256 | INDEX/STABLE_STATE/docs README + GALAXY_ROADMAP zriz | **✅** |
 | 197 | **PH-S262** | Rust ratio loc-audit refresh + hold gate (ops) | PH-S165 | `poolai-loc-audit` → `rust_ratio.json`; FM §5.13 advisory | **✅** |
+| 198 | **PH-S263** | Admin i18n residual ui.* + common.* slim patch (code) | PH-S260 | `common.*` + residual `ui.*` → `admin_ui_common_patch` | **✅** |
+| 199 | **PH-S264** | Dashboard libs panel i18n slim (code) | PH-S263 | `libs.*` keys out of `i18n_core.js` | **✅** |
+| 200 | **PH-S265** | Dashboard raid panel i18n slim (code) | PH-S264 | `raid.*` keys out of `i18n_core.js` | **✅** |
+| 201 | **PH-S266** | i18n_core.js near-empty gate + loc-audit (ops) | PH-S265 | STRINGS core **0** inline keys; `rust_ratio.json` refresh | **✅** |
+| 202 | **PH-S267** | Docs canon sync band (docs) | PH-S266 | INDEX/HANDOFF/NEXT/STABLE_STATE sync | **✅** |
+| 203 | **PH-S268** | Galaxy prefetch wire horizon doc (docs) | GALAXY §5.5 | roadmap pointer; metrics ✅; live prefetch TBD | **✅** |
+| 204 | **PH-S269** | Vision feed.json refresh (docs/vision) | PH-S200 | `docs/vision/feed.json` sprint zriz | **✅** |
+| 205 | **PH-S270** | poolai-vision-sync drift gate (ops) | PH-S205 | `--check` green after FM/HANDOFF | **✅** |
+| 206 | **PH-S271** | Rust ratio hold advisory refresh (ops) | PH-S266 | `--min-ratio 0.95` advisory snapshot **94.34%** | **✅** |
+| 207 | **PH-S272** | Docs INDEX sprint zriz (docs) | PH-S267 | INDEX step 8 + §7 ratio pointer | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S128…S262 ✅. Vision rev **203**. rust_ratio **94.23%** (formal band ✅; hold 95% advisory).
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S128…S272 ✅. Vision rev **205**. rust_ratio **94.34%** (formal band ✅; hold 95% advisory).
 
 **Наступна сесія:** replenish ≤10 з §5.13 · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
-**Replenish (2026-06-17):** Galaxy `/metrics` stand smoke gaps (S253…S256, [`PROMETHEUS_METRICS.md`](../development/PROMETHEUS_METRICS.md)) + i18n slim maintain (S257…S260, ~100 keys лишилось у `i18n_core.js`) + docs canon hygiene (S261) + ratio audit (S262) — з [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md) §4.2/§5.3/§6.4, [`RUST_RATIO_STRATEGY_2026-06-13.md`](../development/RUST_RATIO_STRATEGY_2026-06-13.md) post-S252.
+**Replenish (2026-06-17 post-S272):** i18n slim band **закрито** (`i18n_core.js` STRINGS core empty); ratio **94.34%** hold advisory; наступні спринти — §5.13 maintain / Galaxy horizon / vision UX.
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S262)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-06-17):** PH-S128…S262 ✅ закрито · **0** відкритих · replenish з §5.13.
+**Активна смуга (2026-06-17):** PH-S128…S272 ✅ закрито · **0** відкритих · replenish з §5.13.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

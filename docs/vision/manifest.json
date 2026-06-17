@@ -1830,7 +1830,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S262",
+  "last_sprint_closed": "PH-S272",
   "layers": [
     {
       "id": "L0",
@@ -7718,7 +7718,7 @@
       "path": "docs/vision/vision.svg"
     }
   ],
-  "revision": 203,
+  "revision": 205,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -9492,6 +9492,96 @@
       "row": 197,
       "status": "closed",
       "title": "Rust ratio loc-audit refresh + hold gate (ops)"
+    },
+    {
+      "acceptance": "common.*` + residual `ui.*` → `admin_ui_common_patch",
+      "deps": "PH-S260",
+      "id": "PH-S263",
+      "open": false,
+      "row": 198,
+      "status": "closed",
+      "title": "Admin i18n residual ui.* + common.* slim patch (code)"
+    },
+    {
+      "acceptance": "libs.*` keys out of `i18n_core.js",
+      "deps": "PH-S263",
+      "id": "PH-S264",
+      "open": false,
+      "row": 199,
+      "status": "closed",
+      "title": "Dashboard libs panel i18n slim (code)"
+    },
+    {
+      "acceptance": "raid.*` keys out of `i18n_core.js",
+      "deps": "PH-S264",
+      "id": "PH-S265",
+      "open": false,
+      "row": 200,
+      "status": "closed",
+      "title": "Dashboard raid panel i18n slim (code)"
+    },
+    {
+      "acceptance": "STRINGS core 0 inline keys; `rust_ratio.json` refresh",
+      "deps": "PH-S265",
+      "id": "PH-S266",
+      "open": false,
+      "row": 201,
+      "status": "closed",
+      "title": "i18n_core.js near-empty gate + loc-audit (ops)"
+    },
+    {
+      "acceptance": "INDEX/HANDOFF/NEXT/STABLE_STATE sync",
+      "deps": "PH-S266",
+      "id": "PH-S267",
+      "open": false,
+      "row": 202,
+      "status": "closed",
+      "title": "Docs canon sync band (docs)"
+    },
+    {
+      "acceptance": "roadmap pointer; metrics ✅; live prefetch TBD",
+      "deps": "GALAXY §5.5",
+      "id": "PH-S268",
+      "open": false,
+      "row": 203,
+      "status": "closed",
+      "title": "Galaxy prefetch wire horizon doc (docs)"
+    },
+    {
+      "acceptance": "docs/vision/feed.json` sprint zriz",
+      "deps": "PH-S200",
+      "id": "PH-S269",
+      "open": false,
+      "row": 204,
+      "status": "closed",
+      "title": "Vision feed.json refresh (docs/vision)"
+    },
+    {
+      "acceptance": "--check` green after FM/HANDOFF",
+      "deps": "PH-S205",
+      "id": "PH-S270",
+      "open": false,
+      "row": 205,
+      "status": "closed",
+      "title": "poolai-vision-sync drift gate (ops)"
+    },
+    {
+      "acceptance": "--min-ratio 0.95` advisory snapshot 94.34%",
+      "deps": "PH-S266",
+      "id": "PH-S271",
+      "open": false,
+      "row": 206,
+      "status": "closed",
+      "title": "Rust ratio hold advisory refresh (ops)"
+    },
+    {
+      "acceptance": "INDEX step 8 + §7 ratio pointer",
+      "deps": "PH-S267",
+      "id": "PH-S272",
+      "open": false,
+      "row": 207,
+      "status": "closed",
+      "title": "Docs INDEX sprint zriz (docs)"
     }
   ],
   "sprint_queue_open_count": 0,

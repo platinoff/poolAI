@@ -2024,6 +2024,201 @@ pub const UI_TOOLBAR_EN: &[I18nRow<'_>] = &[
     ),
 ];
 
+/// English common + residual ui keys (PH-S263; shared dashboard + admin glue).
+pub const UI_COMMON_SHELL_EN: &[I18nRow<'_>] = &[
+    ("common.loading", "Loading…"),
+    (
+        "common.unauthorized",
+        "Unauthorized — session expired. Please sign in again.",
+    ),
+    ("ui.upload", "Upload"),
+    ("ui.register", "Register"),
+    ("ui.create", "Create"),
+    ("ui.install", "Install"),
+    ("ui.delete", "Delete"),
+    ("ui.update", "Update"),
+    ("ui.uninstall", "Uninstall"),
+    ("ui.closeNotificationAria", "Close notification"),
+    ("ui.clearSearchAria", "Clear search"),
+    ("ui.stepOfTotal", "Step {current} of {total}"),
+    ("ui.tabsAria", "Tabs"),
+    (
+        "ui.suggestion.checkInternet",
+        "Check your internet connection",
+    ),
+    ("ui.suggestion.verifyServer", "Verify the server is running"),
+    ("ui.suggestion.refreshPage", "Try refreshing the page"),
+    (
+        "ui.suggestion.contactSupport",
+        "Contact support if the problem persists",
+    ),
+    ("ui.noItems", "No items."),
+    ("ui.sourceLabel", "Source:"),
+    ("ui.artifactsLabel", "Artifacts:"),
+    ("ui.nodesLabel", "Nodes:"),
+    ("ui.creating", "Creating…"),
+    ("ui.installing", "Installing…"),
+    ("ui.deleting", "Deleting…"),
+];
+
+/// Ukrainian common + residual ui keys (PH-S263).
+pub const UI_COMMON_SHELL_UK: &[I18nRow<'_>] = &[
+    ("common.loading", "Завантаження…"),
+    (
+        "common.unauthorized",
+        "Неавторизовано — сесію завершено. Увійдіть знову.",
+    ),
+    ("ui.upload", "Завантажити"),
+    ("ui.register", "Зареєструвати"),
+    ("ui.create", "Створити"),
+    ("ui.install", "Встановити"),
+    ("ui.delete", "Видалити"),
+    ("ui.update", "Оновити"),
+    ("ui.uninstall", "Видалити (бібліотеку)"),
+    ("ui.closeNotificationAria", "Закрити сповіщення"),
+    ("ui.clearSearchAria", "Очистити пошук"),
+    ("ui.stepOfTotal", "Крок {current} з {total}"),
+    ("ui.tabsAria", "Вкладки"),
+    (
+        "ui.suggestion.checkInternet",
+        "Перевірте підключення до інтернету",
+    ),
+    (
+        "ui.suggestion.verifyServer",
+        "Переконайтеся, що сервер запущено",
+    ),
+    ("ui.suggestion.refreshPage", "Спробуйте оновити сторінку"),
+    (
+        "ui.suggestion.contactSupport",
+        "Зверніться до підтримки, якщо проблема не зникає",
+    ),
+    ("ui.noItems", "Немає записів."),
+    ("ui.sourceLabel", "Джерело:"),
+    ("ui.artifactsLabel", "Артефакти:"),
+    ("ui.nodesLabel", "Вузли:"),
+    ("ui.creating", "Створення…"),
+    ("ui.installing", "Встановлення…"),
+    ("ui.deleting", "Видалення…"),
+];
+
+/// English dashboard libs panel keys (PH-S264; moved from `i18n_core.js`).
+pub const LIBS_PANEL_EN: &[I18nRow<'_>] = &[
+    ("libs.empty", "No libraries installed."),
+    ("libs.col.name", "Name"),
+    ("libs.col.version", "Version"),
+    ("libs.col.type", "Type"),
+    ("libs.col.status", "Status"),
+    ("libs.col.actions", "Actions"),
+    ("libs.updateAria", "Update library {name}"),
+    ("libs.uninstallAria", "Uninstall library {name}"),
+    ("libs.installBtn", "Install Library"),
+    ("libs.modalTitle", "Install Library"),
+    ("libs.label.name", "Library name"),
+    (
+        "libs.label.version",
+        "Version (optional, defaults to latest)",
+    ),
+    ("libs.ph.name", "libtorch"),
+    ("libs.ph.version", "1.13.0"),
+    ("libs.installingSubmit", "Installing…"),
+    ("libs.installedOk", "Library installed successfully"),
+    ("libs.uninstalledOk", "Library uninstalled successfully"),
+    ("libs.uninstallingLoad", "Uninstalling library…"),
+    ("libs.updatingLoad", "Updating library…"),
+    ("libs.processingLoad", "Processing library…"),
+    ("libs.updatedOk", "Library updated successfully"),
+    ("libs.processingOk", "Operation completed successfully"),
+    (
+        "libs.confirmUninstall",
+        "Are you sure you want to uninstall library \"{name}\"? This action cannot be undone.",
+    ),
+];
+
+/// Ukrainian dashboard libs panel keys (PH-S264).
+pub const LIBS_PANEL_UK: &[I18nRow<'_>] = &[
+    ("libs.empty", "Бібліотеки не встановлено."),
+    ("libs.col.name", "Назва"),
+    ("libs.col.version", "Версія"),
+    ("libs.col.type", "Тип"),
+    ("libs.col.status", "Статус"),
+    ("libs.col.actions", "Дії"),
+    ("libs.updateAria", "Оновити бібліотеку {name}"),
+    ("libs.uninstallAria", "Видалити бібліотеку {name}"),
+    ("libs.installBtn", "Встановити бібліотеку"),
+    ("libs.modalTitle", "Встановити бібліотеку"),
+    ("libs.label.name", "Назва бібліотеки"),
+    (
+        "libs.label.version",
+        "Версія (необов’язково, за замовчуванням остання)",
+    ),
+    ("libs.ph.name", "libtorch"),
+    ("libs.ph.version", "1.13.0"),
+    ("libs.installingSubmit", "Встановлення…"),
+    ("libs.installedOk", "Бібліотеку встановлено"),
+    ("libs.uninstalledOk", "Бібліотеку видалено"),
+    ("libs.uninstallingLoad", "Видалення бібліотеки…"),
+    ("libs.updatingLoad", "Оновлення бібліотеки…"),
+    ("libs.processingLoad", "Обробка бібліотеки…"),
+    ("libs.updatedOk", "Бібліотеку оновлено"),
+    ("libs.processingOk", "Операцію виконано"),
+    (
+        "libs.confirmUninstall",
+        "Видалити бібліотеку «{name}»? Цю дію не можна скасувати.",
+    ),
+];
+
+/// English dashboard RAID panel keys (PH-S265; moved from `i18n_core.js`).
+pub const RAID_PANEL_EN: &[I18nRow<'_>] = &[
+    ("raid.empty", "No artifacts stored."),
+    ("raid.col.id", "ID"),
+    ("raid.col.name", "Name"),
+    ("raid.col.storedAt", "Stored at"),
+    ("raid.col.actions", "Actions"),
+    ("raid.createBtn", "Create Artifact"),
+    ("raid.createBtnAria", "Create new artifact"),
+    ("raid.modalTitle", "Create Artifact"),
+    ("raid.label.name", "Artifact name"),
+    ("raid.label.file", "File"),
+    ("raid.ph.name", "my-artifact"),
+    ("raid.sectionArtifacts", "Artifacts:"),
+    ("raid.sectionNodes", "Nodes:"),
+    ("raid.deleteAria", "Delete artifact {name}"),
+    ("raid.creatingSubmit", "Creating…"),
+    ("raid.createdOk", "Artifact created successfully"),
+    ("raid.deletedOk", "Artifact deleted successfully"),
+    ("raid.deletingLoad", "Deleting artifact…"),
+    (
+        "raid.confirmDelete",
+        "Are you sure you want to delete artifact \"{name}\" ({id})? This action cannot be undone.",
+    ),
+];
+
+/// Ukrainian dashboard RAID panel keys (PH-S265).
+pub const RAID_PANEL_UK: &[I18nRow<'_>] = &[
+    ("raid.empty", "Артефактів не збережено."),
+    ("raid.col.id", "ID"),
+    ("raid.col.name", "Назва"),
+    ("raid.col.storedAt", "Збережено"),
+    ("raid.col.actions", "Дії"),
+    ("raid.createBtn", "Створити артефакт"),
+    ("raid.createBtnAria", "Створити новий артефакт"),
+    ("raid.modalTitle", "Створити артефакт"),
+    ("raid.label.name", "Назва артефакту"),
+    ("raid.label.file", "Файл"),
+    ("raid.ph.name", "my-artifact"),
+    ("raid.sectionArtifacts", "Артефакти:"),
+    ("raid.sectionNodes", "Вузли:"),
+    ("raid.deleteAria", "Видалити артефакт {name}"),
+    ("raid.creatingSubmit", "Створення…"),
+    ("raid.createdOk", "Артефакт створено"),
+    ("raid.deletedOk", "Артефакт видалено"),
+    ("raid.deletingLoad", "Видалення артефакту…"),
+    (
+        "raid.confirmDelete",
+        "Видалити артефакт «{name}» ({id})? Цю дію не можна скасувати.",
+    ),
+];
+
 /// Ukrainian shared UI toolbar glue (PH-S260).
 pub const UI_TOOLBAR_UK: &[I18nRow<'_>] = &[
     ("ui.save", "Зберегти зміни"),
@@ -2926,6 +3121,63 @@ pub fn admin_ui_toolbar_patch_script() -> String {
     )
 }
 
+/// Shared common + residual ui keys — slim `common.*` / `ui.upload`…`ui.deleting` (PH-S263).
+pub fn admin_ui_common_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(UI_COMMON_SHELL_EN));
+    root.insert("uk".into(), rows_to_map(UI_COMMON_SHELL_UK));
+    root
+}
+
+pub fn admin_ui_common_patch_json() -> String {
+    serde_json::to_string(&admin_ui_common_patch()).expect("ui common i18n patch serializes")
+}
+
+pub fn admin_ui_common_patch_script() -> String {
+    format!(
+        "window.__poolaiUiCommonI18nRust={};",
+        admin_ui_common_patch_json()
+    )
+}
+
+/// Dashboard libs panel — slim `libs.*` patch (PH-S264).
+pub fn libs_panel_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(LIBS_PANEL_EN));
+    root.insert("uk".into(), rows_to_map(LIBS_PANEL_UK));
+    root
+}
+
+pub fn libs_panel_patch_json() -> String {
+    serde_json::to_string(&libs_panel_patch()).expect("libs panel i18n patch serializes")
+}
+
+pub fn libs_panel_patch_script() -> String {
+    format!(
+        "window.__poolaiLibsPanelI18nRust={};",
+        libs_panel_patch_json()
+    )
+}
+
+/// Dashboard RAID panel — slim `raid.*` patch (PH-S265).
+pub fn raid_panel_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(RAID_PANEL_EN));
+    root.insert("uk".into(), rows_to_map(RAID_PANEL_UK));
+    root
+}
+
+pub fn raid_panel_patch_json() -> String {
+    serde_json::to_string(&raid_panel_patch()).expect("raid panel i18n patch serializes")
+}
+
+pub fn raid_panel_patch_script() -> String {
+    format!(
+        "window.__poolaiRaidPanelI18nRust={};",
+        raid_panel_patch_json()
+    )
+}
+
 /// `{"en":{...},"uk":{...}}` patch for auth + dashboard + admin nav/chrome shell keys (PH-S162, PH-S242, PH-S243).
 pub fn auth_dash_shell_patch() -> BTreeMap<String, BTreeMap<String, String>> {
     let mut en = BTreeMap::new();
@@ -3440,5 +3692,66 @@ mod tests {
         let script = auth_dash_shell_patch_script();
         assert!(script.starts_with("window.__poolaiAuthDashI18nRust="));
         assert!(script.ends_with(';'));
+    }
+
+    #[test]
+    fn ui_common_patch_has_matching_en_uk_key_counts_ph_s263() {
+        assert_eq!(UI_COMMON_SHELL_EN.len(), UI_COMMON_SHELL_UK.len());
+    }
+
+    #[test]
+    fn ui_common_patch_json_common_and_ui_only_ph_s263() {
+        let json = admin_ui_common_patch_json();
+        assert!(json.contains(r#""common.loading""#));
+        assert!(json.contains(r#""ui.create""#));
+        assert!(json.contains(r#""ui.suggestion.checkInternet""#));
+        assert!(!json.contains(r#""ui.save""#));
+        assert!(!json.contains(r#""libs.empty""#));
+    }
+
+    #[test]
+    fn ui_common_patch_script_assigns_window_patch_ph_s263() {
+        let script = admin_ui_common_patch_script();
+        assert!(script.starts_with("window.__poolaiUiCommonI18nRust="));
+    }
+
+    #[test]
+    fn libs_panel_patch_has_matching_en_uk_key_counts_ph_s264() {
+        assert_eq!(LIBS_PANEL_EN.len(), LIBS_PANEL_UK.len());
+    }
+
+    #[test]
+    fn libs_panel_patch_json_libs_only_ph_s264() {
+        let json = libs_panel_patch_json();
+        assert!(json.contains(r#""libs.empty""#));
+        assert!(json.contains(r#""libs.confirmUninstall""#));
+        assert!(!json.contains(r#""raid.empty""#));
+        assert!(!json.contains(r#""admin.lib.section""#));
+    }
+
+    #[test]
+    fn libs_panel_patch_script_assigns_window_patch_ph_s264() {
+        let script = libs_panel_patch_script();
+        assert!(script.starts_with("window.__poolaiLibsPanelI18nRust="));
+    }
+
+    #[test]
+    fn raid_panel_patch_has_matching_en_uk_key_counts_ph_s265() {
+        assert_eq!(RAID_PANEL_EN.len(), RAID_PANEL_UK.len());
+    }
+
+    #[test]
+    fn raid_panel_patch_json_raid_only_ph_s265() {
+        let json = raid_panel_patch_json();
+        assert!(json.contains(r#""raid.empty""#));
+        assert!(json.contains(r#""raid.confirmDelete""#));
+        assert!(!json.contains(r#""libs.empty""#));
+        assert!(!json.contains(r#""admin.raidadm.section""#));
+    }
+
+    #[test]
+    fn raid_panel_patch_script_assigns_window_patch_ph_s265() {
+        let script = raid_panel_patch_script();
+        assert!(script.starts_with("window.__poolaiRaidPanelI18nRust="));
     }
 }

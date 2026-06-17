@@ -1,6 +1,6 @@
 # Rust codebase ratio — стратегія 90–95% (PoolAI)
 
-**Оновлено:** 2026-06-17 · **Канон:** FM **§5.13** · §5.12 **0** відкритих (PH-S128…S262 ✅) · rust_ratio **94.23%**
+**Оновлено:** 2026-06-17 · **Канон:** FM **§5.13** · §5.12 **0** відкритих (PH-S128…S272 ✅) · rust_ratio **94.34%**
 
 **Мета:** зростання частки **Rust** у виконуваному коді репозиторію до **90–95%** (формально), **96% stretch spirit** (орієнтир replenish PH-S150…S159) — платформа збирається і перевіряється через **`cargo`** без обов'язкового Node на edge.
 
@@ -85,7 +85,7 @@ flowchart TB
 | **E — gate** | PH-S150 ✅ | CI advisory якщо ratio <88%; target 93%; stretch 96% spirit | стабільно 90–95% |
 | **F — stretch 96%** | PH-S151…S159 ✅ | wasm wiring, slim JS/i18n/charts, Rust stand/e2e bins; CI warn **93%** | **→96% spirit** |
 
-**Черга §5.12:** **0** відкритих · replenish з §5.13. **Зріз:** **94.23%** (PH-S262).
+**Черга §5.12:** **0** відкритих · replenish з §5.13. **Зріз:** **94.34%** (PH-S271).
 
 ---
 
@@ -212,6 +212,16 @@ flowchart TB
 | 117 | **PH-S260** | Admin i18n shared ui toolbar slim patch | code | **✅** |
 | 118 | **PH-S261** | Docs canon sync band | docs | **✅** |
 | 119 | **PH-S262** | Rust ratio loc-audit refresh + hold gate | ops | **✅** |
+| 120 | **PH-S263** | Admin i18n residual ui.* + common.* slim patch | `admin_ui_common_patch`; keys out of `i18n_core.js` | **✅** |
+| 121 | **PH-S264** | Dashboard libs panel i18n slim | `libs.*` → poolai-ui-core | **✅** |
+| 122 | **PH-S265** | Dashboard raid panel i18n slim | `raid.*` → poolai-ui-core | **✅** |
+| 123 | **PH-S266** | i18n_core.js near-empty gate + loc-audit | STRINGS core **0** keys | **✅** |
+| 124 | **PH-S267** | Docs canon sync band | INDEX/HANDOFF/NEXT | **✅** |
+| 125 | **PH-S268** | Galaxy prefetch horizon doc | GALAXY §5.5 | **✅** |
+| 126 | **PH-S269** | Vision feed.json refresh | docs/vision | **✅** |
+| 127 | **PH-S270** | poolai-vision-sync drift gate | ops | **✅** |
+| 128 | **PH-S271** | Rust ratio hold advisory refresh | **94.34%** advisory | **✅** |
+| 129 | **PH-S272** | Docs INDEX sprint zriz | INDEX §7 ratio | **✅** |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 

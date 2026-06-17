@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-17 (PH-S254…S262 ✅ · §5.12 **0** відкритих · rust_ratio **94.23%**) · VDT
+**Оновлено:** 2026-06-17 (PH-S254…S272 ✅ · §5.12 **0** відкритих · rust_ratio **94.34%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -213,8 +213,18 @@
 **PH-S260 ✅ (code/ui):** `ui.save`/`ui.search*`/`ui.retry*` → `admin_ui_toolbar_patch`; audit tests `ph_s260`.
 **PH-S261 ✅ (docs):** INDEX/STABLE_STATE/GALAXY_ROADMAP/RUST_RATIO sprint zriz; §5.12 band S253…S262 closed.
 **PH-S262 ✅ (ops):** `poolai-loc-audit` → `rust_ratio.json` **94.23%**; hold 95% advisory; stretch 96% spirit.
-**§5.12:** **0** відкритих — replenish з §5.13 на наступній сесії.
-**Vision ✅:** rev **203** · rust_ratio **94.23%** · hold **95%** advisory.
+**PH-S263 ✅ (code/ui):** `common.*` + residual `ui.*` → `admin_ui_common_patch`.
+**PH-S264 ✅ (code/ui):** dashboard `libs.*` → `libs_panel_patch`.
+**PH-S265 ✅ (code/ui):** dashboard `raid.*` → `raid_panel_patch`.
+**PH-S266 ✅ (ops):** `i18n_core.js` STRINGS core **0** inline keys; `poolai-loc-audit` → **94.34%**.
+**PH-S267 ✅ (docs):** INDEX/STABLE_STATE/FM/HANDOFF/NEXT canon sync.
+**PH-S268 ✅ (docs):** GALAXY_GRID_ROADMAP §5.5 prefetch horizon pointer.
+**PH-S269 ✅ (vision):** `feed.json` sprint zriz via `poolai-vision-sync`.
+**PH-S270 ✅ (ops):** `poolai-vision-sync --check` green.
+**PH-S271 ✅ (ops):** hold advisory `--min-ratio 0.95` snapshot **94.34%** (advisory warn).
+**PH-S272 ✅ (docs):** INDEX §7 + ratio pointer **94.34%**.
+**§5.12:** **0** відкритих — replenish з §5.13.
+**Vision ✅:** rev **205** · rust_ratio **94.34%** · hold **95%** advisory.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

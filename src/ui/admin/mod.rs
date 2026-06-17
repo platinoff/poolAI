@@ -411,6 +411,7 @@ pub fn admin_layout_with_module_script(
     let err_patch = poolai_ui_core::i18n::admin_err_patch_script();
     let form_patch = poolai_ui_core::i18n::admin_form_patch_script();
     let ui_toolbar_patch = poolai_ui_core::i18n::admin_ui_toolbar_patch_script();
+    let ui_common_patch = poolai_ui_core::i18n::admin_ui_common_patch_script();
     let vm_modal_patch = poolai_ui_core::i18n::vm_modal_patch_script();
     let ui_confirm_patch = poolai_ui_core::i18n::admin_ui_confirm_patch_script();
     let theme_patch = poolai_ui_core::theme::admin_theme_patch_script();
@@ -488,6 +489,7 @@ pub fn admin_layout_with_module_script(
   <script>{err_patch}</script>
   <script>{form_patch}</script>
   <script>{ui_toolbar_patch}</script>
+  <script>{ui_common_patch}</script>
   <script>{vm_modal_patch}</script>
   <script>{ui_confirm_patch}</script>
   <script>{theme_patch}</script>
@@ -780,6 +782,15 @@ fn admin_layout_injects_form_and_ui_toolbar_patches_ph_s260() {
 }
 
 #[test]
+fn admin_layout_injects_ui_common_patch_ph_s263() {
+    let patch = poolai_ui_core::i18n::admin_ui_common_patch_script();
+    assert!(patch.contains("window.__poolaiUiCommonI18nRust="));
+    let html = admin_layout("admin.test.page", "Test", "<p>body</p>", "");
+    assert!(html.0.contains(r#""common.loading""#));
+    assert!(html.0.contains(r#""ui.create""#));
+}
+
+#[test]
 fn i18n_core_js_has_no_workers_home_form_ui_toolbar_keys_ph_s257_s260() {
     let js = include_str!("../i18n_core.js");
     assert!(!js.contains("'workers.empty'"));
@@ -789,6 +800,21 @@ fn i18n_core_js_has_no_workers_home_form_ui_toolbar_keys_ph_s257_s260() {
     assert!(!js.contains("'ui.searchTableAria'"));
     assert!(!js.contains("'ui.retry'"));
     assert!(!js.contains("'err.errorPrefix'"));
+}
+
+#[test]
+fn i18n_core_js_has_no_common_or_residual_ui_keys_ph_s263() {
+    let js = include_str!("../i18n_core.js");
+    assert!(!js.contains("'common.loading'"));
+    assert!(!js.contains("'ui.create'"));
+    assert!(!js.contains("'ui.suggestion.checkInternet'"));
+}
+
+#[test]
+fn i18n_core_js_has_no_libs_or_raid_keys_ph_s264_s265() {
+    let js = include_str!("../i18n_core.js");
+    assert!(!js.contains("'libs.empty'"));
+    assert!(!js.contains("'raid.empty'"));
 }
 
 #[test]

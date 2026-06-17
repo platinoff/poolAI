@@ -737,6 +737,9 @@ fn layout(
     let form_patch = poolai_ui_core::i18n::admin_form_patch_script();
     let err_patch = poolai_ui_core::i18n::admin_err_patch_script();
     let ui_toolbar_patch = poolai_ui_core::i18n::admin_ui_toolbar_patch_script();
+    let ui_common_patch = poolai_ui_core::i18n::admin_ui_common_patch_script();
+    let libs_panel_patch = poolai_ui_core::i18n::libs_panel_patch_script();
+    let raid_panel_patch = poolai_ui_core::i18n::raid_panel_patch_script();
     let vm_modal_patch = poolai_ui_core::i18n::vm_modal_patch_script();
     let ui_confirm_patch = poolai_ui_core::i18n::admin_ui_confirm_patch_script();
     let i18n_boot = r#"
@@ -753,13 +756,16 @@ fn layout(
   });
 })();"#;
     let full_script = format!(
-        "{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}",
+        "{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}",
         auth_dash_patch,
         home_patch,
         workers_panel_patch,
         form_patch,
         err_patch,
         ui_toolbar_patch,
+        ui_common_patch,
+        libs_panel_patch,
+        raid_panel_patch,
         vm_modal_patch,
         ui_confirm_patch,
         i18n_js,
@@ -5256,6 +5262,44 @@ fn dashboard_layout_injects_home_and_workers_panel_patches_ph_s258() {
     let html = layout("dash.title.home", "Home", "<p>body</p>", "");
     assert!(html.0.contains(r#""home.apiTitle""#));
     assert!(html.0.contains(r#""workers.empty""#));
+}
+
+#[test]
+fn dashboard_layout_injects_ui_common_patch_ph_s263() {
+    let patch = poolai_ui_core::i18n::admin_ui_common_patch_script();
+    assert!(patch.contains("window.__poolaiUiCommonI18nRust="));
+    let html = layout("dash.title.libs", "Libs", "<p>body</p>", "");
+    assert!(html.0.contains(r#""common.loading""#));
+    assert!(html.0.contains(r#""ui.install""#));
+}
+
+#[test]
+fn dashboard_layout_injects_libs_and_raid_panel_patches_ph_s264_s265() {
+    let libs = poolai_ui_core::i18n::libs_panel_patch_script();
+    let raid = poolai_ui_core::i18n::raid_panel_patch_script();
+    assert!(libs.contains("window.__poolaiLibsPanelI18nRust="));
+    assert!(raid.contains("window.__poolaiRaidPanelI18nRust="));
+    let libs_html = layout("dash.title.libraries", "Libs", "<p>body</p>", "");
+    let raid_html = layout("dash.title.raid", "RAID", "<p>body</p>", "");
+    assert!(libs_html.0.contains(r#""libs.empty""#));
+    assert!(raid_html.0.contains(r#""raid.empty""#));
+}
+
+#[test]
+fn i18n_core_js_strings_core_near_empty_ph_s266() {
+    let js = include_str!("i18n_core.js");
+    assert!(!js.contains("'libs.empty'"));
+    assert!(!js.contains("'raid.empty'"));
+    assert!(!js.contains("'common.loading'"));
+    assert!(!js.contains("'ui.create'"));
+    let key_lines = js
+        .lines()
+        .filter(|l| l.contains("'") && l.contains(": '"))
+        .count();
+    assert!(
+        key_lines < 10,
+        "i18n_core STRINGS core should have <10 inline keys, got {key_lines}"
+    );
 }
 
 #[test]
