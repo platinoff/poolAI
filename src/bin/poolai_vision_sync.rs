@@ -454,6 +454,8 @@ fn sync_fm_sprint_queue(manifest: &mut Value, entries: &[SprintQueueEntry]) -> b
     manifest["sprint_queue_open_count"] = json!(open_count);
     if let Some(ns) = next_sprint {
         manifest["next_sprint"] = json!(ns);
+    } else if manifest.get("next_sprint").is_some() {
+        manifest.as_object_mut().expect("manifest object").remove("next_sprint");
     }
     if let Some(lc) = last_closed {
         manifest["last_sprint_closed"] = json!(lc);

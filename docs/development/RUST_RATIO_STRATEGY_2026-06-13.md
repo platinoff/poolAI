@@ -168,7 +168,7 @@ flowchart TB
 | 73 | **PH-S216** | Galaxy pricing fallback metrics smoke | tests | **✅** |
 | 74 | **PH-S217** | Admin i18n slim grid-pricing panel | code | **✅** |
 | 75 | **PH-S218** | Vision map aria-live selection | docs/vision | **✅** |
-| 76 | **PH-S219** | Galaxy trust payout metrics smoke | tests | відкрито |
+| 76 | **PH-S219** | Galaxy trust payout metrics smoke | tests | **✅** |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 

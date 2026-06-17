@@ -2,12 +2,11 @@
   "description": "RSS-style ticker of FM §5.12 sprint queue (open + recent closed)",
   "items": [
     {
-      "category": "open",
+      "category": "closed",
       "id": "PH-S219",
       "link": "docs/vision/index.html#sprint-queue",
-      "next": true,
       "published": "2026-05-28",
-      "status": "open",
+      "status": "closed",
       "summary": "stand smoke trust payout counters on `/metrics",
       "title": "Galaxy trust payout metrics smoke (tests)"
     },
@@ -109,15 +108,6 @@
       "status": "closed",
       "summary": "poolai-http-stand-smoke` checks vision rev header",
       "title": "Stand smoke vision revision parity (tests)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S207",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "next admin panel strings → `poolai-ui-core",
-      "title": "Admin i18n slim next panel (code)"
     }
   ],
   "link": "docs/vision/index.html",

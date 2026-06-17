@@ -362,6 +362,38 @@ async fn smoke_galaxy_pricing_forced_fallback_metrics(
     metrics_text_has_pricing_forced_fallback(&body)
 }
 
+/// PH-S219: live stand exposes Galaxy trust payout counters on Prometheus scrape.
+const GALAXY_TRUST_PAYOUT_METRICS: &[&str] = &[
+    "galaxy_trust_payout_eligible_total",
+    "galaxy_trust_payout_held_total",
+    "galaxy_trust_score",
+];
+
+fn metrics_text_has_trust_payout_counters(body: &str) -> Result<(), String> {
+    for name in GALAXY_TRUST_PAYOUT_METRICS {
+        if !body.contains(name) {
+            return Err(format!("/metrics missing {name}"));
+        }
+        if !body.contains(&format!("# TYPE {name} gauge")) {
+            return Err(format!("/metrics missing TYPE gauge for {name}"));
+        }
+    }
+    Ok(())
+}
+
+async fn smoke_galaxy_trust_payout_metrics(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("/metrics request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("/metrics status {}", resp.status()));
+    }
+    let body = resp.text().await.map_err(|e| e.to_string())?;
+    metrics_text_has_trust_payout_counters(&body)
+}
+
 async fn smoke_grid_pricing(client: &Client, base: &str) -> Result<(), String> {
     let model = smoke_id("smoke-pricing");
     let url = format!(
@@ -947,6 +979,12 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
     .await;
     record(
         &mut cases,
+        "galaxy_trust_payout_metrics",
+        smoke_galaxy_trust_payout_metrics(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
         "jobs_migrating",
         smoke_jobs_migrating(&client, &cli.base_url).await,
     )
@@ -1143,6 +1181,22 @@ mod tests {
             "galaxy_pricing_forced_fallback_total 0\n",
         );
         metrics_text_has_pricing_forced_fallback(sample).expect("sample export");
+    }
+
+    #[test]
+    fn galaxy_trust_payout_metrics_export_shape_ph_s219() {
+        let sample = concat!(
+            "# HELP galaxy_trust_payout_eligible_total Galaxy trust payout eligible\n",
+            "# TYPE galaxy_trust_payout_eligible_total gauge\n",
+            "galaxy_trust_payout_eligible_total 0\n",
+            "# HELP galaxy_trust_payout_held_total Galaxy trust payout held\n",
+            "# TYPE galaxy_trust_payout_held_total gauge\n",
+            "galaxy_trust_payout_held_total 0\n",
+            "# HELP galaxy_trust_score Galaxy last trust score\n",
+            "# TYPE galaxy_trust_score gauge\n",
+            "galaxy_trust_score 0\n",
+        );
+        metrics_text_has_trust_payout_counters(sample).expect("sample export");
     }
 
     #[test]

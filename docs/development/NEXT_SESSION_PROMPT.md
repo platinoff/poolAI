@@ -1,28 +1,28 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-16 · PH-S218 ✅ · vision **rev 157** · **1** відкритий (PH-S219) · **hold 95%** · **stretch spirit 96%**
+**Оновлено:** 2026-06-16 · PH-S219 ✅ · vision **rev 166** · **0** відкритих · **replenish §5.13** · **hold 95%** · **stretch spirit 96%**
 
-| **← наступний** | **PH-S219** — Galaxy trust payout metrics smoke |
-| **Відкритих** | **1** (PH-S219) |
+| **← наступний** | **replenish §5.13** — нові PH-S* з [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md) |
+| **Відкритих** | **0** (смуга PH-S128…S219 закрита) |
 | **VDT** | один PH-S* = 1 commit (code) + docs sync |
 
 ---
 
-## Зріз §5.12 (1 відкритий: PH-S219)
+## Зріз §5.12 (0 відкритих — replenish)
 
 ### Закрито недавно ✅
 
 | Sprint | Scope | Зріз |
 |--------|-------|------|
+| PH-S219 | Galaxy trust payout metrics smoke | trust payout gauges on `/metrics` |
 | PH-S218 | Vision map aria-live selection | `#map-selection-live` on node select |
 | PH-S217 | Admin i18n slim grid-pricing panel | `admin.page.gridPricing` → `poolai-ui-core` |
-| PH-S216 | Galaxy pricing fallback metrics smoke | `galaxy_pricing_forced_fallback_total` on `/metrics` |
 
-### Відкрито
+### Наступний крок
 
-| # | Sprint | Scope |
-|---|--------|-------|
-| 1 | **PH-S219** | Galaxy trust payout metrics smoke |
+1. `rg "\- \[ \]" docs/development/NEXT_STEPS_ARCHITECT_*.md`
+2. Доповнити FM §5.12 до **≤10** відкритих з **§5.13** / code-first research
+3. Перший новий спринт → `NEXT_SESSION_PROMPT` + vision-sync
 
 ---
 
@@ -39,20 +39,12 @@ export K8S_OPENAPI_ENABLED_VERSION=1.28
 
 ---
 
-## PH-S219 — scope
-
-- `poolai-http-stand-smoke` — trust payout counters on live `/metrics` (PH-S182 pattern)
-- Acceptance: FM/HANDOFF/NEXT; `cargo test --bin poolai-http-stand-smoke`; push
-
----
-
-## Copy-paste — PH-S219
+## Copy-paste — replenish
 
 ```
-PoolAI VDT · один PH-S* · main · MSYS2 PATH · git-push.md
+PoolAI VDT · replenish §5.12 · main · MSYS2 PATH · git-push.md
 
 S0: git fetch · HANDOFF · FM §5.12 · df -h /s
 
-PH-S219 — Galaxy trust payout metrics smoke (tests)
-Scope: stand smoke trust payout counters on /metrics; cargo test; FM/HANDOFF/NEXT; commit+push
+Replenish — додати PH-S220+ з §5.13 / research; один спринт за сесію; FM/HANDOFF/NEXT; vision-sync; commit+push
 ```
