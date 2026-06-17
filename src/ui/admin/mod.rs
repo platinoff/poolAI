@@ -133,6 +133,24 @@ pub fn admin_layout_audit(
     )
 }
 
+/// Tenants admin page layout — slim `admin.tenants.*` Rust i18n patch only (PH-S230).
+pub fn admin_layout_tenants(
+    title_i18n_key: &str,
+    title_fallback: &str,
+    body_html: &str,
+    script_js: &str,
+) -> Html<String> {
+    let i18n_patch = poolai_ui_core::i18n::admin_tenants_patch_script();
+    admin_layout_with_module_script(
+        title_i18n_key,
+        title_fallback,
+        body_html,
+        POOLAI_UI_WASM_MODULE,
+        script_js,
+        &i18n_patch,
+    )
+}
+
 /// Jobs admin page layout — slim `admin.jobs.*` Rust i18n patch only (PH-S211).
 pub fn admin_layout_jobs(
     title_i18n_key: &str,
@@ -447,6 +465,14 @@ fn admin_layout_default_patch_excludes_audit_ph_s229() {
     let patch = poolai_ui_core::i18n::admin_jobs_grid_patch_script();
     assert!(!patch.contains(r#""admin.audit.sectionTitle""#));
     assert!(!patch.contains(r#""admin.page.audit""#));
+}
+
+#[test]
+fn admin_layout_default_patch_excludes_tenants_ph_s230() {
+    let patch = poolai_ui_core::i18n::admin_jobs_grid_patch_script();
+    assert!(!patch.contains(r#""admin.tenants.section""#));
+    assert!(!patch.contains(r#""admin.page.tenants""#));
+    assert!(patch.contains(r#""admin.tenants.col.name""#));
 }
 
 #[test]

@@ -1,6 +1,6 @@
 //! UI i18n subsets moved from `i18n_core.js` (PH-S154 admin jobs/grid; PH-S162 auth/dash shell; PH-S197 updates-compat; PH-S207 monitoring; PH-S211 jobs-only patch; PH-S214 raid-only patch; PH-S217 grid-pricing-only patch).
 //!
-//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs — `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); dashboard — `admin_dashboard_patch` (PH-S228); audit — `admin_audit_patch` (PH-S229); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221); workers — `admin_workers_patch` (PH-S222); libs — `admin_libs_patch` (PH-S223).
+//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs — `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); dashboard — `admin_dashboard_patch` (PH-S228); audit — `admin_audit_patch` (PH-S229); tenants — `admin_tenants_patch` (PH-S230); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221); workers — `admin_workers_patch` (PH-S222); libs — `admin_libs_patch` (PH-S223).
 //! Auth + dashboard shell: `window.__poolaiAuthDashI18nRust` on login, dashboard layout, admin layout (PH-S162).
 
 use std::collections::BTreeMap;
@@ -596,6 +596,87 @@ pub const ADMIN_AUDIT_UK: &[I18nRow<'_>] = &[
     ("admin.audit.loading", "Завантаження подій аудиту…"),
     ("admin.audit.errLoad", "Помилка завантаження журналу: "),
 ];
+
+/// English tenants admin keys (PH-S230; moved from `i18n_core.js`).
+pub const ADMIN_TENANTS_EN: &[I18nRow<'_>] = &[
+    ("admin.page.tenants", "Tenant Management"),
+    ("admin.tenants.loading", "Loading tenants…"),
+    ("admin.tenants.errLoad", "Error loading tenants: "),
+    ("admin.tenants.empty", "No tenants found"),
+    ("admin.tenants.col.name", "Name"),
+    ("admin.tenants.col.id", "ID"),
+    ("admin.tenants.col.status", "Status"),
+    ("admin.tenants.col.resources", "Resources"),
+    ("admin.tenants.col.actions", "Actions"),
+    ("admin.tenants.resWorkers", "Workers:"),
+    ("admin.tenants.resMemory", "Memory:"),
+    ("admin.tenants.section", "Tenants"),
+    ("admin.tenants.createBtn", "Create Tenant"),
+    ("admin.tenants.createTitle", "Create Tenant"),
+    ("admin.tenants.editTitle", "Edit Tenant"),
+    ("admin.tenants.label.name", "Tenant Name"),
+    ("admin.tenants.label.maxWorkers", "Max Workers"),
+    ("admin.tenants.hint.unlimited", "Leave empty for unlimited"),
+    ("admin.tenants.label.maxMem", "Max Memory (MB)"),
+    ("admin.tenants.label.maxCpu", "Max CPU Cores"),
+    ("admin.tenants.label.maxStorage", "Max Storage (MB)"),
+    ("admin.tenants.label.maxVm", "Max VM Instances"),
+    ("admin.tenants.active", "Active"),
+    ("admin.tenants.ph.name", "tenant-abc"),
+    ("admin.tenants.creating", "Creating…"),
+    ("admin.tenants.updating", "Updating…"),
+    ("admin.tenants.createdOk", "Tenant created successfully"),
+    ("admin.tenants.updatedOk", "Tenant updated successfully"),
+    ("admin.tenants.deletedOk", "Tenant deleted successfully"),
+    ("admin.tenants.loadErr", "Error loading tenant: "),
+    (
+        "admin.tenants.confirmDel",
+        "Are you sure you want to delete this tenant? This action cannot be undone.",
+    ),
+];
+
+/// Ukrainian tenants admin keys (PH-S230).
+pub const ADMIN_TENANTS_UK: &[I18nRow<'_>] = &[
+    ("admin.page.tenants", "Керування орендарями"),
+    ("admin.tenants.loading", "Завантаження орендарів…"),
+    ("admin.tenants.errLoad", "Помилка завантаження орендарів: "),
+    ("admin.tenants.empty", "Орендарів не знайдено"),
+    ("admin.tenants.col.name", "Назва"),
+    ("admin.tenants.col.id", "ID"),
+    ("admin.tenants.col.status", "Статус"),
+    ("admin.tenants.col.resources", "Ресурси"),
+    ("admin.tenants.col.actions", "Дії"),
+    ("admin.tenants.resWorkers", "Воркери:"),
+    ("admin.tenants.resMemory", "Пам’ять:"),
+    ("admin.tenants.section", "Орендарі"),
+    ("admin.tenants.createBtn", "Створити орендаря"),
+    ("admin.tenants.createTitle", "Створити орендаря"),
+    ("admin.tenants.editTitle", "Редагувати орендаря"),
+    ("admin.tenants.label.name", "Назва орендаря"),
+    ("admin.tenants.label.maxWorkers", "Макс. воркерів"),
+    ("admin.tenants.hint.unlimited", "Порожньо — без обмежень"),
+    ("admin.tenants.label.maxMem", "Макс. пам’ять (МБ)"),
+    ("admin.tenants.label.maxCpu", "Макс. ядер CPU"),
+    ("admin.tenants.label.maxStorage", "Макс. сховище (МБ)"),
+    ("admin.tenants.label.maxVm", "Макс. інстансів VM"),
+    ("admin.tenants.active", "Активний"),
+    ("admin.tenants.ph.name", "tenant-abc"),
+    ("admin.tenants.creating", "Створення…"),
+    ("admin.tenants.updating", "Оновлення…"),
+    ("admin.tenants.createdOk", "Орендаря створено"),
+    ("admin.tenants.updatedOk", "Орендаря оновлено"),
+    ("admin.tenants.deletedOk", "Орендаря видалено"),
+    ("admin.tenants.loadErr", "Помилка завантаження орендаря: "),
+    (
+        "admin.tenants.confirmDel",
+        "Видалити цього орендаря? Дію не скасувати.",
+    ),
+];
+
+/// Shared tenants keys for default admin layout until PH-S231 (`security.rs`).
+pub const ADMIN_TENANTS_SHARED_EN: &[I18nRow<'_>] = &[("admin.tenants.col.name", "Name")];
+
+pub const ADMIN_TENANTS_SHARED_UK: &[I18nRow<'_>] = &[("admin.tenants.col.name", "Назва")];
 
 /// English monitoring admin keys (PH-S207; moved from `i18n_core.js`).
 pub const ADMIN_MONITORING_EN: &[I18nRow<'_>] = &[
@@ -1236,6 +1317,25 @@ pub fn admin_audit_patch_script() -> String {
     format!("window.__poolaiAdminI18nRust={};", admin_audit_patch_json())
 }
 
+/// Tenants admin page — slim `admin.tenants.*` patch only (PH-S230).
+pub fn admin_tenants_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_TENANTS_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_TENANTS_UK));
+    root
+}
+
+pub fn admin_tenants_patch_json() -> String {
+    serde_json::to_string(&admin_tenants_patch()).expect("admin tenants i18n patch serializes")
+}
+
+pub fn admin_tenants_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminI18nRust={};",
+        admin_tenants_patch_json()
+    )
+}
+
 /// Monitoring admin page — slim `admin.mon.*` patch only (PH-S220).
 pub fn admin_monitoring_patch() -> BTreeMap<String, BTreeMap<String, String>> {
     let mut root = BTreeMap::new();
@@ -1314,8 +1414,12 @@ pub fn admin_libs_patch_script() -> String {
 /// Default admin layout — slim `admin.jobs.*` patch only (PH-S221; updates-compat on dedicated page).
 pub fn admin_jobs_grid_patch() -> BTreeMap<String, BTreeMap<String, String>> {
     let mut root = BTreeMap::new();
-    root.insert("en".into(), rows_to_map(ADMIN_JOBS_EN));
-    root.insert("uk".into(), rows_to_map(ADMIN_JOBS_UK));
+    let mut en = rows_to_map(ADMIN_JOBS_EN);
+    let mut uk = rows_to_map(ADMIN_JOBS_UK);
+    merge_rows(&mut en, ADMIN_TENANTS_SHARED_EN);
+    merge_rows(&mut uk, ADMIN_TENANTS_SHARED_UK);
+    root.insert("en".into(), en);
+    root.insert("uk".into(), uk);
     root
 }
 
@@ -1373,6 +1477,7 @@ pub fn t_en(key: &str) -> Option<&'static str> {
         ADMIN_UPDATES_COMPAT_EN,
         ADMIN_DASHBOARD_EN,
         ADMIN_AUDIT_EN,
+        ADMIN_TENANTS_EN,
         ADMIN_MONITORING_EN,
     ] {
         if let Some((_, v)) = rows.iter().find(|(k, _)| *k == key) {
@@ -1390,6 +1495,7 @@ pub fn t_uk(key: &str) -> Option<&'static str> {
         ADMIN_UPDATES_COMPAT_UK,
         ADMIN_DASHBOARD_UK,
         ADMIN_AUDIT_UK,
+        ADMIN_TENANTS_UK,
         ADMIN_MONITORING_UK,
     ] {
         if let Some((_, v)) = rows.iter().find(|(k, _)| *k == key) {
@@ -1469,6 +1575,20 @@ mod tests {
         assert!(!json.contains(r#""admin.updatesCompat.section""#));
         assert!(!json.contains(r#""admin.mon.mlTitle""#));
         assert!(!json.contains(r#""admin.page.monitoring""#));
+    }
+
+    #[test]
+    fn tenants_patch_has_matching_en_uk_key_counts_ph_s230() {
+        assert_eq!(ADMIN_TENANTS_EN.len(), ADMIN_TENANTS_UK.len());
+    }
+
+    #[test]
+    fn tenants_patch_json_tenants_only_ph_s230() {
+        let json = admin_tenants_patch_json();
+        assert!(json.contains(r#""admin.page.tenants""#));
+        assert!(json.contains(r#""admin.tenants.section""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+        assert!(!json.contains(r#""admin.audit.sectionTitle""#));
     }
 
     #[test]

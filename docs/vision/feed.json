@@ -3,18 +3,9 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S230",
-      "link": "docs/vision/index.html#sprint-queue",
-      "next": true,
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "admin.tenants.*` slim patch",
-      "title": "Admin i18n slim tenants panel (code)"
-    },
-    {
-      "category": "open",
       "id": "PH-S231",
       "link": "docs/vision/index.html#sprint-queue",
+      "next": true,
       "published": "2026-05-28",
       "status": "open",
       "summary": "admin.sec.*` slim patch",
@@ -55,6 +46,15 @@
       "status": "open",
       "summary": "stand checks vision rev vs FM footer",
       "title": "Stand smoke vision rev parity (tests)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S230",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "admin.tenants.*` → `admin_tenants_patch",
+      "title": "Admin i18n slim tenants panel (code)"
     },
     {
       "category": "closed",
@@ -154,15 +154,6 @@
       "status": "closed",
       "summary": "stand smoke trust payout counters on `/metrics",
       "title": "Galaxy trust payout metrics smoke (tests)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S218",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "aria-live` region for selected node label; rev++",
-      "title": "Vision map aria-live selection (docs/vision)"
     }
   ],
   "link": "docs/vision/index.html",

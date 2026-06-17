@@ -2,7 +2,7 @@
 //!
 //! Provides tenant CRUD operations with resource quota management.
 
-use crate::ui::admin::admin_layout;
+use crate::ui::admin::admin_layout_tenants;
 use axum::response::Html;
 
 /// Tenant management page
@@ -224,7 +224,7 @@ pub async fn admin_tenants() -> Html<String> {
     loadTenants();
     "#;
 
-    admin_layout(
+    admin_layout_tenants(
         "admin.page.tenants",
         "Tenant Management",
         r#"
@@ -339,4 +339,14 @@ pub async fn admin_tenants() -> Html<String> {
         "#,
         script,
     )
+}
+
+#[tokio::test]
+async fn admin_tenants_page_slim_tenants_i18n_patch_ph_s230() {
+    let html = admin_tenants().await.0;
+    assert!(html.contains("window.__poolaiAdminI18nRust="));
+    assert!(html.contains(r#""admin.page.tenants""#));
+    assert!(html.contains(r#""admin.tenants.section""#));
+    assert!(!html.contains(r#""admin.jobs.leaseState.active""#));
+    assert!(!html.contains(r#""admin.sec.tab.oauth""#));
 }
