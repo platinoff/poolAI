@@ -1,6 +1,6 @@
 //! UI i18n subsets moved from `i18n_core.js` (PH-S154 admin jobs/grid; PH-S162 auth/dash shell; PH-S197 updates-compat; PH-S207 monitoring; PH-S211 jobs-only patch; PH-S214 raid-only patch; PH-S217 grid-pricing-only patch).
 //!
-//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs — `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221); workers — `admin_workers_patch` (PH-S222); libs — `admin_libs_patch` (PH-S223).
+//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs — `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); dashboard — `admin_dashboard_patch` (PH-S228); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221); workers — `admin_workers_patch` (PH-S222); libs — `admin_libs_patch` (PH-S223).
 //! Auth + dashboard shell: `window.__poolaiAuthDashI18nRust` on login, dashboard layout, admin layout (PH-S162).
 
 use std::collections::BTreeMap;
@@ -499,6 +499,50 @@ pub const ADMIN_UPDATES_COMPAT_UK: &[I18nRow<'_>] = &[
         "admin.updatesCompat.link.matrix",
         "Galaxy §9.3 compat matrix (docs)",
     ),
+];
+
+/// English admin dashboard keys (PH-S228; moved from `i18n_core.js`).
+pub const ADMIN_DASHBOARD_EN: &[I18nRow<'_>] = &[
+    ("admin.page.dashboard", "Admin Dashboard"),
+    ("admin.dash.card.overview", "System Overview"),
+    ("admin.dash.card.quickStats", "Quick Stats"),
+    ("admin.dash.card.alerts", "Active Alerts"),
+    ("admin.dash.card.activity", "Recent Activity"),
+    ("admin.dash.card.metrics", "Metrics Overview (Last Hour)"),
+    ("admin.dash.label.status", "Status:"),
+    ("admin.dash.label.uptime", "Uptime:"),
+    ("admin.dash.quick.workers", "Workers (active):"),
+    ("admin.dash.quick.vm", "VM Instances:"),
+    ("admin.dash.quick.cpu", "CPU Usage:"),
+    ("admin.dash.quick.memory", "Memory (tracked):"),
+    ("admin.dash.spark.cpu", "CPU Usage"),
+    ("admin.dash.spark.memory", "Memory Usage"),
+    ("admin.dash.avg", "Avg:"),
+    ("admin.dash.noAlerts", "No active alerts"),
+    ("admin.dash.noActivity", "No recent activity"),
+    ("admin.dash.errLoad", "Error loading dashboard: "),
+];
+
+/// Ukrainian admin dashboard keys (PH-S228).
+pub const ADMIN_DASHBOARD_UK: &[I18nRow<'_>] = &[
+    ("admin.page.dashboard", "Адмін-панель"),
+    ("admin.dash.card.overview", "Огляд системи"),
+    ("admin.dash.card.quickStats", "Швидка статистика"),
+    ("admin.dash.card.alerts", "Активні сповіщення"),
+    ("admin.dash.card.activity", "Остання активність"),
+    ("admin.dash.card.metrics", "Метрики (остання година)"),
+    ("admin.dash.label.status", "Статус:"),
+    ("admin.dash.label.uptime", "Час роботи:"),
+    ("admin.dash.quick.workers", "Воркери (активні):"),
+    ("admin.dash.quick.vm", "Інстанси VM:"),
+    ("admin.dash.quick.cpu", "Використання CPU:"),
+    ("admin.dash.quick.memory", "Пам’ять (відстеж.):"),
+    ("admin.dash.spark.cpu", "Використання CPU"),
+    ("admin.dash.spark.memory", "Використання пам’яті"),
+    ("admin.dash.avg", "Сер.:"),
+    ("admin.dash.noAlerts", "Немає активних сповіщень"),
+    ("admin.dash.noActivity", "Немає недавньої активності"),
+    ("admin.dash.errLoad", "Помилка завантаження панелі: "),
 ];
 
 /// English monitoring admin keys (PH-S207; moved from `i18n_core.js`).
@@ -1105,6 +1149,25 @@ pub fn admin_grid_pricing_patch_script() -> String {
     )
 }
 
+/// Dashboard admin page — slim `admin.dash.*` patch only (PH-S228).
+pub fn admin_dashboard_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_DASHBOARD_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_DASHBOARD_UK));
+    root
+}
+
+pub fn admin_dashboard_patch_json() -> String {
+    serde_json::to_string(&admin_dashboard_patch()).expect("admin dashboard i18n patch serializes")
+}
+
+pub fn admin_dashboard_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminI18nRust={};",
+        admin_dashboard_patch_json()
+    )
+}
+
 /// Monitoring admin page — slim `admin.mon.*` patch only (PH-S220).
 pub fn admin_monitoring_patch() -> BTreeMap<String, BTreeMap<String, String>> {
     let mut root = BTreeMap::new();
@@ -1240,6 +1303,7 @@ pub fn t_en(key: &str) -> Option<&'static str> {
         ADMIN_JOBS_EN,
         ADMIN_GRID_PRICING_EN,
         ADMIN_UPDATES_COMPAT_EN,
+        ADMIN_DASHBOARD_EN,
         ADMIN_MONITORING_EN,
     ] {
         if let Some((_, v)) = rows.iter().find(|(k, _)| *k == key) {
@@ -1255,6 +1319,7 @@ pub fn t_uk(key: &str) -> Option<&'static str> {
         ADMIN_JOBS_UK,
         ADMIN_GRID_PRICING_UK,
         ADMIN_UPDATES_COMPAT_UK,
+        ADMIN_DASHBOARD_UK,
         ADMIN_MONITORING_UK,
     ] {
         if let Some((_, v)) = rows.iter().find(|(k, _)| *k == key) {
@@ -1334,6 +1399,21 @@ mod tests {
         assert!(!json.contains(r#""admin.updatesCompat.section""#));
         assert!(!json.contains(r#""admin.mon.mlTitle""#));
         assert!(!json.contains(r#""admin.page.monitoring""#));
+    }
+
+    #[test]
+    fn dashboard_patch_has_matching_en_uk_key_counts_ph_s228() {
+        assert_eq!(ADMIN_DASHBOARD_EN.len(), ADMIN_DASHBOARD_UK.len());
+    }
+
+    #[test]
+    fn dashboard_patch_json_dashboard_only_ph_s228() {
+        let json = admin_dashboard_patch_json();
+        assert!(json.contains(r#""admin.page.dashboard""#));
+        assert!(json.contains(r#""admin.dash.card.overview""#));
+        assert!(json.contains(r#""admin.dash.avg""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+        assert!(!json.contains(r#""admin.mon.mlTitle""#));
     }
 
     #[test]

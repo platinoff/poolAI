@@ -3,18 +3,9 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S228",
-      "link": "docs/vision/index.html#sprint-queue",
-      "next": true,
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "admin.dash.*` → `poolai-ui-core",
-      "title": "Admin i18n slim dashboard panel (code)"
-    },
-    {
-      "category": "open",
       "id": "PH-S229",
       "link": "docs/vision/index.html#sprint-queue",
+      "next": true,
       "published": "2026-05-28",
       "status": "open",
       "summary": "admin.audit.*` slim patch",
@@ -73,6 +64,15 @@
       "status": "open",
       "summary": "stand checks vision rev vs FM footer",
       "title": "Stand smoke vision rev parity (tests)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S228",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "admin.dash.*` → `admin_dashboard_patch",
+      "title": "Admin i18n slim dashboard panel (code)"
     },
     {
       "category": "closed",
@@ -172,15 +172,6 @@
       "status": "closed",
       "summary": "grid-pricing strings → `poolai-ui-core",
       "title": "Admin i18n slim grid-pricing panel (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S216",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "stand smoke `galaxy_pricing_forced_fallback_total",
-      "title": "Galaxy pricing fallback metrics smoke (tests)"
     }
   ],
   "link": "docs/vision/index.html",

@@ -2,7 +2,7 @@
 //!
 //! Provides system overview with real-time status, metrics, alerts, and recent activity.
 
-use crate::ui::admin::admin_layout;
+use crate::ui::admin::admin_layout_dashboard;
 use axum::response::Html;
 
 /// Admin dashboard home page
@@ -147,7 +147,7 @@ pub async fn admin_dashboard() -> Html<String> {
     poolaiStartMetricsPolling(renderMetricsChart, 30000);
     "#;
 
-    admin_layout(
+    admin_layout_dashboard(
         "admin.page.dashboard",
         "Admin Dashboard",
         r#"
@@ -176,4 +176,14 @@ pub async fn admin_dashboard() -> Html<String> {
         "#,
         script,
     )
+}
+
+#[tokio::test]
+async fn admin_dashboard_page_slim_dashboard_i18n_patch_ph_s228() {
+    let html = admin_dashboard().await.0;
+    assert!(html.contains("window.__poolaiAdminI18nRust="));
+    assert!(html.contains(r#""admin.page.dashboard""#));
+    assert!(html.contains(r#""admin.dash.card.overview""#));
+    assert!(!html.contains(r#""admin.jobs.leaseState.active""#));
+    assert!(!html.contains(r#""admin.mon.mlTitle""#));
 }
