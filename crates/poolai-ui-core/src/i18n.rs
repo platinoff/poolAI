@@ -1,6 +1,6 @@
 //! UI i18n subsets moved from `i18n_core.js` (PH-S154 admin jobs/grid; PH-S162 auth/dash shell; PH-S197 updates-compat; PH-S207 monitoring; PH-S211 jobs-only patch; PH-S214 raid-only patch; PH-S217 grid-pricing-only patch).
 //!
-//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs — `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); dashboard — `admin_dashboard_patch` (PH-S228); audit — `admin_audit_patch` (PH-S229); tenants — `admin_tenants_patch` (PH-S230); security — `admin_security_patch` (PH-S231); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221); workers — `admin_workers_patch` (PH-S222); libs — `admin_libs_patch` (PH-S223).
+//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs — `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); dashboard — `admin_dashboard_patch` (PH-S228); audit — `admin_audit_patch` (PH-S229); tenants — `admin_tenants_patch` (PH-S230); security — `admin_security_patch` (PH-S231); topology — `admin_topology_patch` (PH-S234); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221); workers — `admin_workers_patch` (PH-S222); libs — `admin_libs_patch` (PH-S223).
 //! Auth + dashboard shell: `window.__poolaiAuthDashI18nRust` on login, dashboard layout, admin layout (PH-S162).
 
 use std::collections::BTreeMap;
@@ -929,6 +929,96 @@ pub const ADMIN_SECURITY_UK: &[I18nRow<'_>] = &[
     ("admin.sec.emDash", "—"),
 ];
 
+/// English topology admin keys (PH-S234; moved from `i18n_core.js`).
+pub const ADMIN_TOPOLOGY_EN: &[I18nRow<'_>] = &[
+    ("admin.page.topology", "Topology"),
+    ("admin.topo.title", "Network Topology"),
+    (
+        "admin.topo.intro",
+        "View network topology, latency matrix, and node resources.",
+    ),
+    ("admin.topo.stat.nodes", "Nodes"),
+    ("admin.topo.stat.latencyMs", "Latency Measurements"),
+    ("admin.topo.stat.lastUpd", "Last Updated"),
+    ("admin.topo.sectionOverview", "Topology Overview"),
+    ("admin.topo.sectionGraph", "Cluster Graph"),
+    ("admin.topo.sectionHeatmap", "Latency Heatmap"),
+    ("admin.topo.graphTitle", "Cluster topology graph"),
+    (
+        "admin.topo.graphLegend",
+        "Edge color: lower latency (greener) → higher (warmer). Node size: load.",
+    ),
+    ("admin.topo.refresh", "Refresh"),
+    ("admin.topo.sectionLatency", "Latency Matrix"),
+    ("admin.topo.loading", "Loading…"),
+    ("admin.topo.noNodes", "No nodes found"),
+    ("admin.topo.errNodesRow", "Error loading nodes"),
+    ("admin.topo.noLatency", "No latency measurements available"),
+    ("admin.topo.errLatencyRow", "Error loading latency matrix"),
+    ("admin.topo.viewDetails", "View Details"),
+    ("admin.topo.modalNodeTitle", "Node Resources"),
+    ("admin.topo.errLoad", "Error loading topology: "),
+    ("admin.topo.errNodeRes", "Error loading node resources: "),
+    ("admin.topo.refreshInfo", "Topology refresh initiated"),
+    ("admin.topo.col.nodeId", "Node ID"),
+    ("admin.topo.col.gpuMem", "Available GPU Memory"),
+    ("admin.topo.col.cpu", "Available CPU Cores"),
+    ("admin.topo.col.load", "Current Load"),
+    ("admin.topo.col.actions", "Actions"),
+    ("admin.topo.col.from", "From Node"),
+    ("admin.topo.col.to", "To Node"),
+    ("admin.topo.col.latency", "Latency (ms)"),
+    ("admin.topo.lbl.gpu", "GPU Memory:"),
+    ("admin.topo.lbl.cpu", "CPU Cores:"),
+    ("admin.topo.lbl.sysMem", "System Memory:"),
+    ("admin.topo.lbl.load", "Current Load:"),
+];
+
+/// Ukrainian topology admin keys (PH-S234).
+pub const ADMIN_TOPOLOGY_UK: &[I18nRow<'_>] = &[
+    ("admin.page.topology", "Топологія"),
+    ("admin.topo.title", "Топологія мережі"),
+    (
+        "admin.topo.intro",
+        "Топологія, матриця затримок і ресурси вузлів.",
+    ),
+    ("admin.topo.stat.nodes", "Вузли"),
+    ("admin.topo.stat.latencyMs", "Виміри затримки"),
+    ("admin.topo.stat.lastUpd", "Оновлено"),
+    ("admin.topo.sectionOverview", "Огляд топології"),
+    ("admin.topo.sectionGraph", "Граф кластера"),
+    ("admin.topo.sectionHeatmap", "Теплова карта затримок"),
+    ("admin.topo.graphTitle", "Граф топології кластера"),
+    (
+        "admin.topo.graphLegend",
+        "Колір ребра: менша затримка (зеленіше) → більша (тепліше). Розмір вузла: навантаження.",
+    ),
+    ("admin.topo.refresh", "Оновити"),
+    ("admin.topo.sectionLatency", "Матриця затримок"),
+    ("admin.topo.loading", "Завантаження…"),
+    ("admin.topo.noNodes", "Вузлів не знайдено"),
+    ("admin.topo.errNodesRow", "Помилка завантаження вузлів"),
+    ("admin.topo.noLatency", "Вимірів затримки немає"),
+    ("admin.topo.errLatencyRow", "Помилка матриці затримок"),
+    ("admin.topo.viewDetails", "Деталі"),
+    ("admin.topo.modalNodeTitle", "Ресурси вузла"),
+    ("admin.topo.errLoad", "Помилка завантаження топології: "),
+    ("admin.topo.errNodeRes", "Помилка ресурсів вузла: "),
+    ("admin.topo.refreshInfo", "Оновлення топології розпочато"),
+    ("admin.topo.col.nodeId", "ID вузла"),
+    ("admin.topo.col.gpuMem", "Доступна пам’ять GPU"),
+    ("admin.topo.col.cpu", "Доступні ядра CPU"),
+    ("admin.topo.col.load", "Поточне навантаження"),
+    ("admin.topo.col.actions", "Дії"),
+    ("admin.topo.col.from", "З вузла"),
+    ("admin.topo.col.to", "До вузла"),
+    ("admin.topo.col.latency", "Затримка (мс)"),
+    ("admin.topo.lbl.gpu", "Пам’ять GPU:"),
+    ("admin.topo.lbl.cpu", "Ядра CPU:"),
+    ("admin.topo.lbl.sysMem", "Системна пам’ять:"),
+    ("admin.topo.lbl.load", "Навантаження:"),
+];
+
 /// English monitoring admin keys (PH-S207; moved from `i18n_core.js`).
 pub const ADMIN_MONITORING_EN: &[I18nRow<'_>] = &[
     ("admin.page.monitoring", "Monitoring Dashboard"),
@@ -1606,6 +1696,25 @@ pub fn admin_security_patch_script() -> String {
     )
 }
 
+/// Topology admin page — slim `admin.topo.*` patch only (PH-S234).
+pub fn admin_topology_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_TOPOLOGY_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_TOPOLOGY_UK));
+    root
+}
+
+pub fn admin_topology_patch_json() -> String {
+    serde_json::to_string(&admin_topology_patch()).expect("admin topology i18n patch serializes")
+}
+
+pub fn admin_topology_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminI18nRust={};",
+        admin_topology_patch_json()
+    )
+}
+
 /// Monitoring admin page — slim `admin.mon.*` patch only (PH-S220).
 pub fn admin_monitoring_patch() -> BTreeMap<String, BTreeMap<String, String>> {
     let mut root = BTreeMap::new();
@@ -1745,6 +1854,7 @@ pub fn t_en(key: &str) -> Option<&'static str> {
         ADMIN_AUDIT_EN,
         ADMIN_TENANTS_EN,
         ADMIN_SECURITY_EN,
+        ADMIN_TOPOLOGY_EN,
         ADMIN_MONITORING_EN,
     ] {
         if let Some((_, v)) = rows.iter().find(|(k, _)| *k == key) {
@@ -1764,6 +1874,7 @@ pub fn t_uk(key: &str) -> Option<&'static str> {
         ADMIN_AUDIT_UK,
         ADMIN_TENANTS_UK,
         ADMIN_SECURITY_UK,
+        ADMIN_TOPOLOGY_UK,
         ADMIN_MONITORING_UK,
     ] {
         if let Some((_, v)) = rows.iter().find(|(k, _)| *k == key) {
@@ -1878,6 +1989,21 @@ mod tests {
     fn jobs_grid_patch_excludes_tenants_shim_ph_s231() {
         let json = admin_jobs_grid_patch_json();
         assert!(!json.contains(r#""admin.tenants.col.name""#));
+    }
+
+    #[test]
+    fn topology_patch_has_matching_en_uk_key_counts_ph_s234() {
+        assert_eq!(ADMIN_TOPOLOGY_EN.len(), ADMIN_TOPOLOGY_UK.len());
+    }
+
+    #[test]
+    fn topology_patch_json_topology_only_ph_s234() {
+        let json = admin_topology_patch_json();
+        assert!(json.contains(r#""admin.page.topology""#));
+        assert!(json.contains(r#""admin.topo.title""#));
+        assert!(json.contains(r#""admin.topo.graphLegend""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+        assert!(!json.contains(r#""admin.sec.tab.oauth""#));
     }
 
     #[test]

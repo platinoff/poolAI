@@ -1,6 +1,6 @@
 //! Topology management admin page (FM-037: SVG graph + latency heatmap).
 
-use super::admin_layout;
+use super::admin_layout_topology;
 
 /// Admin topology page
 pub async fn admin_topology() -> axum::response::Html<String> {
@@ -346,7 +346,7 @@ pub async fn admin_topology() -> axum::response::Html<String> {
         graph_js = graph_js
     );
 
-    admin_layout("admin.page.topology", "Topology", body, &script)
+    admin_layout_topology("admin.page.topology", "Topology", body, &script)
 }
 
 #[cfg(test)]
@@ -364,5 +364,15 @@ mod fm037_tests {
         assert!(html.contains("/api/v1/topology/graph"));
         assert!(html.contains("connectTopologyWebSocket"));
         assert!(html.contains("subscribe_topology"));
+    }
+
+    #[tokio::test]
+    async fn admin_topology_page_slim_topology_i18n_patch_ph_s234() {
+        let html = admin_topology().await.0;
+        assert!(html.contains("window.__poolaiAdminI18nRust="));
+        assert!(html.contains(r#""admin.page.topology""#));
+        assert!(html.contains(r#""admin.topo.title""#));
+        assert!(!html.contains(r#""admin.jobs.leaseState.active""#));
+        assert!(!html.contains(r#""admin.sec.tab.oauth""#));
     }
 }

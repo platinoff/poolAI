@@ -169,6 +169,24 @@ pub fn admin_layout_security(
     )
 }
 
+/// Topology admin page layout — slim `admin.topo.*` Rust i18n patch only (PH-S234).
+pub fn admin_layout_topology(
+    title_i18n_key: &str,
+    title_fallback: &str,
+    body_html: &str,
+    script_js: &str,
+) -> Html<String> {
+    let i18n_patch = poolai_ui_core::i18n::admin_topology_patch_script();
+    admin_layout_with_module_script(
+        title_i18n_key,
+        title_fallback,
+        body_html,
+        POOLAI_UI_WASM_MODULE,
+        script_js,
+        &i18n_patch,
+    )
+}
+
 /// Jobs admin page layout — slim `admin.jobs.*` Rust i18n patch only (PH-S211).
 pub fn admin_layout_jobs(
     title_i18n_key: &str,
@@ -498,6 +516,13 @@ fn admin_layout_default_patch_excludes_security_ph_s231() {
     let patch = poolai_ui_core::i18n::admin_jobs_grid_patch_script();
     assert!(!patch.contains(r#""admin.sec.tab.oauth""#));
     assert!(!patch.contains(r#""admin.page.security""#));
+}
+
+#[test]
+fn admin_layout_default_patch_excludes_topology_ph_s234() {
+    let patch = poolai_ui_core::i18n::admin_jobs_grid_patch_script();
+    assert!(!patch.contains(r#""admin.topo.title""#));
+    assert!(!patch.contains(r#""admin.page.topology""#));
 }
 
 #[test]
