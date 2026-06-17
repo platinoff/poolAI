@@ -133,6 +133,24 @@ pub fn admin_layout_raid(
     )
 }
 
+/// Grid-pricing admin page layout — slim `admin.gridPricing.*` Rust i18n patch only (PH-S217).
+pub fn admin_layout_grid_pricing(
+    title_i18n_key: &str,
+    title_fallback: &str,
+    body_html: &str,
+    script_js: &str,
+) -> Html<String> {
+    let i18n_patch = poolai_ui_core::i18n::admin_grid_pricing_patch_script();
+    admin_layout_with_module_script(
+        title_i18n_key,
+        title_fallback,
+        body_html,
+        POOLAI_UI_WASM_MODULE,
+        script_js,
+        &i18n_patch,
+    )
+}
+
 /// Like [`admin_layout`] but inserts a `<script type="module">` before the page IIFE (PH-S151 wasm wiring).
 pub fn admin_layout_with_module_script(
     title_i18n_key: &str,
@@ -304,7 +322,7 @@ fn admin_layout_injects_rust_i18n_patch_ph_s154() {
     let patch = poolai_ui_core::i18n::admin_jobs_grid_patch_script();
     assert!(patch.contains("window.__poolaiAdminI18nRust="));
     assert!(patch.contains(r#""admin.jobs.leaseState.active""#));
-    assert!(patch.contains(r#""admin.gridPricing.section""#));
+    assert!(!patch.contains(r#""admin.gridPricing.section""#));
 }
 
 #[test]

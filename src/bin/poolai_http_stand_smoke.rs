@@ -332,6 +332,36 @@ async fn smoke_galaxy_prefetch_metrics(client: &Client, base: &str) -> Result<()
     metrics_text_has_prefetch_counters(&body)
 }
 
+/// PH-S216: live stand exposes Galaxy pricing forced-fallback counter on Prometheus scrape.
+const GALAXY_PRICING_FORCED_FALLBACK: &str = "galaxy_pricing_forced_fallback_total";
+
+fn metrics_text_has_pricing_forced_fallback(body: &str) -> Result<(), String> {
+    let name = GALAXY_PRICING_FORCED_FALLBACK;
+    if !body.contains(name) {
+        return Err(format!("/metrics missing {name}"));
+    }
+    if !body.contains(&format!("# TYPE {name} gauge")) {
+        return Err(format!("/metrics missing TYPE gauge for {name}"));
+    }
+    Ok(())
+}
+
+async fn smoke_galaxy_pricing_forced_fallback_metrics(
+    client: &Client,
+    base: &str,
+) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("/metrics request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("/metrics status {}", resp.status()));
+    }
+    let body = resp.text().await.map_err(|e| e.to_string())?;
+    metrics_text_has_pricing_forced_fallback(&body)
+}
+
 async fn smoke_grid_pricing(client: &Client, base: &str) -> Result<(), String> {
     let model = smoke_id("smoke-pricing");
     let url = format!(
@@ -911,6 +941,12 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
     .await;
     record(
         &mut cases,
+        "galaxy_pricing_forced_fallback_metrics",
+        smoke_galaxy_pricing_forced_fallback_metrics(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
         "jobs_migrating",
         smoke_jobs_migrating(&client, &cli.base_url).await,
     )
@@ -1097,6 +1133,16 @@ mod tests {
             "galaxy_prefetch_bytes_total 0\n",
         );
         metrics_text_has_prefetch_counters(sample).expect("sample export");
+    }
+
+    #[test]
+    fn galaxy_pricing_forced_fallback_metrics_export_shape_ph_s216() {
+        let sample = concat!(
+            "# HELP galaxy_pricing_forced_fallback_total Galaxy pricing forced L2 quotes\n",
+            "# TYPE galaxy_pricing_forced_fallback_total gauge\n",
+            "galaxy_pricing_forced_fallback_total 0\n",
+        );
+        metrics_text_has_pricing_forced_fallback(sample).expect("sample export");
     }
 
     #[test]

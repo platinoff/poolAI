@@ -170,8 +170,6 @@
       'admin.wrk.autoRestart': 'Auto Restart',
       'admin.wrk.resourceMon': 'Resource Monitoring',
 
-      'admin.page.gridPricing': 'Grid pricing',
-
       'admin.lib.loading': 'Loading libraries…',
       'admin.lib.errLoad': 'Error loading libraries: ',
       'admin.lib.empty': 'No libraries found',
@@ -794,8 +792,6 @@
       'admin.wrk.hintId': 'Літери, цифри, дефіс і підкреслення',
       'admin.wrk.autoRestart': 'Автоперезапуск',
       'admin.wrk.resourceMon': 'Моніторинг ресурсів',
-
-      'admin.page.gridPricing': 'Ціни Grid',
 
       'admin.lib.loading': 'Завантаження бібліотек…',
       'admin.lib.errLoad': 'Помилка завантаження бібліотек: ',

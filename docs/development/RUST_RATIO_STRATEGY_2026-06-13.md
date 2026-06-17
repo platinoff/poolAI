@@ -163,10 +163,10 @@ flowchart TB
 | 68 | **PH-S211** | Admin i18n slim jobs panel | code | **✅** |
 | 69 | **PH-S212** | Vision reduced-motion map FX | docs/vision | **✅** |
 | 70 | **PH-S213** | Galaxy prefetch metrics stand smoke | tests | **✅** |
-| 71 | **PH-S214** | Admin i18n slim raid panel | code | відкрито |
-| 72 | **PH-S215** | Vision panel collapse focus restore | docs/vision | відкрито |
-| 73 | **PH-S216** | Galaxy pricing fallback metrics smoke | tests | відкрито |
-| 74 | **PH-S217** | Admin i18n slim grid-pricing panel | code | відкрито |
+| 71 | **PH-S214** | Admin i18n slim raid panel | code | **✅** |
+| 72 | **PH-S215** | Vision panel collapse focus restore | docs/vision | **✅** |
+| 73 | **PH-S216** | Galaxy pricing fallback metrics smoke | tests | **✅** |
+| 74 | **PH-S217** | Admin i18n slim grid-pricing panel | code | **✅** |
 | 75 | **PH-S218** | Vision map aria-live selection | docs/vision | відкрито |
 | 76 | **PH-S219** | Galaxy trust payout metrics smoke | tests | відкрито |
 

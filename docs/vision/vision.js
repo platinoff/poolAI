@@ -1941,6 +1941,7 @@
       panel.classList.toggle("panel-docked", collapsed);
       panel.querySelectorAll(".btn-panel-collapse").forEach((btn) => {
         btn.textContent = collapsed ? "+" : "−";
+        btn.setAttribute("aria-expanded", collapsed ? "false" : "true");
         btn.title = collapsed
           ? "Restore " + (panel.querySelector("h2 > span")?.textContent || id)
           : "Collapse to dock bar";
@@ -1985,12 +1986,25 @@
     window.dispatchEvent(new Event("resize"));
   }
 
+  function focusPanelToggle(panelId) {
+    const panel = document.querySelector('.panel[data-panel="' + panelId + '"]');
+    if (!panel) return;
+    const btn = panel.querySelector(".btn-panel-collapse");
+    if (btn && typeof btn.focus === "function") {
+      btn.focus({ preventScroll: true });
+    }
+  }
+
   function togglePanelCollapse(panelId) {
     if (fullscreenPanel) exitPanelFullscreen();
+    const willCollapse = !collapsedPanels.has(panelId);
     if (collapsedPanels.has(panelId)) collapsedPanels.delete(panelId);
     else collapsedPanels.add(panelId);
     saveMapPrefs();
     syncPanelCollapseLayout();
+    if (willCollapse) {
+      requestAnimationFrame(() => focusPanelToggle(panelId));
+    }
   }
 
   function initPanelCollapse() {
@@ -3053,7 +3067,9 @@
   }
 
   function exitPanelFullscreen() {
+    const panelId = fullscreenPanel?.dataset?.panel;
     if (fullscreenPanel) setPanelFullscreen(fullscreenPanel, false);
+    if (panelId) focusPanelToggle(panelId);
   }
 
   function initPanelFullscreen() {

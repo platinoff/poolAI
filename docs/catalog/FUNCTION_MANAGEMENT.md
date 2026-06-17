@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-16 (PH-S213 ✅ · §5.12 **6** відкритих PH-S214…S219 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-16 (PH-S217 ✅ · §5.12 **2** відкритих PH-S218…S219 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -413,18 +413,18 @@ FM-xxx (з таблиці нижче)
 | 146 | **PH-S211** | Admin i18n slim jobs panel (code) | PH-S207 | `admin.jobs.*` → `poolai-ui-core`; slim `i18n_core.js` | **✅** |
 | 147 | **PH-S212** | Vision reduced-motion map FX (docs/vision) | PH-S209 | `prefers-reduced-motion` → skip glow/animation; rev++ | **✅** |
 | 148 | **PH-S213** | Galaxy prefetch metrics stand smoke (tests) | PH-S184 | stand smoke checks prefetch counters on `/metrics` | **✅** |
-| 149 | **PH-S214** | Admin i18n slim raid panel (code) | PH-S207 | `admin.raid.*` → `poolai-ui-core`; slim JS | відкрито |
-| 150 | **PH-S215** | Vision panel collapse focus restore (docs/vision) | PH-S209 | collapse/Esc returns focus to panel toggle; rev++ | відкрито |
-| 151 | **PH-S216** | Galaxy pricing fallback metrics smoke (tests) | PH-S168 | stand smoke `galaxy_pricing_forced_fallback_total` | відкрито |
-| 152 | **PH-S217** | Admin i18n slim grid-pricing panel (code) | PH-S207 | grid-pricing strings → `poolai-ui-core` | відкрито |
+| 149 | **PH-S214** | Admin i18n slim raid panel (code) | PH-S207 | `admin.raid.*` → `poolai-ui-core`; slim JS | **✅** |
+| 150 | **PH-S215** | Vision panel collapse focus restore (docs/vision) | PH-S209 | collapse/Esc returns focus to panel toggle; rev++ | **✅** |
+| 151 | **PH-S216** | Galaxy pricing fallback metrics smoke (tests) | PH-S168 | stand smoke `galaxy_pricing_forced_fallback_total` | **✅** |
+| 152 | **PH-S217** | Admin i18n slim grid-pricing panel (code) | PH-S207 | grid-pricing strings → `poolai-ui-core` | **✅** |
 | 153 | **PH-S218** | Vision map aria-live selection (docs/vision) | PH-S209 | `aria-live` region for selected node label; rev++ | відкрито |
 | 154 | **PH-S219** | Galaxy trust payout metrics smoke (tests) | PH-S182 | stand smoke trust payout counters on `/metrics` | відкрито |
 
-**Відкритих у §5.12:** **6** (PH-S214…S219). **Закрито смуга:** PH-S128…S213 ✅. Vision rev **155**.
+**Відкритих у §5.12:** **2** (PH-S218…S219). **Закрито смуга:** PH-S128…S217 ✅. Vision rev **156**.
 
-**Rust ratio:** формальна смуга **90–95%**; **hold 95%** — PH-S165 ✅; replenish **S214…S219** (code-first + vision a11y).
+**Rust ratio:** формальна смуга **90–95%**; **hold 95%** — PH-S165 ✅; replenish **S218…S219** (code-first + vision a11y).
 
-**Наступна сесія:** **PH-S214** · черга **6** відкритих (PH-S214…S219) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S218** · черга **2** відкритих (PH-S218…S219) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S169)
 

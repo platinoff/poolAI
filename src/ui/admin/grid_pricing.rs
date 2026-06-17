@@ -1,8 +1,9 @@
 //! Galaxy Grid pricing snapshot admin page (PH-S82) — read-only `GET /api/v1/grid/pricing`.
 //! PH-S151/PH-S152: USD/time formatters via shared `poolai-ui-wasm` bootstrap; thin JS fallback otherwise.
-//! PH-S154: EN/UK i18n subset in `poolai-ui-core::i18n` (injected via admin_layout).
+//! PH-S154: EN/UK i18n subset in `poolai-ui-core::i18n` (injected via admin layout).
+//! PH-S217: grid-pricing page uses slim `admin_layout_grid_pricing` + `admin_grid_pricing_patch`.
 
-use crate::ui::admin::admin_layout;
+use crate::ui::admin::admin_layout_grid_pricing;
 use axum::response::Html;
 
 /// Grid pricing snapshot page (`/ui/admin/grid-pricing`).
@@ -119,7 +120,7 @@ pub async fn admin_grid_pricing() -> Html<String> {
     }
     "#;
 
-    admin_layout(
+    admin_layout_grid_pricing(
         "admin.page.gridPricing",
         "Grid pricing",
         r#"
@@ -158,6 +159,16 @@ pub async fn admin_grid_pricing() -> Html<String> {
         "#,
         script,
     )
+}
+
+#[tokio::test]
+async fn admin_grid_pricing_page_slim_grid_pricing_i18n_patch_ph_s217() {
+    let html = admin_grid_pricing().await.0;
+    assert!(html.contains("window.__poolaiAdminI18nRust="));
+    assert!(html.contains(r#""admin.page.gridPricing""#));
+    assert!(html.contains(r#""admin.gridPricing.section""#));
+    assert!(!html.contains(r#""admin.jobs.leaseState.active""#));
+    assert!(!html.contains(r#""admin.mon.mlTitle""#));
 }
 
 #[tokio::test]

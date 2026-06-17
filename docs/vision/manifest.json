@@ -1728,7 +1728,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S213",
+  "last_sprint_closed": "PH-S217",
   "layers": [
     {
       "id": "L0",
@@ -1761,7 +1761,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S214",
+  "next_sprint": "PH-S218",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7469,7 +7469,7 @@
       "path": "tests/grid_seed_inventory_integration.rs"
     }
   ],
-  "revision": 155,
+  "revision": 156,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -8807,36 +8807,36 @@
       "acceptance": "admin.raid.*` → `poolai-ui-core`; slim JS",
       "deps": "PH-S207",
       "id": "PH-S214",
-      "open": true,
+      "open": false,
       "row": 149,
-      "status": "open",
+      "status": "closed",
       "title": "Admin i18n slim raid panel (code)"
     },
     {
       "acceptance": "collapse/Esc returns focus to panel toggle; rev++",
       "deps": "PH-S209",
       "id": "PH-S215",
-      "open": true,
+      "open": false,
       "row": 150,
-      "status": "open",
+      "status": "closed",
       "title": "Vision panel collapse focus restore (docs/vision)"
     },
     {
       "acceptance": "stand smoke `galaxy_pricing_forced_fallback_total",
       "deps": "PH-S168",
       "id": "PH-S216",
-      "open": true,
+      "open": false,
       "row": 151,
-      "status": "open",
+      "status": "closed",
       "title": "Galaxy pricing fallback metrics smoke (tests)"
     },
     {
       "acceptance": "grid-pricing strings → `poolai-ui-core",
       "deps": "PH-S207",
       "id": "PH-S217",
-      "open": true,
+      "open": false,
       "row": 152,
-      "status": "open",
+      "status": "closed",
       "title": "Admin i18n slim grid-pricing panel (code)"
     },
     {
@@ -8858,7 +8858,7 @@
       "title": "Galaxy trust payout metrics smoke (tests)"
     }
   ],
-  "sprint_queue_open_count": 6,
+  "sprint_queue_open_count": 2,
   "updated_at": "2026-06-15",
   "vision_ui_rev": 58
 }

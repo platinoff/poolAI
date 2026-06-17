@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-16 (PH-S213 ✅ · §5.12 **6** відкритих PH-S214…S219 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
+**Оновлено:** 2026-06-16 (PH-S217 ✅ · §5.12 **2** відкритих PH-S218…S219 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -164,6 +164,10 @@
 **PH-S211 ✅ (code/ui):** `admin_layout_jobs` + `admin_jobs_patch` — jobs page slim Rust i18n; `admin.page.jobs` removed from `i18n_core.js`; `cargo test-ci`.
 **PH-S212 ✅ (vision):** `docs/vision/` — `prefers-reduced-motion` + `map-fx-off` skip constellation glow/edge animation; rev **154**.
 **PH-S213 ✅ (code/tests):** `poolai-http-stand-smoke` — `galaxy_prefetch_metrics` on live `/metrics` (PH-S184 counters); `cargo test-ci`.
+**PH-S214 ✅ (code/ui):** `admin_raid_patch` + `admin_layout_raid` — raid page slim Rust i18n; `admin.raid.*` removed from `i18n_core.js`.
+**PH-S215 ✅ (vision):** `docs/vision/` — `focusPanelToggle` on panel collapse/Esc; `aria-expanded` on collapse toggles; UI cache **v71**; rev **161**.
+**PH-S216 ✅ (code/tests):** `poolai-http-stand-smoke` — `galaxy_pricing_forced_fallback_metrics` on live `/metrics`; rev **161**.
+**PH-S217 ✅ (code/ui):** `admin_grid_pricing_patch` + `admin_layout_grid_pricing` — grid-pricing slim Rust i18n; `admin.page.gridPricing` removed from `i18n_core.js`.
 **Ops:** `open-docs-vision.ps1` — ASCII Write-Host + robust `SendVisionBytes`; URL `http://127.0.0.1:8765/docs/vision/index.html`.
 **PH-S198 ✅ (code):** `topology_graph.rs` — hub labels + `label_x`/`label_y`/`is_hub` in graph JSON; heatmap short ids; slim `topology_graph.js` (SVG paint only); `cargo test-ci`.
 **PH-S194 ✅ (code):** `galaxy_fee_split_applied_total` on grid result wire; `cargo test-ci`.
