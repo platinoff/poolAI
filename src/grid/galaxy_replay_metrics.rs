@@ -9,11 +9,20 @@ use crate::grid::galaxy_settlement::SettlementStatus;
 /// Current replay verifications pending coordinator verdict (mirrored on `GET /metrics`).
 pub const METRIC_REPLAY_PENDING: &str = "galaxy_replay_pending";
 
+/// Replay holds scheduled on grid result path (PH-S333).
+pub const METRIC_REPLAY_PENDING_SCHEDULED_TOTAL: &str = "galaxy_replay_pending_scheduled_total";
+
+/// Replay holds cleared on verdict (PH-S335).
+pub const METRIC_REPLAY_PENDING_RESOLVED_TOTAL: &str = "galaxy_replay_pending_resolved_total";
+
 static REPLAY_PENDING: AtomicU64 = AtomicU64::new(0);
+static REPLAY_PENDING_SCHEDULED_TOTAL: AtomicU64 = AtomicU64::new(0);
+static REPLAY_PENDING_RESOLVED_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// Schedule one replay verification hold (mismatch / explicit flag).
 pub fn record_replay_pending_scheduled() {
     REPLAY_PENDING.fetch_add(1, Ordering::Relaxed);
+    REPLAY_PENDING_SCHEDULED_TOTAL.fetch_add(1, Ordering::Relaxed);
 }
 
 /// Clear one replay verification hold when verdict arrives.
@@ -21,6 +30,15 @@ pub fn record_replay_pending_resolved() {
     let _ = REPLAY_PENDING.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
         Some(n.saturating_sub(1))
     });
+    REPLAY_PENDING_RESOLVED_TOTAL.fetch_add(1, Ordering::Relaxed);
+}
+
+pub fn replay_pending_scheduled_total() -> u64 {
+    REPLAY_PENDING_SCHEDULED_TOTAL.load(Ordering::Relaxed)
+}
+
+pub fn replay_pending_resolved_total() -> u64 {
+    REPLAY_PENDING_RESOLVED_TOTAL.load(Ordering::Relaxed)
 }
 
 pub fn replay_pending() -> u64 {
@@ -30,6 +48,8 @@ pub fn replay_pending() -> u64 {
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_replay_pending_metrics_for_test() {
     REPLAY_PENDING.store(0, Ordering::Relaxed);
+    REPLAY_PENDING_SCHEDULED_TOTAL.store(0, Ordering::Relaxed);
+    REPLAY_PENDING_RESOLVED_TOTAL.store(0, Ordering::Relaxed);
 }
 
 #[cfg(test)]
@@ -108,6 +128,25 @@ mod tests {
             SettlementStatus::Cleared,
         );
         assert_eq!(replay_pending(), 1);
+        reset_replay_pending_metrics_for_test();
+    }
+
+    #[test]
+    fn record_replay_pending_scheduled_total_ph_s333() {
+        let _lock = replay_metrics_test_lock();
+        reset_replay_pending_metrics_for_test();
+        record_replay_pending_scheduled();
+        assert_eq!(replay_pending_scheduled_total(), 1);
+        reset_replay_pending_metrics_for_test();
+    }
+
+    #[test]
+    fn record_replay_pending_resolved_total_ph_s335() {
+        let _lock = replay_metrics_test_lock();
+        reset_replay_pending_metrics_for_test();
+        record_replay_pending_scheduled();
+        record_replay_pending_resolved();
+        assert_eq!(replay_pending_resolved_total(), 1);
         reset_replay_pending_metrics_for_test();
     }
 

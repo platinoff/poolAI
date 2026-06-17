@@ -957,6 +957,18 @@ fn admin_charts_ml_pipeline_demo_url_wasm_first_ph_s327() {
     assert!(js.contains("wasm.buildMlPipelineDemoUrl"));
 }
 
+#[test]
+fn admin_charts_metric_history_url_with_hours_wasm_first_ph_s334() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("wasm.buildMetricHistoryUrlWithHours"));
+}
+
+#[test]
+fn admin_charts_metrics_window_url_with_hours_wasm_first_ph_s337() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("wasm.buildMetricsWindowUrlWithHours"));
+}
+
 #[tokio::test]
 async fn admin_monitoring_ph_s43_ml_metrics_panel() {
     let html = monitoring::admin_monitoring().await.0;

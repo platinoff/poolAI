@@ -1,6 +1,7 @@
-//! ML pipeline metric helpers — parity with `admin_charts.js` (PH-S43, PH-S155, PH-S275, PH-S284, PH-S287, PH-S294, PH-S297, PH-S314, PH-S317, PH-S324, PH-S327).
+//! ML pipeline metric helpers — parity with `admin_charts.js` (PH-S43, PH-S155, PH-S275, PH-S284, PH-S287, PH-S294, PH-S297, PH-S314, PH-S317, PH-S324, PH-S327, PH-S334, PH-S337).
 
 use crate::format::escape_html;
+use chrono::{DateTime, Duration, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::BTreeMap;
@@ -438,6 +439,31 @@ pub fn build_metrics_window_url(start_time: &str, end_time: &str, limit: u32) ->
     )
 }
 
+fn parse_rfc3339_utc(raw: &str) -> Option<DateTime<Utc>> {
+    DateTime::parse_from_rfc3339(raw)
+        .ok()
+        .map(|dt| dt.with_timezone(&Utc))
+}
+
+/// Mirrors `poolaiFetchMetricHistory` with relative hours window (PH-S334).
+pub fn build_metric_history_url_with_hours(
+    metric_name: &str,
+    hours: u32,
+    limit: u32,
+    now_rfc3339: &str,
+) -> String {
+    let now = parse_rfc3339_utc(now_rfc3339).unwrap_or_else(Utc::now);
+    let start = now - Duration::hours(hours as i64);
+    build_metric_history_url(metric_name, &start.to_rfc3339(), &now.to_rfc3339(), limit)
+}
+
+/// Mirrors `poolaiFetchMetricsWindow` with relative hours window (PH-S337).
+pub fn build_metrics_window_url_with_hours(hours: u32, limit: u32, now_rfc3339: &str) -> String {
+    let now = parse_rfc3339_utc(now_rfc3339).unwrap_or_else(Utc::now);
+    let start = now - Duration::hours(hours as i64);
+    build_metrics_window_url(&start.to_rfc3339(), &now.to_rfc3339(), limit)
+}
+
 /// Mirrors `poolaiFetchMlPipelines` URL (PH-S324).
 pub fn build_ml_pipelines_url() -> String {
     "/api/enterprise/ai-ml/pipeline".to_string()
@@ -587,6 +613,23 @@ mod tests {
         let html = render_line_chart_empty_html("No data");
         assert!(html.contains("muted"));
         assert!(html.contains("No data"));
+    }
+
+    #[test]
+    fn build_metric_history_url_with_hours_ph_s334() {
+        let url =
+            build_metric_history_url_with_hours("cpu.usage", 24, 200, "2026-01-02T12:00:00.000Z");
+        assert!(url.contains("cpu%2Eusage"));
+        assert!(url.contains("start_time="));
+        assert!(url.contains("limit=200"));
+    }
+
+    #[test]
+    fn build_metrics_window_url_with_hours_ph_s337() {
+        let url = build_metrics_window_url_with_hours(1, 60, "2026-01-02T12:00:00.000Z");
+        assert!(url.starts_with("/api/enterprise/monitoring/metrics?"));
+        assert!(!url.contains("metric="));
+        assert!(url.contains("limit=60"));
     }
 
     #[test]

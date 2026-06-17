@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-17 (PH-S323…S332 ✅ · тригер **абракадабра** · rust_ratio **94.37%**) · VDT
+**Оновлено:** 2026-06-17 (PH-S333…S342 ✅ · rust_ratio **94.37%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -283,9 +283,19 @@
 **PH-S330 ✅ (ops):** `poolai-vision-sync --check` green.
 **PH-S331 ✅ (ops):** hold advisory `--min-ratio 0.95` snapshot **94.37%**.
 **PH-S332 ✅ (docs):** INDEX §7 + rust_ratio pointer **94.37%**.
+**PH-S333 ✅ (code):** `galaxy_replay_pending_scheduled_total` on replay schedule path.
+**PH-S334 ✅ (code/ui):** `buildMetricHistoryUrlWithHours` wasm; `poolaiFetchMetricHistory` wasm-first.
+**PH-S335 ✅ (code):** `galaxy_replay_pending_resolved_total` on replay verdict path.
+**PH-S336 ✅ (tests):** stand smoke `/metrics` replay scheduled + resolved counters.
+**PH-S337 ✅ (code/ui):** `buildMetricsWindowUrlWithHours` wasm; `poolaiFetchMetricsWindow` wasm-first.
+**PH-S338 ✅ (ops):** `poolai-loc-audit` → `rust_ratio.json` sprint **PH-S338** (**94.37%**).
+**PH-S339 ✅ (docs):** INDEX/HANDOFF/NEXT/STABLE/GALAXY canon sync.
+**PH-S340 ✅ (ops):** `poolai-vision-sync --check` green.
+**PH-S341 ✅ (ops):** hold advisory `--min-ratio 0.95` snapshot **94.37%**.
+**PH-S342 ✅ (docs):** INDEX §7 + rust_ratio pointer **94.37%**.
 **Rules ✅:** тригер **`абракадабра`** у `poolai-session-iteration.mdc` + `virtual-development-team.mdc`.
 **§5.12:** **0** відкритих — replenish §5.13 або **`абракадабра`**.
-**Vision ✅:** rev **217** · rust_ratio **94.37%** · hold **95%** advisory.
+**Vision ✅:** rev **218** · rust_ratio **94.37%** · hold **95%** advisory.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

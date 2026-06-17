@@ -51,9 +51,9 @@ flowchart LR
 
 Промпт власника **`абракадабра`** у новій сесії = повний цикл без окремого підтвердження кожного PH-S*:
 
-**S0** → якщо §5.12 **< 10** відкритих → **replenish до 10** (research + §5.13) → **drain усіх** → **vision-sync `--check`** → **git push + самарі**.
+**S0** → якщо §5.12 **< 10** відкритих → **replenish до 10** (research + §5.13) → **drain усіх** → vision-sync → FM rev sync → **`--check`** → **git push + самарі**.
 
-Деталі кроків — [`poolai-session-iteration.mdc`](poolai-session-iteration.mdc) § «Тригер абракадабра».
+Деталі (shell, replenish шаблон, один test-ci, amend-head-msg, vision порядок) — [`poolai-session-iteration.mdc`](poolai-session-iteration.mdc) § «Тригер абракадабра».
 
 ## Staging
 

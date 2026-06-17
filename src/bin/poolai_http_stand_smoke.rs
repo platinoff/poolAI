@@ -620,16 +620,21 @@ async fn smoke_galaxy_cross_region_egress_metrics(
     metrics_text_has_cross_region_egress_mb(&body)
 }
 
-/// PH-S256: live stand exposes Galaxy replay pending gauge.
-const GALAXY_REPLAY_PENDING: &str = "galaxy_replay_pending";
+/// PH-S256 / PH-S336: live stand exposes Galaxy replay pending gauge + scheduled/resolved totals.
+const GALAXY_REPLAY_METRICS: &[&str] = &[
+    "galaxy_replay_pending",
+    "galaxy_replay_pending_scheduled_total",
+    "galaxy_replay_pending_resolved_total",
+];
 
 fn metrics_text_has_replay_pending(body: &str) -> Result<(), String> {
-    let name = GALAXY_REPLAY_PENDING;
-    if !body.contains(name) {
-        return Err(format!("/metrics missing {name}"));
-    }
-    if !body.contains(&format!("# TYPE {name} gauge")) {
-        return Err(format!("/metrics missing TYPE gauge for {name}"));
+    for name in GALAXY_REPLAY_METRICS {
+        if !body.contains(*name) {
+            return Err(format!("/metrics missing {name}"));
+        }
+        if !body.contains(&format!("# TYPE {name} gauge")) {
+            return Err(format!("/metrics missing TYPE gauge for {name}"));
+        }
     }
     Ok(())
 }
@@ -1776,6 +1781,12 @@ mod tests {
             "# HELP galaxy_replay_pending Galaxy replay verifications pending coordinator verdict (PH-S176)\n",
             "# TYPE galaxy_replay_pending gauge\n",
             "galaxy_replay_pending 0\n",
+            "# HELP galaxy_replay_pending_scheduled_total Galaxy replay holds scheduled on grid result path (PH-S333)\n",
+            "# TYPE galaxy_replay_pending_scheduled_total gauge\n",
+            "galaxy_replay_pending_scheduled_total 0\n",
+            "# HELP galaxy_replay_pending_resolved_total Galaxy replay holds cleared on verdict (PH-S335)\n",
+            "# TYPE galaxy_replay_pending_resolved_total gauge\n",
+            "galaxy_replay_pending_resolved_total 0\n",
         );
         metrics_text_has_replay_pending(sample).expect("sample export");
     }

@@ -3,6 +3,96 @@
   "items": [
     {
       "category": "closed",
+      "id": "PH-S342",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "INDEX §7 + rust_ratio pointer",
+      "title": "Docs INDEX ratio maintain (docs)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S341",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--min-ratio 0.95 --advisory",
+      "title": "Ratio hold advisory snapshot (ops)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S340",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--check` green",
+      "title": "poolai-vision-sync drift gate (ops)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S339",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "INDEX/HANDOFF/NEXT/STABLE/GALAXY",
+      "title": "Docs canon sync band (docs)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S338",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "rust_ratio.json` sprint zriz",
+      "title": "Rust ratio loc-audit refresh (ops)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S337",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "buildMetricsWindowUrlWithHours` wasm glue",
+      "title": "admin metrics window URL hours wasm (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S336",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "/metrics` export shape",
+      "title": "Stand smoke replay scheduled + resolved (tests)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S335",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_replay_pending_resolved_total",
+      "title": "Galaxy replay resolved metric (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S334",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "buildMetricHistoryUrlWithHours` wasm glue",
+      "title": "admin metric history URL hours wasm (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S333",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_replay_pending_scheduled_total",
+      "title": "Galaxy replay scheduled metric (code)"
+    },
+    {
+      "category": "closed",
       "id": "PH-S332",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
@@ -13,96 +103,6 @@
     {
       "category": "closed",
       "id": "PH-S331",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--min-ratio 0.95 --advisory",
-      "title": "Ratio hold advisory snapshot (ops)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S330",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--check` green",
-      "title": "poolai-vision-sync drift gate (ops)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S329",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "INDEX/HANDOFF/NEXT/STABLE/GALAXY",
-      "title": "Docs canon sync band (docs)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S328",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "rust_ratio.json` sprint zriz",
-      "title": "Rust ratio loc-audit refresh (ops)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S327",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "buildMlPipelineDemoUrl` wasm glue",
-      "title": "admin ML pipeline demo URL wasm (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S326",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "/metrics` export shape",
-      "title": "Stand smoke skip ingest + rank skip (tests)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S325",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_locality_rank_skip_total",
-      "title": "Galaxy locality rank skip metric (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S324",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "buildMlPipelinesUrl` wasm glue",
-      "title": "admin ML pipelines URL wasm (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S323",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_prefetch_skip_ingest_total",
-      "title": "Galaxy prefetch skip ingest metric (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S322",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "INDEX §7 + rust_ratio pointer",
-      "title": "Docs INDEX ratio maintain (docs)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S321",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",

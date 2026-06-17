@@ -48,7 +48,11 @@ use crate::grid::galaxy_pricing_provider_metrics::{
     METRIC_PROVIDER_CATALOG_HITS_TOTAL, METRIC_PROVIDER_CATALOG_LOOKUPS_TOTAL,
     METRIC_PROVIDER_ERRORS_TOTAL,
 };
-use crate::grid::galaxy_replay_metrics::{replay_pending, METRIC_REPLAY_PENDING};
+use crate::grid::galaxy_replay_metrics::{
+    replay_pending, replay_pending_resolved_total, replay_pending_scheduled_total,
+    METRIC_REPLAY_PENDING, METRIC_REPLAY_PENDING_RESOLVED_TOTAL,
+    METRIC_REPLAY_PENDING_SCHEDULED_TOTAL,
+};
 use crate::grid::galaxy_replication_metrics::{
     replication_strict_total, METRIC_REPLICATION_STRICT_TOTAL,
 };
@@ -116,6 +120,8 @@ pub struct PoolAiPrometheus {
     galaxy_verification_sample_total: IntGauge,
     galaxy_verification_sample_scheduled_total: IntGauge,
     galaxy_replay_pending: IntGauge,
+    galaxy_replay_pending_scheduled_total: IntGauge,
+    galaxy_replay_pending_resolved_total: IntGauge,
     galaxy_settlement_pending_verification_total: IntGauge,
     galaxy_settlement_cleared_total: IntGauge,
     galaxy_fee_split_applied_total: IntGauge,
@@ -533,6 +539,24 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_replay_pending.clone()))
         .expect("register galaxy_replay_pending");
 
+    let galaxy_replay_pending_scheduled_total = IntGauge::with_opts(Opts::new(
+        METRIC_REPLAY_PENDING_SCHEDULED_TOTAL,
+        "Galaxy replay holds scheduled on grid result path (PH-S333)",
+    ))
+    .expect(METRIC_REPLAY_PENDING_SCHEDULED_TOTAL);
+    registry
+        .register(Box::new(galaxy_replay_pending_scheduled_total.clone()))
+        .expect("register galaxy_replay_pending_scheduled_total");
+
+    let galaxy_replay_pending_resolved_total = IntGauge::with_opts(Opts::new(
+        METRIC_REPLAY_PENDING_RESOLVED_TOTAL,
+        "Galaxy replay holds cleared on verdict (PH-S335)",
+    ))
+    .expect(METRIC_REPLAY_PENDING_RESOLVED_TOTAL);
+    registry
+        .register(Box::new(galaxy_replay_pending_resolved_total.clone()))
+        .expect("register galaxy_replay_pending_resolved_total");
+
     let galaxy_settlement_pending_verification_total = IntGauge::with_opts(Opts::new(
         METRIC_SETTLEMENT_PENDING_VERIFICATION_TOTAL,
         "Galaxy settlement holds pending verification on grid result path (PH-S178)",
@@ -623,6 +647,8 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_verification_sample_total,
         galaxy_verification_sample_scheduled_total,
         galaxy_replay_pending,
+        galaxy_replay_pending_scheduled_total,
+        galaxy_replay_pending_resolved_total,
         galaxy_settlement_pending_verification_total,
         galaxy_settlement_cleared_total,
         galaxy_fee_split_applied_total,
@@ -717,6 +743,10 @@ pub fn refresh_galaxy_verification_gauges() {
     prom.galaxy_verification_sample_scheduled_total
         .set(verify_sample_scheduled_total() as i64);
     prom.galaxy_replay_pending.set(replay_pending() as i64);
+    prom.galaxy_replay_pending_scheduled_total
+        .set(replay_pending_scheduled_total() as i64);
+    prom.galaxy_replay_pending_resolved_total
+        .set(replay_pending_resolved_total() as i64);
     prom.galaxy_settlement_pending_verification_total
         .set(settlement_pending_verification_total() as i64);
     prom.galaxy_settlement_cleared_total
