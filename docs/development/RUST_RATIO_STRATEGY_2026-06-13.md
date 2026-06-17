@@ -85,7 +85,7 @@ flowchart TB
 | **E — gate** | PH-S150 ✅ | CI advisory якщо ratio <88%; target 93%; stretch 96% spirit | стабільно 90–95% |
 | **F — stretch 96%** | PH-S151…S159 ✅ | wasm wiring, slim JS/i18n/charts, Rust stand/e2e bins; CI warn **93%** | **→96% spirit** |
 
-**Черга §5.12:** **0** відкритих · replenish з §5.13. **Зріз:** **94.34%** (PH-S271).
+**Черга §5.12:** **9** відкритих (S274…S282) · PH-S273 ✅.
 
 ---
 
@@ -222,6 +222,8 @@ flowchart TB
 | 127 | **PH-S270** | poolai-vision-sync drift gate | ops | **✅** |
 | 128 | **PH-S271** | Rust ratio hold advisory refresh | **94.34%** advisory | **✅** |
 | 129 | **PH-S272** | Docs INDEX sprint zriz | INDEX §7 ratio | **✅** |
+| 130 | **PH-S273** | admin_common api-error path slim | wasm-first; drop `hintFor503` JS dup | **✅** |
+| 131 | **PH-S274** | admin_common loading/error DOM wasm glue | `adminShowLoading` / inline error | відкрито |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 

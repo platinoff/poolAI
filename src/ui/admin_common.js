@@ -21,7 +21,7 @@ function poolaiUiWasmCall(name) {
   return w && w.ready && typeof w[name] === 'function' ? w[name] : null;
 }
 
-/** Parse API error body: legacy flat `error` string or `{ error: { code, message } }`. */
+/** Parse API error body via wasm (PH-S273); minimal JS fallback when wasm absent. */
 function apiErrorMessageFromBody(payload) {
   const fn = poolaiUiWasmCall('apiErrorMessageFromBody');
   if (fn) {
@@ -38,41 +38,24 @@ function apiErrorMessageFromBody(payload) {
 
 function apiErrorDetailFromBody(payload) {
   const fn = poolaiUiWasmCall('apiErrorDetailFromBody');
-  if (fn) return fn(JSON.stringify(payload || {}));
-  const message = apiErrorMessageFromBody(payload);
-  let code = null;
-  let hint = null;
-  if (payload && typeof payload === 'object') {
-    const e = payload.error;
-    if (e && typeof e === 'object' && typeof e.code === 'string') code = e.code;
-    const ctx = payload.context;
-    if (ctx && typeof ctx === 'object' && typeof ctx.hint === 'string') hint = ctx.hint;
+  if (fn) {
+    const detail = fn(JSON.stringify(payload || {}));
+    if (detail && typeof detail === 'object') {
+      return {
+        message: detail.message || null,
+        code: detail.code || null,
+        hint: detail.hint || null,
+      };
+    }
   }
-  return { message, code, hint };
-}
-
-function hintFor503(code, message) {
-  if (code === 'RAID_MANAGER_UNAVAILABLE') {
-    return poolaiT('err.hint503.raid', 'RAID manager is not initialized on this server.');
-  }
-  const m = message || '';
-  if (/library/i.test(m)) return poolaiT('err.hint503.library', 'Library subsystem may not be initialized.');
-  if (/\bvm\b/i.test(m)) return poolaiT('err.hint503.vm', 'VM manager may not be attached.');
-  return poolaiT('err.hint503.generic', 'A subsystem may still be starting or unavailable.');
+  return { message: apiErrorMessageFromBody(payload), code: null, hint: null };
 }
 
 function formatFetchError(status, url, payload) {
   const fn = poolaiUiWasmCall('formatFetchError');
   if (fn) return fn(status, url || '', JSON.stringify(payload || {}));
-  const { message, code, hint } = apiErrorDetailFromBody(payload);
-  const base = message || 'HTTP ' + status;
-  let extra = hint || '';
-  if (status === 403 && !extra) extra = poolaiT('err.hint403', 'You may need Admin or Operator role, or sign in again.');
-  if (status === 503 && !extra) extra = hintFor503(code, base);
-  if (status === 404 && url && url.indexOf('/api/enterprise') !== -1 && !extra) {
-    extra = poolaiT('err.hint404.enterprise', 'Build and run the server with the enterprise feature for this API.');
-  }
-  return extra ? base + ' — ' + extra : base;
+  const message = apiErrorMessageFromBody(payload);
+  return message || 'HTTP ' + status;
 }
 
 function escapeHtml(s) {

@@ -472,12 +472,20 @@ FM-xxx (з таблиці нижче)
 | 205 | **PH-S270** | poolai-vision-sync drift gate (ops) | PH-S205 | `--check` green after FM/HANDOFF | **✅** |
 | 206 | **PH-S271** | Rust ratio hold advisory refresh (ops) | PH-S266 | `--min-ratio 0.95` advisory snapshot **94.34%** | **✅** |
 | 207 | **PH-S272** | Docs INDEX sprint zriz (docs) | PH-S267 | INDEX step 8 + §7 ratio pointer | **✅** |
+| 208 | **PH-S273** | admin_common api-error path slim (code) | PH-S153 | wasm-first `formatFetchError`; drop `hintFor503` JS dup | **✅** |
+| 209 | **PH-S274** | admin_common loading/error DOM wasm glue (code) | PH-S273 | `adminShowLoading` / `adminShowInlineError` → wasm | відкрито |
+| 210 | **PH-S275** | admin_charts sparkline wasm-only glue (code) | PH-S155 | slim `admin_charts.js` canvas path | відкрито |
+| 211 | **PH-S276** | Galaxy prefetch wire stub (code) | GALAXY §5.5 | `plan_prefetch` ingest stub + unit test | відкрито |
+| 212 | **PH-S277** | topology_graph.js paint-only audit (code) | PH-S157 | labels via Rust; JS ≤100 LOC gate | відкрито |
+| 213 | **PH-S278** | Rust ratio loc-audit refresh (ops) | PH-S271 | `rust_ratio.json` sprint zriz | відкрито |
+| 214 | **PH-S279** | Docs canon sync band (docs) | PH-S278 | INDEX/HANDOFF/NEXT/STABLE_STATE | відкрито |
+| 215 | **PH-S280** | poolai-vision-sync drift gate (ops) | PH-S270 | `--check` green | відкрито |
+| 216 | **PH-S281** | Ratio hold advisory snapshot (ops) | PH-S278 | `--min-ratio 0.95 --advisory` | відкрито |
+| 217 | **PH-S282** | Docs INDEX ratio maintain (docs) | PH-S279 | INDEX §7 + rust_ratio pointer | відкрито |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S128…S272 ✅. Vision rev **205**. rust_ratio **94.34%** (formal band ✅; hold 95% advisory).
+**Відкритих у §5.12:** **9** (PH-S274…S282). **Закрито смуга:** PH-S128…S273 ✅. Vision rev **205**. rust_ratio **94.34%**.
 
-**Наступна сесія:** replenish ≤10 з §5.13 · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
-
-**Replenish (2026-06-17 post-S272):** i18n slim band **закрито** (`i18n_core.js` STRINGS core empty); ratio **94.34%** hold advisory; наступні спринти — §5.13 maintain / Galaxy horizon / vision UX.
+**Наступна сесія:** **PH-S274** · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S262)
 

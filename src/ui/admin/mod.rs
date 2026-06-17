@@ -951,6 +951,15 @@ fn admin_common_ph_s42_table_ux_helpers() {
 }
 
 #[test]
+fn admin_common_api_error_wasm_first_ph_s273() {
+    let js = include_str!("../admin_common.js");
+    assert!(!js.contains("function hintFor503"));
+    assert!(!js.contains("err.hint503.raid"));
+    assert!(!js.contains("err.hint403"));
+    assert!(js.contains("poolaiUiWasmCall('formatFetchError')"));
+}
+
+#[test]
 fn admin_common_ph_s14_high_contrast_theme() {
     let js = include_str!("../admin_theme.js");
     assert!(js.contains("'high-contrast'"));
