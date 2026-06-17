@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-17 · PH-S313…S322 ✅ · vision **rev 214** · **0** відкритих · rust_ratio **94.39%**
+**Оновлено:** 2026-06-17 · PH-S323…S332 ✅ · vision **rev 217** · **0** відкритих · rust_ratio **94.37%**
 
 | **← наступний** | replenish §5.13 **або** **`абракадабра`** (drain) |
 | **Відкритих** | **0** |
@@ -30,15 +30,15 @@ S0: git fetch; HANDOFF; FM §5.12; df -h /s
 
 ---
 
-## Закрито (смуга PH-S313…S322)
+## Закрито (смуга PH-S323…S332)
 
-PH-S313 ✅ — `galaxy_prefetch_ingest_total` on prefetch ingest stub.
-PH-S314 ✅ — `buildMetricHistoryUrl` wasm; metric history fetch wasm-first.
-PH-S315 ✅ — `galaxy_locality_rank_empty_workers_total` on empty worker inventory.
-PH-S316 ✅ — stand smoke export includes ingest + empty workers metrics.
-PH-S317 ✅ — `buildMetricsWindowUrl` wasm; metrics window fetch wasm-first.
-PH-S308…S322 ✅ — loc-audit **94.39%**, docs canon, vision `--check`, INDEX maintain.
+PH-S323 ✅ — `galaxy_prefetch_skip_ingest_total` on empty shard list.
+PH-S324 ✅ — `buildMlPipelinesUrl` wasm; ML pipelines fetch wasm-first.
+PH-S325 ✅ — `galaxy_locality_rank_skip_total` on empty shard list.
+PH-S326 ✅ — stand smoke export includes skip ingest + rank skip metrics.
+PH-S327 ✅ — `buildMlPipelineDemoUrl` wasm; ML demo fetch wasm-first.
+PH-S328…S332 ✅ — loc-audit **94.37%**, docs canon, vision `--check`, INDEX maintain.
 
-**rust_ratio:** **94.39%** (formal 90–95% ✅; hold 95% advisory).
+**rust_ratio:** **94.37%** (formal 90–95% ✅; hold 95% advisory).
 
 **BLOCKED / Deferred:** FM-003 LAN · FM-041 Cloud SDK live.

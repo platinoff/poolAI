@@ -1,4 +1,4 @@
-//! ML pipeline metric helpers — parity with `admin_charts.js` (PH-S43, PH-S155, PH-S275, PH-S284, PH-S287, PH-S294, PH-S297, PH-S314, PH-S317).
+//! ML pipeline metric helpers — parity with `admin_charts.js` (PH-S43, PH-S155, PH-S275, PH-S284, PH-S287, PH-S294, PH-S297, PH-S314, PH-S317, PH-S324, PH-S327).
 
 use crate::format::escape_html;
 use serde::{Deserialize, Serialize};
@@ -438,6 +438,16 @@ pub fn build_metrics_window_url(start_time: &str, end_time: &str, limit: u32) ->
     )
 }
 
+/// Mirrors `poolaiFetchMlPipelines` URL (PH-S324).
+pub fn build_ml_pipelines_url() -> String {
+    "/api/enterprise/ai-ml/pipeline".to_string()
+}
+
+/// Mirrors `poolaiRunMlPipelineDemo` URL (PH-S327).
+pub fn build_ml_pipeline_demo_url() -> String {
+    "/api/enterprise/ai-ml/pipeline/demo".to_string()
+}
+
 /// Mirrors `poolaiRenderMetricsChartGrid` card wrapper (PH-S294).
 pub fn render_metrics_chart_grid_html(title: &str, parts: &[String]) -> String {
     if parts.is_empty() {
@@ -599,6 +609,19 @@ mod tests {
         assert!(url.starts_with("/api/enterprise/monitoring/metrics?"));
         assert!(!url.contains("metric="));
         assert!(url.contains("limit=60"));
+    }
+
+    #[test]
+    fn build_ml_pipelines_url_ph_s324() {
+        assert_eq!(build_ml_pipelines_url(), "/api/enterprise/ai-ml/pipeline");
+    }
+
+    #[test]
+    fn build_ml_pipeline_demo_url_ph_s327() {
+        assert_eq!(
+            build_ml_pipeline_demo_url(),
+            "/api/enterprise/ai-ml/pipeline/demo"
+        );
     }
 
     #[test]

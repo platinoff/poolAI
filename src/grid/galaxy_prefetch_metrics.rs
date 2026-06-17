@@ -32,6 +32,9 @@ pub const METRIC_PREFETCH_COMPLETE_TOTAL: &str = "galaxy_prefetch_complete_total
 /// Grid job ingest prefetch stub invocations (PH-S313 stub).
 pub const METRIC_PREFETCH_INGEST_TOTAL: &str = "galaxy_prefetch_ingest_total";
 
+/// Prefetch ingest skipped when job has no required shards (PH-S323 stub).
+pub const METRIC_PREFETCH_SKIP_INGEST_TOTAL: &str = "galaxy_prefetch_skip_ingest_total";
+
 /// Default stub bytes per RAM-tier planned shard (4 MiB, Galaxy §5.5).
 pub const DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM: u64 = 4_194_304;
 
@@ -47,6 +50,7 @@ static WAIT_MS_TOTAL: AtomicU64 = AtomicU64::new(0);
 static STRICT_MODE_TOTAL: AtomicU64 = AtomicU64::new(0);
 static COMPLETE_TOTAL: AtomicU64 = AtomicU64::new(0);
 static INGEST_TOTAL: AtomicU64 = AtomicU64::new(0);
+static SKIP_INGEST_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// Record one `plan_prefetch` outcome (no wire enqueue).
 pub fn record_prefetch_plan(required_shards: usize, planned_shards: usize, prefetch_bytes: u64) {
@@ -129,6 +133,15 @@ pub fn prefetch_ingest_total() -> u64 {
     INGEST_TOTAL.load(Ordering::Relaxed)
 }
 
+/// Record prefetch ingest skip on empty `required_shard_ids` (PH-S323).
+pub fn record_prefetch_skip_ingest() {
+    SKIP_INGEST_TOTAL.fetch_add(1, Ordering::Relaxed);
+}
+
+pub fn prefetch_skip_ingest_total() -> u64 {
+    SKIP_INGEST_TOTAL.load(Ordering::Relaxed)
+}
+
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_prefetch_metrics_for_test() {
     PLAN_TOTAL.store(0, Ordering::Relaxed);
@@ -140,6 +153,7 @@ pub fn reset_prefetch_metrics_for_test() {
     STRICT_MODE_TOTAL.store(0, Ordering::Relaxed);
     COMPLETE_TOTAL.store(0, Ordering::Relaxed);
     INGEST_TOTAL.store(0, Ordering::Relaxed);
+    SKIP_INGEST_TOTAL.store(0, Ordering::Relaxed);
 }
 
 #[cfg(test)]
@@ -196,5 +210,12 @@ mod tests {
         reset_prefetch_metrics_for_test();
         record_prefetch_ingest();
         assert_eq!(prefetch_ingest_total(), 1);
+    }
+
+    #[test]
+    fn record_prefetch_skip_ingest_ph_s323() {
+        reset_prefetch_metrics_for_test();
+        record_prefetch_skip_ingest();
+        assert_eq!(prefetch_skip_ingest_total(), 1);
     }
 }

@@ -1,6 +1,6 @@
 # Rust codebase ratio — стратегія 90–95% (PoolAI)
 
-**Оновлено:** 2026-06-17 · **Канон:** FM **§5.13** · §5.12 **0** відкритих (PH-S128…S312 ✅) · rust_ratio **94.38%**
+**Оновлено:** 2026-06-17 · **Канон:** FM **§5.13** · §5.12 **0** відкритих (PH-S128…S332 ✅) · rust_ratio **94.37%**
 
 **Мета:** зростання частки **Rust** у виконуваному коді репозиторію до **90–95%** (формально), **96% stretch spirit** (орієнтир replenish PH-S150…S159) — платформа збирається і перевіряється через **`cargo`** без обов'язкового Node на edge.
 
@@ -85,7 +85,7 @@ flowchart TB
 | **E — gate** | PH-S150 ✅ | CI advisory якщо ratio <88%; target 93%; stretch 96% spirit | стабільно 90–95% |
 | **F — stretch 96%** | PH-S151…S159 ✅ | wasm wiring, slim JS/i18n/charts, Rust stand/e2e bins; CI warn **93%** | **→96% spirit** |
 
-**Черга §5.12:** **0** відкритих · PH-S312 ✅ · replenish §5.13.
+**Черга §5.12:** **0** відкритих · PH-S332 ✅ · replenish §5.13.
 
 ---
 
@@ -272,6 +272,16 @@ flowchart TB
 | 177 | **PH-S320** | poolai-vision-sync drift gate | `--check` green | **✅** |
 | 178 | **PH-S321** | Ratio hold advisory snapshot | **94.39%** advisory | **✅** |
 | 179 | **PH-S322** | Docs INDEX ratio maintain | INDEX §7 pointer | **✅** |
+| 180 | **PH-S323** | Galaxy prefetch skip ingest metric | `galaxy_prefetch_skip_ingest_total` | **✅** |
+| 181 | **PH-S324** | admin ML pipelines URL wasm | `buildMlPipelinesUrl` | **✅** |
+| 182 | **PH-S325** | Galaxy locality rank skip metric | `galaxy_locality_rank_skip_total` | **✅** |
+| 183 | **PH-S326** | Stand smoke skip metrics | `/metrics` export | **✅** |
+| 184 | **PH-S327** | admin ML demo URL wasm | `buildMlPipelineDemoUrl` | **✅** |
+| 185 | **PH-S328** | Rust ratio loc-audit refresh | **94.37%** sprint zriz | **✅** |
+| 186 | **PH-S329** | Docs canon sync band | INDEX/HANDOFF/NEXT | **✅** |
+| 187 | **PH-S330** | poolai-vision-sync drift gate | `--check` green | **✅** |
+| 188 | **PH-S331** | Ratio hold advisory snapshot | **94.37%** advisory | **✅** |
+| 189 | **PH-S332** | Docs INDEX ratio maintain | INDEX §7 pointer | **✅** |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 

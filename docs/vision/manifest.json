@@ -1836,7 +1836,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S322",
+  "last_sprint_closed": "PH-S332",
   "layers": [
     {
       "id": "L0",
@@ -7731,7 +7731,7 @@
       "path": "crates/poolai-ui-core/src/admin_dom.rs"
     }
   ],
-  "revision": 215,
+  "revision": 217,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -10045,9 +10045,99 @@
       "row": 257,
       "status": "closed",
       "title": "Docs INDEX ratio maintain (docs)"
+    },
+    {
+      "acceptance": "galaxy_prefetch_skip_ingest_total",
+      "deps": "PH-S313",
+      "id": "PH-S323",
+      "open": false,
+      "row": 258,
+      "status": "closed",
+      "title": "Galaxy prefetch skip ingest metric (code)"
+    },
+    {
+      "acceptance": "buildMlPipelinesUrl` wasm glue",
+      "deps": "PH-S314",
+      "id": "PH-S324",
+      "open": false,
+      "row": 259,
+      "status": "closed",
+      "title": "admin ML pipelines URL wasm (code)"
+    },
+    {
+      "acceptance": "galaxy_locality_rank_skip_total",
+      "deps": "PH-S315",
+      "id": "PH-S325",
+      "open": false,
+      "row": 260,
+      "status": "closed",
+      "title": "Galaxy locality rank skip metric (code)"
+    },
+    {
+      "acceptance": "/metrics` export shape",
+      "deps": "PH-S323",
+      "id": "PH-S326",
+      "open": false,
+      "row": 261,
+      "status": "closed",
+      "title": "Stand smoke skip ingest + rank skip (tests)"
+    },
+    {
+      "acceptance": "buildMlPipelineDemoUrl` wasm glue",
+      "deps": "PH-S324",
+      "id": "PH-S327",
+      "open": false,
+      "row": 262,
+      "status": "closed",
+      "title": "admin ML pipeline demo URL wasm (code)"
+    },
+    {
+      "acceptance": "rust_ratio.json` sprint zriz",
+      "deps": "PH-S318",
+      "id": "PH-S328",
+      "open": false,
+      "row": 263,
+      "status": "closed",
+      "title": "Rust ratio loc-audit refresh (ops)"
+    },
+    {
+      "acceptance": "INDEX/HANDOFF/NEXT/STABLE/GALAXY",
+      "deps": "PH-S328",
+      "id": "PH-S329",
+      "open": false,
+      "row": 264,
+      "status": "closed",
+      "title": "Docs canon sync band (docs)"
+    },
+    {
+      "acceptance": "--check` green",
+      "deps": "PH-S320",
+      "id": "PH-S330",
+      "open": false,
+      "row": 265,
+      "status": "closed",
+      "title": "poolai-vision-sync drift gate (ops)"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory",
+      "deps": "PH-S328",
+      "id": "PH-S331",
+      "open": false,
+      "row": 266,
+      "status": "closed",
+      "title": "Ratio hold advisory snapshot (ops)"
+    },
+    {
+      "acceptance": "INDEX §7 + rust_ratio pointer",
+      "deps": "PH-S329",
+      "id": "PH-S332",
+      "open": false,
+      "row": 267,
+      "status": "closed",
+      "title": "Docs INDEX ratio maintain (docs)"
     }
   ],
   "sprint_queue_open_count": 0,
-  "updated_at": "2026-06-16",
+  "updated_at": "2026-06-17",
   "vision_ui_rev": 59
 }

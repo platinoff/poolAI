@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-17 (PH-S313…S322 ✅ · §5.12 **0** · rust_ratio **94.39%** · тригер **абракадабра** у rules) · FM-041 Deferred).
+**Оновлено:** 2026-06-17 (PH-S323…S332 ✅ · §5.12 **0** · rust_ratio **94.37%** · тригер **абракадабра** у rules) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -522,8 +522,18 @@ FM-xxx (з таблиці нижче)
 | 255 | **PH-S320** | poolai-vision-sync drift gate (ops) | PH-S310 | `--check` green | **✅** |
 | 256 | **PH-S321** | Ratio hold advisory snapshot (ops) | PH-S318 | `--min-ratio 0.95 --advisory` | **✅** |
 | 257 | **PH-S322** | Docs INDEX ratio maintain (docs) | PH-S319 | INDEX §7 + rust_ratio pointer | **✅** |
+| 258 | **PH-S323** | Galaxy prefetch skip ingest metric (code) | PH-S313 | `galaxy_prefetch_skip_ingest_total` | **✅** |
+| 259 | **PH-S324** | admin ML pipelines URL wasm (code) | PH-S314 | `buildMlPipelinesUrl` wasm glue | **✅** |
+| 260 | **PH-S325** | Galaxy locality rank skip metric (code) | PH-S315 | `galaxy_locality_rank_skip_total` | **✅** |
+| 261 | **PH-S326** | Stand smoke skip ingest + rank skip (tests) | PH-S323 | `/metrics` export shape | **✅** |
+| 262 | **PH-S327** | admin ML pipeline demo URL wasm (code) | PH-S324 | `buildMlPipelineDemoUrl` wasm glue | **✅** |
+| 263 | **PH-S328** | Rust ratio loc-audit refresh (ops) | PH-S318 | `rust_ratio.json` sprint zriz | **✅** |
+| 264 | **PH-S329** | Docs canon sync band (docs) | PH-S328 | INDEX/HANDOFF/NEXT/STABLE/GALAXY | **✅** |
+| 265 | **PH-S330** | poolai-vision-sync drift gate (ops) | PH-S320 | `--check` green | **✅** |
+| 266 | **PH-S331** | Ratio hold advisory snapshot (ops) | PH-S328 | `--min-ratio 0.95 --advisory` | **✅** |
+| 267 | **PH-S332** | Docs INDEX ratio maintain (docs) | PH-S329 | INDEX §7 + rust_ratio pointer | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S128…S322 ✅. Vision rev **214**. rust_ratio **94.39%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S128…S332 ✅. Vision rev **217**. rust_ratio **94.37%**.
 
 **Наступна сесія:** replenish з **§5.13** · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · або **`абракадабра`** (drain).
 
@@ -531,7 +541,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-06-17):** PH-S128…S322 ✅ закрито · **0** відкритих · replenish §5.13 або **`абракадабра`**.
+**Активна смуга (2026-06-17):** PH-S128…S332 ✅ закрито · **0** відкритих · replenish §5.13 або **`абракадабра`**.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

@@ -16,13 +16,14 @@ use crate::grid::galaxy_fee_split_metrics::evaluate_result_fee_split;
 use crate::grid::galaxy_locality::{
     observe_last_cross_region_egress_mb, pick_best_worker_by_locality,
     record_locality_rank_empty_workers, record_locality_rank_ingest, record_locality_rank_miss,
-    LocalityHotTier, LocalityNetworkProfile, LocalitySeedInventory, LocalityTask, LocalityWorker,
-    DEFAULT_PREFETCH_CROSS_REGION_EGRESS_MB_PER_SHARD,
+    record_locality_rank_skip, LocalityHotTier, LocalityNetworkProfile, LocalitySeedInventory,
+    LocalityTask, LocalityWorker, DEFAULT_PREFETCH_CROSS_REGION_EGRESS_MB_PER_SHARD,
 };
 use crate::grid::galaxy_prefetch_metrics::{
     record_prefetch_complete, record_prefetch_enqueue, record_prefetch_ingest,
-    record_prefetch_plan, record_prefetch_strict_mode, record_prefetch_wait,
-    DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM, DEFAULT_PREFETCH_BYTES_PER_SHARD_VRAM,
+    record_prefetch_plan, record_prefetch_skip_ingest, record_prefetch_strict_mode,
+    record_prefetch_wait, DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM,
+    DEFAULT_PREFETCH_BYTES_PER_SHARD_VRAM,
 };
 use crate::grid::galaxy_replay_metrics::evaluate_result_replay_pending;
 use crate::grid::galaxy_replication::{
@@ -148,6 +149,7 @@ pub fn coordinator_merged_seed_inventory() -> SeedInventoryEntry {
 /// Task-driven prefetch on grid job ingest (PH-S276 stub; no enqueue wire).
 pub fn ingest_job_prefetch_stub(required_shard_ids: &[String], gpu_capable: bool) -> usize {
     if required_shard_ids.is_empty() {
+        record_prefetch_skip_ingest();
         return 0;
     }
     record_prefetch_ingest();
@@ -202,6 +204,7 @@ pub fn ingest_job_locality_rank_stub(
     task_kind: &str,
 ) -> Option<String> {
     if required_shard_ids.is_empty() {
+        record_locality_rank_skip();
         return None;
     }
     let workers = locality_workers_from_seed_snapshots();

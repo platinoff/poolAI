@@ -1,15 +1,15 @@
 # Galaxy Grid roadmap (зріз)
 
-**Оновлено:** 2026-06-17 · **Канон черги:** FM §5.12 (**0** · PH-S128…S322 ✅) · тригер **`абракадабра`**
+**Оновлено:** 2026-06-17 · **Канон черги:** FM §5.12 (**0** · PH-S128…S332 ✅) · тригер **`абракадабра`**
 
 | Зріз | Значення |
 |------|----------|
-| **Galaxy prefetch/locality** | PH-S303…S317 ✅ |
-| **Wasm / admin slim** | PH-S314/S317 URL builders |
-| **Docs / ratio** | PH-S318…S322 ✅ |
-| **Rust ratio** | **94.39%** hold **95%** advisory |
+| **Galaxy prefetch/locality** | PH-S323…S325 skip metrics ✅ |
+| **Wasm / admin slim** | PH-S324/S327 ML pipeline URL builders |
+| **Docs / ratio** | PH-S328…S332 ✅ |
+| **Rust ratio** | **94.37%** hold **95%** advisory |
 
-**0** відкритих · остання смуга **PH-S313…S322** ✅.
+**0** відкритих · остання смуга **PH-S323…S332** ✅.
 
 ---
 
@@ -20,15 +20,15 @@
 | LAN replication benchmarks | Architect P4 / FM-003 §4 | **BLOCKED** (2 хости) |
 | Cloud SDK live (AWS/Azure/GCP) | FM-041 Deferred | infra only |
 | ZK / TEE attestation | Galaxy §6.6 | roadmap only |
-| **Live prefetch seed pull** | Galaxy **§5.5** | plan + ingest + enqueue stubs ✅ (S276/S283); live pull — §5.13 |
+| **Live prefetch seed pull** | Galaxy **§5.5** | plan + ingest + enqueue + skip stubs ✅ (S276/S283/S323); live pull — §5.13 |
 | Signed capability documents | Galaxy §6.6 / §9 | post-S292 horizon |
 
-**§5.5 prefetch (PH-S268…S283):** metrics + ingest + enqueue stub; live wire — replenish §5.13.
+**§5.5 prefetch (PH-S268…S323):** metrics + ingest + enqueue + skip stub; live wire — replenish §5.13.
 
 ---
 
 ## 5. Пов’язані документи
 
 - [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md) — концепт v1
-- [`PROMETHEUS_METRICS.md`](./PROMETHEUS_METRICS.md) — stand smoke band PH-S244…S256 + enqueue (S286)
-- [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md) — ratio **94.36%**
+- [`PROMETHEUS_METRICS.md`](./PROMETHEUS_METRICS.md) — stand smoke band PH-S244…S256 + skip (S323/S325)
+- [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md) — ratio **94.37%**

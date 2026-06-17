@@ -140,11 +140,11 @@ function poolaiGroupMetricsByName(metrics) {
  */
 function poolaiRenderLineChart(metricName, data, opts) {
   opts = opts || {};
+  var wasm = poolaiChartsWasm();
   if (!data || data.length === 0) {
     var noData = poolaiChartT('admin.mon.noData', 'No data available');
-    var wasmEmpty = poolaiChartsWasm();
-    if (wasmEmpty && typeof wasmEmpty.renderLineChartEmptyHtml === 'function') {
-      return wasmEmpty.renderLineChartEmptyHtml(noData);
+    if (wasm && typeof wasm.renderLineChartEmptyHtml === 'function') {
+      return wasm.renderLineChartEmptyHtml(noData);
     }
     return '<div class="muted">' + escapeHtml(noData) + '</div>';
   }
@@ -160,7 +160,6 @@ function poolaiRenderLineChart(metricName, data, opts) {
   var statMin = poolaiChartT('admin.mon.statMin', 'Min:');
   var statMax = poolaiChartT('admin.mon.statMax', 'Max:');
   var statAvg = poolaiChartT('admin.mon.statAvg', 'Avg:');
-  var wasm = poolaiChartsWasm();
   if (wasm && typeof wasm.renderLineChartHtml === 'function') {
     return wasm.renderLineChartHtml(
       metricName,
@@ -516,7 +515,12 @@ function poolaiRenderMlPipelineMetricsPanel(pipelines, opts) {
 
 async function poolaiFetchMlPipelines() {
   try {
-    var data = await fetchJson('/api/enterprise/ai-ml/pipeline');
+    var wasm = poolaiChartsWasm();
+    var url =
+      wasm && typeof wasm.buildMlPipelinesUrl === 'function'
+        ? wasm.buildMlPipelinesUrl()
+        : '/api/enterprise/ai-ml/pipeline';
+    var data = await fetchJson(url);
     return data || [];
   } catch (e) {
     console.warn('poolaiFetchMlPipelines:', e);
@@ -525,5 +529,10 @@ async function poolaiFetchMlPipelines() {
 }
 
 async function poolaiRunMlPipelineDemo() {
-  return fetchJson('/api/enterprise/ai-ml/pipeline/demo');
+  var wasm = poolaiChartsWasm();
+  var url =
+    wasm && typeof wasm.buildMlPipelineDemoUrl === 'function'
+      ? wasm.buildMlPipelineDemoUrl()
+      : '/api/enterprise/ai-ml/pipeline/demo';
+  return fetchJson(url);
 }

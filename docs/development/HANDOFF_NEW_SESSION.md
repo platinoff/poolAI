@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-17 (PH-S313…S322 ✅ · тригер **абракадабра** · rust_ratio **94.39%**) · VDT
+**Оновлено:** 2026-06-17 (PH-S323…S332 ✅ · тригер **абракадабра** · rust_ratio **94.37%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -273,9 +273,19 @@
 **PH-S320 ✅ (ops):** `poolai-vision-sync --check` green.
 **PH-S321 ✅ (ops):** hold advisory `--min-ratio 0.95` snapshot **94.39%**.
 **PH-S322 ✅ (docs):** INDEX §7 + rust_ratio pointer **94.39%**.
+**PH-S323 ✅ (code):** `galaxy_prefetch_skip_ingest_total` on empty `required_shard_ids`.
+**PH-S324 ✅ (code/ui):** `buildMlPipelinesUrl` wasm; `poolaiFetchMlPipelines` wasm-first.
+**PH-S325 ✅ (code):** `galaxy_locality_rank_skip_total` on empty shard list.
+**PH-S326 ✅ (tests):** stand smoke `/metrics` skip ingest + rank skip counters.
+**PH-S327 ✅ (code/ui):** `buildMlPipelineDemoUrl` wasm; `poolaiRunMlPipelineDemo` wasm-first.
+**PH-S328 ✅ (ops):** `poolai-loc-audit` → `rust_ratio.json` sprint **PH-S328** (**94.37%**).
+**PH-S329 ✅ (docs):** INDEX/HANDOFF/NEXT/STABLE/GALAXY canon sync.
+**PH-S330 ✅ (ops):** `poolai-vision-sync --check` green.
+**PH-S331 ✅ (ops):** hold advisory `--min-ratio 0.95` snapshot **94.37%**.
+**PH-S332 ✅ (docs):** INDEX §7 + rust_ratio pointer **94.37%**.
 **Rules ✅:** тригер **`абракадабра`** у `poolai-session-iteration.mdc` + `virtual-development-team.mdc`.
 **§5.12:** **0** відкритих — replenish §5.13 або **`абракадабра`**.
-**Vision ✅:** rev **214** · rust_ratio **94.39%** · hold **95%** advisory.
+**Vision ✅:** rev **217** · rust_ratio **94.37%** · hold **95%** advisory.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

@@ -8,10 +8,11 @@ use poolai_ui_core::api_error::{api_error_detail_from_body, format_fetch_error};
 use poolai_ui_core::format::escape_html;
 use poolai_ui_core::lease::lease_state;
 use poolai_ui_core::ml::{
-    build_metric_history_url, build_metrics_window_url, chart_scale, collect_ml_sparkline_series,
-    flatten_ml_step_rows, format_ml_metric_summary, group_metrics_by_name, metric_point_values,
-    parse_ml_numeric, render_line_chart_empty_html, render_line_chart_html,
-    render_metrics_chart_grid_html, render_sparkline_html, sanitize_chart_id,
+    build_metric_history_url, build_metrics_window_url, build_ml_pipeline_demo_url,
+    build_ml_pipelines_url, chart_scale, collect_ml_sparkline_series, flatten_ml_step_rows,
+    format_ml_metric_summary, group_metrics_by_name, metric_point_values, parse_ml_numeric,
+    render_line_chart_empty_html, render_line_chart_html, render_metrics_chart_grid_html,
+    render_sparkline_html, sanitize_chart_id,
 };
 use poolai_ui_core::modal::{admin_dynamic_modal_html, trap_tab_action, MODAL_FOCUSABLE_SELECTOR};
 use poolai_ui_core::pricing::{format_unix_secs, format_usd_micro};
@@ -295,6 +296,16 @@ pub fn build_metric_history_url_wasm(
 #[wasm_bindgen(js_name = buildMetricsWindowUrl)]
 pub fn build_metrics_window_url_wasm(start_time: &str, end_time: &str, limit: u32) -> String {
     build_metrics_window_url(start_time, end_time, limit)
+}
+
+#[wasm_bindgen(js_name = buildMlPipelinesUrl)]
+pub fn build_ml_pipelines_url_wasm() -> String {
+    build_ml_pipelines_url()
+}
+
+#[wasm_bindgen(js_name = buildMlPipelineDemoUrl)]
+pub fn build_ml_pipeline_demo_url_wasm() -> String {
+    build_ml_pipeline_demo_url()
 }
 
 #[wasm_bindgen(js_name = groupMetricsByName)]
