@@ -1728,7 +1728,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S221",
+  "last_sprint_closed": "PH-S222",
   "layers": [
     {
       "id": "L0",
@@ -1761,7 +1761,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S222",
+  "next_sprint": "PH-S223",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7469,7 +7469,7 @@
       "path": "tests/grid_seed_inventory_integration.rs"
     }
   ],
-  "revision": 168,
+  "revision": 169,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -8879,9 +8879,9 @@
       "acceptance": "admin.wrk.*` → `poolai-ui-core",
       "deps": "PH-S207",
       "id": "PH-S222",
-      "open": true,
+      "open": false,
       "row": 157,
-      "status": "open",
+      "status": "closed",
       "title": "Admin i18n slim workers panel (code)"
     },
     {
@@ -8930,7 +8930,7 @@
       "title": "Vision VDT rules docs autosync audit (docs/vision)"
     }
   ],
-  "sprint_queue_open_count": 6,
+  "sprint_queue_open_count": 5,
   "updated_at": "2026-06-15",
   "vision_ui_rev": 58
 }

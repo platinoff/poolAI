@@ -171,7 +171,7 @@ flowchart TB
 | 76 | **PH-S219** | Galaxy trust payout metrics smoke | tests | **✅** |
 | 77 | **PH-S220** | Admin i18n slim monitoring panel | code | **✅** |
 | 78 | **PH-S221** | Admin i18n slim updates-compat panel | code | **✅** |
-| 79 | **PH-S222** | Admin i18n slim workers panel | code | відкрито |
+| 79 | **PH-S222** | Admin i18n slim workers panel | code | **✅** |
 | 80 | **PH-S223** | Admin i18n slim libs panel | code | відкрито |
 | 81 | **PH-S224** | Galaxy pricing cache age metrics smoke | tests | відкрито |
 | 82 | **PH-S225** | Galaxy verification sample metrics smoke | tests | відкрито |

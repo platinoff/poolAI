@@ -1,8 +1,8 @@
 //! Worker Management page
 //!
-//! Provides worker pool configuration and monitoring.
+//! PH-S222: workers page uses slim `admin_layout_workers` + `admin_workers_patch`.
 
-use crate::ui::admin::admin_layout;
+use crate::ui::admin::admin_layout_workers;
 use axum::response::Html;
 
 /// Worker management page
@@ -138,7 +138,7 @@ pub async fn admin_workers() -> Html<String> {
     setInterval(loadWorkers, 5000);
     "#;
 
-    admin_layout(
+    admin_layout_workers(
         "admin.page.workers",
         "Worker Management",
         r#"
@@ -218,4 +218,14 @@ pub async fn admin_workers() -> Html<String> {
         "#,
         script,
     )
+}
+
+#[tokio::test]
+async fn admin_workers_page_slim_workers_i18n_patch_ph_s222() {
+    let html = admin_workers().await.0;
+    assert!(html.contains("window.__poolaiAdminI18nRust="));
+    assert!(html.contains(r#""admin.page.workers""#));
+    assert!(html.contains(r#""admin.wrk.section""#));
+    assert!(!html.contains(r#""admin.jobs.leaseState.active""#));
+    assert!(!html.contains(r#""admin.lib.loading""#));
 }

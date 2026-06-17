@@ -1,6 +1,6 @@
 //! UI i18n subsets moved from `i18n_core.js` (PH-S154 admin jobs/grid; PH-S162 auth/dash shell; PH-S197 updates-compat; PH-S207 monitoring; PH-S211 jobs-only patch; PH-S214 raid-only patch; PH-S217 grid-pricing-only patch).
 //!
-//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs page uses slim `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221).
+//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs page uses slim `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221); workers — `admin_workers_patch` (PH-S222).
 //! Auth + dashboard shell: `window.__poolaiAuthDashI18nRust` on login, dashboard layout, admin layout (PH-S162).
 
 use std::collections::BTreeMap;
@@ -697,6 +697,51 @@ pub const ADMIN_MONITORING_UK: &[I18nRow<'_>] = &[
     ("admin.mon.ph.metric", "cpu_usage"),
 ];
 
+/// English workers admin keys (PH-S222; moved from `i18n_core.js`).
+pub const ADMIN_WORKERS_EN: &[I18nRow<'_>] = &[
+    ("admin.page.workers", "Worker Management"),
+    ("admin.wrk.loading", "Loading workers…"),
+    ("admin.wrk.errLoad", "Error loading workers: "),
+    ("admin.wrk.empty", "No workers found"),
+    ("admin.wrk.col.id", "ID"),
+    ("admin.wrk.col.status", "Status"),
+    ("admin.wrk.col.metrics", "Metrics"),
+    ("admin.wrk.col.actions", "Actions"),
+    ("admin.wrk.reqLabel", "Requests:"),
+    ("admin.wrk.confirmDel", "Delete worker {id}?"),
+    ("admin.wrk.deletedOk", "Worker deleted"),
+    ("admin.wrk.section", "Workers"),
+    ("admin.wrk.createBtn", "Create Worker"),
+    ("admin.wrk.title", "Create Worker"),
+    (
+        "admin.wrk.hintId",
+        "Alphanumeric, hyphens, and underscores only",
+    ),
+    ("admin.wrk.autoRestart", "Auto Restart"),
+    ("admin.wrk.resourceMon", "Resource Monitoring"),
+];
+
+/// Ukrainian workers admin keys (PH-S222).
+pub const ADMIN_WORKERS_UK: &[I18nRow<'_>] = &[
+    ("admin.page.workers", "Керування воркерами"),
+    ("admin.wrk.loading", "Завантаження воркерів…"),
+    ("admin.wrk.errLoad", "Помилка завантаження воркерів: "),
+    ("admin.wrk.empty", "Воркерів не знайдено"),
+    ("admin.wrk.col.id", "ID"),
+    ("admin.wrk.col.status", "Статус"),
+    ("admin.wrk.col.metrics", "Метрики"),
+    ("admin.wrk.col.actions", "Дії"),
+    ("admin.wrk.reqLabel", "Запити:"),
+    ("admin.wrk.confirmDel", "Видалити воркер {id}?"),
+    ("admin.wrk.deletedOk", "Воркер видалено"),
+    ("admin.wrk.section", "Воркери"),
+    ("admin.wrk.createBtn", "Створити воркер"),
+    ("admin.wrk.title", "Створити воркер"),
+    ("admin.wrk.hintId", "Літери, цифри, дефіс і підкреслення"),
+    ("admin.wrk.autoRestart", "Автоперезапуск"),
+    ("admin.wrk.resourceMon", "Моніторинг ресурсів"),
+];
+
 /// English auth keys (login, OAuth, bootstrap banner, lang toggle).
 pub const AUTH_SHELL_EN: &[I18nRow<'_>] = &[
     ("auth.pageTitle", "Login - PoolAI"),
@@ -1013,6 +1058,25 @@ pub fn admin_updates_compat_patch_script() -> String {
     )
 }
 
+/// Workers admin page — slim `admin.wrk.*` patch only (PH-S222).
+pub fn admin_workers_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_WORKERS_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_WORKERS_UK));
+    root
+}
+
+pub fn admin_workers_patch_json() -> String {
+    serde_json::to_string(&admin_workers_patch()).expect("admin workers i18n patch serializes")
+}
+
+pub fn admin_workers_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminI18nRust={};",
+        admin_workers_patch_json()
+    )
+}
+
 /// Default admin layout — slim `admin.jobs.*` patch only (PH-S221; updates-compat on dedicated page).
 pub fn admin_jobs_grid_patch() -> BTreeMap<String, BTreeMap<String, String>> {
     let mut root = BTreeMap::new();
@@ -1107,6 +1171,7 @@ mod tests {
         assert_eq!(ADMIN_GRID_PRICING_EN.len(), ADMIN_GRID_PRICING_UK.len());
         assert_eq!(ADMIN_UPDATES_COMPAT_EN.len(), ADMIN_UPDATES_COMPAT_UK.len());
         assert_eq!(ADMIN_MONITORING_EN.len(), ADMIN_MONITORING_UK.len());
+        assert_eq!(ADMIN_WORKERS_EN.len(), ADMIN_WORKERS_UK.len());
         let patch = admin_jobs_grid_patch();
         assert_eq!(patch["en"].len(), ADMIN_JOBS_EN.len());
         assert_eq!(patch["uk"].len(), ADMIN_JOBS_UK.len());
@@ -1179,6 +1244,21 @@ mod tests {
         assert!(json.contains(r#""admin.mon.mlTitle""#));
         assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
         assert!(!json.contains(r#""admin.updatesCompat.section""#));
+    }
+
+    #[test]
+    fn workers_patch_has_matching_en_uk_key_counts_ph_s222() {
+        assert_eq!(ADMIN_WORKERS_EN.len(), ADMIN_WORKERS_UK.len());
+    }
+
+    #[test]
+    fn workers_patch_json_workers_only_ph_s222() {
+        let json = admin_workers_patch_json();
+        assert!(json.contains(r#""admin.page.workers""#));
+        assert!(json.contains(r#""admin.wrk.section""#));
+        assert!(json.contains(r#""admin.wrk.createBtn""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+        assert!(!json.contains(r#""admin.lib.section""#));
     }
 
     #[test]

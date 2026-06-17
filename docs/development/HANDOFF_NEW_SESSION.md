@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-16 (PH-S221 ✅ · §5.12 **6** відкритих PH-S222…S227 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
+**Оновлено:** 2026-06-16 (PH-S222 ✅ · §5.12 **5** відкритих PH-S223…S227 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -172,6 +172,7 @@
 **PH-S219 ✅ (code/tests):** `poolai-http-stand-smoke` — `galaxy_trust_payout_metrics` on live `/metrics` (eligible/held/score gauges); `cargo test-ci`.
 **PH-S220 ✅ (code/ui):** `admin_monitoring_patch` + `admin_layout_monitoring` — monitoring slim Rust i18n; removed from fat `admin_jobs_grid_patch`.
 **PH-S221 ✅ (code/ui):** `admin_updates_compat_patch` + `admin_layout_updates_compat` — updates-compat slim Rust i18n; default layout patch jobs-only.
+**PH-S222 ✅ (code/ui):** `admin_workers_patch` + `admin_layout_workers` — workers slim Rust i18n; `admin.wrk.*` removed from `i18n_core.js`.
 **Ops:** `open-docs-vision.ps1` — ASCII Write-Host + robust `SendVisionBytes`; URL `http://127.0.0.1:8765/docs/vision/index.html`.
 **PH-S198 ✅ (code):** `topology_graph.rs` — hub labels + `label_x`/`label_y`/`is_hub` in graph JSON; heatmap short ids; slim `topology_graph.js` (SVG paint only); `cargo test-ci`.
 **PH-S194 ✅ (code):** `galaxy_fee_split_applied_total` on grid result wire; `cargo test-ci`.
