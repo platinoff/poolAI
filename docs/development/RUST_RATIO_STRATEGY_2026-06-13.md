@@ -170,7 +170,7 @@ flowchart TB
 | 75 | **PH-S218** | Vision map aria-live selection | docs/vision | **✅** |
 | 76 | **PH-S219** | Galaxy trust payout metrics smoke | tests | **✅** |
 | 77 | **PH-S220** | Admin i18n slim monitoring panel | code | **✅** |
-| 78 | **PH-S221** | Admin i18n slim updates-compat panel | code | відкрито |
+| 78 | **PH-S221** | Admin i18n slim updates-compat panel | code | **✅** |
 | 79 | **PH-S222** | Admin i18n slim workers panel | code | відкрито |
 | 80 | **PH-S223** | Admin i18n slim libs panel | code | відкрито |
 | 81 | **PH-S224** | Galaxy pricing cache age metrics smoke | tests | відкрито |

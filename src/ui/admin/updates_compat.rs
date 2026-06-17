@@ -1,9 +1,10 @@
 //! Galaxy Grid updates & compatibility admin page (PH-S93) — read-only ops pointers.
+//! PH-S221: updates-compat page uses slim `admin_layout_updates_compat` + `admin_updates_compat_patch`.
 
 use crate::grid::protocol_compat::{
     negotiate, CompatStatus, DEFAULT_COORDINATOR_PROTOCOL, MIN_COORDINATOR_VERSION_DOCS_URL,
 };
-use crate::ui::admin::admin_layout;
+use crate::ui::admin::admin_layout_updates_compat;
 use axum::response::Html;
 
 const DOC_SECURITY_HARDENING: &str =
@@ -171,7 +172,7 @@ pub async fn admin_updates_compat() -> Html<String> {
     }
     "#;
 
-    admin_layout(
+    admin_layout_updates_compat(
         "admin.page.updatesCompat",
         "Updates & compatibility",
         &body,
@@ -192,7 +193,17 @@ async fn admin_updates_compat_page_includes_protocol_and_doc_blocks() {
     assert!(html.contains(MIN_COORDINATOR_VERSION_DOCS_URL));
     assert!(html.contains(DEFAULT_COORDINATOR_PROTOCOL));
     assert!(html.contains("window.__poolaiAdminI18nRust="));
-    assert!(html.contains("admin.updatesCompat.section"));
+    assert!(html.contains(r#""admin.updatesCompat.section""#));
+}
+
+#[tokio::test]
+async fn admin_updates_compat_page_slim_updates_compat_i18n_patch_ph_s221() {
+    let html = admin_updates_compat().await.0;
+    assert!(html.contains("window.__poolaiAdminI18nRust="));
+    assert!(html.contains(r#""admin.page.updatesCompat""#));
+    assert!(html.contains(r#""admin.updatesCompat.protocolTitle""#));
+    assert!(!html.contains(r#""admin.jobs.leaseState.active""#));
+    assert!(!html.contains(r#""admin.mon.mlTitle""#));
 }
 
 #[tokio::test]

@@ -169,6 +169,24 @@ pub fn admin_layout_monitoring(
     )
 }
 
+/// Updates-compat admin page layout — slim `admin.updatesCompat.*` Rust i18n patch only (PH-S221).
+pub fn admin_layout_updates_compat(
+    title_i18n_key: &str,
+    title_fallback: &str,
+    body_html: &str,
+    script_js: &str,
+) -> Html<String> {
+    let i18n_patch = poolai_ui_core::i18n::admin_updates_compat_patch_script();
+    admin_layout_with_module_script(
+        title_i18n_key,
+        title_fallback,
+        body_html,
+        POOLAI_UI_WASM_MODULE,
+        script_js,
+        &i18n_patch,
+    )
+}
+
 /// Like [`admin_layout`] but inserts a `<script type="module">` before the page IIFE (PH-S151 wasm wiring).
 pub fn admin_layout_with_module_script(
     title_i18n_key: &str,
@@ -341,6 +359,13 @@ fn admin_layout_default_patch_excludes_monitoring_ph_s220() {
     let patch = poolai_ui_core::i18n::admin_jobs_grid_patch_script();
     assert!(!patch.contains(r#""admin.mon.mlTitle""#));
     assert!(!patch.contains(r#""admin.page.monitoring""#));
+}
+
+#[test]
+fn admin_layout_default_patch_excludes_updates_compat_ph_s221() {
+    let patch = poolai_ui_core::i18n::admin_jobs_grid_patch_script();
+    assert!(!patch.contains(r#""admin.updatesCompat.section""#));
+    assert!(!patch.contains(r#""admin.page.updatesCompat""#));
 }
 
 #[test]

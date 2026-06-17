@@ -3,18 +3,9 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S221",
-      "link": "docs/vision/index.html#sprint-queue",
-      "next": true,
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "admin.updatesCompat.*` slim patch",
-      "title": "Admin i18n slim updates-compat panel (code)"
-    },
-    {
-      "category": "open",
       "id": "PH-S222",
       "link": "docs/vision/index.html#sprint-queue",
+      "next": true,
       "published": "2026-05-28",
       "status": "open",
       "summary": "admin.wrk.*` → `poolai-ui-core",
@@ -64,6 +55,15 @@
       "status": "open",
       "summary": "manifest ↔ `.mdc` cross-link drift",
       "title": "Vision VDT rules docs autosync audit (docs/vision)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S221",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "admin.updatesCompat.*` slim patch",
+      "title": "Admin i18n slim updates-compat panel (code)"
     },
     {
       "category": "closed",
@@ -163,15 +163,6 @@
       "status": "closed",
       "summary": "poolai-http-stand-smoke` case `grid_seed_inventory",
       "title": "Stand smoke seed_inventory GET (tests)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S209",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "keyboard focus-visible on map controls + nodes",
-      "title": "Vision map a11y focus ring (docs/vision)"
     }
   ],
   "link": "docs/vision/index.html",

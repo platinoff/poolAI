@@ -1728,7 +1728,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S220",
+  "last_sprint_closed": "PH-S221",
   "layers": [
     {
       "id": "L0",
@@ -1761,7 +1761,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S221",
+  "next_sprint": "PH-S222",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7469,7 +7469,7 @@
       "path": "tests/grid_seed_inventory_integration.rs"
     }
   ],
-  "revision": 167,
+  "revision": 168,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -8870,9 +8870,9 @@
       "acceptance": "admin.updatesCompat.*` slim patch",
       "deps": "PH-S207",
       "id": "PH-S221",
-      "open": true,
+      "open": false,
       "row": 156,
-      "status": "open",
+      "status": "closed",
       "title": "Admin i18n slim updates-compat panel (code)"
     },
     {
@@ -8930,7 +8930,7 @@
       "title": "Vision VDT rules docs autosync audit (docs/vision)"
     }
   ],
-  "sprint_queue_open_count": 7,
+  "sprint_queue_open_count": 6,
   "updated_at": "2026-06-15",
   "vision_ui_rev": 58
 }

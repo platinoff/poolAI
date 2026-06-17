@@ -1,6 +1,6 @@
 //! UI i18n subsets moved from `i18n_core.js` (PH-S154 admin jobs/grid; PH-S162 auth/dash shell; PH-S197 updates-compat; PH-S207 monitoring; PH-S211 jobs-only patch; PH-S214 raid-only patch; PH-S217 grid-pricing-only patch).
 //!
-//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs page uses slim `admin_jobs_patch` (PH-S211); raid page uses `admin_raid_patch` (PH-S214); monitoring page uses `admin_monitoring_patch` (PH-S220).
+//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs page uses slim `admin_jobs_patch` (PH-S211); raid — `admin_raid_patch` (PH-S214); monitoring — `admin_monitoring_patch` (PH-S220); updates-compat — `admin_updates_compat_patch` (PH-S221).
 //! Auth + dashboard shell: `window.__poolaiAuthDashI18nRust` on login, dashboard layout, admin layout (PH-S162).
 
 use std::collections::BTreeMap;
@@ -993,15 +993,31 @@ pub fn admin_monitoring_patch_script() -> String {
     )
 }
 
-/// `{"en":{...},"uk":{...}}` patch object for `window.__poolaiAdminI18nRust`.
-pub fn admin_jobs_grid_patch() -> BTreeMap<String, BTreeMap<String, String>> {
-    let mut en = rows_to_map(ADMIN_JOBS_EN);
-    merge_rows(&mut en, ADMIN_UPDATES_COMPAT_EN);
-    let mut uk = rows_to_map(ADMIN_JOBS_UK);
-    merge_rows(&mut uk, ADMIN_UPDATES_COMPAT_UK);
+/// Updates-compat admin page — slim `admin.updatesCompat.*` patch only (PH-S221).
+pub fn admin_updates_compat_patch() -> BTreeMap<String, BTreeMap<String, String>> {
     let mut root = BTreeMap::new();
-    root.insert("en".into(), en);
-    root.insert("uk".into(), uk);
+    root.insert("en".into(), rows_to_map(ADMIN_UPDATES_COMPAT_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_UPDATES_COMPAT_UK));
+    root
+}
+
+pub fn admin_updates_compat_patch_json() -> String {
+    serde_json::to_string(&admin_updates_compat_patch())
+        .expect("admin updates-compat i18n patch serializes")
+}
+
+pub fn admin_updates_compat_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminI18nRust={};",
+        admin_updates_compat_patch_json()
+    )
+}
+
+/// Default admin layout — slim `admin.jobs.*` patch only (PH-S221; updates-compat on dedicated page).
+pub fn admin_jobs_grid_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_JOBS_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_JOBS_UK));
     root
 }
 
@@ -1092,14 +1108,8 @@ mod tests {
         assert_eq!(ADMIN_UPDATES_COMPAT_EN.len(), ADMIN_UPDATES_COMPAT_UK.len());
         assert_eq!(ADMIN_MONITORING_EN.len(), ADMIN_MONITORING_UK.len());
         let patch = admin_jobs_grid_patch();
-        assert_eq!(
-            patch["en"].len(),
-            ADMIN_JOBS_EN.len() + ADMIN_UPDATES_COMPAT_EN.len()
-        );
-        assert_eq!(
-            patch["uk"].len(),
-            ADMIN_JOBS_UK.len() + ADMIN_UPDATES_COMPAT_UK.len()
-        );
+        assert_eq!(patch["en"].len(), ADMIN_JOBS_EN.len());
+        assert_eq!(patch["uk"].len(), ADMIN_JOBS_UK.len());
     }
 
     #[test]
@@ -1147,12 +1157,12 @@ mod tests {
     }
 
     #[test]
-    fn patch_json_contains_jobs_monitoring_keys_not_grid_ph_s217() {
+    fn patch_json_contains_jobs_only_not_grid_or_updates_ph_s221() {
         let json = admin_jobs_grid_patch_json();
         assert!(json.contains(r#""admin.jobs.leaseState.active""#));
         assert!(!json.contains(r#""admin.gridPricing.col.price""#));
         assert!(json.contains(r#""admin.jobs.status.migrating""#));
-        assert!(json.contains(r#""admin.updatesCompat.section""#));
+        assert!(!json.contains(r#""admin.updatesCompat.section""#));
         assert!(!json.contains(r#""admin.mon.mlTitle""#));
         assert!(!json.contains(r#""admin.page.monitoring""#));
     }
@@ -1169,6 +1179,20 @@ mod tests {
         assert!(json.contains(r#""admin.mon.mlTitle""#));
         assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
         assert!(!json.contains(r#""admin.updatesCompat.section""#));
+    }
+
+    #[test]
+    fn updates_compat_patch_has_matching_en_uk_key_counts_ph_s221() {
+        assert_eq!(ADMIN_UPDATES_COMPAT_EN.len(), ADMIN_UPDATES_COMPAT_UK.len());
+    }
+
+    #[test]
+    fn updates_compat_patch_json_updates_only_ph_s221() {
+        let json = admin_updates_compat_patch_json();
+        assert!(json.contains(r#""admin.page.updatesCompat""#));
+        assert!(json.contains(r#""admin.updatesCompat.section""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+        assert!(!json.contains(r#""admin.mon.mlTitle""#));
     }
 
     #[test]
