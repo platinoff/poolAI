@@ -3,18 +3,9 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S224",
-      "link": "docs/vision/index.html#sprint-queue",
-      "next": true,
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "galaxy_pricing_cache_age_seconds` on `/metrics",
-      "title": "Galaxy pricing cache age metrics smoke (tests)"
-    },
-    {
-      "category": "open",
       "id": "PH-S225",
       "link": "docs/vision/index.html#sprint-queue",
+      "next": true,
       "published": "2026-05-28",
       "status": "open",
       "summary": "verification counters on `/metrics",
@@ -37,6 +28,15 @@
       "status": "open",
       "summary": "manifest ↔ `.mdc` cross-link drift",
       "title": "Vision VDT rules docs autosync audit (docs/vision)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S224",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_pricing_cache_age_seconds` on `/metrics",
+      "title": "Galaxy pricing cache age metrics smoke (tests)"
     },
     {
       "category": "closed",
@@ -136,15 +136,6 @@
       "status": "closed",
       "summary": "stand smoke checks prefetch counters on `/metrics",
       "title": "Galaxy prefetch metrics stand smoke (tests)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S212",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "prefers-reduced-motion` → skip glow/animation; rev++",
-      "title": "Vision reduced-motion map FX (docs/vision)"
     }
   ],
   "link": "docs/vision/index.html",

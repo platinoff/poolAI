@@ -362,6 +362,33 @@ async fn smoke_galaxy_pricing_forced_fallback_metrics(
     metrics_text_has_pricing_forced_fallback(&body)
 }
 
+/// PH-S224: live stand exposes Galaxy pricing cache age gauge on Prometheus scrape.
+const GALAXY_PRICING_CACHE_AGE: &str = "galaxy_pricing_cache_age_seconds";
+
+fn metrics_text_has_pricing_cache_age(body: &str) -> Result<(), String> {
+    let name = GALAXY_PRICING_CACHE_AGE;
+    if !body.contains(name) {
+        return Err(format!("/metrics missing {name}"));
+    }
+    if !body.contains(&format!("# TYPE {name} gauge")) {
+        return Err(format!("/metrics missing TYPE gauge for {name}"));
+    }
+    Ok(())
+}
+
+async fn smoke_galaxy_pricing_cache_age_metrics(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("/metrics request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("/metrics status {}", resp.status()));
+    }
+    let body = resp.text().await.map_err(|e| e.to_string())?;
+    metrics_text_has_pricing_cache_age(&body)
+}
+
 /// PH-S219: live stand exposes Galaxy trust payout counters on Prometheus scrape.
 const GALAXY_TRUST_PAYOUT_METRICS: &[&str] = &[
     "galaxy_trust_payout_eligible_total",
@@ -979,6 +1006,12 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
     .await;
     record(
         &mut cases,
+        "galaxy_pricing_cache_age_metrics",
+        smoke_galaxy_pricing_cache_age_metrics(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
         "galaxy_trust_payout_metrics",
         smoke_galaxy_trust_payout_metrics(&client, &cli.base_url).await,
     )
@@ -1181,6 +1214,16 @@ mod tests {
             "galaxy_pricing_forced_fallback_total 0\n",
         );
         metrics_text_has_pricing_forced_fallback(sample).expect("sample export");
+    }
+
+    #[test]
+    fn galaxy_pricing_cache_age_metrics_export_shape_ph_s224() {
+        let sample = concat!(
+            "# HELP galaxy_pricing_cache_age_seconds Galaxy pricing L1 cache age seconds last observed (PH-S168)\n",
+            "# TYPE galaxy_pricing_cache_age_seconds gauge\n",
+            "galaxy_pricing_cache_age_seconds 0\n",
+        );
+        metrics_text_has_pricing_cache_age(sample).expect("sample export");
     }
 
     #[test]

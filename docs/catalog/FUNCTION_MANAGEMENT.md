@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-16 (PH-S223 ✅ · §5.12 **4** відкритих PH-S224…S227 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-16 (PH-S224 ✅ · §5.12 **3** відкритих PH-S225…S227 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -423,16 +423,16 @@ FM-xxx (з таблиці нижче)
 | 156 | **PH-S221** | Admin i18n slim updates-compat panel (code) | PH-S207 | `admin.updatesCompat.*` slim patch | **✅** |
 | 157 | **PH-S222** | Admin i18n slim workers panel (code) | PH-S207 | `admin.wrk.*` → `poolai-ui-core` | **✅** |
 | 158 | **PH-S223** | Admin i18n slim libs panel (code) | PH-S207 | `admin.lib.*` → `poolai-ui-core` | **✅** |
-| 159 | **PH-S224** | Galaxy pricing cache age metrics smoke (tests) | PH-S168 | `galaxy_pricing_cache_age_seconds` on `/metrics` | відкрито |
+| 159 | **PH-S224** | Galaxy pricing cache age metrics smoke (tests) | PH-S168 | `galaxy_pricing_cache_age_seconds` on `/metrics` | **✅** |
 | 160 | **PH-S225** | Galaxy verification sample metrics smoke (tests) | PH-S177 | verification counters on `/metrics` | відкрито |
 | 161 | **PH-S226** | Vision sprint-queue → map focus (docs/vision) | PH-S202 | queue item click focuses map node | відкрито |
 | 162 | **PH-S227** | Vision VDT rules docs autosync audit (docs/vision) | PH-S205 | manifest ↔ `.mdc` cross-link drift | відкрито |
 
-**Відкритих у §5.12:** **4** (PH-S224…S227). **Закрито смуга:** PH-S128…S223 ✅. Vision rev **170**.
+**Відкритих у §5.12:** **3** (PH-S225…S227). **Закрито смуга:** PH-S128…S224 ✅. Vision rev **171**.
 
-**Rust ratio:** формальна смуга **90–95%**; **hold 95%** — PH-S165 ✅; post-S219 band **S224…S227**.
+**Rust ratio:** формальна смуга **90–95%**; **hold 95%** — PH-S165 ✅; post-S219 band **S225…S227**.
 
-**Наступна сесія:** **PH-S224** · черга **4** відкритих (PH-S224…S227) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S225** · черга **3** відкритих (PH-S225…S227) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S169)
 
