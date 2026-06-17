@@ -2,6 +2,97 @@
   "description": "RSS-style ticker of FM §5.12 sprint queue (open + recent closed)",
   "items": [
     {
+      "category": "open",
+      "id": "PH-S254",
+      "link": "docs/vision/index.html#sprint-queue",
+      "next": true,
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "galaxy_fee_split_applied_total` on live `/metrics",
+      "title": "Galaxy fee_split_applied stand smoke (tests)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S255",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "galaxy_cross_region_egress_mb` on live `/metrics",
+      "title": "Galaxy cross_region_egress stand smoke (tests)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S256",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "galaxy_replay_pending` on live `/metrics",
+      "title": "Galaxy replay_pending stand smoke (tests)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S257",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "workers.*` keys out of `i18n_core.js",
+      "title": "Admin i18n workers panel slim patch (code)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S258",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "home.*` keys out of `i18n_core.js",
+      "title": "Admin i18n home shell slim patch (code)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S259",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "form.*` + residual `err.*` out of `i18n_core.js",
+      "title": "Admin i18n form + err core slim patch (code)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S260",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "ui.save`/`ui.search*`/`ui.retry*` glue out of `i18n_core.js",
+      "title": "Admin i18n shared ui toolbar slim patch (code)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S261",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "INDEX/STABLE_STATE/docs README + GALAXY_ROADMAP zriz",
+      "title": "Docs canon sync band (docs)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S262",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "poolai-loc-audit` → `rust_ratio.json`; FM §5.13 advisory",
+      "title": "Rust ratio loc-audit refresh + hold gate (ops)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S253",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_pricing_quote_usd_micro` + `galaxy_pricing_market_min_usd_micro` on `/metrics",
+      "title": "Galaxy pricing quote + market_min stand smoke (tests)"
+    },
+    {
       "category": "closed",
       "id": "PH-S252",
       "link": "docs/vision/index.html#sprint-queue",
@@ -99,15 +190,6 @@
       "status": "closed",
       "summary": "verify `admin.nav.*` only in auth_dash patch",
       "title": "Admin i18n nav shell key audit (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S241",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_pricing_fresh_served` on live `/metrics",
-      "title": "Galaxy pricing fresh served metrics stand smoke (tests)"
     }
   ],
   "link": "docs/vision/index.html",

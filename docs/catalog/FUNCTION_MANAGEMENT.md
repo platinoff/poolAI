@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-17 (PH-S247…S252 ✅ · §5.12 **0** відкритих · replenish §5.13 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-17 (PH-S253 ✅ · §5.12 **9** відкритих · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -452,16 +452,28 @@ FM-xxx (з таблиці нижче)
 | 185 | **PH-S250** | Galaxy shard locality metrics stand smoke (tests) | PH-S183 | `galaxy_shard_local_hit_ratio` on `/metrics` | **✅** |
 | 186 | **PH-S251** | Docs roadmap sync band (docs) | PH-S249 | GALAXY_GRID_ROADMAP + README + INDEX sprint zriz | **✅** |
 | 187 | **PH-S252** | Admin shared ui.confirm slim patch (code) | PH-S245 | `ui.confirm*` + modal glue keys slim patch | **✅** |
+| 188 | **PH-S253** | Galaxy pricing quote + market_min stand smoke (tests) | PH-S174/S181 | `galaxy_pricing_quote_usd_micro` + `galaxy_pricing_market_min_usd_micro` on `/metrics` | **✅** |
+| 189 | **PH-S254** | Galaxy fee_split_applied stand smoke (tests) | PH-S194 | `galaxy_fee_split_applied_total` on live `/metrics` | відкрито |
+| 190 | **PH-S255** | Galaxy cross_region_egress stand smoke (tests) | PH-S185 | `galaxy_cross_region_egress_mb` on live `/metrics` | відкрито |
+| 191 | **PH-S256** | Galaxy replay_pending stand smoke (tests) | PH-S176 | `galaxy_replay_pending` on live `/metrics` | відкрито |
+| 192 | **PH-S257** | Admin i18n workers panel slim patch (code) | PH-S222 | `workers.*` keys out of `i18n_core.js` | відкрито |
+| 193 | **PH-S258** | Admin i18n home shell slim patch (code) | PH-S162 | `home.*` keys out of `i18n_core.js` | відкрито |
+| 194 | **PH-S259** | Admin i18n form + err core slim patch (code) | PH-S246 | `form.*` + residual `err.*` out of `i18n_core.js` | відкрито |
+| 195 | **PH-S260** | Admin i18n shared ui toolbar slim patch (code) | PH-S252 | `ui.save`/`ui.search*`/`ui.retry*` glue out of `i18n_core.js` | відкрито |
+| 196 | **PH-S261** | Docs canon sync band (docs) | PH-S256 | INDEX/STABLE_STATE/docs README + GALAXY_ROADMAP zriz | відкрито |
+| 197 | **PH-S262** | Rust ratio loc-audit refresh + hold gate (ops) | PH-S165 | `poolai-loc-audit` → `rust_ratio.json`; FM §5.13 advisory | відкрито |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S128…S252 ✅. Vision rev **199**.
+**Відкритих у §5.12:** **9** (PH-S254…S262). **Закрито смуга:** PH-S128…S253 ✅. Vision rev **202**.
 
-**Наступна сесія:** **replenish §5.12** з §5.13 · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S254** · черга **9** відкритих · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
-**Replenish (2026-06-16):** i18n slim band (S243…S246, S248, S252) + Galaxy `/metrics` stand smoke (S244, S247, S249, S250) + docs sync (S251) — з [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md), [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md) §4.2/§5.3/§6.4, [`RUST_RATIO_STRATEGY_2026-06-13.md`](../development/RUST_RATIO_STRATEGY_2026-06-13.md) post-S242 maintain.
+**Replenish (2026-06-17):** Galaxy `/metrics` stand smoke gaps (S253…S256, [`PROMETHEUS_METRICS.md`](../development/PROMETHEUS_METRICS.md)) + i18n slim maintain (S257…S260, ~100 keys лишилось у `i18n_core.js`) + docs canon hygiene (S261) + ratio audit (S262) — з [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md) §4.2/§5.3/§6.4, [`RUST_RATIO_STRATEGY_2026-06-13.md`](../development/RUST_RATIO_STRATEGY_2026-06-13.md) post-S252.
 
-### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S169)
+### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S262)
 
-Рядки **PH-S150…S169** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
+Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
+
+**Активна смуга (2026-06-17 replenish):** PH-S253…S262 — Galaxy metrics stand smoke (quote/market/fee/egress/replay) + i18n slim (workers/home/form/ui) + docs canon + loc-audit.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

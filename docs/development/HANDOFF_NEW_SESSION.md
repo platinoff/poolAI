@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-17 (PH-S252 ✅ · §5.12 **0** відкритих · replenish §5.13) · VDT
+**Оновлено:** 2026-06-17 (PH-S253 ✅ · §5.12 **9** відкритих · next **PH-S254**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -203,12 +203,13 @@
 **PH-S250 ✅ (code/tests):** `poolai-http-stand-smoke` — `galaxy_shard_local_hit_ratio_metrics` on live `/metrics`; unit test `ph_s250`.
 **PH-S251 ✅ (docs):** GALAXY_GRID_ROADMAP + README + INDEX sprint zriz; §5.12 band S247…S252 closed.
 **PH-S252 ✅ (code/ui):** `admin_ui_confirm_patch` on admin + dashboard shells; `ui.confirm*` glue removed from `i18n_core.js`; audit tests `ph_s252`.
-**Replenish:** §5.12 **0** відкритих — наступна сесія replenish з §5.13 ([`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md)); див. [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md).
+**PH-S253 ✅ (code/tests):** `poolai-http-stand-smoke` — `galaxy_pricing_quote_market_metrics` on live `/metrics`; unit test `ph_s253`.
+**Replenish ✅ (2026-06-17):** §5.12 **9** відкритих **PH-S254…S262** — Galaxy `/metrics` stand smoke gaps (quote/market/fee/egress/replay) + i18n slim maintain (workers/home/form/ui) + docs canon (S261) + loc-audit (S262); див. [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md), [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md).
 **Ops:** `open-docs-vision.ps1` — ASCII Write-Host + robust `SendVisionBytes`; URL `http://127.0.0.1:8765/docs/vision/index.html`.
 **PH-S198 ✅ (code):** `topology_graph.rs` — hub labels + `label_x`/`label_y`/`is_hub` in graph JSON; heatmap short ids; slim `topology_graph.js` (SVG paint only); `cargo test-ci`.
 **PH-S194 ✅ (code):** `galaxy_fee_split_applied_total` on grid result wire; `cargo test-ci`.
-**Vision ✅:** next **PH-S210** · **10** відкритих (S210…S219) · rev **151**.
-**Черга:** §5.12 **10** відкритих — **PH-S210…S219**. Stand smoke + i18n slim + vision a11y · baseline **92.78%** · hold **95%** · spirit **96%**.
+**Vision ✅:** next **PH-S254** · **9** відкритих (S254…S262) · rev **202**.
+**Черга:** §5.12 **9** відкритих — **PH-S254…S262**. Stand smoke + i18n slim + docs canon + loc-audit · baseline **92.78%** · hold **95%** · spirit **96%**.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

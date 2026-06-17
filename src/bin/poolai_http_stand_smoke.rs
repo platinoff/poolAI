@@ -519,6 +519,40 @@ async fn smoke_galaxy_pricing_provider_metrics(client: &Client, base: &str) -> R
     metrics_text_has_pricing_provider_counters(&body)
 }
 
+/// PH-S253: live stand exposes Galaxy pricing quote + market min gauges.
+const GALAXY_PRICING_QUOTE_MARKET_METRICS: &[&str] = &[
+    "galaxy_pricing_quote_usd_micro",
+    "galaxy_pricing_market_min_usd_micro",
+];
+
+fn metrics_text_has_pricing_quote_market_gauges(body: &str) -> Result<(), String> {
+    for name in GALAXY_PRICING_QUOTE_MARKET_METRICS {
+        if !body.contains(name) {
+            return Err(format!("/metrics missing {name}"));
+        }
+        if !body.contains(&format!("# TYPE {name} gauge")) {
+            return Err(format!("/metrics missing TYPE gauge for {name}"));
+        }
+    }
+    Ok(())
+}
+
+async fn smoke_galaxy_pricing_quote_market_metrics(
+    client: &Client,
+    base: &str,
+) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("/metrics request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("/metrics status {}", resp.status()));
+    }
+    let body = resp.text().await.map_err(|e| e.to_string())?;
+    metrics_text_has_pricing_quote_market_gauges(&body)
+}
+
 /// PH-S249: live stand exposes Galaxy settlement pending + cleared gauges.
 const GALAXY_SETTLEMENT_METRICS: &[&str] = &[
     "galaxy_settlement_pending_verification_total",
@@ -1281,6 +1315,12 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
     .await;
     record(
         &mut cases,
+        "galaxy_pricing_quote_market_metrics",
+        smoke_galaxy_pricing_quote_market_metrics(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
         "galaxy_verification_metrics",
         smoke_galaxy_verification_metrics(&client, &cli.base_url).await,
     )
@@ -1553,6 +1593,19 @@ mod tests {
             "galaxy_pricing_provider_errors_total 0\n",
         );
         metrics_text_has_pricing_provider_counters(sample).expect("sample export");
+    }
+
+    #[test]
+    fn galaxy_pricing_quote_market_metrics_export_shape_ph_s253() {
+        let sample = concat!(
+            "# HELP galaxy_pricing_quote_usd_micro Galaxy pricing last served PoolAI quote micro-USD (PH-S174)\n",
+            "# TYPE galaxy_pricing_quote_usd_micro gauge\n",
+            "galaxy_pricing_quote_usd_micro 0\n",
+            "# HELP galaxy_pricing_market_min_usd_micro Galaxy pricing last observed market min micro-USD (PH-S181)\n",
+            "# TYPE galaxy_pricing_market_min_usd_micro gauge\n",
+            "galaxy_pricing_market_min_usd_micro 0\n",
+        );
+        metrics_text_has_pricing_quote_market_gauges(sample).expect("sample export");
     }
 
     #[test]
