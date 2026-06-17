@@ -1,9 +1,9 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-17 · PH-S243 ✅ · vision **rev 193** (after sync) · **9** відкритих (PH-S244…S252) · **hold 95%** · **stretch spirit 96%**
+**Оновлено:** 2026-06-17 · PH-S244 ✅ · vision **rev 195** (after sync) · **8** відкритих (PH-S245…S252) · **hold 95%** · **stretch spirit 96%**
 
-| **← наступний** | **PH-S244** — Galaxy pricing stale served metrics stand smoke |
-| **Відкритих** | **9** (PH-S244…S252) |
+| **← наступний** | **PH-S245** — Admin shared status keys slim patch |
+| **Відкритих** | **8** (PH-S245…S252) |
 
 ---
 
@@ -11,8 +11,7 @@
 
 | Sprint | Scope | Type |
 |--------|-------|------|
-| **PH-S244** ← | `galaxy_pricing_stale_served` stand smoke | tests |
-| PH-S245 | `admin.status.*` slim patch | code |
+| **PH-S245** ← | `admin.status.*` slim patch | code |
 | PH-S246 | `err.hint*` + access keys slim | code |
 | PH-S247 | pricing provider metrics stand smoke | tests |
 | PH-S248 | `vm.*` modal i18n slim | code |
@@ -23,19 +22,20 @@
 
 ---
 
-## PH-S244 — scope
+## PH-S245 — scope
 
-- `poolai-http-stand-smoke` — `galaxy_pricing_stale_served` on live `/metrics` (PH-S127 gauge export)
-- Pattern: PH-S241 fresh served stand smoke
-- Acceptance: `cargo test ph_s244`; FM/HANDOFF/NEXT; `poolai-vision-sync --check`; commit+push
+- `admin.status.active` / `inactive` / `yes` / `no`, `admin.na`, `admin.btn.edit` → slim patch (`admin_status_patch` or shared admin patch)
+- Remove from `i18n_core.js`; extend admin layout tests
+- Pattern: PH-S240 table toolbar slim
+- Acceptance: `cargo test ph_s245`; FM/HANDOFF/NEXT; `poolai-vision-sync --check`; commit+push
 
 ---
 
-## Copy-paste — PH-S244
+## Copy-paste — PH-S245
 
 ```
-PH-S244 — Galaxy pricing stale served metrics stand smoke (tests)
-Scope: galaxy_pricing_stale_served on live /metrics; cargo test ph_s244; FM/HANDOFF/NEXT; commit+push
+PH-S245 — Admin shared status keys slim patch (code)
+Scope: admin.status.* + admin.na + admin.btn.edit slim patch; cargo test ph_s245; FM/HANDOFF/NEXT; commit+push
 ```
 
 ---

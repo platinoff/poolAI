@@ -3,18 +3,9 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S244",
-      "link": "docs/vision/index.html#sprint-queue",
-      "next": true,
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "galaxy_pricing_stale_served` on live `/metrics",
-      "title": "Galaxy pricing stale served metrics stand smoke (tests)"
-    },
-    {
-      "category": "open",
       "id": "PH-S245",
       "link": "docs/vision/index.html#sprint-queue",
+      "next": true,
       "published": "2026-05-28",
       "status": "open",
       "summary": "admin.status.*` + `admin.na` + `admin.btn.edit` slim patch",
@@ -82,6 +73,15 @@
       "status": "open",
       "summary": "ui.confirm*` + modal glue keys slim patch",
       "title": "Admin shared ui.confirm slim patch (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S244",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_pricing_stale_served` on live `/metrics",
+      "title": "Galaxy pricing stale served metrics stand smoke (tests)"
     },
     {
       "category": "closed",
@@ -181,15 +181,6 @@
       "status": "closed",
       "summary": "aria-label` on map sprint chips",
       "title": "Vision map sprint chips a11y (docs/vision)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S232",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "replication counters on `/metrics",
-      "title": "Galaxy replication metrics stand smoke (tests)"
     }
   ],
   "link": "docs/vision/index.html",
