@@ -1836,7 +1836,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S282",
+  "last_sprint_closed": "PH-S292",
   "layers": [
     {
       "id": "L0",
@@ -1869,7 +1869,6 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S283",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7732,7 +7731,7 @@
       "path": "crates/poolai-ui-core/src/admin_dom.rs"
     }
   ],
-  "revision": 208,
+  "revision": 209,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -9691,94 +9690,94 @@
       "acceptance": "enqueue_prefetch_hook` + unit test; no live pull",
       "deps": "PH-S276",
       "id": "PH-S283",
-      "open": true,
+      "open": false,
       "row": 218,
-      "status": "open",
+      "status": "closed",
       "title": "Galaxy prefetch enqueue wire stub (code)"
     },
     {
       "acceptance": "render_line_chart_html` → wasm; slim `poolaiRenderLineChart",
       "deps": "PH-S275",
       "id": "PH-S284",
-      "open": true,
+      "open": false,
       "row": 219,
-      "status": "open",
+      "status": "closed",
       "title": "admin_charts line chart wasm HTML (code)"
     },
     {
       "acceptance": "rank_workers_by_locality` on grid job `required_shard_ids",
       "deps": "PH-S128",
       "id": "PH-S285",
-      "open": true,
+      "open": false,
       "row": 220,
-      "status": "open",
+      "status": "closed",
       "title": "Galaxy locality rank job ingest stub (code)"
     },
     {
       "acceptance": "poolai-http-stand-smoke` ingest + `/metrics",
       "deps": "PH-S283",
       "id": "PH-S286",
-      "open": true,
+      "open": false,
       "row": 221,
-      "status": "open",
+      "status": "closed",
       "title": "Stand smoke prefetch enqueue path (tests)"
     },
     {
       "acceptance": "poolaiGroupMetricsByName` → wasm",
       "deps": "PH-S155",
       "id": "PH-S287",
-      "open": true,
+      "open": false,
       "row": 222,
-      "status": "open",
+      "status": "closed",
       "title": "admin_charts metric group wasm glue (code)"
     },
     {
       "acceptance": "rust_ratio.json` sprint zriz",
       "deps": "PH-S278",
       "id": "PH-S288",
-      "open": true,
+      "open": false,
       "row": 223,
-      "status": "open",
+      "status": "closed",
       "title": "Rust ratio loc-audit refresh (ops)"
     },
     {
       "acceptance": "INDEX/HANDOFF/NEXT/STABLE/GALAXY",
       "deps": "PH-S288",
       "id": "PH-S289",
-      "open": true,
+      "open": false,
       "row": 224,
-      "status": "open",
+      "status": "closed",
       "title": "Docs canon sync band (docs)"
     },
     {
       "acceptance": "--check` green",
       "deps": "PH-S280",
       "id": "PH-S290",
-      "open": true,
+      "open": false,
       "row": 225,
-      "status": "open",
+      "status": "closed",
       "title": "poolai-vision-sync drift gate (ops)"
     },
     {
       "acceptance": "--min-ratio 0.95 --advisory",
       "deps": "PH-S288",
       "id": "PH-S291",
-      "open": true,
+      "open": false,
       "row": 226,
-      "status": "open",
+      "status": "closed",
       "title": "Ratio hold advisory snapshot (ops)"
     },
     {
       "acceptance": "INDEX §7 + rust_ratio pointer",
       "deps": "PH-S289",
       "id": "PH-S292",
-      "open": true,
+      "open": false,
       "row": 227,
-      "status": "open",
+      "status": "closed",
       "title": "Docs INDEX ratio maintain (docs)"
     }
   ],
-  "sprint_queue_open_count": 10,
+  "sprint_queue_open_count": 0,
   "updated_at": "2026-06-16",
   "vision_ui_rev": 59
 }

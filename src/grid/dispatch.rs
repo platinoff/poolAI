@@ -14,10 +14,12 @@ use serde::{Deserialize, Serialize};
 use crate::core::error::AppError;
 use crate::grid::galaxy_fee_split_metrics::evaluate_result_fee_split;
 use crate::grid::galaxy_locality::{
-    observe_last_cross_region_egress_mb, DEFAULT_PREFETCH_CROSS_REGION_EGRESS_MB_PER_SHARD,
+    observe_last_cross_region_egress_mb, pick_best_worker_by_locality, LocalityHotTier,
+    LocalityNetworkProfile, LocalitySeedInventory, LocalityTask, LocalityWorker,
+    DEFAULT_PREFETCH_CROSS_REGION_EGRESS_MB_PER_SHARD,
 };
 use crate::grid::galaxy_prefetch_metrics::{
-    record_prefetch_plan, DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM,
+    record_prefetch_enqueue, record_prefetch_plan, DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM,
     DEFAULT_PREFETCH_BYTES_PER_SHARD_VRAM,
 };
 use crate::grid::galaxy_replay_metrics::evaluate_result_replay_pending;
@@ -155,7 +157,57 @@ pub fn ingest_job_prefetch_stub(required_shard_ids: &[String], gpu_capable: bool
         gpu_capable,
         &config,
     );
-    noop_prefetch_hook(&plan)
+    enqueue_prefetch_hook(&plan)
+}
+
+/// Coordinator worker rows for locality rank stub (PH-S285).
+pub fn locality_workers_from_seed_snapshots() -> Vec<LocalityWorker> {
+    coordinator_seed_inventory_snapshot()
+        .into_iter()
+        .map(|snap| {
+            let region = snap
+                .seed_inventory
+                .local_replica_regions
+                .first()
+                .cloned()
+                .unwrap_or_else(|| "unknown".into());
+            LocalityWorker {
+                worker_id: snap.peer_id,
+                seed_inventory: LocalitySeedInventory {
+                    shard_ids: snap.seed_inventory.shard_ids,
+                    hot_tier: LocalityHotTier {
+                        ram_bytes_used: snap.seed_inventory.hot_tier.ram_bytes_used,
+                        vram_bytes_used: snap.seed_inventory.hot_tier.vram_bytes_used,
+                        profiles: snap.seed_inventory.hot_tier.profiles,
+                    },
+                    local_replica_regions: snap.seed_inventory.local_replica_regions,
+                },
+                network_profile: LocalityNetworkProfile {
+                    region,
+                    latency_ms_p50: 12,
+                    profile_age_secs: None,
+                },
+            }
+        })
+        .collect()
+}
+
+/// Rank workers by locality on grid job ingest (PH-S285 stub; no bind wire).
+pub fn ingest_job_locality_rank_stub(
+    required_shard_ids: &[String],
+    task_kind: &str,
+) -> Option<String> {
+    if required_shard_ids.is_empty() {
+        return None;
+    }
+    let workers = locality_workers_from_seed_snapshots();
+    let task = LocalityTask {
+        required_shard_ids: required_shard_ids.to_vec(),
+        task_profile: task_kind.to_string(),
+        estimated_cross_region_egress_mb: 0.0,
+        source_region: None,
+    };
+    pick_best_worker_by_locality(&workers, &task).map(|w| w.worker_id.clone())
 }
 
 fn grid_job_gpu_capable(task_kind: &str) -> bool {
@@ -313,6 +365,14 @@ pub fn noop_prefetch_hook(plan: &PrefetchPlan) -> usize {
     plan.items.len()
 }
 
+/// Prefetch enqueue stub (PH-S283): records enqueue metrics; no live seed pull wire.
+#[inline]
+pub fn enqueue_prefetch_hook(plan: &PrefetchPlan) -> usize {
+    let n = plan.items.len();
+    record_prefetch_enqueue(n);
+    n
+}
+
 /// Outcome of processing one grid envelope.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum GridIngestKind {
@@ -408,6 +468,7 @@ fn ingest_job(
             &body.required_shard_ids,
             grid_job_gpu_capable(&body.task_kind),
         );
+        let _ = ingest_job_locality_rank_stub(&body.required_shard_ids, &body.task_kind);
     }
     let row = jobs
         .get(&job_id)?
@@ -1657,6 +1718,53 @@ mod tests {
         };
         ingest_envelope(env, &jobs, &memory).expect("ingest");
         assert_eq!(prefetch_plan_total(), 1);
+        reset_prefetch_metrics_for_test();
+    }
+
+    #[test]
+    fn enqueue_prefetch_hook_ph_s283() {
+        use crate::grid::galaxy_prefetch_metrics::{
+            prefetch_enqueue_total, reset_prefetch_metrics_for_test,
+        };
+
+        reset_prefetch_metrics_for_test();
+        let plan = PrefetchPlan {
+            items: vec![
+                PrefetchPlanItem {
+                    shard_id: "a".into(),
+                    target_tier: PrefetchTargetTier::Ram,
+                },
+                PrefetchPlanItem {
+                    shard_id: "b".into(),
+                    target_tier: PrefetchTargetTier::Ram,
+                },
+            ],
+            trigger: PrefetchTrigger::JobAdmitted,
+            deadline_ms: DEFAULT_PREFETCH_DEADLINE_MS,
+            mode: PrefetchPolicyMode::BestEffort,
+        };
+        assert_eq!(enqueue_prefetch_hook(&plan), 2);
+        assert_eq!(prefetch_enqueue_total(), 2);
+        reset_prefetch_metrics_for_test();
+    }
+
+    #[test]
+    fn ingest_job_locality_rank_stub_ph_s285() {
+        let picked =
+            ingest_job_locality_rank_stub(&["w:emb-1".into(), "w:missing".into()], "inference");
+        assert!(picked.is_some());
+        assert!(picked.unwrap().starts_with("srv"));
+    }
+
+    #[test]
+    fn ingest_job_prefetch_enqueue_ph_s286() {
+        use crate::grid::galaxy_prefetch_metrics::{
+            prefetch_enqueue_total, reset_prefetch_metrics_for_test,
+        };
+
+        reset_prefetch_metrics_for_test();
+        ingest_job_prefetch_stub(&["w:missing-shard".into()], false);
+        assert_eq!(prefetch_enqueue_total(), 1);
         reset_prefetch_metrics_for_test();
     }
 }

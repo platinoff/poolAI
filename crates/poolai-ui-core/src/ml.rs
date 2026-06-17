@@ -1,4 +1,4 @@
-//! ML pipeline metric helpers — parity with `admin_charts.js` (PH-S43, PH-S155, PH-S275).
+//! ML pipeline metric helpers — parity with `admin_charts.js` (PH-S43, PH-S155, PH-S275, PH-S284, PH-S287).
 
 use crate::format::escape_html;
 use serde::{Deserialize, Serialize};
@@ -293,6 +293,113 @@ pub fn render_sparkline_html(
     )
 }
 
+fn sanitize_chart_id(name: &str) -> String {
+    name.chars()
+        .map(|c| {
+            if c.is_ascii_alphanumeric() || c == '_' || c == '-' {
+                c
+            } else {
+                '_'
+            }
+        })
+        .collect()
+}
+
+/// Mirrors `poolaiRenderLineChart` empty state.
+pub fn render_line_chart_empty_html(no_data_label: &str) -> String {
+    format!(r#"<div class="muted">{}</div>"#, escape_html(no_data_label))
+}
+
+/// Mirrors `poolaiRenderLineChart(metricName, data, opts)` (PH-S284).
+pub fn render_line_chart_html(
+    metric_name: &str,
+    values: &[f64],
+    width: f64,
+    height: f64,
+    padding: f64,
+    points_label: &str,
+    stat_min_lbl: &str,
+    stat_max_lbl: &str,
+    stat_avg_lbl: &str,
+) -> String {
+    if values.is_empty() {
+        return render_line_chart_empty_html("No data available");
+    }
+    let scale = chart_scale(values, width, height, padding);
+    let avg = values.iter().sum::<f64>() / values.len() as f64;
+    let grad_id = format!("grad-{}", sanitize_chart_id(metric_name));
+    let w = width.round() as u32;
+    let h = height.round() as u32;
+    let circles: String = scale
+        .points
+        .iter()
+        .map(|p| {
+            format!(
+                r#"<circle cx="{:.1}" cy="{:.1}" r="3" fill="var(--primary, #67e480)" />"#,
+                p.x, p.y
+            )
+        })
+        .collect();
+    format!(
+        concat!(
+            r#"<div class="metric-chart-container">"#,
+            r#"<h4>{title}</h4>"#,
+            r#"<svg width="{w}" height="{h}" class="metric-chart-svg" role="img" aria-label="{title}">"#,
+            r#"<defs><linearGradient id="{grad}" x1="0%" y1="0%" x2="0%" y2="100%">"#,
+            r#"<stop offset="0%" style="stop-color:var(--primary, #67e480);stop-opacity:0.3" />"#,
+            r#"<stop offset="100%" style="stop-color:var(--primary, #67e480);stop-opacity:0.05" />"#,
+            r#"</linearGradient></defs>"#,
+            r#"<rect x="{pad:.0}" y="{pad:.0}" width="{cw:.0}" height="{ch:.0}" fill="url(#{grad})" />"#,
+            r#"<polyline points="{poly}" fill="none" stroke="var(--primary, #67e480)" stroke-width="2" />"#,
+            r#"{circles}"#,
+            r#"<text x="{pad:.0}" y="{ymax:.0}" fill="var(--text, #f8f8f2)" font-size="12">{maxv:.1}</text>"#,
+            r#"<text x="{pad:.0}" y="{ymin:.0}" fill="var(--text, #f8f8f2)" font-size="12">{minv:.1}</text>"#,
+            r#"<text x="{xend:.0}" y="{ymin:.0}" fill="var(--text-muted, #a8b0bf)" font-size="10" text-anchor="end">{pts}</text>"#,
+            r#"</svg>"#,
+            r#"<div class="metric-stats">"#,
+            r#"<span>{stat_min} <strong>{minv2:.2}</strong></span>"#,
+            r#"<span>{stat_max} <strong>{maxv2:.2}</strong></span>"#,
+            r#"<span>{stat_avg} <strong>{avg:.2}</strong></span>"#,
+            r#"</div></div>"#
+        ),
+        title = escape_html(metric_name),
+        w = w,
+        h = h,
+        grad = grad_id,
+        pad = scale.padding,
+        cw = scale.chart_width,
+        ch = scale.chart_height,
+        poly = scale.polyline,
+        circles = circles,
+        ymax = scale.padding - 10.0,
+        ymin = height - scale.padding + 20.0,
+        maxv = scale.max,
+        minv = scale.min,
+        xend = width - scale.padding,
+        pts = escape_html(points_label),
+        stat_min = escape_html(stat_min_lbl),
+        stat_max = escape_html(stat_max_lbl),
+        stat_avg = escape_html(stat_avg_lbl),
+        minv2 = scale.min,
+        maxv2 = scale.max,
+        avg = avg
+    )
+}
+
+/// Mirrors `poolaiGroupMetricsByName(metrics)` (PH-S287).
+pub fn group_metrics_by_name(data: &[Value]) -> BTreeMap<String, Vec<Value>> {
+    let mut by: BTreeMap<String, Vec<Value>> = BTreeMap::new();
+    for m in data {
+        let key = m
+            .get("metric")
+            .and_then(|v| v.as_str())
+            .unwrap_or("unknown")
+            .to_string();
+        by.entry(key).or_default().push(m.clone());
+    }
+    by
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -384,5 +491,34 @@ mod tests {
         assert!(html.contains("metric-sparkline-svg"));
         assert!(html.contains("<polyline"));
         assert!(html.contains("Avg:"));
+    }
+
+    #[test]
+    fn render_line_chart_html_ph_s284() {
+        let html = render_line_chart_html(
+            "cpu",
+            &[1.0, 3.0, 2.0],
+            600.0,
+            200.0,
+            40.0,
+            "3 points",
+            "Min:",
+            "Max:",
+            "Avg:",
+        );
+        assert!(html.contains("metric-chart-container"));
+        assert!(html.contains("metric-chart-svg"));
+        assert!(html.contains("<polyline"));
+    }
+
+    #[test]
+    fn group_metrics_by_name_ph_s287() {
+        let grouped = group_metrics_by_name(&[
+            json!({"metric": "a", "value": 1}),
+            json!({"metric": "b", "value": 2}),
+            json!({"metric": "a", "value": 3}),
+        ]);
+        assert_eq!(grouped.get("a").map(|v| v.len()), Some(2));
+        assert_eq!(grouped.get("b").map(|v| v.len()), Some(1));
     }
 }

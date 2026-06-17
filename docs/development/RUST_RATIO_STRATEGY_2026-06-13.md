@@ -1,6 +1,6 @@
 # Rust codebase ratio — стратегія 90–95% (PoolAI)
 
-**Оновлено:** 2026-06-17 · **Канон:** FM **§5.13** · §5.12 **0** відкритих (PH-S128…S282 ✅) · rust_ratio **94.36%**
+**Оновлено:** 2026-06-17 · **Канон:** FM **§5.13** · §5.12 **0** відкритих (PH-S128…S292 ✅) · rust_ratio **94.36%**
 
 **Мета:** зростання частки **Rust** у виконуваному коді репозиторію до **90–95%** (формально), **96% stretch spirit** (орієнтир replenish PH-S150…S159) — платформа збирається і перевіряється через **`cargo`** без обов'язкового Node на edge.
 
@@ -85,7 +85,7 @@ flowchart TB
 | **E — gate** | PH-S150 ✅ | CI advisory якщо ratio <88%; target 93%; stretch 96% spirit | стабільно 90–95% |
 | **F — stretch 96%** | PH-S151…S159 ✅ | wasm wiring, slim JS/i18n/charts, Rust stand/e2e bins; CI warn **93%** | **→96% spirit** |
 
-**Черга §5.12:** **10** відкритих (S283…S292) · PH-S282 ✅ · replenish post-S282 band.
+**Черга §5.12:** **0** відкритих · PH-S292 ✅ · replenish §5.13.
 
 ---
 
@@ -232,16 +232,16 @@ flowchart TB
 | 137 | **PH-S280** | poolai-vision-sync drift gate | `--check` green | **✅** |
 | 138 | **PH-S281** | Ratio hold advisory snapshot | **94.36%** advisory | **✅** |
 | 139 | **PH-S282** | Docs INDEX ratio maintain | INDEX §7 pointer | **✅** |
-| 140 | **PH-S283** | Galaxy prefetch enqueue wire stub | `enqueue_prefetch_hook` | відкрито |
-| 141 | **PH-S284** | admin line chart wasm HTML | slim `poolaiRenderLineChart` | відкрито |
-| 142 | **PH-S285** | Galaxy locality rank ingest stub | job `required_shard_ids` | відкрито |
-| 143 | **PH-S286** | Stand smoke prefetch enqueue | poolai-http-stand-smoke | відкрито |
-| 144 | **PH-S287** | admin_charts metric group wasm | `poolaiGroupMetricsByName` | відкрито |
-| 145 | **PH-S288** | Rust ratio loc-audit refresh | sprint zriz | відкрито |
-| 146 | **PH-S289** | Docs canon sync band | INDEX/HANDOFF/NEXT | відкрито |
-| 147 | **PH-S290** | poolai-vision-sync drift gate | `--check` green | відкрито |
-| 148 | **PH-S291** | Ratio hold advisory snapshot | **94.36%** advisory | відкрито |
-| 149 | **PH-S292** | Docs INDEX ratio maintain | INDEX §7 pointer | відкрито |
+| 140 | **PH-S283** | Galaxy prefetch enqueue wire stub | `enqueue_prefetch_hook` | **✅** |
+| 141 | **PH-S284** | admin line chart wasm HTML | slim `poolaiRenderLineChart` | **✅** |
+| 142 | **PH-S285** | Galaxy locality rank ingest stub | job `required_shard_ids` | **✅** |
+| 143 | **PH-S286** | Stand smoke prefetch enqueue | `galaxy_prefetch_enqueue_total` | **✅** |
+| 144 | **PH-S287** | admin_charts metric group wasm | `poolaiGroupMetricsByName` | **✅** |
+| 145 | **PH-S288** | Rust ratio loc-audit refresh | **94.36%** sprint zriz | **✅** |
+| 146 | **PH-S289** | Docs canon sync band | INDEX/HANDOFF/NEXT | **✅** |
+| 147 | **PH-S290** | poolai-vision-sync drift gate | `--check` green | **✅** |
+| 148 | **PH-S291** | Ratio hold advisory snapshot | **94.36%** advisory | **✅** |
+| 149 | **PH-S292** | Docs INDEX ratio maintain | INDEX §7 pointer | **✅** |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 

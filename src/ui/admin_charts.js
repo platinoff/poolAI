@@ -108,6 +108,10 @@ async function poolaiFetchMetricsWindow(opts) {
 }
 
 function poolaiGroupMetricsByName(metrics) {
+  var wasm = poolaiChartsWasm();
+  if (wasm && typeof wasm.groupMetricsByName === 'function') {
+    return wasm.groupMetricsByName(JSON.stringify(metrics || []));
+  }
   var by = {};
   if (!Array.isArray(metrics)) return by;
   metrics.forEach(function (m) {
@@ -138,12 +142,30 @@ function poolaiRenderLineChart(metricName, data, opts) {
   var width = opts.width != null ? opts.width : 600;
   var height = opts.height != null ? opts.height : 200;
   var padding = opts.padding != null ? opts.padding : 40;
-  var scale = poolaiChartScale(values, width, height, padding);
-  var gradId = 'grad-' + poolaiSanitizeChartId(metricName);
   var pointsLabel = poolaiChartT('admin.mon.chartPoints', '{n} points').replace(
     /\{n\}/g,
     String(data.length),
   );
+  var statMin = poolaiChartT('admin.mon.statMin', 'Min:');
+  var statMax = poolaiChartT('admin.mon.statMax', 'Max:');
+  var statAvg = poolaiChartT('admin.mon.statAvg', 'Avg:');
+  var wasm = poolaiChartsWasm();
+  if (wasm && typeof wasm.renderLineChartHtml === 'function') {
+    return wasm.renderLineChartHtml(
+      metricName,
+      JSON.stringify(values),
+      width,
+      height,
+      padding,
+      pointsLabel,
+      statMin,
+      statMax,
+      statAvg,
+    );
+  }
+
+  var scale = poolaiChartScale(values, width, height, padding);
+  var gradId = 'grad-' + poolaiSanitizeChartId(metricName);
   var avg = values.reduce(function (a, b) {
     return a + b;
   }, 0) / values.length;
@@ -217,17 +239,17 @@ function poolaiRenderLineChart(metricName, data, opts) {
     '</svg>' +
     '<div class="metric-stats">' +
     '<span>' +
-    escapeHtml(poolaiChartT('admin.mon.statMin', 'Min:')) +
+    escapeHtml(statMin) +
     ' <strong>' +
     scale.min.toFixed(2) +
     '</strong></span>' +
     '<span>' +
-    escapeHtml(poolaiChartT('admin.mon.statMax', 'Max:')) +
+    escapeHtml(statMax) +
     ' <strong>' +
     scale.max.toFixed(2) +
     '</strong></span>' +
     '<span>' +
-    escapeHtml(poolaiChartT('admin.mon.statAvg', 'Avg:')) +
+    escapeHtml(statAvg) +
     ' <strong>' +
     avg.toFixed(2) +
     '</strong></span>' +

@@ -888,12 +888,26 @@ fn admin_charts_layer_exports() {
     assert!(js.contains("chartScale"));
     assert!(js.contains("flattenMlStepRows"));
     assert!(js.contains("renderSparklineHtml"));
+    assert!(js.contains("renderLineChartHtml"));
+    assert!(js.contains("groupMetricsByName"));
 }
 
 #[test]
 fn admin_charts_sparkline_wasm_first_ph_s275() {
     let js = include_str!("../admin_charts.js");
     assert!(js.contains("wasm.renderSparklineHtml"));
+}
+
+#[test]
+fn admin_charts_line_chart_wasm_first_ph_s284() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("wasm.renderLineChartHtml"));
+}
+
+#[test]
+fn admin_charts_group_metrics_wasm_first_ph_s287() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("wasm.groupMetricsByName"));
 }
 
 #[tokio::test]

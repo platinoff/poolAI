@@ -9,7 +9,8 @@ use poolai_ui_core::format::escape_html;
 use poolai_ui_core::lease::lease_state;
 use poolai_ui_core::ml::{
     chart_scale, collect_ml_sparkline_series, flatten_ml_step_rows, format_ml_metric_summary,
-    metric_point_values, parse_ml_numeric, render_sparkline_html,
+    group_metrics_by_name, metric_point_values, parse_ml_numeric, render_line_chart_html,
+    render_sparkline_html,
 };
 use poolai_ui_core::modal::{admin_dynamic_modal_html, trap_tab_action, MODAL_FOCUSABLE_SELECTOR};
 use poolai_ui_core::pricing::{format_unix_secs, format_usd_micro};
@@ -247,6 +248,38 @@ pub fn render_sparkline_html_wasm(
 ) -> String {
     let values: Vec<f64> = serde_json::from_str(values_json).unwrap_or_default();
     render_sparkline_html(label, &values, width, height, avg_label)
+}
+
+#[wasm_bindgen(js_name = renderLineChartHtml)]
+pub fn render_line_chart_html_wasm(
+    metric_name: &str,
+    values_json: &str,
+    width: f64,
+    height: f64,
+    padding: f64,
+    points_label: &str,
+    stat_min_lbl: &str,
+    stat_max_lbl: &str,
+    stat_avg_lbl: &str,
+) -> String {
+    let values: Vec<f64> = serde_json::from_str(values_json).unwrap_or_default();
+    render_line_chart_html(
+        metric_name,
+        &values,
+        width,
+        height,
+        padding,
+        points_label,
+        stat_min_lbl,
+        stat_max_lbl,
+        stat_avg_lbl,
+    )
+}
+
+#[wasm_bindgen(js_name = groupMetricsByName)]
+pub fn group_metrics_by_name_wasm(metrics_json: &str) -> JsValue {
+    let data: Vec<Value> = serde_json::from_str(metrics_json).unwrap_or_default();
+    serde_wasm_bindgen::to_value(&group_metrics_by_name(&data)).unwrap_or(JsValue::NULL)
 }
 
 /// POC version string for smoke checks in browser devtools.

@@ -17,6 +17,9 @@ pub const METRIC_PREFETCH_HOT_SKIP_TOTAL: &str = "galaxy_prefetch_hot_skip_total
 /// Estimated prefetch bytes scheduled in plans since process start (PH-S184 stub).
 pub const METRIC_PREFETCH_BYTES_TOTAL: &str = "galaxy_prefetch_bytes_total";
 
+/// Prefetch enqueue hook invocations (shard items enqueued, PH-S283 stub).
+pub const METRIC_PREFETCH_ENQUEUE_TOTAL: &str = "galaxy_prefetch_enqueue_total";
+
 /// Default stub bytes per RAM-tier planned shard (4 MiB, Galaxy §5.5).
 pub const DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM: u64 = 4_194_304;
 
@@ -27,6 +30,7 @@ static PLAN_TOTAL: AtomicU64 = AtomicU64::new(0);
 static PLANNED_SHARDS_TOTAL: AtomicU64 = AtomicU64::new(0);
 static HOT_SKIP_TOTAL: AtomicU64 = AtomicU64::new(0);
 static PREFETCH_BYTES_TOTAL: AtomicU64 = AtomicU64::new(0);
+static ENQUEUE_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// Record one `plan_prefetch` outcome (no wire enqueue).
 pub fn record_prefetch_plan(required_shards: usize, planned_shards: usize, prefetch_bytes: u64) {
@@ -55,12 +59,24 @@ pub fn prefetch_bytes_total() -> u64 {
     PREFETCH_BYTES_TOTAL.load(Ordering::Relaxed)
 }
 
+/// Record prefetch enqueue stub (PH-S283; no live seed pull wire).
+pub fn record_prefetch_enqueue(shard_count: usize) {
+    if shard_count > 0 {
+        ENQUEUE_TOTAL.fetch_add(shard_count as u64, Ordering::Relaxed);
+    }
+}
+
+pub fn prefetch_enqueue_total() -> u64 {
+    ENQUEUE_TOTAL.load(Ordering::Relaxed)
+}
+
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_prefetch_metrics_for_test() {
     PLAN_TOTAL.store(0, Ordering::Relaxed);
     PLANNED_SHARDS_TOTAL.store(0, Ordering::Relaxed);
     HOT_SKIP_TOTAL.store(0, Ordering::Relaxed);
     PREFETCH_BYTES_TOTAL.store(0, Ordering::Relaxed);
+    ENQUEUE_TOTAL.store(0, Ordering::Relaxed);
 }
 
 #[cfg(test)]
@@ -76,6 +92,14 @@ mod tests {
         assert_eq!(prefetch_planned_shards_total(), 3);
         assert_eq!(prefetch_hot_skip_total(), 1);
         assert_eq!(prefetch_bytes_total(), 12_582_912);
+    }
+
+    #[test]
+    fn record_prefetch_enqueue_ph_s283() {
         reset_prefetch_metrics_for_test();
+        record_prefetch_enqueue(2);
+        assert_eq!(prefetch_enqueue_total(), 2);
+        record_prefetch_enqueue(0);
+        assert_eq!(prefetch_enqueue_total(), 2);
     }
 }

@@ -343,6 +343,7 @@ const GALAXY_PREFETCH_METRICS: &[&str] = &[
     "galaxy_prefetch_planned_shards_total",
     "galaxy_prefetch_hot_skip_total",
     "galaxy_prefetch_bytes_total",
+    "galaxy_prefetch_enqueue_total",
 ];
 
 fn metrics_text_has_prefetch_counters(body: &str) -> Result<(), String> {
@@ -1637,6 +1638,9 @@ mod tests {
             "# HELP galaxy_prefetch_bytes_total Galaxy prefetch bytes\n",
             "# TYPE galaxy_prefetch_bytes_total gauge\n",
             "galaxy_prefetch_bytes_total 0\n",
+            "# HELP galaxy_prefetch_enqueue_total Galaxy prefetch enqueue stub\n",
+            "# TYPE galaxy_prefetch_enqueue_total gauge\n",
+            "galaxy_prefetch_enqueue_total 0\n",
         );
         metrics_text_has_prefetch_counters(sample).expect("sample export");
     }
