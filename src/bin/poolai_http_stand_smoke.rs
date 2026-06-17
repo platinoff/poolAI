@@ -427,6 +427,36 @@ async fn smoke_galaxy_pricing_cache_age_metrics(client: &Client, base: &str) -> 
     metrics_text_has_pricing_cache_age(&body)
 }
 
+/// PH-S241: live stand exposes Galaxy pricing fresh-served gauge on Prometheus scrape.
+const GALAXY_PRICING_FRESH_SERVED: &str = "galaxy_pricing_fresh_served";
+
+fn metrics_text_has_pricing_fresh_served(body: &str) -> Result<(), String> {
+    let name = GALAXY_PRICING_FRESH_SERVED;
+    if !body.contains(name) {
+        return Err(format!("/metrics missing {name}"));
+    }
+    if !body.contains(&format!("# TYPE {name} gauge")) {
+        return Err(format!("/metrics missing TYPE gauge for {name}"));
+    }
+    Ok(())
+}
+
+async fn smoke_galaxy_pricing_fresh_served_metrics(
+    client: &Client,
+    base: &str,
+) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("/metrics request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("/metrics status {}", resp.status()));
+    }
+    let body = resp.text().await.map_err(|e| e.to_string())?;
+    metrics_text_has_pricing_fresh_served(&body)
+}
+
 /// PH-S225: live stand exposes Galaxy verification counters on Prometheus scrape.
 const GALAXY_VERIFICATION_METRICS: &[&str] = &[
     "galaxy_verification_sample_total",
@@ -1110,6 +1140,12 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
     .await;
     record(
         &mut cases,
+        "galaxy_pricing_fresh_served_metrics",
+        smoke_galaxy_pricing_fresh_served_metrics(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
         "galaxy_verification_metrics",
         smoke_galaxy_verification_metrics(&client, &cli.base_url).await,
     )
@@ -1334,6 +1370,16 @@ mod tests {
             "galaxy_pricing_cache_age_seconds 0\n",
         );
         metrics_text_has_pricing_cache_age(sample).expect("sample export");
+    }
+
+    #[test]
+    fn galaxy_pricing_fresh_served_metrics_export_shape_ph_s241() {
+        let sample = concat!(
+            "# HELP galaxy_pricing_fresh_served Galaxy pricing oracle L1 fresh cache serves (PH-S127)\n",
+            "# TYPE galaxy_pricing_fresh_served gauge\n",
+            "galaxy_pricing_fresh_served 0\n",
+        );
+        metrics_text_has_pricing_fresh_served(sample).expect("sample export");
     }
 
     #[test]

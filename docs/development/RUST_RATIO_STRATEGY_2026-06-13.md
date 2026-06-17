@@ -190,7 +190,7 @@ flowchart TB
 | 95 | **PH-S238** | Admin i18n slim users panel | code | **✅** |
 | 96 | **PH-S239** | Admin i18n slim config panel | code | **✅** |
 | 97 | **PH-S240** | Admin i18n slim table toolbar | code | **✅** |
-| 98 | **PH-S241** | Galaxy pricing fresh served metrics stand smoke | tests | відкрито |
+| 98 | **PH-S241** | Galaxy pricing fresh served metrics stand smoke | tests | **✅** |
 | 99 | **PH-S242** | Admin i18n nav shell key audit | code | відкрито |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
