@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-17 (PH-S273 ✅ · §5.12 **9** відкритих · rust_ratio **94.34%**) · VDT
+**Оновлено:** 2026-06-17 (PH-S273…S274 ✅ · §5.12 **8** відкритих · rust_ratio **94.34%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -224,7 +224,8 @@
 **PH-S271 ✅ (ops):** hold advisory `--min-ratio 0.95` snapshot **94.34%** (advisory warn).
 **PH-S272 ✅ (docs):** INDEX §7 + ratio pointer **94.34%**.
 **PH-S273 ✅ (code/ui):** `admin_common.js` api-error wasm-first; removed `hintFor503` + JS `err.hint*` dup; audit test `ph_s273`.
-**§5.12:** **9** відкритих (PH-S274…S282) — наступний **PH-S274**.
+**PH-S274 ✅ (code/ui):** `admin_dom` + wasm `adminLoadingHtml`/`adminInlineErrorHtml`; `adminShowLoading`/`adminShowInlineError` wasm-first glue.
+**§5.12:** **8** відкритих (PH-S275…S282) — наступний **PH-S275**.
 **Vision ✅:** rev **206** · rust_ratio **94.34%** · hold **95%** advisory.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).

@@ -70,11 +70,12 @@ function escapeHtml(s) {
 
 function adminShowLoading(containerId, text) {
   const el = document.getElementById(containerId);
-  if (el)
-    el.innerHTML =
-      '<div class="muted">' +
-      escapeHtml(text || poolaiT('common.loading', 'Loading…')) +
-      '</div>';
+  if (!el) return;
+  const resolved = text || poolaiT('common.loading', 'Loading…');
+  const fn = poolaiUiWasmCall('adminLoadingHtml');
+  el.innerHTML = fn
+    ? fn(resolved)
+    : '<div class="muted">' + escapeHtml(resolved) + '</div>';
 }
 
 function adminAnnounceLive(message, priority) {
@@ -88,8 +89,10 @@ function adminShowInlineError(containerId, err) {
   const el = document.getElementById(containerId);
   if (!el) return;
   const msg = err instanceof Error ? err.message : String(err);
-  el.innerHTML =
-    '<div class="admin-fetch-error" role="alert">' + escapeHtml(msg) + '</div>';
+  const fn = poolaiUiWasmCall('adminInlineErrorHtml');
+  el.innerHTML = fn
+    ? fn(msg)
+    : '<div class="admin-fetch-error" role="alert">' + escapeHtml(msg) + '</div>';
   adminAnnounceLive(msg, 'assertive');
 }
 

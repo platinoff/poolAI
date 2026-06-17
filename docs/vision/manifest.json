@@ -1826,11 +1826,17 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_vision_vision_svg"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_admin_dom_rs"
     }
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S272",
+  "last_sprint_closed": "PH-S274",
   "layers": [
     {
       "id": "L0",
@@ -1863,6 +1869,7 @@
       "z": 5
     }
   ],
+  "next_sprint": "PH-S275",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7716,9 +7723,16 @@
       "label": "vision.svg",
       "layer": "L1",
       "path": "docs/vision/vision.svg"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_admin_dom_rs",
+      "label": "admin_dom.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/admin_dom.rs"
     }
   ],
-  "revision": 205,
+  "revision": 206,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -9582,9 +9596,99 @@
       "row": 207,
       "status": "closed",
       "title": "Docs INDEX sprint zriz (docs)"
+    },
+    {
+      "acceptance": "wasm-first `formatFetchError`; drop `hintFor503` JS dup",
+      "deps": "PH-S153",
+      "id": "PH-S273",
+      "open": false,
+      "row": 208,
+      "status": "closed",
+      "title": "admin_common api-error path slim (code)"
+    },
+    {
+      "acceptance": "adminShowLoading` / `adminShowInlineError` → wasm",
+      "deps": "PH-S273",
+      "id": "PH-S274",
+      "open": false,
+      "row": 209,
+      "status": "closed",
+      "title": "admin_common loading/error DOM wasm glue (code)"
+    },
+    {
+      "acceptance": "slim `admin_charts.js` canvas path",
+      "deps": "PH-S155",
+      "id": "PH-S275",
+      "open": true,
+      "row": 210,
+      "status": "open",
+      "title": "admin_charts sparkline wasm-only glue (code)"
+    },
+    {
+      "acceptance": "plan_prefetch` ingest stub + unit test",
+      "deps": "GALAXY §5.5",
+      "id": "PH-S276",
+      "open": true,
+      "row": 211,
+      "status": "open",
+      "title": "Galaxy prefetch wire stub (code)"
+    },
+    {
+      "acceptance": "labels via Rust; JS ≤100 LOC gate",
+      "deps": "PH-S157",
+      "id": "PH-S277",
+      "open": true,
+      "row": 212,
+      "status": "open",
+      "title": "topology_graph.js paint-only audit (code)"
+    },
+    {
+      "acceptance": "rust_ratio.json` sprint zriz",
+      "deps": "PH-S271",
+      "id": "PH-S278",
+      "open": true,
+      "row": 213,
+      "status": "open",
+      "title": "Rust ratio loc-audit refresh (ops)"
+    },
+    {
+      "acceptance": "INDEX/HANDOFF/NEXT/STABLE_STATE",
+      "deps": "PH-S278",
+      "id": "PH-S279",
+      "open": true,
+      "row": 214,
+      "status": "open",
+      "title": "Docs canon sync band (docs)"
+    },
+    {
+      "acceptance": "--check` green",
+      "deps": "PH-S270",
+      "id": "PH-S280",
+      "open": true,
+      "row": 215,
+      "status": "open",
+      "title": "poolai-vision-sync drift gate (ops)"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory",
+      "deps": "PH-S278",
+      "id": "PH-S281",
+      "open": true,
+      "row": 216,
+      "status": "open",
+      "title": "Ratio hold advisory snapshot (ops)"
+    },
+    {
+      "acceptance": "INDEX §7 + rust_ratio pointer",
+      "deps": "PH-S279",
+      "id": "PH-S282",
+      "open": true,
+      "row": 217,
+      "status": "open",
+      "title": "Docs INDEX ratio maintain (docs)"
     }
   ],
-  "sprint_queue_open_count": 0,
+  "sprint_queue_open_count": 8,
   "updated_at": "2026-06-16",
   "vision_ui_rev": 59
 }

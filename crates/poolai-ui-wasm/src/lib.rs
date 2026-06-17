@@ -3,6 +3,7 @@
 //! Wraps [`poolai_ui_core`] formatters so the same logic runs in the browser via WASM.
 
 use chrono::{DateTime, Utc};
+use poolai_ui_core::admin_dom::{admin_inline_error_html, admin_loading_html};
 use poolai_ui_core::api_error::{api_error_detail_from_body, format_fetch_error};
 use poolai_ui_core::format::escape_html;
 use poolai_ui_core::lease::lease_state;
@@ -132,6 +133,16 @@ pub fn format_fetch_error_wasm(status: u16, url: &str, payload_json: &str) -> St
     let payload: Value = serde_json::from_str(payload_json).unwrap_or(Value::Null);
     let url_opt = if url.is_empty() { None } else { Some(url) };
     format_fetch_error(status, url_opt, &payload)
+}
+
+#[wasm_bindgen(js_name = adminLoadingHtml)]
+pub fn admin_loading_html_wasm(text: &str) -> String {
+    admin_loading_html(text)
+}
+
+#[wasm_bindgen(js_name = adminInlineErrorHtml)]
+pub fn admin_inline_error_html_wasm(message: &str) -> String {
+    admin_inline_error_html(message)
 }
 
 #[wasm_bindgen(js_name = emptyStateHtml)]
@@ -270,6 +281,8 @@ mod tests {
             "2024-06-13T12:00:00Z"
         );
         assert_eq!(escape_html_wasm("a<b>"), "a&lt;b&gt;");
+        assert!(admin_loading_html_wasm("x").contains("muted"));
+        assert!(admin_inline_error_html_wasm("err").contains("admin-fetch-error"));
     }
 
     #[test]

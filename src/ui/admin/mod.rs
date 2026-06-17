@@ -960,6 +960,13 @@ fn admin_common_api_error_wasm_first_ph_s273() {
 }
 
 #[test]
+fn admin_common_loading_error_wasm_first_ph_s274() {
+    let js = include_str!("../admin_common.js");
+    assert!(js.contains("poolaiUiWasmCall('adminLoadingHtml')"));
+    assert!(js.contains("poolaiUiWasmCall('adminInlineErrorHtml')"));
+}
+
+#[test]
 fn admin_common_ph_s14_high_contrast_theme() {
     let js = include_str!("../admin_theme.js");
     assert!(js.contains("'high-contrast'"));
