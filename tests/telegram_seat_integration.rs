@@ -5,11 +5,11 @@ use axum::http::{Request, StatusCode};
 use axum::{body::Body, Router};
 use ed25519_dalek::Signer;
 use ed25519_dalek::SigningKey;
-use poolai::grid::galaxy_capability_doc::{
-    capability_signing_message, DEV_CAPABILITY_VERIFY_PK_HEX, GalaxyCapabilityDocument,
-};
 use poolai::core::discovery_handle::DiscoveryHandle;
 use poolai::core::state::ApiContext;
+use poolai::grid::galaxy_capability_doc::{
+    capability_signing_message, GalaxyCapabilityDocument, DEV_CAPABILITY_VERIFY_PK_HEX,
+};
 use poolai::network::api::create_api_routes;
 use poolai::network::discovery::{DiscoveryConfig, DiscoveryService};
 use poolai::services::telegram_seat_service::{
