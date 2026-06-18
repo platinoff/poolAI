@@ -60,12 +60,16 @@ pub const METRIC_GATE_EVALUATIONS_TOTAL: &str = "galaxy_trust_gate_evaluations_t
 /// Total grid results where default trust score was applied (PH-S395 `/metrics` gauge).
 pub const METRIC_DEFAULT_SCORE_APPLIED_TOTAL: &str = "galaxy_trust_default_score_applied_total";
 
+/// Total grid results with explicit `trust_score` on ingest (PH-S405 `/metrics` gauge).
+pub const METRIC_EXPLICIT_SCORE_TOTAL: &str = "galaxy_trust_explicit_score_total";
+
 static PAYOUT_ELIGIBLE_TOTAL: AtomicU64 = AtomicU64::new(0);
 static PAYOUT_HELD_TOTAL: AtomicU64 = AtomicU64::new(0);
 static PAYOUT_NOT_APPLICABLE_TOTAL: AtomicU64 = AtomicU64::new(0);
 static LAST_TRUST_SCORE: AtomicU64 = AtomicU64::new(0);
 static GATE_EVALUATIONS_TOTAL: AtomicU64 = AtomicU64::new(0);
 static DEFAULT_SCORE_APPLIED_TOTAL: AtomicU64 = AtomicU64::new(0);
+static EXPLICIT_SCORE_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// Gate configuration (env-backed stub).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -140,7 +144,10 @@ pub fn evaluate_result_settlement_gate(
     GATE_EVALUATIONS_TOTAL.fetch_add(1, Ordering::Relaxed);
     let origin = infer_worker_origin(source_peer_id);
     let score = match trust_score {
-        Some(s) => s,
+        Some(s) => {
+            EXPLICIT_SCORE_TOTAL.fetch_add(1, Ordering::Relaxed);
+            s
+        }
         None => {
             DEFAULT_SCORE_APPLIED_TOTAL.fetch_add(1, Ordering::Relaxed);
             DEFAULT_TRUST_SCORE
@@ -217,6 +224,11 @@ pub fn default_score_applied_total() -> u64 {
     DEFAULT_SCORE_APPLIED_TOTAL.load(Ordering::Relaxed)
 }
 
+/// Total grid results with explicit trust score since process start (PH-S405).
+pub fn explicit_score_total() -> u64 {
+    EXPLICIT_SCORE_TOTAL.load(Ordering::Relaxed)
+}
+
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_settlement_gate_metrics_for_test() {
     PAYOUT_ELIGIBLE_TOTAL.store(0, Ordering::Relaxed);
@@ -224,6 +236,7 @@ pub fn reset_settlement_gate_metrics_for_test() {
     PAYOUT_NOT_APPLICABLE_TOTAL.store(0, Ordering::Relaxed);
     GATE_EVALUATIONS_TOTAL.store(0, Ordering::Relaxed);
     DEFAULT_SCORE_APPLIED_TOTAL.store(0, Ordering::Relaxed);
+    EXPLICIT_SCORE_TOTAL.store(0, Ordering::Relaxed);
 }
 
 #[cfg(test)]
@@ -347,6 +360,19 @@ mod tests {
         evaluate_result_settlement_gate(Some("peer-local"), None, &cfg);
         assert_eq!(gate_evaluations_total(), 3);
         assert_eq!(default_score_applied_total(), 2);
+        assert_eq!(explicit_score_total(), 1);
+        reset_settlement_gate_metrics_for_test();
+    }
+
+    #[test]
+    fn explicit_score_counter_ph_s405() {
+        reset_settlement_gate_metrics_for_test();
+        let cfg = TrustScoreGateConfig::default_stub();
+        evaluate_result_settlement_gate(Some("tg-peer"), Some(55), &cfg);
+        evaluate_result_settlement_gate(Some("tg-peer"), Some(70), &cfg);
+        evaluate_result_settlement_gate(Some("tg-peer"), None, &cfg);
+        assert_eq!(explicit_score_total(), 2);
+        assert_eq!(default_score_applied_total(), 1);
         reset_settlement_gate_metrics_for_test();
     }
 

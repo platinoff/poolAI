@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-18 (PH-S394…S403 ✅ · vision **rev 225** · **0** відкритих · rust_ratio **94.34%**)
+**Оновлено:** 2026-06-18 (PH-S404…S413 ✅ · vision **rev 226** · **0** відкритих · rust_ratio **94.34%**)
 
 | **← наступний** | replenish §5.13 **або** **`абракадабра`** (drain) |
 | **Відкритих** | **0** |
@@ -30,14 +30,14 @@ S0: git fetch; HANDOFF; FM §5.12; df -h /s
 
 ---
 
-## Закрито (смуга PH-S394…S403)
+## Закрито (смуга PH-S404…S413)
 
-PH-S394 ✅ — `galaxy_trust_gate_evaluations_total` gauge on `/metrics`.
-PH-S395 ✅ — `galaxy_trust_default_score_applied_total` on grid result path.
-PH-S396 ✅ — dashboard audit timestamps `formatIsoDatetime` wasm-first.
-PH-S397 ✅ — stand smoke trust gate evaluation counters `/metrics` shape.
-PH-S398 ✅ — dashboard audit + wasm glue tests.
-PH-S399…S403 ✅ — loc-audit **94.34%**, docs canon, vision `--check`, INDEX maintain.
+PH-S404 ✅ — `galaxy_settlement_resolved_total` on grid result path.
+PH-S405 ✅ — `galaxy_trust_explicit_score_total` when trust_score provided.
+PH-S406 ✅ — dashboard active alerts `alertSeverityBadgeClass` wasm-first.
+PH-S407 ✅ — stand smoke settlement resolved + explicit score `/metrics` shape.
+PH-S408 ✅ — dashboard alert severity wasm glue tests.
+PH-S409…S413 ✅ — loc-audit **94.34%**, docs canon, vision `--check`, INDEX maintain.
 
 **rust_ratio:** **94.34%** (formal 90–95% ✅; hold 95% advisory).
 

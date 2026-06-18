@@ -139,12 +139,19 @@ pub async fn admin_dashboard() -> Html<String> {
         el.innerHTML = '<div class="muted">' + escapeHtml(T('admin.dash.noAlerts', 'No active alerts')) + '</div>';
         return;
       }
-      el.innerHTML = data.map(alert => `
+      el.innerHTML = data.map(alert => {
+        const wasm = typeof window !== 'undefined' ? window.poolaiUiWasm : null;
+        const severityClass =
+          wasm && typeof wasm.alertSeverityBadgeClass === 'function'
+            ? wasm.alertSeverityBadgeClass(alert.severity || '')
+            : (alert.severity || 'info').toLowerCase();
+        return `
         <div class="alert-item">
-          <span class="status-badge ${alert.severity.toLowerCase()}">${alert.severity}</span>
+          <span class="status-badge ${severityClass}">${alert.severity}</span>
           <span>${alert.metric}: ${alert.current_value}</span>
         </div>
-      `).join('');
+      `;
+      }).join('');
     }
     
     function renderRecentActivity(data) {

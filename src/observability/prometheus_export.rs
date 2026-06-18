@@ -58,15 +58,17 @@ use crate::grid::galaxy_replication_metrics::{
 };
 use crate::grid::galaxy_settlement_metrics::{
     settlement_cleared_total, settlement_not_applicable_total,
-    settlement_pending_verification_total, METRIC_SETTLEMENT_CLEARED_TOTAL,
-    METRIC_SETTLEMENT_NOT_APPLICABLE_TOTAL, METRIC_SETTLEMENT_PENDING_VERIFICATION_TOTAL,
+    settlement_pending_verification_total, settlement_resolved_total,
+    METRIC_SETTLEMENT_CLEARED_TOTAL, METRIC_SETTLEMENT_NOT_APPLICABLE_TOTAL,
+    METRIC_SETTLEMENT_PENDING_VERIFICATION_TOTAL, METRIC_SETTLEMENT_RESOLVED_TOTAL,
 };
 use crate::grid::galaxy_trust_score::{
     configured_default_trust_score, configured_min_trust_for_payout, default_score_applied_total,
-    gate_evaluations_total, last_trust_score, payout_eligible_total, payout_held_total,
-    payout_not_applicable_total, METRIC_DEFAULT_SCORE_APPLIED_TOTAL, METRIC_GATE_EVALUATIONS_TOTAL,
-    METRIC_PAYOUT_ELIGIBLE_TOTAL, METRIC_PAYOUT_HELD_TOTAL, METRIC_PAYOUT_NOT_APPLICABLE_TOTAL,
-    METRIC_TRUST_GATE_DEFAULT_SCORE, METRIC_TRUST_GATE_MIN_THRESHOLD, METRIC_TRUST_SCORE,
+    explicit_score_total, gate_evaluations_total, last_trust_score, payout_eligible_total,
+    payout_held_total, payout_not_applicable_total, METRIC_DEFAULT_SCORE_APPLIED_TOTAL,
+    METRIC_EXPLICIT_SCORE_TOTAL, METRIC_GATE_EVALUATIONS_TOTAL, METRIC_PAYOUT_ELIGIBLE_TOTAL,
+    METRIC_PAYOUT_HELD_TOTAL, METRIC_PAYOUT_NOT_APPLICABLE_TOTAL, METRIC_TRUST_GATE_DEFAULT_SCORE,
+    METRIC_TRUST_GATE_MIN_THRESHOLD, METRIC_TRUST_SCORE,
 };
 use crate::grid::galaxy_verification_metrics::{
     verification_match_total, verification_mismatch_total, verification_sample_completed_total,
@@ -110,6 +112,7 @@ pub struct PoolAiPrometheus {
     galaxy_trust_gate_default_score: IntGauge,
     galaxy_trust_gate_evaluations_total: IntGauge,
     galaxy_trust_default_score_applied_total: IntGauge,
+    galaxy_trust_explicit_score_total: IntGauge,
     galaxy_shard_local_hit_ratio: IntGauge,
     galaxy_cross_region_egress_mb: IntGauge,
     galaxy_prefetch_plan_total: IntGauge,
@@ -139,6 +142,7 @@ pub struct PoolAiPrometheus {
     galaxy_settlement_pending_verification_total: IntGauge,
     galaxy_settlement_cleared_total: IntGauge,
     galaxy_settlement_not_applicable_total: IntGauge,
+    galaxy_settlement_resolved_total: IntGauge,
     galaxy_fee_split_applied_total: IntGauge,
     galaxy_replication_strict_total: IntGauge,
 }
@@ -410,6 +414,15 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_trust_default_score_applied_total.clone()))
         .expect("register galaxy_trust_default_score_applied_total");
 
+    let galaxy_trust_explicit_score_total = IntGauge::with_opts(Opts::new(
+        METRIC_EXPLICIT_SCORE_TOTAL,
+        "Galaxy grid results with explicit trust_score on ingest (PH-S405)",
+    ))
+    .expect(METRIC_EXPLICIT_SCORE_TOTAL);
+    registry
+        .register(Box::new(galaxy_trust_explicit_score_total.clone()))
+        .expect("register galaxy_trust_explicit_score_total");
+
     let galaxy_shard_local_hit_ratio = IntGauge::with_opts(Opts::new(
         METRIC_SHARD_LOCAL_HIT_RATIO,
         "Galaxy last observed top-ranked shard local hit ratio basis points 0-10000 (PH-S183)",
@@ -675,6 +688,15 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_settlement_not_applicable_total.clone()))
         .expect("register galaxy_settlement_not_applicable_total");
 
+    let galaxy_settlement_resolved_total = IntGauge::with_opts(Opts::new(
+        METRIC_SETTLEMENT_RESOLVED_TOTAL,
+        "Galaxy settlement status resolutions on grid result path (PH-S404)",
+    ))
+    .expect(METRIC_SETTLEMENT_RESOLVED_TOTAL);
+    registry
+        .register(Box::new(galaxy_settlement_resolved_total.clone()))
+        .expect("register galaxy_settlement_resolved_total");
+
     let galaxy_fee_split_applied_total = IntGauge::with_opts(Opts::new(
         METRIC_FEE_SPLIT_APPLIED_TOTAL,
         "Galaxy fee split applied on grid result path (PH-S194)",
@@ -729,6 +751,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_trust_gate_default_score,
         galaxy_trust_gate_evaluations_total,
         galaxy_trust_default_score_applied_total,
+        galaxy_trust_explicit_score_total,
         galaxy_shard_local_hit_ratio,
         galaxy_cross_region_egress_mb,
         galaxy_prefetch_plan_total,
@@ -758,6 +781,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_settlement_pending_verification_total,
         galaxy_settlement_cleared_total,
         galaxy_settlement_not_applicable_total,
+        galaxy_settlement_resolved_total,
         galaxy_fee_split_applied_total,
         galaxy_replication_strict_total,
     }
@@ -804,6 +828,8 @@ pub fn refresh_galaxy_trust_gauges() {
         .set(gate_evaluations_total() as i64);
     prom.galaxy_trust_default_score_applied_total
         .set(default_score_applied_total() as i64);
+    prom.galaxy_trust_explicit_score_total
+        .set(explicit_score_total() as i64);
 }
 
 /// Mirror in-process locality rank counters into Prometheus gauges (scrape snapshot).
@@ -876,6 +902,8 @@ pub fn refresh_galaxy_verification_gauges() {
         .set(settlement_cleared_total() as i64);
     prom.galaxy_settlement_not_applicable_total
         .set(settlement_not_applicable_total() as i64);
+    prom.galaxy_settlement_resolved_total
+        .set(settlement_resolved_total() as i64);
     prom.galaxy_fee_split_applied_total
         .set(fee_split_applied_total() as i64);
 }
@@ -1383,6 +1411,40 @@ mod tests {
         assert!(body.contains(METRIC_SETTLEMENT_CLEARED_TOTAL));
         assert!(body.contains(&format!("{METRIC_SETTLEMENT_CLEARED_TOTAL} 1")));
         reset_settlement_cleared_metrics_for_test();
+    }
+
+    #[test]
+    fn galaxy_settlement_resolved_gauge_reflects_counter_ph_s404() {
+        use crate::grid::galaxy_settlement_metrics::{
+            record_settlement_resolved, reset_settlement_resolved_metrics_for_test,
+        };
+
+        reset_settlement_resolved_metrics_for_test();
+        init_prometheus();
+        record_settlement_resolved();
+        refresh_galaxy_verification_gauges();
+        let body = encode_metrics_text().expect("encode");
+        assert!(body.contains(METRIC_SETTLEMENT_RESOLVED_TOTAL));
+        assert!(body.contains(&format!("{METRIC_SETTLEMENT_RESOLVED_TOTAL} 1")));
+        reset_settlement_resolved_metrics_for_test();
+    }
+
+    #[test]
+    fn galaxy_trust_explicit_score_gauge_reflects_counter_ph_s405() {
+        use crate::grid::galaxy_trust_score::{
+            evaluate_result_settlement_gate, reset_settlement_gate_metrics_for_test,
+            TrustScoreGateConfig,
+        };
+
+        reset_settlement_gate_metrics_for_test();
+        init_prometheus();
+        let cfg = TrustScoreGateConfig::default_stub();
+        evaluate_result_settlement_gate(Some("tg-peer"), Some(72), &cfg);
+        refresh_galaxy_trust_gauges();
+        let body = encode_metrics_text().expect("encode");
+        assert!(body.contains(METRIC_EXPLICIT_SCORE_TOTAL));
+        assert!(body.contains(&format!("{METRIC_EXPLICIT_SCORE_TOTAL} 1")));
+        reset_settlement_gate_metrics_for_test();
     }
 
     #[test]

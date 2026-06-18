@@ -657,6 +657,7 @@ const GALAXY_SETTLEMENT_METRICS: &[&str] = &[
     "galaxy_settlement_pending_verification_total",
     "galaxy_settlement_cleared_total",
     "galaxy_settlement_not_applicable_total",
+    "galaxy_settlement_resolved_total",
 ];
 
 fn metrics_text_has_settlement_counters(body: &str) -> Result<(), String> {
@@ -760,6 +761,7 @@ const GALAXY_TRUST_PAYOUT_METRICS: &[&str] = &[
     "galaxy_trust_gate_default_score",
     "galaxy_trust_gate_evaluations_total",
     "galaxy_trust_default_score_applied_total",
+    "galaxy_trust_explicit_score_total",
 ];
 
 fn metrics_text_has_trust_payout_counters(body: &str) -> Result<(), String> {
@@ -1812,6 +1814,9 @@ mod tests {
             "# HELP galaxy_settlement_not_applicable_total Galaxy settlement not applicable on grid result path (PH-S354)\n",
             "# TYPE galaxy_settlement_not_applicable_total gauge\n",
             "galaxy_settlement_not_applicable_total 0\n",
+            "# HELP galaxy_settlement_resolved_total Galaxy settlement status resolutions on grid result path (PH-S404)\n",
+            "# TYPE galaxy_settlement_resolved_total gauge\n",
+            "galaxy_settlement_resolved_total 0\n",
         );
         metrics_text_has_settlement_counters(sample).expect("sample export");
     }
@@ -1881,6 +1886,9 @@ mod tests {
             "# HELP galaxy_trust_default_score_applied_total Galaxy grid results where default trust score was applied (PH-S395)\n",
             "# TYPE galaxy_trust_default_score_applied_total gauge\n",
             "galaxy_trust_default_score_applied_total 0\n",
+            "# HELP galaxy_trust_explicit_score_total Galaxy grid results with explicit trust_score on ingest (PH-S405)\n",
+            "# TYPE galaxy_trust_explicit_score_total gauge\n",
+            "galaxy_trust_explicit_score_total 0\n",
         );
         metrics_text_has_trust_payout_counters(sample).expect("sample export");
     }

@@ -1073,6 +1073,20 @@ fn admin_dashboard_wasm_glue_tests_ph_s398() {
     assert!(dash.contains("buildMonitoringActiveAlertsUrl"));
 }
 
+#[test]
+fn admin_dashboard_alert_severity_wasm_first_ph_s406() {
+    let script = include_str!("dashboard.rs");
+    assert!(script.contains("alertSeverityBadgeClass"));
+}
+
+#[test]
+fn admin_dashboard_wasm_glue_tests_ph_s408() {
+    let dash = include_str!("dashboard.rs");
+    assert!(dash.contains("alertSeverityBadgeClass"));
+    assert!(dash.contains("buildMonitoringActiveAlertsUrl"));
+    assert!(dash.contains("formatAuditTimestamp"));
+}
+
 #[tokio::test]
 async fn admin_monitoring_ph_s43_ml_metrics_panel() {
     let html = monitoring::admin_monitoring().await.0;

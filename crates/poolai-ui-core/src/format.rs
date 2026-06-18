@@ -47,6 +47,18 @@ pub fn format_locale_time_hms(now_rfc3339: Option<&str>) -> String {
     now.format("%H:%M:%S").to_string()
 }
 
+/// Dashboard alert severity → `status-badge` CSS class (PH-S406 wasm glue).
+pub fn alert_severity_badge_class(severity: Option<&str>) -> String {
+    let raw = severity
+        .map(str::trim)
+        .filter(|s| !s.is_empty())
+        .unwrap_or("info");
+    match raw.to_ascii_lowercase().as_str() {
+        "critical" | "error" | "warning" | "info" => raw.to_ascii_lowercase(),
+        _ => "info".to_string(),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -87,5 +99,13 @@ mod tests {
             format_locale_time_hms(Some("2026-06-15T14:05:07Z")),
             "14:05:07"
         );
+    }
+
+    #[test]
+    fn alert_severity_badge_class_ph_s406() {
+        assert_eq!(alert_severity_badge_class(Some("Critical")), "critical");
+        assert_eq!(alert_severity_badge_class(Some("WARNING")), "warning");
+        assert_eq!(alert_severity_badge_class(None), "info");
+        assert_eq!(alert_severity_badge_class(Some("unknown")), "info");
     }
 }

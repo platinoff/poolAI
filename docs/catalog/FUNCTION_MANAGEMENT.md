@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-18 (PH-S394…S403 ✅ · vision rev **225** · rust_ratio **94.34%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-18 (PH-S404…S413 ✅ · vision rev **226** · rust_ratio **94.34%**) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -603,8 +603,18 @@ FM-xxx (з таблиці нижче)
 | 336 | **PH-S401** | poolai-vision-sync drift gate (ops) | PH-S391 | `--check` green | **✅** |
 | 337 | **PH-S402** | Ratio hold advisory snapshot (ops) | PH-S399 | `--min-ratio 0.95 --advisory` | **✅** |
 | 338 | **PH-S403** | Docs INDEX ratio maintain (docs) | PH-S400 | INDEX §7 + rust_ratio pointer | **✅** |
+| 339 | **PH-S404** | Galaxy settlement resolved metric (code) | PH-S178 | `galaxy_settlement_resolved_total` on grid result path | **✅** |
+| 340 | **PH-S405** | Galaxy explicit trust score metric (code) | PH-S404 | `galaxy_trust_explicit_score_total` on grid result path | **✅** |
+| 341 | **PH-S406** | Admin dashboard alert severity wasm (code) | PH-S396 | `alertSeverityBadgeClass` wasm glue on active alerts | **✅** |
+| 342 | **PH-S407** | Stand smoke settlement + explicit score (tests) | PH-S404/S405 | `/metrics` export shape | **✅** |
+| 343 | **PH-S408** | Admin dashboard wasm glue tests (code) | PH-S406 | `alertSeverityBadgeClass` gates | **✅** |
+| 344 | **PH-S409** | Rust ratio loc-audit refresh (ops) | PH-S399 | `rust_ratio.json` sprint zriz **94.34%** | **✅** |
+| 345 | **PH-S410** | Docs canon sync band (docs) | PH-S409 | INDEX/HANDOFF/NEXT/STABLE/GALAXY | **✅** |
+| 346 | **PH-S411** | poolai-vision-sync drift gate (ops) | PH-S401 | `--check` green | **✅** |
+| 347 | **PH-S412** | Ratio hold advisory snapshot (ops) | PH-S409 | `--min-ratio 0.95 --advisory` | **✅** |
+| 348 | **PH-S413** | Docs INDEX ratio maintain (docs) | PH-S410 | INDEX §7 + rust_ratio pointer | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S394…S403 ✅. Vision rev **225**. rust_ratio **94.34%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S404…S413 ✅. Vision rev **226**. rust_ratio **94.34%**.
 
 **Наступна сесія:** replenish з **§5.13** · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · або **`абракадабра`** (drain).
 
@@ -612,7 +622,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-06-18):** PH-S394…S403 ✅ закрито · **0** відкритих · replenish §5.13 або **`абракадабра`**.
+**Активна смуга (2026-06-18):** PH-S404…S413 ✅ закрито · **0** відкритих · replenish §5.13 або **`абракадабра`**.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

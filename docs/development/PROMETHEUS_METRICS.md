@@ -67,6 +67,7 @@ scrape_configs:
 | `galaxy_settlement_pending_verification_total` | gauge | Galaxy settlement holds pending verification on grid result path (PH-S178) |
 | `galaxy_settlement_cleared_total` | gauge | Galaxy settlement cleared on grid result path (PH-S187) |
 | `galaxy_settlement_not_applicable_total` | gauge | Galaxy settlement not applicable on grid result path (PH-S354) |
+| `galaxy_settlement_resolved_total` | gauge | Galaxy settlement status resolutions on grid result path (PH-S404) |
 | `galaxy_verification_sample_not_applicable_total` | gauge | Galaxy verification samples not applicable on local origin path (PH-S356) |
 | `galaxy_fee_split_applied_total` | gauge | Galaxy fee split applied on grid result path (PH-S194) |
 | `galaxy_replication_strict_total` | gauge | Galaxy replication strict tier grid job ingests (PH-S179) |
@@ -79,6 +80,7 @@ scrape_configs:
 | `galaxy_trust_gate_default_score` | gauge | Galaxy default trust score 0..=100 when grid result omits trust_score (PH-S384) |
 | `galaxy_trust_gate_evaluations_total` | gauge | Galaxy trust gate evaluations on grid result path (PH-S394) |
 | `galaxy_trust_default_score_applied_total` | gauge | Galaxy grid results where default trust score was applied (PH-S395) |
+| `galaxy_trust_explicit_score_total` | gauge | Galaxy grid results with explicit trust_score on ingest (PH-S405) |
 | `process_*` | various | `prometheus` process collector when available |
 
 JSON metrics for the admin UI remain at **`GET /api/v1/metrics`** — different contract.
