@@ -70,25 +70,24 @@ async function poolaiFetchMetricHistory(metricName, opts) {
   var limit = opts.limit != null ? opts.limit : 200;
   try {
     var endTime = new Date().toISOString();
+    var startTime = new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
     var wasm = poolaiChartsWasm();
     var url =
       wasm && typeof wasm.buildMetricHistoryUrlWithHours === 'function'
         ? wasm.buildMetricHistoryUrlWithHours(metricName, hours, limit, endTime)
-        : wasm && typeof wasm.buildMetricHistoryUrl === 'function'
-          ? wasm.buildMetricHistoryUrl(
-              metricName,
-              new Date(Date.now() - hours * 60 * 60 * 1000).toISOString(),
-              endTime,
-              limit,
-            )
-          : '/api/enterprise/monitoring/metrics?metric=' +
-            encodeURIComponent(metricName) +
-            '&start_time=' +
-            encodeURIComponent(new Date(Date.now() - hours * 60 * 60 * 1000).toISOString()) +
-            '&end_time=' +
-            encodeURIComponent(endTime) +
-            '&limit=' +
-            limit;
+        : wasm && typeof wasm.buildMetricHistoryQuery === 'function'
+          ? '/api/enterprise/monitoring/metrics?' +
+            wasm.buildMetricHistoryQuery(metricName, startTime, endTime, limit)
+          : wasm && typeof wasm.buildMetricHistoryUrl === 'function'
+            ? wasm.buildMetricHistoryUrl(metricName, startTime, endTime, limit)
+            : '/api/enterprise/monitoring/metrics?metric=' +
+              encodeURIComponent(metricName) +
+              '&start_time=' +
+              encodeURIComponent(startTime) +
+              '&end_time=' +
+              encodeURIComponent(endTime) +
+              '&limit=' +
+              limit;
     var data = await fetchJson(url);
     return data || [];
   } catch (e) {

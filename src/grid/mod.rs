@@ -6,6 +6,7 @@
 
 pub mod dispatch;
 mod envelope;
+pub mod galaxy_capability_doc;
 pub mod galaxy_fee_split;
 pub mod galaxy_fee_split_metrics;
 pub mod galaxy_locality;
@@ -28,14 +29,19 @@ pub use dispatch::{
     complete_prefetch_hook, coordinator_merged_seed_inventory, coordinator_seed_inventory_snapshot,
     enqueue_prefetch_hook, ingest_envelope, ingest_job_locality_rank_stub,
     ingest_job_prefetch_stub, lease_acquire_prefetch_stub, locality_workers_from_seed_snapshots,
-    noop_prefetch_hook, parse_prefetch_policy_mode, plan_prefetch, seed_pull_hook,
-    wait_prefetch_hook, GridIngestKind, GridIngestOutcome, PrefetchPlan, PrefetchPolicyConfig,
-    PrefetchPolicyMode, PrefetchTrigger, SeedInventoryEntry, SeedInventoryPeerSnapshot,
-    DEFAULT_PREFETCH_DEADLINE_MS, ENV_LOCALITY_MODE, ENV_PREFETCH_DEADLINE_MS,
+    noop_prefetch_hook, parse_prefetch_policy_mode, plan_prefetch, resolve_seed_pull_shards,
+    seed_pull_hook, wait_prefetch_hook, GridIngestKind, GridIngestOutcome, PrefetchPlan,
+    PrefetchPolicyConfig, PrefetchPolicyMode, PrefetchTrigger, SeedInventoryEntry,
+    SeedInventoryPeerSnapshot, DEFAULT_PREFETCH_DEADLINE_MS, ENV_LOCALITY_MODE,
+    ENV_PREFETCH_DEADLINE_MS,
 };
 pub use envelope::{
     GridEnvelope, GridEnvelopeError, GridJobBody, GridMemoryShardBody, GridMessage,
     GridPeerStatusBody, GridResultBody, GridResultStatus, GRID_ENVELOPE_VERSION,
+};
+pub use galaxy_capability_doc::{
+    parse_capability_document, validate_capability_document, CapabilityDocParseError,
+    GalaxyCapabilityDocument,
 };
 pub use galaxy_network_profile::{
     normalize_register_metadata, parse_network_profile_value, GalaxyEgressPolicy,

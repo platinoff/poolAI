@@ -51,11 +51,13 @@ use crate::grid::galaxy_pricing_provider_metrics::{
 };
 use crate::grid::galaxy_replay_metrics::{
     replay_evaluations_total, replay_pending, replay_pending_resolved_total,
-    replay_pending_scheduled_total, METRIC_REPLAY_EVALUATIONS_TOTAL, METRIC_REPLAY_PENDING,
-    METRIC_REPLAY_PENDING_RESOLVED_TOTAL, METRIC_REPLAY_PENDING_SCHEDULED_TOTAL,
+    replay_pending_scheduled_total, replay_verification_enqueue_total,
+    METRIC_REPLAY_EVALUATIONS_TOTAL, METRIC_REPLAY_PENDING, METRIC_REPLAY_PENDING_RESOLVED_TOTAL,
+    METRIC_REPLAY_PENDING_SCHEDULED_TOTAL, METRIC_REPLAY_VERIFICATION_ENQUEUE_TOTAL,
 };
 use crate::grid::galaxy_replication_metrics::{
-    replication_enqueue_total, replication_strict_total, METRIC_REPLICATION_ENQUEUE_TOTAL,
+    replication_enqueue_total, replication_executor_enqueue_total, replication_strict_total,
+    METRIC_REPLICATION_ENQUEUE_TOTAL, METRIC_REPLICATION_EXECUTOR_ENQUEUE_TOTAL,
     METRIC_REPLICATION_STRICT_TOTAL,
 };
 use crate::grid::galaxy_settlement_metrics::{
@@ -74,9 +76,11 @@ use crate::grid::galaxy_trust_score::{
     METRIC_TRUST_GATE_MIN_THRESHOLD, METRIC_TRUST_SCORE,
 };
 use crate::grid::galaxy_verification_metrics::{
-    verification_match_total, verification_mismatch_total, verification_sample_completed_total,
-    verification_sample_total, METRIC_VERIFICATION_MATCH_TOTAL, METRIC_VERIFICATION_MISMATCH_TOTAL,
-    METRIC_VERIFICATION_SAMPLE_COMPLETED_TOTAL, METRIC_VERIFICATION_SAMPLE_TOTAL,
+    verification_checker_enqueue_total, verification_match_total, verification_mismatch_total,
+    verification_sample_completed_total, verification_sample_total,
+    METRIC_VERIFICATION_CHECKER_ENQUEUE_TOTAL, METRIC_VERIFICATION_MATCH_TOTAL,
+    METRIC_VERIFICATION_MISMATCH_TOTAL, METRIC_VERIFICATION_SAMPLE_COMPLETED_TOTAL,
+    METRIC_VERIFICATION_SAMPLE_TOTAL,
 };
 use crate::grid::galaxy_verify_sampling::{
     verify_sample_not_applicable_total, verify_sample_scheduled_total, verify_sample_skipped_total,
@@ -143,10 +147,12 @@ pub struct PoolAiPrometheus {
     galaxy_verification_sample_skipped_total: IntGauge,
     galaxy_verification_sample_not_applicable_total: IntGauge,
     galaxy_verification_sampling_evaluations_total: IntGauge,
+    galaxy_verification_checker_enqueue_total: IntGauge,
     galaxy_replay_pending: IntGauge,
     galaxy_replay_pending_scheduled_total: IntGauge,
     galaxy_replay_pending_resolved_total: IntGauge,
     galaxy_replay_evaluations_total: IntGauge,
+    galaxy_replay_verification_enqueue_total: IntGauge,
     galaxy_settlement_pending_verification_total: IntGauge,
     galaxy_settlement_cleared_total: IntGauge,
     galaxy_settlement_not_applicable_total: IntGauge,
@@ -155,6 +161,7 @@ pub struct PoolAiPrometheus {
     galaxy_fee_split_applied_total: IntGauge,
     galaxy_replication_strict_total: IntGauge,
     galaxy_replication_enqueue_total: IntGauge,
+    galaxy_replication_executor_enqueue_total: IntGauge,
 }
 
 static PROMETHEUS: OnceLock<PoolAiPrometheus> = OnceLock::new();
@@ -671,6 +678,15 @@ fn build_prometheus() -> PoolAiPrometheus {
         ))
         .expect("register galaxy_verification_sampling_evaluations_total");
 
+    let galaxy_verification_checker_enqueue_total = IntGauge::with_opts(Opts::new(
+        METRIC_VERIFICATION_CHECKER_ENQUEUE_TOTAL,
+        "Galaxy verification checker enqueue stub on sample verdict (PH-S437)",
+    ))
+    .expect(METRIC_VERIFICATION_CHECKER_ENQUEUE_TOTAL);
+    registry
+        .register(Box::new(galaxy_verification_checker_enqueue_total.clone()))
+        .expect("register galaxy_verification_checker_enqueue_total");
+
     let galaxy_replay_pending = IntGauge::with_opts(Opts::new(
         METRIC_REPLAY_PENDING,
         "Galaxy replay verifications pending coordinator verdict (PH-S176)",
@@ -706,6 +722,15 @@ fn build_prometheus() -> PoolAiPrometheus {
     registry
         .register(Box::new(galaxy_replay_evaluations_total.clone()))
         .expect("register galaxy_replay_evaluations_total");
+
+    let galaxy_replay_verification_enqueue_total = IntGauge::with_opts(Opts::new(
+        METRIC_REPLAY_VERIFICATION_ENQUEUE_TOTAL,
+        "Galaxy replay verification enqueue stub on mismatch (PH-S438)",
+    ))
+    .expect(METRIC_REPLAY_VERIFICATION_ENQUEUE_TOTAL);
+    registry
+        .register(Box::new(galaxy_replay_verification_enqueue_total.clone()))
+        .expect("register galaxy_replay_verification_enqueue_total");
 
     let galaxy_settlement_pending_verification_total = IntGauge::with_opts(Opts::new(
         METRIC_SETTLEMENT_PENDING_VERIFICATION_TOTAL,
@@ -781,6 +806,15 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_replication_enqueue_total.clone()))
         .expect("register galaxy_replication_enqueue_total");
 
+    let galaxy_replication_executor_enqueue_total = IntGauge::with_opts(Opts::new(
+        METRIC_REPLICATION_EXECUTOR_ENQUEUE_TOTAL,
+        "Galaxy replication executor queue stub on grid job ingest (PH-S435)",
+    ))
+    .expect(METRIC_REPLICATION_EXECUTOR_ENQUEUE_TOTAL);
+    registry
+        .register(Box::new(galaxy_replication_executor_enqueue_total.clone()))
+        .expect("register galaxy_replication_executor_enqueue_total");
+
     #[cfg(target_os = "linux")]
     {
         let collector = prometheus::process_collector::ProcessCollector::for_self();
@@ -844,10 +878,12 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_verification_sample_skipped_total,
         galaxy_verification_sample_not_applicable_total,
         galaxy_verification_sampling_evaluations_total,
+        galaxy_verification_checker_enqueue_total,
         galaxy_replay_pending,
         galaxy_replay_pending_scheduled_total,
         galaxy_replay_pending_resolved_total,
         galaxy_replay_evaluations_total,
+        galaxy_replay_verification_enqueue_total,
         galaxy_settlement_pending_verification_total,
         galaxy_settlement_cleared_total,
         galaxy_settlement_not_applicable_total,
@@ -856,6 +892,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_fee_split_applied_total,
         galaxy_replication_strict_total,
         galaxy_replication_enqueue_total,
+        galaxy_replication_executor_enqueue_total,
     }
 }
 
@@ -969,6 +1006,8 @@ pub fn refresh_galaxy_verification_gauges() {
         .set(verify_sample_not_applicable_total() as i64);
     prom.galaxy_verification_sampling_evaluations_total
         .set(verify_sampling_evaluations_total() as i64);
+    prom.galaxy_verification_checker_enqueue_total
+        .set(verification_checker_enqueue_total() as i64);
     prom.galaxy_replay_pending.set(replay_pending() as i64);
     prom.galaxy_replay_pending_scheduled_total
         .set(replay_pending_scheduled_total() as i64);
@@ -976,6 +1015,8 @@ pub fn refresh_galaxy_verification_gauges() {
         .set(replay_pending_resolved_total() as i64);
     prom.galaxy_replay_evaluations_total
         .set(replay_evaluations_total() as i64);
+    prom.galaxy_replay_verification_enqueue_total
+        .set(replay_verification_enqueue_total() as i64);
     prom.galaxy_settlement_pending_verification_total
         .set(settlement_pending_verification_total() as i64);
     prom.galaxy_settlement_cleared_total
@@ -997,6 +1038,8 @@ pub fn refresh_galaxy_replication_gauges() {
         .set(replication_strict_total() as i64);
     prom.galaxy_replication_enqueue_total
         .set(replication_enqueue_total() as i64);
+    prom.galaxy_replication_executor_enqueue_total
+        .set(replication_executor_enqueue_total() as i64);
 }
 
 /// Record a secret rotation attempt (called from `security::secret_rotation`).

@@ -120,6 +120,61 @@ async fn register_remote_parses_metadata_network_profile_json_string() {
 }
 
 #[tokio::test]
+async fn heartbeat_remote_retains_network_profile_ph_s440() {
+    let app = app_with_discovery().await;
+
+    let register = Request::builder()
+        .method("POST")
+        .uri("/api/v1/discovery/register-remote")
+        .header("content-type", "application/json")
+        .body(Body::from(
+            r#"{
+                "peer_id": "np-hb-worker",
+                "address": "192.168.3.20",
+                "port": 9095,
+                "metadata": {
+                    "role": "virtual_node",
+                    "network_profile": {
+                        "region": "ap-south",
+                        "latency_ms_p50": 110,
+                        "egress_policy": "lan_only"
+                    }
+                }
+            }"#,
+        ))
+        .unwrap();
+
+    let response = app.clone().oneshot(register).await.unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let heartbeat = Request::builder()
+        .method("POST")
+        .uri("/api/v1/discovery/heartbeat-remote")
+        .header("content-type", "application/json")
+        .body(Body::from(r#"{"peer_id":"np-hb-worker"}"#))
+        .unwrap();
+
+    let hb_resp = app.clone().oneshot(heartbeat).await.unwrap();
+    assert_eq!(hb_resp.status(), StatusCode::OK);
+
+    let peer_req = Request::builder()
+        .uri("/api/v1/discovery/peers/np-hb-worker")
+        .body(Body::empty())
+        .unwrap();
+    let peer_resp = app.oneshot(peer_req).await.unwrap();
+    assert_eq!(peer_resp.status(), StatusCode::OK);
+    let peer_body = to_bytes(peer_resp.into_body(), usize::MAX).await.unwrap();
+    let peer: Value = serde_json::from_slice(&peer_body).unwrap();
+    let stored = peer["peer"]["metadata"]["network_profile"]
+        .as_str()
+        .expect("network_profile retained after heartbeat");
+    let parsed: Value = serde_json::from_str(stored).unwrap();
+    assert_eq!(parsed["region"], "ap-south");
+    assert_eq!(parsed["latency_ms_p50"], 110);
+    assert_eq!(parsed["egress_policy"], "lan_only");
+}
+
+#[tokio::test]
 async fn register_remote_invalid_network_profile_returns_validation_error() {
     let app = app_with_discovery().await;
 

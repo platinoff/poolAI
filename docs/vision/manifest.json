@@ -1836,7 +1836,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S433",
+  "last_sprint_closed": "PH-S443",
   "layers": [
     {
       "id": "L0",
@@ -7731,7 +7731,7 @@
       "path": "crates/poolai-ui-core/src/admin_dom.rs"
     }
   ],
-  "revision": 229,
+  "revision": 230,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -11044,6 +11044,96 @@
       "row": 368,
       "status": "closed",
       "title": "poolai-vision-sync + INDEX ratio (ops/docs)"
+    },
+    {
+      "acceptance": "resolve_seed_pull_shards` + inventory lookup; unit tests",
+      "deps": "Galaxy §5.5",
+      "id": "PH-S434",
+      "open": false,
+      "row": 369,
+      "status": "closed",
+      "title": "Live prefetch seed-pull resolver stub"
+    },
+    {
+      "acceptance": "replication_executor_hook` + `galaxy_replication_executor_enqueue_total",
+      "deps": "Galaxy §6.4",
+      "id": "PH-S435",
+      "open": false,
+      "row": 370,
+      "status": "closed",
+      "title": "Replication executor enqueue hook"
+    },
+    {
+      "acceptance": "PayoutBatchLedgerEntry` on cleared path; unit tests",
+      "deps": "Galaxy §8.2",
+      "id": "PH-S436",
+      "open": false,
+      "row": 371,
+      "status": "closed",
+      "title": "Settlement payout batch ledger entry stub"
+    },
+    {
+      "acceptance": "enqueue_verification_checker` + counter; unit tests",
+      "deps": "Galaxy §6.2",
+      "id": "PH-S437",
+      "open": false,
+      "row": 372,
+      "status": "closed",
+      "title": "Verification checker enqueue stub"
+    },
+    {
+      "acceptance": "record_replay_verification_enqueue` on mismatch; unit tests",
+      "deps": "Galaxy §6.3",
+      "id": "PH-S438",
+      "open": false,
+      "row": 373,
+      "status": "closed",
+      "title": "Replay verification enqueue stub"
+    },
+    {
+      "acceptance": "galaxy_capability_doc.rs` parse/validate; unit tests",
+      "deps": "Galaxy §6.6/§9",
+      "id": "PH-S439",
+      "open": false,
+      "row": 374,
+      "status": "closed",
+      "title": "Signed capability document parse stub"
+    },
+    {
+      "acceptance": "discovery_network_profile_integration` heartbeat test",
+      "deps": "Galaxy §8.1",
+      "id": "PH-S440",
+      "open": false,
+      "row": 375,
+      "status": "closed",
+      "title": "network_profile` persistence across heartbeat"
+    },
+    {
+      "acceptance": "buildMetricHistoryQuery` wasm; slim `admin_charts.js",
+      "deps": "RUST_RATIO §5.13",
+      "id": "PH-S441",
+      "open": false,
+      "row": 376,
+      "status": "closed",
+      "title": "Admin metric history query wasm glue"
+    },
+    {
+      "acceptance": "/metrics` export shape executor/checker/replay enqueue",
+      "deps": "PH-S434…S438",
+      "id": "PH-S442",
+      "open": false,
+      "row": 377,
+      "status": "closed",
+      "title": "Stand smoke horizon wire band (S434–S438)"
+    },
+    {
+      "acceptance": "rust_ratio.json` 94.36%; FM/HANDOFF/NEXT; `--check` green",
+      "deps": "§5.12 fallback",
+      "id": "PH-S443",
+      "open": false,
+      "row": 378,
+      "status": "closed",
+      "title": "Ops close band: loc-audit + docs + vision-sync"
     }
   ],
   "sprint_queue_open_count": 0,

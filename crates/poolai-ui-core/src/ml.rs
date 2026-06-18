@@ -438,6 +438,21 @@ pub fn build_metric_history_url(
     )
 }
 
+/// Query string only for metric history fetch (PH-S441).
+pub fn build_metric_history_query(
+    metric_name: &str,
+    start_time: &str,
+    end_time: &str,
+    limit: u32,
+) -> String {
+    format!(
+        "metric={}&start_time={}&end_time={}&limit={limit}",
+        encode_uri_component(metric_name),
+        encode_uri_component(start_time),
+        encode_uri_component(end_time),
+    )
+}
+
 /// Mirrors `poolaiFetchMetricsWindow` URL (PH-S317).
 pub fn build_metrics_window_url(start_time: &str, end_time: &str, limit: u32) -> String {
     format!(
@@ -694,6 +709,19 @@ mod tests {
             url,
             "/api/enterprise/monitoring/metrics?metric=cpu_usage&limit=10"
         );
+    }
+
+    fn build_metric_history_query_ph_s441() {
+        let q = build_metric_history_query(
+            "cpu.usage",
+            "2026-01-01T00:00:00Z",
+            "2026-01-02T00:00:00Z",
+            100,
+        );
+        assert!(q.starts_with("metric=cpu.usage"));
+        assert!(q.contains("start_time="));
+        assert!(q.contains("limit=100"));
+        assert!(!q.starts_with('/'));
     }
 
     #[test]

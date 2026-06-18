@@ -5,6 +5,13 @@
 use crate::grid::galaxy_trust_score::SettlementGateVerdict;
 use crate::grid::galaxy_verify_sampling::VerifySamplingVerdict;
 
+/// Offline payout batch ledger entry stub (PH-S436, Galaxy §8.2).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PayoutBatchLedgerEntry {
+    pub job_id: String,
+    pub cleared_at: String,
+}
+
 /// Coordinator settlement status on grid result ingest (stub — no payout wire).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SettlementStatus {

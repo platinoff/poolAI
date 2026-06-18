@@ -8,7 +8,7 @@
 | **Replication / settlement** | PH-S426 enqueue + PH-S427 payout batch ledger stub ✅ |
 | **Wasm / admin slim** | PH-S428 dashboard quick-stats `formatPercent`/`formatMegabytes` |
 | **Docs / ratio** | PH-S348…S352 ✅ |
-| **Rust ratio** | **94.35%** hold **95%** advisory |
+| **Rust ratio** | **94.36%** hold **95%** advisory |
 
 **0** відкритих · остання смуга **PH-S343…S352** ✅.
 
@@ -32,4 +32,4 @@
 
 - [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md) — концепт v1
 - [`PROMETHEUS_METRICS.md`](./PROMETHEUS_METRICS.md) — stand smoke band PH-S244…S256 + verification completed/skipped (S343/S345/S346)
-- [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md) — ratio **94.35%**
+- [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md) — ratio **94.36%**

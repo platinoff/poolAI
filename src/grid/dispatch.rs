@@ -29,11 +29,14 @@ use crate::grid::galaxy_replay_metrics::evaluate_result_replay_pending;
 use crate::grid::galaxy_replication::{
     replication_tier_from_policy, ReplicationTierConfig, REPLICATION_STANDARD, REPLICATION_STRICT,
 };
-use crate::grid::galaxy_replication_metrics::evaluate_job_replication_strict;
-use crate::grid::galaxy_settlement::{resolve_settlement_status, SettlementStatus};
+use crate::grid::galaxy_replication_metrics::replication_executor_hook;
+use crate::grid::galaxy_settlement::{
+    resolve_settlement_status, PayoutBatchLedgerEntry, SettlementStatus,
+};
 use crate::grid::galaxy_settlement_metrics::{
     evaluate_result_settlement_cleared, evaluate_result_settlement_not_applicable,
     evaluate_result_settlement_pending_verification, evaluate_result_settlement_resolved,
+    record_payout_batch_ledger_entry,
 };
 use crate::grid::galaxy_trust_score::{
     clamp_trust_score, evaluate_result_settlement_gate, SettlementGateVerdict, TrustScore,
@@ -437,11 +440,22 @@ pub fn complete_prefetch_hook(plan: &PrefetchPlan) -> usize {
     n
 }
 
-/// Seed pull stub (PH-S424): records pull metric; no live memory/RAID fetch wire.
+/// Seed pull resolver: planned shards present in coordinator inventory (PH-S434).
+pub fn resolve_seed_pull_shards(plan: &PrefetchPlan) -> usize {
+    let inventory = coordinator_merged_seed_inventory();
+    plan.items
+        .iter()
+        .filter(|item| inventory.shard_ids.iter().any(|id| id == &item.shard_id))
+        .count()
+}
+
+/// Seed pull stub (PH-S424/PH-S434): resolve against inventory; no live memory/RAID fetch wire.
 #[inline]
 pub fn seed_pull_hook(plan: &PrefetchPlan) -> usize {
-    let n = plan.items.len();
-    record_prefetch_seed_pull(n);
+    let n = resolve_seed_pull_shards(plan);
+    if n > 0 {
+        record_prefetch_seed_pull(n);
+    }
     n
 }
 
@@ -546,7 +560,7 @@ fn ingest_job(
         .get(&job_id)?
         .ok_or_else(|| AppError::InternalError("job missing after grid ingest".into()))?;
     let replication_tier = replication_tier_from_policy(body.verification_policy.as_deref());
-    evaluate_job_replication_strict(replication_tier);
+    replication_executor_hook(replication_tier);
     Ok(GridIngestOutcome {
         kind: GridIngestKind::Job {
             job_id,
@@ -607,6 +621,12 @@ fn ingest_result(
     evaluate_result_settlement_resolved(settlement_status);
     evaluate_result_settlement_pending_verification(settlement_status);
     evaluate_result_settlement_cleared(settlement_status);
+    if settlement_status == SettlementStatus::Cleared {
+        record_payout_batch_ledger_entry(PayoutBatchLedgerEntry {
+            job_id: job_id.clone(),
+            cleared_at: now.to_rfc3339(),
+        });
+    }
     evaluate_result_settlement_not_applicable(settlement_status);
     evaluate_result_fee_split(body.metrics.as_ref());
     evaluate_result_replay_pending(body.metrics.as_ref(), settlement_status);
@@ -1933,6 +1953,34 @@ mod tests {
         assert_eq!(prefetch_ingest_total(), 0);
         ingest_job_prefetch_stub(&["w:x".into()], false);
         assert_eq!(prefetch_ingest_total(), 1);
+        reset_prefetch_metrics_for_test();
+    }
+
+    #[test]
+    fn seed_pull_hook_resolves_inventory_ph_s434() {
+        use crate::grid::galaxy_prefetch_metrics::{
+            prefetch_seed_pull_total, reset_prefetch_metrics_for_test,
+        };
+
+        reset_prefetch_metrics_for_test();
+        let plan = PrefetchPlan {
+            items: vec![
+                PrefetchPlanItem {
+                    shard_id: "w:emb-1".into(),
+                    target_tier: PrefetchTargetTier::Ram,
+                },
+                PrefetchPlanItem {
+                    shard_id: "w:missing".into(),
+                    target_tier: PrefetchTargetTier::Ram,
+                },
+            ],
+            trigger: PrefetchTrigger::JobAdmitted,
+            deadline_ms: DEFAULT_PREFETCH_DEADLINE_MS,
+            mode: PrefetchPolicyMode::BestEffort,
+        };
+        assert_eq!(resolve_seed_pull_shards(&plan), 1);
+        assert_eq!(seed_pull_hook(&plan), 1);
+        assert_eq!(prefetch_seed_pull_total(), 1);
         reset_prefetch_metrics_for_test();
     }
 }

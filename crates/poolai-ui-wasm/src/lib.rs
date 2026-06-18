@@ -11,7 +11,7 @@ use poolai_ui_core::format::{
 use poolai_ui_core::lease::lease_state;
 use poolai_ui_core::ml::{
     build_admin_overview_url, build_alert_rules_url, build_audit_events_url,
-    build_dashboard_metrics_window_url, build_metric_history_url,
+    build_dashboard_metrics_window_url, build_metric_history_query, build_metric_history_url,
     build_metric_history_url_with_hours, build_metrics_window_url,
     build_metrics_window_url_with_hours, build_ml_pipeline_demo_url, build_ml_pipelines_url,
     build_monitoring_active_alerts_url, build_monitoring_alert_acknowledge_url,
@@ -288,6 +288,16 @@ pub fn render_line_chart_html_wasm(
 #[wasm_bindgen(js_name = renderLineChartEmptyHtml)]
 pub fn render_line_chart_empty_html_wasm(no_data_label: &str) -> String {
     render_line_chart_empty_html(no_data_label)
+}
+
+#[wasm_bindgen(js_name = buildMetricHistoryQuery)]
+pub fn build_metric_history_query_wasm(
+    metric_name: &str,
+    start_time: &str,
+    end_time: &str,
+    limit: u32,
+) -> String {
+    build_metric_history_query(metric_name, start_time, end_time, limit)
 }
 
 #[wasm_bindgen(js_name = buildMetricHistoryUrl)]

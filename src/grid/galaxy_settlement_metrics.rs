@@ -5,7 +5,7 @@
 
 use std::sync::atomic::{AtomicU64, Ordering};
 
-use crate::grid::galaxy_settlement::SettlementStatus;
+use crate::grid::galaxy_settlement::{PayoutBatchLedgerEntry, SettlementStatus};
 
 /// In-process counter for settlement holds pending verification (mirrored on `GET /metrics`).
 pub const METRIC_SETTLEMENT_PENDING_VERIFICATION_TOTAL: &str =
@@ -123,6 +123,11 @@ pub fn evaluate_result_settlement_cleared(settlement_status: SettlementStatus) {
     }
 }
 
+/// Record payout batch ledger entry on cleared settlement (PH-S436).
+pub fn record_payout_batch_ledger_entry(entry: PayoutBatchLedgerEntry) {
+    let _ = entry;
+}
+
 /// Grid result path stub: increment when settlement is not applicable (PH-S354).
 pub fn evaluate_result_settlement_not_applicable(settlement_status: SettlementStatus) {
     if settlement_status == SettlementStatus::NotApplicable {
@@ -237,5 +242,17 @@ mod tests {
         assert_eq!(settlement_not_applicable_total(), 1);
 
         reset_settlement_not_applicable_metrics_for_test();
+    }
+
+    #[test]
+    fn record_payout_batch_ledger_entry_ph_s436() {
+        let _lock = settlement_metrics_test_lock();
+        reset_settlement_metrics_for_test();
+        record_payout_batch_ledger_entry(PayoutBatchLedgerEntry {
+            job_id: "job-1".into(),
+            cleared_at: "2026-06-18T00:00:00Z".into(),
+        });
+        assert_eq!(settlement_payout_batch_total(), 0);
+        reset_settlement_metrics_for_test();
     }
 }

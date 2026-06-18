@@ -628,6 +628,7 @@ const GALAXY_REPLAY_METRICS: &[&str] = &[
     "galaxy_replay_pending_scheduled_total",
     "galaxy_replay_pending_resolved_total",
     "galaxy_replay_evaluations_total",
+    "galaxy_replay_verification_enqueue_total",
 ];
 
 fn metrics_text_has_replay_pending(body: &str) -> Result<(), String> {
@@ -729,6 +730,7 @@ const GALAXY_VERIFICATION_METRICS: &[&str] = &[
     "galaxy_verification_sample_skipped_total",
     "galaxy_verification_sample_not_applicable_total",
     "galaxy_verification_sampling_evaluations_total",
+    "galaxy_verification_checker_enqueue_total",
 ];
 
 fn metrics_text_has_verification_counters(body: &str) -> Result<(), String> {
@@ -798,6 +800,7 @@ async fn smoke_galaxy_trust_payout_metrics(client: &Client, base: &str) -> Resul
 const GALAXY_REPLICATION_METRICS: &[&str] = &[
     "galaxy_replication_strict_total",
     "galaxy_replication_enqueue_total",
+    "galaxy_replication_executor_enqueue_total",
 ];
 
 fn metrics_text_has_replication_strict(body: &str) -> Result<(), String> {
@@ -1816,6 +1819,9 @@ mod tests {
             "# HELP galaxy_replay_evaluations_total Galaxy replay pending evaluations on grid result path (PH-S415)\n",
             "# TYPE galaxy_replay_evaluations_total gauge\n",
             "galaxy_replay_evaluations_total 0\n",
+            "# HELP galaxy_replay_verification_enqueue_total Galaxy replay verification enqueue stub on mismatch (PH-S438)\n",
+            "# TYPE galaxy_replay_verification_enqueue_total gauge\n",
+            "galaxy_replay_verification_enqueue_total 0\n",
         );
         metrics_text_has_replay_pending(sample).expect("sample export");
     }
@@ -1879,6 +1885,9 @@ mod tests {
             "# HELP galaxy_verification_sampling_evaluations_total Galaxy verification sampling evaluations on grid result path (PH-S414)\n",
             "# TYPE galaxy_verification_sampling_evaluations_total gauge\n",
             "galaxy_verification_sampling_evaluations_total 0\n",
+            "# HELP galaxy_verification_checker_enqueue_total Galaxy verification checker enqueue stub on sample verdict (PH-S437)\n",
+            "# TYPE galaxy_verification_checker_enqueue_total gauge\n",
+            "galaxy_verification_checker_enqueue_total 0\n",
         );
         metrics_text_has_verification_counters(sample).expect("sample export");
     }
@@ -1926,6 +1935,9 @@ mod tests {
             "# HELP galaxy_replication_enqueue_total Galaxy replication executor enqueue stub on grid job ingest (PH-S426)\n",
             "# TYPE galaxy_replication_enqueue_total gauge\n",
             "galaxy_replication_enqueue_total 0\n",
+            "# HELP galaxy_replication_executor_enqueue_total Galaxy replication executor queue stub on grid job ingest (PH-S435)\n",
+            "# TYPE galaxy_replication_executor_enqueue_total gauge\n",
+            "galaxy_replication_executor_enqueue_total 0\n",
         );
         metrics_text_has_replication_strict(sample).expect("sample export");
     }

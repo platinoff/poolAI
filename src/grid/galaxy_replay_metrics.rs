@@ -18,10 +18,15 @@ pub const METRIC_REPLAY_PENDING_RESOLVED_TOTAL: &str = "galaxy_replay_pending_re
 /// Total replay pending evaluations on grid result path (PH-S415 `/metrics` gauge).
 pub const METRIC_REPLAY_EVALUATIONS_TOTAL: &str = "galaxy_replay_evaluations_total";
 
+/// Replay verification enqueue stub invocations (PH-S438).
+pub const METRIC_REPLAY_VERIFICATION_ENQUEUE_TOTAL: &str =
+    "galaxy_replay_verification_enqueue_total";
+
 static REPLAY_PENDING: AtomicU64 = AtomicU64::new(0);
 static REPLAY_PENDING_SCHEDULED_TOTAL: AtomicU64 = AtomicU64::new(0);
 static REPLAY_PENDING_RESOLVED_TOTAL: AtomicU64 = AtomicU64::new(0);
 static REPLAY_EVALUATIONS_TOTAL: AtomicU64 = AtomicU64::new(0);
+static REPLAY_VERIFICATION_ENQUEUE_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// Schedule one replay verification hold (mismatch / explicit flag).
 pub fn record_replay_pending_scheduled() {
@@ -60,6 +65,26 @@ pub fn reset_replay_pending_metrics_for_test() {
     REPLAY_PENDING_SCHEDULED_TOTAL.store(0, Ordering::Relaxed);
     REPLAY_PENDING_RESOLVED_TOTAL.store(0, Ordering::Relaxed);
     REPLAY_EVALUATIONS_TOTAL.store(0, Ordering::Relaxed);
+    REPLAY_VERIFICATION_ENQUEUE_TOTAL.store(0, Ordering::Relaxed);
+}
+
+/// Record one replay verification enqueue stub (PH-S438).
+pub fn record_replay_verification_enqueue() {
+    REPLAY_VERIFICATION_ENQUEUE_TOTAL.fetch_add(1, Ordering::Relaxed);
+}
+
+pub fn replay_verification_enqueue_total() -> u64 {
+    REPLAY_VERIFICATION_ENQUEUE_TOTAL.load(Ordering::Relaxed)
+}
+
+/// Enqueue replay verification stub when mismatch/replay flags schedule hold (PH-S438).
+pub fn enqueue_replay_verification(
+    metrics: Option<&serde_json::Value>,
+    settlement_status: SettlementStatus,
+) {
+    if should_schedule_replay_pending(metrics, settlement_status) {
+        record_replay_verification_enqueue();
+    }
 }
 
 #[cfg(test)]
@@ -122,6 +147,7 @@ pub fn evaluate_result_replay_pending(
     }
     if should_schedule_replay_pending(metrics, settlement_status) {
         record_replay_pending_scheduled();
+        record_replay_verification_enqueue();
     }
 }
 
@@ -139,6 +165,7 @@ mod tests {
             SettlementStatus::Cleared,
         );
         assert_eq!(replay_pending(), 1);
+        assert_eq!(replay_verification_enqueue_total(), 1);
         reset_replay_pending_metrics_for_test();
     }
 

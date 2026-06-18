@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-18 (PH-S424…S433 ✅ · rust_ratio **94.35%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-18 (PH-S434…S443 ✅ · rust_ratio **94.36%**) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -633,8 +633,18 @@ FM-xxx (з таблиці нижче)
 | 366 | **PH-S431** | Rust ratio loc-audit refresh (ops) | PH-S419 | `rust_ratio.json` sprint zriz **94.35%** | **✅** |
 | 367 | **PH-S432** | Docs canon sync band (docs) | PH-S420 | INDEX/HANDOFF/NEXT/STABLE/GALAXY | **✅** |
 | 368 | **PH-S433** | poolai-vision-sync + INDEX ratio (ops/docs) | PH-S421/S432 | `--check` green + INDEX §7 rust_ratio | **✅** |
+| 369 | **PH-S434** | Live prefetch seed-pull resolver stub | Galaxy §5.5 | `resolve_seed_pull_shards` + inventory lookup; unit tests | **✅** |
+| 370 | **PH-S435** | Replication executor enqueue hook | Galaxy §6.4 | `replication_executor_hook` + `galaxy_replication_executor_enqueue_total` | **✅** |
+| 371 | **PH-S436** | Settlement payout batch ledger entry stub | Galaxy §8.2 | `PayoutBatchLedgerEntry` on cleared path; unit tests | **✅** |
+| 372 | **PH-S437** | Verification checker enqueue stub | Galaxy §6.2 | `enqueue_verification_checker` + counter; unit tests | **✅** |
+| 373 | **PH-S438** | Replay verification enqueue stub | Galaxy §6.3 | `record_replay_verification_enqueue` on mismatch; unit tests | **✅** |
+| 374 | **PH-S439** | Signed capability document parse stub | Galaxy §6.6/§9 | `galaxy_capability_doc.rs` parse/validate; unit tests | **✅** |
+| 375 | **PH-S440** | `network_profile` persistence across heartbeat | Galaxy §8.1 | `discovery_network_profile_integration` heartbeat test | **✅** |
+| 376 | **PH-S441** | Admin metric history query wasm glue | RUST_RATIO §5.13 | `buildMetricHistoryQuery` wasm; slim `admin_charts.js` | **✅** |
+| 377 | **PH-S442** | Stand smoke horizon wire band (S434–S438) | PH-S434…S438 | `/metrics` export shape executor/checker/replay enqueue | **✅** |
+| 378 | **PH-S443** | Ops close band: loc-audit + docs + vision-sync | §5.12 fallback | `rust_ratio.json` **94.36%**; FM/HANDOFF/NEXT; `--check` green | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S424…S433 ✅. Vision rev **229**. rust_ratio **94.35%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S434…S443 ✅. Vision rev **230**. rust_ratio **94.36%**.
 
 **Наступна сесія:** **`абракадабра`** (research concept/roadmap → drain 10) **або** один PH-S* · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
@@ -642,7 +652,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-06-18):** PH-S424…S433 ✅ закрито · **0** відкритих · **`абракадабра`** = project scan → §5.12 → drain.
+**Активна смуга (2026-06-18):** PH-S434…S443 ✅ закрито · **0** відкритих · **`абракадабра`** = project scan → §5.12 → drain.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

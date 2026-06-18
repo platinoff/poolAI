@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-18 (PH-S424…S433 ✅ · vision **rev 229** · **0** відкритих · rust_ratio **94.35%**)
+**Оновлено:** 2026-06-18 (PH-S434…S443 ✅ · vision **rev 230** · **0** відкритих · rust_ratio **94.36%**)
 
 | **← наступний** | **`абракадабра`** (project scan + drain) **або** один PH-S* |
 | **Відкритих** | **0** |
@@ -38,12 +38,12 @@ S0: git fetch; HANDOFF; FM §5.12; df -h /s
 
 ---
 
-## Закрито (смуга PH-S424…S433)
+## Закрито (смуга PH-S434…S443)
 
-PH-S424…S427 ✅ — Galaxy prefetch seed-pull, lease-acquired trigger, replication enqueue, payout batch metrics.
-PH-S428…S430 ✅ — dashboard quick-stats wasm (`formatPercent`/`formatMegabytes`) + stand smoke.
-PH-S431…S433 ✅ — loc-audit **94.35%**, docs canon, vision-sync.
+PH-S434…S438 ✅ — Galaxy horizon wire: seed-pull resolver, replication executor, payout ledger, verify/replay enqueue stubs, capability doc parse.
+PH-S439…S441 ✅ — capability doc module, network_profile heartbeat persistence, metric history query wasm.
+PH-S442…S443 ✅ — stand smoke horizon metrics, loc-audit **94.36%**, docs canon, vision-sync.
 
-**rust_ratio:** **94.35%** (formal 90–95% ✅; hold 95% advisory).
+**rust_ratio:** **94.36%** (formal 90–95% ✅; hold 95% advisory).
 
 **BLOCKED / Deferred:** FM-003 LAN · FM-041 Cloud SDK live.

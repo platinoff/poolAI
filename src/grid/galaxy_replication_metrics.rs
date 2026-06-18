@@ -12,8 +12,13 @@ pub const METRIC_REPLICATION_STRICT_TOTAL: &str = "galaxy_replication_strict_tot
 /// Executor enqueue stub invocations on grid job ingest (PH-S426).
 pub const METRIC_REPLICATION_ENQUEUE_TOTAL: &str = "galaxy_replication_enqueue_total";
 
+/// Replication executor queue stub invocations (PH-S435).
+pub const METRIC_REPLICATION_EXECUTOR_ENQUEUE_TOTAL: &str =
+    "galaxy_replication_executor_enqueue_total";
+
 static REPLICATION_STRICT_TOTAL: AtomicU64 = AtomicU64::new(0);
 static REPLICATION_ENQUEUE_TOTAL: AtomicU64 = AtomicU64::new(0);
+static REPLICATION_EXECUTOR_ENQUEUE_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// Record one grid job ingest with `replication_strict` tier.
 pub fn record_replication_strict_ingest() {
@@ -33,10 +38,26 @@ pub fn replication_enqueue_total() -> u64 {
     REPLICATION_ENQUEUE_TOTAL.load(Ordering::Relaxed)
 }
 
+/// Record one replication executor queue stub (PH-S435).
+pub fn record_replication_executor_enqueue() {
+    REPLICATION_EXECUTOR_ENQUEUE_TOTAL.fetch_add(1, Ordering::Relaxed);
+}
+
+pub fn replication_executor_enqueue_total() -> u64 {
+    REPLICATION_EXECUTOR_ENQUEUE_TOTAL.load(Ordering::Relaxed)
+}
+
+/// Grid job ingest executor queue stub (PH-S435).
+pub fn replication_executor_hook(replication_tier: ReplicationTierConfig) {
+    record_replication_executor_enqueue();
+    evaluate_job_replication_strict(replication_tier);
+}
+
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_replication_strict_metrics_for_test() {
     REPLICATION_STRICT_TOTAL.store(0, Ordering::Relaxed);
     REPLICATION_ENQUEUE_TOTAL.store(0, Ordering::Relaxed);
+    REPLICATION_EXECUTOR_ENQUEUE_TOTAL.store(0, Ordering::Relaxed);
 }
 
 /// Grid job ingest path stub: increment when tier profile is strict (PH-S179).
@@ -94,6 +115,17 @@ mod tests {
         evaluate_job_replication_strict(tier);
         assert_eq!(replication_strict_total(), 1);
 
+        reset_replication_strict_metrics_for_test();
+    }
+
+    #[test]
+    fn replication_executor_hook_ph_s435() {
+        let _lock = replication_metrics_test_lock();
+        reset_replication_strict_metrics_for_test();
+        replication_executor_hook(REPLICATION_STRICT);
+        assert_eq!(replication_executor_enqueue_total(), 1);
+        assert_eq!(replication_enqueue_total(), 1);
+        assert_eq!(replication_strict_total(), 1);
         reset_replication_strict_metrics_for_test();
     }
 }

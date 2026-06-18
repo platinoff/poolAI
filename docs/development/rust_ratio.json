@@ -1,23 +1,23 @@
 {
   "generated_at": "2026-06-18",
-  "sprint": "PH-S431",
+  "sprint": "PH-S318",
   "formal_band_min": 0.9,
   "formal_band_max": 0.95,
   "warn_below": 0.93,
   "target_ratio": 0.95,
   "stretch_spirit": 0.96,
-  "advisory_mode": false,
-  "min_ratio": null,
-  "rust_loc": 123919,
-  "non_rust_product_loc": 7422,
-  "product_loc_total": 131341,
-  "rust_ratio": 0.94349060841626,
-  "rust_ratio_pct": 94.349060841626,
+  "advisory_mode": true,
+  "min_ratio": 0.95,
+  "rust_loc": 124197,
+  "non_rust_product_loc": 7421,
+  "product_loc_total": 131618,
+  "rust_ratio": 0.9436171344344998,
+  "rust_ratio_pct": 94.36171344344999,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
   "below_stretch_spirit": true,
-  "meets_min_ratio": null,
+  "meets_min_ratio": false,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -37,15 +37,15 @@
     },
     "rust_crates": {
       "files": 27,
-      "loc": 8002
+      "loc": 8037
     },
     "rust_src": {
       "files": 242,
-      "loc": 91587
+      "loc": 91781
     },
     "rust_tests": {
       "files": 132,
-      "loc": 23722
+      "loc": 23771
     },
     "ui_css": {
       "files": 2,
@@ -53,7 +53,7 @@
     },
     "ui_js": {
       "files": 6,
-      "loc": 2028
+      "loc": 2027
     }
   },
   "notes": [

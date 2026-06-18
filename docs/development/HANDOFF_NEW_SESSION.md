@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-18 (PH-S424…S433 ✅ · vision rev **229** · rust_ratio **94.35%**) · VDT
+**Оновлено:** 2026-06-18 (PH-S434…S443 ✅ · vision rev **230** · rust_ratio **94.36%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -384,9 +384,19 @@
 **PH-S431 ✅ (ops):** `poolai-loc-audit` → `rust_ratio.json` sprint zriz **94.35%**.
 **PH-S432 ✅ (docs):** INDEX/HANDOFF/NEXT/STABLE/GALAXY canon sync band.
 **PH-S433 ✅ (ops/docs):** `poolai-vision-sync` **rev 229** + INDEX §7 rust_ratio maintain.
+**PH-S434 ✅ (code):** `resolve_seed_pull_shards` + `seed_pull_hook` inventory resolver (Galaxy §5.5).
+**PH-S435 ✅ (code):** `replication_executor_hook` + `galaxy_replication_executor_enqueue_total` on grid job ingest.
+**PH-S436 ✅ (code):** `PayoutBatchLedgerEntry` stub on cleared settlement path.
+**PH-S437 ✅ (code):** `enqueue_verification_checker` + `galaxy_verification_checker_enqueue_total`.
+**PH-S438 ✅ (code):** `record_replay_verification_enqueue` on mismatch replay path.
+**PH-S439 ✅ (code):** `galaxy_capability_doc.rs` — signed capability document parse/validate stub.
+**PH-S440 ✅ (tests):** `discovery_network_profile_integration` — `network_profile` retained across `heartbeat-remote`.
+**PH-S441 ✅ (code/ui):** `buildMetricHistoryQuery` wasm; `admin_charts.js` wasm-first fetch path.
+**PH-S442 ✅ (tests):** `poolai-http-stand-smoke` — executor/checker/replay enqueue `/metrics` shape (PH-S434…S438).
+**PH-S443 ✅ (ops/docs):** `poolai-loc-audit` **94.36%**; FM/HANDOFF/NEXT; `poolai-vision-sync` **rev 230**.
 **Rules ✅:** **`абракадабра`** — project scan **всього репо** (concept · FM §5.1 · roadmaps · architect · code) → 10 PH-S* у §5.12 (журнал) → drain → push; канон [`.cursor/rules/poolai-session-iteration.mdc`](../.cursor/rules/poolai-session-iteration.mdc) § «Тригер абракадабра»; commit **`git-commit-tree-msg.sh`**.
 **§5.12:** **0** відкритих — наступна сесія: **`абракадабра`** (project scan + drain) або один PH-S*.
-**Vision ✅:** rev **228** · rust_ratio **94.35%** · hold **95%** advisory.
+**Vision ✅:** rev **230** · rust_ratio **94.36%** · hold **95%** advisory.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

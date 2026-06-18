@@ -17,10 +17,15 @@ pub const METRIC_VERIFICATION_MATCH_TOTAL: &str = "galaxy_verification_match_tot
 pub const METRIC_VERIFICATION_SAMPLE_COMPLETED_TOTAL: &str =
     "galaxy_verification_sample_completed_total";
 
+/// Verification checker enqueue stub invocations (PH-S437).
+pub const METRIC_VERIFICATION_CHECKER_ENQUEUE_TOTAL: &str =
+    "galaxy_verification_checker_enqueue_total";
+
 static SAMPLE_TOTAL: AtomicU64 = AtomicU64::new(0);
 static MISMATCH_TOTAL: AtomicU64 = AtomicU64::new(0);
 static MATCH_TOTAL: AtomicU64 = AtomicU64::new(0);
 static SAMPLE_COMPLETED_TOTAL: AtomicU64 = AtomicU64::new(0);
+static CHECKER_ENQUEUE_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// Record one verification sample on the grid result path.
 pub fn record_verification_sample() {
@@ -84,6 +89,23 @@ pub fn reset_verification_metrics_for_test() {
     reset_verification_mismatch_metrics_for_test();
     reset_verification_match_metrics_for_test();
     reset_verification_sample_completed_metrics_for_test();
+    CHECKER_ENQUEUE_TOTAL.store(0, Ordering::Relaxed);
+}
+
+/// Record one verification checker enqueue stub (PH-S437).
+pub fn record_verification_checker_enqueue() {
+    CHECKER_ENQUEUE_TOTAL.fetch_add(1, Ordering::Relaxed);
+}
+
+pub fn verification_checker_enqueue_total() -> u64 {
+    CHECKER_ENQUEUE_TOTAL.load(Ordering::Relaxed)
+}
+
+/// Enqueue verification checker stub when sample is scheduled (PH-S437).
+pub fn enqueue_verification_checker(scheduled: bool) {
+    if scheduled {
+        record_verification_checker_enqueue();
+    }
 }
 
 /// Grid result path stub: increment sample counter when stub selects edge sample or explicit flag.
@@ -98,6 +120,7 @@ pub fn evaluate_result_verification_sample(
     let scheduled = sample_scheduled || explicit;
     if scheduled {
         record_verification_sample();
+        enqueue_verification_checker(true);
     }
     scheduled
 }
@@ -164,6 +187,7 @@ mod tests {
 
         assert!(evaluate_result_verification_sample(None, true));
         assert_eq!(verification_sample_total(), 1);
+        assert_eq!(verification_checker_enqueue_total(), 1);
 
         assert!(!evaluate_result_verification_sample(None, false));
         assert_eq!(verification_sample_total(), 1);
