@@ -156,10 +156,23 @@ pub async fn admin_dashboard() -> Html<String> {
       }
       el.innerHTML = data.map(event => `
         <div class="activity-item">
-          <span class="muted">${new Date(event.timestamp).toLocaleString()}</span>
-          <span>${event.action}</span>
+          <span class="muted">${escapeHtml(formatAuditTimestamp(event.timestamp))}</span>
+          <span>${escapeHtml(event.action || '')}</span>
         </div>
       `).join('');
+    }
+
+    function formatAuditTimestamp(raw) {
+      const wasm = typeof window !== 'undefined' ? window.poolaiUiWasm : null;
+      if (wasm && typeof wasm.formatIsoDatetime === 'function') {
+        return wasm.formatIsoDatetime(raw == null ? '' : String(raw));
+      }
+      if (!raw) return '—';
+      try {
+        return new Date(raw).toLocaleString();
+      } catch (_) {
+        return String(raw);
+      }
     }
     
     function formatUptime(seconds) {

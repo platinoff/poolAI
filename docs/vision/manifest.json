@@ -1836,7 +1836,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S393",
+  "last_sprint_closed": "PH-S403",
   "layers": [
     {
       "id": "L0",
@@ -7731,7 +7731,7 @@
       "path": "crates/poolai-ui-core/src/admin_dom.rs"
     }
   ],
-  "revision": 224,
+  "revision": 225,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -10682,6 +10682,96 @@
       "id": "PH-S393",
       "open": false,
       "row": 328,
+      "status": "closed",
+      "title": "Docs INDEX ratio maintain (docs)"
+    },
+    {
+      "acceptance": "galaxy_trust_gate_evaluations_total` on `/metrics",
+      "deps": "PH-S384",
+      "id": "PH-S394",
+      "open": false,
+      "row": 329,
+      "status": "closed",
+      "title": "Galaxy trust gate evaluations metric (code)"
+    },
+    {
+      "acceptance": "galaxy_trust_default_score_applied_total` on grid result path",
+      "deps": "PH-S394",
+      "id": "PH-S395",
+      "open": false,
+      "row": 330,
+      "status": "closed",
+      "title": "Galaxy default score applied metric (code)"
+    },
+    {
+      "acceptance": "formatIsoDatetime` wasm glue on recent activity",
+      "deps": "PH-S385",
+      "id": "PH-S396",
+      "open": false,
+      "row": 331,
+      "status": "closed",
+      "title": "Admin dashboard audit timestamp wasm (code)"
+    },
+    {
+      "acceptance": "/metrics` export shape",
+      "deps": "PH-S394/S395",
+      "id": "PH-S397",
+      "open": false,
+      "row": 332,
+      "status": "closed",
+      "title": "Stand smoke trust gate counters (tests)"
+    },
+    {
+      "acceptance": "formatAuditTimestamp` + `formatIsoDatetime` gates",
+      "deps": "PH-S396",
+      "id": "PH-S398",
+      "open": false,
+      "row": 333,
+      "status": "closed",
+      "title": "Admin dashboard wasm glue tests (code)"
+    },
+    {
+      "acceptance": "rust_ratio.json` sprint zriz 94.34%",
+      "deps": "PH-S389",
+      "id": "PH-S399",
+      "open": false,
+      "row": 334,
+      "status": "closed",
+      "title": "Rust ratio loc-audit refresh (ops)"
+    },
+    {
+      "acceptance": "INDEX/HANDOFF/NEXT/STABLE/GALAXY",
+      "deps": "PH-S399",
+      "id": "PH-S400",
+      "open": false,
+      "row": 335,
+      "status": "closed",
+      "title": "Docs canon sync band (docs)"
+    },
+    {
+      "acceptance": "--check` green",
+      "deps": "PH-S391",
+      "id": "PH-S401",
+      "open": false,
+      "row": 336,
+      "status": "closed",
+      "title": "poolai-vision-sync drift gate (ops)"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory",
+      "deps": "PH-S399",
+      "id": "PH-S402",
+      "open": false,
+      "row": 337,
+      "status": "closed",
+      "title": "Ratio hold advisory snapshot (ops)"
+    },
+    {
+      "acceptance": "INDEX §7 + rust_ratio pointer",
+      "deps": "PH-S400",
+      "id": "PH-S403",
+      "open": false,
+      "row": 338,
       "status": "closed",
       "title": "Docs INDEX ratio maintain (docs)"
     }

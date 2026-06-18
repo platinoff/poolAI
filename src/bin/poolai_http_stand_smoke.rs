@@ -758,6 +758,8 @@ const GALAXY_TRUST_PAYOUT_METRICS: &[&str] = &[
     "galaxy_trust_score",
     "galaxy_trust_gate_min_threshold",
     "galaxy_trust_gate_default_score",
+    "galaxy_trust_gate_evaluations_total",
+    "galaxy_trust_default_score_applied_total",
 ];
 
 fn metrics_text_has_trust_payout_counters(body: &str) -> Result<(), String> {
@@ -1873,6 +1875,12 @@ mod tests {
             "# HELP galaxy_trust_gate_default_score Galaxy default trust score 0..=100 when grid result omits trust_score (PH-S384)\n",
             "# TYPE galaxy_trust_gate_default_score gauge\n",
             "galaxy_trust_gate_default_score 50\n",
+            "# HELP galaxy_trust_gate_evaluations_total Galaxy trust gate evaluations on grid result path (PH-S394)\n",
+            "# TYPE galaxy_trust_gate_evaluations_total gauge\n",
+            "galaxy_trust_gate_evaluations_total 0\n",
+            "# HELP galaxy_trust_default_score_applied_total Galaxy grid results where default trust score was applied (PH-S395)\n",
+            "# TYPE galaxy_trust_default_score_applied_total gauge\n",
+            "galaxy_trust_default_score_applied_total 0\n",
         );
         metrics_text_has_trust_payout_counters(sample).expect("sample export");
     }

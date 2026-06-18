@@ -54,10 +54,18 @@ pub const METRIC_TRUST_GATE_MIN_THRESHOLD: &str = "galaxy_trust_gate_min_thresho
 /// Default trust score used when grid result omits `trust_score` (PH-S384 `/metrics` gauge).
 pub const METRIC_TRUST_GATE_DEFAULT_SCORE: &str = "galaxy_trust_gate_default_score";
 
+/// Total settlement gate evaluations on grid result path (PH-S394 `/metrics` gauge).
+pub const METRIC_GATE_EVALUATIONS_TOTAL: &str = "galaxy_trust_gate_evaluations_total";
+
+/// Total grid results where default trust score was applied (PH-S395 `/metrics` gauge).
+pub const METRIC_DEFAULT_SCORE_APPLIED_TOTAL: &str = "galaxy_trust_default_score_applied_total";
+
 static PAYOUT_ELIGIBLE_TOTAL: AtomicU64 = AtomicU64::new(0);
 static PAYOUT_HELD_TOTAL: AtomicU64 = AtomicU64::new(0);
 static PAYOUT_NOT_APPLICABLE_TOTAL: AtomicU64 = AtomicU64::new(0);
 static LAST_TRUST_SCORE: AtomicU64 = AtomicU64::new(0);
+static GATE_EVALUATIONS_TOTAL: AtomicU64 = AtomicU64::new(0);
+static DEFAULT_SCORE_APPLIED_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// Gate configuration (env-backed stub).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -129,8 +137,15 @@ pub fn evaluate_result_settlement_gate(
     trust_score: Option<TrustScore>,
     config: &TrustScoreGateConfig,
 ) -> SettlementGateVerdict {
+    GATE_EVALUATIONS_TOTAL.fetch_add(1, Ordering::Relaxed);
     let origin = infer_worker_origin(source_peer_id);
-    let score = trust_score.unwrap_or(DEFAULT_TRUST_SCORE);
+    let score = match trust_score {
+        Some(s) => s,
+        None => {
+            DEFAULT_SCORE_APPLIED_TOTAL.fetch_add(1, Ordering::Relaxed);
+            DEFAULT_TRUST_SCORE
+        }
+    };
     observe_last_trust_score(score);
     let verdict = evaluate_settlement_gate(origin, score, config);
     record_settlement_gate_verdict(verdict);
@@ -192,11 +207,23 @@ pub fn configured_default_trust_score() -> u64 {
     u64::from(DEFAULT_TRUST_SCORE)
 }
 
+/// Total settlement gate evaluations since process start (PH-S394).
+pub fn gate_evaluations_total() -> u64 {
+    GATE_EVALUATIONS_TOTAL.load(Ordering::Relaxed)
+}
+
+/// Total grid results where default trust score was applied (PH-S395).
+pub fn default_score_applied_total() -> u64 {
+    DEFAULT_SCORE_APPLIED_TOTAL.load(Ordering::Relaxed)
+}
+
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_settlement_gate_metrics_for_test() {
     PAYOUT_ELIGIBLE_TOTAL.store(0, Ordering::Relaxed);
     PAYOUT_HELD_TOTAL.store(0, Ordering::Relaxed);
     PAYOUT_NOT_APPLICABLE_TOTAL.store(0, Ordering::Relaxed);
+    GATE_EVALUATIONS_TOTAL.store(0, Ordering::Relaxed);
+    DEFAULT_SCORE_APPLIED_TOTAL.store(0, Ordering::Relaxed);
 }
 
 #[cfg(test)]
@@ -309,6 +336,18 @@ mod tests {
     #[test]
     fn configured_default_trust_score_is_constant_ph_s384() {
         assert_eq!(configured_default_trust_score(), 50);
+    }
+
+    #[test]
+    fn gate_evaluations_and_default_score_counters_ph_s394_s395() {
+        reset_settlement_gate_metrics_for_test();
+        let cfg = TrustScoreGateConfig::default_stub();
+        evaluate_result_settlement_gate(Some("tg-peer"), Some(80), &cfg);
+        evaluate_result_settlement_gate(Some("tg-peer"), None, &cfg);
+        evaluate_result_settlement_gate(Some("peer-local"), None, &cfg);
+        assert_eq!(gate_evaluations_total(), 3);
+        assert_eq!(default_score_applied_total(), 2);
+        reset_settlement_gate_metrics_for_test();
     }
 
     #[test]
