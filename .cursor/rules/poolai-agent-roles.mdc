@@ -12,7 +12,7 @@ alwaysApply: true
 | Роль | Хто | Відповідальність |
 |------|-----|------------------|
 | **Власник / креативний директор** | Людина | Візія, пріоритети, BLOCKED/Deferred, фінальний push за бажанням |
-| **Оркестратор** | Головний агент Cursor (Composer) | Звичайна сесія: один **PH-S***. **`абракадабра`:** S0 → research replenish (concept/roadmap/FM) → drain ≤10 PH-S* → push + самарі |
+| **Оркестратор** | Головний агент Cursor (Composer) | Звичайна сесія: один **PH-S***. **`абракадабра`:** S0 → **project scan всього репо** → 10 PH-S* у §5.12 → drain → push + самарі |
 | **Субагенти** | Task tool | Вузькі підзадачі; результат повертається оркестратору |
 
 ## Субагенти Cursor (коли делегувати)
@@ -32,11 +32,11 @@ alwaysApply: true
 | Розділ FM | Зміст |
 |-----------|--------|
 | **§5.1** | Порядок **FM-*** (функціональні тікети) |
-| **§5.12** | Черга **PH-S*** (спринти; ≤10 відкритих) |
+| **§5.12** | **Журнал PH-S*** (≤10 відкритих); пріоритети — project scan (concept, §5.1, roadmaps, code) |
 | **§5.13** | Rust ratio **90–95%** (після S142; PH-S143…S150) — [`RUST_RATIO_STRATEGY_2026-06-13.md`](../../docs/development/RUST_RATIO_STRATEGY_2026-06-13.md) |
 | **HANDOFF** + **NEXT_SESSION_PROMPT** | Операційний зріз і copy-paste промпт сесії |
 
-**Ітераційна розробка:** промпт з [`NEXT_SESSION_PROMPT.md`](../../docs/development/NEXT_SESSION_PROMPT.md) → один **PH-S*** з §5.12 **або** **`абракадабра`** (drain смуги з research по concept/roadmap).
+**Ітераційна розробка:** промпт з [`NEXT_SESSION_PROMPT.md`](../../docs/development/NEXT_SESSION_PROMPT.md) → один **PH-S*** з §5.12 **або** **`абракадабра`** (project scan → drain смуги).
 
 **AUTO_RUN:** лише за явним запитом або [`autonomous-orchestrator.mdc`](autonomous-orchestrator.mdc) — не підміняє §5.12.
 

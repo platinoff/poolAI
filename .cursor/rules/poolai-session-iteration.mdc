@@ -12,8 +12,8 @@ alwaysApply: false
 
 | Правило | Дія |
 |--------|-----|
-| Черга спринтів | FM **§5.12** + [`NEXT_SESSION_PROMPT.md`](../../docs/development/NEXT_SESSION_PROMPT.md) |
-| Черга FM-* | FM **§5.1** (окремо від PH-S*) |
+| Черга спринтів | FM **§5.12** (журнал PH-S*) + [`NEXT_SESSION_PROMPT.md`](../../docs/development/NEXT_SESSION_PROMPT.md) |
+| Черга FM-* | FM **§5.1** — **джерело пріоритетів** для project scan |
 | Scope | Лише файли поточного PH-S*; не повторювати з блоку «Не повторювати» у NEXT_SESSION |
 | Завершення | PH-S* → ✅ §5.12 + HANDOFF + NEXT_SESSION → наступний PH-S* |
 
@@ -74,20 +74,24 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 4. `git push origin main` + короткий самарі в чат.
 5. Оновити FM §5.12, HANDOFF, `NEXT_SESSION_PROMPT` (крок 12 + операційний зріз).
 
-**Research replenish:** коли відкритих PH-S* у §5.12 **< 10** — додати code-first **Rust** рядки (орієнтир: [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../../docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md), [`RUST_RATIO_STRATEGY_2026-06-13.md`](../../docs/development/RUST_RATIO_STRATEGY_2026-06-13.md), `rg "TODO|FIXME" src/`), тримати **≤ 10** відкритих. Після S142 — **§5.13** ratio track.
+**Research replenish (звичайна сесія):** якщо §5.12 **< 10** — project scan ([`functionality-management.mdc`](functionality-management.mdc), concept, FM §5.1). **`абракадабра`** — повний project scan → §5.12 (журнал) → drain; див. § нижче.
 
-## Тригер «абракадабра» (ітераційний drain усього проєкту)
+## Тригер «абракадабра» (ітераційний drain **всього проєкту**)
 
-Коли власник у **новій сесії** пише **`абракадабра`** (синоніми: «дренаж черги», «виконати всі спринти», «поки черга не вільна»):
+Коли власник у **новій сесії** пише **`абракадабра`**:
 
-**Сенс:** один промпт = **повний VDT-цикл по всьому репо** (концепт → роадмеп → FM → код → docs → push), а не лише ratio-шаблон §5.13. **§5.12** — **черга виконання** (≤10 відкритих PH-S*); **replenish** — з усіх канонічних джерел пріоритетів.
+| ❌ Не так | ✅ Так |
+|----------|--------|
+| Scope = лише FM §5.12 / §5.13 | **Project scan** усього репо → 10 gap → запис у §5.12 → drain |
+| §5.12 = джерело пріоритетів | §5.12 = **журнал PH-S*** (≤10 відкритих); пріоритети — concept, FM §5.1, roadmaps, code |
+
+**Сенс:** VDT по **всьому PoolAI** — не ratio-band. Кожна нова сесія **`абракадабра`** = новий project scan + drain + push.
 
 ```mermaid
 flowchart LR
-  S0[S0 git+HANDOFF+FM] --> Count{§5.12 < 10?}
-  Count -->|так| Research[Research replenish → 10]
-  Count -->|ні| Drain[Drain усі відкриті PH-S*]
-  Research --> Drain
+  S0[S0 git+HANDOFF+FM] --> Scan[Project scan цілого репо]
+  Scan --> Pick[Top 10 → PH-S* у §5.12]
+  Pick --> Drain[Drain усі відкриті]
   Drain --> Test[cargo fmt + test-ci]
   Test --> Vision[vision-sync + --check]
   Vision --> Push[git push + самарі]
@@ -96,23 +100,37 @@ flowchart LR
 
 | Крок | Дія |
 |------|-----|
-| 1 S0 | `git fetch`; HANDOFF; FM **§5.1** + **§5.12** + **§5.13**; `NEXT_SESSION`; `df -h /s` |
-| 2 Research | Якщо відкритих у §5.12 **< 10** → **replenish до 10** (алгоритм нижче; не лише ratio band) |
+| 1 S0 | `git fetch`; HANDOFF; FM **§1–§5.1**; [`STABLE_STATE`](../../docs/status/STABLE_STATE_SUMMARY.md); `NEXT_SESSION`; `df -h /s` |
+| 2 Project scan | Якщо §5.12 **< 10** → **scan всього проєкту** (карта нижче) → **10 PH-S*** у §5.12 |
 | 3 Drain | Усі відкриті PH-S* в одній сесії (код → scope-тести → docs band) |
 | 4 Vision | FM/HANDOFF/NEXT → `poolai-vision-sync` → FM rev = manifest → `--check` |
 | 5 Git | **один** commit (`git-commit-tree-msg.sh`) + `git push origin main` + **самарі** |
 
-**Ітерація:** після push черга знову **0** (або <10) → у **наступній** сесії знову **`абракадабра`** → S0 → replenish (якщо треба) → drain → push. Без окремого підтвердження кожного PH-S*.
+**Ітерація:** після push §5.12 знову **0** (або <10) → у **наступній** сесії **`абракадабра`** → S0 → **project scan** (якщо <10) → drain → push. Без окремого підтвердження кожного PH-S*.
 
 **Не** підміняє BLOCKED/Deferred (FM-003 LAN, FM-041 Cloud SDK). **Не** `git add -A`. Канон push — [`.cursor/commands/git-push.md`](../commands/git-push.md).
 
 **Не повторювати:** закриті acceptance з FM; блок «Не повторювати» у `NEXT_SESSION_PROMPT`.
 
-### Research replenish (до 10 PH-S* у §5.12)
+### Project scan — карта **всього проєкту** (не лише §5.12)
 
-**Мета:** обрати **10 найнеобхідніших** ще не зроблених кроків згідно **концепту, роадмепів і планів** — Rust-first, без дублювання вже ✅ acceptance.
+Сканувати шарами ([`docs/STRUCTURE.md`](../../docs/STRUCTURE.md), [`functionality-management.mdc`](functionality-management.mdc)):
 
-**Порядок сканування (code-first, зверху вниз):**
+| Шар | Джерела | Що шукати |
+|-----|---------|-----------|
+| **Concept** | `docs/concept/POOLAI_GALAXY_GRID.md`, GRID/Solana/JOB docs | §TBD, horizon wire без PH-S* / FM-* |
+| **FM функції** | FM **§5.1** **FM-*** | Planned / partial / без ✅ — **пріоритет §5.1** |
+| **Architect** | `NEXT_STEPS_ARCHITECT_*.md` | `rg "\- \[ \]"` |
+| **Roadmaps** | `GALAXY_GRID_ROADMAP`, `RUST_RATIO_STRATEGY`, `UI_UX_IMPROVEMENTS_PLAN`, `HORIZON_TO_100_PLAN` | horizon без code |
+| **Gaps** | `DOCS_LEGACY_AUDIT`, `OPENAPI_GAP_AUDIT`, FM **§5.3** | docs/API/code gaps |
+| **Статус** | `STABLE_STATE_SUMMARY`, `FUNCTIONALITY_DIGEST` | заявлено vs `src/` |
+| **Код** | `rg "TODO|FIXME" src/` tests/ crates/ | Rust-first |
+| **Ratio** | FM **§5.13** | лише якщо п.1–7 < 10 рядків |
+| **Fallback** | band 10 (нижче) | останній резорт |
+
+**Після scan:** обрані пункти → **PH-S(N…)** у FM **§5.12** (журнал). Колонка «Джерело»: `FM-042`, `Galaxy §5.5`, `Architect L130`, …
+
+**Порядок (якщо потрібен один список):**
 
 | Пріоритет | Джерело | Що шукати |
 |-----------|---------|-----------|
@@ -147,14 +165,14 @@ flowchart LR
 | 9 | ops | `poolai-loc-audit -- --min-ratio 0.95 --advisory` |
 | 10 | docs | INDEX §7 + rust_ratio pointer |
 
+### Shell (обов’язково з першої команди)
+
 | ❌ | ✅ |
 |----|-----|
-| PowerShell (`&&`, `cd S:\…`) | `C:\msys64\usr\bin\bash.exe -lc '…'` |
-| bare `bash` (може піти в WSL stub) | повний шлях MSYS2 bash |
-| паралельні `cargo test-ci` / `cargo build` | **один** `cargo test-ci` наприкінці drain |
-| sandbox `cargo-target` без override | `export CARGO_TARGET_DIR=/s/rust/poolAI/target` |
-
-Канонічний префікс (copy-paste на всю сесію):
+| PowerShell | `C:\msys64\usr\bin\bash.exe -lc '…'` |
+| bare `bash` | MSYS2 bash |
+| паралельні `cargo test-ci` | **один** test-ci на drain |
+| sandbox target | `export CARGO_TARGET_DIR=/s/rust/poolAI/target` |
 
 ```bash
 export PATH="/c/Users/${USER:-${USERNAME}}/.cargo/bin:$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"
@@ -164,26 +182,12 @@ export CARGO_TARGET_DIR=/s/rust/poolAI/target
 cd /s/rust/poolAI || cd "S:/rust/poolAI"
 ```
 
-### Replenish смуга 10 (коли §5.12 = 0, §5.13 ratio track)
+### Drain: тести та wasm glue
 
-Орієнтир однієї смуги **PH-S(N)…S(N+9)** — code-first Rust, без дублювання FM acceptance:
-
-| # | Тип | Приклад acceptance |
-|---|-----|-------------------|
-| 1–2 | Galaxy metrics stub | `galaxy_*_total` + unit test + `prometheus_export` |
-| 3 | wasm URL/HTML glue | `poolai-ui-core` + `poolai-ui-wasm` + `admin_charts.js` |
-| 4 | stand smoke | `poolai_http_stand_smoke` `/metrics` export shape |
-| 5 | ще code або wasm | locality / ML helpers |
-| 6 | ops | `cargo run --bin poolai-loc-audit` → `rust_ratio.json` |
-| 7 | docs canon | INDEX, HANDOFF, NEXT, STABLE, GALAXY_GRID_ROADMAP |
-| 8 | ops | `cargo run --bin poolai-vision-sync` |
-| 9 | ops | `poolai-loc-audit -- --min-ratio 0.95 --advisory` |
-### Shell (обов’язково з першої команди)
-
-1. Після коду: `cargo fmt --all` → **один** `cargo test-ci` (не запускати другий, поки перший не завершився).
-2. Зміни `src/ui/admin_charts.js` (wasm-first) → додати `admin_charts_*_wasm_first_ph_s*` у `src/ui/admin/mod.rs` (рядок `wasm.<fn>` у JS).
-3. Після `poolai-ui-core` / `poolai-ui-wasm`: `rustup target add wasm32-unknown-unknown` (разово) → `bash bin/build-ui-wasm.sh` (PATH з `/c/Users/…/.cargo/bin`; `RUSTUP_TOOLCHAIN=stable-x86_64-pc-windows-gnu`).
-4. UI-only scope без API — Playwright не блокує, якщо `cargo test-ci` green ([`poolai-testing-policy.mdc`](poolai-testing-policy.mdc)).
+1. `cargo fmt --all` → **один** `cargo test-ci`.
+2. wasm-first UI → `admin_charts_*_wasm_first_ph_s*` у `src/ui/admin/mod.rs`.
+3. `bash bin/build-ui-wasm.sh` після `poolai-ui-wasm` змін.
+4. API-only — Playwright не блокує ([`poolai-testing-policy.mdc`](poolai-testing-policy.mdc)).
 
 ### Vision (порядок — уникати drift rev)
 

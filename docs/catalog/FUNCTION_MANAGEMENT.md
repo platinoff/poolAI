@@ -236,7 +236,7 @@ FM-xxx (з таблиці нижче)
 
 ### 5.11 Наступні 10 спринтів PH-S55…S64 (Galaxy Grid + ops/docs, 2026-05-26)
 
-**VDT / локальний CI:** одна сесія = один PH-S*; верифікація — `cargo test-ci` (+ scope: raft, openapi-gap, e2e). GitHub Actions — довідково. Правила — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc). Якщо відкритих <3 — research у `docs/` і доповнити чергу (**max 10**).
+**VDT / локальний CI:** одна сесія = один PH-S*; верифікація — `cargo test-ci` (+ scope: raft, openapi-gap, e2e). GitHub Actions — довідково. Правила — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc). Якщо відкритих <10 — **project scan** всього репо (не лише §5.12) і доповнити §5.12 (**max 10**).
 
 **Джерела (пріоритет):** локальні failures → §5.10 → [`DOCS_LEGACY_AUDIT_2026-05-19.md`](../development/DOCS_LEGACY_AUDIT_2026-05-19.md) → Architect / UI_UX / [`E2E_PLAYWRIGHT.md`](../development/E2E_PLAYWRIGHT.md).
 
@@ -261,7 +261,7 @@ FM-xxx (з таблиці нижче)
 
 ### 5.12 Research backlog PH-S65+ (Galaxy wire / ops, 2026-05-27)
 
-**VDT:** якщо відкритих **< 10** — research replenish (канон **`абракадабра`**): concept [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md) → [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md) → FM **§5.1** → `rg "\- \[ \]" docs/development/NEXT_STEPS_ARCHITECT_*.md` → DOCS_LEGACY §5.3 → §5.13 → `rg "TODO|FIXME" src/` → fallback band 10. Деталі: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Research replenish». **Rust-first:** API → `tests/`; Playwright лише browser scope.
+**VDT:** §5.12 = **журнал PH-S*** (≤10 відкритих). Якщо **< 10** — **`абракадабра`** / project scan **всього проєкту**: concept → FM **§5.1** → roadmaps → architect → DOCS_LEGACY → code → §5.13 fallback. Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Project scan». **Rust-first:** API → `tests/`; Playwright лише browser scope.
 
 | # | Sprint | Фокус | Джерело | Acceptance (скорочено) | Стан |
 |---|--------|--------|---------|-------------------------|------|
@@ -632,7 +632,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-06-18):** PH-S414…S423 ✅ закрито · **0** відкритих · **`абракадабра`** replenish (concept/roadmap/FM) → drain.
+**Активна смуга (2026-06-18):** PH-S414…S423 ✅ закрито · **0** відкритих · **`абракадабра`** = project scan → §5.12 → drain.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 
@@ -749,7 +749,7 @@ FM-xxx (з таблиці нижче)
 
 **Baseline:** rust_ratio **94.36%** → **hold 95%** advisory · **stretch spirit 96%** ([`rust_ratio.json`](../development/rust_ratio.json), [`RUST_RATIO_STRATEGY_2026-06-13.md`](../development/RUST_RATIO_STRATEGY_2026-06-13.md)).
 
-**Наступна сесія:** replenish з **§5.13** · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **`абракадабра`** (project scan) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 
