@@ -8,6 +8,7 @@ use poolai_ui_core::api_error::{api_error_detail_from_body, format_fetch_error};
 use poolai_ui_core::format::{
     alert_severity_badge_class, escape_html, format_megabytes, format_percent, format_uptime,
 };
+use poolai_ui_core::instances::render_instances_panel_html;
 use poolai_ui_core::lease::lease_state;
 use poolai_ui_core::ml::{
     build_admin_overview_url, build_alert_rules_url, build_audit_events_url,
@@ -425,6 +426,37 @@ pub fn render_workers_panel_wasm(
         healthy_label,
         unhealthy_label,
         req_label,
+        delete_label,
+        empty_message,
+    )
+}
+
+#[wasm_bindgen(js_name = renderInstancesPanel)]
+pub fn render_instances_panel_wasm(
+    instances_json: &str,
+    col_instance_id: &str,
+    col_model_id: &str,
+    col_status: &str,
+    col_strategy: &str,
+    col_nodes: &str,
+    col_created: &str,
+    col_actions: &str,
+    table_aria: &str,
+    view_label: &str,
+    delete_label: &str,
+    empty_message: &str,
+) -> String {
+    render_instances_panel_html(
+        instances_json,
+        col_instance_id,
+        col_model_id,
+        col_status,
+        col_strategy,
+        col_nodes,
+        col_created,
+        col_actions,
+        table_aria,
+        view_label,
         delete_label,
         empty_message,
     )

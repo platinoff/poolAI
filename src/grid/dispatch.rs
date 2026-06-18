@@ -21,14 +21,15 @@ use crate::grid::galaxy_locality::{
 };
 use crate::grid::galaxy_network_profile::GalaxyEgressPolicy;
 use crate::grid::galaxy_prefetch_metrics::{
-    observe_prefetch_queue_depth, record_hot_promote, record_locality_unsatisfied,
-    record_prefetch_backpressure, record_prefetch_co_access, record_prefetch_complete,
-    record_prefetch_egress_blocked, record_prefetch_enqueue, record_prefetch_ingest,
-    record_prefetch_lease_acquired, record_prefetch_peer_fetch, record_prefetch_peer_fetch_miss,
-    record_prefetch_plan, record_prefetch_raid_fetch, record_prefetch_raid_fetch_miss,
-    record_prefetch_re_migrate, record_prefetch_seed_fetch, record_prefetch_seed_fetch_miss,
-    record_prefetch_seed_pull, record_prefetch_skip_ingest, record_prefetch_strict_mode,
-    record_prefetch_wait, record_shard_access, DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM,
+    observe_prefetch_queue_depth, record_hot_evict, record_hot_promote,
+    record_locality_unsatisfied, record_prefetch_backpressure, record_prefetch_co_access,
+    record_prefetch_complete, record_prefetch_egress_blocked, record_prefetch_enqueue,
+    record_prefetch_ingest, record_prefetch_lease_acquired, record_prefetch_peer_fetch,
+    record_prefetch_peer_fetch_miss, record_prefetch_plan, record_prefetch_pull_bytes,
+    record_prefetch_raid_fetch, record_prefetch_raid_fetch_miss, record_prefetch_re_migrate,
+    record_prefetch_seed_fetch, record_prefetch_seed_fetch_miss, record_prefetch_seed_pull,
+    record_prefetch_skip_ingest, record_prefetch_strict_mode, record_prefetch_wait,
+    record_shard_access, should_hot_promote, DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM,
     DEFAULT_PREFETCH_BYTES_PER_SHARD_VRAM,
 };
 use crate::grid::galaxy_replay_metrics::evaluate_result_replay_pending;
@@ -49,8 +50,9 @@ use crate::grid::galaxy_trust_score::{
     SettlementGateVerdict, TrustScore, TrustScoreGateConfig,
 };
 use crate::grid::galaxy_verification_metrics::{
-    evaluate_result_verification_match, evaluate_result_verification_mismatch,
-    evaluate_result_verification_sample, evaluate_result_verification_sample_completed,
+    enqueue_verification_checker_task, evaluate_result_verification_match,
+    evaluate_result_verification_mismatch, evaluate_result_verification_sample,
+    evaluate_result_verification_sample_completed,
 };
 use crate::grid::galaxy_verify_sampling::{
     evaluate_post_mismatch_elevated_sampling, evaluate_result_verify_sampling,
@@ -570,30 +572,46 @@ pub fn complete_prefetch_hook(plan: &PrefetchPlan, memory: Option<&MemoryShardSt
         observe_prefetch_queue_depth(n as u64);
         record_prefetch_wait(n, plan.deadline_ms);
         record_prefetch_complete(n);
-        record_hot_promote(n);
+        let memory_hits = if let Some(store) = memory {
+            fetch_seed_shards_hook(plan, store)
+        } else {
+            0
+        };
+        if should_hot_promote(memory_hits) {
+            record_hot_promote(memory_hits);
+        } else if memory_hits > 0 {
+            record_hot_evict(memory_hits);
+        }
         record_shard_access(n);
         seed_pull_hook(plan);
         fetch_seed_shards_from_peer_hook(plan);
         if let Some(store) = memory {
-            fetch_seed_shards_hook(plan, store);
             fetch_seed_shards_from_raid_hook(plan, store);
         }
     }
     n
 }
 
-/// Memory-layer seed fetch stub after inventory resolve (PH-S444).
+/// Memory-layer seed fetch stub after inventory resolve (PH-S444); live bytes pull (PH-S484).
 pub fn fetch_seed_shards_hook(plan: &PrefetchPlan, memory: &MemoryShardStore) -> usize {
     let mut hits = 0usize;
+    let mut pull_bytes = 0u64;
     for item in &plan.items {
         match memory.get(&item.shard_id) {
-            Ok(Some(_)) => hits += 1,
+            Ok(Some(_)) => {
+                hits += 1;
+                pull_bytes += match item.target_tier {
+                    PrefetchTargetTier::Vram => DEFAULT_PREFETCH_BYTES_PER_SHARD_VRAM,
+                    PrefetchTargetTier::Ram => DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM,
+                };
+            }
             Ok(None) => record_prefetch_seed_fetch_miss(),
             Err(_) => record_prefetch_seed_fetch_miss(),
         }
     }
     if hits > 0 {
         record_prefetch_seed_fetch(hits);
+        record_prefetch_pull_bytes(pull_bytes);
     }
     hits
 }
@@ -818,14 +836,19 @@ fn ingest_job(
         lease_expires_at: None,
     };
     jobs.push(record)?;
-    schedule_with_grid_peer(jobs, source_peer_id)?;
+    let locality_peer = if !body.required_shard_ids.is_empty() {
+        ingest_job_locality_rank_stub(&body.required_shard_ids, &body.task_kind)
+    } else {
+        None
+    };
+    let schedule_peer = locality_peer.as_deref().or(source_peer_id);
+    schedule_with_grid_peer(jobs, schedule_peer)?;
     if !body.required_shard_ids.is_empty() {
         ingest_job_prefetch_stub(
             &body.required_shard_ids,
             grid_job_gpu_capable(&body.task_kind),
             Some(memory),
         );
-        let _ = ingest_job_locality_rank_stub(&body.required_shard_ids, &body.task_kind);
     }
     let row = jobs
         .get(&job_id)?
@@ -903,10 +926,11 @@ fn ingest_result(
     );
     let verification_sample =
         evaluate_result_verify_sampling(source_peer_id, &job_id, &VerifySamplingConfig::from_env());
-    evaluate_result_verification_sample(
-        body.metrics.as_ref(),
-        verification_sample == VerifySamplingVerdict::SampleScheduled,
-    );
+    let sample_scheduled = verification_sample == VerifySamplingVerdict::SampleScheduled;
+    evaluate_result_verification_sample(body.metrics.as_ref(), sample_scheduled);
+    if sample_scheduled {
+        enqueue_verification_checker_task(&job_id);
+    }
     let settlement_status = resolve_settlement_status(settlement_gate, verification_sample);
     evaluate_result_settlement_resolved(settlement_status);
     evaluate_result_settlement_pending_verification(settlement_status);

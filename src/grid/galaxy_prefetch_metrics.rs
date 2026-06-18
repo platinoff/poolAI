@@ -47,6 +47,12 @@ pub const METRIC_PREFETCH_SEED_FETCH_TOTAL: &str = "galaxy_prefetch_seed_fetch_t
 /// Memory-layer seed fetch misses on prefetch path (PH-S444).
 pub const METRIC_PREFETCH_SEED_FETCH_MISS_TOTAL: &str = "galaxy_prefetch_seed_fetch_miss_total";
 
+/// Live prefetch bytes pulled from memory on fetch path (PH-S484).
+pub const METRIC_PREFETCH_PULL_BYTES_TOTAL: &str = "galaxy_prefetch_pull_bytes_total";
+
+/// Env: minimum shard hits before hot-tier promotion (Galaxy §5.4, PH-S487).
+pub const ENV_HOT_PROMOTE_THRESHOLD: &str = "POOLAI_GALAXY_HOT_PROMOTE_THRESHOLD";
+
 /// Co-access graph speculative prefetch plans (PH-S446).
 pub const METRIC_PREFETCH_CO_ACCESS_TOTAL: &str = "galaxy_prefetch_co_access_total";
 
@@ -119,6 +125,7 @@ static RAID_FETCH_MISS_TOTAL: AtomicU64 = AtomicU64::new(0);
 static EGRESS_BLOCKED_TOTAL: AtomicU64 = AtomicU64::new(0);
 static PEER_FETCH_TOTAL: AtomicU64 = AtomicU64::new(0);
 static PEER_FETCH_MISS_TOTAL: AtomicU64 = AtomicU64::new(0);
+static PULL_BYTES_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// Record one `plan_prefetch` outcome (no wire enqueue).
 pub fn record_prefetch_plan(required_shards: usize, planned_shards: usize, prefetch_bytes: u64) {
@@ -236,6 +243,31 @@ pub fn record_prefetch_seed_fetch(shard_count: usize) {
     if shard_count > 0 {
         SEED_FETCH_TOTAL.fetch_add(shard_count as u64, Ordering::Relaxed);
     }
+}
+
+/// Record live bytes pulled on memory fetch path (PH-S484).
+pub fn record_prefetch_pull_bytes(bytes: u64) {
+    if bytes > 0 {
+        PULL_BYTES_TOTAL.fetch_add(bytes, Ordering::Relaxed);
+    }
+}
+
+pub fn prefetch_pull_bytes_total() -> u64 {
+    PULL_BYTES_TOTAL.load(Ordering::Relaxed)
+}
+
+/// Hot-tier promotion threshold from env; default 1 (PH-S487).
+pub fn hot_promote_threshold_from_env() -> usize {
+    std::env::var(ENV_HOT_PROMOTE_THRESHOLD)
+        .ok()
+        .and_then(|v| v.trim().parse().ok())
+        .filter(|&n| n > 0)
+        .unwrap_or(1)
+}
+
+/// Whether shard hit count meets hot-promote threshold (PH-S487).
+pub fn should_hot_promote(shard_hits: usize) -> bool {
+    shard_hits >= hot_promote_threshold_from_env()
 }
 
 pub fn prefetch_seed_fetch_total() -> u64 {
@@ -407,6 +439,7 @@ pub fn reset_prefetch_metrics_for_test() {
     EGRESS_BLOCKED_TOTAL.store(0, Ordering::Relaxed);
     PEER_FETCH_TOTAL.store(0, Ordering::Relaxed);
     PEER_FETCH_MISS_TOTAL.store(0, Ordering::Relaxed);
+    PULL_BYTES_TOTAL.store(0, Ordering::Relaxed);
 }
 
 #[cfg(test)]
@@ -502,6 +535,27 @@ mod tests {
         record_hot_evict(1);
         assert_eq!(hot_promote_total(), 2);
         assert_eq!(hot_evict_total(), 1);
+    }
+
+    #[test]
+    fn prefetch_pull_bytes_ph_s484() {
+        reset_prefetch_metrics_for_test();
+        record_prefetch_pull_bytes(DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM);
+        assert_eq!(
+            prefetch_pull_bytes_total(),
+            DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM
+        );
+    }
+
+    #[test]
+    fn hot_promote_threshold_ph_s487() {
+        static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+        let _guard = ENV_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+        std::env::set_var(ENV_HOT_PROMOTE_THRESHOLD, "2");
+        assert!(!should_hot_promote(1));
+        assert!(should_hot_promote(2));
+        std::env::remove_var(ENV_HOT_PROMOTE_THRESHOLD);
+        assert!(should_hot_promote(1));
     }
 
     #[test]

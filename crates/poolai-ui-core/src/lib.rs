@@ -8,6 +8,7 @@ pub mod api_error;
 pub mod design_tokens;
 pub mod format;
 pub mod i18n;
+pub mod instances;
 pub mod lease;
 pub mod ml;
 pub mod modal;

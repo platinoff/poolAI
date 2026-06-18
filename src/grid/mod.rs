@@ -11,6 +11,7 @@ pub mod galaxy_fee_split;
 pub mod galaxy_fee_split_metrics;
 pub mod galaxy_locality;
 pub mod galaxy_network_profile;
+pub mod galaxy_network_profile_store;
 pub mod galaxy_prefetch_metrics;
 pub mod galaxy_pricing_oracle;
 pub mod galaxy_pricing_provider_metrics;

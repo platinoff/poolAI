@@ -1,8 +1,9 @@
 //! Galaxy Grid verification metrics stubs (PH-S175 / PH-S177 / PH-S180, §6.2).
 //!
-//! Counters for grid result verification sample, mismatch, and match; no live checker wire.
+//! Counters for grid result verification sample, mismatch, and match; checker task enqueue wire (PH-S488).
 
 use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::{LazyLock, Mutex};
 
 /// In-process counter for verification samples scheduled (mirrored on `GET /metrics`).
 pub const METRIC_VERIFICATION_SAMPLE_TOTAL: &str = "galaxy_verification_sample_total";
@@ -26,6 +27,16 @@ static MISMATCH_TOTAL: AtomicU64 = AtomicU64::new(0);
 static MATCH_TOTAL: AtomicU64 = AtomicU64::new(0);
 static SAMPLE_COMPLETED_TOTAL: AtomicU64 = AtomicU64::new(0);
 static CHECKER_ENQUEUE_TOTAL: AtomicU64 = AtomicU64::new(0);
+
+/// Stub verification checker task record (PH-S488).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct VerificationCheckerTask {
+    pub job_id: String,
+    pub task_type: String,
+}
+
+static CHECKER_TASKS: LazyLock<Mutex<Vec<VerificationCheckerTask>>> =
+    LazyLock::new(|| Mutex::new(Vec::new()));
 
 /// Record one verification sample on the grid result path.
 pub fn record_verification_sample() {
@@ -90,6 +101,7 @@ pub fn reset_verification_metrics_for_test() {
     reset_verification_match_metrics_for_test();
     reset_verification_sample_completed_metrics_for_test();
     CHECKER_ENQUEUE_TOTAL.store(0, Ordering::Relaxed);
+    reset_verification_checker_tasks_for_test();
 }
 
 /// Record one verification checker enqueue stub (PH-S437).
@@ -101,10 +113,32 @@ pub fn verification_checker_enqueue_total() -> u64 {
     CHECKER_ENQUEUE_TOTAL.load(Ordering::Relaxed)
 }
 
-/// Enqueue verification checker stub when sample is scheduled (PH-S437).
+/// Enqueue verification checker stub when sample is scheduled (PH-S437); task wire (PH-S488).
 pub fn enqueue_verification_checker(scheduled: bool) {
     if scheduled {
         record_verification_checker_enqueue();
+    }
+}
+
+/// Enqueue shadow-checker stub task for a sampled job (PH-S488).
+pub fn enqueue_verification_checker_task(job_id: &str) {
+    if let Ok(mut tasks) = CHECKER_TASKS.lock() {
+        tasks.push(VerificationCheckerTask {
+            job_id: job_id.to_string(),
+            task_type: "verification_checker".into(),
+        });
+    }
+}
+
+/// Pending checker stub tasks (in-process, PH-S488).
+pub fn verification_checker_tasks() -> Vec<VerificationCheckerTask> {
+    CHECKER_TASKS.lock().map(|g| g.clone()).unwrap_or_default()
+}
+
+#[cfg(any(test, feature = "test-utils"))]
+pub fn reset_verification_checker_tasks_for_test() {
+    if let Ok(mut tasks) = CHECKER_TASKS.lock() {
+        tasks.clear();
     }
 }
 
@@ -268,6 +302,20 @@ mod tests {
         )));
         assert_eq!(verification_sample_completed_total(), 2);
 
+        reset_verification_metrics_for_test();
+    }
+
+    #[test]
+    fn enqueue_verification_checker_task_ph_s488() {
+        let _lock = verification_metrics_test_lock();
+        reset_verification_metrics_for_test();
+        enqueue_verification_checker_task("job-vc-1");
+        enqueue_verification_checker(true);
+        assert_eq!(verification_checker_enqueue_total(), 1);
+        let tasks = verification_checker_tasks();
+        assert_eq!(tasks.len(), 1);
+        assert_eq!(tasks[0].job_id, "job-vc-1");
+        assert_eq!(tasks[0].task_type, "verification_checker");
         reset_verification_metrics_for_test();
     }
 }

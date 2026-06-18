@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-18 (PH-S474…S483 ✅ · rust_ratio **94.39%**) · VDT
+**Оновлено:** 2026-06-18 (PH-S484…S493 ✅ · rust_ratio **94.41%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -434,6 +434,16 @@
 **PH-S481 ✅ (tests):** `tests/galaxy_horizon_s474_integration.rs` — `/metrics` + history API shape PH-S474…S479 band.
 **PH-S482 ✅ (ops):** `poolai_http_stand_smoke` — S474 metrics + payout/replay history API smoke.
 **PH-S483 ✅ (ops):** `rust_ratio.json` **94.39%**; FM/HANDOFF/NEXT; `poolai-vision-sync` **rev 236** + `--check`.
+**PH-S484 ✅ (code):** live prefetch bytes pull — `galaxy_prefetch_pull_bytes_total` on `fetch_seed_shards_hook`; `/metrics` gauge; unit tests.
+**PH-S485 ✅ (code):** locality rank → grid schedule bind — `ingest_job_locality_rank_stub` result passed to `schedule_with_grid_peer`; integration band.
+**PH-S486 ✅ (code):** `POOLAI_TELEGRAM_SEAT_POLICY` (`bound_wallet_session`) + `compute_seat_limit`; extends PH-S475 flat cap; unit tests.
+**PH-S487 ✅ (code):** `POOLAI_GALAXY_HOT_PROMOTE_THRESHOLD` gates `record_hot_promote` in `complete_prefetch_hook`; unit tests.
+**PH-S488 ✅ (code):** `enqueue_verification_checker_task` + in-process task record on grid result sample path; unit tests.
+**PH-S489 ✅ (code):** `galaxy_network_profile_store` — persist `network_profile` on register-remote; `POOLAI_GALAXY_NETWORK_PROFILE_DATA_DIR`; unit tests.
+**PH-S490 ✅ (code/ui):** `renderInstancesPanel` wasm; slim `instances.rs`; `poolai-ui-core` + `admin_charts.js`.
+**PH-S491 ✅ (tests):** `tests/galaxy_horizon_s484_integration.rs` — `/metrics` shape PH-S484…S489 band.
+**PH-S492 ✅ (ops):** `poolai_http_stand_smoke` — `galaxy_horizon_wire_s484_metrics` (`galaxy_prefetch_pull_bytes_total`).
+**PH-S493 ✅ (ops):** `rust_ratio.json` **94.41%**; FM/HANDOFF/NEXT; `poolai-vision-sync` **rev 237** + `--check`.
 **Rules ✅:** **`абракадабра`** — project scan **всього репо** (concept · FM §5.1 · roadmaps · architect · code) → 10 PH-S* у §5.12 (журнал) → drain → push; канон [`.cursor/rules/poolai-session-iteration.mdc`](../.cursor/rules/poolai-session-iteration.mdc) § «Тригер абракадабра»; commit **`git-commit-tree-msg.sh`**.
 **§5.12:** **0** відкритих — наступна сесія: **`абракадабра`** (project scan + drain) або один PH-S*.
 **Vision ✅:** rev **235** · rust_ratio **94.38%** · hold **95%** advisory.

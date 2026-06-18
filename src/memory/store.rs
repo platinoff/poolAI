@@ -27,7 +27,7 @@ impl MemoryShardStore {
         &STORE
     }
 
-    #[cfg(test)]
+    #[cfg(any(test, feature = "test-utils"))]
     pub fn open_for_test(data_dir: Option<PathBuf>) -> Self {
         Self::open(data_dir)
     }

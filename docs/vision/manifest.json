@@ -1850,11 +1850,17 @@
       "from": "galaxy_grid",
       "kind": "implements",
       "to": "src_grid_galaxy_verification_replay_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_workers_rs"
     }
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S483",
+  "last_sprint_closed": "PH-S493",
   "layers": [
     {
       "id": "L0",
@@ -7796,9 +7802,51 @@
       "label": "grid_payout_batch_integration.rs",
       "layer": "L3",
       "path": "tests/grid_payout_batch_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_workers_rs",
+      "label": "workers.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/workers.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_services_telegram_seat_service_rs",
+      "label": "telegram_seat_service.rs",
+      "layer": "L3",
+      "path": "src/services/telegram_seat_service.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s474_integration_rs",
+      "label": "galaxy_horizon_s474_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s474_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_grid_payout_batch_history_integration_rs",
+      "label": "grid_payout_batch_history_integration.rs",
+      "layer": "L3",
+      "path": "tests/grid_payout_batch_history_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_grid_verification_replay_history_integration_rs",
+      "label": "grid_verification_replay_history_integration.rs",
+      "layer": "L3",
+      "path": "tests/grid_verification_replay_history_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_telegram_seat_integration_rs",
+      "label": "telegram_seat_integration.rs",
+      "layer": "L3",
+      "path": "tests/telegram_seat_integration.rs"
     }
   ],
-  "revision": 236,
+  "revision": 237,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -11559,6 +11607,96 @@
       "id": "PH-S483",
       "open": false,
       "row": 418,
+      "status": "closed",
+      "title": "Ops close band: loc-audit + vision-sync"
+    },
+    {
+      "acceptance": "galaxy_prefetch_pull_bytes_total` on memory fetch; unit tests",
+      "deps": "Roadmap §4, Galaxy §5.5",
+      "id": "PH-S484",
+      "open": false,
+      "row": 419,
+      "status": "closed",
+      "title": "Live prefetch bytes pull wire"
+    },
+    {
+      "acceptance": "ingest_job_locality_rank_stub` → `schedule_with_grid_peer`; integration test",
+      "deps": "Galaxy §5.2",
+      "id": "PH-S485",
+      "open": false,
+      "row": 420,
+      "status": "closed",
+      "title": "Locality rank → grid schedule bind"
+    },
+    {
+      "acceptance": "POOLAI_TELEGRAM_SEAT_POLICY` + `compute_seat_limit`; unit tests",
+      "deps": "Galaxy §3.1",
+      "id": "PH-S486",
+      "open": false,
+      "row": 421,
+      "status": "closed",
+      "title": "Telegram `bound_wallet_session` seat policy"
+    },
+    {
+      "acceptance": "POOLAI_GALAXY_HOT_PROMOTE_THRESHOLD` gates `record_hot_promote`; unit tests",
+      "deps": "Galaxy §5.4",
+      "id": "PH-S487",
+      "open": false,
+      "row": 422,
+      "status": "closed",
+      "title": "Hot-tier promotion threshold env gate"
+    },
+    {
+      "acceptance": "enqueue_verification_checker_task` + task record; unit tests",
+      "deps": "Galaxy §6.2",
+      "id": "PH-S488",
+      "open": false,
+      "row": 423,
+      "status": "closed",
+      "title": "Verification checker task enqueue wire"
+    },
+    {
+      "acceptance": "galaxy_network_profile_store` + register-remote persist; unit tests",
+      "deps": "Galaxy §8.1",
+      "id": "PH-S489",
+      "open": false,
+      "row": 424,
+      "status": "closed",
+      "title": "network_profile` disk persistence"
+    },
+    {
+      "acceptance": "renderInstancesPanel` wasm; slim `instances.rs",
+      "deps": "RUST_RATIO §5.13",
+      "id": "PH-S490",
+      "open": false,
+      "row": 425,
+      "status": "closed",
+      "title": "Instances admin panel wasm"
+    },
+    {
+      "acceptance": "galaxy_horizon_s484_integration` + `/metrics` shape",
+      "deps": "PH-S484…S489",
+      "id": "PH-S491",
+      "open": false,
+      "row": 426,
+      "status": "closed",
+      "title": "Horizon wire integration band S484–S489"
+    },
+    {
+      "acceptance": "/metrics` pull-bytes smoke",
+      "deps": "PH-S484…S488",
+      "id": "PH-S492",
+      "open": false,
+      "row": 427,
+      "status": "closed",
+      "title": "Stand smoke S484–S489 band"
+    },
+    {
+      "acceptance": "rust_ratio.json` 94.41%; FM/HANDOFF/NEXT; `--check` green",
+      "deps": "§5.12 fallback",
+      "id": "PH-S493",
+      "open": false,
+      "row": 428,
       "status": "closed",
       "title": "Ops close band: loc-audit + vision-sync"
     }

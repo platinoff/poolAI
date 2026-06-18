@@ -3,6 +3,96 @@
   "items": [
     {
       "category": "closed",
+      "id": "PH-S493",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "rust_ratio.json` 94.41%; FM/HANDOFF/NEXT; `--check` green",
+      "title": "Ops close band: loc-audit + vision-sync"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S492",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "/metrics` pull-bytes smoke",
+      "title": "Stand smoke S484–S489 band"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S491",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_horizon_s484_integration` + `/metrics` shape",
+      "title": "Horizon wire integration band S484–S489"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S490",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "renderInstancesPanel` wasm; slim `instances.rs",
+      "title": "Instances admin panel wasm"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S489",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_network_profile_store` + register-remote persist; unit tests",
+      "title": "network_profile` disk persistence"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S488",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "enqueue_verification_checker_task` + task record; unit tests",
+      "title": "Verification checker task enqueue wire"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S487",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "POOLAI_GALAXY_HOT_PROMOTE_THRESHOLD` gates `record_hot_promote`; unit tests",
+      "title": "Hot-tier promotion threshold env gate"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S486",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "POOLAI_TELEGRAM_SEAT_POLICY` + `compute_seat_limit`; unit tests",
+      "title": "Telegram `bound_wallet_session` seat policy"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S485",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "ingest_job_locality_rank_stub` → `schedule_with_grid_peer`; integration test",
+      "title": "Locality rank → grid schedule bind"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S484",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_prefetch_pull_bytes_total` on memory fetch; unit tests",
+      "title": "Live prefetch bytes pull wire"
+    },
+    {
+      "category": "closed",
       "id": "PH-S483",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
@@ -18,96 +108,6 @@
       "status": "closed",
       "summary": "/metrics` + history API smoke",
       "title": "Stand smoke S474–S479 band"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S481",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_horizon_s474_integration` + `/metrics` shape",
-      "title": "Horizon wire integration band S474–S479"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S480",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "renderWorkersPanel` wasm; slim `workers.rs",
-      "title": "Workers admin panel wasm"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S479",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "fetch_seed_shards_from_peer_hook` + `galaxy_prefetch_peer_fetch_*`; unit tests",
-      "title": "Prefetch peer seed fetch stub"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S478",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "GET /api/v1/grid/verification-replay/history`; integration test + OpenAPI",
-      "title": "Verification replay history read API"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S477",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "GET /api/v1/grid/payout-batch/history`; OpenAPI + integration test",
-      "title": "Payout batch history read API"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S476",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "POOLAI_GALAXY_CAPABILITY_VERIFY_PK_HEX` override; integration test",
-      "title": "Capability verify env trust root"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S475",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "POOLAI_TELEGRAM_SEAT_LIMIT`; register-remote 409 `seat_exhausted`; integration test",
-      "title": "Telegram seat cap admission stub"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S474",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "lan_only` cross-region block + `galaxy_prefetch_egress_blocked_total`; unit tests",
-      "title": "Prefetch egress guardrail gate"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S473",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "rust_ratio.json`; FM/HANDOFF/NEXT; `--check` green",
-      "title": "Ops close band: loc-audit + vision-sync"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S472",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "/metrics` + `grid/payout-batch` smoke",
-      "title": "Stand smoke S464–S471 band"
     }
   ],
   "link": "docs/vision/index.html",

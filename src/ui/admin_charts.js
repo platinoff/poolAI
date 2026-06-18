@@ -746,3 +746,33 @@ function poolaiRenderWorkersPanel(workers, labels) {
     { icon: '👷' },
   );
 }
+
+/**
+ * PH-S490: instances table (wasm-first).
+ * @param {Array<object>} instances
+ * @param {object} labels i18n label map
+ */
+function poolaiRenderInstancesPanel(instances, labels) {
+  labels = labels || {};
+  var wasm = poolaiChartsWasm();
+  if (wasm && typeof wasm.renderInstancesPanel === 'function') {
+    return wasm.renderInstancesPanel(
+      JSON.stringify(instances || []),
+      labels.instanceId || poolaiChartT('admin.inst.col.instanceId', 'Instance ID'),
+      labels.modelId || poolaiChartT('admin.inst.col.modelId', 'Model ID'),
+      labels.status || poolaiChartT('admin.inst.col.status', 'Status'),
+      labels.strategy || poolaiChartT('admin.inst.col.strategy', 'Strategy'),
+      labels.nodes || poolaiChartT('admin.inst.col.nodes', 'Nodes'),
+      labels.created || poolaiChartT('admin.inst.col.created', 'Created'),
+      labels.actions || poolaiChartT('admin.inst.col.actions', 'Actions'),
+      labels.tableAria || poolaiChartT('admin.inst.title', 'Model Instances'),
+      labels.view || poolaiChartT('admin.inst.viewBtn', 'View'),
+      labels.delete || poolaiChartT('ui.delete', 'Delete'),
+      labels.empty || poolaiChartT('admin.inst.empty', 'No instances found'),
+    );
+  }
+  return adminEmptyStateHtml(
+    labels.empty || poolaiChartT('admin.inst.empty', 'No instances found'),
+    { icon: '🧠' },
+  );
+}

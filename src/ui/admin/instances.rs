@@ -15,22 +15,7 @@ pub async fn admin_instances() -> axum::response::Html<String> {
       </div>
       
       <div id="instances-list" class="admin-table-container">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th data-i18n="admin.inst.col.instanceId">Instance ID</th>
-              <th data-i18n="admin.inst.col.modelId">Model ID</th>
-              <th data-i18n="admin.inst.col.status">Status</th>
-              <th data-i18n="admin.inst.col.strategy">Strategy</th>
-              <th data-i18n="admin.inst.col.nodes">Nodes</th>
-              <th data-i18n="admin.inst.col.created">Created</th>
-              <th data-i18n="admin.inst.col.actions">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="instances-tbody">
-            <tr><td colspan="7" data-i18n="admin.inst.loadingRow">Loading…</td></tr>
-          </tbody>
-        </table>
+        <p class="muted" data-i18n="admin.inst.loadingRow">Loading…</p>
       </div>
 
       <div class="admin-section-header">
@@ -63,10 +48,37 @@ pub async fn admin_instances() -> axum::response::Html<String> {
     function T(k, fb) { return typeof poolaiT === 'function' ? poolaiT(k, fb) : fb; }
     function Ep() { return typeof poolaiT === 'function' ? poolaiT('err.errorPrefix', 'Error: ') : 'Error: '; }
 
+    function renderInstancesTable(instances) {
+      const el = document.getElementById('instances-list');
+      if (!el) return;
+      el.innerHTML = poolaiRenderInstancesPanel(instances, {
+        instanceId: T('admin.inst.col.instanceId', 'Instance ID'),
+        modelId: T('admin.inst.col.modelId', 'Model ID'),
+        status: T('admin.inst.col.status', 'Status'),
+        strategy: T('admin.inst.col.strategy', 'Strategy'),
+        nodes: T('admin.inst.col.nodes', 'Nodes'),
+        created: T('admin.inst.col.created', 'Created'),
+        actions: T('admin.inst.col.actions', 'Actions'),
+        tableAria: T('admin.inst.title', 'Model Instances'),
+        view: T('admin.inst.viewBtn', 'View'),
+        delete: T('ui.delete', 'Delete'),
+        empty: T('admin.inst.empty', 'No instances found'),
+      });
+      el.querySelectorAll('[data-instance-view]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          viewInstance(btn.getAttribute('data-instance-view'));
+        });
+      });
+      el.querySelectorAll('[data-instance-delete]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          deleteInstance(btn.getAttribute('data-instance-delete'));
+        });
+      });
+    }
+
     async function loadInstances() {
-      const tbody = document.getElementById('instances-tbody');
-      if (!tbody) return;
-      tbody.innerHTML = '<tr><td colspan="7" class="muted">' + escapeHtml(T('admin.inst.loadingRow', 'Loading…')) + '</td></tr>';
+      const el = document.getElementById('instances-list');
+      if (el) el.innerHTML = '<p class="muted">' + escapeHtml(T('admin.inst.loadingRow', 'Loading…')) + '</p>';
       try {
         const token = getAuthToken();
         const response = await fetch('/api/v1/instance', {
@@ -82,39 +94,16 @@ pub async fn admin_instances() -> axum::response::Html<String> {
         }
         const data = await response.json();
         
-        tbody.innerHTML = '';
-        
-        if (!data.instances || data.instances.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="7">' + escapeHtml(T('admin.inst.empty', 'No instances found')) + '</td></tr>';
-          return;
-        }
-        
-        for (const instance of data.instances) {
-          const row = document.createElement('tr');
-          const iid = instance.instance_id;
-          row.innerHTML = `
-            <td>${escapeHtml(instance.instance_id)}</td>
-            <td>${escapeHtml(instance.model_id)}</td>
-            <td><span class="badge">${escapeHtml(instance.status)}</span></td>
-            <td>${escapeHtml(instance.placement.strategy)}</td>
-            <td>${instance.placement.node_ids.join(', ')}</td>
-            <td>${escapeHtml(new Date(instance.created_at).toLocaleString())}</td>
-            <td>
-              <button type="button" class="btn btn-sm" onclick='viewInstance(${JSON.stringify(iid)})'>${escapeHtml(T('admin.inst.viewBtn', 'View'))}</button>
-              <button type="button" class="btn btn-sm btn-danger" onclick='deleteInstance(${JSON.stringify(iid)})'>${escapeHtml(T('ui.delete', 'Delete'))}</button>
-            </td>
-          `;
-          tbody.appendChild(row);
-        }
+        renderInstancesTable(data.instances || []);
       } catch (error) {
         console.error('Error loading instances:', error);
-        const tb = document.getElementById('instances-tbody');
-        if (tb) {
+        const list = document.getElementById('instances-list');
+        if (list) {
           const msg = error instanceof Error ? error.message : String(error);
-          tb.innerHTML =
-            '<tr><td colspan="7"><div class="admin-fetch-error" role="alert">' +
+          list.innerHTML =
+            '<div class="admin-fetch-error" role="alert">' +
             escapeHtml(msg) +
-            '</div></td></tr>';
+            '</div>';
         }
         showNotification(T('admin.inst.errLoad', 'Error loading instances: ') + (error && error.message ? error.message : error), 'error');
       }

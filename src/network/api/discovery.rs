@@ -286,6 +286,14 @@ async fn register_remote_handler(
     if let Some(worker_ver) = &negotiation.worker_protocol_version {
         metadata.insert("protocol_version".to_string(), worker_ver.clone());
     }
+    if let Some(profile_json) = metadata.get("network_profile") {
+        if let Err(e) = crate::grid::galaxy_network_profile_store::persist_peer_network_profile(
+            &peer_id,
+            profile_json,
+        ) {
+            tracing::warn!("network_profile persist failed for {peer_id}: {e}");
+        }
+    }
 
     if is_telegram_edge_metadata(&metadata) && try_admit_telegram_edge(&peer_id).is_err() {
         return (

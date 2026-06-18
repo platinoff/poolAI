@@ -981,12 +981,22 @@ fn admin_charts_monitoring_dashboards_panel_wasm_first_ph_s470() {
     assert!(mon.contains("poolaiRenderMonitoringDashboardsPanel"));
 }
 
+#[test]
 fn admin_charts_workers_panel_wasm_first_ph_s480() {
     let js = include_str!("../admin_charts.js");
     assert!(js.contains("wasm.renderWorkersPanel"));
     assert!(js.contains("poolaiRenderWorkersPanel"));
     let wrk = include_str!("workers.rs");
     assert!(wrk.contains("poolaiRenderWorkersPanel"));
+}
+
+#[test]
+fn admin_charts_instances_panel_wasm_first_ph_s490() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("wasm.renderInstancesPanel"));
+    assert!(js.contains("poolaiRenderInstancesPanel"));
+    let inst = include_str!("instances.rs");
+    assert!(inst.contains("poolaiRenderInstancesPanel"));
 }
 
 #[test]
