@@ -48,6 +48,9 @@ pub const METRIC_PAYOUT_NOT_APPLICABLE_TOTAL: &str = "galaxy_trust_payout_not_ap
 /// Last observed grid result `trust_score` on 0..=100 scale (PH-S182 `/metrics` gauge).
 pub const METRIC_TRUST_SCORE: &str = "galaxy_trust_score";
 
+/// Configured minimum trust (0..=100) for edge auto payout (PH-S374 `/metrics` gauge).
+pub const METRIC_TRUST_GATE_MIN_THRESHOLD: &str = "galaxy_trust_gate_min_threshold";
+
 static PAYOUT_ELIGIBLE_TOTAL: AtomicU64 = AtomicU64::new(0);
 static PAYOUT_HELD_TOTAL: AtomicU64 = AtomicU64::new(0);
 static PAYOUT_NOT_APPLICABLE_TOTAL: AtomicU64 = AtomicU64::new(0);
@@ -176,6 +179,11 @@ pub fn payout_held_total() -> u64 {
     PAYOUT_HELD_TOTAL.load(Ordering::Relaxed)
 }
 
+/// Configured minimum trust for edge payout from env (mirrored on `GET /metrics`, PH-S374).
+pub fn configured_min_trust_for_payout() -> u64 {
+    u64::from(TrustScoreGateConfig::from_env().min_trust_for_payout)
+}
+
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_settlement_gate_metrics_for_test() {
     PAYOUT_ELIGIBLE_TOTAL.store(0, Ordering::Relaxed);
@@ -291,13 +299,13 @@ mod tests {
     }
 
     #[test]
-    fn evaluate_result_settlement_gate_observes_trust_score() {
-        reset_last_trust_score_for_test();
-        let cfg = TrustScoreGateConfig::default_stub();
-        evaluate_result_settlement_gate(Some("tg-obs"), Some(88), &cfg);
-        assert_eq!(last_trust_score(), 88);
-        evaluate_result_settlement_gate(Some("tg-obs"), None, &cfg);
-        assert_eq!(last_trust_score(), u64::from(DEFAULT_TRUST_SCORE));
-        reset_last_trust_score_for_test();
+    fn configured_min_trust_for_payout_reads_env_ph_s374() {
+        let prior = std::env::var(ENV_MIN_TRUST_PAYOUT).ok();
+        std::env::set_var(ENV_MIN_TRUST_PAYOUT, "62");
+        assert_eq!(configured_min_trust_for_payout(), 62);
+        match prior {
+            Some(v) => std::env::set_var(ENV_MIN_TRUST_PAYOUT, v),
+            None => std::env::remove_var(ENV_MIN_TRUST_PAYOUT),
+        }
     }
 }

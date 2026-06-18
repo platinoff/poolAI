@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-17 (PH-S373 ✅ · vision **rev 222** · **0** відкритих · rust_ratio **94.32%**)
+**Оновлено:** 2026-06-18 (PH-S383 ✅ · vision **rev 223** · **0** відкритих · rust_ratio **94.33%**)
 
 | **← наступний** | replenish §5.13 **або** **`абракадабра`** (drain) |
 | **Відкритих** | **0** |
@@ -30,15 +30,15 @@ S0: git fetch; HANDOFF; FM §5.12; df -h /s
 
 ---
 
-## Закрито (смуга PH-S364…S373)
+## Закрито (смуга PH-S374…S383)
 
-PH-S364 ✅ — `galaxy_trust_payout_not_applicable_total` on local-origin trust gate.
-PH-S365 ✅ — dashboard `buildMonitoringActiveAlertsUrl` wasm-first.
-PH-S366 ✅ — `buildMonitoringMetricLatestUrl` wasm glue.
-PH-S367 ✅ — stand smoke trust not-applicable `/metrics` shape.
-PH-S368 ✅ — dashboard + metric latest wasm glue tests.
-PH-S369…S373 ✅ — loc-audit **94.32%**, docs canon, vision `--check`, INDEX maintain.
+PH-S374 ✅ — `galaxy_trust_gate_min_threshold` gauge on `/metrics`.
+PH-S375 ✅ — dashboard `buildAuditEventsUrl` wasm-first.
+PH-S376 ✅ — `buildAdminOverviewUrl` wasm glue.
+PH-S377 ✅ — stand smoke trust gate min threshold `/metrics` shape.
+PH-S378 ✅ — dashboard overview + audit wasm glue tests.
+PH-S379…S383 ✅ — loc-audit **94.33%**, docs canon, vision `--check`, INDEX maintain.
 
-**rust_ratio:** **94.32%** (formal 90–95% ✅; hold 95% advisory).
+**rust_ratio:** **94.33%** (formal 90–95% ✅; hold 95% advisory).
 
 **BLOCKED / Deferred:** FM-003 LAN · FM-041 Cloud SDK live.

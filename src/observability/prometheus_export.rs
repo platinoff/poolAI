@@ -62,9 +62,9 @@ use crate::grid::galaxy_settlement_metrics::{
     METRIC_SETTLEMENT_NOT_APPLICABLE_TOTAL, METRIC_SETTLEMENT_PENDING_VERIFICATION_TOTAL,
 };
 use crate::grid::galaxy_trust_score::{
-    last_trust_score, payout_eligible_total, payout_held_total, payout_not_applicable_total,
-    METRIC_PAYOUT_ELIGIBLE_TOTAL, METRIC_PAYOUT_HELD_TOTAL, METRIC_PAYOUT_NOT_APPLICABLE_TOTAL,
-    METRIC_TRUST_SCORE,
+    configured_min_trust_for_payout, last_trust_score, payout_eligible_total, payout_held_total,
+    payout_not_applicable_total, METRIC_PAYOUT_ELIGIBLE_TOTAL, METRIC_PAYOUT_HELD_TOTAL,
+    METRIC_PAYOUT_NOT_APPLICABLE_TOTAL, METRIC_TRUST_GATE_MIN_THRESHOLD, METRIC_TRUST_SCORE,
 };
 use crate::grid::galaxy_verification_metrics::{
     verification_match_total, verification_mismatch_total, verification_sample_completed_total,
@@ -104,6 +104,7 @@ pub struct PoolAiPrometheus {
     galaxy_trust_payout_held_total: IntGauge,
     galaxy_trust_payout_not_applicable_total: IntGauge,
     galaxy_trust_score: IntGauge,
+    galaxy_trust_gate_min_threshold: IntGauge,
     galaxy_shard_local_hit_ratio: IntGauge,
     galaxy_cross_region_egress_mb: IntGauge,
     galaxy_prefetch_plan_total: IntGauge,
@@ -367,6 +368,15 @@ fn build_prometheus() -> PoolAiPrometheus {
     registry
         .register(Box::new(galaxy_trust_score.clone()))
         .expect("register galaxy_trust_score");
+
+    let galaxy_trust_gate_min_threshold = IntGauge::with_opts(Opts::new(
+        METRIC_TRUST_GATE_MIN_THRESHOLD,
+        "Galaxy configured minimum trust 0..=100 for edge auto payout (PH-S374)",
+    ))
+    .expect(METRIC_TRUST_GATE_MIN_THRESHOLD);
+    registry
+        .register(Box::new(galaxy_trust_gate_min_threshold.clone()))
+        .expect("register galaxy_trust_gate_min_threshold");
 
     let galaxy_shard_local_hit_ratio = IntGauge::with_opts(Opts::new(
         METRIC_SHARD_LOCAL_HIT_RATIO,
@@ -683,6 +693,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_trust_payout_held_total,
         galaxy_trust_payout_not_applicable_total,
         galaxy_trust_score,
+        galaxy_trust_gate_min_threshold,
         galaxy_shard_local_hit_ratio,
         galaxy_cross_region_egress_mb,
         galaxy_prefetch_plan_total,
@@ -750,6 +761,8 @@ pub fn refresh_galaxy_trust_gauges() {
     prom.galaxy_trust_payout_not_applicable_total
         .set(payout_not_applicable_total() as i64);
     prom.galaxy_trust_score.set(last_trust_score() as i64);
+    prom.galaxy_trust_gate_min_threshold
+        .set(configured_min_trust_for_payout() as i64);
 }
 
 /// Mirror in-process locality rank counters into Prometheus gauges (scrape snapshot).
@@ -1079,6 +1092,22 @@ mod tests {
         assert!(body.contains(METRIC_PAYOUT_ELIGIBLE_TOTAL));
         assert!(body.contains(METRIC_PAYOUT_HELD_TOTAL));
         assert!(body.contains(METRIC_TRUST_SCORE));
+        assert!(body.contains(METRIC_TRUST_GATE_MIN_THRESHOLD));
+    }
+
+    #[test]
+    fn galaxy_trust_gate_min_threshold_reflects_env_ph_s374() {
+        use crate::grid::galaxy_trust_score::ENV_MIN_TRUST_PAYOUT;
+        let prior = std::env::var(ENV_MIN_TRUST_PAYOUT).ok();
+        std::env::set_var(ENV_MIN_TRUST_PAYOUT, "55");
+        init_prometheus();
+        refresh_galaxy_trust_gauges();
+        let body = encode_metrics_text().expect("encode");
+        assert!(body.contains(&format!("{METRIC_TRUST_GATE_MIN_THRESHOLD} 55")));
+        match prior {
+            Some(v) => std::env::set_var(ENV_MIN_TRUST_PAYOUT, v),
+            None => std::env::remove_var(ENV_MIN_TRUST_PAYOUT),
+        }
     }
 
     #[test]

@@ -1,4 +1,4 @@
-//! ML pipeline metric helpers — parity with `admin_charts.js` (PH-S43, PH-S155, PH-S275, PH-S284, PH-S287, PH-S294, PH-S297, PH-S314, PH-S317, PH-S324, PH-S327, PH-S334, PH-S337, PH-S344, PH-S347, PH-S353).
+//! ML pipeline metric helpers — parity with `admin_charts.js` (PH-S43, PH-S155, PH-S275, PH-S284, PH-S287, PH-S294, PH-S297, PH-S314, PH-S317, PH-S324, PH-S327, PH-S334, PH-S337, PH-S344, PH-S347, PH-S353, PH-S375, PH-S376).
 
 use crate::format::escape_html;
 use chrono::{DateTime, Duration, Utc};
@@ -514,6 +514,16 @@ pub fn build_monitoring_alert_acknowledge_url(alert_id: &str) -> String {
     )
 }
 
+/// Mirrors dashboard `GET /api/v1/admin/overview` (PH-S376).
+pub fn build_admin_overview_url() -> String {
+    "/api/v1/admin/overview".to_string()
+}
+
+/// Mirrors dashboard recent activity `GET /api/enterprise/audit/events?limit=` (PH-S375).
+pub fn build_audit_events_url(limit: u32) -> String {
+    format!("/api/enterprise/audit/events?limit={limit}")
+}
+
 /// Mirrors `poolaiRenderMetricsChartGrid` card wrapper (PH-S294).
 pub fn render_metrics_chart_grid_html(title: &str, parts: &[String]) -> String {
     if parts.is_empty() {
@@ -776,5 +786,18 @@ mod tests {
         assert!(html.contains("metrics-charts-grid"));
         assert!(html.contains("metric-chart-container"));
         assert!(render_metrics_chart_grid_html("Empty", &[]).is_empty());
+    }
+
+    #[test]
+    fn build_audit_events_url_ph_s375() {
+        assert_eq!(
+            build_audit_events_url(10),
+            "/api/enterprise/audit/events?limit=10"
+        );
+    }
+
+    #[test]
+    fn build_admin_overview_url_ph_s376() {
+        assert_eq!(build_admin_overview_url(), "/api/v1/admin/overview");
     }
 }

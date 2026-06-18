@@ -1018,6 +1018,26 @@ fn admin_charts_monitoring_metric_latest_url_wasm_first_ph_s366() {
     assert!(js.contains("poolaiMonitoringMetricLatestUrl"));
 }
 
+#[test]
+fn admin_dashboard_audit_events_url_wasm_first_ph_s375() {
+    let script = include_str!("dashboard.rs");
+    assert!(script.contains("buildAuditEventsUrl"));
+}
+
+#[test]
+fn admin_dashboard_overview_url_wasm_first_ph_s376() {
+    let script = include_str!("dashboard.rs");
+    assert!(script.contains("buildAdminOverviewUrl"));
+}
+
+#[test]
+fn admin_dashboard_wasm_glue_tests_ph_s378() {
+    let dash = include_str!("dashboard.rs");
+    assert!(dash.contains("buildMonitoringActiveAlertsUrl"));
+    assert!(dash.contains("buildAuditEventsUrl"));
+    assert!(dash.contains("buildAdminOverviewUrl"));
+}
+
 #[tokio::test]
 async fn admin_monitoring_ph_s43_ml_metrics_panel() {
     let html = monitoring::admin_monitoring().await.0;

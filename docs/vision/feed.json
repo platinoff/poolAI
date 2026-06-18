@@ -3,6 +3,96 @@
   "items": [
     {
       "category": "closed",
+      "id": "PH-S383",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "INDEX §7 + rust_ratio pointer",
+      "title": "Docs INDEX ratio maintain (docs)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S382",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--min-ratio 0.95 --advisory",
+      "title": "Ratio hold advisory snapshot (ops)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S381",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--check` green",
+      "title": "poolai-vision-sync drift gate (ops)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S380",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "INDEX/HANDOFF/NEXT/STABLE/GALAXY",
+      "title": "Docs canon sync band (docs)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S379",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "rust_ratio.json` sprint zriz 94.33%",
+      "title": "Rust ratio loc-audit refresh (ops)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S378",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "overview + audit wasm-first gates",
+      "title": "Admin dashboard wasm glue tests (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S377",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "/metrics` export shape",
+      "title": "Stand smoke trust gate min threshold (tests)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S376",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "buildAdminOverviewUrl` wasm glue",
+      "title": "Admin dashboard overview URL wasm (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S375",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "buildAuditEventsUrl` wasm glue",
+      "title": "Admin dashboard audit events wasm (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S374",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_trust_gate_min_threshold` on `/metrics",
+      "title": "Galaxy trust gate min threshold metric (code)"
+    },
+    {
+      "category": "closed",
       "id": "PH-S373",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
@@ -13,96 +103,6 @@
     {
       "category": "closed",
       "id": "PH-S372",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--min-ratio 0.95 --advisory",
-      "title": "Ratio hold advisory snapshot (ops)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S371",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--check` green",
-      "title": "poolai-vision-sync drift gate (ops)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S370",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "INDEX/HANDOFF/NEXT/STABLE/GALAXY",
-      "title": "Docs canon sync band (docs)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S369",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "rust_ratio.json` sprint zriz 94.32%",
-      "title": "Rust ratio loc-audit refresh (ops)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S368",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "dashboard + metric latest wasm-first gates",
-      "title": "Admin wasm glue tests (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S367",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "/metrics` export shape",
-      "title": "Stand smoke trust not applicable (tests)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S366",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "buildMonitoringMetricLatestUrl` wasm glue",
-      "title": "Admin metric latest URL wasm (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S365",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "buildMonitoringActiveAlertsUrl` on dashboard load",
-      "title": "Admin dashboard active alerts wasm (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S364",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_trust_payout_not_applicable_total` on local origin",
-      "title": "Galaxy trust payout not applicable metric (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S363",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "INDEX §7 + rust_ratio pointer",
-      "title": "Docs INDEX ratio maintain (docs)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S362",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",

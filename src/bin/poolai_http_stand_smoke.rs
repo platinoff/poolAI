@@ -756,6 +756,7 @@ const GALAXY_TRUST_PAYOUT_METRICS: &[&str] = &[
     "galaxy_trust_payout_held_total",
     "galaxy_trust_payout_not_applicable_total",
     "galaxy_trust_score",
+    "galaxy_trust_gate_min_threshold",
 ];
 
 fn metrics_text_has_trust_payout_counters(body: &str) -> Result<(), String> {
@@ -1865,6 +1866,9 @@ mod tests {
             "# HELP galaxy_trust_score Galaxy last trust score\n",
             "# TYPE galaxy_trust_score gauge\n",
             "galaxy_trust_score 0\n",
+            "# HELP galaxy_trust_gate_min_threshold Galaxy configured minimum trust 0..=100 for edge auto payout (PH-S374)\n",
+            "# TYPE galaxy_trust_gate_min_threshold gauge\n",
+            "galaxy_trust_gate_min_threshold 40\n",
         );
         metrics_text_has_trust_payout_counters(sample).expect("sample export");
     }

@@ -8,15 +8,15 @@ use poolai_ui_core::api_error::{api_error_detail_from_body, format_fetch_error};
 use poolai_ui_core::format::escape_html;
 use poolai_ui_core::lease::lease_state;
 use poolai_ui_core::ml::{
-    build_alert_rules_url, build_metric_history_url, build_metric_history_url_with_hours,
-    build_metrics_window_url, build_metrics_window_url_with_hours, build_ml_pipeline_demo_url,
-    build_ml_pipelines_url, build_monitoring_active_alerts_url,
-    build_monitoring_alert_acknowledge_url, build_monitoring_alerts_url,
-    build_monitoring_dashboards_url, build_monitoring_metric_latest_url, chart_scale,
-    collect_ml_sparkline_series, flatten_ml_step_rows, format_ml_metric_summary,
-    group_metrics_by_name, metric_point_values, parse_ml_numeric, render_line_chart_empty_html,
-    render_line_chart_html, render_metrics_chart_grid_html, render_sparkline_html,
-    sanitize_chart_id,
+    build_admin_overview_url, build_alert_rules_url, build_audit_events_url,
+    build_metric_history_url, build_metric_history_url_with_hours, build_metrics_window_url,
+    build_metrics_window_url_with_hours, build_ml_pipeline_demo_url, build_ml_pipelines_url,
+    build_monitoring_active_alerts_url, build_monitoring_alert_acknowledge_url,
+    build_monitoring_alerts_url, build_monitoring_dashboards_url,
+    build_monitoring_metric_latest_url, chart_scale, collect_ml_sparkline_series,
+    flatten_ml_step_rows, format_ml_metric_summary, group_metrics_by_name, metric_point_values,
+    parse_ml_numeric, render_line_chart_empty_html, render_line_chart_html,
+    render_metrics_chart_grid_html, render_sparkline_html, sanitize_chart_id,
 };
 use poolai_ui_core::modal::{admin_dynamic_modal_html, trap_tab_action, MODAL_FOCUSABLE_SELECTOR};
 use poolai_ui_core::pricing::{format_unix_secs, format_usd_micro};
@@ -359,6 +359,16 @@ pub fn build_monitoring_alert_acknowledge_url_wasm(alert_id: &str) -> String {
 #[wasm_bindgen(js_name = buildMonitoringMetricLatestUrl)]
 pub fn build_monitoring_metric_latest_url_wasm(metric_name: &str, limit: u32) -> String {
     build_monitoring_metric_latest_url(metric_name, limit)
+}
+
+#[wasm_bindgen(js_name = buildAuditEventsUrl)]
+pub fn build_audit_events_url_wasm(limit: u32) -> String {
+    build_audit_events_url(limit)
+}
+
+#[wasm_bindgen(js_name = buildAdminOverviewUrl)]
+pub fn build_admin_overview_url_wasm() -> String {
+    build_admin_overview_url()
 }
 
 #[wasm_bindgen(js_name = groupMetricsByName)]
