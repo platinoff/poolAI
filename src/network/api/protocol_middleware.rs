@@ -4,6 +4,7 @@ use axum::http::{Request, StatusCode};
 use axum::middleware::Next;
 use axum::response::{IntoResponse, Response};
 
+use crate::grid::galaxy_protocol_negotiation_metrics::record_protocol_negotiation_rejected;
 use crate::grid::protocol_compat::{negotiate, CompatStatus, MIN_COORDINATOR_VERSION_DOCS_URL};
 use crate::network::json_errors::api_json_error;
 
@@ -62,6 +63,7 @@ pub async fn protocol_header_middleware(req: Request<Body>, next: Next) -> Respo
     let negotiation = negotiate(worker_protocol);
 
     if negotiation.status == CompatStatus::Unsupported {
+        record_protocol_negotiation_rejected();
         let (status, body) = api_json_error(
             "protocol_unsupported",
             format!(

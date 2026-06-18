@@ -1,6 +1,7 @@
 //! ML pipeline metric helpers — parity with `admin_charts.js` (PH-S43, PH-S155, PH-S275, PH-S284, PH-S287, PH-S294, PH-S297, PH-S314, PH-S317, PH-S324, PH-S327, PH-S334, PH-S337, PH-S344, PH-S347, PH-S353, PH-S375, PH-S376).
 
 use crate::format::escape_html;
+use crate::table::{empty_state_html, render_table_html};
 use chrono::{DateTime, Duration, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -497,6 +498,78 @@ pub fn build_ml_pipeline_demo_url() -> String {
     "/api/enterprise/ai-ml/pipeline/demo".to_string()
 }
 
+/// Mirrors `poolaiRenderMlPipelineMetricsPanel` (PH-S43, PH-S450 wasm-first).
+pub fn render_ml_pipeline_metrics_panel_html(
+    pipelines_json: &str,
+    title: &str,
+    empty_message: &str,
+    empty_hint: &str,
+    columns_json: &str,
+    avg_label: &str,
+) -> String {
+    let pipelines: Vec<Value> = serde_json::from_str(pipelines_json).unwrap_or_default();
+    let rows = flatten_ml_step_rows(&pipelines);
+    if rows.is_empty() {
+        return format!(
+            r#"<div class="admin-card ml-pipeline-metrics-panel"><h3>{}</h3>{}</div>"#,
+            escape_html(title),
+            empty_state_html(empty_message, Some(empty_hint), "🧠", None)
+        );
+    }
+    let series = collect_ml_sparkline_series(&rows);
+    let spark_parts: Vec<String> = series
+        .iter()
+        .take(6)
+        .filter_map(|(label, values)| {
+            if values.is_empty() {
+                None
+            } else {
+                Some(render_sparkline_html(label, values, 220.0, 44.0, avg_label))
+            }
+        })
+        .collect();
+    let table_rows: Vec<Vec<String>> = rows
+        .iter()
+        .map(|r| {
+            let status_cls = match r.step_status.to_ascii_lowercase().as_str() {
+                "completed" => "active",
+                "failed" => "error",
+                _ => "warning",
+            };
+            vec![
+                escape_html(&r.pipeline_name),
+                escape_html(&r.step_id),
+                format!(r#"<code>{}</code>"#, escape_html(&r.step_kind)),
+                format!(
+                    r#"<span class="status-badge {status_cls}">{}</span>"#,
+                    escape_html(if r.step_status.is_empty() {
+                        "—"
+                    } else {
+                        &r.step_status
+                    })
+                ),
+                escape_html(&format_ml_metric_summary(&r.output)),
+            ]
+        })
+        .collect();
+    let rows_json = serde_json::to_string(&table_rows).unwrap_or_else(|_| "[]".into());
+    let table_html = render_table_html(columns_json, &rows_json, "{}");
+    format!(
+        r#"<div class="admin-card ml-pipeline-metrics-panel"><h3>{} ({})</h3>{}{}</div>"#,
+        escape_html(title),
+        rows.len(),
+        if spark_parts.is_empty() {
+            String::new()
+        } else {
+            format!(
+                r#"<div class="metrics-sparklines-grid ml-step-sparklines">{}</div>"#,
+                spark_parts.join("")
+            )
+        },
+        table_html
+    )
+}
+
 /// Mirrors `poolaiFetchMonitoringAlerts` URL (PH-S344).
 pub fn build_monitoring_alerts_url(limit: u32, acknowledged: Option<bool>) -> String {
     let mut url = format!("/api/enterprise/monitoring/alerts?limit={limit}");
@@ -744,6 +817,20 @@ mod tests {
         assert!(url.starts_with("/api/enterprise/monitoring/metrics?"));
         assert!(!url.contains("metric="));
         assert!(url.contains("limit=60"));
+    }
+
+    #[test]
+    fn render_ml_pipeline_metrics_panel_html_ph_s450() {
+        let html = render_ml_pipeline_metrics_panel_html(
+            "[]",
+            "ML Pipeline Step Metrics",
+            "No ML pipeline step metrics yet",
+            "Run the demo pipeline",
+            r#"["Pipeline","Step","Kind","Status","Metrics"]"#,
+            "Avg: ",
+        );
+        assert!(html.contains("ml-pipeline-metrics-panel"));
+        assert!(html.contains("No ML pipeline step metrics yet"));
     }
 
     #[test]

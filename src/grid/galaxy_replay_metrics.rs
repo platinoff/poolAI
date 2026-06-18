@@ -5,6 +5,9 @@
 use std::sync::atomic::{AtomicU64, Ordering};
 
 use crate::grid::galaxy_settlement::SettlementStatus;
+use crate::grid::galaxy_verification_replay::{
+    build_verification_replay_record, GalaxyVerificationReplayRecord,
+};
 
 /// Current replay verifications pending coordinator verdict (mirrored on `GET /metrics`).
 pub const METRIC_REPLAY_PENDING: &str = "galaxy_replay_pending";
@@ -26,7 +29,11 @@ static REPLAY_PENDING: AtomicU64 = AtomicU64::new(0);
 static REPLAY_PENDING_SCHEDULED_TOTAL: AtomicU64 = AtomicU64::new(0);
 static REPLAY_PENDING_RESOLVED_TOTAL: AtomicU64 = AtomicU64::new(0);
 static REPLAY_EVALUATIONS_TOTAL: AtomicU64 = AtomicU64::new(0);
+/// Replay verification structured records emitted (PH-S447).
+pub const METRIC_VERIFICATION_REPLAY_RECORD_TOTAL: &str = "galaxy_verification_replay_record_total";
+
 static REPLAY_VERIFICATION_ENQUEUE_TOTAL: AtomicU64 = AtomicU64::new(0);
+static VERIFICATION_REPLAY_RECORD_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// Schedule one replay verification hold (mismatch / explicit flag).
 pub fn record_replay_pending_scheduled() {
@@ -66,6 +73,7 @@ pub fn reset_replay_pending_metrics_for_test() {
     REPLAY_PENDING_RESOLVED_TOTAL.store(0, Ordering::Relaxed);
     REPLAY_EVALUATIONS_TOTAL.store(0, Ordering::Relaxed);
     REPLAY_VERIFICATION_ENQUEUE_TOTAL.store(0, Ordering::Relaxed);
+    VERIFICATION_REPLAY_RECORD_TOTAL.store(0, Ordering::Relaxed);
 }
 
 /// Record one replay verification enqueue stub (PH-S438).
@@ -77,13 +85,29 @@ pub fn replay_verification_enqueue_total() -> u64 {
     REPLAY_VERIFICATION_ENQUEUE_TOTAL.load(Ordering::Relaxed)
 }
 
+pub fn verification_replay_record_total() -> u64 {
+    VERIFICATION_REPLAY_RECORD_TOTAL.load(Ordering::Relaxed)
+}
+
+/// Build structured replay record and bump emit counter (PH-S447).
+pub fn emit_verification_replay_record(
+    primary_job_id: &str,
+    metrics: Option<&serde_json::Value>,
+) -> GalaxyVerificationReplayRecord {
+    let rec = build_verification_replay_record(primary_job_id, metrics);
+    VERIFICATION_REPLAY_RECORD_TOTAL.fetch_add(1, Ordering::Relaxed);
+    rec
+}
+
 /// Enqueue replay verification stub when mismatch/replay flags schedule hold (PH-S438).
 pub fn enqueue_replay_verification(
+    primary_job_id: &str,
     metrics: Option<&serde_json::Value>,
     settlement_status: SettlementStatus,
 ) {
     if should_schedule_replay_pending(metrics, settlement_status) {
         record_replay_verification_enqueue();
+        let _ = emit_verification_replay_record(primary_job_id, metrics);
     }
 }
 
@@ -137,6 +161,7 @@ fn should_schedule_replay_pending(
 
 /// Grid result path stub: track replay pending gauge from metrics + settlement (PH-S176).
 pub fn evaluate_result_replay_pending(
+    primary_job_id: &str,
     metrics: Option<&serde_json::Value>,
     settlement_status: SettlementStatus,
 ) {
@@ -147,7 +172,7 @@ pub fn evaluate_result_replay_pending(
     }
     if should_schedule_replay_pending(metrics, settlement_status) {
         record_replay_pending_scheduled();
-        record_replay_verification_enqueue();
+        enqueue_replay_verification(primary_job_id, metrics, settlement_status);
     }
 }
 
@@ -161,11 +186,13 @@ mod tests {
         let _lock = replay_metrics_test_lock();
         reset_replay_pending_metrics_for_test();
         evaluate_result_replay_pending(
+            "job-1",
             Some(&json!({ "verification_verdict": "mismatch" })),
             SettlementStatus::Cleared,
         );
         assert_eq!(replay_pending(), 1);
         assert_eq!(replay_verification_enqueue_total(), 1);
+        assert_eq!(verification_replay_record_total(), 1);
         reset_replay_pending_metrics_for_test();
     }
 
@@ -195,6 +222,7 @@ mod tests {
         record_replay_pending_scheduled();
         record_replay_pending_scheduled();
         evaluate_result_replay_pending(
+            "job-1",
             Some(&json!({ "replay_verdict": "accepted" })),
             SettlementStatus::Cleared,
         );
@@ -207,10 +235,12 @@ mod tests {
         let _lock = replay_metrics_test_lock();
         reset_replay_pending_metrics_for_test();
         evaluate_result_replay_pending(
+            "job-1",
             Some(&json!({ "verification_verdict": "mismatch" })),
             SettlementStatus::Cleared,
         );
         evaluate_result_replay_pending(
+            "job-1",
             Some(&json!({ "replay_verdict": "accepted" })),
             SettlementStatus::Cleared,
         );

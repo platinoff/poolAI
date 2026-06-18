@@ -19,7 +19,11 @@ use std::collections::HashMap;
 use crate::core::discovery_types::{PeerCapabilities, PeerInfo};
 use crate::core::error::{AppError, ErrorContext};
 use crate::core::state::ApiContext;
+use crate::grid::galaxy_capability_doc::{
+    parse_capability_document, validate_capability_document, CapabilityDocParseError,
+};
 use crate::grid::galaxy_network_profile::normalize_register_metadata;
+use crate::grid::galaxy_protocol_negotiation_metrics::record_protocol_negotiation_rejected;
 use crate::grid::protocol_compat::{negotiate, CompatStatus, MIN_COORDINATOR_VERSION_DOCS_URL};
 use crate::grid::GridEnvelope;
 use crate::network::api::common::HttpAppError;
@@ -58,6 +62,9 @@ struct RegisterRemotePeerRequest {
     signature_fingerprint: Option<String>,
     #[serde(default)]
     capabilities: PeerCapabilities,
+    /// Signed capability document stub (Galaxy §6.6, PH-S448).
+    #[serde(default)]
+    capability_document: Option<Value>,
     #[serde(default)]
     metadata: HashMap<String, Value>,
 }
@@ -235,6 +242,7 @@ async fn register_remote_handler(
     let peer_id = payload.peer_id.clone();
 
     if negotiation.status == CompatStatus::Unsupported {
+        record_protocol_negotiation_rejected();
         return (
             StatusCode::FORBIDDEN,
             Json(register_compat_response(peer_id, &negotiation, false)),
@@ -248,6 +256,21 @@ async fn register_remote_handler(
             return discovery_validation("register_remote", e.message).into_response();
         }
     };
+    if let Some(doc_val) = &payload.capability_document {
+        let doc = match parse_capability_document(doc_val) {
+            Ok(d) => d,
+            Err(CapabilityDocParseError { message }) => {
+                return discovery_validation("register_remote", message).into_response();
+            }
+        };
+        if let Err(CapabilityDocParseError { message }) = validate_capability_document(&doc) {
+            return discovery_validation("register_remote", message).into_response();
+        }
+        metadata.insert(
+            "capability_document".to_string(),
+            serde_json::to_string(&doc).unwrap_or_else(|_| doc_val.to_string()),
+        );
+    }
     if let Some(build_id) = payload.build_id {
         metadata.insert("build_id".to_string(), build_id);
     }

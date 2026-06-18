@@ -429,6 +429,27 @@ function poolaiCollectMlSparklineSeries(rows) {
  */
 function poolaiRenderMlPipelineMetricsPanel(pipelines, opts) {
   opts = opts || {};
+  var wasm = poolaiChartsWasm();
+  if (wasm && typeof wasm.renderMlPipelineMetricsPanel === 'function') {
+    return wasm.renderMlPipelineMetricsPanel(
+      JSON.stringify(pipelines || []),
+      opts.title || poolaiChartT('admin.mon.mlTitle', 'ML Pipeline Step Metrics'),
+      opts.emptyMessage ||
+        poolaiChartT('admin.mon.mlEmpty', 'No ML pipeline step metrics yet'),
+      poolaiChartT(
+        'admin.mon.mlEmptyHint',
+        'Run the demo pipeline or execute a pipeline via the AI/ML API.',
+      ),
+      JSON.stringify([
+        poolaiChartT('admin.mon.mlCol.pipeline', 'Pipeline'),
+        poolaiChartT('admin.mon.mlCol.step', 'Step'),
+        poolaiChartT('admin.mon.mlCol.kind', 'Kind'),
+        poolaiChartT('admin.mon.mlCol.status', 'Status'),
+        poolaiChartT('admin.mon.mlCol.metrics', 'Metrics'),
+      ]),
+      poolaiChartT('admin.charts.avg', 'Avg: '),
+    );
+  }
   var rows = poolaiFlattenMlStepRows(pipelines);
   var title =
     opts.title ||

@@ -1832,11 +1832,17 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_admin_dom_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_capability_doc_rs"
     }
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S443",
+  "last_sprint_closed": "PH-S453",
   "layers": [
     {
       "id": "L0",
@@ -7729,9 +7735,16 @@
       "label": "admin_dom.rs",
       "layer": "L4",
       "path": "crates/poolai-ui-core/src/admin_dom.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_capability_doc_rs",
+      "label": "galaxy_capability_doc.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_capability_doc.rs"
     }
   ],
-  "revision": 230,
+  "revision": 232,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -11134,6 +11147,96 @@
       "row": 378,
       "status": "closed",
       "title": "Ops close band: loc-audit + docs + vision-sync"
+    },
+    {
+      "acceptance": "fetch_seed_shards_hook` + `galaxy_prefetch_seed_fetch_*` metrics; unit tests",
+      "deps": "Galaxy §5.5, roadmap §4",
+      "id": "PH-S444",
+      "open": false,
+      "row": 379,
+      "status": "closed",
+      "title": "Live prefetch memory fetch stub"
+    },
+    {
+      "acceptance": "locality_unsatisfied` + `galaxy_locality_unsatisfied_total`; unit tests",
+      "deps": "Galaxy §5.6",
+      "id": "PH-S445",
+      "open": false,
+      "row": 380,
+      "status": "closed",
+      "title": "Strict-locality grid ingest gate"
+    },
+    {
+      "acceptance": "PrefetchTrigger::CoAccessGraph` + `plan_co_access_prefetch`; metric + unit tests",
+      "deps": "Galaxy §5.5",
+      "id": "PH-S446",
+      "open": false,
+      "row": 381,
+      "status": "closed",
+      "title": "Co-access graph speculative prefetch"
+    },
+    {
+      "acceptance": "GalaxyVerificationReplayRecord` on mismatch enqueue; unit tests",
+      "deps": "Galaxy §6.3",
+      "id": "PH-S447",
+      "open": false,
+      "row": 382,
+      "status": "closed",
+      "title": "Verification replay wire DTO"
+    },
+    {
+      "acceptance": "optional `capability_document` on register-remote; integration tests",
+      "deps": "Galaxy §6.6",
+      "id": "PH-S448",
+      "open": false,
+      "row": 383,
+      "status": "closed",
+      "title": "Capability document register-remote wire"
+    },
+    {
+      "acceptance": "poolai_protocol_negotiation_rejected_total` middleware + `/metrics",
+      "deps": "Galaxy §9.8",
+      "id": "PH-S449",
+      "open": false,
+      "row": 384,
+      "status": "closed",
+      "title": "Protocol negotiation rejected metric"
+    },
+    {
+      "acceptance": "renderMlPipelineMetricsPanel` wasm; slim `admin_charts.js",
+      "deps": "RUST_RATIO §5.13",
+      "id": "PH-S450",
+      "open": false,
+      "row": 385,
+      "status": "closed",
+      "title": "ML pipeline metrics panel wasm"
+    },
+    {
+      "acceptance": "/metrics` export shape seed-fetch/co-access/locality/protocol/replay record",
+      "deps": "PH-S444…S449",
+      "id": "PH-S451",
+      "open": false,
+      "row": 386,
+      "status": "closed",
+      "title": "Stand smoke horizon wire band (S444–S449)"
+    },
+    {
+      "acceptance": "rust_ratio.json` 94.37%; FM/HANDOFF/NEXT",
+      "deps": "§5.12 fallback",
+      "id": "PH-S452",
+      "open": false,
+      "row": 387,
+      "status": "closed",
+      "title": "Ops close band: loc-audit + docs canon"
+    },
+    {
+      "acceptance": "poolai-vision-sync`; FM rev = manifest",
+      "deps": "ops",
+      "id": "PH-S453",
+      "open": false,
+      "row": 388,
+      "status": "closed",
+      "title": "Vision-sync + `--check"
     }
   ],
   "sprint_queue_open_count": 0,

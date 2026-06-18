@@ -28,15 +28,19 @@ use crate::grid::galaxy_locality::{
     METRIC_LOCALITY_RANK_SKIP_TOTAL, METRIC_SHARD_LOCAL_HIT_RATIO,
 };
 use crate::grid::galaxy_prefetch_metrics::{
-    prefetch_bytes_total, prefetch_complete_total, prefetch_enqueue_total, prefetch_hot_skip_total,
+    locality_unsatisfied_total, prefetch_bytes_total, prefetch_co_access_total,
+    prefetch_complete_total, prefetch_enqueue_total, prefetch_hot_skip_total,
     prefetch_ingest_total, prefetch_lease_acquired_total, prefetch_plan_total,
-    prefetch_planned_shards_total, prefetch_seed_pull_total, prefetch_skip_ingest_total,
-    prefetch_strict_mode_total, prefetch_wait_ms_total, METRIC_PREFETCH_BYTES_TOTAL,
-    METRIC_PREFETCH_COMPLETE_TOTAL, METRIC_PREFETCH_ENQUEUE_TOTAL, METRIC_PREFETCH_HOT_SKIP_TOTAL,
-    METRIC_PREFETCH_INGEST_TOTAL, METRIC_PREFETCH_LEASE_ACQUIRED_TOTAL,
-    METRIC_PREFETCH_PLANNED_SHARDS_TOTAL, METRIC_PREFETCH_PLAN_TOTAL,
-    METRIC_PREFETCH_SEED_PULL_TOTAL, METRIC_PREFETCH_SKIP_INGEST_TOTAL,
-    METRIC_PREFETCH_STRICT_MODE_TOTAL, METRIC_PREFETCH_WAIT_MS_TOTAL,
+    prefetch_planned_shards_total, prefetch_seed_fetch_miss_total, prefetch_seed_fetch_total,
+    prefetch_seed_pull_total, prefetch_skip_ingest_total, prefetch_strict_mode_total,
+    prefetch_wait_ms_total, METRIC_LOCALITY_UNSATISFIED_TOTAL, METRIC_PREFETCH_BYTES_TOTAL,
+    METRIC_PREFETCH_COMPLETE_TOTAL, METRIC_PREFETCH_CO_ACCESS_TOTAL, METRIC_PREFETCH_ENQUEUE_TOTAL,
+    METRIC_PREFETCH_HOT_SKIP_TOTAL, METRIC_PREFETCH_INGEST_TOTAL,
+    METRIC_PREFETCH_LEASE_ACQUIRED_TOTAL, METRIC_PREFETCH_PLANNED_SHARDS_TOTAL,
+    METRIC_PREFETCH_PLAN_TOTAL, METRIC_PREFETCH_SEED_FETCH_MISS_TOTAL,
+    METRIC_PREFETCH_SEED_FETCH_TOTAL, METRIC_PREFETCH_SEED_PULL_TOTAL,
+    METRIC_PREFETCH_SKIP_INGEST_TOTAL, METRIC_PREFETCH_STRICT_MODE_TOTAL,
+    METRIC_PREFETCH_WAIT_MS_TOTAL,
 };
 use crate::grid::galaxy_pricing_oracle::{
     forced_fallback_total, fresh_served_total, last_market_min_usd_micro, last_quote_usd_micro,
@@ -49,11 +53,15 @@ use crate::grid::galaxy_pricing_provider_metrics::{
     METRIC_PROVIDER_CATALOG_HITS_TOTAL, METRIC_PROVIDER_CATALOG_LOOKUPS_TOTAL,
     METRIC_PROVIDER_ERRORS_TOTAL,
 };
+use crate::grid::galaxy_protocol_negotiation_metrics::{
+    protocol_negotiation_rejected_total, METRIC_PROTOCOL_NEGOTIATION_REJECTED_TOTAL,
+};
 use crate::grid::galaxy_replay_metrics::{
     replay_evaluations_total, replay_pending, replay_pending_resolved_total,
     replay_pending_scheduled_total, replay_verification_enqueue_total,
-    METRIC_REPLAY_EVALUATIONS_TOTAL, METRIC_REPLAY_PENDING, METRIC_REPLAY_PENDING_RESOLVED_TOTAL,
-    METRIC_REPLAY_PENDING_SCHEDULED_TOTAL, METRIC_REPLAY_VERIFICATION_ENQUEUE_TOTAL,
+    verification_replay_record_total, METRIC_REPLAY_EVALUATIONS_TOTAL, METRIC_REPLAY_PENDING,
+    METRIC_REPLAY_PENDING_RESOLVED_TOTAL, METRIC_REPLAY_PENDING_SCHEDULED_TOTAL,
+    METRIC_REPLAY_VERIFICATION_ENQUEUE_TOTAL, METRIC_VERIFICATION_REPLAY_RECORD_TOTAL,
 };
 use crate::grid::galaxy_replication_metrics::{
     replication_enqueue_total, replication_executor_enqueue_total, replication_strict_total,
@@ -135,6 +143,11 @@ pub struct PoolAiPrometheus {
     galaxy_prefetch_skip_ingest_total: IntGauge,
     galaxy_prefetch_seed_pull_total: IntGauge,
     galaxy_prefetch_lease_acquired_total: IntGauge,
+    galaxy_prefetch_seed_fetch_total: IntGauge,
+    galaxy_prefetch_seed_fetch_miss_total: IntGauge,
+    galaxy_prefetch_co_access_total: IntGauge,
+    galaxy_locality_unsatisfied_total: IntGauge,
+    poolai_protocol_negotiation_rejected_total: IntGauge,
     galaxy_locality_rank_ingest_total: IntGauge,
     galaxy_locality_rank_miss_total: IntGauge,
     galaxy_locality_rank_empty_workers_total: IntGauge,
@@ -153,6 +166,7 @@ pub struct PoolAiPrometheus {
     galaxy_replay_pending_resolved_total: IntGauge,
     galaxy_replay_evaluations_total: IntGauge,
     galaxy_replay_verification_enqueue_total: IntGauge,
+    galaxy_verification_replay_record_total: IntGauge,
     galaxy_settlement_pending_verification_total: IntGauge,
     galaxy_settlement_cleared_total: IntGauge,
     galaxy_settlement_not_applicable_total: IntGauge,
@@ -566,6 +580,51 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_prefetch_lease_acquired_total.clone()))
         .expect("register galaxy_prefetch_lease_acquired_total");
 
+    let galaxy_prefetch_seed_fetch_total = IntGauge::with_opts(Opts::new(
+        METRIC_PREFETCH_SEED_FETCH_TOTAL,
+        "Galaxy prefetch memory-layer seed fetch hits (PH-S444)",
+    ))
+    .expect(METRIC_PREFETCH_SEED_FETCH_TOTAL);
+    registry
+        .register(Box::new(galaxy_prefetch_seed_fetch_total.clone()))
+        .expect("register galaxy_prefetch_seed_fetch_total");
+
+    let galaxy_prefetch_seed_fetch_miss_total = IntGauge::with_opts(Opts::new(
+        METRIC_PREFETCH_SEED_FETCH_MISS_TOTAL,
+        "Galaxy prefetch memory-layer seed fetch misses (PH-S444)",
+    ))
+    .expect(METRIC_PREFETCH_SEED_FETCH_MISS_TOTAL);
+    registry
+        .register(Box::new(galaxy_prefetch_seed_fetch_miss_total.clone()))
+        .expect("register galaxy_prefetch_seed_fetch_miss_total");
+
+    let galaxy_prefetch_co_access_total = IntGauge::with_opts(Opts::new(
+        METRIC_PREFETCH_CO_ACCESS_TOTAL,
+        "Galaxy co-access graph speculative prefetch plans (PH-S446)",
+    ))
+    .expect(METRIC_PREFETCH_CO_ACCESS_TOTAL);
+    registry
+        .register(Box::new(galaxy_prefetch_co_access_total.clone()))
+        .expect("register galaxy_prefetch_co_access_total");
+
+    let galaxy_locality_unsatisfied_total = IntGauge::with_opts(Opts::new(
+        METRIC_LOCALITY_UNSATISFIED_TOTAL,
+        "Galaxy strict locality ingest rejections (PH-S445)",
+    ))
+    .expect(METRIC_LOCALITY_UNSATISFIED_TOTAL);
+    registry
+        .register(Box::new(galaxy_locality_unsatisfied_total.clone()))
+        .expect("register galaxy_locality_unsatisfied_total");
+
+    let poolai_protocol_negotiation_rejected_total = IntGauge::with_opts(Opts::new(
+        METRIC_PROTOCOL_NEGOTIATION_REJECTED_TOTAL,
+        "Unsupported protocol negotiation rejections (PH-S449)",
+    ))
+    .expect(METRIC_PROTOCOL_NEGOTIATION_REJECTED_TOTAL);
+    registry
+        .register(Box::new(poolai_protocol_negotiation_rejected_total.clone()))
+        .expect("register poolai_protocol_negotiation_rejected_total");
+
     let galaxy_locality_rank_ingest_total = IntGauge::with_opts(Opts::new(
         METRIC_LOCALITY_RANK_INGEST_TOTAL,
         "Galaxy locality rank invocations on grid job ingest (PH-S295)",
@@ -732,6 +791,15 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_replay_verification_enqueue_total.clone()))
         .expect("register galaxy_replay_verification_enqueue_total");
 
+    let galaxy_verification_replay_record_total = IntGauge::with_opts(Opts::new(
+        METRIC_VERIFICATION_REPLAY_RECORD_TOTAL,
+        "Galaxy structured verification replay records emitted (PH-S447)",
+    ))
+    .expect(METRIC_VERIFICATION_REPLAY_RECORD_TOTAL);
+    registry
+        .register(Box::new(galaxy_verification_replay_record_total.clone()))
+        .expect("register galaxy_verification_replay_record_total");
+
     let galaxy_settlement_pending_verification_total = IntGauge::with_opts(Opts::new(
         METRIC_SETTLEMENT_PENDING_VERIFICATION_TOTAL,
         "Galaxy settlement holds pending verification on grid result path (PH-S178)",
@@ -866,6 +934,11 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_prefetch_skip_ingest_total,
         galaxy_prefetch_seed_pull_total,
         galaxy_prefetch_lease_acquired_total,
+        galaxy_prefetch_seed_fetch_total,
+        galaxy_prefetch_seed_fetch_miss_total,
+        galaxy_prefetch_co_access_total,
+        galaxy_locality_unsatisfied_total,
+        poolai_protocol_negotiation_rejected_total,
         galaxy_locality_rank_ingest_total,
         galaxy_locality_rank_miss_total,
         galaxy_locality_rank_empty_workers_total,
@@ -884,6 +957,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_replay_pending_resolved_total,
         galaxy_replay_evaluations_total,
         galaxy_replay_verification_enqueue_total,
+        galaxy_verification_replay_record_total,
         galaxy_settlement_pending_verification_total,
         galaxy_settlement_cleared_total,
         galaxy_settlement_not_applicable_total,
@@ -985,6 +1059,16 @@ pub fn refresh_galaxy_prefetch_gauges() {
         .set(prefetch_seed_pull_total() as i64);
     prom.galaxy_prefetch_lease_acquired_total
         .set(prefetch_lease_acquired_total() as i64);
+    prom.galaxy_prefetch_seed_fetch_total
+        .set(prefetch_seed_fetch_total() as i64);
+    prom.galaxy_prefetch_seed_fetch_miss_total
+        .set(prefetch_seed_fetch_miss_total() as i64);
+    prom.galaxy_prefetch_co_access_total
+        .set(prefetch_co_access_total() as i64);
+    prom.galaxy_locality_unsatisfied_total
+        .set(locality_unsatisfied_total() as i64);
+    prom.poolai_protocol_negotiation_rejected_total
+        .set(protocol_negotiation_rejected_total() as i64);
 }
 
 /// Mirror in-process verification counters into Prometheus gauges (scrape snapshot).
@@ -1017,6 +1101,8 @@ pub fn refresh_galaxy_verification_gauges() {
         .set(replay_evaluations_total() as i64);
     prom.galaxy_replay_verification_enqueue_total
         .set(replay_verification_enqueue_total() as i64);
+    prom.galaxy_verification_replay_record_total
+        .set(verification_replay_record_total() as i64);
     prom.galaxy_settlement_pending_verification_total
         .set(settlement_pending_verification_total() as i64);
     prom.galaxy_settlement_cleared_total

@@ -19,7 +19,8 @@ use poolai_ui_core::ml::{
     build_monitoring_metric_latest_url, chart_scale, collect_ml_sparkline_series,
     flatten_ml_step_rows, format_ml_metric_summary, group_metrics_by_name, metric_point_values,
     parse_ml_numeric, render_line_chart_empty_html, render_line_chart_html,
-    render_metrics_chart_grid_html, render_sparkline_html, sanitize_chart_id,
+    render_metrics_chart_grid_html, render_ml_pipeline_metrics_panel_html, render_sparkline_html,
+    sanitize_chart_id,
 };
 use poolai_ui_core::modal::{admin_dynamic_modal_html, trap_tab_action, MODAL_FOCUSABLE_SELECTOR};
 use poolai_ui_core::pricing::{format_unix_secs, format_usd_micro};
@@ -342,6 +343,25 @@ pub fn build_ml_pipelines_url_wasm() -> String {
 #[wasm_bindgen(js_name = buildMlPipelineDemoUrl)]
 pub fn build_ml_pipeline_demo_url_wasm() -> String {
     build_ml_pipeline_demo_url()
+}
+
+#[wasm_bindgen(js_name = renderMlPipelineMetricsPanel)]
+pub fn render_ml_pipeline_metrics_panel_wasm(
+    pipelines_json: &str,
+    title: &str,
+    empty_message: &str,
+    empty_hint: &str,
+    columns_json: &str,
+    avg_label: &str,
+) -> String {
+    render_ml_pipeline_metrics_panel_html(
+        pipelines_json,
+        title,
+        empty_message,
+        empty_hint,
+        columns_json,
+        avg_label,
+    )
 }
 
 #[wasm_bindgen(js_name = buildMonitoringAlertsUrl)]

@@ -14,6 +14,7 @@ pub mod galaxy_network_profile;
 pub mod galaxy_prefetch_metrics;
 pub mod galaxy_pricing_oracle;
 pub mod galaxy_pricing_provider_metrics;
+pub mod galaxy_protocol_negotiation_metrics;
 pub mod galaxy_replay_metrics;
 pub mod galaxy_replication;
 pub mod galaxy_replication_metrics;
@@ -21,19 +22,21 @@ pub mod galaxy_settlement;
 pub mod galaxy_settlement_metrics;
 pub mod galaxy_trust_score;
 pub mod galaxy_verification_metrics;
+pub mod galaxy_verification_replay;
 pub mod galaxy_verify_sampling;
 mod map;
 pub mod protocol_compat;
 
 pub use dispatch::{
-    complete_prefetch_hook, coordinator_merged_seed_inventory, coordinator_seed_inventory_snapshot,
-    enqueue_prefetch_hook, ingest_envelope, ingest_job_locality_rank_stub,
-    ingest_job_prefetch_stub, lease_acquire_prefetch_stub, locality_workers_from_seed_snapshots,
-    noop_prefetch_hook, parse_prefetch_policy_mode, plan_prefetch, resolve_seed_pull_shards,
-    seed_pull_hook, wait_prefetch_hook, GridIngestKind, GridIngestOutcome, PrefetchPlan,
-    PrefetchPolicyConfig, PrefetchPolicyMode, PrefetchTrigger, SeedInventoryEntry,
-    SeedInventoryPeerSnapshot, DEFAULT_PREFETCH_DEADLINE_MS, ENV_LOCALITY_MODE,
-    ENV_PREFETCH_DEADLINE_MS,
+    all_required_shards_hot, check_strict_locality_gate, complete_prefetch_hook,
+    coordinator_merged_seed_inventory, coordinator_seed_inventory_snapshot,
+    default_co_access_graph, enqueue_prefetch_hook, fetch_seed_shards_hook, ingest_envelope,
+    ingest_job_locality_rank_stub, ingest_job_prefetch_stub, lease_acquire_prefetch_stub,
+    locality_workers_from_seed_snapshots, noop_prefetch_hook, parse_prefetch_policy_mode,
+    plan_co_access_prefetch, plan_prefetch, resolve_seed_pull_shards, seed_pull_hook,
+    wait_prefetch_hook, GridIngestKind, GridIngestOutcome, PrefetchPlan, PrefetchPolicyConfig,
+    PrefetchPolicyMode, PrefetchTrigger, SeedInventoryEntry, SeedInventoryPeerSnapshot,
+    DEFAULT_PREFETCH_DEADLINE_MS, ENV_LOCALITY_MODE, ENV_PREFETCH_DEADLINE_MS,
 };
 pub use envelope::{
     GridEnvelope, GridEnvelopeError, GridJobBody, GridMemoryShardBody, GridMessage,
@@ -46,6 +49,13 @@ pub use galaxy_capability_doc::{
 pub use galaxy_network_profile::{
     normalize_register_metadata, parse_network_profile_value, GalaxyEgressPolicy,
     GalaxyNetworkProfile, NetworkProfileParseError,
+};
+pub use galaxy_protocol_negotiation_metrics::{
+    protocol_negotiation_rejected_total, record_protocol_negotiation_rejected,
+    METRIC_PROTOCOL_NEGOTIATION_REJECTED_TOTAL,
+};
+pub use galaxy_verification_replay::{
+    build_verification_replay_record, GalaxyVerificationReplayRecord,
 };
 pub use galaxy_verify_sampling::{
     parse_verify_base_sample_rate, VerifySamplingConfig, DEFAULT_VERIFY_BASE_SAMPLE_RATE,

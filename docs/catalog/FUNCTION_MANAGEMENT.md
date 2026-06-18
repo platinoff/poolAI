@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-18 (PH-S434…S443 ✅ · rust_ratio **94.36%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-18 (PH-S444…S453 ✅ · rust_ratio **94.37%**) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -643,16 +643,26 @@ FM-xxx (з таблиці нижче)
 | 376 | **PH-S441** | Admin metric history query wasm glue | RUST_RATIO §5.13 | `buildMetricHistoryQuery` wasm; slim `admin_charts.js` | **✅** |
 | 377 | **PH-S442** | Stand smoke horizon wire band (S434–S438) | PH-S434…S438 | `/metrics` export shape executor/checker/replay enqueue | **✅** |
 | 378 | **PH-S443** | Ops close band: loc-audit + docs + vision-sync | §5.12 fallback | `rust_ratio.json` **94.36%**; FM/HANDOFF/NEXT; `--check` green | **✅** |
+| 379 | **PH-S444** | Live prefetch memory fetch stub | Galaxy §5.5, roadmap §4 | `fetch_seed_shards_hook` + `galaxy_prefetch_seed_fetch_*` metrics; unit tests | **✅** |
+| 380 | **PH-S445** | Strict-locality grid ingest gate | Galaxy §5.6 | `locality_unsatisfied` + `galaxy_locality_unsatisfied_total`; unit tests | **✅** |
+| 381 | **PH-S446** | Co-access graph speculative prefetch | Galaxy §5.5 | `PrefetchTrigger::CoAccessGraph` + `plan_co_access_prefetch`; metric + unit tests | **✅** |
+| 382 | **PH-S447** | Verification replay wire DTO | Galaxy §6.3 | `GalaxyVerificationReplayRecord` on mismatch enqueue; unit tests | **✅** |
+| 383 | **PH-S448** | Capability document register-remote wire | Galaxy §6.6 | optional `capability_document` on register-remote; integration tests | **✅** |
+| 384 | **PH-S449** | Protocol negotiation rejected metric | Galaxy §9.8 | `poolai_protocol_negotiation_rejected_total` middleware + `/metrics` | **✅** |
+| 385 | **PH-S450** | ML pipeline metrics panel wasm | RUST_RATIO §5.13 | `renderMlPipelineMetricsPanel` wasm; slim `admin_charts.js` | **✅** |
+| 386 | **PH-S451** | Stand smoke horizon wire band (S444–S449) | PH-S444…S449 | `/metrics` export shape seed-fetch/co-access/locality/protocol/replay record | **✅** |
+| 387 | **PH-S452** | Ops close band: loc-audit + docs canon | §5.12 fallback | `rust_ratio.json` **94.37%**; FM/HANDOFF/NEXT | **✅** |
+| 388 | **PH-S453** | Vision-sync + `--check` | ops | `poolai-vision-sync`; FM rev = manifest | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S434…S443 ✅. Vision rev **230**. rust_ratio **94.36%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S444…S453 ✅. Vision rev **232**. rust_ratio **94.37%**.
 
-**Наступна сесія:** **`абракадабра`** (research concept/roadmap → drain 10) **або** один PH-S* · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **`абракадабра`** (project scan → drain) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S262)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-06-18):** PH-S434…S443 ✅ закрито · **0** відкритих · **`абракадабра`** = project scan → §5.12 → drain.
+**Активна смуга (2026-06-18):** PH-S444…S453 ✅ закрито · **0** відкритих · **`абракадабра`** = project scan → §5.12 → drain.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

@@ -20,10 +20,12 @@ use crate::grid::galaxy_locality::{
     LocalityTask, LocalityWorker, DEFAULT_PREFETCH_CROSS_REGION_EGRESS_MB_PER_SHARD,
 };
 use crate::grid::galaxy_prefetch_metrics::{
-    record_prefetch_complete, record_prefetch_enqueue, record_prefetch_ingest,
-    record_prefetch_lease_acquired, record_prefetch_plan, record_prefetch_seed_pull,
-    record_prefetch_skip_ingest, record_prefetch_strict_mode, record_prefetch_wait,
-    DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM, DEFAULT_PREFETCH_BYTES_PER_SHARD_VRAM,
+    record_locality_unsatisfied, record_prefetch_co_access, record_prefetch_complete,
+    record_prefetch_enqueue, record_prefetch_ingest, record_prefetch_lease_acquired,
+    record_prefetch_plan, record_prefetch_seed_fetch, record_prefetch_seed_fetch_miss,
+    record_prefetch_seed_pull, record_prefetch_skip_ingest, record_prefetch_strict_mode,
+    record_prefetch_wait, DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM,
+    DEFAULT_PREFETCH_BYTES_PER_SHARD_VRAM,
 };
 use crate::grid::galaxy_replay_metrics::evaluate_result_replay_pending;
 use crate::grid::galaxy_replication::{
@@ -151,7 +153,11 @@ pub fn coordinator_merged_seed_inventory() -> SeedInventoryEntry {
 }
 
 /// Task-driven prefetch on grid job ingest (PH-S276 stub; no enqueue wire).
-pub fn ingest_job_prefetch_stub(required_shard_ids: &[String], gpu_capable: bool) -> usize {
+pub fn ingest_job_prefetch_stub(
+    required_shard_ids: &[String],
+    gpu_capable: bool,
+    memory: Option<&MemoryShardStore>,
+) -> usize {
     if required_shard_ids.is_empty() {
         record_prefetch_skip_ingest();
         return 0;
@@ -166,7 +172,14 @@ pub fn ingest_job_prefetch_stub(required_shard_ids: &[String], gpu_capable: bool
         gpu_capable,
         &config,
     );
-    let n = complete_prefetch_hook(&plan);
+    let n = complete_prefetch_hook(&plan, memory);
+    if let Some(first) = required_shard_ids.first() {
+        if let Some(co_plan) = plan_co_access_prefetch(first, gpu_capable, &config) {
+            if !co_plan.items.is_empty() {
+                let _ = complete_prefetch_hook(&co_plan, memory);
+            }
+        }
+    }
     n
 }
 
@@ -185,7 +198,7 @@ pub fn lease_acquire_prefetch_stub() -> usize {
         false,
         &config,
     );
-    complete_prefetch_hook(&plan)
+    complete_prefetch_hook(&plan, None)
 }
 
 /// Coordinator worker rows for locality rank stub (PH-S285).
@@ -270,6 +283,7 @@ pub enum PrefetchTrigger {
     JobAdmitted,
     LeaseAcquired,
     ReMigrate,
+    CoAccessGraph,
 }
 
 /// Locality / prefetch strictness (concept ?5.5, ?5.6).
@@ -393,6 +407,9 @@ pub fn plan_prefetch(
     if trigger == PrefetchTrigger::LeaseAcquired {
         record_prefetch_lease_acquired();
     }
+    if trigger == PrefetchTrigger::CoAccessGraph {
+        record_prefetch_co_access();
+    }
     if !items.is_empty() {
         observe_last_cross_region_egress_mb(
             DEFAULT_PREFETCH_CROSS_REGION_EGRESS_MB_PER_SHARD * items.len() as f64,
@@ -427,17 +444,93 @@ pub fn wait_prefetch_hook(plan: &PrefetchPlan) -> u64 {
     plan.deadline_ms
 }
 
-/// Prefetch complete stub (PH-S307): enqueue + wait + complete metric; no live seed pull wire.
+/// Prefetch complete stub (PH-S307): enqueue + wait + complete metric; optional memory fetch (PH-S444).
 #[inline]
-pub fn complete_prefetch_hook(plan: &PrefetchPlan) -> usize {
+pub fn complete_prefetch_hook(plan: &PrefetchPlan, memory: Option<&MemoryShardStore>) -> usize {
     let n = plan.items.len();
     if n > 0 {
         record_prefetch_enqueue(n);
         record_prefetch_wait(n, plan.deadline_ms);
         record_prefetch_complete(n);
         seed_pull_hook(plan);
+        if let Some(store) = memory {
+            fetch_seed_shards_hook(plan, store);
+        }
     }
     n
+}
+
+/// Memory-layer seed fetch stub after inventory resolve (PH-S444).
+pub fn fetch_seed_shards_hook(plan: &PrefetchPlan, memory: &MemoryShardStore) -> usize {
+    let mut hits = 0usize;
+    for item in &plan.items {
+        match memory.get(&item.shard_id) {
+            Ok(Some(_)) => hits += 1,
+            Ok(None) => record_prefetch_seed_fetch_miss(),
+            Err(_) => record_prefetch_seed_fetch_miss(),
+        }
+    }
+    if hits > 0 {
+        record_prefetch_seed_fetch(hits);
+    }
+    hits
+}
+
+/// Default co-access graph stub: admitted shard → speculative neighbors (PH-S446).
+pub fn default_co_access_graph() -> std::collections::BTreeMap<String, Vec<String>> {
+    let mut map = std::collections::BTreeMap::new();
+    map.insert("w:emb-1".into(), vec!["w:ckpt-7".into()]);
+    map.insert("w:ckpt-7".into(), vec!["w:emb-1".into()]);
+    map
+}
+
+/// Speculative prefetch from co-access graph when shard A is admitted (PH-S446).
+pub fn plan_co_access_prefetch(
+    admitted_shard_id: &str,
+    gpu_capable: bool,
+    config: &PrefetchPolicyConfig,
+) -> Option<PrefetchPlan> {
+    let co_access = default_co_access_graph();
+    let speculative = co_access.get(admitted_shard_id)?;
+    if speculative.is_empty() {
+        return None;
+    }
+    let inventory = coordinator_merged_seed_inventory();
+    Some(plan_prefetch(
+        &inventory,
+        speculative,
+        PrefetchTrigger::CoAccessGraph,
+        gpu_capable,
+        config,
+    ))
+}
+
+/// Whether all required shards are hot in coordinator inventory (Galaxy §5.6).
+pub fn all_required_shards_hot(
+    inventory: &SeedInventoryEntry,
+    required_shard_ids: &[String],
+) -> bool {
+    required_shard_ids.iter().all(|id| hot_hit(inventory, id))
+}
+
+/// Strict locality gate: reject ingest when required shards are not hot (PH-S445).
+pub fn check_strict_locality_gate(required_shard_ids: &[String]) -> Result<(), AppError> {
+    if required_shard_ids.is_empty() {
+        return Ok(());
+    }
+    let config = PrefetchPolicyConfig::from_env();
+    if config.mode != PrefetchPolicyMode::StrictLocality {
+        return Ok(());
+    }
+    let inventory = coordinator_merged_seed_inventory();
+    if all_required_shards_hot(&inventory, required_shard_ids) {
+        return Ok(());
+    }
+    record_locality_unsatisfied();
+    Err(AppError::RestError {
+        code: "locality_unsatisfied",
+        message: "required shards are not hot/local under strict_locality (Galaxy §5.6)".into(),
+    })
 }
 
 /// Seed pull resolver: planned shards present in coordinator inventory (PH-S434).
@@ -495,7 +588,7 @@ pub fn ingest_envelope(
     env.validate()
         .map_err(|e: GridEnvelopeError| AppError::ValidationError(e.to_string()))?;
     match env.msg {
-        GridMessage::Job(body) => ingest_job(body, env.source_peer_id.as_deref(), jobs),
+        GridMessage::Job(body) => ingest_job(body, env.source_peer_id.as_deref(), jobs, memory),
         GridMessage::Result(body) => ingest_result(body, env.source_peer_id.as_deref(), jobs),
         GridMessage::MemoryShard(body) => {
             let shard = memory_shard_from_grid_body(&body);
@@ -534,7 +627,11 @@ fn ingest_job(
     body: crate::grid::GridJobBody,
     source_peer_id: Option<&str>,
     jobs: &JobStore,
+    memory: &MemoryShardStore,
 ) -> Result<GridIngestOutcome, AppError> {
+    if !body.required_shard_ids.is_empty() {
+        check_strict_locality_gate(&body.required_shard_ids)?;
+    }
     let spec = job_spec_from_grid_job(&body);
     let job_id = spec.id.0.clone();
     let record = JobRecord {
@@ -553,6 +650,7 @@ fn ingest_job(
         ingest_job_prefetch_stub(
             &body.required_shard_ids,
             grid_job_gpu_capable(&body.task_kind),
+            Some(memory),
         );
         let _ = ingest_job_locality_rank_stub(&body.required_shard_ids, &body.task_kind);
     }
@@ -629,7 +727,7 @@ fn ingest_result(
     }
     evaluate_result_settlement_not_applicable(settlement_status);
     evaluate_result_fee_split(body.metrics.as_ref());
-    evaluate_result_replay_pending(body.metrics.as_ref(), settlement_status);
+    evaluate_result_replay_pending(&job_id, body.metrics.as_ref(), settlement_status);
     Ok(GridIngestOutcome {
         kind: GridIngestKind::Result {
             job_id,
@@ -1779,7 +1877,7 @@ mod tests {
         };
 
         reset_prefetch_metrics_for_test();
-        let planned = ingest_job_prefetch_stub(&["w:missing-shard".into()], false);
+        let planned = ingest_job_prefetch_stub(&["w:missing-shard".into()], false, None);
         assert_eq!(planned, 1);
         assert_eq!(prefetch_plan_total(), 1);
         reset_prefetch_metrics_for_test();
@@ -1887,7 +1985,7 @@ mod tests {
         };
 
         reset_prefetch_metrics_for_test();
-        ingest_job_prefetch_stub(&["w:missing-shard".into()], false);
+        ingest_job_prefetch_stub(&["w:missing-shard".into()], false, None);
         assert_eq!(prefetch_ingest_total(), 1);
         assert_eq!(prefetch_enqueue_total(), 1);
         assert_eq!(prefetch_wait_ms_total(), DEFAULT_PREFETCH_DEADLINE_MS);
@@ -1935,7 +2033,7 @@ mod tests {
             deadline_ms: DEFAULT_PREFETCH_DEADLINE_MS,
             mode: PrefetchPolicyMode::BestEffort,
         };
-        assert_eq!(complete_prefetch_hook(&plan), 1);
+        assert_eq!(complete_prefetch_hook(&plan, None), 1);
         assert_eq!(prefetch_enqueue_total(), 1);
         assert_eq!(prefetch_wait_ms_total(), DEFAULT_PREFETCH_DEADLINE_MS);
         assert_eq!(prefetch_complete_total(), 1);
@@ -1949,9 +2047,9 @@ mod tests {
         };
 
         reset_prefetch_metrics_for_test();
-        assert_eq!(ingest_job_prefetch_stub(&[], false), 0);
+        assert_eq!(ingest_job_prefetch_stub(&[], false, None), 0);
         assert_eq!(prefetch_ingest_total(), 0);
-        ingest_job_prefetch_stub(&["w:x".into()], false);
+        ingest_job_prefetch_stub(&["w:x".into()], false, None);
         assert_eq!(prefetch_ingest_total(), 1);
         reset_prefetch_metrics_for_test();
     }
@@ -1981,6 +2079,81 @@ mod tests {
         assert_eq!(resolve_seed_pull_shards(&plan), 1);
         assert_eq!(seed_pull_hook(&plan), 1);
         assert_eq!(prefetch_seed_pull_total(), 1);
+        reset_prefetch_metrics_for_test();
+    }
+
+    #[test]
+    fn fetch_seed_shards_hook_ph_s444() {
+        use crate::grid::galaxy_prefetch_metrics::{
+            prefetch_seed_fetch_miss_total, prefetch_seed_fetch_total,
+            reset_prefetch_metrics_for_test,
+        };
+        use crate::memory::{MemoryShardId, MemoryShardRef, MemoryShardStore};
+
+        reset_prefetch_metrics_for_test();
+        let memory = MemoryShardStore::open_for_test(None);
+        memory
+            .upsert(MemoryShardRef {
+                shard_id: MemoryShardId::new("w:emb-1"),
+                artifact_id: "a1".into(),
+                version: "1".into(),
+                raid_logical_name: None,
+                seed_hints: None,
+            })
+            .unwrap();
+        let plan = PrefetchPlan {
+            items: vec![
+                PrefetchPlanItem {
+                    shard_id: "w:emb-1".into(),
+                    target_tier: PrefetchTargetTier::Ram,
+                },
+                PrefetchPlanItem {
+                    shard_id: "w:missing".into(),
+                    target_tier: PrefetchTargetTier::Ram,
+                },
+            ],
+            trigger: PrefetchTrigger::JobAdmitted,
+            deadline_ms: DEFAULT_PREFETCH_DEADLINE_MS,
+            mode: PrefetchPolicyMode::BestEffort,
+        };
+        assert_eq!(fetch_seed_shards_hook(&plan, &memory), 1);
+        assert_eq!(prefetch_seed_fetch_total(), 1);
+        assert_eq!(prefetch_seed_fetch_miss_total(), 1);
+        reset_prefetch_metrics_for_test();
+    }
+
+    #[test]
+    fn check_strict_locality_gate_ph_s445() {
+        use std::sync::{Mutex, MutexGuard};
+
+        static ENV_LOCK: Mutex<()> = Mutex::new(());
+
+        fn lock() -> MutexGuard<'static, ()> {
+            ENV_LOCK.lock().unwrap_or_else(|e| e.into_inner())
+        }
+
+        let _guard = lock();
+        std::env::remove_var(ENV_LOCALITY_MODE);
+        assert!(check_strict_locality_gate(&["w:missing".into()]).is_ok());
+
+        std::env::set_var(ENV_LOCALITY_MODE, "strict_locality");
+        assert!(check_strict_locality_gate(&["w:missing-shard".into()]).is_err());
+        assert!(check_strict_locality_gate(&["w:emb-1".into()]).is_ok());
+        std::env::remove_var(ENV_LOCALITY_MODE);
+    }
+
+    #[test]
+    fn plan_co_access_prefetch_ph_s446() {
+        use crate::grid::galaxy_prefetch_metrics::{
+            prefetch_co_access_total, reset_prefetch_metrics_for_test,
+        };
+
+        reset_prefetch_metrics_for_test();
+        let config = PrefetchPolicyConfig::default();
+        let plan = plan_co_access_prefetch("w:emb-1", false, &config).expect("co-access plan");
+        assert_eq!(plan.trigger, PrefetchTrigger::CoAccessGraph);
+        assert_eq!(prefetch_co_access_total(), 1);
+        assert!(plan_co_access_prefetch("w:unknown", false, &config).is_none());
         reset_prefetch_metrics_for_test();
     }
 }

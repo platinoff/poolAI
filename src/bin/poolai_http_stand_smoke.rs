@@ -828,6 +828,41 @@ async fn smoke_galaxy_replication_metrics(client: &Client, base: &str) -> Result
     metrics_text_has_replication_strict(&body)
 }
 
+/// PH-S451: live stand exposes PH-S444…S449 horizon wire metrics on Prometheus scrape.
+const GALAXY_HORIZON_WIRE_S444_METRICS: &[&str] = &[
+    "galaxy_prefetch_seed_fetch_total",
+    "galaxy_prefetch_seed_fetch_miss_total",
+    "galaxy_prefetch_co_access_total",
+    "galaxy_locality_unsatisfied_total",
+    "poolai_protocol_negotiation_rejected_total",
+    "galaxy_verification_replay_record_total",
+];
+
+fn metrics_text_has_horizon_wire_s444(body: &str) -> Result<(), String> {
+    for name in GALAXY_HORIZON_WIRE_S444_METRICS {
+        if !body.contains(name) {
+            return Err(format!("/metrics missing {name}"));
+        }
+        if !body.contains(&format!("# TYPE {name} gauge")) {
+            return Err(format!("/metrics missing TYPE gauge for {name}"));
+        }
+    }
+    Ok(())
+}
+
+async fn smoke_galaxy_horizon_wire_s444_metrics(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("/metrics request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("/metrics status {}", resp.status()));
+    }
+    let body = resp.text().await.map_err(|e| e.to_string())?;
+    metrics_text_has_horizon_wire_s444(&body)
+}
+
 async fn smoke_grid_pricing(client: &Client, base: &str) -> Result<(), String> {
     let model = smoke_id("smoke-pricing");
     let url = format!(
@@ -1475,6 +1510,12 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
         &mut cases,
         "galaxy_replication_metrics",
         smoke_galaxy_replication_metrics(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
+        "galaxy_horizon_wire_s444_metrics",
+        smoke_galaxy_horizon_wire_s444_metrics(&client, &cli.base_url).await,
     )
     .await;
     record(

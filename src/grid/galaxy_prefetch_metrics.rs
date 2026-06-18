@@ -41,6 +41,18 @@ pub const METRIC_PREFETCH_SEED_PULL_TOTAL: &str = "galaxy_prefetch_seed_pull_tot
 /// Prefetch plans triggered by lease acquire (PH-S425 stub).
 pub const METRIC_PREFETCH_LEASE_ACQUIRED_TOTAL: &str = "galaxy_prefetch_lease_acquired_total";
 
+/// Memory-layer seed fetch hits on prefetch path (PH-S444).
+pub const METRIC_PREFETCH_SEED_FETCH_TOTAL: &str = "galaxy_prefetch_seed_fetch_total";
+
+/// Memory-layer seed fetch misses on prefetch path (PH-S444).
+pub const METRIC_PREFETCH_SEED_FETCH_MISS_TOTAL: &str = "galaxy_prefetch_seed_fetch_miss_total";
+
+/// Co-access graph speculative prefetch plans (PH-S446).
+pub const METRIC_PREFETCH_CO_ACCESS_TOTAL: &str = "galaxy_prefetch_co_access_total";
+
+/// Strict locality ingest rejections (PH-S445).
+pub const METRIC_LOCALITY_UNSATISFIED_TOTAL: &str = "galaxy_locality_unsatisfied_total";
+
 /// Default stub bytes per RAM-tier planned shard (4 MiB, Galaxy §5.5).
 pub const DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM: u64 = 4_194_304;
 
@@ -59,6 +71,10 @@ static INGEST_TOTAL: AtomicU64 = AtomicU64::new(0);
 static SKIP_INGEST_TOTAL: AtomicU64 = AtomicU64::new(0);
 static SEED_PULL_TOTAL: AtomicU64 = AtomicU64::new(0);
 static LEASE_ACQUIRED_TOTAL: AtomicU64 = AtomicU64::new(0);
+static SEED_FETCH_TOTAL: AtomicU64 = AtomicU64::new(0);
+static SEED_FETCH_MISS_TOTAL: AtomicU64 = AtomicU64::new(0);
+static CO_ACCESS_TOTAL: AtomicU64 = AtomicU64::new(0);
+static LOCALITY_UNSATISFIED_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// Record one `plan_prefetch` outcome (no wire enqueue).
 pub fn record_prefetch_plan(required_shards: usize, planned_shards: usize, prefetch_bytes: u64) {
@@ -170,6 +186,44 @@ pub fn prefetch_lease_acquired_total() -> u64 {
     LEASE_ACQUIRED_TOTAL.load(Ordering::Relaxed)
 }
 
+/// Record memory-layer seed fetch hits (PH-S444).
+pub fn record_prefetch_seed_fetch(shard_count: usize) {
+    if shard_count > 0 {
+        SEED_FETCH_TOTAL.fetch_add(shard_count as u64, Ordering::Relaxed);
+    }
+}
+
+pub fn prefetch_seed_fetch_total() -> u64 {
+    SEED_FETCH_TOTAL.load(Ordering::Relaxed)
+}
+
+/// Record memory-layer seed fetch misses (PH-S444).
+pub fn record_prefetch_seed_fetch_miss() {
+    SEED_FETCH_MISS_TOTAL.fetch_add(1, Ordering::Relaxed);
+}
+
+pub fn prefetch_seed_fetch_miss_total() -> u64 {
+    SEED_FETCH_MISS_TOTAL.load(Ordering::Relaxed)
+}
+
+/// Record co-access speculative prefetch plan (PH-S446).
+pub fn record_prefetch_co_access() {
+    CO_ACCESS_TOTAL.fetch_add(1, Ordering::Relaxed);
+}
+
+pub fn prefetch_co_access_total() -> u64 {
+    CO_ACCESS_TOTAL.load(Ordering::Relaxed)
+}
+
+/// Record strict locality ingest rejection (PH-S445).
+pub fn record_locality_unsatisfied() {
+    LOCALITY_UNSATISFIED_TOTAL.fetch_add(1, Ordering::Relaxed);
+}
+
+pub fn locality_unsatisfied_total() -> u64 {
+    LOCALITY_UNSATISFIED_TOTAL.load(Ordering::Relaxed)
+}
+
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_prefetch_metrics_for_test() {
     PLAN_TOTAL.store(0, Ordering::Relaxed);
@@ -184,6 +238,10 @@ pub fn reset_prefetch_metrics_for_test() {
     SKIP_INGEST_TOTAL.store(0, Ordering::Relaxed);
     SEED_PULL_TOTAL.store(0, Ordering::Relaxed);
     LEASE_ACQUIRED_TOTAL.store(0, Ordering::Relaxed);
+    SEED_FETCH_TOTAL.store(0, Ordering::Relaxed);
+    SEED_FETCH_MISS_TOTAL.store(0, Ordering::Relaxed);
+    CO_ACCESS_TOTAL.store(0, Ordering::Relaxed);
+    LOCALITY_UNSATISFIED_TOTAL.store(0, Ordering::Relaxed);
 }
 
 #[cfg(test)]
