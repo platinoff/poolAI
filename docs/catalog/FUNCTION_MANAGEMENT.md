@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-18 (PH-S494…S503 ✅ · rust_ratio **94.41%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-18 (PH-S504…S513 ✅ · rust_ratio **94.42%**) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -703,8 +703,18 @@ FM-xxx (з таблиці нижче)
 | 436 | **PH-S501** | Stand smoke S494–S499 band | PH-S494…S498 | `/metrics` + checker tasks + network profile API smoke | **✅** |
 | 437 | **PH-S502** | Ops close band: loc-audit | §5.12 fallback | `rust_ratio.json` **94.41%**; FM/HANDOFF/NEXT | **✅** |
 | 438 | **PH-S503** | Ops close band: vision-sync | §5.12 fallback | `poolai-vision-sync` + `--check` green | **✅** |
+| 439 | **PH-S504** | Mandatory signed capability for `telegram_edge` | Galaxy §6.6/§9 | reject unsigned register-remote; dev fixture passes; integration test | **✅** |
+| 440 | **PH-S505** | Telegram seat coordinator read API | Galaxy §3.1 | `GET /api/v1/grid/telegram-seats`; seat snapshot fields | **✅** |
+| 441 | **PH-S506** | Network profile upsert API | Galaxy §8.1 | `PUT /api/v1/grid/network-profiles/{peer_id}`; round-trip GET | **✅** |
+| 442 | **PH-S507** | Unified Galaxy worker DTO on virtual-nodes | Galaxy §2.3 | `galaxy` field on virtual-nodes list; origin + network_profile | **✅** |
+| 443 | **PH-S508** | Admin workers: origin badges + locality sort | PH-S507 | virtual-nodes panel on `/ui/admin/workers`; wasm renderer | **✅** |
+| 444 | **PH-S509** | tgbot `/wallet` command | Galaxy §3.2 | `Wallet` command POSTs wallet bind API; coordinator unit test | **✅** |
+| 445 | **PH-S510** | Payout wallet rebind cooldown | Galaxy §3.2 | 409 `wallet_rebind_cooldown`; env cooldown secs | **✅** |
+| 446 | **PH-S511** | Non-deterministic `semantic_hash` stub | Galaxy §6.2 | semantic_hash match/mismatch on grid result path | **✅** |
+| 447 | **PH-S512** | Admin grid verification-checker panel | PH-S494 | `/ui/admin/grid-verification`; wasm table renderer | **✅** |
+| 448 | **PH-S513** | Horizon close band S504–S512 | §5.12 fallback | `galaxy_horizon_s504_integration` + stand smoke + loc-audit + vision-sync | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S494…S503 ✅. Vision rev **238**. rust_ratio **94.41%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S504…S513 ✅. Vision rev **239**. rust_ratio **94.42%**.
 
 **Наступна сесія:** **`абракадабра`** (project scan → drain) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
@@ -712,7 +722,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-06-18):** PH-S494…S503 ✅ закрито · **0** відкритих · **`абракадабра`** = project scan → §5.12 → drain.
+**Активна смуга (2026-06-18):** PH-S504…S513 ✅ закрито · **0** відкритих · **`абракадабра`** = project scan → §5.12 → drain.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

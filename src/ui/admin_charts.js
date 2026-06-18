@@ -804,3 +804,40 @@ function poolaiRenderVmPanel(instances, labels) {
     { icon: '🖥' },
   );
 }
+
+/** PH-S508: Galaxy virtual nodes table (wasm-first). */
+function poolaiRenderGalaxyVirtualNodesPanel(nodes, labels) {
+  labels = labels || {};
+  var wasm = poolaiChartsWasm();
+  if (wasm && typeof wasm.renderGalaxyVirtualNodesPanel === 'function') {
+    return wasm.renderGalaxyVirtualNodesPanel(
+      JSON.stringify(nodes || []),
+      labels.peer || 'Peer',
+      labels.origin || 'Origin',
+      labels.region || 'Region',
+      labels.latency || 'Latency',
+      labels.stale || 'Liveness',
+      labels.tableAria || 'Virtual nodes',
+      labels.empty || 'No virtual nodes',
+    );
+  }
+  return adminEmptyStateHtml(labels.empty || 'No virtual nodes', { icon: '🌐' });
+}
+
+/** PH-S512: verification checker tasks table (wasm-first). */
+function poolaiRenderGridVerificationPanel(tasks, pendingTotal, labels) {
+  labels = labels || {};
+  var wasm = poolaiChartsWasm();
+  if (wasm && typeof wasm.renderGridVerificationPanel === 'function') {
+    return wasm.renderGridVerificationPanel(
+      JSON.stringify(tasks || []),
+      pendingTotal || 0,
+      labels.job || 'Job ID',
+      labels.type || 'Task type',
+      labels.pending || 'Pending total',
+      labels.tableAria || 'Verification checker',
+      labels.empty || 'No pending checker tasks',
+    );
+  }
+  return adminEmptyStateHtml(labels.empty || 'No pending checker tasks', { icon: '🔍' });
+}

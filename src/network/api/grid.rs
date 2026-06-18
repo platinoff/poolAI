@@ -3,7 +3,7 @@
 use axum::{
     extract::{Query, State},
     http::StatusCode,
-    routing::{get, post},
+    routing::{get, post, put},
     Json, Router,
 };
 use serde::{Deserialize, Serialize};
@@ -72,8 +72,9 @@ pub fn create_grid_routes() -> Router<ApiContext> {
         )
         .route(
             "/grid/network-profiles/{peer_id}",
-            get(get_grid_network_profile),
+            get(get_grid_network_profile).put(put_grid_network_profile),
         )
+        .route("/grid/telegram-seats", get(get_grid_telegram_seats))
         .route("/grid/payout-batch", get(get_grid_payout_batch))
         .route(
             "/grid/payout-batch/history",
@@ -239,6 +240,64 @@ async fn get_grid_network_profile(
             ok: true,
             peer_id,
             network_profile,
+        }),
+    ))
+}
+
+#[derive(Debug, Deserialize)]
+struct PutGridNetworkProfileRequest {
+    network_profile: serde_json::Value,
+}
+
+async fn put_grid_network_profile(
+    State(_ctx): State<ApiContext>,
+    axum::extract::Path(peer_id): axum::extract::Path<String>,
+    Json(body): Json<PutGridNetworkProfileRequest>,
+) -> Result<(StatusCode, Json<GridNetworkProfileResponse>), HttpAppError> {
+    if peer_id.trim().is_empty() {
+        return Err(AppError::RestError {
+            code: "invalid_peer_id",
+            message: "peer_id must not be empty".into(),
+        }
+        .into());
+    }
+    let profile =
+        crate::grid::galaxy_network_profile::parse_network_profile_value(&body.network_profile)
+            .map_err(|e| AppError::RestError {
+                code: "invalid_network_profile",
+                message: e.message,
+            })?;
+    let canonical = profile.to_storage_json().map_err(|e| AppError::RestError {
+        code: "invalid_network_profile",
+        message: e.message,
+    })?;
+    crate::grid::galaxy_network_profile_store::persist_peer_network_profile(&peer_id, &canonical)
+        .map_err(HttpAppError::from)?;
+    Ok((
+        StatusCode::OK,
+        Json(GridNetworkProfileResponse {
+            ok: true,
+            peer_id,
+            network_profile: Some(serde_json::from_str(&canonical).unwrap_or(body.network_profile)),
+        }),
+    ))
+}
+
+#[derive(Debug, Serialize)]
+struct GridTelegramSeatsResponse {
+    ok: bool,
+    #[serde(flatten)]
+    snapshot: crate::services::telegram_seat_service::TelegramSeatCoordinatorSnapshot,
+}
+
+async fn get_grid_telegram_seats(
+    State(_ctx): State<ApiContext>,
+) -> Result<(StatusCode, Json<GridTelegramSeatsResponse>), HttpAppError> {
+    Ok((
+        StatusCode::OK,
+        Json(GridTelegramSeatsResponse {
+            ok: true,
+            snapshot: crate::services::telegram_seat_service::telegram_seat_coordinator_snapshot(),
         }),
     ))
 }

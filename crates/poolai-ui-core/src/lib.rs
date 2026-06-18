@@ -7,6 +7,8 @@ pub mod admin_dom;
 pub mod api_error;
 pub mod design_tokens;
 pub mod format;
+pub mod galaxy_virtual_nodes;
+pub mod grid_verification;
 pub mod i18n;
 pub mod instances;
 pub mod lease;

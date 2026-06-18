@@ -53,6 +53,7 @@ use crate::grid::galaxy_verification_metrics::{
     drain_verification_checker_task, enqueue_verification_checker_task,
     evaluate_result_verification_match, evaluate_result_verification_mismatch,
     evaluate_result_verification_sample, evaluate_result_verification_sample_completed,
+    evaluate_semantic_hash_verification,
 };
 use crate::grid::galaxy_verify_sampling::{
     evaluate_post_mismatch_elevated_sampling, evaluate_result_verify_sampling,
@@ -897,8 +898,11 @@ fn ingest_result(
     let status = job_status_from_grid_result(body.status);
     jobs.force_status(&job_id, status)?;
     let trust_score = trust_score_from_result_metrics(body.metrics.as_ref());
-    let is_mismatch = evaluate_result_verification_mismatch(body.metrics.as_ref());
-    let is_match = evaluate_result_verification_match(body.metrics.as_ref());
+    let semantic_hash_match = evaluate_semantic_hash_verification(body.metrics.as_ref());
+    let is_mismatch = evaluate_result_verification_mismatch(body.metrics.as_ref())
+        || semantic_hash_match == Some(false);
+    let is_match = evaluate_result_verification_match(body.metrics.as_ref())
+        || semantic_hash_match == Some(true);
     if is_match || is_mismatch {
         drain_verification_checker_task(&job_id);
     }

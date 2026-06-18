@@ -1,0 +1,147 @@
+//! Unified Galaxy worker DTO for virtual-node list (PH-S507, Galaxy §2.3).
+
+use crate::core::discovery_types::PeerInfo;
+use crate::grid::galaxy_network_profile::{parse_network_profile_value, GalaxyNetworkProfile};
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+
+/// Worker origin class (Galaxy §2.3).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum GalaxyWorkerOrigin {
+    Local,
+    Cloud,
+    TelegramEdge,
+    Unknown,
+}
+
+impl GalaxyWorkerOrigin {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::Local => "local",
+            Self::Cloud => "cloud",
+            Self::TelegramEdge => "telegram_edge",
+            Self::Unknown => "unknown",
+        }
+    }
+}
+
+/// Resource limits subset from peer metadata (Galaxy §2.3 sketch).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
+pub struct GalaxyWorkerLimits {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_memory_mb: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_concurrent_requests: Option<u32>,
+}
+
+/// Telemetry subset for admin sort/filter (Galaxy §2.3).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
+pub struct GalaxyWorkerTelemetry {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub latency_ms_p50: Option<u32>,
+}
+
+/// Unified worker row for `GET /api/v1/discovery/virtual-nodes` (PH-S507).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct GalaxyWorkerDto {
+    pub origin: GalaxyWorkerOrigin,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub admin_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub srv_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub network_profile: Option<GalaxyNetworkProfile>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limits: Option<GalaxyWorkerLimits>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub telemetry: Option<GalaxyWorkerTelemetry>,
+}
+
+fn parse_origin(metadata: &std::collections::HashMap<String, String>) -> GalaxyWorkerOrigin {
+    let raw = metadata
+        .get("origin")
+        .map(String::as_str)
+        .or_else(|| metadata.get("role").map(String::as_str))
+        .unwrap_or("")
+        .trim()
+        .to_ascii_lowercase();
+    match raw.as_str() {
+        "local" | "local_srv" => GalaxyWorkerOrigin::Local,
+        "cloud" => GalaxyWorkerOrigin::Cloud,
+        "telegram_edge" => GalaxyWorkerOrigin::TelegramEdge,
+        "" => GalaxyWorkerOrigin::Unknown,
+        _ => GalaxyWorkerOrigin::Unknown,
+    }
+}
+
+fn parse_network_profile(
+    metadata: &std::collections::HashMap<String, String>,
+) -> Option<GalaxyNetworkProfile> {
+    let raw = metadata.get("network_profile")?;
+    let value: Value = serde_json::from_str(raw).ok()?;
+    parse_network_profile_value(&value).ok()
+}
+
+fn parse_u32(meta: &std::collections::HashMap<String, String>, key: &str) -> Option<u32> {
+    meta.get(key)?.trim().parse().ok()
+}
+
+/// Map discovery peer metadata to Galaxy worker DTO.
+pub fn galaxy_worker_from_peer(peer: &PeerInfo) -> GalaxyWorkerDto {
+    let network_profile = parse_network_profile(&peer.metadata);
+    let latency_ms_p50 = network_profile.as_ref().map(|p| p.latency_ms_p50);
+    GalaxyWorkerDto {
+        origin: parse_origin(&peer.metadata),
+        admin_id: peer.metadata.get("admin_id").cloned(),
+        srv_id: peer
+            .metadata
+            .get("srv_id")
+            .cloned()
+            .or_else(|| Some(peer.peer_id.clone())),
+        network_profile,
+        limits: Some(GalaxyWorkerLimits {
+            max_memory_mb: parse_u32(&peer.metadata, "max_memory_mb")
+                .or(Some(peer.capabilities.memory_mb as u32)),
+            max_concurrent_requests: parse_u32(&peer.metadata, "max_concurrent_requests"),
+        }),
+        telemetry: latency_ms_p50.map(|latency_ms_p50| GalaxyWorkerTelemetry {
+            latency_ms_p50: Some(latency_ms_p50),
+        }),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::core::discovery_types::PeerCapabilities;
+    use chrono::Utc;
+    use std::collections::HashMap;
+
+    #[test]
+    fn galaxy_worker_from_peer_ph_s507() {
+        let mut metadata = HashMap::new();
+        metadata.insert("origin".into(), "telegram_edge".into());
+        metadata.insert("admin_id".into(), "admin-1".into());
+        metadata.insert(
+            "network_profile".into(),
+            r#"{"region":"eu-west","latency_ms_p50":42}"#.into(),
+        );
+        let peer = PeerInfo {
+            peer_id: "peer-1".into(),
+            address: "127.0.0.1".into(),
+            port: 9000,
+            last_seen: Utc::now(),
+            capabilities: PeerCapabilities {
+                memory_mb: 4096,
+                ..Default::default()
+            },
+            metadata,
+        };
+        let dto = galaxy_worker_from_peer(&peer);
+        assert_eq!(dto.origin, GalaxyWorkerOrigin::TelegramEdge);
+        assert_eq!(dto.admin_id.as_deref(), Some("admin-1"));
+        assert_eq!(dto.network_profile.as_ref().unwrap().latency_ms_p50, 42);
+        assert_eq!(dto.telemetry.as_ref().unwrap().latency_ms_p50, Some(42));
+    }
+}

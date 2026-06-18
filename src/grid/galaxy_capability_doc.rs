@@ -100,6 +100,30 @@ pub fn validate_capability_document(
     verify_capability_signature_stub(doc)
 }
 
+/// `telegram_edge` register-remote requires signed capability document (PH-S504, Galaxy §6.6).
+pub fn validate_telegram_edge_capability(
+    is_telegram_edge: bool,
+    doc: Option<&GalaxyCapabilityDocument>,
+) -> Result<(), CapabilityDocParseError> {
+    if !is_telegram_edge {
+        return Ok(());
+    }
+    let doc = doc.ok_or_else(|| {
+        CapabilityDocParseError::new("capability_document required for telegram_edge origin")
+    })?;
+    if doc
+        .signature
+        .as_ref()
+        .map(|s| s.trim().is_empty())
+        .unwrap_or(true)
+    {
+        return Err(CapabilityDocParseError::new(
+            "signed capability_document required for telegram_edge origin",
+        ));
+    }
+    validate_capability_document(doc)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

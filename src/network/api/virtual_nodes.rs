@@ -23,7 +23,7 @@ use crate::services::virtual_node_telegram_binding_service::{
     TelegramBinding, VirtualNodeTelegramBindingService,
 };
 use crate::services::virtual_node_telegram_wallet_service::{
-    TelegramWalletBinding, VirtualNodeTelegramWalletService,
+    TelegramWalletBinding, VirtualNodeTelegramWalletService, WalletBindError,
 };
 use crate::services::worker_pool_service::{AddWorkerError, CreateWorkerInput, WorkerPoolService};
 
@@ -305,6 +305,15 @@ async fn bind_telegram_wallet_handler(
         body.chain.as_deref(),
     ) {
         Ok(wallet) => (StatusCode::OK, Json(BindTelegramWalletResponse { wallet })).into_response(),
+        Err(WalletBindError::RebindCooldown { retry_after_secs }) => (
+            StatusCode::CONFLICT,
+            Json(serde_json::json!({
+                "error": "wallet_rebind_cooldown",
+                "message": "wallet rebind cooldown active",
+                "retry_after_secs": retry_after_secs,
+            })),
+        )
+            .into_response(),
         Err(e) => (StatusCode::BAD_REQUEST, e.as_status_message()).into_response(),
     }
 }

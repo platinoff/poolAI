@@ -37,6 +37,7 @@ pub mod audit;
 pub mod config;
 pub mod dashboard;
 pub mod grid_pricing;
+pub mod grid_verification;
 pub mod instances;
 pub mod jobs;
 pub mod libs;
@@ -65,6 +66,10 @@ pub fn create_admin_routes() -> Router<ApiContext> {
         .route("/admin/workers", get(workers::admin_workers))
         .route("/admin/jobs", get(jobs::admin_jobs))
         .route("/admin/grid-pricing", get(grid_pricing::admin_grid_pricing))
+        .route(
+            "/admin/grid-verification",
+            get(grid_verification::admin_grid_verification),
+        )
         .route(
             "/admin/updates-compat",
             get(updates_compat::admin_updates_compat),
@@ -454,6 +459,7 @@ pub fn admin_layout_with_module_script(
         <a href="/ui/admin/workers" class="admin-nav-item" data-i18n="admin.nav.workers">Workers</a>
         <a href="/ui/admin/jobs" class="admin-nav-item" data-i18n="admin.nav.jobs">Jobs</a>
         <a href="/ui/admin/grid-pricing" class="admin-nav-item" data-i18n="admin.nav.gridPricing">Grid pricing</a>
+        <a href="/ui/admin/grid-verification" class="admin-nav-item" data-i18n="admin.nav.gridVerification">Grid verify</a>
         <a href="/ui/admin/updates-compat" class="admin-nav-item" data-i18n="admin.nav.updatesCompat">Updates</a>
         <a href="/ui/admin/libs" class="admin-nav-item" data-i18n="admin.nav.libs">Libraries</a>
         <a href="/ui/admin/raid" class="admin-nav-item" data-i18n="admin.nav.raid">RAID</a>

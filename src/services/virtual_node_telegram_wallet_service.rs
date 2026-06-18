@@ -13,6 +13,13 @@ use super::virtual_node_store;
 /// Supported payout chain on the stub path (concept default).
 pub const DEFAULT_WALLET_CHAIN: &str = "solana";
 
+/// Env: cooldown seconds before payout pubkey rebind (Galaxy §3.2, PH-S510).
+pub const ENV_TELEGRAM_WALLET_REBIND_COOLDOWN_SECS: &str =
+    "POOLAI_TELEGRAM_WALLET_REBIND_COOLDOWN_SECS";
+
+/// Default rebind cooldown: 24h.
+pub const DEFAULT_WALLET_REBIND_COOLDOWN_SECS: u64 = 86_400;
+
 /// Solana pubkey length bounds for base58 stub validation.
 pub const SOLANA_PUBKEY_MIN_LEN: usize = 32;
 pub const SOLANA_PUBKEY_MAX_LEN: usize = 44;
@@ -35,6 +42,7 @@ pub enum WalletBindError {
     EmptyPayoutPubkey,
     UnsupportedChain(String),
     InvalidSolanaPubkey,
+    RebindCooldown { retry_after_secs: u64 },
 }
 
 impl WalletBindError {
@@ -45,6 +53,14 @@ impl WalletBindError {
             Self::EmptyPayoutPubkey => "payout_pubkey is required",
             Self::UnsupportedChain(_) => "unsupported chain (stub supports solana only)",
             Self::InvalidSolanaPubkey => "invalid solana payout_pubkey",
+            Self::RebindCooldown { .. } => "wallet rebind cooldown active",
+        }
+    }
+
+    pub fn error_code(&self) -> &'static str {
+        match self {
+            Self::RebindCooldown { .. } => "wallet_rebind_cooldown",
+            _ => "wallet_bind_invalid",
         }
     }
 }
@@ -69,6 +85,13 @@ fn persist_all(guard: &HashMap<String, TelegramWalletBinding>) {
     if let Err(e) = virtual_node_store::save_json("telegram_wallets.json", &entries) {
         tracing::warn!("virtual node telegram wallets persist failed: {e}");
     }
+}
+
+pub fn wallet_rebind_cooldown_secs_from_env() -> u64 {
+    std::env::var(ENV_TELEGRAM_WALLET_REBIND_COOLDOWN_SECS)
+        .ok()
+        .and_then(|v| v.trim().parse().ok())
+        .unwrap_or(DEFAULT_WALLET_REBIND_COOLDOWN_SECS)
 }
 
 /// Base58 charset stub check for Solana pubkeys (no on-chain verify).
@@ -122,6 +145,21 @@ impl VirtualNodeTelegramWalletService {
         if !is_valid_solana_pubkey_stub(payout_pubkey) {
             return Err(WalletBindError::InvalidSolanaPubkey);
         }
+        let mut guard = wallets().lock().expect("telegram wallets lock");
+        if let Some(existing) = guard.get(telegram_user_id) {
+            if existing.payout_pubkey != payout_pubkey {
+                let cooldown = wallet_rebind_cooldown_secs_from_env();
+                let elapsed = Utc::now()
+                    .signed_duration_since(existing.bound_at)
+                    .num_seconds()
+                    .max(0) as u64;
+                if elapsed < cooldown {
+                    return Err(WalletBindError::RebindCooldown {
+                        retry_after_secs: cooldown - elapsed,
+                    });
+                }
+            }
+        }
         let binding = TelegramWalletBinding {
             telegram_user_id: telegram_user_id.to_string(),
             chat_id: chat_id.to_string(),
@@ -130,7 +168,6 @@ impl VirtualNodeTelegramWalletService {
             verified: true,
             bound_at: Utc::now(),
         };
-        let mut guard = wallets().lock().expect("telegram wallets lock");
         guard.insert(telegram_user_id.to_string(), binding.clone());
         persist_all(&guard);
         Ok(binding)
@@ -182,12 +219,18 @@ mod tests {
     }
 
     #[test]
-    fn reject_unsupported_chain() {
+    fn wallet_rebind_cooldown_ph_s510() {
+        static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+        let _guard = ENV_LOCK.lock().unwrap_or_else(|e| e.into_inner());
         VirtualNodeTelegramWalletService::clear_all();
-        let pubkey = "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU";
+        std::env::set_var(ENV_TELEGRAM_WALLET_REBIND_COOLDOWN_SECS, "86400");
+        let pk1 = "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU";
+        let pk2 = "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM";
+        VirtualNodeTelegramWalletService::bind("9002", "-100124", pk1, None).expect("bind");
         let err =
-            VirtualNodeTelegramWalletService::bind("9001", "-100123", pubkey, Some("ethereum"))
-                .expect_err("reject");
-        assert!(matches!(err, WalletBindError::UnsupportedChain(_)));
+            VirtualNodeTelegramWalletService::bind("9002", "-100124", pk2, None).expect_err("409");
+        assert!(matches!(err, WalletBindError::RebindCooldown { .. }));
+        std::env::remove_var(ENV_TELEGRAM_WALLET_REBIND_COOLDOWN_SECS);
+        VirtualNodeTelegramWalletService::clear_all();
     }
 }

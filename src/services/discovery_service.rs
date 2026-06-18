@@ -3,6 +3,7 @@
 use crate::core::discovery_types::{PeerCapabilities, PeerInfo};
 use crate::core::error::AppError;
 use crate::core::state::ApiContext;
+use crate::grid::galaxy_worker_dto::{galaxy_worker_from_peer, GalaxyWorkerDto};
 use chrono::Utc;
 use serde::Serialize;
 use std::collections::HashMap;
@@ -109,6 +110,7 @@ impl DiscoveryService {
                     peer: p.clone(),
                     stale: age > stale_after_secs,
                     last_seen_age_secs: age,
+                    galaxy: galaxy_worker_from_peer(&p),
                 }
             })
             .collect())
@@ -162,6 +164,8 @@ pub struct VirtualNodeStatus {
     pub peer: PeerInfo,
     pub stale: bool,
     pub last_seen_age_secs: i64,
+    /// Galaxy §2.3 unified worker fields (PH-S507).
+    pub galaxy: GalaxyWorkerDto,
 }
 
 #[derive(Debug, Clone, Serialize)]

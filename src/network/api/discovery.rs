@@ -20,7 +20,8 @@ use crate::core::discovery_types::{PeerCapabilities, PeerInfo};
 use crate::core::error::{AppError, ErrorContext};
 use crate::core::state::ApiContext;
 use crate::grid::galaxy_capability_doc::{
-    parse_capability_document, validate_capability_document, CapabilityDocParseError,
+    parse_capability_document, validate_capability_document, validate_telegram_edge_capability,
+    CapabilityDocParseError,
 };
 use crate::grid::galaxy_network_profile::normalize_register_metadata;
 use crate::grid::galaxy_protocol_negotiation_metrics::{
@@ -262,7 +263,8 @@ async fn register_remote_handler(
             return discovery_validation("register_remote", e.message).into_response();
         }
     };
-    if let Some(doc_val) = &payload.capability_document {
+    let telegram_edge = is_telegram_edge_metadata(&metadata);
+    let parsed_capability = if let Some(doc_val) = &payload.capability_document {
         let doc = match parse_capability_document(doc_val) {
             Ok(d) => d,
             Err(CapabilityDocParseError { message }) => {
@@ -272,9 +274,19 @@ async fn register_remote_handler(
         if let Err(CapabilityDocParseError { message }) = validate_capability_document(&doc) {
             return discovery_validation("register_remote", message).into_response();
         }
+        Some(doc)
+    } else {
+        None
+    };
+    if let Err(CapabilityDocParseError { message }) =
+        validate_telegram_edge_capability(telegram_edge, parsed_capability.as_ref())
+    {
+        return discovery_validation("register_remote", message).into_response();
+    }
+    if let Some(doc) = parsed_capability {
         metadata.insert(
             "capability_document".to_string(),
-            serde_json::to_string(&doc).unwrap_or_else(|_| doc_val.to_string()),
+            serde_json::to_string(&doc).unwrap_or_else(|_| "{}".into()),
         );
     }
     if let Some(build_id) = payload.build_id {

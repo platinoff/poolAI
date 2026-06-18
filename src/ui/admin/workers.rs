@@ -122,6 +122,34 @@ pub async fn admin_workers() -> Html<String> {
     
     loadWorkers();
     setInterval(loadWorkers, 5000);
+
+    async function loadGalaxyVirtualNodes() {
+      const el = document.getElementById('galaxy-virtual-nodes-list');
+      if (!el) return;
+      adminShowLoading('galaxy-virtual-nodes-list', T('admin.wrk.vnLoading', 'Loading virtual nodes…'));
+      try {
+        const data = await fetchJson('/api/v1/discovery/virtual-nodes');
+        const nodes = (data && data.nodes) ? data.nodes : [];
+        nodes.sort(function(a, b) {
+          var la = (a.galaxy && a.galaxy.telemetry && a.galaxy.telemetry.latency_ms_p50) || 999999;
+          var lb = (b.galaxy && b.galaxy.telemetry && b.galaxy.telemetry.latency_ms_p50) || 999999;
+          return la - lb;
+        });
+        el.innerHTML = poolaiRenderGalaxyVirtualNodesPanel(nodes, {
+          peer: T('admin.wrk.vnColPeer', 'Peer'),
+          origin: T('admin.wrk.vnColOrigin', 'Origin'),
+          region: T('admin.wrk.vnColRegion', 'Region'),
+          latency: T('admin.wrk.vnColLatency', 'Latency ms p50'),
+          stale: T('admin.wrk.vnColStale', 'Liveness'),
+          tableAria: T('admin.wrk.vnSection', 'Galaxy virtual nodes'),
+          empty: T('admin.wrk.vnEmpty', 'No virtual nodes registered'),
+        });
+      } catch (e) {
+        adminShowInlineError('galaxy-virtual-nodes-list', e);
+      }
+    }
+    loadGalaxyVirtualNodes();
+    setInterval(loadGalaxyVirtualNodes, 8000);
     "#;
 
     admin_layout_workers(
@@ -134,6 +162,16 @@ pub async fn admin_workers() -> Html<String> {
             <button type="button" class="btn btn-primary" onclick="showCreateWorkerModal()" data-i18n="admin.wrk.createBtn" data-i18n-aria="workers.createBtnAria">Create Worker</button>
           </div>
           <div id="workers-list"></div>
+        </div>
+
+        <div class="admin-section">
+          <div class="admin-header">
+            <h2 data-i18n="admin.wrk.vnSection">Galaxy virtual nodes</h2>
+          </div>
+          <p class="muted admin-hint" data-i18n="admin.wrk.vnHint">
+            Origin badges and latency sort from unified Galaxy worker DTO (PH-S507/S508).
+          </p>
+          <div id="galaxy-virtual-nodes-list"></div>
         </div>
         
         <div id="createWorkerModal" class="modal" role="dialog" aria-labelledby="createWorkerModalTitle" aria-modal="false" aria-hidden="true">

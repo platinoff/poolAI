@@ -200,6 +200,25 @@ pub fn evaluate_result_verification_match(metrics: Option<&serde_json::Value>) -
     is_match
 }
 
+/// Grid result path stub: non-deterministic `semantic_hash` compare (PH-S511, Galaxy §6.2).
+/// Returns `Some(true)` on match, `Some(false)` on mismatch, `None` when not applicable.
+pub fn evaluate_semantic_hash_verification(metrics: Option<&serde_json::Value>) -> Option<bool> {
+    let m = metrics?;
+    let task_profile = m.get("task_profile").and_then(|v| v.as_str())?;
+    if !task_profile.eq_ignore_ascii_case("non_deterministic") {
+        return None;
+    }
+    let expected = m.get("expected_semantic_hash").and_then(|v| v.as_str())?;
+    let actual = m.get("semantic_hash").and_then(|v| v.as_str());
+    let is_match = actual.is_some_and(|a| a == expected);
+    if is_match {
+        record_verification_match();
+    } else {
+        record_verification_mismatch();
+    }
+    Some(is_match)
+}
+
 /// Grid result path stub: increment when verification verdict is `match` or `mismatch` (PH-S343).
 pub fn evaluate_result_verification_sample_completed(metrics: Option<&serde_json::Value>) -> bool {
     let completed = metrics
@@ -348,6 +367,35 @@ mod tests {
         assert!(!drain_verification_checker_task("job-missing"));
         drain_verification_checker_task("job-drain-2");
         assert_eq!(verification_checker_pending_total(), 0);
+        reset_verification_metrics_for_test();
+    }
+
+    #[test]
+    fn evaluate_semantic_hash_verification_ph_s511() {
+        let _lock = verification_metrics_test_lock();
+        reset_verification_metrics_for_test();
+        let match_metrics = json!({
+            "task_profile": "non_deterministic",
+            "expected_semantic_hash": "abc123",
+            "semantic_hash": "abc123"
+        });
+        assert_eq!(
+            evaluate_semantic_hash_verification(Some(&match_metrics)),
+            Some(true)
+        );
+        assert_eq!(verification_match_total(), 1);
+
+        reset_verification_metrics_for_test();
+        let mismatch_metrics = json!({
+            "task_profile": "non_deterministic",
+            "expected_semantic_hash": "abc123",
+            "semantic_hash": "other"
+        });
+        assert_eq!(
+            evaluate_semantic_hash_verification(Some(&mismatch_metrics)),
+            Some(false)
+        );
+        assert_eq!(verification_mismatch_total(), 1);
         reset_verification_metrics_for_test();
     }
 }

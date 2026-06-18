@@ -25,6 +25,7 @@ pub mod galaxy_trust_score;
 pub mod galaxy_verification_metrics;
 pub mod galaxy_verification_replay;
 pub mod galaxy_verify_sampling;
+pub mod galaxy_worker_dto;
 mod map;
 pub mod protocol_compat;
 

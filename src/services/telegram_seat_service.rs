@@ -5,6 +5,8 @@ use std::collections::HashSet;
 use std::sync::{LazyLock, Mutex};
 
 use crate::services::virtual_node_telegram_binding_service::VirtualNodeTelegramBindingService;
+use crate::services::virtual_node_telegram_wallet_service::VirtualNodeTelegramWalletService;
+use serde::Serialize;
 
 /// Env: max concurrent active `telegram_edge` workers (Galaxy §3.1 seat cap).
 pub const ENV_TELEGRAM_SEAT_LIMIT: &str = "POOLAI_TELEGRAM_SEAT_LIMIT";
@@ -89,6 +91,33 @@ pub fn try_admit_telegram_edge(peer_id: &str) -> Result<(), ()> {
 /// Active telegram_edge seat count (in-process stub).
 pub fn active_telegram_edge_seats() -> usize {
     ACTIVE_TELEGRAM_EDGE.lock().map(|g| g.len()).unwrap_or(0)
+}
+
+/// Coordinator seat snapshot for read API (PH-S505, Galaxy §3.1).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct TelegramSeatCoordinatorSnapshot {
+    pub seat_policy: String,
+    pub admin_max_seats: Option<u32>,
+    pub bound_wallets_count: usize,
+    pub seat_limit: Option<u32>,
+    pub active_telegram_edge_workers: usize,
+}
+
+pub fn telegram_seat_coordinator_snapshot() -> TelegramSeatCoordinatorSnapshot {
+    let policy = match telegram_seat_policy_from_env() {
+        TelegramSeatPolicy::Flat => "flat",
+        TelegramSeatPolicy::BoundWalletSession => "bound_wallet_session",
+    };
+    let admin_max = telegram_seat_limit_from_env();
+    let bound_wallets = VirtualNodeTelegramWalletService::list().len();
+    let seat_limit = admin_max.map(|max| compute_seat_limit(max, bound_wallets));
+    TelegramSeatCoordinatorSnapshot {
+        seat_policy: policy.to_string(),
+        admin_max_seats: admin_max,
+        bound_wallets_count: bound_wallets,
+        seat_limit,
+        active_telegram_edge_workers: active_telegram_edge_seats(),
+    }
 }
 
 #[cfg(any(test, feature = "test-utils"))]

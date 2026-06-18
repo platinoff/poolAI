@@ -1048,6 +1048,48 @@ async fn smoke_grid_network_profile_read(client: &Client, base: &str) -> Result<
     Ok(())
 }
 
+async fn smoke_grid_telegram_seats(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/api/v1/grid/telegram-seats"))
+        .send()
+        .await
+        .map_err(|e| format!("telegram-seats request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("telegram-seats status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    if body.get("ok").and_then(|v| v.as_bool()) != Some(true) {
+        return Err(format!("telegram-seats body: {body}"));
+    }
+    if !body.get("seat_policy").and_then(|v| v.as_str()).is_some() {
+        return Err(format!("telegram-seats missing seat_policy: {body}"));
+    }
+    Ok(())
+}
+
+async fn smoke_grid_network_profile_put(client: &Client, base: &str) -> Result<(), String> {
+    let peer = "smoke-peer-put-s504";
+    let resp = client
+        .put(api_url(
+            base,
+            &format!("/api/v1/grid/network-profiles/{peer}"),
+        ))
+        .json(&serde_json::json!({
+            "network_profile": { "region": "smoke", "latency_ms_p50": 11 }
+        }))
+        .send()
+        .await
+        .map_err(|e| format!("network-profiles PUT request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("network-profiles PUT status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    if body.get("ok").and_then(|v| v.as_bool()) != Some(true) {
+        return Err(format!("network-profiles PUT body: {body}"));
+    }
+    Ok(())
+}
+
 async fn smoke_grid_payout_batch_history(client: &Client, base: &str) -> Result<(), String> {
     let resp = client
         .get(api_url(base, "/api/v1/grid/payout-batch/history?limit=5"))
@@ -1850,6 +1892,18 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
         &mut cases,
         "grid_network_profile_read",
         smoke_grid_network_profile_read(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
+        "grid_telegram_seats",
+        smoke_grid_telegram_seats(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
+        "grid_network_profile_put",
+        smoke_grid_network_profile_put(&client, &cli.base_url).await,
     )
     .await;
     record(

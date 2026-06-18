@@ -17,6 +17,8 @@ enum Command {
     Status,
     #[command(description = "ping coordinator binding")]
     Start,
+    #[command(description = "bind payout wallet pubkey")]
+    Wallet(String),
 }
 
 pub async fn run_bot(token: &str, config: CoordinatorConfig) -> Result<(), String> {
@@ -61,6 +63,25 @@ async fn command_handler(
         }
         Command::Status => "/status",
         Command::Start => "/start",
+        Command::Wallet(pubkey) => {
+            if pubkey.trim().is_empty() {
+                bot.send_message(msg.chat.id, "Usage: /wallet <solana_pubkey> (Galaxy §3.2)")
+                    .await?;
+                return Ok(());
+            }
+            let user_id = msg.from.as_ref().map(|u| u.id.0 as i64).unwrap_or(0);
+            let chat_id = msg.chat.id.0;
+            if user_id == 0 {
+                bot.send_message(msg.chat.id, "Cannot resolve Telegram user id")
+                    .await?;
+                return Ok(());
+            }
+            let result =
+                crate::tgbot::coordinator::bind_wallet(&cfg, user_id, chat_id, pubkey.trim()).await;
+            let reply = crate::tgbot::coordinator::format_wallet_reply(&result);
+            bot.send_message(msg.chat.id, reply).await?;
+            return Ok(());
+        }
     };
     handle_user_text(bot, msg, cfg, text).await
 }

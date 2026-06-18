@@ -8,6 +8,8 @@ use poolai_ui_core::api_error::{api_error_detail_from_body, format_fetch_error};
 use poolai_ui_core::format::{
     alert_severity_badge_class, escape_html, format_megabytes, format_percent, format_uptime,
 };
+use poolai_ui_core::galaxy_virtual_nodes::render_galaxy_virtual_nodes_panel_html;
+use poolai_ui_core::grid_verification::render_grid_verification_panel_html;
 use poolai_ui_core::instances::render_instances_panel_html;
 use poolai_ui_core::lease::lease_state;
 use poolai_ui_core::ml::{
@@ -490,6 +492,50 @@ pub fn render_vm_panel_wasm(
         start_label,
         stop_label,
         delete_label,
+        empty_message,
+    )
+}
+
+#[wasm_bindgen(js_name = renderGalaxyVirtualNodesPanel)]
+pub fn render_galaxy_virtual_nodes_panel_wasm(
+    nodes_json: &str,
+    col_peer: &str,
+    col_origin: &str,
+    col_region: &str,
+    col_latency: &str,
+    col_stale: &str,
+    table_aria: &str,
+    empty_message: &str,
+) -> String {
+    render_galaxy_virtual_nodes_panel_html(
+        nodes_json,
+        col_peer,
+        col_origin,
+        col_region,
+        col_latency,
+        col_stale,
+        table_aria,
+        empty_message,
+    )
+}
+
+#[wasm_bindgen(js_name = renderGridVerificationPanel)]
+pub fn render_grid_verification_panel_wasm(
+    tasks_json: &str,
+    pending_total: u64,
+    col_job: &str,
+    col_type: &str,
+    col_pending: &str,
+    table_aria: &str,
+    empty_message: &str,
+) -> String {
+    render_grid_verification_panel_html(
+        tasks_json,
+        pending_total,
+        col_job,
+        col_type,
+        col_pending,
+        table_aria,
         empty_message,
     )
 }

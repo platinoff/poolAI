@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-18 (PH-S494…S503 ✅ · rust_ratio **94.41%**) · VDT
+**Оновлено:** 2026-06-18 (PH-S504…S513 ✅ · rust_ratio **94.41%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -454,6 +454,16 @@
 **PH-S501 ✅ (ops):** `poolai_http_stand_smoke` — checker tasks + network profile + `galaxy_verification_checker_pending_total`.
 **PH-S502 ✅ (ops):** `rust_ratio.json` **94.41%**; FM/HANDOFF/NEXT.
 **PH-S503 ✅ (ops):** `poolai-vision-sync` **rev 238** + `--check`.
+**PH-S504 ✅ (code):** mandatory signed `capability_document` for `telegram_edge` on register-remote; `validate_telegram_edge_capability`.
+**PH-S505 ✅ (code):** `GET /api/v1/grid/telegram-seats` — seat coordinator snapshot (Galaxy §3.1).
+**PH-S506 ✅ (code):** `PUT /api/v1/grid/network-profiles/{peer_id}` — profile upsert + GET round-trip.
+**PH-S507 ✅ (code):** `galaxy_worker_dto` on `GET /api/v1/discovery/virtual-nodes` (`galaxy` field).
+**PH-S508 ✅ (ui):** workers admin — Galaxy virtual-nodes panel (origin badges, latency sort); wasm `renderGalaxyVirtualNodesPanel`.
+**PH-S509 ✅ (code):** tgbot `/wallet` command → `POST …/telegram/wallet` via coordinator client.
+**PH-S510 ✅ (code):** wallet rebind cooldown — `409 wallet_rebind_cooldown`; `POOLAI_TELEGRAM_WALLET_REBIND_COOLDOWN_SECS`.
+**PH-S511 ✅ (code):** `evaluate_semantic_hash_verification` on grid result ingest (non_deterministic task_profile).
+**PH-S512 ✅ (ui):** `/ui/admin/grid-verification` read-only checker tasks panel; wasm `renderGridVerificationPanel`.
+**PH-S513 ✅ (ops):** `galaxy_horizon_s504_integration` + stand smoke (telegram-seats, network-profile PUT) + loc-audit + vision-sync.
 **Rules ✅:** **`абракадабра`** — project scan **всього репо** (concept · FM §5.1 · roadmaps · architect · code) → 10 PH-S* у §5.12 (журнал) → drain → push; канон [`.cursor/rules/poolai-session-iteration.mdc`](../.cursor/rules/poolai-session-iteration.mdc) § «Тригер абракадабра»; commit **`git-commit-tree-msg.sh`**.
 **§5.12:** **0** відкритих — наступна сесія: **`абракадабра`** (project scan + drain) або один PH-S*.
 **Vision ✅:** rev **238** · rust_ratio **94.41%** · hold **95%** advisory.

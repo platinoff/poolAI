@@ -29,6 +29,10 @@ impl CoordinatorConfig {
     pub fn webhook_url(&self) -> String {
         format!("{}/api/v1/virtual-nodes/telegram/webhook", self.base_url)
     }
+
+    pub fn wallet_url(&self) -> String {
+        format!("{}/api/v1/virtual-nodes/telegram/wallet", self.base_url)
+    }
 }
 
 /// Build Telegram Bot API-shaped JSON accepted by `POST .../telegram/webhook`.
@@ -51,6 +55,13 @@ pub struct ForwardResult {
     pub detail: Option<String>,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct WalletBindResult {
+    pub ok: bool,
+    pub payout_pubkey: Option<String>,
+    pub detail: Option<String>,
+}
+
 /// POST update JSON to coordinator virtual-node webhook.
 pub async fn forward_message(
     config: &CoordinatorConfig,
@@ -61,6 +72,64 @@ pub async fn forward_message(
 ) -> Result<ForwardResult, String> {
     let payload = message_to_webhook_payload(update_id, user_id, chat_id, text);
     forward_payload(config, &payload).await
+}
+
+/// POST wallet bind to coordinator (PH-S509, Galaxy §3.2).
+pub async fn bind_wallet(
+    config: &CoordinatorConfig,
+    user_id: i64,
+    chat_id: i64,
+    payout_pubkey: &str,
+) -> Result<WalletBindResult, String> {
+    let client = reqwest::Client::builder()
+        .timeout(Duration::from_secs(15))
+        .build()
+        .map_err(|e| e.to_string())?;
+
+    let payload = json!({
+        "telegram_user_id": user_id.to_string(),
+        "chat_id": chat_id.to_string(),
+        "payout_pubkey": payout_pubkey,
+        "chain": "solana",
+    });
+
+    let response = client
+        .post(config.wallet_url())
+        .header("content-type", "application/json")
+        .json(&payload)
+        .send()
+        .await
+        .map_err(|e| format!("wallet bind request failed: {e}"))?;
+
+    let status = response.status();
+    let body = response.text().await.unwrap_or_default();
+
+    if status.is_success() {
+        let v: Value = serde_json::from_str(&body).map_err(|e| format!("parse response: {e}"))?;
+        return Ok(WalletBindResult {
+            ok: true,
+            payout_pubkey: v
+                .get("wallet")
+                .and_then(|w| w.get("payout_pubkey"))
+                .and_then(|x| x.as_str())
+                .map(str::to_string),
+            detail: None,
+        });
+    }
+
+    let detail = serde_json::from_str::<Value>(&body)
+        .ok()
+        .and_then(|v| {
+            v.get("message")
+                .and_then(|m| m.as_str())
+                .map(str::to_string)
+        })
+        .unwrap_or(body);
+    Ok(WalletBindResult {
+        ok: false,
+        payout_pubkey: None,
+        detail: Some(format!("HTTP {status}: {detail}")),
+    })
 }
 
 pub async fn forward_payload(
@@ -125,6 +194,21 @@ pub fn format_reply(result: &Result<ForwardResult, String>) -> String {
     }
 }
 
+/// User-facing reply after wallet bind (PH-S509).
+pub fn format_wallet_reply(result: &Result<WalletBindResult, String>) -> String {
+    match result {
+        Ok(r) if r.ok => {
+            let pk = r.payout_pubkey.as_deref().unwrap_or("?");
+            format!("✅ Wallet bound: `{pk}`")
+        }
+        Ok(r) => r
+            .detail
+            .clone()
+            .unwrap_or_else(|| "Wallet bind rejected".to_string()),
+        Err(e) => format!("❌ {e}"),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -135,5 +219,16 @@ mod tests {
         assert_eq!(v["update_id"], 1);
         assert_eq!(v["message"]["from"]["id"], 42);
         assert_eq!(v["message"]["text"], "/status");
+    }
+
+    #[test]
+    fn wallet_bind_payload_fields_ph_s509() {
+        let cfg = CoordinatorConfig {
+            base_url: "http://127.0.0.1:8080".into(),
+            webhook_secret: None,
+        };
+        assert!(cfg
+            .wallet_url()
+            .ends_with("/api/v1/virtual-nodes/telegram/wallet"));
     }
 }

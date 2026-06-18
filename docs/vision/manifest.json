@@ -1868,11 +1868,17 @@
       "from": "galaxy_grid",
       "kind": "implements",
       "to": "src_grid_galaxy_network_profile_store_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_vm_rs"
     }
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S503",
+  "last_sprint_closed": "PH-S513",
   "layers": [
     {
       "id": "L0",
@@ -7877,9 +7883,23 @@
       "label": "galaxy_horizon_s484_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s484_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_vm_rs",
+      "label": "vm.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/vm.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s494_integration_rs",
+      "label": "galaxy_horizon_s494_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s494_integration.rs"
     }
   ],
-  "revision": 238,
+  "revision": 239,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -11822,6 +11842,96 @@
       "row": 438,
       "status": "closed",
       "title": "Ops close band: vision-sync"
+    },
+    {
+      "acceptance": "reject unsigned register-remote; dev fixture passes; integration test",
+      "deps": "Galaxy §6.6/§9",
+      "id": "PH-S504",
+      "open": false,
+      "row": 439,
+      "status": "closed",
+      "title": "Mandatory signed capability for `telegram_edge"
+    },
+    {
+      "acceptance": "GET /api/v1/grid/telegram-seats`; seat snapshot fields",
+      "deps": "Galaxy §3.1",
+      "id": "PH-S505",
+      "open": false,
+      "row": 440,
+      "status": "closed",
+      "title": "Telegram seat coordinator read API"
+    },
+    {
+      "acceptance": "PUT /api/v1/grid/network-profiles/{peer_id}`; round-trip GET",
+      "deps": "Galaxy §8.1",
+      "id": "PH-S506",
+      "open": false,
+      "row": 441,
+      "status": "closed",
+      "title": "Network profile upsert API"
+    },
+    {
+      "acceptance": "galaxy` field on virtual-nodes list; origin + network_profile",
+      "deps": "Galaxy §2.3",
+      "id": "PH-S507",
+      "open": false,
+      "row": 442,
+      "status": "closed",
+      "title": "Unified Galaxy worker DTO on virtual-nodes"
+    },
+    {
+      "acceptance": "virtual-nodes panel on `/ui/admin/workers`; wasm renderer",
+      "deps": "PH-S507",
+      "id": "PH-S508",
+      "open": false,
+      "row": 443,
+      "status": "closed",
+      "title": "Admin workers: origin badges + locality sort"
+    },
+    {
+      "acceptance": "Wallet` command POSTs wallet bind API; coordinator unit test",
+      "deps": "Galaxy §3.2",
+      "id": "PH-S509",
+      "open": false,
+      "row": 444,
+      "status": "closed",
+      "title": "tgbot `/wallet` command"
+    },
+    {
+      "acceptance": "409 `wallet_rebind_cooldown`; env cooldown secs",
+      "deps": "Galaxy §3.2",
+      "id": "PH-S510",
+      "open": false,
+      "row": 445,
+      "status": "closed",
+      "title": "Payout wallet rebind cooldown"
+    },
+    {
+      "acceptance": "semantic_hash match/mismatch on grid result path",
+      "deps": "Galaxy §6.2",
+      "id": "PH-S511",
+      "open": false,
+      "row": 446,
+      "status": "closed",
+      "title": "Non-deterministic `semantic_hash` stub"
+    },
+    {
+      "acceptance": "/ui/admin/grid-verification`; wasm table renderer",
+      "deps": "PH-S494",
+      "id": "PH-S512",
+      "open": false,
+      "row": 447,
+      "status": "closed",
+      "title": "Admin grid verification-checker panel"
+    },
+    {
+      "acceptance": "galaxy_horizon_s504_integration` + stand smoke + loc-audit + vision-sync",
+      "deps": "§5.12 fallback",
+      "id": "PH-S513",
+      "open": false,
+      "row": 448,
+      "status": "closed",
+      "title": "Horizon close band S504–S512"
     }
   ],
   "sprint_queue_open_count": 0,
