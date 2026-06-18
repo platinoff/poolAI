@@ -29,35 +29,12 @@ function poolaiMetricPointValues(data) {
   });
 }
 
-function poolaiChartScaleFallback(values, width, height, padding) {
-  var min = Math.min.apply(null, values);
-  var max = Math.max.apply(null, values);
-  var range = max - min || 1;
-  var chartWidth = width - padding * 2;
-  var chartHeight = height - padding * 2;
-  var points = values.map(function (v, i) {
-    var x = padding + (i / (values.length - 1 || 1)) * chartWidth;
-    var y = padding + chartHeight - ((v - min) / range) * chartHeight;
-    return { x: x, y: y };
-  });
-  return {
-    min: min,
-    max: max,
-    range: range,
-    chartWidth: chartWidth,
-    chartHeight: chartHeight,
-    padding: padding,
-    points: points,
-    polyline: points.map(function (p) { return p.x + ',' + p.y; }).join(' '),
-  };
-}
-
 function poolaiChartScale(values, width, height, padding) {
   var wasm = poolaiChartsWasm();
   if (wasm && typeof wasm.chartScale === 'function') {
     return wasm.chartScale(JSON.stringify(values || []), width, height, padding);
   }
-  return poolaiChartScaleFallback(values, width, height, padding);
+  return { points: [], polyline: '', min: 0, max: 0, range: 1, chartWidth: width, chartHeight: height, padding: padding };
 }
 
 /**
@@ -132,14 +109,39 @@ function poolaiGroupMetricsByName(metrics) {
   if (wasm && typeof wasm.groupMetricsByName === 'function') {
     return wasm.groupMetricsByName(JSON.stringify(metrics || []));
   }
-  var by = {};
-  if (!Array.isArray(metrics)) return by;
-  metrics.forEach(function (m) {
-    var key = m && m.metric ? m.metric : 'unknown';
-    if (!by[key]) by[key] = [];
-    by[key].push(m);
-  });
-  return by;
+  return {};
+}
+
+function poolaiAlertRulesUrl() {
+  var wasm = poolaiChartsWasm();
+  return wasm && typeof wasm.buildAlertRulesUrl === 'function'
+    ? wasm.buildAlertRulesUrl()
+    : '/api/enterprise/monitoring/alert-rules';
+}
+
+function poolaiMonitoringDashboardsUrl() {
+  var wasm = poolaiChartsWasm();
+  return wasm && typeof wasm.buildMonitoringDashboardsUrl === 'function'
+    ? wasm.buildMonitoringDashboardsUrl()
+    : '/api/enterprise/monitoring/dashboards';
+}
+
+function poolaiMonitoringAlertAcknowledgeUrl(alertId) {
+  var wasm = poolaiChartsWasm();
+  return wasm && typeof wasm.buildMonitoringAlertAcknowledgeUrl === 'function'
+    ? wasm.buildMonitoringAlertAcknowledgeUrl(String(alertId || ''))
+    : '/api/enterprise/monitoring/alerts/' + encodeURIComponent(String(alertId || '')) + '/acknowledge';
+}
+
+function poolaiMonitoringMetricLatestUrl(metricName, limit) {
+  var wasm = poolaiChartsWasm();
+  var lim = limit != null ? limit : 10;
+  return wasm && typeof wasm.buildMonitoringMetricLatestUrl === 'function'
+    ? wasm.buildMonitoringMetricLatestUrl(String(metricName || ''), lim)
+    : '/api/enterprise/monitoring/metrics?metric=' +
+        encodeURIComponent(String(metricName || '')) +
+        '&limit=' +
+        lim;
 }
 
 /**
@@ -183,98 +185,7 @@ function poolaiRenderLineChart(metricName, data, opts) {
       statAvg,
     );
   }
-
-  var scale = poolaiChartScale(values, width, height, padding);
-  var gradId = 'grad-' + poolaiSanitizeChartId(metricName);
-  var avg = values.reduce(function (a, b) {
-    return a + b;
-  }, 0) / values.length;
-
-  var circles = scale.points
-    .map(function (p) {
-      return (
-        '<circle cx="' +
-        p.x +
-        '" cy="' +
-        p.y +
-        '" r="3" fill="var(--primary, #67e480)" />'
-      );
-    })
-    .join('');
-
-  return (
-    '<div class="metric-chart-container">' +
-    '<h4>' +
-    escapeHtml(metricName) +
-    '</h4>' +
-    '<svg width="' +
-    width +
-    '" height="' +
-    height +
-    '" class="metric-chart-svg" role="img" aria-label="' +
-    escapeHtml(metricName) +
-    '">' +
-    '<defs><linearGradient id="' +
-    gradId +
-    '" x1="0%" y1="0%" x2="0%" y2="100%">' +
-    '<stop offset="0%" style="stop-color:var(--primary, #67e480);stop-opacity:0.3" />' +
-    '<stop offset="100%" style="stop-color:var(--primary, #67e480);stop-opacity:0.05" />' +
-    '</linearGradient></defs>' +
-    '<rect x="' +
-    scale.padding +
-    '" y="' +
-    scale.padding +
-    '" width="' +
-    scale.chartWidth +
-    '" height="' +
-    scale.chartHeight +
-    '" fill="url(#' +
-    gradId +
-    ')" />' +
-    '<polyline points="' +
-    scale.polyline +
-    '" fill="none" stroke="var(--primary, #67e480)" stroke-width="2" />' +
-    circles +
-    '<text x="' +
-    scale.padding +
-    '" y="' +
-    (scale.padding - 10) +
-    '" fill="var(--text, #f8f8f2)" font-size="12">' +
-    scale.max.toFixed(1) +
-    '</text>' +
-    '<text x="' +
-    scale.padding +
-    '" y="' +
-    (height - scale.padding + 20) +
-    '" fill="var(--text, #f8f8f2)" font-size="12">' +
-    scale.min.toFixed(1) +
-    '</text>' +
-    '<text x="' +
-    (width - scale.padding) +
-    '" y="' +
-    (height - scale.padding + 20) +
-    '" fill="var(--text-muted, #a8b0bf)" font-size="10" text-anchor="end">' +
-    escapeHtml(pointsLabel) +
-    '</text>' +
-    '</svg>' +
-    '<div class="metric-stats">' +
-    '<span>' +
-    escapeHtml(statMin) +
-    ' <strong>' +
-    scale.min.toFixed(2) +
-    '</strong></span>' +
-    '<span>' +
-    escapeHtml(statMax) +
-    ' <strong>' +
-    scale.max.toFixed(2) +
-    '</strong></span>' +
-    '<span>' +
-    escapeHtml(statAvg) +
-    ' <strong>' +
-    avg.toFixed(2) +
-    '</strong></span>' +
-    '</div></div>'
-  );
+  return '<div class="muted">' + escapeHtml(noData) + '</div>';
 }
 
 /**
@@ -293,35 +204,7 @@ function poolaiRenderSparkline(label, values, opts) {
   if (wasm && typeof wasm.renderSparklineHtml === 'function') {
     return wasm.renderSparklineHtml(label, JSON.stringify(values), width, height, avgLabel);
   }
-  var scale = poolaiChartScale(values, width, height, 4);
-  var avg =
-    values.reduce(function (a, b) {
-      return a + b;
-    }, 0) / values.length;
-  return (
-    '<div class="metric-sparkline-card">' +
-    '<div class="metric-sparkline-label">' +
-    escapeHtml(label) +
-    '</div>' +
-    '<svg width="' +
-    width +
-    '" height="' +
-    height +
-    '" class="metric-sparkline-svg" role="img" aria-label="' +
-    escapeHtml(label) +
-    '">' +
-    '<polyline points="' +
-    scale.polyline +
-    '" fill="none" stroke="var(--primary, #67e480)" stroke-width="1.5" />' +
-    '</svg>' +
-    '<div class="metric-sparkline-avg">' +
-    '<span class="metric-sparkline-avg-label">' +
-    escapeHtml(avgLabel) +
-    '</span>' +
-    '<strong>' +
-    avg.toFixed(1) +
-    '</strong></div></div>'
-  );
+  return '';
 }
 
 /**
@@ -602,48 +485,6 @@ async function poolaiFetchAlertRules() {
     console.warn('poolaiFetchAlertRules:', e);
     return [];
   }
-}
-
-function poolaiAlertRulesUrl() {
-  var wasm = poolaiChartsWasm();
-  if (wasm && typeof wasm.buildAlertRulesUrl === 'function') {
-    return wasm.buildAlertRulesUrl();
-  }
-  return '/api/enterprise/monitoring/alert-rules';
-}
-
-function poolaiMonitoringDashboardsUrl() {
-  var wasm = poolaiChartsWasm();
-  if (wasm && typeof wasm.buildMonitoringDashboardsUrl === 'function') {
-    return wasm.buildMonitoringDashboardsUrl();
-  }
-  return '/api/enterprise/monitoring/dashboards';
-}
-
-function poolaiMonitoringAlertAcknowledgeUrl(alertId) {
-  var wasm = poolaiChartsWasm();
-  if (wasm && typeof wasm.buildMonitoringAlertAcknowledgeUrl === 'function') {
-    return wasm.buildMonitoringAlertAcknowledgeUrl(String(alertId || ''));
-  }
-  return (
-    '/api/enterprise/monitoring/alerts/' +
-    encodeURIComponent(String(alertId || '')) +
-    '/acknowledge'
-  );
-}
-
-function poolaiMonitoringMetricLatestUrl(metricName, limit) {
-  var wasm = poolaiChartsWasm();
-  var lim = limit != null ? limit : 10;
-  if (wasm && typeof wasm.buildMonitoringMetricLatestUrl === 'function') {
-    return wasm.buildMonitoringMetricLatestUrl(String(metricName || ''), lim);
-  }
-  return (
-    '/api/enterprise/monitoring/metrics?metric=' +
-    encodeURIComponent(String(metricName || '')) +
-    '&limit=' +
-    lim
-  );
 }
 
 async function poolaiRunMlPipelineDemo() {

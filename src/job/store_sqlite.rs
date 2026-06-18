@@ -124,6 +124,7 @@ mod tests {
             lease_expires_at: None,
             migration_count: None,
             fail_reason: None,
+            leased_at: None,
         }
     }
 

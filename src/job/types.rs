@@ -126,6 +126,9 @@ pub struct JobRecord {
     /// Fail reason when job fails after lease failover budget (PH-S518).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub fail_reason: Option<String>,
+    /// When job entered `Leased` (PH-S530 queue-starvation stub).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub leased_at: Option<DateTime<Utc>>,
 }
 
 impl JobRecord {
@@ -263,6 +266,7 @@ mod lease_tests {
             lease_expires_at: Some(before + chrono::Duration::seconds(90)),
             migration_count: None,
             fail_reason: None,
+            leased_at: None,
         };
         assert!(check_grid_result_lease_epoch(&record, Some(2), before).is_ok());
         assert!(check_grid_result_lease_epoch(&record, None, before).is_err());
@@ -295,6 +299,7 @@ mod lease_tests {
             lease_expires_at: Some(expires),
             migration_count: None,
             fail_reason: None,
+            leased_at: None,
         };
         assert!(check_patch_lease_epoch(&record, None, before).is_ok());
         assert!(check_patch_lease_epoch(&record, Some(5), before).is_ok());
@@ -337,6 +342,7 @@ mod lease_tests {
             lease_expires_at: Some(expires),
             migration_count: None,
             fail_reason: None,
+            leased_at: None,
         };
         let json = serde_json::to_string(&record).expect("serialize");
         let back: JobRecord = serde_json::from_str(&json).expect("deserialize");

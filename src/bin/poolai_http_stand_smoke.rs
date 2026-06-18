@@ -690,6 +690,31 @@ async fn smoke_galaxy_settlement_metrics(client: &Client, base: &str) -> Result<
     metrics_text_has_settlement_counters(&body)
 }
 
+/// PH-S528: governance ops Prometheus gauges on live stand.
+const GALAXY_GOVERNANCE_METRICS: &[&str] = &[
+    "poolai_release_verify_total",
+    "poolai_release_verify_fail_total",
+    "poolai_update_notify_pending",
+];
+
+async fn smoke_galaxy_governance_metrics(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("/metrics request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("/metrics status {}", resp.status()));
+    }
+    let body = resp.text().await.map_err(|e| e.to_string())?;
+    for name in GALAXY_GOVERNANCE_METRICS {
+        if !body.contains(name) {
+            return Err(format!("/metrics missing {name}"));
+        }
+    }
+    Ok(())
+}
+
 /// PH-S250: live stand exposes Galaxy shard local hit ratio gauge.
 const GALAXY_SHARD_LOCAL_HIT_RATIO: &str = "galaxy_shard_local_hit_ratio";
 
@@ -1181,6 +1206,9 @@ async fn smoke_grid_payout_batch(client: &Client, base: &str) -> Result<(), Stri
     let body: Value = resp.json().await.map_err(|e| e.to_string())?;
     if body.get("ok").and_then(|v| v.as_bool()) != Some(true) {
         return Err(format!("payout-batch body: {body}"));
+    }
+    if body.get("settlement_mode").and_then(|v| v.as_str()) != Some("offline_batch") {
+        return Err(format!("payout-batch missing settlement_mode: {body}"));
     }
     Ok(())
 }
@@ -1922,6 +1950,12 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
         &mut cases,
         "galaxy_settlement_metrics",
         smoke_galaxy_settlement_metrics(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
+        "galaxy_governance_metrics",
+        smoke_galaxy_governance_metrics(&client, &cli.base_url).await,
     )
     .await;
     record(

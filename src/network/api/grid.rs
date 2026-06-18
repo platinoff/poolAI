@@ -138,6 +138,10 @@ async fn get_grid_verification_replay(
 #[derive(Debug, Serialize)]
 struct GridPayoutBatchResponse {
     ok: bool,
+    /// Settlement mechanism stub (PH-S531, Galaxy §8.2).
+    settlement_mode: &'static str,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    on_chain_pending: Option<bool>,
     entry: Option<crate::grid::galaxy_settlement::PayoutBatchLedgerEntry>,
 }
 
@@ -148,6 +152,8 @@ async fn get_grid_payout_batch(
         StatusCode::OK,
         Json(GridPayoutBatchResponse {
             ok: true,
+            settlement_mode: "offline_batch",
+            on_chain_pending: Some(false),
             entry: crate::grid::galaxy_settlement_metrics::last_payout_batch_ledger_entry(),
         }),
     ))

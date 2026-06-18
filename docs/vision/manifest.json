@@ -1892,11 +1892,35 @@
       "from": "galaxy_grid",
       "kind": "implements",
       "to": "src_grid_galaxy_worker_dto_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_galaxy_telegram_seats_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_worker_health_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_job_lease_failover_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "job_types",
+      "kind": "sprint-scope",
+      "to": "tests_jobs_failover_budget_integration_rs"
     }
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S523",
+  "last_sprint_closed": "PH-S533",
   "layers": [
     {
       "id": "L0",
@@ -7971,9 +7995,65 @@
       "label": "telegram_seat_read_integration.rs",
       "layer": "L3",
       "path": "tests/telegram_seat_read_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_galaxy_telegram_seats_rs",
+      "label": "galaxy_telegram_seats.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/galaxy_telegram_seats.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_worker_health_rs",
+      "label": "galaxy_worker_health.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_worker_health.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_job_lease_failover_rs",
+      "label": "lease_failover.rs",
+      "layer": "L3",
+      "path": "src/job/lease_failover.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ui_admin_telegram_seats_rs",
+      "label": "telegram_seats.rs",
+      "layer": "L3",
+      "path": "src/ui/admin/telegram_seats.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_discovery_heartbeat_unhealthy_integration_rs",
+      "label": "discovery_heartbeat_unhealthy_integration.rs",
+      "layer": "L3",
+      "path": "tests/discovery_heartbeat_unhealthy_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s514_integration_rs",
+      "label": "galaxy_horizon_s514_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s514_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_worker_dto_integration_rs",
+      "label": "galaxy_worker_dto_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_worker_dto_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_jobs_failover_budget_integration_rs",
+      "label": "jobs_failover_budget_integration.rs",
+      "layer": "L3",
+      "path": "tests/jobs_failover_budget_integration.rs"
     }
   ],
-  "revision": 240,
+  "revision": 241,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -12096,6 +12176,96 @@
       "row": 458,
       "status": "closed",
       "title": "Horizon close band S514–S522"
+    },
+    {
+      "acceptance": "fail_reason=worker-unhealthy`; `jobs_worker_unhealthy_failover_integration",
+      "deps": "Galaxy §4.3.3",
+      "id": "PH-S524",
+      "open": false,
+      "row": 459,
+      "status": "closed",
+      "title": "Worker-unhealthy → lease failover requeue"
+    },
+    {
+      "acceptance": "pick_worker` + grid peer bind; `jobs_scheduler_unhealthy_integration",
+      "deps": "Galaxy §4.3.3",
+      "id": "PH-S525",
+      "open": false,
+      "row": 460,
+      "status": "closed",
+      "title": "Scheduler bind skips unhealthy peers"
+    },
+    {
+      "acceptance": "POOLAI_JOB_MAX_TOTAL_RUNTIME_SECS`; unit tests in `lease_failover.rs",
+      "deps": "Galaxy §4.3.3",
+      "id": "PH-S526",
+      "open": false,
+      "row": 461,
+      "status": "closed",
+      "title": "max_total_runtime` job lifecycle cap"
+    },
+    {
+      "acceptance": "validate_capability_document_at`; telegram_edge requires expiry",
+      "deps": "Galaxy §6.6/§9",
+      "id": "PH-S527",
+      "open": false,
+      "row": 462,
+      "status": "closed",
+      "title": "Signed capability `expires_at` enforcement"
+    },
+    {
+      "acceptance": "poolai_release_verify_*` + `poolai_update_notify_pending`; stand smoke",
+      "deps": "Galaxy §9.8",
+      "id": "PH-S528",
+      "open": false,
+      "row": 463,
+      "status": "closed",
+      "title": "Governance ops Prometheus gauges"
+    },
+    {
+      "acceptance": "hydrate_persisted_network_profiles`; `network_profile_hydrate_integration",
+      "deps": "Galaxy §8.1",
+      "id": "PH-S529",
+      "open": false,
+      "row": 464,
+      "status": "closed",
+      "title": "Startup hydrate persisted `network_profile"
+    },
+    {
+      "acceptance": "POOLAI_JOB_QUEUE_STARVATION_SECS` + `leased_at`; unit tests",
+      "deps": "Galaxy §4.3.3",
+      "id": "PH-S530",
+      "open": false,
+      "row": 465,
+      "status": "closed",
+      "title": "queue_starvation` failover stub"
+    },
+    {
+      "acceptance": "GET /api/v1/grid/payout-batch` → `settlement_mode: offline_batch",
+      "deps": "Galaxy §8.2",
+      "id": "PH-S531",
+      "open": false,
+      "row": 466,
+      "status": "closed",
+      "title": "Offline settlement mode on payout-batch wire"
+    },
+    {
+      "acceptance": "line/sparkline JS fallbacks removed; wasm-first chart glue",
+      "deps": "RUST_RATIO §5.13",
+      "id": "PH-S532",
+      "open": false,
+      "row": 467,
+      "status": "closed",
+      "title": "admin_charts.js` wasm slim band"
+    },
+    {
+      "acceptance": "galaxy_horizon_s524_integration` + stand smoke + loc-audit + vision-sync",
+      "deps": "§5.12 fallback",
+      "id": "PH-S533",
+      "open": false,
+      "row": 468,
+      "status": "closed",
+      "title": "Horizon close band S524–S532"
     }
   ],
   "sprint_queue_open_count": 0,

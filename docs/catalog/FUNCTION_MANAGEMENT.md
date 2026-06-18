@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-18 (PH-S514…S523 ✅ · vision **rev 240** · **0** відкритих · rust_ratio **94.47%**)
+**Оновлено:** 2026-06-18 (PH-S524…S533 ✅ · vision **rev 241** · **0** відкритих · rust_ratio **94.5%+**)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -723,8 +723,18 @@ FM-xxx (з таблиці нижче)
 | 456 | **PH-S521** | Payout batch fee-split ledger fields | Galaxy §8.2 | `PayoutBatchLedgerEntry` split fields; payout-batch GET test | **✅** |
 | 457 | **PH-S522** | Heartbeat miss → worker unhealthy metric | Galaxy §4.3.3 | `galaxy_worker_health`; `/metrics` gauge | **✅** |
 | 458 | **PH-S523** | Horizon close band S514–S522 | §5.12 fallback | `galaxy_horizon_s514_integration` + stand smoke + loc-audit + vision-sync | **✅** |
+| 459 | **PH-S524** | Worker-unhealthy → lease failover requeue | Galaxy §4.3.3 | `fail_reason=worker-unhealthy`; `jobs_worker_unhealthy_failover_integration` | **✅** |
+| 460 | **PH-S525** | Scheduler bind skips unhealthy peers | Galaxy §4.3.3 | `pick_worker` + grid peer bind; `jobs_scheduler_unhealthy_integration` | **✅** |
+| 461 | **PH-S526** | `max_total_runtime` job lifecycle cap | Galaxy §4.3.3 | `POOLAI_JOB_MAX_TOTAL_RUNTIME_SECS`; unit tests in `lease_failover.rs` | **✅** |
+| 462 | **PH-S527** | Signed capability `expires_at` enforcement | Galaxy §6.6/§9 | `validate_capability_document_at`; telegram_edge requires expiry | **✅** |
+| 463 | **PH-S528** | Governance ops Prometheus gauges | Galaxy §9.8 | `poolai_release_verify_*` + `poolai_update_notify_pending`; stand smoke | **✅** |
+| 464 | **PH-S529** | Startup hydrate persisted `network_profile` | Galaxy §8.1 | `hydrate_persisted_network_profiles`; `network_profile_hydrate_integration` | **✅** |
+| 465 | **PH-S530** | `queue_starvation` failover stub | Galaxy §4.3.3 | `POOLAI_JOB_QUEUE_STARVATION_SECS` + `leased_at`; unit tests | **✅** |
+| 466 | **PH-S531** | Offline settlement mode on payout-batch wire | Galaxy §8.2 | `GET /api/v1/grid/payout-batch` → `settlement_mode: offline_batch` | **✅** |
+| 467 | **PH-S532** | `admin_charts.js` wasm slim band | RUST_RATIO §5.13 | line/sparkline JS fallbacks removed; wasm-first chart glue | **✅** |
+| 468 | **PH-S533** | Horizon close band S524–S532 | §5.12 fallback | `galaxy_horizon_s524_integration` + stand smoke + loc-audit + vision-sync | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S514…S523 ✅. Vision rev **240**. rust_ratio **94.47%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S524…S533 ✅. Vision rev **241**. rust_ratio **94.61%**.
 
 **Наступна сесія:** **`абракадабра`** (project scan → drain) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 

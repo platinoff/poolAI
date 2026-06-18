@@ -25,6 +25,7 @@ fn sample_record(id: &str) -> JobRecord {
         lease_expires_at: None,
         migration_count: None,
         fail_reason: None,
+        leased_at: None,
     }
 }
 

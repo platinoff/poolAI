@@ -178,6 +178,7 @@ mod tests {
             lease_expires_at: Some(Utc::now()),
             migration_count: None,
             fail_reason: None,
+            leased_at: None,
         }
     }
 

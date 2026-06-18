@@ -28,6 +28,7 @@ fn leased_record(id: &str) -> JobRecord {
         lease_expires_at: Some(now - Duration::seconds(1)),
         migration_count: None,
         fail_reason: None,
+        leased_at: None,
     }
 }
 

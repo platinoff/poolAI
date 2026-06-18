@@ -66,6 +66,13 @@ pub async fn start_server(addr: SocketAddr, app_state: ApiContext) {
         if let Err(e) = service.start().await {
             tracing::warn!("Failed to start discovery service: {}", e);
         } else {
+            let hydrated = service.hydrate_persisted_network_profiles().await;
+            if hydrated > 0 {
+                info!(
+                    "Hydrated network_profile metadata for {} discovery peers",
+                    hydrated
+                );
+            }
             info!("Discovery service started successfully");
         }
     }

@@ -25,8 +25,10 @@ pub use lease_config::{
     ENV_JOB_LEASE_TTL_SECS,
 };
 pub use lease_failover::{
-    max_migrations_per_job, migration_budget_exhausted, next_migration_count, LeaseFailReason,
-    ENV_JOB_MAX_MIGRATIONS_PER_JOB,
+    apply_lease_failover, apply_max_total_runtime_failover, max_migrations_per_job,
+    max_total_runtime_secs, migration_budget_exhausted, next_migration_count,
+    queue_starvation_secs, LeaseFailReason, ENV_JOB_MAX_MIGRATIONS_PER_JOB,
+    ENV_JOB_MAX_TOTAL_RUNTIME_SECS, ENV_JOB_QUEUE_STARVATION_SECS,
 };
 pub use lifecycle::allows_transition;
 pub use onchain::{

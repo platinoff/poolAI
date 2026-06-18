@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-18 (PH-S514…S523 ✅ · vision **rev 240** · **0** відкритих · rust_ratio **94.47%**)
+**Оновлено:** 2026-06-18 (PH-S524…S533 ✅ · vision **rev 241** · **0** відкритих · rust_ratio **94.61%**)
 
 | **← наступний** | **`абракадабра`** (project scan + drain) **або** один PH-S* |
 | **Відкритих** | **0** |
@@ -30,19 +30,19 @@
 
 ---
 
-## Закрито (смуга PH-S514…S523)
+## Закрито (смуга PH-S524…S533)
 
-PH-S514 ✅ — tgbot `/status` → coordinator `GET /api/v1/grid/telegram-seats` snapshot.
-PH-S515 ✅ — tgbot `/stop` → `DELETE /api/v1/virtual-nodes/telegram/bindings/{telegram_user_id}`.
-PH-S516 ✅ — Galaxy DTO `capabilities` + `seed_inventory` on virtual-nodes list.
-PH-S517 ✅ — `/ui/admin/telegram-seats` read-only panel (wasm renderer).
-PH-S518 ✅ — lease failover retry budget (`POOLAI_JOB_MAX_MIGRATIONS_PER_JOB`) + `fail_reason` codes.
-PH-S519 ✅ — heartbeat-remote refreshes `network_profile.last_measured_at`.
-PH-S520 ✅ — optional `POOLAI_ALLOWED_BUILD_IDS` gate on register-remote (`403 build_id_rejected`).
-PH-S521 ✅ — payout batch ledger carries fee-split lamports fields.
-PH-S522 ✅ — consecutive heartbeat misses → `galaxy_worker_unhealthy_total`.
-PH-S523 ✅ — horizon S514 integration + stand smoke + loc-audit + vision-sync.
+PH-S524 ✅ — worker-unhealthy lease failover (`fail_reason=worker-unhealthy`).
+PH-S525 ✅ — scheduler/grid bind skips unhealthy peers.
+PH-S526 ✅ — `POOLAI_JOB_MAX_TOTAL_RUNTIME_SECS` wall-clock cap.
+PH-S527 ✅ — signed capability `expires_at` enforcement (telegram_edge).
+PH-S528 ✅ — governance Prometheus gauges (`poolai_release_verify_*`, `poolai_update_notify_pending`).
+PH-S529 ✅ — discovery startup hydrate persisted `network_profile`.
+PH-S530 ✅ — queue starvation failover (`POOLAI_JOB_QUEUE_STARVATION_SECS`, `leased_at`).
+PH-S531 ✅ — payout-batch `settlement_mode: offline_batch` wire.
+PH-S532 ✅ — `admin_charts.js` wasm-first slim (line/sparkline fallbacks removed).
+PH-S533 ✅ — horizon S524 integration + stand smoke + loc-audit + vision-sync.
 
-**rust_ratio:** **94.47%** (formal 90–95% ✅; hold 95% advisory).
+**rust_ratio:** **94.61%** (formal 90–95% ✅; hold 95% advisory).
 
 **BLOCKED / Deferred:** FM-003 LAN · FM-041 Cloud SDK live.

@@ -37,6 +37,21 @@ struct SignatureEnvelope {
 pub fn verify_release(
     opts: VerifyReleaseOptions,
 ) -> Result<VerifyReleaseReport, VerifyReleaseError> {
+    match verify_release_inner(opts) {
+        Ok(report) => {
+            crate::grid::galaxy_governance_metrics::record_release_verify_success();
+            Ok(report)
+        }
+        Err(err) => {
+            crate::grid::galaxy_governance_metrics::record_release_verify_fail();
+            Err(err)
+        }
+    }
+}
+
+fn verify_release_inner(
+    opts: VerifyReleaseOptions,
+) -> Result<VerifyReleaseReport, VerifyReleaseError> {
     let manifest_path = &opts.manifest_path;
     if !manifest_path.exists() {
         return Err(VerifyReleaseError::ManifestNotFound(manifest_path.clone()));

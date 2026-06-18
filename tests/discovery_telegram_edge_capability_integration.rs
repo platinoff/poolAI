@@ -70,16 +70,18 @@ fn signed_capability_doc(peer_id: &str) -> Value {
         hex::encode(sk.verifying_key().to_bytes()),
         DEV_CAPABILITY_VERIFY_PK_HEX
     );
+    let expires_at = "2027-12-31T00:00:00Z";
     let unsigned = GalaxyCapabilityDocument {
         peer_id: peer_id.into(),
         capabilities: vec!["inference:edge".into()],
         signature: None,
-        expires_at: None,
+        expires_at: Some(expires_at.into()),
     };
     let msg = capability_signing_message(&unsigned);
     json!({
         "peer_id": peer_id,
         "capabilities": ["inference:edge"],
+        "expires_at": expires_at,
         "signature": hex::encode(sk.sign(msg.as_bytes()).to_bytes()),
     })
 }

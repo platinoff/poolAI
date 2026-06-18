@@ -355,6 +355,7 @@ async fn register_remote_handler(
     .await
     {
         Ok(()) => {
+            on_heartbeat_success(&peer_id);
             if is_virtual_node {
                 VirtualNodeTaskService::enqueue_bootstrap_tasks(&peer_id);
                 if let Some(tg) = telegram_id {

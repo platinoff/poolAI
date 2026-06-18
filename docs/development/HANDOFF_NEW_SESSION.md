@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-18 (PH-S514…S523 ✅ · rust_ratio **94.47%**) · VDT
+**Оновлено:** 2026-06-18 (PH-S524…S533 ✅ · rust_ratio **94.61%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -474,6 +474,16 @@
 **PH-S521 ✅ (code):** `PayoutBatchLedgerEntry` fee-split lamports fields on cleared settlement ingest.
 **PH-S522 ✅ (code):** `galaxy_worker_health` — consecutive miss → `galaxy_worker_unhealthy_total` metric.
 **PH-S523 ✅ (ops):** `galaxy_horizon_s514_integration` + stand smoke + loc-audit + vision-sync.
+**PH-S524 ✅ (code):** worker-unhealthy lease failover → `fail_reason=worker-unhealthy`; `jobs_worker_unhealthy_failover_integration`.
+**PH-S525 ✅ (code):** scheduler/grid bind skips unhealthy peers; `jobs_scheduler_unhealthy_integration`.
+**PH-S526 ✅ (code):** `POOLAI_JOB_MAX_TOTAL_RUNTIME_SECS` max wall-clock runtime cap; `lease_failover.rs` unit tests.
+**PH-S527 ✅ (code):** signed capability `expires_at` enforcement; telegram_edge requires expiry (PH-S527).
+**PH-S528 ✅ (code):** governance Prometheus gauges (`poolai_release_verify_*`, `poolai_update_notify_pending`); stand smoke.
+**PH-S529 ✅ (code):** discovery startup hydrate persisted `network_profile`; `network_profile_hydrate_integration`.
+**PH-S530 ✅ (code):** queue starvation failover (`POOLAI_JOB_QUEUE_STARVATION_SECS`, `JobRecord.leased_at`).
+**PH-S531 ✅ (code):** `GET /api/v1/grid/payout-batch` → `settlement_mode: offline_batch`.
+**PH-S532 ✅ (code/e2e):** `admin_charts.js` wasm-first slim — line/sparkline JS fallbacks removed.
+**PH-S533 ✅ (ops):** `galaxy_horizon_s524_integration` + stand smoke + loc-audit + vision-sync.
 **Rules ✅:** **`абракадабра`** — project scan **всього репо** (concept · FM §5.1 · roadmaps · architect · code) → 10 PH-S* у §5.12 (журнал) → drain → push; канон [`.cursor/rules/poolai-session-iteration.mdc`](../.cursor/rules/poolai-session-iteration.mdc) § «Тригер абракадабра»; commit **`git-commit-tree-msg.sh`**.
 **§5.12:** **0** відкритих — наступна сесія: **`абракадабра`** (project scan + drain) або один PH-S*.
 **Vision ✅:** rev **240** · rust_ratio **94.47%** · hold **95%** advisory.

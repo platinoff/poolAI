@@ -92,10 +92,36 @@ pub fn load_peer_network_profile(peer_id: &str) -> Option<String> {
     STORE.lock().ok().and_then(|g| g.get(peer_id))
 }
 
+/// All peer ids with persisted profiles (PH-S529 startup hydrate).
+pub fn list_persisted_network_profile_peer_ids() -> Vec<String> {
+    STORE
+        .lock()
+        .ok()
+        .map(|g| g.profiles.keys().cloned().collect())
+        .unwrap_or_default()
+}
+
+/// Merge persisted profile into peer metadata when absent (PH-S529).
+pub fn merge_persisted_network_profile(metadata: &mut HashMap<String, String>, peer_id: &str) {
+    if metadata.contains_key("network_profile") {
+        return;
+    }
+    if let Some(stored) = load_peer_network_profile(peer_id) {
+        metadata.insert("network_profile".to_string(), stored);
+    }
+}
+
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_network_profile_store_for_test() {
     if let Ok(mut guard) = STORE.lock() {
         guard.profiles.clear();
+    }
+}
+
+#[cfg(any(test, feature = "test-utils"))]
+pub fn reopen_network_profile_store_for_test() {
+    if let Ok(mut guard) = STORE.lock() {
+        *guard = NetworkProfileStoreInner::open(data_dir_from_env());
     }
 }
 

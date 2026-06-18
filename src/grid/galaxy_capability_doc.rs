@@ -1,7 +1,9 @@
 //! Signed capability document parse/validate stub (PH-S439, Galaxy §6.6/§9).
 //!
 //! JSON schema parse for edge worker capability documents; ed25519 verify stub (PH-S466).
+//! PH-S527: `expires_at` enforcement.
 
+use chrono::{DateTime, Utc};
 use ed25519_dalek::{Signature, VerifyingKey};
 use serde::{Deserialize, Serialize};
 
@@ -90,14 +92,62 @@ pub fn verify_capability_signature_stub(
         .map_err(|_| CapabilityDocParseError::new("capability signature invalid"))
 }
 
+/// Env: override validation clock for tests (RFC3339, PH-S527).
+pub const ENV_CAPABILITY_VALIDATION_NOW: &str = "POOLAI_CAPABILITY_VALIDATION_NOW";
+
+fn capability_validation_now() -> DateTime<Utc> {
+    std::env::var(ENV_CAPABILITY_VALIDATION_NOW)
+        .ok()
+        .and_then(|s| DateTime::parse_from_rfc3339(s.trim()).ok())
+        .map(|dt| dt.with_timezone(&Utc))
+        .unwrap_or_else(Utc::now)
+}
+
+fn check_capability_expires_at(
+    doc: &GalaxyCapabilityDocument,
+    now: DateTime<Utc>,
+    require_expiry: bool,
+) -> Result<(), CapabilityDocParseError> {
+    let Some(raw) = doc
+        .expires_at
+        .as_ref()
+        .map(|s| s.trim())
+        .filter(|s| !s.is_empty())
+    else {
+        if require_expiry {
+            return Err(CapabilityDocParseError::new(
+                "expires_at required for signed capability documents",
+            ));
+        }
+        return Ok(());
+    };
+    let expires = DateTime::parse_from_rfc3339(raw)
+        .map_err(|_| CapabilityDocParseError::new("expires_at must be RFC3339"))?
+        .with_timezone(&Utc);
+    if now >= expires {
+        return Err(CapabilityDocParseError::new("capability document expired"));
+    }
+    Ok(())
+}
+
 /// Validate required fields and optional dev signature (PH-S466).
 pub fn validate_capability_document(
     doc: &GalaxyCapabilityDocument,
 ) -> Result<(), CapabilityDocParseError> {
+    validate_capability_document_at(doc, capability_validation_now(), false)
+}
+
+/// Validate with explicit clock (PH-S527 tests).
+pub fn validate_capability_document_at(
+    doc: &GalaxyCapabilityDocument,
+    now: DateTime<Utc>,
+    require_expiry: bool,
+) -> Result<(), CapabilityDocParseError> {
     if doc.peer_id.trim().is_empty() {
         return Err(CapabilityDocParseError::new("peer_id required"));
     }
-    verify_capability_signature_stub(doc)
+    verify_capability_signature_stub(doc)?;
+    check_capability_expires_at(doc, now, require_expiry)
 }
 
 /// `telegram_edge` register-remote requires signed capability document (PH-S504, Galaxy §6.6).
@@ -121,12 +171,13 @@ pub fn validate_telegram_edge_capability(
             "signed capability_document required for telegram_edge origin",
         ));
     }
-    validate_capability_document(doc)
+    validate_capability_document_at(doc, capability_validation_now(), true)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use chrono::TimeZone;
     use ed25519_dalek::Signer;
     use ed25519_dalek::SigningKey;
     use serde_json::json;
@@ -179,5 +230,30 @@ mod tests {
         let mut bad = doc.clone();
         bad.signature = Some("00".repeat(64));
         assert!(validate_capability_document(&bad).is_err());
+    }
+
+    #[test]
+    fn capability_expires_at_enforced_ph_s527() {
+        static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+        let _guard = ENV_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+        let sk = dev_signing_key();
+        let unsigned = GalaxyCapabilityDocument {
+            peer_id: "edge-worker-1".into(),
+            capabilities: vec!["inference:gpu".into()],
+            signature: None,
+            expires_at: Some("2026-12-31T00:00:00Z".into()),
+        };
+        let msg = capability_signing_message(&unsigned);
+        let doc = GalaxyCapabilityDocument {
+            signature: Some(hex::encode(sk.sign(msg.as_bytes()).to_bytes())),
+            ..unsigned
+        };
+        let now = Utc.with_ymd_and_hms(2026, 6, 1, 0, 0, 0).unwrap();
+        assert!(validate_capability_document_at(&doc, now, true).is_ok());
+        let expired = Utc.with_ymd_and_hms(2027, 1, 1, 0, 0, 0).unwrap();
+        assert!(validate_capability_document_at(&doc, expired, true).is_err());
+        let mut missing = doc.clone();
+        missing.expires_at = None;
+        assert!(validate_capability_document_at(&missing, now, true).is_err());
     }
 }

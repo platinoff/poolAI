@@ -20,6 +20,10 @@ use crate::core::state::ApiContext;
 use crate::grid::galaxy_fee_split_metrics::{
     fee_split_applied_total, METRIC_FEE_SPLIT_APPLIED_TOTAL,
 };
+use crate::grid::galaxy_governance_metrics::{
+    release_verify_fail_total, release_verify_total, update_notify_pending,
+    METRIC_RELEASE_VERIFY_FAIL_TOTAL, METRIC_RELEASE_VERIFY_TOTAL, METRIC_UPDATE_NOTIFY_PENDING,
+};
 use crate::grid::galaxy_locality::{
     last_cross_region_egress_mb, last_shard_local_hit_ratio_bps, locality_rank_empty_workers_total,
     locality_rank_ingest_total, locality_rank_miss_total, locality_rank_skip_total,
@@ -206,6 +210,9 @@ pub struct PoolAiPrometheus {
     galaxy_settlement_resolved_total: IntGauge,
     galaxy_settlement_payout_batch_total: IntGauge,
     galaxy_worker_unhealthy_total: IntGauge,
+    poolai_release_verify_total: IntGauge,
+    poolai_release_verify_fail_total: IntGauge,
+    poolai_update_notify_pending: IntGauge,
     galaxy_fee_split_applied_total: IntGauge,
     galaxy_replication_strict_total: IntGauge,
     galaxy_replication_enqueue_total: IntGauge,
@@ -1035,6 +1042,33 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_worker_unhealthy_total.clone()))
         .expect("register galaxy_worker_unhealthy_total");
 
+    let poolai_release_verify_total = IntGauge::with_opts(Opts::new(
+        METRIC_RELEASE_VERIFY_TOTAL,
+        "Successful poolai-verify-release runs (PH-S528, Galaxy §9.8)",
+    ))
+    .expect(METRIC_RELEASE_VERIFY_TOTAL);
+    registry
+        .register(Box::new(poolai_release_verify_total.clone()))
+        .expect("register poolai_release_verify_total");
+
+    let poolai_release_verify_fail_total = IntGauge::with_opts(Opts::new(
+        METRIC_RELEASE_VERIFY_FAIL_TOTAL,
+        "Failed poolai-verify-release runs (PH-S528, Galaxy §9.8)",
+    ))
+    .expect(METRIC_RELEASE_VERIFY_FAIL_TOTAL);
+    registry
+        .register(Box::new(poolai_release_verify_fail_total.clone()))
+        .expect("register poolai_release_verify_fail_total");
+
+    let poolai_update_notify_pending = IntGauge::with_opts(Opts::new(
+        METRIC_UPDATE_NOTIFY_PENDING,
+        "Pending opt-in update notifications (PH-S528 stub, Galaxy §9.8)",
+    ))
+    .expect(METRIC_UPDATE_NOTIFY_PENDING);
+    registry
+        .register(Box::new(poolai_update_notify_pending.clone()))
+        .expect("register poolai_update_notify_pending");
+
     let galaxy_fee_split_applied_total = IntGauge::with_opts(Opts::new(
         METRIC_FEE_SPLIT_APPLIED_TOTAL,
         "Galaxy fee split applied on grid result path (PH-S194)",
@@ -1177,6 +1211,9 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_settlement_resolved_total,
         galaxy_settlement_payout_batch_total,
         galaxy_worker_unhealthy_total,
+        poolai_release_verify_total,
+        poolai_release_verify_fail_total,
+        poolai_update_notify_pending,
         galaxy_fee_split_applied_total,
         galaxy_replication_strict_total,
         galaxy_replication_enqueue_total,
@@ -1340,6 +1377,12 @@ pub fn refresh_galaxy_verification_gauges() {
         .set(verification_checker_pending_total() as i64);
     prom.galaxy_worker_unhealthy_total
         .set(galaxy_worker_unhealthy_total() as i64);
+    prom.poolai_release_verify_total
+        .set(release_verify_total() as i64);
+    prom.poolai_release_verify_fail_total
+        .set(release_verify_fail_total() as i64);
+    prom.poolai_update_notify_pending
+        .set(update_notify_pending() as i64);
     prom.galaxy_replay_pending.set(replay_pending() as i64);
     prom.galaxy_replay_pending_scheduled_total
         .set(replay_pending_scheduled_total() as i64);

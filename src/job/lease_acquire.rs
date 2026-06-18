@@ -64,6 +64,9 @@ pub fn acquire_lease_on_record(
     record.lease_epoch = Some(next_epoch);
     record.lease_expires_at = Some(now + Duration::seconds(cfg.lease_ttl_secs as i64));
     maybe_transition_to_leased(record);
+    if record.status == JobStatus::Leased {
+        record.leased_at = Some(now);
+    }
     Ok(())
 }
 
@@ -128,6 +131,7 @@ mod tests {
             lease_expires_at: None,
             migration_count: None,
             fail_reason: None,
+            leased_at: None,
         }
     }
 

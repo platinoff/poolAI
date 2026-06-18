@@ -680,6 +680,29 @@ impl DiscoveryService {
         Ok(())
     }
 
+    /// Reload persisted `network_profile` rows into registered peers (PH-S529).
+    pub async fn hydrate_persisted_network_profiles(&self) -> usize {
+        let ids =
+            crate::grid::galaxy_network_profile_store::list_persisted_network_profile_peer_ids();
+        if ids.is_empty() {
+            return 0;
+        }
+        let mut peers = self.peers.write().await;
+        let mut updated = 0usize;
+        for peer_id in ids {
+            let Some(stored) =
+                crate::grid::galaxy_network_profile_store::load_peer_network_profile(&peer_id)
+            else {
+                continue;
+            };
+            if let Some(peer) = peers.get_mut(&peer_id) {
+                peer.metadata.insert("network_profile".to_string(), stored);
+                updated += 1;
+            }
+        }
+        updated
+    }
+
     /// Gets all discovered peers
     pub async fn get_peers(&self) -> Vec<PeerInfo> {
         let peers = self.peers.read().await;

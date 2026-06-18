@@ -9,6 +9,7 @@ mod envelope;
 pub mod galaxy_capability_doc;
 pub mod galaxy_fee_split;
 pub mod galaxy_fee_split_metrics;
+pub mod galaxy_governance_metrics;
 pub mod galaxy_locality;
 pub mod galaxy_network_profile;
 pub mod galaxy_network_profile_store;

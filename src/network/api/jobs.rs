@@ -158,6 +158,7 @@ async fn create_job(
         lease_expires_at: body.lease_expires_at,
         migration_count: None,
         fail_reason: None,
+        leased_at: None,
     };
     store().push(record)?;
     schedule_from_context(&ctx, store()).await?;

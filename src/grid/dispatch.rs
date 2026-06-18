@@ -840,6 +840,7 @@ fn ingest_job(
         lease_expires_at: None,
         migration_count: None,
         fail_reason: None,
+        leased_at: None,
     };
     jobs.push(record)?;
     let locality_peer = if !body.required_shard_ids.is_empty() {
@@ -1158,6 +1159,7 @@ mod tests {
             lease_expires_at: None,
             migration_count: None,
             fail_reason: None,
+            leased_at: None,
         })
         .expect("push");
 
@@ -1210,6 +1212,7 @@ mod tests {
             lease_expires_at: Some(now + chrono::Duration::seconds(90)),
             migration_count: None,
             fail_reason: None,
+            leased_at: None,
         })
         .expect("push");
 
@@ -1262,6 +1265,7 @@ mod tests {
             lease_expires_at: Some(now + chrono::Duration::seconds(90)),
             migration_count: None,
             fail_reason: None,
+            leased_at: None,
         })
         .expect("push");
 
@@ -1310,6 +1314,7 @@ mod tests {
             lease_expires_at: Some(now + chrono::Duration::seconds(90)),
             migration_count: None,
             fail_reason: None,
+            leased_at: None,
         })
         .expect("push");
 
@@ -1489,6 +1494,7 @@ mod tests {
             lease_expires_at: None,
             migration_count: None,
             fail_reason: None,
+            leased_at: None,
         })
         .expect("push");
 
@@ -1552,6 +1558,7 @@ mod tests {
             lease_expires_at: None,
             migration_count: None,
             fail_reason: None,
+            leased_at: None,
         })
         .expect("push");
 
@@ -1625,6 +1632,7 @@ mod tests {
             lease_expires_at: None,
             migration_count: None,
             fail_reason: None,
+            leased_at: None,
         })
         .expect("push");
 
@@ -1688,6 +1696,7 @@ mod tests {
             lease_expires_at: None,
             migration_count: None,
             fail_reason: None,
+            leased_at: None,
         })
         .expect("push");
 
@@ -1741,6 +1750,7 @@ mod tests {
                 lease_expires_at: None,
                 migration_count: None,
                 fail_reason: None,
+                leased_at: None,
             })
             .expect("push");
 
@@ -1795,6 +1805,7 @@ mod tests {
             lease_expires_at: None,
             migration_count: None,
             fail_reason: None,
+            leased_at: None,
         })
         .expect("push");
 
@@ -1847,6 +1858,7 @@ mod tests {
             lease_expires_at: None,
             migration_count: None,
             fail_reason: None,
+            leased_at: None,
         })
         .expect("push");
 
@@ -1898,6 +1910,7 @@ mod tests {
             lease_expires_at: None,
             migration_count: None,
             fail_reason: None,
+            leased_at: None,
         })
         .expect("push");
 
@@ -1950,6 +1963,7 @@ mod tests {
             lease_expires_at: None,
             migration_count: None,
             fail_reason: None,
+            leased_at: None,
         })
         .expect("push");
 
@@ -2002,6 +2016,7 @@ mod tests {
             lease_expires_at: None,
             migration_count: None,
             fail_reason: None,
+            leased_at: None,
         })
         .expect("push");
 
@@ -2046,6 +2061,7 @@ mod tests {
             lease_expires_at: None,
             migration_count: None,
             fail_reason: None,
+            leased_at: None,
         })
         .expect("push");
 

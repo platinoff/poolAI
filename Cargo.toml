@@ -406,6 +406,26 @@ path = "tests/grid_verification_replay_history_integration.rs"
 required-features = ["test-utils"]
 
 [[test]]
+name = "jobs_worker_unhealthy_failover_integration"
+path = "tests/jobs_worker_unhealthy_failover_integration.rs"
+required-features = ["test-utils"]
+
+[[test]]
+name = "jobs_scheduler_unhealthy_integration"
+path = "tests/jobs_scheduler_unhealthy_integration.rs"
+required-features = ["test-utils"]
+
+[[test]]
+name = "network_profile_hydrate_integration"
+path = "tests/network_profile_hydrate_integration.rs"
+required-features = ["test-utils"]
+
+[[test]]
+name = "galaxy_horizon_s524_integration"
+path = "tests/galaxy_horizon_s524_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
 name = "tls_https_integration"
 path = "tests/tls_https_integration.rs"
 required-features = ["https"]

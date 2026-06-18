@@ -77,9 +77,15 @@ pub fn schedule_with_grid_peer(
     store: &JobStore,
     source_peer_id: Option<&str>,
 ) -> Result<ScheduleOutcome, AppError> {
-    let peer_binding = source_peer_id.map(|id| JobScheduleBinding {
-        worker_id: Some(id.to_string()),
-        vm_id: None,
+    let peer_binding = source_peer_id.and_then(|id| {
+        if crate::grid::galaxy_worker_health::is_peer_unhealthy(id) {
+            None
+        } else {
+            Some(JobScheduleBinding {
+                worker_id: Some(id.to_string()),
+                vm_id: None,
+            })
+        }
     });
     let (scheduled, bound_workers, bound_vms, expired) =
         store.promote_submitted_to_scheduled_with(|_| peer_binding.clone().unwrap_or_default())?;
@@ -195,6 +201,7 @@ fn pick_worker(
     let mut eligible: Vec<&WorkerCandidate> = workers
         .iter()
         .filter(|w| w.is_healthy && !taken.contains(&w.id))
+        .filter(|w| !crate::grid::galaxy_worker_health::is_peer_unhealthy(&w.id))
         .filter(|w| worker_meets_resources(w, resources))
         .filter(|w| worker_meets_gpu(w, resources))
         .collect();
@@ -285,6 +292,7 @@ mod tests {
             lease_expires_at: None,
             migration_count: None,
             fail_reason: None,
+            leased_at: None,
         }
     }
 
