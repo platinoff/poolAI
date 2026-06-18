@@ -863,6 +863,59 @@ async fn smoke_galaxy_horizon_wire_s444_metrics(client: &Client, base: &str) -> 
     metrics_text_has_horizon_wire_s444(&body)
 }
 
+/// PH-S462: live stand exposes PH-S454…S460 horizon wire metrics on Prometheus scrape.
+const GALAXY_HORIZON_WIRE_S454_METRICS: &[&str] = &[
+    "galaxy_prefetch_re_migrate_total",
+    "galaxy_verification_elevated_applied_total",
+    "galaxy_trust_score_delta_total",
+    "galaxy_replication_rate_limited_total",
+    "galaxy_hot_promote_total",
+    "galaxy_hot_evict_total",
+    "galaxy_shard_access_total",
+    "galaxy_prefetch_queue_depth",
+];
+
+fn metrics_text_has_horizon_wire_s454(body: &str) -> Result<(), String> {
+    for name in GALAXY_HORIZON_WIRE_S454_METRICS {
+        if !body.contains(name) {
+            return Err(format!("/metrics missing {name}"));
+        }
+        if !body.contains(&format!("# TYPE {name} gauge")) {
+            return Err(format!("/metrics missing TYPE gauge for {name}"));
+        }
+    }
+    Ok(())
+}
+
+async fn smoke_galaxy_horizon_wire_s454_metrics(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("/metrics request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("/metrics status {}", resp.status()));
+    }
+    let body = resp.text().await.map_err(|e| e.to_string())?;
+    metrics_text_has_horizon_wire_s454(&body)
+}
+
+async fn smoke_grid_verification_replay(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/api/v1/grid/verification-replay"))
+        .send()
+        .await
+        .map_err(|e| format!("verification-replay request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("verification-replay status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    if body.get("ok").and_then(|v| v.as_bool()) != Some(true) {
+        return Err(format!("verification-replay body: {body}"));
+    }
+    Ok(())
+}
+
 async fn smoke_grid_pricing(client: &Client, base: &str) -> Result<(), String> {
     let model = smoke_id("smoke-pricing");
     let url = format!(
@@ -1516,6 +1569,18 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
         &mut cases,
         "galaxy_horizon_wire_s444_metrics",
         smoke_galaxy_horizon_wire_s444_metrics(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
+        "galaxy_horizon_wire_s454_metrics",
+        smoke_galaxy_horizon_wire_s454_metrics(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
+        "grid_verification_replay",
+        smoke_grid_verification_replay(&client, &cli.base_url).await,
     )
     .await;
     record(

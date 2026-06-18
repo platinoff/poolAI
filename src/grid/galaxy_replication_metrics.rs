@@ -6,6 +6,12 @@ use std::sync::atomic::{AtomicU64, Ordering};
 
 use crate::grid::galaxy_replication::{ReplicationProfile, ReplicationTierConfig};
 
+/// Env: max strict-tier replication enqueues per hour (PH-S457 stub).
+pub const ENV_REPLICATION_MAX_PER_HOUR: &str = "POOLAI_GALAXY_REPLICATION_MAX_PER_HOUR";
+
+/// Default hourly cap for strict-tier replication enqueue stub.
+pub const DEFAULT_REPLICATION_MAX_PER_HOUR: u64 = 1000;
+
 /// In-process counter for strict-tier grid job ingests (mirrored on `GET /metrics`).
 pub const METRIC_REPLICATION_STRICT_TOTAL: &str = "galaxy_replication_strict_total";
 
@@ -16,9 +22,14 @@ pub const METRIC_REPLICATION_ENQUEUE_TOTAL: &str = "galaxy_replication_enqueue_t
 pub const METRIC_REPLICATION_EXECUTOR_ENQUEUE_TOTAL: &str =
     "galaxy_replication_executor_enqueue_total";
 
+/// Strict-tier replication rate-limited rejections (PH-S457).
+pub const METRIC_REPLICATION_RATE_LIMITED_TOTAL: &str = "galaxy_replication_rate_limited_total";
+
 static REPLICATION_STRICT_TOTAL: AtomicU64 = AtomicU64::new(0);
 static REPLICATION_ENQUEUE_TOTAL: AtomicU64 = AtomicU64::new(0);
 static REPLICATION_EXECUTOR_ENQUEUE_TOTAL: AtomicU64 = AtomicU64::new(0);
+static REPLICATION_HOURLY_COUNT: AtomicU64 = AtomicU64::new(0);
+static REPLICATION_RATE_LIMITED_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// Record one grid job ingest with `replication_strict` tier.
 pub fn record_replication_strict_ingest() {
@@ -47,8 +58,44 @@ pub fn replication_executor_enqueue_total() -> u64 {
     REPLICATION_EXECUTOR_ENQUEUE_TOTAL.load(Ordering::Relaxed)
 }
 
+/// Parse hourly replication cap from env (PH-S457).
+pub fn replication_max_per_hour_from_env() -> u64 {
+    std::env::var(ENV_REPLICATION_MAX_PER_HOUR)
+        .ok()
+        .and_then(|v| v.trim().parse().ok())
+        .filter(|&n| n > 0)
+        .unwrap_or(DEFAULT_REPLICATION_MAX_PER_HOUR)
+}
+
+/// Returns true when strict-tier replication enqueue should proceed (PH-S457 stub).
+pub fn replication_enqueue_allowed(replication_tier: ReplicationTierConfig) -> bool {
+    if replication_tier.profile != ReplicationProfile::Strict {
+        return true;
+    }
+    let cap = replication_max_per_hour_from_env();
+    let current = REPLICATION_HOURLY_COUNT.load(Ordering::Relaxed);
+    if current >= cap {
+        record_replication_rate_limited();
+        false
+    } else {
+        REPLICATION_HOURLY_COUNT.fetch_add(1, Ordering::Relaxed);
+        true
+    }
+}
+
+pub fn record_replication_rate_limited() {
+    REPLICATION_RATE_LIMITED_TOTAL.fetch_add(1, Ordering::Relaxed);
+}
+
+pub fn replication_rate_limited_total() -> u64 {
+    REPLICATION_RATE_LIMITED_TOTAL.load(Ordering::Relaxed)
+}
+
 /// Grid job ingest executor queue stub (PH-S435).
 pub fn replication_executor_hook(replication_tier: ReplicationTierConfig) {
+    if !replication_enqueue_allowed(replication_tier) {
+        return;
+    }
     record_replication_executor_enqueue();
     evaluate_job_replication_strict(replication_tier);
 }
@@ -58,6 +105,8 @@ pub fn reset_replication_strict_metrics_for_test() {
     REPLICATION_STRICT_TOTAL.store(0, Ordering::Relaxed);
     REPLICATION_ENQUEUE_TOTAL.store(0, Ordering::Relaxed);
     REPLICATION_EXECUTOR_ENQUEUE_TOTAL.store(0, Ordering::Relaxed);
+    REPLICATION_HOURLY_COUNT.store(0, Ordering::Relaxed);
+    REPLICATION_RATE_LIMITED_TOTAL.store(0, Ordering::Relaxed);
 }
 
 /// Grid job ingest path stub: increment when tier profile is strict (PH-S179).
@@ -126,6 +175,22 @@ mod tests {
         assert_eq!(replication_executor_enqueue_total(), 1);
         assert_eq!(replication_enqueue_total(), 1);
         assert_eq!(replication_strict_total(), 1);
+        reset_replication_strict_metrics_for_test();
+    }
+
+    #[test]
+    fn replication_rate_limit_ph_s457() {
+        let _lock = replication_metrics_test_lock();
+        reset_replication_strict_metrics_for_test();
+        let prior = std::env::var(ENV_REPLICATION_MAX_PER_HOUR).ok();
+        std::env::set_var(ENV_REPLICATION_MAX_PER_HOUR, "1");
+        assert!(replication_enqueue_allowed(REPLICATION_STRICT));
+        assert!(!replication_enqueue_allowed(REPLICATION_STRICT));
+        assert_eq!(replication_rate_limited_total(), 1);
+        match prior {
+            Some(v) => std::env::set_var(ENV_REPLICATION_MAX_PER_HOUR, v),
+            None => std::env::remove_var(ENV_REPLICATION_MAX_PER_HOUR),
+        }
         reset_replication_strict_metrics_for_test();
     }
 }

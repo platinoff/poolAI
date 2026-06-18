@@ -570,6 +570,123 @@ pub fn render_ml_pipeline_metrics_panel_html(
     )
 }
 
+/// Monitoring active alerts table HTML (PH-S461 wasm glue).
+pub fn render_monitoring_alerts_panel_html(
+    alerts_json: &str,
+    na_label: &str,
+    ack_label: &str,
+    active_label: &str,
+    ack_btn_label: &str,
+    col_severity: &str,
+    col_metric: &str,
+    col_current: &str,
+    col_threshold: &str,
+    col_triggered: &str,
+    col_status: &str,
+    col_actions: &str,
+    table_aria: &str,
+    empty_message: &str,
+) -> String {
+    use crate::format::{alert_severity_badge_class, escape_html};
+    use crate::table::empty_state_html;
+
+    let alerts: Vec<Value> = serde_json::from_str(alerts_json).unwrap_or_default();
+    if alerts.is_empty() {
+        return empty_state_html(empty_message, None, "✅", None);
+    }
+    let rows: String = alerts
+        .iter()
+        .map(|a| {
+            let severity = a
+                .get("severity")
+                .and_then(|v| v.as_str())
+                .unwrap_or("WARNING");
+            let severity_class = alert_severity_badge_class(Some(severity));
+            let metric = a
+                .get("metric")
+                .and_then(|v| v.as_str())
+                .unwrap_or("unknown");
+            let current = a
+                .get("current_value")
+                .map(|v| v.to_string())
+                .unwrap_or_else(|| na_label.to_string());
+            let threshold = a
+                .get("threshold")
+                .map(|v| v.to_string())
+                .unwrap_or_else(|| na_label.to_string());
+            let triggered = a
+                .get("triggered_at")
+                .and_then(|v| v.as_str())
+                .map(|s| escape_html(s))
+                .unwrap_or_else(|| escape_html(na_label));
+            let acknowledged = a.get("acknowledged").and_then(|v| v.as_bool()) == Some(true);
+            let status_cell = if acknowledged {
+                format!(r#"<span class="muted">{}</span>"#, escape_html(ack_label))
+            } else {
+                format!(
+                    r#"<span class="status-badge active">{}</span>"#,
+                    escape_html(active_label)
+                )
+            };
+            let id = a.get("id").cloned().unwrap_or(Value::Null);
+            let id_json = serde_json::to_string(&id).unwrap_or_else(|_| "null".to_string());
+            let action_cell = if acknowledged {
+                String::new()
+            } else {
+                format!(
+                    r#"<button type="button" class="btn btn-sm" onclick='acknowledgeAlert({})'>{}</button>"#,
+                    id_json,
+                    escape_html(ack_btn_label)
+                )
+            };
+            format!(
+                r#"<tr>
+                  <td><span class="status-badge {}">{}</span></td>
+                  <td><strong>{}</strong></td>
+                  <td>{}</td>
+                  <td>{}</td>
+                  <td>{}</td>
+                  <td>{}</td>
+                  <td>{}</td>
+                </tr>"#,
+                severity_class,
+                escape_html(severity),
+                escape_html(metric),
+                escape_html(&current),
+                escape_html(&threshold),
+                triggered,
+                status_cell,
+                action_cell
+            )
+        })
+        .collect();
+    format!(
+        r#"<div class="admin-table-container"><table class="admin-table" aria-label="{}">
+            <thead>
+              <tr>
+                <th>{}</th>
+                <th>{}</th>
+                <th>{}</th>
+                <th>{}</th>
+                <th>{}</th>
+                <th>{}</th>
+                <th class="admin-table-actions-col" data-no-sort="1">{}</th>
+              </tr>
+            </thead>
+            <tbody>{}</tbody>
+          </table></div>"#,
+        escape_html(table_aria),
+        escape_html(col_severity),
+        escape_html(col_metric),
+        escape_html(col_current),
+        escape_html(col_threshold),
+        escape_html(col_triggered),
+        escape_html(col_status),
+        escape_html(col_actions),
+        rows
+    )
+}
+
 /// Mirrors `poolaiFetchMonitoringAlerts` URL (PH-S344).
 pub fn build_monitoring_alerts_url(limit: u32, acknowledged: Option<bool>) -> String {
     let mut url = format!("/api/enterprise/monitoring/alerts?limit={limit}");
@@ -831,6 +948,27 @@ mod tests {
         );
         assert!(html.contains("ml-pipeline-metrics-panel"));
         assert!(html.contains("No ML pipeline step metrics yet"));
+    }
+
+    #[test]
+    fn render_monitoring_alerts_panel_html_ph_s461() {
+        let html = render_monitoring_alerts_panel_html(
+            "[]",
+            "N/A",
+            "Acknowledged",
+            "Active",
+            "Acknowledge",
+            "Severity",
+            "Metric",
+            "Current Value",
+            "Threshold",
+            "Triggered",
+            "Status",
+            "Actions",
+            "Active Alerts",
+            "No active alerts",
+        );
+        assert!(html.contains("No active alerts"));
     }
 
     #[test]

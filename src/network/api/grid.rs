@@ -58,6 +58,10 @@ pub fn create_grid_routes() -> Router<ApiContext> {
         .route("/grid/envelope", post(ingest_grid_envelope))
         .route("/grid/pricing", get(get_grid_pricing_snapshot))
         .route("/grid/seed-inventory", get(get_grid_seed_inventory))
+        .route(
+            "/grid/verification-replay",
+            get(get_grid_verification_replay),
+        )
 }
 
 pub async fn ingest_grid_envelope_handler(
@@ -90,6 +94,25 @@ async fn get_grid_seed_inventory(
             ok: true,
             entries: coordinator_seed_inventory_snapshot(),
             generated_at: chrono::Utc::now().to_rfc3339(),
+        }),
+    ))
+}
+
+#[derive(Debug, Serialize)]
+struct GridVerificationReplayResponse {
+    ok: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    record: Option<crate::grid::GalaxyVerificationReplayRecord>,
+}
+
+async fn get_grid_verification_replay(
+    State(_ctx): State<ApiContext>,
+) -> Result<(StatusCode, Json<GridVerificationReplayResponse>), HttpAppError> {
+    Ok((
+        StatusCode::OK,
+        Json(GridVerificationReplayResponse {
+            ok: true,
+            record: crate::grid::galaxy_replay_metrics::last_verification_replay_record(),
         }),
     ))
 }

@@ -279,6 +279,10 @@ async fn patch_job(
             }
         });
     }
+    let prior_status = existing.status;
     let job = store().update_status(&id, body.status)?;
+    if prior_status == JobStatus::Migrating && body.status == JobStatus::Leased {
+        crate::grid::dispatch::re_migrate_prefetch_stub(None);
+    }
     Ok(Json(JobDetailResponse { job }))
 }

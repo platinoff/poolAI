@@ -1,16 +1,16 @@
 # Galaxy Grid roadmap (зріз)
 
-**Оновлено:** 2026-06-18 · **Канон черги:** FM §5.12 (**0** · PH-S424…S433 ✅) · **`абракадабра`** = research concept/roadmap → drain 10
+**Оновлено:** 2026-06-18 · **Канон черги:** FM §5.12 (**0** · PH-S454…S463 ✅) · **`абракадабра`** = research concept/roadmap → drain 10
 
 | Зріз | Значення |
 |------|----------|
-| **Galaxy prefetch horizon** | PH-S424/S425 seed-pull + lease-acquired metrics ✅ |
-| **Replication / settlement** | PH-S426 enqueue + PH-S427 payout batch ledger stub ✅ |
-| **Wasm / admin slim** | PH-S428 dashboard quick-stats `formatPercent`/`formatMegabytes` |
-| **Docs / ratio** | PH-S348…S352 ✅ |
-| **Rust ratio** | **94.36%** hold **95%** advisory |
+| **Galaxy horizon wire** | PH-S454 re-migrate prefetch · S455 elevated verify · S456 trust deltas · S457 replication cap |
+| **Telemetry / read API** | PH-S458 hot-tier · S459 §5.3 gauges · S460 verification-replay GET |
+| **Wasm / admin slim** | PH-S461 monitoring alerts panel wasm |
+| **Docs / ratio** | PH-S462 stand smoke · S463 loc-audit + vision-sync |
+| **Rust ratio** | **94.38%** hold **95%** advisory |
 
-**0** відкритих · остання смуга **PH-S343…S352** ✅.
+**0** відкритих · остання смуга **PH-S454…S463** ✅.
 
 ---
 

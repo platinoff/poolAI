@@ -3,6 +3,96 @@
   "items": [
     {
       "category": "closed",
+      "id": "PH-S463",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "rust_ratio.json`; FM/HANDOFF/NEXT; `--check` green",
+      "title": "Ops close band: loc-audit + vision-sync"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S462",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "/metrics` + verification-replay smoke",
+      "title": "Stand smoke horizon band S454–S460"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S461",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "renderMonitoringAlertsPanel` wasm; slim `monitoring.rs",
+      "title": "Monitoring alerts panel wasm"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S460",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "GET /api/v1/grid/verification-replay`; integration test",
+      "title": "Verification replay read API"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S459",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_shard_access_total` + `galaxy_prefetch_queue_depth` gauges",
+      "title": "Locality telemetry counters (§5.3)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S458",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_hot_promote_total`/`galaxy_hot_evict_total` on prefetch path",
+      "title": "Hot tier promote/evict metrics"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S457",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "POOLAI_GALAXY_REPLICATION_MAX_PER_HOUR` gate + `galaxy_replication_rate_limited_total",
+      "title": "Replication hourly rate-limit stub"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S456",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "+10`/`-100` deltas + `galaxy_trust_score_delta_total`; unit tests",
+      "title": "Trust score delta on verify verdict"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S455",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "POOLAI_GALAXY_VERIFY_ELEVATED_RATE` + `galaxy_verification_elevated_applied_total`; unit tests",
+      "title": "Elevated verification sample rate"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S454",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "re_migrate_prefetch_stub` on Migrating→Leased; `galaxy_prefetch_re_migrate_total`; unit tests",
+      "title": "Re-migrate delta prefetch trigger"
+    },
+    {
+      "category": "closed",
       "id": "PH-S453",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
@@ -18,96 +108,6 @@
       "status": "closed",
       "summary": "rust_ratio.json` 94.37%; FM/HANDOFF/NEXT",
       "title": "Ops close band: loc-audit + docs canon"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S451",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "/metrics` export shape seed-fetch/co-access/locality/protocol/replay record",
-      "title": "Stand smoke horizon wire band (S444–S449)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S450",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "renderMlPipelineMetricsPanel` wasm; slim `admin_charts.js",
-      "title": "ML pipeline metrics panel wasm"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S449",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "poolai_protocol_negotiation_rejected_total` middleware + `/metrics",
-      "title": "Protocol negotiation rejected metric"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S448",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "optional `capability_document` on register-remote; integration tests",
-      "title": "Capability document register-remote wire"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S447",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "GalaxyVerificationReplayRecord` on mismatch enqueue; unit tests",
-      "title": "Verification replay wire DTO"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S446",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "PrefetchTrigger::CoAccessGraph` + `plan_co_access_prefetch`; metric + unit tests",
-      "title": "Co-access graph speculative prefetch"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S445",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "locality_unsatisfied` + `galaxy_locality_unsatisfied_total`; unit tests",
-      "title": "Strict-locality grid ingest gate"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S444",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "fetch_seed_shards_hook` + `galaxy_prefetch_seed_fetch_*` metrics; unit tests",
-      "title": "Live prefetch memory fetch stub"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S443",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "rust_ratio.json` 94.36%; FM/HANDOFF/NEXT; `--check` green",
-      "title": "Ops close band: loc-audit + docs + vision-sync"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S442",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "/metrics` export shape executor/checker/replay enqueue",
-      "title": "Stand smoke horizon wire band (S434–S438)"
     }
   ],
   "link": "docs/vision/index.html",

@@ -53,6 +53,21 @@ pub const METRIC_PREFETCH_CO_ACCESS_TOTAL: &str = "galaxy_prefetch_co_access_tot
 /// Strict locality ingest rejections (PH-S445).
 pub const METRIC_LOCALITY_UNSATISFIED_TOTAL: &str = "galaxy_locality_unsatisfied_total";
 
+/// Re-migrate prefetch plans on Migrating→Leased handoff (PH-S454).
+pub const METRIC_PREFETCH_RE_MIGRATE_TOTAL: &str = "galaxy_prefetch_re_migrate_total";
+
+/// Hot tier shard promotions on prefetch complete (PH-S458).
+pub const METRIC_HOT_PROMOTE_TOTAL: &str = "galaxy_hot_promote_total";
+
+/// Hot tier shard evictions when skipped in plan (PH-S458).
+pub const METRIC_HOT_EVICT_TOTAL: &str = "galaxy_hot_evict_total";
+
+/// Shard access events on prefetch path (Galaxy §5.3, PH-S459).
+pub const METRIC_SHARD_ACCESS_TOTAL: &str = "galaxy_shard_access_total";
+
+/// Prefetch queue depth gauge stub (Galaxy §5.3, PH-S459).
+pub const METRIC_PREFETCH_QUEUE_DEPTH: &str = "galaxy_prefetch_queue_depth";
+
 /// Default stub bytes per RAM-tier planned shard (4 MiB, Galaxy §5.5).
 pub const DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM: u64 = 4_194_304;
 
@@ -75,15 +90,21 @@ static SEED_FETCH_TOTAL: AtomicU64 = AtomicU64::new(0);
 static SEED_FETCH_MISS_TOTAL: AtomicU64 = AtomicU64::new(0);
 static CO_ACCESS_TOTAL: AtomicU64 = AtomicU64::new(0);
 static LOCALITY_UNSATISFIED_TOTAL: AtomicU64 = AtomicU64::new(0);
+static RE_MIGRATE_TOTAL: AtomicU64 = AtomicU64::new(0);
+static HOT_PROMOTE_TOTAL: AtomicU64 = AtomicU64::new(0);
+static HOT_EVICT_TOTAL: AtomicU64 = AtomicU64::new(0);
+static SHARD_ACCESS_TOTAL: AtomicU64 = AtomicU64::new(0);
+static PREFETCH_QUEUE_DEPTH: AtomicU64 = AtomicU64::new(0);
 
 /// Record one `plan_prefetch` outcome (no wire enqueue).
 pub fn record_prefetch_plan(required_shards: usize, planned_shards: usize, prefetch_bytes: u64) {
     PLAN_TOTAL.fetch_add(1, Ordering::Relaxed);
     PLANNED_SHARDS_TOTAL.fetch_add(planned_shards as u64, Ordering::Relaxed);
-    HOT_SKIP_TOTAL.fetch_add(
-        required_shards.saturating_sub(planned_shards) as u64,
-        Ordering::Relaxed,
-    );
+    let skipped = required_shards.saturating_sub(planned_shards);
+    HOT_SKIP_TOTAL.fetch_add(skipped as u64, Ordering::Relaxed);
+    if skipped > 0 {
+        record_hot_evict(skipped);
+    }
     PREFETCH_BYTES_TOTAL.fetch_add(prefetch_bytes, Ordering::Relaxed);
 }
 
@@ -224,6 +245,57 @@ pub fn locality_unsatisfied_total() -> u64 {
     LOCALITY_UNSATISFIED_TOTAL.load(Ordering::Relaxed)
 }
 
+/// Record re-migrate prefetch trigger (PH-S454).
+pub fn record_prefetch_re_migrate() {
+    RE_MIGRATE_TOTAL.fetch_add(1, Ordering::Relaxed);
+}
+
+pub fn prefetch_re_migrate_total() -> u64 {
+    RE_MIGRATE_TOTAL.load(Ordering::Relaxed)
+}
+
+/// Record hot tier promotions (PH-S458).
+pub fn record_hot_promote(shard_count: usize) {
+    if shard_count > 0 {
+        HOT_PROMOTE_TOTAL.fetch_add(shard_count as u64, Ordering::Relaxed);
+    }
+}
+
+pub fn hot_promote_total() -> u64 {
+    HOT_PROMOTE_TOTAL.load(Ordering::Relaxed)
+}
+
+/// Record hot tier evictions when shards skipped (PH-S458).
+pub fn record_hot_evict(shard_count: usize) {
+    if shard_count > 0 {
+        HOT_EVICT_TOTAL.fetch_add(shard_count as u64, Ordering::Relaxed);
+    }
+}
+
+pub fn hot_evict_total() -> u64 {
+    HOT_EVICT_TOTAL.load(Ordering::Relaxed)
+}
+
+/// Record shard access on prefetch path (PH-S459).
+pub fn record_shard_access(shard_count: usize) {
+    if shard_count > 0 {
+        SHARD_ACCESS_TOTAL.fetch_add(shard_count as u64, Ordering::Relaxed);
+    }
+}
+
+pub fn shard_access_total() -> u64 {
+    SHARD_ACCESS_TOTAL.load(Ordering::Relaxed)
+}
+
+/// Observe prefetch queue depth gauge (PH-S459).
+pub fn observe_prefetch_queue_depth(depth: u64) {
+    PREFETCH_QUEUE_DEPTH.store(depth, Ordering::Relaxed);
+}
+
+pub fn prefetch_queue_depth() -> u64 {
+    PREFETCH_QUEUE_DEPTH.load(Ordering::Relaxed)
+}
+
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_prefetch_metrics_for_test() {
     PLAN_TOTAL.store(0, Ordering::Relaxed);
@@ -242,6 +314,11 @@ pub fn reset_prefetch_metrics_for_test() {
     SEED_FETCH_MISS_TOTAL.store(0, Ordering::Relaxed);
     CO_ACCESS_TOTAL.store(0, Ordering::Relaxed);
     LOCALITY_UNSATISFIED_TOTAL.store(0, Ordering::Relaxed);
+    RE_MIGRATE_TOTAL.store(0, Ordering::Relaxed);
+    HOT_PROMOTE_TOTAL.store(0, Ordering::Relaxed);
+    HOT_EVICT_TOTAL.store(0, Ordering::Relaxed);
+    SHARD_ACCESS_TOTAL.store(0, Ordering::Relaxed);
+    PREFETCH_QUEUE_DEPTH.store(0, Ordering::Relaxed);
 }
 
 #[cfg(test)]
@@ -321,5 +398,30 @@ mod tests {
         reset_prefetch_metrics_for_test();
         record_prefetch_lease_acquired();
         assert_eq!(prefetch_lease_acquired_total(), 1);
+    }
+
+    #[test]
+    fn record_prefetch_re_migrate_ph_s454() {
+        reset_prefetch_metrics_for_test();
+        record_prefetch_re_migrate();
+        assert_eq!(prefetch_re_migrate_total(), 1);
+    }
+
+    #[test]
+    fn hot_promote_evict_ph_s458() {
+        reset_prefetch_metrics_for_test();
+        record_hot_promote(2);
+        record_hot_evict(1);
+        assert_eq!(hot_promote_total(), 2);
+        assert_eq!(hot_evict_total(), 1);
+    }
+
+    #[test]
+    fn shard_access_and_queue_depth_ph_s459() {
+        reset_prefetch_metrics_for_test();
+        record_shard_access(3);
+        observe_prefetch_queue_depth(5);
+        assert_eq!(shard_access_total(), 3);
+        assert_eq!(prefetch_queue_depth(), 5);
     }
 }

@@ -3,6 +3,7 @@
 //! Gauge for in-flight replay verifications blocking settlement; no live replay enqueue wire.
 
 use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::Mutex;
 
 use crate::grid::galaxy_settlement::SettlementStatus;
 use crate::grid::galaxy_verification_replay::{
@@ -34,6 +35,9 @@ pub const METRIC_VERIFICATION_REPLAY_RECORD_TOTAL: &str = "galaxy_verification_r
 
 static REPLAY_VERIFICATION_ENQUEUE_TOTAL: AtomicU64 = AtomicU64::new(0);
 static VERIFICATION_REPLAY_RECORD_TOTAL: AtomicU64 = AtomicU64::new(0);
+
+static LAST_VERIFICATION_REPLAY_RECORD: Mutex<Option<GalaxyVerificationReplayRecord>> =
+    Mutex::new(None);
 
 /// Schedule one replay verification hold (mismatch / explicit flag).
 pub fn record_replay_pending_scheduled() {
@@ -74,6 +78,7 @@ pub fn reset_replay_pending_metrics_for_test() {
     REPLAY_EVALUATIONS_TOTAL.store(0, Ordering::Relaxed);
     REPLAY_VERIFICATION_ENQUEUE_TOTAL.store(0, Ordering::Relaxed);
     VERIFICATION_REPLAY_RECORD_TOTAL.store(0, Ordering::Relaxed);
+    reset_last_verification_replay_record_for_test();
 }
 
 /// Record one replay verification enqueue stub (PH-S438).
@@ -96,7 +101,25 @@ pub fn emit_verification_replay_record(
 ) -> GalaxyVerificationReplayRecord {
     let rec = build_verification_replay_record(primary_job_id, metrics);
     VERIFICATION_REPLAY_RECORD_TOTAL.fetch_add(1, Ordering::Relaxed);
+    if let Ok(mut slot) = LAST_VERIFICATION_REPLAY_RECORD.lock() {
+        *slot = Some(rec.clone());
+    }
     rec
+}
+
+/// Last in-process verification replay record (PH-S460 read API stub).
+pub fn last_verification_replay_record() -> Option<GalaxyVerificationReplayRecord> {
+    LAST_VERIFICATION_REPLAY_RECORD
+        .lock()
+        .ok()
+        .and_then(|g| g.clone())
+}
+
+#[cfg(any(test, feature = "test-utils"))]
+pub fn reset_last_verification_replay_record_for_test() {
+    if let Ok(mut slot) = LAST_VERIFICATION_REPLAY_RECORD.lock() {
+        *slot = None;
+    }
 }
 
 /// Enqueue replay verification stub when mismatch/replay flags schedule hold (PH-S438).

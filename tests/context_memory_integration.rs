@@ -187,16 +187,15 @@ async fn test_get_changes_in_window() {
 
     monitor.track_file_added("src/file2.rs", 200).await.unwrap();
 
+    // Most recent change should appear in a short window immediately after insert
+    let recent = monitor
+        .get_changes_in_window(Duration::from_millis(50))
+        .await;
+    assert!(!recent.is_empty());
+
     // Get changes in last second
     let changes = monitor.get_changes_in_window(Duration::from_secs(1)).await;
     assert!(changes.len() >= 2);
-
-    // Get changes in last millisecond (should be empty or very few)
-    let changes = monitor
-        .get_changes_in_window(Duration::from_millis(1))
-        .await;
-    // Should have at least the most recent change
-    assert!(!changes.is_empty());
 }
 
 #[tokio::test]

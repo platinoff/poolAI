@@ -1838,11 +1838,23 @@
       "from": "galaxy_grid",
       "kind": "implements",
       "to": "src_grid_galaxy_capability_doc_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_protocol_negotiation_metrics_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_verification_replay_rs"
     }
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S453",
+  "last_sprint_closed": "PH-S463",
   "layers": [
     {
       "id": "L0",
@@ -7742,9 +7754,30 @@
       "label": "galaxy_capability_doc.rs",
       "layer": "L3",
       "path": "src/grid/galaxy_capability_doc.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_protocol_negotiation_metrics_rs",
+      "label": "galaxy_protocol_negotiation_metrics.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_protocol_negotiation_metrics.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_verification_replay_rs",
+      "label": "galaxy_verification_replay.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_verification_replay.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_discovery_capability_document_integration_rs",
+      "label": "discovery_capability_document_integration.rs",
+      "layer": "L3",
+      "path": "tests/discovery_capability_document_integration.rs"
     }
   ],
-  "revision": 232,
+  "revision": 234,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -11237,6 +11270,96 @@
       "row": 388,
       "status": "closed",
       "title": "Vision-sync + `--check"
+    },
+    {
+      "acceptance": "re_migrate_prefetch_stub` on Migrating→Leased; `galaxy_prefetch_re_migrate_total`; unit tests",
+      "deps": "Galaxy §5.5",
+      "id": "PH-S454",
+      "open": false,
+      "row": 389,
+      "status": "closed",
+      "title": "Re-migrate delta prefetch trigger"
+    },
+    {
+      "acceptance": "POOLAI_GALAXY_VERIFY_ELEVATED_RATE` + `galaxy_verification_elevated_applied_total`; unit tests",
+      "deps": "Galaxy §6.2",
+      "id": "PH-S455",
+      "open": false,
+      "row": 390,
+      "status": "closed",
+      "title": "Elevated verification sample rate"
+    },
+    {
+      "acceptance": "+10`/`-100` deltas + `galaxy_trust_score_delta_total`; unit tests",
+      "deps": "Galaxy §6.5",
+      "id": "PH-S456",
+      "open": false,
+      "row": 391,
+      "status": "closed",
+      "title": "Trust score delta on verify verdict"
+    },
+    {
+      "acceptance": "POOLAI_GALAXY_REPLICATION_MAX_PER_HOUR` gate + `galaxy_replication_rate_limited_total",
+      "deps": "Galaxy §6.6",
+      "id": "PH-S457",
+      "open": false,
+      "row": 392,
+      "status": "closed",
+      "title": "Replication hourly rate-limit stub"
+    },
+    {
+      "acceptance": "galaxy_hot_promote_total`/`galaxy_hot_evict_total` on prefetch path",
+      "deps": "Galaxy §5.4",
+      "id": "PH-S458",
+      "open": false,
+      "row": 393,
+      "status": "closed",
+      "title": "Hot tier promote/evict metrics"
+    },
+    {
+      "acceptance": "galaxy_shard_access_total` + `galaxy_prefetch_queue_depth` gauges",
+      "deps": "Galaxy §5.3",
+      "id": "PH-S459",
+      "open": false,
+      "row": 394,
+      "status": "closed",
+      "title": "Locality telemetry counters (§5.3)"
+    },
+    {
+      "acceptance": "GET /api/v1/grid/verification-replay`; integration test",
+      "deps": "Galaxy §6.3",
+      "id": "PH-S460",
+      "open": false,
+      "row": 395,
+      "status": "closed",
+      "title": "Verification replay read API"
+    },
+    {
+      "acceptance": "renderMonitoringAlertsPanel` wasm; slim `monitoring.rs",
+      "deps": "RUST_RATIO §5.13",
+      "id": "PH-S461",
+      "open": false,
+      "row": 396,
+      "status": "closed",
+      "title": "Monitoring alerts panel wasm"
+    },
+    {
+      "acceptance": "/metrics` + verification-replay smoke",
+      "deps": "PH-S454…S460",
+      "id": "PH-S462",
+      "open": false,
+      "row": 397,
+      "status": "closed",
+      "title": "Stand smoke horizon band S454–S460"
+    },
+    {
+      "acceptance": "rust_ratio.json`; FM/HANDOFF/NEXT; `--check` green",
+      "deps": "§5.12 fallback",
+      "id": "PH-S463",
+      "open": false,
+      "row": 398,
+      "status": "closed",
+      "title": "Ops close band: loc-audit + vision-sync"
     }
   ],
   "sprint_queue_open_count": 0,

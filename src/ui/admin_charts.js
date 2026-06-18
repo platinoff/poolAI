@@ -654,3 +654,35 @@ async function poolaiRunMlPipelineDemo() {
       : '/api/enterprise/ai-ml/pipeline/demo';
   return fetchJson(url);
 }
+
+/**
+ * PH-S461: monitoring active alerts table (wasm-first).
+ * @param {Array<object>} alerts
+ * @param {object} labels i18n label map
+ */
+function poolaiRenderMonitoringAlertsPanel(alerts, labels) {
+  labels = labels || {};
+  var wasm = poolaiChartsWasm();
+  if (wasm && typeof wasm.renderMonitoringAlertsPanel === 'function') {
+    return wasm.renderMonitoringAlertsPanel(
+      JSON.stringify(alerts || []),
+      labels.na || poolaiChartT('admin.na', 'N/A'),
+      labels.ack || poolaiChartT('admin.mon.statusAck', 'Acknowledged'),
+      labels.active || poolaiChartT('admin.mon.statusActiveLbl', 'Active'),
+      labels.ackBtn || poolaiChartT('admin.mon.ackBtn', 'Acknowledge'),
+      labels.severity || poolaiChartT('admin.mon.col.severity', 'Severity'),
+      labels.metric || poolaiChartT('admin.mon.col.metric', 'Metric'),
+      labels.current || poolaiChartT('admin.mon.col.currentVal', 'Current Value'),
+      labels.threshold || poolaiChartT('admin.mon.col.threshold', 'Threshold'),
+      labels.triggered || poolaiChartT('admin.mon.col.triggered', 'Triggered'),
+      labels.status || poolaiChartT('admin.mon.col.statusCol', 'Status'),
+      labels.actions || poolaiChartT('admin.mon.col.actions', 'Actions'),
+      labels.tableAria || poolaiChartT('admin.mon.activeAlertsTitle', 'Active Alerts'),
+      labels.empty || poolaiChartT('admin.mon.noAlerts', 'No active alerts'),
+    );
+  }
+  return adminEmptyStateHtml(
+    labels.empty || poolaiChartT('admin.mon.noAlerts', 'No active alerts'),
+    { icon: '✅' },
+  );
+}

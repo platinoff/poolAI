@@ -964,6 +964,15 @@ fn admin_charts_ml_pipeline_panel_wasm_first_ph_s450() {
 }
 
 #[test]
+fn admin_charts_monitoring_alerts_panel_wasm_first_ph_s461() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("wasm.renderMonitoringAlertsPanel"));
+    assert!(js.contains("poolaiRenderMonitoringAlertsPanel"));
+    let mon = include_str!("monitoring.rs");
+    assert!(mon.contains("poolaiRenderMonitoringAlertsPanel"));
+}
+
+#[test]
 fn admin_charts_metric_history_url_with_hours_wasm_first_ph_s334() {
     let js = include_str!("../admin_charts.js");
     assert!(js.contains("wasm.buildMetricHistoryUrlWithHours"));

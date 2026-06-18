@@ -84,36 +84,21 @@ pub async fn admin_monitoring() -> Html<String> {
               title: T('admin.mon.mlTitle', 'ML Pipeline Step Metrics'),
             });
       
-      const alertsHtml = alerts.length === 0 
-        ? adminEmptyStateHtml(T('admin.mon.noAlerts', 'No active alerts'), { icon: '✅' })
-        : `
-          <div class="admin-table-container"><table class="admin-table" aria-label="${escapeHtml(T('admin.mon.activeAlertsTitle', 'Active Alerts'))}">
-            <thead>
-              <tr>
-                <th>${escapeHtml(T('admin.mon.col.severity', 'Severity'))}</th>
-                <th>${escapeHtml(T('admin.mon.col.metric', 'Metric'))}</th>
-                <th>${escapeHtml(T('admin.mon.col.currentVal', 'Current Value'))}</th>
-                <th>${escapeHtml(T('admin.mon.col.threshold', 'Threshold'))}</th>
-                <th>${escapeHtml(T('admin.mon.col.triggered', 'Triggered'))}</th>
-                <th>${escapeHtml(T('admin.mon.col.statusCol', 'Status'))}</th>
-                <th class="admin-table-actions-col" data-no-sort="1">${escapeHtml(T('admin.mon.col.actions', 'Actions'))}</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${alerts.map(a => `
-                <tr>
-                  <td><span class="status-badge ${a.severity?.toLowerCase() || 'warning'}">${escapeHtml(a.severity || 'WARNING')}</span></td>
-                  <td><strong>${escapeHtml(a.metric || 'unknown')}</strong></td>
-                  <td>${escapeHtml(String(a.current_value != null ? a.current_value : T('admin.na', 'N/A')))}</td>
-                  <td>${escapeHtml(String(a.threshold != null ? a.threshold : T('admin.na', 'N/A')))}</td>
-                  <td>${a.triggered_at ? escapeHtml(new Date(a.triggered_at).toLocaleString()) : escapeHtml(T('admin.na', 'N/A'))}</td>
-                  <td>${a.acknowledged ? '<span class="muted">' + escapeHtml(T('admin.mon.statusAck', 'Acknowledged')) + '</span>' : '<span class="status-badge active">' + escapeHtml(T('admin.mon.statusActiveLbl', 'Active')) + '</span>'}</td>
-                  <td>${a.acknowledged ? '' : '<button type="button" class="btn btn-sm" onclick=\'acknowledgeAlert(' + JSON.stringify(a.id) + ')\'>' + escapeHtml(T('admin.mon.ackBtn', 'Acknowledge')) + '</button>'}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table></div>
-        `;
+      const alertsHtml = poolaiRenderMonitoringAlertsPanel(alerts, {
+        na: T('admin.na', 'N/A'),
+        ack: T('admin.mon.statusAck', 'Acknowledged'),
+        active: T('admin.mon.statusActiveLbl', 'Active'),
+        ackBtn: T('admin.mon.ackBtn', 'Acknowledge'),
+        severity: T('admin.mon.col.severity', 'Severity'),
+        metric: T('admin.mon.col.metric', 'Metric'),
+        current: T('admin.mon.col.currentVal', 'Current Value'),
+        threshold: T('admin.mon.col.threshold', 'Threshold'),
+        triggered: T('admin.mon.col.triggered', 'Triggered'),
+        status: T('admin.mon.col.statusCol', 'Status'),
+        actions: T('admin.mon.col.actions', 'Actions'),
+        tableAria: T('admin.mon.activeAlertsTitle', 'Active Alerts'),
+        empty: T('admin.mon.noAlerts', 'No active alerts'),
+      });
       
       const dashboardsHtml = dashboards.length === 0
         ? adminEmptyStateHtml(T('admin.mon.noDashboards', 'No dashboards created'), { icon: '📊' })

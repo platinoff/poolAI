@@ -33,10 +33,11 @@ pub use dispatch::{
     default_co_access_graph, enqueue_prefetch_hook, fetch_seed_shards_hook, ingest_envelope,
     ingest_job_locality_rank_stub, ingest_job_prefetch_stub, lease_acquire_prefetch_stub,
     locality_workers_from_seed_snapshots, noop_prefetch_hook, parse_prefetch_policy_mode,
-    plan_co_access_prefetch, plan_prefetch, resolve_seed_pull_shards, seed_pull_hook,
-    wait_prefetch_hook, GridIngestKind, GridIngestOutcome, PrefetchPlan, PrefetchPolicyConfig,
-    PrefetchPolicyMode, PrefetchTrigger, SeedInventoryEntry, SeedInventoryPeerSnapshot,
-    DEFAULT_PREFETCH_DEADLINE_MS, ENV_LOCALITY_MODE, ENV_PREFETCH_DEADLINE_MS,
+    plan_co_access_prefetch, plan_prefetch, re_migrate_prefetch_stub, resolve_seed_pull_shards,
+    seed_pull_hook, wait_prefetch_hook, GridIngestKind, GridIngestOutcome, PrefetchPlan,
+    PrefetchPolicyConfig, PrefetchPolicyMode, PrefetchTrigger, SeedInventoryEntry,
+    SeedInventoryPeerSnapshot, DEFAULT_PREFETCH_DEADLINE_MS, ENV_LOCALITY_MODE,
+    ENV_PREFETCH_DEADLINE_MS,
 };
 pub use envelope::{
     GridEnvelope, GridEnvelopeError, GridJobBody, GridMemoryShardBody, GridMessage,

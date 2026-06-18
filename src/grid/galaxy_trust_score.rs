@@ -63,6 +63,15 @@ pub const METRIC_DEFAULT_SCORE_APPLIED_TOTAL: &str = "galaxy_trust_default_score
 /// Total grid results with explicit `trust_score` on ingest (PH-S405 `/metrics` gauge).
 pub const METRIC_EXPLICIT_SCORE_TOTAL: &str = "galaxy_trust_explicit_score_total";
 
+/// Trust score delta applications on verification verdict (PH-S456).
+pub const METRIC_TRUST_SCORE_DELTA_TOTAL: &str = "galaxy_trust_score_delta_total";
+
+/// Trust delta on verification match (0..=100 scale, PH-S456).
+pub const TRUST_DELTA_MATCH: i16 = 10;
+
+/// Trust delta on verification mismatch (0..=100 scale, PH-S456).
+pub const TRUST_DELTA_MISMATCH: i16 = -100;
+
 static PAYOUT_ELIGIBLE_TOTAL: AtomicU64 = AtomicU64::new(0);
 static PAYOUT_HELD_TOTAL: AtomicU64 = AtomicU64::new(0);
 static PAYOUT_NOT_APPLICABLE_TOTAL: AtomicU64 = AtomicU64::new(0);
@@ -70,6 +79,7 @@ static LAST_TRUST_SCORE: AtomicU64 = AtomicU64::new(0);
 static GATE_EVALUATIONS_TOTAL: AtomicU64 = AtomicU64::new(0);
 static DEFAULT_SCORE_APPLIED_TOTAL: AtomicU64 = AtomicU64::new(0);
 static EXPLICIT_SCORE_TOTAL: AtomicU64 = AtomicU64::new(0);
+static TRUST_SCORE_DELTA_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// Gate configuration (env-backed stub).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -159,6 +169,24 @@ pub fn evaluate_result_settlement_gate(
     verdict
 }
 
+/// Apply verification verdict trust delta and record counter (PH-S456 stub).
+pub fn apply_verification_trust_delta(verdict: &str, current: TrustScore) -> TrustScore {
+    let delta = if verdict.eq_ignore_ascii_case("match") {
+        TRUST_DELTA_MATCH
+    } else if verdict.eq_ignore_ascii_case("mismatch") {
+        TRUST_DELTA_MISMATCH
+    } else {
+        return current;
+    };
+    TRUST_SCORE_DELTA_TOTAL.fetch_add(1, Ordering::Relaxed);
+    let adjusted = i16::from(current).saturating_add(delta);
+    clamp_trust_score(adjusted.max(0) as u16)
+}
+
+pub fn trust_score_delta_total() -> u64 {
+    TRUST_SCORE_DELTA_TOTAL.load(Ordering::Relaxed)
+}
+
 /// Observe last grid result trust score for Prometheus gauge (PH-S182).
 pub fn observe_last_trust_score(score: TrustScore) {
     LAST_TRUST_SCORE.store(u64::from(score), Ordering::Relaxed);
@@ -237,6 +265,7 @@ pub fn reset_settlement_gate_metrics_for_test() {
     GATE_EVALUATIONS_TOTAL.store(0, Ordering::Relaxed);
     DEFAULT_SCORE_APPLIED_TOTAL.store(0, Ordering::Relaxed);
     EXPLICIT_SCORE_TOTAL.store(0, Ordering::Relaxed);
+    TRUST_SCORE_DELTA_TOTAL.store(0, Ordering::Relaxed);
 }
 
 #[cfg(test)]
@@ -385,5 +414,14 @@ mod tests {
             Some(v) => std::env::set_var(ENV_MIN_TRUST_PAYOUT, v),
             None => std::env::remove_var(ENV_MIN_TRUST_PAYOUT),
         }
+    }
+
+    #[test]
+    fn apply_verification_trust_delta_ph_s456() {
+        reset_settlement_gate_metrics_for_test();
+        assert_eq!(apply_verification_trust_delta("match", 50), 60);
+        assert_eq!(apply_verification_trust_delta("mismatch", 50), 0);
+        assert_eq!(trust_score_delta_total(), 2);
+        reset_settlement_gate_metrics_for_test();
     }
 }

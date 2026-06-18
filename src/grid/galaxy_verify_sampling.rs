@@ -14,6 +14,12 @@ pub const HEADER_VERIFY_BASE_SAMPLE_RATE: &str = "x-poolai-verify-base-sample-ra
 /// Env: base sampling rate for `telegram_edge` verification (0.0..=1.0).
 pub const ENV_VERIFY_BASE_SAMPLE_RATE: &str = "POOLAI_GALAXY_VERIFY_BASE_SAMPLE_RATE";
 
+/// Env: elevated sample rate after mismatch (0.0..=1.0, PH-S455).
+pub const ENV_VERIFY_ELEVATED_RATE: &str = "POOLAI_GALAXY_VERIFY_ELEVATED_RATE";
+
+/// Concept default elevated rate after mismatch: 25%.
+pub const DEFAULT_VERIFY_ELEVATED_SAMPLE_RATE: f64 = 0.25;
+
 /// Concept default: 5% of edge results sampled for verification.
 pub const DEFAULT_VERIFY_BASE_SAMPLE_RATE: f64 = 0.05;
 
@@ -21,6 +27,7 @@ static VERIFY_SAMPLE_SCHEDULED_TOTAL: AtomicU64 = AtomicU64::new(0);
 static VERIFY_SAMPLE_SKIPPED_TOTAL: AtomicU64 = AtomicU64::new(0);
 static VERIFY_SAMPLE_NOT_APPLICABLE_TOTAL: AtomicU64 = AtomicU64::new(0);
 static VERIFY_SAMPLING_EVALUATIONS_TOTAL: AtomicU64 = AtomicU64::new(0);
+static VERIFY_ELEVATED_APPLIED_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// In-process counter for stub scheduled verification samples (grid result path).
 pub const METRIC_VERIFY_SAMPLE_SCHEDULED_TOTAL: &str = "galaxy_verification_sample_scheduled_total";
@@ -36,10 +43,14 @@ pub const METRIC_VERIFY_SAMPLE_NOT_APPLICABLE_TOTAL: &str =
 pub const METRIC_VERIFY_SAMPLING_EVALUATIONS_TOTAL: &str =
     "galaxy_verification_sampling_evaluations_total";
 
+/// Elevated sample rate applied after mismatch (PH-S455).
+pub const METRIC_VERIFY_ELEVATED_APPLIED_TOTAL: &str = "galaxy_verification_elevated_applied_total";
+
 /// Coordinator verification sampling policy (env-backed stub).
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct VerifySamplingConfig {
     pub base_sample_rate: f64,
+    pub elevated_sample_rate: f64,
 }
 
 /// Stub verdict on grid result ingest (no enqueue wire).
@@ -57,17 +68,27 @@ impl VerifySamplingConfig {
     pub const fn default_stub() -> Self {
         Self {
             base_sample_rate: DEFAULT_VERIFY_BASE_SAMPLE_RATE,
+            elevated_sample_rate: DEFAULT_VERIFY_ELEVATED_SAMPLE_RATE,
         }
     }
 
-    /// Read [`ENV_VERIFY_BASE_SAMPLE_RATE`]; invalid/missing → [`default_stub`].
+    /// Read env vars; invalid/missing → [`default_stub`].
     pub fn from_env() -> Self {
-        match std::env::var(ENV_VERIFY_BASE_SAMPLE_RATE) {
-            Ok(raw) => Self {
-                base_sample_rate: parse_verify_base_sample_rate(&raw)
-                    .unwrap_or(DEFAULT_VERIFY_BASE_SAMPLE_RATE),
-            },
-            Err(_) => Self::default_stub(),
+        let base = match std::env::var(ENV_VERIFY_BASE_SAMPLE_RATE) {
+            Ok(raw) => {
+                parse_verify_base_sample_rate(&raw).unwrap_or(DEFAULT_VERIFY_BASE_SAMPLE_RATE)
+            }
+            Err(_) => DEFAULT_VERIFY_BASE_SAMPLE_RATE,
+        };
+        let elevated = match std::env::var(ENV_VERIFY_ELEVATED_RATE) {
+            Ok(raw) => {
+                parse_verify_base_sample_rate(&raw).unwrap_or(DEFAULT_VERIFY_ELEVATED_SAMPLE_RATE)
+            }
+            Err(_) => DEFAULT_VERIFY_ELEVATED_SAMPLE_RATE,
+        };
+        Self {
+            base_sample_rate: base,
+            elevated_sample_rate: elevated,
         }
     }
 }
@@ -161,6 +182,23 @@ pub fn verify_sampling_evaluations_total() -> u64 {
     VERIFY_SAMPLING_EVALUATIONS_TOTAL.load(Ordering::Relaxed)
 }
 
+/// Post-mismatch elevated sampling stub (PH-S455).
+pub fn evaluate_post_mismatch_elevated_sampling(
+    job_id: &str,
+    config: &VerifySamplingConfig,
+) -> bool {
+    if deterministic_sample_selected(job_id, config.elevated_sample_rate) {
+        VERIFY_ELEVATED_APPLIED_TOTAL.fetch_add(1, Ordering::Relaxed);
+        true
+    } else {
+        false
+    }
+}
+
+pub fn verify_elevated_applied_total() -> u64 {
+    VERIFY_ELEVATED_APPLIED_TOTAL.load(Ordering::Relaxed)
+}
+
 /// Format sample rate for the HTTP response header (6 decimal places).
 pub fn format_verify_base_sample_rate_header(rate: f64) -> String {
     format!("{rate:.6}")
@@ -172,6 +210,7 @@ pub fn reset_verify_sampling_metrics_for_test() {
     VERIFY_SAMPLE_SKIPPED_TOTAL.store(0, Ordering::Relaxed);
     VERIFY_SAMPLE_NOT_APPLICABLE_TOTAL.store(0, Ordering::Relaxed);
     VERIFY_SAMPLING_EVALUATIONS_TOTAL.store(0, Ordering::Relaxed);
+    VERIFY_ELEVATED_APPLIED_TOTAL.store(0, Ordering::Relaxed);
 }
 
 #[cfg(test)]
@@ -244,6 +283,7 @@ mod tests {
         reset_verify_sampling_metrics_for_test();
         let cfg = VerifySamplingConfig {
             base_sample_rate: 1.0,
+            elevated_sample_rate: DEFAULT_VERIFY_ELEVATED_SAMPLE_RATE,
         };
         assert_eq!(
             evaluate_result_verify_sampling(Some("tg-edge"), "job-edge", &cfg),
@@ -263,6 +303,7 @@ mod tests {
         reset_verify_sampling_metrics_for_test();
         let cfg = VerifySamplingConfig {
             base_sample_rate: 0.0,
+            elevated_sample_rate: DEFAULT_VERIFY_ELEVATED_SAMPLE_RATE,
         };
         assert_eq!(
             evaluate_result_verify_sampling(Some("tg-edge"), "job-skip", &cfg),
@@ -291,6 +332,21 @@ mod tests {
         evaluate_result_verify_sampling(Some("peer-a"), "job-1", &cfg);
         evaluate_result_verify_sampling(Some("tg-edge"), "job-2", &cfg);
         assert_eq!(verify_sampling_evaluations_total(), 2);
+        reset_verify_sampling_metrics_for_test();
+    }
+
+    #[test]
+    fn evaluate_post_mismatch_elevated_sampling_ph_s455() {
+        reset_verify_sampling_metrics_for_test();
+        let cfg = VerifySamplingConfig {
+            base_sample_rate: 0.05,
+            elevated_sample_rate: 1.0,
+        };
+        assert!(evaluate_post_mismatch_elevated_sampling(
+            "job-mismatch",
+            &cfg
+        ));
+        assert_eq!(verify_elevated_applied_total(), 1);
         reset_verify_sampling_metrics_for_test();
     }
 }

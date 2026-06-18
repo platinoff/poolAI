@@ -20,11 +20,12 @@ use crate::grid::galaxy_locality::{
     LocalityTask, LocalityWorker, DEFAULT_PREFETCH_CROSS_REGION_EGRESS_MB_PER_SHARD,
 };
 use crate::grid::galaxy_prefetch_metrics::{
-    record_locality_unsatisfied, record_prefetch_co_access, record_prefetch_complete,
-    record_prefetch_enqueue, record_prefetch_ingest, record_prefetch_lease_acquired,
-    record_prefetch_plan, record_prefetch_seed_fetch, record_prefetch_seed_fetch_miss,
+    observe_prefetch_queue_depth, record_hot_promote, record_locality_unsatisfied,
+    record_prefetch_co_access, record_prefetch_complete, record_prefetch_enqueue,
+    record_prefetch_ingest, record_prefetch_lease_acquired, record_prefetch_plan,
+    record_prefetch_re_migrate, record_prefetch_seed_fetch, record_prefetch_seed_fetch_miss,
     record_prefetch_seed_pull, record_prefetch_skip_ingest, record_prefetch_strict_mode,
-    record_prefetch_wait, DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM,
+    record_prefetch_wait, record_shard_access, DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM,
     DEFAULT_PREFETCH_BYTES_PER_SHARD_VRAM,
 };
 use crate::grid::galaxy_replay_metrics::evaluate_result_replay_pending;
@@ -41,15 +42,16 @@ use crate::grid::galaxy_settlement_metrics::{
     record_payout_batch_ledger_entry,
 };
 use crate::grid::galaxy_trust_score::{
-    clamp_trust_score, evaluate_result_settlement_gate, SettlementGateVerdict, TrustScore,
-    TrustScoreGateConfig,
+    apply_verification_trust_delta, clamp_trust_score, evaluate_result_settlement_gate,
+    SettlementGateVerdict, TrustScore, TrustScoreGateConfig,
 };
 use crate::grid::galaxy_verification_metrics::{
     evaluate_result_verification_match, evaluate_result_verification_mismatch,
     evaluate_result_verification_sample, evaluate_result_verification_sample_completed,
 };
 use crate::grid::galaxy_verify_sampling::{
-    evaluate_result_verify_sampling, VerifySamplingConfig, VerifySamplingVerdict,
+    evaluate_post_mismatch_elevated_sampling, evaluate_result_verify_sampling,
+    VerifySamplingConfig, VerifySamplingVerdict,
 };
 use crate::grid::{GridEnvelope, GridEnvelopeError, GridMessage, GridResultBody};
 use crate::job::{
@@ -199,6 +201,24 @@ pub fn lease_acquire_prefetch_stub() -> usize {
         &config,
     );
     complete_prefetch_hook(&plan, None)
+}
+
+/// Re-migrate prefetch stub on Migrating→Leased handoff (PH-S454; no enqueue wire).
+pub fn re_migrate_prefetch_stub(memory: Option<&MemoryShardStore>) -> usize {
+    let inventory = coordinator_merged_seed_inventory();
+    let config = PrefetchPolicyConfig::from_env();
+    let shard_ids: Vec<String> = inventory.shard_ids.iter().take(1).cloned().collect();
+    if shard_ids.is_empty() {
+        return 0;
+    }
+    let plan = plan_prefetch(
+        &inventory,
+        &shard_ids,
+        PrefetchTrigger::ReMigrate,
+        false,
+        &config,
+    );
+    complete_prefetch_hook(&plan, memory)
 }
 
 /// Coordinator worker rows for locality rank stub (PH-S285).
@@ -410,6 +430,9 @@ pub fn plan_prefetch(
     if trigger == PrefetchTrigger::CoAccessGraph {
         record_prefetch_co_access();
     }
+    if trigger == PrefetchTrigger::ReMigrate {
+        record_prefetch_re_migrate();
+    }
     if !items.is_empty() {
         observe_last_cross_region_egress_mb(
             DEFAULT_PREFETCH_CROSS_REGION_EGRESS_MB_PER_SHARD * items.len() as f64,
@@ -434,6 +457,7 @@ pub fn noop_prefetch_hook(plan: &PrefetchPlan) -> usize {
 pub fn enqueue_prefetch_hook(plan: &PrefetchPlan) -> usize {
     let n = plan.items.len();
     record_prefetch_enqueue(n);
+    observe_prefetch_queue_depth(n as u64);
     n
 }
 
@@ -450,8 +474,11 @@ pub fn complete_prefetch_hook(plan: &PrefetchPlan, memory: Option<&MemoryShardSt
     let n = plan.items.len();
     if n > 0 {
         record_prefetch_enqueue(n);
+        observe_prefetch_queue_depth(n as u64);
         record_prefetch_wait(n, plan.deadline_ms);
         record_prefetch_complete(n);
+        record_hot_promote(n);
+        record_shard_access(n);
         seed_pull_hook(plan);
         if let Some(store) = memory {
             fetch_seed_shards_hook(plan, store);
@@ -703,6 +730,25 @@ fn ingest_result(
     let trust_score = trust_score_from_result_metrics(body.metrics.as_ref());
     evaluate_result_verification_mismatch(body.metrics.as_ref());
     evaluate_result_verification_match(body.metrics.as_ref());
+    let verify_cfg = VerifySamplingConfig::from_env();
+    if body
+        .metrics
+        .as_ref()
+        .and_then(|m| m.get("verification_verdict"))
+        .and_then(|v| v.as_str())
+        .is_some_and(|s| s.eq_ignore_ascii_case("mismatch"))
+    {
+        let _ = evaluate_post_mismatch_elevated_sampling(&job_id, &verify_cfg);
+    }
+    if let (Some(score), Some(verdict)) = (
+        trust_score,
+        body.metrics
+            .as_ref()
+            .and_then(|m| m.get("verification_verdict"))
+            .and_then(|v| v.as_str()),
+    ) {
+        apply_verification_trust_delta(verdict, score);
+    }
     evaluate_result_verification_sample_completed(body.metrics.as_ref());
     let settlement_gate = evaluate_result_settlement_gate(
         source_peer_id,
@@ -2154,6 +2200,18 @@ mod tests {
         assert_eq!(plan.trigger, PrefetchTrigger::CoAccessGraph);
         assert_eq!(prefetch_co_access_total(), 1);
         assert!(plan_co_access_prefetch("w:unknown", false, &config).is_none());
+        reset_prefetch_metrics_for_test();
+    }
+
+    #[test]
+    fn re_migrate_prefetch_stub_ph_s454() {
+        use crate::grid::galaxy_prefetch_metrics::{
+            prefetch_re_migrate_total, reset_prefetch_metrics_for_test,
+        };
+
+        reset_prefetch_metrics_for_test();
+        let n = re_migrate_prefetch_stub(None);
+        assert!(n > 0 || prefetch_re_migrate_total() == 1);
         reset_prefetch_metrics_for_test();
     }
 }

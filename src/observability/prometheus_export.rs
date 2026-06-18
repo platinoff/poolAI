@@ -28,19 +28,21 @@ use crate::grid::galaxy_locality::{
     METRIC_LOCALITY_RANK_SKIP_TOTAL, METRIC_SHARD_LOCAL_HIT_RATIO,
 };
 use crate::grid::galaxy_prefetch_metrics::{
-    locality_unsatisfied_total, prefetch_bytes_total, prefetch_co_access_total,
-    prefetch_complete_total, prefetch_enqueue_total, prefetch_hot_skip_total,
-    prefetch_ingest_total, prefetch_lease_acquired_total, prefetch_plan_total,
-    prefetch_planned_shards_total, prefetch_seed_fetch_miss_total, prefetch_seed_fetch_total,
+    hot_evict_total, hot_promote_total, locality_unsatisfied_total, prefetch_bytes_total,
+    prefetch_co_access_total, prefetch_complete_total, prefetch_enqueue_total,
+    prefetch_hot_skip_total, prefetch_ingest_total, prefetch_lease_acquired_total,
+    prefetch_plan_total, prefetch_planned_shards_total, prefetch_queue_depth,
+    prefetch_re_migrate_total, prefetch_seed_fetch_miss_total, prefetch_seed_fetch_total,
     prefetch_seed_pull_total, prefetch_skip_ingest_total, prefetch_strict_mode_total,
-    prefetch_wait_ms_total, METRIC_LOCALITY_UNSATISFIED_TOTAL, METRIC_PREFETCH_BYTES_TOTAL,
-    METRIC_PREFETCH_COMPLETE_TOTAL, METRIC_PREFETCH_CO_ACCESS_TOTAL, METRIC_PREFETCH_ENQUEUE_TOTAL,
-    METRIC_PREFETCH_HOT_SKIP_TOTAL, METRIC_PREFETCH_INGEST_TOTAL,
-    METRIC_PREFETCH_LEASE_ACQUIRED_TOTAL, METRIC_PREFETCH_PLANNED_SHARDS_TOTAL,
-    METRIC_PREFETCH_PLAN_TOTAL, METRIC_PREFETCH_SEED_FETCH_MISS_TOTAL,
+    prefetch_wait_ms_total, shard_access_total, METRIC_HOT_EVICT_TOTAL, METRIC_HOT_PROMOTE_TOTAL,
+    METRIC_LOCALITY_UNSATISFIED_TOTAL, METRIC_PREFETCH_BYTES_TOTAL, METRIC_PREFETCH_COMPLETE_TOTAL,
+    METRIC_PREFETCH_CO_ACCESS_TOTAL, METRIC_PREFETCH_ENQUEUE_TOTAL, METRIC_PREFETCH_HOT_SKIP_TOTAL,
+    METRIC_PREFETCH_INGEST_TOTAL, METRIC_PREFETCH_LEASE_ACQUIRED_TOTAL,
+    METRIC_PREFETCH_PLANNED_SHARDS_TOTAL, METRIC_PREFETCH_PLAN_TOTAL, METRIC_PREFETCH_QUEUE_DEPTH,
+    METRIC_PREFETCH_RE_MIGRATE_TOTAL, METRIC_PREFETCH_SEED_FETCH_MISS_TOTAL,
     METRIC_PREFETCH_SEED_FETCH_TOTAL, METRIC_PREFETCH_SEED_PULL_TOTAL,
     METRIC_PREFETCH_SKIP_INGEST_TOTAL, METRIC_PREFETCH_STRICT_MODE_TOTAL,
-    METRIC_PREFETCH_WAIT_MS_TOTAL,
+    METRIC_PREFETCH_WAIT_MS_TOTAL, METRIC_SHARD_ACCESS_TOTAL,
 };
 use crate::grid::galaxy_pricing_oracle::{
     forced_fallback_total, fresh_served_total, last_market_min_usd_micro, last_quote_usd_micro,
@@ -64,8 +66,9 @@ use crate::grid::galaxy_replay_metrics::{
     METRIC_REPLAY_VERIFICATION_ENQUEUE_TOTAL, METRIC_VERIFICATION_REPLAY_RECORD_TOTAL,
 };
 use crate::grid::galaxy_replication_metrics::{
-    replication_enqueue_total, replication_executor_enqueue_total, replication_strict_total,
-    METRIC_REPLICATION_ENQUEUE_TOTAL, METRIC_REPLICATION_EXECUTOR_ENQUEUE_TOTAL,
+    replication_enqueue_total, replication_executor_enqueue_total, replication_rate_limited_total,
+    replication_strict_total, METRIC_REPLICATION_ENQUEUE_TOTAL,
+    METRIC_REPLICATION_EXECUTOR_ENQUEUE_TOTAL, METRIC_REPLICATION_RATE_LIMITED_TOTAL,
     METRIC_REPLICATION_STRICT_TOTAL,
 };
 use crate::grid::galaxy_settlement_metrics::{
@@ -78,10 +81,11 @@ use crate::grid::galaxy_settlement_metrics::{
 use crate::grid::galaxy_trust_score::{
     configured_default_trust_score, configured_min_trust_for_payout, default_score_applied_total,
     explicit_score_total, gate_evaluations_total, last_trust_score, payout_eligible_total,
-    payout_held_total, payout_not_applicable_total, METRIC_DEFAULT_SCORE_APPLIED_TOTAL,
-    METRIC_EXPLICIT_SCORE_TOTAL, METRIC_GATE_EVALUATIONS_TOTAL, METRIC_PAYOUT_ELIGIBLE_TOTAL,
-    METRIC_PAYOUT_HELD_TOTAL, METRIC_PAYOUT_NOT_APPLICABLE_TOTAL, METRIC_TRUST_GATE_DEFAULT_SCORE,
-    METRIC_TRUST_GATE_MIN_THRESHOLD, METRIC_TRUST_SCORE,
+    payout_held_total, payout_not_applicable_total, trust_score_delta_total,
+    METRIC_DEFAULT_SCORE_APPLIED_TOTAL, METRIC_EXPLICIT_SCORE_TOTAL, METRIC_GATE_EVALUATIONS_TOTAL,
+    METRIC_PAYOUT_ELIGIBLE_TOTAL, METRIC_PAYOUT_HELD_TOTAL, METRIC_PAYOUT_NOT_APPLICABLE_TOTAL,
+    METRIC_TRUST_GATE_DEFAULT_SCORE, METRIC_TRUST_GATE_MIN_THRESHOLD, METRIC_TRUST_SCORE,
+    METRIC_TRUST_SCORE_DELTA_TOTAL,
 };
 use crate::grid::galaxy_verification_metrics::{
     verification_checker_enqueue_total, verification_match_total, verification_mismatch_total,
@@ -91,8 +95,9 @@ use crate::grid::galaxy_verification_metrics::{
     METRIC_VERIFICATION_SAMPLE_TOTAL,
 };
 use crate::grid::galaxy_verify_sampling::{
-    verify_sample_not_applicable_total, verify_sample_scheduled_total, verify_sample_skipped_total,
-    verify_sampling_evaluations_total, METRIC_VERIFY_SAMPLE_NOT_APPLICABLE_TOTAL,
+    verify_elevated_applied_total, verify_sample_not_applicable_total,
+    verify_sample_scheduled_total, verify_sample_skipped_total, verify_sampling_evaluations_total,
+    METRIC_VERIFY_ELEVATED_APPLIED_TOTAL, METRIC_VERIFY_SAMPLE_NOT_APPLICABLE_TOTAL,
     METRIC_VERIFY_SAMPLE_SCHEDULED_TOTAL, METRIC_VERIFY_SAMPLE_SKIPPED_TOTAL,
     METRIC_VERIFY_SAMPLING_EVALUATIONS_TOTAL,
 };
@@ -129,6 +134,7 @@ pub struct PoolAiPrometheus {
     galaxy_trust_gate_evaluations_total: IntGauge,
     galaxy_trust_default_score_applied_total: IntGauge,
     galaxy_trust_explicit_score_total: IntGauge,
+    galaxy_trust_score_delta_total: IntGauge,
     galaxy_shard_local_hit_ratio: IntGauge,
     galaxy_cross_region_egress_mb: IntGauge,
     galaxy_prefetch_plan_total: IntGauge,
@@ -147,6 +153,11 @@ pub struct PoolAiPrometheus {
     galaxy_prefetch_seed_fetch_miss_total: IntGauge,
     galaxy_prefetch_co_access_total: IntGauge,
     galaxy_locality_unsatisfied_total: IntGauge,
+    galaxy_prefetch_re_migrate_total: IntGauge,
+    galaxy_hot_promote_total: IntGauge,
+    galaxy_hot_evict_total: IntGauge,
+    galaxy_shard_access_total: IntGauge,
+    galaxy_prefetch_queue_depth: IntGauge,
     poolai_protocol_negotiation_rejected_total: IntGauge,
     galaxy_locality_rank_ingest_total: IntGauge,
     galaxy_locality_rank_miss_total: IntGauge,
@@ -160,6 +171,7 @@ pub struct PoolAiPrometheus {
     galaxy_verification_sample_skipped_total: IntGauge,
     galaxy_verification_sample_not_applicable_total: IntGauge,
     galaxy_verification_sampling_evaluations_total: IntGauge,
+    galaxy_verification_elevated_applied_total: IntGauge,
     galaxy_verification_checker_enqueue_total: IntGauge,
     galaxy_replay_pending: IntGauge,
     galaxy_replay_pending_scheduled_total: IntGauge,
@@ -176,6 +188,7 @@ pub struct PoolAiPrometheus {
     galaxy_replication_strict_total: IntGauge,
     galaxy_replication_enqueue_total: IntGauge,
     galaxy_replication_executor_enqueue_total: IntGauge,
+    galaxy_replication_rate_limited_total: IntGauge,
 }
 
 static PROMETHEUS: OnceLock<PoolAiPrometheus> = OnceLock::new();
@@ -454,6 +467,15 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_trust_explicit_score_total.clone()))
         .expect("register galaxy_trust_explicit_score_total");
 
+    let galaxy_trust_score_delta_total = IntGauge::with_opts(Opts::new(
+        METRIC_TRUST_SCORE_DELTA_TOTAL,
+        "Galaxy trust score delta applications on verification verdict (PH-S456)",
+    ))
+    .expect(METRIC_TRUST_SCORE_DELTA_TOTAL);
+    registry
+        .register(Box::new(galaxy_trust_score_delta_total.clone()))
+        .expect("register galaxy_trust_score_delta_total");
+
     let galaxy_shard_local_hit_ratio = IntGauge::with_opts(Opts::new(
         METRIC_SHARD_LOCAL_HIT_RATIO,
         "Galaxy last observed top-ranked shard local hit ratio basis points 0-10000 (PH-S183)",
@@ -616,6 +638,51 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_locality_unsatisfied_total.clone()))
         .expect("register galaxy_locality_unsatisfied_total");
 
+    let galaxy_prefetch_re_migrate_total = IntGauge::with_opts(Opts::new(
+        METRIC_PREFETCH_RE_MIGRATE_TOTAL,
+        "Galaxy re-migrate prefetch plans (PH-S454)",
+    ))
+    .expect(METRIC_PREFETCH_RE_MIGRATE_TOTAL);
+    registry
+        .register(Box::new(galaxy_prefetch_re_migrate_total.clone()))
+        .expect("register galaxy_prefetch_re_migrate_total");
+
+    let galaxy_hot_promote_total = IntGauge::with_opts(Opts::new(
+        METRIC_HOT_PROMOTE_TOTAL,
+        "Galaxy hot tier shard promotions (PH-S458)",
+    ))
+    .expect(METRIC_HOT_PROMOTE_TOTAL);
+    registry
+        .register(Box::new(galaxy_hot_promote_total.clone()))
+        .expect("register galaxy_hot_promote_total");
+
+    let galaxy_hot_evict_total = IntGauge::with_opts(Opts::new(
+        METRIC_HOT_EVICT_TOTAL,
+        "Galaxy hot tier shard evictions (PH-S458)",
+    ))
+    .expect(METRIC_HOT_EVICT_TOTAL);
+    registry
+        .register(Box::new(galaxy_hot_evict_total.clone()))
+        .expect("register galaxy_hot_evict_total");
+
+    let galaxy_shard_access_total = IntGauge::with_opts(Opts::new(
+        METRIC_SHARD_ACCESS_TOTAL,
+        "Galaxy shard access events on prefetch path (PH-S459)",
+    ))
+    .expect(METRIC_SHARD_ACCESS_TOTAL);
+    registry
+        .register(Box::new(galaxy_shard_access_total.clone()))
+        .expect("register galaxy_shard_access_total");
+
+    let galaxy_prefetch_queue_depth = IntGauge::with_opts(Opts::new(
+        METRIC_PREFETCH_QUEUE_DEPTH,
+        "Galaxy prefetch queue depth gauge stub (PH-S459)",
+    ))
+    .expect(METRIC_PREFETCH_QUEUE_DEPTH);
+    registry
+        .register(Box::new(galaxy_prefetch_queue_depth.clone()))
+        .expect("register galaxy_prefetch_queue_depth");
+
     let poolai_protocol_negotiation_rejected_total = IntGauge::with_opts(Opts::new(
         METRIC_PROTOCOL_NEGOTIATION_REJECTED_TOTAL,
         "Unsupported protocol negotiation rejections (PH-S449)",
@@ -736,6 +803,15 @@ fn build_prometheus() -> PoolAiPrometheus {
             galaxy_verification_sampling_evaluations_total.clone(),
         ))
         .expect("register galaxy_verification_sampling_evaluations_total");
+
+    let galaxy_verification_elevated_applied_total = IntGauge::with_opts(Opts::new(
+        METRIC_VERIFY_ELEVATED_APPLIED_TOTAL,
+        "Galaxy elevated verification sample rate applied after mismatch (PH-S455)",
+    ))
+    .expect(METRIC_VERIFY_ELEVATED_APPLIED_TOTAL);
+    registry
+        .register(Box::new(galaxy_verification_elevated_applied_total.clone()))
+        .expect("register galaxy_verification_elevated_applied_total");
 
     let galaxy_verification_checker_enqueue_total = IntGauge::with_opts(Opts::new(
         METRIC_VERIFICATION_CHECKER_ENQUEUE_TOTAL,
@@ -883,6 +959,15 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_replication_executor_enqueue_total.clone()))
         .expect("register galaxy_replication_executor_enqueue_total");
 
+    let galaxy_replication_rate_limited_total = IntGauge::with_opts(Opts::new(
+        METRIC_REPLICATION_RATE_LIMITED_TOTAL,
+        "Galaxy strict-tier replication rate-limited rejections (PH-S457)",
+    ))
+    .expect(METRIC_REPLICATION_RATE_LIMITED_TOTAL);
+    registry
+        .register(Box::new(galaxy_replication_rate_limited_total.clone()))
+        .expect("register galaxy_replication_rate_limited_total");
+
     #[cfg(target_os = "linux")]
     {
         let collector = prometheus::process_collector::ProcessCollector::for_self();
@@ -920,6 +1005,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_trust_gate_evaluations_total,
         galaxy_trust_default_score_applied_total,
         galaxy_trust_explicit_score_total,
+        galaxy_trust_score_delta_total,
         galaxy_shard_local_hit_ratio,
         galaxy_cross_region_egress_mb,
         galaxy_prefetch_plan_total,
@@ -938,6 +1024,11 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_prefetch_seed_fetch_miss_total,
         galaxy_prefetch_co_access_total,
         galaxy_locality_unsatisfied_total,
+        galaxy_prefetch_re_migrate_total,
+        galaxy_hot_promote_total,
+        galaxy_hot_evict_total,
+        galaxy_shard_access_total,
+        galaxy_prefetch_queue_depth,
         poolai_protocol_negotiation_rejected_total,
         galaxy_locality_rank_ingest_total,
         galaxy_locality_rank_miss_total,
@@ -951,6 +1042,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_verification_sample_skipped_total,
         galaxy_verification_sample_not_applicable_total,
         galaxy_verification_sampling_evaluations_total,
+        galaxy_verification_elevated_applied_total,
         galaxy_verification_checker_enqueue_total,
         galaxy_replay_pending,
         galaxy_replay_pending_scheduled_total,
@@ -967,6 +1059,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_replication_strict_total,
         galaxy_replication_enqueue_total,
         galaxy_replication_executor_enqueue_total,
+        galaxy_replication_rate_limited_total,
     }
 }
 
@@ -1013,6 +1106,8 @@ pub fn refresh_galaxy_trust_gauges() {
         .set(default_score_applied_total() as i64);
     prom.galaxy_trust_explicit_score_total
         .set(explicit_score_total() as i64);
+    prom.galaxy_trust_score_delta_total
+        .set(trust_score_delta_total() as i64);
 }
 
 /// Mirror in-process locality rank counters into Prometheus gauges (scrape snapshot).
@@ -1067,6 +1162,15 @@ pub fn refresh_galaxy_prefetch_gauges() {
         .set(prefetch_co_access_total() as i64);
     prom.galaxy_locality_unsatisfied_total
         .set(locality_unsatisfied_total() as i64);
+    prom.galaxy_prefetch_re_migrate_total
+        .set(prefetch_re_migrate_total() as i64);
+    prom.galaxy_hot_promote_total
+        .set(hot_promote_total() as i64);
+    prom.galaxy_hot_evict_total.set(hot_evict_total() as i64);
+    prom.galaxy_shard_access_total
+        .set(shard_access_total() as i64);
+    prom.galaxy_prefetch_queue_depth
+        .set(prefetch_queue_depth() as i64);
     prom.poolai_protocol_negotiation_rejected_total
         .set(protocol_negotiation_rejected_total() as i64);
 }
@@ -1090,6 +1194,8 @@ pub fn refresh_galaxy_verification_gauges() {
         .set(verify_sample_not_applicable_total() as i64);
     prom.galaxy_verification_sampling_evaluations_total
         .set(verify_sampling_evaluations_total() as i64);
+    prom.galaxy_verification_elevated_applied_total
+        .set(verify_elevated_applied_total() as i64);
     prom.galaxy_verification_checker_enqueue_total
         .set(verification_checker_enqueue_total() as i64);
     prom.galaxy_replay_pending.set(replay_pending() as i64);
@@ -1126,6 +1232,8 @@ pub fn refresh_galaxy_replication_gauges() {
         .set(replication_enqueue_total() as i64);
     prom.galaxy_replication_executor_enqueue_total
         .set(replication_executor_enqueue_total() as i64);
+    prom.galaxy_replication_rate_limited_total
+        .set(replication_rate_limited_total() as i64);
 }
 
 /// Record a secret rotation attempt (called from `security::secret_rotation`).

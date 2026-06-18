@@ -19,8 +19,8 @@ use poolai_ui_core::ml::{
     build_monitoring_metric_latest_url, chart_scale, collect_ml_sparkline_series,
     flatten_ml_step_rows, format_ml_metric_summary, group_metrics_by_name, metric_point_values,
     parse_ml_numeric, render_line_chart_empty_html, render_line_chart_html,
-    render_metrics_chart_grid_html, render_ml_pipeline_metrics_panel_html, render_sparkline_html,
-    sanitize_chart_id,
+    render_metrics_chart_grid_html, render_ml_pipeline_metrics_panel_html,
+    render_monitoring_alerts_panel_html, render_sparkline_html, sanitize_chart_id,
 };
 use poolai_ui_core::modal::{admin_dynamic_modal_html, trap_tab_action, MODAL_FOCUSABLE_SELECTOR};
 use poolai_ui_core::pricing::{format_unix_secs, format_usd_micro};
@@ -361,6 +361,41 @@ pub fn render_ml_pipeline_metrics_panel_wasm(
         empty_hint,
         columns_json,
         avg_label,
+    )
+}
+
+#[wasm_bindgen(js_name = renderMonitoringAlertsPanel)]
+pub fn render_monitoring_alerts_panel_wasm(
+    alerts_json: &str,
+    na_label: &str,
+    ack_label: &str,
+    active_label: &str,
+    ack_btn_label: &str,
+    col_severity: &str,
+    col_metric: &str,
+    col_current: &str,
+    col_threshold: &str,
+    col_triggered: &str,
+    col_status: &str,
+    col_actions: &str,
+    table_aria: &str,
+    empty_message: &str,
+) -> String {
+    render_monitoring_alerts_panel_html(
+        alerts_json,
+        na_label,
+        ack_label,
+        active_label,
+        ack_btn_label,
+        col_severity,
+        col_metric,
+        col_current,
+        col_threshold,
+        col_triggered,
+        col_status,
+        col_actions,
+        table_aria,
+        empty_message,
     )
 }
 

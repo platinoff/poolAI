@@ -653,8 +653,18 @@ FM-xxx (з таблиці нижче)
 | 386 | **PH-S451** | Stand smoke horizon wire band (S444–S449) | PH-S444…S449 | `/metrics` export shape seed-fetch/co-access/locality/protocol/replay record | **✅** |
 | 387 | **PH-S452** | Ops close band: loc-audit + docs canon | §5.12 fallback | `rust_ratio.json` **94.37%**; FM/HANDOFF/NEXT | **✅** |
 | 388 | **PH-S453** | Vision-sync + `--check` | ops | `poolai-vision-sync`; FM rev = manifest | **✅** |
+| 389 | **PH-S454** | Re-migrate delta prefetch trigger | Galaxy §5.5 | `re_migrate_prefetch_stub` on Migrating→Leased; `galaxy_prefetch_re_migrate_total`; unit tests | **✅** |
+| 390 | **PH-S455** | Elevated verification sample rate | Galaxy §6.2 | `POOLAI_GALAXY_VERIFY_ELEVATED_RATE` + `galaxy_verification_elevated_applied_total`; unit tests | **✅** |
+| 391 | **PH-S456** | Trust score delta on verify verdict | Galaxy §6.5 | `+10`/`-100` deltas + `galaxy_trust_score_delta_total`; unit tests | **✅** |
+| 392 | **PH-S457** | Replication hourly rate-limit stub | Galaxy §6.6 | `POOLAI_GALAXY_REPLICATION_MAX_PER_HOUR` gate + `galaxy_replication_rate_limited_total` | **✅** |
+| 393 | **PH-S458** | Hot tier promote/evict metrics | Galaxy §5.4 | `galaxy_hot_promote_total`/`galaxy_hot_evict_total` on prefetch path | **✅** |
+| 394 | **PH-S459** | Locality telemetry counters (§5.3) | Galaxy §5.3 | `galaxy_shard_access_total` + `galaxy_prefetch_queue_depth` gauges | **✅** |
+| 395 | **PH-S460** | Verification replay read API | Galaxy §6.3 | `GET /api/v1/grid/verification-replay`; integration test | **✅** |
+| 396 | **PH-S461** | Monitoring alerts panel wasm | RUST_RATIO §5.13 | `renderMonitoringAlertsPanel` wasm; slim `monitoring.rs` | **✅** |
+| 397 | **PH-S462** | Stand smoke horizon band S454–S460 | PH-S454…S460 | `/metrics` + verification-replay smoke | **✅** |
+| 398 | **PH-S463** | Ops close band: loc-audit + vision-sync | §5.12 fallback | `rust_ratio.json`; FM/HANDOFF/NEXT; `--check` green | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S444…S453 ✅. Vision rev **232**. rust_ratio **94.37%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S454…S463 ✅. Vision rev **234**. rust_ratio **94.38%**.
 
 **Наступна сесія:** **`абракадабра`** (project scan → drain) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
@@ -662,7 +672,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-06-18):** PH-S444…S453 ✅ закрито · **0** відкритих · **`абракадабра`** = project scan → §5.12 → drain.
+**Активна смуга (2026-06-18):** PH-S454…S463 ✅ закрито · **0** відкритих · **`абракадабра`** = project scan → §5.12 → drain.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 
