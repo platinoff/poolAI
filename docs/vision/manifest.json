@@ -1836,7 +1836,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S413",
+  "last_sprint_closed": "PH-S423",
   "layers": [
     {
       "id": "L0",
@@ -7731,7 +7731,7 @@
       "path": "crates/poolai-ui-core/src/admin_dom.rs"
     }
   ],
-  "revision": 226,
+  "revision": 228,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -10862,6 +10862,96 @@
       "id": "PH-S413",
       "open": false,
       "row": 348,
+      "status": "closed",
+      "title": "Docs INDEX ratio maintain (docs)"
+    },
+    {
+      "acceptance": "galaxy_verification_sampling_evaluations_total` on grid result path",
+      "deps": "PH-S356",
+      "id": "PH-S414",
+      "open": false,
+      "row": 349,
+      "status": "closed",
+      "title": "Galaxy verify sampling evaluations metric (code)"
+    },
+    {
+      "acceptance": "galaxy_replay_evaluations_total` on grid result path",
+      "deps": "PH-S335",
+      "id": "PH-S415",
+      "open": false,
+      "row": 350,
+      "status": "closed",
+      "title": "Galaxy replay evaluations metric (code)"
+    },
+    {
+      "acceptance": "updateDashboardRefreshedAt` + `formatLocaleTimeHms",
+      "deps": "PH-S406",
+      "id": "PH-S416",
+      "open": false,
+      "row": 351,
+      "status": "closed",
+      "title": "Admin dashboard refreshed-at wasm (code/ui)"
+    },
+    {
+      "acceptance": "/metrics` export shape",
+      "deps": "PH-S414/S415",
+      "id": "PH-S417",
+      "open": false,
+      "row": 352,
+      "status": "closed",
+      "title": "Stand smoke verify + replay evaluations (tests)"
+    },
+    {
+      "acceptance": "updateDashboardRefreshedAt` gates",
+      "deps": "PH-S416",
+      "id": "PH-S418",
+      "open": false,
+      "row": 353,
+      "status": "closed",
+      "title": "Admin dashboard refreshed-at glue tests (code)"
+    },
+    {
+      "acceptance": "rust_ratio.json` sprint zriz 94.35%",
+      "deps": "PH-S409",
+      "id": "PH-S419",
+      "open": false,
+      "row": 354,
+      "status": "closed",
+      "title": "Rust ratio loc-audit refresh (ops)"
+    },
+    {
+      "acceptance": "INDEX/HANDOFF/NEXT/STABLE/GALAXY",
+      "deps": "PH-S410",
+      "id": "PH-S420",
+      "open": false,
+      "row": 355,
+      "status": "closed",
+      "title": "Docs canon sync band (docs)"
+    },
+    {
+      "acceptance": "--check` green",
+      "deps": "PH-S411",
+      "id": "PH-S421",
+      "open": false,
+      "row": 356,
+      "status": "closed",
+      "title": "poolai-vision-sync drift gate (ops)"
+    },
+    {
+      "acceptance": "--min-ratio 0.95` snapshot 94.35%",
+      "deps": "PH-S419",
+      "id": "PH-S422",
+      "open": false,
+      "row": 357,
+      "status": "closed",
+      "title": "Ratio hold advisory snapshot (ops)"
+    },
+    {
+      "acceptance": "INDEX §7 + rust_ratio pointer",
+      "deps": "PH-S420",
+      "id": "PH-S423",
+      "open": false,
+      "row": 358,
       "status": "closed",
       "title": "Docs INDEX ratio maintain (docs)"
     }

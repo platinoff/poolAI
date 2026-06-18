@@ -1087,6 +1087,23 @@ fn admin_dashboard_wasm_glue_tests_ph_s408() {
     assert!(dash.contains("formatAuditTimestamp"));
 }
 
+#[test]
+fn admin_dashboard_refreshed_at_wasm_first_ph_s416() {
+    let script = include_str!("dashboard.rs");
+    assert!(script.contains("formatLocaleTimeHms"));
+    assert!(script.contains("updateDashboardRefreshedAt"));
+    assert!(script.contains("dash-refreshed-at"));
+}
+
+#[test]
+fn admin_dashboard_wasm_glue_tests_ph_s418() {
+    let dash = include_str!("dashboard.rs");
+    assert!(dash.contains("updateDashboardRefreshedAt"));
+    assert!(dash.contains("dash-refreshed-at"));
+    assert!(dash.contains("formatLocaleTimeHms"));
+    assert!(dash.contains("buildAdminOverviewUrl"));
+}
+
 #[tokio::test]
 async fn admin_monitoring_ph_s43_ml_metrics_panel() {
     let html = monitoring::admin_monitoring().await.0;

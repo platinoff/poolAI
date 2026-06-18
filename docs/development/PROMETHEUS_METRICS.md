@@ -64,11 +64,14 @@ scrape_configs:
 | `galaxy_verification_sample_total` | gauge | Galaxy verification samples scheduled on grid result path (PH-S177) |
 | `galaxy_verification_match_total` | gauge | Galaxy verification digest matches on grid result path (PH-S180) |
 | `galaxy_replay_pending` | gauge | Galaxy replay verifications pending coordinator verdict (PH-S176) |
+| `galaxy_replay_evaluations_total` | gauge | Galaxy replay pending evaluations on grid result path (PH-S415) |
 | `galaxy_settlement_pending_verification_total` | gauge | Galaxy settlement holds pending verification on grid result path (PH-S178) |
 | `galaxy_settlement_cleared_total` | gauge | Galaxy settlement cleared on grid result path (PH-S187) |
 | `galaxy_settlement_not_applicable_total` | gauge | Galaxy settlement not applicable on grid result path (PH-S354) |
 | `galaxy_settlement_resolved_total` | gauge | Galaxy settlement status resolutions on grid result path (PH-S404) |
 | `galaxy_verification_sample_not_applicable_total` | gauge | Galaxy verification samples not applicable on local origin path (PH-S356) |
+| `galaxy_verification_sampling_evaluations_total` | gauge | Galaxy verification sampling evaluations on grid result path (PH-S414) |
+| `galaxy_replay_evaluations_total` | gauge | Galaxy replay pending evaluations on grid result path (PH-S415) |
 | `galaxy_fee_split_applied_total` | gauge | Galaxy fee split applied on grid result path (PH-S194) |
 | `galaxy_replication_strict_total` | gauge | Galaxy replication strict tier grid job ingests (PH-S179) |
 
@@ -97,4 +100,4 @@ Prometheus alert rules live in your monitoring stack (Prometheus / Alertmanager 
 
 - [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) — stand smoke band PH-S244…S256 (`poolai-http-stand-smoke`)
 
-**Last updated:** 2026-06-17 (PH-S254…S256 stand smoke ✅; Galaxy metrics stand smoke band complete).
+**Last updated:** 2026-06-17 (PH-S414…S415 Galaxy evaluation counters ✅; stand smoke band extended).

@@ -49,9 +49,9 @@ use crate::grid::galaxy_pricing_provider_metrics::{
     METRIC_PROVIDER_ERRORS_TOTAL,
 };
 use crate::grid::galaxy_replay_metrics::{
-    replay_pending, replay_pending_resolved_total, replay_pending_scheduled_total,
-    METRIC_REPLAY_PENDING, METRIC_REPLAY_PENDING_RESOLVED_TOTAL,
-    METRIC_REPLAY_PENDING_SCHEDULED_TOTAL,
+    replay_evaluations_total, replay_pending, replay_pending_resolved_total,
+    replay_pending_scheduled_total, METRIC_REPLAY_EVALUATIONS_TOTAL, METRIC_REPLAY_PENDING,
+    METRIC_REPLAY_PENDING_RESOLVED_TOTAL, METRIC_REPLAY_PENDING_SCHEDULED_TOTAL,
 };
 use crate::grid::galaxy_replication_metrics::{
     replication_strict_total, METRIC_REPLICATION_STRICT_TOTAL,
@@ -77,8 +77,9 @@ use crate::grid::galaxy_verification_metrics::{
 };
 use crate::grid::galaxy_verify_sampling::{
     verify_sample_not_applicable_total, verify_sample_scheduled_total, verify_sample_skipped_total,
-    METRIC_VERIFY_SAMPLE_NOT_APPLICABLE_TOTAL, METRIC_VERIFY_SAMPLE_SCHEDULED_TOTAL,
-    METRIC_VERIFY_SAMPLE_SKIPPED_TOTAL,
+    verify_sampling_evaluations_total, METRIC_VERIFY_SAMPLE_NOT_APPLICABLE_TOTAL,
+    METRIC_VERIFY_SAMPLE_SCHEDULED_TOTAL, METRIC_VERIFY_SAMPLE_SKIPPED_TOTAL,
+    METRIC_VERIFY_SAMPLING_EVALUATIONS_TOTAL,
 };
 
 /// Lazily initialized Prometheus registry and metric handles.
@@ -136,9 +137,11 @@ pub struct PoolAiPrometheus {
     galaxy_verification_sample_completed_total: IntGauge,
     galaxy_verification_sample_skipped_total: IntGauge,
     galaxy_verification_sample_not_applicable_total: IntGauge,
+    galaxy_verification_sampling_evaluations_total: IntGauge,
     galaxy_replay_pending: IntGauge,
     galaxy_replay_pending_scheduled_total: IntGauge,
     galaxy_replay_pending_resolved_total: IntGauge,
+    galaxy_replay_evaluations_total: IntGauge,
     galaxy_settlement_pending_verification_total: IntGauge,
     galaxy_settlement_cleared_total: IntGauge,
     galaxy_settlement_not_applicable_total: IntGauge,
@@ -632,6 +635,17 @@ fn build_prometheus() -> PoolAiPrometheus {
         ))
         .expect("register galaxy_verification_sample_not_applicable_total");
 
+    let galaxy_verification_sampling_evaluations_total = IntGauge::with_opts(Opts::new(
+        METRIC_VERIFY_SAMPLING_EVALUATIONS_TOTAL,
+        "Galaxy verification sampling evaluations on grid result path (PH-S414)",
+    ))
+    .expect(METRIC_VERIFY_SAMPLING_EVALUATIONS_TOTAL);
+    registry
+        .register(Box::new(
+            galaxy_verification_sampling_evaluations_total.clone(),
+        ))
+        .expect("register galaxy_verification_sampling_evaluations_total");
+
     let galaxy_replay_pending = IntGauge::with_opts(Opts::new(
         METRIC_REPLAY_PENDING,
         "Galaxy replay verifications pending coordinator verdict (PH-S176)",
@@ -658,6 +672,15 @@ fn build_prometheus() -> PoolAiPrometheus {
     registry
         .register(Box::new(galaxy_replay_pending_resolved_total.clone()))
         .expect("register galaxy_replay_pending_resolved_total");
+
+    let galaxy_replay_evaluations_total = IntGauge::with_opts(Opts::new(
+        METRIC_REPLAY_EVALUATIONS_TOTAL,
+        "Galaxy replay pending evaluations on grid result path (PH-S415)",
+    ))
+    .expect(METRIC_REPLAY_EVALUATIONS_TOTAL);
+    registry
+        .register(Box::new(galaxy_replay_evaluations_total.clone()))
+        .expect("register galaxy_replay_evaluations_total");
 
     let galaxy_settlement_pending_verification_total = IntGauge::with_opts(Opts::new(
         METRIC_SETTLEMENT_PENDING_VERIFICATION_TOTAL,
@@ -775,9 +798,11 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_verification_sample_completed_total,
         galaxy_verification_sample_skipped_total,
         galaxy_verification_sample_not_applicable_total,
+        galaxy_verification_sampling_evaluations_total,
         galaxy_replay_pending,
         galaxy_replay_pending_scheduled_total,
         galaxy_replay_pending_resolved_total,
+        galaxy_replay_evaluations_total,
         galaxy_settlement_pending_verification_total,
         galaxy_settlement_cleared_total,
         galaxy_settlement_not_applicable_total,
@@ -891,11 +916,15 @@ pub fn refresh_galaxy_verification_gauges() {
         .set(verify_sample_skipped_total() as i64);
     prom.galaxy_verification_sample_not_applicable_total
         .set(verify_sample_not_applicable_total() as i64);
+    prom.galaxy_verification_sampling_evaluations_total
+        .set(verify_sampling_evaluations_total() as i64);
     prom.galaxy_replay_pending.set(replay_pending() as i64);
     prom.galaxy_replay_pending_scheduled_total
         .set(replay_pending_scheduled_total() as i64);
     prom.galaxy_replay_pending_resolved_total
         .set(replay_pending_resolved_total() as i64);
+    prom.galaxy_replay_evaluations_total
+        .set(replay_evaluations_total() as i64);
     prom.galaxy_settlement_pending_verification_total
         .set(settlement_pending_verification_total() as i64);
     prom.galaxy_settlement_cleared_total

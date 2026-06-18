@@ -42,6 +42,7 @@ pub async fn admin_dashboard() -> Html<String> {
         ]);
         renderActiveAlerts(alerts);
         renderRecentActivity(audit);
+        updateDashboardRefreshedAt();
       } catch (e) {
         ['system-overview', 'quick-stats', 'active-alerts', 'recent-activity'].forEach(id => adminShowInlineError(id, e));
         adminShowInlineError('metrics-chart', e);
@@ -188,6 +189,21 @@ pub async fn admin_dashboard() -> Html<String> {
       const mins = Math.floor((seconds % 3600) / 60);
       return `${days}d ${hours}h ${mins}m`;
     }
+
+    function updateDashboardRefreshedAt() {
+      const el = document.getElementById('dash-refreshed-at');
+      if (!el) return;
+      const wasm = typeof window !== 'undefined' ? window.poolaiUiWasm : null;
+      const iso = new Date().toISOString();
+      const formatted =
+        wasm && typeof wasm.formatLocaleTimeHms === 'function'
+          ? wasm.formatLocaleTimeHms(iso)
+          : typeof formatLocaleTimeHms === 'function'
+            ? formatLocaleTimeHms(iso)
+            : new Date(iso).toLocaleTimeString();
+      const p = T('admin.dash.refreshedAt', 'Refreshed: ');
+      el.textContent = p + formatted;
+    }
     
     loadSystemOverview();
     renderMetricsChart();
@@ -199,6 +215,7 @@ pub async fn admin_dashboard() -> Html<String> {
         "admin.page.dashboard",
         "Admin Dashboard",
         r#"
+        <p id="dash-refreshed-at" class="muted"></p>
         <div class="admin-grid">
           <div class="admin-card">
             <h3 data-i18n="admin.dash.card.overview">System Overview</h3>

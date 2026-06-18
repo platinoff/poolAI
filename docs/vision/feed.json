@@ -3,6 +3,96 @@
   "items": [
     {
       "category": "closed",
+      "id": "PH-S423",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "INDEX §7 + rust_ratio pointer",
+      "title": "Docs INDEX ratio maintain (docs)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S422",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--min-ratio 0.95` snapshot 94.35%",
+      "title": "Ratio hold advisory snapshot (ops)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S421",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--check` green",
+      "title": "poolai-vision-sync drift gate (ops)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S420",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "INDEX/HANDOFF/NEXT/STABLE/GALAXY",
+      "title": "Docs canon sync band (docs)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S419",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "rust_ratio.json` sprint zriz 94.35%",
+      "title": "Rust ratio loc-audit refresh (ops)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S418",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "updateDashboardRefreshedAt` gates",
+      "title": "Admin dashboard refreshed-at glue tests (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S417",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "/metrics` export shape",
+      "title": "Stand smoke verify + replay evaluations (tests)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S416",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "updateDashboardRefreshedAt` + `formatLocaleTimeHms",
+      "title": "Admin dashboard refreshed-at wasm (code/ui)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S415",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_replay_evaluations_total` on grid result path",
+      "title": "Galaxy replay evaluations metric (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S414",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_verification_sampling_evaluations_total` on grid result path",
+      "title": "Galaxy verify sampling evaluations metric (code)"
+    },
+    {
+      "category": "closed",
       "id": "PH-S413",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
@@ -13,96 +103,6 @@
     {
       "category": "closed",
       "id": "PH-S412",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--min-ratio 0.95 --advisory",
-      "title": "Ratio hold advisory snapshot (ops)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S411",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--check` green",
-      "title": "poolai-vision-sync drift gate (ops)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S410",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "INDEX/HANDOFF/NEXT/STABLE/GALAXY",
-      "title": "Docs canon sync band (docs)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S409",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "rust_ratio.json` sprint zriz 94.34%",
-      "title": "Rust ratio loc-audit refresh (ops)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S408",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "alertSeverityBadgeClass` gates",
-      "title": "Admin dashboard wasm glue tests (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S407",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "/metrics` export shape",
-      "title": "Stand smoke settlement + explicit score (tests)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S406",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "alertSeverityBadgeClass` wasm glue on active alerts",
-      "title": "Admin dashboard alert severity wasm (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S405",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_trust_explicit_score_total` on grid result path",
-      "title": "Galaxy explicit trust score metric (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S404",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_settlement_resolved_total` on grid result path",
-      "title": "Galaxy settlement resolved metric (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S403",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "INDEX §7 + rust_ratio pointer",
-      "title": "Docs INDEX ratio maintain (docs)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S402",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",

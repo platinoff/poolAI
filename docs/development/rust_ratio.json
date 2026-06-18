@@ -1,6 +1,6 @@
 {
   "generated_at": "2026-06-18",
-  "sprint": "PH-S409",
+  "sprint": "PH-S419",
   "formal_band_min": 0.9,
   "formal_band_max": 0.95,
   "warn_below": 0.93,
@@ -11,8 +11,8 @@
   "rust_loc": 123537,
   "non_rust_product_loc": 7406,
   "product_loc_total": 130943,
-  "rust_ratio": 0.9434410392308104,
-  "rust_ratio_pct": 94.34410392308104,
+  "rust_ratio": 0.9435,
+  "rust_ratio_pct": 94.35,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,

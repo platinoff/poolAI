@@ -625,6 +625,7 @@ const GALAXY_REPLAY_METRICS: &[&str] = &[
     "galaxy_replay_pending",
     "galaxy_replay_pending_scheduled_total",
     "galaxy_replay_pending_resolved_total",
+    "galaxy_replay_evaluations_total",
 ];
 
 fn metrics_text_has_replay_pending(body: &str) -> Result<(), String> {
@@ -724,6 +725,7 @@ const GALAXY_VERIFICATION_METRICS: &[&str] = &[
     "galaxy_verification_sample_completed_total",
     "galaxy_verification_sample_skipped_total",
     "galaxy_verification_sample_not_applicable_total",
+    "galaxy_verification_sampling_evaluations_total",
 ];
 
 fn metrics_text_has_verification_counters(body: &str) -> Result<(), String> {
@@ -1798,6 +1800,9 @@ mod tests {
             "# HELP galaxy_replay_pending_resolved_total Galaxy replay holds cleared on verdict (PH-S335)\n",
             "# TYPE galaxy_replay_pending_resolved_total gauge\n",
             "galaxy_replay_pending_resolved_total 0\n",
+            "# HELP galaxy_replay_evaluations_total Galaxy replay pending evaluations on grid result path (PH-S415)\n",
+            "# TYPE galaxy_replay_evaluations_total gauge\n",
+            "galaxy_replay_evaluations_total 0\n",
         );
         metrics_text_has_replay_pending(sample).expect("sample export");
     }
@@ -1855,6 +1860,9 @@ mod tests {
             "# HELP galaxy_verification_sample_not_applicable_total Galaxy verification samples not applicable on local origin path (PH-S356)\n",
             "# TYPE galaxy_verification_sample_not_applicable_total gauge\n",
             "galaxy_verification_sample_not_applicable_total 0\n",
+            "# HELP galaxy_verification_sampling_evaluations_total Galaxy verification sampling evaluations on grid result path (PH-S414)\n",
+            "# TYPE galaxy_verification_sampling_evaluations_total gauge\n",
+            "galaxy_verification_sampling_evaluations_total 0\n",
         );
         metrics_text_has_verification_counters(sample).expect("sample export");
     }
