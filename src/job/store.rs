@@ -315,13 +315,15 @@ impl JobStore {
     where
         F: FnMut(&JobSpec) -> crate::job::JobScheduleBinding,
     {
-        let (scheduled, bound_workers, bound_vms, expired) = {
+        let (scheduled, bound_workers, bound_vms, expired, failover_changes) = {
             let mut guard = self
                 .jobs
                 .lock()
                 .map_err(|_| AppError::InternalError("job store lock poisoned".into()))?;
             // PH-S101 failover stub: lease expired in `Leased` state -> requeue for scheduler.
+            // PH-S518: retry budget + fail_reason codes.
             let now = Utc::now();
+            let mut failover_changes = 0usize;
             for record in guard.iter_mut() {
                 if record.status != JobStatus::Leased {
                     continue;
@@ -332,12 +334,29 @@ impl JobStore {
                 if now < expires_at {
                     continue;
                 }
+                let next_count =
+                    crate::job::next_migration_count(record.migration_count.unwrap_or(0));
+                record.migration_count = Some(next_count);
+                if crate::job::migration_budget_exhausted(next_count) {
+                    record.status = JobStatus::Failed;
+                    record.fail_reason =
+                        Some(crate::job::LeaseFailReason::BudgetExhausted.as_str().into());
+                    record.worker_id = None;
+                    record.vm_id = None;
+                    record.lease_owner = None;
+                    record.lease_expires_at = None;
+                    failover_changes += 1;
+                    continue;
+                }
+                record.fail_reason =
+                    Some(crate::job::LeaseFailReason::LeaseTimeout.as_str().into());
                 // Keep `lease_epoch` so next acquire bumps generation monotonically.
                 record.status = JobStatus::Submitted;
                 record.worker_id = None;
                 record.vm_id = None;
                 record.lease_owner = None;
                 record.lease_expires_at = None;
+                failover_changes += 1;
             }
             let mut indices: Vec<usize> = guard
                 .iter()
@@ -369,9 +388,15 @@ impl JobStore {
                 guard[i].vm_id = binding.vm_id;
                 maybe_acquire_lease_on_schedule(&mut guard[i], now);
             }
-            (scheduled, bound_workers, bound_vms, expired)
+            (
+                scheduled,
+                bound_workers,
+                bound_vms,
+                expired,
+                failover_changes,
+            )
         };
-        if scheduled > 0 || expired > 0 {
+        if scheduled > 0 || expired > 0 || failover_changes > 0 {
             self.persist()?;
         }
         Ok((scheduled, bound_workers, bound_vms, expired))
@@ -571,7 +596,7 @@ fn write_json_atomic<T: serde::Serialize>(path: &Path, value: &T) -> Result<(), 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::job::{JobId, JobKind, JobSpec, JobStatus};
+    use crate::job::{JobId, JobKind, JobSpec, JobStatus, ENV_JOB_MAX_MIGRATIONS_PER_JOB};
     use chrono::Utc;
     use std::sync::{Mutex, OnceLock};
     use tempfile::TempDir;
@@ -606,6 +631,8 @@ mod tests {
             lease_owner: None,
             lease_epoch: None,
             lease_expires_at: None,
+            migration_count: None,
+            fail_reason: None,
         };
 
         {
@@ -643,6 +670,8 @@ mod tests {
             lease_owner: None,
             lease_epoch: None,
             lease_expires_at: None,
+            migration_count: None,
+            fail_reason: None,
         };
 
         {
@@ -679,12 +708,52 @@ mod tests {
             lease_owner: None,
             lease_epoch: None,
             lease_expires_at: None,
+            migration_count: None,
+            fail_reason: None,
         };
         store.push(record).expect("push");
         let err = store
             .update_status("job-bad", JobStatus::Completed)
             .expect_err("invalid");
         assert!(matches!(err, AppError::ValidationError(_)));
+    }
+
+    #[test]
+    fn lease_failover_budget_exhausted_ph_s518() {
+        let _guard = env_lock();
+        std::env::set_var(ENV_JOB_MAX_MIGRATIONS_PER_JOB, "1");
+
+        let store = JobStore::open_for_test(None);
+        let mut record = JobRecord {
+            spec: JobSpec {
+                id: JobId::new("job-budget"),
+                kind: JobKind::Inference,
+                resources: Default::default(),
+                priority: 0,
+                max_duration_secs: None,
+                input_artifact_ids: vec![],
+                verification_policy: None,
+                deadline: None,
+            },
+            status: JobStatus::Leased,
+            created_at: Utc::now(),
+            worker_id: Some("w1".into()),
+            vm_id: None,
+            lease_owner: Some("w1".into()),
+            lease_epoch: Some(1),
+            lease_expires_at: Some(Utc::now() - chrono::Duration::seconds(5)),
+            migration_count: None,
+            fail_reason: None,
+        };
+        store.push(record.clone()).expect("push");
+        store
+            .promote_submitted_to_scheduled_with(|_| Default::default())
+            .expect("promote");
+        let row = store.get("job-budget").expect("get").expect("row");
+        assert_eq!(row.status, JobStatus::Failed);
+        assert_eq!(row.fail_reason.as_deref(), Some("budget-exhausted"));
+
+        std::env::remove_var(ENV_JOB_MAX_MIGRATIONS_PER_JOB);
     }
 
     #[cfg(feature = "job-store-sqlite")]
@@ -713,6 +782,8 @@ mod tests {
             lease_owner: None,
             lease_epoch: None,
             lease_expires_at: None,
+            migration_count: None,
+            fail_reason: None,
         };
 
         {

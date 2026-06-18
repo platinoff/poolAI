@@ -68,10 +68,10 @@ async fn metrics_export_horizon_s474_band_ph_s481() {
     std::env::remove_var(ENV_PREFETCH_PEER_EGRESS_POLICY);
     std::env::remove_var(ENV_TELEGRAM_SEAT_LIMIT);
 
-    record_payout_batch_ledger_entry(PayoutBatchLedgerEntry {
-        job_id: "job-hist-1".into(),
-        cleared_at: "2026-06-18T12:00:00Z".into(),
-    });
+    record_payout_batch_ledger_entry(PayoutBatchLedgerEntry::minimal(
+        "job-hist-1",
+        "2026-06-18T12:00:00Z",
+    ));
     emit_verification_replay_record("job-replay-1", None);
     std::env::set_var(ENV_TELEGRAM_SEAT_LIMIT, "2");
     assert!(try_admit_telegram_edge("tg-peer-1").is_ok());

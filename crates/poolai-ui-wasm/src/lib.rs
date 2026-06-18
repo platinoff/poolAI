@@ -8,6 +8,7 @@ use poolai_ui_core::api_error::{api_error_detail_from_body, format_fetch_error};
 use poolai_ui_core::format::{
     alert_severity_badge_class, escape_html, format_megabytes, format_percent, format_uptime,
 };
+use poolai_ui_core::galaxy_telegram_seats::render_telegram_seats_panel_html;
 use poolai_ui_core::galaxy_virtual_nodes::render_galaxy_virtual_nodes_panel_html;
 use poolai_ui_core::grid_verification::render_grid_verification_panel_html;
 use poolai_ui_core::instances::render_instances_panel_html;
@@ -537,6 +538,25 @@ pub fn render_grid_verification_panel_wasm(
         col_pending,
         table_aria,
         empty_message,
+    )
+}
+
+#[wasm_bindgen(js_name = renderTelegramSeatsPanel)]
+pub fn render_telegram_seats_panel_wasm(
+    snapshot_json: &str,
+    col_policy: &str,
+    col_limit: &str,
+    col_active: &str,
+    col_bound: &str,
+    table_aria: &str,
+) -> String {
+    render_telegram_seats_panel_html(
+        snapshot_json,
+        col_policy,
+        col_limit,
+        col_active,
+        col_bound,
+        table_aria,
     )
 }
 

@@ -106,9 +106,13 @@ impl DiscoveryService {
             .filter(|p| p.metadata.get("role").map(String::as_str) == Some("virtual_node"))
             .map(|p| {
                 let age = now.signed_duration_since(p.last_seen).num_seconds();
+                let stale = age > stale_after_secs;
+                if stale {
+                    crate::grid::galaxy_worker_health::on_heartbeat_miss(&p.peer_id);
+                }
                 VirtualNodeStatus {
                     peer: p.clone(),
-                    stale: age > stale_after_secs,
+                    stale,
                     last_seen_age_secs: age,
                     galaxy: galaxy_worker_from_peer(&p),
                 }

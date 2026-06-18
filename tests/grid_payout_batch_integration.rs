@@ -45,10 +45,10 @@ async fn get_json(app: &Router, uri: &str) -> (StatusCode, Value) {
 async fn get_payout_batch_returns_last_entry_ph_s467() {
     reset_settlement_metrics_for_test();
     reset_last_payout_batch_ledger_entry_for_test();
-    record_payout_batch_ledger_entry(PayoutBatchLedgerEntry {
-        job_id: "job-payout-1".into(),
-        cleared_at: "2026-06-18T12:00:00Z".into(),
-    });
+    record_payout_batch_ledger_entry(PayoutBatchLedgerEntry::minimal(
+        "job-payout-1",
+        "2026-06-18T12:00:00Z",
+    ));
 
     let app = app().await;
     let (status, body) = get_json(&app, "/api/v1/grid/payout-batch").await;
@@ -70,5 +70,34 @@ async fn get_payout_batch_empty_when_no_entry_ph_s467() {
     assert_eq!(status, StatusCode::OK, "body={body}");
     let entry = body.get("entry");
     assert!(entry.is_none() || entry.unwrap().is_null());
+    reset_last_payout_batch_ledger_entry_for_test();
+}
+
+#[tokio::test]
+async fn get_payout_batch_fee_split_fields_ph_s521() {
+    reset_last_payout_batch_ledger_entry_for_test();
+    record_payout_batch_ledger_entry(PayoutBatchLedgerEntry {
+        job_id: "job-fee-1".into(),
+        cleared_at: "2026-06-18T12:00:00Z".into(),
+        gross_usd_micro: Some(1_000_000),
+        gross_lamports: Some(1_000_000_000),
+        primary_dev_lamports: Some(1_000_000),
+        secondary_admin_lamports: Some(10_000_000),
+    });
+
+    let app = app().await;
+    let (status, body) = get_json(&app, "/api/v1/grid/payout-batch").await;
+    assert_eq!(status, StatusCode::OK, "body={body}");
+    let entry = body.get("entry").expect("entry");
+    assert_eq!(
+        entry.get("primary_dev_lamports").and_then(|v| v.as_u64()),
+        Some(1_000_000)
+    );
+    assert_eq!(
+        entry
+            .get("secondary_admin_lamports")
+            .and_then(|v| v.as_u64()),
+        Some(10_000_000)
+    );
     reset_last_payout_batch_ledger_entry_for_test();
 }

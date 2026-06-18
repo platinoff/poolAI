@@ -1,5 +1,6 @@
 //! Forward Telegram updates to PoolAI coordinator webhook (FM-016++).
 
+use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::time::Duration;
@@ -33,6 +34,35 @@ impl CoordinatorConfig {
     pub fn wallet_url(&self) -> String {
         format!("{}/api/v1/virtual-nodes/telegram/wallet", self.base_url)
     }
+
+    pub fn telegram_seats_url(&self) -> String {
+        format!("{}/api/v1/grid/telegram-seats", self.base_url)
+    }
+
+    pub fn telegram_unbind_url(&self, telegram_user_id: i64) -> String {
+        format!(
+            "{}/api/v1/virtual-nodes/telegram/bindings/{telegram_user_id}",
+            self.base_url
+        )
+    }
+}
+
+/// Coordinator Telegram seat snapshot (`GET /api/v1/grid/telegram-seats`, PH-S514).
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct TelegramSeatsSnapshot {
+    pub seat_policy: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub admin_max_seats: Option<u32>,
+    pub bound_wallets_count: usize,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub seat_limit: Option<u32>,
+    pub active_telegram_edge_workers: usize,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UnbindResult {
+    pub ok: bool,
+    pub detail: Option<String>,
 }
 
 /// Build Telegram Bot API-shaped JSON accepted by `POST .../telegram/webhook`.
@@ -176,6 +206,93 @@ pub async fn forward_payload(
             .map(str::to_string),
         detail: v.get("detail").and_then(|x| x.as_str()).map(str::to_string),
     })
+}
+
+/// Fetch coordinator Telegram seat snapshot (PH-S514, Galaxy §3.1).
+pub async fn fetch_telegram_seats(
+    config: &CoordinatorConfig,
+) -> Result<TelegramSeatsSnapshot, String> {
+    let client = reqwest::Client::builder()
+        .timeout(Duration::from_secs(15))
+        .build()
+        .map_err(|e| e.to_string())?;
+
+    let response = client
+        .get(config.telegram_seats_url())
+        .send()
+        .await
+        .map_err(|e| format!("telegram-seats request failed: {e}"))?;
+
+    let status = response.status();
+    let body = response.text().await.unwrap_or_default();
+    if !status.is_success() {
+        return Err(format!("telegram-seats HTTP {status}: {body}"));
+    }
+    serde_json::from_str(&body).map_err(|e| format!("parse telegram-seats: {e}"))
+}
+
+/// DELETE Telegram edge binding (PH-S515, Galaxy §3.2 `/stop`).
+pub async fn unbind_telegram(
+    config: &CoordinatorConfig,
+    user_id: i64,
+) -> Result<UnbindResult, String> {
+    let client = reqwest::Client::builder()
+        .timeout(Duration::from_secs(15))
+        .build()
+        .map_err(|e| e.to_string())?;
+
+    let response = client
+        .delete(config.telegram_unbind_url(user_id))
+        .send()
+        .await
+        .map_err(|e| format!("unbind request failed: {e}"))?;
+
+    match response.status() {
+        s if s.is_success() => Ok(UnbindResult {
+            ok: true,
+            detail: None,
+        }),
+        StatusCode::NOT_FOUND => Ok(UnbindResult {
+            ok: false,
+            detail: Some("No binding found for this Telegram user".into()),
+        }),
+        s => {
+            let body = response.text().await.unwrap_or_default();
+            Ok(UnbindResult {
+                ok: false,
+                detail: Some(format!("HTTP {s}: {body}")),
+            })
+        }
+    }
+}
+
+/// User-facing reply after `/status` seat snapshot (PH-S514).
+pub fn format_seats_reply(result: &Result<TelegramSeatsSnapshot, String>) -> String {
+    match result {
+        Ok(s) => {
+            let limit = s
+                .seat_limit
+                .map(|n| n.to_string())
+                .unwrap_or_else(|| "∞".into());
+            format!(
+                "📊 Telegram seats\npolicy: `{}`\nactive: {}/{}\nbound wallets: {}",
+                s.seat_policy, s.active_telegram_edge_workers, limit, s.bound_wallets_count
+            )
+        }
+        Err(e) => format!("❌ {e}"),
+    }
+}
+
+/// User-facing reply after `/stop` unbind (PH-S515).
+pub fn format_unbind_reply(result: &Result<UnbindResult, String>) -> String {
+    match result {
+        Ok(r) if r.ok => "✅ Edge worker unbound".to_string(),
+        Ok(r) => r
+            .detail
+            .clone()
+            .unwrap_or_else(|| "Unbind rejected".to_string()),
+        Err(e) => format!("❌ {e}"),
+    }
 }
 
 /// User-facing reply after coordinator forward.

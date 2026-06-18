@@ -110,6 +110,9 @@ use crate::grid::galaxy_verify_sampling::{
     METRIC_VERIFY_SAMPLE_SCHEDULED_TOTAL, METRIC_VERIFY_SAMPLE_SKIPPED_TOTAL,
     METRIC_VERIFY_SAMPLING_EVALUATIONS_TOTAL,
 };
+use crate::grid::galaxy_worker_health::{
+    galaxy_worker_unhealthy_total, METRIC_WORKER_UNHEALTHY_TOTAL,
+};
 
 /// Lazily initialized Prometheus registry and metric handles.
 pub struct PoolAiPrometheus {
@@ -202,6 +205,7 @@ pub struct PoolAiPrometheus {
     galaxy_settlement_not_applicable_total: IntGauge,
     galaxy_settlement_resolved_total: IntGauge,
     galaxy_settlement_payout_batch_total: IntGauge,
+    galaxy_worker_unhealthy_total: IntGauge,
     galaxy_fee_split_applied_total: IntGauge,
     galaxy_replication_strict_total: IntGauge,
     galaxy_replication_enqueue_total: IntGauge,
@@ -1022,6 +1026,15 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_settlement_payout_batch_total.clone()))
         .expect("register galaxy_settlement_payout_batch_total");
 
+    let galaxy_worker_unhealthy_total = IntGauge::with_opts(Opts::new(
+        METRIC_WORKER_UNHEALTHY_TOTAL,
+        "Galaxy workers marked unhealthy after consecutive heartbeat misses (PH-S522)",
+    ))
+    .expect(METRIC_WORKER_UNHEALTHY_TOTAL);
+    registry
+        .register(Box::new(galaxy_worker_unhealthy_total.clone()))
+        .expect("register galaxy_worker_unhealthy_total");
+
     let galaxy_fee_split_applied_total = IntGauge::with_opts(Opts::new(
         METRIC_FEE_SPLIT_APPLIED_TOTAL,
         "Galaxy fee split applied on grid result path (PH-S194)",
@@ -1163,6 +1176,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_settlement_not_applicable_total,
         galaxy_settlement_resolved_total,
         galaxy_settlement_payout_batch_total,
+        galaxy_worker_unhealthy_total,
         galaxy_fee_split_applied_total,
         galaxy_replication_strict_total,
         galaxy_replication_enqueue_total,
@@ -1324,6 +1338,8 @@ pub fn refresh_galaxy_verification_gauges() {
         .set(verification_checker_enqueue_total() as i64);
     prom.galaxy_verification_checker_pending_total
         .set(verification_checker_pending_total() as i64);
+    prom.galaxy_worker_unhealthy_total
+        .set(galaxy_worker_unhealthy_total() as i64);
     prom.galaxy_replay_pending.set(replay_pending() as i64);
     prom.galaxy_replay_pending_scheduled_total
         .set(replay_pending_scheduled_total() as i64);

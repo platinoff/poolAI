@@ -804,6 +804,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/GridNetworkProfileResponse'
 
+  /grid/telegram-seats:
+    get:
+      tags:
+        - Grid
+      summary: Telegram edge seat coordinator snapshot (PH-S505, PH-S514)
+      operationId: getGridTelegramSeats
+      responses:
+        '200':
+          description: Telegram seat policy and occupancy snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GridTelegramSeatsResponse'
+
   /grid/payout-batch:
     get:
       tags:
@@ -6256,6 +6270,34 @@ components:
           type: string
         cleared_at:
           type: string
+
+    GridTelegramSeatsResponse:
+      type: object
+      required:
+        - ok
+        - seat_policy
+        - bound_wallets_count
+        - active_telegram_edge_workers
+      properties:
+        ok:
+          type: boolean
+        seat_policy:
+          type: string
+          description: flat | bound_wallet_session
+        admin_max_seats:
+          type: integer
+          format: int32
+          nullable: true
+        bound_wallets_count:
+          type: integer
+          format: int32
+        seat_limit:
+          type: integer
+          format: int32
+          nullable: true
+        active_telegram_edge_workers:
+          type: integer
+          format: int32
 
     GridPayoutBatchResponse:
       type: object

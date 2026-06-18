@@ -65,10 +65,6 @@ async fn register_remote_protocol_1_2_accepted() {
     assert_eq!(v["worker_protocol_version"], "1.2");
 }
 
-// upgrade_required (426) path: `grid::protocol_compat` unit tests — env is process-global
-// and parallel `#[tokio::test]` would race on `POOLAI_COORDINATOR_PROTOCOL_VERSION`.
-
-#[tokio::test]
 async fn register_remote_protocol_1_0_unsupported() {
     let app = app_with_discovery().await;
     let register = Request::builder()
@@ -84,4 +80,36 @@ async fn register_remote_protocol_1_0_unsupported() {
     let v: Value = serde_json::from_slice(&body).unwrap();
     assert_eq!(v["compat_status"], "unsupported");
     assert_eq!(v["registered"], false);
+}
+
+#[tokio::test]
+async fn register_remote_build_id_allowlist_ph_s520() {
+    static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+    let _guard = ENV_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+    std::env::set_var("POOLAI_ALLOWED_BUILD_IDS", "ci-build,prod");
+
+    let app = app_with_discovery().await;
+    let register = Request::builder()
+        .method("POST")
+        .uri("/api/v1/discovery/register-remote")
+        .header("content-type", "application/json")
+        .body(Body::from(
+            r#"{
+                "peer_id": "build-reject",
+                "address": "10.0.0.9",
+                "port": 9091,
+                "protocol_version": "1.2",
+                "build_id": "unknown-build",
+                "metadata": { "role": "virtual_node" }
+            }"#,
+        ))
+        .unwrap();
+
+    let response = app.oneshot(register).await.unwrap();
+    assert_eq!(response.status(), StatusCode::FORBIDDEN);
+    let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+    let v: Value = serde_json::from_slice(&body).unwrap();
+    assert_eq!(v["error"], "build_id_rejected");
+
+    std::env::remove_var("POOLAI_ALLOWED_BUILD_IDS");
 }

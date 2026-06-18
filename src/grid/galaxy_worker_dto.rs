@@ -1,6 +1,7 @@
 //! Unified Galaxy worker DTO for virtual-node list (PH-S507, Galaxy §2.3).
 
-use crate::core::discovery_types::PeerInfo;
+use crate::core::discovery_types::{PeerCapabilities, PeerInfo};
+use crate::grid::dispatch::SeedInventoryEntry;
 use crate::grid::galaxy_network_profile::{parse_network_profile_value, GalaxyNetworkProfile};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -35,6 +36,17 @@ pub struct GalaxyWorkerLimits {
     pub max_concurrent_requests: Option<u32>,
 }
 
+/// Capabilities subset from discovery peer (PH-S516, Galaxy §2.3).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
+pub struct GalaxyWorkerCapabilities {
+    pub cpu_cores: usize,
+    pub memory_mb: usize,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub gpu_devices: Vec<usize>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub active_requests: Option<usize>,
+}
+
 /// Telemetry subset for admin sort/filter (Galaxy §2.3).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub struct GalaxyWorkerTelemetry {
@@ -48,6 +60,10 @@ pub struct GalaxyWorkerDto {
     pub origin: GalaxyWorkerOrigin,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub admin_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub capabilities: Option<GalaxyWorkerCapabilities>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub seed_inventory: Option<SeedInventoryEntry>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub srv_id: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -87,6 +103,23 @@ fn parse_u32(meta: &std::collections::HashMap<String, String>, key: &str) -> Opt
     meta.get(key)?.trim().parse().ok()
 }
 
+fn capabilities_from_peer(caps: &PeerCapabilities) -> GalaxyWorkerCapabilities {
+    GalaxyWorkerCapabilities {
+        cpu_cores: caps.cpu_cores,
+        memory_mb: caps.memory_mb,
+        gpu_devices: caps.gpu_devices.clone(),
+        active_requests: Some(caps.active_requests),
+    }
+}
+
+fn parse_seed_inventory(
+    metadata: &std::collections::HashMap<String, String>,
+) -> Option<SeedInventoryEntry> {
+    let raw = metadata.get("seed_inventory")?;
+    let value: Value = serde_json::from_str(raw).ok()?;
+    serde_json::from_value(value).ok()
+}
+
 /// Map discovery peer metadata to Galaxy worker DTO.
 pub fn galaxy_worker_from_peer(peer: &PeerInfo) -> GalaxyWorkerDto {
     let network_profile = parse_network_profile(&peer.metadata);
@@ -94,6 +127,8 @@ pub fn galaxy_worker_from_peer(peer: &PeerInfo) -> GalaxyWorkerDto {
     GalaxyWorkerDto {
         origin: parse_origin(&peer.metadata),
         admin_id: peer.metadata.get("admin_id").cloned(),
+        capabilities: Some(capabilities_from_peer(&peer.capabilities)),
+        seed_inventory: parse_seed_inventory(&peer.metadata),
         srv_id: peer
             .metadata
             .get("srv_id")
@@ -143,5 +178,29 @@ mod tests {
         assert_eq!(dto.admin_id.as_deref(), Some("admin-1"));
         assert_eq!(dto.network_profile.as_ref().unwrap().latency_ms_p50, 42);
         assert_eq!(dto.telemetry.as_ref().unwrap().latency_ms_p50, Some(42));
+        assert_eq!(dto.capabilities.as_ref().unwrap().memory_mb, 4096);
+    }
+
+    #[test]
+    fn galaxy_worker_seed_inventory_ph_s516() {
+        let mut metadata = HashMap::new();
+        metadata.insert("origin".into(), "local".into());
+        metadata.insert(
+            "seed_inventory".into(),
+            r#"{"shard_ids":["s1"],"hot_tier":{"ram_bytes_used":100,"vram_bytes_used":0,"profiles":[]},"local_replica_regions":[]}"#.into(),
+        );
+        let peer = PeerInfo {
+            peer_id: "peer-2".into(),
+            address: "127.0.0.1".into(),
+            port: 9000,
+            last_seen: Utc::now(),
+            capabilities: PeerCapabilities::default(),
+            metadata,
+        };
+        let dto = galaxy_worker_from_peer(&peer);
+        assert_eq!(
+            dto.seed_inventory.as_ref().unwrap().shard_ids,
+            vec!["s1".to_string()]
+        );
     }
 }

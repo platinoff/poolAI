@@ -3,6 +3,96 @@
   "items": [
     {
       "category": "closed",
+      "id": "PH-S523",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_horizon_s514_integration` + stand smoke + loc-audit + vision-sync",
+      "title": "Horizon close band S514–S522"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S522",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_worker_health`; `/metrics` gauge",
+      "title": "Heartbeat miss → worker unhealthy metric"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S521",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "PayoutBatchLedgerEntry` split fields; payout-batch GET test",
+      "title": "Payout batch fee-split ledger fields"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S520",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "POOLAI_ALLOWED_BUILD_IDS`; 403 `build_id_rejected",
+      "title": "build_id` allowlist on register-remote"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S519",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "last_measured_at` on heartbeat-remote; integration test",
+      "title": "Heartbeat refreshes `network_profile` freshness"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S518",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "lease_failover.rs`; `jobs_failover_budget_integration",
+      "title": "Job failover retry budget + fail_reason"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S517",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "/ui/admin/telegram-seats`; wasm renderer",
+      "title": "Admin Telegram seats panel"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S516",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "virtual-nodes list round-trip; `galaxy_worker_dto_integration",
+      "title": "Galaxy DTO `capabilities` + `seed_inventory"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S515",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "DELETE .../telegram/bindings/{id}` client; integration test",
+      "title": "tgbot `/stop` → unbind edge worker"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S514",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "fetch_telegram_seats`; `tgbot_coordinator_bridge_integration",
+      "title": "tgbot `/status` → telegram-seats snapshot"
+    },
+    {
+      "category": "closed",
       "id": "PH-S513",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
@@ -18,96 +108,6 @@
       "status": "closed",
       "summary": "/ui/admin/grid-verification`; wasm table renderer",
       "title": "Admin grid verification-checker panel"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S511",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "semantic_hash match/mismatch on grid result path",
-      "title": "Non-deterministic `semantic_hash` stub"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S510",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "409 `wallet_rebind_cooldown`; env cooldown secs",
-      "title": "Payout wallet rebind cooldown"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S509",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "Wallet` command POSTs wallet bind API; coordinator unit test",
-      "title": "tgbot `/wallet` command"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S508",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "virtual-nodes panel on `/ui/admin/workers`; wasm renderer",
-      "title": "Admin workers: origin badges + locality sort"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S507",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy` field on virtual-nodes list; origin + network_profile",
-      "title": "Unified Galaxy worker DTO on virtual-nodes"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S506",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "PUT /api/v1/grid/network-profiles/{peer_id}`; round-trip GET",
-      "title": "Network profile upsert API"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S505",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "GET /api/v1/grid/telegram-seats`; seat snapshot fields",
-      "title": "Telegram seat coordinator read API"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S504",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "reject unsigned register-remote; dev fixture passes; integration test",
-      "title": "Mandatory signed capability for `telegram_edge"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S503",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "poolai-vision-sync` + `--check` green",
-      "title": "Ops close band: vision-sync"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S502",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "rust_ratio.json` 94.41%; FM/HANDOFF/NEXT",
-      "title": "Ops close band: loc-audit"
     }
   ],
   "link": "docs/vision/index.html",

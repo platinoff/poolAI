@@ -297,10 +297,10 @@ mod tests {
     fn record_payout_batch_ledger_entry_ph_s436() {
         let _lock = settlement_metrics_test_lock();
         reset_settlement_metrics_for_test();
-        record_payout_batch_ledger_entry(PayoutBatchLedgerEntry {
-            job_id: "job-1".into(),
-            cleared_at: "2026-06-18T00:00:00Z".into(),
-        });
+        record_payout_batch_ledger_entry(PayoutBatchLedgerEntry::minimal(
+            "job-1",
+            "2026-06-18T00:00:00Z",
+        ));
         let last = last_payout_batch_ledger_entry().expect("stored");
         assert_eq!(last.job_id, "job-1");
         assert_eq!(settlement_payout_batch_total(), 0);

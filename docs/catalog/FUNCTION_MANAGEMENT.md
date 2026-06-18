@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-18 (PH-S504…S513 ✅ · rust_ratio **94.42%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-18 (PH-S514…S523 ✅ · vision **rev 240** · **0** відкритих · rust_ratio **94.47%**)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -713,8 +713,18 @@ FM-xxx (з таблиці нижче)
 | 446 | **PH-S511** | Non-deterministic `semantic_hash` stub | Galaxy §6.2 | semantic_hash match/mismatch on grid result path | **✅** |
 | 447 | **PH-S512** | Admin grid verification-checker panel | PH-S494 | `/ui/admin/grid-verification`; wasm table renderer | **✅** |
 | 448 | **PH-S513** | Horizon close band S504–S512 | §5.12 fallback | `galaxy_horizon_s504_integration` + stand smoke + loc-audit + vision-sync | **✅** |
+| 449 | **PH-S514** | tgbot `/status` → telegram-seats snapshot | Galaxy §3.1 | `fetch_telegram_seats`; `tgbot_coordinator_bridge_integration` | **✅** |
+| 450 | **PH-S515** | tgbot `/stop` → unbind edge worker | Galaxy §3.2 | `DELETE .../telegram/bindings/{id}` client; integration test | **✅** |
+| 451 | **PH-S516** | Galaxy DTO `capabilities` + `seed_inventory` | Galaxy §2.3 | virtual-nodes list round-trip; `galaxy_worker_dto_integration` | **✅** |
+| 452 | **PH-S517** | Admin Telegram seats panel | PH-S505 | `/ui/admin/telegram-seats`; wasm renderer | **✅** |
+| 453 | **PH-S518** | Job failover retry budget + fail_reason | Galaxy §4.3.3 | `lease_failover.rs`; `jobs_failover_budget_integration` | **✅** |
+| 454 | **PH-S519** | Heartbeat refreshes `network_profile` freshness | Galaxy §8.1 | `last_measured_at` on heartbeat-remote; integration test | **✅** |
+| 455 | **PH-S520** | `build_id` allowlist on register-remote | Galaxy §9.3 | `POOLAI_ALLOWED_BUILD_IDS`; 403 `build_id_rejected` | **✅** |
+| 456 | **PH-S521** | Payout batch fee-split ledger fields | Galaxy §8.2 | `PayoutBatchLedgerEntry` split fields; payout-batch GET test | **✅** |
+| 457 | **PH-S522** | Heartbeat miss → worker unhealthy metric | Galaxy §4.3.3 | `galaxy_worker_health`; `/metrics` gauge | **✅** |
+| 458 | **PH-S523** | Horizon close band S514–S522 | §5.12 fallback | `galaxy_horizon_s514_integration` + stand smoke + loc-audit + vision-sync | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S504…S513 ✅. Vision rev **239**. rust_ratio **94.42%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S514…S523 ✅. Vision rev **240**. rust_ratio **94.47%**.
 
 **Наступна сесія:** **`абракадабра`** (project scan → drain) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 

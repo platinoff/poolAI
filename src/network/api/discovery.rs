@@ -27,7 +27,10 @@ use crate::grid::galaxy_network_profile::normalize_register_metadata;
 use crate::grid::galaxy_protocol_negotiation_metrics::{
     record_protocol_negotiation_accepted, record_protocol_negotiation_rejected,
 };
-use crate::grid::protocol_compat::{negotiate, CompatStatus, MIN_COORDINATOR_VERSION_DOCS_URL};
+use crate::grid::galaxy_worker_health::{on_heartbeat_miss, on_heartbeat_success};
+use crate::grid::protocol_compat::{
+    check_build_id_allowed, negotiate, CompatStatus, MIN_COORDINATOR_VERSION_DOCS_URL,
+};
 use crate::grid::GridEnvelope;
 use crate::network::api::common::HttpAppError;
 use crate::network::api::grid::ingest_grid_envelope_handler;
@@ -257,6 +260,20 @@ async fn register_remote_handler(
         record_protocol_negotiation_accepted();
     }
 
+    if let Err(reject) = check_build_id_allowed(payload.build_id.as_deref()) {
+        record_protocol_negotiation_rejected();
+        return (
+            StatusCode::FORBIDDEN,
+            Json(serde_json::json!({
+                "error": "build_id_rejected",
+                "message": "worker build_id not in allow-list (Galaxy §9.3)",
+                "build_id": reject.build_id,
+                "peer_id": peer_id,
+            })),
+        )
+            .into_response();
+    }
+
     let mut metadata = match normalize_register_metadata(payload.metadata) {
         Ok(m) => m,
         Err(e) => {
@@ -374,12 +391,16 @@ async fn heartbeat_remote_handler(
     }
     let peer_id = payload.peer_id.clone();
     match DiscoveryService::heartbeat_remote_peer(&ctx, &peer_id, payload.capabilities).await {
-        Ok(()) => (
-            StatusCode::OK,
-            Json(HeartbeatRemotePeerResponse { peer_id, ok: true }),
-        )
-            .into_response(),
+        Ok(()) => {
+            on_heartbeat_success(&peer_id);
+            (
+                StatusCode::OK,
+                Json(HeartbeatRemotePeerResponse { peer_id, ok: true }),
+            )
+                .into_response()
+        }
         Err(DiscoveryAnnounceError::Failed(e)) => {
+            on_heartbeat_miss(&peer_id);
             discovery_peer_not_found("heartbeat_remote", &peer_id, e).into_response()
         }
         Err(DiscoveryAnnounceError::NotReady) => {

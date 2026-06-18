@@ -11,6 +11,28 @@ use serde::{Deserialize, Serialize};
 pub struct PayoutBatchLedgerEntry {
     pub job_id: String,
     pub cleared_at: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub gross_usd_micro: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub gross_lamports: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub primary_dev_lamports: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub secondary_admin_lamports: Option<u64>,
+}
+
+impl PayoutBatchLedgerEntry {
+    /// Ledger row with only required fields (fee-split fields optional).
+    pub fn minimal(job_id: impl Into<String>, cleared_at: impl Into<String>) -> Self {
+        Self {
+            job_id: job_id.into(),
+            cleared_at: cleared_at.into(),
+            gross_usd_micro: None,
+            gross_lamports: None,
+            primary_dev_lamports: None,
+            secondary_admin_lamports: None,
+        }
+    }
 }
 
 /// Coordinator settlement status on grid result ingest (stub — no payout wire).

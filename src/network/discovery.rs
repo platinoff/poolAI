@@ -643,6 +643,20 @@ impl DiscoveryService {
         if let Some(cap) = capabilities {
             peer.capabilities = cap;
         }
+        if let Some(np_json) = peer.metadata.get("network_profile").cloned() {
+            if let Ok(updated) =
+                crate::grid::galaxy_network_profile::refresh_network_profile_measured_at(
+                    &np_json,
+                    peer.last_seen,
+                )
+            {
+                peer.metadata
+                    .insert("network_profile".to_string(), updated.clone());
+                let _ = crate::grid::galaxy_network_profile_store::persist_peer_network_profile(
+                    peer_id, &updated,
+                );
+            }
+        }
         debug!("Heartbeat from remote peer: {}", peer_id);
         Ok(())
     }

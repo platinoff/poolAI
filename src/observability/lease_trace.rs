@@ -176,6 +176,8 @@ mod tests {
             lease_owner: Some("worker-a".into()),
             lease_epoch: Some(1),
             lease_expires_at: Some(Utc::now()),
+            migration_count: None,
+            fail_reason: None,
         }
     }
 

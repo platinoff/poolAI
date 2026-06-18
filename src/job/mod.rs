@@ -3,6 +3,7 @@
 mod domain_events;
 mod lease_acquire;
 mod lease_config;
+mod lease_failover;
 mod lifecycle;
 mod map;
 mod onchain;
@@ -22,6 +23,10 @@ pub use lease_acquire::{
 pub use lease_config::{
     JobLeaseConfig, DEFAULT_JOB_LEASE_TTL_SECS, ENV_JOB_LEASE_RENEW_INTERVAL_SECS,
     ENV_JOB_LEASE_TTL_SECS,
+};
+pub use lease_failover::{
+    max_migrations_per_job, migration_budget_exhausted, next_migration_count, LeaseFailReason,
+    ENV_JOB_MAX_MIGRATIONS_PER_JOB,
 };
 pub use lifecycle::allows_transition;
 pub use onchain::{

@@ -1874,11 +1874,29 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_vm_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_galaxy_virtual_nodes_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_grid_verification_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_worker_dto_rs"
     }
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S513",
+  "last_sprint_closed": "PH-S523",
   "layers": [
     {
       "id": "L0",
@@ -7897,9 +7915,65 @@
       "label": "galaxy_horizon_s494_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s494_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_galaxy_virtual_nodes_rs",
+      "label": "galaxy_virtual_nodes.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/galaxy_virtual_nodes.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_grid_verification_rs",
+      "label": "grid_verification.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/grid_verification.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_worker_dto_rs",
+      "label": "galaxy_worker_dto.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_worker_dto.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ui_admin_grid_verification_rs",
+      "label": "grid_verification.rs",
+      "layer": "L3",
+      "path": "src/ui/admin/grid_verification.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_discovery_telegram_edge_capability_integration_rs",
+      "label": "discovery_telegram_edge_capability_integration.rs",
+      "layer": "L3",
+      "path": "tests/discovery_telegram_edge_capability_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s504_integration_rs",
+      "label": "galaxy_horizon_s504_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s504_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_network_profile_put_integration_rs",
+      "label": "galaxy_network_profile_put_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_network_profile_put_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_telegram_seat_read_integration_rs",
+      "label": "telegram_seat_read_integration.rs",
+      "layer": "L3",
+      "path": "tests/telegram_seat_read_integration.rs"
     }
   ],
-  "revision": 239,
+  "revision": 240,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -11932,6 +12006,96 @@
       "row": 448,
       "status": "closed",
       "title": "Horizon close band S504–S512"
+    },
+    {
+      "acceptance": "fetch_telegram_seats`; `tgbot_coordinator_bridge_integration",
+      "deps": "Galaxy §3.1",
+      "id": "PH-S514",
+      "open": false,
+      "row": 449,
+      "status": "closed",
+      "title": "tgbot `/status` → telegram-seats snapshot"
+    },
+    {
+      "acceptance": "DELETE .../telegram/bindings/{id}` client; integration test",
+      "deps": "Galaxy §3.2",
+      "id": "PH-S515",
+      "open": false,
+      "row": 450,
+      "status": "closed",
+      "title": "tgbot `/stop` → unbind edge worker"
+    },
+    {
+      "acceptance": "virtual-nodes list round-trip; `galaxy_worker_dto_integration",
+      "deps": "Galaxy §2.3",
+      "id": "PH-S516",
+      "open": false,
+      "row": 451,
+      "status": "closed",
+      "title": "Galaxy DTO `capabilities` + `seed_inventory"
+    },
+    {
+      "acceptance": "/ui/admin/telegram-seats`; wasm renderer",
+      "deps": "PH-S505",
+      "id": "PH-S517",
+      "open": false,
+      "row": 452,
+      "status": "closed",
+      "title": "Admin Telegram seats panel"
+    },
+    {
+      "acceptance": "lease_failover.rs`; `jobs_failover_budget_integration",
+      "deps": "Galaxy §4.3.3",
+      "id": "PH-S518",
+      "open": false,
+      "row": 453,
+      "status": "closed",
+      "title": "Job failover retry budget + fail_reason"
+    },
+    {
+      "acceptance": "last_measured_at` on heartbeat-remote; integration test",
+      "deps": "Galaxy §8.1",
+      "id": "PH-S519",
+      "open": false,
+      "row": 454,
+      "status": "closed",
+      "title": "Heartbeat refreshes `network_profile` freshness"
+    },
+    {
+      "acceptance": "POOLAI_ALLOWED_BUILD_IDS`; 403 `build_id_rejected",
+      "deps": "Galaxy §9.3",
+      "id": "PH-S520",
+      "open": false,
+      "row": 455,
+      "status": "closed",
+      "title": "build_id` allowlist on register-remote"
+    },
+    {
+      "acceptance": "PayoutBatchLedgerEntry` split fields; payout-batch GET test",
+      "deps": "Galaxy §8.2",
+      "id": "PH-S521",
+      "open": false,
+      "row": 456,
+      "status": "closed",
+      "title": "Payout batch fee-split ledger fields"
+    },
+    {
+      "acceptance": "galaxy_worker_health`; `/metrics` gauge",
+      "deps": "Galaxy §4.3.3",
+      "id": "PH-S522",
+      "open": false,
+      "row": 457,
+      "status": "closed",
+      "title": "Heartbeat miss → worker unhealthy metric"
+    },
+    {
+      "acceptance": "galaxy_horizon_s514_integration` + stand smoke + loc-audit + vision-sync",
+      "deps": "§5.12 fallback",
+      "id": "PH-S523",
+      "open": false,
+      "row": 458,
+      "status": "closed",
+      "title": "Horizon close band S514–S522"
     }
   ],
   "sprint_queue_open_count": 0,

@@ -4,6 +4,7 @@
 //! normalizes to canonical JSON for peer metadata storage.
 
 use crate::grid::galaxy_locality::LocalityNetworkProfile;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
@@ -67,12 +68,49 @@ impl GalaxyNetworkProfile {
         }
     }
 
+    /// Locality subset with computed profile age at `now` (PH-S519).
+    pub fn locality_subset_at(&self, now: DateTime<Utc>) -> LocalityNetworkProfile {
+        LocalityNetworkProfile {
+            region: self.region.clone(),
+            latency_ms_p50: self.latency_ms_p50,
+            profile_age_secs: self.profile_age_secs_at(now),
+        }
+    }
+
     /// Canonical JSON string for peer `metadata["network_profile"]`.
     pub fn to_storage_json(&self) -> Result<String, NetworkProfileParseError> {
         serde_json::to_string(self).map_err(|e| {
             NetworkProfileParseError::new(format!("network_profile serialize failed: {e}"))
         })
     }
+
+    /// Seconds since `last_measured_at`; `None` when missing or unparsable (§8.1).
+    pub fn profile_age_secs_at(&self, now: DateTime<Utc>) -> Option<u64> {
+        profile_age_secs_from_measured_at(self.last_measured_at.as_deref(), now)
+    }
+}
+
+/// Compute profile age from RFC3339 timestamp (PH-S519).
+pub fn profile_age_secs_from_measured_at(
+    last_measured_at: Option<&str>,
+    now: DateTime<Utc>,
+) -> Option<u64> {
+    let raw = last_measured_at?;
+    let parsed = DateTime::parse_from_rfc3339(raw).ok()?.with_timezone(&Utc);
+    Some(now.signed_duration_since(parsed).num_seconds().max(0) as u64)
+}
+
+/// Refresh `last_measured_at` on stored profile JSON (PH-S519).
+pub fn refresh_network_profile_measured_at(
+    profile_json: &str,
+    now: DateTime<Utc>,
+) -> Result<String, NetworkProfileParseError> {
+    let value: Value = serde_json::from_str(profile_json).map_err(|e| {
+        NetworkProfileParseError::new(format!("network_profile JSON parse failed: {e}"))
+    })?;
+    let mut profile = parse_network_profile_value(&value)?;
+    profile.last_measured_at = Some(now.to_rfc3339());
+    profile.to_storage_json()
 }
 
 /// Parse `network_profile` from a JSON object or JSON-encoded string.

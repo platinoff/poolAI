@@ -172,6 +172,13 @@ async fn heartbeat_remote_retains_network_profile_ph_s440() {
     assert_eq!(parsed["region"], "ap-south");
     assert_eq!(parsed["latency_ms_p50"], 110);
     assert_eq!(parsed["egress_policy"], "lan_only");
+    assert!(
+        parsed
+            .get("last_measured_at")
+            .and_then(|v| v.as_str())
+            .is_some(),
+        "heartbeat must refresh last_measured_at (PH-S519): {parsed}"
+    );
 }
 
 #[tokio::test]

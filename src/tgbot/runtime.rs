@@ -1,6 +1,9 @@
 //! Teloxide dispatcher (FM-016++, requires feature `tgbot`).
 
-use crate::tgbot::coordinator::{format_reply, forward_message, CoordinatorConfig};
+use crate::tgbot::coordinator::{
+    fetch_telegram_seats, format_reply, format_seats_reply, format_unbind_reply, forward_message,
+    unbind_telegram, CoordinatorConfig,
+};
 use std::sync::atomic::{AtomicI64, Ordering};
 use teloxide::prelude::*;
 use teloxide::utils::command::BotCommands;
@@ -19,6 +22,8 @@ enum Command {
     Start,
     #[command(description = "bind payout wallet pubkey")]
     Wallet(String),
+    #[command(description = "unbind edge worker")]
+    Stop,
 }
 
 pub async fn run_bot(token: &str, config: CoordinatorConfig) -> Result<(), String> {
@@ -61,7 +66,30 @@ async fn command_handler(
                 .await?;
             return Ok(());
         }
-        Command::Status => "/status",
+        Command::Status => {
+            let user_id = msg.from.as_ref().map(|u| u.id.0 as i64).unwrap_or(0);
+            if user_id == 0 {
+                bot.send_message(msg.chat.id, "Cannot resolve Telegram user id")
+                    .await?;
+                return Ok(());
+            }
+            let result = fetch_telegram_seats(&cfg).await;
+            let reply = format_seats_reply(&result);
+            bot.send_message(msg.chat.id, reply).await?;
+            return Ok(());
+        }
+        Command::Stop => {
+            let user_id = msg.from.as_ref().map(|u| u.id.0 as i64).unwrap_or(0);
+            if user_id == 0 {
+                bot.send_message(msg.chat.id, "Cannot resolve Telegram user id")
+                    .await?;
+                return Ok(());
+            }
+            let result = unbind_telegram(&cfg, user_id).await;
+            let reply = format_unbind_reply(&result);
+            bot.send_message(msg.chat.id, reply).await?;
+            return Ok(());
+        }
         Command::Start => "/start",
         Command::Wallet(pubkey) => {
             if pubkey.trim().is_empty() {

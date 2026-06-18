@@ -12,6 +12,42 @@ pub const DEFAULT_COORDINATOR_PROTOCOL: &str = "1.2";
 pub const MIN_COORDINATOR_VERSION_DOCS_URL: &str =
     "https://github.com/platinoff/poolAI/blob/main/docs/concept/POOLAI_GALAXY_GRID.md#93-protocol-versioning-та-compat-matrix";
 
+/// Env: comma-separated allow-list of worker `build_id` values (PH-S520).
+pub const ENV_ALLOWED_BUILD_IDS: &str = "POOLAI_ALLOWED_BUILD_IDS";
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BuildIdReject {
+    pub build_id: Option<String>,
+}
+
+/// When allow-list env is set, reject unknown `build_id` (Galaxy §9.3 step 2).
+pub fn check_build_id_allowed(build_id: Option<&str>) -> Result<(), BuildIdReject> {
+    let raw = match std::env::var(ENV_ALLOWED_BUILD_IDS) {
+        Ok(v) if !v.trim().is_empty() => v,
+        _ => return Ok(()),
+    };
+    let allowed: Vec<String> = raw
+        .split(',')
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
+        .collect();
+    if allowed.is_empty() {
+        return Ok(());
+    }
+    let Some(id) = build_id.map(str::trim).filter(|s| !s.is_empty()) else {
+        return Err(BuildIdReject {
+            build_id: build_id.map(str::to_string),
+        });
+    };
+    if allowed.iter().any(|a| a == id) {
+        Ok(())
+    } else {
+        Err(BuildIdReject {
+            build_id: Some(id.to_string()),
+        })
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum CompatStatus {
@@ -214,5 +250,17 @@ mod tests {
             negotiate_with_coordinator(coord, Some("1.2")).status,
             CompatStatus::UpgradeRequired
         );
+    }
+
+    #[test]
+    fn build_id_allowlist_ph_s520() {
+        static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+        let _guard = ENV_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+        std::env::remove_var(ENV_ALLOWED_BUILD_IDS);
+        assert!(check_build_id_allowed(Some("any")).is_ok());
+        std::env::set_var(ENV_ALLOWED_BUILD_IDS, "ci-build,prod");
+        assert!(check_build_id_allowed(Some("ci-build")).is_ok());
+        assert!(check_build_id_allowed(Some("other")).is_err());
+        std::env::remove_var(ENV_ALLOWED_BUILD_IDS);
     }
 }

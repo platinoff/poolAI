@@ -44,6 +44,7 @@ pub mod libs;
 pub mod monitoring;
 pub mod raid;
 pub mod security;
+pub mod telegram_seats;
 pub mod tenants;
 pub mod topology;
 pub mod updates_compat;
@@ -69,6 +70,10 @@ pub fn create_admin_routes() -> Router<ApiContext> {
         .route(
             "/admin/grid-verification",
             get(grid_verification::admin_grid_verification),
+        )
+        .route(
+            "/admin/telegram-seats",
+            get(telegram_seats::admin_telegram_seats),
         )
         .route(
             "/admin/updates-compat",
@@ -460,6 +465,7 @@ pub fn admin_layout_with_module_script(
         <a href="/ui/admin/jobs" class="admin-nav-item" data-i18n="admin.nav.jobs">Jobs</a>
         <a href="/ui/admin/grid-pricing" class="admin-nav-item" data-i18n="admin.nav.gridPricing">Grid pricing</a>
         <a href="/ui/admin/grid-verification" class="admin-nav-item" data-i18n="admin.nav.gridVerification">Grid verify</a>
+        <a href="/ui/admin/telegram-seats" class="admin-nav-item" data-i18n="admin.nav.telegramSeats">Telegram seats</a>
         <a href="/ui/admin/updates-compat" class="admin-nav-item" data-i18n="admin.nav.updatesCompat">Updates</a>
         <a href="/ui/admin/libs" class="admin-nav-item" data-i18n="admin.nav.libs">Libraries</a>
         <a href="/ui/admin/raid" class="admin-nav-item" data-i18n="admin.nav.raid">RAID</a>

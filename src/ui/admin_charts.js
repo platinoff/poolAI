@@ -841,3 +841,20 @@ function poolaiRenderGridVerificationPanel(tasks, pendingTotal, labels) {
   }
   return adminEmptyStateHtml(labels.empty || 'No pending checker tasks', { icon: '🔍' });
 }
+
+/** PH-S517: Telegram seats snapshot table (wasm-first). */
+function poolaiRenderTelegramSeatsPanel(snapshotJson, labels) {
+  labels = labels || {};
+  var wasm = poolaiChartsWasm();
+  if (wasm && typeof wasm.renderTelegramSeatsPanel === 'function') {
+    return wasm.renderTelegramSeatsPanel(
+      snapshotJson || '{}',
+      labels.policy || 'Policy',
+      labels.limit || 'Seat limit',
+      labels.active || 'Active workers',
+      labels.bound || 'Bound wallets',
+      labels.tableAria || 'Telegram seats',
+    );
+  }
+  return adminEmptyStateHtml(labels.empty || 'Seat snapshot unavailable', { icon: '📊' });
+}

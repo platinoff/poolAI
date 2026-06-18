@@ -39,14 +39,14 @@ async fn get_json(app: &Router, uri: &str) -> (StatusCode, serde_json::Value) {
 #[tokio::test]
 async fn get_payout_batch_history_returns_entries_ph_s477() {
     reset_settlement_metrics_for_test();
-    record_payout_batch_ledger_entry(PayoutBatchLedgerEntry {
-        job_id: "job-h1".into(),
-        cleared_at: "2026-06-18T00:00:00Z".into(),
-    });
-    record_payout_batch_ledger_entry(PayoutBatchLedgerEntry {
-        job_id: "job-h2".into(),
-        cleared_at: "2026-06-18T01:00:00Z".into(),
-    });
+    record_payout_batch_ledger_entry(PayoutBatchLedgerEntry::minimal(
+        "job-h1",
+        "2026-06-18T00:00:00Z",
+    ));
+    record_payout_batch_ledger_entry(PayoutBatchLedgerEntry::minimal(
+        "job-h2",
+        "2026-06-18T01:00:00Z",
+    ));
 
     let app = grid_app();
     let (status, body) = get_json(&app, "/api/v1/grid/payout-batch/history?limit=10").await;

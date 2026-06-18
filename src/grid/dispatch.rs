@@ -12,6 +12,9 @@ use chrono::Utc;
 use serde::{Deserialize, Serialize};
 
 use crate::core::error::AppError;
+use crate::grid::galaxy_fee_split::{
+    split_gross_payment, SECONDARY_ADMIN_FEE_MAX_BPS, SECONDARY_ADMIN_FEE_MIN_BPS,
+};
 use crate::grid::galaxy_fee_split_metrics::evaluate_result_fee_split;
 use crate::grid::galaxy_locality::{
     observe_last_cross_region_egress_mb, pick_best_worker_by_locality,
@@ -835,6 +838,8 @@ fn ingest_job(
         lease_owner: None,
         lease_epoch: None,
         lease_expires_at: None,
+        migration_count: None,
+        fail_reason: None,
     };
     jobs.push(record)?;
     let locality_peer = if !body.required_shard_ids.is_empty() {
@@ -943,10 +948,11 @@ fn ingest_result(
     evaluate_result_settlement_pending_verification(settlement_status);
     evaluate_result_settlement_cleared(settlement_status);
     if settlement_status == SettlementStatus::Cleared {
-        record_payout_batch_ledger_entry(PayoutBatchLedgerEntry {
-            job_id: job_id.clone(),
-            cleared_at: now.to_rfc3339(),
-        });
+        record_payout_batch_ledger_entry(build_payout_batch_entry(
+            &job_id,
+            now.to_rfc3339(),
+            body.metrics.as_ref(),
+        ));
     }
     evaluate_result_settlement_not_applicable(settlement_status);
     evaluate_result_fee_split(body.metrics.as_ref());
@@ -960,6 +966,40 @@ fn ingest_result(
             settlement_status,
         },
     })
+}
+
+/// Build payout batch ledger entry with optional fee-split fields (PH-S521).
+fn build_payout_batch_entry(
+    job_id: &str,
+    cleared_at: String,
+    metrics: Option<&serde_json::Value>,
+) -> PayoutBatchLedgerEntry {
+    let mut entry = PayoutBatchLedgerEntry {
+        job_id: job_id.to_string(),
+        cleared_at,
+        gross_usd_micro: metrics.and_then(|m| m.get("gross_usd_micro").and_then(|v| v.as_u64())),
+        gross_lamports: None,
+        primary_dev_lamports: None,
+        secondary_admin_lamports: None,
+    };
+    let Some(m) = metrics else {
+        return entry;
+    };
+    let gross = m.get("gross_lamports").and_then(|v| v.as_u64());
+    let bps = m.get("secondary_admin_bps").and_then(|v| v.as_u64());
+    if let (Some(gross_lamports), Some(bps_raw)) = (gross, bps) {
+        if bps_raw <= u64::from(u16::MAX) {
+            let bps = bps_raw as u16;
+            if (SECONDARY_ADMIN_FEE_MIN_BPS..=SECONDARY_ADMIN_FEE_MAX_BPS).contains(&bps) {
+                if let Ok(split) = split_gross_payment(gross_lamports, bps) {
+                    entry.gross_lamports = Some(gross_lamports);
+                    entry.primary_dev_lamports = Some(split.primary_dev_lamports);
+                    entry.secondary_admin_lamports = Some(split.secondary_admin_lamports);
+                }
+            }
+        }
+    }
+    entry
 }
 
 /// Optional `trust_score` on grid result metrics (PH-S130 stub wire).
@@ -1116,6 +1156,8 @@ mod tests {
             lease_owner: None,
             lease_epoch: None,
             lease_expires_at: None,
+            migration_count: None,
+            fail_reason: None,
         })
         .expect("push");
 
@@ -1166,6 +1208,8 @@ mod tests {
             lease_owner: Some("peer-r".into()),
             lease_epoch: Some(3),
             lease_expires_at: Some(now + chrono::Duration::seconds(90)),
+            migration_count: None,
+            fail_reason: None,
         })
         .expect("push");
 
@@ -1216,6 +1260,8 @@ mod tests {
             lease_owner: Some("peer-r".into()),
             lease_epoch: Some(5),
             lease_expires_at: Some(now + chrono::Duration::seconds(90)),
+            migration_count: None,
+            fail_reason: None,
         })
         .expect("push");
 
@@ -1262,6 +1308,8 @@ mod tests {
             lease_owner: Some("peer-r".into()),
             lease_epoch: Some(1),
             lease_expires_at: Some(now + chrono::Duration::seconds(90)),
+            migration_count: None,
+            fail_reason: None,
         })
         .expect("push");
 
@@ -1439,6 +1487,8 @@ mod tests {
             lease_owner: None,
             lease_epoch: None,
             lease_expires_at: None,
+            migration_count: None,
+            fail_reason: None,
         })
         .expect("push");
 
@@ -1500,6 +1550,8 @@ mod tests {
             lease_owner: None,
             lease_epoch: None,
             lease_expires_at: None,
+            migration_count: None,
+            fail_reason: None,
         })
         .expect("push");
 
@@ -1571,6 +1623,8 @@ mod tests {
             lease_owner: None,
             lease_epoch: None,
             lease_expires_at: None,
+            migration_count: None,
+            fail_reason: None,
         })
         .expect("push");
 
@@ -1632,6 +1686,8 @@ mod tests {
             lease_owner: None,
             lease_epoch: None,
             lease_expires_at: None,
+            migration_count: None,
+            fail_reason: None,
         })
         .expect("push");
 
@@ -1683,6 +1739,8 @@ mod tests {
                 lease_owner: None,
                 lease_epoch: None,
                 lease_expires_at: None,
+                migration_count: None,
+                fail_reason: None,
             })
             .expect("push");
 
@@ -1735,6 +1793,8 @@ mod tests {
             lease_owner: None,
             lease_epoch: None,
             lease_expires_at: None,
+            migration_count: None,
+            fail_reason: None,
         })
         .expect("push");
 
@@ -1785,6 +1845,8 @@ mod tests {
             lease_owner: None,
             lease_epoch: None,
             lease_expires_at: None,
+            migration_count: None,
+            fail_reason: None,
         })
         .expect("push");
 
@@ -1834,6 +1896,8 @@ mod tests {
             lease_owner: None,
             lease_epoch: None,
             lease_expires_at: None,
+            migration_count: None,
+            fail_reason: None,
         })
         .expect("push");
 
@@ -1884,6 +1948,8 @@ mod tests {
             lease_owner: None,
             lease_epoch: None,
             lease_expires_at: None,
+            migration_count: None,
+            fail_reason: None,
         })
         .expect("push");
 
@@ -1934,6 +2000,8 @@ mod tests {
             lease_owner: None,
             lease_epoch: None,
             lease_expires_at: None,
+            migration_count: None,
+            fail_reason: None,
         })
         .expect("push");
 
@@ -1976,6 +2044,8 @@ mod tests {
             lease_owner: None,
             lease_epoch: None,
             lease_expires_at: None,
+            migration_count: None,
+            fail_reason: None,
         })
         .expect("push");
 

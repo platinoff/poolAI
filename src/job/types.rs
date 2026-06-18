@@ -120,6 +120,12 @@ pub struct JobRecord {
     /// Lease expiry (RFC3339); worker must renew before this instant (PH-S94 stub).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub lease_expires_at: Option<DateTime<Utc>>,
+    /// Lease-timeout re-migration count (PH-S518, Galaxy §4.3.3).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub migration_count: Option<u32>,
+    /// Fail reason when job fails after lease failover budget (PH-S518).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fail_reason: Option<String>,
 }
 
 impl JobRecord {
@@ -255,6 +261,8 @@ mod lease_tests {
             lease_owner: Some("peer-1".into()),
             lease_epoch: Some(2),
             lease_expires_at: Some(before + chrono::Duration::seconds(90)),
+            migration_count: None,
+            fail_reason: None,
         };
         assert!(check_grid_result_lease_epoch(&record, Some(2), before).is_ok());
         assert!(check_grid_result_lease_epoch(&record, None, before).is_err());
@@ -285,6 +293,8 @@ mod lease_tests {
             lease_owner: Some("worker-a".into()),
             lease_epoch: Some(5),
             lease_expires_at: Some(expires),
+            migration_count: None,
+            fail_reason: None,
         };
         assert!(check_patch_lease_epoch(&record, None, before).is_ok());
         assert!(check_patch_lease_epoch(&record, Some(5), before).is_ok());
@@ -325,6 +335,8 @@ mod lease_tests {
             lease_owner: Some("worker-a".into()),
             lease_epoch: Some(3),
             lease_expires_at: Some(expires),
+            migration_count: None,
+            fail_reason: None,
         };
         let json = serde_json::to_string(&record).expect("serialize");
         let back: JobRecord = serde_json::from_str(&json).expect("deserialize");

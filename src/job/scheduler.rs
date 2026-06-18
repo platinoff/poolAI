@@ -283,6 +283,8 @@ mod tests {
             lease_owner: None,
             lease_epoch: None,
             lease_expires_at: None,
+            migration_count: None,
+            fail_reason: None,
         }
     }
 

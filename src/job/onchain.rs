@@ -165,6 +165,8 @@ mod tests {
             lease_owner: None,
             lease_epoch: None,
             lease_expires_at: None,
+            migration_count: None,
+            fail_reason: None,
         };
         emit_job_completed_if_anchor(&record);
 
@@ -210,6 +212,8 @@ mod tests {
             lease_owner: None,
             lease_epoch: None,
             lease_expires_at: None,
+            migration_count: None,
+            fail_reason: None,
         };
         emit_job_completed_if_anchor(&record);
     }
