@@ -356,6 +356,26 @@ path = "tests/galaxy_horizon_s464_integration.rs"
 required-features = ["test-utils", "prometheus"]
 
 [[test]]
+name = "galaxy_horizon_s474_integration"
+path = "tests/galaxy_horizon_s474_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
+name = "telegram_seat_integration"
+path = "tests/telegram_seat_integration.rs"
+required-features = ["test-utils"]
+
+[[test]]
+name = "grid_payout_batch_history_integration"
+path = "tests/grid_payout_batch_history_integration.rs"
+required-features = ["test-utils"]
+
+[[test]]
+name = "grid_verification_replay_history_integration"
+path = "tests/grid_verification_replay_history_integration.rs"
+required-features = ["test-utils"]
+
+[[test]]
 name = "tls_https_integration"
 path = "tests/tls_https_integration.rs"
 required-features = ["https"]

@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-18 (PH-S464…S473 ✅ · vision **rev 235** · **0** відкритих · rust_ratio **94.39%**)
+**Оновлено:** 2026-06-18 (PH-S474…S483 ✅ · vision **rev 236** · **0** відкритих · rust_ratio **94.39%**)
 
 | **← наступний** | **`абракадабра`** (project scan + drain) **або** один PH-S* |
 | **Відкритих** | **0** |
@@ -30,12 +30,16 @@
 
 ---
 
-## Закрито (смуга PH-S464…S473)
+## Закрито (смуга PH-S474…S483)
 
-PH-S464…S469 ✅ — Galaxy horizon: prefetch backpressure, RAID fetch stub, capability sig verify, payout-batch GET, protocol accepted metric, co-access env JSON.
-PH-S470 ✅ — monitoring dashboards panel wasm (`renderMonitoringDashboardsPanel`).
-PH-S471…S472 ✅ — horizon S464 integration + stand smoke band.
-PH-S473 ✅ — loc-audit **94.39%**, vision-sync + `--check`.
+PH-S474 ✅ — prefetch `lan_only` egress guardrail + `galaxy_prefetch_egress_blocked_total`.
+PH-S475 ✅ — `POOLAI_TELEGRAM_SEAT_LIMIT`; register-remote **409** `seat_exhausted`.
+PH-S476 ✅ — `POOLAI_GALAXY_CAPABILITY_VERIFY_PK_HEX` env override for capability verify.
+PH-S477…S478 ✅ — payout-batch + verification-replay **history** read APIs.
+PH-S479 ✅ — peer seed inventory prefetch fetch stub + metrics.
+PH-S480 ✅ — workers admin panel wasm (`renderWorkersPanel`).
+PH-S481…S482 ✅ — horizon S474 integration + stand smoke band.
+PH-S483 ✅ — loc-audit **94.39%**, vision-sync + `--check`.
 
 **rust_ratio:** **94.39%** (formal 90–95% ✅; hold 95% advisory).
 

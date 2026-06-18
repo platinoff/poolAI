@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-18 (PH-S464…S473 ✅ · rust_ratio **94.39%**) · VDT
+**Оновлено:** 2026-06-18 (PH-S474…S483 ✅ · rust_ratio **94.39%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -424,6 +424,16 @@
 **PH-S471 ✅ (tests):** `tests/galaxy_horizon_s464_integration.rs` — `/metrics` shape PH-S464…S469 band.
 **PH-S472 ✅ (tests):** `poolai-http-stand-smoke` — `galaxy_horizon_wire_s464_metrics` + `grid_payout_batch` smoke.
 **PH-S473 ✅ (ops):** `rust_ratio.json` **94.39%**; FM/HANDOFF/NEXT; `poolai-vision-sync` **rev 235** + `--check`.
+**PH-S474 ✅ (code):** prefetch `lan_only` cross-region egress guardrail — `POOLAI_GALAXY_COORDINATOR_REGION` / `POOLAI_GALAXY_PREFETCH_PEER_*` + `galaxy_prefetch_egress_blocked_total`; `prefetch_enqueue_blocked` gate; unit tests.
+**PH-S475 ✅ (code):** `telegram_seat_service` — `POOLAI_TELEGRAM_SEAT_LIMIT`; register-remote **409** `seat_exhausted` for `origin=telegram_edge`; `tests/telegram_seat_integration.rs`.
+**PH-S476 ✅ (code):** `POOLAI_GALAXY_CAPABILITY_VERIFY_PK_HEX` env override in `verify_capability_signature_stub` (PH-S466 extension).
+**PH-S477 ✅ (code):** `GET /api/v1/grid/payout-batch/history?limit=N` — ring buffer ledger; OpenAPI + integration test.
+**PH-S478 ✅ (code):** `GET /api/v1/grid/verification-replay/history?limit=N` — replay record ring buffer; OpenAPI + integration test.
+**PH-S479 ✅ (code):** `fetch_seed_shards_from_peer_hook` + `galaxy_prefetch_peer_fetch_*` metrics; `coordinator_seed_inventory_snapshot` resolve path.
+**PH-S480 ✅ (code/ui):** `renderWorkersPanel` wasm; slim `workers.rs` table; `poolai-ui-core` + `admin_charts.js`.
+**PH-S481 ✅ (tests):** `tests/galaxy_horizon_s474_integration.rs` — `/metrics` + history API shape PH-S474…S479 band.
+**PH-S482 ✅ (ops):** `poolai_http_stand_smoke` — S474 metrics + payout/replay history API smoke.
+**PH-S483 ✅ (ops):** `rust_ratio.json` **94.39%**; FM/HANDOFF/NEXT; `poolai-vision-sync` **rev 236** + `--check`.
 **Rules ✅:** **`абракадабра`** — project scan **всього репо** (concept · FM §5.1 · roadmaps · architect · code) → 10 PH-S* у §5.12 (журнал) → drain → push; канон [`.cursor/rules/poolai-session-iteration.mdc`](../.cursor/rules/poolai-session-iteration.mdc) § «Тригер абракадабра»; commit **`git-commit-tree-msg.sh`**.
 **§5.12:** **0** відкритих — наступна сесія: **`абракадабра`** (project scan + drain) або один PH-S*.
 **Vision ✅:** rev **235** · rust_ratio **94.38%** · hold **95%** advisory.

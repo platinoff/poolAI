@@ -34,6 +34,7 @@ use crate::services::discovery_service::{
     DiscoveryAnnounceError, DiscoveryNotReady, DiscoveryService, RemoteHealthProbe,
     VirtualNodeStatus,
 };
+use crate::services::telegram_seat_service::{is_telegram_edge_metadata, try_admit_telegram_edge};
 use crate::services::virtual_node_task_service::VirtualNodeTaskService;
 use crate::services::virtual_node_telegram_binding_service::VirtualNodeTelegramBindingService;
 
@@ -284,6 +285,18 @@ async fn register_remote_handler(
     }
     if let Some(worker_ver) = &negotiation.worker_protocol_version {
         metadata.insert("protocol_version".to_string(), worker_ver.clone());
+    }
+
+    if is_telegram_edge_metadata(&metadata) && try_admit_telegram_edge(&peer_id).is_err() {
+        return (
+            StatusCode::CONFLICT,
+            Json(serde_json::json!({
+                "error": "seat_exhausted",
+                "message": "telegram_edge seat cap exhausted (Galaxy §3.1)",
+                "peer_id": peer_id,
+            })),
+        )
+            .into_response();
     }
 
     let is_virtual_node = metadata.get("role").map(String::as_str) == Some("virtual_node");

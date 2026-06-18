@@ -673,8 +673,18 @@ FM-xxx (з таблиці нижче)
 | 406 | **PH-S471** | Galaxy horizon wire integration band | PH-S464…S469 | `galaxy_horizon_s464_integration` + `/metrics` shape | **✅** |
 | 407 | **PH-S472** | Stand smoke S464–S471 band | PH-S464…S467 | `/metrics` + `grid/payout-batch` smoke | **✅** |
 | 408 | **PH-S473** | Ops close band: loc-audit + vision-sync | §5.12 fallback | `rust_ratio.json`; FM/HANDOFF/NEXT; `--check` green | **✅** |
+| 409 | **PH-S474** | Prefetch egress guardrail gate | Galaxy §8.1 | `lan_only` cross-region block + `galaxy_prefetch_egress_blocked_total`; unit tests | **✅** |
+| 410 | **PH-S475** | Telegram seat cap admission stub | Galaxy §3.1 | `POOLAI_TELEGRAM_SEAT_LIMIT`; register-remote **409** `seat_exhausted`; integration test | **✅** |
+| 411 | **PH-S476** | Capability verify env trust root | Galaxy §6.6 | `POOLAI_GALAXY_CAPABILITY_VERIFY_PK_HEX` override; integration test | **✅** |
+| 412 | **PH-S477** | Payout batch history read API | Galaxy §8.2 | `GET /api/v1/grid/payout-batch/history`; OpenAPI + integration test | **✅** |
+| 413 | **PH-S478** | Verification replay history read API | Galaxy §6.3 | `GET /api/v1/grid/verification-replay/history`; integration test + OpenAPI | **✅** |
+| 414 | **PH-S479** | Prefetch peer seed fetch stub | Roadmap §4 | `fetch_seed_shards_from_peer_hook` + `galaxy_prefetch_peer_fetch_*`; unit tests | **✅** |
+| 415 | **PH-S480** | Workers admin panel wasm | RUST_RATIO §5.13 | `renderWorkersPanel` wasm; slim `workers.rs` | **✅** |
+| 416 | **PH-S481** | Horizon wire integration band S474–S479 | PH-S474…S479 | `galaxy_horizon_s474_integration` + `/metrics` shape | **✅** |
+| 417 | **PH-S482** | Stand smoke S474–S479 band | PH-S474…S478 | `/metrics` + history API smoke | **✅** |
+| 418 | **PH-S483** | Ops close band: loc-audit + vision-sync | §5.12 fallback | `rust_ratio.json`; FM/HANDOFF/NEXT; `--check` green | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S464…S473 ✅. Vision rev **235**. rust_ratio **94.39%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S474…S483 ✅. Vision rev **236**. rust_ratio **94.39%**.
 
 **Наступна сесія:** **`абракадабра`** (project scan → drain) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
@@ -682,7 +692,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-06-18):** PH-S464…S473 ✅ закрито · **0** відкритих · **`абракадабра`** = project scan → §5.12 → drain.
+**Активна смуга (2026-06-18):** PH-S474…S483 ✅ закрито · **0** відкритих · **`абракадабра`** = project scan → §5.12 → drain.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

@@ -62,7 +62,15 @@ pub fn create_grid_routes() -> Router<ApiContext> {
             "/grid/verification-replay",
             get(get_grid_verification_replay),
         )
+        .route(
+            "/grid/verification-replay/history",
+            get(get_grid_verification_replay_history),
+        )
         .route("/grid/payout-batch", get(get_grid_payout_batch))
+        .route(
+            "/grid/payout-batch/history",
+            get(get_grid_payout_batch_history),
+        )
 }
 
 pub async fn ingest_grid_envelope_handler(
@@ -132,6 +140,54 @@ async fn get_grid_payout_batch(
         Json(GridPayoutBatchResponse {
             ok: true,
             entry: crate::grid::galaxy_settlement_metrics::last_payout_batch_ledger_entry(),
+        }),
+    ))
+}
+
+#[derive(Debug, Deserialize)]
+struct GridHistoryLimitQuery {
+    #[serde(default = "default_history_limit")]
+    limit: usize,
+}
+
+fn default_history_limit() -> usize {
+    10
+}
+
+#[derive(Debug, Serialize)]
+struct GridPayoutBatchHistoryResponse {
+    ok: bool,
+    entries: Vec<crate::grid::galaxy_settlement::PayoutBatchLedgerEntry>,
+}
+
+async fn get_grid_payout_batch_history(
+    State(_ctx): State<ApiContext>,
+    Query(params): Query<GridHistoryLimitQuery>,
+) -> Result<(StatusCode, Json<GridPayoutBatchHistoryResponse>), HttpAppError> {
+    Ok((
+        StatusCode::OK,
+        Json(GridPayoutBatchHistoryResponse {
+            ok: true,
+            entries: crate::grid::galaxy_settlement_metrics::payout_batch_history(params.limit),
+        }),
+    ))
+}
+
+#[derive(Debug, Serialize)]
+struct GridVerificationReplayHistoryResponse {
+    ok: bool,
+    records: Vec<crate::grid::GalaxyVerificationReplayRecord>,
+}
+
+async fn get_grid_verification_replay_history(
+    State(_ctx): State<ApiContext>,
+    Query(params): Query<GridHistoryLimitQuery>,
+) -> Result<(StatusCode, Json<GridVerificationReplayHistoryResponse>), HttpAppError> {
+    Ok((
+        StatusCode::OK,
+        Json(GridVerificationReplayHistoryResponse {
+            ok: true,
+            records: crate::grid::galaxy_replay_metrics::verification_replay_history(params.limit),
         }),
     ))
 }

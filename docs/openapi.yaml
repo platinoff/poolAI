@@ -747,6 +747,29 @@ paths:
               schema:
                 $ref: '#/components/schemas/GridVerificationReplayResponse'
 
+  /grid/verification-replay/history:
+    get:
+      tags:
+        - Grid
+      summary: Verification replay history (PH-S478)
+      operationId: getGridVerificationReplayHistory
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 32
+      responses:
+        '200':
+          description: Verification replay history snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GridVerificationReplayHistoryResponse'
+
   /grid/payout-batch:
     get:
       tags:
@@ -760,6 +783,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GridPayoutBatchResponse'
+
+  /grid/payout-batch/history:
+    get:
+      tags:
+        - Grid
+      summary: Payout batch ledger history (PH-S477)
+      operationId: getGridPayoutBatchHistory
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 32
+      responses:
+        '200':
+          description: Payout batch ledger history snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GridPayoutBatchHistoryResponse'
 
   /discovery/grid/envelope:
     post:
@@ -6187,6 +6233,33 @@ components:
         entry:
           $ref: '#/components/schemas/PayoutBatchLedgerEntry'
           nullable: true
+
+    GridPayoutBatchHistoryResponse:
+      type: object
+      required:
+        - ok
+        - entries
+      properties:
+        ok:
+          type: boolean
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/PayoutBatchLedgerEntry'
+
+    GridVerificationReplayHistoryResponse:
+      type: object
+      required:
+        - ok
+        - records
+      properties:
+        ok:
+          type: boolean
+        records:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
 
     MemoryShardRef:
       type: object

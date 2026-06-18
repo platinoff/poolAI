@@ -1854,7 +1854,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S473",
+  "last_sprint_closed": "PH-S483",
   "layers": [
     {
       "id": "L0",
@@ -7782,9 +7782,23 @@
       "label": "grid_verification_replay_integration.rs",
       "layer": "L3",
       "path": "tests/grid_verification_replay_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s464_integration_rs",
+      "label": "galaxy_horizon_s464_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s464_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_grid_payout_batch_integration_rs",
+      "label": "grid_payout_batch_integration.rs",
+      "layer": "L3",
+      "path": "tests/grid_payout_batch_integration.rs"
     }
   ],
-  "revision": 235,
+  "revision": 236,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -11455,6 +11469,96 @@
       "id": "PH-S473",
       "open": false,
       "row": 408,
+      "status": "closed",
+      "title": "Ops close band: loc-audit + vision-sync"
+    },
+    {
+      "acceptance": "lan_only` cross-region block + `galaxy_prefetch_egress_blocked_total`; unit tests",
+      "deps": "Galaxy §8.1",
+      "id": "PH-S474",
+      "open": false,
+      "row": 409,
+      "status": "closed",
+      "title": "Prefetch egress guardrail gate"
+    },
+    {
+      "acceptance": "POOLAI_TELEGRAM_SEAT_LIMIT`; register-remote 409 `seat_exhausted`; integration test",
+      "deps": "Galaxy §3.1",
+      "id": "PH-S475",
+      "open": false,
+      "row": 410,
+      "status": "closed",
+      "title": "Telegram seat cap admission stub"
+    },
+    {
+      "acceptance": "POOLAI_GALAXY_CAPABILITY_VERIFY_PK_HEX` override; integration test",
+      "deps": "Galaxy §6.6",
+      "id": "PH-S476",
+      "open": false,
+      "row": 411,
+      "status": "closed",
+      "title": "Capability verify env trust root"
+    },
+    {
+      "acceptance": "GET /api/v1/grid/payout-batch/history`; OpenAPI + integration test",
+      "deps": "Galaxy §8.2",
+      "id": "PH-S477",
+      "open": false,
+      "row": 412,
+      "status": "closed",
+      "title": "Payout batch history read API"
+    },
+    {
+      "acceptance": "GET /api/v1/grid/verification-replay/history`; integration test + OpenAPI",
+      "deps": "Galaxy §6.3",
+      "id": "PH-S478",
+      "open": false,
+      "row": 413,
+      "status": "closed",
+      "title": "Verification replay history read API"
+    },
+    {
+      "acceptance": "fetch_seed_shards_from_peer_hook` + `galaxy_prefetch_peer_fetch_*`; unit tests",
+      "deps": "Roadmap §4",
+      "id": "PH-S479",
+      "open": false,
+      "row": 414,
+      "status": "closed",
+      "title": "Prefetch peer seed fetch stub"
+    },
+    {
+      "acceptance": "renderWorkersPanel` wasm; slim `workers.rs",
+      "deps": "RUST_RATIO §5.13",
+      "id": "PH-S480",
+      "open": false,
+      "row": 415,
+      "status": "closed",
+      "title": "Workers admin panel wasm"
+    },
+    {
+      "acceptance": "galaxy_horizon_s474_integration` + `/metrics` shape",
+      "deps": "PH-S474…S479",
+      "id": "PH-S481",
+      "open": false,
+      "row": 416,
+      "status": "closed",
+      "title": "Horizon wire integration band S474–S479"
+    },
+    {
+      "acceptance": "/metrics` + history API smoke",
+      "deps": "PH-S474…S478",
+      "id": "PH-S482",
+      "open": false,
+      "row": 417,
+      "status": "closed",
+      "title": "Stand smoke S474–S479 band"
+    },
+    {
+      "acceptance": "rust_ratio.json`; FM/HANDOFF/NEXT; `--check` green",
+      "deps": "§5.12 fallback",
+      "id": "PH-S483",
+      "open": false,
+      "row": 418,
       "status": "closed",
       "title": "Ops close band: loc-audit + vision-sync"
     }

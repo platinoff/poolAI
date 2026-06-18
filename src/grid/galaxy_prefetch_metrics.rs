@@ -77,6 +77,15 @@ pub const METRIC_PREFETCH_RAID_FETCH_TOTAL: &str = "galaxy_prefetch_raid_fetch_t
 /// RAID artifact prefetch fetch misses (PH-S465).
 pub const METRIC_PREFETCH_RAID_FETCH_MISS_TOTAL: &str = "galaxy_prefetch_raid_fetch_miss_total";
 
+/// Prefetch enqueue blocked by lan_only egress guardrail (PH-S474).
+pub const METRIC_PREFETCH_EGRESS_BLOCKED_TOTAL: &str = "galaxy_prefetch_egress_blocked_total";
+
+/// Peer seed inventory prefetch fetch hits (PH-S479).
+pub const METRIC_PREFETCH_PEER_FETCH_TOTAL: &str = "galaxy_prefetch_peer_fetch_total";
+
+/// Peer seed inventory prefetch fetch misses (PH-S479).
+pub const METRIC_PREFETCH_PEER_FETCH_MISS_TOTAL: &str = "galaxy_prefetch_peer_fetch_miss_total";
+
 /// Default stub bytes per RAM-tier planned shard (4 MiB, Galaxy §5.5).
 pub const DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM: u64 = 4_194_304;
 
@@ -107,6 +116,9 @@ static PREFETCH_QUEUE_DEPTH: AtomicU64 = AtomicU64::new(0);
 static BACKPRESSURE_TOTAL: AtomicU64 = AtomicU64::new(0);
 static RAID_FETCH_TOTAL: AtomicU64 = AtomicU64::new(0);
 static RAID_FETCH_MISS_TOTAL: AtomicU64 = AtomicU64::new(0);
+static EGRESS_BLOCKED_TOTAL: AtomicU64 = AtomicU64::new(0);
+static PEER_FETCH_TOTAL: AtomicU64 = AtomicU64::new(0);
+static PEER_FETCH_MISS_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// Record one `plan_prefetch` outcome (no wire enqueue).
 pub fn record_prefetch_plan(required_shards: usize, planned_shards: usize, prefetch_bytes: u64) {
@@ -337,6 +349,35 @@ pub fn prefetch_raid_fetch_miss_total() -> u64 {
     RAID_FETCH_MISS_TOTAL.load(Ordering::Relaxed)
 }
 
+/// Record prefetch blocked by lan_only cross-region egress guardrail (PH-S474).
+pub fn record_prefetch_egress_blocked() {
+    EGRESS_BLOCKED_TOTAL.fetch_add(1, Ordering::Relaxed);
+}
+
+pub fn prefetch_egress_blocked_total() -> u64 {
+    EGRESS_BLOCKED_TOTAL.load(Ordering::Relaxed)
+}
+
+/// Record peer inventory seed fetch hits (PH-S479).
+pub fn record_prefetch_peer_fetch(shard_count: usize) {
+    if shard_count > 0 {
+        PEER_FETCH_TOTAL.fetch_add(shard_count as u64, Ordering::Relaxed);
+    }
+}
+
+pub fn prefetch_peer_fetch_total() -> u64 {
+    PEER_FETCH_TOTAL.load(Ordering::Relaxed)
+}
+
+/// Record peer inventory seed fetch misses (PH-S479).
+pub fn record_prefetch_peer_fetch_miss() {
+    PEER_FETCH_MISS_TOTAL.fetch_add(1, Ordering::Relaxed);
+}
+
+pub fn prefetch_peer_fetch_miss_total() -> u64 {
+    PEER_FETCH_MISS_TOTAL.load(Ordering::Relaxed)
+}
+
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_prefetch_metrics_for_test() {
     PLAN_TOTAL.store(0, Ordering::Relaxed);
@@ -363,6 +404,9 @@ pub fn reset_prefetch_metrics_for_test() {
     BACKPRESSURE_TOTAL.store(0, Ordering::Relaxed);
     RAID_FETCH_TOTAL.store(0, Ordering::Relaxed);
     RAID_FETCH_MISS_TOTAL.store(0, Ordering::Relaxed);
+    EGRESS_BLOCKED_TOTAL.store(0, Ordering::Relaxed);
+    PEER_FETCH_TOTAL.store(0, Ordering::Relaxed);
+    PEER_FETCH_MISS_TOTAL.store(0, Ordering::Relaxed);
 }
 
 #[cfg(test)]

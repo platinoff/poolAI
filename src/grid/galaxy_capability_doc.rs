@@ -45,9 +45,12 @@ pub fn parse_capability_document(
         .map_err(|e| CapabilityDocParseError::new(format!("capability document parse failed: {e}")))
 }
 
-/// Dev fixture verifying key hex (PH-S466; matches `tests/fixtures/capability/dev_pubkey.hex`).
+/// Env: dev fixture verifying key hex (PH-S466; matches `tests/fixtures/capability/dev_pubkey.hex`).
 pub const DEV_CAPABILITY_VERIFY_PK_HEX: &str =
     "ea4a6c63e29c520abef5507b132ec5f9954776aebebe7b92421eea691446d22c";
+
+/// Env: override capability verify public key hex (PH-S476).
+pub const ENV_CAPABILITY_VERIFY_PK_HEX: &str = "POOLAI_GALAXY_CAPABILITY_VERIFY_PK_HEX";
 
 /// Canonical signing message for capability documents (PH-S466 stub).
 pub fn capability_signing_message(doc: &GalaxyCapabilityDocument) -> String {
@@ -64,9 +67,12 @@ pub fn verify_capability_signature_stub(
     if sig_hex.trim().is_empty() {
         return Err(CapabilityDocParseError::new("signature must not be empty"));
     }
-    let pk_bytes = hex::decode(DEV_CAPABILITY_VERIFY_PK_HEX).map_err(|e| {
-        CapabilityDocParseError::new(format!("dev capability verify pk decode: {e}"))
-    })?;
+    let pk_hex = std::env::var(ENV_CAPABILITY_VERIFY_PK_HEX)
+        .ok()
+        .filter(|v| !v.trim().is_empty())
+        .unwrap_or_else(|| DEV_CAPABILITY_VERIFY_PK_HEX.to_string());
+    let pk_bytes = hex::decode(pk_hex.trim())
+        .map_err(|e| CapabilityDocParseError::new(format!("capability verify pk decode: {e}")))?;
     let pk_array: [u8; 32] = pk_bytes
         .try_into()
         .map_err(|_| CapabilityDocParseError::new("dev capability verify pk length"))?;

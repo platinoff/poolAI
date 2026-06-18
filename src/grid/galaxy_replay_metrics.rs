@@ -38,6 +38,11 @@ static VERIFICATION_REPLAY_RECORD_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 static LAST_VERIFICATION_REPLAY_RECORD: Mutex<Option<GalaxyVerificationReplayRecord>> =
     Mutex::new(None);
+static VERIFICATION_REPLAY_HISTORY: Mutex<Vec<GalaxyVerificationReplayRecord>> =
+    Mutex::new(Vec::new());
+
+/// Default max verification replay history rows (PH-S478).
+pub const DEFAULT_VERIFICATION_REPLAY_HISTORY_LIMIT: usize = 32;
 
 /// Schedule one replay verification hold (mismatch / explicit flag).
 pub fn record_replay_pending_scheduled() {
@@ -79,6 +84,7 @@ pub fn reset_replay_pending_metrics_for_test() {
     REPLAY_VERIFICATION_ENQUEUE_TOTAL.store(0, Ordering::Relaxed);
     VERIFICATION_REPLAY_RECORD_TOTAL.store(0, Ordering::Relaxed);
     reset_last_verification_replay_record_for_test();
+    reset_verification_replay_history_for_test();
 }
 
 /// Record one replay verification enqueue stub (PH-S438).
@@ -104,6 +110,12 @@ pub fn emit_verification_replay_record(
     if let Ok(mut slot) = LAST_VERIFICATION_REPLAY_RECORD.lock() {
         *slot = Some(rec.clone());
     }
+    if let Ok(mut history) = VERIFICATION_REPLAY_HISTORY.lock() {
+        history.push(rec.clone());
+        while history.len() > DEFAULT_VERIFICATION_REPLAY_HISTORY_LIMIT {
+            history.remove(0);
+        }
+    }
     rec
 }
 
@@ -113,6 +125,26 @@ pub fn last_verification_replay_record() -> Option<GalaxyVerificationReplayRecor
         .lock()
         .ok()
         .and_then(|g| g.clone())
+}
+
+/// Last N verification replay records (PH-S478 history API).
+pub fn verification_replay_history(limit: usize) -> Vec<GalaxyVerificationReplayRecord> {
+    let cap = limit.clamp(1, DEFAULT_VERIFICATION_REPLAY_HISTORY_LIMIT);
+    VERIFICATION_REPLAY_HISTORY
+        .lock()
+        .ok()
+        .map(|g| {
+            let start = g.len().saturating_sub(cap);
+            g[start..].to_vec()
+        })
+        .unwrap_or_default()
+}
+
+#[cfg(any(test, feature = "test-utils"))]
+pub fn reset_verification_replay_history_for_test() {
+    if let Ok(mut history) = VERIFICATION_REPLAY_HISTORY.lock() {
+        history.clear();
+    }
 }
 
 #[cfg(any(test, feature = "test-utils"))]

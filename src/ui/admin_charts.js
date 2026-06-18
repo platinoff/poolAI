@@ -717,3 +717,32 @@ function poolaiRenderMonitoringDashboardsPanel(dashboards, labels) {
     { icon: '📊' },
   );
 }
+
+/**
+ * PH-S480: workers table (wasm-first).
+ * @param {Array<object>} workers
+ * @param {object} labels i18n label map
+ */
+function poolaiRenderWorkersPanel(workers, labels) {
+  labels = labels || {};
+  var wasm = poolaiChartsWasm();
+  if (wasm && typeof wasm.renderWorkersPanel === 'function') {
+    return wasm.renderWorkersPanel(
+      JSON.stringify(workers || []),
+      labels.id || poolaiChartT('admin.wrk.col.id', 'ID'),
+      labels.status || poolaiChartT('admin.wrk.col.status', 'Status'),
+      labels.metrics || poolaiChartT('admin.wrk.col.metrics', 'Metrics'),
+      labels.actions || poolaiChartT('admin.wrk.col.actions', 'Actions'),
+      labels.tableAria || poolaiChartT('admin.nav.workers', 'Workers'),
+      labels.healthy || poolaiChartT('workers.healthy', 'Healthy'),
+      labels.unhealthy || poolaiChartT('workers.unhealthy', 'Unhealthy'),
+      labels.reqLabel || poolaiChartT('admin.wrk.reqLabel', 'Requests:'),
+      labels.delete || poolaiChartT('ui.delete', 'Delete'),
+      labels.empty || poolaiChartT('admin.wrk.empty', 'No workers found'),
+    );
+  }
+  return adminEmptyStateHtml(
+    labels.empty || poolaiChartT('admin.wrk.empty', 'No workers found'),
+    { icon: '👷' },
+  );
+}

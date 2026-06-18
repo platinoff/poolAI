@@ -16,3 +16,4 @@ pub mod table;
 pub mod theme;
 pub mod updates_compat;
 pub mod validate;
+pub mod workers;

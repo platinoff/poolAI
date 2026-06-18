@@ -16,6 +16,7 @@ pub mod raid_distributed_protocol_service;
 pub mod raid_service;
 pub mod rewards_service;
 pub mod system_service;
+pub mod telegram_seat_service;
 pub mod topology_service;
 pub mod ui_service;
 pub mod virtual_node_store;

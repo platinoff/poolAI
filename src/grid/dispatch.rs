@@ -19,10 +19,12 @@ use crate::grid::galaxy_locality::{
     record_locality_rank_skip, LocalityHotTier, LocalityNetworkProfile, LocalitySeedInventory,
     LocalityTask, LocalityWorker, DEFAULT_PREFETCH_CROSS_REGION_EGRESS_MB_PER_SHARD,
 };
+use crate::grid::galaxy_network_profile::GalaxyEgressPolicy;
 use crate::grid::galaxy_prefetch_metrics::{
     observe_prefetch_queue_depth, record_hot_promote, record_locality_unsatisfied,
     record_prefetch_backpressure, record_prefetch_co_access, record_prefetch_complete,
-    record_prefetch_enqueue, record_prefetch_ingest, record_prefetch_lease_acquired,
+    record_prefetch_egress_blocked, record_prefetch_enqueue, record_prefetch_ingest,
+    record_prefetch_lease_acquired, record_prefetch_peer_fetch, record_prefetch_peer_fetch_miss,
     record_prefetch_plan, record_prefetch_raid_fetch, record_prefetch_raid_fetch_miss,
     record_prefetch_re_migrate, record_prefetch_seed_fetch, record_prefetch_seed_fetch_miss,
     record_prefetch_seed_pull, record_prefetch_skip_ingest, record_prefetch_strict_mode,
@@ -333,6 +335,15 @@ pub const ENV_PREFETCH_PEER_BANDWIDTH_MBPS: &str = "POOLAI_GALAXY_PREFETCH_PEER_
 /// Env: JSON map of admitted shard → speculative neighbors (PH-S469).
 pub const ENV_CO_ACCESS_GRAPH_JSON: &str = "POOLAI_GALAXY_CO_ACCESS_GRAPH_JSON";
 
+/// Env: coordinator region for cross-region egress guardrail (PH-S474).
+pub const ENV_PREFETCH_COORDINATOR_REGION: &str = "POOLAI_GALAXY_COORDINATOR_REGION";
+
+/// Env: stub peer region for prefetch egress gate (PH-S474).
+pub const ENV_PREFETCH_PEER_REGION: &str = "POOLAI_GALAXY_PREFETCH_PEER_REGION";
+
+/// Env: stub peer egress policy (`lan_only` | `direct`, PH-S474).
+pub const ENV_PREFETCH_PEER_EGRESS_POLICY: &str = "POOLAI_GALAXY_PREFETCH_PEER_EGRESS_POLICY";
+
 /// Coordinator prefetch policy from environment (PH-S136, Galaxy ?5.6).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PrefetchPolicyConfig {
@@ -469,13 +480,18 @@ pub fn noop_prefetch_hook(plan: &PrefetchPlan) -> usize {
 /// Prefetch enqueue stub (PH-S283): records enqueue metrics; no live seed pull wire.
 #[inline]
 pub fn enqueue_prefetch_hook(plan: &PrefetchPlan) -> usize {
-    if prefetch_backpressure_skip() {
+    if prefetch_enqueue_blocked() {
         return 0;
     }
     let n = plan.items.len();
     record_prefetch_enqueue(n);
     observe_prefetch_queue_depth(n as u64);
     n
+}
+
+/// Returns true when prefetch enqueue should be skipped (backpressure or egress guardrail).
+pub fn prefetch_enqueue_blocked() -> bool {
+    prefetch_backpressure_skip() || prefetch_egress_blocked_skip()
 }
 
 /// Bandwidth backpressure gate for prefetch enqueue (PH-S464).
@@ -492,6 +508,52 @@ pub fn prefetch_backpressure_skip() -> bool {
     }
 }
 
+/// Cross-region egress guardrail for `lan_only` peers (PH-S474, Galaxy §8.1).
+pub fn prefetch_egress_blocked_skip() -> bool {
+    let Some(policy) = env_prefetch_peer_egress_policy() else {
+        return false;
+    };
+    if policy != GalaxyEgressPolicy::LanOnly {
+        return false;
+    }
+    let Some(coord) = env_prefetch_coordinator_region() else {
+        return false;
+    };
+    let Some(peer) = env_prefetch_peer_region() else {
+        return false;
+    };
+    if coord == peer {
+        return false;
+    }
+    record_prefetch_egress_blocked();
+    true
+}
+
+fn env_prefetch_coordinator_region() -> Option<String> {
+    std::env::var(ENV_PREFETCH_COORDINATOR_REGION)
+        .ok()
+        .map(|v| v.trim().to_ascii_lowercase())
+        .filter(|v| !v.is_empty())
+}
+
+fn env_prefetch_peer_region() -> Option<String> {
+    std::env::var(ENV_PREFETCH_PEER_REGION)
+        .ok()
+        .map(|v| v.trim().to_ascii_lowercase())
+        .filter(|v| !v.is_empty())
+}
+
+fn env_prefetch_peer_egress_policy() -> Option<GalaxyEgressPolicy> {
+    let raw = std::env::var(ENV_PREFETCH_PEER_EGRESS_POLICY).ok()?;
+    match raw.trim().to_ascii_lowercase().as_str() {
+        "lan_only" | "lan-only" => Some(GalaxyEgressPolicy::LanOnly),
+        "direct" => Some(GalaxyEgressPolicy::Direct),
+        "vpn_proxy" | "vpn-proxy" => Some(GalaxyEgressPolicy::VpnProxy),
+        "white_ip" | "white-ip" => Some(GalaxyEgressPolicy::WhiteIp),
+        _ => None,
+    }
+}
+
 /// Prefetch wait stub (PH-S293): records wait ms metric; no live seed pull wire.
 #[inline]
 pub fn wait_prefetch_hook(plan: &PrefetchPlan) -> u64 {
@@ -503,7 +565,7 @@ pub fn wait_prefetch_hook(plan: &PrefetchPlan) -> u64 {
 #[inline]
 pub fn complete_prefetch_hook(plan: &PrefetchPlan, memory: Option<&MemoryShardStore>) -> usize {
     let n = plan.items.len();
-    if n > 0 {
+    if n > 0 && !prefetch_enqueue_blocked() {
         record_prefetch_enqueue(n);
         observe_prefetch_queue_depth(n as u64);
         record_prefetch_wait(n, plan.deadline_ms);
@@ -511,6 +573,7 @@ pub fn complete_prefetch_hook(plan: &PrefetchPlan, memory: Option<&MemoryShardSt
         record_hot_promote(n);
         record_shard_access(n);
         seed_pull_hook(plan);
+        fetch_seed_shards_from_peer_hook(plan);
         if let Some(store) = memory {
             fetch_seed_shards_hook(plan, store);
             fetch_seed_shards_from_raid_hook(plan, store);
@@ -549,6 +612,26 @@ pub fn fetch_seed_shards_from_raid_hook(plan: &PrefetchPlan, memory: &MemoryShar
             record_prefetch_raid_fetch(1);
         } else {
             record_prefetch_raid_fetch_miss();
+        }
+    }
+    hits
+}
+
+/// Peer seed inventory prefetch fetch stub (PH-S479): resolve shards via discovery peer snapshot.
+pub fn fetch_seed_shards_from_peer_hook(plan: &PrefetchPlan) -> usize {
+    let mut hits = 0usize;
+    for item in &plan.items {
+        let found = coordinator_seed_inventory_snapshot().iter().any(|snap| {
+            snap.seed_inventory
+                .shard_ids
+                .iter()
+                .any(|id| id == &item.shard_id)
+        });
+        if found {
+            hits += 1;
+            record_prefetch_peer_fetch(1);
+        } else {
+            record_prefetch_peer_fetch_miss();
         }
     }
     hits
@@ -2373,5 +2456,63 @@ mod tests {
         let config = PrefetchPolicyConfig::default();
         assert!(plan_co_access_prefetch("w:custom", false, &config).is_some());
         std::env::remove_var(ENV_CO_ACCESS_GRAPH_JSON);
+    }
+
+    #[test]
+    fn prefetch_egress_blocked_skip_ph_s474() {
+        use crate::grid::galaxy_prefetch_metrics::{
+            prefetch_egress_blocked_total, reset_prefetch_metrics_for_test,
+        };
+
+        static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+        let _guard = ENV_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+        reset_prefetch_metrics_for_test();
+        std::env::remove_var(ENV_PREFETCH_COORDINATOR_REGION);
+        std::env::remove_var(ENV_PREFETCH_PEER_REGION);
+        std::env::remove_var(ENV_PREFETCH_PEER_EGRESS_POLICY);
+        assert!(!prefetch_egress_blocked_skip());
+
+        std::env::set_var(ENV_PREFETCH_COORDINATOR_REGION, "eu-west");
+        std::env::set_var(ENV_PREFETCH_PEER_REGION, "us-east");
+        std::env::set_var(ENV_PREFETCH_PEER_EGRESS_POLICY, "lan_only");
+        assert!(prefetch_egress_blocked_skip());
+        assert_eq!(prefetch_egress_blocked_total(), 1);
+
+        std::env::set_var(ENV_PREFETCH_PEER_REGION, "eu-west");
+        reset_prefetch_metrics_for_test();
+        assert!(!prefetch_egress_blocked_skip());
+        std::env::remove_var(ENV_PREFETCH_COORDINATOR_REGION);
+        std::env::remove_var(ENV_PREFETCH_PEER_REGION);
+        std::env::remove_var(ENV_PREFETCH_PEER_EGRESS_POLICY);
+        reset_prefetch_metrics_for_test();
+    }
+
+    #[test]
+    fn fetch_seed_shards_from_peer_hook_ph_s479() {
+        use crate::grid::galaxy_prefetch_metrics::{
+            prefetch_peer_fetch_miss_total, prefetch_peer_fetch_total,
+            reset_prefetch_metrics_for_test,
+        };
+
+        reset_prefetch_metrics_for_test();
+        let plan = PrefetchPlan {
+            items: vec![
+                PrefetchPlanItem {
+                    shard_id: "w:emb-1".into(),
+                    target_tier: PrefetchTargetTier::Ram,
+                },
+                PrefetchPlanItem {
+                    shard_id: "w:missing".into(),
+                    target_tier: PrefetchTargetTier::Ram,
+                },
+            ],
+            trigger: PrefetchTrigger::JobAdmitted,
+            deadline_ms: DEFAULT_PREFETCH_DEADLINE_MS,
+            mode: PrefetchPolicyMode::BestEffort,
+        };
+        assert_eq!(fetch_seed_shards_from_peer_hook(&plan), 1);
+        assert_eq!(prefetch_peer_fetch_total(), 1);
+        assert_eq!(prefetch_peer_fetch_miss_total(), 1);
+        reset_prefetch_metrics_for_test();
     }
 }

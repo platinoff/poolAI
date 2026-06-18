@@ -916,6 +916,84 @@ async fn smoke_grid_verification_replay(client: &Client, base: &str) -> Result<(
     Ok(())
 }
 
+/// PH-S482: live stand exposes PH-S474…S479 horizon wire metrics on Prometheus scrape.
+const GALAXY_HORIZON_WIRE_S474_METRICS: &[&str] = &[
+    "galaxy_prefetch_egress_blocked_total",
+    "galaxy_prefetch_peer_fetch_total",
+    "galaxy_prefetch_peer_fetch_miss_total",
+];
+
+fn metrics_text_has_horizon_wire_s474(body: &str) -> Result<(), String> {
+    for name in GALAXY_HORIZON_WIRE_S474_METRICS {
+        if !body.contains(name) {
+            return Err(format!("/metrics missing {name}"));
+        }
+        if !body.contains(&format!("# TYPE {name} gauge")) {
+            return Err(format!("/metrics missing TYPE gauge for {name}"));
+        }
+    }
+    Ok(())
+}
+
+async fn smoke_galaxy_horizon_wire_s474_metrics(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("/metrics request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("/metrics status {}", resp.status()));
+    }
+    let body = resp.text().await.map_err(|e| e.to_string())?;
+    metrics_text_has_horizon_wire_s474(&body)
+}
+
+async fn smoke_grid_payout_batch_history(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/api/v1/grid/payout-batch/history?limit=5"))
+        .send()
+        .await
+        .map_err(|e| format!("payout-batch/history request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("payout-batch/history status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    if body.get("ok").and_then(|v| v.as_bool()) != Some(true) {
+        return Err(format!("payout-batch/history body: {body}"));
+    }
+    if !body.get("entries").and_then(|v| v.as_array()).is_some() {
+        return Err(format!("payout-batch/history missing entries: {body}"));
+    }
+    Ok(())
+}
+
+async fn smoke_grid_verification_replay_history(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(
+            base,
+            "/api/v1/grid/verification-replay/history?limit=5",
+        ))
+        .send()
+        .await
+        .map_err(|e| format!("verification-replay/history request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!(
+            "verification-replay/history status {}",
+            resp.status()
+        ));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    if body.get("ok").and_then(|v| v.as_bool()) != Some(true) {
+        return Err(format!("verification-replay/history body: {body}"));
+    }
+    if !body.get("records").and_then(|v| v.as_array()).is_some() {
+        return Err(format!(
+            "verification-replay/history missing records: {body}"
+        ));
+    }
+    Ok(())
+}
+
 /// PH-S472: live stand exposes PH-S464…S468 horizon wire metrics on Prometheus scrape.
 const GALAXY_HORIZON_WIRE_S464_METRICS: &[&str] = &[
     "galaxy_prefetch_backpressure_total",
@@ -1642,6 +1720,24 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
         &mut cases,
         "grid_payout_batch",
         smoke_grid_payout_batch(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
+        "galaxy_horizon_wire_s474_metrics",
+        smoke_galaxy_horizon_wire_s474_metrics(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
+        "grid_payout_batch_history",
+        smoke_grid_payout_batch_history(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
+        "grid_verification_replay_history",
+        smoke_grid_verification_replay_history(&client, &cli.base_url).await,
     )
     .await;
     record(

@@ -25,37 +25,23 @@ pub async fn admin_workers() -> Html<String> {
     function renderWorkers(workers) {
       const el = document.getElementById('workers-list');
       if (!el) return;
-      if (!workers || workers.length === 0) {
-        el.innerHTML = '<div class="muted">' + escapeHtml(T('admin.wrk.empty', 'No workers found')) + '</div>';
-        return;
-      }
-      el.innerHTML = `
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>${escapeHtml(T('admin.wrk.col.id', 'ID'))}</th>
-              <th>${escapeHtml(T('admin.wrk.col.status', 'Status'))}</th>
-              <th>${escapeHtml(T('admin.wrk.col.metrics', 'Metrics'))}</th>
-              <th>${escapeHtml(T('admin.wrk.col.actions', 'Actions'))}</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${workers.map(w => {
-              const wid = w.id || w.worker_id || 'unknown';
-              return `
-              <tr>
-                <td>${escapeHtml(String(wid))}</td>
-                <td><span class="status-badge ${w.is_healthy ? 'active' : 'error'}">${w.is_healthy ? escapeHtml(T('workers.healthy', 'Healthy')) : escapeHtml(T('workers.unhealthy', 'Unhealthy'))}</span></td>
-                <td>${escapeHtml(T('admin.wrk.reqLabel', 'Requests:'))} ${w.total_requests_processed || 0}</td>
-                <td>
-                  <button type="button" class="btn btn-danger" onclick='deleteWorker(${JSON.stringify(wid)})'>${escapeHtml(T('ui.delete', 'Delete'))}</button>
-                </td>
-              </tr>
-            `;
-            }).join('')}
-          </tbody>
-        </table>
-      `;
+      el.innerHTML = poolaiRenderWorkersPanel(workers, {
+        id: T('admin.wrk.col.id', 'ID'),
+        status: T('admin.wrk.col.status', 'Status'),
+        metrics: T('admin.wrk.col.metrics', 'Metrics'),
+        actions: T('admin.wrk.col.actions', 'Actions'),
+        tableAria: T('admin.nav.workers', 'Workers'),
+        healthy: T('workers.healthy', 'Healthy'),
+        unhealthy: T('workers.unhealthy', 'Unhealthy'),
+        reqLabel: T('admin.wrk.reqLabel', 'Requests:'),
+        delete: T('ui.delete', 'Delete'),
+        empty: T('admin.wrk.empty', 'No workers found'),
+      });
+      el.querySelectorAll('[data-worker-id]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          deleteWorker(btn.getAttribute('data-worker-id'));
+        });
+      });
     }
     
     async function deleteWorker(id) {

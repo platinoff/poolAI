@@ -31,6 +31,10 @@ static RESOLVED_TOTAL: AtomicU64 = AtomicU64::new(0);
 static PAYOUT_BATCH_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 static LAST_PAYOUT_BATCH: Mutex<Option<PayoutBatchLedgerEntry>> = Mutex::new(None);
+static PAYOUT_BATCH_HISTORY: Mutex<Vec<PayoutBatchLedgerEntry>> = Mutex::new(Vec::new());
+
+/// Default max payout batch history rows (PH-S477).
+pub const DEFAULT_PAYOUT_BATCH_HISTORY_LIMIT: usize = 32;
 
 /// Record one grid result held in pending verification settlement.
 pub fn record_settlement_pending_verification() {
@@ -105,6 +109,7 @@ pub fn reset_settlement_metrics_for_test() {
     reset_settlement_resolved_metrics_for_test();
     PAYOUT_BATCH_TOTAL.store(0, Ordering::Relaxed);
     reset_last_payout_batch_ledger_entry_for_test();
+    reset_payout_batch_history_for_test();
 }
 
 /// Grid result path stub: increment on every settlement resolution (PH-S404).
@@ -130,13 +135,39 @@ pub fn evaluate_result_settlement_cleared(settlement_status: SettlementStatus) {
 /// Record payout batch ledger entry on cleared settlement (PH-S436 / PH-S467).
 pub fn record_payout_batch_ledger_entry(entry: PayoutBatchLedgerEntry) {
     if let Ok(mut slot) = LAST_PAYOUT_BATCH.lock() {
-        *slot = Some(entry);
+        *slot = Some(entry.clone());
     }
+    if let Ok(mut history) = PAYOUT_BATCH_HISTORY.lock() {
+        history.push(entry);
+        while history.len() > DEFAULT_PAYOUT_BATCH_HISTORY_LIMIT {
+            history.remove(0);
+        }
+    }
+}
+
+/// Last N payout batch ledger entries (PH-S477 history API).
+pub fn payout_batch_history(limit: usize) -> Vec<PayoutBatchLedgerEntry> {
+    let cap = limit.clamp(1, DEFAULT_PAYOUT_BATCH_HISTORY_LIMIT);
+    PAYOUT_BATCH_HISTORY
+        .lock()
+        .ok()
+        .map(|g| {
+            let start = g.len().saturating_sub(cap);
+            g[start..].to_vec()
+        })
+        .unwrap_or_default()
 }
 
 /// Last recorded payout batch ledger entry (PH-S467 read API).
 pub fn last_payout_batch_ledger_entry() -> Option<PayoutBatchLedgerEntry> {
     LAST_PAYOUT_BATCH.lock().ok().and_then(|g| g.clone())
+}
+
+#[cfg(any(test, feature = "test-utils"))]
+pub fn reset_payout_batch_history_for_test() {
+    if let Ok(mut history) = PAYOUT_BATCH_HISTORY.lock() {
+        history.clear();
+    }
 }
 
 #[cfg(any(test, feature = "test-utils"))]
