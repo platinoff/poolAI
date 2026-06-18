@@ -374,8 +374,8 @@
 **PH-S421 ✅ (ops):** `poolai-vision-sync --check` green.
 **PH-S422 ✅ (ops):** hold advisory `--min-ratio 0.95` snapshot **94.35%**.
 **PH-S423 ✅ (docs):** INDEX §7 + rust_ratio pointer **94.35%**.
-**Rules ✅:** тригер **`абракадабра`** · wasm MSYS2 PATH у `poolai-session-iteration.mdc`.
-**§5.12:** **0** відкритих — replenish §5.13 або **`абракадабра`**.
+**Rules ✅:** тригер **`абракадабра`** — ітераційний drain проєкту (research concept/roadmap/FM §5.1 → replenish 10 → drain → push); канон [`.cursor/rules/poolai-session-iteration.mdc`](../.cursor/rules/poolai-session-iteration.mdc) § «Тригер абракадабра»; commit **`git-commit-tree-msg.sh`**.
+**§5.12:** **0** відкритих — наступна сесія: **`абракадабра`** (auto-replenish + drain) або один PH-S*.
 **Vision ✅:** rev **228** · rust_ratio **94.35%** · hold **95%** advisory.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).

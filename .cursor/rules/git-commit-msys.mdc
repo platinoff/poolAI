@@ -19,13 +19,19 @@ export GIT_EDITOR=true EDITOR=true
 git commit -m "type(scope): subject" -m "Summary:" -m "- …"
 ```
 
-Або після невдалого commit:
+Або після невдалого commit / **лише subject**:
 
 ```bash
 bash bin/amend-head-msg.sh comitmsg/.commit-msg-<sprint>.txt
 ```
 
-(`commit-tree` — обходить commit-msg hook.)
+**Drain смуги `абракадабра` (новий код + docs)** — канон:
+
+```bash
+bash bin/git-commit-tree-msg.sh comitmsg/.commit-msg-ph-sNNN-NNN.txt path/to/file …
+```
+
+(`commit-tree` + `write-tree` — обходить commit-msg hook; **включає** staged файли на відміну від `amend-head-msg`.)
 
 ## Перед push
 

@@ -76,23 +76,76 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 
 **Research replenish:** коли відкритих PH-S* у §5.12 **< 10** — додати code-first **Rust** рядки (орієнтир: [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../../docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md), [`RUST_RATIO_STRATEGY_2026-06-13.md`](../../docs/development/RUST_RATIO_STRATEGY_2026-06-13.md), `rg "TODO|FIXME" src/`), тримати **≤ 10** відкритих. Після S142 — **§5.13** ratio track.
 
-## Тригер «абракадабра» (drain черги)
+## Тригер «абракадабра» (ітераційний drain усього проєкту)
 
 Коли власник у **новій сесії** пише **`абракадабра`** (синоніми: «дренаж черги», «виконати всі спринти», «поки черга не вільна»):
 
+**Сенс:** один промпт = **повний VDT-цикл по всьому репо** (концепт → роадмеп → FM → код → docs → push), а не лише ratio-шаблон §5.13. **§5.12** — **черга виконання** (≤10 відкритих PH-S*); **replenish** — з усіх канонічних джерел пріоритетів.
+
+```mermaid
+flowchart LR
+  S0[S0 git+HANDOFF+FM] --> Count{§5.12 < 10?}
+  Count -->|так| Research[Research replenish → 10]
+  Count -->|ні| Drain[Drain усі відкриті PH-S*]
+  Research --> Drain
+  Drain --> Test[cargo fmt + test-ci]
+  Test --> Vision[vision-sync + --check]
+  Vision --> Push[git push + самарі]
+  Push --> Next[Нова сесія: знову абракадабра]
+```
+
 | Крок | Дія |
 |------|-----|
-| 1 S0 | `git fetch`; HANDOFF; FM **§5.12** (порахувати відкритих) |
-| 2 Research | Якщо відкритих **< 10** → replenish до **10** (§5.12 + §5.13; шаблон нижче) |
+| 1 S0 | `git fetch`; HANDOFF; FM **§5.1** + **§5.12** + **§5.13**; `NEXT_SESSION`; `df -h /s` |
+| 2 Research | Якщо відкритих у §5.12 **< 10** → **replenish до 10** (алгоритм нижче; не лише ratio band) |
 | 3 Drain | Усі відкриті PH-S* в одній сесії (код → scope-тести → docs band) |
-| 4 Vision | `poolai-vision-sync` → оновити FM rev → `--check` (порядок нижче) |
-| 5 Git | **один** commit (`amend-head-msg`) + `git push origin main` + **самарі** |
+| 4 Vision | FM/HANDOFF/NEXT → `poolai-vision-sync` → FM rev = manifest → `--check` |
+| 5 Git | **один** commit (`git-commit-tree-msg.sh`) + `git push origin main` + **самарі** |
+
+**Ітерація:** після push черга знову **0** (або <10) → у **наступній** сесії знову **`абракадабра`** → S0 → replenish (якщо треба) → drain → push. Без окремого підтвердження кожного PH-S*.
 
 **Не** підміняє BLOCKED/Deferred (FM-003 LAN, FM-041 Cloud SDK). **Не** `git add -A`. Канон push — [`.cursor/commands/git-push.md`](../commands/git-push.md).
 
-**Не повторювати в наступних спринтах:** вже закриті acceptance з FM (блок «Не повторювати» у `NEXT_SESSION_PROMPT`).
+**Не повторювати:** закриті acceptance з FM; блок «Не повторювати» у `NEXT_SESSION_PROMPT`.
 
-### Shell (обов’язково з першої команди)
+### Research replenish (до 10 PH-S* у §5.12)
+
+**Мета:** обрати **10 найнеобхідніших** ще не зроблених кроків згідно **концепту, роадмепів і планів** — Rust-first, без дублювання вже ✅ acceptance.
+
+**Порядок сканування (code-first, зверху вниз):**
+
+| Пріоритет | Джерело | Що шукати |
+|-----------|---------|-----------|
+| 1 | [`POOLAI_GALAXY_GRID.md`](../../docs/concept/POOLAI_GALAXY_GRID.md) §TBD / «майбутній wire» / horizon | stub/metrics/wire ще без PH-S* |
+| 2 | [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../../docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md) §4 horizon | live wire, prefetch pull, governance gaps |
+| 3 | FM **§5.1** (FM-* **Implemented partial** / **Planned**) | найвищий номер без ✅ у §5.1 |
+| 4 | [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../../docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md) | `rg "\- \[ \]"` — unchecked architect rows |
+| 5 | [`DOCS_LEGACY_AUDIT_2026-05-19.md`](../../docs/development/DOCS_LEGACY_AUDIT_2026-05-19.md) §5.3 | docs/code gaps |
+| 6 | [`RUST_RATIO_STRATEGY_2026-06-13.md`](../../docs/development/RUST_RATIO_STRATEGY_2026-06-13.md) §5.13 | wasm slim, stand smoke, loc-audit band |
+| 7 | `rg "TODO|FIXME" src/` tests/ crates/ | code-first мікро-PH-S* |
+| 8 | Шаблон смуги 10 (нижче) | лише якщо п.1–7 не дають 10 рядків |
+
+**Правила рядків §5.12:**
+
+- Нумерація **PH-S(N+1)…** — наступний вільний номер після останнього у FM §5.12.
+- Кожен рядок: Sprint · Фокус · Джерело (концепт § / FM-* / roadmap) · Acceptance (1 речення) · `[ ]`.
+- **≤10** відкритих одночасно; після drain — знову replenish при наступному **`абракадабра`**.
+- API acceptance → `tests/*_integration.rs`; Playwright лише browser scope ([`poolai-testing-policy.mdc`](poolai-testing-policy.mdc)).
+- Субагент `explore` — для швидкого збору п.1–6 без повного читання репо.
+
+**Смуга 10 (fallback-шаблон, якщо concept/roadmap не заповнюють чергу):**
+
+| # | Тип | Приклад acceptance |
+|---|-----|-------------------|
+| 1–2 | Galaxy metrics / grid stub | `galaxy_*_total` + unit test + `prometheus_export` |
+| 3 | wasm URL/HTML glue | `poolai-ui-core` + `poolai-ui-wasm` + admin panel |
+| 4 | stand smoke | `poolai_http_stand_smoke` `/metrics` export shape |
+| 5 | concept wire stub | locality / trust / prefetch helper з Galaxy § |
+| 6 | ops | `poolai-loc-audit` → `rust_ratio.json` |
+| 7 | docs canon | INDEX, HANDOFF, NEXT, STABLE, GALAXY_GRID_ROADMAP |
+| 8 | ops | `poolai-vision-sync` |
+| 9 | ops | `poolai-loc-audit -- --min-ratio 0.95 --advisory` |
+| 10 | docs | INDEX §7 + rust_ratio pointer |
 
 | ❌ | ✅ |
 |----|-----|
@@ -125,11 +178,7 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 | 7 | docs canon | INDEX, HANDOFF, NEXT, STABLE, GALAXY_GRID_ROADMAP |
 | 8 | ops | `cargo run --bin poolai-vision-sync` |
 | 9 | ops | `poolai-loc-audit -- --min-ratio 0.95 --advisory` |
-| 10 | docs | INDEX §7 + rust_ratio pointer |
-
-Джерела рядків: [`RUST_RATIO_STRATEGY_2026-06-13.md`](../../docs/development/RUST_RATIO_STRATEGY_2026-06-13.md), [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../../docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md), `rg "TODO|FIXME" src/`.
-
-### Drain: тести та wasm glue
+### Shell (обов’язково з першої команди)
 
 1. Після коду: `cargo fmt --all` → **один** `cargo test-ci` (не запускати другий, поки перший не завершився).
 2. Зміни `src/ui/admin_charts.js` (wasm-first) → додати `admin_charts_*_wasm_first_ph_s*` у `src/ui/admin/mod.rs` (рядок `wasm.<fn>` у JS).
@@ -145,10 +194,11 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 
 ### Git (один commit на всю смугу)
 
-1. Staging лише файлів смуги (`git diff --cached --stat`); не `comitmsg/`, не `bin/commit-*.sh`, не `data/audit/`.
+1. Staging лише файлів смуги (`git diff --cached --stat`); не `comitmsg/`, не `data/audit/`.
 2. Текст: `comitmsg/.commit-msg-ph-sNNN-NNN.txt`.
-3. **Не** `git commit -m` / `-F` у Cursor terminal (hook → subject `Co-authored-by:`).
-4. `bash bin/amend-head-msg.sh comitmsg/.commit-msg-ph-sNNN-NNN.txt` → `git push origin main`.
+3. **Канон (новий код + docs):** `bash bin/git-commit-tree-msg.sh comitmsg/.commit-msg-ph-sNNN-NNN.txt <paths…>` — `write-tree` зі staged файлів.
+4. **Лише subject hook-fix** (без нових файлів): `bash bin/amend-head-msg.sh comitmsg/…` — **не** включає unstaged/staged diff у tree.
+5. `git push origin main` + самарі в чат (смуга PH-S*, rust_ratio, vision rev).
 
 Деталі hook — [`git-commit-msys.mdc`](git-commit-msys.mdc).
 
@@ -157,7 +207,8 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 | Симптом | Дія |
 |--------|-----|
 | error 112 / диск S: | `cargo clean` |
-| subject = `Co-authored-by:` | [`git-commit-msys.mdc`](git-commit-msys.mdc) → `bin/amend-head-msg.sh` |
+| `amend-head-msg` без нових файлів у commit | drain смуги → **`git-commit-tree-msg.sh`** (див. § «Git абракадабра») |
+| subject = `Co-authored-by:` | [`git-commit-msys.mdc`](git-commit-msys.mdc) → `git-commit-tree-msg.sh` або `amend-head-msg.sh` |
 | `bash` → WSL «no distributions» | `C:\msys64\usr\bin\bash.exe -lc` (не bare `bash`) |
 | `Blocking waiting for file lock on build directory` | не паралелити `cargo`; дочекатися або один MSYS2 процес |
 | `libsqlite3-sys` / sandbox target missing | `export CARGO_TARGET_DIR=/s/rust/poolAI/target` |

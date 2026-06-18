@@ -2,22 +2,30 @@
 
 **Оновлено:** 2026-06-18 (PH-S414…S423 ✅ · vision **rev 228** · **0** відкритих · rust_ratio **94.35%**)
 
-| **← наступний** | replenish §5.13 **або** **`абракадабра`** (drain) |
+| **← наступний** | **`абракадабра`** (research + drain) **або** один PH-S* |
 | **Відкритих** | **0** |
 
 ---
 
-## Тригер «абракадабра» (drain черги)
+## Тригер «абракадабра» (ітераційний drain проєкту)
 
-Одне слово в новій сесії → повний цикл без підтвердження кожного PH-S*:
+Одне слово в **новій сесії** → повний цикл без підтвердження кожного PH-S*:
 
 ```
 абракадабра
 ```
 
-Агент: S0 → якщо §5.12 **< 10** → replenish до **10** → drain усіх → vision-sync → FM rev → `--check` → git push + самарі.
+| Крок | Дія |
+|------|-----|
+| S0 | `git fetch`; HANDOFF; FM **§5.1** + **§5.12**; `df -h /s` |
+| Research | Якщо §5.12 **< 10** → replenish **10** PH-S* з **concept/roadmap/FM §5.1/architect/code** (не лише ratio band) |
+| Drain | Усі відкриті PH-S* → `cargo fmt` → **один** `cargo test-ci` |
+| Docs | FM §5.12 ✅ + HANDOFF + NEXT + vision rev |
+| Git | `git-commit-tree-msg.sh` + `git push origin main` + **самарі** |
 
-Правила: [`.cursor/rules/poolai-session-iteration.mdc`](../.cursor/rules/poolai-session-iteration.mdc) § «Тригер абракадабра» (shell MSYS2, один test-ci, amend-head-msg).
+**Наступна сесія:** знову **`абракадабра`** → S0 → replenish (якщо 0) → drain → push.
+
+Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../.cursor/rules/poolai-session-iteration.mdc) § «Тригер абракадабра».
 
 ---
 
@@ -32,12 +40,8 @@ S0: git fetch; HANDOFF; FM §5.12; df -h /s
 
 ## Закрито (смуга PH-S414…S423)
 
-PH-S414 ✅ — `galaxy_verification_sampling_evaluations_total` on grid result path.
-PH-S415 ✅ — `galaxy_replay_evaluations_total` on grid result path.
-PH-S416 ✅ — dashboard `updateDashboardRefreshedAt` + `formatLocaleTimeHms` wasm-first.
-PH-S417 ✅ — stand smoke verify + replay evaluation `/metrics` shape.
-PH-S418 ✅ — dashboard refreshed-at wasm glue tests.
-PH-S419…S423 ✅ — loc-audit **94.35%**, docs canon, vision `--check`, INDEX maintain.
+PH-S414…S418 ✅ — verify/replay metrics, dashboard refresh wasm, stand smoke.
+PH-S419…S423 ✅ — loc-audit **94.35%**, docs canon, vision **rev 228**.
 
 **rust_ratio:** **94.35%** (formal 90–95% ✅; hold 95% advisory).
 

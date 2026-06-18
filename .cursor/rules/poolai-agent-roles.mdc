@@ -12,7 +12,7 @@ alwaysApply: true
 | Роль | Хто | Відповідальність |
 |------|-----|------------------|
 | **Власник / креативний директор** | Людина | Візія, пріоритети, BLOCKED/Deferred, фінальний push за бажанням |
-| **Оркестратор** | Головний агент Cursor (Composer) | Один **PH-S*** за сесію, архітектура Rust, локальний CI, FM/HANDOFF/NEXT_SESSION, commit scope |
+| **Оркестратор** | Головний агент Cursor (Composer) | Звичайна сесія: один **PH-S***. **`абракадабра`:** S0 → research replenish (concept/roadmap/FM) → drain ≤10 PH-S* → push + самарі |
 | **Субагенти** | Task tool | Вузькі підзадачі; результат повертається оркестратору |
 
 ## Субагенти Cursor (коли делегувати)
@@ -36,7 +36,7 @@ alwaysApply: true
 | **§5.13** | Rust ratio **90–95%** (після S142; PH-S143…S150) — [`RUST_RATIO_STRATEGY_2026-06-13.md`](../../docs/development/RUST_RATIO_STRATEGY_2026-06-13.md) |
 | **HANDOFF** + **NEXT_SESSION_PROMPT** | Операційний зріз і copy-paste промпт сесії |
 
-**Ітераційна розробка:** промпт з [`NEXT_SESSION_PROMPT.md`](../../docs/development/NEXT_SESSION_PROMPT.md) → один **PH-S*** з §5.12.
+**Ітераційна розробка:** промпт з [`NEXT_SESSION_PROMPT.md`](../../docs/development/NEXT_SESSION_PROMPT.md) → один **PH-S*** з §5.12 **або** **`абракадабра`** (drain смуги з research по concept/roadmap).
 
 **AUTO_RUN:** лише за явним запитом або [`autonomous-orchestrator.mdc`](autonomous-orchestrator.mdc) — не підміняє §5.12.
 

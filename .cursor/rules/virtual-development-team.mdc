@@ -41,19 +41,23 @@ flowchart LR
 
 ## Research (черга PH-S* <10 відкритих)
 
+**Звичайна сесія (один PH-S*):** п.1–3 нижче.
+
+**`абракадабра`:** повний research по всьому проєкту — див. [`poolai-session-iteration.mdc`](poolai-session-iteration.mdc) § «Research replenish» (концепт → roadmap → §5.1 → architect → §5.13 → code → fallback band).
+
 1. `rg "\- \[ \]" docs/development/NEXT_STEPS_ARCHITECT_*.md`
-2. [`DOCS_LEGACY_AUDIT`](../../docs/development/DOCS_LEGACY_AUDIT_2026-05-19.md)
+2. [`DOCS_LEGACY_AUDIT`](../../docs/development/DOCS_LEGACY_AUDIT_2026-05-19.md) · [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../../docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md) · FM **§5.1**
 3. `rg "TODO|FIXME" src/` → нові PH-S* у FM §5.12 (code-first, **Rust integration** для API)
 4. Після закриття §5.12 смуги — replenish з **§5.13** ([`RUST_RATIO_STRATEGY_2026-06-13.md`](../../docs/development/RUST_RATIO_STRATEGY_2026-06-13.md))
-5. Приклад багатоспринтової смуги + docs-sync — [`poolai-session-iteration.mdc`](poolai-session-iteration.mdc) § «Приклад ітерації (PH-S97…S99)»
+5. Приклад багатоспринтової смуги — [`poolai-session-iteration.mdc`](poolai-session-iteration.mdc) § «Приклад ітерації (PH-S97…S99)»
 
-## Тригер «абракадабра» (drain §5.12)
+## Тригер «абракадабра» (ітераційний drain проєкту)
 
-Промпт власника **`абракадабра`** у новій сесії = повний цикл без окремого підтвердження кожного PH-S*:
+Промпт власника **`абракадабра`** у **новій сесії** = повний VDT-цикл **без підтвердження** кожного PH-S*:
 
-**S0** → якщо §5.12 **< 10** відкритих → **replenish до 10** (research + §5.13) → **drain усіх** → vision-sync → FM rev sync → **`--check`** → **git push + самарі**.
+**S0** → якщо §5.12 **< 10** → **replenish до 10** (concept/roadmap/FM §5.1/architect/code, не лише ratio) → **drain усіх** → vision-sync → FM rev → **`--check`** → **`git push` + самарі** → наступна сесія знову **`абракадабра`**.
 
-Деталі (shell, replenish шаблон, один test-ci, amend-head-msg, vision порядок) — [`poolai-session-iteration.mdc`](poolai-session-iteration.mdc) § «Тригер абракадабра».
+Деталі (shell, research priority, один test-ci, `git-commit-tree-msg.sh`, vision) — [`poolai-session-iteration.mdc`](poolai-session-iteration.mdc) § «Тригер абракадабра».
 
 ## Staging
 

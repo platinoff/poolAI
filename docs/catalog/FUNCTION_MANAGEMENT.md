@@ -261,7 +261,7 @@ FM-xxx (з таблиці нижче)
 
 ### 5.12 Research backlog PH-S65+ (Galaxy wire / ops, 2026-05-27)
 
-**VDT:** якщо відкритих <3 — `rg "\- \[ \]" docs/development/NEXT_STEPS_ARCHITECT_*.md`, DOCS_LEGACY §5.3, `rg "TODO|FIXME" src/` → доповнити до **≤10** відкритих. **Rust-first:** API acceptance → `tests/`; Playwright лише browser scope; після S142 — replenish з **§5.13** ([`RUST_RATIO_STRATEGY_2026-06-13.md`](../development/RUST_RATIO_STRATEGY_2026-06-13.md)).
+**VDT:** якщо відкритих **< 10** — research replenish (канон **`абракадабра`**): concept [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md) → [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md) → FM **§5.1** → `rg "\- \[ \]" docs/development/NEXT_STEPS_ARCHITECT_*.md` → DOCS_LEGACY §5.3 → §5.13 → `rg "TODO|FIXME" src/` → fallback band 10. Деталі: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Research replenish». **Rust-first:** API → `tests/`; Playwright лише browser scope.
 
 | # | Sprint | Фокус | Джерело | Acceptance (скорочено) | Стан |
 |---|--------|--------|---------|-------------------------|------|
@@ -626,13 +626,13 @@ FM-xxx (з таблиці нижче)
 
 **Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S414…S423 ✅. Vision rev **228**. rust_ratio **94.35%**.
 
-**Наступна сесія:** replenish з **§5.13** · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · або **`абракадабра`** (drain).
+**Наступна сесія:** **`абракадабра`** (research concept/roadmap → drain 10) **або** один PH-S* · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S262)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-06-18):** PH-S414…S423 ✅ закрито · **0** відкритих · replenish §5.13 або **`абракадабра`**.
+**Активна смуга (2026-06-18):** PH-S414…S423 ✅ закрито · **0** відкритих · **`абракадабра`** replenish (concept/roadmap/FM) → drain.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 
