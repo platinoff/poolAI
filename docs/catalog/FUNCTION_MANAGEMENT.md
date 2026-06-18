@@ -664,7 +664,7 @@ FM-xxx (з таблиці нижче)
 | 397 | **PH-S462** | Stand smoke horizon band S454–S460 | PH-S454…S460 | `/metrics` + verification-replay smoke | **✅** |
 | 398 | **PH-S463** | Ops close band: loc-audit + vision-sync | §5.12 fallback | `rust_ratio.json`; FM/HANDOFF/NEXT; `--check` green | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S454…S463 ✅. Vision rev **234**. rust_ratio **94.38%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S454…S463 ✅. Vision rev **235**. rust_ratio **94.38%**.
 
 **Наступна сесія:** **`абракадабра`** (project scan → drain) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 

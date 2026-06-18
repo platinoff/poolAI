@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-18 (PH-S454…S463 ✅ · vision **rev 234** · **0** відкритих · rust_ratio **94.38%**)
+**Оновлено:** 2026-06-18 (PH-S454…S463 ✅ · vision **rev 235** · **0** відкритих · rust_ratio **94.38%**)
 
 | **← наступний** | **`абракадабра`** (project scan + drain) **або** один PH-S* |
 | **Відкритих** | **0** |
@@ -32,7 +32,7 @@
 PH-S454…S459 ✅ — Galaxy horizon: re-migrate prefetch, elevated verify rate, trust deltas, replication cap, hot-tier + §5.3 telemetry.
 PH-S460 ✅ — `GET /api/v1/grid/verification-replay` read API + integration test.
 PH-S461 ✅ — monitoring alerts panel wasm (`renderMonitoringAlertsPanel`).
-PH-S462…S463 ✅ — stand smoke S454 band, loc-audit **94.38%**, vision-sync rev **234**.
+PH-S462…S463 ✅ — stand smoke S454 band, loc-audit **94.38%**, vision-sync rev **235**.
 
 **rust_ratio:** **94.38%** (formal 90–95% ✅; hold 95% advisory).
 

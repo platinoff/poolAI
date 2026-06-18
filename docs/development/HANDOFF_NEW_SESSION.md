@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-18 (PH-S454…S463 ✅ · vision rev **234** · rust_ratio **94.38%**) · VDT
+**Оновлено:** 2026-06-18 (PH-S454…S463 ✅ · vision rev **235** · rust_ratio **94.38%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -413,10 +413,10 @@
 **PH-S460 ✅ (code/tests):** `GET /api/v1/grid/verification-replay` + `grid_verification_replay_integration`.
 **PH-S461 ✅ (code/wasm):** `renderMonitoringAlertsPanel` wasm-first; slim `monitoring.rs`.
 **PH-S462 ✅ (tests):** `poolai-http-stand-smoke` — S454…S460 `/metrics` + verification-replay smoke.
-**PH-S463 ✅ (ops):** `rust_ratio.json` **94.38%**; FM/HANDOFF/NEXT; `poolai-vision-sync` **rev 234** + `--check`.
+**PH-S463 ✅ (ops):** `rust_ratio.json` **94.38%**; FM/HANDOFF/NEXT; `poolai-vision-sync` **rev 235** + `--check`.
 **Rules ✅:** **`абракадабра`** — project scan **всього репо** (concept · FM §5.1 · roadmaps · architect · code) → 10 PH-S* у §5.12 (журнал) → drain → push; канон [`.cursor/rules/poolai-session-iteration.mdc`](../.cursor/rules/poolai-session-iteration.mdc) § «Тригер абракадабра»; commit **`git-commit-tree-msg.sh`**.
 **§5.12:** **0** відкритих — наступна сесія: **`абракадабра`** (project scan + drain) або один PH-S*.
-**Vision ✅:** rev **234** · rust_ratio **94.38%** · hold **95%** advisory.
+**Vision ✅:** rev **235** · rust_ratio **94.38%** · hold **95%** advisory.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 
