@@ -1856,11 +1856,23 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_workers_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_instances_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_network_profile_store_rs"
     }
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S493",
+  "last_sprint_closed": "PH-S503",
   "layers": [
     {
       "id": "L0",
@@ -7844,9 +7856,30 @@
       "label": "telegram_seat_integration.rs",
       "layer": "L3",
       "path": "tests/telegram_seat_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_instances_rs",
+      "label": "instances.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/instances.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_network_profile_store_rs",
+      "label": "galaxy_network_profile_store.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_network_profile_store.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s484_integration_rs",
+      "label": "galaxy_horizon_s484_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s484_integration.rs"
     }
   ],
-  "revision": 237,
+  "revision": 238,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -11699,6 +11732,96 @@
       "row": 428,
       "status": "closed",
       "title": "Ops close band: loc-audit + vision-sync"
+    },
+    {
+      "acceptance": "GET /api/v1/grid/verification-checker/tasks`; OpenAPI + unit tests",
+      "deps": "Galaxy §6.2",
+      "id": "PH-S494",
+      "open": false,
+      "row": 429,
+      "status": "closed",
+      "title": "Verification checker tasks read API"
+    },
+    {
+      "acceptance": "drain_verification_checker_task` on grid result match/mismatch",
+      "deps": "Galaxy §6.2",
+      "id": "PH-S495",
+      "open": false,
+      "row": 430,
+      "status": "closed",
+      "title": "Checker task drain on verdict"
+    },
+    {
+      "acceptance": "galaxy_verification_checker_pending_total` on `/metrics",
+      "deps": "Galaxy §6.2",
+      "id": "PH-S496",
+      "open": false,
+      "row": 431,
+      "status": "closed",
+      "title": "Checker pending Prometheus gauge"
+    },
+    {
+      "acceptance": "GET /api/v1/grid/network-profiles/{peer_id}`; OpenAPI + tests",
+      "deps": "Galaxy §8.1",
+      "id": "PH-S497",
+      "open": false,
+      "row": 432,
+      "status": "closed",
+      "title": "Network profile read API"
+    },
+    {
+      "acceptance": "load persisted `network_profile` when metadata absent",
+      "deps": "PH-S489",
+      "id": "PH-S498",
+      "open": false,
+      "row": 433,
+      "status": "closed",
+      "title": "Register-remote profile hydrate"
+    },
+    {
+      "acceptance": "renderVmPanel` wasm; slim `vm.rs",
+      "deps": "RUST_RATIO §5.13",
+      "id": "PH-S499",
+      "open": false,
+      "row": 434,
+      "status": "closed",
+      "title": "VM admin panel wasm"
+    },
+    {
+      "acceptance": "galaxy_horizon_s494_integration` + `/metrics` shape",
+      "deps": "PH-S494…S499",
+      "id": "PH-S500",
+      "open": false,
+      "row": 435,
+      "status": "closed",
+      "title": "Horizon wire integration band S494–S499"
+    },
+    {
+      "acceptance": "/metrics` + checker tasks + network profile API smoke",
+      "deps": "PH-S494…S498",
+      "id": "PH-S501",
+      "open": false,
+      "row": 436,
+      "status": "closed",
+      "title": "Stand smoke S494–S499 band"
+    },
+    {
+      "acceptance": "rust_ratio.json` 94.41%; FM/HANDOFF/NEXT",
+      "deps": "§5.12 fallback",
+      "id": "PH-S502",
+      "open": false,
+      "row": 437,
+      "status": "closed",
+      "title": "Ops close band: loc-audit"
+    },
+    {
+      "acceptance": "poolai-vision-sync` + `--check` green",
+      "deps": "§5.12 fallback",
+      "id": "PH-S503",
+      "open": false,
+      "row": 438,
+      "status": "closed",
+      "title": "Ops close band: vision-sync"
     }
   ],
   "sprint_queue_open_count": 0,

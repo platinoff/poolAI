@@ -96,9 +96,10 @@ use crate::grid::galaxy_trust_score::{
     METRIC_TRUST_SCORE_DELTA_TOTAL,
 };
 use crate::grid::galaxy_verification_metrics::{
-    verification_checker_enqueue_total, verification_match_total, verification_mismatch_total,
-    verification_sample_completed_total, verification_sample_total,
-    METRIC_VERIFICATION_CHECKER_ENQUEUE_TOTAL, METRIC_VERIFICATION_MATCH_TOTAL,
+    verification_checker_enqueue_total, verification_checker_pending_total,
+    verification_match_total, verification_mismatch_total, verification_sample_completed_total,
+    verification_sample_total, METRIC_VERIFICATION_CHECKER_ENQUEUE_TOTAL,
+    METRIC_VERIFICATION_CHECKER_PENDING_TOTAL, METRIC_VERIFICATION_MATCH_TOTAL,
     METRIC_VERIFICATION_MISMATCH_TOTAL, METRIC_VERIFICATION_SAMPLE_COMPLETED_TOTAL,
     METRIC_VERIFICATION_SAMPLE_TOTAL,
 };
@@ -189,6 +190,7 @@ pub struct PoolAiPrometheus {
     galaxy_verification_sampling_evaluations_total: IntGauge,
     galaxy_verification_elevated_applied_total: IntGauge,
     galaxy_verification_checker_enqueue_total: IntGauge,
+    galaxy_verification_checker_pending_total: IntGauge,
     galaxy_replay_pending: IntGauge,
     galaxy_replay_pending_scheduled_total: IntGauge,
     galaxy_replay_pending_resolved_total: IntGauge,
@@ -910,6 +912,15 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_verification_checker_enqueue_total.clone()))
         .expect("register galaxy_verification_checker_enqueue_total");
 
+    let galaxy_verification_checker_pending_total = IntGauge::with_opts(Opts::new(
+        METRIC_VERIFICATION_CHECKER_PENDING_TOTAL,
+        "Galaxy verification checker pending stub tasks (PH-S496)",
+    ))
+    .expect(METRIC_VERIFICATION_CHECKER_PENDING_TOTAL);
+    registry
+        .register(Box::new(galaxy_verification_checker_pending_total.clone()))
+        .expect("register galaxy_verification_checker_pending_total");
+
     let galaxy_replay_pending = IntGauge::with_opts(Opts::new(
         METRIC_REPLAY_PENDING,
         "Galaxy replay verifications pending coordinator verdict (PH-S176)",
@@ -1140,6 +1151,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_verification_sampling_evaluations_total,
         galaxy_verification_elevated_applied_total,
         galaxy_verification_checker_enqueue_total,
+        galaxy_verification_checker_pending_total,
         galaxy_replay_pending,
         galaxy_replay_pending_scheduled_total,
         galaxy_replay_pending_resolved_total,
@@ -1310,6 +1322,8 @@ pub fn refresh_galaxy_verification_gauges() {
         .set(verify_elevated_applied_total() as i64);
     prom.galaxy_verification_checker_enqueue_total
         .set(verification_checker_enqueue_total() as i64);
+    prom.galaxy_verification_checker_pending_total
+        .set(verification_checker_pending_total() as i64);
     prom.galaxy_replay_pending.set(replay_pending() as i64);
     prom.galaxy_replay_pending_scheduled_total
         .set(replay_pending_scheduled_total() as i64);

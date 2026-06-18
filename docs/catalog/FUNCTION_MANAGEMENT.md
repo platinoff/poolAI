@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-18 (PH-S444…S453 ✅ · rust_ratio **94.37%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-18 (PH-S494…S503 ✅ · rust_ratio **94.41%**) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -693,8 +693,18 @@ FM-xxx (з таблиці нижче)
 | 426 | **PH-S491** | Horizon wire integration band S484–S489 | PH-S484…S489 | `galaxy_horizon_s484_integration` + `/metrics` shape | **✅** |
 | 427 | **PH-S492** | Stand smoke S484–S489 band | PH-S484…S488 | `/metrics` pull-bytes smoke | **✅** |
 | 428 | **PH-S493** | Ops close band: loc-audit + vision-sync | §5.12 fallback | `rust_ratio.json` **94.41%**; FM/HANDOFF/NEXT; `--check` green | **✅** |
+| 429 | **PH-S494** | Verification checker tasks read API | Galaxy §6.2 | `GET /api/v1/grid/verification-checker/tasks`; OpenAPI + unit tests | **✅** |
+| 430 | **PH-S495** | Checker task drain on verdict | Galaxy §6.2 | `drain_verification_checker_task` on grid result match/mismatch | **✅** |
+| 431 | **PH-S496** | Checker pending Prometheus gauge | Galaxy §6.2 | `galaxy_verification_checker_pending_total` on `/metrics` | **✅** |
+| 432 | **PH-S497** | Network profile read API | Galaxy §8.1 | `GET /api/v1/grid/network-profiles/{peer_id}`; OpenAPI + tests | **✅** |
+| 433 | **PH-S498** | Register-remote profile hydrate | PH-S489 | load persisted `network_profile` when metadata absent | **✅** |
+| 434 | **PH-S499** | VM admin panel wasm | RUST_RATIO §5.13 | `renderVmPanel` wasm; slim `vm.rs` | **✅** |
+| 435 | **PH-S500** | Horizon wire integration band S494–S499 | PH-S494…S499 | `galaxy_horizon_s494_integration` + `/metrics` shape | **✅** |
+| 436 | **PH-S501** | Stand smoke S494–S499 band | PH-S494…S498 | `/metrics` + checker tasks + network profile API smoke | **✅** |
+| 437 | **PH-S502** | Ops close band: loc-audit | §5.12 fallback | `rust_ratio.json` **94.41%**; FM/HANDOFF/NEXT | **✅** |
+| 438 | **PH-S503** | Ops close band: vision-sync | §5.12 fallback | `poolai-vision-sync` + `--check` green | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S484…S493 ✅. Vision rev **237**. rust_ratio **94.41%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S494…S503 ✅. Vision rev **238**. rust_ratio **94.41%**.
 
 **Наступна сесія:** **`абракадабра`** (project scan → drain) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
@@ -702,7 +712,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-06-18):** PH-S484…S493 ✅ закрито · **0** відкритих · **`абракадабра`** = project scan → §5.12 → drain.
+**Активна смуга (2026-06-18):** PH-S494…S503 ✅ закрито · **0** відкритих · **`абракадабра`** = project scan → §5.12 → drain.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

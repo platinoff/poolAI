@@ -770,6 +770,40 @@ paths:
               schema:
                 $ref: '#/components/schemas/GridVerificationReplayHistoryResponse'
 
+  /grid/verification-checker/tasks:
+    get:
+      tags:
+        - Grid
+      summary: Pending verification checker stub tasks (PH-S494)
+      operationId: getGridVerificationCheckerTasks
+      responses:
+        '200':
+          description: Pending checker tasks snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GridVerificationCheckerTasksResponse'
+
+  /grid/network-profiles/{peer_id}:
+    get:
+      tags:
+        - Grid
+      summary: Persisted peer network profile (PH-S497)
+      operationId: getGridNetworkProfile
+      parameters:
+        - name: peer_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Network profile snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GridNetworkProfileResponse'
+
   /grid/payout-batch:
     get:
       tags:
@@ -6260,6 +6294,45 @@ components:
           items:
             type: object
             additionalProperties: true
+
+    VerificationCheckerTask:
+      type: object
+      required:
+        - job_id
+        - task_type
+      properties:
+        job_id:
+          type: string
+        task_type:
+          type: string
+
+    GridVerificationCheckerTasksResponse:
+      type: object
+      required:
+        - ok
+        - tasks
+      properties:
+        ok:
+          type: boolean
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/VerificationCheckerTask'
+
+    GridNetworkProfileResponse:
+      type: object
+      required:
+        - ok
+        - peer_id
+      properties:
+        ok:
+          type: boolean
+        peer_id:
+          type: string
+        network_profile:
+          type: object
+          nullable: true
+          additionalProperties: true
 
     MemoryShardRef:
       type: object

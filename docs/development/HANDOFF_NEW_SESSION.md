@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-18 (PH-S484…S493 ✅ · rust_ratio **94.41%**) · VDT
+**Оновлено:** 2026-06-18 (PH-S494…S503 ✅ · rust_ratio **94.41%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -444,9 +444,19 @@
 **PH-S491 ✅ (tests):** `tests/galaxy_horizon_s484_integration.rs` — `/metrics` shape PH-S484…S489 band.
 **PH-S492 ✅ (ops):** `poolai_http_stand_smoke` — `galaxy_horizon_wire_s484_metrics` (`galaxy_prefetch_pull_bytes_total`).
 **PH-S493 ✅ (ops):** `rust_ratio.json` **94.41%**; FM/HANDOFF/NEXT; `poolai-vision-sync` **rev 237** + `--check`.
+**PH-S494 ✅ (code):** `GET /api/v1/grid/verification-checker/tasks`; OpenAPI + `grid.rs` tests.
+**PH-S495 ✅ (code):** `drain_verification_checker_task` on grid result match/mismatch wire.
+**PH-S496 ✅ (code):** `galaxy_verification_checker_pending_total` on `/metrics`.
+**PH-S497 ✅ (code):** `GET /api/v1/grid/network-profiles/{peer_id}` read API; OpenAPI sync.
+**PH-S498 ✅ (code):** `register-remote` hydrates persisted `network_profile` when metadata absent.
+**PH-S499 ✅ (code/ui):** `renderVmPanel` wasm; slim `vm.rs`; `poolai-ui-core` + `admin_charts.js`.
+**PH-S500 ✅ (tests):** `tests/galaxy_horizon_s494_integration.rs` — `/metrics` + read APIs PH-S494…S499 band.
+**PH-S501 ✅ (ops):** `poolai_http_stand_smoke` — checker tasks + network profile + `galaxy_verification_checker_pending_total`.
+**PH-S502 ✅ (ops):** `rust_ratio.json` **94.41%**; FM/HANDOFF/NEXT.
+**PH-S503 ✅ (ops):** `poolai-vision-sync` **rev 238** + `--check`.
 **Rules ✅:** **`абракадабра`** — project scan **всього репо** (concept · FM §5.1 · roadmaps · architect · code) → 10 PH-S* у §5.12 (журнал) → drain → push; канон [`.cursor/rules/poolai-session-iteration.mdc`](../.cursor/rules/poolai-session-iteration.mdc) § «Тригер абракадабра»; commit **`git-commit-tree-msg.sh`**.
 **§5.12:** **0** відкритих — наступна сесія: **`абракадабра`** (project scan + drain) або один PH-S*.
-**Vision ✅:** rev **235** · rust_ratio **94.38%** · hold **95%** advisory.
+**Vision ✅:** rev **238** · rust_ratio **94.41%** · hold **95%** advisory.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

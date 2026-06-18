@@ -32,6 +32,7 @@ use poolai_ui_core::table::{
 };
 use poolai_ui_core::theme::normalize_theme;
 use poolai_ui_core::updates_compat::{compat_status_label, protocol_version_label};
+use poolai_ui_core::vm::render_vm_panel_html;
 use poolai_ui_core::workers::render_workers_panel_html;
 use serde_json::Value;
 use wasm_bindgen::prelude::*;
@@ -457,6 +458,37 @@ pub fn render_instances_panel_wasm(
         col_actions,
         table_aria,
         view_label,
+        delete_label,
+        empty_message,
+    )
+}
+
+#[wasm_bindgen(js_name = renderVmPanel)]
+pub fn render_vm_panel_wasm(
+    instances_json: &str,
+    col_name: &str,
+    col_status: &str,
+    col_resources: &str,
+    col_actions: &str,
+    table_aria: &str,
+    res_cpu_label: &str,
+    res_mem_label: &str,
+    start_label: &str,
+    stop_label: &str,
+    delete_label: &str,
+    empty_message: &str,
+) -> String {
+    render_vm_panel_html(
+        instances_json,
+        col_name,
+        col_status,
+        col_resources,
+        col_actions,
+        table_aria,
+        res_cpu_label,
+        res_mem_label,
+        start_label,
+        stop_label,
         delete_label,
         empty_message,
     )

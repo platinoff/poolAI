@@ -66,6 +66,14 @@ pub fn create_grid_routes() -> Router<ApiContext> {
             "/grid/verification-replay/history",
             get(get_grid_verification_replay_history),
         )
+        .route(
+            "/grid/verification-checker/tasks",
+            get(get_grid_verification_checker_tasks),
+        )
+        .route(
+            "/grid/network-profiles/{peer_id}",
+            get(get_grid_network_profile),
+        )
         .route("/grid/payout-batch", get(get_grid_payout_batch))
         .route(
             "/grid/payout-batch/history",
@@ -188,6 +196,49 @@ async fn get_grid_verification_replay_history(
         Json(GridVerificationReplayHistoryResponse {
             ok: true,
             records: crate::grid::galaxy_replay_metrics::verification_replay_history(params.limit),
+        }),
+    ))
+}
+
+#[derive(Debug, Serialize)]
+struct GridVerificationCheckerTasksResponse {
+    ok: bool,
+    tasks: Vec<crate::grid::galaxy_verification_metrics::VerificationCheckerTask>,
+}
+
+async fn get_grid_verification_checker_tasks(
+    State(_ctx): State<ApiContext>,
+) -> Result<(StatusCode, Json<GridVerificationCheckerTasksResponse>), HttpAppError> {
+    Ok((
+        StatusCode::OK,
+        Json(GridVerificationCheckerTasksResponse {
+            ok: true,
+            tasks: crate::grid::galaxy_verification_metrics::verification_checker_tasks(),
+        }),
+    ))
+}
+
+#[derive(Debug, Serialize)]
+struct GridNetworkProfileResponse {
+    ok: bool,
+    peer_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    network_profile: Option<serde_json::Value>,
+}
+
+async fn get_grid_network_profile(
+    State(_ctx): State<ApiContext>,
+    axum::extract::Path(peer_id): axum::extract::Path<String>,
+) -> Result<(StatusCode, Json<GridNetworkProfileResponse>), HttpAppError> {
+    let network_profile =
+        crate::grid::galaxy_network_profile_store::load_peer_network_profile(&peer_id)
+            .and_then(|raw| serde_json::from_str(&raw).ok());
+    Ok((
+        StatusCode::OK,
+        Json(GridNetworkProfileResponse {
+            ok: true,
+            peer_id,
+            network_profile,
         }),
     ))
 }
@@ -710,5 +761,68 @@ mod tests {
         assert_eq!(res.snapshot.market_min_usd_micro, 500_000);
         assert_eq!(res.snapshot.poolai_quote_usd_micro, 450_000);
         assert_eq!(res.snapshot.provider_id_at_min, "live_openai_us");
+    }
+
+    #[tokio::test]
+    async fn grid_verification_checker_tasks_read_ph_s494() {
+        use crate::grid::galaxy_verification_metrics::{
+            enqueue_verification_checker_task, reset_verification_checker_tasks_for_test,
+            reset_verification_metrics_for_test, verification_checker_tasks,
+        };
+
+        reset_verification_metrics_for_test();
+        reset_verification_checker_tasks_for_test();
+        enqueue_verification_checker_task("job-api-vc-1");
+
+        let res = get_grid_verification_checker_tasks(State(ApiContext::default()))
+            .await
+            .expect("checker tasks")
+            .1
+             .0;
+        assert!(res.ok);
+        assert_eq!(res.tasks.len(), verification_checker_tasks().len());
+        assert_eq!(res.tasks[0].job_id, "job-api-vc-1");
+
+        reset_verification_metrics_for_test();
+        reset_verification_checker_tasks_for_test();
+    }
+
+    #[tokio::test]
+    async fn grid_network_profile_read_ph_s497() {
+        use crate::grid::galaxy_network_profile_store::{
+            persist_peer_network_profile, reset_network_profile_store_for_test,
+        };
+
+        reset_network_profile_store_for_test();
+        let json = r#"{"region":"us-east","latency_ms_p50":20}"#;
+        persist_peer_network_profile("peer-read-1", json).expect("persist");
+
+        let res = get_grid_network_profile(
+            State(ApiContext::default()),
+            axum::extract::Path("peer-read-1".into()),
+        )
+        .await
+        .expect("network profile")
+        .1
+         .0;
+        assert!(res.ok);
+        assert_eq!(res.peer_id, "peer-read-1");
+        assert_eq!(
+            res.network_profile
+                .and_then(|v| v.get("region").and_then(|r| r.as_str()).map(String::from)),
+            Some("us-east".into())
+        );
+
+        let missing = get_grid_network_profile(
+            State(ApiContext::default()),
+            axum::extract::Path("peer-missing".into()),
+        )
+        .await
+        .expect("missing profile")
+        .1
+         .0;
+        assert!(missing.network_profile.is_none());
+
+        reset_network_profile_store_for_test();
     }
 }

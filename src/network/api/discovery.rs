@@ -293,6 +293,10 @@ async fn register_remote_handler(
         ) {
             tracing::warn!("network_profile persist failed for {peer_id}: {e}");
         }
+    } else if let Some(stored) =
+        crate::grid::galaxy_network_profile_store::load_peer_network_profile(&peer_id)
+    {
+        metadata.insert("network_profile".to_string(), stored);
     }
 
     if is_telegram_edge_metadata(&metadata) && try_admit_telegram_edge(&peer_id).is_err() {

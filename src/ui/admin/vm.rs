@@ -22,46 +22,27 @@ pub async fn admin_vm() -> Html<String> {
       }
     }
     
-    function vmStatusBadge(status) {
-      const s = (typeof status === 'string') ? status : JSON.stringify(status ?? '');
-      const low = s.toLowerCase();
-      const cls = low.startsWith('failed') ? 'error' : (low === 'stopped' ? 'inactive' : 'active');
-      return `<span class="status-badge ${cls}">${s}</span>`;
-    }
-    
     function renderVmInstances(instances) {
       const el = document.getElementById('vm-instances');
       if (!el) return;
-      if (!instances || instances.length === 0) {
-        el.innerHTML = '<div class="muted">' + escapeHtml(T('admin.vmadm.empty', 'No VM instances found')) + '</div>';
-        return;
-      }
-      el.innerHTML = `
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>${escapeHtml(T('admin.vmadm.col.name', 'Name'))}</th>
-              <th>${escapeHtml(T('admin.vmadm.col.status', 'Status'))}</th>
-              <th>${escapeHtml(T('admin.vmadm.col.resources', 'Resources'))}</th>
-              <th>${escapeHtml(T('admin.vmadm.col.actions', 'Actions'))}</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${instances.map(i => `
-              <tr>
-                <td>${i.name}</td>
-                <td>${vmStatusBadge(i.status)}</td>
-                <td>${escapeHtml(T('admin.vmadm.resCpu', 'CPU:'))} ${i.resources ? i.resources.cpu_cores : '—'}, ${escapeHtml(T('admin.vmadm.resMem', 'Memory:'))} ${i.resources ? i.resources.memory_mb : '—'}MB</td>
-                <td>
-                  <button type="button" class="btn" onclick="vmAction('${i.id}', 'start')">${escapeHtml(T('vm.start', 'Start'))}</button>
-                  <button type="button" class="btn" onclick="vmAction('${i.id}', 'stop')">${escapeHtml(T('vm.stop', 'Stop'))}</button>
-                  <button type="button" class="btn btn-danger" onclick="vmAction('${i.id}', 'delete')">${escapeHtml(T('ui.delete', 'Delete'))}</button>
-                </td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      `;
+      el.innerHTML = poolaiRenderVmPanel(instances, {
+        name: T('admin.vmadm.col.name', 'Name'),
+        status: T('admin.vmadm.col.status', 'Status'),
+        resources: T('admin.vmadm.col.resources', 'Resources'),
+        actions: T('admin.vmadm.col.actions', 'Actions'),
+        tableAria: T('admin.vmadm.section', 'VM Instances'),
+        resCpu: T('admin.vmadm.resCpu', 'CPU:'),
+        resMem: T('admin.vmadm.resMem', 'Memory:'),
+        start: T('vm.start', 'Start'),
+        stop: T('vm.stop', 'Stop'),
+        delete: T('ui.delete', 'Delete'),
+        empty: T('admin.vmadm.empty', 'No VM instances found'),
+      });
+      el.querySelectorAll('[data-vm-id]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          vmAction(btn.getAttribute('data-vm-id'), btn.getAttribute('data-vm-action'));
+        });
+      });
     }
     
     async function vmAction(id, action) {

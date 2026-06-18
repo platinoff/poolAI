@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-18 (PH-S484…S493 ✅ · vision **rev 237** · **0** відкритих · rust_ratio **94.41%**)
+**Оновлено:** 2026-06-18 (PH-S494…S503 ✅ · vision **rev 238** · **0** відкритих · rust_ratio **94.41%**)
 
 | **← наступний** | **`абракадабра`** (project scan + drain) **або** один PH-S* |
 | **Відкритих** | **0** |
@@ -30,17 +30,16 @@
 
 ---
 
-## Закрито (смуга PH-S484…S493)
+## Закрито (смуга PH-S494…S503)
 
-PH-S484 ✅ — live prefetch bytes pull (`galaxy_prefetch_pull_bytes_total`).
-PH-S485 ✅ — locality rank → `schedule_with_grid_peer` bind.
-PH-S486 ✅ — `POOLAI_TELEGRAM_SEAT_POLICY` bound_wallet_session seat cap.
-PH-S487 ✅ — `POOLAI_GALAXY_HOT_PROMOTE_THRESHOLD` hot-tier gate.
-PH-S488 ✅ — verification checker task enqueue wire.
-PH-S489 ✅ — `network_profile` disk persistence store.
-PH-S490 ✅ — instances admin panel wasm (`renderInstancesPanel`).
-PH-S491…S492 ✅ — horizon S484 integration + stand smoke band.
-PH-S493 ✅ — loc-audit **94.41%**, vision-sync + `--check`.
+PH-S494 ✅ — `GET /api/v1/grid/verification-checker/tasks` read API.
+PH-S495 ✅ — drain checker task on grid result verdict.
+PH-S496 ✅ — `galaxy_verification_checker_pending_total` Prometheus gauge.
+PH-S497 ✅ — `GET /api/v1/grid/network-profiles/{peer_id}` read API.
+PH-S498 ✅ — register-remote hydrates persisted `network_profile`.
+PH-S499 ✅ — VM admin panel wasm (`renderVmPanel`).
+PH-S500…S501 ✅ — horizon S494 integration + stand smoke band.
+PH-S502…S503 ✅ — loc-audit **94.41%**, vision-sync + `--check`.
 
 **rust_ratio:** **94.41%** (formal 90–95% ✅; hold 95% advisory).
 

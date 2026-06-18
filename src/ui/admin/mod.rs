@@ -1000,6 +1000,15 @@ fn admin_charts_instances_panel_wasm_first_ph_s490() {
 }
 
 #[test]
+fn admin_charts_vm_panel_wasm_first_ph_s499() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("wasm.renderVmPanel"));
+    assert!(js.contains("poolaiRenderVmPanel"));
+    let vm = include_str!("vm.rs");
+    assert!(vm.contains("poolaiRenderVmPanel"));
+}
+
+#[test]
 fn admin_charts_metric_history_url_with_hours_wasm_first_ph_s334() {
     let js = include_str!("../admin_charts.js");
     assert!(js.contains("wasm.buildMetricHistoryUrlWithHours"));

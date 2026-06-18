@@ -21,6 +21,8 @@ pub const METRIC_VERIFICATION_SAMPLE_COMPLETED_TOTAL: &str =
 /// Verification checker enqueue stub invocations (PH-S437).
 pub const METRIC_VERIFICATION_CHECKER_ENQUEUE_TOTAL: &str =
     "galaxy_verification_checker_enqueue_total";
+pub const METRIC_VERIFICATION_CHECKER_PENDING_TOTAL: &str =
+    "galaxy_verification_checker_pending_total";
 
 static SAMPLE_TOTAL: AtomicU64 = AtomicU64::new(0);
 static MISMATCH_TOTAL: AtomicU64 = AtomicU64::new(0);
@@ -29,7 +31,7 @@ static SAMPLE_COMPLETED_TOTAL: AtomicU64 = AtomicU64::new(0);
 static CHECKER_ENQUEUE_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// Stub verification checker task record (PH-S488).
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
 pub struct VerificationCheckerTask {
     pub job_id: String,
     pub task_type: String,
@@ -133,6 +135,21 @@ pub fn enqueue_verification_checker_task(job_id: &str) {
 /// Pending checker stub tasks (in-process, PH-S488).
 pub fn verification_checker_tasks() -> Vec<VerificationCheckerTask> {
     CHECKER_TASKS.lock().map(|g| g.clone()).unwrap_or_default()
+}
+
+/// Pending checker task count for Prometheus (PH-S496).
+pub fn verification_checker_pending_total() -> u64 {
+    CHECKER_TASKS.lock().map(|g| g.len() as u64).unwrap_or(0)
+}
+
+/// Remove pending checker task after verdict (PH-S495).
+pub fn drain_verification_checker_task(job_id: &str) -> bool {
+    if let Ok(mut tasks) = CHECKER_TASKS.lock() {
+        let before = tasks.len();
+        tasks.retain(|t| t.job_id != job_id);
+        return tasks.len() < before;
+    }
+    false
 }
 
 #[cfg(any(test, feature = "test-utils"))]
@@ -316,6 +333,21 @@ mod tests {
         assert_eq!(tasks.len(), 1);
         assert_eq!(tasks[0].job_id, "job-vc-1");
         assert_eq!(tasks[0].task_type, "verification_checker");
+        reset_verification_metrics_for_test();
+    }
+
+    #[test]
+    fn drain_verification_checker_task_ph_s495() {
+        let _lock = verification_metrics_test_lock();
+        reset_verification_metrics_for_test();
+        enqueue_verification_checker_task("job-drain-1");
+        enqueue_verification_checker_task("job-drain-2");
+        assert_eq!(verification_checker_pending_total(), 2);
+        assert!(drain_verification_checker_task("job-drain-1"));
+        assert_eq!(verification_checker_pending_total(), 1);
+        assert!(!drain_verification_checker_task("job-missing"));
+        drain_verification_checker_task("job-drain-2");
+        assert_eq!(verification_checker_pending_total(), 0);
         reset_verification_metrics_for_test();
     }
 }

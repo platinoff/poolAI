@@ -776,3 +776,31 @@ function poolaiRenderInstancesPanel(instances, labels) {
     { icon: '🧠' },
   );
 }
+
+/**
+ * PH-S499: VM instances table (wasm-first).
+ */
+function poolaiRenderVmPanel(instances, labels) {
+  labels = labels || {};
+  var wasm = poolaiChartsWasm();
+  if (wasm && typeof wasm.renderVmPanel === 'function') {
+    return wasm.renderVmPanel(
+      JSON.stringify(instances || []),
+      labels.name || poolaiChartT('admin.vmadm.col.name', 'Name'),
+      labels.status || poolaiChartT('admin.vmadm.col.status', 'Status'),
+      labels.resources || poolaiChartT('admin.vmadm.col.resources', 'Resources'),
+      labels.actions || poolaiChartT('admin.vmadm.col.actions', 'Actions'),
+      labels.tableAria || poolaiChartT('admin.vmadm.section', 'VM Instances'),
+      labels.resCpu || poolaiChartT('admin.vmadm.resCpu', 'CPU:'),
+      labels.resMem || poolaiChartT('admin.vmadm.resMem', 'Memory:'),
+      labels.start || poolaiChartT('vm.start', 'Start'),
+      labels.stop || poolaiChartT('vm.stop', 'Stop'),
+      labels.delete || poolaiChartT('ui.delete', 'Delete'),
+      labels.empty || poolaiChartT('admin.vmadm.empty', 'No VM instances found'),
+    );
+  }
+  return adminEmptyStateHtml(
+    labels.empty || poolaiChartT('admin.vmadm.empty', 'No VM instances found'),
+    { icon: '🖥' },
+  );
+}
