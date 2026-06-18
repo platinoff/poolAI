@@ -1038,6 +1038,26 @@ fn admin_dashboard_wasm_glue_tests_ph_s378() {
     assert!(dash.contains("buildAdminOverviewUrl"));
 }
 
+#[test]
+fn admin_dashboard_format_uptime_wasm_first_ph_s385() {
+    let script = include_str!("dashboard.rs");
+    assert!(script.contains("formatUptime"));
+}
+
+#[test]
+fn admin_dashboard_metrics_window_url_wasm_first_ph_s386() {
+    let script = include_str!("dashboard.rs");
+    assert!(script.contains("buildDashboardMetricsWindowUrl"));
+}
+
+#[test]
+fn admin_dashboard_wasm_glue_tests_ph_s388() {
+    let dash = include_str!("dashboard.rs");
+    assert!(dash.contains("formatUptime"));
+    assert!(dash.contains("buildDashboardMetricsWindowUrl"));
+    assert!(dash.contains("buildAdminOverviewUrl"));
+}
+
 #[tokio::test]
 async fn admin_monitoring_ph_s43_ml_metrics_panel() {
     let html = monitoring::admin_monitoring().await.0;

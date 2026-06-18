@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-18 (PH-S374…S383 ✅ · vision rev **223** · rust_ratio **94.33%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-18 (PH-S384…S393 ✅ · vision rev **224** · rust_ratio **94.33%**) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -583,8 +583,18 @@ FM-xxx (з таблиці нижче)
 | 316 | **PH-S381** | poolai-vision-sync drift gate (ops) | PH-S371 | `--check` green | **✅** |
 | 317 | **PH-S382** | Ratio hold advisory snapshot (ops) | PH-S379 | `--min-ratio 0.95 --advisory` | **✅** |
 | 318 | **PH-S383** | Docs INDEX ratio maintain (docs) | PH-S380 | INDEX §7 + rust_ratio pointer | **✅** |
+| 319 | **PH-S384** | Galaxy trust gate default score metric (code) | PH-S374 | `galaxy_trust_gate_default_score` on `/metrics` | **✅** |
+| 320 | **PH-S385** | Admin dashboard formatUptime wasm (code) | PH-S376 | `formatUptime` wasm glue on overview | **✅** |
+| 321 | **PH-S386** | Admin dashboard metrics window wasm (code) | PH-S385 | `buildDashboardMetricsWindowUrl` wasm glue | **✅** |
+| 322 | **PH-S387** | Stand smoke trust gate default score (tests) | PH-S384 | `/metrics` export shape | **✅** |
+| 323 | **PH-S388** | Admin dashboard wasm glue tests (code) | PH-S385/S386 | uptime + metrics window wasm-first gates | **✅** |
+| 324 | **PH-S389** | Rust ratio loc-audit refresh (ops) | PH-S379 | `rust_ratio.json` sprint zriz **94.33%** | **✅** |
+| 325 | **PH-S390** | Docs canon sync band (docs) | PH-S389 | INDEX/HANDOFF/NEXT/STABLE/GALAXY | **✅** |
+| 326 | **PH-S391** | poolai-vision-sync drift gate (ops) | PH-S381 | `--check` green | **✅** |
+| 327 | **PH-S392** | Ratio hold advisory snapshot (ops) | PH-S389 | `--min-ratio 0.95 --advisory` | **✅** |
+| 328 | **PH-S393** | Docs INDEX ratio maintain (docs) | PH-S390 | INDEX §7 + rust_ratio pointer | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S374…S383 ✅. Vision rev **223**. rust_ratio **94.33%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S384…S393 ✅. Vision rev **224**. rust_ratio **94.33%**.
 
 **Наступна сесія:** replenish з **§5.13** · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · або **`абракадабра`** (drain).
 
@@ -592,7 +602,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-06-18):** PH-S374…S383 ✅ закрито · **0** відкритих · replenish §5.13 або **`абракадабра`**.
+**Активна смуга (2026-06-18):** PH-S384…S393 ✅ закрито · **0** відкритих · replenish §5.13 або **`абракадабра`**.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

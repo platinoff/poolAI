@@ -51,6 +51,9 @@ pub const METRIC_TRUST_SCORE: &str = "galaxy_trust_score";
 /// Configured minimum trust (0..=100) for edge auto payout (PH-S374 `/metrics` gauge).
 pub const METRIC_TRUST_GATE_MIN_THRESHOLD: &str = "galaxy_trust_gate_min_threshold";
 
+/// Default trust score used when grid result omits `trust_score` (PH-S384 `/metrics` gauge).
+pub const METRIC_TRUST_GATE_DEFAULT_SCORE: &str = "galaxy_trust_gate_default_score";
+
 static PAYOUT_ELIGIBLE_TOTAL: AtomicU64 = AtomicU64::new(0);
 static PAYOUT_HELD_TOTAL: AtomicU64 = AtomicU64::new(0);
 static PAYOUT_NOT_APPLICABLE_TOTAL: AtomicU64 = AtomicU64::new(0);
@@ -184,6 +187,11 @@ pub fn configured_min_trust_for_payout() -> u64 {
     u64::from(TrustScoreGateConfig::from_env().min_trust_for_payout)
 }
 
+/// Default trust score constant for edge settlement stub (mirrored on `GET /metrics`, PH-S384).
+pub fn configured_default_trust_score() -> u64 {
+    u64::from(DEFAULT_TRUST_SCORE)
+}
+
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_settlement_gate_metrics_for_test() {
     PAYOUT_ELIGIBLE_TOTAL.store(0, Ordering::Relaxed);
@@ -296,6 +304,11 @@ mod tests {
         observe_last_trust_score(72);
         assert_eq!(last_trust_score(), 72);
         reset_last_trust_score_for_test();
+    }
+
+    #[test]
+    fn configured_default_trust_score_is_constant_ph_s384() {
+        assert_eq!(configured_default_trust_score(), 50);
     }
 
     #[test]

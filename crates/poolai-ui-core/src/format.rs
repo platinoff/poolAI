@@ -30,6 +30,14 @@ pub fn format_iso_datetime_display(raw: Option<&str>) -> String {
     s.to_string()
 }
 
+/// Dashboard uptime label — `Nd Nh Nm` from seconds (PH-S385 wasm glue).
+pub fn format_uptime(seconds: u64) -> String {
+    let days = seconds / 86_400;
+    let hours = (seconds % 86_400) / 3_600;
+    let mins = (seconds % 3_600) / 60;
+    format!("{days}d {hours}h {mins}m")
+}
+
 /// Dashboard `last_updated` clock — UTC `HH:MM:SS` from RFC3339 `now` (PH-S193).
 pub fn format_locale_time_hms(now_rfc3339: Option<&str>) -> String {
     let now = now_rfc3339
@@ -64,6 +72,13 @@ mod tests {
     #[test]
     fn format_iso_datetime_empty() {
         assert_eq!(format_iso_datetime_display(None), "—");
+    }
+
+    #[test]
+    fn format_uptime_days_hours_mins_ph_s385() {
+        assert_eq!(format_uptime(0), "0d 0h 0m");
+        assert_eq!(format_uptime(3_600), "0d 1h 0m");
+        assert_eq!(format_uptime(90_061), "1d 1h 1m");
     }
 
     #[test]

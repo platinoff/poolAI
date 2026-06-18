@@ -519,6 +519,11 @@ pub fn build_admin_overview_url() -> String {
     "/api/v1/admin/overview".to_string()
 }
 
+/// Dashboard metrics sparkline window — default 1h / 60 points (PH-S386 wasm glue).
+pub fn build_dashboard_metrics_window_url(hours: u32, limit: u32, now_rfc3339: &str) -> String {
+    build_metrics_window_url_with_hours(hours, limit, now_rfc3339)
+}
+
 /// Mirrors dashboard recent activity `GET /api/enterprise/audit/events?limit=` (PH-S375).
 pub fn build_audit_events_url(limit: u32) -> String {
     format!("/api/enterprise/audit/events?limit={limit}")
@@ -794,6 +799,13 @@ mod tests {
             build_audit_events_url(10),
             "/api/enterprise/audit/events?limit=10"
         );
+    }
+
+    #[test]
+    fn build_dashboard_metrics_window_url_ph_s386() {
+        let url = build_dashboard_metrics_window_url(1, 60, "2026-01-02T12:00:00.000Z");
+        assert!(url.starts_with("/api/enterprise/monitoring/metrics?"));
+        assert!(url.contains("limit=60"));
     }
 
     #[test]

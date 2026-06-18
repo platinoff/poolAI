@@ -76,6 +76,7 @@ scrape_configs:
 | `galaxy_trust_payout_held_total` | gauge | Galaxy trust gate edge payout-held results (PH-S137 stub; PH-S163 grid wire) |
 | `galaxy_trust_payout_not_applicable_total` | gauge | Galaxy trust gate local-origin results not applicable (PH-S364) |
 | `galaxy_trust_gate_min_threshold` | gauge | Galaxy configured minimum trust 0..=100 for edge auto payout (PH-S374) |
+| `galaxy_trust_gate_default_score` | gauge | Galaxy default trust score 0..=100 when grid result omits trust_score (PH-S384) |
 | `process_*` | various | `prometheus` process collector when available |
 
 JSON metrics for the admin UI remain at **`GET /api/v1/metrics`** — different contract.

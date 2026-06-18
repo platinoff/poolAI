@@ -59,7 +59,11 @@ pub async fn admin_dashboard() -> Html<String> {
         </div>
         <div class="stat-item">
           <span class="stat-label">${T('admin.dash.label.uptime', 'Uptime:')}</span>
-          <span class="stat-value">${formatUptime(data.uptime_seconds || 0)}</span>
+          <span class="stat-value">${
+            (typeof window !== 'undefined' && window.poolaiUiWasm && typeof window.poolaiUiWasm.formatUptime === 'function')
+              ? window.poolaiUiWasm.formatUptime(data.uptime_seconds || 0)
+              : formatUptime(data.uptime_seconds || 0)
+          }</span>
         </div>
       `;
     }
@@ -89,7 +93,19 @@ pub async fn admin_dashboard() -> Html<String> {
     }
     
     async function renderMetricsChart() {
-      const metrics = await poolaiFetchMetricsWindow({ hours: 1, limit: 60 });
+      const endTime = new Date().toISOString();
+      const wasm = typeof window !== 'undefined' ? window.poolaiUiWasm : null;
+      const url =
+        wasm && typeof wasm.buildDashboardMetricsWindowUrl === 'function'
+          ? wasm.buildDashboardMetricsWindowUrl(1, 60, endTime)
+          : wasm && typeof wasm.buildMetricsWindowUrlWithHours === 'function'
+            ? wasm.buildMetricsWindowUrlWithHours(1, 60, endTime)
+            : '/api/enterprise/monitoring/metrics?start_time=' +
+              encodeURIComponent(new Date(Date.now() - 60 * 60 * 1000).toISOString()) +
+              '&end_time=' +
+              encodeURIComponent(endTime) +
+              '&limit=60';
+      const metrics = await fetchJson(url).then((data) => data || []).catch(() => []);
       if (metrics.length === 0) return;
       
       const el = document.getElementById('metrics-chart');

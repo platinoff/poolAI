@@ -5,11 +5,12 @@
 use chrono::{DateTime, Utc};
 use poolai_ui_core::admin_dom::{admin_inline_error_html, admin_loading_html};
 use poolai_ui_core::api_error::{api_error_detail_from_body, format_fetch_error};
-use poolai_ui_core::format::escape_html;
+use poolai_ui_core::format::{escape_html, format_uptime};
 use poolai_ui_core::lease::lease_state;
 use poolai_ui_core::ml::{
     build_admin_overview_url, build_alert_rules_url, build_audit_events_url,
-    build_metric_history_url, build_metric_history_url_with_hours, build_metrics_window_url,
+    build_dashboard_metrics_window_url, build_metric_history_url,
+    build_metric_history_url_with_hours, build_metrics_window_url,
     build_metrics_window_url_with_hours, build_ml_pipeline_demo_url, build_ml_pipelines_url,
     build_monitoring_active_alerts_url, build_monitoring_alert_acknowledge_url,
     build_monitoring_alerts_url, build_monitoring_dashboards_url,
@@ -369,6 +370,20 @@ pub fn build_audit_events_url_wasm(limit: u32) -> String {
 #[wasm_bindgen(js_name = buildAdminOverviewUrl)]
 pub fn build_admin_overview_url_wasm() -> String {
     build_admin_overview_url()
+}
+
+#[wasm_bindgen(js_name = formatUptime)]
+pub fn format_uptime_wasm(seconds: u64) -> String {
+    format_uptime(seconds)
+}
+
+#[wasm_bindgen(js_name = buildDashboardMetricsWindowUrl)]
+pub fn build_dashboard_metrics_window_url_wasm(
+    hours: u32,
+    limit: u32,
+    now_rfc3339: &str,
+) -> String {
+    build_dashboard_metrics_window_url(hours, limit, now_rfc3339)
 }
 
 #[wasm_bindgen(js_name = groupMetricsByName)]
