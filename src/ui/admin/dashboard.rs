@@ -73,6 +73,15 @@ pub async fn admin_dashboard() -> Html<String> {
     function renderQuickStats(data) {
       const el = document.getElementById('quick-stats');
       if (!el) return;
+      const wasm = typeof window !== 'undefined' ? window.poolaiUiWasm : null;
+      const cpuPct =
+        wasm && typeof wasm.formatPercent === 'function'
+          ? wasm.formatPercent(data.cpu_usage_percent ?? 0)
+          : ((data.cpu_usage_percent ?? 0).toFixed(1) + '%');
+      const memMb =
+        wasm && typeof wasm.formatMegabytes === 'function'
+          ? wasm.formatMegabytes(data.memory_usage_mb ?? 0)
+          : ((data.memory_usage_mb ?? 0).toFixed(0) + ' MB');
       el.innerHTML = `
         <div class="stat-item">
           <span class="stat-label">${T('admin.dash.quick.workers', 'Workers (active):')}</span>
@@ -84,11 +93,11 @@ pub async fn admin_dashboard() -> Html<String> {
         </div>
         <div class="stat-item">
           <span class="stat-label">${T('admin.dash.quick.cpu', 'CPU Usage:')}</span>
-          <span class="stat-value">${(data.cpu_usage_percent ?? 0).toFixed(1)}%</span>
+          <span class="stat-value">${cpuPct}</span>
         </div>
         <div class="stat-item">
           <span class="stat-label">${T('admin.dash.quick.memory', 'Memory (tracked):')}</span>
-          <span class="stat-value">${(data.memory_usage_mb ?? 0).toFixed(0)} MB</span>
+          <span class="stat-value">${memMb}</span>
         </div>
       `;
     }

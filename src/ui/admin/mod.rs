@@ -1104,6 +1104,22 @@ fn admin_dashboard_wasm_glue_tests_ph_s418() {
     assert!(dash.contains("buildAdminOverviewUrl"));
 }
 
+#[test]
+fn admin_dashboard_quick_stats_wasm_first_ph_s428() {
+    let dash = include_str!("dashboard.rs");
+    assert!(dash.contains("formatPercent"));
+    assert!(dash.contains("formatMegabytes"));
+    assert!(dash.contains("renderQuickStats"));
+}
+
+#[test]
+fn admin_dashboard_quick_stats_glue_tests_ph_s430() {
+    let dash = include_str!("dashboard.rs");
+    assert!(dash.contains("poolaiUiWasm"));
+    assert!(dash.contains("cpu_usage_percent"));
+    assert!(dash.contains("memory_usage_mb"));
+}
+
 #[tokio::test]
 async fn admin_monitoring_ph_s43_ml_metrics_panel() {
     let html = monitoring::admin_monitoring().await.0;

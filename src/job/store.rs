@@ -171,6 +171,7 @@ impl JobStore {
                 Ok(()) => {
                     let row = record.clone();
                     trace_acquire_success(&row, LeaseSource::Api, cfg.lease_ttl_secs);
+                    crate::grid::lease_acquire_prefetch_stub();
                     row
                 }
                 Err(AcquireLeaseError::NoLeaseOwner) => {

@@ -29,13 +29,14 @@ use crate::grid::galaxy_locality::{
 };
 use crate::grid::galaxy_prefetch_metrics::{
     prefetch_bytes_total, prefetch_complete_total, prefetch_enqueue_total, prefetch_hot_skip_total,
-    prefetch_ingest_total, prefetch_plan_total, prefetch_planned_shards_total,
-    prefetch_skip_ingest_total, prefetch_strict_mode_total, prefetch_wait_ms_total,
-    METRIC_PREFETCH_BYTES_TOTAL, METRIC_PREFETCH_COMPLETE_TOTAL, METRIC_PREFETCH_ENQUEUE_TOTAL,
-    METRIC_PREFETCH_HOT_SKIP_TOTAL, METRIC_PREFETCH_INGEST_TOTAL,
+    prefetch_ingest_total, prefetch_lease_acquired_total, prefetch_plan_total,
+    prefetch_planned_shards_total, prefetch_seed_pull_total, prefetch_skip_ingest_total,
+    prefetch_strict_mode_total, prefetch_wait_ms_total, METRIC_PREFETCH_BYTES_TOTAL,
+    METRIC_PREFETCH_COMPLETE_TOTAL, METRIC_PREFETCH_ENQUEUE_TOTAL, METRIC_PREFETCH_HOT_SKIP_TOTAL,
+    METRIC_PREFETCH_INGEST_TOTAL, METRIC_PREFETCH_LEASE_ACQUIRED_TOTAL,
     METRIC_PREFETCH_PLANNED_SHARDS_TOTAL, METRIC_PREFETCH_PLAN_TOTAL,
-    METRIC_PREFETCH_SKIP_INGEST_TOTAL, METRIC_PREFETCH_STRICT_MODE_TOTAL,
-    METRIC_PREFETCH_WAIT_MS_TOTAL,
+    METRIC_PREFETCH_SEED_PULL_TOTAL, METRIC_PREFETCH_SKIP_INGEST_TOTAL,
+    METRIC_PREFETCH_STRICT_MODE_TOTAL, METRIC_PREFETCH_WAIT_MS_TOTAL,
 };
 use crate::grid::galaxy_pricing_oracle::{
     forced_fallback_total, fresh_served_total, last_market_min_usd_micro, last_quote_usd_micro,
@@ -54,13 +55,15 @@ use crate::grid::galaxy_replay_metrics::{
     METRIC_REPLAY_PENDING_RESOLVED_TOTAL, METRIC_REPLAY_PENDING_SCHEDULED_TOTAL,
 };
 use crate::grid::galaxy_replication_metrics::{
-    replication_strict_total, METRIC_REPLICATION_STRICT_TOTAL,
+    replication_enqueue_total, replication_strict_total, METRIC_REPLICATION_ENQUEUE_TOTAL,
+    METRIC_REPLICATION_STRICT_TOTAL,
 };
 use crate::grid::galaxy_settlement_metrics::{
-    settlement_cleared_total, settlement_not_applicable_total,
+    settlement_cleared_total, settlement_not_applicable_total, settlement_payout_batch_total,
     settlement_pending_verification_total, settlement_resolved_total,
     METRIC_SETTLEMENT_CLEARED_TOTAL, METRIC_SETTLEMENT_NOT_APPLICABLE_TOTAL,
-    METRIC_SETTLEMENT_PENDING_VERIFICATION_TOTAL, METRIC_SETTLEMENT_RESOLVED_TOTAL,
+    METRIC_SETTLEMENT_PAYOUT_BATCH_TOTAL, METRIC_SETTLEMENT_PENDING_VERIFICATION_TOTAL,
+    METRIC_SETTLEMENT_RESOLVED_TOTAL,
 };
 use crate::grid::galaxy_trust_score::{
     configured_default_trust_score, configured_min_trust_for_payout, default_score_applied_total,
@@ -126,6 +129,8 @@ pub struct PoolAiPrometheus {
     galaxy_prefetch_complete_total: IntGauge,
     galaxy_prefetch_ingest_total: IntGauge,
     galaxy_prefetch_skip_ingest_total: IntGauge,
+    galaxy_prefetch_seed_pull_total: IntGauge,
+    galaxy_prefetch_lease_acquired_total: IntGauge,
     galaxy_locality_rank_ingest_total: IntGauge,
     galaxy_locality_rank_miss_total: IntGauge,
     galaxy_locality_rank_empty_workers_total: IntGauge,
@@ -146,8 +151,10 @@ pub struct PoolAiPrometheus {
     galaxy_settlement_cleared_total: IntGauge,
     galaxy_settlement_not_applicable_total: IntGauge,
     galaxy_settlement_resolved_total: IntGauge,
+    galaxy_settlement_payout_batch_total: IntGauge,
     galaxy_fee_split_applied_total: IntGauge,
     galaxy_replication_strict_total: IntGauge,
+    galaxy_replication_enqueue_total: IntGauge,
 }
 
 static PROMETHEUS: OnceLock<PoolAiPrometheus> = OnceLock::new();
@@ -534,6 +541,24 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_prefetch_skip_ingest_total.clone()))
         .expect("register galaxy_prefetch_skip_ingest_total");
 
+    let galaxy_prefetch_seed_pull_total = IntGauge::with_opts(Opts::new(
+        METRIC_PREFETCH_SEED_PULL_TOTAL,
+        "Galaxy prefetch seed pull stub invocations (PH-S424)",
+    ))
+    .expect(METRIC_PREFETCH_SEED_PULL_TOTAL);
+    registry
+        .register(Box::new(galaxy_prefetch_seed_pull_total.clone()))
+        .expect("register galaxy_prefetch_seed_pull_total");
+
+    let galaxy_prefetch_lease_acquired_total = IntGauge::with_opts(Opts::new(
+        METRIC_PREFETCH_LEASE_ACQUIRED_TOTAL,
+        "Galaxy prefetch plans triggered by lease acquire (PH-S425)",
+    ))
+    .expect(METRIC_PREFETCH_LEASE_ACQUIRED_TOTAL);
+    registry
+        .register(Box::new(galaxy_prefetch_lease_acquired_total.clone()))
+        .expect("register galaxy_prefetch_lease_acquired_total");
+
     let galaxy_locality_rank_ingest_total = IntGauge::with_opts(Opts::new(
         METRIC_LOCALITY_RANK_INGEST_TOTAL,
         "Galaxy locality rank invocations on grid job ingest (PH-S295)",
@@ -720,6 +745,15 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_settlement_resolved_total.clone()))
         .expect("register galaxy_settlement_resolved_total");
 
+    let galaxy_settlement_payout_batch_total = IntGauge::with_opts(Opts::new(
+        METRIC_SETTLEMENT_PAYOUT_BATCH_TOTAL,
+        "Galaxy offline payout batch ledger entries on cleared settlement (PH-S427)",
+    ))
+    .expect(METRIC_SETTLEMENT_PAYOUT_BATCH_TOTAL);
+    registry
+        .register(Box::new(galaxy_settlement_payout_batch_total.clone()))
+        .expect("register galaxy_settlement_payout_batch_total");
+
     let galaxy_fee_split_applied_total = IntGauge::with_opts(Opts::new(
         METRIC_FEE_SPLIT_APPLIED_TOTAL,
         "Galaxy fee split applied on grid result path (PH-S194)",
@@ -737,6 +771,15 @@ fn build_prometheus() -> PoolAiPrometheus {
     registry
         .register(Box::new(galaxy_replication_strict_total.clone()))
         .expect("register galaxy_replication_strict_total");
+
+    let galaxy_replication_enqueue_total = IntGauge::with_opts(Opts::new(
+        METRIC_REPLICATION_ENQUEUE_TOTAL,
+        "Galaxy replication executor enqueue stub on grid job ingest (PH-S426)",
+    ))
+    .expect(METRIC_REPLICATION_ENQUEUE_TOTAL);
+    registry
+        .register(Box::new(galaxy_replication_enqueue_total.clone()))
+        .expect("register galaxy_replication_enqueue_total");
 
     #[cfg(target_os = "linux")]
     {
@@ -787,6 +830,8 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_prefetch_complete_total,
         galaxy_prefetch_ingest_total,
         galaxy_prefetch_skip_ingest_total,
+        galaxy_prefetch_seed_pull_total,
+        galaxy_prefetch_lease_acquired_total,
         galaxy_locality_rank_ingest_total,
         galaxy_locality_rank_miss_total,
         galaxy_locality_rank_empty_workers_total,
@@ -807,8 +852,10 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_settlement_cleared_total,
         galaxy_settlement_not_applicable_total,
         galaxy_settlement_resolved_total,
+        galaxy_settlement_payout_batch_total,
         galaxy_fee_split_applied_total,
         galaxy_replication_strict_total,
+        galaxy_replication_enqueue_total,
     }
 }
 
@@ -897,6 +944,10 @@ pub fn refresh_galaxy_prefetch_gauges() {
         .set(prefetch_ingest_total() as i64);
     prom.galaxy_prefetch_skip_ingest_total
         .set(prefetch_skip_ingest_total() as i64);
+    prom.galaxy_prefetch_seed_pull_total
+        .set(prefetch_seed_pull_total() as i64);
+    prom.galaxy_prefetch_lease_acquired_total
+        .set(prefetch_lease_acquired_total() as i64);
 }
 
 /// Mirror in-process verification counters into Prometheus gauges (scrape snapshot).
@@ -933,6 +984,8 @@ pub fn refresh_galaxy_verification_gauges() {
         .set(settlement_not_applicable_total() as i64);
     prom.galaxy_settlement_resolved_total
         .set(settlement_resolved_total() as i64);
+    prom.galaxy_settlement_payout_batch_total
+        .set(settlement_payout_batch_total() as i64);
     prom.galaxy_fee_split_applied_total
         .set(fee_split_applied_total() as i64);
 }
@@ -942,6 +995,8 @@ pub fn refresh_galaxy_replication_gauges() {
     let prom = init_prometheus();
     prom.galaxy_replication_strict_total
         .set(replication_strict_total() as i64);
+    prom.galaxy_replication_enqueue_total
+        .set(replication_enqueue_total() as i64);
 }
 
 /// Record a secret rotation attempt (called from `security::secret_rotation`).
@@ -1506,5 +1561,69 @@ mod tests {
         assert!(body.contains(METRIC_REPLICATION_STRICT_TOTAL));
         assert!(body.contains(&format!("{METRIC_REPLICATION_STRICT_TOTAL} 1")));
         reset_replication_strict_metrics_for_test();
+    }
+
+    #[test]
+    fn galaxy_prefetch_seed_pull_gauge_reflects_counter_ph_s424() {
+        use crate::grid::galaxy_prefetch_metrics::{
+            record_prefetch_seed_pull, reset_prefetch_metrics_for_test,
+        };
+
+        reset_prefetch_metrics_for_test();
+        init_prometheus();
+        record_prefetch_seed_pull(2);
+        refresh_galaxy_prefetch_gauges();
+        let body = encode_metrics_text().expect("encode");
+        assert!(body.contains(METRIC_PREFETCH_SEED_PULL_TOTAL));
+        assert!(body.contains(&format!("{METRIC_PREFETCH_SEED_PULL_TOTAL} 2")));
+        reset_prefetch_metrics_for_test();
+    }
+
+    #[test]
+    fn galaxy_prefetch_lease_acquired_gauge_reflects_counter_ph_s425() {
+        use crate::grid::galaxy_prefetch_metrics::{
+            record_prefetch_lease_acquired, reset_prefetch_metrics_for_test,
+        };
+
+        reset_prefetch_metrics_for_test();
+        init_prometheus();
+        record_prefetch_lease_acquired();
+        refresh_galaxy_prefetch_gauges();
+        let body = encode_metrics_text().expect("encode");
+        assert!(body.contains(METRIC_PREFETCH_LEASE_ACQUIRED_TOTAL));
+        assert!(body.contains(&format!("{METRIC_PREFETCH_LEASE_ACQUIRED_TOTAL} 1")));
+        reset_prefetch_metrics_for_test();
+    }
+
+    #[test]
+    fn galaxy_replication_enqueue_gauge_reflects_counter_ph_s426() {
+        use crate::grid::galaxy_replication_metrics::{
+            record_replication_enqueue, reset_replication_strict_metrics_for_test,
+        };
+
+        reset_replication_strict_metrics_for_test();
+        init_prometheus();
+        record_replication_enqueue();
+        refresh_galaxy_replication_gauges();
+        let body = encode_metrics_text().expect("encode");
+        assert!(body.contains(METRIC_REPLICATION_ENQUEUE_TOTAL));
+        assert!(body.contains(&format!("{METRIC_REPLICATION_ENQUEUE_TOTAL} 1")));
+        reset_replication_strict_metrics_for_test();
+    }
+
+    #[test]
+    fn galaxy_settlement_payout_batch_gauge_reflects_counter_ph_s427() {
+        use crate::grid::galaxy_settlement_metrics::{
+            record_settlement_payout_batch, reset_settlement_metrics_for_test,
+        };
+
+        reset_settlement_metrics_for_test();
+        init_prometheus();
+        record_settlement_payout_batch();
+        refresh_galaxy_verification_gauges();
+        let body = encode_metrics_text().expect("encode");
+        assert!(body.contains(METRIC_SETTLEMENT_PAYOUT_BATCH_TOTAL));
+        assert!(body.contains(&format!("{METRIC_SETTLEMENT_PAYOUT_BATCH_TOTAL} 1")));
+        reset_settlement_metrics_for_test();
     }
 }

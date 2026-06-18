@@ -20,10 +20,14 @@ pub const METRIC_SETTLEMENT_NOT_APPLICABLE_TOTAL: &str = "galaxy_settlement_not_
 /// Total settlement status resolutions on grid result path (PH-S404 `/metrics` gauge).
 pub const METRIC_SETTLEMENT_RESOLVED_TOTAL: &str = "galaxy_settlement_resolved_total";
 
+/// Offline payout batch ledger entries on cleared settlement (PH-S427 stub).
+pub const METRIC_SETTLEMENT_PAYOUT_BATCH_TOTAL: &str = "galaxy_settlement_payout_batch_total";
+
 static PENDING_VERIFICATION_TOTAL: AtomicU64 = AtomicU64::new(0);
 static CLEARED_TOTAL: AtomicU64 = AtomicU64::new(0);
 static NOT_APPLICABLE_TOTAL: AtomicU64 = AtomicU64::new(0);
 static RESOLVED_TOTAL: AtomicU64 = AtomicU64::new(0);
+static PAYOUT_BATCH_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// Record one grid result held in pending verification settlement.
 pub fn record_settlement_pending_verification() {
@@ -61,6 +65,15 @@ pub fn settlement_resolved_total() -> u64 {
     RESOLVED_TOTAL.load(Ordering::Relaxed)
 }
 
+/// Record one offline payout batch ledger entry (PH-S427).
+pub fn record_settlement_payout_batch() {
+    PAYOUT_BATCH_TOTAL.fetch_add(1, Ordering::Relaxed);
+}
+
+pub fn settlement_payout_batch_total() -> u64 {
+    PAYOUT_BATCH_TOTAL.load(Ordering::Relaxed)
+}
+
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_settlement_resolved_metrics_for_test() {
     RESOLVED_TOTAL.store(0, Ordering::Relaxed);
@@ -87,6 +100,7 @@ pub fn reset_settlement_metrics_for_test() {
     reset_settlement_cleared_metrics_for_test();
     reset_settlement_not_applicable_metrics_for_test();
     reset_settlement_resolved_metrics_for_test();
+    PAYOUT_BATCH_TOTAL.store(0, Ordering::Relaxed);
 }
 
 /// Grid result path stub: increment on every settlement resolution (PH-S404).
@@ -105,6 +119,7 @@ pub fn evaluate_result_settlement_pending_verification(settlement_status: Settle
 pub fn evaluate_result_settlement_cleared(settlement_status: SettlementStatus) {
     if settlement_status == SettlementStatus::Cleared {
         record_settlement_cleared();
+        record_settlement_payout_batch();
     }
 }
 
@@ -169,17 +184,19 @@ mod tests {
     #[test]
     fn evaluate_result_settlement_cleared_increments_on_cleared_ph_s187() {
         let _lock = settlement_metrics_test_lock();
-        reset_settlement_cleared_metrics_for_test();
+        reset_settlement_metrics_for_test();
         evaluate_result_settlement_cleared(SettlementStatus::PendingVerification);
         assert_eq!(settlement_cleared_total(), 0);
 
         evaluate_result_settlement_cleared(SettlementStatus::Cleared);
         assert_eq!(settlement_cleared_total(), 1);
+        assert_eq!(settlement_payout_batch_total(), 1);
 
         evaluate_result_settlement_cleared(SettlementStatus::NotApplicable);
         assert_eq!(settlement_cleared_total(), 1);
+        assert_eq!(settlement_payout_batch_total(), 1);
 
-        reset_settlement_cleared_metrics_for_test();
+        reset_settlement_metrics_for_test();
     }
 
     #[test]

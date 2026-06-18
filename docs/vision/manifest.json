@@ -1836,7 +1836,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S423",
+  "last_sprint_closed": "PH-S433",
   "layers": [
     {
       "id": "L0",
@@ -7731,7 +7731,7 @@
       "path": "crates/poolai-ui-core/src/admin_dom.rs"
     }
   ],
-  "revision": 228,
+  "revision": 229,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -10954,6 +10954,96 @@
       "row": 358,
       "status": "closed",
       "title": "Docs INDEX ratio maintain (docs)"
+    },
+    {
+      "acceptance": "galaxy_prefetch_seed_pull_total` on complete hook",
+      "deps": "Galaxy §5.5",
+      "id": "PH-S424",
+      "open": false,
+      "row": 359,
+      "status": "closed",
+      "title": "Galaxy prefetch seed-pull metric (code)"
+    },
+    {
+      "acceptance": "galaxy_prefetch_lease_acquired_total` on lease acquire path",
+      "deps": "Galaxy §5.5",
+      "id": "PH-S425",
+      "open": false,
+      "row": 360,
+      "status": "closed",
+      "title": "Lease-acquired prefetch trigger (code)"
+    },
+    {
+      "acceptance": "galaxy_replication_enqueue_total` on grid job ingest",
+      "deps": "Galaxy §6.4",
+      "id": "PH-S426",
+      "open": false,
+      "row": 361,
+      "status": "closed",
+      "title": "Replication executor enqueue metric (code)"
+    },
+    {
+      "acceptance": "galaxy_settlement_payout_batch_total` on cleared settlement",
+      "deps": "Galaxy §8.2",
+      "id": "PH-S427",
+      "open": false,
+      "row": 362,
+      "status": "closed",
+      "title": "Settlement payout batch ledger metric (code)"
+    },
+    {
+      "acceptance": "formatPercent` + `formatMegabytes` wasm glue",
+      "deps": "RUST_RATIO §5.13",
+      "id": "PH-S428",
+      "open": false,
+      "row": 363,
+      "status": "closed",
+      "title": "Admin dashboard quick-stats wasm (code/ui)"
+    },
+    {
+      "acceptance": "/metrics` export shape prefetch/replication/settlement",
+      "deps": "PH-S424…S427",
+      "id": "PH-S429",
+      "open": false,
+      "row": 364,
+      "status": "closed",
+      "title": "Stand smoke horizon metrics band (tests)"
+    },
+    {
+      "acceptance": "formatPercent`/`formatMegabytes` gates",
+      "deps": "PH-S428",
+      "id": "PH-S430",
+      "open": false,
+      "row": 365,
+      "status": "closed",
+      "title": "Admin dashboard quick-stats glue tests (code)"
+    },
+    {
+      "acceptance": "rust_ratio.json` sprint zriz 94.35%",
+      "deps": "PH-S419",
+      "id": "PH-S431",
+      "open": false,
+      "row": 366,
+      "status": "closed",
+      "title": "Rust ratio loc-audit refresh (ops)"
+    },
+    {
+      "acceptance": "INDEX/HANDOFF/NEXT/STABLE/GALAXY",
+      "deps": "PH-S420",
+      "id": "PH-S432",
+      "open": false,
+      "row": 367,
+      "status": "closed",
+      "title": "Docs canon sync band (docs)"
+    },
+    {
+      "acceptance": "--check` green + INDEX §7 rust_ratio",
+      "deps": "PH-S421/S432",
+      "id": "PH-S433",
+      "open": false,
+      "row": 368,
+      "status": "closed",
+      "title": "poolai-vision-sync + INDEX ratio (ops/docs)"
     }
   ],
   "sprint_queue_open_count": 0,

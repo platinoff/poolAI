@@ -59,6 +59,16 @@ pub fn alert_severity_badge_class(severity: Option<&str>) -> String {
     }
 }
 
+/// Dashboard quick-stat CPU percent label (PH-S428 wasm glue).
+pub fn format_percent(value: f64) -> String {
+    format!("{:.1}%", value)
+}
+
+/// Dashboard quick-stat memory MB label (PH-S428 wasm glue).
+pub fn format_megabytes(value: f64) -> String {
+    format!("{:.0} MB", value)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -107,5 +117,17 @@ mod tests {
         assert_eq!(alert_severity_badge_class(Some("WARNING")), "warning");
         assert_eq!(alert_severity_badge_class(None), "info");
         assert_eq!(alert_severity_badge_class(Some("unknown")), "info");
+    }
+
+    #[test]
+    fn format_percent_ph_s428() {
+        assert_eq!(format_percent(12.345), "12.3%");
+        assert_eq!(format_percent(0.0), "0.0%");
+    }
+
+    #[test]
+    fn format_megabytes_ph_s428() {
+        assert_eq!(format_megabytes(1024.6), "1025 MB");
+        assert_eq!(format_megabytes(0.0), "0 MB");
     }
 }

@@ -21,9 +21,9 @@ use crate::grid::galaxy_locality::{
 };
 use crate::grid::galaxy_prefetch_metrics::{
     record_prefetch_complete, record_prefetch_enqueue, record_prefetch_ingest,
-    record_prefetch_plan, record_prefetch_skip_ingest, record_prefetch_strict_mode,
-    record_prefetch_wait, DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM,
-    DEFAULT_PREFETCH_BYTES_PER_SHARD_VRAM,
+    record_prefetch_lease_acquired, record_prefetch_plan, record_prefetch_seed_pull,
+    record_prefetch_skip_ingest, record_prefetch_strict_mode, record_prefetch_wait,
+    DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM, DEFAULT_PREFETCH_BYTES_PER_SHARD_VRAM,
 };
 use crate::grid::galaxy_replay_metrics::evaluate_result_replay_pending;
 use crate::grid::galaxy_replication::{
@@ -165,6 +165,24 @@ pub fn ingest_job_prefetch_stub(required_shard_ids: &[String], gpu_capable: bool
     );
     let n = complete_prefetch_hook(&plan);
     n
+}
+
+/// Lease-acquired prefetch stub (PH-S425; no enqueue wire).
+pub fn lease_acquire_prefetch_stub() -> usize {
+    let inventory = coordinator_merged_seed_inventory();
+    let config = PrefetchPolicyConfig::from_env();
+    let shard_ids: Vec<String> = inventory.shard_ids.iter().take(2).cloned().collect();
+    if shard_ids.is_empty() {
+        return 0;
+    }
+    let plan = plan_prefetch(
+        &inventory,
+        &shard_ids,
+        PrefetchTrigger::LeaseAcquired,
+        false,
+        &config,
+    );
+    complete_prefetch_hook(&plan)
 }
 
 /// Coordinator worker rows for locality rank stub (PH-S285).
@@ -369,6 +387,9 @@ pub fn plan_prefetch(
     if config.mode == PrefetchPolicyMode::StrictLocality && !items.is_empty() {
         record_prefetch_strict_mode();
     }
+    if trigger == PrefetchTrigger::LeaseAcquired {
+        record_prefetch_lease_acquired();
+    }
     if !items.is_empty() {
         observe_last_cross_region_egress_mb(
             DEFAULT_PREFETCH_CROSS_REGION_EGRESS_MB_PER_SHARD * items.len() as f64,
@@ -411,7 +432,16 @@ pub fn complete_prefetch_hook(plan: &PrefetchPlan) -> usize {
         record_prefetch_enqueue(n);
         record_prefetch_wait(n, plan.deadline_ms);
         record_prefetch_complete(n);
+        seed_pull_hook(plan);
     }
+    n
+}
+
+/// Seed pull stub (PH-S424): records pull metric; no live memory/RAID fetch wire.
+#[inline]
+pub fn seed_pull_hook(plan: &PrefetchPlan) -> usize {
+    let n = plan.items.len();
+    record_prefetch_seed_pull(n);
     n
 }
 

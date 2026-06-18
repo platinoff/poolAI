@@ -35,6 +35,12 @@ pub const METRIC_PREFETCH_INGEST_TOTAL: &str = "galaxy_prefetch_ingest_total";
 /// Prefetch ingest skipped when job has no required shards (PH-S323 stub).
 pub const METRIC_PREFETCH_SKIP_INGEST_TOTAL: &str = "galaxy_prefetch_skip_ingest_total";
 
+/// Seed pull hook invocations on prefetch complete path (PH-S424 stub).
+pub const METRIC_PREFETCH_SEED_PULL_TOTAL: &str = "galaxy_prefetch_seed_pull_total";
+
+/// Prefetch plans triggered by lease acquire (PH-S425 stub).
+pub const METRIC_PREFETCH_LEASE_ACQUIRED_TOTAL: &str = "galaxy_prefetch_lease_acquired_total";
+
 /// Default stub bytes per RAM-tier planned shard (4 MiB, Galaxy §5.5).
 pub const DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM: u64 = 4_194_304;
 
@@ -51,6 +57,8 @@ static STRICT_MODE_TOTAL: AtomicU64 = AtomicU64::new(0);
 static COMPLETE_TOTAL: AtomicU64 = AtomicU64::new(0);
 static INGEST_TOTAL: AtomicU64 = AtomicU64::new(0);
 static SKIP_INGEST_TOTAL: AtomicU64 = AtomicU64::new(0);
+static SEED_PULL_TOTAL: AtomicU64 = AtomicU64::new(0);
+static LEASE_ACQUIRED_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// Record one `plan_prefetch` outcome (no wire enqueue).
 pub fn record_prefetch_plan(required_shards: usize, planned_shards: usize, prefetch_bytes: u64) {
@@ -142,6 +150,26 @@ pub fn prefetch_skip_ingest_total() -> u64 {
     SKIP_INGEST_TOTAL.load(Ordering::Relaxed)
 }
 
+/// Record seed pull stub on prefetch complete hook (PH-S424).
+pub fn record_prefetch_seed_pull(shard_count: usize) {
+    if shard_count > 0 {
+        SEED_PULL_TOTAL.fetch_add(shard_count as u64, Ordering::Relaxed);
+    }
+}
+
+pub fn prefetch_seed_pull_total() -> u64 {
+    SEED_PULL_TOTAL.load(Ordering::Relaxed)
+}
+
+/// Record lease-acquired prefetch trigger (PH-S425).
+pub fn record_prefetch_lease_acquired() {
+    LEASE_ACQUIRED_TOTAL.fetch_add(1, Ordering::Relaxed);
+}
+
+pub fn prefetch_lease_acquired_total() -> u64 {
+    LEASE_ACQUIRED_TOTAL.load(Ordering::Relaxed)
+}
+
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_prefetch_metrics_for_test() {
     PLAN_TOTAL.store(0, Ordering::Relaxed);
@@ -154,6 +182,8 @@ pub fn reset_prefetch_metrics_for_test() {
     COMPLETE_TOTAL.store(0, Ordering::Relaxed);
     INGEST_TOTAL.store(0, Ordering::Relaxed);
     SKIP_INGEST_TOTAL.store(0, Ordering::Relaxed);
+    SEED_PULL_TOTAL.store(0, Ordering::Relaxed);
+    LEASE_ACQUIRED_TOTAL.store(0, Ordering::Relaxed);
 }
 
 #[cfg(test)]
@@ -217,5 +247,21 @@ mod tests {
         reset_prefetch_metrics_for_test();
         record_prefetch_skip_ingest();
         assert_eq!(prefetch_skip_ingest_total(), 1);
+    }
+
+    #[test]
+    fn record_prefetch_seed_pull_ph_s424() {
+        reset_prefetch_metrics_for_test();
+        record_prefetch_seed_pull(2);
+        assert_eq!(prefetch_seed_pull_total(), 2);
+        record_prefetch_seed_pull(0);
+        assert_eq!(prefetch_seed_pull_total(), 2);
+    }
+
+    #[test]
+    fn record_prefetch_lease_acquired_ph_s425() {
+        reset_prefetch_metrics_for_test();
+        record_prefetch_lease_acquired();
+        assert_eq!(prefetch_lease_acquired_total(), 1);
     }
 }

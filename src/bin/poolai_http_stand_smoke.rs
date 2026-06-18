@@ -349,6 +349,8 @@ const GALAXY_PREFETCH_METRICS: &[&str] = &[
     "galaxy_prefetch_complete_total",
     "galaxy_prefetch_ingest_total",
     "galaxy_prefetch_skip_ingest_total",
+    "galaxy_prefetch_seed_pull_total",
+    "galaxy_prefetch_lease_acquired_total",
     "galaxy_locality_rank_ingest_total",
     "galaxy_locality_rank_miss_total",
     "galaxy_locality_rank_empty_workers_total",
@@ -659,6 +661,7 @@ const GALAXY_SETTLEMENT_METRICS: &[&str] = &[
     "galaxy_settlement_cleared_total",
     "galaxy_settlement_not_applicable_total",
     "galaxy_settlement_resolved_total",
+    "galaxy_settlement_payout_batch_total",
 ];
 
 fn metrics_text_has_settlement_counters(body: &str) -> Result<(), String> {
@@ -791,16 +794,20 @@ async fn smoke_galaxy_trust_payout_metrics(client: &Client, base: &str) -> Resul
     metrics_text_has_trust_payout_counters(&body)
 }
 
-/// PH-S232: live stand exposes Galaxy replication strict-tier counter on Prometheus scrape.
-const GALAXY_REPLICATION_STRICT: &str = "galaxy_replication_strict_total";
+/// PH-S232 / PH-S426: live stand exposes Galaxy replication counters on Prometheus scrape.
+const GALAXY_REPLICATION_METRICS: &[&str] = &[
+    "galaxy_replication_strict_total",
+    "galaxy_replication_enqueue_total",
+];
 
 fn metrics_text_has_replication_strict(body: &str) -> Result<(), String> {
-    let name = GALAXY_REPLICATION_STRICT;
-    if !body.contains(name) {
-        return Err(format!("/metrics missing {name}"));
-    }
-    if !body.contains(&format!("# TYPE {name} gauge")) {
-        return Err(format!("/metrics missing TYPE gauge for {name}"));
+    for name in GALAXY_REPLICATION_METRICS {
+        if !body.contains(name) {
+            return Err(format!("/metrics missing {name}"));
+        }
+        if !body.contains(&format!("# TYPE {name} gauge")) {
+            return Err(format!("/metrics missing TYPE gauge for {name}"));
+        }
     }
     Ok(())
 }
@@ -1683,6 +1690,12 @@ mod tests {
             "# HELP galaxy_prefetch_skip_ingest_total Galaxy prefetch skip ingest\n",
             "# TYPE galaxy_prefetch_skip_ingest_total gauge\n",
             "galaxy_prefetch_skip_ingest_total 0\n",
+            "# HELP galaxy_prefetch_seed_pull_total Galaxy prefetch seed pull stub invocations (PH-S424)\n",
+            "# TYPE galaxy_prefetch_seed_pull_total gauge\n",
+            "galaxy_prefetch_seed_pull_total 0\n",
+            "# HELP galaxy_prefetch_lease_acquired_total Galaxy prefetch plans triggered by lease acquire (PH-S425)\n",
+            "# TYPE galaxy_prefetch_lease_acquired_total gauge\n",
+            "galaxy_prefetch_lease_acquired_total 0\n",
             "# HELP galaxy_locality_rank_ingest_total Galaxy locality rank ingest\n",
             "# TYPE galaxy_locality_rank_ingest_total gauge\n",
             "galaxy_locality_rank_ingest_total 0\n",
@@ -1822,6 +1835,9 @@ mod tests {
             "# HELP galaxy_settlement_resolved_total Galaxy settlement status resolutions on grid result path (PH-S404)\n",
             "# TYPE galaxy_settlement_resolved_total gauge\n",
             "galaxy_settlement_resolved_total 0\n",
+            "# HELP galaxy_settlement_payout_batch_total Galaxy offline payout batch ledger entries on cleared settlement (PH-S427)\n",
+            "# TYPE galaxy_settlement_payout_batch_total gauge\n",
+            "galaxy_settlement_payout_batch_total 0\n",
         );
         metrics_text_has_settlement_counters(sample).expect("sample export");
     }
@@ -1907,6 +1923,9 @@ mod tests {
             "# HELP galaxy_replication_strict_total Galaxy replication strict tier grid job ingests (PH-S179)\n",
             "# TYPE galaxy_replication_strict_total gauge\n",
             "galaxy_replication_strict_total 0\n",
+            "# HELP galaxy_replication_enqueue_total Galaxy replication executor enqueue stub on grid job ingest (PH-S426)\n",
+            "# TYPE galaxy_replication_enqueue_total gauge\n",
+            "galaxy_replication_enqueue_total 0\n",
         );
         metrics_text_has_replication_strict(sample).expect("sample export");
     }

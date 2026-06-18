@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-18 (PH-S414…S423 ✅ · vision **rev 228** · **0** відкритих · rust_ratio **94.35%**)
+**Оновлено:** 2026-06-18 (PH-S424…S433 ✅ · vision **rev 229** · **0** відкритих · rust_ratio **94.35%**)
 
 | **← наступний** | **`абракадабра`** (project scan + drain) **або** один PH-S* |
 | **Відкритих** | **0** |
@@ -38,10 +38,11 @@ S0: git fetch; HANDOFF; FM §5.12; df -h /s
 
 ---
 
-## Закрито (смуга PH-S414…S423)
+## Закрито (смуга PH-S424…S433)
 
-PH-S414…S418 ✅ — verify/replay metrics, dashboard refresh wasm, stand smoke.
-PH-S419…S423 ✅ — loc-audit **94.35%**, docs canon, vision **rev 228**.
+PH-S424…S427 ✅ — Galaxy prefetch seed-pull, lease-acquired trigger, replication enqueue, payout batch metrics.
+PH-S428…S430 ✅ — dashboard quick-stats wasm (`formatPercent`/`formatMegabytes`) + stand smoke.
+PH-S431…S433 ✅ — loc-audit **94.35%**, docs canon, vision-sync.
 
 **rust_ratio:** **94.35%** (formal 90–95% ✅; hold 95% advisory).
 

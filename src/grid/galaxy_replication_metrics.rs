@@ -9,7 +9,11 @@ use crate::grid::galaxy_replication::{ReplicationProfile, ReplicationTierConfig}
 /// In-process counter for strict-tier grid job ingests (mirrored on `GET /metrics`).
 pub const METRIC_REPLICATION_STRICT_TOTAL: &str = "galaxy_replication_strict_total";
 
+/// Executor enqueue stub invocations on grid job ingest (PH-S426).
+pub const METRIC_REPLICATION_ENQUEUE_TOTAL: &str = "galaxy_replication_enqueue_total";
+
 static REPLICATION_STRICT_TOTAL: AtomicU64 = AtomicU64::new(0);
+static REPLICATION_ENQUEUE_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// Record one grid job ingest with `replication_strict` tier.
 pub fn record_replication_strict_ingest() {
@@ -20,13 +24,24 @@ pub fn replication_strict_total() -> u64 {
     REPLICATION_STRICT_TOTAL.load(Ordering::Relaxed)
 }
 
+/// Record one replication executor enqueue stub (PH-S426).
+pub fn record_replication_enqueue() {
+    REPLICATION_ENQUEUE_TOTAL.fetch_add(1, Ordering::Relaxed);
+}
+
+pub fn replication_enqueue_total() -> u64 {
+    REPLICATION_ENQUEUE_TOTAL.load(Ordering::Relaxed)
+}
+
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_replication_strict_metrics_for_test() {
     REPLICATION_STRICT_TOTAL.store(0, Ordering::Relaxed);
+    REPLICATION_ENQUEUE_TOTAL.store(0, Ordering::Relaxed);
 }
 
 /// Grid job ingest path stub: increment when tier profile is strict (PH-S179).
 pub fn evaluate_job_replication_strict(replication_tier: ReplicationTierConfig) {
+    record_replication_enqueue();
     if replication_tier.profile == ReplicationProfile::Strict {
         record_replication_strict_ingest();
     }
@@ -57,12 +72,15 @@ mod tests {
         reset_replication_strict_metrics_for_test();
         evaluate_job_replication_strict(REPLICATION_STANDARD);
         assert_eq!(replication_strict_total(), 0);
+        assert_eq!(replication_enqueue_total(), 1);
 
         evaluate_job_replication_strict(REPLICATION_STRICT);
         assert_eq!(replication_strict_total(), 1);
+        assert_eq!(replication_enqueue_total(), 2);
 
         evaluate_job_replication_strict(REPLICATION_STANDARD);
         assert_eq!(replication_strict_total(), 1);
+        assert_eq!(replication_enqueue_total(), 3);
 
         reset_replication_strict_metrics_for_test();
     }

@@ -3,6 +3,96 @@
   "items": [
     {
       "category": "closed",
+      "id": "PH-S433",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--check` green + INDEX §7 rust_ratio",
+      "title": "poolai-vision-sync + INDEX ratio (ops/docs)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S432",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "INDEX/HANDOFF/NEXT/STABLE/GALAXY",
+      "title": "Docs canon sync band (docs)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S431",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "rust_ratio.json` sprint zriz 94.35%",
+      "title": "Rust ratio loc-audit refresh (ops)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S430",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "formatPercent`/`formatMegabytes` gates",
+      "title": "Admin dashboard quick-stats glue tests (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S429",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "/metrics` export shape prefetch/replication/settlement",
+      "title": "Stand smoke horizon metrics band (tests)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S428",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "formatPercent` + `formatMegabytes` wasm glue",
+      "title": "Admin dashboard quick-stats wasm (code/ui)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S427",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_settlement_payout_batch_total` on cleared settlement",
+      "title": "Settlement payout batch ledger metric (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S426",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_replication_enqueue_total` on grid job ingest",
+      "title": "Replication executor enqueue metric (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S425",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_prefetch_lease_acquired_total` on lease acquire path",
+      "title": "Lease-acquired prefetch trigger (code)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S424",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_prefetch_seed_pull_total` on complete hook",
+      "title": "Galaxy prefetch seed-pull metric (code)"
+    },
+    {
+      "category": "closed",
       "id": "PH-S423",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
@@ -17,96 +107,6 @@
       "published": "2026-05-28",
       "status": "closed",
       "summary": "--min-ratio 0.95` snapshot 94.35%",
-      "title": "Ratio hold advisory snapshot (ops)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S421",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--check` green",
-      "title": "poolai-vision-sync drift gate (ops)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S420",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "INDEX/HANDOFF/NEXT/STABLE/GALAXY",
-      "title": "Docs canon sync band (docs)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S419",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "rust_ratio.json` sprint zriz 94.35%",
-      "title": "Rust ratio loc-audit refresh (ops)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S418",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "updateDashboardRefreshedAt` gates",
-      "title": "Admin dashboard refreshed-at glue tests (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S417",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "/metrics` export shape",
-      "title": "Stand smoke verify + replay evaluations (tests)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S416",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "updateDashboardRefreshedAt` + `formatLocaleTimeHms",
-      "title": "Admin dashboard refreshed-at wasm (code/ui)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S415",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_replay_evaluations_total` on grid result path",
-      "title": "Galaxy replay evaluations metric (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S414",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_verification_sampling_evaluations_total` on grid result path",
-      "title": "Galaxy verify sampling evaluations metric (code)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S413",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "INDEX §7 + rust_ratio pointer",
-      "title": "Docs INDEX ratio maintain (docs)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S412",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--min-ratio 0.95 --advisory",
       "title": "Ratio hold advisory snapshot (ops)"
     }
   ],

@@ -5,7 +5,9 @@
 use chrono::{DateTime, Utc};
 use poolai_ui_core::admin_dom::{admin_inline_error_html, admin_loading_html};
 use poolai_ui_core::api_error::{api_error_detail_from_body, format_fetch_error};
-use poolai_ui_core::format::{alert_severity_badge_class, escape_html, format_uptime};
+use poolai_ui_core::format::{
+    alert_severity_badge_class, escape_html, format_megabytes, format_percent, format_uptime,
+};
 use poolai_ui_core::lease::lease_state;
 use poolai_ui_core::ml::{
     build_admin_overview_url, build_alert_rules_url, build_audit_events_url,
@@ -375,6 +377,16 @@ pub fn build_admin_overview_url_wasm() -> String {
 #[wasm_bindgen(js_name = formatUptime)]
 pub fn format_uptime_wasm(seconds: u64) -> String {
     format_uptime(seconds)
+}
+
+#[wasm_bindgen(js_name = formatPercent)]
+pub fn format_percent_wasm(value: f64) -> String {
+    format_percent(value)
+}
+
+#[wasm_bindgen(js_name = formatMegabytes)]
+pub fn format_megabytes_wasm(value: f64) -> String {
+    format_megabytes(value)
 }
 
 #[wasm_bindgen(js_name = alertSeverityBadgeClass)]

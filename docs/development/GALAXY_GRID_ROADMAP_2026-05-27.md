@@ -1,11 +1,12 @@
 # Galaxy Grid roadmap (зріз)
 
-**Оновлено:** 2026-06-18 · **Канон черги:** FM §5.12 (**0** · PH-S414…S423 ✅) · **`абракадабра`** = research concept/roadmap → drain 10
+**Оновлено:** 2026-06-18 · **Канон черги:** FM §5.12 (**0** · PH-S424…S433 ✅) · **`абракадабра`** = research concept/roadmap → drain 10
 
 | Зріз | Значення |
 |------|----------|
-| **Galaxy verification metrics** | PH-S343/S345 completed + skipped totals ✅ |
-| **Wasm / admin slim** | PH-S344/S347 monitoring alerts + alert-rules URL builders |
+| **Galaxy prefetch horizon** | PH-S424/S425 seed-pull + lease-acquired metrics ✅ |
+| **Replication / settlement** | PH-S426 enqueue + PH-S427 payout batch ledger stub ✅ |
+| **Wasm / admin slim** | PH-S428 dashboard quick-stats `formatPercent`/`formatMegabytes` |
 | **Docs / ratio** | PH-S348…S352 ✅ |
 | **Rust ratio** | **94.35%** hold **95%** advisory |
 

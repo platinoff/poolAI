@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-18 (PH-S414…S423 ✅ · vision rev **228** · rust_ratio **94.35%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-18 (PH-S424…S433 ✅ · rust_ratio **94.35%**) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -623,8 +623,18 @@ FM-xxx (з таблиці нижче)
 | 356 | **PH-S421** | poolai-vision-sync drift gate (ops) | PH-S411 | `--check` green | **✅** |
 | 357 | **PH-S422** | Ratio hold advisory snapshot (ops) | PH-S419 | `--min-ratio 0.95` snapshot **94.35%** | **✅** |
 | 358 | **PH-S423** | Docs INDEX ratio maintain (docs) | PH-S420 | INDEX §7 + rust_ratio pointer | **✅** |
+| 359 | **PH-S424** | Galaxy prefetch seed-pull metric (code) | Galaxy §5.5 | `galaxy_prefetch_seed_pull_total` on complete hook | **✅** |
+| 360 | **PH-S425** | Lease-acquired prefetch trigger (code) | Galaxy §5.5 | `galaxy_prefetch_lease_acquired_total` on lease acquire path | **✅** |
+| 361 | **PH-S426** | Replication executor enqueue metric (code) | Galaxy §6.4 | `galaxy_replication_enqueue_total` on grid job ingest | **✅** |
+| 362 | **PH-S427** | Settlement payout batch ledger metric (code) | Galaxy §8.2 | `galaxy_settlement_payout_batch_total` on cleared settlement | **✅** |
+| 363 | **PH-S428** | Admin dashboard quick-stats wasm (code/ui) | RUST_RATIO §5.13 | `formatPercent` + `formatMegabytes` wasm glue | **✅** |
+| 364 | **PH-S429** | Stand smoke horizon metrics band (tests) | PH-S424…S427 | `/metrics` export shape prefetch/replication/settlement | **✅** |
+| 365 | **PH-S430** | Admin dashboard quick-stats glue tests (code) | PH-S428 | `formatPercent`/`formatMegabytes` gates | **✅** |
+| 366 | **PH-S431** | Rust ratio loc-audit refresh (ops) | PH-S419 | `rust_ratio.json` sprint zriz **94.35%** | **✅** |
+| 367 | **PH-S432** | Docs canon sync band (docs) | PH-S420 | INDEX/HANDOFF/NEXT/STABLE/GALAXY | **✅** |
+| 368 | **PH-S433** | poolai-vision-sync + INDEX ratio (ops/docs) | PH-S421/S432 | `--check` green + INDEX §7 rust_ratio | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S414…S423 ✅. Vision rev **228**. rust_ratio **94.35%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S424…S433 ✅. Vision rev **229**. rust_ratio **94.35%**.
 
 **Наступна сесія:** **`абракадабра`** (research concept/roadmap → drain 10) **або** один PH-S* · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
@@ -632,7 +642,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-06-18):** PH-S414…S423 ✅ закрито · **0** відкритих · **`абракадабра`** = project scan → §5.12 → drain.
+**Активна смуга (2026-06-18):** PH-S424…S433 ✅ закрито · **0** відкритих · **`абракадабра`** = project scan → §5.12 → drain.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

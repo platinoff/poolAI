@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-18 (PH-S414…S423 ✅ · rust_ratio **94.35%**) · VDT
+**Оновлено:** 2026-06-18 (PH-S424…S433 ✅ · vision rev **229** · rust_ratio **94.35%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -374,6 +374,16 @@
 **PH-S421 ✅ (ops):** `poolai-vision-sync --check` green.
 **PH-S422 ✅ (ops):** hold advisory `--min-ratio 0.95` snapshot **94.35%**.
 **PH-S423 ✅ (docs):** INDEX §7 + rust_ratio pointer **94.35%**.
+**PH-S424 ✅ (code):** `galaxy_prefetch_seed_pull_total` on `seed_pull_hook` / `complete_prefetch_hook` (Galaxy §5.5).
+**PH-S425 ✅ (code):** `galaxy_prefetch_lease_acquired_total` + `lease_acquire_prefetch_stub` on `POST /jobs/{id}/lease`.
+**PH-S426 ✅ (code):** `galaxy_replication_enqueue_total` on grid job ingest (`galaxy_replication_metrics`).
+**PH-S427 ✅ (code):** `galaxy_settlement_payout_batch_total` on cleared settlement path.
+**PH-S428 ✅ (code/ui):** dashboard quick-stats wasm — `formatPercent` + `formatMegabytes` (`poolai-ui-core` / `poolai-ui-wasm`).
+**PH-S429 ✅ (tests):** `poolai-http-stand-smoke` — prefetch seed-pull / lease-acquired / replication enqueue / payout batch `/metrics` shape.
+**PH-S430 ✅ (code):** admin dashboard quick-stats wasm glue tests (PH-S428 gates).
+**PH-S431 ✅ (ops):** `poolai-loc-audit` → `rust_ratio.json` sprint zriz **94.35%**.
+**PH-S432 ✅ (docs):** INDEX/HANDOFF/NEXT/STABLE/GALAXY canon sync band.
+**PH-S433 ✅ (ops/docs):** `poolai-vision-sync` **rev 229** + INDEX §7 rust_ratio maintain.
 **Rules ✅:** **`абракадабра`** — project scan **всього репо** (concept · FM §5.1 · roadmaps · architect · code) → 10 PH-S* у §5.12 (журнал) → drain → push; канон [`.cursor/rules/poolai-session-iteration.mdc`](../.cursor/rules/poolai-session-iteration.mdc) § «Тригер абракадабра»; commit **`git-commit-tree-msg.sh`**.
 **§5.12:** **0** відкритих — наступна сесія: **`абракадабра`** (project scan + drain) або один PH-S*.
 **Vision ✅:** rev **228** · rust_ratio **94.35%** · hold **95%** advisory.
