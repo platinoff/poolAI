@@ -100,32 +100,20 @@ pub async fn admin_monitoring() -> Html<String> {
         empty: T('admin.mon.noAlerts', 'No active alerts'),
       });
       
-      const dashboardsHtml = dashboards.length === 0
-        ? adminEmptyStateHtml(T('admin.mon.noDashboards', 'No dashboards created'), { icon: '📊' })
-        : `
-          <div class="admin-table-container"><table class="admin-table" aria-label="${escapeHtml(T('admin.mon.dashboardsTitle', 'Dashboards'))}">
-            <thead>
-              <tr>
-                <th>${escapeHtml(T('admin.mon.col.name', 'Name'))}</th>
-                <th>${escapeHtml(T('admin.mon.col.description', 'Description'))}</th>
-                <th>${escapeHtml(T('admin.mon.col.metrics', 'Metrics'))}</th>
-                <th>${escapeHtml(T('admin.mon.col.public', 'Public'))}</th>
-                <th>${escapeHtml(T('admin.mon.col.created', 'Created'))}</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${dashboards.map(d => `
-                <tr>
-                  <td><strong>${escapeHtml(d.name || 'unnamed')}</strong></td>
-                  <td>${escapeHtml(d.description || T('admin.sec.emDash', '—'))}</td>
-                  <td>${escapeHtml(T('admin.mon.metricsN', '{n} metrics').replace(/\{n\}/g, String(d.metrics?.length || 0)))}</td>
-                  <td><span class="status-badge ${d.is_public ? 'active' : 'inactive'}">${d.is_public ? escapeHtml(T('admin.mon.public', 'Public')) : escapeHtml(T('admin.mon.private', 'Private'))}</span></td>
-                  <td>${d.created_at ? escapeHtml(new Date(d.created_at).toLocaleDateString()) : escapeHtml(T('admin.na', 'N/A'))}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table></div>
-        `;
+      const dashboardsHtml = poolaiRenderMonitoringDashboardsPanel(dashboards, {
+        name: T('admin.mon.col.name', 'Name'),
+        description: T('admin.mon.col.description', 'Description'),
+        metrics: T('admin.mon.col.metrics', 'Metrics'),
+        publicCol: T('admin.mon.col.public', 'Public'),
+        created: T('admin.mon.col.created', 'Created'),
+        tableAria: T('admin.mon.dashboardsTitle', 'Dashboards'),
+        emDash: T('admin.sec.emDash', '—'),
+        na: T('admin.na', 'N/A'),
+        public: T('admin.mon.public', 'Public'),
+        private: T('admin.mon.private', 'Private'),
+        metricsN: T('admin.mon.metricsN', '{n} metrics'),
+        empty: T('admin.mon.noDashboards', 'No dashboards created'),
+      });
       
       el.innerHTML = `
         ${chartsHtml}

@@ -686,3 +686,34 @@ function poolaiRenderMonitoringAlertsPanel(alerts, labels) {
     { icon: '✅' },
   );
 }
+
+/**
+ * PH-S470: monitoring dashboards table (wasm-first).
+ * @param {Array<object>} dashboards
+ * @param {object} labels i18n label map
+ */
+function poolaiRenderMonitoringDashboardsPanel(dashboards, labels) {
+  labels = labels || {};
+  var wasm = poolaiChartsWasm();
+  if (wasm && typeof wasm.renderMonitoringDashboardsPanel === 'function') {
+    return wasm.renderMonitoringDashboardsPanel(
+      JSON.stringify(dashboards || []),
+      labels.name || poolaiChartT('admin.mon.col.name', 'Name'),
+      labels.description || poolaiChartT('admin.mon.col.description', 'Description'),
+      labels.metrics || poolaiChartT('admin.mon.col.metrics', 'Metrics'),
+      labels.publicCol || poolaiChartT('admin.mon.col.public', 'Public'),
+      labels.created || poolaiChartT('admin.mon.col.created', 'Created'),
+      labels.tableAria || poolaiChartT('admin.mon.dashboardsTitle', 'Dashboards'),
+      labels.emDash || poolaiChartT('admin.sec.emDash', '—'),
+      labels.na || poolaiChartT('admin.na', 'N/A'),
+      labels.public || poolaiChartT('admin.mon.public', 'Public'),
+      labels.private || poolaiChartT('admin.mon.private', 'Private'),
+      labels.metricsN || poolaiChartT('admin.mon.metricsN', '{n} metrics'),
+      labels.empty || poolaiChartT('admin.mon.noDashboards', 'No dashboards created'),
+    );
+  }
+  return adminEmptyStateHtml(
+    labels.empty || poolaiChartT('admin.mon.noDashboards', 'No dashboards created'),
+    { icon: '📊' },
+  );
+}

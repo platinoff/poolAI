@@ -973,6 +973,15 @@ fn admin_charts_monitoring_alerts_panel_wasm_first_ph_s461() {
 }
 
 #[test]
+fn admin_charts_monitoring_dashboards_panel_wasm_first_ph_s470() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("wasm.renderMonitoringDashboardsPanel"));
+    assert!(js.contains("poolaiRenderMonitoringDashboardsPanel"));
+    let mon = include_str!("monitoring.rs");
+    assert!(mon.contains("poolaiRenderMonitoringDashboardsPanel"));
+}
+
+#[test]
 fn admin_charts_metric_history_url_with_hours_wasm_first_ph_s334() {
     let js = include_str!("../admin_charts.js");
     assert!(js.contains("wasm.buildMetricHistoryUrlWithHours"));

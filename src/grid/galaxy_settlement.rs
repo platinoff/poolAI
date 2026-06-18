@@ -4,9 +4,10 @@
 
 use crate::grid::galaxy_trust_score::SettlementGateVerdict;
 use crate::grid::galaxy_verify_sampling::VerifySamplingVerdict;
+use serde::{Deserialize, Serialize};
 
 /// Offline payout batch ledger entry stub (PH-S436, Galaxy §8.2).
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct PayoutBatchLedgerEntry {
     pub job_id: String,
     pub cleared_at: String,

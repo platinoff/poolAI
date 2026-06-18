@@ -28,32 +28,35 @@ mod map;
 pub mod protocol_compat;
 
 pub use dispatch::{
-    all_required_shards_hot, check_strict_locality_gate, complete_prefetch_hook,
-    coordinator_merged_seed_inventory, coordinator_seed_inventory_snapshot,
-    default_co_access_graph, enqueue_prefetch_hook, fetch_seed_shards_hook, ingest_envelope,
-    ingest_job_locality_rank_stub, ingest_job_prefetch_stub, lease_acquire_prefetch_stub,
-    locality_workers_from_seed_snapshots, noop_prefetch_hook, parse_prefetch_policy_mode,
-    plan_co_access_prefetch, plan_prefetch, re_migrate_prefetch_stub, resolve_seed_pull_shards,
-    seed_pull_hook, wait_prefetch_hook, GridIngestKind, GridIngestOutcome, PrefetchPlan,
-    PrefetchPolicyConfig, PrefetchPolicyMode, PrefetchTrigger, SeedInventoryEntry,
-    SeedInventoryPeerSnapshot, DEFAULT_PREFETCH_DEADLINE_MS, ENV_LOCALITY_MODE,
-    ENV_PREFETCH_DEADLINE_MS,
+    all_required_shards_hot, check_strict_locality_gate, co_access_graph_from_env,
+    complete_prefetch_hook, coordinator_merged_seed_inventory, coordinator_seed_inventory_snapshot,
+    default_co_access_graph, enqueue_prefetch_hook, fetch_seed_shards_from_raid_hook,
+    fetch_seed_shards_hook, ingest_envelope, ingest_job_locality_rank_stub,
+    ingest_job_prefetch_stub, lease_acquire_prefetch_stub, locality_workers_from_seed_snapshots,
+    noop_prefetch_hook, parse_prefetch_policy_mode, plan_co_access_prefetch, plan_prefetch,
+    prefetch_backpressure_skip, re_migrate_prefetch_stub, resolve_seed_pull_shards, seed_pull_hook,
+    wait_prefetch_hook, GridIngestKind, GridIngestOutcome, PrefetchPlan, PrefetchPolicyConfig,
+    PrefetchPolicyMode, PrefetchTrigger, SeedInventoryEntry, SeedInventoryPeerSnapshot,
+    DEFAULT_PREFETCH_DEADLINE_MS, ENV_CO_ACCESS_GRAPH_JSON, ENV_LOCALITY_MODE,
+    ENV_PREFETCH_DEADLINE_MS, ENV_PREFETCH_MIN_BANDWIDTH_MBPS, ENV_PREFETCH_PEER_BANDWIDTH_MBPS,
 };
 pub use envelope::{
     GridEnvelope, GridEnvelopeError, GridJobBody, GridMemoryShardBody, GridMessage,
     GridPeerStatusBody, GridResultBody, GridResultStatus, GRID_ENVELOPE_VERSION,
 };
 pub use galaxy_capability_doc::{
-    parse_capability_document, validate_capability_document, CapabilityDocParseError,
-    GalaxyCapabilityDocument,
+    capability_signing_message, parse_capability_document, validate_capability_document,
+    verify_capability_signature_stub, CapabilityDocParseError, GalaxyCapabilityDocument,
+    DEV_CAPABILITY_VERIFY_PK_HEX,
 };
 pub use galaxy_network_profile::{
     normalize_register_metadata, parse_network_profile_value, GalaxyEgressPolicy,
     GalaxyNetworkProfile, NetworkProfileParseError,
 };
 pub use galaxy_protocol_negotiation_metrics::{
-    protocol_negotiation_rejected_total, record_protocol_negotiation_rejected,
-    METRIC_PROTOCOL_NEGOTIATION_REJECTED_TOTAL,
+    protocol_negotiation_accepted_total, protocol_negotiation_rejected_total,
+    record_protocol_negotiation_accepted, record_protocol_negotiation_rejected,
+    METRIC_PROTOCOL_NEGOTIATION_ACCEPTED_TOTAL, METRIC_PROTOCOL_NEGOTIATION_REJECTED_TOTAL,
 };
 pub use galaxy_verification_replay::{
     build_verification_replay_record, GalaxyVerificationReplayRecord,

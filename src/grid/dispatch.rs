@@ -21,8 +21,9 @@ use crate::grid::galaxy_locality::{
 };
 use crate::grid::galaxy_prefetch_metrics::{
     observe_prefetch_queue_depth, record_hot_promote, record_locality_unsatisfied,
-    record_prefetch_co_access, record_prefetch_complete, record_prefetch_enqueue,
-    record_prefetch_ingest, record_prefetch_lease_acquired, record_prefetch_plan,
+    record_prefetch_backpressure, record_prefetch_co_access, record_prefetch_complete,
+    record_prefetch_enqueue, record_prefetch_ingest, record_prefetch_lease_acquired,
+    record_prefetch_plan, record_prefetch_raid_fetch, record_prefetch_raid_fetch_miss,
     record_prefetch_re_migrate, record_prefetch_seed_fetch, record_prefetch_seed_fetch_miss,
     record_prefetch_seed_pull, record_prefetch_skip_ingest, record_prefetch_strict_mode,
     record_prefetch_wait, record_shard_access, DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM,
@@ -323,6 +324,15 @@ pub const ENV_PREFETCH_DEADLINE_MS: &str = "POOLAI_GALAXY_PREFETCH_DEADLINE_MS";
 /// Env: `strict_locality` | `best_effort` (?5.6).
 pub const ENV_LOCALITY_MODE: &str = "POOLAI_GALAXY_LOCALITY_MODE";
 
+/// Env: minimum peer bandwidth (Mbps) before prefetch enqueue is skipped (PH-S464).
+pub const ENV_PREFETCH_MIN_BANDWIDTH_MBPS: &str = "POOLAI_GALAXY_PREFETCH_MIN_BANDWIDTH_MBPS";
+
+/// Env: stub peer bandwidth (Mbps) for backpressure gate (PH-S464).
+pub const ENV_PREFETCH_PEER_BANDWIDTH_MBPS: &str = "POOLAI_GALAXY_PREFETCH_PEER_BANDWIDTH_MBPS";
+
+/// Env: JSON map of admitted shard → speculative neighbors (PH-S469).
+pub const ENV_CO_ACCESS_GRAPH_JSON: &str = "POOLAI_GALAXY_CO_ACCESS_GRAPH_JSON";
+
 /// Coordinator prefetch policy from environment (PH-S136, Galaxy ?5.6).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PrefetchPolicyConfig {
@@ -367,6 +377,10 @@ fn prefetch_policy_mode_from_env() -> PrefetchPolicyMode {
 }
 
 fn env_u64(name: &str) -> Option<u64> {
+    std::env::var(name).ok().and_then(|v| v.trim().parse().ok())
+}
+
+fn env_u32(name: &str) -> Option<u32> {
     std::env::var(name).ok().and_then(|v| v.trim().parse().ok())
 }
 
@@ -455,10 +469,27 @@ pub fn noop_prefetch_hook(plan: &PrefetchPlan) -> usize {
 /// Prefetch enqueue stub (PH-S283): records enqueue metrics; no live seed pull wire.
 #[inline]
 pub fn enqueue_prefetch_hook(plan: &PrefetchPlan) -> usize {
+    if prefetch_backpressure_skip() {
+        return 0;
+    }
     let n = plan.items.len();
     record_prefetch_enqueue(n);
     observe_prefetch_queue_depth(n as u64);
     n
+}
+
+/// Bandwidth backpressure gate for prefetch enqueue (PH-S464).
+pub fn prefetch_backpressure_skip() -> bool {
+    let Some(min) = env_u32(ENV_PREFETCH_MIN_BANDWIDTH_MBPS) else {
+        return false;
+    };
+    let peer_bw = env_u32(ENV_PREFETCH_PEER_BANDWIDTH_MBPS).unwrap_or(0);
+    if peer_bw < min {
+        record_prefetch_backpressure();
+        true
+    } else {
+        false
+    }
 }
 
 /// Prefetch wait stub (PH-S293): records wait ms metric; no live seed pull wire.
@@ -482,6 +513,7 @@ pub fn complete_prefetch_hook(plan: &PrefetchPlan, memory: Option<&MemoryShardSt
         seed_pull_hook(plan);
         if let Some(store) = memory {
             fetch_seed_shards_hook(plan, store);
+            fetch_seed_shards_from_raid_hook(plan, store);
         }
     }
     n
@@ -503,6 +535,25 @@ pub fn fetch_seed_shards_hook(plan: &PrefetchPlan, memory: &MemoryShardStore) ->
     hits
 }
 
+/// RAID artifact prefetch fetch stub (PH-S465): resolve shards via memory / RAID logical name.
+pub fn fetch_seed_shards_from_raid_hook(plan: &PrefetchPlan, memory: &MemoryShardStore) -> usize {
+    let mut hits = 0usize;
+    for item in &plan.items {
+        let found = memory.get(&item.shard_id).ok().flatten().is_some()
+            || memory
+                .list_by_raid_logical_name(&item.shard_id)
+                .map(|shards| !shards.is_empty())
+                .unwrap_or(false);
+        if found {
+            hits += 1;
+            record_prefetch_raid_fetch(1);
+        } else {
+            record_prefetch_raid_fetch_miss();
+        }
+    }
+    hits
+}
+
 /// Default co-access graph stub: admitted shard → speculative neighbors (PH-S446).
 pub fn default_co_access_graph() -> std::collections::BTreeMap<String, Vec<String>> {
     let mut map = std::collections::BTreeMap::new();
@@ -511,13 +562,25 @@ pub fn default_co_access_graph() -> std::collections::BTreeMap<String, Vec<Strin
     map
 }
 
+/// Co-access graph from env JSON or default stub (PH-S469).
+pub fn co_access_graph_from_env() -> std::collections::BTreeMap<String, Vec<String>> {
+    if let Ok(raw) = std::env::var(ENV_CO_ACCESS_GRAPH_JSON) {
+        if let Ok(map) =
+            serde_json::from_str::<std::collections::BTreeMap<String, Vec<String>>>(&raw)
+        {
+            return map;
+        }
+    }
+    default_co_access_graph()
+}
+
 /// Speculative prefetch from co-access graph when shard A is admitted (PH-S446).
 pub fn plan_co_access_prefetch(
     admitted_shard_id: &str,
     gpu_capable: bool,
     config: &PrefetchPolicyConfig,
 ) -> Option<PrefetchPlan> {
-    let co_access = default_co_access_graph();
+    let co_access = co_access_graph_from_env();
     let speculative = co_access.get(admitted_shard_id)?;
     if speculative.is_empty() {
         return None;
@@ -2213,5 +2276,102 @@ mod tests {
         let n = re_migrate_prefetch_stub(None);
         assert!(n > 0 || prefetch_re_migrate_total() == 1);
         reset_prefetch_metrics_for_test();
+    }
+
+    #[test]
+    fn prefetch_backpressure_skip_ph_s464() {
+        use crate::grid::galaxy_prefetch_metrics::{
+            prefetch_backpressure_total, prefetch_enqueue_total, reset_prefetch_metrics_for_test,
+        };
+
+        static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+        let _guard = ENV_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+        std::env::remove_var(ENV_PREFETCH_MIN_BANDWIDTH_MBPS);
+        std::env::remove_var(ENV_PREFETCH_PEER_BANDWIDTH_MBPS);
+        reset_prefetch_metrics_for_test();
+        assert!(!prefetch_backpressure_skip());
+
+        std::env::set_var(ENV_PREFETCH_MIN_BANDWIDTH_MBPS, "100");
+        std::env::set_var(ENV_PREFETCH_PEER_BANDWIDTH_MBPS, "10");
+        assert!(prefetch_backpressure_skip());
+        assert_eq!(prefetch_backpressure_total(), 1);
+
+        let plan = PrefetchPlan {
+            items: vec![PrefetchPlanItem {
+                shard_id: "w:emb-1".into(),
+                target_tier: PrefetchTargetTier::Ram,
+            }],
+            trigger: PrefetchTrigger::JobAdmitted,
+            deadline_ms: DEFAULT_PREFETCH_DEADLINE_MS,
+            mode: PrefetchPolicyMode::BestEffort,
+        };
+        reset_prefetch_metrics_for_test();
+        std::env::set_var(ENV_PREFETCH_MIN_BANDWIDTH_MBPS, "100");
+        std::env::set_var(ENV_PREFETCH_PEER_BANDWIDTH_MBPS, "10");
+        assert_eq!(enqueue_prefetch_hook(&plan), 0);
+        std::env::set_var(ENV_PREFETCH_PEER_BANDWIDTH_MBPS, "200");
+        assert_eq!(enqueue_prefetch_hook(&plan), 1);
+        assert_eq!(prefetch_enqueue_total(), 1);
+        std::env::remove_var(ENV_PREFETCH_MIN_BANDWIDTH_MBPS);
+        std::env::remove_var(ENV_PREFETCH_PEER_BANDWIDTH_MBPS);
+        reset_prefetch_metrics_for_test();
+    }
+
+    #[test]
+    fn fetch_seed_shards_from_raid_hook_ph_s465() {
+        use crate::grid::galaxy_prefetch_metrics::{
+            prefetch_raid_fetch_miss_total, prefetch_raid_fetch_total,
+            reset_prefetch_metrics_for_test,
+        };
+        use crate::memory::{MemoryShardId, MemoryShardRef, MemoryShardStore};
+
+        reset_prefetch_metrics_for_test();
+        let memory = MemoryShardStore::open_for_test(None);
+        let shard = MemoryShardRef {
+            shard_id: MemoryShardId::new("w:emb-1"),
+            artifact_id: "art-raid-1".into(),
+            version: "v1".into(),
+            raid_logical_name: Some("weights".into()),
+            seed_hints: None,
+        };
+        memory.upsert(shard).unwrap();
+        let plan = PrefetchPlan {
+            items: vec![
+                PrefetchPlanItem {
+                    shard_id: "w:emb-1".into(),
+                    target_tier: PrefetchTargetTier::Ram,
+                },
+                PrefetchPlanItem {
+                    shard_id: "w:missing".into(),
+                    target_tier: PrefetchTargetTier::Ram,
+                },
+            ],
+            trigger: PrefetchTrigger::JobAdmitted,
+            deadline_ms: DEFAULT_PREFETCH_DEADLINE_MS,
+            mode: PrefetchPolicyMode::BestEffort,
+        };
+        assert_eq!(fetch_seed_shards_from_raid_hook(&plan, &memory), 1);
+        assert_eq!(prefetch_raid_fetch_total(), 1);
+        assert_eq!(prefetch_raid_fetch_miss_total(), 1);
+        reset_prefetch_metrics_for_test();
+    }
+
+    #[test]
+    fn co_access_graph_from_env_ph_s469() {
+        static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+        let _guard = ENV_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+        std::env::remove_var(ENV_CO_ACCESS_GRAPH_JSON);
+        let default = co_access_graph_from_env();
+        assert!(default.contains_key("w:emb-1"));
+
+        std::env::set_var(ENV_CO_ACCESS_GRAPH_JSON, r#"{"w:custom":["w:neighbor"]}"#);
+        let custom = co_access_graph_from_env();
+        assert_eq!(
+            custom.get("w:custom").map(|v| v.as_slice()),
+            Some(["w:neighbor".to_string()].as_slice())
+        );
+        let config = PrefetchPolicyConfig::default();
+        assert!(plan_co_access_prefetch("w:custom", false, &config).is_some());
+        std::env::remove_var(ENV_CO_ACCESS_GRAPH_JSON);
     }
 }

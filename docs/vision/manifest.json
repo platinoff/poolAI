@@ -1854,7 +1854,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S463",
+  "last_sprint_closed": "PH-S473",
   "layers": [
     {
       "id": "L0",
@@ -7775,9 +7775,16 @@
       "label": "discovery_capability_document_integration.rs",
       "layer": "L3",
       "path": "tests/discovery_capability_document_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_grid_verification_replay_integration_rs",
+      "label": "grid_verification_replay_integration.rs",
+      "layer": "L3",
+      "path": "tests/grid_verification_replay_integration.rs"
     }
   ],
-  "revision": 234,
+  "revision": 235,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -11358,6 +11365,96 @@
       "id": "PH-S463",
       "open": false,
       "row": 398,
+      "status": "closed",
+      "title": "Ops close band: loc-audit + vision-sync"
+    },
+    {
+      "acceptance": "POOLAI_GALAXY_PREFETCH_MIN_BANDWIDTH_MBPS` + `galaxy_prefetch_backpressure_total`; unit tests",
+      "deps": "Galaxy §5.5",
+      "id": "PH-S464",
+      "open": false,
+      "row": 399,
+      "status": "closed",
+      "title": "Prefetch bandwidth backpressure stub"
+    },
+    {
+      "acceptance": "fetch_seed_shards_from_raid_hook` + `galaxy_prefetch_raid_fetch_*`; unit tests",
+      "deps": "Galaxy roadmap §4",
+      "id": "PH-S465",
+      "open": false,
+      "row": 400,
+      "status": "closed",
+      "title": "RAID artifact prefetch fetch stub"
+    },
+    {
+      "acceptance": "ed25519 dev fixture + `verify_capability_signature_stub`; integration test",
+      "deps": "Galaxy §6.6",
+      "id": "PH-S466",
+      "open": false,
+      "row": 401,
+      "status": "closed",
+      "title": "Capability document signature verify stub"
+    },
+    {
+      "acceptance": "GET /api/v1/grid/payout-batch` + integration test; OpenAPI sync",
+      "deps": "Galaxy §8.2",
+      "id": "PH-S467",
+      "open": false,
+      "row": 402,
+      "status": "closed",
+      "title": "Payout batch read API"
+    },
+    {
+      "acceptance": "poolai_protocol_negotiation_accepted_total` on register-remote Accepted",
+      "deps": "Galaxy §9.3",
+      "id": "PH-S468",
+      "open": false,
+      "row": 403,
+      "status": "closed",
+      "title": "Protocol negotiation accepted metric"
+    },
+    {
+      "acceptance": "POOLAI_GALAXY_CO_ACCESS_GRAPH_JSON` + `co_access_graph_from_env`; unit tests",
+      "deps": "Galaxy §5.5",
+      "id": "PH-S469",
+      "open": false,
+      "row": 404,
+      "status": "closed",
+      "title": "Co-access graph env config"
+    },
+    {
+      "acceptance": "renderMonitoringDashboardsPanel` wasm; slim `monitoring.rs",
+      "deps": "RUST_RATIO §5.13",
+      "id": "PH-S470",
+      "open": false,
+      "row": 405,
+      "status": "closed",
+      "title": "Monitoring dashboards panel wasm"
+    },
+    {
+      "acceptance": "galaxy_horizon_s464_integration` + `/metrics` shape",
+      "deps": "PH-S464…S469",
+      "id": "PH-S471",
+      "open": false,
+      "row": 406,
+      "status": "closed",
+      "title": "Galaxy horizon wire integration band"
+    },
+    {
+      "acceptance": "/metrics` + `grid/payout-batch` smoke",
+      "deps": "PH-S464…S467",
+      "id": "PH-S472",
+      "open": false,
+      "row": 407,
+      "status": "closed",
+      "title": "Stand smoke S464–S471 band"
+    },
+    {
+      "acceptance": "rust_ratio.json`; FM/HANDOFF/NEXT; `--check` green",
+      "deps": "§5.12 fallback",
+      "id": "PH-S473",
+      "open": false,
+      "row": 408,
       "status": "closed",
       "title": "Ops close band: loc-audit + vision-sync"
     }

@@ -4,6 +4,7 @@
 //! no live payout wire.
 
 use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::Mutex;
 
 use crate::grid::galaxy_settlement::{PayoutBatchLedgerEntry, SettlementStatus};
 
@@ -28,6 +29,8 @@ static CLEARED_TOTAL: AtomicU64 = AtomicU64::new(0);
 static NOT_APPLICABLE_TOTAL: AtomicU64 = AtomicU64::new(0);
 static RESOLVED_TOTAL: AtomicU64 = AtomicU64::new(0);
 static PAYOUT_BATCH_TOTAL: AtomicU64 = AtomicU64::new(0);
+
+static LAST_PAYOUT_BATCH: Mutex<Option<PayoutBatchLedgerEntry>> = Mutex::new(None);
 
 /// Record one grid result held in pending verification settlement.
 pub fn record_settlement_pending_verification() {
@@ -101,6 +104,7 @@ pub fn reset_settlement_metrics_for_test() {
     reset_settlement_not_applicable_metrics_for_test();
     reset_settlement_resolved_metrics_for_test();
     PAYOUT_BATCH_TOTAL.store(0, Ordering::Relaxed);
+    reset_last_payout_batch_ledger_entry_for_test();
 }
 
 /// Grid result path stub: increment on every settlement resolution (PH-S404).
@@ -123,9 +127,23 @@ pub fn evaluate_result_settlement_cleared(settlement_status: SettlementStatus) {
     }
 }
 
-/// Record payout batch ledger entry on cleared settlement (PH-S436).
+/// Record payout batch ledger entry on cleared settlement (PH-S436 / PH-S467).
 pub fn record_payout_batch_ledger_entry(entry: PayoutBatchLedgerEntry) {
-    let _ = entry;
+    if let Ok(mut slot) = LAST_PAYOUT_BATCH.lock() {
+        *slot = Some(entry);
+    }
+}
+
+/// Last recorded payout batch ledger entry (PH-S467 read API).
+pub fn last_payout_batch_ledger_entry() -> Option<PayoutBatchLedgerEntry> {
+    LAST_PAYOUT_BATCH.lock().ok().and_then(|g| g.clone())
+}
+
+#[cfg(any(test, feature = "test-utils"))]
+pub fn reset_last_payout_batch_ledger_entry_for_test() {
+    if let Ok(mut slot) = LAST_PAYOUT_BATCH.lock() {
+        *slot = None;
+    }
 }
 
 /// Grid result path stub: increment when settlement is not applicable (PH-S354).
@@ -252,6 +270,8 @@ mod tests {
             job_id: "job-1".into(),
             cleared_at: "2026-06-18T00:00:00Z".into(),
         });
+        let last = last_payout_batch_ledger_entry().expect("stored");
+        assert_eq!(last.job_id, "job-1");
         assert_eq!(settlement_payout_batch_total(), 0);
         reset_settlement_metrics_for_test();
     }

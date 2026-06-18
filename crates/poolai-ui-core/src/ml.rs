@@ -687,6 +687,99 @@ pub fn render_monitoring_alerts_panel_html(
     )
 }
 
+/// Monitoring dashboards table HTML (PH-S470 wasm glue).
+pub fn render_monitoring_dashboards_panel_html(
+    dashboards_json: &str,
+    col_name: &str,
+    col_description: &str,
+    col_metrics: &str,
+    col_public: &str,
+    col_created: &str,
+    table_aria: &str,
+    em_dash: &str,
+    na_label: &str,
+    public_label: &str,
+    private_label: &str,
+    metrics_n_template: &str,
+    empty_message: &str,
+) -> String {
+    use crate::format::escape_html;
+    use crate::table::empty_state_html;
+
+    let dashboards: Vec<Value> = serde_json::from_str(dashboards_json).unwrap_or_default();
+    if dashboards.is_empty() {
+        return empty_state_html(empty_message, None, "📊", None);
+    }
+    let rows: String = dashboards
+        .iter()
+        .map(|d| {
+            let name = d.get("name").and_then(|v| v.as_str()).unwrap_or("unnamed");
+            let description = d
+                .get("description")
+                .and_then(|v| v.as_str())
+                .unwrap_or(em_dash);
+            let metrics_len = d
+                .get("metrics")
+                .and_then(|v| v.as_array())
+                .map(|a| a.len())
+                .unwrap_or(0);
+            let metrics_label = metrics_n_template.replace("{n}", &metrics_len.to_string());
+            let is_public = d.get("is_public").and_then(|v| v.as_bool()) == Some(true);
+            let public_cell = if is_public {
+                format!(
+                    r#"<span class="status-badge active">{}</span>"#,
+                    escape_html(public_label)
+                )
+            } else {
+                format!(
+                    r#"<span class="status-badge inactive">{}</span>"#,
+                    escape_html(private_label)
+                )
+            };
+            let created = d
+                .get("created_at")
+                .and_then(|v| v.as_str())
+                .map(|s| escape_html(s))
+                .unwrap_or_else(|| escape_html(na_label));
+            format!(
+                r#"<tr>
+                  <td><strong>{}</strong></td>
+                  <td>{}</td>
+                  <td>{}</td>
+                  <td>{}</td>
+                  <td>{}</td>
+                </tr>"#,
+                escape_html(name),
+                escape_html(description),
+                escape_html(&metrics_label),
+                public_cell,
+                created
+            )
+        })
+        .collect();
+    format!(
+        r#"<div class="admin-table-container"><table class="admin-table" aria-label="{}">
+            <thead>
+              <tr>
+                <th>{}</th>
+                <th>{}</th>
+                <th>{}</th>
+                <th>{}</th>
+                <th>{}</th>
+              </tr>
+            </thead>
+            <tbody>{}</tbody>
+          </table></div>"#,
+        escape_html(table_aria),
+        escape_html(col_name),
+        escape_html(col_description),
+        escape_html(col_metrics),
+        escape_html(col_public),
+        escape_html(col_created),
+        rows
+    )
+}
+
 /// Mirrors `poolaiFetchMonitoringAlerts` URL (PH-S344).
 pub fn build_monitoring_alerts_url(limit: u32, acknowledged: Option<bool>) -> String {
     let mut url = format!("/api/enterprise/monitoring/alerts?limit={limit}");
@@ -969,6 +1062,27 @@ mod tests {
             "No active alerts",
         );
         assert!(html.contains("No active alerts"));
+    }
+
+    #[test]
+    fn render_monitoring_dashboards_panel_html_ph_s470() {
+        let html = render_monitoring_dashboards_panel_html(
+            r#"[{"name":"ops","description":"main","metrics":["cpu"],"is_public":true,"created_at":"2026-06-18"}]"#,
+            "Name",
+            "Description",
+            "Metrics",
+            "Public",
+            "Created",
+            "Dashboards",
+            "—",
+            "N/A",
+            "Public",
+            "Private",
+            "{n} metrics",
+            "No dashboards",
+        );
+        assert!(html.contains("ops"));
+        assert!(html.contains("1 metrics"));
     }
 
     #[test]

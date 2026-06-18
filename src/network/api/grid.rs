@@ -62,6 +62,7 @@ pub fn create_grid_routes() -> Router<ApiContext> {
             "/grid/verification-replay",
             get(get_grid_verification_replay),
         )
+        .route("/grid/payout-batch", get(get_grid_payout_batch))
 }
 
 pub async fn ingest_grid_envelope_handler(
@@ -113,6 +114,24 @@ async fn get_grid_verification_replay(
         Json(GridVerificationReplayResponse {
             ok: true,
             record: crate::grid::galaxy_replay_metrics::last_verification_replay_record(),
+        }),
+    ))
+}
+
+#[derive(Debug, Serialize)]
+struct GridPayoutBatchResponse {
+    ok: bool,
+    entry: Option<crate::grid::galaxy_settlement::PayoutBatchLedgerEntry>,
+}
+
+async fn get_grid_payout_batch(
+    State(_ctx): State<ApiContext>,
+) -> Result<(StatusCode, Json<GridPayoutBatchResponse>), HttpAppError> {
+    Ok((
+        StatusCode::OK,
+        Json(GridPayoutBatchResponse {
+            ok: true,
+            entry: crate::grid::galaxy_settlement_metrics::last_payout_batch_ledger_entry(),
         }),
     ))
 }

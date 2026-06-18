@@ -23,7 +23,9 @@ use crate::grid::galaxy_capability_doc::{
     parse_capability_document, validate_capability_document, CapabilityDocParseError,
 };
 use crate::grid::galaxy_network_profile::normalize_register_metadata;
-use crate::grid::galaxy_protocol_negotiation_metrics::record_protocol_negotiation_rejected;
+use crate::grid::galaxy_protocol_negotiation_metrics::{
+    record_protocol_negotiation_accepted, record_protocol_negotiation_rejected,
+};
 use crate::grid::protocol_compat::{negotiate, CompatStatus, MIN_COORDINATOR_VERSION_DOCS_URL};
 use crate::grid::GridEnvelope;
 use crate::network::api::common::HttpAppError;
@@ -248,6 +250,9 @@ async fn register_remote_handler(
             Json(register_compat_response(peer_id, &negotiation, false)),
         )
             .into_response();
+    }
+    if negotiation.status == CompatStatus::Accepted {
+        record_protocol_negotiation_accepted();
     }
 
     let mut metadata = match normalize_register_metadata(payload.metadata) {

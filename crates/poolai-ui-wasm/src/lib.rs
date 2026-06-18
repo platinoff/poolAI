@@ -20,7 +20,8 @@ use poolai_ui_core::ml::{
     flatten_ml_step_rows, format_ml_metric_summary, group_metrics_by_name, metric_point_values,
     parse_ml_numeric, render_line_chart_empty_html, render_line_chart_html,
     render_metrics_chart_grid_html, render_ml_pipeline_metrics_panel_html,
-    render_monitoring_alerts_panel_html, render_sparkline_html, sanitize_chart_id,
+    render_monitoring_alerts_panel_html, render_monitoring_dashboards_panel_html,
+    render_sparkline_html, sanitize_chart_id,
 };
 use poolai_ui_core::modal::{admin_dynamic_modal_html, trap_tab_action, MODAL_FOCUSABLE_SELECTOR};
 use poolai_ui_core::pricing::{format_unix_secs, format_usd_micro};
@@ -395,6 +396,39 @@ pub fn render_monitoring_alerts_panel_wasm(
         col_status,
         col_actions,
         table_aria,
+        empty_message,
+    )
+}
+
+#[wasm_bindgen(js_name = renderMonitoringDashboardsPanel)]
+pub fn render_monitoring_dashboards_panel_wasm(
+    dashboards_json: &str,
+    col_name: &str,
+    col_description: &str,
+    col_metrics: &str,
+    col_public: &str,
+    col_created: &str,
+    table_aria: &str,
+    em_dash: &str,
+    na_label: &str,
+    public_label: &str,
+    private_label: &str,
+    metrics_n_template: &str,
+    empty_message: &str,
+) -> String {
+    render_monitoring_dashboards_panel_html(
+        dashboards_json,
+        col_name,
+        col_description,
+        col_metrics,
+        col_public,
+        col_created,
+        table_aria,
+        em_dash,
+        na_label,
+        public_label,
+        private_label,
+        metrics_n_template,
         empty_message,
     )
 }

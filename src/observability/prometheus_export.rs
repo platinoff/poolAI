@@ -28,21 +28,23 @@ use crate::grid::galaxy_locality::{
     METRIC_LOCALITY_RANK_SKIP_TOTAL, METRIC_SHARD_LOCAL_HIT_RATIO,
 };
 use crate::grid::galaxy_prefetch_metrics::{
-    hot_evict_total, hot_promote_total, locality_unsatisfied_total, prefetch_bytes_total,
-    prefetch_co_access_total, prefetch_complete_total, prefetch_enqueue_total,
-    prefetch_hot_skip_total, prefetch_ingest_total, prefetch_lease_acquired_total,
-    prefetch_plan_total, prefetch_planned_shards_total, prefetch_queue_depth,
+    hot_evict_total, hot_promote_total, locality_unsatisfied_total, prefetch_backpressure_total,
+    prefetch_bytes_total, prefetch_co_access_total, prefetch_complete_total,
+    prefetch_enqueue_total, prefetch_hot_skip_total, prefetch_ingest_total,
+    prefetch_lease_acquired_total, prefetch_plan_total, prefetch_planned_shards_total,
+    prefetch_queue_depth, prefetch_raid_fetch_miss_total, prefetch_raid_fetch_total,
     prefetch_re_migrate_total, prefetch_seed_fetch_miss_total, prefetch_seed_fetch_total,
     prefetch_seed_pull_total, prefetch_skip_ingest_total, prefetch_strict_mode_total,
     prefetch_wait_ms_total, shard_access_total, METRIC_HOT_EVICT_TOTAL, METRIC_HOT_PROMOTE_TOTAL,
-    METRIC_LOCALITY_UNSATISFIED_TOTAL, METRIC_PREFETCH_BYTES_TOTAL, METRIC_PREFETCH_COMPLETE_TOTAL,
-    METRIC_PREFETCH_CO_ACCESS_TOTAL, METRIC_PREFETCH_ENQUEUE_TOTAL, METRIC_PREFETCH_HOT_SKIP_TOTAL,
-    METRIC_PREFETCH_INGEST_TOTAL, METRIC_PREFETCH_LEASE_ACQUIRED_TOTAL,
-    METRIC_PREFETCH_PLANNED_SHARDS_TOTAL, METRIC_PREFETCH_PLAN_TOTAL, METRIC_PREFETCH_QUEUE_DEPTH,
-    METRIC_PREFETCH_RE_MIGRATE_TOTAL, METRIC_PREFETCH_SEED_FETCH_MISS_TOTAL,
-    METRIC_PREFETCH_SEED_FETCH_TOTAL, METRIC_PREFETCH_SEED_PULL_TOTAL,
-    METRIC_PREFETCH_SKIP_INGEST_TOTAL, METRIC_PREFETCH_STRICT_MODE_TOTAL,
-    METRIC_PREFETCH_WAIT_MS_TOTAL, METRIC_SHARD_ACCESS_TOTAL,
+    METRIC_LOCALITY_UNSATISFIED_TOTAL, METRIC_PREFETCH_BACKPRESSURE_TOTAL,
+    METRIC_PREFETCH_BYTES_TOTAL, METRIC_PREFETCH_COMPLETE_TOTAL, METRIC_PREFETCH_CO_ACCESS_TOTAL,
+    METRIC_PREFETCH_ENQUEUE_TOTAL, METRIC_PREFETCH_HOT_SKIP_TOTAL, METRIC_PREFETCH_INGEST_TOTAL,
+    METRIC_PREFETCH_LEASE_ACQUIRED_TOTAL, METRIC_PREFETCH_PLANNED_SHARDS_TOTAL,
+    METRIC_PREFETCH_PLAN_TOTAL, METRIC_PREFETCH_QUEUE_DEPTH, METRIC_PREFETCH_RAID_FETCH_MISS_TOTAL,
+    METRIC_PREFETCH_RAID_FETCH_TOTAL, METRIC_PREFETCH_RE_MIGRATE_TOTAL,
+    METRIC_PREFETCH_SEED_FETCH_MISS_TOTAL, METRIC_PREFETCH_SEED_FETCH_TOTAL,
+    METRIC_PREFETCH_SEED_PULL_TOTAL, METRIC_PREFETCH_SKIP_INGEST_TOTAL,
+    METRIC_PREFETCH_STRICT_MODE_TOTAL, METRIC_PREFETCH_WAIT_MS_TOTAL, METRIC_SHARD_ACCESS_TOTAL,
 };
 use crate::grid::galaxy_pricing_oracle::{
     forced_fallback_total, fresh_served_total, last_market_min_usd_micro, last_quote_usd_micro,
@@ -56,7 +58,8 @@ use crate::grid::galaxy_pricing_provider_metrics::{
     METRIC_PROVIDER_ERRORS_TOTAL,
 };
 use crate::grid::galaxy_protocol_negotiation_metrics::{
-    protocol_negotiation_rejected_total, METRIC_PROTOCOL_NEGOTIATION_REJECTED_TOTAL,
+    protocol_negotiation_accepted_total, protocol_negotiation_rejected_total,
+    METRIC_PROTOCOL_NEGOTIATION_ACCEPTED_TOTAL, METRIC_PROTOCOL_NEGOTIATION_REJECTED_TOTAL,
 };
 use crate::grid::galaxy_replay_metrics::{
     replay_evaluations_total, replay_pending, replay_pending_resolved_total,
@@ -158,7 +161,11 @@ pub struct PoolAiPrometheus {
     galaxy_hot_evict_total: IntGauge,
     galaxy_shard_access_total: IntGauge,
     galaxy_prefetch_queue_depth: IntGauge,
+    galaxy_prefetch_backpressure_total: IntGauge,
+    galaxy_prefetch_raid_fetch_total: IntGauge,
+    galaxy_prefetch_raid_fetch_miss_total: IntGauge,
     poolai_protocol_negotiation_rejected_total: IntGauge,
+    poolai_protocol_negotiation_accepted_total: IntGauge,
     galaxy_locality_rank_ingest_total: IntGauge,
     galaxy_locality_rank_miss_total: IntGauge,
     galaxy_locality_rank_empty_workers_total: IntGauge,
@@ -683,6 +690,33 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_prefetch_queue_depth.clone()))
         .expect("register galaxy_prefetch_queue_depth");
 
+    let galaxy_prefetch_backpressure_total = IntGauge::with_opts(Opts::new(
+        METRIC_PREFETCH_BACKPRESSURE_TOTAL,
+        "Galaxy prefetch enqueue skipped by bandwidth backpressure (PH-S464)",
+    ))
+    .expect(METRIC_PREFETCH_BACKPRESSURE_TOTAL);
+    registry
+        .register(Box::new(galaxy_prefetch_backpressure_total.clone()))
+        .expect("register galaxy_prefetch_backpressure_total");
+
+    let galaxy_prefetch_raid_fetch_total = IntGauge::with_opts(Opts::new(
+        METRIC_PREFETCH_RAID_FETCH_TOTAL,
+        "Galaxy RAID artifact prefetch fetch hits (PH-S465)",
+    ))
+    .expect(METRIC_PREFETCH_RAID_FETCH_TOTAL);
+    registry
+        .register(Box::new(galaxy_prefetch_raid_fetch_total.clone()))
+        .expect("register galaxy_prefetch_raid_fetch_total");
+
+    let galaxy_prefetch_raid_fetch_miss_total = IntGauge::with_opts(Opts::new(
+        METRIC_PREFETCH_RAID_FETCH_MISS_TOTAL,
+        "Galaxy RAID artifact prefetch fetch misses (PH-S465)",
+    ))
+    .expect(METRIC_PREFETCH_RAID_FETCH_MISS_TOTAL);
+    registry
+        .register(Box::new(galaxy_prefetch_raid_fetch_miss_total.clone()))
+        .expect("register galaxy_prefetch_raid_fetch_miss_total");
+
     let poolai_protocol_negotiation_rejected_total = IntGauge::with_opts(Opts::new(
         METRIC_PROTOCOL_NEGOTIATION_REJECTED_TOTAL,
         "Unsupported protocol negotiation rejections (PH-S449)",
@@ -691,6 +725,15 @@ fn build_prometheus() -> PoolAiPrometheus {
     registry
         .register(Box::new(poolai_protocol_negotiation_rejected_total.clone()))
         .expect("register poolai_protocol_negotiation_rejected_total");
+
+    let poolai_protocol_negotiation_accepted_total = IntGauge::with_opts(Opts::new(
+        METRIC_PROTOCOL_NEGOTIATION_ACCEPTED_TOTAL,
+        "Successful protocol negotiations on register-remote (PH-S468)",
+    ))
+    .expect(METRIC_PROTOCOL_NEGOTIATION_ACCEPTED_TOTAL);
+    registry
+        .register(Box::new(poolai_protocol_negotiation_accepted_total.clone()))
+        .expect("register poolai_protocol_negotiation_accepted_total");
 
     let galaxy_locality_rank_ingest_total = IntGauge::with_opts(Opts::new(
         METRIC_LOCALITY_RANK_INGEST_TOTAL,
@@ -1029,7 +1072,11 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_hot_evict_total,
         galaxy_shard_access_total,
         galaxy_prefetch_queue_depth,
+        galaxy_prefetch_backpressure_total,
+        galaxy_prefetch_raid_fetch_total,
+        galaxy_prefetch_raid_fetch_miss_total,
         poolai_protocol_negotiation_rejected_total,
+        poolai_protocol_negotiation_accepted_total,
         galaxy_locality_rank_ingest_total,
         galaxy_locality_rank_miss_total,
         galaxy_locality_rank_empty_workers_total,
@@ -1171,8 +1218,16 @@ pub fn refresh_galaxy_prefetch_gauges() {
         .set(shard_access_total() as i64);
     prom.galaxy_prefetch_queue_depth
         .set(prefetch_queue_depth() as i64);
+    prom.galaxy_prefetch_backpressure_total
+        .set(prefetch_backpressure_total() as i64);
+    prom.galaxy_prefetch_raid_fetch_total
+        .set(prefetch_raid_fetch_total() as i64);
+    prom.galaxy_prefetch_raid_fetch_miss_total
+        .set(prefetch_raid_fetch_miss_total() as i64);
     prom.poolai_protocol_negotiation_rejected_total
         .set(protocol_negotiation_rejected_total() as i64);
+    prom.poolai_protocol_negotiation_accepted_total
+        .set(protocol_negotiation_accepted_total() as i64);
 }
 
 /// Mirror in-process verification counters into Prometheus gauges (scrape snapshot).

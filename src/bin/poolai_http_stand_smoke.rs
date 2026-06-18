@@ -916,6 +916,55 @@ async fn smoke_grid_verification_replay(client: &Client, base: &str) -> Result<(
     Ok(())
 }
 
+/// PH-S472: live stand exposes PH-S464…S468 horizon wire metrics on Prometheus scrape.
+const GALAXY_HORIZON_WIRE_S464_METRICS: &[&str] = &[
+    "galaxy_prefetch_backpressure_total",
+    "galaxy_prefetch_raid_fetch_total",
+    "galaxy_prefetch_raid_fetch_miss_total",
+    "poolai_protocol_negotiation_accepted_total",
+];
+
+fn metrics_text_has_horizon_wire_s464(body: &str) -> Result<(), String> {
+    for name in GALAXY_HORIZON_WIRE_S464_METRICS {
+        if !body.contains(name) {
+            return Err(format!("/metrics missing {name}"));
+        }
+        if !body.contains(&format!("# TYPE {name} gauge")) {
+            return Err(format!("/metrics missing TYPE gauge for {name}"));
+        }
+    }
+    Ok(())
+}
+
+async fn smoke_galaxy_horizon_wire_s464_metrics(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("/metrics request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("/metrics status {}", resp.status()));
+    }
+    let body = resp.text().await.map_err(|e| e.to_string())?;
+    metrics_text_has_horizon_wire_s464(&body)
+}
+
+async fn smoke_grid_payout_batch(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/api/v1/grid/payout-batch"))
+        .send()
+        .await
+        .map_err(|e| format!("payout-batch request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("payout-batch status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    if body.get("ok").and_then(|v| v.as_bool()) != Some(true) {
+        return Err(format!("payout-batch body: {body}"));
+    }
+    Ok(())
+}
+
 async fn smoke_grid_pricing(client: &Client, base: &str) -> Result<(), String> {
     let model = smoke_id("smoke-pricing");
     let url = format!(
@@ -1581,6 +1630,18 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
         &mut cases,
         "grid_verification_replay",
         smoke_grid_verification_replay(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
+        "galaxy_horizon_wire_s464_metrics",
+        smoke_galaxy_horizon_wire_s464_metrics(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
+        "grid_payout_batch",
+        smoke_grid_payout_batch(&client, &cli.base_url).await,
     )
     .await;
     record(

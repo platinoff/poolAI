@@ -346,6 +346,16 @@ path = "tests/vm_api_contracts.rs"
 required-features = ["test-utils"]
 
 [[test]]
+name = "grid_payout_batch_integration"
+path = "tests/grid_payout_batch_integration.rs"
+required-features = ["test-utils"]
+
+[[test]]
+name = "galaxy_horizon_s464_integration"
+path = "tests/galaxy_horizon_s464_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
 name = "tls_https_integration"
 path = "tests/tls_https_integration.rs"
 required-features = ["https"]

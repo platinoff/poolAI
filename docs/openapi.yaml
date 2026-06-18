@@ -733,6 +733,34 @@ paths:
               schema:
                 $ref: '#/components/schemas/GridSeedInventoryResponse'
 
+  /grid/verification-replay:
+    get:
+      tags:
+        - Grid
+      summary: Last verification replay record (PH-S460)
+      operationId: getGridVerificationReplay
+      responses:
+        '200':
+          description: Verification replay snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GridVerificationReplayResponse'
+
+  /grid/payout-batch:
+    get:
+      tags:
+        - Grid
+      summary: Last payout batch ledger entry (PH-S467)
+      operationId: getGridPayoutBatch
+      responses:
+        '200':
+          description: Payout batch ledger snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GridPayoutBatchResponse'
+
   /discovery/grid/envelope:
     post:
       tags:
@@ -6125,6 +6153,40 @@ components:
         generated_at:
           type: string
           format: date-time
+
+    GridVerificationReplayResponse:
+      type: object
+      required:
+        - ok
+      properties:
+        ok:
+          type: boolean
+        record:
+          type: object
+          nullable: true
+          additionalProperties: true
+
+    PayoutBatchLedgerEntry:
+      type: object
+      required:
+        - job_id
+        - cleared_at
+      properties:
+        job_id:
+          type: string
+        cleared_at:
+          type: string
+
+    GridPayoutBatchResponse:
+      type: object
+      required:
+        - ok
+      properties:
+        ok:
+          type: boolean
+        entry:
+          $ref: '#/components/schemas/PayoutBatchLedgerEntry'
+          nullable: true
 
     MemoryShardRef:
       type: object

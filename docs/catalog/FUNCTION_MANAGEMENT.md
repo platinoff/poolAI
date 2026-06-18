@@ -663,8 +663,18 @@ FM-xxx (з таблиці нижче)
 | 396 | **PH-S461** | Monitoring alerts panel wasm | RUST_RATIO §5.13 | `renderMonitoringAlertsPanel` wasm; slim `monitoring.rs` | **✅** |
 | 397 | **PH-S462** | Stand smoke horizon band S454–S460 | PH-S454…S460 | `/metrics` + verification-replay smoke | **✅** |
 | 398 | **PH-S463** | Ops close band: loc-audit + vision-sync | §5.12 fallback | `rust_ratio.json`; FM/HANDOFF/NEXT; `--check` green | **✅** |
+| 399 | **PH-S464** | Prefetch bandwidth backpressure stub | Galaxy §5.5 | `POOLAI_GALAXY_PREFETCH_MIN_BANDWIDTH_MBPS` + `galaxy_prefetch_backpressure_total`; unit tests | **✅** |
+| 400 | **PH-S465** | RAID artifact prefetch fetch stub | Galaxy roadmap §4 | `fetch_seed_shards_from_raid_hook` + `galaxy_prefetch_raid_fetch_*`; unit tests | **✅** |
+| 401 | **PH-S466** | Capability document signature verify stub | Galaxy §6.6 | ed25519 dev fixture + `verify_capability_signature_stub`; integration test | **✅** |
+| 402 | **PH-S467** | Payout batch read API | Galaxy §8.2 | `GET /api/v1/grid/payout-batch` + integration test; OpenAPI sync | **✅** |
+| 403 | **PH-S468** | Protocol negotiation accepted metric | Galaxy §9.3 | `poolai_protocol_negotiation_accepted_total` on register-remote Accepted | **✅** |
+| 404 | **PH-S469** | Co-access graph env config | Galaxy §5.5 | `POOLAI_GALAXY_CO_ACCESS_GRAPH_JSON` + `co_access_graph_from_env`; unit tests | **✅** |
+| 405 | **PH-S470** | Monitoring dashboards panel wasm | RUST_RATIO §5.13 | `renderMonitoringDashboardsPanel` wasm; slim `monitoring.rs` | **✅** |
+| 406 | **PH-S471** | Galaxy horizon wire integration band | PH-S464…S469 | `galaxy_horizon_s464_integration` + `/metrics` shape | **✅** |
+| 407 | **PH-S472** | Stand smoke S464–S471 band | PH-S464…S467 | `/metrics` + `grid/payout-batch` smoke | **✅** |
+| 408 | **PH-S473** | Ops close band: loc-audit + vision-sync | §5.12 fallback | `rust_ratio.json`; FM/HANDOFF/NEXT; `--check` green | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S454…S463 ✅. Vision rev **235**. rust_ratio **94.38%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S464…S473 ✅. Vision rev **235**. rust_ratio **94.39%**.
 
 **Наступна сесія:** **`абракадабра`** (project scan → drain) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
@@ -672,7 +682,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-06-18):** PH-S454…S463 ✅ закрито · **0** відкритих · **`абракадабра`** = project scan → §5.12 → drain.
+**Активна смуга (2026-06-18):** PH-S464…S473 ✅ закрито · **0** відкритих · **`абракадабра`** = project scan → §5.12 → drain.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 
