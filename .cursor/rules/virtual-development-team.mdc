@@ -55,7 +55,7 @@ flowchart LR
 
 Промпт **`абракадабра`** у **новій сесії** = VDT-цикл **без підтвердження** кожного PH-S*:
 
-**S0** → **project scan** (concept · FM §5.1 · roadmaps · architect · code · §5.13 fallback) → **10 PH-S*** у §5.12 → **drain усіх** → vision-sync → **`--check`** → **`git push` + самарі** → наступна сесія знову **`абракадабра`**.
+**S0** → **project scan** → **10 PH-S*** у §5.12 → **drain** (код + scope-тести) → **vision close** (один `poolai-vision-sync` + `--check`) → **один** `cargo test-ci` → **один** commit (код + `docs/vision/*` + FM/HANDOFF/NEXT) → **`git push` + самарі** → наступна сесія знову **`абракадабра`**. Деталі — [`poolai-session-iteration.mdc`](poolai-session-iteration.mdc) § «Vision close band».
 
 §5.12 — **журнал виконання**, не джерело пріоритетів. Деталі — [`poolai-session-iteration.mdc`](poolai-session-iteration.mdc) § «Тригер абракадабра».
 

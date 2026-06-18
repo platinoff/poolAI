@@ -24,6 +24,8 @@ alwaysApply: false
 | `explore` | Широкий пошук по `docs/`, `rg` по FM/Architect, інвентар маршрутів без повного читання файлів |
 | `shell` | MSYS2 bash: `cargo test-ci`, git, бенч `poolai_health_load` |
 | `generalPurpose` | Ізольована фіча з acceptance criteria (один FM або один модуль) |
+| `ci-investigator` | Розбір одного failed CI check (довідково) |
+| `bugbot` / `security-review` | Лише за явним запитом review; не в drain `абракадабра` |
 
 **Не делегуй:** git push, оновлення §5.1 / §5.12 FM, `NEXT_SESSION_PROMPT`, фінальний Summary коміта — залишай собі.
 

@@ -24,6 +24,9 @@ alwaysApply: true
 | `generalPurpose` | Один модуль / один FM з чіткими acceptance criteria |
 | `ci-investigator` | Розбір одного failed CI check (довідково, не блокує локальний канон) |
 | `cursor-guide` | Питання про Cursor IDE/CLI — не про код PoolAI |
+| `bugbot` | Лише за явним запитом review (`review-bugbot` skill); **не** в drain `абракадабра` |
+| `security-review` | Лише за явним запитом security review; **не** в drain |
+| `best-of-n-runner` | Ізольовані git worktree / паралельні спроби; **не** замість канонічного drain |
 
 **Не делегувати оркестратору:** фінальний `git push`, закриття спринту в FM §5.12, оновлення `NEXT_SESSION_PROMPT.md`, amend після push.
 

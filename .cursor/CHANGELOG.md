@@ -1,5 +1,12 @@
 # Cursor Agent Configuration Changelog
 
+## 2026-06-18 — Cursor 3.7.42 + абракадабра vision close band
+
+- **`cursor-environment-baseline.mdc`**: `cursor` **3.7.42**; Multitask Mode, SwitchMode, нові subagent types.
+- **`poolai-agent-roles.mdc`**: `bugbot`, `security-review`, `best-of-n-runner` (лише за явним запитом).
+- **`poolai-session-iteration.mdc`**: канон drain → **vision close** → **один** `test-ci` → **один** commit (код + `docs/vision/*`); § Vision close band.
+- **`virtual-development-team.mdc`**: one-liner `абракадабра` узгоджено з NEXT_SESSION.
+
 ## 2026-06-16 — PH-S201 post-push VDT hook
 
 - **`hooks.json`**: `postToolUse` → `.cursor/hooks/post-push-ph-s-notify.sh` (Shell matcher).

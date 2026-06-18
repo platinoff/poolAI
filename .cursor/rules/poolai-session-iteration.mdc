@@ -92,19 +92,20 @@ flowchart LR
   S0[S0 git+HANDOFF+FM] --> Scan[Project scan цілого репо]
   Scan --> Pick[Top 10 → PH-S* у §5.12]
   Pick --> Drain[Drain усі відкриті]
-  Drain --> Test[cargo fmt + test-ci]
-  Test --> Vision[vision-sync + --check]
-  Vision --> Push[git push + самарі]
+  Drain --> Vision[Vision close band]
+  Vision --> Test[cargo fmt + test-ci]
+  Test --> Push[git push + самарі]
   Push --> Next[Нова сесія: знову абракадабра]
 ```
 
 | Крок | Дія |
 |------|-----|
-| 1 S0 | `git fetch`; HANDOFF; FM **§1–§5.1**; [`STABLE_STATE`](../../docs/status/STABLE_STATE_SUMMARY.md); `NEXT_SESSION`; `df -h /s` |
+| 1 S0 | `git fetch`; HANDOFF; FM **§1–§5.1**; [`STABLE_STATE`](../../docs/status/STABLE_STATE_SUMMARY.md); `NEXT_SESSION`; **`poolai-vision-sync --check` ok**; `df -h /s` |
 | 2 Project scan | Якщо §5.12 **< 10** → **scan всього проєкту** (карта нижче) → **10 PH-S*** у §5.12 |
-| 3 Drain | Усі відкриті PH-S* в одній сесії (код → scope-тести → docs band) |
-| 4 Vision | FM/HANDOFF/NEXT → `poolai-vision-sync` → FM rev = manifest → `--check` |
-| 5 Git | **один** commit (`git-commit-tree-msg.sh`) + `git push origin main` + **самарі** |
+| 3 Drain | Усі відкриті PH-S* (код → scope-тести → docs **без** vision rev footer) |
+| 4 Vision close | FM §5.12 ✅ + HANDOFF + NEXT → **один** `poolai-vision-sync` → rev з `manifest.json` → `--check` |
+| 5 Test | `cargo fmt --all` → **один** `cargo test-ci` (**після** vision close) |
+| 6 Git | **один** commit (`git-commit-tree-msg.sh`: код + `docs/vision/*` + FM/HANDOFF/NEXT) + `git push origin main` + **самарі** |
 
 **Ітерація:** після push §5.12 знову **0** (або <10) → у **наступній** сесії **`абракадабра`** → S0 → **project scan** (якщо <10) → drain → push. Без окремого підтвердження кожного PH-S*.
 
@@ -182,27 +183,32 @@ export CARGO_TARGET_DIR=/s/rust/poolAI/target
 cd /s/rust/poolAI || cd "S:/rust/poolAI"
 ```
 
-### Drain: тести та wasm glue
+### Drain: код, scope-тести, wasm glue
 
-1. `cargo fmt --all` → **один** `cargo test-ci`.
+1. Реалізувати усі PH-S* смуги; після кожного API scope — `tests/*_integration.rs`; після API — `poolai-openapi-gap-audit` (0).
 2. wasm-first UI → `admin_charts_*_wasm_first_ph_s*` у `src/ui/admin/mod.rs`.
 3. `bash bin/build-ui-wasm.sh` після `poolai-ui-wasm` змін.
 4. API-only — Playwright не блокує ([`poolai-testing-policy.mdc`](poolai-testing-policy.mdc)).
+5. **Не** `poolai-vision-sync` mid-drain; **не** другий commit «sync rev».
 
-### Vision (порядок — уникати drift rev)
+**Фінальний gate:** один `cargo fmt --all` → один `cargo test-ci` — **після** Vision close band (крок 5 таблиці вище).
 
-1. Оновити FM **§5.12** (рядки спринтів ✅) + HANDOFF + NEXT (без жорсткого vision rev).
+### Vision close band (порядок — уникати drift rev)
+
+1. Оновити FM **§5.12** (рядки спринтів ✅) + HANDOFF + NEXT (без жорсткого vision rev у footer до sync).
 2. `cargo run --bin poolai-vision-sync` (manifest `revision++`, `sprint_queue` з FM).
 3. FM / NEXT / INDEX: **vision rev = `manifest.revision`** (читати з `docs/vision/manifest.json`).
 4. `cargo run --bin poolai-vision-sync -- --check` → має бути **ok**.
+5. Потім — фінальний `cargo test-ci` (див. Drain § вище).
 
 ### Git (один commit на всю смугу)
 
 1. Staging лише файлів смуги (`git diff --cached --stat`); не `comitmsg/`, не `data/audit/`.
-2. Текст: `comitmsg/.commit-msg-ph-sNNN-NNN.txt`.
-3. **Канон (новий код + docs):** `bash bin/git-commit-tree-msg.sh comitmsg/.commit-msg-ph-sNNN-NNN.txt <paths…>` — `write-tree` зі staged файлів.
-4. **Лише subject hook-fix** (без нових файлів): `bash bin/amend-head-msg.sh comitmsg/…` — **не** включає unstaged/staged diff у tree.
-5. `git push origin main` + самарі в чат (смуга PH-S*, rust_ratio, vision rev).
+2. У commit: код + `docs/vision/*` + FM/HANDOFF/NEXT (після vision close + test-ci green).
+3. Текст: `comitmsg/.commit-msg-ph-sNNN-NNN.txt`.
+4. **Канон (новий код + docs):** `bash bin/git-commit-tree-msg.sh comitmsg/.commit-msg-ph-sNNN-NNN.txt <paths…>` — `write-tree` зі staged файлів.
+5. **Лише subject hook-fix** (без нових файлів): `bash bin/amend-head-msg.sh comitmsg/…` — **не** включає unstaged/staged diff у tree.
+6. `git push origin main` + самарі в чат (смуга PH-S*, rust_ratio, vision rev).
 
 Деталі hook — [`git-commit-msys.mdc`](git-commit-msys.mdc).
 
