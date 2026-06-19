@@ -82,6 +82,7 @@ async fn horizon_s524_band_payout_settlement_and_governance_metrics_ph_s533() {
         primary_dev_lamports: Some(50),
         secondary_admin_lamports: Some(500),
         gross_usd_micro: None,
+        ..PayoutBatchLedgerEntry::minimal("", "")
     });
 
     let app = grid_app();

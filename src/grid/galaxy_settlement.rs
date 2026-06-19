@@ -19,6 +19,11 @@ pub struct PayoutBatchLedgerEntry {
     pub primary_dev_lamports: Option<u64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub secondary_admin_lamports: Option<u64>,
+    /// Resolved Solana wallet for offline batch payout (PH-S538, Galaxy §8.2).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub payout_pubkey: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub telegram_user_id: Option<String>,
 }
 
 impl PayoutBatchLedgerEntry {
@@ -31,8 +36,22 @@ impl PayoutBatchLedgerEntry {
             gross_lamports: None,
             primary_dev_lamports: None,
             secondary_admin_lamports: None,
+            payout_pubkey: None,
+            telegram_user_id: None,
         }
     }
+}
+
+/// Resolve payout wallet from telegram user id (PH-S538).
+pub fn resolve_payout_pubkey(telegram_user_id: Option<&str>) -> Option<String> {
+    let uid = telegram_user_id?.trim();
+    if uid.is_empty() {
+        return None;
+    }
+    crate::services::virtual_node_telegram_wallet_service::VirtualNodeTelegramWalletService::lookup(
+        uid,
+    )
+    .map(|b| b.payout_pubkey)
 }
 
 /// Coordinator settlement status on grid result ingest (stub — no payout wire).
@@ -55,7 +74,9 @@ pub fn resolve_settlement_status(
     if settlement_gate == SettlementGateVerdict::PayoutHeld {
         return SettlementStatus::PendingVerification;
     }
-    if verification_sample == VerifySamplingVerdict::SampleScheduled {
+    if verification_sample == VerifySamplingVerdict::SampleScheduled
+        || verification_sample == VerifySamplingVerdict::VerificationInconclusive
+    {
         return SettlementStatus::PendingVerification;
     }
     match settlement_gate {

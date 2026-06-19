@@ -17,6 +17,19 @@ pub const ENV_VERIFY_BASE_SAMPLE_RATE: &str = "POOLAI_GALAXY_VERIFY_BASE_SAMPLE_
 /// Env: elevated sample rate after mismatch (0.0..=1.0, PH-S455).
 pub const ENV_VERIFY_ELEVATED_RATE: &str = "POOLAI_GALAXY_VERIFY_ELEVATED_RATE";
 
+/// Env: checker task timeout seconds before inconclusive policy (PH-S542).
+pub const ENV_CHECKER_TIMEOUT_SECS: &str = "POOLAI_GALAXY_CHECKER_TIMEOUT_SECS";
+
+/// Default checker timeout before inconclusive escalation (Galaxy §6.2).
+pub const DEFAULT_CHECKER_TIMEOUT_SECS: u64 = 300;
+
+/// Metric: checker timeout → verification inconclusive (PH-S542).
+pub const METRIC_VERIFY_CHECKER_TIMEOUT_INCONCLUSIVE_TOTAL: &str =
+    "galaxy_verification_checker_timeout_inconclusive_total";
+
+static CHECKER_TIMEOUT_INCONCLUSIVE_TOTAL: AtomicU64 = AtomicU64::new(0);
+static CHECKER_TIMEOUT_RETRY_TOTAL: AtomicU64 = AtomicU64::new(0);
+
 /// Concept default elevated rate after mismatch: 25%.
 pub const DEFAULT_VERIFY_ELEVATED_SAMPLE_RATE: f64 = 0.25;
 
@@ -62,6 +75,8 @@ pub enum VerifySamplingVerdict {
     NotApplicable,
     /// Edge peer but stub did not select this result (below configured rate).
     NotSelected,
+    /// Checker timed out — settlement inconclusive, elevated sample rate (PH-S542).
+    VerificationInconclusive,
 }
 
 impl VerifySamplingConfig {
@@ -159,6 +174,9 @@ pub fn record_verify_sampling_verdict(verdict: VerifySamplingVerdict) {
         VerifySamplingVerdict::NotApplicable => {
             VERIFY_SAMPLE_NOT_APPLICABLE_TOTAL.fetch_add(1, Ordering::Relaxed);
         }
+        VerifySamplingVerdict::VerificationInconclusive => {
+            VERIFY_SAMPLE_SCHEDULED_TOTAL.fetch_add(1, Ordering::Relaxed);
+        }
     }
 }
 
@@ -199,6 +217,48 @@ pub fn verify_elevated_applied_total() -> u64 {
     VERIFY_ELEVATED_APPLIED_TOTAL.load(Ordering::Relaxed)
 }
 
+pub fn checker_timeout_secs_from_env() -> u64 {
+    std::env::var(ENV_CHECKER_TIMEOUT_SECS)
+        .ok()
+        .and_then(|v| v.trim().parse().ok())
+        .filter(|&n| n > 0)
+        .unwrap_or(DEFAULT_CHECKER_TIMEOUT_SECS)
+}
+
+pub fn checker_timeout_inconclusive_total() -> u64 {
+    CHECKER_TIMEOUT_INCONCLUSIVE_TOTAL.load(Ordering::Relaxed)
+}
+
+pub fn checker_timeout_retry_total() -> u64 {
+    CHECKER_TIMEOUT_RETRY_TOTAL.load(Ordering::Relaxed)
+}
+
+/// Apply checker_timeout policy: one retry, else verification_inconclusive + elevated sample (PH-S542).
+pub fn evaluate_checker_timeout_policy(
+    job_id: &str,
+    metrics: Option<&serde_json::Value>,
+    config: &VerifySamplingConfig,
+) -> VerifySamplingVerdict {
+    let timed_out = metrics
+        .and_then(|m| m.get("checker_timeout"))
+        .and_then(|v| v.as_bool())
+        == Some(true);
+    if !timed_out {
+        return VerifySamplingVerdict::NotSelected;
+    }
+    let retry_count = metrics
+        .and_then(|m| m.get("checker_retry_count"))
+        .and_then(|v| v.as_u64())
+        .unwrap_or(0);
+    if retry_count == 0 {
+        CHECKER_TIMEOUT_RETRY_TOTAL.fetch_add(1, Ordering::Relaxed);
+        return VerifySamplingVerdict::SampleScheduled;
+    }
+    CHECKER_TIMEOUT_INCONCLUSIVE_TOTAL.fetch_add(1, Ordering::Relaxed);
+    let _ = evaluate_post_mismatch_elevated_sampling(job_id, config);
+    VerifySamplingVerdict::VerificationInconclusive
+}
+
 /// Format sample rate for the HTTP response header (6 decimal places).
 pub fn format_verify_base_sample_rate_header(rate: f64) -> String {
     format!("{rate:.6}")
@@ -211,6 +271,8 @@ pub fn reset_verify_sampling_metrics_for_test() {
     VERIFY_SAMPLE_NOT_APPLICABLE_TOTAL.store(0, Ordering::Relaxed);
     VERIFY_SAMPLING_EVALUATIONS_TOTAL.store(0, Ordering::Relaxed);
     VERIFY_ELEVATED_APPLIED_TOTAL.store(0, Ordering::Relaxed);
+    CHECKER_TIMEOUT_INCONCLUSIVE_TOTAL.store(0, Ordering::Relaxed);
+    CHECKER_TIMEOUT_RETRY_TOTAL.store(0, Ordering::Relaxed);
 }
 
 #[cfg(test)]
@@ -347,6 +409,30 @@ mod tests {
             &cfg
         ));
         assert_eq!(verify_elevated_applied_total(), 1);
+        reset_verify_sampling_metrics_for_test();
+    }
+
+    #[test]
+    fn evaluate_checker_timeout_policy_ph_s542() {
+        reset_verify_sampling_metrics_for_test();
+        let cfg = VerifySamplingConfig::default_stub();
+        assert_eq!(
+            evaluate_checker_timeout_policy(
+                "job-t",
+                Some(&serde_json::json!({"checker_timeout": true, "checker_retry_count": 0})),
+                &cfg,
+            ),
+            VerifySamplingVerdict::SampleScheduled
+        );
+        assert_eq!(
+            evaluate_checker_timeout_policy(
+                "job-t",
+                Some(&serde_json::json!({"checker_timeout": true, "checker_retry_count": 1})),
+                &cfg,
+            ),
+            VerifySamplingVerdict::VerificationInconclusive
+        );
+        assert_eq!(checker_timeout_inconclusive_total(), 1);
         reset_verify_sampling_metrics_for_test();
     }
 }

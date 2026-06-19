@@ -80,6 +80,7 @@ async fn horizon_s514_band_read_apis_and_metrics_ph_s523() {
         primary_dev_lamports: Some(100),
         secondary_admin_lamports: Some(1_000),
         gross_usd_micro: None,
+        ..PayoutBatchLedgerEntry::minimal("", "")
     });
 
     let app = grid_app();

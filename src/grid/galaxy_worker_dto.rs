@@ -34,6 +34,15 @@ pub struct GalaxyWorkerLimits {
     pub max_memory_mb: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_concurrent_requests: Option<u32>,
+    /// Telegram cold-mining CPU cap percent (PH-S541, Galaxy §2.3 / §8.2 TBD #2).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_cpu_pct: Option<u32>,
+    /// Telegram cold-mining RAM cap MB (PH-S541).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_ram_mb: Option<u32>,
+    /// Telegram cold-mining disk cap MB (PH-S541).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_disk_mb: Option<u32>,
 }
 
 /// Capabilities subset from discovery peer (PH-S516, Galaxy §2.3).
@@ -139,6 +148,12 @@ pub fn galaxy_worker_from_peer(peer: &PeerInfo) -> GalaxyWorkerDto {
             max_memory_mb: parse_u32(&peer.metadata, "max_memory_mb")
                 .or(Some(peer.capabilities.memory_mb as u32)),
             max_concurrent_requests: parse_u32(&peer.metadata, "max_concurrent_requests"),
+            max_cpu_pct: parse_u32(&peer.metadata, "max_cpu_pct")
+                .or(parse_u32(&peer.metadata, "cold_mining_max_cpu_pct")),
+            max_ram_mb: parse_u32(&peer.metadata, "max_ram_mb")
+                .or(parse_u32(&peer.metadata, "cold_mining_max_ram_mb")),
+            max_disk_mb: parse_u32(&peer.metadata, "max_disk_mb")
+                .or(parse_u32(&peer.metadata, "cold_mining_max_disk_mb")),
         }),
         telemetry: latency_ms_p50.map(|latency_ms_p50| GalaxyWorkerTelemetry {
             latency_ms_p50: Some(latency_ms_p50),
@@ -202,5 +217,27 @@ mod tests {
             dto.seed_inventory.as_ref().unwrap().shard_ids,
             vec!["s1".to_string()]
         );
+    }
+
+    #[test]
+    fn galaxy_worker_cold_mining_limits_ph_s541() {
+        let mut metadata = HashMap::new();
+        metadata.insert("origin".into(), "telegram_edge".into());
+        metadata.insert("cold_mining_max_cpu_pct".into(), "25".into());
+        metadata.insert("cold_mining_max_ram_mb".into(), "512".into());
+        metadata.insert("cold_mining_max_disk_mb".into(), "2048".into());
+        let peer = PeerInfo {
+            peer_id: "peer-cold".into(),
+            address: "127.0.0.1".into(),
+            port: 9000,
+            last_seen: Utc::now(),
+            capabilities: PeerCapabilities::default(),
+            metadata,
+        };
+        let dto = galaxy_worker_from_peer(&peer);
+        let limits = dto.limits.expect("limits");
+        assert_eq!(limits.max_cpu_pct, Some(25));
+        assert_eq!(limits.max_ram_mb, Some(512));
+        assert_eq!(limits.max_disk_mb, Some(2048));
     }
 }

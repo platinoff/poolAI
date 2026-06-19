@@ -32,8 +32,8 @@ pub use lease_failover::{
 };
 pub use lifecycle::allows_transition;
 pub use onchain::{
-    emit_job_completed_if_anchor, emit_memory_updated, emit_seed_provided, events_dir_from_env,
-    memory_content_digest,
+    emit_envelope, emit_job_completed_if_anchor, emit_memory_updated, emit_seed_provided,
+    events_dir_from_env, memory_content_digest,
 };
 
 pub use map::{

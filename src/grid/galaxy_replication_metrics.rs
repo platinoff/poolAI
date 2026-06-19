@@ -1,10 +1,14 @@
 //! Galaxy Grid replication metrics stub (PH-S179, §6.3).
 //!
-//! Counter for grid jobs ingested with `replication_strict` tier; no live executor enqueue wire.
+//! Counter for grid jobs ingested with `replication_strict` tier; executor enqueue to JobStore (PH-S536).
 
 use std::sync::atomic::{AtomicU64, Ordering};
 
+use chrono::Utc;
+
+use crate::core::error::AppError;
 use crate::grid::galaxy_replication::{ReplicationProfile, ReplicationTierConfig};
+use crate::job::{JobId, JobKind, JobRecord, JobSpec, JobStatus, JobStore};
 
 /// Env: max strict-tier replication enqueues per hour (PH-S457 stub).
 pub const ENV_REPLICATION_MAX_PER_HOUR: &str = "POOLAI_GALAXY_REPLICATION_MAX_PER_HOUR";
@@ -91,13 +95,63 @@ pub fn replication_rate_limited_total() -> u64 {
     REPLICATION_RATE_LIMITED_TOTAL.load(Ordering::Relaxed)
 }
 
-/// Grid job ingest executor queue stub (PH-S435).
-pub fn replication_executor_hook(replication_tier: ReplicationTierConfig) {
+/// Grid job ingest executor queue stub (PH-S435); JobStore parallel fan-out (PH-S536).
+pub fn replication_executor_hook(
+    replication_tier: ReplicationTierConfig,
+    jobs: Option<&JobStore>,
+    primary_job_id: Option<&str>,
+) {
     if !replication_enqueue_allowed(replication_tier) {
         return;
     }
     record_replication_executor_enqueue();
     evaluate_job_replication_strict(replication_tier);
+    if replication_tier.profile == ReplicationProfile::Strict {
+        if let (Some(store), Some(job_id)) = (jobs, primary_job_id) {
+            let _ = enqueue_replication_executor_jobs(store, job_id, replication_tier);
+        }
+    }
+}
+
+/// Enqueue M parallel replication executor jobs for strict tier (PH-S536).
+pub fn enqueue_replication_executor_jobs(
+    jobs: &JobStore,
+    primary_job_id: &str,
+    tier: ReplicationTierConfig,
+) -> Result<usize, AppError> {
+    let m = tier.executors_m as usize;
+    let mut enqueued = 0usize;
+    for i in 0..m {
+        let rep_id = format!("{primary_job_id}-rep-{i}");
+        if jobs.get(&rep_id)?.is_some() {
+            continue;
+        }
+        let record = JobRecord {
+            spec: JobSpec {
+                id: JobId::new(rep_id),
+                kind: JobKind::System,
+                resources: Default::default(),
+                priority: 0,
+                max_duration_secs: None,
+                input_artifact_ids: vec![],
+                verification_policy: Some("replication_executor".into()),
+                deadline: None,
+            },
+            status: JobStatus::Submitted,
+            created_at: Utc::now(),
+            worker_id: None,
+            vm_id: None,
+            lease_owner: None,
+            lease_epoch: None,
+            lease_expires_at: None,
+            migration_count: None,
+            fail_reason: None,
+            leased_at: None,
+        };
+        jobs.push(record)?;
+        enqueued += 1;
+    }
+    Ok(enqueued)
 }
 
 #[cfg(any(test, feature = "test-utils"))]
@@ -171,7 +225,7 @@ mod tests {
     fn replication_executor_hook_ph_s435() {
         let _lock = replication_metrics_test_lock();
         reset_replication_strict_metrics_for_test();
-        replication_executor_hook(REPLICATION_STRICT);
+        replication_executor_hook(REPLICATION_STRICT, None, None);
         assert_eq!(replication_executor_enqueue_total(), 1);
         assert_eq!(replication_enqueue_total(), 1);
         assert_eq!(replication_strict_total(), 1);
@@ -191,6 +245,18 @@ mod tests {
             Some(v) => std::env::set_var(ENV_REPLICATION_MAX_PER_HOUR, v),
             None => std::env::remove_var(ENV_REPLICATION_MAX_PER_HOUR),
         }
+        reset_replication_strict_metrics_for_test();
+    }
+
+    #[test]
+    fn enqueue_replication_executor_jobs_ph_s536() {
+        let _lock = replication_metrics_test_lock();
+        reset_replication_strict_metrics_for_test();
+        let jobs = JobStore::open_for_test(None);
+        let n = enqueue_replication_executor_jobs(&jobs, "grid-job-1", REPLICATION_STRICT)
+            .expect("enqueue");
+        assert_eq!(n, 3);
+        assert!(jobs.get("grid-job-1-rep-0").expect("get").is_some());
         reset_replication_strict_metrics_for_test();
     }
 }

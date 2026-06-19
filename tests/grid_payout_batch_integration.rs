@@ -83,6 +83,7 @@ async fn get_payout_batch_fee_split_fields_ph_s521() {
         gross_lamports: Some(1_000_000_000),
         primary_dev_lamports: Some(1_000_000),
         secondary_admin_lamports: Some(10_000_000),
+        ..PayoutBatchLedgerEntry::minimal("", "")
     });
 
     let app = app().await;

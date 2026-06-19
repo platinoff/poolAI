@@ -6,6 +6,7 @@
 
 pub mod dispatch;
 mod envelope;
+pub mod galaxy_capability_admission;
 pub mod galaxy_capability_doc;
 pub mod galaxy_fee_split;
 pub mod galaxy_fee_split_metrics;
@@ -14,15 +15,19 @@ pub mod galaxy_locality;
 pub mod galaxy_network_profile;
 pub mod galaxy_network_profile_store;
 pub mod galaxy_prefetch_metrics;
+pub mod galaxy_prefetch_peer_pull;
 pub mod galaxy_pricing_oracle;
 pub mod galaxy_pricing_provider_metrics;
 pub mod galaxy_protocol_negotiation_metrics;
+pub mod galaxy_replay_jobs;
 pub mod galaxy_replay_metrics;
 pub mod galaxy_replication;
 pub mod galaxy_replication_metrics;
 pub mod galaxy_settlement;
 pub mod galaxy_settlement_metrics;
+pub mod galaxy_settlement_onchain;
 pub mod galaxy_trust_score;
+pub mod galaxy_verification_checker_jobs;
 pub mod galaxy_verification_metrics;
 pub mod galaxy_verification_replay;
 pub mod galaxy_verify_sampling;

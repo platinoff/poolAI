@@ -1938,7 +1938,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S533",
+  "last_sprint_closed": "PH-S543",
   "layers": [
     {
       "id": "L0",
@@ -8106,7 +8106,7 @@
       "path": "tests/network_profile_hydrate_integration.rs"
     }
   ],
-  "revision": 242,
+  "revision": 243,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -12319,6 +12319,96 @@
       "row": 468,
       "status": "closed",
       "title": "Horizon close band S524–S532"
+    },
+    {
+      "acceptance": "submit_shadow_verification_checker_job` → JobStore; `galaxy_verification_checker_job_submit_total",
+      "deps": "Galaxy §6.2",
+      "id": "PH-S534",
+      "open": false,
+      "row": 469,
+      "status": "closed",
+      "title": "Verification checker shadow job submit"
+    },
+    {
+      "acceptance": "submit_replay_verification_job` on mismatch; JobStore `Verifying` row",
+      "deps": "Galaxy §6.3",
+      "id": "PH-S535",
+      "open": false,
+      "row": 470,
+      "status": "closed",
+      "title": "Replay verification job enqueue"
+    },
+    {
+      "acceptance": "enqueue_replication_executor_jobs` M parallel strict-tier jobs",
+      "deps": "Galaxy §6.4",
+      "id": "PH-S536",
+      "open": false,
+      "row": 471,
+      "status": "closed",
+      "title": "Replication parallel executor fan-out"
+    },
+    {
+      "acceptance": "fetch_seed_shards_from_peer_http` + `POOLAI_GALAXY_PREFETCH_PEER_HTTP_URL",
+      "deps": "Galaxy §5.5",
+      "id": "PH-S537",
+      "open": false,
+      "row": 472,
+      "status": "closed",
+      "title": "Peer HTTP seed-pull prefetch wire"
+    },
+    {
+      "acceptance": "resolve_payout_pubkey`; `PayoutBatchLedgerEntry.payout_pubkey` on Cleared",
+      "deps": "Galaxy §8.2",
+      "id": "PH-S538",
+      "open": false,
+      "row": 473,
+      "status": "closed",
+      "title": "Payout ledger `payout_pubkey` resolution"
+    },
+    {
+      "acceptance": "emit_settlement_job_rewarded` NDJSON `JobCompleted` + `payout_lamports",
+      "deps": "FM-010 · Galaxy §7",
+      "id": "PH-S539",
+      "open": false,
+      "row": 474,
+      "status": "closed",
+      "title": "Cleared settlement → Solana sidecar stub"
+    },
+    {
+      "acceptance": "check_telegram_edge_capability_admission`; `capability_probe_required",
+      "deps": "Galaxy §6.1",
+      "id": "PH-S540",
+      "open": false,
+      "row": 475,
+      "status": "closed",
+      "title": "Task-probe capability admission gate"
+    },
+    {
+      "acceptance": "GalaxyWorkerLimits` max_cpu/ram/disk on virtual-nodes DTO",
+      "deps": "Galaxy §2.3",
+      "id": "PH-S541",
+      "open": false,
+      "row": 476,
+      "status": "closed",
+      "title": "Telegram cold-mining limits DTO"
+    },
+    {
+      "acceptance": "evaluate_checker_timeout_policy`; retry → `VerificationInconclusive",
+      "deps": "Galaxy §6.2",
+      "id": "PH-S542",
+      "open": false,
+      "row": 477,
+      "status": "closed",
+      "title": "Checker timeout inconclusive policy"
+    },
+    {
+      "acceptance": "galaxy_horizon_s534_integration` + stand smoke + loc-audit + vision-sync",
+      "deps": "§5.12 fallback",
+      "id": "PH-S543",
+      "open": false,
+      "row": 478,
+      "status": "closed",
+      "title": "Horizon close band S534–S542"
     }
   ],
   "sprint_queue_open_count": 0,

@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-19 (PH-S524…S533 ✅ · rust_ratio **94.62%**) · VDT
+**Оновлено:** 2026-06-19 (PH-S534…S543 ✅ · rust_ratio **94.62%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -484,9 +484,19 @@
 **PH-S531 ✅ (code):** `GET /api/v1/grid/payout-batch` → `settlement_mode: offline_batch`.
 **PH-S532 ✅ (code/e2e):** `admin_charts.js` wasm-first slim — line/sparkline JS fallbacks removed.
 **PH-S533 ✅ (ops):** `galaxy_horizon_s524_integration` + stand smoke + loc-audit + vision-sync.
+**PH-S534 ✅ (code):** `submit_shadow_verification_checker_job` → JobStore `local_srv` shadow check on sample.
+**PH-S535 ✅ (code):** `submit_replay_verification_job` on mismatch/replay_pending → JobStore `Verifying`.
+**PH-S536 ✅ (code):** `enqueue_replication_executor_jobs` — M parallel strict-tier replication jobs.
+**PH-S537 ✅ (code):** `fetch_seed_shards_from_peer_http` — peer seed-inventory HTTP pull prefetch.
+**PH-S538 ✅ (code):** `PayoutBatchLedgerEntry.payout_pubkey` via `resolve_payout_pubkey` on Cleared.
+**PH-S539 ✅ (code):** `emit_settlement_job_rewarded` — NDJSON `JobCompleted` + `payout_lamports` stub.
+**PH-S540 ✅ (code):** `check_telegram_edge_capability_admission` — GPU jobs require probe history.
+**PH-S541 ✅ (code):** `GalaxyWorkerLimits` cold-mining caps (`max_cpu_pct`, `max_ram_mb`, `max_disk_mb`).
+**PH-S542 ✅ (code):** `evaluate_checker_timeout_policy` — retry then `VerificationInconclusive`.
+**PH-S543 ✅ (ops):** `galaxy_horizon_s534_integration` + stand smoke + loc-audit + vision-sync.
 **Rules ✅:** **`абракадабра`** — project scan **всього репо** (concept · FM §5.1 · roadmaps · architect · code) → 10 PH-S* у §5.12 (журнал) → drain → push; канон [`.cursor/rules/poolai-session-iteration.mdc`](../.cursor/rules/poolai-session-iteration.mdc) § «Тригер абракадабра»; commit **`git-commit-tree-msg.sh`**.
 **§5.12:** **0** відкритих — наступна сесія: **`абракадабра`** (project scan + drain) або один PH-S*.
-**Vision ✅:** rev **240** · rust_ratio **94.47%** · hold **95%** advisory.
+**Vision ✅:** rev **243** · rust_ratio **94.62%** · hold **95%** advisory.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

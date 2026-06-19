@@ -12,6 +12,7 @@ use chrono::Utc;
 use serde::{Deserialize, Serialize};
 
 use crate::core::error::AppError;
+use crate::grid::galaxy_capability_admission::check_telegram_edge_capability_admission;
 use crate::grid::galaxy_fee_split::{
     split_gross_payment, SECONDARY_ADMIN_FEE_MAX_BPS, SECONDARY_ADMIN_FEE_MIN_BPS,
 };
@@ -35,23 +36,27 @@ use crate::grid::galaxy_prefetch_metrics::{
     record_shard_access, should_hot_promote, DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM,
     DEFAULT_PREFETCH_BYTES_PER_SHARD_VRAM,
 };
+use crate::grid::galaxy_prefetch_peer_pull::fetch_seed_shards_from_peer_http;
+use crate::grid::galaxy_replay_jobs::submit_replay_verification_job;
 use crate::grid::galaxy_replay_metrics::evaluate_result_replay_pending;
 use crate::grid::galaxy_replication::{
     replication_tier_from_policy, ReplicationTierConfig, REPLICATION_STANDARD, REPLICATION_STRICT,
 };
 use crate::grid::galaxy_replication_metrics::replication_executor_hook;
 use crate::grid::galaxy_settlement::{
-    resolve_settlement_status, PayoutBatchLedgerEntry, SettlementStatus,
+    resolve_payout_pubkey, resolve_settlement_status, PayoutBatchLedgerEntry, SettlementStatus,
 };
 use crate::grid::galaxy_settlement_metrics::{
     evaluate_result_settlement_cleared, evaluate_result_settlement_not_applicable,
     evaluate_result_settlement_pending_verification, evaluate_result_settlement_resolved,
     record_payout_batch_ledger_entry,
 };
+use crate::grid::galaxy_settlement_onchain::emit_settlement_job_rewarded;
 use crate::grid::galaxy_trust_score::{
     apply_verification_trust_delta, clamp_trust_score, evaluate_result_settlement_gate,
     SettlementGateVerdict, TrustScore, TrustScoreGateConfig,
 };
+use crate::grid::galaxy_verification_checker_jobs::submit_shadow_verification_checker_job;
 use crate::grid::galaxy_verification_metrics::{
     drain_verification_checker_task, enqueue_verification_checker_task,
     evaluate_result_verification_match, evaluate_result_verification_mismatch,
@@ -59,8 +64,8 @@ use crate::grid::galaxy_verification_metrics::{
     evaluate_semantic_hash_verification,
 };
 use crate::grid::galaxy_verify_sampling::{
-    evaluate_post_mismatch_elevated_sampling, evaluate_result_verify_sampling,
-    VerifySamplingConfig, VerifySamplingVerdict,
+    evaluate_checker_timeout_policy, evaluate_post_mismatch_elevated_sampling,
+    evaluate_result_verify_sampling, VerifySamplingConfig, VerifySamplingVerdict,
 };
 use crate::grid::{GridEnvelope, GridEnvelopeError, GridMessage, GridResultBody};
 use crate::job::{
@@ -639,8 +644,12 @@ pub fn fetch_seed_shards_from_raid_hook(plan: &PrefetchPlan, memory: &MemoryShar
     hits
 }
 
-/// Peer seed inventory prefetch fetch stub (PH-S479): resolve shards via discovery peer snapshot.
+/// Peer seed inventory prefetch fetch (PH-S479 snapshot; PH-S537 HTTP pull when env set).
 pub fn fetch_seed_shards_from_peer_hook(plan: &PrefetchPlan) -> usize {
+    let http_hits = fetch_seed_shards_from_peer_http(plan);
+    if http_hits > 0 || peer_http_prefetch_enabled() {
+        return http_hits;
+    }
     let mut hits = 0usize;
     for item in &plan.items {
         let found = coordinator_seed_inventory_snapshot().iter().any(|snap| {
@@ -657,6 +666,12 @@ pub fn fetch_seed_shards_from_peer_hook(plan: &PrefetchPlan) -> usize {
         }
     }
     hits
+}
+
+fn peer_http_prefetch_enabled() -> bool {
+    std::env::var(crate::grid::galaxy_prefetch_peer_pull::ENV_PREFETCH_PEER_HTTP_URL)
+        .ok()
+        .is_some_and(|s| !s.trim().is_empty())
 }
 
 /// Default co-access graph stub: admitted shard → speculative neighbors (PH-S446).
@@ -827,6 +842,7 @@ fn ingest_job(
     if !body.required_shard_ids.is_empty() {
         check_strict_locality_gate(&body.required_shard_ids)?;
     }
+    check_telegram_edge_capability_admission(source_peer_id, &body.task_kind)?;
     let spec = job_spec_from_grid_job(&body);
     let job_id = spec.id.0.clone();
     let record = JobRecord {
@@ -861,7 +877,7 @@ fn ingest_job(
         .get(&job_id)?
         .ok_or_else(|| AppError::InternalError("job missing after grid ingest".into()))?;
     let replication_tier = replication_tier_from_policy(body.verification_policy.as_deref());
-    replication_executor_hook(replication_tier);
+    replication_executor_hook(replication_tier, Some(jobs), Some(&job_id));
     Ok(GridIngestOutcome {
         kind: GridIngestKind::Job {
             job_id,
@@ -913,6 +929,14 @@ fn ingest_result(
         drain_verification_checker_task(&job_id);
     }
     let verify_cfg = VerifySamplingConfig::from_env();
+    if let timeout_verdict @ VerifySamplingVerdict::SampleScheduled
+    | timeout_verdict @ VerifySamplingVerdict::VerificationInconclusive =
+        evaluate_checker_timeout_policy(&job_id, body.metrics.as_ref(), &verify_cfg)
+    {
+        if timeout_verdict == VerifySamplingVerdict::SampleScheduled {
+            let _ = submit_shadow_verification_checker_job(jobs, &job_id);
+        }
+    }
     if body
         .metrics
         .as_ref()
@@ -943,21 +967,26 @@ fn ingest_result(
     evaluate_result_verification_sample(body.metrics.as_ref(), sample_scheduled);
     if sample_scheduled {
         enqueue_verification_checker_task(&job_id);
+        let _ = submit_shadow_verification_checker_job(jobs, &job_id);
     }
     let settlement_status = resolve_settlement_status(settlement_gate, verification_sample);
     evaluate_result_settlement_resolved(settlement_status);
     evaluate_result_settlement_pending_verification(settlement_status);
     evaluate_result_settlement_cleared(settlement_status);
     if settlement_status == SettlementStatus::Cleared {
-        record_payout_batch_ledger_entry(build_payout_batch_entry(
+        let entry = build_payout_batch_entry(
             &job_id,
             now.to_rfc3339(),
             body.metrics.as_ref(),
-        ));
+            source_peer_id,
+        );
+        record_payout_batch_ledger_entry(entry.clone());
+        emit_settlement_job_rewarded(&entry, source_peer_id.unwrap_or("coordinator"));
     }
     evaluate_result_settlement_not_applicable(settlement_status);
     evaluate_result_fee_split(body.metrics.as_ref());
     evaluate_result_replay_pending(&job_id, body.metrics.as_ref(), settlement_status);
+    let _ = submit_replay_verification_job(jobs, &job_id, body.metrics.as_ref(), settlement_status);
     Ok(GridIngestOutcome {
         kind: GridIngestKind::Result {
             job_id,
@@ -974,7 +1003,12 @@ fn build_payout_batch_entry(
     job_id: &str,
     cleared_at: String,
     metrics: Option<&serde_json::Value>,
+    source_peer_id: Option<&str>,
 ) -> PayoutBatchLedgerEntry {
+    let telegram_user_id = metrics
+        .and_then(|m| m.get("telegram_user_id"))
+        .and_then(|v| v.as_str())
+        .map(str::to_string);
     let mut entry = PayoutBatchLedgerEntry {
         job_id: job_id.to_string(),
         cleared_at,
@@ -982,6 +1016,8 @@ fn build_payout_batch_entry(
         gross_lamports: None,
         primary_dev_lamports: None,
         secondary_admin_lamports: None,
+        payout_pubkey: resolve_payout_pubkey(telegram_user_id.as_deref()),
+        telegram_user_id,
     };
     let Some(m) = metrics else {
         return entry;

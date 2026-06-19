@@ -83,6 +83,9 @@ use crate::grid::galaxy_replication_metrics::{
     METRIC_REPLICATION_EXECUTOR_ENQUEUE_TOTAL, METRIC_REPLICATION_RATE_LIMITED_TOTAL,
     METRIC_REPLICATION_STRICT_TOTAL,
 };
+use crate::grid::galaxy_replay_jobs::{
+    replay_job_submit_total, METRIC_REPLAY_JOB_SUBMIT_TOTAL,
+};
 use crate::grid::galaxy_settlement_metrics::{
     settlement_cleared_total, settlement_not_applicable_total, settlement_payout_batch_total,
     settlement_pending_verification_total, settlement_resolved_total,
@@ -98,6 +101,9 @@ use crate::grid::galaxy_trust_score::{
     METRIC_PAYOUT_ELIGIBLE_TOTAL, METRIC_PAYOUT_HELD_TOTAL, METRIC_PAYOUT_NOT_APPLICABLE_TOTAL,
     METRIC_TRUST_GATE_DEFAULT_SCORE, METRIC_TRUST_GATE_MIN_THRESHOLD, METRIC_TRUST_SCORE,
     METRIC_TRUST_SCORE_DELTA_TOTAL,
+};
+use crate::grid::galaxy_verification_checker_jobs::{
+    verification_checker_job_submit_total, METRIC_VERIFICATION_CHECKER_JOB_SUBMIT_TOTAL,
 };
 use crate::grid::galaxy_verification_metrics::{
     verification_checker_enqueue_total, verification_checker_pending_total,
@@ -198,6 +204,8 @@ pub struct PoolAiPrometheus {
     galaxy_verification_elevated_applied_total: IntGauge,
     galaxy_verification_checker_enqueue_total: IntGauge,
     galaxy_verification_checker_pending_total: IntGauge,
+    galaxy_verification_checker_job_submit_total: IntGauge,
+    galaxy_replay_job_submit_total: IntGauge,
     galaxy_replay_pending: IntGauge,
     galaxy_replay_pending_scheduled_total: IntGauge,
     galaxy_replay_pending_resolved_total: IntGauge,
@@ -932,6 +940,26 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_verification_checker_pending_total.clone()))
         .expect("register galaxy_verification_checker_pending_total");
 
+    let galaxy_verification_checker_job_submit_total = IntGauge::with_opts(Opts::new(
+        METRIC_VERIFICATION_CHECKER_JOB_SUBMIT_TOTAL,
+        "Galaxy shadow checker jobs submitted to JobStore (PH-S534)",
+    ))
+    .expect(METRIC_VERIFICATION_CHECKER_JOB_SUBMIT_TOTAL);
+    registry
+        .register(Box::new(
+            galaxy_verification_checker_job_submit_total.clone(),
+        ))
+        .expect("register galaxy_verification_checker_job_submit_total");
+
+    let galaxy_replay_job_submit_total = IntGauge::with_opts(Opts::new(
+        METRIC_REPLAY_JOB_SUBMIT_TOTAL,
+        "Galaxy replay verification jobs submitted to JobStore (PH-S535)",
+    ))
+    .expect(METRIC_REPLAY_JOB_SUBMIT_TOTAL);
+    registry
+        .register(Box::new(galaxy_replay_job_submit_total.clone()))
+        .expect("register galaxy_replay_job_submit_total");
+
     let galaxy_replay_pending = IntGauge::with_opts(Opts::new(
         METRIC_REPLAY_PENDING,
         "Galaxy replay verifications pending coordinator verdict (PH-S176)",
@@ -1199,6 +1227,8 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_verification_elevated_applied_total,
         galaxy_verification_checker_enqueue_total,
         galaxy_verification_checker_pending_total,
+        galaxy_verification_checker_job_submit_total,
+        galaxy_replay_job_submit_total,
         galaxy_replay_pending,
         galaxy_replay_pending_scheduled_total,
         galaxy_replay_pending_resolved_total,
@@ -1375,6 +1405,10 @@ pub fn refresh_galaxy_verification_gauges() {
         .set(verification_checker_enqueue_total() as i64);
     prom.galaxy_verification_checker_pending_total
         .set(verification_checker_pending_total() as i64);
+    prom.galaxy_verification_checker_job_submit_total
+        .set(verification_checker_job_submit_total() as i64);
+    prom.galaxy_replay_job_submit_total
+        .set(replay_job_submit_total() as i64);
     prom.galaxy_worker_unhealthy_total
         .set(galaxy_worker_unhealthy_total() as i64);
     prom.poolai_release_verify_total

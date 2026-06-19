@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-19 (PH-S524…S533 ✅ · vision **rev 242** · **0** відкритих · rust_ratio **94.62%**)
+**Оновлено:** 2026-06-19 (PH-S534…S543 ✅ · vision **rev 243** · **0** відкритих · rust_ratio **94.63%**)
 
 | **← наступний** | **`абракадабра`** (project scan + drain) **або** один PH-S* |
 | **Відкритих** | **0** |
@@ -30,19 +30,19 @@
 
 ---
 
-## Закрито (смуга PH-S524…S533)
+## Закрито (смуга PH-S534…S543)
 
-PH-S524 ✅ — worker-unhealthy lease failover (`fail_reason=worker-unhealthy`).
-PH-S525 ✅ — scheduler/grid bind skips unhealthy peers.
-PH-S526 ✅ — `POOLAI_JOB_MAX_TOTAL_RUNTIME_SECS` wall-clock cap.
-PH-S527 ✅ — signed capability `expires_at` enforcement (telegram_edge).
-PH-S528 ✅ — governance Prometheus gauges (`poolai_release_verify_*`, `poolai_update_notify_pending`).
-PH-S529 ✅ — discovery startup hydrate persisted `network_profile`.
-PH-S530 ✅ — queue starvation failover (`POOLAI_JOB_QUEUE_STARVATION_SECS`, `leased_at`).
-PH-S531 ✅ — payout-batch `settlement_mode: offline_batch` wire.
-PH-S532 ✅ — `admin_charts.js` wasm-first slim (line/sparkline fallbacks removed).
-PH-S533 ✅ — horizon S524 integration + stand smoke + loc-audit + vision-sync.
+PH-S534 ✅ — shadow verification checker JobStore submit (`local_srv`).
+PH-S535 ✅ — replay verification job enqueue on mismatch.
+PH-S536 ✅ — strict-tier replication M parallel executor jobs.
+PH-S537 ✅ — peer HTTP seed-pull prefetch (`POOLAI_GALAXY_PREFETCH_PEER_HTTP_URL`).
+PH-S538 ✅ — payout-batch `payout_pubkey` from telegram wallet bind.
+PH-S539 ✅ — Cleared settlement → Solana NDJSON `JobCompleted` stub.
+PH-S540 ✅ — telegram_edge GPU admission gate (`raid_artifact_probe` history).
+PH-S541 ✅ — cold-mining limits on Galaxy worker DTO.
+PH-S542 ✅ — checker_timeout → retry / verification_inconclusive policy.
+PH-S543 ✅ — horizon S534 integration + stand smoke + loc-audit + vision-sync.
 
-**rust_ratio:** **94.62%** (formal 90–95% ✅; hold 95% advisory).
+**rust_ratio:** **94.63%** (formal 90–95% ✅; hold 95% advisory).
 
 **BLOCKED / Deferred:** FM-003 LAN · FM-041 Cloud SDK live.

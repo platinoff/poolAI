@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-19 (PH-S524…S533 ✅ · vision **rev 242** · **0** відкритих · rust_ratio **94.62%**)
+**Оновлено:** 2026-06-19 (PH-S534…S543 ✅ · vision **rev 243** · **0** відкритих · rust_ratio **94.63%**)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -733,8 +733,18 @@ FM-xxx (з таблиці нижче)
 | 466 | **PH-S531** | Offline settlement mode on payout-batch wire | Galaxy §8.2 | `GET /api/v1/grid/payout-batch` → `settlement_mode: offline_batch` | **✅** |
 | 467 | **PH-S532** | `admin_charts.js` wasm slim band | RUST_RATIO §5.13 | line/sparkline JS fallbacks removed; wasm-first chart glue | **✅** |
 | 468 | **PH-S533** | Horizon close band S524–S532 | §5.12 fallback | `galaxy_horizon_s524_integration` + stand smoke + loc-audit + vision-sync | **✅** |
+| 469 | **PH-S534** | Verification checker shadow job submit | Galaxy §6.2 | `submit_shadow_verification_checker_job` → JobStore; `galaxy_verification_checker_job_submit_total` | **✅** |
+| 470 | **PH-S535** | Replay verification job enqueue | Galaxy §6.3 | `submit_replay_verification_job` on mismatch; JobStore `Verifying` row | **✅** |
+| 471 | **PH-S536** | Replication parallel executor fan-out | Galaxy §6.4 | `enqueue_replication_executor_jobs` M parallel strict-tier jobs | **✅** |
+| 472 | **PH-S537** | Peer HTTP seed-pull prefetch wire | Galaxy §5.5 | `fetch_seed_shards_from_peer_http` + `POOLAI_GALAXY_PREFETCH_PEER_HTTP_URL` | **✅** |
+| 473 | **PH-S538** | Payout ledger `payout_pubkey` resolution | Galaxy §8.2 | `resolve_payout_pubkey`; `PayoutBatchLedgerEntry.payout_pubkey` on Cleared | **✅** |
+| 474 | **PH-S539** | Cleared settlement → Solana sidecar stub | FM-010 · Galaxy §7 | `emit_settlement_job_rewarded` NDJSON `JobCompleted` + `payout_lamports` | **✅** |
+| 475 | **PH-S540** | Task-probe capability admission gate | Galaxy §6.1 | `check_telegram_edge_capability_admission`; `capability_probe_required` | **✅** |
+| 476 | **PH-S541** | Telegram cold-mining limits DTO | Galaxy §2.3 | `GalaxyWorkerLimits` max_cpu/ram/disk on virtual-nodes DTO | **✅** |
+| 477 | **PH-S542** | Checker timeout inconclusive policy | Galaxy §6.2 | `evaluate_checker_timeout_policy`; retry → `VerificationInconclusive` | **✅** |
+| 478 | **PH-S543** | Horizon close band S534–S542 | §5.12 fallback | `galaxy_horizon_s534_integration` + stand smoke + loc-audit + vision-sync | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S524…S533 ✅. Vision rev **242**. rust_ratio **94.62%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S534…S543 ✅. Vision rev **243**. rust_ratio **94.63%**.
 
 **Наступна сесія:** **`абракадабра`** (project scan → drain) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
