@@ -70,6 +70,7 @@ use crate::grid::galaxy_protocol_negotiation_metrics::{
     protocol_negotiation_accepted_total, protocol_negotiation_rejected_total,
     METRIC_PROTOCOL_NEGOTIATION_ACCEPTED_TOTAL, METRIC_PROTOCOL_NEGOTIATION_REJECTED_TOTAL,
 };
+use crate::grid::galaxy_replay_jobs::{replay_job_submit_total, METRIC_REPLAY_JOB_SUBMIT_TOTAL};
 use crate::grid::galaxy_replay_metrics::{
     replay_evaluations_total, replay_pending, replay_pending_resolved_total,
     replay_pending_scheduled_total, replay_verification_enqueue_total,
@@ -82,9 +83,6 @@ use crate::grid::galaxy_replication_metrics::{
     replication_strict_total, METRIC_REPLICATION_ENQUEUE_TOTAL,
     METRIC_REPLICATION_EXECUTOR_ENQUEUE_TOTAL, METRIC_REPLICATION_RATE_LIMITED_TOTAL,
     METRIC_REPLICATION_STRICT_TOTAL,
-};
-use crate::grid::galaxy_replay_jobs::{
-    replay_job_submit_total, METRIC_REPLAY_JOB_SUBMIT_TOTAL,
 };
 use crate::grid::galaxy_settlement_metrics::{
     settlement_cleared_total, settlement_not_applicable_total, settlement_payout_batch_total,
