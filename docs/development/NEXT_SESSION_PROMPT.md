@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-19 (PH-S555 ✅ · vision **rev 246** · **0** відкритих · rust_ratio **94.66%**)
+**Оновлено:** 2026-06-19 (PH-S556 ✅ · vision **rev 247** · **0** відкритих · rust_ratio **94.66%**)
 
 | **← наступний** | **`абракадабра`** (project scan + drain) **або** один PH-S* |
 | **Відкритих** | **0** |
@@ -17,8 +17,8 @@
 
 ---
 
-## Закрито (PH-S555)
+## Закрито (PH-S556)
 
-PH-S555 ✅ — Vision map 3D orbit: WASD + center touch pad; `map-scene-3d`; layer stack sync.
+PH-S556 ✅ — Vision map true 3D: `applyMap3DProjection` layer Z depth; WASD W↑ S↓ A← D→; orbit pad bottom-center; UI v78 / CSS v74.
 
 **rust_ratio:** **94.66%** · **BLOCKED:** FM-003 LAN · FM-041 Cloud SDK.

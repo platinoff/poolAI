@@ -755,8 +755,9 @@ FM-xxx (з таблиці нижче)
 | 488 | **PH-S553** | Admin payout-batch read panel | Galaxy §8.2 | `/ui/admin/payout-batch` read-only GET payout-batch + history | **✅** |
 | 489 | **PH-S554** | Horizon close band S545–S553 | §5.12 fallback | `galaxy_horizon_s545_integration` + loc-audit + vision-sync | **✅** |
 | 490 | **PH-S555** | Vision map 3D orbit WASD + touch pad | docs/vision UX | `map-scene-3d` perspective orbit; WASD + center pad; layer stack sync; rev++ | **✅** |
+| 491 | **PH-S556** | Vision map true 3D layer projection | docs/vision UX | `applyMap3DProjection` layer Z; WASD W↑S↓A←D→; pad bottom-center; rev++ | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S555 ✅. Vision rev **246**. rust_ratio **94.66%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S556 ✅. Vision rev **247**. rust_ratio **94.66%**.
 
 **Наступна сесія:** **`абракадабра`** (project scan → drain) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 

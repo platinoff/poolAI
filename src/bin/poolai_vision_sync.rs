@@ -1145,4 +1145,22 @@ mod tests {
             "index.html missing 3D scene / orbit pad"
         );
     }
+
+    #[test]
+    fn vision_js_map_layer_z_projection_ph_s556() {
+        let js = std::fs::read_to_string("docs/vision/vision.js").expect("vision.js");
+        assert!(
+            js.contains("function applyMap3DProjection"),
+            "missing applyMap3DProjection"
+        );
+        assert!(
+            js.contains("function rotateProject3D") && js.contains("MAP_LAYER_Z_STEP"),
+            "missing layer Z projection"
+        );
+        let css = std::fs::read_to_string("docs/vision/vision.css").expect("vision.css");
+        assert!(
+            css.contains(".map-orbit-pad") && css.contains("bottom:"),
+            "orbit pad should anchor above bottom bar"
+        );
+    }
 }

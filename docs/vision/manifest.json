@@ -1992,7 +1992,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S555",
+  "last_sprint_closed": "PH-S556",
   "layers": [
     {
       "id": "L0",
@@ -8251,7 +8251,7 @@
       "path": "tests/galaxy_replication_quorum_integration.rs"
     }
   ],
-  "revision": 246,
+  "revision": 247,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -12662,6 +12662,15 @@
       "row": 490,
       "status": "closed",
       "title": "Vision map 3D orbit WASD + touch pad"
+    },
+    {
+      "acceptance": "applyMap3DProjection` layer Z; WASD W↑S↓A←D→; pad bottom-center; rev++",
+      "deps": "docs/vision UX",
+      "id": "PH-S556",
+      "open": false,
+      "row": 491,
+      "status": "closed",
+      "title": "Vision map true 3D layer projection"
     }
   ],
   "sprint_queue_open_count": 0,

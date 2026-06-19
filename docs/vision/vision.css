@@ -1072,7 +1072,7 @@ body.panel-fs-active.sidebar-overlay-open .sidebar-overlay-backdrop {
   z-index: 2;
   transform-style: preserve-3d;
   transform-origin: 50% 48%;
-  will-change: transform;
+  will-change: auto;
   pointer-events: none;
 }
 
@@ -1102,11 +1102,12 @@ body.panel-fs-active.sidebar-overlay-open .sidebar-overlay-backdrop {
 .map-orbit-pad {
   position: absolute;
   left: 50%;
-  top: 50%;
+  top: auto;
+  bottom: 44px;
   width: 92px;
   height: 92px;
-  margin: -46px 0 0 -46px;
-  z-index: 4;
+  margin: 0 0 0 -46px;
+  z-index: 6;
   border-radius: 50%;
   border: 1px solid rgba(126, 184, 255, 0.28);
   background: radial-gradient(
@@ -1167,9 +1168,10 @@ body.panel-fs-active.sidebar-overlay-open .sidebar-overlay-backdrop {
 }
 
 body.panel-fs-active .map-orbit-pad {
+  bottom: 56px;
   width: 112px;
   height: 112px;
-  margin: -56px 0 0 -56px;
+  margin-left: -56px;
 }
 
 body.vision-eco .map-orbit-pad,

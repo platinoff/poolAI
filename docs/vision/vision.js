@@ -27,9 +27,13 @@
   const MAP_ORBIT_STEP_DEG = 4;
   const MAP_ORBIT_PAD_SENS = 0.16;
   const MAP_ORBIT_CLAMP_X = 72;
+  const MAP_LAYER_Z_STEP = 52;
+  const MAP_3D_FOCAL = 880;
   const MAP_PREFS_ORBIT_KEY = "mapOrbit";
   let mapOrbit = { rotX: MAP_ORBIT_DEFAULT.rotX, rotY: MAP_ORBIT_DEFAULT.rotY, rotZ: MAP_ORBIT_DEFAULT.rotZ };
   let mapOrbitBound = false;
+  /** Projected screen coords after layer Z + orbit (PH-S556). */
+  let map3DProjected = new Map();
   const mapViewStack = [];
   let mapNavBound = false;
   let mapHoverRaf = 0;
@@ -280,10 +284,204 @@
   }
 
   function mapPosForNode(nodeId) {
+    const projected = map3DProjected.get(nodeId);
+    if (projected) return projected;
     const p = nodePositions.get(nodeId);
     if (!p) return null;
-    if (p.collapsedHidden && p.hubId) return nodePositions.get(p.hubId);
+    if (p.collapsedHidden && p.hubId) {
+      return map3DProjected.get(p.hubId) || nodePositions.get(p.hubId);
+    }
     return p;
+  }
+
+  function layerZDepth(layerId) {
+    const layers = manifest && manifest.layers ? manifest.layers : [];
+    const idx = layers.findIndex((l) => l.id === layerId);
+    return (idx >= 0 ? idx : 0) * MAP_LAYER_Z_STEP;
+  }
+
+  function rotateProject3D(bx, by, bz, rotX, rotY, rotZ) {
+    const px = bx - MAP_W / 2;
+    const py = by - MAP_H / 2;
+    const pz = bz;
+    const rx = (rotX * Math.PI) / 180;
+    const ry = (rotY * Math.PI) / 180;
+    const rz = (rotZ * Math.PI) / 180;
+    let x = px * Math.cos(ry) + pz * Math.sin(ry);
+    let z = -px * Math.sin(ry) + pz * Math.cos(ry);
+    let y = py;
+    const y2 = y * Math.cos(rx) - z * Math.sin(rx);
+    const z2 = y * Math.sin(rx) + z * Math.cos(rx);
+    const x3 = x * Math.cos(rz) - y2 * Math.sin(rz);
+    const y3 = x * Math.sin(rz) + y2 * Math.cos(rz);
+    const depth = z2;
+    const persp = MAP_3D_FOCAL / (MAP_3D_FOCAL + z2);
+    return {
+      x: x3 * persp + MAP_W / 2,
+      y: y3 * persp + MAP_H / 2,
+      depth: depth,
+      scale: persp,
+    };
+  }
+
+  function projectPlanePathD(bounds, layerId) {
+    const z = layerZDepth(layerId);
+    const cx = bounds.cx;
+    const cy = bounds.cy;
+    const hw = bounds.w / 2;
+    const hh = bounds.h / 2;
+    const corners = [
+      [cx, cy + hh, z],
+      [cx + hw, cy, z],
+      [cx, cy - hh, z],
+      [cx - hw, cy, z],
+    ].map((c) =>
+      rotateProject3D(c[0], c[1], c[2], mapOrbit.rotX, mapOrbit.rotY, mapOrbit.rotZ)
+    );
+    return (
+      "M" +
+      corners[0].x +
+      "," +
+      corners[0].y +
+      " L" +
+      corners[1].x +
+      "," +
+      corners[1].y +
+      " L" +
+      corners[2].x +
+      "," +
+      corners[2].y +
+      " L" +
+      corners[3].x +
+      "," +
+      corners[3].y +
+      " Z"
+    );
+  }
+
+  function applyMap3DProjection() {
+    const world = document.getElementById("map-world");
+    if (!world || !manifest) return;
+    map3DProjected.clear();
+    manifest.nodes.forEach((n) => {
+      const base = nodePositions.get(n.id);
+      if (!base || base.collapsedHidden) return;
+      map3DProjected.set(
+        n.id,
+        rotateProject3D(
+          base.x,
+          base.y,
+          layerZDepth(n.layer),
+          mapOrbit.rotX,
+          mapOrbit.rotY,
+          mapOrbit.rotZ
+        )
+      );
+    });
+
+    world.querySelectorAll(".plane").forEach((path) => {
+      const layer = path.dataset.layer;
+      if (!layer) return;
+      path.setAttribute("d", projectPlanePathD(layerPlaneBounds(layer), layer));
+    });
+
+    world.querySelectorAll(".layer-tier-label").forEach((label) => {
+      const layer = label.dataset.layer;
+      if (!layer) return;
+      const bounds = layerPlaneBounds(layer);
+      const p = rotateProject3D(
+        28,
+        bounds.cy + 4,
+        layerZDepth(layer),
+        mapOrbit.rotX,
+        mapOrbit.rotY,
+        mapOrbit.rotZ
+      );
+      label.setAttribute("x", p.x.toFixed(1));
+      label.setAttribute("y", p.y.toFixed(1));
+    });
+
+    world.querySelectorAll(".edge").forEach((path) => {
+      const a = mapPosForNode(path.dataset.from);
+      const b = mapPosForNode(path.dataset.to);
+      if (a && b) path.setAttribute("d", buildConstellationEdgePath(a, b));
+    });
+
+    clusterLabelPositions.forEach((cl, i) => {
+      const label = world.querySelectorAll(".cluster-labels text")[i];
+      if (!label) return;
+      const p = rotateProject3D(
+        cl.x,
+        cl.y,
+        layerZDepth(cl.layer),
+        mapOrbit.rotX,
+        mapOrbit.rotY,
+        mapOrbit.rotZ
+      );
+      label.setAttribute("x", p.x.toFixed(1));
+      label.setAttribute("y", p.y.toFixed(1));
+    });
+
+    const nodesG = world.querySelector(".nodes");
+    if (!nodesG) return;
+    const nodeEls = Array.from(nodesG.querySelectorAll(".node"));
+    nodeEls.sort((ea, eb) => {
+      const da = map3DProjected.get(ea.dataset.id);
+      const db = map3DProjected.get(eb.dataset.id);
+      return (da ? da.depth : 0) - (db ? db.depth : 0);
+    });
+    nodeEls.forEach((el) => nodesG.appendChild(el));
+    nodeEls.forEach((el) => {
+      const id = el.dataset.id;
+      const base = nodePositions.get(id);
+      const proj = map3DProjected.get(id);
+      if (!base || !proj) return;
+      const n = nodeById(id);
+      const circle = el.querySelector("circle");
+      const text = el.querySelector("text") || el._labelEl;
+      const r = nodeRenderRadius(n, base) * Math.max(0.62, Math.min(1.15, proj.scale));
+      if (circle) {
+        circle.setAttribute("cx", proj.x.toFixed(2));
+        circle.setAttribute("cy", proj.y.toFixed(2));
+        circle.setAttribute("r", r.toFixed(2));
+      }
+      if (text) {
+        text.setAttribute("x", proj.x.toFixed(2));
+        text.setAttribute("y", (proj.y + r + (r <= 5 ? 8 : 11)).toFixed(2));
+      }
+    });
+    updateMapSelectionCallout3D();
+  }
+
+  function updateMapSelectionCallout3D() {
+    const world = document.querySelector("#map-svg #map-world");
+    if (!world) return;
+    const callout = world.querySelector("#map-selection-callout");
+    if (!callout || !selectedId) return;
+    const n = nodeById(selectedId);
+    const pos = mapPosForNode(selectedId);
+    const base = nodePositions.get(selectedId);
+    if (!n || !pos || !base) return;
+    const hub = !!base.clusterHub;
+    const r = nodeBaseRadius(selectedId, hub) + 4;
+    const caption = mapNodeFullLabel(n, base);
+    const fontSize = 11;
+    const padX = 8;
+    const padY = 5;
+    const estW = Math.min(MAP_W - 48, Math.max(72, caption.length * (fontSize * 0.58)));
+    const estH = fontSize + padY * 2;
+    const cx = Math.min(MAP_W - 24 - estW / 2, Math.max(24 + estW / 2, pos.x));
+    const cy = pos.y - r - 10 - estH / 2;
+    const rect = callout.querySelector("rect");
+    const text = callout.querySelector("text");
+    if (rect) {
+      rect.setAttribute("x", (cx - estW / 2).toFixed(1));
+      rect.setAttribute("y", (cy - estH / 2).toFixed(1));
+    }
+    if (text) {
+      text.setAttribute("x", cx.toFixed(1));
+      text.setAttribute("y", (cy + fontSize * 0.35).toFixed(1));
+    }
   }
 
   function mapNodeDimmed(node) {
@@ -1013,11 +1211,9 @@
   }
 
   function applyMapOrbitTransform() {
-    const t = mapOrbitTransformString();
-    const scene = document.getElementById("map-scene-3d");
-    if (scene) scene.style.transform = t;
+    applyMap3DProjection();
     const stack = document.getElementById("layer-stack");
-    if (stack) stack.style.transform = t;
+    if (stack) stack.style.transform = mapOrbitTransformString();
   }
 
   function resetMapOrbit() {
@@ -1103,7 +1299,7 @@
     function orbitFromPadPointer(clientX, clientY) {
       const dx = clientX - padCx;
       const dy = clientY - padCy;
-      adjustMapOrbit(-dy * MAP_ORBIT_PAD_SENS, dx * MAP_ORBIT_PAD_SENS);
+      adjustMapOrbit(dy * MAP_ORBIT_PAD_SENS, dx * MAP_ORBIT_PAD_SENS);
       updateOrbitPadStick(dx, dy);
     }
 
@@ -1220,8 +1416,8 @@
   function edgeTraceNodeId(edgeEl, mx, my) {
     const from = edgeEl.dataset.from;
     const to = edgeEl.dataset.to;
-    const pf = nodePositions.get(from);
-    const pt = nodePositions.get(to);
+    const pf = mapPosForNode(from);
+    const pt = mapPosForNode(to);
     if (!pf || !pt) return from;
     const df = (pf.x - mx) ** 2 + (pf.y - my) ** 2;
     const dt = (pt.x - mx) ** 2 + (pt.y - my) ** 2;
@@ -1276,11 +1472,12 @@
 
   function focusMapNode(node, opts) {
     const pushHistory = !opts || opts.pushHistory !== false;
-    const pos = nodePositions.get(node.id);
+    const pos = mapPosForNode(node.id);
     if (!pos) return;
     if (pushHistory) pushMapViewState();
     const n = nodeById(node.id) || node;
-    const fs = labelFontSize(n, pos);
+    const base = nodePositions.get(node.id);
+    const fs = labelFontSize(n, base || pos);
     const svg = document.getElementById("map-svg");
     const rect = svg ? svg.getBoundingClientRect() : { width: MAP_W };
     const pxPerSvgUnit = rect.width > 0 ? rect.width / MAP_W : 1;
@@ -2738,6 +2935,7 @@
     svg.classList.toggle("map-fx-off", isMapFxOff());
 
     applyMapTransform();
+    applyMap3DProjection();
     bindMapNavigation(svg);
     bindMapNodeEvents(svg);
     renderMinimap();
@@ -2753,13 +2951,14 @@
     if (!selectedId) return;
 
     const n = nodeById(selectedId);
-    const pos = nodePositions.get(selectedId);
-    if (!n || !pos) return;
+    const base = nodePositions.get(selectedId);
+    const pos = mapPosForNode(selectedId);
+    if (!n || !base || !pos) return;
 
     const ns = "http://www.w3.org/2000/svg";
-    const hub = !!pos.clusterHub;
+    const hub = !!base.clusterHub;
     const r = nodeBaseRadius(selectedId, hub) + 4;
-    const caption = mapNodeFullLabel(n, pos);
+    const caption = mapNodeFullLabel(n, base);
     const fontSize = 11;
     const padX = 8;
     const padY = 5;

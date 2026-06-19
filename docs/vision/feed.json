@@ -3,6 +3,15 @@
   "items": [
     {
       "category": "closed",
+      "id": "PH-S556",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "applyMap3DProjection` layer Z; WASD W↑S↓A←D→; pad bottom-center; rev++",
+      "title": "Vision map true 3D layer projection"
+    },
+    {
+      "category": "closed",
       "id": "PH-S555",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
@@ -99,15 +108,6 @@
       "status": "closed",
       "summary": "replication_quorum_allows_cleared` on strict-tier digests before Cleared",
       "title": "Replication quorum result gate"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S544",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "FEED у header; однорядкова бігуча строка; тонкий custom scroll rail; rev++",
-      "title": "Vision feed ticker header marquee"
     }
   ],
   "link": "docs/vision/index.html",
