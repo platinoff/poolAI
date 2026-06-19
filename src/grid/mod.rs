@@ -23,10 +23,14 @@ pub mod galaxy_replay_jobs;
 pub mod galaxy_replay_metrics;
 pub mod galaxy_replication;
 pub mod galaxy_replication_metrics;
+pub mod galaxy_replication_quorum_gate;
 pub mod galaxy_settlement;
 pub mod galaxy_settlement_metrics;
+pub mod galaxy_settlement_mode;
 pub mod galaxy_settlement_onchain;
 pub mod galaxy_trust_score;
+pub mod galaxy_trust_score_store;
+pub mod galaxy_update_policy;
 pub mod galaxy_verification_checker_jobs;
 pub mod galaxy_verification_metrics;
 pub mod galaxy_verification_replay;
@@ -39,15 +43,16 @@ pub mod protocol_compat;
 pub use dispatch::{
     all_required_shards_hot, check_strict_locality_gate, co_access_graph_from_env,
     complete_prefetch_hook, coordinator_merged_seed_inventory, coordinator_seed_inventory_snapshot,
-    default_co_access_graph, enqueue_prefetch_hook, fetch_seed_shards_from_raid_hook,
-    fetch_seed_shards_hook, ingest_envelope, ingest_job_locality_rank_stub,
-    ingest_job_prefetch_stub, lease_acquire_prefetch_stub, locality_workers_from_seed_snapshots,
-    noop_prefetch_hook, parse_prefetch_policy_mode, plan_co_access_prefetch, plan_prefetch,
-    prefetch_backpressure_skip, re_migrate_prefetch_stub, resolve_seed_pull_shards, seed_pull_hook,
-    wait_prefetch_hook, GridIngestKind, GridIngestOutcome, PrefetchPlan, PrefetchPolicyConfig,
-    PrefetchPolicyMode, PrefetchTrigger, SeedInventoryEntry, SeedInventoryPeerSnapshot,
-    DEFAULT_PREFETCH_DEADLINE_MS, ENV_CO_ACCESS_GRAPH_JSON, ENV_LOCALITY_MODE,
-    ENV_PREFETCH_DEADLINE_MS, ENV_PREFETCH_MIN_BANDWIDTH_MBPS, ENV_PREFETCH_PEER_BANDWIDTH_MBPS,
+    default_co_access_graph, enqueue_prefetch_hook, evaluate_strict_prefetch_timeout,
+    fetch_seed_shards_from_raid_hook, fetch_seed_shards_hook, ingest_envelope,
+    ingest_job_locality_rank_stub, ingest_job_prefetch_stub, lease_acquire_prefetch_stub,
+    locality_workers_from_seed_snapshots, noop_prefetch_hook, parse_prefetch_policy_mode,
+    plan_co_access_prefetch, plan_prefetch, prefetch_backpressure_skip, re_migrate_prefetch_stub,
+    resolve_seed_pull_shards, seed_pull_hook, wait_prefetch_hook, GridIngestKind,
+    GridIngestOutcome, PrefetchPlan, PrefetchPolicyConfig, PrefetchPolicyMode, PrefetchTrigger,
+    SeedInventoryEntry, SeedInventoryPeerSnapshot, DEFAULT_PREFETCH_DEADLINE_MS,
+    ENV_CO_ACCESS_GRAPH_JSON, ENV_LOCALITY_MODE, ENV_PREFETCH_DEADLINE_MS,
+    ENV_PREFETCH_MIN_BANDWIDTH_MBPS, ENV_PREFETCH_PEER_BANDWIDTH_MBPS,
 };
 pub use envelope::{
     GridEnvelope, GridEnvelopeError, GridJobBody, GridMemoryShardBody, GridMessage,

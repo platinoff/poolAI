@@ -744,8 +744,18 @@ FM-xxx (з таблиці нижче)
 | 477 | **PH-S542** | Checker timeout inconclusive policy | Galaxy §6.2 | `evaluate_checker_timeout_policy`; retry → `VerificationInconclusive` | **✅** |
 | 478 | **PH-S543** | Horizon close band S534–S542 | §5.12 fallback | `galaxy_horizon_s534_integration` + stand smoke + loc-audit + vision-sync | **✅** |
 | 479 | **PH-S544** | Vision feed ticker header marquee | docs/vision UX | FEED у header; однорядкова бігуча строка; тонкий custom scroll rail; rev++ | **✅** |
+| 480 | **PH-S545** | Replication quorum result gate | Galaxy §6.4 | `replication_quorum_allows_cleared` on strict-tier digests before Cleared | **✅** |
+| 481 | **PH-S546** | Prefetch timeout fail trigger | Galaxy §5.6 | `evaluate_strict_prefetch_timeout` → `prefetch-timeout` under strict_locality | **✅** |
+| 482 | **PH-S547** | Capacity-preemption lease failover | Galaxy §4.3.3 | `LeaseFailReason::CapacityPreemption` + `apply_capacity_preemption_failover` | **✅** |
+| 483 | **PH-S548** | Scheduler pricing + queue_depth rank | Galaxy §5.2 | `LocalityWorker` tie-break queue_depth + pricing_usd_micro after locality score | **✅** |
+| 484 | **PH-S549** | Update policy notify env stub | Galaxy §9.5/§9.8 | `POOLAI_UPDATE_POLICY` + `tick_update_notify_from_env` on verify-release | **✅** |
+| 485 | **PH-S550** | On-chain settlement mode toggle | Galaxy §8.2 | `POOLAI_SETTLEMENT_ON_CHAIN=1` → payout-batch `on_chain` + pending | **✅** |
+| 486 | **PH-S551** | Telegram cold-mining + GPU horizon docs | Galaxy §8.2 TBD #2 | MVP CPU/RAM/Disk probros scope + GPU migration path in concept + RUN_LOCAL | **✅** |
+| 487 | **PH-S552** | Edge trust_score disk persistence | Galaxy §6.5 | `galaxy_trust_score_store` persist/hydrate on register-remote | **✅** |
+| 488 | **PH-S553** | Admin payout-batch read panel | Galaxy §8.2 | `/ui/admin/payout-batch` read-only GET payout-batch + history | **✅** |
+| 489 | **PH-S554** | Horizon close band S545–S553 | §5.12 fallback | `galaxy_horizon_s545_integration` + loc-audit + vision-sync | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S544 ✅. Vision rev **244**. rust_ratio **94.66%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S554 ✅. Vision rev **245**. rust_ratio **94.66%**.
 
 **Наступна сесія:** **`абракадабра`** (project scan → drain) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 

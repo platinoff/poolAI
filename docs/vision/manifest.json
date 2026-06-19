@@ -1968,7 +1968,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S544",
+  "last_sprint_closed": "PH-S554",
   "layers": [
     {
       "id": "L0",
@@ -8178,7 +8178,7 @@
       "path": "tests/galaxy_horizon_s534_integration.rs"
     }
   ],
-  "revision": 244,
+  "revision": 245,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -12490,6 +12490,96 @@
       "row": 479,
       "status": "closed",
       "title": "Vision feed ticker header marquee"
+    },
+    {
+      "acceptance": "replication_quorum_allows_cleared` on strict-tier digests before Cleared",
+      "deps": "Galaxy §6.4",
+      "id": "PH-S545",
+      "open": false,
+      "row": 480,
+      "status": "closed",
+      "title": "Replication quorum result gate"
+    },
+    {
+      "acceptance": "evaluate_strict_prefetch_timeout` → `prefetch-timeout` under strict_locality",
+      "deps": "Galaxy §5.6",
+      "id": "PH-S546",
+      "open": false,
+      "row": 481,
+      "status": "closed",
+      "title": "Prefetch timeout fail trigger"
+    },
+    {
+      "acceptance": "LeaseFailReason::CapacityPreemption` + `apply_capacity_preemption_failover",
+      "deps": "Galaxy §4.3.3",
+      "id": "PH-S547",
+      "open": false,
+      "row": 482,
+      "status": "closed",
+      "title": "Capacity-preemption lease failover"
+    },
+    {
+      "acceptance": "LocalityWorker` tie-break queue_depth + pricing_usd_micro after locality score",
+      "deps": "Galaxy §5.2",
+      "id": "PH-S548",
+      "open": false,
+      "row": 483,
+      "status": "closed",
+      "title": "Scheduler pricing + queue_depth rank"
+    },
+    {
+      "acceptance": "POOLAI_UPDATE_POLICY` + `tick_update_notify_from_env` on verify-release",
+      "deps": "Galaxy §9.5/§9.8",
+      "id": "PH-S549",
+      "open": false,
+      "row": 484,
+      "status": "closed",
+      "title": "Update policy notify env stub"
+    },
+    {
+      "acceptance": "POOLAI_SETTLEMENT_ON_CHAIN=1` → payout-batch `on_chain` + pending",
+      "deps": "Galaxy §8.2",
+      "id": "PH-S550",
+      "open": false,
+      "row": 485,
+      "status": "closed",
+      "title": "On-chain settlement mode toggle"
+    },
+    {
+      "acceptance": "MVP CPU/RAM/Disk probros scope + GPU migration path in concept + RUN_LOCAL",
+      "deps": "Galaxy §8.2 TBD #2",
+      "id": "PH-S551",
+      "open": false,
+      "row": 486,
+      "status": "closed",
+      "title": "Telegram cold-mining + GPU horizon docs"
+    },
+    {
+      "acceptance": "galaxy_trust_score_store` persist/hydrate on register-remote",
+      "deps": "Galaxy §6.5",
+      "id": "PH-S552",
+      "open": false,
+      "row": 487,
+      "status": "closed",
+      "title": "Edge trust_score disk persistence"
+    },
+    {
+      "acceptance": "/ui/admin/payout-batch` read-only GET payout-batch + history",
+      "deps": "Galaxy §8.2",
+      "id": "PH-S553",
+      "open": false,
+      "row": 488,
+      "status": "closed",
+      "title": "Admin payout-batch read panel"
+    },
+    {
+      "acceptance": "galaxy_horizon_s545_integration` + loc-audit + vision-sync",
+      "deps": "§5.12 fallback",
+      "id": "PH-S554",
+      "open": false,
+      "row": 489,
+      "status": "closed",
+      "title": "Horizon close band S545–S553"
     }
   ],
   "sprint_queue_open_count": 0,

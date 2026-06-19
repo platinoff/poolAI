@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-19 (PH-S544 ✅ · vision **rev 244** · **0** відкритих · rust_ratio **94.66%**)
+**Оновлено:** 2026-06-19 (PH-S554 ✅ · vision **rev 245** · **0** відкритих · rust_ratio **94.66%**)
 
 | **← наступний** | **`абракадабра`** (project scan + drain) **або** один PH-S* |
 | **Відкритих** | **0** |
@@ -30,23 +30,22 @@
 
 ---
 
-## Закрито (PH-S544)
+## Закрито (PH-S554)
 
-PH-S544 ✅ — Vision feed ticker: FEED у header, однорядкова бігуща строка, тонкий scroll rail.
+PH-S554 ✅ — Horizon close band S545–S553: quorum gate, prefetch timeout, capacity preemption, locality tie-break, update notify, on-chain settlement toggle, trust store, payout-batch admin, integration + loc-audit + vision-sync.
 
-## Закрито (смуга PH-S534…S543)
+## Закрито (смуга PH-S545…S553)
 
-PH-S534 ✅ — shadow verification checker JobStore submit (`local_srv`).
-PH-S535 ✅ — replay verification job enqueue on mismatch.
-PH-S536 ✅ — strict-tier replication M parallel executor jobs.
-PH-S537 ✅ — peer HTTP seed-pull prefetch (`POOLAI_GALAXY_PREFETCH_PEER_HTTP_URL`).
-PH-S538 ✅ — payout-batch `payout_pubkey` from telegram wallet bind.
-PH-S539 ✅ — Cleared settlement → Solana NDJSON `JobCompleted` stub.
-PH-S540 ✅ — telegram_edge GPU admission gate (`raid_artifact_probe` history).
-PH-S541 ✅ — cold-mining limits on Galaxy worker DTO.
-PH-S542 ✅ — checker_timeout → retry / verification_inconclusive policy.
-PH-S543 ✅ — horizon S534 integration + stand smoke + loc-audit + vision-sync.
+PH-S545 ✅ — replication quorum digest gate before Cleared settlement.
+PH-S546 ✅ — strict_locality prefetch deadline → `prefetch-timeout`.
+PH-S547 ✅ — `capacity-preemption` lease failover reason.
+PH-S548 ✅ — locality rank queue_depth + pricing tie-break.
+PH-S549 ✅ — `POOLAI_UPDATE_POLICY` notify tick + verify-release hook.
+PH-S550 ✅ — `POOLAI_SETTLEMENT_ON_CHAIN` payout-batch mode stub.
+PH-S551 ✅ — Telegram cold-mining MVP docs (Galaxy §8.2 TBD #2).
+PH-S552 ✅ — peer `trust_score` JSON store + register-remote hydrate.
+PH-S553 ✅ — `/ui/admin/payout-batch` read-only panel.
 
-**rust_ratio:** **94.63%** (formal 90–95% ✅; hold 95% advisory).
+**rust_ratio:** **94.66%** (formal 90–95% ✅; hold 95% advisory).
 
 **BLOCKED / Deferred:** FM-003 LAN · FM-041 Cloud SDK live.

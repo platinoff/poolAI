@@ -28,6 +28,8 @@ pub enum LeaseFailReason {
     WorkerUnhealthy,
     QueueStarvation,
     MaxTotalRuntime,
+    /// Lease owner lost required task capability profile (PH-S547, Galaxy §4.3.3).
+    CapacityPreemption,
 }
 
 impl LeaseFailReason {
@@ -38,6 +40,7 @@ impl LeaseFailReason {
             Self::WorkerUnhealthy => "worker-unhealthy",
             Self::QueueStarvation => "queue-starvation",
             Self::MaxTotalRuntime => "max-total-runtime",
+            Self::CapacityPreemption => "capacity-preemption",
         }
     }
 }
@@ -173,6 +176,17 @@ pub fn apply_lease_failover(record: &mut JobRecord, now: DateTime<Utc>) -> bool 
     try_requeue_with_budget(record, LeaseFailReason::LeaseTimeout)
 }
 
+/// Requeue when lease owner lacks required task capability (PH-S547).
+pub fn apply_capacity_preemption_failover(
+    record: &mut JobRecord,
+    owner_has_required_capability: bool,
+) -> bool {
+    if record.status != JobStatus::Leased || owner_has_required_capability {
+        return false;
+    }
+    try_requeue_with_budget(record, LeaseFailReason::CapacityPreemption)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -242,6 +256,10 @@ mod tests {
             LeaseFailReason::MaxTotalRuntime.as_str(),
             "max-total-runtime"
         );
+        assert_eq!(
+            LeaseFailReason::CapacityPreemption.as_str(),
+            "capacity-preemption"
+        );
     }
 
     #[test]
@@ -269,6 +287,18 @@ mod tests {
         assert_eq!(record.status, JobStatus::Submitted);
         assert_eq!(record.fail_reason.as_deref(), Some("queue-starvation"));
         std::env::remove_var(ENV_JOB_QUEUE_STARVATION_SECS);
+        std::env::remove_var(ENV_JOB_MAX_MIGRATIONS_PER_JOB);
+    }
+
+    #[test]
+    fn capacity_preemption_requeues_ph_s547() {
+        static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+        let _guard = ENV_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+        std::env::set_var(ENV_JOB_MAX_MIGRATIONS_PER_JOB, "3");
+        let mut record = leased_record("cap-1", "w1");
+        assert!(apply_capacity_preemption_failover(&mut record, false));
+        assert_eq!(record.status, JobStatus::Submitted);
+        assert_eq!(record.fail_reason.as_deref(), Some("capacity-preemption"));
         std::env::remove_var(ENV_JOB_MAX_MIGRATIONS_PER_JOB);
     }
 }

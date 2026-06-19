@@ -18,6 +18,8 @@ mod fixture {
     ) -> LocalityWorker {
         LocalityWorker {
             worker_id: id.into(),
+            queue_depth: 0,
+            pricing_usd_micro: None,
             seed_inventory: LocalitySeedInventory {
                 shard_ids: shards.iter().map(|s| (*s).to_string()).collect(),
                 hot_tier: LocalityHotTier {

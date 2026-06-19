@@ -40,6 +40,7 @@ pub fn verify_release(
     match verify_release_inner(opts) {
         Ok(report) => {
             crate::grid::galaxy_governance_metrics::record_release_verify_success();
+            crate::grid::galaxy_update_policy::tick_update_notify_from_env();
             Ok(report)
         }
         Err(err) => {

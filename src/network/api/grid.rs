@@ -21,6 +21,7 @@ use crate::grid::galaxy_pricing_oracle::{
     GalaxyPricingProviderCatalog, GalaxyPricingProviderEntry, GalaxyPricingQuote,
     MockProviderQuote, PRICING_UNAVAILABLE_ERROR_CODE,
 };
+use crate::grid::galaxy_settlement_mode::{current_settlement_mode, settlement_on_chain_pending};
 use crate::grid::{
     coordinator_seed_inventory_snapshot, ingest_envelope, GridEnvelope, GridIngestKind,
     GridIngestOutcome,
@@ -152,8 +153,8 @@ async fn get_grid_payout_batch(
         StatusCode::OK,
         Json(GridPayoutBatchResponse {
             ok: true,
-            settlement_mode: "offline_batch",
-            on_chain_pending: Some(false),
+            settlement_mode: current_settlement_mode(),
+            on_chain_pending: Some(settlement_on_chain_pending()),
             entry: crate::grid::galaxy_settlement_metrics::last_payout_batch_ledger_entry(),
         }),
     ))

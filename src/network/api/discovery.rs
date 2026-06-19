@@ -327,6 +327,10 @@ async fn register_remote_handler(
     {
         metadata.insert("network_profile".to_string(), stored);
     }
+    crate::grid::galaxy_trust_score_store::hydrate_register_metadata_trust_score(
+        &peer_id,
+        &mut metadata,
+    );
 
     if is_telegram_edge_metadata(&metadata) && try_admit_telegram_edge(&peer_id).is_err() {
         return (

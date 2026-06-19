@@ -5,6 +5,11 @@
 
 use std::sync::atomic::{AtomicU64, Ordering};
 
+/// Prefetch deadline exceeded under strict locality (PH-S546).
+pub const METRIC_PREFETCH_TIMEOUT_TOTAL: &str = "galaxy_prefetch_timeout_total";
+
+static PREFETCH_TIMEOUT_TOTAL: AtomicU64 = AtomicU64::new(0);
+
 /// Prefetch plans computed since process start.
 pub const METRIC_PREFETCH_PLAN_TOTAL: &str = "galaxy_prefetch_plan_total";
 
@@ -410,6 +415,14 @@ pub fn prefetch_peer_fetch_miss_total() -> u64 {
     PEER_FETCH_MISS_TOTAL.load(Ordering::Relaxed)
 }
 
+pub fn record_prefetch_timeout() {
+    PREFETCH_TIMEOUT_TOTAL.fetch_add(1, Ordering::Relaxed);
+}
+
+pub fn prefetch_timeout_total() -> u64 {
+    PREFETCH_TIMEOUT_TOTAL.load(Ordering::Relaxed)
+}
+
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_prefetch_metrics_for_test() {
     PLAN_TOTAL.store(0, Ordering::Relaxed);
@@ -440,6 +453,7 @@ pub fn reset_prefetch_metrics_for_test() {
     PEER_FETCH_TOTAL.store(0, Ordering::Relaxed);
     PEER_FETCH_MISS_TOTAL.store(0, Ordering::Relaxed);
     PULL_BYTES_TOTAL.store(0, Ordering::Relaxed);
+    PREFETCH_TIMEOUT_TOTAL.store(0, Ordering::Relaxed);
 }
 
 #[cfg(test)]

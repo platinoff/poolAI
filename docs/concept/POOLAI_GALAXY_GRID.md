@@ -920,7 +920,7 @@ On-chain події потрібні, коли вони:
 ### 8.2 Відкриті питання (залишок)
 
 1. **Primary/secondary fee settlement**: точний механізм payout (on-chain чи офлайн batch).
-2. **Telegram “VM probros” на старте**: що входить у MVP для cold mining (CPU/RAM/Disk) і як мігруємо до GPU passthrough пізніше.
+2. **Telegram “VM probros” на старте** *(PH-S541 limits DTO ✅ · PH-S551 ops docs)*: MVP cold mining — **CPU/RAM/Disk** probros через `GalaxyWorkerLimits` на virtual-nodes DTO (`max_cpu_cores`, `max_ram_mb`, `max_disk_mb`); **без GPU passthrough** на старті. GPU admission — окремий gate (`raid_artifact_probe` / PH-S540). Міграція до GPU passthrough: roadmap §8.2 → host passthrough + capability document §6.6; див. [`RUN_LOCAL.md`](../development/RUN_LOCAL.md) telegram edge stand.
 
 > **Закрито в концепті:** job lease / re-migrate (§4.3), unified worker DTO (§2.3), fee split (§1.2.1), pricing oracle (§4.2), Telegram seats + wallet bind (§3.1–3.2), seeds/locality + prefetch (§5.1–5.6), edge verification baseline (§6.1–6.6), open-source governance без root super-admin (§9), **network_profile contract (§8.1, PH-S132)**.
 

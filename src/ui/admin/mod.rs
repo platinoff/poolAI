@@ -42,6 +42,7 @@ pub mod instances;
 pub mod jobs;
 pub mod libs;
 pub mod monitoring;
+pub mod payout_batch;
 pub mod raid;
 pub mod security;
 pub mod telegram_seats;
@@ -79,6 +80,7 @@ pub fn create_admin_routes() -> Router<ApiContext> {
             "/admin/updates-compat",
             get(updates_compat::admin_updates_compat),
         )
+        .route("/admin/payout-batch", get(payout_batch::admin_payout_batch))
         .route("/admin/libs", get(libs::admin_libs))
         .route("/admin/raid", get(raid::admin_raid))
         .route("/admin/instances", get(instances::admin_instances))

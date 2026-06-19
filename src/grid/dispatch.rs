@@ -32,9 +32,9 @@ use crate::grid::galaxy_prefetch_metrics::{
     record_prefetch_peer_fetch_miss, record_prefetch_plan, record_prefetch_pull_bytes,
     record_prefetch_raid_fetch, record_prefetch_raid_fetch_miss, record_prefetch_re_migrate,
     record_prefetch_seed_fetch, record_prefetch_seed_fetch_miss, record_prefetch_seed_pull,
-    record_prefetch_skip_ingest, record_prefetch_strict_mode, record_prefetch_wait,
-    record_shard_access, should_hot_promote, DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM,
-    DEFAULT_PREFETCH_BYTES_PER_SHARD_VRAM,
+    record_prefetch_skip_ingest, record_prefetch_strict_mode, record_prefetch_timeout,
+    record_prefetch_wait, record_shard_access, should_hot_promote,
+    DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM, DEFAULT_PREFETCH_BYTES_PER_SHARD_VRAM,
 };
 use crate::grid::galaxy_prefetch_peer_pull::fetch_seed_shards_from_peer_http;
 use crate::grid::galaxy_replay_jobs::submit_replay_verification_job;
@@ -43,6 +43,9 @@ use crate::grid::galaxy_replication::{
     replication_tier_from_policy, ReplicationTierConfig, REPLICATION_STANDARD, REPLICATION_STRICT,
 };
 use crate::grid::galaxy_replication_metrics::replication_executor_hook;
+use crate::grid::galaxy_replication_quorum_gate::{
+    record_result_executor_digest, replication_quorum_allows_cleared,
+};
 use crate::grid::galaxy_settlement::{
     resolve_payout_pubkey, resolve_settlement_status, PayoutBatchLedgerEntry, SettlementStatus,
 };
@@ -56,6 +59,7 @@ use crate::grid::galaxy_trust_score::{
     apply_verification_trust_delta, clamp_trust_score, evaluate_result_settlement_gate,
     SettlementGateVerdict, TrustScore, TrustScoreGateConfig,
 };
+use crate::grid::galaxy_trust_score_store::persist_peer_trust_score;
 use crate::grid::galaxy_verification_checker_jobs::submit_shadow_verification_checker_job;
 use crate::grid::galaxy_verification_metrics::{
     drain_verification_checker_task, enqueue_verification_checker_task,
@@ -199,6 +203,45 @@ pub fn ingest_job_prefetch_stub(
     n
 }
 
+/// Strict locality prefetch deadline fail policy (PH-S546, Galaxy §5.6).
+pub fn evaluate_strict_prefetch_timeout(
+    required_shard_ids: &[String],
+    memory: &MemoryShardStore,
+) -> Result<(), AppError> {
+    let config = PrefetchPolicyConfig::from_env();
+    if config.mode != PrefetchPolicyMode::StrictLocality || required_shard_ids.is_empty() {
+        return Ok(());
+    }
+    let hits = required_shard_ids
+        .iter()
+        .filter(|id| memory.get(id).ok().flatten().is_some())
+        .count();
+    if hits >= required_shard_ids.len() {
+        return Ok(());
+    }
+    let inventory = coordinator_merged_seed_inventory();
+    let plan = plan_prefetch(
+        &inventory,
+        required_shard_ids,
+        PrefetchTrigger::JobAdmitted,
+        false,
+        &config,
+    );
+    let waited = wait_prefetch_hook(&plan);
+    if waited >= config.prefetch_deadline_ms && hits < required_shard_ids.len() {
+        record_prefetch_timeout();
+        return Err(AppError::RestError {
+            code: "prefetch-timeout",
+            message: format!(
+                "prefetch deadline exceeded under strict_locality ({}/{} shards in memory)",
+                hits,
+                required_shard_ids.len()
+            ),
+        });
+    }
+    Ok(())
+}
+
 /// Lease-acquired prefetch stub (PH-S425; no enqueue wire).
 pub fn lease_acquire_prefetch_stub() -> usize {
     let inventory = coordinator_merged_seed_inventory();
@@ -248,6 +291,8 @@ pub fn locality_workers_from_seed_snapshots() -> Vec<LocalityWorker> {
                 .unwrap_or_else(|| "unknown".into());
             LocalityWorker {
                 worker_id: snap.peer_id,
+                queue_depth: 0,
+                pricing_usd_micro: None,
                 seed_inventory: LocalitySeedInventory {
                     shard_ids: snap.seed_inventory.shard_ids,
                     hot_tier: LocalityHotTier {
@@ -872,6 +917,7 @@ fn ingest_job(
             grid_job_gpu_capable(&body.task_kind),
             Some(memory),
         );
+        evaluate_strict_prefetch_timeout(&body.required_shard_ids, memory)?;
     }
     let row = jobs
         .get(&job_id)?
@@ -969,7 +1015,16 @@ fn ingest_result(
         enqueue_verification_checker_task(&job_id);
         let _ = submit_shadow_verification_checker_job(jobs, &job_id);
     }
-    let settlement_status = resolve_settlement_status(settlement_gate, verification_sample);
+    let mut settlement_status = resolve_settlement_status(settlement_gate, verification_sample);
+    record_result_executor_digest(&job_id, body.metrics.as_ref());
+    if settlement_status == SettlementStatus::Cleared
+        && !replication_quorum_allows_cleared(&job_id, existing.spec.verification_policy.as_deref())
+    {
+        settlement_status = SettlementStatus::PendingVerification;
+    }
+    if let (Some(peer_id), Some(score)) = (source_peer_id, trust_score) {
+        persist_peer_trust_score(peer_id, score);
+    }
     evaluate_result_settlement_resolved(settlement_status);
     evaluate_result_settlement_pending_verification(settlement_status);
     evaluate_result_settlement_cleared(settlement_status);

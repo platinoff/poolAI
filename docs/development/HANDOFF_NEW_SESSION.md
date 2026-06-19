@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-19 (PH-S544 ✅ · rust_ratio **94.66%**) · VDT
+**Оновлено:** 2026-06-19 (PH-S554 ✅ · rust_ratio **94.66%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -495,6 +495,16 @@
 **PH-S542 ✅ (code):** `evaluate_checker_timeout_policy` — retry then `VerificationInconclusive`.
 **PH-S543 ✅ (ops):** `galaxy_horizon_s534_integration` + stand smoke + loc-audit + vision-sync.
 **PH-S544 ✅ (vision UX):** feed ticker у header — однорядкова marquee + тонкий custom scroll rail (`docs/vision/`).
+**PH-S545 ✅ (code):** `galaxy_replication_quorum_gate` — strict-tier executor digest quorum before Cleared; `tests/galaxy_replication_quorum_integration.rs`.
+**PH-S546 ✅ (code):** `evaluate_strict_prefetch_timeout` — `prefetch-timeout` under strict_locality + `galaxy_prefetch_timeout_total`.
+**PH-S547 ✅ (code):** `LeaseFailReason::CapacityPreemption` + `apply_capacity_preemption_failover` (`lease_failover.rs`).
+**PH-S548 ✅ (code):** `rank_workers_by_locality` tie-break `queue_depth` + `pricing_usd_micro` (`galaxy_locality.rs`).
+**PH-S549 ✅ (code):** `galaxy_update_policy` — `POOLAI_UPDATE_POLICY` notify tick; hook on `poolai-verify-release` success.
+**PH-S550 ✅ (code):** `galaxy_settlement_mode` — `POOLAI_SETTLEMENT_ON_CHAIN=1` → payout-batch `on_chain` + pending.
+**PH-S551 ✅ (docs):** Galaxy §8.2 TBD #2 — Telegram cold-mining MVP CPU/RAM/Disk + GPU migration pointer.
+**PH-S552 ✅ (code):** `galaxy_trust_score_store` — JSON persist + register-remote metadata hydrate.
+**PH-S553 ✅ (code/e2e):** `/ui/admin/payout-batch` read-only panel; unit test in `payout_batch.rs`.
+**PH-S554 ✅ (tests):** `galaxy_horizon_s545_integration` close band + loc-audit + vision-sync.
 **Rules ✅:** **`абракадабра`** — project scan **всього репо** (concept · FM §5.1 · roadmaps · architect · code) → 10 PH-S* у §5.12 (журнал) → drain → push; канон [`.cursor/rules/poolai-session-iteration.mdc`](../.cursor/rules/poolai-session-iteration.mdc) § «Тригер абракадабра»; commit **`git-commit-tree-msg.sh`**.
 **§5.12:** **0** відкритих — наступна сесія: **`абракадабра`** (project scan + drain).
 **Vision ✅:** rev **244** · rust_ratio **94.66%** · hold **95%** advisory.

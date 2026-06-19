@@ -47,6 +47,8 @@ async fn rank_and_prefetch_paths_observe_cross_region_egress_mb_on_scrape() {
     };
     let worker = LocalityWorker {
         worker_id: "us-remote".into(),
+        queue_depth: 0,
+        pricing_usd_micro: None,
         seed_inventory: LocalitySeedInventory {
             shard_ids: vec![],
             hot_tier: LocalityHotTier::default(),

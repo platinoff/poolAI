@@ -37,6 +37,10 @@ pub struct LocalityWorker {
     pub worker_id: String,
     pub seed_inventory: LocalitySeedInventory,
     pub network_profile: LocalityNetworkProfile,
+    /// Worker queue depth for scheduler tie-break (PH-S548, Galaxy §5.2).
+    pub queue_depth: u32,
+    /// Optional pricing quote in usd_micro for tie-break after locality score (PH-S548).
+    pub pricing_usd_micro: Option<u64>,
 }
 
 /// Task / job inputs for locality scoring.
@@ -102,7 +106,23 @@ static LOCALITY_RANK_MISS_TOTAL: AtomicU64 = AtomicU64::new(0);
 static LOCALITY_RANK_EMPTY_WORKERS_TOTAL: AtomicU64 = AtomicU64::new(0);
 static LOCALITY_RANK_SKIP_TOTAL: AtomicU64 = AtomicU64::new(0);
 
-/// Ranked worker for scheduler stub (locality first; pricing/queue_depth — future wire).
+fn worker_queue_depth(workers: &[LocalityWorker], worker_id: &str) -> u32 {
+    workers
+        .iter()
+        .find(|w| w.worker_id == worker_id)
+        .map(|w| w.queue_depth)
+        .unwrap_or(0)
+}
+
+fn worker_pricing_usd_micro(workers: &[LocalityWorker], worker_id: &str) -> u64 {
+    workers
+        .iter()
+        .find(|w| w.worker_id == worker_id)
+        .and_then(|w| w.pricing_usd_micro)
+        .unwrap_or(u64::MAX)
+}
+
+/// Ranked worker for scheduler stub (locality first; pricing/queue_depth tie-break PH-S548).
 #[derive(Debug, Clone, PartialEq)]
 pub struct LocalityRankedWorker {
     pub worker_id: String,
@@ -221,6 +241,14 @@ pub fn rank_workers_by_locality_with_weights(
         b.score
             .partial_cmp(&a.score)
             .unwrap_or(std::cmp::Ordering::Equal)
+            .then_with(|| {
+                worker_queue_depth(workers, &a.worker_id)
+                    .cmp(&worker_queue_depth(workers, &b.worker_id))
+            })
+            .then_with(|| {
+                worker_pricing_usd_micro(workers, &a.worker_id)
+                    .cmp(&worker_pricing_usd_micro(workers, &b.worker_id))
+            })
             .then_with(|| a.worker_id.cmp(&b.worker_id))
     });
     if let Some(best) = ranked.first() {
@@ -361,6 +389,8 @@ mod tests {
     ) -> LocalityWorker {
         LocalityWorker {
             worker_id: id.into(),
+            queue_depth: 0,
+            pricing_usd_micro: None,
             seed_inventory: LocalitySeedInventory {
                 shard_ids: shards.iter().map(|s| (*s).to_string()).collect(),
                 hot_tier: LocalityHotTier {
@@ -434,6 +464,19 @@ mod tests {
         assert!(ranked[0].score >= ranked[1].score);
         assert_eq!(ranked[0].worker_id, "a-worker");
         assert_eq!(ranked[1].worker_id, "b-worker");
+    }
+
+    #[test]
+    fn rank_workers_tie_break_queue_depth_then_pricing_ph_s548() {
+        let job = task(&["w:emb-1"], "inference:text", 0.0, None);
+        let mut low_queue = worker("w-low-q", "eu-west", 50, &["w:emb-1"]);
+        low_queue.queue_depth = 1;
+        low_queue.pricing_usd_micro = Some(500);
+        let mut high_queue = worker("w-high-q", "eu-west", 50, &["w:emb-1"]);
+        high_queue.queue_depth = 9;
+        high_queue.pricing_usd_micro = Some(100);
+        let ranked = rank_workers_by_locality(&[high_queue, low_queue], &job);
+        assert_eq!(ranked[0].worker_id, "w-low-q");
     }
 
     #[test]
