@@ -91,6 +91,9 @@ pub const METRIC_PREFETCH_RAID_FETCH_MISS_TOTAL: &str = "galaxy_prefetch_raid_fe
 /// Prefetch enqueue blocked by lan_only egress guardrail (PH-S474).
 pub const METRIC_PREFETCH_EGRESS_BLOCKED_TOTAL: &str = "galaxy_prefetch_egress_blocked_total";
 
+/// Prefetch blocked by topology ring / white-IP admission (PH-S604, Galaxy §8.1).
+pub const METRIC_PREFETCH_TOPOLOGY_BLOCKED_TOTAL: &str = "galaxy_prefetch_topology_blocked_total";
+
 /// Peer seed inventory prefetch fetch hits (PH-S479).
 pub const METRIC_PREFETCH_PEER_FETCH_TOTAL: &str = "galaxy_prefetch_peer_fetch_total";
 
@@ -128,6 +131,7 @@ static BACKPRESSURE_TOTAL: AtomicU64 = AtomicU64::new(0);
 static RAID_FETCH_TOTAL: AtomicU64 = AtomicU64::new(0);
 static RAID_FETCH_MISS_TOTAL: AtomicU64 = AtomicU64::new(0);
 static EGRESS_BLOCKED_TOTAL: AtomicU64 = AtomicU64::new(0);
+static TOPOLOGY_BLOCKED_TOTAL: AtomicU64 = AtomicU64::new(0);
 static PEER_FETCH_TOTAL: AtomicU64 = AtomicU64::new(0);
 static PEER_FETCH_MISS_TOTAL: AtomicU64 = AtomicU64::new(0);
 static PULL_BYTES_TOTAL: AtomicU64 = AtomicU64::new(0);
@@ -395,6 +399,15 @@ pub fn prefetch_egress_blocked_total() -> u64 {
     EGRESS_BLOCKED_TOTAL.load(Ordering::Relaxed)
 }
 
+/// Record prefetch blocked by topology ring / white-IP admission (PH-S604).
+pub fn record_prefetch_topology_blocked() {
+    TOPOLOGY_BLOCKED_TOTAL.fetch_add(1, Ordering::Relaxed);
+}
+
+pub fn prefetch_topology_blocked_total() -> u64 {
+    TOPOLOGY_BLOCKED_TOTAL.load(Ordering::Relaxed)
+}
+
 /// Record peer inventory seed fetch hits (PH-S479).
 pub fn record_prefetch_peer_fetch(shard_count: usize) {
     if shard_count > 0 {
@@ -450,6 +463,7 @@ pub fn reset_prefetch_metrics_for_test() {
     RAID_FETCH_TOTAL.store(0, Ordering::Relaxed);
     RAID_FETCH_MISS_TOTAL.store(0, Ordering::Relaxed);
     EGRESS_BLOCKED_TOTAL.store(0, Ordering::Relaxed);
+    TOPOLOGY_BLOCKED_TOTAL.store(0, Ordering::Relaxed);
     PEER_FETCH_TOTAL.store(0, Ordering::Relaxed);
     PEER_FETCH_MISS_TOTAL.store(0, Ordering::Relaxed);
     PULL_BYTES_TOTAL.store(0, Ordering::Relaxed);

@@ -30,11 +30,12 @@ use crate::grid::galaxy_governance_metrics::{
 use crate::grid::galaxy_locality::{
     last_cross_region_egress_mb, last_hot_tier_hit_ratio_bps, last_shard_local_hit_ratio_bps,
     locality_rank_empty_workers_total, locality_rank_ingest_total, locality_rank_miss_total,
-    locality_rank_skip_total, network_profile_stale_total, METRIC_CROSS_REGION_EGRESS_MB,
-    METRIC_HOT_TIER_HIT_RATIO, METRIC_LOCALITY_RANK_EMPTY_WORKERS_TOTAL,
-    METRIC_LOCALITY_RANK_INGEST_TOTAL, METRIC_LOCALITY_RANK_MISS_TOTAL,
-    METRIC_LOCALITY_RANK_SKIP_TOTAL, METRIC_NETWORK_PROFILE_STALE_TOTAL,
-    METRIC_SHARD_LOCAL_HIT_RATIO,
+    locality_rank_skip_total, network_profile_stale_total, tail_latency_penalty_total,
+    METRIC_CROSS_REGION_EGRESS_MB, METRIC_HOT_TIER_HIT_RATIO,
+    METRIC_LOCALITY_RANK_EMPTY_WORKERS_TOTAL, METRIC_LOCALITY_RANK_INGEST_TOTAL,
+    METRIC_LOCALITY_RANK_MISS_TOTAL, METRIC_LOCALITY_RANK_SKIP_TOTAL,
+    METRIC_NETWORK_PROFILE_STALE_TOTAL, METRIC_SHARD_LOCAL_HIT_RATIO,
+    METRIC_TAIL_LATENCY_PENALTY_TOTAL,
 };
 use crate::grid::galaxy_prefetch_metrics::{
     hot_evict_total, hot_promote_total, locality_unsatisfied_total, prefetch_backpressure_total,
@@ -45,10 +46,10 @@ use crate::grid::galaxy_prefetch_metrics::{
     prefetch_pull_bytes_total, prefetch_queue_depth, prefetch_raid_fetch_miss_total,
     prefetch_raid_fetch_total, prefetch_re_migrate_total, prefetch_seed_fetch_miss_total,
     prefetch_seed_fetch_total, prefetch_seed_pull_total, prefetch_skip_ingest_total,
-    prefetch_strict_mode_total, prefetch_wait_ms_total, shard_access_total, METRIC_HOT_EVICT_TOTAL,
-    METRIC_HOT_PROMOTE_TOTAL, METRIC_LOCALITY_UNSATISFIED_TOTAL,
-    METRIC_PREFETCH_BACKPRESSURE_TOTAL, METRIC_PREFETCH_BYTES_TOTAL,
-    METRIC_PREFETCH_COMPLETE_TOTAL, METRIC_PREFETCH_CO_ACCESS_TOTAL,
+    prefetch_strict_mode_total, prefetch_topology_blocked_total, prefetch_wait_ms_total,
+    shard_access_total, METRIC_HOT_EVICT_TOTAL, METRIC_HOT_PROMOTE_TOTAL,
+    METRIC_LOCALITY_UNSATISFIED_TOTAL, METRIC_PREFETCH_BACKPRESSURE_TOTAL,
+    METRIC_PREFETCH_BYTES_TOTAL, METRIC_PREFETCH_COMPLETE_TOTAL, METRIC_PREFETCH_CO_ACCESS_TOTAL,
     METRIC_PREFETCH_EGRESS_BLOCKED_TOTAL, METRIC_PREFETCH_ENQUEUE_TOTAL,
     METRIC_PREFETCH_HOT_SKIP_TOTAL, METRIC_PREFETCH_INGEST_TOTAL,
     METRIC_PREFETCH_LEASE_ACQUIRED_TOTAL, METRIC_PREFETCH_PEER_FETCH_MISS_TOTAL,
@@ -58,7 +59,8 @@ use crate::grid::galaxy_prefetch_metrics::{
     METRIC_PREFETCH_RE_MIGRATE_TOTAL, METRIC_PREFETCH_SEED_FETCH_MISS_TOTAL,
     METRIC_PREFETCH_SEED_FETCH_TOTAL, METRIC_PREFETCH_SEED_PULL_TOTAL,
     METRIC_PREFETCH_SKIP_INGEST_TOTAL, METRIC_PREFETCH_STRICT_MODE_TOTAL,
-    METRIC_PREFETCH_WAIT_MS_TOTAL, METRIC_SHARD_ACCESS_TOTAL,
+    METRIC_PREFETCH_TOPOLOGY_BLOCKED_TOTAL, METRIC_PREFETCH_WAIT_MS_TOTAL,
+    METRIC_SHARD_ACCESS_TOTAL,
 };
 use crate::grid::galaxy_pricing_oracle::{
     forced_fallback_total, fresh_served_total, last_market_min_usd_micro, last_quote_usd_micro,
@@ -193,6 +195,7 @@ pub struct PoolAiPrometheus {
     galaxy_prefetch_raid_fetch_total: IntGauge,
     galaxy_prefetch_raid_fetch_miss_total: IntGauge,
     galaxy_prefetch_egress_blocked_total: IntGauge,
+    galaxy_prefetch_topology_blocked_total: IntGauge,
     galaxy_prefetch_peer_fetch_total: IntGauge,
     galaxy_prefetch_peer_fetch_miss_total: IntGauge,
     galaxy_prefetch_pull_bytes_total: IntGauge,
@@ -203,6 +206,7 @@ pub struct PoolAiPrometheus {
     galaxy_locality_rank_empty_workers_total: IntGauge,
     galaxy_locality_rank_skip_total: IntGauge,
     galaxy_network_profile_stale_total: IntGauge,
+    galaxy_tail_latency_penalty_total: IntGauge,
     galaxy_verification_mismatch_total: IntGauge,
     galaxy_verification_match_total: IntGauge,
     galaxy_verification_sample_total: IntGauge,
@@ -780,6 +784,15 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_prefetch_egress_blocked_total.clone()))
         .expect("register galaxy_prefetch_egress_blocked_total");
 
+    let galaxy_prefetch_topology_blocked_total = IntGauge::with_opts(Opts::new(
+        METRIC_PREFETCH_TOPOLOGY_BLOCKED_TOTAL,
+        "Galaxy prefetch blocked by topology ring / white-IP admission (PH-S604)",
+    ))
+    .expect(METRIC_PREFETCH_TOPOLOGY_BLOCKED_TOTAL);
+    registry
+        .register(Box::new(galaxy_prefetch_topology_blocked_total.clone()))
+        .expect("register galaxy_prefetch_topology_blocked_total");
+
     let galaxy_prefetch_peer_fetch_total = IntGauge::with_opts(Opts::new(
         METRIC_PREFETCH_PEER_FETCH_TOTAL,
         "Galaxy peer seed inventory prefetch fetch hits (PH-S479)",
@@ -869,6 +882,15 @@ fn build_prometheus() -> PoolAiPrometheus {
     registry
         .register(Box::new(galaxy_network_profile_stale_total.clone()))
         .expect("register galaxy_network_profile_stale_total");
+
+    let galaxy_tail_latency_penalty_total = IntGauge::with_opts(Opts::new(
+        METRIC_TAIL_LATENCY_PENALTY_TOTAL,
+        "Galaxy tail latency (p95≫p50) penalty on locality rank (PH-S603)",
+    ))
+    .expect(METRIC_TAIL_LATENCY_PENALTY_TOTAL);
+    registry
+        .register(Box::new(galaxy_tail_latency_penalty_total.clone()))
+        .expect("register galaxy_tail_latency_penalty_total");
 
     let galaxy_verification_mismatch_total = IntGauge::with_opts(Opts::new(
         METRIC_VERIFICATION_MISMATCH_TOTAL,
@@ -1290,6 +1312,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_prefetch_raid_fetch_total,
         galaxy_prefetch_raid_fetch_miss_total,
         galaxy_prefetch_egress_blocked_total,
+        galaxy_prefetch_topology_blocked_total,
         galaxy_prefetch_peer_fetch_total,
         galaxy_prefetch_peer_fetch_miss_total,
         galaxy_prefetch_pull_bytes_total,
@@ -1300,6 +1323,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_locality_rank_empty_workers_total,
         galaxy_locality_rank_skip_total,
         galaxy_network_profile_stale_total,
+        galaxy_tail_latency_penalty_total,
         galaxy_verification_mismatch_total,
         galaxy_verification_match_total,
         galaxy_verification_sample_total,
@@ -1407,6 +1431,8 @@ pub fn refresh_galaxy_locality_gauges() {
         .set(locality_rank_skip_total() as i64);
     prom.galaxy_network_profile_stale_total
         .set(network_profile_stale_total() as i64);
+    prom.galaxy_tail_latency_penalty_total
+        .set(tail_latency_penalty_total() as i64);
 }
 
 /// Mirror in-process prefetch plan counters into Prometheus gauges (scrape snapshot).
@@ -1461,6 +1487,8 @@ pub fn refresh_galaxy_prefetch_gauges() {
         .set(prefetch_raid_fetch_miss_total() as i64);
     prom.galaxy_prefetch_egress_blocked_total
         .set(prefetch_egress_blocked_total() as i64);
+    prom.galaxy_prefetch_topology_blocked_total
+        .set(prefetch_topology_blocked_total() as i64);
     prom.galaxy_prefetch_peer_fetch_total
         .set(prefetch_peer_fetch_total() as i64);
     prom.galaxy_prefetch_peer_fetch_miss_total

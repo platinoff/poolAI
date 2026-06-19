@@ -1,6 +1,8 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-19 (PH-S590…S599 ✅ · vision **rev 259** · **0** відкритих · rust_ratio **94.67%**)
+**Оновлено:** 2026-06-19 (PH-S600…S609 ✅ · vision **rev 260** · **0** відкритих · rust_ratio **94.69%**)
+
+**PH-S600…S609 ✅ (2026-06-19):** strict-locality HTTP 409; semantic_hash human-review; wallet rebind cooldown; p95 tail-latency penalty; topology/white-IP prefetch admission; RAID prefetch HTTP; re-migrate PATCH; fraud-proof HTTP; dashboard wasm slim; `galaxy_horizon_s600_integration`.
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 

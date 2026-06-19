@@ -35,8 +35,9 @@ use crate::grid::galaxy_prefetch_metrics::{
     record_prefetch_raid_fetch, record_prefetch_raid_fetch_miss, record_prefetch_re_migrate,
     record_prefetch_seed_fetch, record_prefetch_seed_fetch_miss, record_prefetch_seed_pull,
     record_prefetch_skip_ingest, record_prefetch_strict_mode, record_prefetch_timeout,
-    record_prefetch_wait, record_shard_access, should_hot_promote,
-    DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM, DEFAULT_PREFETCH_BYTES_PER_SHARD_VRAM,
+    record_prefetch_topology_blocked, record_prefetch_wait, record_shard_access,
+    should_hot_promote, DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM,
+    DEFAULT_PREFETCH_BYTES_PER_SHARD_VRAM,
 };
 use crate::grid::galaxy_prefetch_peer_pull::fetch_seed_shards_from_peer_http;
 use crate::grid::galaxy_replay_jobs::submit_replay_verification_job;
@@ -292,6 +293,14 @@ pub fn locality_workers_from_seed_snapshots() -> Vec<LocalityWorker> {
                 .first()
                 .cloned()
                 .unwrap_or_else(|| "unknown".into());
+            let network_profile = load_parsed_peer_network_profile(&snap.peer_id)
+                .map(|p| p.locality_subset())
+                .unwrap_or(LocalityNetworkProfile {
+                    region: region.clone(),
+                    latency_ms_p50: 12,
+                    latency_ms_p95: None,
+                    profile_age_secs: None,
+                });
             LocalityWorker {
                 worker_id: snap.peer_id,
                 queue_depth: 0,
@@ -305,11 +314,7 @@ pub fn locality_workers_from_seed_snapshots() -> Vec<LocalityWorker> {
                     },
                     local_replica_regions: snap.seed_inventory.local_replica_regions,
                 },
-                network_profile: LocalityNetworkProfile {
-                    region,
-                    latency_ms_p50: 12,
-                    profile_age_secs: None,
-                },
+                network_profile,
             }
         })
         .collect()
@@ -403,6 +408,9 @@ pub const ENV_PREFETCH_PEER_REGION: &str = "POOLAI_GALAXY_PREFETCH_PEER_REGION";
 /// Env: stub peer egress policy (`lan_only` | `direct`, PH-S474).
 pub const ENV_PREFETCH_PEER_EGRESS_POLICY: &str = "POOLAI_GALAXY_PREFETCH_PEER_EGRESS_POLICY";
 
+/// Coordinator topology ring for SmallWorld admission (PH-S604, Galaxy §8.1).
+pub const ENV_PREFETCH_COORDINATOR_TOPOLOGY_RING: &str = "POOLAI_GALAXY_COORDINATOR_TOPOLOGY_RING";
+
 thread_local! {
     static PREFETCH_PEER_CTX: RefCell<Option<String>> = const { RefCell::new(None) };
 }
@@ -454,6 +462,37 @@ fn resolve_prefetch_peer_egress_policy() -> Option<GalaxyEgressPolicy> {
         }
     }
     env_prefetch_peer_egress_policy()
+}
+
+fn resolve_prefetch_peer_topology_ring() -> Option<String> {
+    if let Some(peer_id) = current_prefetch_peer_id() {
+        if let Some(profile) = load_parsed_peer_network_profile(&peer_id) {
+            if let Some(ring) = profile.topology_ring.as_ref() {
+                let trimmed = ring.trim().to_ascii_lowercase();
+                if !trimmed.is_empty() {
+                    return Some(trimmed);
+                }
+            }
+        }
+    }
+    None
+}
+
+fn resolve_prefetch_peer_white_ip_only() -> bool {
+    if let Some(peer_id) = current_prefetch_peer_id() {
+        if let Some(profile) = load_parsed_peer_network_profile(&peer_id) {
+            return profile.white_ip_only.unwrap_or(false)
+                || profile.egress_policy == Some(GalaxyEgressPolicy::WhiteIp);
+        }
+    }
+    false
+}
+
+fn env_coordinator_topology_ring() -> Option<String> {
+    std::env::var(ENV_PREFETCH_COORDINATOR_TOPOLOGY_RING)
+        .ok()
+        .map(|v| v.trim().to_ascii_lowercase())
+        .filter(|v| !v.is_empty())
 }
 
 /// Coordinator prefetch policy from environment (PH-S136, Galaxy ?5.6).
@@ -603,7 +642,9 @@ pub fn enqueue_prefetch_hook(plan: &PrefetchPlan) -> usize {
 
 /// Returns true when prefetch enqueue should be skipped (backpressure or egress guardrail).
 pub fn prefetch_enqueue_blocked() -> bool {
-    prefetch_backpressure_skip() || prefetch_egress_blocked_skip()
+    prefetch_backpressure_skip()
+        || prefetch_egress_blocked_skip()
+        || prefetch_topology_admission_blocked_skip()
 }
 
 /// Bandwidth backpressure gate for prefetch enqueue (PH-S464).
@@ -639,6 +680,32 @@ pub fn prefetch_egress_blocked_skip() -> bool {
     }
     record_prefetch_egress_blocked();
     true
+}
+
+/// Topology / white-IP admission guard for prefetch (PH-S604, Galaxy §8.1).
+pub fn prefetch_topology_admission_blocked_skip() -> bool {
+    if resolve_prefetch_peer_white_ip_only() {
+        let Some(coord) = env_prefetch_coordinator_region() else {
+            return false;
+        };
+        let Some(peer) = resolve_prefetch_peer_region() else {
+            return false;
+        };
+        if coord != peer {
+            record_prefetch_topology_blocked();
+            return true;
+        }
+    }
+    if let (Some(coord_ring), Some(peer_ring)) = (
+        env_coordinator_topology_ring(),
+        resolve_prefetch_peer_topology_ring(),
+    ) {
+        if coord_ring != peer_ring {
+            record_prefetch_topology_blocked();
+            return true;
+        }
+    }
+    false
 }
 
 fn env_prefetch_coordinator_region() -> Option<String> {

@@ -64,6 +64,7 @@ impl GalaxyNetworkProfile {
         LocalityNetworkProfile {
             region: self.region.clone(),
             latency_ms_p50: self.latency_ms_p50,
+            latency_ms_p95: self.latency_ms_p95,
             profile_age_secs: None,
         }
     }
@@ -73,6 +74,7 @@ impl GalaxyNetworkProfile {
         LocalityNetworkProfile {
             region: self.region.clone(),
             latency_ms_p50: self.latency_ms_p50,
+            latency_ms_p95: self.latency_ms_p95,
             profile_age_secs: self.profile_age_secs_at(now),
         }
     }

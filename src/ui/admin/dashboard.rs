@@ -63,7 +63,7 @@ pub async fn admin_dashboard() -> Html<String> {
           <span class="stat-value">${
             (typeof window !== 'undefined' && window.poolaiUiWasm && typeof window.poolaiUiWasm.formatUptime === 'function')
               ? window.poolaiUiWasm.formatUptime(data.uptime_seconds || 0)
-              : formatUptime(data.uptime_seconds || 0)
+              : String(data.uptime_seconds || 0) + 's'
           }</span>
         </div>
       `;
@@ -77,11 +77,11 @@ pub async fn admin_dashboard() -> Html<String> {
       const cpuPct =
         wasm && typeof wasm.formatPercent === 'function'
           ? wasm.formatPercent(data.cpu_usage_percent ?? 0)
-          : ((data.cpu_usage_percent ?? 0).toFixed(1) + '%');
+          : String((data.cpu_usage_percent ?? 0).toFixed(1)) + '%';
       const memMb =
         wasm && typeof wasm.formatMegabytes === 'function'
           ? wasm.formatMegabytes(data.memory_usage_mb ?? 0)
-          : ((data.memory_usage_mb ?? 0).toFixed(0) + ' MB');
+          : String(Math.round(data.memory_usage_mb ?? 0)) + ' MB';
       el.innerHTML = `
         <div class="stat-item">
           <span class="stat-label">${T('admin.dash.quick.workers', 'Workers (active):')}</span>
@@ -192,13 +192,6 @@ pub async fn admin_dashboard() -> Html<String> {
       }
     }
     
-    function formatUptime(seconds) {
-      const days = Math.floor(seconds / 86400);
-      const hours = Math.floor((seconds % 86400) / 3600);
-      const mins = Math.floor((seconds % 3600) / 60);
-      return `${days}d ${hours}h ${mins}m`;
-    }
-
     function updateDashboardRefreshedAt() {
       const el = document.getElementById('dash-refreshed-at');
       if (!el) return;

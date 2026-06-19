@@ -12,6 +12,8 @@ use std::sync::atomic::{AtomicU64, Ordering};
 pub struct LocalityNetworkProfile {
     pub region: String,
     pub latency_ms_p50: u32,
+    /// Tail latency SLA (Galaxy §8.1); penalized when p95 ≫ p50 (PH-S603).
+    pub latency_ms_p95: Option<u32>,
     /// Seconds since `last_measured_at`; `None` = missing freshness probe (stale, §8.1).
     pub profile_age_secs: Option<u64>,
 }
@@ -103,6 +105,15 @@ pub const METRIC_LOCALITY_RANK_SKIP_TOTAL: &str = "galaxy_locality_rank_skip_tot
 /// Stale network profile observations during locality rank (PH-S563, Galaxy §8.1).
 pub const METRIC_NETWORK_PROFILE_STALE_TOTAL: &str = "galaxy_network_profile_stale_total";
 
+/// Tail-latency (p95≫p50) penalty applications on locality rank (PH-S603, Galaxy §8.1).
+pub const METRIC_TAIL_LATENCY_PENALTY_TOTAL: &str = "galaxy_tail_latency_penalty_total";
+
+/// p95/p50 ratio above which tail latency penalty applies (PH-S603).
+pub const DEFAULT_TAIL_LATENCY_RATIO_THRESHOLD: f64 = 2.0;
+
+/// Max score deduction for tail latency SLA breach (PH-S603).
+pub const DEFAULT_TAIL_LATENCY_MAX_PENALTY: f64 = 0.08;
+
 /// Stub MB per cold shard on prefetch plan path when no task egress wire (PH-S185).
 pub const DEFAULT_PREFETCH_CROSS_REGION_EGRESS_MB_PER_SHARD: f64 = 50.0;
 
@@ -114,6 +125,7 @@ static LOCALITY_RANK_MISS_TOTAL: AtomicU64 = AtomicU64::new(0);
 static LOCALITY_RANK_EMPTY_WORKERS_TOTAL: AtomicU64 = AtomicU64::new(0);
 static LOCALITY_RANK_SKIP_TOTAL: AtomicU64 = AtomicU64::new(0);
 static NETWORK_PROFILE_STALE_TOTAL: AtomicU64 = AtomicU64::new(0);
+static TAIL_LATENCY_PENALTY_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 fn worker_queue_depth(workers: &[LocalityWorker], worker_id: &str) -> u32 {
     workers
@@ -155,6 +167,49 @@ pub fn shard_local_hit(inventory_shard_ids: &[String], required_shard_ids: &[Str
 #[inline]
 pub fn latency_factor(latency_ms_p50: u32) -> f64 {
     1.0 / (1.0 + f64::from(latency_ms_p50) / 100.0)
+}
+
+/// Penalty when `latency_ms_p95` exceeds `ratio_threshold × p50` (Galaxy §8.1, PH-S603).
+#[inline]
+pub fn tail_latency_penalty(
+    latency_ms_p50: u32,
+    latency_ms_p95: Option<u32>,
+    ratio_threshold: f64,
+    max_penalty: f64,
+) -> f64 {
+    let Some(p95) = latency_ms_p95 else {
+        return 0.0;
+    };
+    if latency_ms_p50 == 0 || p95 <= latency_ms_p50 {
+        return 0.0;
+    }
+    let ratio = f64::from(p95) / f64::from(latency_ms_p50);
+    if ratio <= ratio_threshold {
+        return 0.0;
+    }
+    let excess = (ratio - ratio_threshold) / ratio_threshold;
+    excess.mul_add(max_penalty, 0.0).min(max_penalty)
+}
+
+pub fn record_tail_latency_penalty_if_applicable(latency_ms_p50: u32, latency_ms_p95: Option<u32>) {
+    let penalty = tail_latency_penalty(
+        latency_ms_p50,
+        latency_ms_p95,
+        DEFAULT_TAIL_LATENCY_RATIO_THRESHOLD,
+        DEFAULT_TAIL_LATENCY_MAX_PENALTY,
+    );
+    if penalty > 0.0 {
+        TAIL_LATENCY_PENALTY_TOTAL.fetch_add(1, Ordering::Relaxed);
+    }
+}
+
+pub fn tail_latency_penalty_total() -> u64 {
+    TAIL_LATENCY_PENALTY_TOTAL.load(Ordering::Relaxed)
+}
+
+#[cfg(any(test, feature = "test-utils"))]
+pub fn reset_tail_latency_penalty_metrics_for_test() {
+    TAIL_LATENCY_PENALTY_TOTAL.store(0, Ordering::Relaxed);
 }
 
 /// Hot tier effectiveness: blend shard presence and task profile match (0..=1).
@@ -219,10 +274,17 @@ pub fn locality_score(
         DEFAULT_STALE_PROFILE_MAX_AGE_SECS,
         DEFAULT_STALE_PROFILE_PENALTY,
     );
+    let tail = tail_latency_penalty(
+        worker.network_profile.latency_ms_p50,
+        worker.network_profile.latency_ms_p95,
+        DEFAULT_TAIL_LATENCY_RATIO_THRESHOLD,
+        DEFAULT_TAIL_LATENCY_MAX_PENALTY,
+    );
 
     weights.w_shard * shard + weights.w_lat * lat + weights.w_hot * hot
         - weights.w_egress * egress
         - stale
+        - tail
 }
 
 /// Scheduler stub: sort workers by `locality_score` desc, then `worker_id` asc.
@@ -245,6 +307,10 @@ pub fn rank_workers_by_locality_with_weights(
             record_network_profile_stale_if_applicable(
                 w.network_profile.profile_age_secs,
                 DEFAULT_STALE_PROFILE_MAX_AGE_SECS,
+            );
+            record_tail_latency_penalty_if_applicable(
+                w.network_profile.latency_ms_p50,
+                w.network_profile.latency_ms_p95,
             );
             LocalityRankedWorker {
                 worker_id: w.worker_id.clone(),
@@ -455,6 +521,7 @@ mod tests {
             network_profile: LocalityNetworkProfile {
                 region: region.into(),
                 latency_ms_p50: latency,
+                latency_ms_p95: None,
                 profile_age_secs,
             },
         }
@@ -638,6 +705,33 @@ mod tests {
         let _ = rank_workers_by_locality(&[remote], &job);
         assert_eq!(last_cross_region_egress_mb(), 200);
         reset_last_cross_region_egress_mb_for_test();
+    }
+
+    #[test]
+    fn tail_latency_penalty_ph_s603() {
+        reset_tail_latency_penalty_metrics_for_test();
+        assert_eq!(
+            tail_latency_penalty(20, Some(50), DEFAULT_TAIL_LATENCY_RATIO_THRESHOLD, 0.08),
+            0.02
+        );
+        assert_eq!(
+            tail_latency_penalty(20, Some(120), DEFAULT_TAIL_LATENCY_RATIO_THRESHOLD, 0.08),
+            0.08
+        );
+        assert_eq!(
+            tail_latency_penalty(20, Some(30), DEFAULT_TAIL_LATENCY_RATIO_THRESHOLD, 0.08),
+            0.0
+        );
+        let mut w = worker("tail", "eu-west", 20, &["w:emb-1"]);
+        w.network_profile.latency_ms_p95 = Some(120);
+        let job = task(&["w:emb-1"], "inference:text", 0.0, None);
+        let base = locality_score(&w, &job, &DEFAULT_LOCALITY_WEIGHTS);
+        w.network_profile.latency_ms_p95 = Some(40);
+        let lower = locality_score(&w, &job, &DEFAULT_LOCALITY_WEIGHTS);
+        assert!(base < lower);
+        record_tail_latency_penalty_if_applicable(20, Some(120));
+        assert_eq!(tail_latency_penalty_total(), 1);
+        reset_tail_latency_penalty_metrics_for_test();
     }
 
     #[test]

@@ -57,6 +57,7 @@ async fn rank_and_prefetch_paths_observe_cross_region_egress_mb_on_scrape() {
         network_profile: LocalityNetworkProfile {
             region: "us-east".into(),
             latency_ms_p50: 90,
+            latency_ms_p95: None,
             profile_age_secs: Some(0),
         },
     };

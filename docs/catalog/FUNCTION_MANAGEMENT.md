@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-19 (PH-S590…S599 ✅ · vision **rev 259** · **0** відкритих · rust_ratio **94.67%**)
+**Оновлено:** 2026-06-19 (PH-S600…S609 ✅ · vision **rev 260** · **0** відкритих · rust_ratio **TBD**)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -799,8 +799,18 @@ FM-xxx (з таблиці нижче)
 | 532 | **PH-S597** | On-chain Cleared grid complete HTTP integration | Galaxy §7 | `SETTLEMENT_ON_CHAIN=1` result → mock RPC ack via HTTP | **✅** |
 | 533 | **PH-S598** | Galaxy admin a11y matrix expand | FM-019 / DOCS_LEGACY | network-profiles, seed-inventory, security-advisories in pa11y + axe | **✅** |
 | 534 | **PH-S599** | Horizon close band S591–S598 | §5.12 fallback | `galaxy_horizon_s591_integration` + loc-audit + vision-sync `--check` | **✅** |
+| 535 | **PH-S600** | Strict-locality grid job ingest HTTP | Galaxy §5.6 | `POST /grid/envelope` + `strict_locality` → 409 `locality_unsatisfied` / `prefetch-timeout`; integration test | **✅** |
+| 536 | **PH-S601** | Human-review settlement hold HTTP | Galaxy §6.2 | grid result `non_deterministic` semantic_hash mismatch → `galaxy_settlement_human_review_total` | **✅** |
+| 537 | **PH-S602** | Wallet rebind cooldown HTTP | Galaxy §3.2 | second `POST …/telegram/wallet` → 409 `wallet_rebind_cooldown` integration test | **✅** |
+| 538 | **PH-S603** | `latency_ms_p95` tail-latency locality penalty | Galaxy §8.1 | p95≫p50 penalty in `locality_score` + `galaxy_tail_latency_penalty_total` | **✅** |
+| 539 | **PH-S604** | Topology ring / white-IP prefetch admission | Galaxy §8.1 | `prefetch_topology_admission_blocked_skip` + `galaxy_prefetch_topology_blocked_total` | **✅** |
+| 540 | **PH-S605** | RAID prefetch fetch grid job HTTP | Roadmap §5.5 | job ingest → `galaxy_prefetch_raid_fetch_total` via HTTP | **✅** |
+| 541 | **PH-S606** | Re-migrate prefetch Migrating→Leased HTTP | Galaxy §5.5 | `PATCH /jobs/{id}` → `galaxy_prefetch_re_migrate_total` integration test | **✅** |
+| 542 | **PH-S607** | Fraud-proof hold grid envelope HTTP | Galaxy §6.6 | `POOLAI_GALAXY_FRAUD_PROOF=1` result mismatch → `galaxy_fraud_proof_pending_total` | **✅** |
+| 543 | **PH-S608** | Admin dashboard wasm-first formatters slim | RUST_RATIO §5.13 | remove JS `formatUptime` dup; wasm `formatPercent`/`formatMegabytes` glue | **✅** |
+| 544 | **PH-S609** | Horizon close band S600–S608 | §5.12 fallback | `galaxy_horizon_s600_integration` + loc-audit + vision-sync `--check` | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S590…S599 ✅. Vision rev **259**. rust_ratio **94.67%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S600…S609 ✅. Vision rev **260**. rust_ratio **94.69%**.
 
 **Наступна сесія:** **`абракадабра`** — project scan → +10 PH-S* → drain → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 

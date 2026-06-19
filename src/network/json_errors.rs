@@ -59,6 +59,7 @@ pub fn http_status_for_app_error(err: &AppError) -> StatusCode {
             "gpu_passthrough_required" | "capability_probe_required" | "wallet_rebind_cooldown" => {
                 StatusCode::FORBIDDEN
             }
+            "locality_unsatisfied" | "prefetch-timeout" => StatusCode::CONFLICT,
             _ => StatusCode::INTERNAL_SERVER_ERROR,
         },
         TimeoutError(_) => StatusCode::GATEWAY_TIMEOUT,

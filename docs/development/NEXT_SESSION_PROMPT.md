@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-19 (PH-S590…S599 ✅ · vision **rev 259** · **0** відкритих · rust_ratio **94.67%**)
+**Оновлено:** 2026-06-19 (PH-S600…S609 ✅ · vision **rev 260** · **0** відкритих · rust_ratio **94.69%**)
 
 | **← наступний** | **`абракадабра`** (project scan → +10 PH-S* → drain) |
 | **Відкритих** | **0** |
@@ -42,15 +42,17 @@ bash bin/e2e-playwright.sh --start
 
 ---
 
-## Закрито (PH-S590…S599)
+## Закрито (PH-S600…S609)
 
-PH-S590 ✅ vision orbit UX (~30% WASD, pause/layers, `vision.spec.ts` rotY).  
-PH-S591/S592 ✅ prefetch profile bandwidth/egress gates.  
-PH-S593/S594 ✅ GPU passthrough + TEE attestation HTTP integration.  
-PH-S595 ✅ wallet rebind admin override.  
-PH-S596 ✅ network-profiles admin PUT UI.  
-PH-S597 ✅ on-chain grid complete HTTP.  
-PH-S598 ✅ a11y matrix (network-profiles, seed-inventory, security-advisories).  
-PH-S599 ✅ `galaxy_horizon_s591_integration` close band.
+PH-S600 ✅ strict-locality HTTP (`locality_unsatisfied` / `prefetch-timeout` 409).  
+PH-S601 ✅ semantic_hash human-review settlement HTTP.  
+PH-S602 ✅ wallet rebind cooldown HTTP integration.  
+PH-S603 ✅ `latency_ms_p95` tail-latency locality penalty + metric.  
+PH-S604 ✅ topology ring / white-IP prefetch admission guard.  
+PH-S605 ✅ RAID prefetch fetch on grid job HTTP.  
+PH-S606 ✅ re-migrate prefetch on Migrating→Leased PATCH HTTP.  
+PH-S607 ✅ fraud-proof hold via grid envelope HTTP.  
+PH-S608 ✅ admin dashboard wasm-first formatter slim.  
+PH-S609 ✅ `galaxy_horizon_s600_integration` close band.
 
-**rust_ratio:** **94.67%** · **BLOCKED:** FM-003 LAN · FM-041 Cloud SDK.
+**rust_ratio:** **94.69%** · **BLOCKED:** FM-003 LAN · FM-041 Cloud SDK.

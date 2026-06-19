@@ -2016,7 +2016,7 @@
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S599",
+  "last_sprint_closed": "PH-S609",
   "layers": [
     {
       "id": "L0",
@@ -8378,9 +8378,16 @@
       "label": "galaxy_horizon_s580_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s580_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s591_integration_rs",
+      "label": "galaxy_horizon_s591_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s591_integration.rs"
     }
   ],
-  "revision": 259,
+  "revision": 260,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -13187,6 +13194,96 @@
       "row": 534,
       "status": "closed",
       "title": "Horizon close band S591–S598"
+    },
+    {
+      "acceptance": "POST /grid/envelope` + `strict_locality` → 409 `locality_unsatisfied` / `prefetch-timeout`; integration test",
+      "deps": "Galaxy §5.6",
+      "id": "PH-S600",
+      "open": false,
+      "row": 535,
+      "status": "closed",
+      "title": "Strict-locality grid job ingest HTTP"
+    },
+    {
+      "acceptance": "grid result `non_deterministic` semantic_hash mismatch → `galaxy_settlement_human_review_total",
+      "deps": "Galaxy §6.2",
+      "id": "PH-S601",
+      "open": false,
+      "row": 536,
+      "status": "closed",
+      "title": "Human-review settlement hold HTTP"
+    },
+    {
+      "acceptance": "second `POST …/telegram/wallet` → 409 `wallet_rebind_cooldown` integration test",
+      "deps": "Galaxy §3.2",
+      "id": "PH-S602",
+      "open": false,
+      "row": 537,
+      "status": "closed",
+      "title": "Wallet rebind cooldown HTTP"
+    },
+    {
+      "acceptance": "p95≫p50 penalty in `locality_score` + `galaxy_tail_latency_penalty_total",
+      "deps": "Galaxy §8.1",
+      "id": "PH-S603",
+      "open": false,
+      "row": 538,
+      "status": "closed",
+      "title": "latency_ms_p95` tail-latency locality penalty"
+    },
+    {
+      "acceptance": "prefetch_topology_admission_blocked_skip` + `galaxy_prefetch_topology_blocked_total",
+      "deps": "Galaxy §8.1",
+      "id": "PH-S604",
+      "open": false,
+      "row": 539,
+      "status": "closed",
+      "title": "Topology ring / white-IP prefetch admission"
+    },
+    {
+      "acceptance": "job ingest → `galaxy_prefetch_raid_fetch_total` via HTTP",
+      "deps": "Roadmap §5.5",
+      "id": "PH-S605",
+      "open": false,
+      "row": 540,
+      "status": "closed",
+      "title": "RAID prefetch fetch grid job HTTP"
+    },
+    {
+      "acceptance": "PATCH /jobs/{id}` → `galaxy_prefetch_re_migrate_total` integration test",
+      "deps": "Galaxy §5.5",
+      "id": "PH-S606",
+      "open": false,
+      "row": 541,
+      "status": "closed",
+      "title": "Re-migrate prefetch Migrating→Leased HTTP"
+    },
+    {
+      "acceptance": "POOLAI_GALAXY_FRAUD_PROOF=1` result mismatch → `galaxy_fraud_proof_pending_total",
+      "deps": "Galaxy §6.6",
+      "id": "PH-S607",
+      "open": false,
+      "row": 542,
+      "status": "closed",
+      "title": "Fraud-proof hold grid envelope HTTP"
+    },
+    {
+      "acceptance": "remove JS `formatUptime` dup; wasm `formatPercent`/`formatMegabytes` glue",
+      "deps": "RUST_RATIO §5.13",
+      "id": "PH-S608",
+      "open": false,
+      "row": 543,
+      "status": "closed",
+      "title": "Admin dashboard wasm-first formatters slim"
+    },
+    {
+      "acceptance": "galaxy_horizon_s600_integration` + loc-audit + vision-sync `--check",
+      "deps": "§5.12 fallback",
+      "id": "PH-S609",
+      "open": false,
+      "row": 544,
+      "status": "closed",
+      "title": "Horizon close band S600–S608"
     }
   ],
   "sprint_queue_open_count": 0,

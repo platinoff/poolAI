@@ -46,6 +46,7 @@ fn worker(id: &str, shards: &[&str]) -> LocalityWorker {
         network_profile: LocalityNetworkProfile {
             region: "eu-west".into(),
             latency_ms_p50: 20,
+            latency_ms_p95: None,
             profile_age_secs: Some(0),
         },
     }

@@ -101,6 +101,7 @@ async fn horizon_s558_band_routing_wallet_capability_metrics_ph_s567() {
         network_profile: LocalityNetworkProfile {
             region: "eu".into(),
             latency_ms_p50: 10,
+            latency_ms_p95: None,
             profile_age_secs: None,
         },
         queue_depth: 0,
