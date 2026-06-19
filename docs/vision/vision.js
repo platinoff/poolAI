@@ -24,8 +24,8 @@
 
   let mapView = { tx: 0, ty: 0, scale: 1 };
   const MAP_ORBIT_DEFAULT = { rotX: 48, rotY: -28, rotZ: -8 };
-  const MAP_ORBIT_STEP_DEG = 4;
-  const MAP_ORBIT_PAD_SENS = 0.16;
+  const MAP_ORBIT_STEP_DEG = 2;
+  const MAP_ORBIT_PAD_SENS = 0.08;
   const MAP_ORBIT_CLAMP_X = 72;
   const MAP_LAYER_Z_STEP = 52;
   const MAP_3D_FOCAL = 880;
@@ -717,7 +717,10 @@
   }
 
   function nodeRenderRadius(n, pos) {
-    if (pos && pos.clusterHub) return 11;
+    if (pos && pos.clusterHub) {
+      const c = pos.clusterCount || pos.mass || 1;
+      return Math.min(20, 8 + Math.sqrt(c) * 1.75);
+    }
     if (n.id === "galaxy_grid") return 14;
     const w = nodeVisualWeight(n);
     if (w >= 0.9) return 12;
@@ -1214,6 +1217,20 @@
     applyMap3DProjection();
     const stack = document.getElementById("layer-stack");
     if (stack) stack.style.transform = mapOrbitTransformString();
+    syncLayerStack3D();
+  }
+
+  function syncLayerStack3D() {
+    const stack = document.getElementById("layer-stack");
+    if (!stack || !manifest) return;
+    const layers = manifest.layers || [];
+    stack.querySelectorAll(".layer-plane").forEach((el) => {
+      const idx = layers.findIndex((l) => l.id === el.dataset.layer);
+      const z = (idx >= 0 ? idx : 0) * 18;
+      const lift =
+        !stackLayerFocus || el.dataset.layer === stackLayerFocus ? 10 : 0;
+      el.style.transform = "translateZ(" + (z + lift) + "px)";
+    });
   }
 
   function resetMapOrbit() {
@@ -2048,6 +2065,7 @@
     }
 
     syncLayerStackHighlight();
+    syncLayerStack3D();
   }
 
   function syncLayerStackHighlight() {
@@ -2062,18 +2080,30 @@
   }
 
   function setStackLayerFocus(layerId) {
-    if (stackLayerFocus === layerId) stackLayerFocus = null;
-    else stackLayerFocus = layerId;
+    if (stackLayerFocus === layerId) {
+      stackLayerFocus = null;
+      mapLayerFocus = null;
+    } else {
+      stackLayerFocus = layerId;
+      mapLayerFocus = layerId;
+    }
     syncLayerStackHighlight();
+    syncLayerStack3D();
+    syncMapFilterDock();
+    updateMapFilters();
   }
 
   function setMapLayerFocus(layerId) {
     if (mapLayerFocus === layerId) {
       mapLayerFocus = null;
+      stackLayerFocus = null;
     } else {
       mapLayerFocus = layerId;
+      stackLayerFocus = layerId;
     }
     syncMapFilterDock();
+    syncLayerStackHighlight();
+    syncLayerStack3D();
     updateMapFilters();
   }
 
@@ -2513,6 +2543,7 @@
   }
 
   function placeConstellationNode(n, cx, cy, i, layer, cluster, opts) {
+    const count = (opts && opts.count) || 1;
     if (i === 0) {
       nodePositions.set(n.id, {
         x: cx,
@@ -2520,28 +2551,66 @@
         layer,
         cluster,
         clusterHub: !!(opts && opts.hub),
-        clusterCount: opts && opts.count,
+        clusterCount: count,
+        mass: count,
       });
       return;
     }
-    const angle = (i - 1) * GOLDEN_ANGLE + hashUnit(n.id) * 1.1;
-    const clusterSize = opts && opts.count ? opts.count : 1;
-    const radius =
-      22 +
-      Math.sqrt(i) * (clusterSize > 24 ? 34 : clusterSize > 10 ? 28 : 22) +
-      hashUnit(n.id + "r") * 14;
-    const x = cx + Math.cos(angle) * radius;
-    const y =
-      cy +
-      Math.sin(angle) * radius * 0.68 +
-      (hashUnit(n.id + "y") - 0.5) * 22;
+    const orbitIndex = i - 1;
+    const ring = Math.floor(Math.sqrt(orbitIndex + 0.5));
+    const ringStep = 14 + Math.sqrt(count) * 2.4;
+    const ringRadius = 20 + ring * ringStep;
+    const perRing = Math.max(4, Math.ceil(Math.sqrt(count + orbitIndex + 2)));
+    const angle =
+      (orbitIndex / perRing) * Math.PI * 2 +
+      ring * GOLDEN_ANGLE +
+      hashUnit(n.id) * 0.55;
+    const flatten = 0.68 + Math.min(0.12, count * 0.004);
+    const wobble = (hashUnit(n.id + "y") - 0.5) * 10;
+    const deg = nodeDegree(n.id);
+    const massBias = 1 - Math.min(0.35, deg * 0.04);
+    const x = cx + Math.cos(angle) * ringRadius * massBias;
+    const y = cy + Math.sin(angle) * ringRadius * flatten + wobble;
     nodePositions.set(n.id, {
       x,
       y,
       layer,
       cluster,
       constellation: true,
+      satelliteRing: ring,
+      mass: Math.max(1, deg),
     });
+  }
+
+  function layoutOrphanStars(orphans, baseY, layer) {
+    if (!orphans.length) return;
+    const rimY = baseY + 38;
+    orphans.forEach((meta, oi) => {
+      const n = meta.nodes[0];
+      const t = orphans.length === 1 ? 0.5 : oi / Math.max(1, orphans.length - 1);
+      const edgeX = marginXForOrbit(t);
+      const cx = edgeX;
+      const cy = rimY + (hashUnit(meta.key + "y") - 0.5) * 22;
+      nodePositions.set(n.id, {
+        x: cx,
+        y: cy,
+        layer,
+        cluster: meta.key,
+        orphan: true,
+        clusterCount: 1,
+        mass: 1,
+      });
+    });
+  }
+
+  function marginXForOrbit(t) {
+    const margin = 56;
+    const usable = MAP_W - margin * 2;
+    return margin + t * usable;
+  }
+
+  function solarSystemFootprint(mass) {
+    return 36 + Math.sqrt(mass) * 22;
   }
 
   function layoutLayerConstellation(list, baseY, layer) {
@@ -2552,33 +2621,52 @@
       clusters.get(key).push(n);
     });
 
-    const clusterKeys = Array.from(clusters.keys()).sort();
-    const nClusters = clusterKeys.length;
-    const arcSpan = Math.min(
-      Math.PI * 1.38,
-      Math.max(0.55, nClusters * 0.44)
-    );
-    const xSpread = MAP_W * (0.3 + Math.min(0.24, nClusters * 0.007));
+    const clusterMeta = Array.from(clusters.entries())
+      .map(([key, nodes]) => ({
+        key,
+        nodes: nodes.slice().sort((a, b) => a.label.localeCompare(b.label)),
+        mass: nodes.length,
+      }))
+      .sort((a, b) => b.mass - a.mass);
 
-    clusterKeys.forEach((key, ci) => {
-      const nodes = clusters
-        .get(key)
-        .slice()
-        .sort((a, b) => a.label.localeCompare(b.label));
+    const solarSystems = clusterMeta.filter((c) => c.mass > 1);
+    const orphans = clusterMeta.filter((c) => c.mass === 1);
+    layoutOrphanStars(orphans, baseY, layer);
+
+    const nSystems = solarSystems.length;
+    if (!nSystems) return;
+
+    const totalFootprint = solarSystems.reduce(
+      (sum, c) => sum + solarSystemFootprint(c.mass),
+      0
+    );
+    const arcSpan = Math.min(
+      Math.PI * 1.42,
+      Math.max(0.65, nSystems * 0.38 + totalFootprint / MAP_W)
+    );
+    const xSpread = MAP_W * (0.28 + Math.min(0.28, nSystems * 0.008));
+
+    let massCursor = 0;
+    const massTotal = solarSystems.reduce((s, c) => s + c.mass, 0) || 1;
+
+    solarSystems.forEach((meta) => {
+      const { key, nodes, mass } = meta;
       const collapsed = isClusterCollapsed(layer, key, nodes.length);
-      const t = nClusters === 1 ? 0.5 : ci / Math.max(1, nClusters - 1);
+      const slot = (massCursor + mass * 0.5) / massTotal;
+      massCursor += mass;
+      const t = nSystems === 1 ? 0.5 : slot;
       const angle = -arcSpan / 2 + t * arcSpan;
       const cx = MAP_W / 2 + Math.sin(angle) * xSpread;
       const cy =
         baseY +
-        Math.cos(angle) * (32 + nClusters * 0.55) -
-        14 +
-        (hashUnit(key) - 0.5) * 18;
+        Math.cos(angle) * (28 + nSystems * 0.5) -
+        10 +
+        (hashUnit(key) - 0.5) * 14;
 
       if (collapsed) {
         const hub = pickClusterHub(nodes);
         const hubId = hub.id;
-        nodes.forEach((n, i) => {
+        nodes.forEach((n) => {
           if (n.id === hubId) {
             nodePositions.set(n.id, {
               x: cx,
@@ -2587,6 +2675,7 @@
               cluster: key,
               clusterHub: true,
               clusterCount: nodes.length,
+              mass: nodes.length,
             });
           } else {
             nodePositions.set(n.id, {
@@ -2601,7 +2690,7 @@
         });
         clusterLabelPositions.push({
           x: cx,
-          y: cy - 26,
+          y: cy - 26 - Math.sqrt(mass) * 2,
           key,
           layer,
           collapsed: true,
@@ -2611,7 +2700,10 @@
       }
 
       const hub = pickClusterHub(nodes);
-      const ordered = [hub].concat(nodes.filter((n) => n.id !== hub.id));
+      const satellites = nodes
+        .filter((n) => n.id !== hub.id)
+        .sort((a, b) => nodeDegree(b.id) - nodeDegree(a.id));
+      const ordered = [hub].concat(satellites);
       ordered.forEach((n, i) => {
         placeConstellationNode(n, cx, cy, i, layer, key, {
           hub: i === 0 && nodes.length >= collapseThresholdForLayer(layer),
@@ -2619,19 +2711,59 @@
         });
       });
       if (nodes.length > 1) {
-        const labelY =
-          cy -
-          24 -
-          Math.sqrt(nodes.length) * 8 -
-          Math.min(40, nodes.length * 2);
         clusterLabelPositions.push({
           x: cx,
-          y: labelY,
+          y: cy - 24 - Math.sqrt(mass) * 10 - Math.min(36, mass * 1.5),
           key,
           layer,
           collapsed: false,
           count: nodes.length,
         });
+      }
+    });
+  }
+
+  function nudgeSolarSystemsApart() {
+    const hubs = [];
+    nodePositions.forEach((p, id) => {
+      if (!p.clusterHub || p.collapsedHidden) return;
+      hubs.push({ id, p, footprint: solarSystemFootprint(p.clusterCount || 1) });
+    });
+    for (let pass = 0; pass < 6; pass++) {
+      for (let i = 0; i < hubs.length; i++) {
+        for (let j = i + 1; j < hubs.length; j++) {
+          const a = hubs[i];
+          const b = hubs[j];
+          if (a.p.layer !== b.p.layer) continue;
+          const dx = b.p.x - a.p.x;
+          const dy = b.p.y - a.p.y;
+          const d = Math.hypot(dx, dy) || 1;
+          const minD = a.footprint + b.footprint + 24;
+          if (d >= minD) continue;
+          const push = (minD - d) * 0.42;
+          const ax = -(dx / d) * push;
+          const ay = -(dy / d) * push;
+          const bx = (dx / d) * push;
+          const by = (dy / d) * push;
+          shiftClusterByDelta(a.p.cluster, a.p.layer, ax, ay);
+          shiftClusterByDelta(b.p.cluster, b.p.layer, bx, by);
+        }
+      }
+    }
+  }
+
+  function shiftClusterByDelta(cluster, layer, dx, dy) {
+    if (!dx && !dy) return;
+    nodePositions.forEach((p) => {
+      if (p.cluster !== cluster || p.layer !== layer) return;
+      if (p.collapsedHidden) return;
+      p.x += dx;
+      p.y += dy;
+    });
+    clusterLabelPositions.forEach((cl) => {
+      if (cl.key === cluster && cl.layer === layer) {
+        cl.x += dx;
+        cl.y += dy;
       }
     });
   }
@@ -2682,6 +2814,7 @@
     Object.keys(byLayer).forEach((layer) => {
       layoutLayerConstellation(byLayer[layer], LAYER_Y[layer] || 200, layer);
     });
+    nudgeSolarSystemsApart();
     nudgeConstellationApart();
   }
 
@@ -2749,28 +2882,28 @@
     const defs = document.createElementNS(ns, "defs");
     defs.innerHTML = `
       <linearGradient id="gradL0" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#2d4a6f" stop-opacity="0.5"/>
-        <stop offset="100%" stop-color="#1a2840" stop-opacity="0.25"/>
+        <stop offset="0%" stop-color="#2d4a6f" stop-opacity="0.25"/>
+        <stop offset="100%" stop-color="#1a2840" stop-opacity="0.125"/>
       </linearGradient>
       <linearGradient id="gradL1" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#3d5a40" stop-opacity="0.45"/>
-        <stop offset="100%" stop-color="#243828" stop-opacity="0.2"/>
+        <stop offset="0%" stop-color="#3d5a40" stop-opacity="0.225"/>
+        <stop offset="100%" stop-color="#243828" stop-opacity="0.1"/>
       </linearGradient>
       <linearGradient id="gradL2" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#5a4a2d" stop-opacity="0.4"/>
-        <stop offset="100%" stop-color="#302818" stop-opacity="0.18"/>
+        <stop offset="0%" stop-color="#5a4a2d" stop-opacity="0.2"/>
+        <stop offset="100%" stop-color="#302818" stop-opacity="0.09"/>
       </linearGradient>
       <linearGradient id="gradL3" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#5a2d4a" stop-opacity="0.4"/>
-        <stop offset="100%" stop-color="#301820" stop-opacity="0.18"/>
+        <stop offset="0%" stop-color="#5a2d4a" stop-opacity="0.2"/>
+        <stop offset="100%" stop-color="#301820" stop-opacity="0.09"/>
       </linearGradient>
       <linearGradient id="gradL4" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#4a3d5a" stop-opacity="0.42"/>
-        <stop offset="100%" stop-color="#281830" stop-opacity="0.18"/>
+        <stop offset="0%" stop-color="#4a3d5a" stop-opacity="0.21"/>
+        <stop offset="100%" stop-color="#281830" stop-opacity="0.09"/>
       </linearGradient>
       <linearGradient id="gradL5" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#2d4a5a" stop-opacity="0.45"/>
-        <stop offset="100%" stop-color="#182830" stop-opacity="0.2"/>
+        <stop offset="0%" stop-color="#2d4a5a" stop-opacity="0.225"/>
+        <stop offset="100%" stop-color="#182830" stop-opacity="0.1"/>
       </linearGradient>
       ${
         isLowGpuMode()

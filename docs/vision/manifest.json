@@ -1992,7 +1992,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S556",
+  "last_sprint_closed": "PH-S557",
   "layers": [
     {
       "id": "L0",
@@ -8251,7 +8251,7 @@
       "path": "tests/galaxy_replication_quorum_integration.rs"
     }
   ],
-  "revision": 247,
+  "revision": 248,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -12671,6 +12671,15 @@
       "row": 491,
       "status": "closed",
       "title": "Vision map true 3D layer projection"
+    },
+    {
+      "acceptance": "folder mass hubs + multi-ring orbits; orphans at rim; orbit 2× slower; planes 50% transparent; stack sync",
+      "deps": "docs/vision UX",
+      "id": "PH-S557",
+      "open": false,
+      "row": 492,
+      "status": "closed",
+      "title": "Vision gravity solar-system layout"
     }
   ],
   "sprint_queue_open_count": 0,

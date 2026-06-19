@@ -1460,9 +1460,9 @@ body.panel-fs-active .panel[data-panel="map"].panel-fullscreen .map-hint {
   pointer-events: none;
 }
 
-#map-svg .plane { stroke-width: 1.5; transition: opacity 0.25s, stroke-width 0.25s; }
-#map-svg .plane.layer-dim { opacity: 0.14; }
-#map-svg .plane.layer-focus { opacity: 0.92; stroke-width: 2.5; }
+#map-svg .plane { stroke-width: 1.5; opacity: 0.55; transition: opacity 0.25s, stroke-width 0.25s; }
+#map-svg .plane.layer-dim { opacity: 0.12; }
+#map-svg .plane.layer-focus { opacity: 0.72; stroke-width: 2.5; }
 #map-svg .layer-tier-label { transition: opacity 0.25s, fill 0.25s; }
 #map-svg .layer-tier-label.layer-dim { opacity: 0.2; }
 #map-svg .layer-tier-label.layer-focus { fill: #c8d8e8; opacity: 1; }

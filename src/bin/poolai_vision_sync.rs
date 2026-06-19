@@ -1163,4 +1163,19 @@ mod tests {
             "orbit pad should anchor above bottom bar"
         );
     }
+
+    #[test]
+    fn vision_js_gravity_solar_layout_ph_s557() {
+        let js = std::fs::read_to_string("docs/vision/vision.js").expect("vision.js");
+        assert!(
+            js.contains("function layoutOrphanStars")
+                && js.contains("function nudgeSolarSystemsApart")
+                && js.contains("function syncLayerStack3D"),
+            "missing gravity solar layout + stack sync"
+        );
+        assert!(
+            js.contains("MAP_ORBIT_STEP_DEG = 2") && js.contains("MAP_ORBIT_PAD_SENS = 0.08"),
+            "orbit should be 2x slower"
+        );
+    }
 }

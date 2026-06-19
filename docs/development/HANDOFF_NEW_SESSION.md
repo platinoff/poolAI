@@ -507,9 +507,10 @@
 **PH-S554 ✅ (tests):** `galaxy_horizon_s545_integration` close band + loc-audit + vision-sync.
 **PH-S555 ✅ (vision UX):** Galaxy map 3D orbit — `map-scene-3d` perspective, **WASD** keys, center **touch pad**; layer stack sync; UI v77 / CSS v73; rev **246**.
 **PH-S556 ✅ (vision UX):** True 3D layer projection — `applyMap3DProjection` + `MAP_LAYER_Z_STEP`; WASD W↑S↓A←D→; orbit pad bottom-center; UI v78 / CSS v74; rev **247**.
+**PH-S557 ✅ (vision UX):** Gravity solar-system layout — folder mass hubs, multi-ring orbits, orphan rim stars; orbit 2× slower; planes 50% transparent; stack↔map sync; UI v79 / CSS v75; rev **248**.
 **Rules ✅:** **`абракадабра`** — project scan **всього репо** (concept · FM §5.1 · roadmaps · architect · code) → 10 PH-S* у §5.12 (журнал) → drain → push; канон [`.cursor/rules/poolai-session-iteration.mdc`](../.cursor/rules/poolai-session-iteration.mdc) § «Тригер абракадабра»; commit **`git-commit-tree-msg.sh`**.
 **§5.12:** **0** відкритих — наступна сесія: **`абракадабра`** (project scan + drain).
-**Vision ✅:** rev **247** · rust_ratio **94.66%** · hold **95%** advisory.
+**Vision ✅:** rev **248** · rust_ratio **94.66%** · hold **95%** advisory.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 
