@@ -743,8 +743,9 @@ FM-xxx (з таблиці нижче)
 | 476 | **PH-S541** | Telegram cold-mining limits DTO | Galaxy §2.3 | `GalaxyWorkerLimits` max_cpu/ram/disk on virtual-nodes DTO | **✅** |
 | 477 | **PH-S542** | Checker timeout inconclusive policy | Galaxy §6.2 | `evaluate_checker_timeout_policy`; retry → `VerificationInconclusive` | **✅** |
 | 478 | **PH-S543** | Horizon close band S534–S542 | §5.12 fallback | `galaxy_horizon_s534_integration` + stand smoke + loc-audit + vision-sync | **✅** |
+| 479 | **PH-S544** | Vision feed ticker header marquee | docs/vision UX | FEED у header; однорядкова бігуча строка; тонкий custom scroll rail; rev++ | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S534…S543 ✅. Vision rev **243**. rust_ratio **94.63%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S544 ✅. Vision rev **244**. rust_ratio **94.66%**.
 
 **Наступна сесія:** **`абракадабра`** (project scan → drain) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 

@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-19 (PH-S534…S543 ✅ · rust_ratio **94.62%**) · VDT
+**Оновлено:** 2026-06-19 (PH-S544 ✅ · rust_ratio **94.66%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -494,9 +494,10 @@
 **PH-S541 ✅ (code):** `GalaxyWorkerLimits` cold-mining caps (`max_cpu_pct`, `max_ram_mb`, `max_disk_mb`).
 **PH-S542 ✅ (code):** `evaluate_checker_timeout_policy` — retry then `VerificationInconclusive`.
 **PH-S543 ✅ (ops):** `galaxy_horizon_s534_integration` + stand smoke + loc-audit + vision-sync.
+**PH-S544 ✅ (vision UX):** feed ticker у header — однорядкова marquee + тонкий custom scroll rail (`docs/vision/`).
 **Rules ✅:** **`абракадабра`** — project scan **всього репо** (concept · FM §5.1 · roadmaps · architect · code) → 10 PH-S* у §5.12 (журнал) → drain → push; канон [`.cursor/rules/poolai-session-iteration.mdc`](../.cursor/rules/poolai-session-iteration.mdc) § «Тригер абракадабра»; commit **`git-commit-tree-msg.sh`**.
-**§5.12:** **0** відкритих — наступна сесія: **`абракадабра`** (project scan + drain) або один PH-S*.
-**Vision ✅:** rev **243** · rust_ratio **94.62%** · hold **95%** advisory.
+**§5.12:** **0** відкритих — наступна сесія: **`абракадабра`** (project scan + drain).
+**Vision ✅:** rev **244** · rust_ratio **94.66%** · hold **95%** advisory.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

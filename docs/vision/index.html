@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PoolAI Galaxy Starwalker Vision</title>
-  <link rel="stylesheet" href="vision.css?v=70" />
+  <link rel="stylesheet" href="vision.css?v=72" />
 </head>
 <body>
   <div id="galaxy-backdrop" class="galaxy-backdrop" aria-hidden="true">
@@ -12,22 +12,24 @@
   </div>
   <canvas id="starfield" aria-hidden="true"></canvas>
   <header>
-    <button type="button" id="btn-sidebar" title="Toggle Explorer (overlay in fullscreen)">☰</button>
-    <h1>PoolAI Galaxy Starwalker Vision</h1>
-    <span class="meta" id="meta-rev">…</span>
-    <span class="meta-trail" id="meta-trail" aria-label="Git HEAD and next sprint"></span>
-    <div class="header-actions" aria-label="Vision controls">
-      <button type="button" id="btn-eco" class="btn-eco on" title="Eco — low GPU. Click → FX → Ms">Eco</button>
-      <button type="button" id="btn-auto" class="btn-auto on" title="Auto-reload when vision files change">Auto</button>
-      <button type="button" id="btn-reload" title="Reload manifest.json">↻ Reload</button>
+    <div id="rss-ticker" class="rss-ticker" aria-label="Sprint feed ticker" hidden>
+      <span class="rss-ticker-label" title="FM §5.12 feed from feed.json">Feed</span>
+      <div class="rss-ticker-viewport" aria-live="polite">
+        <ul class="rss-ticker-track" id="rss-ticker-track"></ul>
+      </div>
+    </div>
+    <div class="header-main">
+      <button type="button" id="btn-sidebar" title="Toggle Explorer (overlay in fullscreen)">☰</button>
+      <h1>PoolAI Galaxy Starwalker Vision</h1>
+      <span class="meta" id="meta-rev">…</span>
+      <span class="meta-trail" id="meta-trail" aria-label="Git HEAD and next sprint"></span>
+      <div class="header-actions" aria-label="Vision controls">
+        <button type="button" id="btn-eco" class="btn-eco on" title="Eco — low GPU. Click → FX → Ms">Eco</button>
+        <button type="button" id="btn-auto" class="btn-auto on" title="Auto-reload when vision files change">Auto</button>
+        <button type="button" id="btn-reload" title="Reload manifest.json">↻ Reload</button>
+      </div>
     </div>
   </header>
-  <div id="rss-ticker" class="rss-ticker" aria-label="Sprint feed ticker" hidden>
-    <span class="rss-ticker-label" title="FM §5.12 feed from feed.json">Feed</span>
-    <div class="rss-ticker-viewport" aria-live="polite">
-      <ul class="rss-ticker-track" id="rss-ticker-track"></ul>
-    </div>
-  </div>
   <div class="workspace">
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-head">
@@ -124,6 +126,6 @@
       </section>
     </div>
   </div>
-  <script src="vision.js?v=74"></script>
+  <script src="vision.js?v=76"></script>
 </body>
 </html>

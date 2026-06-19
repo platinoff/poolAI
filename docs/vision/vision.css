@@ -97,14 +97,23 @@ header,
 
 header {
   flex: 0 0 auto;
-  padding: 8px 14px;
+  padding: 0;
   border-bottom: 1px solid var(--border);
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
   backdrop-filter: blur(12px);
   background: rgba(10, 14, 24, 0.75);
   z-index: 22;
+}
+
+.header-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  min-width: 0;
 }
 
 header h1 {
@@ -138,17 +147,14 @@ header .meta {
 }
 
 .rss-ticker {
-  position: relative;
-  z-index: 21;
   flex: 0 0 auto;
   display: flex;
-  align-items: stretch;
-  gap: 8px;
-  padding: 4px 14px;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 14px 4px;
   border-bottom: 1px solid var(--border);
-  background: rgba(12, 18, 30, 0.82);
-  backdrop-filter: blur(8px);
-  min-height: 28px;
+  background: rgba(12, 18, 30, 0.88);
+  min-height: 32px;
   overflow: hidden;
 }
 
@@ -170,18 +176,65 @@ header .meta {
   flex: 1;
   min-width: 0;
   overflow: hidden;
-  mask-image: linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 28px, #000 calc(100% - 28px), transparent);
+  position: relative;
+  padding-bottom: 5px;
+}
+
+/* Thin custom scroll rail — visible in manual (reduced-motion) mode */
+.rss-ticker-manual .rss-ticker-viewport {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(126, 184, 255, 0.62) rgba(120, 160, 220, 0.1);
+}
+
+.rss-ticker-manual .rss-ticker-viewport::-webkit-scrollbar {
+  height: 3px;
+}
+
+.rss-ticker-manual .rss-ticker-viewport::-webkit-scrollbar-track {
+  background: rgba(120, 160, 220, 0.1);
+  border-radius: 999px;
+  margin: 0 28px;
+}
+
+.rss-ticker-manual .rss-ticker-viewport::-webkit-scrollbar-thumb {
+  min-width: 48px;
+  background: linear-gradient(90deg, rgba(126, 184, 255, 0.45), rgba(196, 165, 255, 0.55));
+  border-radius: 999px;
+  border: 1px solid rgba(126, 184, 255, 0.25);
+}
+
+.rss-ticker-manual .rss-ticker-viewport::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(90deg, rgba(126, 184, 255, 0.72), rgba(196, 165, 255, 0.78));
+}
+
+/* Animated mode — hide native bar, show thin decorative rail */
+.rss-ticker:not(.rss-ticker-manual) .rss-ticker-viewport::after {
+  content: "";
+  position: absolute;
+  left: 28px;
+  right: 28px;
+  bottom: 0;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(120, 160, 220, 0.12);
+  pointer-events: none;
 }
 
 .rss-ticker-track {
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 0;
   margin: 0;
   padding: 0;
   list-style: none;
   width: max-content;
-  animation: rss-ticker-scroll 48s linear infinite;
+  white-space: nowrap;
+  animation: rss-ticker-scroll var(--rss-ticker-duration, 48s) linear infinite;
+  will-change: transform;
 }
 
 .rss-ticker:hover .rss-ticker-track {
@@ -229,13 +282,9 @@ header .meta {
 @media (prefers-reduced-motion: reduce) {
   .rss-ticker-track {
     animation: none;
-    flex-wrap: wrap;
-    width: 100%;
-    white-space: normal;
-  }
-  .rss-ticker-viewport {
-    mask-image: none;
-    overflow: auto;
+    flex-wrap: nowrap;
+    width: max-content;
+    white-space: nowrap;
   }
 }
 

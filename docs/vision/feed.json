@@ -3,6 +3,15 @@
   "items": [
     {
       "category": "closed",
+      "id": "PH-S544",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "FEED у header; однорядкова бігуча строка; тонкий custom scroll rail; rev++",
+      "title": "Vision feed ticker header marquee"
+    },
+    {
+      "category": "closed",
       "id": "PH-S543",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
@@ -99,15 +108,6 @@
       "status": "closed",
       "summary": "galaxy_horizon_s524_integration` + stand smoke + loc-audit + vision-sync",
       "title": "Horizon close band S524–S532"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S532",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "line/sparkline JS fallbacks removed; wasm-first chart glue",
-      "title": "admin_charts.js` wasm slim band"
     }
   ],
   "link": "docs/vision/index.html",

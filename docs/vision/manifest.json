@@ -1934,11 +1934,41 @@
       "from": "job_types",
       "kind": "sprint-scope",
       "to": "tests_jobs_worker_unhealthy_failover_integration_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_capability_admission_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_prefetch_peer_pull_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_replay_jobs_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_settlement_onchain_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_verification_checker_jobs_rs"
     }
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S543",
+  "last_sprint_closed": "PH-S544",
   "layers": [
     {
       "id": "L0",
@@ -8104,9 +8134,51 @@
       "label": "network_profile_hydrate_integration.rs",
       "layer": "L3",
       "path": "tests/network_profile_hydrate_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_capability_admission_rs",
+      "label": "galaxy_capability_admission.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_capability_admission.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_prefetch_peer_pull_rs",
+      "label": "galaxy_prefetch_peer_pull.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_prefetch_peer_pull.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_replay_jobs_rs",
+      "label": "galaxy_replay_jobs.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_replay_jobs.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_settlement_onchain_rs",
+      "label": "galaxy_settlement_onchain.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_settlement_onchain.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_verification_checker_jobs_rs",
+      "label": "galaxy_verification_checker_jobs.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_verification_checker_jobs.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s534_integration_rs",
+      "label": "galaxy_horizon_s534_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s534_integration.rs"
     }
   ],
-  "revision": 243,
+  "revision": 244,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -12409,6 +12481,15 @@
       "row": 478,
       "status": "closed",
       "title": "Horizon close band S534–S542"
+    },
+    {
+      "acceptance": "FEED у header; однорядкова бігуча строка; тонкий custom scroll rail; rev++",
+      "deps": "docs/vision UX",
+      "id": "PH-S544",
+      "open": false,
+      "row": 479,
+      "status": "closed",
+      "title": "Vision feed ticker header marquee"
     }
   ],
   "sprint_queue_open_count": 0,

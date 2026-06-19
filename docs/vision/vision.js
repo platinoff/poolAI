@@ -3006,8 +3006,18 @@
       }
     });
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    bar.classList.toggle("rss-ticker-manual", reduced);
     if (reduced) {
       track.innerHTML = chunk;
+      bar.style.removeProperty("--rss-ticker-duration");
+    } else {
+      const halfWidth = track.scrollWidth / 2;
+      const pxPerSec = 42;
+      const durationSec = Math.max(24, Math.min(120, halfWidth / pxPerSec));
+      bar.style.setProperty("--rss-ticker-duration", durationSec + "s");
+      track.style.animation = "none";
+      void track.offsetWidth;
+      track.style.animation = "";
     }
   }
 
