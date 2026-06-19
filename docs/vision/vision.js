@@ -25,13 +25,26 @@
   let mapView = { tx: 0, ty: 0, scale: 1 };
   const MAP_ORBIT_DEFAULT = { rotX: 48, rotY: -28, rotZ: -8 };
   const MAP_ORBIT_STEP_DEG = 2;
+  /** Approx. browser key-repeat when holding WASD (keydown ~33 Hz). */
+  const MAP_ORBIT_KEY_REPEAT_HZ = 33;
+  /** Auto-orbit: 10% slower than held WASD (PH-S579). */
+  const MAP_ORBIT_AUTO_SPEED_FACTOR = 0.9;
+  const MAP_ORBIT_AUTO_DEG_PER_SEC =
+    MAP_ORBIT_STEP_DEG * MAP_ORBIT_KEY_REPEAT_HZ * MAP_ORBIT_AUTO_SPEED_FACTOR;
+  const MAP_FIT_PADDING = 36;
   const MAP_ORBIT_PAD_SENS = 0.08;
   const MAP_ORBIT_CLAMP_X = 72;
   const MAP_LAYER_Z_STEP = 52;
   const MAP_3D_FOCAL = 880;
   const MAP_PREFS_ORBIT_KEY = "mapOrbit";
+  const MAP_PREFS_ORBIT_AUTO_KEY = "mapOrbitAuto";
   let mapOrbit = { rotX: MAP_ORBIT_DEFAULT.rotX, rotY: MAP_ORBIT_DEFAULT.rotY, rotZ: MAP_ORBIT_DEFAULT.rotZ };
   let mapOrbitBound = false;
+  let mapOrbitAutoPlay = true;
+  let mapOrbitAutoRaf = 0;
+  let mapOrbitAutoLastTs = 0;
+  let mapOrbitAutoTicking = false;
+  let mapInitialFitDone = false;
   /** Projected screen coords after layer Z + orbit (PH-S556). */
   let map3DProjected = new Map();
   const mapViewStack = [];
@@ -84,8 +97,8 @@
 
   const WATCH_INTERVAL_MS = 1500;
   const WATCH_INTERVAL_ECO_MS = 4000;
-  const STAR_COUNT_FX = 48;
-  const STAR_FRAME_MS = 50;
+  const STAR_COUNT_FX = 42;
+  const STAR_FRAME_MS = 56;
   const VISION_MODES = ["eco", "fx", "ms"];
   const MAP_PREFS_MODE_KEY = "visionMode";
   const MAP_PREFS_MODE_PIN_KEY = "visionModePinned";
@@ -232,6 +245,9 @@
         if (typeof o.rotZ === "number") mapOrbit.rotZ = o.rotZ;
         clampMapOrbit();
       }
+      if (typeof p[MAP_PREFS_ORBIT_AUTO_KEY] === "boolean") {
+        mapOrbitAutoPlay = p[MAP_PREFS_ORBIT_AUTO_KEY];
+      }
     } catch (_) {
       /* ignore */
     }
@@ -251,6 +267,7 @@
           [MAP_PREFS_ECO_KEY]: visionMode === "eco",
           [MAP_PREFS_ECO_PIN_KEY]: visionModePinned,
           [MAP_PREFS_ORBIT_KEY]: mapOrbit,
+          [MAP_PREFS_ORBIT_AUTO_KEY]: mapOrbitAutoPlay,
         })
       );
     } catch (_) {
@@ -1053,6 +1070,7 @@
 
   function applyVisionMode() {
     document.body.classList.toggle("vision-eco", isVisionEco());
+    document.body.classList.toggle("vision-fx", visionMode === "fx");
     document.body.classList.toggle("vision-ms", isVisionMs());
     document.body.classList.toggle("vision-reduced-motion", prefersReducedMotion());
     const svg = document.getElementById("map-svg");
@@ -1188,10 +1206,132 @@
     return true;
   }
 
-  function resetMapView() {
-    mapView = { tx: 0, ty: 0, scale: 1 };
-    resetMapOrbit();
+  function computeMapProjectedBounds() {
+    if (!manifest) return null;
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+    let count = 0;
+    manifest.nodes.forEach((n) => {
+      const base = nodePositions.get(n.id);
+      if (!base || base.collapsedHidden) return;
+      const proj = rotateProject3D(
+        base.x,
+        base.y,
+        layerZDepth(n.layer),
+        mapOrbit.rotX,
+        mapOrbit.rotY,
+        mapOrbit.rotZ
+      );
+      const r =
+        nodeRenderRadius(n, base) * Math.max(0.62, Math.min(1.15, proj.scale));
+      const pad = r + 10;
+      minX = Math.min(minX, proj.x - pad);
+      minY = Math.min(minY, proj.y - pad);
+      maxX = Math.max(maxX, proj.x + pad);
+      maxY = Math.max(maxY, proj.y + pad);
+      count++;
+    });
+    if (!count || !Number.isFinite(minX)) return null;
+    return { minX, minY, maxX, maxY, count };
+  }
+
+  function fitMapToContent(opts) {
+    const padding =
+      opts && opts.padding != null ? opts.padding : MAP_FIT_PADDING;
+    const bounds = computeMapProjectedBounds();
+    if (!bounds) return;
+    const contentW = bounds.maxX - bounds.minX + padding * 2;
+    const contentH = bounds.maxY - bounds.minY + padding * 2;
+    if (contentW <= 0 || contentH <= 0) return;
+    const scale = Math.min(
+      MAP_MAX_SCALE,
+      Math.max(MAP_MIN_SCALE, Math.min(MAP_W / contentW, MAP_H / contentH))
+    );
+    const cx = (bounds.minX + bounds.maxX) / 2;
+    const cy = (bounds.minY + bounds.maxY) / 2;
+    if (opts && opts.pushHistory) pushMapViewState();
+    mapView.scale = scale;
+    mapView.tx = MAP_W / 2 - cx * scale;
+    mapView.ty = MAP_H / 2 - cy * scale;
     applyMapTransform();
+  }
+
+  function resetMapView() {
+    resetMapOrbit();
+    fitMapToContent();
+  }
+
+  function syncMapOrbitAutoBtn() {
+    const btn = document.getElementById("map-orbit-auto");
+    if (!btn) return;
+    btn.classList.toggle("on", mapOrbitAutoPlay);
+    btn.textContent = mapOrbitAutoPlay ? "⏸" : "▶";
+    btn.title = mapOrbitAutoPlay
+      ? "Pause auto-orbit (90% WASD speed)"
+      : "Play auto-orbit (90% WASD speed)";
+    btn.setAttribute(
+      "aria-label",
+      mapOrbitAutoPlay ? "Pause auto-orbit" : "Play auto-orbit"
+    );
+    btn.setAttribute("aria-pressed", mapOrbitAutoPlay ? "true" : "false");
+  }
+
+  function stopMapOrbitAutoLoop() {
+    if (mapOrbitAutoRaf) {
+      cancelAnimationFrame(mapOrbitAutoRaf);
+      mapOrbitAutoRaf = 0;
+    }
+    mapOrbitAutoLastTs = 0;
+    mapOrbitAutoTicking = false;
+  }
+
+  function pauseMapOrbitAuto() {
+    mapOrbitAutoPlay = false;
+    stopMapOrbitAutoLoop();
+    syncMapOrbitAutoBtn();
+    saveMapPrefs();
+  }
+
+  function startMapOrbitAuto() {
+    if (prefersReducedMotion()) return;
+    mapOrbitAutoPlay = true;
+    syncMapOrbitAutoBtn();
+    saveMapPrefs();
+    if (mapOrbitAutoRaf || !manifest) return;
+    function tick(ts) {
+      if (!mapOrbitAutoPlay) {
+        stopMapOrbitAutoLoop();
+        return;
+      }
+      if (document.hidden) {
+        mapOrbitAutoLastTs = 0;
+        mapOrbitAutoRaf = requestAnimationFrame(tick);
+        return;
+      }
+      if (!mapOrbitAutoLastTs) mapOrbitAutoLastTs = ts;
+      const dt = Math.min(0.1, (ts - mapOrbitAutoLastTs) / 1000);
+      mapOrbitAutoLastTs = ts;
+      mapOrbitAutoTicking = true;
+      mapOrbit.rotY += MAP_ORBIT_AUTO_DEG_PER_SEC * dt;
+      clampMapOrbit();
+      applyMapOrbitTransform();
+      fitMapToContent();
+      mapOrbitAutoTicking = false;
+      mapOrbitAutoRaf = requestAnimationFrame(tick);
+    }
+    mapOrbitAutoRaf = requestAnimationFrame(tick);
+  }
+
+  function toggleMapOrbitAuto() {
+    if (mapOrbitAutoPlay) pauseMapOrbitAuto();
+    else startMapOrbitAuto();
+  }
+
+  function ensureMapOrbitAutoAfterFit() {
+    if (!mapInitialFitDone) return;
+    if (mapOrbitAutoPlay && !prefersReducedMotion()) startMapOrbitAuto();
   }
 
   function mapOrbitTransformString() {
@@ -1242,6 +1382,7 @@
   }
 
   function adjustMapOrbit(dRotX, dRotY) {
+    if (!mapOrbitAutoTicking) pauseMapOrbitAuto();
     mapOrbit.rotX += dRotX;
     mapOrbit.rotY += dRotY;
     clampMapOrbit();
@@ -1489,6 +1630,7 @@
 
   function focusMapNode(node, opts) {
     const pushHistory = !opts || opts.pushHistory !== false;
+    pauseMapOrbitAuto();
     const pos = mapPosForNode(node.id);
     if (!pos) return;
     if (pushHistory) pushMapViewState();
@@ -1682,6 +1824,7 @@
       (ev) => {
         if (!ev.target.closest("#map-svg")) return;
         ev.preventDefault();
+        pauseMapOrbitAuto();
         const rect = svg.getBoundingClientRect();
         const sx = ((ev.clientX - rect.left) / rect.width) * MAP_W;
         const sy = ((ev.clientY - rect.top) / rect.height) * MAP_H;
@@ -1704,6 +1847,7 @@
         return;
       }
       dragging = true;
+      pauseMapOrbitAuto();
       lastX = ev.clientX;
       lastY = ev.clientY;
       wrap.classList.add("map-panning");
@@ -1730,12 +1874,14 @@
     if (zi) {
       zi.addEventListener("click", (ev) => {
         ev.stopPropagation();
+        pauseMapOrbitAuto();
         zoomMapAt(MAP_W / 2, MAP_H / 2, 1.16);
       });
     }
     if (zo) {
       zo.addEventListener("click", (ev) => {
         ev.stopPropagation();
+        pauseMapOrbitAuto();
         zoomMapAt(MAP_W / 2, MAP_H / 2, 1 / 1.16);
       });
     }
@@ -1745,6 +1891,14 @@
         mapViewStack.length = 0;
         syncMapZoomBackBtn();
         resetMapView();
+        if (!prefersReducedMotion()) startMapOrbitAuto();
+      });
+    }
+    const za = document.getElementById("map-orbit-auto");
+    if (za) {
+      za.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        toggleMapOrbitAuto();
       });
     }
     const zb = document.getElementById("map-zoom-back");
@@ -3074,6 +3228,11 @@
     renderMinimap();
     updateMapSelection();
     updateMapLayerFocus();
+    if (!mapInitialFitDone) {
+      mapInitialFitDone = true;
+      fitMapToContent();
+      ensureMapOrbitAutoAfterFit();
+    }
   }
 
   function syncMapSelectionCallout() {
@@ -3739,7 +3898,12 @@
       manifest && manifest.galaxy_background
         ? String(manifest.galaxy_background)
         : "";
-    return fromManifest || "vision2.png";
+    return fromManifest || "vision2.webp";
+  }
+
+  function galaxyBackgroundFallbackFile(file) {
+    if (/\.webp$/i.test(file)) return file.replace(/\.webp$/i, ".png");
+    return "";
   }
 
   function galaxyImageUrl() {
@@ -3761,7 +3925,18 @@
       img.alt = "";
       img.onerror = () => {
         if (img.dataset.fallbackTried) return;
-        img.dataset.fallbackTried = "1";
+        const fallback = galaxyBackgroundFallbackFile(file);
+        if (fallback) {
+          img.dataset.fallbackTried = "1";
+          const fbUrl =
+            location.protocol === "file:"
+              ? new URL("../../" + fallback, location.href).href
+              : (location.origin || "http://127.0.0.1:8765") +
+                "/" +
+                fallback.replace(/^\//, "");
+          img.src = fbUrl;
+          return;
+        }
         console.warn(
           "[vision] Galaxy background not found:",
           file,
@@ -4132,6 +4307,10 @@
   initSidebarOverlayBackdrop();
   loadMapPrefs();
   syncMapZoomBackBtn();
+  syncMapOrbitAutoBtn();
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    mapOrbitAutoPlay = false;
+  }
   if (
     window.matchMedia("(prefers-reduced-motion: reduce)").matches &&
     !visionModePinned
@@ -4143,6 +4322,7 @@
     if (!visionModePinned && reducedMotionMq.matches) {
       visionMode = "eco";
     }
+    if (reducedMotionMq.matches) pauseMapOrbitAuto();
     applyVisionMode();
     if (manifest) renderMap();
   });

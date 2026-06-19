@@ -376,6 +376,21 @@ button.btn-eco.ms {
   color: #7ee8b8;
 }
 
+/* FX — full glow + starfield; tuned for dense map (PH-S579) */
+body.vision-fx {
+  --galaxy-bg-opacity: 0.17;
+}
+
+body.vision-fx #map-svg .edge.constellation-pipe {
+  animation-duration: 1.55s;
+  filter: drop-shadow(0 0 5px rgba(126, 184, 255, 0.45));
+}
+
+body.vision-fx #map-svg .node:hover circle,
+body.vision-fx #map-svg .node.selected circle {
+  filter: url(#nodeGlow);
+}
+
 /* Eco / Ms — lower GPU: no blur, no starfield rAF, no SVG glow/edge animation */
 body.vision-eco #starfield,
 body.vision-ms #starfield {
@@ -1610,6 +1625,16 @@ body.vision-ms #map-svg .edge {
   flex-wrap: nowrap;
   gap: 4px;
   align-items: center;
+}
+
+.map-controls button.on {
+  border-color: rgba(126, 184, 255, 0.65);
+  color: var(--accent);
+  background: rgba(30, 48, 72, 0.9);
+}
+
+.map-controls button#map-orbit-auto {
+  font-size: 0.72rem;
 }
 
 .map-controls button {

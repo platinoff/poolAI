@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-19 (PH-S534…S543 ✅ · vision **rev 243** · **0** відкритих · rust_ratio **94.63%**)
+**Оновлено:** 2026-06-19 (PH-S589 ✅ · vision **rev 258** · **0** відкритих · rust_ratio **94.70%**)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -778,8 +778,19 @@ FM-xxx (з таблиці нижче)
 | 511 | **PH-S576** | Protocol sunset env gate | Galaxy §9.6 | `POOLAI_PROTOCOL_SUNSET_MIN` → HTTP 426 on register-remote | **✅** |
 | 512 | **PH-S577** | Horizon close band S568–S576 | §5.12 fallback | `galaxy_horizon_s568_integration` + loc-audit + vision-sync | **✅** |
 | 513 | **PH-S578** | Vision fullscreen PiP above header | docs/vision UX | `.panel-fullscreen` `inset:0` + workspace z-index above header; Explorer overlay `top:0`; rev++ | **✅** |
+| 514 | **PH-S579** | Galaxy map fit-all zoom + auto-orbit + WebP bg | docs/vision UX | default/⌂ fit-all; ▶/⏸ orbit 90% WASD + auto zoom; `vision2.webp`; FX tune; rev **257** | **✅** |
+| 515 | **PH-S580** | `hot_tier_hit_ratio` Prometheus gauge | Galaxy §5.2 | `galaxy_hot_tier_hit_ratio` on rank path; unit test; `/metrics` export | **✅** |
+| 516 | **PH-S581** | Hot-tier metric stand smoke | stand smoke | `poolai-http-stand-smoke` case `galaxy_hot_tier_hit_ratio_metrics` | **✅** |
+| 517 | **PH-S582** | Admin network-profiles panel | Galaxy §8.1 | `/ui/admin/network-profiles` + list/per-peer GET; admin smoke | **✅** |
+| 518 | **PH-S583** | heartbeat-remote `network_profile` persist | Galaxy §8.1 | optional `metadata.network_profile` on heartbeat → persist; integration test | **✅** |
+| 519 | **PH-S584** | Admin seed-inventory panel | Galaxy §5.5 | `/ui/admin/seed-inventory` read-only; admin smoke | **✅** |
+| 520 | **PH-S585** | Vision auto-orbit / fit-all Playwright | docs/vision UX | `vision.spec.ts` ▶/⏸ + ⌂ fit-all smoke (PH-S579) | **✅** |
+| 521 | **PH-S586** | Security advisories list + admin UI | Galaxy §9.6 | `GET /admin/security-advisories` stub + `/ui/admin/security-advisories` | **✅** |
+| 522 | **PH-S587** | Updates-compat update policy readout | Galaxy §9.5 | `POOLAI_UPDATE_POLICY` + `POOLAI_RELEASE_MANIFEST_URL` on updates-compat page | **✅** |
+| 523 | **PH-S588** | Co-access prefetch HTTP integration | Roadmap §5.5 | grid ingest + `POOLAI_GALAXY_CO_ACCESS_GRAPH_JSON` → `galaxy_prefetch_co_access_total` | **✅** |
+| 524 | **PH-S589** | Horizon close band S580–S588 | §5.12 fallback | `galaxy_horizon_s580_integration` + loc-audit + vision-sync `--check` | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S578 ✅. Vision rev **252**. rust_ratio **94.69%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S589 ✅. Vision rev **258**. rust_ratio **94.70%**.
 
 **Наступна сесія:** **`абракадабра`** (project scan → drain) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 

@@ -84,11 +84,12 @@ impl DiscoveryService {
         ctx: &ApiContext,
         peer_id: &str,
         capabilities: Option<PeerCapabilities>,
+        metadata_patch: Option<HashMap<String, String>>,
     ) -> Result<(), DiscoveryAnnounceError> {
         let guard = ctx.discovery.read().await;
         let discovery = guard.as_ref().ok_or(DiscoveryAnnounceError::NotReady)?;
         discovery
-            .heartbeat_remote_peer(peer_id, capabilities)
+            .heartbeat_remote_peer(peer_id, capabilities, metadata_patch)
             .await
             .map_err(DiscoveryAnnounceError::Failed)
     }

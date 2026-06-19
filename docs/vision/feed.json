@@ -3,111 +3,111 @@
   "items": [
     {
       "category": "closed",
+      "id": "PH-S589",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_horizon_s580_integration` + loc-audit + vision-sync `--check",
+      "title": "Horizon close band S580–S588"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S588",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "grid ingest + `POOLAI_GALAXY_CO_ACCESS_GRAPH_JSON` → `galaxy_prefetch_co_access_total",
+      "title": "Co-access prefetch HTTP integration"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S587",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "POOLAI_UPDATE_POLICY` + `POOLAI_RELEASE_MANIFEST_URL` on updates-compat page",
+      "title": "Updates-compat update policy readout"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S586",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "GET /admin/security-advisories` stub + `/ui/admin/security-advisories",
+      "title": "Security advisories list + admin UI"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S585",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "vision.spec.ts` ▶/⏸ + ⌂ fit-all smoke (PH-S579)",
+      "title": "Vision auto-orbit / fit-all Playwright"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S584",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "/ui/admin/seed-inventory` read-only; admin smoke",
+      "title": "Admin seed-inventory panel"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S583",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "optional `metadata.network_profile` on heartbeat → persist; integration test",
+      "title": "heartbeat-remote `network_profile` persist"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S582",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "/ui/admin/network-profiles` + list/per-peer GET; admin smoke",
+      "title": "Admin network-profiles panel"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S581",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "poolai-http-stand-smoke` case `galaxy_hot_tier_hit_ratio_metrics",
+      "title": "Hot-tier metric stand smoke"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S580",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_hot_tier_hit_ratio` on rank path; unit test; `/metrics` export",
+      "title": "hot_tier_hit_ratio` Prometheus gauge"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S579",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "default/⌂ fit-all; ▶/⏸ orbit 90% WASD + auto zoom; `vision2.webp`; FX tune; rev 257",
+      "title": "Galaxy map fit-all zoom + auto-orbit + WebP bg"
+    },
+    {
+      "category": "closed",
       "id": "PH-S578",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
       "summary": ".panel-fullscreen` `inset:0` + workspace z-index above header; Explorer overlay `top:0`; rev++",
       "title": "Vision fullscreen PiP above header"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S577",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_horizon_s568_integration` + loc-audit + vision-sync",
-      "title": "Horizon close band S568–S576"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S576",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "POOLAI_PROTOCOL_SUNSET_MIN` → HTTP 426 on register-remote",
-      "title": "Protocol sunset env gate"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S575",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "table_export_buttons_html` + `exportFilenameFromAria` wasm; slim JS",
-      "title": "Admin table toolbar → wasm"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S574",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "wiremock seed-inventory HTTP → `galaxy_prefetch_peer_fetch_total",
-      "title": "Peer HTTP prefetch integration"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S573",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "POST /admin/security-advisories/{id}/acknowledge` + metric",
-      "title": "Security advisory acknowledge wire"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S572",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "tee_attestation` field + `POOLAI_TEE_ATTEST_REQUIRED` gate",
-      "title": "TEE attestation on capability doc"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S571",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "POOLAI_GALAXY_FRAUD_PROOF=1` → hold + `galaxy_fraud_proof_pending_total",
-      "title": "Fraud-proof horizon stub"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S570",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "list persisted peer ids; integration round-trip",
-      "title": "GET /api/v1/grid/network-profiles` list"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S569",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_verification_checker_timeout_*` in prometheus + stand smoke",
-      "title": "Checker-timeout `/metrics` export"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S568",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "POOLAI_SETTLEMENT_ON_CHAIN=1` → mock RPC ack on Cleared NDJSON; unit test",
-      "title": "On-chain Cleared → mock RPC submit"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S567",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_horizon_s558_integration` + loc-audit + vision-sync",
-      "title": "Horizon close band S558–S566"
     }
   ],
   "link": "docs/vision/index.html",

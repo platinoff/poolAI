@@ -634,6 +634,7 @@ impl DiscoveryService {
         &self,
         peer_id: &str,
         capabilities: Option<PeerCapabilities>,
+        metadata_patch: Option<std::collections::HashMap<String, String>>,
     ) -> Result<(), AppError> {
         let mut peers = self.peers.write().await;
         let peer = peers.get_mut(peer_id).ok_or_else(|| {
@@ -642,6 +643,15 @@ impl DiscoveryService {
         peer.last_seen = Utc::now();
         if let Some(cap) = capabilities {
             peer.capabilities = cap;
+        }
+        if let Some(patch) = metadata_patch {
+            if let Some(np_json) = patch.get("network_profile") {
+                peer.metadata
+                    .insert("network_profile".to_string(), np_json.clone());
+                let _ = crate::grid::galaxy_network_profile_store::persist_peer_network_profile(
+                    peer_id, np_json,
+                );
+            }
         }
         if let Some(np_json) = peer.metadata.get("network_profile").cloned() {
             if let Ok(updated) =
@@ -826,8 +836,9 @@ impl crate::core::discovery_handle::DiscoveryHandle for DiscoveryService {
         &self,
         peer_id: &str,
         capabilities: Option<PeerCapabilities>,
+        metadata_patch: Option<std::collections::HashMap<String, String>>,
     ) -> Result<(), AppError> {
-        DiscoveryService::heartbeat_remote_peer(self, peer_id, capabilities).await
+        DiscoveryService::heartbeat_remote_peer(self, peer_id, capabilities, metadata_patch).await
     }
 }
 
@@ -861,7 +872,7 @@ mod tests {
         service.register_remote_peer(peer).await.unwrap();
         tokio::time::sleep(std::time::Duration::from_millis(20)).await;
         service
-            .heartbeat_remote_peer("tg-worker-hb", None)
+            .heartbeat_remote_peer("tg-worker-hb", None, None)
             .await
             .unwrap();
         let updated = service.get_peer("tg-worker-hb").await.expect("peer");

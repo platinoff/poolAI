@@ -734,6 +734,9 @@ async fn smoke_galaxy_governance_metrics(client: &Client, base: &str) -> Result<
 /// PH-S250: live stand exposes Galaxy shard local hit ratio gauge.
 const GALAXY_SHARD_LOCAL_HIT_RATIO: &str = "galaxy_shard_local_hit_ratio";
 
+/// PH-S581: live stand exposes Galaxy hot tier hit ratio gauge.
+const GALAXY_HOT_TIER_HIT_RATIO: &str = "galaxy_hot_tier_hit_ratio";
+
 fn metrics_text_has_shard_local_hit_ratio(body: &str) -> Result<(), String> {
     let name = GALAXY_SHARD_LOCAL_HIT_RATIO;
     if !body.contains(name) {
@@ -759,6 +762,33 @@ async fn smoke_galaxy_shard_local_hit_ratio_metrics(
     }
     let body = resp.text().await.map_err(|e| e.to_string())?;
     metrics_text_has_shard_local_hit_ratio(&body)
+}
+
+fn metrics_text_has_hot_tier_hit_ratio(body: &str) -> Result<(), String> {
+    let name = GALAXY_HOT_TIER_HIT_RATIO;
+    if !body.contains(name) {
+        return Err(format!("/metrics missing {name}"));
+    }
+    if !body.contains(&format!("# TYPE {name} gauge")) {
+        return Err(format!("/metrics missing TYPE gauge for {name}"));
+    }
+    Ok(())
+}
+
+async fn smoke_galaxy_hot_tier_hit_ratio_metrics(
+    client: &Client,
+    base: &str,
+) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("/metrics request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("/metrics status {}", resp.status()));
+    }
+    let body = resp.text().await.map_err(|e| e.to_string())?;
+    metrics_text_has_hot_tier_hit_ratio(&body)
 }
 
 /// PH-S225: live stand exposes Galaxy verification counters on Prometheus scrape.
@@ -2007,6 +2037,12 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
     .await;
     record(
         &mut cases,
+        "galaxy_hot_tier_hit_ratio_metrics",
+        smoke_galaxy_hot_tier_hit_ratio_metrics(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
         "jobs_migrating",
         smoke_jobs_migrating(&client, &cli.base_url).await,
     )
@@ -2378,6 +2414,16 @@ mod tests {
             "galaxy_shard_local_hit_ratio 0\n",
         );
         metrics_text_has_shard_local_hit_ratio(sample).expect("sample export");
+    }
+
+    #[test]
+    fn galaxy_hot_tier_hit_ratio_metrics_export_shape_ph_s581() {
+        let sample = concat!(
+            "# HELP galaxy_hot_tier_hit_ratio Galaxy last observed top-ranked hot tier hit ratio basis points 0-10000 (PH-S580)\n",
+            "# TYPE galaxy_hot_tier_hit_ratio gauge\n",
+            "galaxy_hot_tier_hit_ratio 0\n",
+        );
+        metrics_text_has_hot_tier_hit_ratio(sample).expect("sample export");
     }
 
     #[test]

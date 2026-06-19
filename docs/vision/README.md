@@ -77,7 +77,8 @@ http://127.0.0.1:8765/docs/vision/index.html
 - **Колесо миші** — zoom у межах SVG (не масштаб сторінки браузера).
 - **Drag** по порожньому фону карти — pan.
 - **Подвійний клік** на вузол — focus/zoom на об’єкт.
-- Кнопки **+ / − / ⌂** — zoom in/out/reset.
+- Кнопки **+ / − / ⌂** — zoom in/out; **⌂** = fit all + resume auto-orbit.
+- **▶ / ⏸** — auto-orbit (90% WASD) з auto fit-all zoom (PH-S579).
 - Ребра: **зелений** docs, **рожевий** code, **бірюзовий** toml, **фіолетовий** mixed — ортогональний маршрут через «folder hub».
 - **Щільні шари (L3+):** вузли групуються за папкою (`src/grid/`, `src/job/`, …) у міні-сітку 2–3 ряди, а не в одну лінію.
 
@@ -98,7 +99,9 @@ http://127.0.0.1:8765/docs/vision/index.html
 | **Layers (3D stack)** | клік по шару L0–L5 — фокус tier у stack/legend (PH-S188: окремо від map filters); повторний клік або Esc — скинути stack focus |
 | **Вузол на map** | клік — повна назва у callout; pipeline-ребра до hub-файлів (`galaxy_grid`, `fm`, …) як сузір’я |
 | **Constellation layout** | файли в дузі/спіралі (не ряд); криві ребра між зірками |
-| **Galaxy wallpaper** | `vision2.png` у корені репо (`manifest.galaxy_background`, 15% opacity). **Не** `PoolAIGalaxy.png` — це схема шарів |
+| **Galaxy wallpaper** | `vision2.webp` у корені репо (`manifest.galaxy_background`, 15–17% opacity; PNG fallback). **Не** `PoolAIGalaxy.png` — це схема шарів |
+| **Fit-all zoom** | дефолт і **⌂** — zoom щоб усі вузли вміщались; auto-orbit підтримує fit (PH-S579) |
+| **Auto-orbit** | **▶/⏸** біля zoom — обертання Y на 90% швидкості held WASD; пауза при pan/zoom/WASD |
 | Кластер + сітка | ≤4 файли на шар — ряд; більше — сітка 2–3 колонки |
 | pan/zoom | навігація по великій карті |
 

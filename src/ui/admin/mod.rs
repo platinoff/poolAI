@@ -42,9 +42,12 @@ pub mod instances;
 pub mod jobs;
 pub mod libs;
 pub mod monitoring;
+pub mod network_profiles;
 pub mod payout_batch;
 pub mod raid;
 pub mod security;
+pub mod security_advisories;
+pub mod seed_inventory;
 pub mod telegram_seats;
 pub mod tenants;
 pub mod topology;
@@ -75,6 +78,18 @@ pub fn create_admin_routes() -> Router<ApiContext> {
         .route(
             "/admin/telegram-seats",
             get(telegram_seats::admin_telegram_seats),
+        )
+        .route(
+            "/admin/network-profiles",
+            get(network_profiles::admin_network_profiles),
+        )
+        .route(
+            "/admin/seed-inventory",
+            get(seed_inventory::admin_seed_inventory),
+        )
+        .route(
+            "/admin/security-advisories",
+            get(security_advisories::admin_security_advisories),
         )
         .route(
             "/admin/updates-compat",
@@ -468,6 +483,9 @@ pub fn admin_layout_with_module_script(
         <a href="/ui/admin/grid-pricing" class="admin-nav-item" data-i18n="admin.nav.gridPricing">Grid pricing</a>
         <a href="/ui/admin/grid-verification" class="admin-nav-item" data-i18n="admin.nav.gridVerification">Grid verify</a>
         <a href="/ui/admin/telegram-seats" class="admin-nav-item" data-i18n="admin.nav.telegramSeats">Telegram seats</a>
+        <a href="/ui/admin/network-profiles" class="admin-nav-item" data-i18n="admin.nav.networkProfiles">Network profiles</a>
+        <a href="/ui/admin/seed-inventory" class="admin-nav-item" data-i18n="admin.nav.seedInventory">Seed inventory</a>
+        <a href="/ui/admin/security-advisories" class="admin-nav-item" data-i18n="admin.nav.securityAdvisories">Advisories</a>
         <a href="/ui/admin/updates-compat" class="admin-nav-item" data-i18n="admin.nav.updatesCompat">Updates</a>
         <a href="/ui/admin/libs" class="admin-nav-item" data-i18n="admin.nav.libs">Libraries</a>
         <a href="/ui/admin/raid" class="admin-nav-item" data-i18n="admin.nav.raid">RAID</a>

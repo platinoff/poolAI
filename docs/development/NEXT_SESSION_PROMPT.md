@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-19 (PH-S578 ✅ · vision **rev 252** · **0** відкритих · rust_ratio **94.69%**)
+**Оновлено:** 2026-06-19 (PH-S589 ✅ · vision **rev 258** · **0** відкритих · rust_ratio **94.70%**)
 
 | **← наступний** | **`абракадабра`** (project scan + drain) |
 | **Відкритих** | **0** |
@@ -17,8 +17,8 @@
 
 ---
 
-## Закрито (PH-S578)
+## Закрито (PH-S589)
 
-PH-S578 ✅ — Vision fullscreen PiP: панелі Map/Layers/Queue/Links/Preview у fullscreen поверх header (`inset:0`, z-index workspace 29, backdrop); Explorer overlay `top:0` у fs mode.
+PH-S589 ✅ — horizon close band S580–S588: hot-tier gauge, network/seed admin panels, heartbeat profile persist, advisories API/UI, co-access integration, vision orbit e2e.
 
-**rust_ratio:** **94.69%** · **BLOCKED:** FM-003 LAN · FM-041 Cloud SDK.
+**rust_ratio:** **94.70%** · **BLOCKED:** FM-003 LAN · FM-041 Cloud SDK.

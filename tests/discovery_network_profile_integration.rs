@@ -218,3 +218,63 @@ async fn register_remote_invalid_network_profile_returns_validation_error() {
         "expected network_profile validation message: {v:?}"
     );
 }
+
+#[tokio::test]
+async fn heartbeat_remote_persists_metadata_network_profile_ph_s583() {
+    let app = app_with_discovery().await;
+
+    let register = Request::builder()
+        .method("POST")
+        .uri("/api/v1/discovery/register-remote")
+        .header("content-type", "application/json")
+        .body(Body::from(
+            r#"{
+                "peer_id": "np-hb-patch-worker",
+                "address": "192.168.4.30",
+                "port": 9096,
+                "metadata": { "role": "virtual_node" }
+            }"#,
+        ))
+        .unwrap();
+    assert_eq!(
+        app.clone().oneshot(register).await.unwrap().status(),
+        StatusCode::OK
+    );
+
+    let heartbeat = Request::builder()
+        .method("POST")
+        .uri("/api/v1/discovery/heartbeat-remote")
+        .header("content-type", "application/json")
+        .body(Body::from(
+            r#"{
+                "peer_id": "np-hb-patch-worker",
+                "metadata": {
+                    "network_profile": {
+                        "region": "eu-central",
+                        "latency_ms_p50": 35,
+                        "egress_policy": "vpn_proxy"
+                    }
+                }
+            }"#,
+        ))
+        .unwrap();
+    assert_eq!(
+        app.clone().oneshot(heartbeat).await.unwrap().status(),
+        StatusCode::OK
+    );
+
+    let peer_req = Request::builder()
+        .uri("/api/v1/discovery/peers/np-hb-patch-worker")
+        .body(Body::empty())
+        .unwrap();
+    let peer_resp = app.oneshot(peer_req).await.unwrap();
+    let peer_body = to_bytes(peer_resp.into_body(), usize::MAX).await.unwrap();
+    let peer: Value = serde_json::from_slice(&peer_body).unwrap();
+    let stored = peer["peer"]["metadata"]["network_profile"]
+        .as_str()
+        .expect("network_profile persisted from heartbeat metadata");
+    let parsed: Value = serde_json::from_str(stored).unwrap();
+    assert_eq!(parsed["region"], "eu-central");
+    assert_eq!(parsed["latency_ms_p50"], 35);
+    assert_eq!(parsed["egress_policy"], "vpn_proxy");
+}

@@ -110,10 +110,11 @@
               <div class="map-controls" aria-label="Map zoom">
                 <button type="button" id="map-zoom-in" title="Zoom in">+</button>
                 <button type="button" id="map-zoom-out" title="Zoom out">−</button>
-                <button type="button" id="map-zoom-reset" title="Reset view">⌂</button>
+                <button type="button" id="map-orbit-auto" class="on" title="Pause auto-orbit (90% WASD speed)" aria-pressed="true" aria-label="Pause auto-orbit">⏸</button>
+                <button type="button" id="map-zoom-reset" title="Reset view — fit all nodes, resume auto-orbit">⌂</button>
                 <button type="button" id="map-zoom-back" title="Back to previous view" disabled aria-label="Back to previous view">←</button>
               </div>
-              <span class="map-hint">W↑ S↓ A← D→ orbit · drag pad · Tab focus · ←→↑↓ · Eco→FX→Ms · ⌂ reset</span>
+              <span class="map-hint">▶/⏸ orbit · W↑ S↓ A← D→ · drag pad · Tab · Eco→FX→Ms · ⌂ fit all</span>
             </div>
             <p id="map-selection-live" class="map-selection-live" aria-live="polite" aria-atomic="true"></p>
             <aside class="map-minimap" id="map-minimap" aria-label="Map minimap — viewport inset and selection ring; click to pan">
@@ -139,6 +140,6 @@
       </section>
     </div>
   </div>
-  <script src="vision.js?v=79"></script>
+  <script src="vision.js?v=80"></script>
 </body>
 </html>

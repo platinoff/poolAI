@@ -2,6 +2,7 @@
 //! and scheduler ranking stub per `docs/concept/POOLAI_GALAXY_GRID.md` §5.1–5.2.
 //! Stale `network_profile` penalty stub (PH-S169, §8.1). No prefetch wire (PH-S129).
 //! Last observed `shard_local_hit_ratio` gauge on rank path (PH-S183).
+//! Last observed `hot_tier_hit_ratio` gauge on rank path (PH-S580).
 //! Last observed `cross_region_egress_mb` gauge on rank/prefetch path (PH-S185).
 
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -80,6 +81,9 @@ pub const DEFAULT_STALE_PROFILE_PENALTY: f64 = 0.05;
 /// Last observed shard local hit ratio in basis points 0..=10_000 (PH-S183 `/metrics` gauge).
 pub const METRIC_SHARD_LOCAL_HIT_RATIO: &str = "galaxy_shard_local_hit_ratio";
 
+/// Last observed hot tier hit ratio in basis points 0..=10_000 (PH-S580 `/metrics` gauge).
+pub const METRIC_HOT_TIER_HIT_RATIO: &str = "galaxy_hot_tier_hit_ratio";
+
 /// Last observed cross-region egress in whole MB (PH-S185 `/metrics` gauge).
 pub const METRIC_CROSS_REGION_EGRESS_MB: &str = "galaxy_cross_region_egress_mb";
 
@@ -103,6 +107,7 @@ pub const METRIC_NETWORK_PROFILE_STALE_TOTAL: &str = "galaxy_network_profile_sta
 pub const DEFAULT_PREFETCH_CROSS_REGION_EGRESS_MB_PER_SHARD: f64 = 50.0;
 
 static LAST_SHARD_LOCAL_HIT_RATIO_BPS: AtomicU64 = AtomicU64::new(0);
+static LAST_HOT_TIER_HIT_RATIO_BPS: AtomicU64 = AtomicU64::new(0);
 static LAST_CROSS_REGION_EGRESS_MB: AtomicU64 = AtomicU64::new(0);
 static LOCALITY_RANK_INGEST_TOTAL: AtomicU64 = AtomicU64::new(0);
 static LOCALITY_RANK_MISS_TOTAL: AtomicU64 = AtomicU64::new(0);
@@ -267,6 +272,7 @@ pub fn rank_workers_by_locality_with_weights(
                 &worker.seed_inventory.shard_ids,
                 &task.required_shard_ids,
             ));
+            observe_last_hot_tier_hit_ratio(hot_tier_hit_ratio(&worker.seed_inventory, task));
             observe_last_cross_region_egress_mb(effective_cross_region_egress_mb(worker, task));
         }
     }
@@ -307,6 +313,23 @@ pub fn last_shard_local_hit_ratio_bps() -> u64 {
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_last_shard_local_hit_ratio_for_test() {
     LAST_SHARD_LOCAL_HIT_RATIO_BPS.store(0, Ordering::Relaxed);
+}
+
+/// Observe last top-ranked worker hot tier hit ratio for Prometheus gauge (PH-S580).
+pub fn observe_last_hot_tier_hit_ratio(ratio: f64) {
+    let clamped = ratio.clamp(0.0, 1.0);
+    let bps = (clamped * 10_000.0).round() as u64;
+    LAST_HOT_TIER_HIT_RATIO_BPS.store(bps.min(10_000), Ordering::Relaxed);
+}
+
+/// Last observed hot tier hit ratio in basis points (10_000 = 1.0) since process start.
+pub fn last_hot_tier_hit_ratio_bps() -> u64 {
+    LAST_HOT_TIER_HIT_RATIO_BPS.load(Ordering::Relaxed)
+}
+
+#[cfg(any(test, feature = "test-utils"))]
+pub fn reset_last_hot_tier_hit_ratio_for_test() {
+    LAST_HOT_TIER_HIT_RATIO_BPS.store(0, Ordering::Relaxed);
 }
 
 /// Observe last cross-region egress MB for Prometheus gauge (PH-S185).
@@ -594,6 +617,17 @@ mod tests {
         let _ = rank_workers_by_locality(&[partial, full], &job);
         assert_eq!(last_shard_local_hit_ratio_bps(), 10_000);
         reset_last_shard_local_hit_ratio_for_test();
+    }
+
+    #[test]
+    fn rank_workers_by_locality_observes_top_hot_tier_hit_ratio_ph_s580() {
+        reset_last_hot_tier_hit_ratio_for_test();
+        let job = task(&["w:emb-1"], "inference:text", 0.0, None);
+        let mut hot = worker("hot", "eu-west", 20, &["w:emb-1"]);
+        hot.seed_inventory.hot_tier.profiles = vec!["inference:text".into()];
+        let _ = rank_workers_by_locality(&[hot], &job);
+        assert_eq!(last_hot_tier_hit_ratio_bps(), 10_000);
+        reset_last_hot_tier_hit_ratio_for_test();
     }
 
     #[test]

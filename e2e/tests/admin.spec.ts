@@ -316,6 +316,20 @@ test.describe("PoolAI admin E2E (S27–S34, PH-S23)", () => {
     });
   });
 
+  test("network profiles panel loads (PH-S582)", async ({ page }) => {
+    await gotoAdminReady(page, "/ui/admin/network-profiles", "#network-profiles-panel");
+    await expect(
+      page.locator("#network-profiles-panel .admin-table, #network-profiles-panel .muted, #network-profiles-panel .admin-fetch-error"),
+    ).toBeVisible({ timeout: 15_000 });
+  });
+
+  test("seed inventory panel loads (PH-S584)", async ({ page }) => {
+    await gotoAdminReady(page, "/ui/admin/seed-inventory", "#seed-inventory-panel");
+    await expect(
+      page.locator("#seed-inventory-panel .admin-table, #seed-inventory-panel .muted, #seed-inventory-panel .admin-fetch-error"),
+    ).toBeVisible({ timeout: 15_000 });
+  });
+
   test("vm page loads instances container", async ({ page }) => {
     await gotoAdminReady(page, "/ui/admin/vm", "#vm-instances");
     await expect(page.locator('[data-i18n="admin.vmadm.createBtn"]')).toBeVisible({

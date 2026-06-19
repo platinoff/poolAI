@@ -21,5 +21,6 @@ pub trait DiscoveryHandle: Send + Sync {
         &self,
         peer_id: &str,
         capabilities: Option<PeerCapabilities>,
+        metadata_patch: Option<std::collections::HashMap<String, String>>,
     ) -> Result<(), AppError>;
 }

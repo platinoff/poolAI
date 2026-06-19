@@ -31,4 +31,16 @@ test.describe("Vision solar layout (PH-S565)", () => {
     const focused = page.locator(":focus");
     await expect(focused).toBeVisible({ timeout: 10_000 });
   });
+
+  test("auto-orbit toggle and fit-all controls (PH-S585)", async ({ page }) => {
+    const orbitBtn = page.locator("#map-orbit-auto");
+    await expect(orbitBtn).toBeVisible({ timeout: 10_000 });
+    await expect(orbitBtn).toHaveAttribute("aria-pressed", /true|false/);
+    const resetBtn = page.locator("#map-zoom-reset");
+    await expect(resetBtn).toBeVisible();
+    await orbitBtn.click();
+    await expect(orbitBtn).toHaveAttribute("aria-pressed", /true|false/);
+    await resetBtn.click();
+    await expect(page.locator("#map-svg, .map-scene")).toBeVisible();
+  });
 });

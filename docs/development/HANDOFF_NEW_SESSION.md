@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-19 (PH-S578 ✅ · rust_ratio **94.69%**) · VDT
+**Оновлено:** 2026-06-19 (PH-S589 ✅ · vision **rev 258** · **0** відкритих · rust_ratio **94.70%**)
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -528,10 +528,22 @@
 **PH-S575 ✅ (code):** `table_export_buttons_html` + `exportFilenameFromAria` wasm; slim `admin_common.js`.
 **PH-S576 ✅ (code):** `POOLAI_PROTOCOL_SUNSET_MIN` → HTTP 426 on register-remote.
 **PH-S577 ✅ (ops):** `galaxy_horizon_s568_integration` close band; vision rev **250**.
-**PH-S578 ✅ (vision):** fullscreen panels PiP above header — `inset:0`, workspace z-index 29, dim backdrop; Explorer `top:0` in fs; `vision.css?v=76`; vision rev **252**.
+**PH-S579 ✅ (vision):** Galaxy map fit-all default zoom; ▶/⏸ auto-orbit (90% WASD) + auto fit; `vision2.webp`; FX tune (`body.vision-fx`); rev **257**.
+
+**PH-S580 ✅ (code):** `galaxy_hot_tier_hit_ratio` gauge on `rank_workers_by_locality` top worker; `/metrics` via `refresh_galaxy_locality_gauges`; unit tests.
+**PH-S581 ✅ (tests):** `poolai-http-stand-smoke` — `galaxy_hot_tier_hit_ratio_metrics` on live `/metrics`.
+**PH-S582 ✅ (ui):** `/ui/admin/network-profiles` — list + per-peer GET panels; admin smoke.
+**PH-S583 ✅ (code):** `heartbeat-remote` optional `metadata.network_profile` → persist; `discovery_network_profile_integration`.
+**PH-S584 ✅ (ui):** `/ui/admin/seed-inventory` read-only panel; admin smoke.
+**PH-S585 ✅ (e2e):** `e2e/tests/vision.spec.ts` — auto-orbit toggle + fit-all ⌂ smoke (PH-S579).
+**PH-S586 ✅ (code/ui):** `GET /api/v1/admin/security-advisories` stub list + `/ui/admin/security-advisories` acknowledge UI.
+**PH-S587 ✅ (ui):** `/ui/admin/updates-compat` — `POOLAI_UPDATE_POLICY` + `POOLAI_RELEASE_MANIFEST_URL` readout.
+**PH-S588 ✅ (tests):** grid ingest + `POOLAI_GALAXY_CO_ACCESS_GRAPH_JSON` → `galaxy_prefetch_co_access_total`.
+**PH-S589 ✅ (ops):** `galaxy_horizon_s580_integration` close band + loc-audit + vision-sync.
+
 **Rules ✅:** **`абракадабра`** — project scan **всього репо** (concept · FM §5.1 · roadmaps · architect · code) → 10 PH-S* у §5.12 (журнал) → drain → push; канон [`.cursor/rules/poolai-session-iteration.mdc`](../.cursor/rules/poolai-session-iteration.mdc) § «Тригер абракадабра»; commit **`git-commit-tree-msg.sh`**.
 **§5.12:** **0** відкритих — наступна сесія: **`абракадабра`** (project scan + drain).
-**Vision ✅:** rev **248** · rust_ratio **94.66%** · hold **95%** advisory.
+**Vision ✅:** rev **258** · rust_ratio **94.70%** · hold **95%** advisory.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

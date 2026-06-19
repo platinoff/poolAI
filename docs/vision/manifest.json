@@ -2014,9 +2014,9 @@
       "to": "src_grid_galaxy_security_advisory_rs"
     }
   ],
-  "galaxy_background": "vision2.png",
+  "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S578",
+  "last_sprint_closed": "PH-S589",
   "layers": [
     {
       "id": "L0",
@@ -8352,7 +8352,7 @@
       "path": "tests/galaxy_prefetch_peer_http_integration.rs"
     }
   ],
-  "revision": 252,
+  "revision": 258,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -12970,9 +12970,108 @@
       "row": 513,
       "status": "closed",
       "title": "Vision fullscreen PiP above header"
+    },
+    {
+      "acceptance": "default/⌂ fit-all; ▶/⏸ orbit 90% WASD + auto zoom; `vision2.webp`; FX tune; rev 257",
+      "deps": "docs/vision UX",
+      "id": "PH-S579",
+      "open": false,
+      "row": 514,
+      "status": "closed",
+      "title": "Galaxy map fit-all zoom + auto-orbit + WebP bg"
+    },
+    {
+      "acceptance": "galaxy_hot_tier_hit_ratio` on rank path; unit test; `/metrics` export",
+      "deps": "Galaxy §5.2",
+      "id": "PH-S580",
+      "open": false,
+      "row": 515,
+      "status": "closed",
+      "title": "hot_tier_hit_ratio` Prometheus gauge"
+    },
+    {
+      "acceptance": "poolai-http-stand-smoke` case `galaxy_hot_tier_hit_ratio_metrics",
+      "deps": "stand smoke",
+      "id": "PH-S581",
+      "open": false,
+      "row": 516,
+      "status": "closed",
+      "title": "Hot-tier metric stand smoke"
+    },
+    {
+      "acceptance": "/ui/admin/network-profiles` + list/per-peer GET; admin smoke",
+      "deps": "Galaxy §8.1",
+      "id": "PH-S582",
+      "open": false,
+      "row": 517,
+      "status": "closed",
+      "title": "Admin network-profiles panel"
+    },
+    {
+      "acceptance": "optional `metadata.network_profile` on heartbeat → persist; integration test",
+      "deps": "Galaxy §8.1",
+      "id": "PH-S583",
+      "open": false,
+      "row": 518,
+      "status": "closed",
+      "title": "heartbeat-remote `network_profile` persist"
+    },
+    {
+      "acceptance": "/ui/admin/seed-inventory` read-only; admin smoke",
+      "deps": "Galaxy §5.5",
+      "id": "PH-S584",
+      "open": false,
+      "row": 519,
+      "status": "closed",
+      "title": "Admin seed-inventory panel"
+    },
+    {
+      "acceptance": "vision.spec.ts` ▶/⏸ + ⌂ fit-all smoke (PH-S579)",
+      "deps": "docs/vision UX",
+      "id": "PH-S585",
+      "open": false,
+      "row": 520,
+      "status": "closed",
+      "title": "Vision auto-orbit / fit-all Playwright"
+    },
+    {
+      "acceptance": "GET /admin/security-advisories` stub + `/ui/admin/security-advisories",
+      "deps": "Galaxy §9.6",
+      "id": "PH-S586",
+      "open": false,
+      "row": 521,
+      "status": "closed",
+      "title": "Security advisories list + admin UI"
+    },
+    {
+      "acceptance": "POOLAI_UPDATE_POLICY` + `POOLAI_RELEASE_MANIFEST_URL` on updates-compat page",
+      "deps": "Galaxy §9.5",
+      "id": "PH-S587",
+      "open": false,
+      "row": 522,
+      "status": "closed",
+      "title": "Updates-compat update policy readout"
+    },
+    {
+      "acceptance": "grid ingest + `POOLAI_GALAXY_CO_ACCESS_GRAPH_JSON` → `galaxy_prefetch_co_access_total",
+      "deps": "Roadmap §5.5",
+      "id": "PH-S588",
+      "open": false,
+      "row": 523,
+      "status": "closed",
+      "title": "Co-access prefetch HTTP integration"
+    },
+    {
+      "acceptance": "galaxy_horizon_s580_integration` + loc-audit + vision-sync `--check",
+      "deps": "§5.12 fallback",
+      "id": "PH-S589",
+      "open": false,
+      "row": 524,
+      "status": "closed",
+      "title": "Horizon close band S580–S588"
     }
   ],
   "sprint_queue_open_count": 0,
-  "updated_at": "2026-06-17",
+  "updated_at": "2026-06-19",
   "vision_ui_rev": 59
 }

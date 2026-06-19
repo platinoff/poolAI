@@ -94,6 +94,8 @@ struct HeartbeatRemotePeerRequest {
     peer_id: String,
     #[serde(default)]
     capabilities: Option<PeerCapabilities>,
+    #[serde(default)]
+    metadata: HashMap<String, Value>,
 }
 
 #[derive(Serialize)]
@@ -429,7 +431,24 @@ async fn heartbeat_remote_handler(
             .into_response();
     }
     let peer_id = payload.peer_id.clone();
-    match DiscoveryService::heartbeat_remote_peer(&ctx, &peer_id, payload.capabilities).await {
+    let metadata_patch = if payload.metadata.is_empty() {
+        None
+    } else {
+        match normalize_register_metadata(payload.metadata) {
+            Ok(m) => Some(m),
+            Err(e) => {
+                return discovery_validation("heartbeat_remote", e.message).into_response();
+            }
+        }
+    };
+    match DiscoveryService::heartbeat_remote_peer(
+        &ctx,
+        &peer_id,
+        payload.capabilities,
+        metadata_patch,
+    )
+    .await
+    {
         Ok(()) => {
             on_heartbeat_success(&peer_id);
             (

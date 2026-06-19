@@ -1,6 +1,10 @@
 //! Galaxy Grid updates & compatibility admin page (PH-S93) — read-only ops pointers.
 //! PH-S221: updates-compat page uses slim `admin_layout_updates_compat` + `admin_updates_compat_patch`.
 
+use crate::grid::galaxy_update_policy::{
+    release_manifest_url_from_env, update_policy_from_env, UpdatePolicyMode,
+    ENV_RELEASE_MANIFEST_URL, ENV_UPDATE_POLICY,
+};
 use crate::grid::protocol_compat::{
     negotiate, CompatStatus, DEFAULT_COORDINATOR_PROTOCOL, MIN_COORDINATOR_VERSION_DOCS_URL,
 };
@@ -26,6 +30,14 @@ fn compat_status_wire(status: CompatStatus) -> &'static str {
     }
 }
 
+fn update_policy_wire(mode: UpdatePolicyMode) -> &'static str {
+    match mode {
+        UpdatePolicyMode::Notify => "notify",
+        UpdatePolicyMode::Auto => "auto",
+        UpdatePolicyMode::Never => "never",
+    }
+}
+
 /// Updates & compatibility page (`/ui/admin/updates-compat`).
 pub async fn admin_updates_compat() -> Html<String> {
     let negotiation = negotiate(None);
@@ -34,6 +46,8 @@ pub async fn admin_updates_compat() -> Html<String> {
     let build_id = env!("CARGO_PKG_VERSION");
     let default_protocol = DEFAULT_COORDINATOR_PROTOCOL;
     let compat_docs_url = MIN_COORDINATOR_VERSION_DOCS_URL;
+    let update_policy = update_policy_wire(update_policy_from_env());
+    let manifest_url = release_manifest_url_from_env().unwrap_or_else(|| "—".to_string());
 
     let body = format!(
         r#"
@@ -71,6 +85,23 @@ pub async fn admin_updates_compat() -> Html<String> {
             <p class="muted admin-hint" data-i18n="admin.updatesCompat.compatStatusHint">
               Registration may return <code>compat_status</code> with HTTP 403/426 when the worker is outside the matrix window.
             </p>
+          </div>
+
+          <div class="admin-card" id="updates-compat-policy">
+            <h3 data-i18n="admin.updatesCompat.policyTitle">Update policy</h3>
+            <p class="muted" data-i18n="admin.updatesCompat.policyHint">
+              Runtime env readout for Galaxy §9.5 opt-in update policy (PH-S549). Policy prose lives in docs.
+            </p>
+            <div class="stat-item">
+              <span class="stat-label" data-i18n="admin.updatesCompat.col.updatePolicy">Update policy</span>
+              <span class="stat-value"><code id="updates-compat-policy-mode">{update_policy}</code>
+                <span class="muted">(<code>{env_update_policy}</code>)</span></span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label" data-i18n="admin.updatesCompat.col.manifestUrl">Release manifest URL</span>
+              <span class="stat-value"><code id="updates-compat-manifest-url">{manifest_url}</code>
+                <span class="muted">(<code>{env_manifest_url}</code>)</span></span>
+            </div>
           </div>
 
           <div class="admin-card" id="updates-compat-verify-release">
@@ -112,6 +143,10 @@ pub async fn admin_updates_compat() -> Html<String> {
         doc_fixtures = DOC_FIXTURES_README,
         compat_docs_url = compat_docs_url,
         default_negotiation_status = default_negotiation_status,
+        update_policy = update_policy,
+        manifest_url = manifest_url,
+        env_update_policy = ENV_UPDATE_POLICY,
+        env_manifest_url = ENV_RELEASE_MANIFEST_URL,
     );
 
     let script = r#"
@@ -185,11 +220,14 @@ async fn admin_updates_compat_page_includes_protocol_and_doc_blocks() {
     let html = admin_updates_compat().await.0;
     assert!(html.contains("id=\"updates-compat-panel\""));
     assert!(html.contains("id=\"updates-compat-protocol\""));
+    assert!(html.contains("id=\"updates-compat-policy\""));
     assert!(html.contains("id=\"updates-compat-verify-release\""));
     assert!(html.contains("id=\"updates-compat-matrix\""));
     assert!(html.contains("id=\"updates-compat-negotiation-status\""));
     assert!(html.contains("poolai-verify-release"));
     assert!(html.contains("POOLAI_COORDINATOR_PROTOCOL_VERSION"));
+    assert!(html.contains(ENV_UPDATE_POLICY));
+    assert!(html.contains(ENV_RELEASE_MANIFEST_URL));
     assert!(html.contains(MIN_COORDINATOR_VERSION_DOCS_URL));
     assert!(html.contains(DEFAULT_COORDINATOR_PROTOCOL));
     assert!(html.contains("window.__poolaiAdminI18nRust="));

@@ -2,7 +2,9 @@
 
 use crate::core::error::AppError;
 use crate::core::state::ApiContext;
-use crate::grid::galaxy_security_advisory::acknowledge_security_advisory;
+use crate::grid::galaxy_security_advisory::{
+    acknowledge_security_advisory, list_security_advisories, SecurityAdvisoryEntry,
+};
 use crate::network::api::common::{check_permission, HttpAppError};
 use crate::network::auth::{auth_middleware, Claims};
 use crate::security::secret_rotation::{rotation_status, run_rotation, SecretKind};
@@ -87,10 +89,18 @@ async fn admin_security_advisory_acknowledge_handler(
         .into_response()
 }
 
+async fn admin_security_advisories_list_handler() -> impl IntoResponse {
+    (StatusCode::OK, AxumJson(list_security_advisories())).into_response()
+}
+
 /// Routes under `/api/v1` (see `network::start_server` nest).
 pub fn create_admin_routes() -> Router<ApiContext> {
     Router::new()
         .route("/admin/overview", get(admin_overview_handler))
+        .route(
+            "/admin/security-advisories",
+            get(admin_security_advisories_list_handler),
+        )
         .route(
             "/admin/secrets/rotation",
             get(admin_secrets_rotation_status_handler),
@@ -128,5 +138,28 @@ mod tests {
             .await
             .expect("oneshot");
         assert_eq!(res.status(), StatusCode::OK);
+    }
+
+    #[tokio::test]
+    async fn admin_security_advisories_list_ph_s586() {
+        let ctx = ApiContext::default();
+        ctx.initialize().await.expect("init");
+        let app = create_admin_routes().with_state(ctx);
+        let res = app
+            .oneshot(
+                Request::builder()
+                    .uri("/admin/security-advisories")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .expect("oneshot");
+        assert_eq!(res.status(), StatusCode::OK);
+        let bytes = axum::body::to_bytes(res.into_body(), usize::MAX)
+            .await
+            .expect("body");
+        let rows: Vec<SecurityAdvisoryEntry> = serde_json::from_slice(&bytes).expect("json array");
+        assert_eq!(rows.len(), 3);
+        assert!(rows.iter().any(|r| r.id == "CVE-2026-0001"));
     }
 }
