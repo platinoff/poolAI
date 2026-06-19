@@ -20,6 +20,9 @@ use crate::core::state::ApiContext;
 use crate::grid::galaxy_fee_split_metrics::{
     fee_split_applied_total, METRIC_FEE_SPLIT_APPLIED_TOTAL,
 };
+use crate::grid::galaxy_fraud_proof::{
+    fraud_proof_pending_total, METRIC_FRAUD_PROOF_PENDING_TOTAL,
+};
 use crate::grid::galaxy_governance_metrics::{
     release_verify_fail_total, release_verify_total, update_notify_pending,
     METRIC_RELEASE_VERIFY_FAIL_TOTAL, METRIC_RELEASE_VERIFY_TOTAL, METRIC_UPDATE_NOTIFY_PENDING,
@@ -85,6 +88,9 @@ use crate::grid::galaxy_replication_metrics::{
     METRIC_REPLICATION_EXECUTOR_ENQUEUE_TOTAL, METRIC_REPLICATION_RATE_LIMITED_TOTAL,
     METRIC_REPLICATION_STRICT_TOTAL,
 };
+use crate::grid::galaxy_security_advisory::{
+    advisory_acknowledged_total, METRIC_ADVISORY_ACKNOWLEDGED_TOTAL,
+};
 use crate::grid::galaxy_settlement_metrics::{
     settlement_cleared_total, settlement_human_review_total, settlement_not_applicable_total,
     settlement_payout_batch_total, settlement_pending_verification_total,
@@ -114,11 +120,12 @@ use crate::grid::galaxy_verification_metrics::{
     METRIC_VERIFICATION_SAMPLE_TOTAL,
 };
 use crate::grid::galaxy_verify_sampling::{
-    verify_elevated_applied_total, verify_sample_not_applicable_total,
-    verify_sample_scheduled_total, verify_sample_skipped_total, verify_sampling_evaluations_total,
-    METRIC_VERIFY_ELEVATED_APPLIED_TOTAL, METRIC_VERIFY_SAMPLE_NOT_APPLICABLE_TOTAL,
-    METRIC_VERIFY_SAMPLE_SCHEDULED_TOTAL, METRIC_VERIFY_SAMPLE_SKIPPED_TOTAL,
-    METRIC_VERIFY_SAMPLING_EVALUATIONS_TOTAL,
+    checker_timeout_inconclusive_total, checker_timeout_retry_total, verify_elevated_applied_total,
+    verify_sample_not_applicable_total, verify_sample_scheduled_total, verify_sample_skipped_total,
+    verify_sampling_evaluations_total, METRIC_VERIFY_CHECKER_TIMEOUT_INCONCLUSIVE_TOTAL,
+    METRIC_VERIFY_CHECKER_TIMEOUT_RETRY_TOTAL, METRIC_VERIFY_ELEVATED_APPLIED_TOTAL,
+    METRIC_VERIFY_SAMPLE_NOT_APPLICABLE_TOTAL, METRIC_VERIFY_SAMPLE_SCHEDULED_TOTAL,
+    METRIC_VERIFY_SAMPLE_SKIPPED_TOTAL, METRIC_VERIFY_SAMPLING_EVALUATIONS_TOTAL,
 };
 use crate::grid::galaxy_worker_health::{
     galaxy_worker_unhealthy_total, METRIC_WORKER_UNHEALTHY_TOTAL,
@@ -206,6 +213,10 @@ pub struct PoolAiPrometheus {
     galaxy_verification_checker_enqueue_total: IntGauge,
     galaxy_verification_checker_pending_total: IntGauge,
     galaxy_verification_checker_job_submit_total: IntGauge,
+    galaxy_verification_checker_timeout_inconclusive_total: IntGauge,
+    galaxy_verification_checker_timeout_retry_total: IntGauge,
+    galaxy_fraud_proof_pending_total: IntGauge,
+    poolai_advisory_acknowledged_total: IntGauge,
     galaxy_replay_job_submit_total: IntGauge,
     galaxy_replay_pending: IntGauge,
     galaxy_replay_pending_scheduled_total: IntGauge,
@@ -962,6 +973,46 @@ fn build_prometheus() -> PoolAiPrometheus {
         ))
         .expect("register galaxy_verification_checker_job_submit_total");
 
+    let galaxy_verification_checker_timeout_inconclusive_total = IntGauge::with_opts(Opts::new(
+        METRIC_VERIFY_CHECKER_TIMEOUT_INCONCLUSIVE_TOTAL,
+        "Galaxy checker timeout inconclusive verdicts (PH-S569)",
+    ))
+    .expect(METRIC_VERIFY_CHECKER_TIMEOUT_INCONCLUSIVE_TOTAL);
+    registry
+        .register(Box::new(
+            galaxy_verification_checker_timeout_inconclusive_total.clone(),
+        ))
+        .expect("register galaxy_verification_checker_timeout_inconclusive_total");
+
+    let galaxy_verification_checker_timeout_retry_total = IntGauge::with_opts(Opts::new(
+        METRIC_VERIFY_CHECKER_TIMEOUT_RETRY_TOTAL,
+        "Galaxy checker timeout retries scheduled (PH-S569)",
+    ))
+    .expect(METRIC_VERIFY_CHECKER_TIMEOUT_RETRY_TOTAL);
+    registry
+        .register(Box::new(
+            galaxy_verification_checker_timeout_retry_total.clone(),
+        ))
+        .expect("register galaxy_verification_checker_timeout_retry_total");
+
+    let galaxy_fraud_proof_pending_total = IntGauge::with_opts(Opts::new(
+        METRIC_FRAUD_PROOF_PENDING_TOTAL,
+        "Galaxy fraud-proof settlement holds (PH-S571)",
+    ))
+    .expect(METRIC_FRAUD_PROOF_PENDING_TOTAL);
+    registry
+        .register(Box::new(galaxy_fraud_proof_pending_total.clone()))
+        .expect("register galaxy_fraud_proof_pending_total");
+
+    let poolai_advisory_acknowledged_total = IntGauge::with_opts(Opts::new(
+        METRIC_ADVISORY_ACKNOWLEDGED_TOTAL,
+        "Security advisory acknowledgements recorded (PH-S573)",
+    ))
+    .expect(METRIC_ADVISORY_ACKNOWLEDGED_TOTAL);
+    registry
+        .register(Box::new(poolai_advisory_acknowledged_total.clone()))
+        .expect("register poolai_advisory_acknowledged_total");
+
     let galaxy_replay_job_submit_total = IntGauge::with_opts(Opts::new(
         METRIC_REPLAY_JOB_SUBMIT_TOTAL,
         "Galaxy replay verification jobs submitted to JobStore (PH-S535)",
@@ -1249,6 +1300,10 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_verification_checker_enqueue_total,
         galaxy_verification_checker_pending_total,
         galaxy_verification_checker_job_submit_total,
+        galaxy_verification_checker_timeout_inconclusive_total,
+        galaxy_verification_checker_timeout_retry_total,
+        galaxy_fraud_proof_pending_total,
+        poolai_advisory_acknowledged_total,
         galaxy_replay_job_submit_total,
         galaxy_replay_pending,
         galaxy_replay_pending_scheduled_total,
@@ -1431,6 +1486,14 @@ pub fn refresh_galaxy_verification_gauges() {
         .set(verification_checker_pending_total() as i64);
     prom.galaxy_verification_checker_job_submit_total
         .set(verification_checker_job_submit_total() as i64);
+    prom.galaxy_verification_checker_timeout_inconclusive_total
+        .set(checker_timeout_inconclusive_total() as i64);
+    prom.galaxy_verification_checker_timeout_retry_total
+        .set(checker_timeout_retry_total() as i64);
+    prom.galaxy_fraud_proof_pending_total
+        .set(fraud_proof_pending_total() as i64);
+    prom.poolai_advisory_acknowledged_total
+        .set(advisory_acknowledged_total() as i64);
     prom.galaxy_replay_job_submit_total
         .set(replay_job_submit_total() as i64);
     prom.galaxy_worker_unhealthy_total

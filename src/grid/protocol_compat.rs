@@ -15,6 +15,15 @@ pub const MIN_COORDINATOR_VERSION_DOCS_URL: &str =
 /// Env: comma-separated allow-list of worker `build_id` values (PH-S520).
 pub const ENV_ALLOWED_BUILD_IDS: &str = "POOLAI_ALLOWED_BUILD_IDS";
 
+/// Env: minimum worker protocol version during sunset window (PH-S576, Galaxy §9.6).
+pub const ENV_PROTOCOL_SUNSET_MIN: &str = "POOLAI_PROTOCOL_SUNSET_MIN";
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ProtocolSunsetReject {
+    pub worker_version: String,
+    pub min_version: String,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BuildIdReject {
     pub build_id: Option<String>,
@@ -180,6 +189,41 @@ pub fn negotiate(protocol_version: Option<&str>) -> ProtocolNegotiation {
     negotiate_with_coordinator(coordinator_protocol_version(), protocol_version)
 }
 
+/// Reject workers below sunset minimum with HTTP 426 (PH-S576).
+pub fn check_protocol_sunset(worker_version: Option<&str>) -> Result<(), ProtocolSunsetReject> {
+    let min_raw = match std::env::var(ENV_PROTOCOL_SUNSET_MIN) {
+        Ok(v) if !v.trim().is_empty() => v,
+        _ => return Ok(()),
+    };
+    let min = match ProtocolVersion::parse(&min_raw) {
+        Some(v) => v,
+        None => return Ok(()),
+    };
+    let Some(raw) = worker_version.map(str::trim).filter(|s| !s.is_empty()) else {
+        return Err(ProtocolSunsetReject {
+            worker_version: "missing".into(),
+            min_version: min.label(),
+        });
+    };
+    let worker = match ProtocolVersion::parse(raw) {
+        Some(v) => v,
+        None => {
+            return Err(ProtocolSunsetReject {
+                worker_version: raw.to_string(),
+                min_version: min.label(),
+            });
+        }
+    };
+    if worker < min {
+        Err(ProtocolSunsetReject {
+            worker_version: worker.label(),
+            min_version: min.label(),
+        })
+    } else {
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -262,5 +306,17 @@ mod tests {
         assert!(check_build_id_allowed(Some("ci-build")).is_ok());
         assert!(check_build_id_allowed(Some("other")).is_err());
         std::env::remove_var(ENV_ALLOWED_BUILD_IDS);
+    }
+
+    #[test]
+    fn protocol_sunset_min_ph_s576() {
+        static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+        let _guard = ENV_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+        std::env::remove_var(ENV_PROTOCOL_SUNSET_MIN);
+        assert!(check_protocol_sunset(Some("1.2")).is_ok());
+        std::env::set_var(ENV_PROTOCOL_SUNSET_MIN, "1.1");
+        assert!(check_protocol_sunset(Some("1.2")).is_ok());
+        assert!(check_protocol_sunset(Some("1.0")).is_err());
+        std::env::remove_var(ENV_PROTOCOL_SUNSET_MIN);
     }
 }

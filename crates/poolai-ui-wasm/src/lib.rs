@@ -31,7 +31,8 @@ use poolai_ui_core::payout_batch::render_payout_batch_panel_html;
 use poolai_ui_core::pricing::{format_unix_secs, format_usd_micro};
 use poolai_ui_core::table::{
     build_csv, build_json_export, compare_sort_values, empty_state_html, escape_regex,
-    form_field_html, highlight_query_html, render_table_html, row_matches_query,
+    export_filename_from_aria, form_field_html, highlight_query_html, render_table_html,
+    row_matches_query, table_export_buttons_html,
 };
 use poolai_ui_core::theme::normalize_theme;
 use poolai_ui_core::topology::{short_topology_node_id, topology_hub_label};
@@ -206,6 +207,21 @@ pub fn compare_sort_values_wasm(a: &str, b: &str, numeric: bool, ascending: bool
 #[wasm_bindgen(js_name = rowMatchesQuery)]
 pub fn row_matches_query_wasm(row_text: &str, query: &str) -> bool {
     row_matches_query(row_text, query)
+}
+
+#[wasm_bindgen(js_name = exportFilenameFromAria)]
+pub fn export_filename_from_aria_wasm(aria_label: &str, extension: &str) -> String {
+    export_filename_from_aria(aria_label, extension)
+}
+
+#[wasm_bindgen(js_name = tableExportButtonsHtml)]
+pub fn table_export_buttons_html_wasm(
+    export_csv_label: &str,
+    export_json_label: &str,
+    csv_aria: &str,
+    json_aria: &str,
+) -> String {
+    table_export_buttons_html(export_csv_label, export_json_label, csv_aria, json_aria)
 }
 
 #[wasm_bindgen(js_name = highlightQueryHtml)]

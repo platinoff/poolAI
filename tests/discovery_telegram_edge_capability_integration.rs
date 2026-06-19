@@ -76,6 +76,7 @@ fn signed_capability_doc(peer_id: &str) -> Value {
         capabilities: vec!["inference:edge".into()],
         signature: None,
         expires_at: Some(expires_at.into()),
+        tee_attestation: None,
     };
     let msg = capability_signing_message(&unsigned);
     json!({

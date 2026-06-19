@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-19 (PH-S567 ✅ · vision **rev 249** · **0** відкритих · rust_ratio **94.69%**)
+**Оновлено:** 2026-06-19 (PH-S577 ✅ · vision **rev 250** · **0** відкритих · rust_ratio **94.69%**)
 
 | **← наступний** | **`абракадабра`** (project scan + drain) **або** один PH-S* |
 | **Відкритих** | **0** |
@@ -17,8 +17,8 @@
 
 ---
 
-## Закрито (PH-S567)
+## Закрито (PH-S577)
 
-PH-S567 ✅ — Horizon close band S558–S566: payout routing wire, wallet devnet verify, human-review settlement, capability production verify, GPU passthrough gate, network profile stale metric, payout-batch wasm, vision Playwright + pa11y, topology ui-core/wasm.
+PH-S577 ✅ — Horizon close band S568–S576: on-chain mock RPC submit, checker-timeout metrics, network-profiles list API, fraud-proof hold, TEE attestation gate, security advisory ack, peer HTTP prefetch integration, admin table wasm toolbar, protocol sunset 426.
 
 **rust_ratio:** **94.69%** · **BLOCKED:** FM-003 LAN · FM-041 Cloud SDK.

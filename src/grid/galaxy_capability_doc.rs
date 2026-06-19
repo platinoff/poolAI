@@ -17,6 +17,9 @@ pub struct GalaxyCapabilityDocument {
     pub signature: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expires_at: Option<String>,
+    /// TEE attestation blob (Galaxy §6.6 roadmap, PH-S572).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tee_attestation: Option<String>,
 }
 
 /// Parse/validation failure for capability documents.
@@ -56,6 +59,48 @@ pub const ENV_CAPABILITY_VERIFY_PK_HEX: &str = "POOLAI_GALAXY_CAPABILITY_VERIFY_
 
 /// Env: production capability verify key hex (PH-S561 alias).
 pub const ENV_CAPABILITY_VERIFY_KEY: &str = "POOLAI_CAPABILITY_VERIFY_KEY";
+
+/// Env: require `tee_attestation` on telegram_edge GPU capability docs (PH-S572).
+pub const ENV_TEE_ATTEST_REQUIRED: &str = "POOLAI_TEE_ATTEST_REQUIRED";
+
+/// Returns true when TEE attestation is required for telegram_edge GPU workers (PH-S572).
+pub fn tee_attestation_required() -> bool {
+    matches!(
+        std::env::var(ENV_TEE_ATTEST_REQUIRED)
+            .ok()
+            .map(|v| v.trim().to_ascii_lowercase())
+            .as_deref(),
+        Some("1") | Some("true") | Some("yes")
+    )
+}
+
+/// Reject telegram_edge `inference:gpu` without `tee_attestation` when env requires (PH-S572).
+pub fn check_tee_attestation_required(
+    doc: &GalaxyCapabilityDocument,
+) -> Result<(), CapabilityDocParseError> {
+    if !tee_attestation_required() {
+        return Ok(());
+    }
+    let needs_tee = doc.capabilities.iter().any(|c| {
+        let lower = c.trim().to_ascii_lowercase();
+        lower == "inference:gpu" || lower.contains("gpu")
+    });
+    if !needs_tee {
+        return Ok(());
+    }
+    let has_attest = doc
+        .tee_attestation
+        .as_ref()
+        .map(|s| !s.trim().is_empty())
+        .unwrap_or(false);
+    if has_attest {
+        Ok(())
+    } else {
+        Err(CapabilityDocParseError::new(
+            "tee_attestation required for inference:gpu when POOLAI_TEE_ATTEST_REQUIRED=1",
+        ))
+    }
+}
 
 /// Returns true when production capability verify key is configured (PH-S561).
 pub fn capability_verify_production_mode() -> bool {
@@ -192,7 +237,8 @@ pub fn validate_telegram_edge_capability(
             "signed capability_document required for telegram_edge origin",
         ));
     }
-    validate_capability_document_at(doc, capability_validation_now(), true)
+    validate_capability_document_at(doc, capability_validation_now(), true)?;
+    check_tee_attestation_required(doc)
 }
 
 #[cfg(test)]
@@ -227,6 +273,7 @@ mod tests {
             capabilities: vec![],
             signature: None,
             expires_at: None,
+            tee_attestation: None,
         };
         assert!(validate_capability_document(&doc).is_err());
     }
@@ -241,6 +288,7 @@ mod tests {
             capabilities: vec!["inference:gpu".into()],
             signature: None,
             expires_at: None,
+            tee_attestation: None,
         };
         let msg = capability_signing_message(&unsigned);
         let doc = GalaxyCapabilityDocument {
@@ -263,6 +311,7 @@ mod tests {
             capabilities: vec!["inference:gpu".into()],
             signature: None,
             expires_at: Some("2026-12-31T00:00:00Z".into()),
+            tee_attestation: None,
         };
         let msg = capability_signing_message(&unsigned);
         let doc = GalaxyCapabilityDocument {
@@ -276,5 +325,29 @@ mod tests {
         let mut missing = doc.clone();
         missing.expires_at = None;
         assert!(validate_capability_document_at(&missing, now, true).is_err());
+    }
+
+    #[test]
+    fn tee_attestation_required_ph_s572() {
+        static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+        let _guard = ENV_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+        std::env::set_var(ENV_TEE_ATTEST_REQUIRED, "1");
+        let sk = dev_signing_key();
+        let unsigned = GalaxyCapabilityDocument {
+            peer_id: "edge-1".into(),
+            capabilities: vec!["inference:gpu".into()],
+            signature: None,
+            expires_at: None,
+            tee_attestation: None,
+        };
+        let msg = capability_signing_message(&unsigned);
+        let mut doc = GalaxyCapabilityDocument {
+            signature: Some(hex::encode(sk.sign(msg.as_bytes()).to_bytes())),
+            ..unsigned
+        };
+        assert!(check_tee_attestation_required(&doc).is_err());
+        doc.tee_attestation = Some("attest-blob".into());
+        validate_capability_document(&doc).expect("valid with tee");
+        std::env::remove_var(ENV_TEE_ATTEST_REQUIRED);
     }
 }

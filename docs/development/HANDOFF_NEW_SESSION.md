@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-19 (PH-S555 ✅ · rust_ratio **94.66%**) · VDT
+**Оновлено:** 2026-06-19 (PH-S577 ✅ · rust_ratio **94.69%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -518,6 +518,16 @@
 **PH-S565 ✅ (e2e):** `e2e/tests/vision.spec.ts` solar layout smoke; `/ui/admin/payout-batch` in pa11y matrix (FM-019).
 **PH-S566 ✅ (code):** `poolai-ui-core/topology.rs` label helpers + wasm exports; `topology_graph.rs` uses shared crate.
 **PH-S567 ✅ (ops):** `tests/galaxy_horizon_s558_integration.rs` horizon close band S558–S566; vision rev **249**; loc-audit.
+**PH-S568 ✅ (code):** `galaxy_settlement_onchain` mock RPC submit when `POOLAI_SETTLEMENT_ON_CHAIN=1`.
+**PH-S569 ✅ (code):** checker-timeout inconclusive/retry gauges in `prometheus_export` + stand smoke.
+**PH-S570 ✅ (code):** `GET /api/v1/grid/network-profiles` list persisted peer ids.
+**PH-S571 ✅ (code):** `galaxy_fraud_proof` env hold + `galaxy_fraud_proof_pending_total`.
+**PH-S572 ✅ (code):** `tee_attestation` on capability doc + `POOLAI_TEE_ATTEST_REQUIRED` gate.
+**PH-S573 ✅ (code):** `POST /admin/security-advisories/{id}/acknowledge` + `poolai_advisory_acknowledged_total`.
+**PH-S574 ✅ (tests):** `galaxy_prefetch_peer_http_integration` wiremock peer seed pull.
+**PH-S575 ✅ (code):** `table_export_buttons_html` + `exportFilenameFromAria` wasm; slim `admin_common.js`.
+**PH-S576 ✅ (code):** `POOLAI_PROTOCOL_SUNSET_MIN` → HTTP 426 on register-remote.
+**PH-S577 ✅ (ops):** `galaxy_horizon_s568_integration` close band; vision rev **250**.
 **Rules ✅:** **`абракадабра`** — project scan **всього репо** (concept · FM §5.1 · roadmaps · architect · code) → 10 PH-S* у §5.12 (журнал) → drain → push; канон [`.cursor/rules/poolai-session-iteration.mdc`](../.cursor/rules/poolai-session-iteration.mdc) § «Тригер абракадабра»; commit **`git-commit-tree-msg.sh`**.
 **§5.12:** **0** відкритих — наступна сесія: **`абракадабра`** (project scan + drain).
 **Vision ✅:** rev **248** · rust_ratio **94.66%** · hold **95%** advisory.

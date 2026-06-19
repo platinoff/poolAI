@@ -2,18 +2,21 @@
 
 use crate::core::error::AppError;
 use crate::core::state::ApiContext;
+use crate::grid::galaxy_security_advisory::acknowledge_security_advisory;
 use crate::network::api::common::{check_permission, HttpAppError};
 use crate::network::auth::{auth_middleware, Claims};
 use crate::security::secret_rotation::{rotation_status, run_rotation, SecretKind};
 use crate::services::admin_service::{AdminOverview, AdminService};
 use axum::{
-    extract::{Extension, Json, State},
+    extract::{Extension, Json, Path, State},
+    http::StatusCode,
     middleware,
     response::IntoResponse,
     routing::{get, post},
     Json as AxumJson, Router,
 };
 use serde::Deserialize;
+use serde::Serialize;
 
 async fn admin_overview_handler(
     State(ctx): State<ApiContext>,
@@ -51,6 +54,39 @@ async fn admin_secrets_rotate_handler(
     }
 }
 
+#[derive(Serialize)]
+struct SecurityAdvisoryAckResponse {
+    ok: bool,
+    advisory_id: String,
+    acknowledged: bool,
+}
+
+async fn admin_security_advisory_acknowledge_handler(
+    Extension(claims): Extension<Claims>,
+    Path(advisory_id): Path<String>,
+) -> impl IntoResponse {
+    if let Err(err) = check_permission(&claims, "admin:all") {
+        return err.into_response();
+    }
+    let id = advisory_id.trim();
+    if id.is_empty() {
+        return HttpAppError::new(AppError::ValidationError(
+            "advisory id must not be empty".into(),
+        ))
+        .into_response();
+    }
+    let first_ack = acknowledge_security_advisory(id);
+    (
+        StatusCode::OK,
+        AxumJson(SecurityAdvisoryAckResponse {
+            ok: true,
+            advisory_id: id.to_string(),
+            acknowledged: first_ack,
+        }),
+    )
+        .into_response()
+}
+
 /// Routes under `/api/v1` (see `network::start_server` nest).
 pub fn create_admin_routes() -> Router<ApiContext> {
     Router::new()
@@ -62,6 +98,11 @@ pub fn create_admin_routes() -> Router<ApiContext> {
         .route(
             "/admin/secrets/rotate",
             post(admin_secrets_rotate_handler).layer(middleware::from_fn(auth_middleware)),
+        )
+        .route(
+            "/admin/security-advisories/{id}/acknowledge",
+            post(admin_security_advisory_acknowledge_handler)
+                .layer(middleware::from_fn(auth_middleware)),
         )
 }
 

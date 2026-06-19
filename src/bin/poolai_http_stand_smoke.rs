@@ -667,6 +667,14 @@ const GALAXY_SETTLEMENT_METRICS: &[&str] = &[
     "galaxy_settlement_human_review_total",
 ];
 
+/// PH-S569: checker timeout inconclusive/retry gauges on `/metrics`.
+const GALAXY_CHECKER_TIMEOUT_METRICS: &[&str] = &[
+    "galaxy_verification_checker_timeout_inconclusive_total",
+    "galaxy_verification_checker_timeout_retry_total",
+    "galaxy_fraud_proof_pending_total",
+    "poolai_advisory_acknowledged_total",
+];
+
 fn metrics_text_has_settlement_counters(body: &str) -> Result<(), String> {
     for name in GALAXY_SETTLEMENT_METRICS {
         if !body.contains(name) {
@@ -689,7 +697,13 @@ async fn smoke_galaxy_settlement_metrics(client: &Client, base: &str) -> Result<
         return Err(format!("/metrics status {}", resp.status()));
     }
     let body = resp.text().await.map_err(|e| e.to_string())?;
-    metrics_text_has_settlement_counters(&body)
+    metrics_text_has_settlement_counters(&body)?;
+    for name in GALAXY_CHECKER_TIMEOUT_METRICS {
+        if !body.contains(name) {
+            return Err(format!("/metrics missing {name}"));
+        }
+    }
+    Ok(())
 }
 
 /// PH-S528: governance ops Prometheus gauges on live stand.
@@ -1071,6 +1085,25 @@ async fn smoke_grid_network_profile_read(client: &Client, base: &str) -> Result<
     }
     if !body.get("peer_id").and_then(|v| v.as_str()).is_some() {
         return Err(format!("network-profiles missing peer_id: {body}"));
+    }
+    Ok(())
+}
+
+async fn smoke_grid_network_profiles_list(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/api/v1/grid/network-profiles"))
+        .send()
+        .await
+        .map_err(|e| format!("network-profiles list request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("network-profiles list status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    if body.get("ok").and_then(|v| v.as_bool()) != Some(true) {
+        return Err(format!("network-profiles list body: {body}"));
+    }
+    if !body.get("peer_ids").and_then(|v| v.as_array()).is_some() {
+        return Err(format!("network-profiles list missing peer_ids: {body}"));
     }
     Ok(())
 }
@@ -1922,6 +1955,12 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
         &mut cases,
         "grid_network_profile_read",
         smoke_grid_network_profile_read(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
+        "grid_network_profiles_list",
+        smoke_grid_network_profiles_list(&client, &cli.base_url).await,
     )
     .await;
     record(

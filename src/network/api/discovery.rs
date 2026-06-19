@@ -30,7 +30,8 @@ use crate::grid::galaxy_protocol_negotiation_metrics::{
 };
 use crate::grid::galaxy_worker_health::{on_heartbeat_miss, on_heartbeat_success};
 use crate::grid::protocol_compat::{
-    check_build_id_allowed, negotiate, CompatStatus, MIN_COORDINATOR_VERSION_DOCS_URL,
+    check_build_id_allowed, check_protocol_sunset, negotiate, CompatStatus,
+    MIN_COORDINATOR_VERSION_DOCS_URL,
 };
 use crate::grid::GridEnvelope;
 use crate::network::api::common::HttpAppError;
@@ -257,6 +258,22 @@ async fn register_remote_handler(
 
     let negotiation = negotiate(payload.protocol_version.as_deref());
     let peer_id = payload.peer_id.clone();
+
+    if let Err(sunset) = check_protocol_sunset(payload.protocol_version.as_deref()) {
+        record_protocol_negotiation_rejected();
+        return (
+            StatusCode::UPGRADE_REQUIRED,
+            Json(serde_json::json!({
+                "error": "protocol_sunset",
+                "message": "worker protocol below sunset minimum (Galaxy §9.6)",
+                "peer_id": peer_id,
+                "worker_protocol_version": sunset.worker_version,
+                "min_protocol_version": sunset.min_version,
+                "compat_status": "upgrade_required",
+            })),
+        )
+            .into_response();
+    }
 
     if negotiation.status == CompatStatus::Unsupported {
         record_protocol_negotiation_rejected();

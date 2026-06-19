@@ -767,8 +767,18 @@ FM-xxx (з таблиці нижче)
 | 500 | **PH-S565** | Vision solar Playwright + pa11y payout-batch | PH-S557, FM-019 | `e2e/tests/vision.spec.ts`; `/ui/admin/payout-batch` in a11y matrix | **✅** |
 | 501 | **PH-S566** | Topology label helpers → ui-core/wasm | PH-S157 | `poolai-ui-core/topology.rs`; wasm exports; slim JS glue | **✅** |
 | 502 | **PH-S567** | Horizon close band S558–S566 | §5.12 fallback | `galaxy_horizon_s558_integration` + loc-audit + vision-sync | **✅** |
+| 503 | **PH-S568** | On-chain Cleared → mock RPC submit | Galaxy §7 · FM-010 | `POOLAI_SETTLEMENT_ON_CHAIN=1` → mock RPC ack on Cleared NDJSON; unit test | **✅** |
+| 504 | **PH-S569** | Checker-timeout `/metrics` export | Galaxy §6.2 PH-S542 | `galaxy_verification_checker_timeout_*` in prometheus + stand smoke | **✅** |
+| 505 | **PH-S570** | `GET /api/v1/grid/network-profiles` list | Galaxy §8.1 | list persisted peer ids; integration round-trip | **✅** |
+| 506 | **PH-S571** | Fraud-proof horizon stub | Galaxy §6.6 | `POOLAI_GALAXY_FRAUD_PROOF=1` → hold + `galaxy_fraud_proof_pending_total` | **✅** |
+| 507 | **PH-S572** | TEE attestation on capability doc | Galaxy §6.6 | `tee_attestation` field + `POOLAI_TEE_ATTEST_REQUIRED` gate | **✅** |
+| 508 | **PH-S573** | Security advisory acknowledge wire | Galaxy §9.6 | `POST /admin/security-advisories/{id}/acknowledge` + metric | **✅** |
+| 509 | **PH-S574** | Peer HTTP prefetch integration | Roadmap §5.5 | wiremock seed-inventory HTTP → `galaxy_prefetch_peer_fetch_total` | **✅** |
+| 510 | **PH-S575** | Admin table toolbar → wasm | RUST_RATIO §5.13 | `table_export_buttons_html` + `exportFilenameFromAria` wasm; slim JS | **✅** |
+| 511 | **PH-S576** | Protocol sunset env gate | Galaxy §9.6 | `POOLAI_PROTOCOL_SUNSET_MIN` → HTTP 426 on register-remote | **✅** |
+| 512 | **PH-S577** | Horizon close band S568–S576 | §5.12 fallback | `galaxy_horizon_s568_integration` + loc-audit + vision-sync | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S567 ✅. Vision rev **249**. rust_ratio **94.69%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S577 ✅. Vision rev **250**. rust_ratio **94.69%**.
 
 **Наступна сесія:** **`абракадабра`** (project scan → drain) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 

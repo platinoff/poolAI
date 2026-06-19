@@ -3,6 +3,96 @@
   "items": [
     {
       "category": "closed",
+      "id": "PH-S577",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_horizon_s568_integration` + loc-audit + vision-sync",
+      "title": "Horizon close band S568–S576"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S576",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "POOLAI_PROTOCOL_SUNSET_MIN` → HTTP 426 on register-remote",
+      "title": "Protocol sunset env gate"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S575",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "table_export_buttons_html` + `exportFilenameFromAria` wasm; slim JS",
+      "title": "Admin table toolbar → wasm"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S574",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "wiremock seed-inventory HTTP → `galaxy_prefetch_peer_fetch_total",
+      "title": "Peer HTTP prefetch integration"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S573",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "POST /admin/security-advisories/{id}/acknowledge` + metric",
+      "title": "Security advisory acknowledge wire"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S572",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "tee_attestation` field + `POOLAI_TEE_ATTEST_REQUIRED` gate",
+      "title": "TEE attestation on capability doc"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S571",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "POOLAI_GALAXY_FRAUD_PROOF=1` → hold + `galaxy_fraud_proof_pending_total",
+      "title": "Fraud-proof horizon stub"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S570",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "list persisted peer ids; integration round-trip",
+      "title": "GET /api/v1/grid/network-profiles` list"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S569",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_verification_checker_timeout_*` in prometheus + stand smoke",
+      "title": "Checker-timeout `/metrics` export"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S568",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "POOLAI_SETTLEMENT_ON_CHAIN=1` → mock RPC ack on Cleared NDJSON; unit test",
+      "title": "On-chain Cleared → mock RPC submit"
+    },
+    {
+      "category": "closed",
       "id": "PH-S567",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
@@ -18,96 +108,6 @@
       "status": "closed",
       "summary": "poolai-ui-core/topology.rs`; wasm exports; slim JS glue",
       "title": "Topology label helpers → ui-core/wasm"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S565",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "e2e/tests/vision.spec.ts`; `/ui/admin/payout-batch` in a11y matrix",
-      "title": "Vision solar Playwright + pa11y payout-batch"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S564",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "poolai-ui-core/payout_batch.rs` + wasm; slim admin JS",
-      "title": "Admin payout-batch wasm renderer"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S563",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_network_profile_stale_total` on locality rank; stand smoke",
-      "title": "Network profile stale downgrade metric"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S562",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "gpu_passthrough` in capability_document for inference:gpu; unit tests",
-      "title": "GPU passthrough admission gate"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S561",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "POOLAI_CAPABILITY_VERIFY_KEY` → 403 invalid sig on register-remote; integration test",
-      "title": "Signed capability production key verify"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S560",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "non-deterministic semantic_hash → PendingVerification; `galaxy_settlement_human_review_total",
-      "title": "Human-review settlement hold"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S559",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "POOLAI_WALLET_VERIFY_DEVNET=1` → verified on bind; integration test",
-      "title": "Telegram wallet devnet verify opt-in"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S558",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "GET /api/v1/grid/payout-batch` routing snapshot; integration test; openapi-gap 0",
-      "title": "Fee settlement payout routing wire"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S557",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "folder mass hubs + multi-ring orbits; orphans at rim; orbit 2× slower; planes 50% transparent; stack sync",
-      "title": "Vision gravity solar-system layout"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S556",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "applyMap3DProjection` layer Z; WASD W↑S↓A←D→; pad bottom-center; rev++",
-      "title": "Vision map true 3D layer projection"
     }
   ],
   "link": "docs/vision/index.html",

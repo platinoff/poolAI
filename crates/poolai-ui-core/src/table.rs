@@ -311,6 +311,39 @@ pub fn highlight_query_html(original: &str, query: &str) -> String {
     out.push_str(&original[i..]);
     out
 }
+
+/// Export filename from table aria-label (PH-S575).
+pub fn export_filename_from_aria(aria_label: &str, extension: &str) -> String {
+    let slug: String = aria_label
+        .trim()
+        .to_lowercase()
+        .split_whitespace()
+        .collect::<Vec<_>>()
+        .join("-");
+    let base = if slug.is_empty() {
+        "poolai-table".to_string()
+    } else {
+        slug
+    };
+    format!("{base}.{extension}")
+}
+
+/// Export CSV/JSON button markup for admin table toolbar (PH-S575).
+pub fn table_export_buttons_html(
+    export_csv_label: &str,
+    export_json_label: &str,
+    csv_aria: &str,
+    json_aria: &str,
+) -> String {
+    format!(
+        r#"<button type="button" class="btn btn-secondary btn-sm" data-poolai-export="csv" aria-label="{}">{}</button><button type="button" class="btn btn-secondary btn-sm" data-poolai-export="json" aria-label="{}">{}</button>"#,
+        escape_html(csv_aria),
+        escape_html(export_csv_label),
+        escape_html(json_aria),
+        escape_html(export_json_label),
+    )
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -363,5 +396,13 @@ mod tests {
     fn row_matches_query_case_insensitive() {
         assert!(row_matches_query("Hello", "hel"));
         assert!(!row_matches_query("Hello", "xyz"));
+    }
+
+    #[test]
+    fn export_filename_from_aria_ph_s575() {
+        assert_eq!(
+            export_filename_from_aria("Jobs Table", "csv"),
+            "jobs-table.csv"
+        );
     }
 }

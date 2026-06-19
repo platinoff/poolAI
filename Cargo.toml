@@ -431,6 +431,16 @@ path = "tests/galaxy_horizon_s534_integration.rs"
 required-features = ["test-utils", "prometheus"]
 
 [[test]]
+name = "galaxy_horizon_s568_integration"
+path = "tests/galaxy_horizon_s568_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
+name = "galaxy_prefetch_peer_http_integration"
+path = "tests/galaxy_prefetch_peer_http_integration.rs"
+required-features = ["test-utils"]
+
+[[test]]
 name = "tls_https_integration"
 path = "tests/tls_https_integration.rs"
 required-features = ["https"]

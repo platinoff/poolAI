@@ -27,6 +27,10 @@ pub const DEFAULT_CHECKER_TIMEOUT_SECS: u64 = 300;
 pub const METRIC_VERIFY_CHECKER_TIMEOUT_INCONCLUSIVE_TOTAL: &str =
     "galaxy_verification_checker_timeout_inconclusive_total";
 
+/// Metric: checker timeout retry scheduled once (PH-S542 / PH-S569).
+pub const METRIC_VERIFY_CHECKER_TIMEOUT_RETRY_TOTAL: &str =
+    "galaxy_verification_checker_timeout_retry_total";
+
 static CHECKER_TIMEOUT_INCONCLUSIVE_TOTAL: AtomicU64 = AtomicU64::new(0);
 static CHECKER_TIMEOUT_RETRY_TOTAL: AtomicU64 = AtomicU64::new(0);
 

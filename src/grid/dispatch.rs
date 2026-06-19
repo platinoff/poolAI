@@ -17,6 +17,7 @@ use crate::grid::galaxy_fee_split::{
     split_gross_payment, SECONDARY_ADMIN_FEE_MAX_BPS, SECONDARY_ADMIN_FEE_MIN_BPS,
 };
 use crate::grid::galaxy_fee_split_metrics::evaluate_result_fee_split;
+use crate::grid::galaxy_fraud_proof::{evaluate_fraud_proof_hold, record_fraud_proof_pending};
 use crate::grid::galaxy_locality::{
     observe_last_cross_region_egress_mb, pick_best_worker_by_locality,
     record_locality_rank_empty_workers, record_locality_rank_ingest, record_locality_rank_miss,
@@ -1028,6 +1029,10 @@ fn ingest_result(
     {
         settlement_status = SettlementStatus::PendingVerification;
         record_settlement_human_review();
+    }
+    if evaluate_fraud_proof_hold(is_mismatch) {
+        record_fraud_proof_pending();
+        settlement_status = SettlementStatus::PendingVerification;
     }
     if let (Some(peer_id), Some(score)) = (source_peer_id, trust_score) {
         persist_peer_trust_score(peer_id, score);

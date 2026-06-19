@@ -575,6 +575,27 @@ function adminCreateTableToolbar(table, options) {
   actions.className = 'admin-table-toolbar-actions';
 
   if (!opts.noExport) {
+    const exportButtonsFn = poolaiUiWasmCall('tableExportButtonsHtml');
+    const exportNameFn = poolaiUiWasmCall('exportFilenameFromAria');
+    if (exportButtonsFn) {
+      actions.innerHTML = exportButtonsFn(
+        poolaiT('admin.table.exportCsv', 'Export CSV'),
+        poolaiT('admin.table.exportJson', 'Export JSON'),
+        poolaiT('admin.table.exportCsvAria', 'Export visible rows as CSV'),
+        poolaiT('admin.table.exportJsonAria', 'Export visible rows as JSON'),
+      );
+      actions.querySelectorAll('[data-poolai-export]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const aria = table.getAttribute('aria-label') || 'poolai-table';
+          const ext = btn.getAttribute('data-poolai-export') === 'json' ? 'json' : 'csv';
+          const name = exportNameFn
+            ? exportNameFn(aria, ext)
+            : `${aria.replace(/\s+/g, '-').toLowerCase()}.${ext}`;
+          if (ext === 'json') adminExportTableJson(table, name);
+          else adminExportTableCsv(table, name);
+        });
+      });
+    } else {
     const csvBtn = document.createElement('button');
     csvBtn.type = 'button';
     csvBtn.className = 'btn btn-secondary btn-sm';
@@ -607,6 +628,7 @@ function adminCreateTableToolbar(table, options) {
 
     actions.appendChild(csvBtn);
     actions.appendChild(jsonBtn);
+    }
   }
 
   toolbar.appendChild(actions);

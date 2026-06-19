@@ -1988,11 +1988,23 @@
       "from": "galaxy_grid",
       "kind": "implements",
       "to": "src_grid_galaxy_update_policy_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_payout_batch_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_topology_rs"
     }
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S567",
+  "last_sprint_closed": "PH-S577",
   "layers": [
     {
       "id": "L0",
@@ -8249,9 +8261,58 @@
       "label": "galaxy_replication_quorum_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_replication_quorum_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_payout_batch_rs",
+      "label": "payout_batch.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/payout_batch.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_topology_rs",
+      "label": "topology.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/topology.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "e2e_tests_vision_spec_ts",
+      "label": "vision.spec.ts",
+      "layer": "L3",
+      "path": "e2e/tests/vision.spec.ts"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_discovery_capability_production_verify_integration_rs",
+      "label": "discovery_capability_production_verify_integration.rs",
+      "layer": "L3",
+      "path": "tests/discovery_capability_production_verify_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s558_integration_rs",
+      "label": "galaxy_horizon_s558_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s558_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_settlement_human_review_integration_rs",
+      "label": "galaxy_settlement_human_review_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_settlement_human_review_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_telegram_wallet_devnet_verify_integration_rs",
+      "label": "telegram_wallet_devnet_verify_integration.rs",
+      "layer": "L3",
+      "path": "tests/telegram_wallet_devnet_verify_integration.rs"
     }
   ],
-  "revision": 249,
+  "revision": 250,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -12770,6 +12831,96 @@
       "row": 502,
       "status": "closed",
       "title": "Horizon close band S558–S566"
+    },
+    {
+      "acceptance": "POOLAI_SETTLEMENT_ON_CHAIN=1` → mock RPC ack on Cleared NDJSON; unit test",
+      "deps": "Galaxy §7 · FM-010",
+      "id": "PH-S568",
+      "open": false,
+      "row": 503,
+      "status": "closed",
+      "title": "On-chain Cleared → mock RPC submit"
+    },
+    {
+      "acceptance": "galaxy_verification_checker_timeout_*` in prometheus + stand smoke",
+      "deps": "Galaxy §6.2 PH-S542",
+      "id": "PH-S569",
+      "open": false,
+      "row": 504,
+      "status": "closed",
+      "title": "Checker-timeout `/metrics` export"
+    },
+    {
+      "acceptance": "list persisted peer ids; integration round-trip",
+      "deps": "Galaxy §8.1",
+      "id": "PH-S570",
+      "open": false,
+      "row": 505,
+      "status": "closed",
+      "title": "GET /api/v1/grid/network-profiles` list"
+    },
+    {
+      "acceptance": "POOLAI_GALAXY_FRAUD_PROOF=1` → hold + `galaxy_fraud_proof_pending_total",
+      "deps": "Galaxy §6.6",
+      "id": "PH-S571",
+      "open": false,
+      "row": 506,
+      "status": "closed",
+      "title": "Fraud-proof horizon stub"
+    },
+    {
+      "acceptance": "tee_attestation` field + `POOLAI_TEE_ATTEST_REQUIRED` gate",
+      "deps": "Galaxy §6.6",
+      "id": "PH-S572",
+      "open": false,
+      "row": 507,
+      "status": "closed",
+      "title": "TEE attestation on capability doc"
+    },
+    {
+      "acceptance": "POST /admin/security-advisories/{id}/acknowledge` + metric",
+      "deps": "Galaxy §9.6",
+      "id": "PH-S573",
+      "open": false,
+      "row": 508,
+      "status": "closed",
+      "title": "Security advisory acknowledge wire"
+    },
+    {
+      "acceptance": "wiremock seed-inventory HTTP → `galaxy_prefetch_peer_fetch_total",
+      "deps": "Roadmap §5.5",
+      "id": "PH-S574",
+      "open": false,
+      "row": 509,
+      "status": "closed",
+      "title": "Peer HTTP prefetch integration"
+    },
+    {
+      "acceptance": "table_export_buttons_html` + `exportFilenameFromAria` wasm; slim JS",
+      "deps": "RUST_RATIO §5.13",
+      "id": "PH-S575",
+      "open": false,
+      "row": 510,
+      "status": "closed",
+      "title": "Admin table toolbar → wasm"
+    },
+    {
+      "acceptance": "POOLAI_PROTOCOL_SUNSET_MIN` → HTTP 426 on register-remote",
+      "deps": "Galaxy §9.6",
+      "id": "PH-S576",
+      "open": false,
+      "row": 511,
+      "status": "closed",
+      "title": "Protocol sunset env gate"
+    },
+    {
+      "acceptance": "galaxy_horizon_s568_integration` + loc-audit + vision-sync",
+      "deps": "§5.12 fallback",
+      "id": "PH-S577",
+      "open": false,
+      "row": 512,
+      "status": "closed",
+      "title": "Horizon close band S568–S576"
     }
   ],
   "sprint_queue_open_count": 0,

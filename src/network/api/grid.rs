@@ -75,6 +75,7 @@ pub fn create_grid_routes() -> Router<ApiContext> {
             "/grid/network-profiles/{peer_id}",
             get(get_grid_network_profile).put(put_grid_network_profile),
         )
+        .route("/grid/network-profiles", get(list_grid_network_profiles))
         .route("/grid/telegram-seats", get(get_grid_telegram_seats))
         .route("/grid/payout-batch", get(get_grid_payout_batch))
         .route(
@@ -276,6 +277,31 @@ async fn get_grid_network_profile(
             ok: true,
             peer_id,
             network_profile,
+        }),
+    ))
+}
+
+#[derive(Debug, Serialize)]
+struct GridNetworkProfileListResponse {
+    ok: bool,
+    peer_ids: Vec<String>,
+    count: usize,
+}
+
+/// `GET /api/v1/grid/network-profiles` — list persisted peer ids (PH-S570).
+async fn list_grid_network_profiles(
+    State(_ctx): State<ApiContext>,
+) -> Result<(StatusCode, Json<GridNetworkProfileListResponse>), HttpAppError> {
+    let mut peer_ids =
+        crate::grid::galaxy_network_profile_store::list_persisted_network_profile_peer_ids();
+    peer_ids.sort();
+    let count = peer_ids.len();
+    Ok((
+        StatusCode::OK,
+        Json(GridNetworkProfileListResponse {
+            ok: true,
+            peer_ids,
+            count,
         }),
     ))
 }
