@@ -1,8 +1,8 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-19 (PH-S577 ✅ · vision **rev 250** · **0** відкритих · rust_ratio **94.69%**)
+**Оновлено:** 2026-06-19 (PH-S578 ✅ · vision **rev 252** · **0** відкритих · rust_ratio **94.69%**)
 
-| **← наступний** | **`абракадабра`** (project scan + drain) **або** один PH-S* |
+| **← наступний** | **`абракадабра`** (project scan + drain) |
 | **Відкритих** | **0** |
 
 ---
@@ -13,12 +13,12 @@
 абракадабра
 ```
 
-**Наступна сесія:** project scan → drain → push.
+**Наступна сесія:** project scan всього репо → top 10 у §5.12 → drain → vision-sync → `cargo test-ci` → commit + push.
 
 ---
 
-## Закрито (PH-S577)
+## Закрито (PH-S578)
 
-PH-S577 ✅ — Horizon close band S568–S576: on-chain mock RPC submit, checker-timeout metrics, network-profiles list API, fraud-proof hold, TEE attestation gate, security advisory ack, peer HTTP prefetch integration, admin table wasm toolbar, protocol sunset 426.
+PH-S578 ✅ — Vision fullscreen PiP: панелі Map/Layers/Queue/Links/Preview у fullscreen поверх header (`inset:0`, z-index workspace 29, backdrop); Explorer overlay `top:0` у fs mode.
 
 **rust_ratio:** **94.69%** · **BLOCKED:** FM-003 LAN · FM-041 Cloud SDK.

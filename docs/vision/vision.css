@@ -887,14 +887,25 @@ body.sidebar-collapsed .sidebar-title span { display: none; }
   opacity: 1;
 }
 
+/* Fullscreen panel — PiP / video-player layer above header (z 22) */
+body.panel-fs-active::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 28;
+  background: rgba(2, 6, 12, 0.72);
+  pointer-events: none;
+}
+
 body.panel-fs-active .panel.panel-fullscreen {
   position: fixed;
-  z-index: 12;
-  left: 8px;
-  right: 8px;
-  top: 48px;
-  bottom: 8px;
+  z-index: 30;
+  inset: 0;
   max-height: none;
+  border-radius: 0;
+  border-left: none;
+  border-right: none;
+  border-top: none;
   border-color: var(--border-bright);
   box-shadow: 0 8px 48px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(126, 184, 255, 0.12);
 }
@@ -923,17 +934,19 @@ body.panel-fs-active:not(.panel-fs-preview) .preview-panel {
   display: none;
 }
 
-/* Fullscreen: Explorer overlay — backdrop z 18, sidebar z 22 (same stacking context) */
+/* Fullscreen: workspace above header; Explorer overlay above panel */
 body.panel-fs-active .workspace {
+  position: relative;
+  z-index: 29;
   isolation: isolate;
 }
 
 body.panel-fs-active .sidebar {
   position: fixed;
   left: 0;
-  top: 48px;
+  top: 0;
   bottom: 0;
-  z-index: 22;
+  z-index: 32;
   width: var(--sidebar-w) !important;
   max-width: min(var(--sidebar-w), 92vw);
   transform: translateX(-105%);
@@ -967,6 +980,11 @@ body.panel-fs-active .main-col {
   z-index: 18;
   background: rgba(4, 8, 14, 0.5);
   pointer-events: none;
+}
+
+body.panel-fs-active .sidebar-overlay-backdrop {
+  inset: 0;
+  z-index: 31;
 }
 
 body.panel-fs-active.sidebar-overlay-open .sidebar-overlay-backdrop {

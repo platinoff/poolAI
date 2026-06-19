@@ -3,6 +3,15 @@
   "items": [
     {
       "category": "closed",
+      "id": "PH-S578",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": ".panel-fullscreen` `inset:0` + workspace z-index above header; Explorer overlay `top:0`; rev++",
+      "title": "Vision fullscreen PiP above header"
+    },
+    {
+      "category": "closed",
       "id": "PH-S577",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
@@ -99,15 +108,6 @@
       "status": "closed",
       "summary": "galaxy_horizon_s558_integration` + loc-audit + vision-sync",
       "title": "Horizon close band S558–S566"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S566",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "poolai-ui-core/topology.rs`; wasm exports; slim JS glue",
-      "title": "Topology label helpers → ui-core/wasm"
     }
   ],
   "link": "docs/vision/index.html",

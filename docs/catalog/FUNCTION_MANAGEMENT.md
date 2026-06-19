@@ -777,8 +777,9 @@ FM-xxx (з таблиці нижче)
 | 510 | **PH-S575** | Admin table toolbar → wasm | RUST_RATIO §5.13 | `table_export_buttons_html` + `exportFilenameFromAria` wasm; slim JS | **✅** |
 | 511 | **PH-S576** | Protocol sunset env gate | Galaxy §9.6 | `POOLAI_PROTOCOL_SUNSET_MIN` → HTTP 426 on register-remote | **✅** |
 | 512 | **PH-S577** | Horizon close band S568–S576 | §5.12 fallback | `galaxy_horizon_s568_integration` + loc-audit + vision-sync | **✅** |
+| 513 | **PH-S578** | Vision fullscreen PiP above header | docs/vision UX | `.panel-fullscreen` `inset:0` + workspace z-index above header; Explorer overlay `top:0`; rev++ | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S577 ✅. Vision rev **250**. rust_ratio **94.69%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S578 ✅. Vision rev **252**. rust_ratio **94.69%**.
 
 **Наступна сесія:** **`абракадабра`** (project scan → drain) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 

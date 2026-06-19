@@ -2000,11 +2000,23 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_topology_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_fraud_proof_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_security_advisory_rs"
     }
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S577",
+  "last_sprint_closed": "PH-S578",
   "layers": [
     {
       "id": "L0",
@@ -8310,9 +8322,37 @@
       "label": "telegram_wallet_devnet_verify_integration.rs",
       "layer": "L3",
       "path": "tests/telegram_wallet_devnet_verify_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_fraud_proof_rs",
+      "label": "galaxy_fraud_proof.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_fraud_proof.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_security_advisory_rs",
+      "label": "galaxy_security_advisory.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_security_advisory.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s568_integration_rs",
+      "label": "galaxy_horizon_s568_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s568_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_prefetch_peer_http_integration_rs",
+      "label": "galaxy_prefetch_peer_http_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_prefetch_peer_http_integration.rs"
     }
   ],
-  "revision": 250,
+  "revision": 252,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -12921,6 +12961,15 @@
       "row": 512,
       "status": "closed",
       "title": "Horizon close band S568–S576"
+    },
+    {
+      "acceptance": ".panel-fullscreen` `inset:0` + workspace z-index above header; Explorer overlay `top:0`; rev++",
+      "deps": "docs/vision UX",
+      "id": "PH-S578",
+      "open": false,
+      "row": 513,
+      "status": "closed",
+      "title": "Vision fullscreen PiP above header"
     }
   ],
   "sprint_queue_open_count": 0,
