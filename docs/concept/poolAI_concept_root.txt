@@ -5,7 +5,7 @@
 **Прогрес:** autoprogon A+B **100%** (S34); Horizon Layer C **100%** (S35–S40). **Maintenance** — NEXT_SESSION_PROMPT.md. **BLOCKED (ops):** FM-003 §4 LAN (2 хости).
 
 - **FM-016 Virtual nodes ✅:** `poolai-worker`, `poolai-telegram-bot` (`--features tgbot`); coordinator API — discovery `register-remote` / `heartbeat-remote`, `GET /discovery/virtual-nodes`; `virtual_nodes` tasks, Telegram bind/webhook, `pool/join`, bootstrap + `raid_artifact_probe`; services `virtual_node_store`, `virtual_node_task_service`, `virtual_node_telegram_binding_service`; dev stand `bin/run-virtual-node-dev.*`, `bin/verify-dev-stand.*`, `core::dev_stand`.
-- **Galaxy Grid (fee split + Telegram edge mining + locality seeds)**: описано в `concept/POOLAI_GALAXY_GRID.md`. **Job lease wire (PH-S94…S109 ✅):** lease MVP + grid ingest→`leased` + E2E — `POOLAI_GALAXY_GRID.md` §4.3; post-MVP PH-S110…S112 у FM §5.12.
+- **Galaxy Grid (fee split + Telegram edge mining + locality seeds)**: описано в `concept/POOLAI_GALAXY_GRID.md`. **Job lease wire (PH-S94…S109 ✅):** lease MVP + grid ingest→`leased` + E2E — `POOLAI_GALAXY_GRID.md` §4.3. **Horizon band PH-S524…S533 ✅ (2026-06-19):** worker-unhealthy failover, governance Prometheus, settlement offline_batch wire, wasm admin charts slim — FM §5.12 **0** · наступна сесія **`абракадабра`**.
 - **Service layer (P2) ✅:** тонкі handlers у `src/network/api/*` → `src/services/*` (system, discovery, ui, raid, enterprise, cloud, virtual nodes, …).
 - **FM-005 REST errors ✅:** `src/network/json_errors.rs` — `{ "error": { "code", "message" }, "context"?: … }` по REST, enterprise, auth, raid.
 - **OpenAPI S14–S21 ✅:** v1 + `/api/enterprise/*` у `docs/openapi.yaml` (optimization/automl/federated ML.1–ML.3).

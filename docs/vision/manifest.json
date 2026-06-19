@@ -1916,6 +1916,24 @@
       "from": "job_types",
       "kind": "sprint-scope",
       "to": "tests_jobs_failover_budget_integration_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_governance_metrics_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "job_types",
+      "kind": "sprint-scope",
+      "to": "tests_jobs_scheduler_unhealthy_integration_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "job_types",
+      "kind": "sprint-scope",
+      "to": "tests_jobs_worker_unhealthy_failover_integration_rs"
     }
   ],
   "galaxy_background": "vision2.png",
@@ -8051,9 +8069,44 @@
       "label": "jobs_failover_budget_integration.rs",
       "layer": "L3",
       "path": "tests/jobs_failover_budget_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_governance_metrics_rs",
+      "label": "galaxy_governance_metrics.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_governance_metrics.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s524_integration_rs",
+      "label": "galaxy_horizon_s524_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s524_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_jobs_scheduler_unhealthy_integration_rs",
+      "label": "jobs_scheduler_unhealthy_integration.rs",
+      "layer": "L3",
+      "path": "tests/jobs_scheduler_unhealthy_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_jobs_worker_unhealthy_failover_integration_rs",
+      "label": "jobs_worker_unhealthy_failover_integration.rs",
+      "layer": "L3",
+      "path": "tests/jobs_worker_unhealthy_failover_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_network_profile_hydrate_integration_rs",
+      "label": "network_profile_hydrate_integration.rs",
+      "layer": "L3",
+      "path": "tests/network_profile_hydrate_integration.rs"
     }
   ],
-  "revision": 241,
+  "revision": 242,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",

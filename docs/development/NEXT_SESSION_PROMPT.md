@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-18 (PH-S524…S533 ✅ · vision **rev 241** · **0** відкритих · rust_ratio **94.61%**)
+**Оновлено:** 2026-06-19 (PH-S524…S533 ✅ · vision **rev 242** · **0** відкритих · rust_ratio **94.62%**)
 
 | **← наступний** | **`абракадабра`** (project scan + drain) **або** один PH-S* |
 | **Відкритих** | **0** |
@@ -43,6 +43,6 @@ PH-S531 ✅ — payout-batch `settlement_mode: offline_batch` wire.
 PH-S532 ✅ — `admin_charts.js` wasm-first slim (line/sparkline fallbacks removed).
 PH-S533 ✅ — horizon S524 integration + stand smoke + loc-audit + vision-sync.
 
-**rust_ratio:** **94.61%** (formal 90–95% ✅; hold 95% advisory).
+**rust_ratio:** **94.62%** (formal 90–95% ✅; hold 95% advisory).
 
 **BLOCKED / Deferred:** FM-003 LAN · FM-041 Cloud SDK live.

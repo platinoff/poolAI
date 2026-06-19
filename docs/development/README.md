@@ -1,7 +1,7 @@
 # 🚀 Плани Розробки PoolAI
 
 **Версія**: v0.2.2 → v0.3.0+  
-**Останнє оновлення**: 2026-05-24
+**Останнє оновлення**: 2026-06-19
 
 **Структура доків і правила агента:** [`../STRUCTURE.md`](../STRUCTURE.md) · [`.cursor/rules/documentation.md`](../../.cursor/rules/documentation.md)
 
@@ -12,10 +12,10 @@
 ### Нова сесія / передача контексту
 - **[`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md)** — порядок документації, гілка `main`, посилання на `git-push`, короткий стан P2 і наступні кроки.
 - **[`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md)** — **ціль 90–95% Rust** + portability (wasm horizon); FM **§5.13** PH-S143…S150.
-- **[`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md)** — роадмеп Galaxy Grid; §5.12 **3** відкритих PH-S140…S142; sync FM.
+- **[`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md)** — роадмеп Galaxy Grid; §5.12 **0** · PH-S524…S533 ✅; **`абракадабра`** = project scan.
 - **[`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md)** — **поточна фаза:** Horizon Layer C → 100% (S35–S40).
 - **[`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md)** — методика доведення проєкту до 100%.
-- **[`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)** — **humanized copy-paste** для агента; наступний спринт **PH-S122**; §5.12 **4** відкритих; [`OPENAPI_GAP_AUDIT_2026-05-19.md`](./OPENAPI_GAP_AUDIT_2026-05-19.md).
+- **[`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)** — copy-paste для агента; **`абракадабра`** · §5.12 **0** · vision rev **242**; [`OPENAPI_GAP_AUDIT_2026-05-19.md`](./OPENAPI_GAP_AUDIT_2026-05-19.md).
 - **[`PROMETHEUS_METRICS.md`](./PROMETHEUS_METRICS.md)** · **[`OPENTELEMETRY_TRACING.md`](./OPENTELEMETRY_TRACING.md)** · **[`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md)** · **[`VISUAL_REGRESSION_E2E.md`](./VISUAL_REGRESSION_E2E.md)** · **[`../security/TLS.md`](../security/TLS.md)** — PH-S07…S14 ✅; **PH-S03…S06** ✅ (VM, Raft); черга PH закрита — FM **§5.9**.
 - **[`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md)** — autoprogon S21–S34 ✅ (архів черги).
 - **[`DOCS_LEGACY_AUDIT_2026-05-19.md`](./DOCS_LEGACY_AUDIT_2026-05-19.md)** — менеджер функціоналу: stale docs, не повторювати архівні `[ ]`.

@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-18 (PH-S524…S533 ✅ · vision **rev 241** · **0** відкритих · rust_ratio **94.5%+**)
+**Оновлено:** 2026-06-19 (PH-S524…S533 ✅ · vision **rev 242** · **0** відкритих · rust_ratio **94.62%**)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -734,7 +734,7 @@ FM-xxx (з таблиці нижче)
 | 467 | **PH-S532** | `admin_charts.js` wasm slim band | RUST_RATIO §5.13 | line/sparkline JS fallbacks removed; wasm-first chart glue | **✅** |
 | 468 | **PH-S533** | Horizon close band S524–S532 | §5.12 fallback | `galaxy_horizon_s524_integration` + stand smoke + loc-audit + vision-sync | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S524…S533 ✅. Vision rev **241**. rust_ratio **94.61%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S524…S533 ✅. Vision rev **242**. rust_ratio **94.62%**.
 
 **Наступна сесія:** **`абракадабра`** (project scan → drain) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 

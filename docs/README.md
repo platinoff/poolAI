@@ -1,6 +1,6 @@
 # PoolAI documentation
 
-**Last updated:** 2026-06-17 (PH-S292 ✅ · §5.12 **0** відкритих · replenish §5.13 · rust_ratio **94.36%**)
+**Last updated:** 2026-06-19 (PH-S524…S533 ✅ · §5.12 **0** · vision **rev 242** · rust_ratio **94.62%** · **`абракадабра`**)
 
 ## Canonical reading order
 
@@ -31,7 +31,7 @@
 
 ## Short pointers
 
-- **Galaxy docs vision (рекомендовано)** — [vision/index.html](./vision/index.html) + `manifest.json` (rev **114**, git HEAD pill); `../bin/open-docs-vision.ps1`.
+- **Galaxy docs vision (рекомендовано)** — [vision/index.html](./vision/index.html) + `manifest.json` (rev **242**, git HEAD pill); `../bin/open-docs-vision.ps1`.
 - **Galaxy Grid (концепт)** — [concept/POOLAI_GALAXY_GRID.md](./concept/POOLAI_GALAXY_GRID.md) (§4.2 pricing + `/metrics`, §4.3 lease + OTel spans, §5.2 locality_score, §6 verification metrics); код: `src/grid/galaxy_*`, `src/job/lease_*`.
 - **Solana adapter** — [development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md](./development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md) · `crates/poolai-solana-adapter/` (FM-033; без `solana-sdk` у main).
 - **Commit-msg чернетки** — `comitmsg/README.md` (не комітити `comitmsg/*.txt`).

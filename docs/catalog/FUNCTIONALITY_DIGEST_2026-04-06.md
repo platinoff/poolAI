@@ -1,6 +1,6 @@
 # PoolAI — витяг функціоналу (зведення за доками та кодом)
 
-**Оновлено:** 2026-05-27 (PH-S98: lease acquire; PH-S97 TTL env; PH-S96 admin lease columns; PH-S94–S95 wire + PATCH CAS; PH-S78–S92 pricing).
+**Оновлено:** 2026-06-19 (PH-S524…S533: lease failover health, governance metrics, settlement wire, wasm charts slim).
 
 Цей документ — **не автогенерація з коду**, а структурований **витяг можливостей** системи, узгоджений з кореневим [`README.md`](../../README.md), [`docs/status/STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md), [`docs/development/HANDOFF_NEW_SESSION.md`](../development/HANDOFF_NEW_SESSION.md), модулями `src/` та (частково) [`docs/openapi.yaml`](../openapi.yaml). Для повного переліку HTTP-шляхів див. роутери в `src/network/` — OpenAPI може відставати від фактичного API.
 
@@ -154,16 +154,19 @@
 | **Galaxy fee split** | `src/grid/galaxy_fee_split.rs` | primary **0.1%** (10 bps) + secondary **1–5%** admin (floor bps); `GalaxyFeeSplit` lamports | unit tests; `cargo bench --bench galaxy_fee_split_benchmarks` |
 | **Pricing oracle (stub + L2 fallback)** | `src/grid/galaxy_pricing_oracle.rs` | unit keys; TTL/SWR cache (L1 fresh/stale); L2 fallback + FORCE_FALLBACK; `POOLAI_GALAXY_PRICING_PROVIDERS` catalog (PH-S92); in-process metrics fresh/stale/forced_fallback (PH-S81/S83/S91); Prometheus gauges on `GET /metrics` (PH-S127) | unit tests (`galaxy_pricing_oracle`) |
 | **Protocol compat** | `src/grid/protocol_compat.rs` | matrix coordinator↔worker `1.x`; `negotiate()` на register-remote; `CompatStatus` + docs URL | unit tests; `tests/discovery_remote_register_integration.rs` |
-| **Network profile** | `src/grid/galaxy_network_profile.rs`, `discovery.rs` | parse `metadata.network_profile` on register-remote (§8.1); canonical JSON in peer metadata | unit tests; `tests/discovery_network_profile_integration.rs` (PH-S140) |
+| **Network profile** | `src/grid/galaxy_network_profile.rs`, `galaxy_network_profile_store.rs`, `discovery.rs` | parse `metadata.network_profile` on register-remote (§8.1); startup hydrate persisted profiles (PH-S529); canonical JSON in peer metadata | unit tests; `tests/discovery_network_profile_integration.rs`, `tests/network_profile_hydrate_integration.rs` |
+| **Signed capability doc** | `src/grid/galaxy_capability_doc.rs` | ed25519 capability documents for telegram_edge; `expires_at` enforcement (PH-S527) | `tests/discovery_telegram_edge_capability_integration.rs` |
+| **Governance metrics** | `src/grid/galaxy_governance_metrics.rs`, `src/release/verify.rs` | Prometheus `poolai_release_verify_*`, `poolai_update_notify_pending` (Galaxy §9.2, PH-S528) | unit + `/metrics` scrape |
+| **Worker health** | `src/grid/galaxy_worker_health.rs` | peer health signals for scheduler bind / failover (PH-S524…S525) | `tests/jobs_scheduler_unhealthy_integration.rs`, `tests/jobs_worker_unhealthy_failover_integration.rs` |
 | **Verify sampling** | `src/grid/galaxy_verify_sampling.rs`, `verify_sampling_middleware.rs` | `POOLAI_GALAXY_VERIFY_BASE_SAMPLE_RATE` (§6.2, default `0.05`); middleware header + result ingest stub (PH-S142/S164) | unit + integration tests |
 | **Virtual nodes API** | `src/network/api/virtual_nodes.rs`, `discovery.rs` | register-remote/heartbeat, tasks, Telegram bind/webhook, pool join | `virtual_node_*_integration` |
 | **Virtual node services** | `src/services/virtual_node_task_service.rs`, `virtual_node_telegram_binding_service.rs` | task queue, Telegram seat bind (FM-016+) | integration tests |
 | **Signed release** | `src/release/`, `poolai-verify-release` | ed25519 manifest verify + artifact SHA-256 (PH-S66) | `release::verify` unit tests |
 | **Grid pricing API** | `src/network/api/grid.rs` | `GET /api/v1/grid/pricing` (task/model/unit); oracle from `galaxy_pricing_oracle` (PH-S78…S83) | `grid.rs` + `galaxy_pricing_oracle` tests |
-| **Job lease wire** | `src/job/types.rs`, `lease_config.rs`, `lease_acquire.rs`, `src/network/api/jobs.rs` | TTL env; acquire on schedule + `POST /jobs/{id}/lease`; PATCH CAS → `409 lease_epoch_rejected` (PH-S94…S98) | `lease_tests`, `jobs_api_contracts` |
+| **Job lease wire** | `src/job/types.rs`, `lease_config.rs`, `lease_acquire.rs`, `lease_failover.rs`, `src/network/api/jobs.rs` | TTL env; acquire/renew; worker-unhealthy + queue-starvation failover (PH-S524/S530); max runtime cap `POOLAI_JOB_MAX_TOTAL_RUNTIME_SECS` (PH-S526); PATCH CAS → `409 lease_epoch_rejected` | `lease_tests`, `jobs_api_contracts`, `jobs_failover_budget_integration` |
 | **Worker lease ticker** | `src/bin/poolai-worker.rs` | `LeaseRenewGuard` → periodic `POST /jobs/{id}/lease/renew`; payload `job_id` + `lease_epoch`; env `POOLAI_JOB_LEASE_RENEW_INTERVAL_SECS` (PH-S116, Galaxy §4.3.1.1) | `cargo test --bin poolai-worker` |
 | **OTel lease spans** | `src/observability/lease_trace.rs` | `job.lease.acquire` / `renew` / `reject` + `job.lease.*` attrs; wired store/jobs/grid/dispatch (PH-S126); contract PH-S124 | `observability_otel` (`--features otel`) |
-| **Prometheus export** | `src/observability/prometheus_export.rs` | `GET /metrics` pull model (FM-043); galaxy pricing gauges mirror oracle atomics (PH-S127) | `observability_prometheus` tests |
+| **Prometheus export** | `src/observability/prometheus_export.rs` | `GET /metrics` pull model (FM-043); galaxy pricing + governance gauges (PH-S127/S528) | `observability_prometheus` tests |
 
 **Admin UI (Galaxy ops, read-only):**
 
@@ -189,6 +192,8 @@
 | `POOLAI_GALAXY_PRICING_PROVIDERS` | coordinator | JSON allow-list provider catalog (PH-S92) |
 | `POOLAI_JOB_LEASE_TTL_SECS` | coordinator | Default lease TTL seconds (default `90`; `JobLeaseConfig::from_env()`, PH-S97) |
 | `POOLAI_JOB_LEASE_RENEW_INTERVAL_SECS` | coordinator | Optional renew interval override (default `ttl/3`, capped at TTL; PH-S111) |
+| `POOLAI_JOB_MAX_TOTAL_RUNTIME_SECS` | coordinator | Wall-clock cap on total job runtime before forced fail (PH-S526) |
+| `POOLAI_JOB_QUEUE_STARVATION_SECS` | coordinator | Queue starvation failover threshold on `leased_at` (PH-S530) |
 | `POOLAI_GALAXY_LOCALITY_MODE` | coordinator | Prefetch/locality strictness: `best_effort` (default) or `strict_locality` (PH-S136) |
 | `POOLAI_GALAXY_PREFETCH_DEADLINE_MS` | coordinator | Max prefetch wait before Running (default `15000`; PH-S136) |
 | `POOLAI_GALAXY_MIN_TRUST_PAYOUT` | coordinator | Min `trust_score` 0–100 for `telegram_edge` auto payout gate (default `40`; PH-S130) |
