@@ -1,4 +1,4 @@
-//! Admin network profiles panel (PH-S582).
+//! Admin network profiles panel (PH-S582 read, PH-S596 upsert).
 
 use crate::ui::admin::admin_layout_grid_pricing;
 use axum::response::Html;
@@ -21,15 +21,18 @@ pub async fn admin_network_profiles() -> Html<String> {
         const snap = profiles[id] || {};
         const region = snap.region || snap.network_profile?.region || '—';
         const latency = snap.latency_ms_p50 ?? snap.network_profile?.latency_ms_p50 ?? '—';
+        const bandwidth = snap.bandwidth_mbps ?? snap.network_profile?.bandwidth_mbps ?? '—';
         rows += '<tr><td><code>' + escapeHtml(String(id)) + '</code></td>' +
           '<td>' + escapeHtml(String(region)) + '</td>' +
-          '<td>' + escapeHtml(String(latency)) + '</td></tr>';
+          '<td>' + escapeHtml(String(latency)) + '</td>' +
+          '<td>' + escapeHtml(String(bandwidth)) + '</td></tr>';
       });
       el.innerHTML =
         '<table class="admin-table" aria-label="' + escapeHtml(T('admin.networkProfiles.table', 'Network profiles')) + '">' +
         '<thead><tr><th>' + escapeHtml(T('admin.networkProfiles.colPeer', 'Peer')) + '</th>' +
         '<th>' + escapeHtml(T('admin.networkProfiles.colRegion', 'Region')) + '</th>' +
-        '<th>' + escapeHtml(T('admin.networkProfiles.colLatency', 'Latency p50')) + '</th></tr></thead>' +
+        '<th>' + escapeHtml(T('admin.networkProfiles.colLatency', 'Latency p50')) + '</th>' +
+        '<th>' + escapeHtml(T('admin.networkProfiles.colBandwidth', 'Bandwidth Mbps')) + '</th></tr></thead>' +
         '<tbody>' + rows + '</tbody></table>';
     }
 
@@ -53,6 +56,44 @@ pub async fn admin_network_profiles() -> Html<String> {
       }
     }
 
+    async function saveNetworkProfileUpsert(ev) {
+      if (ev && ev.preventDefault) ev.preventDefault();
+      const peerId = document.getElementById('network-profile-peer')?.value?.trim() || '';
+      const region = document.getElementById('network-profile-region')?.value?.trim() || '';
+      const latency = Number(document.getElementById('network-profile-latency')?.value || '0');
+      const bandwidth = Number(document.getElementById('network-profile-bandwidth')?.value || '0');
+      const egress = document.getElementById('network-profile-egress')?.value || 'direct';
+      const statusEl = document.getElementById('network-profile-upsert-status');
+      if (!peerId || !region) {
+        if (statusEl) statusEl.textContent = T('admin.networkProfiles.errRequired', 'Peer id and region required.');
+        return;
+      }
+      const body = {
+        network_profile: {
+          region: region,
+          latency_ms_p50: latency,
+          bandwidth_mbps: bandwidth,
+          egress_policy: egress,
+        },
+      };
+      try {
+        const resp = await fetch('/api/v1/grid/network-profiles/' + encodeURIComponent(peerId), {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        if (!resp.ok) {
+          const errText = await resp.text();
+          throw new Error(errText || resp.statusText);
+        }
+        if (statusEl) statusEl.textContent = T('admin.networkProfiles.saved', 'Profile saved.');
+        await loadNetworkProfilesPanel();
+      } catch (e) {
+        if (statusEl) statusEl.textContent = T('admin.networkProfiles.errSave', 'Save failed: ') + e.message;
+        showNotification(T('admin.networkProfiles.errSave', 'Save failed: ') + e.message, 'error');
+      }
+    }
+
     loadNetworkProfilesPanel();
     setInterval(loadNetworkProfilesPanel, 15000);
     "#;
@@ -69,8 +110,27 @@ pub async fn admin_network_profiles() -> Html<String> {
             </div>
           </div>
           <p class="muted admin-hint" data-i18n="admin.networkProfiles.hint">
-            Read-only persisted peer profiles (Galaxy §8.1, PH-S570).
+            Persisted peer profiles (Galaxy §8.1). Upsert via PUT (PH-S596).
           </p>
+          <form id="network-profile-upsert-form" class="admin-form admin-form-inline" onsubmit="saveNetworkProfileUpsert(event)">
+            <label for="network-profile-peer" data-i18n="admin.networkProfiles.colPeer">Peer</label>
+            <input id="network-profile-peer" name="peer_id" type="text" required autocomplete="off" />
+            <label for="network-profile-region" data-i18n="admin.networkProfiles.colRegion">Region</label>
+            <input id="network-profile-region" name="region" type="text" required autocomplete="off" />
+            <label for="network-profile-latency" data-i18n="admin.networkProfiles.colLatency">Latency p50</label>
+            <input id="network-profile-latency" name="latency_ms_p50" type="number" min="0" value="20" />
+            <label for="network-profile-bandwidth" data-i18n="admin.networkProfiles.colBandwidth">Bandwidth Mbps</label>
+            <input id="network-profile-bandwidth" name="bandwidth_mbps" type="number" min="0" value="500" />
+            <label for="network-profile-egress" data-i18n="admin.networkProfiles.colEgress">Egress</label>
+            <select id="network-profile-egress" name="egress_policy">
+              <option value="direct">direct</option>
+              <option value="lan_only">lan_only</option>
+              <option value="vpn_proxy">vpn_proxy</option>
+              <option value="white_ip">white_ip</option>
+            </select>
+            <button type="submit" class="btn btn-secondary" id="network-profile-save-btn" data-i18n="admin.networkProfiles.save">Save profile</button>
+            <span id="network-profile-upsert-status" class="muted" aria-live="polite"></span>
+          </form>
           <div id="network-profiles-panel" class="network-profiles-panel"></div>
         </div>
         "#,
@@ -84,4 +144,6 @@ async fn admin_network_profiles_page_api_ph_s582() {
     assert!(html.contains("/api/v1/grid/network-profiles"));
     assert!(html.contains("network-profiles-panel"));
     assert!(html.contains("loadNetworkProfilesPanel"));
+    assert!(html.contains("network-profile-upsert-form"));
+    assert!(html.contains("saveNetworkProfileUpsert"));
 }

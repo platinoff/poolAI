@@ -33,6 +33,18 @@ const ADMIN_AXE_PAGES: { path: string; waitFor: string }[] = [
     waitFor: "#updates-compat-panel",
   },
   {
+    path: "/ui/admin/network-profiles",
+    waitFor: "#network-profiles-panel",
+  },
+  {
+    path: "/ui/admin/seed-inventory",
+    waitFor: "#seed-inventory-panel",
+  },
+  {
+    path: "/ui/admin/security-advisories",
+    waitFor: "#security-advisories-panel",
+  },
+  {
     path: "/ui/admin/payout-batch",
     waitFor: "#payout-batch-panel",
   },

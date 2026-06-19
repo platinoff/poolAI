@@ -10,6 +10,7 @@
 
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
+use std::cell::RefCell;
 
 use crate::core::error::AppError;
 use crate::grid::galaxy_capability_admission::check_telegram_edge_capability_admission;
@@ -24,7 +25,7 @@ use crate::grid::galaxy_locality::{
     record_locality_rank_skip, LocalityHotTier, LocalityNetworkProfile, LocalitySeedInventory,
     LocalityTask, LocalityWorker, DEFAULT_PREFETCH_CROSS_REGION_EGRESS_MB_PER_SHARD,
 };
-use crate::grid::galaxy_network_profile::GalaxyEgressPolicy;
+use crate::grid::galaxy_network_profile::{load_parsed_peer_network_profile, GalaxyEgressPolicy};
 use crate::grid::galaxy_prefetch_metrics::{
     observe_prefetch_queue_depth, record_hot_evict, record_hot_promote,
     record_locality_unsatisfied, record_prefetch_backpressure, record_prefetch_co_access,
@@ -402,6 +403,59 @@ pub const ENV_PREFETCH_PEER_REGION: &str = "POOLAI_GALAXY_PREFETCH_PEER_REGION";
 /// Env: stub peer egress policy (`lan_only` | `direct`, PH-S474).
 pub const ENV_PREFETCH_PEER_EGRESS_POLICY: &str = "POOLAI_GALAXY_PREFETCH_PEER_EGRESS_POLICY";
 
+thread_local! {
+    static PREFETCH_PEER_CTX: RefCell<Option<String>> = const { RefCell::new(None) };
+}
+
+/// Scope prefetch backpressure/egress gates to a source peer (PH-S591/S592).
+pub fn with_prefetch_peer<R>(peer_id: Option<&str>, f: impl FnOnce() -> R) -> R {
+    PREFETCH_PEER_CTX.with(|cell| {
+        let prev = cell.borrow_mut().clone();
+        *cell.borrow_mut() = peer_id.map(str::to_string);
+        let out = f();
+        *cell.borrow_mut() = prev;
+        out
+    })
+}
+
+fn current_prefetch_peer_id() -> Option<String> {
+    PREFETCH_PEER_CTX.with(|cell| cell.borrow().clone())
+}
+
+fn resolve_prefetch_peer_bandwidth_mbps() -> Option<u32> {
+    if let Some(peer_id) = current_prefetch_peer_id() {
+        if let Some(profile) = load_parsed_peer_network_profile(&peer_id) {
+            if let Some(bw) = profile.bandwidth_mbps {
+                return Some(bw);
+            }
+        }
+    }
+    env_u32(ENV_PREFETCH_PEER_BANDWIDTH_MBPS)
+}
+
+fn resolve_prefetch_peer_region() -> Option<String> {
+    if let Some(peer_id) = current_prefetch_peer_id() {
+        if let Some(profile) = load_parsed_peer_network_profile(&peer_id) {
+            let region = profile.region.trim().to_ascii_lowercase();
+            if !region.is_empty() {
+                return Some(region);
+            }
+        }
+    }
+    env_prefetch_peer_region()
+}
+
+fn resolve_prefetch_peer_egress_policy() -> Option<GalaxyEgressPolicy> {
+    if let Some(peer_id) = current_prefetch_peer_id() {
+        if let Some(profile) = load_parsed_peer_network_profile(&peer_id) {
+            if let Some(policy) = profile.egress_policy {
+                return Some(policy);
+            }
+        }
+    }
+    env_prefetch_peer_egress_policy()
+}
+
 /// Coordinator prefetch policy from environment (PH-S136, Galaxy ?5.6).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PrefetchPolicyConfig {
@@ -557,7 +611,7 @@ pub fn prefetch_backpressure_skip() -> bool {
     let Some(min) = env_u32(ENV_PREFETCH_MIN_BANDWIDTH_MBPS) else {
         return false;
     };
-    let peer_bw = env_u32(ENV_PREFETCH_PEER_BANDWIDTH_MBPS).unwrap_or(0);
+    let peer_bw = resolve_prefetch_peer_bandwidth_mbps().unwrap_or(0);
     if peer_bw < min {
         record_prefetch_backpressure();
         true
@@ -568,7 +622,7 @@ pub fn prefetch_backpressure_skip() -> bool {
 
 /// Cross-region egress guardrail for `lan_only` peers (PH-S474, Galaxy §8.1).
 pub fn prefetch_egress_blocked_skip() -> bool {
-    let Some(policy) = env_prefetch_peer_egress_policy() else {
+    let Some(policy) = resolve_prefetch_peer_egress_policy() else {
         return false;
     };
     if policy != GalaxyEgressPolicy::LanOnly {
@@ -577,7 +631,7 @@ pub fn prefetch_egress_blocked_skip() -> bool {
     let Some(coord) = env_prefetch_coordinator_region() else {
         return false;
     };
-    let Some(peer) = env_prefetch_peer_region() else {
+    let Some(peer) = resolve_prefetch_peer_region() else {
         return false;
     };
     if coord == peer {
@@ -914,12 +968,14 @@ fn ingest_job(
     let schedule_peer = locality_peer.as_deref().or(source_peer_id);
     schedule_with_grid_peer(jobs, schedule_peer)?;
     if !body.required_shard_ids.is_empty() {
-        ingest_job_prefetch_stub(
-            &body.required_shard_ids,
-            grid_job_gpu_capable(&body.task_kind),
-            Some(memory),
-        );
-        evaluate_strict_prefetch_timeout(&body.required_shard_ids, memory)?;
+        with_prefetch_peer(source_peer_id, || {
+            ingest_job_prefetch_stub(
+                &body.required_shard_ids,
+                grid_job_gpu_capable(&body.task_kind),
+                Some(memory),
+            );
+            evaluate_strict_prefetch_timeout(&body.required_shard_ids, memory)
+        })?;
     }
     let row = jobs
         .get(&job_id)?
@@ -2733,6 +2789,55 @@ mod tests {
         assert_eq!(fetch_seed_shards_from_peer_hook(&plan), 1);
         assert_eq!(prefetch_peer_fetch_total(), 1);
         assert_eq!(prefetch_peer_fetch_miss_total(), 1);
+        reset_prefetch_metrics_for_test();
+    }
+
+    #[test]
+    fn prefetch_profile_gates_ph_s591_s592() {
+        use crate::grid::galaxy_network_profile_store::{
+            persist_peer_network_profile, reset_network_profile_store_for_test,
+        };
+        use crate::grid::galaxy_prefetch_metrics::{
+            prefetch_backpressure_total, prefetch_egress_blocked_total,
+            reset_prefetch_metrics_for_test,
+        };
+
+        static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+        let _guard = ENV_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+        reset_network_profile_store_for_test();
+        reset_prefetch_metrics_for_test();
+        std::env::remove_var(ENV_PREFETCH_PEER_BANDWIDTH_MBPS);
+        std::env::remove_var(ENV_PREFETCH_PEER_REGION);
+        std::env::remove_var(ENV_PREFETCH_PEER_EGRESS_POLICY);
+        std::env::remove_var(ENV_PREFETCH_COORDINATOR_REGION);
+        std::env::remove_var(ENV_PREFETCH_MIN_BANDWIDTH_MBPS);
+
+        std::env::set_var(ENV_PREFETCH_MIN_BANDWIDTH_MBPS, "100");
+        persist_peer_network_profile(
+            "peer-bw-low",
+            r#"{"region":"eu-west","latency_ms_p50":20,"bandwidth_mbps":10}"#,
+        )
+        .expect("persist");
+        with_prefetch_peer(Some("peer-bw-low"), || {
+            assert!(prefetch_backpressure_skip());
+            assert_eq!(prefetch_backpressure_total(), 1);
+        });
+
+        reset_prefetch_metrics_for_test();
+        std::env::set_var(ENV_PREFETCH_COORDINATOR_REGION, "eu-west");
+        persist_peer_network_profile(
+            "peer-egress",
+            r#"{"region":"us-east","latency_ms_p50":20,"egress_policy":"lan_only"}"#,
+        )
+        .expect("persist");
+        with_prefetch_peer(Some("peer-egress"), || {
+            assert!(prefetch_egress_blocked_skip());
+            assert_eq!(prefetch_egress_blocked_total(), 1);
+        });
+
+        std::env::remove_var(ENV_PREFETCH_MIN_BANDWIDTH_MBPS);
+        std::env::remove_var(ENV_PREFETCH_COORDINATOR_REGION);
+        reset_network_profile_store_for_test();
         reset_prefetch_metrics_for_test();
     }
 }

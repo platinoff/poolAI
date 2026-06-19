@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-19 (PH-S589 ✅ · vision **rev 258** · **0** відкритих · rust_ratio **94.70%**)
+**Оновлено:** 2026-06-19 (PH-S590…S599 ✅ · vision **rev 259** · **0** відкритих · rust_ratio **94.67%**)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -789,10 +789,20 @@ FM-xxx (з таблиці нижче)
 | 522 | **PH-S587** | Updates-compat update policy readout | Galaxy §9.5 | `POOLAI_UPDATE_POLICY` + `POOLAI_RELEASE_MANIFEST_URL` on updates-compat page | **✅** |
 | 523 | **PH-S588** | Co-access prefetch HTTP integration | Roadmap §5.5 | grid ingest + `POOLAI_GALAXY_CO_ACCESS_GRAPH_JSON` → `galaxy_prefetch_co_access_total` | **✅** |
 | 524 | **PH-S589** | Horizon close band S580–S588 | §5.12 fallback | `galaxy_horizon_s580_integration` + loc-audit + vision-sync `--check` | **✅** |
+| 525 | **PH-S590** | Vision orbit UX carry-over (pause/layers/speed) | docs/vision UX | pause RAF fix; orbit ~30% WASD; `galaxy-bg` `pointer-events:none`; controls z-index; `vision.spec.ts` rotY play/pause | **✅** |
+| 526 | **PH-S591** | Prefetch backpressure from profile `bandwidth_mbps` | Galaxy §8.1 | `with_prefetch_peer` + persisted profile gate; unit + integration | **✅** |
+| 527 | **PH-S592** | Prefetch egress guardrail from profile `egress_policy` | Galaxy §8.1 | profile-driven `lan_only` cross-region block + metric | **✅** |
+| 528 | **PH-S593** | GPU passthrough grid envelope HTTP integration | Galaxy §6.6 | `POST /grid/envelope` inference:gpu → 403 `gpu_passthrough_required` | **✅** |
+| 529 | **PH-S594** | TEE attestation register-remote HTTP integration | Galaxy §6.6 | `POOLAI_TEE_ATTEST_REQUIRED=1` → 400 without attestation | **✅** |
+| 530 | **PH-S595** | Wallet rebind admin override API | Galaxy §3.2 | `POST …/wallet/rebind-override` + admin bearer; override metric | **✅** |
+| 531 | **PH-S596** | Admin network-profiles upsert UI | Galaxy §8.1 | PUT form round-trip; `admin.spec.ts` smoke | **✅** |
+| 532 | **PH-S597** | On-chain Cleared grid complete HTTP integration | Galaxy §7 | `SETTLEMENT_ON_CHAIN=1` result → mock RPC ack via HTTP | **✅** |
+| 533 | **PH-S598** | Galaxy admin a11y matrix expand | FM-019 / DOCS_LEGACY | network-profiles, seed-inventory, security-advisories in pa11y + axe | **✅** |
+| 534 | **PH-S599** | Horizon close band S591–S598 | §5.12 fallback | `galaxy_horizon_s591_integration` + loc-audit + vision-sync `--check` | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S589 ✅. Vision rev **258**. rust_ratio **94.70%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S590…S599 ✅. Vision rev **259**. rust_ratio **94.67%**.
 
-**Наступна сесія:** **`абракадабра`** (project scan → drain) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **`абракадабра`** — project scan → +10 PH-S* → drain → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S262)
 

@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-19 (PH-S589 ✅ · vision **rev 258** · **0** відкритих · rust_ratio **94.70%**)
+**Оновлено:** 2026-06-19 (PH-S590…S599 ✅ · vision **rev 259** · **0** відкритих · rust_ratio **94.67%**)
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -540,10 +540,20 @@
 **PH-S587 ✅ (ui):** `/ui/admin/updates-compat` — `POOLAI_UPDATE_POLICY` + `POOLAI_RELEASE_MANIFEST_URL` readout.
 **PH-S588 ✅ (tests):** grid ingest + `POOLAI_GALAXY_CO_ACCESS_GRAPH_JSON` → `galaxy_prefetch_co_access_total`.
 **PH-S589 ✅ (ops):** `galaxy_horizon_s580_integration` close band + loc-audit + vision-sync.
+**PH-S590 ✅ (vision):** orbit pause RAF; ~30% WASD auto-orbit; `galaxy-bg` pointer-events; controls z-index; `vision.spec.ts` rotY play/pause.
+**PH-S591 ✅ (code):** prefetch backpressure from persisted profile `bandwidth_mbps` (`with_prefetch_peer`).
+**PH-S592 ✅ (code):** prefetch egress guardrail from profile `egress_policy` + `region`.
+**PH-S593 ✅ (tests):** `POST /grid/envelope` GPU job → 403 `gpu_passthrough_required`.
+**PH-S594 ✅ (tests):** register-remote TEE attestation required when `POOLAI_TEE_ATTEST_REQUIRED=1`.
+**PH-S595 ✅ (code):** `POST /virtual-nodes/telegram/wallet/rebind-override` admin bearer + override metric.
+**PH-S596 ✅ (ui):** `/ui/admin/network-profiles` PUT upsert form + `admin.spec.ts` smoke.
+**PH-S597 ✅ (tests):** on-chain grid result complete HTTP → mock RPC ack.
+**PH-S598 ✅ (a11y):** network-profiles, seed-inventory, security-advisories in `pa11y-ci.sh` + `a11y.spec.ts`.
+**PH-S599 ✅ (ops):** `galaxy_horizon_s591_integration` close band + loc-audit + vision-sync `--check`.
 
-**Rules ✅:** **`абракадабра`** — project scan **всього репо** (concept · FM §5.1 · roadmaps · architect · code) → 10 PH-S* у §5.12 (журнал) → drain → push; канон [`.cursor/rules/poolai-session-iteration.mdc`](../.cursor/rules/poolai-session-iteration.mdc) § «Тригер абракадабра»; commit **`git-commit-tree-msg.sh`**.
-**§5.12:** **0** відкритих — наступна сесія: **`абракадабра`** (project scan + drain).
-**Vision ✅:** rev **258** · rust_ratio **94.70%** · hold **95%** advisory.
+**Rules ✅:** **`абракадабра`** — project scan → 10 PH-S* → drain → push; канон [`.cursor/rules/poolai-session-iteration.mdc`](../.cursor/rules/poolai-session-iteration.mdc).
+**§5.12:** **0** відкритих — наступна сесія: **`абракадабра`** (project scan → +10 → drain).
+**Vision ✅:** rev **259** · rust_ratio **94.67%** · hold **95%** advisory.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

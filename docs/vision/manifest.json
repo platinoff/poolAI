@@ -2016,7 +2016,7 @@
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S589",
+  "last_sprint_closed": "PH-S599",
   "layers": [
     {
       "id": "L0",
@@ -8350,9 +8350,37 @@
       "label": "galaxy_prefetch_peer_http_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_prefetch_peer_http_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ui_admin_network_profiles_rs",
+      "label": "network_profiles.rs",
+      "layer": "L3",
+      "path": "src/ui/admin/network_profiles.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ui_admin_security_advisories_rs",
+      "label": "security_advisories.rs",
+      "layer": "L3",
+      "path": "src/ui/admin/security_advisories.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ui_admin_seed_inventory_rs",
+      "label": "seed_inventory.rs",
+      "layer": "L3",
+      "path": "src/ui/admin/seed_inventory.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s580_integration_rs",
+      "label": "galaxy_horizon_s580_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s580_integration.rs"
     }
   ],
-  "revision": 258,
+  "revision": 259,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -13069,6 +13097,96 @@
       "row": 524,
       "status": "closed",
       "title": "Horizon close band S580–S588"
+    },
+    {
+      "acceptance": "pause RAF fix; orbit ~30% WASD; `galaxy-bg` `pointer-events:none`; controls z-index; `vision.spec.ts` rotY play/pause",
+      "deps": "docs/vision UX",
+      "id": "PH-S590",
+      "open": false,
+      "row": 525,
+      "status": "closed",
+      "title": "Vision orbit UX carry-over (pause/layers/speed)"
+    },
+    {
+      "acceptance": "with_prefetch_peer` + persisted profile gate; unit + integration",
+      "deps": "Galaxy §8.1",
+      "id": "PH-S591",
+      "open": false,
+      "row": 526,
+      "status": "closed",
+      "title": "Prefetch backpressure from profile `bandwidth_mbps"
+    },
+    {
+      "acceptance": "profile-driven `lan_only` cross-region block + metric",
+      "deps": "Galaxy §8.1",
+      "id": "PH-S592",
+      "open": false,
+      "row": 527,
+      "status": "closed",
+      "title": "Prefetch egress guardrail from profile `egress_policy"
+    },
+    {
+      "acceptance": "POST /grid/envelope` inference:gpu → 403 `gpu_passthrough_required",
+      "deps": "Galaxy §6.6",
+      "id": "PH-S593",
+      "open": false,
+      "row": 528,
+      "status": "closed",
+      "title": "GPU passthrough grid envelope HTTP integration"
+    },
+    {
+      "acceptance": "POOLAI_TEE_ATTEST_REQUIRED=1` → 400 without attestation",
+      "deps": "Galaxy §6.6",
+      "id": "PH-S594",
+      "open": false,
+      "row": 529,
+      "status": "closed",
+      "title": "TEE attestation register-remote HTTP integration"
+    },
+    {
+      "acceptance": "POST …/wallet/rebind-override` + admin bearer; override metric",
+      "deps": "Galaxy §3.2",
+      "id": "PH-S595",
+      "open": false,
+      "row": 530,
+      "status": "closed",
+      "title": "Wallet rebind admin override API"
+    },
+    {
+      "acceptance": "PUT form round-trip; `admin.spec.ts` smoke",
+      "deps": "Galaxy §8.1",
+      "id": "PH-S596",
+      "open": false,
+      "row": 531,
+      "status": "closed",
+      "title": "Admin network-profiles upsert UI"
+    },
+    {
+      "acceptance": "SETTLEMENT_ON_CHAIN=1` result → mock RPC ack via HTTP",
+      "deps": "Galaxy §7",
+      "id": "PH-S597",
+      "open": false,
+      "row": 532,
+      "status": "closed",
+      "title": "On-chain Cleared grid complete HTTP integration"
+    },
+    {
+      "acceptance": "network-profiles, seed-inventory, security-advisories in pa11y + axe",
+      "deps": "FM-019 / DOCS_LEGACY",
+      "id": "PH-S598",
+      "open": false,
+      "row": 533,
+      "status": "closed",
+      "title": "Galaxy admin a11y matrix expand"
+    },
+    {
+      "acceptance": "galaxy_horizon_s591_integration` + loc-audit + vision-sync `--check",
+      "deps": "§5.12 fallback",
+      "id": "PH-S599",
+      "open": false,
+      "row": 534,
+      "status": "closed",
+      "title": "Horizon close band S591–S598"
     }
   ],
   "sprint_queue_open_count": 0,

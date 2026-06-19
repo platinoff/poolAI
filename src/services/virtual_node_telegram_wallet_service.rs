@@ -6,6 +6,7 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Mutex, OnceLock};
 
 use super::virtual_node_store;
@@ -22,6 +23,22 @@ pub const ENV_WALLET_VERIFY_DEVNET: &str = "POOLAI_WALLET_VERIFY_DEVNET";
 
 /// Default rebind cooldown: 24h.
 pub const DEFAULT_WALLET_REBIND_COOLDOWN_SECS: u64 = 86_400;
+
+static WALLET_REBIND_OVERRIDE_TOTAL: AtomicU64 = AtomicU64::new(0);
+
+/// Admin override events (PH-S595).
+pub fn record_wallet_rebind_override() {
+    WALLET_REBIND_OVERRIDE_TOTAL.fetch_add(1, Ordering::Relaxed);
+}
+
+pub fn wallet_rebind_override_total() -> u64 {
+    WALLET_REBIND_OVERRIDE_TOTAL.load(Ordering::Relaxed)
+}
+
+#[cfg(any(test, feature = "test-utils"))]
+pub fn reset_wallet_rebind_override_for_test() {
+    WALLET_REBIND_OVERRIDE_TOTAL.store(0, Ordering::Relaxed);
+}
 
 /// Solana pubkey length bounds for base58 stub validation.
 pub const SOLANA_PUBKEY_MIN_LEN: usize = 32;
@@ -149,6 +166,27 @@ impl VirtualNodeTelegramWalletService {
         payout_pubkey: &str,
         chain: Option<&str>,
     ) -> Result<TelegramWalletBinding, WalletBindError> {
+        Self::bind_with_options(telegram_user_id, chat_id, payout_pubkey, chain, false)
+    }
+
+    /// Admin override skips rebind cooldown (PH-S595, Galaxy §3.2).
+    pub fn bind_admin_override(
+        telegram_user_id: &str,
+        chat_id: &str,
+        payout_pubkey: &str,
+        chain: Option<&str>,
+    ) -> Result<TelegramWalletBinding, WalletBindError> {
+        record_wallet_rebind_override();
+        Self::bind_with_options(telegram_user_id, chat_id, payout_pubkey, chain, true)
+    }
+
+    fn bind_with_options(
+        telegram_user_id: &str,
+        chat_id: &str,
+        payout_pubkey: &str,
+        chain: Option<&str>,
+        admin_override: bool,
+    ) -> Result<TelegramWalletBinding, WalletBindError> {
         let telegram_user_id = telegram_user_id.trim();
         let chat_id = chat_id.trim();
         let payout_pubkey = payout_pubkey.trim();
@@ -173,7 +211,7 @@ impl VirtualNodeTelegramWalletService {
         }
         let mut guard = wallets().lock().expect("telegram wallets lock");
         if let Some(existing) = guard.get(telegram_user_id) {
-            if existing.payout_pubkey != payout_pubkey {
+            if existing.payout_pubkey != payout_pubkey && !admin_override {
                 let cooldown = wallet_rebind_cooldown_secs_from_env();
                 let elapsed = Utc::now()
                     .signed_duration_since(existing.bound_at)

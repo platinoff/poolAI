@@ -323,6 +323,28 @@ test.describe("PoolAI admin E2E (S27–S34, PH-S23)", () => {
     ).toBeVisible({ timeout: 15_000 });
   });
 
+  test("network profiles upsert PUT round-trip (PH-S596)", async ({ page }) => {
+    const peerId = `e2e-np-${Date.now()}`;
+    await gotoAdminReady(page, "/ui/admin/network-profiles", "#network-profile-upsert-form");
+    await page.locator("#network-profile-peer").fill(peerId);
+    await page.locator("#network-profile-region").fill("eu-west");
+    await page.locator("#network-profile-latency").fill("22");
+    await page.locator("#network-profile-bandwidth").fill("400");
+    await page.locator("#network-profile-egress").selectOption("direct");
+    const putRespP = page.waitForResponse(
+      (res) =>
+        res.url().includes(`/api/v1/grid/network-profiles/${encodeURIComponent(peerId)}`) &&
+        res.request().method() === "PUT",
+      { timeout: 20_000 },
+    );
+    await page.locator("#network-profile-save-btn").click();
+    const putResp = await putRespP;
+    expect(putResp.ok()).toBeTruthy();
+    await expect(page.locator("#network-profiles-panel")).toContainText(peerId, {
+      timeout: 15_000,
+    });
+  });
+
   test("seed inventory panel loads (PH-S584)", async ({ page }) => {
     await gotoAdminReady(page, "/ui/admin/seed-inventory", "#seed-inventory-panel");
     await expect(

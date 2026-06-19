@@ -27,8 +27,8 @@
   const MAP_ORBIT_STEP_DEG = 2;
   /** Approx. browser key-repeat when holding WASD (keydown ~33 Hz). */
   const MAP_ORBIT_KEY_REPEAT_HZ = 33;
-  /** Auto-orbit: 10% slower than held WASD (PH-S579). */
-  const MAP_ORBIT_AUTO_SPEED_FACTOR = 0.9;
+  /** Auto-orbit: ~30% of held WASD (~3× slower than prior 90% band, PH-S579). */
+  const MAP_ORBIT_AUTO_SPEED_FACTOR = 0.3;
   const MAP_ORBIT_AUTO_DEG_PER_SEC =
     MAP_ORBIT_STEP_DEG * MAP_ORBIT_KEY_REPEAT_HZ * MAP_ORBIT_AUTO_SPEED_FACTOR;
   const MAP_FIT_PADDING = 36;
@@ -1266,11 +1266,12 @@
   function syncMapOrbitAutoBtn() {
     const btn = document.getElementById("map-orbit-auto");
     if (!btn) return;
+    btn.disabled = false;
     btn.classList.toggle("on", mapOrbitAutoPlay);
     btn.textContent = mapOrbitAutoPlay ? "⏸" : "▶";
     btn.title = mapOrbitAutoPlay
-      ? "Pause auto-orbit (90% WASD speed)"
-      : "Play auto-orbit (90% WASD speed)";
+      ? "Pause auto-orbit (~30% WASD speed)"
+      : "Play auto-orbit (~30% WASD speed)";
     btn.setAttribute(
       "aria-label",
       mapOrbitAutoPlay ? "Pause auto-orbit" : "Play auto-orbit"
@@ -1294,12 +1295,20 @@
     saveMapPrefs();
   }
 
+  function scheduleMapOrbitAutoFrame(tick) {
+    if (!mapOrbitAutoPlay) {
+      mapOrbitAutoRaf = 0;
+      return;
+    }
+    mapOrbitAutoRaf = requestAnimationFrame(tick);
+  }
+
   function startMapOrbitAuto() {
-    if (prefersReducedMotion()) return;
     mapOrbitAutoPlay = true;
     syncMapOrbitAutoBtn();
     saveMapPrefs();
-    if (mapOrbitAutoRaf || !manifest) return;
+    if (mapOrbitAutoRaf) return;
+    if (!manifest) return;
     function tick(ts) {
       if (!mapOrbitAutoPlay) {
         stopMapOrbitAutoLoop();
@@ -1307,7 +1316,7 @@
       }
       if (document.hidden) {
         mapOrbitAutoLastTs = 0;
-        mapOrbitAutoRaf = requestAnimationFrame(tick);
+        scheduleMapOrbitAutoFrame(tick);
         return;
       }
       if (!mapOrbitAutoLastTs) mapOrbitAutoLastTs = ts;
@@ -1317,21 +1326,24 @@
       mapOrbit.rotY += MAP_ORBIT_AUTO_DEG_PER_SEC * dt;
       clampMapOrbit();
       applyMapOrbitTransform();
-      fitMapToContent();
       mapOrbitAutoTicking = false;
-      mapOrbitAutoRaf = requestAnimationFrame(tick);
+      scheduleMapOrbitAutoFrame(tick);
     }
-    mapOrbitAutoRaf = requestAnimationFrame(tick);
+    scheduleMapOrbitAutoFrame(tick);
   }
 
   function toggleMapOrbitAuto() {
-    if (mapOrbitAutoPlay) pauseMapOrbitAuto();
-    else startMapOrbitAuto();
+    if (mapOrbitAutoPlay) {
+      pauseMapOrbitAuto();
+      return;
+    }
+    stopMapOrbitAutoLoop();
+    startMapOrbitAuto();
   }
 
   function ensureMapOrbitAutoAfterFit() {
     if (!mapInitialFitDone) return;
-    if (mapOrbitAutoPlay && !prefersReducedMotion()) startMapOrbitAuto();
+    if (mapOrbitAutoPlay) startMapOrbitAuto();
   }
 
   function mapOrbitTransformString() {
@@ -1814,6 +1826,20 @@
     });
   }
 
+  function mapChromeTarget(ev) {
+    return !!(
+      ev.target &&
+      ev.target.closest &&
+      (ev.target.closest(".map-controls") ||
+        ev.target.closest(".map-bottom-bar") ||
+        ev.target.closest(".map-toolbar") ||
+        ev.target.closest(".map-filter-bar") ||
+        ev.target.closest(".map-minimap") ||
+        ev.target.closest(".map-orbit-pad") ||
+        ev.target.closest("button"))
+    );
+  }
+
   function bindMapNavigation(svg) {
     const wrap = svg.closest(".map-wrap");
     if (!wrap || mapNavBound) return;
@@ -1840,9 +1866,9 @@
     wrap.addEventListener("mousedown", (ev) => {
       if (
         ev.button !== 0 ||
+        mapChromeTarget(ev) ||
         ev.target.closest(".node") ||
-        ev.target.closest(".edge") ||
-        ev.target.closest(".map-orbit-pad")
+        ev.target.closest(".edge")
       ) {
         return;
       }

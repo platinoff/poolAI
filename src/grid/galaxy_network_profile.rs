@@ -156,6 +156,14 @@ fn validate_network_profile(
     Ok(())
 }
 
+/// Load persisted peer profile from store (PH-S591/S592 prefetch gates).
+pub fn load_parsed_peer_network_profile(peer_id: &str) -> Option<GalaxyNetworkProfile> {
+    crate::grid::galaxy_network_profile_store::load_peer_network_profile(peer_id).and_then(|raw| {
+        let value: Value = serde_json::from_str(&raw).ok()?;
+        parse_network_profile_value(&value).ok()
+    })
+}
+
 fn validate_region(region: &str) -> Result<(), NetworkProfileParseError> {
     let len = region.len();
     if !(2..=32).contains(&len) {

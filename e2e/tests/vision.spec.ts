@@ -43,4 +43,36 @@ test.describe("Vision solar layout (PH-S565)", () => {
     await resetBtn.click();
     await expect(page.locator("#map-svg, .map-scene")).toBeVisible();
   });
+
+  test("auto-orbit rotY changes on play and holds on pause (PH-S590)", async ({ page }) => {
+    await expect(page.locator("#map-scene, .map-scene, #vision-map")).toBeVisible({
+      timeout: 20_000,
+    });
+    const orbitBtn = page.locator("#map-orbit-auto");
+    await expect(orbitBtn).toBeVisible({ timeout: 10_000 });
+    const readRotY = () =>
+      page.evaluate(() => {
+        const raw = localStorage.getItem("poolai-vision-map-prefs");
+        if (!raw) return null;
+        const parsed = JSON.parse(raw) as { mapOrbit?: { rotY?: number } };
+        return parsed.mapOrbit?.rotY ?? null;
+      });
+    if ((await orbitBtn.getAttribute("aria-pressed")) === "false") {
+      await orbitBtn.click();
+      await expect(orbitBtn).toHaveAttribute("aria-pressed", "true");
+    }
+    await page.waitForTimeout(800);
+    const rotY1 = await readRotY();
+    await page.waitForTimeout(700);
+    const rotY2 = await readRotY();
+    expect(rotY1).not.toBeNull();
+    expect(rotY2).not.toBeNull();
+    expect(Math.abs((rotY2 as number) - (rotY1 as number))).toBeGreaterThan(0.05);
+    await orbitBtn.click();
+    await expect(orbitBtn).toHaveAttribute("aria-pressed", "false");
+    const rotYPause = await readRotY();
+    await page.waitForTimeout(700);
+    const rotYAfter = await readRotY();
+    expect(Math.abs((rotYAfter as number) - (rotYPause as number))).toBeLessThan(0.05);
+  });
 });

@@ -77,6 +77,7 @@ body::before {
   height: 116%;
   object-fit: cover;
   opacity: var(--galaxy-bg-opacity);
+  pointer-events: none;
 }
 
 #starfield {
@@ -827,7 +828,7 @@ body.sidebar-collapsed .sidebar-title span { display: none; }
   position: absolute;
   right: 8px;
   bottom: 8px;
-  z-index: 4;
+  z-index: 8;
   width: 118px;
   height: 72px;
   border-radius: 6px;
@@ -1102,14 +1103,18 @@ body.panel-fs-active.sidebar-overlay-open .sidebar-overlay-backdrop {
 .map-scene-3d {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: 1;
   transform-style: preserve-3d;
   transform-origin: 50% 48%;
   will-change: auto;
   pointer-events: none;
 }
 
-.map-scene-3d .galaxy-bg,
+/* Decorative galaxy wallpaper — must not steal clicks from map SVG / controls */
+.map-scene-3d .galaxy-bg {
+  pointer-events: none;
+}
+
 .map-scene-3d #map-svg {
   pointer-events: auto;
 }
@@ -1140,7 +1145,7 @@ body.panel-fs-active.sidebar-overlay-open .sidebar-overlay-backdrop {
   width: 92px;
   height: 92px;
   margin: 0 0 0 -46px;
-  z-index: 6;
+  z-index: 5;
   border-radius: 50%;
   border: 1px solid rgba(126, 184, 255, 0.28);
   background: radial-gradient(
@@ -1220,7 +1225,7 @@ body.vision-ms .map-orbit-pad {
   content: "";
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 2;
   pointer-events: none;
   background: radial-gradient(
     ellipse at 50% 40%,
@@ -1229,11 +1234,18 @@ body.vision-ms .map-orbit-pad {
   );
 }
 
+/* Interactive map chrome — always above scene + vignette */
 .map-wrap .map-toolbar,
-.map-wrap .map-filter-bar,
-.map-wrap .map-bottom-bar,
+.map-wrap .map-filter-bar {
+  z-index: 8;
+}
+
 .map-wrap .map-minimap {
-  z-index: 3;
+  z-index: 8;
+}
+
+.map-wrap .map-bottom-bar {
+  z-index: 10;
 }
 
 .map-filter-bar {
@@ -1591,7 +1603,7 @@ body.vision-ms #map-svg .edge {
   bottom: 8px;
   left: 8px;
   right: 8px;
-  z-index: 5;
+  z-index: 10;
   display: flex;
   align-items: center;
   gap: 10px;

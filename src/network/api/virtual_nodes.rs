@@ -16,6 +16,7 @@ use serde_json::{json, Value};
 
 use crate::core::discovery_types::PeerInfo;
 use crate::core::state::ApiContext;
+use crate::network::auth::{validate_token, UserRole};
 use crate::network::validation;
 use crate::services::discovery_service::{DiscoveryNotReady, DiscoveryService};
 use crate::services::virtual_node_task_service::{VirtualNodeTask, VirtualNodeTaskService};
@@ -166,6 +167,10 @@ pub fn create_virtual_node_routes() -> Router<ApiContext> {
             post(bind_telegram_wallet_handler),
         )
         .route(
+            "/virtual-nodes/telegram/wallet/rebind-override",
+            post(admin_rebind_telegram_wallet_handler),
+        )
+        .route(
             "/virtual-nodes/telegram/wallets/{telegram_user_id}",
             get(get_telegram_wallet_handler),
         )
@@ -311,6 +316,60 @@ async fn bind_telegram_wallet_handler(
                 "error": "wallet_rebind_cooldown",
                 "message": "wallet rebind cooldown active",
                 "retry_after_secs": retry_after_secs,
+            })),
+        )
+            .into_response(),
+        Err(e) => (StatusCode::BAD_REQUEST, e.as_status_message()).into_response(),
+    }
+}
+
+async fn admin_rebind_telegram_wallet_handler(
+    headers: HeaderMap,
+    Json(body): Json<BindTelegramWalletRequest>,
+) -> impl IntoResponse {
+    let token = headers
+        .get("authorization")
+        .and_then(|v| v.to_str().ok())
+        .and_then(|auth| {
+            auth.strip_prefix("Bearer ")
+                .or_else(|| auth.strip_prefix("bearer "))
+                .map(str::to_string)
+        });
+    let Some(token) = token else {
+        return (
+            StatusCode::UNAUTHORIZED,
+            Json(serde_json::json!({
+                "error": "admin_required",
+                "message": "Bearer admin token required for wallet rebind override",
+            })),
+        )
+            .into_response();
+    };
+    let claims = match validate_token(&token) {
+        Ok(c) if c.role == UserRole::Admin => c,
+        _ => {
+            return (
+                StatusCode::FORBIDDEN,
+                Json(serde_json::json!({
+                    "error": "admin_required",
+                    "message": "admin role required for wallet rebind override",
+                })),
+            )
+                .into_response();
+        }
+    };
+    match VirtualNodeTelegramWalletService::bind_admin_override(
+        &body.telegram_user_id,
+        &body.chat_id,
+        &body.payout_pubkey,
+        body.chain.as_deref(),
+    ) {
+        Ok(wallet) => (
+            StatusCode::OK,
+            Json(serde_json::json!({
+                "wallet": wallet,
+                "admin_override": true,
+                "admin": claims.sub,
             })),
         )
             .into_response(),
