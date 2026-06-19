@@ -355,6 +355,7 @@ const GALAXY_PREFETCH_METRICS: &[&str] = &[
     "galaxy_locality_rank_miss_total",
     "galaxy_locality_rank_empty_workers_total",
     "galaxy_locality_rank_skip_total",
+    "galaxy_network_profile_stale_total",
 ];
 
 fn metrics_text_has_prefetch_counters(body: &str) -> Result<(), String> {
@@ -663,6 +664,7 @@ const GALAXY_SETTLEMENT_METRICS: &[&str] = &[
     "galaxy_settlement_not_applicable_total",
     "galaxy_settlement_resolved_total",
     "galaxy_settlement_payout_batch_total",
+    "galaxy_settlement_human_review_total",
 ];
 
 fn metrics_text_has_settlement_counters(body: &str) -> Result<(), String> {
@@ -2186,6 +2188,9 @@ mod tests {
             "# HELP galaxy_locality_rank_skip_total Galaxy locality rank skip\n",
             "# TYPE galaxy_locality_rank_skip_total gauge\n",
             "galaxy_locality_rank_skip_total 0\n",
+            "# HELP galaxy_network_profile_stale_total Galaxy stale network profile observations during locality rank (PH-S563)\n",
+            "# TYPE galaxy_network_profile_stale_total gauge\n",
+            "galaxy_network_profile_stale_total 0\n",
         );
         metrics_text_has_prefetch_counters(sample).expect("sample export");
     }
@@ -2319,6 +2324,9 @@ mod tests {
             "# HELP galaxy_settlement_payout_batch_total Galaxy offline payout batch ledger entries on cleared settlement (PH-S427)\n",
             "# TYPE galaxy_settlement_payout_batch_total gauge\n",
             "galaxy_settlement_payout_batch_total 0\n",
+            "# HELP galaxy_settlement_human_review_total Galaxy settlement human-review holds on non-deterministic semantic_hash (PH-S560)\n",
+            "# TYPE galaxy_settlement_human_review_total gauge\n",
+            "galaxy_settlement_human_review_total 0\n",
         );
         metrics_text_has_settlement_counters(sample).expect("sample export");
     }

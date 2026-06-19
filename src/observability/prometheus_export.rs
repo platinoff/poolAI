@@ -27,9 +27,10 @@ use crate::grid::galaxy_governance_metrics::{
 use crate::grid::galaxy_locality::{
     last_cross_region_egress_mb, last_shard_local_hit_ratio_bps, locality_rank_empty_workers_total,
     locality_rank_ingest_total, locality_rank_miss_total, locality_rank_skip_total,
-    METRIC_CROSS_REGION_EGRESS_MB, METRIC_LOCALITY_RANK_EMPTY_WORKERS_TOTAL,
-    METRIC_LOCALITY_RANK_INGEST_TOTAL, METRIC_LOCALITY_RANK_MISS_TOTAL,
-    METRIC_LOCALITY_RANK_SKIP_TOTAL, METRIC_SHARD_LOCAL_HIT_RATIO,
+    network_profile_stale_total, METRIC_CROSS_REGION_EGRESS_MB,
+    METRIC_LOCALITY_RANK_EMPTY_WORKERS_TOTAL, METRIC_LOCALITY_RANK_INGEST_TOTAL,
+    METRIC_LOCALITY_RANK_MISS_TOTAL, METRIC_LOCALITY_RANK_SKIP_TOTAL,
+    METRIC_NETWORK_PROFILE_STALE_TOTAL, METRIC_SHARD_LOCAL_HIT_RATIO,
 };
 use crate::grid::galaxy_prefetch_metrics::{
     hot_evict_total, hot_promote_total, locality_unsatisfied_total, prefetch_backpressure_total,
@@ -85,9 +86,10 @@ use crate::grid::galaxy_replication_metrics::{
     METRIC_REPLICATION_STRICT_TOTAL,
 };
 use crate::grid::galaxy_settlement_metrics::{
-    settlement_cleared_total, settlement_not_applicable_total, settlement_payout_batch_total,
-    settlement_pending_verification_total, settlement_resolved_total,
-    METRIC_SETTLEMENT_CLEARED_TOTAL, METRIC_SETTLEMENT_NOT_APPLICABLE_TOTAL,
+    settlement_cleared_total, settlement_human_review_total, settlement_not_applicable_total,
+    settlement_payout_batch_total, settlement_pending_verification_total,
+    settlement_resolved_total, METRIC_SETTLEMENT_CLEARED_TOTAL,
+    METRIC_SETTLEMENT_HUMAN_REVIEW_TOTAL, METRIC_SETTLEMENT_NOT_APPLICABLE_TOTAL,
     METRIC_SETTLEMENT_PAYOUT_BATCH_TOTAL, METRIC_SETTLEMENT_PENDING_VERIFICATION_TOTAL,
     METRIC_SETTLEMENT_RESOLVED_TOTAL,
 };
@@ -191,6 +193,7 @@ pub struct PoolAiPrometheus {
     galaxy_locality_rank_miss_total: IntGauge,
     galaxy_locality_rank_empty_workers_total: IntGauge,
     galaxy_locality_rank_skip_total: IntGauge,
+    galaxy_network_profile_stale_total: IntGauge,
     galaxy_verification_mismatch_total: IntGauge,
     galaxy_verification_match_total: IntGauge,
     galaxy_verification_sample_total: IntGauge,
@@ -215,6 +218,7 @@ pub struct PoolAiPrometheus {
     galaxy_settlement_not_applicable_total: IntGauge,
     galaxy_settlement_resolved_total: IntGauge,
     galaxy_settlement_payout_batch_total: IntGauge,
+    galaxy_settlement_human_review_total: IntGauge,
     galaxy_worker_unhealthy_total: IntGauge,
     poolai_release_verify_total: IntGauge,
     poolai_release_verify_fail_total: IntGauge,
@@ -835,6 +839,15 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_locality_rank_skip_total.clone()))
         .expect("register galaxy_locality_rank_skip_total");
 
+    let galaxy_network_profile_stale_total = IntGauge::with_opts(Opts::new(
+        METRIC_NETWORK_PROFILE_STALE_TOTAL,
+        "Galaxy stale network profile observations during locality rank (PH-S563)",
+    ))
+    .expect(METRIC_NETWORK_PROFILE_STALE_TOTAL);
+    registry
+        .register(Box::new(galaxy_network_profile_stale_total.clone()))
+        .expect("register galaxy_network_profile_stale_total");
+
     let galaxy_verification_mismatch_total = IntGauge::with_opts(Opts::new(
         METRIC_VERIFICATION_MISMATCH_TOTAL,
         "Galaxy verification digest mismatches on grid result path (PH-S175)",
@@ -1059,6 +1072,15 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_settlement_payout_batch_total.clone()))
         .expect("register galaxy_settlement_payout_batch_total");
 
+    let galaxy_settlement_human_review_total = IntGauge::with_opts(Opts::new(
+        METRIC_SETTLEMENT_HUMAN_REVIEW_TOTAL,
+        "Galaxy settlement human-review holds on non-deterministic semantic_hash (PH-S560)",
+    ))
+    .expect(METRIC_SETTLEMENT_HUMAN_REVIEW_TOTAL);
+    registry
+        .register(Box::new(galaxy_settlement_human_review_total.clone()))
+        .expect("register galaxy_settlement_human_review_total");
+
     let galaxy_worker_unhealthy_total = IntGauge::with_opts(Opts::new(
         METRIC_WORKER_UNHEALTHY_TOTAL,
         "Galaxy workers marked unhealthy after consecutive heartbeat misses (PH-S522)",
@@ -1214,6 +1236,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_locality_rank_miss_total,
         galaxy_locality_rank_empty_workers_total,
         galaxy_locality_rank_skip_total,
+        galaxy_network_profile_stale_total,
         galaxy_verification_mismatch_total,
         galaxy_verification_match_total,
         galaxy_verification_sample_total,
@@ -1238,6 +1261,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_settlement_not_applicable_total,
         galaxy_settlement_resolved_total,
         galaxy_settlement_payout_batch_total,
+        galaxy_settlement_human_review_total,
         galaxy_worker_unhealthy_total,
         poolai_release_verify_total,
         poolai_release_verify_fail_total,
@@ -1312,6 +1336,8 @@ pub fn refresh_galaxy_locality_gauges() {
         .set(locality_rank_empty_workers_total() as i64);
     prom.galaxy_locality_rank_skip_total
         .set(locality_rank_skip_total() as i64);
+    prom.galaxy_network_profile_stale_total
+        .set(network_profile_stale_total() as i64);
 }
 
 /// Mirror in-process prefetch plan counters into Prometheus gauges (scrape snapshot).
@@ -1436,6 +1462,8 @@ pub fn refresh_galaxy_verification_gauges() {
         .set(settlement_resolved_total() as i64);
     prom.galaxy_settlement_payout_batch_total
         .set(settlement_payout_batch_total() as i64);
+    prom.galaxy_settlement_human_review_total
+        .set(settlement_human_review_total() as i64);
     prom.galaxy_fee_split_applied_total
         .set(fee_split_applied_total() as i64);
 }

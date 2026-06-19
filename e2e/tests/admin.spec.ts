@@ -309,6 +309,13 @@ test.describe("PoolAI admin E2E (S27–S34, PH-S23)", () => {
     );
   });
 
+  test("payout batch panel loads (PH-S564)", async ({ page }) => {
+    await gotoAdminReady(page, "/ui/admin/payout-batch", "#payout-batch-panel");
+    await expect(page.locator("#payout-batch-panel .admin-card, #payout-batch-panel .admin-fetch-error")).toBeVisible({
+      timeout: 15_000,
+    });
+  });
+
   test("vm page loads instances container", async ({ page }) => {
     await gotoAdminReady(page, "/ui/admin/vm", "#vm-instances");
     await expect(page.locator('[data-i18n="admin.vmadm.createBtn"]')).toBeVisible({

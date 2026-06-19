@@ -96,6 +96,9 @@ pub const METRIC_LOCALITY_RANK_EMPTY_WORKERS_TOTAL: &str =
 /// Locality rank skipped when job has no required shards (PH-S325 stub).
 pub const METRIC_LOCALITY_RANK_SKIP_TOTAL: &str = "galaxy_locality_rank_skip_total";
 
+/// Stale network profile observations during locality rank (PH-S563, Galaxy §8.1).
+pub const METRIC_NETWORK_PROFILE_STALE_TOTAL: &str = "galaxy_network_profile_stale_total";
+
 /// Stub MB per cold shard on prefetch plan path when no task egress wire (PH-S185).
 pub const DEFAULT_PREFETCH_CROSS_REGION_EGRESS_MB_PER_SHARD: f64 = 50.0;
 
@@ -105,6 +108,7 @@ static LOCALITY_RANK_INGEST_TOTAL: AtomicU64 = AtomicU64::new(0);
 static LOCALITY_RANK_MISS_TOTAL: AtomicU64 = AtomicU64::new(0);
 static LOCALITY_RANK_EMPTY_WORKERS_TOTAL: AtomicU64 = AtomicU64::new(0);
 static LOCALITY_RANK_SKIP_TOTAL: AtomicU64 = AtomicU64::new(0);
+static NETWORK_PROFILE_STALE_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 fn worker_queue_depth(workers: &[LocalityWorker], worker_id: &str) -> u32 {
     workers
@@ -232,9 +236,15 @@ pub fn rank_workers_by_locality_with_weights(
 ) -> Vec<LocalityRankedWorker> {
     let mut ranked: Vec<LocalityRankedWorker> = workers
         .iter()
-        .map(|w| LocalityRankedWorker {
-            worker_id: w.worker_id.clone(),
-            score: locality_score(w, task, weights),
+        .map(|w| {
+            record_network_profile_stale_if_applicable(
+                w.network_profile.profile_age_secs,
+                DEFAULT_STALE_PROFILE_MAX_AGE_SECS,
+            );
+            LocalityRankedWorker {
+                worker_id: w.worker_id.clone(),
+                score: locality_score(w, task, weights),
+            }
         })
         .collect();
     ranked.sort_by(|a, b| {
@@ -261,6 +271,25 @@ pub fn rank_workers_by_locality_with_weights(
         }
     }
     ranked
+}
+
+/// Increment stale profile counter when age missing or exceeds threshold (PH-S563).
+pub fn record_network_profile_stale_if_applicable(
+    profile_age_secs: Option<u64>,
+    max_age_secs: u64,
+) {
+    if stale_network_profile_penalty(profile_age_secs, max_age_secs, 1.0) > 0.0 {
+        NETWORK_PROFILE_STALE_TOTAL.fetch_add(1, Ordering::Relaxed);
+    }
+}
+
+pub fn network_profile_stale_total() -> u64 {
+    NETWORK_PROFILE_STALE_TOTAL.load(Ordering::Relaxed)
+}
+
+#[cfg(any(test, feature = "test-utils"))]
+pub fn reset_network_profile_stale_metrics_for_test() {
+    NETWORK_PROFILE_STALE_TOTAL.store(0, Ordering::Relaxed);
 }
 
 /// Observe last top-ranked worker shard local hit ratio for Prometheus gauge (PH-S183).

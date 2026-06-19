@@ -27,7 +27,7 @@ fn replication_quorum_blocks_cleared_on_digest_mismatch_ph_s545() {
             required_shard_ids: vec![],
             deadline: None,
         }),
-        Some("peer-a".into()),
+        Some("tg-edge".into()),
     );
     ingest_envelope(job_env, &jobs, &memory).expect("job ingest");
     let lease_epoch = jobs
@@ -65,7 +65,7 @@ fn replication_quorum_blocks_cleared_on_digest_mismatch_ph_s545() {
             })),
             lease_epoch,
         }),
-        Some("peer-a".into()),
+        Some("tg-edge".into()),
     );
     let out = ingest_envelope(result_env, &jobs, &memory).expect("result ingest");
     match out.kind {

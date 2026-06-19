@@ -32,6 +32,10 @@ const ADMIN_AXE_PAGES: { path: string; waitFor: string }[] = [
     path: "/ui/admin/updates-compat",
     waitFor: "#updates-compat-panel",
   },
+  {
+    path: "/ui/admin/payout-batch",
+    waitFor: "#payout-batch-panel",
+  },
   { path: "/ui/admin/libs", waitFor: "#libraries-list" },
   { path: "/ui/admin/raid", waitFor: "#raid-admin" },
 ];

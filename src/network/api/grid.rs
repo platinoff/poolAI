@@ -137,25 +137,54 @@ async fn get_grid_verification_replay(
 }
 
 #[derive(Debug, Serialize)]
+struct PayoutRoutingSnapshot {
+    settlement_mode: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    primary_dev_lamports: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    secondary_admin_lamports: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    payout_pubkey: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
 struct GridPayoutBatchResponse {
     ok: bool,
     /// Settlement mechanism stub (PH-S531, Galaxy §8.2).
     settlement_mode: &'static str,
     #[serde(skip_serializing_if = "Option::is_none")]
     on_chain_pending: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    routing: Option<PayoutRoutingSnapshot>,
     entry: Option<crate::grid::galaxy_settlement::PayoutBatchLedgerEntry>,
+}
+
+fn payout_routing_snapshot(
+    mode: &'static str,
+    entry: &crate::grid::galaxy_settlement::PayoutBatchLedgerEntry,
+) -> PayoutRoutingSnapshot {
+    PayoutRoutingSnapshot {
+        settlement_mode: mode.to_string(),
+        primary_dev_lamports: entry.primary_dev_lamports,
+        secondary_admin_lamports: entry.secondary_admin_lamports,
+        payout_pubkey: entry.payout_pubkey.clone(),
+    }
 }
 
 async fn get_grid_payout_batch(
     State(_ctx): State<ApiContext>,
 ) -> Result<(StatusCode, Json<GridPayoutBatchResponse>), HttpAppError> {
+    let mode = current_settlement_mode();
+    let entry = crate::grid::galaxy_settlement_metrics::last_payout_batch_ledger_entry();
+    let routing = entry.as_ref().map(|e| payout_routing_snapshot(mode, e));
     Ok((
         StatusCode::OK,
         Json(GridPayoutBatchResponse {
             ok: true,
-            settlement_mode: current_settlement_mode(),
+            settlement_mode: mode,
             on_chain_pending: Some(settlement_on_chain_pending()),
-            entry: crate::grid::galaxy_settlement_metrics::last_payout_batch_ledger_entry(),
+            routing,
+            entry,
         }),
     ))
 }

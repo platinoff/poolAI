@@ -5,7 +5,8 @@ use axum::http::{Request, StatusCode};
 use axum::{body::Body, routing::get, Router};
 use poolai::core::state::ApiContext;
 use poolai::grid::galaxy_capability_admission::{
-    record_raid_artifact_probe_success, reset_probe_success_for_test,
+    record_peer_capabilities, record_raid_artifact_probe_success, reset_peer_capabilities_for_test,
+    reset_probe_success_for_test,
 };
 use poolai::grid::galaxy_replay_jobs::reset_replay_job_submit_for_test;
 use poolai::grid::galaxy_settlement::{resolve_payout_pubkey, PayoutBatchLedgerEntry};
@@ -82,6 +83,7 @@ async fn horizon_s534_band_verification_settlement_and_prefetch_ph_s543() {
     let _guard = ENV_LOCK.lock().unwrap_or_else(|e| e.into_inner());
 
     reset_probe_success_for_test();
+    reset_peer_capabilities_for_test();
     reset_replay_job_submit_for_test();
     reset_verification_checker_job_submit_for_test();
     reset_last_payout_batch_ledger_entry_for_test();
@@ -94,6 +96,7 @@ async fn horizon_s534_band_verification_settlement_and_prefetch_ph_s543() {
     let memory = MemoryShardStore::open_for_test(None);
 
     record_raid_artifact_probe_success("tg-edge");
+    record_peer_capabilities("tg-edge", &["gpu_passthrough".into()]);
 
     let job_env = GridEnvelope::new(
         GridMessage::Job(GridJobBody {
@@ -160,6 +163,7 @@ async fn horizon_s534_band_verification_settlement_and_prefetch_ph_s543() {
 
     std::env::remove_var("POOLAI_GALAXY_VERIFY_BASE_SAMPLE_RATE");
     reset_probe_success_for_test();
+    reset_peer_capabilities_for_test();
     reset_replay_job_submit_for_test();
     reset_verification_checker_job_submit_for_test();
     reset_last_payout_batch_ledger_entry_for_test();

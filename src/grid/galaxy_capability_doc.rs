@@ -54,6 +54,30 @@ pub const DEV_CAPABILITY_VERIFY_PK_HEX: &str =
 /// Env: override capability verify public key hex (PH-S476).
 pub const ENV_CAPABILITY_VERIFY_PK_HEX: &str = "POOLAI_GALAXY_CAPABILITY_VERIFY_PK_HEX";
 
+/// Env: production capability verify key hex (PH-S561 alias).
+pub const ENV_CAPABILITY_VERIFY_KEY: &str = "POOLAI_CAPABILITY_VERIFY_KEY";
+
+/// Returns true when production capability verify key is configured (PH-S561).
+pub fn capability_verify_production_mode() -> bool {
+    std::env::var(ENV_CAPABILITY_VERIFY_KEY)
+        .ok()
+        .filter(|v| !v.trim().is_empty())
+        .is_some()
+        || std::env::var(ENV_CAPABILITY_VERIFY_PK_HEX)
+            .ok()
+            .filter(|v| !v.trim().is_empty())
+            .is_some()
+}
+
+fn capability_verify_pk_hex() -> String {
+    std::env::var(ENV_CAPABILITY_VERIFY_KEY)
+        .ok()
+        .filter(|v| !v.trim().is_empty())
+        .or_else(|| std::env::var(ENV_CAPABILITY_VERIFY_PK_HEX).ok())
+        .filter(|v| !v.trim().is_empty())
+        .unwrap_or_else(|| DEV_CAPABILITY_VERIFY_PK_HEX.to_string())
+}
+
 /// Canonical signing message for capability documents (PH-S466 stub).
 pub fn capability_signing_message(doc: &GalaxyCapabilityDocument) -> String {
     format!("{}:{}", doc.peer_id.trim(), doc.capabilities.join(","))
@@ -69,10 +93,7 @@ pub fn verify_capability_signature_stub(
     if sig_hex.trim().is_empty() {
         return Err(CapabilityDocParseError::new("signature must not be empty"));
     }
-    let pk_hex = std::env::var(ENV_CAPABILITY_VERIFY_PK_HEX)
-        .ok()
-        .filter(|v| !v.trim().is_empty())
-        .unwrap_or_else(|| DEV_CAPABILITY_VERIFY_PK_HEX.to_string());
+    let pk_hex = capability_verify_pk_hex();
     let pk_bytes = hex::decode(pk_hex.trim())
         .map_err(|e| CapabilityDocParseError::new(format!("capability verify pk decode: {e}")))?;
     let pk_array: [u8; 32] = pk_bytes

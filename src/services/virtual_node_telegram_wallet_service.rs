@@ -17,6 +17,9 @@ pub const DEFAULT_WALLET_CHAIN: &str = "solana";
 pub const ENV_TELEGRAM_WALLET_REBIND_COOLDOWN_SECS: &str =
     "POOLAI_TELEGRAM_WALLET_REBIND_COOLDOWN_SECS";
 
+/// Env: opt-in devnet on-chain verify stub on bind (PH-S559, Galaxy §3.2).
+pub const ENV_WALLET_VERIFY_DEVNET: &str = "POOLAI_WALLET_VERIFY_DEVNET";
+
 /// Default rebind cooldown: 24h.
 pub const DEFAULT_WALLET_REBIND_COOLDOWN_SECS: u64 = 86_400;
 
@@ -30,7 +33,7 @@ pub struct TelegramWalletBinding {
     pub chat_id: String,
     pub payout_pubkey: String,
     pub chain: String,
-    /// Stub flag — always `true` on bind until on-chain verify wire (future sprint).
+    /// Stub flag — `true` when devnet verify passes or verify env disabled (PH-S559).
     pub verified: bool,
     pub bound_at: DateTime<Utc>,
 }
@@ -92,6 +95,29 @@ pub fn wallet_rebind_cooldown_secs_from_env() -> u64 {
         .ok()
         .and_then(|v| v.trim().parse().ok())
         .unwrap_or(DEFAULT_WALLET_REBIND_COOLDOWN_SECS)
+}
+
+pub fn wallet_verify_devnet_enabled() -> bool {
+    std::env::var(ENV_WALLET_VERIFY_DEVNET)
+        .ok()
+        .map(|v| {
+            let t = v.trim();
+            t == "1" || t.eq_ignore_ascii_case("true")
+        })
+        .unwrap_or(false)
+}
+
+/// Devnet sidecar stub: base58 pubkey shape check (PH-S559).
+pub fn devnet_verify_pubkey_stub(pubkey: &str) -> bool {
+    is_valid_solana_pubkey_stub(pubkey)
+}
+
+fn resolve_wallet_verified(pubkey: &str) -> bool {
+    if wallet_verify_devnet_enabled() {
+        devnet_verify_pubkey_stub(pubkey)
+    } else {
+        true
+    }
 }
 
 /// Base58 charset stub check for Solana pubkeys (no on-chain verify).
@@ -165,7 +191,7 @@ impl VirtualNodeTelegramWalletService {
             chat_id: chat_id.to_string(),
             payout_pubkey: payout_pubkey.to_string(),
             chain,
-            verified: true,
+            verified: resolve_wallet_verified(payout_pubkey),
             bound_at: Utc::now(),
         };
         guard.insert(telegram_user_id.to_string(), binding.clone());

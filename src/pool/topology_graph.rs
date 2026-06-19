@@ -5,6 +5,7 @@
 
 use crate::pool::topology::NodeResources;
 use poolai_ui_core::format::escape_html;
+use poolai_ui_core::topology::{short_topology_node_id, topology_hub_label};
 use serde::Serialize;
 use std::collections::HashMap;
 
@@ -12,7 +13,6 @@ const DEFAULT_WIDTH: u32 = 640;
 const DEFAULT_HEIGHT: u32 = 360;
 const DEFAULT_ITERATIONS: u32 = 80;
 const LABEL_OFFSET_Y: f64 = 14.0;
-const MAX_HUB_LABEL_LEN: usize = 14;
 
 #[derive(Debug, Clone, Serialize)]
 pub struct TopologyGraphNodeDto {
@@ -202,36 +202,6 @@ fn build_graph(
     }
 
     (nodes, links)
-}
-
-/// Short display id for topology tables and graph labels (PH-S198).
-pub fn short_topology_node_id(node_id: &str) -> String {
-    let id = node_id.trim();
-    if id.is_empty() {
-        return "—".to_string();
-    }
-    let base = id
-        .rsplit(':')
-        .next()
-        .and_then(|s| s.rsplit('/').next())
-        .unwrap_or(id)
-        .trim();
-    let base = base.strip_prefix("node-").unwrap_or(base);
-    if base.len() <= MAX_HUB_LABEL_LEN {
-        base.to_string()
-    } else {
-        format!("{}…", &base[..MAX_HUB_LABEL_LEN.saturating_sub(1)])
-    }
-}
-
-/// Hub-aware SVG label: highest-degree nodes (degree ≥ 2) get a `hub·` prefix.
-pub fn topology_hub_label(node_id: &str, degree: usize, max_degree: usize) -> String {
-    let short = short_topology_node_id(node_id);
-    if max_degree >= 2 && degree == max_degree {
-        format!("hub·{short}")
-    } else {
-        short
-    }
 }
 
 fn node_link_degrees(links: &[SimLink], nodes: &[SimNode]) -> HashMap<String, usize> {

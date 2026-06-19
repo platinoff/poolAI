@@ -3,6 +3,96 @@
   "items": [
     {
       "category": "closed",
+      "id": "PH-S567",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_horizon_s558_integration` + loc-audit + vision-sync",
+      "title": "Horizon close band S558–S566"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S566",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "poolai-ui-core/topology.rs`; wasm exports; slim JS glue",
+      "title": "Topology label helpers → ui-core/wasm"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S565",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "e2e/tests/vision.spec.ts`; `/ui/admin/payout-batch` in a11y matrix",
+      "title": "Vision solar Playwright + pa11y payout-batch"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S564",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "poolai-ui-core/payout_batch.rs` + wasm; slim admin JS",
+      "title": "Admin payout-batch wasm renderer"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S563",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_network_profile_stale_total` on locality rank; stand smoke",
+      "title": "Network profile stale downgrade metric"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S562",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "gpu_passthrough` in capability_document for inference:gpu; unit tests",
+      "title": "GPU passthrough admission gate"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S561",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "POOLAI_CAPABILITY_VERIFY_KEY` → 403 invalid sig on register-remote; integration test",
+      "title": "Signed capability production key verify"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S560",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "non-deterministic semantic_hash → PendingVerification; `galaxy_settlement_human_review_total",
+      "title": "Human-review settlement hold"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S559",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "POOLAI_WALLET_VERIFY_DEVNET=1` → verified on bind; integration test",
+      "title": "Telegram wallet devnet verify opt-in"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S558",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "GET /api/v1/grid/payout-batch` routing snapshot; integration test; openapi-gap 0",
+      "title": "Fee settlement payout routing wire"
+    },
+    {
+      "category": "closed",
       "id": "PH-S557",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
@@ -18,96 +108,6 @@
       "status": "closed",
       "summary": "applyMap3DProjection` layer Z; WASD W↑S↓A←D→; pad bottom-center; rev++",
       "title": "Vision map true 3D layer projection"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S555",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "map-scene-3d` perspective orbit; WASD + center pad; layer stack sync; rev++",
-      "title": "Vision map 3D orbit WASD + touch pad"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S554",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_horizon_s545_integration` + loc-audit + vision-sync",
-      "title": "Horizon close band S545–S553"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S553",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "/ui/admin/payout-batch` read-only GET payout-batch + history",
-      "title": "Admin payout-batch read panel"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S552",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_trust_score_store` persist/hydrate on register-remote",
-      "title": "Edge trust_score disk persistence"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S551",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "MVP CPU/RAM/Disk probros scope + GPU migration path in concept + RUN_LOCAL",
-      "title": "Telegram cold-mining + GPU horizon docs"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S550",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "POOLAI_SETTLEMENT_ON_CHAIN=1` → payout-batch `on_chain` + pending",
-      "title": "On-chain settlement mode toggle"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S549",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "POOLAI_UPDATE_POLICY` + `tick_update_notify_from_env` on verify-release",
-      "title": "Update policy notify env stub"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S548",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "LocalityWorker` tie-break queue_depth + pricing_usd_micro after locality score",
-      "title": "Scheduler pricing + queue_depth rank"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S547",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "LeaseFailReason::CapacityPreemption` + `apply_capacity_preemption_failover",
-      "title": "Capacity-preemption lease failover"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S546",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "evaluate_strict_prefetch_timeout` → `prefetch-timeout` under strict_locality",
-      "title": "Prefetch timeout fail trigger"
     }
   ],
   "link": "docs/vision/index.html",

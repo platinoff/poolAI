@@ -1,4 +1,4 @@
-//! Admin payout batch read panel (PH-S553).
+//! Admin payout batch read panel (PH-S553, PH-S564 wasm renderer).
 
 use crate::ui::admin::admin_layout_grid_pricing;
 use axum::response::Html;
@@ -8,10 +8,26 @@ pub async fn admin_payout_batch() -> Html<String> {
     let script = r#"
     function T(k, fb) { return typeof poolaiT === 'function' ? poolaiT(k, fb) : fb; }
 
-    function formatLamports(n) {
-      const v = Number(n);
-      if (!Number.isFinite(v)) return '—';
-      return v.toLocaleString('en-US');
+    function payoutBatchI18nJson() {
+      return JSON.stringify(window.__poolaiAdminI18nRust || {});
+    }
+
+    function renderPayoutBatchPanel(latest, history) {
+      const el = document.getElementById('payout-batch-panel');
+      if (!el) return;
+      const wasm = window.poolaiUiWasm;
+      if (wasm && wasm.ready && typeof wasm.renderPayoutBatchPanelHtml === 'function') {
+        el.innerHTML = wasm.renderPayoutBatchPanelHtml(
+          JSON.stringify(latest || {}),
+          JSON.stringify(history || {}),
+          payoutBatchI18nJson()
+        );
+        return;
+      }
+      const entry = latest.entry || null;
+      el.innerHTML =
+        '<div class="admin-card"><h3>' + escapeHtml(T('admin.payoutBatch.latest', 'Latest cleared entry')) + '</h3>' +
+        '<dl class="admin-dl"><dt>Job</dt><dd><code>' + escapeHtml(String(entry && entry.job_id || '—')) + '</code></dd></dl></div>';
     }
 
     async function loadPayoutBatchPanel() {
@@ -26,42 +42,6 @@ pub async fn admin_payout_batch() -> Html<String> {
         adminShowInlineError('payout-batch-panel', e);
         showNotification(T('admin.payoutBatch.errLoad', 'Error loading payout batch: ') + e.message, 'error');
       }
-    }
-
-    function renderPayoutBatchPanel(latest, history) {
-      const el = document.getElementById('payout-batch-panel');
-      if (!el) return;
-      const entry = latest.entry || null;
-      const rows = (history.entries || []).map(function (row) {
-        return '<tr>' +
-          '<td><code>' + escapeHtml(String(row.job_id || '—')) + '</code></td>' +
-          '<td>' + escapeHtml(String(row.cleared_at || '—')) + '</td>' +
-          '<td>' + escapeHtml(formatLamports(row.gross_lamports)) + '</td>' +
-          '<td><code>' + escapeHtml(String(row.payout_pubkey || '—')) + '</code></td>' +
-          '</tr>';
-      }).join('');
-      el.innerHTML =
-        '<div class="admin-card">' +
-        '<h3>' + escapeHtml(T('admin.payoutBatch.latest', 'Latest cleared entry')) + '</h3>' +
-        '<dl class="admin-dl">' +
-        '<dt>' + escapeHtml(T('admin.payoutBatch.mode', 'Settlement mode')) + '</dt>' +
-        '<dd><code>' + escapeHtml(String(latest.settlement_mode || 'offline_batch')) + '</code></dd>' +
-        '<dt>' + escapeHtml(T('admin.payoutBatch.onChain', 'On-chain pending')) + '</dt>' +
-        '<dd>' + escapeHtml(entry && latest.on_chain_pending ? 'yes' : 'no') + '</dd>' +
-        '<dt>' + escapeHtml(T('admin.payoutBatch.jobId', 'Job ID')) + '</dt>' +
-        '<dd><code>' + escapeHtml(String(entry && entry.job_id || '—')) + '</code></dd>' +
-        '<dt>' + escapeHtml(T('admin.payoutBatch.pubkey', 'Payout pubkey')) + '</dt>' +
-        '<dd><code>' + escapeHtml(String(entry && entry.payout_pubkey || '—')) + '</code></dd>' +
-        '</dl></div>' +
-        '<div class="admin-card">' +
-        '<h3>' + escapeHtml(T('admin.payoutBatch.history', 'Recent history')) + '</h3>' +
-        '<table class="admin-table"><thead><tr>' +
-        '<th>' + escapeHtml(T('admin.payoutBatch.colJob', 'Job')) + '</th>' +
-        '<th>' + escapeHtml(T('admin.payoutBatch.colCleared', 'Cleared')) + '</th>' +
-        '<th>' + escapeHtml(T('admin.payoutBatch.colGross', 'Gross lamports')) + '</th>' +
-        '<th>' + escapeHtml(T('admin.payoutBatch.colPubkey', 'Pubkey')) + '</th>' +
-        '</tr></thead><tbody>' + (rows || '<tr><td colspan="4">—</td></tr>') + '</tbody></table>' +
-        '</div>';
     }
 
     loadPayoutBatchPanel();
@@ -79,19 +59,22 @@ pub async fn admin_payout_batch() -> Html<String> {
               <button type="button" class="btn btn-primary" onclick="loadPayoutBatchPanel()" data-i18n="admin.payoutBatch.refresh">Refresh</button>
             </div>
           </div>
-          <p class="muted admin-hint" data-i18n="admin.payoutBatch.hint">
-            Read-only coordinator payout batch ledger (Galaxy §8.2, PH-S553).
-          </p>
-          <div id="payout-batch-panel" class="payout-batch-panel"></div>
+          <div id="payout-batch-panel" class="admin-panel-body" aria-live="polite"></div>
         </div>
         "#,
         script,
     )
 }
 
-#[tokio::test]
-async fn admin_payout_batch_page_api_ph_s553() {
-    let html = admin_payout_batch().await.0;
-    assert!(html.contains("payout-batch-panel"));
-    assert!(html.contains("/api/v1/grid/payout-batch"));
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn admin_payout_batch_includes_wasm_renderer_ph_s564() {
+        let html = admin_payout_batch().await.0;
+        assert!(html.contains("/ui/wasm/poolai_ui_wasm.js"));
+        assert!(html.contains("renderPayoutBatchPanelHtml"));
+        assert!(html.contains("payout-batch-panel"));
+    }
 }

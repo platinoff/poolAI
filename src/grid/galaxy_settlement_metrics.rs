@@ -24,11 +24,15 @@ pub const METRIC_SETTLEMENT_RESOLVED_TOTAL: &str = "galaxy_settlement_resolved_t
 /// Offline payout batch ledger entries on cleared settlement (PH-S427 stub).
 pub const METRIC_SETTLEMENT_PAYOUT_BATCH_TOTAL: &str = "galaxy_settlement_payout_batch_total";
 
+/// Human-review settlement holds for non-deterministic / semantic_hash mismatch (PH-S560).
+pub const METRIC_SETTLEMENT_HUMAN_REVIEW_TOTAL: &str = "galaxy_settlement_human_review_total";
+
 static PENDING_VERIFICATION_TOTAL: AtomicU64 = AtomicU64::new(0);
 static CLEARED_TOTAL: AtomicU64 = AtomicU64::new(0);
 static NOT_APPLICABLE_TOTAL: AtomicU64 = AtomicU64::new(0);
 static RESOLVED_TOTAL: AtomicU64 = AtomicU64::new(0);
 static PAYOUT_BATCH_TOTAL: AtomicU64 = AtomicU64::new(0);
+static HUMAN_REVIEW_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 static LAST_PAYOUT_BATCH: Mutex<Option<PayoutBatchLedgerEntry>> = Mutex::new(None);
 static PAYOUT_BATCH_HISTORY: Mutex<Vec<PayoutBatchLedgerEntry>> = Mutex::new(Vec::new());
@@ -81,6 +85,14 @@ pub fn settlement_payout_batch_total() -> u64 {
     PAYOUT_BATCH_TOTAL.load(Ordering::Relaxed)
 }
 
+pub fn record_settlement_human_review() {
+    HUMAN_REVIEW_TOTAL.fetch_add(1, Ordering::Relaxed);
+}
+
+pub fn settlement_human_review_total() -> u64 {
+    HUMAN_REVIEW_TOTAL.load(Ordering::Relaxed)
+}
+
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_settlement_resolved_metrics_for_test() {
     RESOLVED_TOTAL.store(0, Ordering::Relaxed);
@@ -108,6 +120,7 @@ pub fn reset_settlement_metrics_for_test() {
     reset_settlement_not_applicable_metrics_for_test();
     reset_settlement_resolved_metrics_for_test();
     PAYOUT_BATCH_TOTAL.store(0, Ordering::Relaxed);
+    HUMAN_REVIEW_TOTAL.store(0, Ordering::Relaxed);
     reset_last_payout_batch_ledger_entry_for_test();
     reset_payout_batch_history_for_test();
 }
@@ -181,6 +194,27 @@ pub fn reset_last_payout_batch_ledger_entry_for_test() {
 pub fn evaluate_result_settlement_not_applicable(settlement_status: SettlementStatus) {
     if settlement_status == SettlementStatus::NotApplicable {
         record_settlement_not_applicable();
+    }
+}
+
+/// Non-deterministic semantic_hash human-review hold (PH-S560, Galaxy §6.2).
+pub fn evaluate_semantic_hash_human_review_hold(metrics: Option<&serde_json::Value>) -> bool {
+    let Some(m) = metrics else {
+        return false;
+    };
+    let non_det = m
+        .get("task_profile")
+        .and_then(|v| v.as_str())
+        .is_some_and(|p| {
+            p.eq_ignore_ascii_case("non_deterministic") || p.eq_ignore_ascii_case("llm")
+        });
+    if !non_det {
+        return false;
+    }
+    match crate::grid::galaxy_verification_metrics::evaluate_semantic_hash_verification(Some(m)) {
+        Some(true) => false,
+        Some(false) => true,
+        None => true,
     }
 }
 

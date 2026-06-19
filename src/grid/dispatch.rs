@@ -52,7 +52,8 @@ use crate::grid::galaxy_settlement::{
 use crate::grid::galaxy_settlement_metrics::{
     evaluate_result_settlement_cleared, evaluate_result_settlement_not_applicable,
     evaluate_result_settlement_pending_verification, evaluate_result_settlement_resolved,
-    record_payout_batch_ledger_entry,
+    evaluate_semantic_hash_human_review_hold, record_payout_batch_ledger_entry,
+    record_settlement_human_review,
 };
 use crate::grid::galaxy_settlement_onchain::emit_settlement_job_rewarded;
 use crate::grid::galaxy_trust_score::{
@@ -1021,6 +1022,12 @@ fn ingest_result(
         && !replication_quorum_allows_cleared(&job_id, existing.spec.verification_policy.as_deref())
     {
         settlement_status = SettlementStatus::PendingVerification;
+    }
+    if settlement_status == SettlementStatus::Cleared
+        && evaluate_semantic_hash_human_review_hold(body.metrics.as_ref())
+    {
+        settlement_status = SettlementStatus::PendingVerification;
+        record_settlement_human_review();
     }
     if let (Some(peer_id), Some(score)) = (source_peer_id, trust_score) {
         persist_peer_trust_score(peer_id, score);

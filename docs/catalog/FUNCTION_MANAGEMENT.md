@@ -757,8 +757,18 @@ FM-xxx (з таблиці нижче)
 | 490 | **PH-S555** | Vision map 3D orbit WASD + touch pad | docs/vision UX | `map-scene-3d` perspective orbit; WASD + center pad; layer stack sync; rev++ | **✅** |
 | 491 | **PH-S556** | Vision map true 3D layer projection | docs/vision UX | `applyMap3DProjection` layer Z; WASD W↑S↓A←D→; pad bottom-center; rev++ | **✅** |
 | 492 | **PH-S557** | Vision gravity solar-system layout | docs/vision UX | folder mass hubs + multi-ring orbits; orphans at rim; orbit 2× slower; planes 50% transparent; stack sync | **✅** |
+| 493 | **PH-S558** | Fee settlement payout routing wire | Galaxy §8.2 TBD #1 | `GET /api/v1/grid/payout-batch` routing snapshot; integration test; openapi-gap 0 | **✅** |
+| 494 | **PH-S559** | Telegram wallet devnet verify opt-in | Galaxy §3.2 | `POOLAI_WALLET_VERIFY_DEVNET=1` → verified on bind; integration test | **✅** |
+| 495 | **PH-S560** | Human-review settlement hold | Galaxy §6.2 | non-deterministic semantic_hash → PendingVerification; `galaxy_settlement_human_review_total` | **✅** |
+| 496 | **PH-S561** | Signed capability production key verify | Galaxy §6.6 | `POOLAI_CAPABILITY_VERIFY_KEY` → 403 invalid sig on register-remote; integration test | **✅** |
+| 497 | **PH-S562** | GPU passthrough admission gate | Galaxy §6.6 / §8.2 | `gpu_passthrough` in capability_document for inference:gpu; unit tests | **✅** |
+| 498 | **PH-S563** | Network profile stale downgrade metric | Galaxy §8.1 | `galaxy_network_profile_stale_total` on locality rank; stand smoke | **✅** |
+| 499 | **PH-S564** | Admin payout-batch wasm renderer | PH-S553, ratio §5.13 | `poolai-ui-core/payout_batch.rs` + wasm; slim admin JS | **✅** |
+| 500 | **PH-S565** | Vision solar Playwright + pa11y payout-batch | PH-S557, FM-019 | `e2e/tests/vision.spec.ts`; `/ui/admin/payout-batch` in a11y matrix | **✅** |
+| 501 | **PH-S566** | Topology label helpers → ui-core/wasm | PH-S157 | `poolai-ui-core/topology.rs`; wasm exports; slim JS glue | **✅** |
+| 502 | **PH-S567** | Horizon close band S558–S566 | §5.12 fallback | `galaxy_horizon_s558_integration` + loc-audit + vision-sync | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S557 ✅. Vision rev **248**. rust_ratio **94.66%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S567 ✅. Vision rev **249**. rust_ratio **94.69%**.
 
 **Наступна сесія:** **`абракадабра`** (project scan → drain) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 

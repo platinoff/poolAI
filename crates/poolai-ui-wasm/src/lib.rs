@@ -27,13 +27,14 @@ use poolai_ui_core::ml::{
     render_monitoring_alerts_panel_html, render_monitoring_dashboards_panel_html,
     render_sparkline_html, sanitize_chart_id,
 };
-use poolai_ui_core::modal::{admin_dynamic_modal_html, trap_tab_action, MODAL_FOCUSABLE_SELECTOR};
+use poolai_ui_core::payout_batch::render_payout_batch_panel_html;
 use poolai_ui_core::pricing::{format_unix_secs, format_usd_micro};
 use poolai_ui_core::table::{
     build_csv, build_json_export, compare_sort_values, empty_state_html, escape_regex,
     form_field_html, highlight_query_html, render_table_html, row_matches_query,
 };
 use poolai_ui_core::theme::normalize_theme;
+use poolai_ui_core::topology::{short_topology_node_id, topology_hub_label};
 use poolai_ui_core::updates_compat::{compat_status_label, protocol_version_label};
 use poolai_ui_core::vm::render_vm_panel_html;
 use poolai_ui_core::workers::render_workers_panel_html;
@@ -697,6 +698,28 @@ fn parse_rfc3339_utc(raw: &str) -> Option<DateTime<Utc>> {
     DateTime::parse_from_rfc3339(raw)
         .ok()
         .map(|dt| dt.with_timezone(&Utc))
+}
+
+/// Admin payout batch panel HTML (PH-S564).
+#[wasm_bindgen(js_name = renderPayoutBatchPanelHtml)]
+pub fn render_payout_batch_panel_html_wasm(
+    latest_json: &str,
+    history_json: &str,
+    i18n_json: &str,
+) -> String {
+    render_payout_batch_panel_html(latest_json, history_json, i18n_json)
+}
+
+/// Topology hub label helper (PH-S566).
+#[wasm_bindgen(js_name = topologyHubLabel)]
+pub fn topology_hub_label_wasm(node_id: &str, degree: u32, max_degree: u32) -> String {
+    topology_hub_label(node_id, degree as usize, max_degree as usize)
+}
+
+/// Topology short node id helper (PH-S566).
+#[wasm_bindgen(js_name = shortTopologyNodeId)]
+pub fn short_topology_node_id_wasm(node_id: &str) -> String {
+    short_topology_node_id(node_id)
 }
 
 #[cfg(not(target_arch = "wasm32"))]

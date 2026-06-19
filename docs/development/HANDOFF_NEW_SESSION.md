@@ -508,6 +508,16 @@
 **PH-S555 ✅ (vision UX):** Galaxy map 3D orbit — `map-scene-3d` perspective, **WASD** keys, center **touch pad**; layer stack sync; UI v77 / CSS v73; rev **246**.
 **PH-S556 ✅ (vision UX):** True 3D layer projection — `applyMap3DProjection` + `MAP_LAYER_Z_STEP`; WASD W↑S↓A←D→; orbit pad bottom-center; UI v78 / CSS v74; rev **247**.
 **PH-S557 ✅ (vision UX):** Gravity solar-system layout — folder mass hubs, multi-ring orbits, orphan rim stars; orbit 2× slower; planes 50% transparent; stack↔map sync; UI v79 / CSS v75; rev **248**.
+**PH-S558 ✅ (code):** `GET /api/v1/grid/payout-batch` routing snapshot (`primary_dev_lamports`, `secondary_admin_lamports`, `payout_pubkey`); `tests/grid_payout_batch_integration.rs`; `cargo test-ci`.
+**PH-S559 ✅ (code):** `POOLAI_WALLET_VERIFY_DEVNET=1` → devnet verify stub on telegram wallet bind; `tests/telegram_wallet_devnet_verify_integration.rs`.
+**PH-S560 ✅ (code):** human-review settlement hold on non-deterministic semantic_hash mismatch; `galaxy_settlement_human_review_total`; dispatch path; unit + integration tests.
+**PH-S561 ✅ (code):** `POOLAI_CAPABILITY_VERIFY_KEY` → HTTP 403 on invalid capability_document signature; `tests/discovery_capability_production_verify_integration.rs`.
+**PH-S562 ✅ (code):** GPU passthrough gate — `gpu_passthrough` capability required for telegram_edge `inference:gpu`; `galaxy_capability_admission.rs`; unit tests.
+**PH-S563 ✅ (code):** `galaxy_network_profile_stale_total` on locality rank stale profile; `/metrics` export; stand smoke.
+**PH-S564 ✅ (code/e2e):** `poolai-ui-core/payout_batch.rs` + wasm `renderPayoutBatchPanelHtml`; slim `/ui/admin/payout-batch` JS; Playwright admin smoke.
+**PH-S565 ✅ (e2e):** `e2e/tests/vision.spec.ts` solar layout smoke; `/ui/admin/payout-batch` in pa11y matrix (FM-019).
+**PH-S566 ✅ (code):** `poolai-ui-core/topology.rs` label helpers + wasm exports; `topology_graph.rs` uses shared crate.
+**PH-S567 ✅ (ops):** `tests/galaxy_horizon_s558_integration.rs` horizon close band S558–S566; vision rev **249**; loc-audit.
 **Rules ✅:** **`абракадабра`** — project scan **всього репо** (concept · FM §5.1 · roadmaps · architect · code) → 10 PH-S* у §5.12 (журнал) → drain → push; канон [`.cursor/rules/poolai-session-iteration.mdc`](../.cursor/rules/poolai-session-iteration.mdc) § «Тригер абракадабра»; commit **`git-commit-tree-msg.sh`**.
 **§5.12:** **0** відкритих — наступна сесія: **`абракадабра`** (project scan + drain).
 **Vision ✅:** rev **248** · rust_ratio **94.66%** · hold **95%** advisory.

@@ -1992,7 +1992,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S557",
+  "last_sprint_closed": "PH-S567",
   "layers": [
     {
       "id": "L0",
@@ -8251,7 +8251,7 @@
       "path": "tests/galaxy_replication_quorum_integration.rs"
     }
   ],
-  "revision": 248,
+  "revision": 249,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -12680,6 +12680,96 @@
       "row": 492,
       "status": "closed",
       "title": "Vision gravity solar-system layout"
+    },
+    {
+      "acceptance": "GET /api/v1/grid/payout-batch` routing snapshot; integration test; openapi-gap 0",
+      "deps": "Galaxy §8.2 TBD #1",
+      "id": "PH-S558",
+      "open": false,
+      "row": 493,
+      "status": "closed",
+      "title": "Fee settlement payout routing wire"
+    },
+    {
+      "acceptance": "POOLAI_WALLET_VERIFY_DEVNET=1` → verified on bind; integration test",
+      "deps": "Galaxy §3.2",
+      "id": "PH-S559",
+      "open": false,
+      "row": 494,
+      "status": "closed",
+      "title": "Telegram wallet devnet verify opt-in"
+    },
+    {
+      "acceptance": "non-deterministic semantic_hash → PendingVerification; `galaxy_settlement_human_review_total",
+      "deps": "Galaxy §6.2",
+      "id": "PH-S560",
+      "open": false,
+      "row": 495,
+      "status": "closed",
+      "title": "Human-review settlement hold"
+    },
+    {
+      "acceptance": "POOLAI_CAPABILITY_VERIFY_KEY` → 403 invalid sig on register-remote; integration test",
+      "deps": "Galaxy §6.6",
+      "id": "PH-S561",
+      "open": false,
+      "row": 496,
+      "status": "closed",
+      "title": "Signed capability production key verify"
+    },
+    {
+      "acceptance": "gpu_passthrough` in capability_document for inference:gpu; unit tests",
+      "deps": "Galaxy §6.6 / §8.2",
+      "id": "PH-S562",
+      "open": false,
+      "row": 497,
+      "status": "closed",
+      "title": "GPU passthrough admission gate"
+    },
+    {
+      "acceptance": "galaxy_network_profile_stale_total` on locality rank; stand smoke",
+      "deps": "Galaxy §8.1",
+      "id": "PH-S563",
+      "open": false,
+      "row": 498,
+      "status": "closed",
+      "title": "Network profile stale downgrade metric"
+    },
+    {
+      "acceptance": "poolai-ui-core/payout_batch.rs` + wasm; slim admin JS",
+      "deps": "PH-S553, ratio §5.13",
+      "id": "PH-S564",
+      "open": false,
+      "row": 499,
+      "status": "closed",
+      "title": "Admin payout-batch wasm renderer"
+    },
+    {
+      "acceptance": "e2e/tests/vision.spec.ts`; `/ui/admin/payout-batch` in a11y matrix",
+      "deps": "PH-S557, FM-019",
+      "id": "PH-S565",
+      "open": false,
+      "row": 500,
+      "status": "closed",
+      "title": "Vision solar Playwright + pa11y payout-batch"
+    },
+    {
+      "acceptance": "poolai-ui-core/topology.rs`; wasm exports; slim JS glue",
+      "deps": "PH-S157",
+      "id": "PH-S566",
+      "open": false,
+      "row": 501,
+      "status": "closed",
+      "title": "Topology label helpers → ui-core/wasm"
+    },
+    {
+      "acceptance": "galaxy_horizon_s558_integration` + loc-audit + vision-sync",
+      "deps": "§5.12 fallback",
+      "id": "PH-S567",
+      "open": false,
+      "row": 502,
+      "status": "closed",
+      "title": "Horizon close band S558–S566"
     }
   ],
   "sprint_queue_open_count": 0,

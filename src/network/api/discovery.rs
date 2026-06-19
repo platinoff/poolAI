@@ -19,9 +19,10 @@ use std::collections::HashMap;
 use crate::core::discovery_types::{PeerCapabilities, PeerInfo};
 use crate::core::error::{AppError, ErrorContext};
 use crate::core::state::ApiContext;
+use crate::grid::galaxy_capability_admission::record_peer_capabilities;
 use crate::grid::galaxy_capability_doc::{
-    parse_capability_document, validate_capability_document, validate_telegram_edge_capability,
-    CapabilityDocParseError,
+    capability_verify_production_mode, parse_capability_document, validate_capability_document,
+    validate_telegram_edge_capability, CapabilityDocParseError,
 };
 use crate::grid::galaxy_network_profile::normalize_register_metadata;
 use crate::grid::galaxy_protocol_negotiation_metrics::{
@@ -147,6 +148,15 @@ fn discovery_not_ready(op: &'static str) -> HttpAppError {
     ))
     .with_context(ErrorContext::new(op))
     .with_status(StatusCode::SERVICE_UNAVAILABLE)
+}
+
+fn discovery_capability_forbidden(op: &'static str, message: impl Into<String>) -> HttpAppError {
+    HttpAppError::new(AppError::RestError {
+        code: "capability_signature_invalid",
+        message: message.into(),
+    })
+    .with_context(ErrorContext::new(op))
+    .with_status(StatusCode::FORBIDDEN)
 }
 
 fn discovery_validation(op: &'static str, message: impl Into<String>) -> HttpAppError {
@@ -289,6 +299,9 @@ async fn register_remote_handler(
             }
         };
         if let Err(CapabilityDocParseError { message }) = validate_capability_document(&doc) {
+            if capability_verify_production_mode() {
+                return discovery_capability_forbidden("register_remote", message).into_response();
+            }
             return discovery_validation("register_remote", message).into_response();
         }
         Some(doc)
@@ -298,12 +311,16 @@ async fn register_remote_handler(
     if let Err(CapabilityDocParseError { message }) =
         validate_telegram_edge_capability(telegram_edge, parsed_capability.as_ref())
     {
+        if capability_verify_production_mode() {
+            return discovery_capability_forbidden("register_remote", message).into_response();
+        }
         return discovery_validation("register_remote", message).into_response();
     }
-    if let Some(doc) = parsed_capability {
+    if let Some(doc) = parsed_capability.as_ref() {
+        record_peer_capabilities(&peer_id, &doc.capabilities);
         metadata.insert(
             "capability_document".to_string(),
-            serde_json::to_string(&doc).unwrap_or_else(|_| "{}".into()),
+            serde_json::to_string(doc).unwrap_or_else(|_| "{}".into()),
         );
     }
     if let Some(build_id) = payload.build_id {

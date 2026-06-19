@@ -102,3 +102,33 @@ async fn get_payout_batch_fee_split_fields_ph_s521() {
     );
     reset_last_payout_batch_ledger_entry_for_test();
 }
+
+#[tokio::test]
+async fn get_payout_batch_routing_snapshot_ph_s558() {
+    reset_last_payout_batch_ledger_entry_for_test();
+    record_payout_batch_ledger_entry(PayoutBatchLedgerEntry {
+        job_id: "job-route-1".into(),
+        cleared_at: "2026-06-19T12:00:00Z".into(),
+        gross_lamports: Some(2_000_000_000),
+        primary_dev_lamports: Some(2_000_000),
+        secondary_admin_lamports: Some(20_000_000),
+        payout_pubkey: Some("7EqQdE8uK9V3mN2pL4qR5sT6uV7wX8yZ9aB1cD2eF3".into()),
+        ..PayoutBatchLedgerEntry::minimal("", "")
+    });
+
+    let app = app().await;
+    let (status, body) = get_json(&app, "/api/v1/grid/payout-batch").await;
+    assert_eq!(status, StatusCode::OK, "body={body}");
+    let routing = body.get("routing").expect("routing");
+    assert_eq!(
+        routing.get("primary_dev_lamports").and_then(|v| v.as_u64()),
+        Some(2_000_000)
+    );
+    assert_eq!(
+        routing
+            .get("secondary_admin_lamports")
+            .and_then(|v| v.as_u64()),
+        Some(20_000_000)
+    );
+    reset_last_payout_batch_ledger_entry_for_test();
+}
