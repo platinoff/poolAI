@@ -23,6 +23,13 @@
   };
 
   let mapView = { tx: 0, ty: 0, scale: 1 };
+  const MAP_ORBIT_DEFAULT = { rotX: 48, rotY: -28, rotZ: -8 };
+  const MAP_ORBIT_STEP_DEG = 4;
+  const MAP_ORBIT_PAD_SENS = 0.16;
+  const MAP_ORBIT_CLAMP_X = 72;
+  const MAP_PREFS_ORBIT_KEY = "mapOrbit";
+  let mapOrbit = { rotX: MAP_ORBIT_DEFAULT.rotX, rotY: MAP_ORBIT_DEFAULT.rotY, rotZ: MAP_ORBIT_DEFAULT.rotZ };
+  let mapOrbitBound = false;
   const mapViewStack = [];
   let mapNavBound = false;
   let mapHoverRaf = 0;
@@ -214,6 +221,13 @@
       if (Array.isArray(p.collapsedPanels)) {
         collapsedPanels = new Set(p.collapsedPanels);
       }
+      if (p[MAP_PREFS_ORBIT_KEY] && typeof p[MAP_PREFS_ORBIT_KEY] === "object") {
+        const o = p[MAP_PREFS_ORBIT_KEY];
+        if (typeof o.rotX === "number") mapOrbit.rotX = o.rotX;
+        if (typeof o.rotY === "number") mapOrbit.rotY = o.rotY;
+        if (typeof o.rotZ === "number") mapOrbit.rotZ = o.rotZ;
+        clampMapOrbit();
+      }
     } catch (_) {
       /* ignore */
     }
@@ -232,6 +246,7 @@
           [MAP_PREFS_MODE_PIN_KEY]: visionModePinned,
           [MAP_PREFS_ECO_KEY]: visionMode === "eco",
           [MAP_PREFS_ECO_PIN_KEY]: visionModePinned,
+          [MAP_PREFS_ORBIT_KEY]: mapOrbit,
         })
       );
     } catch (_) {
@@ -974,7 +989,170 @@
 
   function resetMapView() {
     mapView = { tx: 0, ty: 0, scale: 1 };
+    resetMapOrbit();
     applyMapTransform();
+  }
+
+  function mapOrbitTransformString() {
+    return (
+      "rotateX(" +
+      mapOrbit.rotX.toFixed(2) +
+      "deg) rotateY(" +
+      mapOrbit.rotY.toFixed(2) +
+      "deg) rotateZ(" +
+      mapOrbit.rotZ.toFixed(2) +
+      "deg)"
+    );
+  }
+
+  function clampMapOrbit() {
+    mapOrbit.rotX = Math.max(-MAP_ORBIT_CLAMP_X, Math.min(MAP_ORBIT_CLAMP_X, mapOrbit.rotX));
+    while (mapOrbit.rotY > 180) mapOrbit.rotY -= 360;
+    while (mapOrbit.rotY < -180) mapOrbit.rotY += 360;
+    mapOrbit.rotZ = Math.max(-40, Math.min(40, mapOrbit.rotZ));
+  }
+
+  function applyMapOrbitTransform() {
+    const t = mapOrbitTransformString();
+    const scene = document.getElementById("map-scene-3d");
+    if (scene) scene.style.transform = t;
+    const stack = document.getElementById("layer-stack");
+    if (stack) stack.style.transform = t;
+  }
+
+  function resetMapOrbit() {
+    mapOrbit.rotX = MAP_ORBIT_DEFAULT.rotX;
+    mapOrbit.rotY = MAP_ORBIT_DEFAULT.rotY;
+    mapOrbit.rotZ = MAP_ORBIT_DEFAULT.rotZ;
+    applyMapOrbitTransform();
+    updateOrbitPadStick(0, 0);
+  }
+
+  function adjustMapOrbit(dRotX, dRotY) {
+    mapOrbit.rotX += dRotX;
+    mapOrbit.rotY += dRotY;
+    clampMapOrbit();
+    applyMapOrbitTransform();
+  }
+
+  function orbitKeyBlocked(ev) {
+    const t = ev.target;
+    if (!t) return false;
+    if (t.isContentEditable) return true;
+    const tag = t.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return true;
+    return false;
+  }
+
+  function updateOrbitPadStick(dx, dy) {
+    const stick = document.getElementById("map-orbit-stick");
+    if (!stick) return;
+    const max = 22;
+    const len = Math.hypot(dx, dy);
+    const scale = len > max ? max / len : 1;
+    stick.style.transform =
+      "translate(" + (dx * scale).toFixed(1) + "px," + (dy * scale).toFixed(1) + "px)";
+  }
+
+  function initMapOrbitControls() {
+    if (mapOrbitBound) return;
+    mapOrbitBound = true;
+    applyMapOrbitTransform();
+
+    document.addEventListener("keydown", (ev) => {
+      if (orbitKeyBlocked(ev)) return;
+      if (ev.metaKey || ev.ctrlKey || ev.altKey) return;
+      let handled = false;
+      switch (ev.key) {
+        case "w":
+        case "W":
+          adjustMapOrbit(-MAP_ORBIT_STEP_DEG, 0);
+          handled = true;
+          break;
+        case "s":
+        case "S":
+          adjustMapOrbit(MAP_ORBIT_STEP_DEG, 0);
+          handled = true;
+          break;
+        case "a":
+        case "A":
+          adjustMapOrbit(0, -MAP_ORBIT_STEP_DEG);
+          handled = true;
+          break;
+        case "d":
+        case "D":
+          adjustMapOrbit(0, MAP_ORBIT_STEP_DEG);
+          handled = true;
+          break;
+        default:
+          break;
+      }
+      if (handled) {
+        ev.preventDefault();
+        saveMapPrefs();
+      }
+    });
+
+    const pad = document.getElementById("map-orbit-pad");
+    if (!pad) return;
+
+    let padActive = false;
+    let padCx = 0;
+    let padCy = 0;
+
+    function orbitFromPadPointer(clientX, clientY) {
+      const dx = clientX - padCx;
+      const dy = clientY - padCy;
+      adjustMapOrbit(-dy * MAP_ORBIT_PAD_SENS, dx * MAP_ORBIT_PAD_SENS);
+      updateOrbitPadStick(dx, dy);
+    }
+
+    function startPad(ev) {
+      if (ev.button !== undefined && ev.button !== 0) return;
+      padActive = true;
+      pad.classList.add("orbit-active");
+      const r = pad.getBoundingClientRect();
+      padCx = r.left + r.width / 2;
+      padCy = r.top + r.height / 2;
+      orbitFromPadPointer(ev.clientX, ev.clientY);
+      ev.preventDefault();
+    }
+
+    function movePad(ev) {
+      if (!padActive) return;
+      orbitFromPadPointer(ev.clientX, ev.clientY);
+      ev.preventDefault();
+    }
+
+    function endPad() {
+      if (!padActive) return;
+      padActive = false;
+      pad.classList.remove("orbit-active");
+      updateOrbitPadStick(0, 0);
+      saveMapPrefs();
+    }
+
+    pad.addEventListener("mousedown", startPad);
+    window.addEventListener("mousemove", movePad);
+    window.addEventListener("mouseup", endPad);
+    pad.addEventListener(
+      "touchstart",
+      (ev) => {
+        if (!ev.touches.length) return;
+        startPad(ev.touches[0]);
+      },
+      { passive: false }
+    );
+    window.addEventListener(
+      "touchmove",
+      (ev) => {
+        if (!padActive || !ev.touches.length) return;
+        movePad(ev.touches[0]);
+      },
+      { passive: false }
+    );
+    window.addEventListener("touchend", endPad);
+    window.addEventListener("touchcancel", endPad);
   }
 
   function normalizeWheelDelta(deltaY, deltaMode) {
@@ -1306,7 +1484,8 @@
       if (
         ev.button !== 0 ||
         ev.target.closest(".node") ||
-        ev.target.closest(".edge")
+        ev.target.closest(".edge") ||
+        ev.target.closest(".map-orbit-pad")
       ) {
         return;
       }
@@ -3638,6 +3817,8 @@
   applyVisionMode();
   initMapToolbar();
   initMapKeyboardNav();
+  initMapOrbitControls();
+  applyMapOrbitTransform();
   reloadAll(false)
     .then(() => startAutoReload())
     .catch((err) => {

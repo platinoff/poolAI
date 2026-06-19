@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PoolAI Galaxy Starwalker Vision</title>
-  <link rel="stylesheet" href="vision.css?v=72" />
+  <link rel="stylesheet" href="vision.css?v=73" />
 </head>
 <body>
   <div id="galaxy-backdrop" class="galaxy-backdrop" aria-hidden="true">
@@ -55,7 +55,21 @@
         <section class="panel" data-panel="map" aria-label="Interactive map">
           <h2><span data-short="Map">Galaxy map</span><span class="panel-head-actions"><button type="button" class="btn-panel-collapse" title="Collapse to title bar">−</button><button type="button" class="btn-panel-fs" title="Fullscreen (Esc)">⛶</button></span></h2>
           <div class="panel-body map-wrap">
+            <div class="map-scene-3d" id="map-scene-3d">
             <img class="galaxy-bg" src="" alt="" />
+            <svg id="map-svg" viewBox="0 0 900 520" role="group" aria-label="Documentation graph — Tab to nodes and controls, arrow keys for linked neighbors, WASD to orbit"></svg>
+            </div>
+            <div
+              class="map-orbit-pad"
+              id="map-orbit-pad"
+              role="application"
+              aria-label="3D orbit control — drag or use W A S D keys"
+              title="Drag to orbit · W A S D keys"
+            >
+              <div class="map-orbit-pad-ring" aria-hidden="true"></div>
+              <div class="map-orbit-pad-stick" id="map-orbit-stick" aria-hidden="true"></div>
+              <span class="map-orbit-pad-label" aria-hidden="true">WASD</span>
+            </div>
             <div class="map-toolbar" aria-label="Map filters">
               <button type="button" id="btn-map-sprint" class="btn-map-toggle" title="Dim nodes outside active sprint (PH-S*)">◎ Sprint</button>
               <button type="button" id="btn-map-clusters" class="btn-map-toggle on" title="Collapse dense folders">⊟ Folders</button>
@@ -99,13 +113,12 @@
                 <button type="button" id="map-zoom-reset" title="Reset view">⌂</button>
                 <button type="button" id="map-zoom-back" title="Back to previous view" disabled aria-label="Back to previous view">←</button>
               </div>
-              <span class="map-hint">Tab focus · click edge · ←→↑↓ neighbors · Eco→FX→Ms · Esc reset</span>
+              <span class="map-hint">WASD orbit · drag center pad · Tab focus · ←→↑↓ · Eco→FX→Ms · ⌂ reset</span>
             </div>
             <p id="map-selection-live" class="map-selection-live" aria-live="polite" aria-atomic="true"></p>
             <aside class="map-minimap" id="map-minimap" aria-label="Map minimap — viewport inset and selection ring; click to pan">
               <svg id="map-minimap-svg" viewBox="0 0 900 580" role="img" aria-hidden="true"></svg>
             </aside>
-            <svg id="map-svg" viewBox="0 0 900 520" role="group" aria-label="Documentation graph — Tab to nodes and controls, arrow keys for linked neighbors"></svg>
           </div>
         </section>
         <section class="panel" data-panel="links" aria-label="Links">
@@ -126,6 +139,6 @@
       </section>
     </div>
   </div>
-  <script src="vision.js?v=76"></script>
+  <script src="vision.js?v=77"></script>
 </body>
 </html>

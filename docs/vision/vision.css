@@ -986,21 +986,20 @@ body.panel-fs-active.sidebar-overlay-open .sidebar-overlay-backdrop {
   align-items: center;
   justify-content: center;
   height: 100%;
-  perspective: 720px;
-  perspective-origin: 50% 40%;
+  perspective: 960px;
+  perspective-origin: 50% 42%;
 }
 
 .layer-stack {
   transform-style: preserve-3d;
-  transform: rotateX(52deg) rotateZ(-28deg);
   width: 200px;
   height: 150px;
   position: relative;
-  transition: transform 0.4s ease;
+  will-change: transform;
 }
 
 .layer-stack:hover {
-  transform: rotateX(48deg) rotateZ(-24deg) scale(1.02);
+  filter: brightness(1.06);
 }
 
 .layer-plane {
@@ -1063,21 +1062,123 @@ body.panel-fs-active.sidebar-overlay-open .sidebar-overlay-backdrop {
   touch-action: none;
   cursor: default;
   background: transparent;
+  perspective: 980px;
+  perspective-origin: 50% 44%;
 }
 
-.map-wrap.map-panning {
-  cursor: grabbing;
+.map-scene-3d {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  transform-style: preserve-3d;
+  transform-origin: 50% 48%;
+  will-change: transform;
+  pointer-events: none;
 }
 
-.map-wrap .galaxy-bg {
+.map-scene-3d .galaxy-bg,
+.map-scene-3d #map-svg {
+  pointer-events: auto;
+}
+
+.map-scene-3d .galaxy-bg {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   opacity: var(--galaxy-bg-opacity);
-  pointer-events: none;
   z-index: 0;
+}
+
+.map-scene-3d #map-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.map-orbit-pad {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 92px;
+  height: 92px;
+  margin: -46px 0 0 -46px;
+  z-index: 4;
+  border-radius: 50%;
+  border: 1px solid rgba(126, 184, 255, 0.28);
+  background: radial-gradient(
+    circle at 50% 45%,
+    rgba(20, 32, 52, 0.72),
+    rgba(8, 12, 22, 0.55)
+  );
+  box-shadow: 0 0 24px rgba(126, 184, 255, 0.12), inset 0 0 18px rgba(0, 0, 0, 0.35);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  opacity: 0.72;
+  transition: opacity 0.2s, border-color 0.2s;
+}
+
+.map-orbit-pad:hover,
+.map-orbit-pad.orbit-active {
+  opacity: 0.95;
+  border-color: rgba(126, 184, 255, 0.55);
+}
+
+.map-orbit-pad.orbit-active {
+  cursor: grabbing;
+}
+
+.map-orbit-pad-ring {
+  position: absolute;
+  inset: 10px;
+  border-radius: 50%;
+  border: 1px dashed rgba(255, 255, 255, 0.14);
+  pointer-events: none;
+}
+
+.map-orbit-pad-stick {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #b8d8ff, #5a88c8);
+  box-shadow: 0 0 10px rgba(126, 184, 255, 0.55);
+  pointer-events: none;
+  transition: transform 0.05s linear;
+}
+
+.map-orbit-pad-label {
+  position: absolute;
+  bottom: 8px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 0.52rem;
+  letter-spacing: 0.14em;
+  color: rgba(180, 200, 230, 0.65);
+  pointer-events: none;
+}
+
+body.panel-fs-active .map-orbit-pad {
+  width: 112px;
+  height: 112px;
+  margin: -56px 0 0 -56px;
+}
+
+body.vision-eco .map-orbit-pad,
+body.vision-ms .map-orbit-pad {
+  box-shadow: 0 0 12px rgba(126, 184, 255, 0.08), inset 0 0 12px rgba(0, 0, 0, 0.4);
+}
+
+.map-wrap.map-panning {
+  cursor: grabbing;
 }
 
 .map-wrap::after {

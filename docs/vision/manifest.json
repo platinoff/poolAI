@@ -1964,11 +1964,35 @@
       "from": "galaxy_grid",
       "kind": "implements",
       "to": "src_grid_galaxy_verification_checker_jobs_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_replication_quorum_gate_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_settlement_mode_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_trust_score_store_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_update_policy_rs"
     }
   ],
   "galaxy_background": "vision2.png",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S554",
+  "last_sprint_closed": "PH-S555",
   "layers": [
     {
       "id": "L0",
@@ -8176,9 +8200,58 @@
       "label": "galaxy_horizon_s534_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s534_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_replication_quorum_gate_rs",
+      "label": "galaxy_replication_quorum_gate.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_replication_quorum_gate.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_settlement_mode_rs",
+      "label": "galaxy_settlement_mode.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_settlement_mode.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_trust_score_store_rs",
+      "label": "galaxy_trust_score_store.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_trust_score_store.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_update_policy_rs",
+      "label": "galaxy_update_policy.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_update_policy.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ui_admin_payout_batch_rs",
+      "label": "payout_batch.rs",
+      "layer": "L3",
+      "path": "src/ui/admin/payout_batch.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s545_integration_rs",
+      "label": "galaxy_horizon_s545_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s545_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_replication_quorum_integration_rs",
+      "label": "galaxy_replication_quorum_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_replication_quorum_integration.rs"
     }
   ],
-  "revision": 245,
+  "revision": 246,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -12580,6 +12653,15 @@
       "row": 489,
       "status": "closed",
       "title": "Horizon close band S545–S553"
+    },
+    {
+      "acceptance": "map-scene-3d` perspective orbit; WASD + center pad; layer stack sync; rev++",
+      "deps": "docs/vision UX",
+      "id": "PH-S555",
+      "open": false,
+      "row": 490,
+      "status": "closed",
+      "title": "Vision map 3D orbit WASD + touch pad"
     }
   ],
   "sprint_queue_open_count": 0,

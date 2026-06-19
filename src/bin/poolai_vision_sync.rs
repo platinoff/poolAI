@@ -1123,4 +1123,26 @@ mod tests {
             "renderSprintChips should bind map-linked chips"
         );
     }
+
+    #[test]
+    fn vision_js_map_orbit_3d_ph_s555() {
+        let js = std::fs::read_to_string("docs/vision/vision.js").expect("vision.js");
+        assert!(
+            js.contains("function initMapOrbitControls"),
+            "missing initMapOrbitControls"
+        );
+        assert!(
+            js.contains("function applyMapOrbitTransform"),
+            "missing applyMapOrbitTransform"
+        );
+        assert!(
+            js.contains("map-orbit-pad") && js.contains("MAP_ORBIT_DEFAULT"),
+            "missing orbit pad + defaults"
+        );
+        let html = std::fs::read_to_string("docs/vision/index.html").expect("index.html");
+        assert!(
+            html.contains("map-scene-3d") && html.contains("map-orbit-pad"),
+            "index.html missing 3D scene / orbit pad"
+        );
+    }
 }
