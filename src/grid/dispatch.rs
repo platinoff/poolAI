@@ -28,17 +28,17 @@ use crate::grid::galaxy_locality::{
 };
 use crate::grid::galaxy_network_profile::{load_parsed_peer_network_profile, GalaxyEgressPolicy};
 use crate::grid::galaxy_prefetch_metrics::{
-    observe_prefetch_queue_depth, record_hot_evict, record_hot_promote,
-    record_locality_unsatisfied, record_prefetch_backpressure, record_prefetch_co_access,
-    record_prefetch_complete, record_prefetch_egress_blocked, record_prefetch_enqueue,
-    record_prefetch_ingest, record_prefetch_lease_acquired, record_prefetch_peer_fetch,
-    record_prefetch_peer_fetch_miss, record_prefetch_plan, record_prefetch_pull_bytes,
-    record_prefetch_raid_fetch, record_prefetch_raid_fetch_miss, record_prefetch_re_migrate,
-    record_prefetch_seed_fetch, record_prefetch_seed_fetch_miss, record_prefetch_seed_pull,
-    record_prefetch_skip_ingest, record_prefetch_strict_mode, record_prefetch_timeout,
-    record_prefetch_topology_blocked, record_prefetch_wait, record_shard_access,
-    should_hot_promote, DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM,
-    DEFAULT_PREFETCH_BYTES_PER_SHARD_VRAM,
+    observe_prefetch_queue_depth, observe_shard_fetch_latency_ms_p50, record_hot_evict,
+    record_hot_promote, record_locality_unsatisfied, record_prefetch_backpressure,
+    record_prefetch_co_access, record_prefetch_complete, record_prefetch_egress_blocked,
+    record_prefetch_enqueue, record_prefetch_ingest, record_prefetch_lease_acquired,
+    record_prefetch_peer_fetch, record_prefetch_peer_fetch_miss, record_prefetch_plan,
+    record_prefetch_pull_bytes, record_prefetch_raid_fetch, record_prefetch_raid_fetch_miss,
+    record_prefetch_re_migrate, record_prefetch_seed_fetch, record_prefetch_seed_fetch_miss,
+    record_prefetch_seed_pull, record_prefetch_skip_ingest, record_prefetch_strict_mode,
+    record_prefetch_timeout, record_prefetch_topology_blocked, record_prefetch_wait,
+    record_shard_access, should_hot_promote, DEFAULT_PREFETCH_BYTES_PER_SHARD_RAM,
+    DEFAULT_PREFETCH_BYTES_PER_SHARD_VRAM, DEFAULT_SHARD_FETCH_LATENCY_MS_P50,
 };
 use crate::grid::galaxy_prefetch_peer_pull::fetch_seed_shards_from_peer_http;
 use crate::grid::galaxy_replay_jobs::submit_replay_verification_job;
@@ -831,6 +831,7 @@ pub fn fetch_seed_shards_hook(plan: &PrefetchPlan, memory: &MemoryShardStore) ->
     if hits > 0 {
         record_prefetch_seed_fetch(hits);
         record_prefetch_pull_bytes(pull_bytes);
+        observe_shard_fetch_latency_ms_p50(DEFAULT_SHARD_FETCH_LATENCY_MS_P50);
     }
     hits
 }
@@ -1162,6 +1163,7 @@ fn ingest_result(
     {
         let _ = evaluate_post_mismatch_elevated_sampling(&job_id, &verify_cfg);
     }
+    let mut effective_trust_score = trust_score;
     if let (Some(score), Some(verdict)) = (
         trust_score,
         body.metrics
@@ -1169,12 +1171,13 @@ fn ingest_result(
             .and_then(|m| m.get("verification_verdict"))
             .and_then(|v| v.as_str()),
     ) {
-        apply_verification_trust_delta(verdict, score);
+        let adjusted = apply_verification_trust_delta(verdict, score);
+        effective_trust_score = Some(adjusted);
     }
     evaluate_result_verification_sample_completed(body.metrics.as_ref());
     let settlement_gate = evaluate_result_settlement_gate(
         source_peer_id,
-        trust_score,
+        effective_trust_score,
         &TrustScoreGateConfig::from_env(),
     );
     let verification_sample =
@@ -1202,7 +1205,7 @@ fn ingest_result(
         record_fraud_proof_pending();
         settlement_status = SettlementStatus::PendingVerification;
     }
-    if let (Some(peer_id), Some(score)) = (source_peer_id, trust_score) {
+    if let (Some(peer_id), Some(score)) = (source_peer_id, effective_trust_score) {
         persist_peer_trust_score(peer_id, score);
     }
     evaluate_result_settlement_resolved(settlement_status);

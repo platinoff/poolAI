@@ -82,6 +82,27 @@ pub fn format_bytes(bytes: u64) -> String {
     format!("{:.2} {}", scaled, SIZES[i])
 }
 
+/// Secret rotation unix timestamp display (PH-S628 wasm glue).
+pub fn format_unix_timestamp_display(secs: Option<i64>, never_label: &str) -> String {
+    let Some(ts) = secs.filter(|&s| s > 0) else {
+        return never_label.to_string();
+    };
+    if let Some(dt) = DateTime::from_timestamp(ts, 0) {
+        return dt.format("%Y-%m-%d %H:%M:%S UTC").to_string();
+    }
+    ts.to_string()
+}
+
+/// Secret rotation kind → default English label (PH-S628 wasm glue).
+pub fn format_rotation_kind(kind: &str) -> String {
+    match kind.trim() {
+        "jwt" => "JWT signing secret".to_string(),
+        "tls_certificate" => "TLS certificate".to_string(),
+        "telegram_webhook" => "Telegram webhook secret".to_string(),
+        other => other.to_string(),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -149,5 +170,20 @@ mod tests {
         assert_eq!(format_bytes(0), "0 B");
         assert_eq!(format_bytes(1024), "1.00 KB");
         assert_eq!(format_bytes(1_500_000), "1.43 MB");
+    }
+
+    #[test]
+    fn format_unix_timestamp_display_ph_s628() {
+        assert_eq!(format_unix_timestamp_display(None, "Never"), "Never");
+        assert_eq!(
+            format_unix_timestamp_display(Some(1_718_280_000), "Never"),
+            "2024-04-13 09:00:00 UTC"
+        );
+    }
+
+    #[test]
+    fn format_rotation_kind_ph_s628() {
+        assert_eq!(format_rotation_kind("jwt"), "JWT signing secret");
+        assert_eq!(format_rotation_kind("custom"), "custom");
     }
 }

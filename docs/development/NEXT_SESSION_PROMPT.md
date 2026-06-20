@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-20 (PH-S610…S619 ✅ · vision **rev 261** · **0** відкритих · rust_ratio **94.72%**)
+**Оновлено:** 2026-06-20 (PH-S620…S629 ✅ · vision **rev 262** · **0** відкритих · rust_ratio **94.73%**)
 
 | **← наступний** | **`абракадабра`** (project scan → +10 PH-S* → drain) |
 | **Відкритих** | **0** |
@@ -42,17 +42,17 @@ bash bin/e2e-playwright.sh --start
 
 ---
 
-## Закрито (PH-S610…S619)
+## Закрито (PH-S620…S629)
 
-PH-S610 ✅ stale-epoch grid result trust delta −50.  
-PH-S611 ✅ worker-unhealthy streak trust delta −30.  
-PH-S612 ✅ hot-tier scheduling gate (`hot_tier_hit_ratio > 0.8`).  
-PH-S613 ✅ re-migrate delta-fetch missing shards on PATCH.  
-PH-S614 ✅ prefetch order by shard access weight.  
-PH-S615 ✅ replication hourly cap HTTP integration.  
-PH-S616 ✅ payout-batch primary/secondary/worker lamports wire.  
-PH-S617 ✅ checker-timeout grid result HTTP integration.  
-PH-S618 ✅ admin raid `formatBytes` wasm-first slim.  
-PH-S619 ✅ `galaxy_horizon_s610_integration` close band.
+PH-S620 ✅ verification verdict trust delta persists to store (+10 match).  
+PH-S621 ✅ telegram_edge low-trust payout-held HTTP `/metrics`.  
+PH-S622 ✅ post-mismatch elevated sampling HTTP.  
+PH-S623 ✅ lease-acquired prefetch HTTP (`POST /jobs/{id}/lease`).  
+PH-S624 ✅ hot-tier promote/evict HTTP integration.  
+PH-S625 ✅ prefetch ingest/wait/complete HTTP metric band.  
+PH-S626 ✅ `galaxy_shard_fetch_latency_ms_p50` gauge.  
+PH-S627 ✅ admin raid `formatBytes` wasm-only (drop JS dup).  
+PH-S628 ✅ admin security `formatUnixTimestamp` / `formatRotationKind` wasm.  
+PH-S629 ✅ `galaxy_horizon_s620_integration` close band.
 
-**rust_ratio:** **94.72%** · **BLOCKED:** FM-003 LAN · FM-041 Cloud SDK.
+**rust_ratio:** **94.73%** · **BLOCKED:** FM-003 LAN · FM-041 Cloud SDK.

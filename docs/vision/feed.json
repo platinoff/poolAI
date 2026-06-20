@@ -3,6 +3,96 @@
   "items": [
     {
       "category": "closed",
+      "id": "PH-S629",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_horizon_s620_integration` + loc-audit + vision-sync `--check",
+      "title": "Horizon close band S620–S628"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S628",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "formatUnixTimestamp` / `formatRotationKind` in `poolai-ui-core` + wasm; slim `security.rs",
+      "title": "Admin security datetime helpers → ui-core/wasm"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S627",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "remove JS fallback in `raid.rs`; wasm `formatBytes` only",
+      "title": "Admin raid drop JS `formatBytes` dup (wasm-only)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S626",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "gauge on prefetch fetch path + unit test + `/metrics` export",
+      "title": "shard_fetch_latency_ms_p50` telemetry gauge"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S625",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "grid job ingest drives ingest/wait/complete counters on `/metrics`; integration test",
+      "title": "Prefetch ingest/wait/complete HTTP metric band"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S624",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "grid job ingest → `galaxy_hot_promote_total` / `galaxy_hot_evict_total` on `/metrics",
+      "title": "Hot-tier promote/evict HTTP integration"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S623",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "POST /api/v1/jobs/{id}/lease` → `galaxy_prefetch_lease_acquired_total`; integration test",
+      "title": "Prefetch lease-acquired HTTP wire"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S622",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "grid result `verification_verdict:mismatch` → `galaxy_verification_elevated_applied_total` via HTTP",
+      "title": "Post-mismatch elevated sampling HTTP"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S621",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "low `trust_score` tg peer → `galaxy_trust_payout_held_total` on `/metrics`; integration test",
+      "title": "Trust payout-held gate HTTP for `telegram_edge"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S620",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "grid result `verification_verdict` adjusts stored `trust_score` + `galaxy_trust_score_delta_total`; integration test",
+      "title": "Verification verdict trust delta → persist store"
+    },
+    {
+      "category": "closed",
       "id": "PH-S619",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
@@ -18,96 +108,6 @@
       "status": "closed",
       "summary": "poolai-ui-core`/`poolai-ui-wasm` `formatBytes`; slim `raid.rs` JS dup",
       "title": "Admin raid `formatBytes` wasm-first slim"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S617",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "grid result `checker_timeout` retry→inconclusive; `/metrics` counters",
-      "title": "Checker-timeout grid result HTTP integration"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S616",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "GET /api/v1/grid/payout-batch` routing includes `worker_lamports` split",
-      "title": "Primary/secondary/worker lamports payout-batch wire"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S615",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "replication_strict` over cap → `galaxy_replication_rate_limited_total` via HTTP",
-      "title": "Replication hourly cap HTTP integration"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S614",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "POOLAI_GALAXY_SHARD_ACCESS_WEIGHTS` orders `plan_prefetch`; integration test",
-      "title": "Prefetch order by shard access weight"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S613",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "Migrating→Leased PATCH plans prefetch only for shards absent from memory",
-      "title": "Re-migrate delta-fetch missing shards"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S612",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "prefer `hot_tier_hit_ratio > 0.8` over zero-hit peer; `galaxy_hot_tier_gate_applied_total",
-      "title": "Hot-tier hit-ratio scheduling gate HTTP"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S611",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "heartbeat miss threshold → trust store delta + metric",
-      "title": "Trust delta on worker-unhealthy streak (−30)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S610",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "lease_epoch_rejected` result path → `galaxy_trust_score_delta_total`; integration test",
-      "title": "Trust delta on stale-epoch grid result (−50)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S609",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_horizon_s600_integration` + loc-audit + vision-sync `--check",
-      "title": "Horizon close band S600–S608"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S608",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "remove JS `formatUptime` dup; wasm `formatPercent`/`formatMegabytes` glue",
-      "title": "Admin dashboard wasm-first formatters slim"
     }
   ],
   "link": "docs/vision/index.html",

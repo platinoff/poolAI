@@ -2016,7 +2016,7 @@
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S619",
+  "last_sprint_closed": "PH-S629",
   "layers": [
     {
       "id": "L0",
@@ -8392,9 +8392,16 @@
       "label": "galaxy_horizon_s600_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s600_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s610_integration_rs",
+      "label": "galaxy_horizon_s610_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s610_integration.rs"
     }
   ],
-  "revision": 261,
+  "revision": 262,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -13381,6 +13388,96 @@
       "row": 554,
       "status": "closed",
       "title": "Horizon close band S610–S618"
+    },
+    {
+      "acceptance": "grid result `verification_verdict` adjusts stored `trust_score` + `galaxy_trust_score_delta_total`; integration test",
+      "deps": "Galaxy §6.5",
+      "id": "PH-S620",
+      "open": false,
+      "row": 555,
+      "status": "closed",
+      "title": "Verification verdict trust delta → persist store"
+    },
+    {
+      "acceptance": "low `trust_score` tg peer → `galaxy_trust_payout_held_total` on `/metrics`; integration test",
+      "deps": "Galaxy §6.5",
+      "id": "PH-S621",
+      "open": false,
+      "row": 556,
+      "status": "closed",
+      "title": "Trust payout-held gate HTTP for `telegram_edge"
+    },
+    {
+      "acceptance": "grid result `verification_verdict:mismatch` → `galaxy_verification_elevated_applied_total` via HTTP",
+      "deps": "Galaxy §6.2 PH-S455",
+      "id": "PH-S622",
+      "open": false,
+      "row": 557,
+      "status": "closed",
+      "title": "Post-mismatch elevated sampling HTTP"
+    },
+    {
+      "acceptance": "POST /api/v1/jobs/{id}/lease` → `galaxy_prefetch_lease_acquired_total`; integration test",
+      "deps": "Galaxy §5.5 PH-S425",
+      "id": "PH-S623",
+      "open": false,
+      "row": 558,
+      "status": "closed",
+      "title": "Prefetch lease-acquired HTTP wire"
+    },
+    {
+      "acceptance": "grid job ingest → `galaxy_hot_promote_total` / `galaxy_hot_evict_total` on `/metrics",
+      "deps": "Galaxy §5.4 PH-S458",
+      "id": "PH-S624",
+      "open": false,
+      "row": 559,
+      "status": "closed",
+      "title": "Hot-tier promote/evict HTTP integration"
+    },
+    {
+      "acceptance": "grid job ingest drives ingest/wait/complete counters on `/metrics`; integration test",
+      "deps": "Galaxy §5.5",
+      "id": "PH-S625",
+      "open": false,
+      "row": 560,
+      "status": "closed",
+      "title": "Prefetch ingest/wait/complete HTTP metric band"
+    },
+    {
+      "acceptance": "gauge on prefetch fetch path + unit test + `/metrics` export",
+      "deps": "Galaxy §5.3",
+      "id": "PH-S626",
+      "open": false,
+      "row": 561,
+      "status": "closed",
+      "title": "shard_fetch_latency_ms_p50` telemetry gauge"
+    },
+    {
+      "acceptance": "remove JS fallback in `raid.rs`; wasm `formatBytes` only",
+      "deps": "RUST_RATIO §5.13 PH-S618",
+      "id": "PH-S627",
+      "open": false,
+      "row": 562,
+      "status": "closed",
+      "title": "Admin raid drop JS `formatBytes` dup (wasm-only)"
+    },
+    {
+      "acceptance": "formatUnixTimestamp` / `formatRotationKind` in `poolai-ui-core` + wasm; slim `security.rs",
+      "deps": "RUST_RATIO §5.13",
+      "id": "PH-S628",
+      "open": false,
+      "row": 563,
+      "status": "closed",
+      "title": "Admin security datetime helpers → ui-core/wasm"
+    },
+    {
+      "acceptance": "galaxy_horizon_s620_integration` + loc-audit + vision-sync `--check",
+      "deps": "§5.12 fallback",
+      "id": "PH-S629",
+      "open": false,
+      "row": 564,
+      "status": "closed",
+      "title": "Horizon close band S620–S628"
     }
   ],
   "sprint_queue_open_count": 0,

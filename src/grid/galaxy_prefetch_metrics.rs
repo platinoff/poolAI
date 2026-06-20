@@ -9,6 +9,10 @@ use std::sync::atomic::{AtomicU64, Ordering};
 pub const METRIC_PREFETCH_TIMEOUT_TOTAL: &str = "galaxy_prefetch_timeout_total";
 
 static PREFETCH_TIMEOUT_TOTAL: AtomicU64 = AtomicU64::new(0);
+static SHARD_FETCH_LATENCY_MS_P50: AtomicU64 = AtomicU64::new(0);
+
+/// Default stub p50 fetch latency when network profile is unavailable (Galaxy §5.3).
+pub const DEFAULT_SHARD_FETCH_LATENCY_MS_P50: u64 = 50;
 
 /// Prefetch plans computed since process start.
 pub const METRIC_PREFETCH_PLAN_TOTAL: &str = "galaxy_prefetch_plan_total";
@@ -78,6 +82,9 @@ pub const METRIC_SHARD_ACCESS_TOTAL: &str = "galaxy_shard_access_total";
 
 /// Prefetch queue depth gauge stub (Galaxy §5.3, PH-S459).
 pub const METRIC_PREFETCH_QUEUE_DEPTH: &str = "galaxy_prefetch_queue_depth";
+
+/// Last observed shard fetch latency p50 ms on prefetch path (Galaxy §5.3, PH-S626).
+pub const METRIC_SHARD_FETCH_LATENCY_MS_P50: &str = "galaxy_shard_fetch_latency_ms_p50";
 
 /// Prefetch enqueue skipped due to bandwidth backpressure (PH-S464).
 pub const METRIC_PREFETCH_BACKPRESSURE_TOTAL: &str = "galaxy_prefetch_backpressure_total";
@@ -436,6 +443,15 @@ pub fn prefetch_timeout_total() -> u64 {
     PREFETCH_TIMEOUT_TOTAL.load(Ordering::Relaxed)
 }
 
+/// Observe shard fetch latency p50 gauge on memory fetch hits (PH-S626 stub).
+pub fn observe_shard_fetch_latency_ms_p50(latency_ms: u64) {
+    SHARD_FETCH_LATENCY_MS_P50.store(latency_ms, Ordering::Relaxed);
+}
+
+pub fn shard_fetch_latency_ms_p50() -> u64 {
+    SHARD_FETCH_LATENCY_MS_P50.load(Ordering::Relaxed)
+}
+
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_prefetch_metrics_for_test() {
     PLAN_TOTAL.store(0, Ordering::Relaxed);
@@ -468,6 +484,7 @@ pub fn reset_prefetch_metrics_for_test() {
     PEER_FETCH_MISS_TOTAL.store(0, Ordering::Relaxed);
     PULL_BYTES_TOTAL.store(0, Ordering::Relaxed);
     PREFETCH_TIMEOUT_TOTAL.store(0, Ordering::Relaxed);
+    SHARD_FETCH_LATENCY_MS_P50.store(0, Ordering::Relaxed);
 }
 
 #[cfg(test)]
@@ -593,5 +610,12 @@ mod tests {
         observe_prefetch_queue_depth(5);
         assert_eq!(shard_access_total(), 3);
         assert_eq!(prefetch_queue_depth(), 5);
+    }
+
+    #[test]
+    fn observe_shard_fetch_latency_ms_p50_ph_s626() {
+        reset_prefetch_metrics_for_test();
+        observe_shard_fetch_latency_ms_p50(42);
+        assert_eq!(shard_fetch_latency_ms_p50(), 42);
     }
 }

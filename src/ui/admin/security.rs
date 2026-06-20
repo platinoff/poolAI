@@ -683,6 +683,15 @@ pub async fn admin_security() -> Html<String> {
     }
 
     function formatRotationKind(kind) {
+      if (typeof window !== 'undefined' && window.poolaiUiWasm && typeof window.poolaiUiWasm.formatRotationKind === 'function') {
+        const base = window.poolaiUiWasm.formatRotationKind(kind);
+        const labels = {
+          jwt: T('admin.sec.rot.kind.jwt', 'JWT signing secret'),
+          tls_certificate: T('admin.sec.rot.kind.tls', 'TLS certificate'),
+          telegram_webhook: T('admin.sec.rot.kind.telegram', 'Telegram webhook secret'),
+        };
+        return labels[kind] || base;
+      }
       const labels = {
         jwt: T('admin.sec.rot.kind.jwt', 'JWT signing secret'),
         tls_certificate: T('admin.sec.rot.kind.tls', 'TLS certificate'),
@@ -692,6 +701,9 @@ pub async fn admin_security() -> Html<String> {
     }
 
     function formatUnixTime(ts) {
+      if (typeof window !== 'undefined' && window.poolaiUiWasm && typeof window.poolaiUiWasm.formatUnixTimestamp === 'function') {
+        return window.poolaiUiWasm.formatUnixTimestamp(ts || 0, T('admin.sec.rot.never', 'Never'));
+      }
       if (!ts) return T('admin.sec.rot.never', 'Never');
       try {
         return new Date(ts * 1000).toLocaleString();

@@ -819,8 +819,18 @@ FM-xxx (з таблиці нижче)
 | 552 | **PH-S617** | Checker-timeout grid result HTTP integration | Galaxy §6.2 PH-S542 | grid result `checker_timeout` retry→inconclusive; `/metrics` counters | **✅** |
 | 553 | **PH-S618** | Admin raid `formatBytes` wasm-first slim | RUST_RATIO §5.13 | `poolai-ui-core`/`poolai-ui-wasm` `formatBytes`; slim `raid.rs` JS dup | **✅** |
 | 554 | **PH-S619** | Horizon close band S610–S618 | §5.12 fallback | `galaxy_horizon_s610_integration` + loc-audit + vision-sync `--check` | **✅** |
+| 555 | **PH-S620** | Verification verdict trust delta → persist store | Galaxy §6.5 | grid result `verification_verdict` adjusts stored `trust_score` + `galaxy_trust_score_delta_total`; integration test | **✅** |
+| 556 | **PH-S621** | Trust payout-held gate HTTP for `telegram_edge` | Galaxy §6.5 | low `trust_score` tg peer → `galaxy_trust_payout_held_total` on `/metrics`; integration test | **✅** |
+| 557 | **PH-S622** | Post-mismatch elevated sampling HTTP | Galaxy §6.2 PH-S455 | grid result `verification_verdict:mismatch` → `galaxy_verification_elevated_applied_total` via HTTP | **✅** |
+| 558 | **PH-S623** | Prefetch lease-acquired HTTP wire | Galaxy §5.5 PH-S425 | `POST /api/v1/jobs/{id}/lease` → `galaxy_prefetch_lease_acquired_total`; integration test | **✅** |
+| 559 | **PH-S624** | Hot-tier promote/evict HTTP integration | Galaxy §5.4 PH-S458 | grid job ingest → `galaxy_hot_promote_total` / `galaxy_hot_evict_total` on `/metrics` | **✅** |
+| 560 | **PH-S625** | Prefetch ingest/wait/complete HTTP metric band | Galaxy §5.5 | grid job ingest drives ingest/wait/complete counters on `/metrics`; integration test | **✅** |
+| 561 | **PH-S626** | `shard_fetch_latency_ms_p50` telemetry gauge | Galaxy §5.3 | gauge on prefetch fetch path + unit test + `/metrics` export | **✅** |
+| 562 | **PH-S627** | Admin raid drop JS `formatBytes` dup (wasm-only) | RUST_RATIO §5.13 PH-S618 | remove JS fallback in `raid.rs`; wasm `formatBytes` only | **✅** |
+| 563 | **PH-S628** | Admin security datetime helpers → ui-core/wasm | RUST_RATIO §5.13 | `formatUnixTimestamp` / `formatRotationKind` in `poolai-ui-core` + wasm; slim `security.rs` | **✅** |
+| 564 | **PH-S629** | Horizon close band S620–S628 | §5.12 fallback | `galaxy_horizon_s620_integration` + loc-audit + vision-sync `--check` | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S610…S619 ✅. Vision rev **261**. rust_ratio **94.72%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S620…S629 ✅. Vision rev **262**. rust_ratio **94.73%**.
 
 **Наступна сесія:** **`абракадабра`** — project scan → +10 PH-S* → drain → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 

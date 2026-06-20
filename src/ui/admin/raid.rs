@@ -280,9 +280,7 @@ pub async fn admin_raid() -> Html<String> {
                   <td><code>${escapeHtml(String(aid))}</code></td>
                   <td>${escapeHtml(a.name || 'unnamed')}</td>
                   <td>${escapeHtml(
-                    (typeof window !== 'undefined' && window.poolaiUiWasm && typeof window.poolaiUiWasm.formatBytes === 'function')
-                      ? window.poolaiUiWasm.formatBytes(a.size || 0)
-                      : formatBytes(a.size || 0)
+                    window.poolaiUiWasm.formatBytes(a.size || 0)
                   )}</td>
                   <td>
                     <button type="button" class="btn btn-danger" onclick='deleteArtifact(${JSON.stringify(aid)})'>${escapeHtml(T('ui.delete', 'Delete'))}</button>
@@ -312,14 +310,6 @@ pub async fn admin_raid() -> Html<String> {
         </div>
         ${snapshotHtml}
       `;
-    }
-    
-    function formatBytes(bytes) {
-      if (bytes === 0) return '0 B';
-      const k = 1024;
-      const sizes = ['B', 'KB', 'MB', 'GB'];
-      const i = Math.floor(Math.log(bytes) / Math.log(k));
-      return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
     }
     
     function showUploadArtifactModal() {

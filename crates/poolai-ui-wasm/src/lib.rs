@@ -7,7 +7,7 @@ use poolai_ui_core::admin_dom::{admin_inline_error_html, admin_loading_html};
 use poolai_ui_core::api_error::{api_error_detail_from_body, format_fetch_error};
 use poolai_ui_core::format::{
     alert_severity_badge_class, escape_html, format_bytes, format_megabytes, format_percent,
-    format_uptime,
+    format_rotation_kind, format_unix_timestamp_display, format_uptime,
 };
 use poolai_ui_core::galaxy_telegram_seats::render_telegram_seats_panel_html;
 use poolai_ui_core::galaxy_virtual_nodes::render_galaxy_virtual_nodes_panel_html;
@@ -670,6 +670,18 @@ pub fn format_megabytes_wasm(value: f64) -> String {
 #[wasm_bindgen(js_name = formatBytes)]
 pub fn format_bytes_wasm(bytes: u64) -> String {
     format_bytes(bytes)
+}
+
+/// Security admin: unix timestamp with never-label fallback (PH-S628).
+#[wasm_bindgen(js_name = formatUnixTimestamp)]
+pub fn format_unix_timestamp_wasm(secs: i64, never_label: &str) -> String {
+    format_unix_timestamp_display(if secs > 0 { Some(secs) } else { None }, never_label)
+}
+
+/// Security admin: rotation kind label (PH-S628).
+#[wasm_bindgen(js_name = formatRotationKind)]
+pub fn format_rotation_kind_wasm(kind: &str) -> String {
+    format_rotation_kind(kind)
 }
 
 #[wasm_bindgen(js_name = alertSeverityBadgeClass)]

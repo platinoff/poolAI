@@ -1,6 +1,8 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-20 (PH-S610…S619 ✅ · vision **rev 261** · **0** відкритих · rust_ratio **94.72%**)
+**Оновлено:** 2026-06-20 (PH-S620…S629 ✅ · vision **rev 262** · **0** відкритих · rust_ratio **94.73%**)
+
+**PH-S620…S629 ✅ (2026-06-20):** verification trust delta persist; payout-held HTTP; elevated sampling HTTP; lease prefetch HTTP; hot-tier promote/evict HTTP; prefetch ingest/wait/complete metrics; shard_fetch_latency_ms_p50; raid formatBytes wasm-only; security datetime wasm; `galaxy_horizon_s620_integration`.
 
 **PH-S610…S619 ✅ (2026-06-20):** stale-epoch trust delta; worker-unhealthy trust delta; hot-tier scheduling gate; re-migrate delta-fetch; access-weight prefetch order; replication hourly cap HTTP; payout-batch worker lamports; checker-timeout HTTP; raid formatBytes wasm; `galaxy_horizon_s610_integration`.
 

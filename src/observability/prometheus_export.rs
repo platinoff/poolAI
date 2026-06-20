@@ -47,9 +47,10 @@ use crate::grid::galaxy_prefetch_metrics::{
     prefetch_raid_fetch_total, prefetch_re_migrate_total, prefetch_seed_fetch_miss_total,
     prefetch_seed_fetch_total, prefetch_seed_pull_total, prefetch_skip_ingest_total,
     prefetch_strict_mode_total, prefetch_topology_blocked_total, prefetch_wait_ms_total,
-    shard_access_total, METRIC_HOT_EVICT_TOTAL, METRIC_HOT_PROMOTE_TOTAL,
-    METRIC_LOCALITY_UNSATISFIED_TOTAL, METRIC_PREFETCH_BACKPRESSURE_TOTAL,
-    METRIC_PREFETCH_BYTES_TOTAL, METRIC_PREFETCH_COMPLETE_TOTAL, METRIC_PREFETCH_CO_ACCESS_TOTAL,
+    shard_access_total, shard_fetch_latency_ms_p50, METRIC_HOT_EVICT_TOTAL,
+    METRIC_HOT_PROMOTE_TOTAL, METRIC_LOCALITY_UNSATISFIED_TOTAL,
+    METRIC_PREFETCH_BACKPRESSURE_TOTAL, METRIC_PREFETCH_BYTES_TOTAL,
+    METRIC_PREFETCH_COMPLETE_TOTAL, METRIC_PREFETCH_CO_ACCESS_TOTAL,
     METRIC_PREFETCH_EGRESS_BLOCKED_TOTAL, METRIC_PREFETCH_ENQUEUE_TOTAL,
     METRIC_PREFETCH_HOT_SKIP_TOTAL, METRIC_PREFETCH_INGEST_TOTAL,
     METRIC_PREFETCH_LEASE_ACQUIRED_TOTAL, METRIC_PREFETCH_PEER_FETCH_MISS_TOTAL,
@@ -60,7 +61,7 @@ use crate::grid::galaxy_prefetch_metrics::{
     METRIC_PREFETCH_SEED_FETCH_TOTAL, METRIC_PREFETCH_SEED_PULL_TOTAL,
     METRIC_PREFETCH_SKIP_INGEST_TOTAL, METRIC_PREFETCH_STRICT_MODE_TOTAL,
     METRIC_PREFETCH_TOPOLOGY_BLOCKED_TOTAL, METRIC_PREFETCH_WAIT_MS_TOTAL,
-    METRIC_SHARD_ACCESS_TOTAL,
+    METRIC_SHARD_ACCESS_TOTAL, METRIC_SHARD_FETCH_LATENCY_MS_P50,
 };
 use crate::grid::galaxy_pricing_oracle::{
     forced_fallback_total, fresh_served_total, last_market_min_usd_micro, last_quote_usd_micro,
@@ -191,6 +192,7 @@ pub struct PoolAiPrometheus {
     galaxy_hot_promote_total: IntGauge,
     galaxy_hot_evict_total: IntGauge,
     galaxy_shard_access_total: IntGauge,
+    galaxy_shard_fetch_latency_ms_p50: IntGauge,
     galaxy_prefetch_queue_depth: IntGauge,
     galaxy_prefetch_backpressure_total: IntGauge,
     galaxy_prefetch_raid_fetch_total: IntGauge,
@@ -748,6 +750,15 @@ fn build_prometheus() -> PoolAiPrometheus {
     registry
         .register(Box::new(galaxy_shard_access_total.clone()))
         .expect("register galaxy_shard_access_total");
+
+    let galaxy_shard_fetch_latency_ms_p50 = IntGauge::with_opts(Opts::new(
+        METRIC_SHARD_FETCH_LATENCY_MS_P50,
+        "Galaxy shard fetch latency p50 ms on prefetch path (PH-S626)",
+    ))
+    .expect(METRIC_SHARD_FETCH_LATENCY_MS_P50);
+    registry
+        .register(Box::new(galaxy_shard_fetch_latency_ms_p50.clone()))
+        .expect("register galaxy_shard_fetch_latency_ms_p50");
 
     let galaxy_prefetch_queue_depth = IntGauge::with_opts(Opts::new(
         METRIC_PREFETCH_QUEUE_DEPTH,
@@ -1318,6 +1329,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_hot_promote_total,
         galaxy_hot_evict_total,
         galaxy_shard_access_total,
+        galaxy_shard_fetch_latency_ms_p50,
         galaxy_prefetch_queue_depth,
         galaxy_prefetch_backpressure_total,
         galaxy_prefetch_raid_fetch_total,
@@ -1490,6 +1502,8 @@ pub fn refresh_galaxy_prefetch_gauges() {
     prom.galaxy_hot_evict_total.set(hot_evict_total() as i64);
     prom.galaxy_shard_access_total
         .set(shard_access_total() as i64);
+    prom.galaxy_shard_fetch_latency_ms_p50
+        .set(shard_fetch_latency_ms_p50() as i64);
     prom.galaxy_prefetch_queue_depth
         .set(prefetch_queue_depth() as i64);
     prom.galaxy_prefetch_backpressure_total
