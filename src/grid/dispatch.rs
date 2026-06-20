@@ -316,7 +316,9 @@ pub fn re_migrate_prefetch_stub(memory: Option<&MemoryShardStore>) -> usize {
         false,
         &config,
     );
-    complete_prefetch_hook(&plan, memory)
+    let n = complete_prefetch_hook(&plan, memory);
+    let _depth = crate::grid::galaxy_re_migrate_policy::re_migrate_policy_depth_from_shard_count(n);
+    n
 }
 
 /// Coordinator worker rows for locality rank stub (PH-S285).

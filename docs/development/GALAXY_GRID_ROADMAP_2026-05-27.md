@@ -1,17 +1,17 @@
 # Galaxy Grid roadmap (зріз)
 
-**Оновлено:** 2026-06-20 · **Completion v2:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · **291** pending PH-S720…S1010 · **§5.12 active:** 10
+**Оновлено:** 2026-06-20 · **Completion v2:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · **281** pending PH-S730…S1010 · **§5.12 active:** 10
 
 | Зріз | Значення |
 |------|----------|
 | **Completion plan** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.14–§5.15** |
 | **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) |
-| **Active drain (band 7)** | PH-S720…S729 — Galaxy **§4** routing / re-migrate depth |
-| **Next promote (band 8)** | PH-S730…S739 — Galaxy **§8.1** network_profile full persist |
+| **Active drain (band 8)** | PH-S730…S739 — Galaxy **§8.1** network_profile full persist |
+| **Next promote (band 9)** | PH-S740…S749 — Galaxy **§6.6** signed capability admission |
 | **Product-complete tail** | PH-S1010 — FM **§5.15** |
-| **Rust ratio** | **94.76%** · hold **95%** advisory (bands 27–29 formal gate) |
+| **Rust ratio** | **94.55%** · hold **95%** advisory (bands 27–29 formal gate) |
 
-**291** pending · **30** `абракадабра` sessions · остання закрита **PH-S710…S719** ✅.
+**281** pending · **29** `абракадабра` sessions · остання закрита **PH-S720…S729** ✅.
 
 ---
 
@@ -26,7 +26,8 @@
 | **Settlement/trust metrics HTTP** | Galaxy **§6.4–6.5** | PH-S680/S681 ✅ |
 | **Replication/pricing metrics HTTP** | Galaxy **§6.4 / §4.2** | PH-S690/S691 ✅ |
 | **Stand smoke JSON↔Prom parity** | ops / PROMETHEUS_METRICS | PH-S710…S719 ✅ |
-| **§4 routing / re-migrate depth** | Galaxy **§4.1–§4.3** | band 7 **active** PH-S720…S729 |
+| **§4 routing / re-migrate depth** | Galaxy **§4.1–§4.3** | band 7 ✅ PH-S720…S729 |
+| **§8.1 network_profile persist** | Galaxy **§8.1** | band 8 **active** PH-S730…S739 |
 | **§8.1 network_profile full persist** | Galaxy **§8.1** | band 8 PH-S730…S739 |
 | **§6.6 signed capability admission** | Galaxy **§6.6** | band 9 PH-S740…S749 |
 | **§5.5 prefetch live pull depth** | Galaxy **§5.5** | band 10 PH-S750…S759 |

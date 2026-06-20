@@ -34,6 +34,7 @@ use poolai_ui_core::modal::{admin_dynamic_modal_html, trap_tab_action, MODAL_FOC
 use poolai_ui_core::payout_batch::render_payout_batch_panel_html;
 use poolai_ui_core::pricing::{format_unix_secs, format_usd_micro};
 use poolai_ui_core::prometheus::parse_prometheus_gauge;
+use poolai_ui_core::stand_smoke_metrics::render_grid_settlement_trust_metrics_strip_html;
 use poolai_ui_core::stand_smoke_metrics::render_grid_verification_metrics_strip_html;
 use poolai_ui_core::table::{
     build_csv, build_json_export, compare_sort_values, empty_state_html, escape_regex,
@@ -585,6 +586,19 @@ pub fn render_grid_verification_metrics_strip_wasm(
     pending_total: u64,
 ) -> String {
     render_grid_verification_metrics_strip_html(verification_metrics_json, pending_total)
+}
+
+#[wasm_bindgen(js_name = renderGridSettlementTrustMetricsStrip)]
+pub fn render_grid_settlement_trust_metrics_strip_wasm(
+    settlement_metrics_json: &str,
+    trust_metrics_json: &str,
+    trust_score_gauge: u64,
+) -> String {
+    render_grid_settlement_trust_metrics_strip_html(
+        settlement_metrics_json,
+        trust_metrics_json,
+        trust_score_gauge,
+    )
 }
 
 /// Parse Prometheus gauge from `/metrics` text (PH-S672).

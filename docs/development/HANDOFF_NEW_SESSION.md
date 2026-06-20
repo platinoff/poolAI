@@ -1,12 +1,14 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-20 (PH-S710…S719 ✅ · master backlog **291** · active **10** · vision **rev 272** · rust_ratio **94.76%**)
+**Оновлено:** 2026-06-20 (PH-S720…S729 ✅ · master backlog **281** · active **10** · vision **rev 273** · rust_ratio **94.55%**)
 
-**Cursor 3.8.11 (2026-06-20):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-06-20.md`](./CURSOR_UPDATE_RESEARCH_2026-06-20.md); `poolai-vision-sync --check` ok; baseline rule оновлено. **Наступна сесія:** **`абракадабра`** (drain PH-S720…S729).
+**Cursor 3.8.11 (2026-06-20):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-06-20.md`](./CURSOR_UPDATE_RESEARCH_2026-06-20.md); `poolai-vision-sync --check` ok; baseline rule оновлено. **Наступна сесія:** **`абракадабра`** (drain PH-S730…S739).
 
-**Completion roadmap v2 (2026-06-20):** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) — **291** спринтів до **product-complete** (PH-S1010 / FM **§5.15**); **30** сесій `абракадабра` × 10 PH-S*. Реєстр: [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · regen `bash scripts/generate-ph-s-master-backlog-351.sh`.
+**Completion roadmap v2 (2026-06-20):** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) — **281** спринтів до **product-complete** (PH-S1010 / FM **§5.15**); **29** сесій `абракадабра` × 10 PH-S*. Реєстр: [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · regen `bash scripts/generate-ph-s-master-backlog-351.sh`.
 
-**Master backlog 291 (2026-06-20):** FM **§5.14**. Активна §5.12: **PH-S720…S729** (band 7 — Galaxy **§4** routing / re-migrate). **`абракадабра`** = drain 10 → promote **PH-S730…S739** (band 8 — Galaxy **§8.1** network_profile persist).
+**Master backlog 281 (2026-06-20):** FM **§5.14**. Активна §5.12: **PH-S730…S739** (band 8 — Galaxy **§8.1** network_profile persist). **`абракадабра`** = drain 10 → promote **PH-S740…S749** (band 9 — Galaxy **§6.6** signed capability admission).
+
+**PH-S720…S729 ✅ (2026-06-20):** `re_migrate_policy_depth_stub` + dispatch hook (PH-S720); `routing_policy_locality_gate` (PH-S721); admin payout-batch `renderGridSettlementTrustMetricsStrip` wasm strip (PH-S722); stand smoke settlement/trust JSON↔Prom parity (PH-S723); `stand_smoke_metrics_parity_depth_stub` band7 extend (PH-S724); `poolai-loc-audit` → `rust_ratio.json` **94.55%**; hold advisory `--min-ratio 0.95`; `galaxy_horizon_s720_integration`; FM/HANDOFF/NEXT/STABLE/GALAXY sync; vision **rev 273**.
 
 **PH-S710…S719 ✅ (2026-06-20):** `stand_smoke_metrics_parity` JSON↔Prometheus parity (PH-S710/S711); ui-core `stand_smoke_metrics` + admin verification-metrics wasm strip (PH-S712); stand smoke `grid_metrics_json_prometheus_parity_band6` (PH-S713); `stand_smoke_metrics_parity_depth_stub` (PH-S714); `poolai-loc-audit` → `rust_ratio.json` **94.76%**; hold advisory `--min-ratio 0.95`; `galaxy_horizon_s710_integration`; FM/HANDOFF/NEXT/STABLE/GALAXY sync; vision **rev 272**.
 

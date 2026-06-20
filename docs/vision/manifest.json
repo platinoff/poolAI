@@ -2036,11 +2036,29 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_grid_replication_pricing_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_stand_smoke_metrics_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_PH_S_COMPLETION_ROADMAP_2026_06_20_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_stand_smoke_metrics_parity_rs"
     }
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S719",
+  "last_sprint_closed": "PH-S729",
   "layers": [
     {
       "id": "L0",
@@ -2073,7 +2091,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S720",
+  "next_sprint": "PH-S730",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -8515,9 +8533,37 @@
       "label": "galaxy_horizon_s700_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s700_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_stand_smoke_metrics_rs",
+      "label": "stand_smoke_metrics.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/stand_smoke_metrics.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_PH_S_COMPLETION_ROADMAP_2026_06_20_md",
+      "label": "PH_S_COMPLETION_ROADMAP_2026-06-20.md",
+      "layer": "L1",
+      "path": "docs/development/PH_S_COMPLETION_ROADMAP_2026-06-20.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_stand_smoke_metrics_parity_rs",
+      "label": "stand_smoke_metrics_parity.rs",
+      "layer": "L3",
+      "path": "src/grid/stand_smoke_metrics_parity.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s710_integration_rs",
+      "label": "galaxy_horizon_s710_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s710_integration.rs"
     }
   ],
-  "revision": 272,
+  "revision": 273,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -14406,94 +14452,184 @@
       "title": "Horizon close band S710–S718"
     },
     {
-      "acceptance": "Galaxy §4.3; unit test; dispatch/scheduler hook",
-      "deps": "re_migrate_policy_depth_stub",
+      "acceptance": "unit test; dispatch/scheduler hook",
+      "deps": "Galaxy §4.3",
       "id": "PH-S720",
-      "open": true,
+      "open": false,
       "row": 655,
-      "status": "open",
+      "status": "closed",
       "title": "re_migrate_policy_depth_stub"
     },
     {
-      "acceptance": "Galaxy §4.1 strict routing helper + unit test",
-      "deps": "routing_policy_locality_gate",
+      "acceptance": "strict routing helper + unit test",
+      "deps": "Galaxy §4.1",
       "id": "PH-S721",
-      "open": true,
+      "open": false,
       "row": 656,
-      "status": "open",
+      "status": "closed",
       "title": "routing_policy_locality_gate"
     },
     {
       "acceptance": "fetch JSON metrics + wasm render",
       "deps": "poolai-ui-core",
       "id": "PH-S722",
-      "open": true,
+      "open": false,
       "row": 657,
-      "status": "open",
+      "status": "closed",
       "title": "Admin settlement/trust metrics wasm strip"
     },
     {
-      "acceptance": "unit tests in poolai-http-stand-smoke",
+      "acceptance": "unit tests in stand smoke bin",
       "deps": "poolai-http-stand-smoke",
       "id": "PH-S723",
-      "open": true,
+      "open": false,
       "row": 658,
-      "status": "open",
+      "status": "closed",
       "title": "Stand smoke settlement/trust JSON↔Prom parity"
     },
     {
       "acceptance": "unit test",
-      "deps": "band 7 depth §4–§8",
+      "deps": "band 7 depth",
       "id": "PH-S724",
-      "open": true,
+      "open": false,
       "row": 659,
-      "status": "open",
+      "status": "closed",
       "title": "Concept stub extend (§4–§8)"
     },
     {
-      "acceptance": "poolai-loc-audit` → `rust_ratio.json` sprint zriz",
+      "acceptance": "poolai-loc-audit` → `rust_ratio.json` 94.55%",
       "deps": "§5.13 fallback",
       "id": "PH-S725",
-      "open": true,
+      "open": false,
       "row": 660,
-      "status": "open",
+      "status": "closed",
       "title": "Rust ratio loc-audit refresh"
     },
     {
       "acceptance": "INDEX + HANDOFF + NEXT + STABLE + GALAXY + completion roadmap",
       "deps": "docs canon",
       "id": "PH-S726",
-      "open": true,
+      "open": false,
       "row": 661,
-      "status": "open",
+      "status": "closed",
       "title": "Docs INDEX canon sync"
     },
     {
       "acceptance": "poolai-vision-sync --check` green",
       "deps": "ops",
       "id": "PH-S727",
-      "open": true,
+      "open": false,
       "row": 662,
+      "status": "closed",
+      "title": "poolai-vision-sync drift gate"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory` 94.55%",
+      "deps": "PH-S351 pattern",
+      "id": "PH-S728",
+      "open": false,
+      "row": 663,
+      "status": "closed",
+      "title": "Ratio hold advisory snapshot"
+    },
+    {
+      "acceptance": "galaxy_horizon_s720_integration` + docs sync",
+      "deps": "Galaxy §4 routing",
+      "id": "PH-S729",
+      "open": false,
+      "row": 664,
+      "status": "closed",
+      "title": "Horizon close band S720–S728"
+    },
+    {
+      "acceptance": "GET profile survives restart stub + integration test",
+      "deps": "Galaxy §8.1",
+      "id": "PH-S730",
+      "open": true,
+      "row": 665,
+      "status": "open",
+      "title": "network_profile_store` persist read"
+    },
+    {
+      "acceptance": "PUT + heartbeat merge persist + test",
+      "deps": "Galaxy §8.1",
+      "id": "PH-S731",
+      "open": true,
+      "row": 666,
+      "status": "open",
+      "title": "network_profile_store` persist write"
+    },
+    {
+      "acceptance": "fetch `/grid/network-profiles` + wasm render",
+      "deps": "poolai-ui-core",
+      "id": "PH-S732",
+      "open": true,
+      "row": 667,
+      "status": "open",
+      "title": "Admin network-profile panel wasm glue"
+    },
+    {
+      "acceptance": "live runner cases green",
+      "deps": "poolai-http-stand-smoke",
+      "id": "PH-S733",
+      "open": true,
+      "row": 668,
+      "status": "open",
+      "title": "Stand smoke network-profiles list/put"
+    },
+    {
+      "acceptance": "egress/locality classification + unit test",
+      "deps": "Galaxy §8.1",
+      "id": "PH-S734",
+      "open": true,
+      "row": 669,
+      "status": "open",
+      "title": "network_profile_depth_stub"
+    },
+    {
+      "acceptance": "poolai-loc-audit` → `rust_ratio.json` PH-S735 zriz",
+      "deps": "§5.13 fallback",
+      "id": "PH-S735",
+      "open": true,
+      "row": 670,
+      "status": "open",
+      "title": "Rust ratio loc-audit refresh"
+    },
+    {
+      "acceptance": "INDEX + HANDOFF + NEXT + STABLE + GALAXY + completion roadmap",
+      "deps": "docs canon",
+      "id": "PH-S736",
+      "open": true,
+      "row": 671,
+      "status": "open",
+      "title": "Docs INDEX canon sync"
+    },
+    {
+      "acceptance": "poolai-vision-sync --check` green",
+      "deps": "ops",
+      "id": "PH-S737",
+      "open": true,
+      "row": 672,
       "status": "open",
       "title": "poolai-vision-sync drift gate"
     },
     {
       "acceptance": "--min-ratio 0.95 --advisory",
       "deps": "PH-S351 pattern",
-      "id": "PH-S728",
+      "id": "PH-S738",
       "open": true,
-      "row": 663,
+      "row": 673,
       "status": "open",
       "title": "Ratio hold advisory snapshot"
     },
     {
-      "acceptance": "galaxy_horizon_s720_integration + docs sync",
-      "deps": "Galaxy §4 routing",
-      "id": "PH-S729",
+      "acceptance": "galaxy_horizon_s730_integration` + docs sync",
+      "deps": "Galaxy §8.1 profile",
+      "id": "PH-S739",
       "open": true,
-      "row": 664,
+      "row": 674,
       "status": "open",
-      "title": "Horizon close band S720–S728"
+      "title": "Horizon close band S730–S738"
     }
   ],
   "sprint_queue_open_count": 10,

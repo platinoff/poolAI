@@ -109,21 +109,35 @@ pub const REPLICATION_PRICING_PARITY: &[(&str, &str)] = &[
     ),
 ];
 
-/// Stand smoke metrics parity depth classification (PH-S714).
+/// Stand smoke metrics parity depth classification (PH-S714; band 7 PH-S724).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StandSmokeMetricsParityDepth {
     None,
     JsonExport,
     PrometheusJson,
+    ReMigratePolicy,
+    RoutingLocality,
 }
 
-/// Classify stand smoke metrics parity depth from optional feature stub (PH-S714).
+/// Classify stand smoke metrics parity depth from optional feature stub (PH-S714/PH-S724).
 pub fn stand_smoke_metrics_parity_depth_stub(
     features: Option<&Value>,
 ) -> StandSmokeMetricsParityDepth {
     let Some(f) = features else {
         return StandSmokeMetricsParityDepth::None;
     };
+    if f.get("routing_locality_gate")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        return StandSmokeMetricsParityDepth::RoutingLocality;
+    }
+    if f.get("re_migrate_policy")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        return StandSmokeMetricsParityDepth::ReMigratePolicy;
+    }
     if f.get("prometheus_json_parity")
         .and_then(|v| v.as_bool())
         .unwrap_or(false)
@@ -237,6 +251,19 @@ pub fn validate_band6_metrics_parity(
         &REPLICATION_PRICING_PARITY[..2],
     )?;
     validate_prometheus_json_parity_pairs(prom_text, pricing, &REPLICATION_PRICING_PARITY[2..])?;
+    Ok(())
+}
+
+/// Settlement + trust JSON export + Prometheus parity gate (PH-S723).
+pub fn validate_settlement_trust_metrics_parity(
+    prom_text: &str,
+    settlement: &Value,
+    trust: &Value,
+) -> Result<(), String> {
+    validate_grid_metrics_json_export(settlement, SETTLEMENT_JSON_KEYS)?;
+    validate_grid_metrics_json_export(trust, TRUST_JSON_KEYS)?;
+    validate_prometheus_json_parity_pairs(prom_text, settlement, &SETTLEMENT_TRUST_PARITY[..2])?;
+    validate_prometheus_json_parity_pairs(prom_text, trust, &SETTLEMENT_TRUST_PARITY[2..])?;
     Ok(())
 }
 
@@ -357,5 +384,46 @@ mod tests {
             stand_smoke_metrics_parity_depth_stub(None),
             StandSmokeMetricsParityDepth::None
         );
+    }
+
+    #[test]
+    fn stand_smoke_metrics_parity_depth_stub_band7_ph_s724() {
+        assert_eq!(
+            stand_smoke_metrics_parity_depth_stub(Some(&json!({"re_migrate_policy": true}))),
+            StandSmokeMetricsParityDepth::ReMigratePolicy
+        );
+        assert_eq!(
+            stand_smoke_metrics_parity_depth_stub(Some(&json!({"routing_locality_gate": true}))),
+            StandSmokeMetricsParityDepth::RoutingLocality
+        );
+    }
+
+    #[test]
+    fn settlement_trust_metrics_parity_ph_s723() {
+        let prom = concat!(
+            "galaxy_settlement_cleared_total 2\n",
+            "galaxy_settlement_payout_batch_total 1\n",
+            "galaxy_trust_payout_eligible_total 3\n",
+            "galaxy_trust_score 55\n",
+        );
+        let settlement = json!({
+            "ok": true,
+            "metrics": {
+                "pending_verification_total": 0,
+                "cleared_total": 2,
+                "resolved_total": 0,
+                "payout_batch_total": 1,
+            }
+        });
+        let trust = json!({
+            "ok": true,
+            "metrics": {
+                "payout_eligible_total": 3,
+                "payout_held_total": 0,
+                "last_trust_score": 55,
+                "gate_min_threshold": 40,
+            }
+        });
+        validate_settlement_trust_metrics_parity(prom, &settlement, &trust).expect("parity");
     }
 }

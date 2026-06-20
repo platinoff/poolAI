@@ -25,7 +25,7 @@
 
 ---
 
-## Band 7 — PH-S720…S729 (Galaxy §4 routing / re-migrate) · **active §5.12**
+## Band 7 — PH-S720…S729 (Galaxy §4 routing / re-migrate) · **✅ drained**
 
 | Sprint | Focus | Acceptance |
 |--------|-------|------------|
@@ -42,7 +42,7 @@
 
 ---
 
-## Band 8 — PH-S730…S739 (Galaxy §8.1 network_profile full persist)
+## Band 8 — PH-S730…S739 (Galaxy §8.1 network_profile full persist) · **active §5.12**
 
 | Sprint | Focus | Acceptance |
 |--------|-------|------------|

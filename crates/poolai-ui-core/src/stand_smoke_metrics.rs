@@ -74,6 +74,42 @@ pub fn render_grid_verification_metrics_strip_html(
     )
 }
 
+/// Settlement + trust metrics strip for admin payout panel (PH-S722).
+pub fn render_grid_settlement_trust_metrics_strip_html(
+    settlement_metrics_json: &str,
+    trust_metrics_json: &str,
+    trust_score_gauge: u64,
+) -> String {
+    use crate::format::escape_html;
+
+    let settlement_body: Value =
+        serde_json::from_str(settlement_metrics_json).unwrap_or(Value::Null);
+    let trust_body: Value = serde_json::from_str(trust_metrics_json).unwrap_or(Value::Null);
+    let sm = settlement_body
+        .get("metrics")
+        .cloned()
+        .unwrap_or(settlement_body);
+    let tm = trust_body.get("metrics").cloned().unwrap_or(trust_body);
+    let cleared = grid_metrics_u64(&sm, "cleared_total");
+    let eligible = grid_metrics_u64(&tm, "payout_eligible_total");
+    let score = if grid_metrics_u64(&tm, "last_trust_score") > 0 {
+        grid_metrics_u64(&tm, "last_trust_score")
+    } else {
+        trust_score_gauge
+    };
+
+    format!(
+        r#"<div class="admin-card admin-metrics-strip">
+<span>Cleared: <strong>{cleared}</strong></span>
+<span>Eligible: <strong>{eligible}</strong></span>
+<span>Trust score: <strong>{score}</strong></span>
+</div>"#,
+        cleared = escape_html(&cleared.to_string()),
+        eligible = escape_html(&eligible.to_string()),
+        score = escape_html(&score.to_string()),
+    )
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -112,5 +148,16 @@ mod tests {
         assert!(html.contains("admin-metrics-strip"));
         assert!(html.contains("Sample"));
         assert!(html.contains("Pending"));
+    }
+
+    #[test]
+    fn render_grid_settlement_trust_metrics_strip_ph_s722() {
+        let settlement = r#"{"ok":true,"metrics":{"cleared_total":5}}"#;
+        let trust = r#"{"ok":true,"metrics":{"payout_eligible_total":2,"last_trust_score":60}}"#;
+        let html = render_grid_settlement_trust_metrics_strip_html(settlement, trust, 0);
+        assert!(html.contains("admin-metrics-strip"));
+        assert!(html.contains("Cleared"));
+        assert!(html.contains("Eligible"));
+        assert!(html.contains("Trust score"));
     }
 }

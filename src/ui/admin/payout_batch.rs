@@ -58,6 +58,14 @@ pub async fn admin_payout_batch() -> Html<String> {
     function renderPayoutBatchMetricsStrip(settlementMetrics, trustMetrics, trustScoreGauge) {
       const sm = (settlementMetrics && settlementMetrics.metrics) ? settlementMetrics.metrics : {};
       const tm = (trustMetrics && trustMetrics.metrics) ? trustMetrics.metrics : {};
+      var wasm = poolaiChartsWasm();
+      if (wasm && typeof wasm.renderGridSettlementTrustMetricsStrip === 'function') {
+        return wasm.renderGridSettlementTrustMetricsStrip(
+          JSON.stringify(settlementMetrics || {}),
+          JSON.stringify(trustMetrics || {}),
+          trustScoreGauge || 0
+        );
+      }
       const score = tm.last_trust_score != null ? tm.last_trust_score : trustScoreGauge;
       return '<div class="admin-card admin-metrics-strip">' +
         '<span>' + escapeHtml(T('admin.payoutBatch.cleared', 'Cleared')) + ': <strong>' + escapeHtml(String(sm.cleared_total || 0)) + '</strong></span>' +
@@ -101,5 +109,13 @@ mod tests {
         assert!(html.contains("/api/v1/grid/settlement-metrics"));
         assert!(html.contains("/api/v1/grid/trust-metrics"));
         assert!(html.contains("parsePrometheusGauge"));
+    }
+
+    #[tokio::test]
+    async fn admin_payout_batch_wasm_glue_ph_s722() {
+        let html = admin_payout_batch().await.0;
+        assert!(html.contains("renderGridSettlementTrustMetricsStrip"));
+        assert!(html.contains("settlement-metrics"));
+        assert!(html.contains("trust-metrics"));
     }
 }

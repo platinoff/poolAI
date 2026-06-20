@@ -16,8 +16,8 @@
 | 4 | PH-S690…S699 | Galaxy replication/pricing wire depth (drained) ✅ drained |
 | 5 | PH-S700…S709 | Admin wasm slim ui-core (drained) ✅ drained |
 | 6 | PH-S710…S719 | Stand smoke metrics parity (drained) ✅ drained |
-| 7 | PH-S720…S729 | Galaxy §4 routing / re-migrate depth **active §5.12** |
-| 8 | PH-S730…S739 | Galaxy §8.1 network_profile full persist |
+| 7 | PH-S720…S729 | Galaxy §4 routing / re-migrate depth ✅ drained |
+| 8 | PH-S730…S739 | Galaxy §8.1 network_profile full persist **active §5.12** |
 | 9 | PH-S740…S749 | Galaxy §6.6 signed capability admission |
 | 10 | PH-S750…S759 | Galaxy §5.5 prefetch live pull depth |
 | 11 | PH-S760…S769 | Galaxy §5.2–5.4 locality / hot-tier |
@@ -139,7 +139,7 @@
 | **PH-S718** | ratio advisory | hold |
 | **PH-S719** | galaxy_horizon_s710_integration | band close |
 
-## Band 7 — PH-S720…S729 (Galaxy §4 routing / re-migrate depth) · **active §5.12**
+## Band 7 — PH-S720…S729 (Galaxy §4 routing / re-migrate depth) · **✅ drained**
 
 | Sprint | Focus | Acceptance |
 |--------|-------|------------|
@@ -154,7 +154,7 @@
 | **PH-S728** | Ratio hold advisory | `--min-ratio 0.95 --advisory` |
 | **PH-S729** | galaxy_horizon_s720_integration | §4 routing band close |
 
-## Band 8 — PH-S730…S739 (Galaxy §8.1 network_profile full persist)
+## Band 8 — PH-S730…S739 (Galaxy §8.1 network_profile full persist) · **active §5.12**
 
 | Sprint | Focus | Acceptance |
 |--------|-------|------------|

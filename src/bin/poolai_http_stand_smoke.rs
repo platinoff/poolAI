@@ -2947,6 +2947,36 @@ mod tests {
     }
 
     #[test]
+    fn grid_settlement_trust_prometheus_parity_export_shape_ph_s723() {
+        use poolai::grid::stand_smoke_metrics_parity::validate_settlement_trust_metrics_parity;
+        let prom = concat!(
+            "galaxy_settlement_cleared_total 2\n",
+            "galaxy_settlement_payout_batch_total 1\n",
+            "galaxy_trust_payout_eligible_total 3\n",
+            "galaxy_trust_score 55\n",
+        );
+        let settlement = serde_json::json!({
+            "ok": true,
+            "metrics": {
+                "pending_verification_total": 0,
+                "cleared_total": 2,
+                "resolved_total": 0,
+                "payout_batch_total": 1,
+            }
+        });
+        let trust = serde_json::json!({
+            "ok": true,
+            "metrics": {
+                "payout_eligible_total": 3,
+                "payout_held_total": 0,
+                "last_trust_score": 55,
+                "gate_min_threshold": 40,
+            }
+        });
+        validate_settlement_trust_metrics_parity(prom, &settlement, &trust).expect("parity");
+    }
+
+    #[test]
     fn vision_revision_fm_parity_ph_s235() {
         let root = repo_root();
         assert_vision_repo_parity(&root)

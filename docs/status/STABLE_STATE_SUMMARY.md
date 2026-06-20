@@ -1,5 +1,5 @@
 # 📊 Стабільний стан розробки PoolAI
-## Rust Architect — оновлено 2026-06-20 (PH-S710…S719 ✅; черга **PH-S720…S729** band 7; **291→S1010** completion v2; rust_ratio **94.76%**; §5.12 **10**)
+## Rust Architect — оновлено 2026-06-20 (PH-S720…S729 ✅; черга **PH-S730…S739** band 8; **281→S1010** completion v2; rust_ratio **94.55%**; §5.12 **10**)
 
 **Completion plan:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.15** at PH-S1010.
 

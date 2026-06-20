@@ -1,6 +1,6 @@
 {
   "generated_at": "2026-06-20",
-  "sprint": "PH-S715",
+  "sprint": "PH-S685",
   "formal_band_min": 0.9,
   "formal_band_max": 0.95,
   "warn_below": 0.93,
@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 140120,
-  "non_rust_product_loc": 7743,
-  "product_loc_total": 147863,
-  "rust_ratio": 0.9476339584615489,
-  "rust_ratio_pct": 94.76339584615488,
+  "rust_loc": 140809,
+  "non_rust_product_loc": 8111,
+  "product_loc_total": 148920,
+  "rust_ratio": 0.9455345151759333,
+  "rust_ratio_pct": 94.55345151759333,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -29,23 +29,23 @@
     },
     "ops_shell": {
       "files": 34,
-      "loc": 2201
+      "loc": 2569
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 37,
-      "loc": 9858
+      "files": 38,
+      "loc": 10019
     },
     "rust_src": {
-      "files": 270,
-      "loc": 100355
+      "files": 271,
+      "loc": 100802
     },
     "rust_tests": {
-      "files": 175,
-      "loc": 29299
+      "files": 176,
+      "loc": 29380
     },
     "ui_css": {
       "files": 2,
