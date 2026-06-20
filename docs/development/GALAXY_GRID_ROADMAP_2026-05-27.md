@@ -1,17 +1,17 @@
 # Galaxy Grid roadmap (зріз)
 
-**Оновлено:** 2026-06-19 · **Канон черги:** FM §5.12 (**0** · PH-S524…S533 ✅) · **`абракадабра`** = project scan → drain 10
+**Оновлено:** 2026-06-20 · **Канон черги:** FM §5.12 (**0** · PH-S640…S649 ✅) · **`абракадабра`** = project scan → drain 10
 
 | Зріз | Значення |
 |------|----------|
-| **Lease failover / health** | PH-S524 worker-unhealthy · S525 scheduler skip unhealthy · S526 max runtime · S530 queue starvation |
-| **Edge capability / profile** | PH-S527 signed capability `expires_at` · S529 discovery hydrate `network_profile` |
-| **Governance / settlement** | PH-S528 Prometheus governance gauges · S531 `settlement_mode: offline_batch` |
-| **Wasm / admin slim** | PH-S532 `admin_charts.js` wasm-first |
-| **Integration / close band** | PH-S533 `galaxy_horizon_s524_integration` + stand smoke + loc-audit + vision-sync |
-| **Rust ratio** | **94.62%** hold **95%** advisory |
+| **Replay / verification wire** | PH-S640 replay resolved · PH-S641 replay record/history · PH-S642 checker enqueue |
+| **Settlement / trust wire** | PH-S643 payout-eligible · PH-S644 settlement resolved |
+| **Prefetch / strict locality wire** | PH-S645 strict-mode metric over HTTP ingest |
+| **Wasm-only admin slim** | PH-S646 dashboard datetime · PH-S647 updates-compat labels · PH-S648 jobs lease badge |
+| **Integration / close band** | PH-S649 `galaxy_horizon_s640_integration` + loc-audit + vision-sync |
+| **Rust ratio** | **94.76%** hold **95%** advisory |
 
-**0** відкритих · остання смуга **PH-S524…S533** ✅.
+**0** відкритих · остання смуга **PH-S640…S649** ✅.
 
 ---
 
@@ -22,14 +22,14 @@
 | LAN replication benchmarks | Architect P4 / FM-003 §4 | **BLOCKED** (2 хости) |
 | Cloud SDK live (AWS/Azure/GCP) | FM-041 Deferred | infra only |
 | ZK / TEE attestation | Galaxy §6.6 | roadmap only |
-| **Worker-unhealthy lease failover** | Galaxy **§4.3.3** | PH-S524…S525 ✅ |
-| **Queue starvation / max runtime** | Galaxy **§4.3.3** | PH-S526/S530 ✅ |
-| **Signed capability expiry** | Galaxy **§6.6** | PH-S527 ✅ |
-| **Governance release metrics** | Galaxy **§9.2** | PH-S528 ✅ |
-| **Network profile hydrate on startup** | Galaxy **§8.1** | PH-S529 ✅ |
-| **Offline batch settlement wire** | Solana / on-chain horizon | PH-S531 ✅ (stub wire) |
+| **Replay resolved + replay history wire** | Galaxy **§6.3** | PH-S640/S641 ✅ |
+| **Verification checker enqueue wire** | Galaxy **§6.2** | PH-S642 ✅ |
+| **Trust payout-eligible + settlement resolved** | Galaxy **§6.5 / §6.4** | PH-S643/S644 ✅ |
+| **Strict-locality prefetch metric wire** | Galaxy **§5.5** | PH-S645 ✅ |
+| **Wasm-only admin slim (dashboard/updates/jobs)** | RUST_RATIO **§5.13** | PH-S646…S648 ✅ |
+| **Horizon integration close band** | §5.12 fallback | PH-S649 ✅ |
 
-**§5.5 prefetch:** live pull + backpressure ✅; replenish §5.13 on next **`абракадабра`** scan.
+**§5.5 prefetch:** live pull + backpressure + strict-mode HTTP wire ✅; replenish §5.13 on next **`абракадабра`** scan.
 
 ---
 

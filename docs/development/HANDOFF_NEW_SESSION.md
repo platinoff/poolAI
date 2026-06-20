@@ -1,6 +1,8 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-20 (PH-S640…S649 ✅ · vision **rev 264** · **0** відкритих · rust_ratio **94.76%**)
+**Оновлено:** 2026-06-20 (PH-S650…S659 ✅ · vision **rev 264** · **0** відкритих · rust_ratio **94.76%**)
+
+**PH-S650…S659 ✅ (2026-06-20):** ui-core warning cleanup (`table.rs`); `GALAXY_GRID_ROADMAP` sync до S640…S649; cursor sandbox temp cleanup + path restore; `poolai-vision-sync --check` (ok, rev 264); `cargo fmt --all`; `cargo test -p poolai-ui-core` rerun (3 pre-existing fails); FM/HANDOFF/NEXT/STABLE_STATE maintenance sync.
 
 **PH-S640…S649 ✅ (2026-06-20):** replay resolved HTTP; verification replay record/history; checker enqueue HTTP; payout-eligible HTTP; settlement resolved HTTP; prefetch strict-mode HTTP; dashboard/updates-compat/jobs wasm-only; `galaxy_horizon_s640_integration`.
 

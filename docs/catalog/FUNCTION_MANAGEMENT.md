@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-20 (PH-S640…S649 ✅ · vision **rev 264** · **0** відкритих · rust_ratio **94.76%**)
+**Оновлено:** 2026-06-20 (PH-S650…S659 ✅ · vision **rev 264** · **0** відкритих · rust_ratio **94.76%**)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -849,8 +849,18 @@ FM-xxx (з таблиці нижче)
 | 582 | **PH-S647** | Admin updates-compat labels wasm-only | RUST_RATIO §5.13 PH-S197 | drop compat/protocol JS fallbacks in `updates_compat.rs` | **✅** |
 | 583 | **PH-S648** | Admin jobs lease badge wasm-only | RUST_RATIO §5.13 PH-S152 | remove `leaseStateFallback`; wasm-only `leaseStateLabel` | **✅** |
 | 584 | **PH-S649** | Horizon close band S640–S648 | §5.12 fallback | `galaxy_horizon_s640_integration` + loc-audit + vision-sync `--check` | **✅** |
+| 585 | **PH-S650** | ui-core warning cleanup (`table.rs`) | RUST_RATIO §5.13 maintain | remove unused `json` import in `poolai-ui-core` table module | **✅** |
+| 586 | **PH-S651** | Galaxy roadmap snapshot sync to S640…S649 | Roadmap §4 / FM §5.12 | refresh `GALAXY_GRID_ROADMAP_2026-05-27.md` current band + ratio | **✅** |
+| 587 | **PH-S652** | Cursor sandbox temp cache triage | VDT S0 / shell hygiene | audit + cleanup `%TEMP%/cursor-sandbox-cache` disk pressure blocker | **✅** |
+| 588 | **PH-S653** | Vision gate recovery after temp cleanup | `poolai-session-iteration` Vision close | restore sandbox path and run `poolai-vision-sync --check` (`ok`, rev 264) | **✅** |
+| 589 | **PH-S654** | Workspace format gate | VDT test gate | `cargo fmt --all` (workspace) | **✅** |
+| 590 | **PH-S655** | ui-core test gate rerun + blocker note | Rust test policy | `cargo test -p poolai-ui-core` rerun; 3 pre-existing failing tests recorded | **✅** |
+| 591 | **PH-S656** | FM §5.12 maintenance close-band sync | FM journal canonical | append PH-S650…S659 maintenance rows + close-band marker | **✅** |
+| 592 | **PH-S657** | HANDOFF maintenance snapshot sync | HANDOFF canonical | add PH-S650…S659 summary + gate notes (vision/test/temp) | **✅** |
+| 593 | **PH-S658** | NEXT session prompt sync | NEXT canonical | update top snapshot to latest closed band and next trigger | **✅** |
+| 594 | **PH-S659** | STABLE_STATE header refresh | status canon | update stable-state header/date to current §5.12/ratio snapshot | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S640…S649 ✅. Vision rev **264**. rust_ratio **94.76%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S650…S659 ✅. Vision rev **264**. rust_ratio **94.76%**.
 
 **Наступна сесія:** **`абракадабра`** — project scan → +10 PH-S* → drain → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 

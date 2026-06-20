@@ -2,7 +2,7 @@
 
 use crate::format::escape_html;
 use serde::Deserialize;
-use serde_json::{json, Value};
+use serde_json::Value;
 
 /// Escape a string for use inside a `RegExp` character class (JS `adminEscapeRegex`).
 pub fn escape_regex(s: &str) -> String {
