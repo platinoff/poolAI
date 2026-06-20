@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-20 (PH-S710…S719 ✅ · **291** master backlog · active **10** · vision **rev 271** · rust_ratio **94.76%**)
+**Оновлено:** 2026-06-20 (PH-S710…S719 ✅ · **291** master backlog · active **10** · vision **rev 272** · rust_ratio **94.76%** · completion v2)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -919,49 +919,81 @@ FM-xxx (з таблиці нижче)
 | 652 | **PH-S717** | poolai-vision-sync drift gate | ops | `poolai-vision-sync --check` green | **✅** |
 | 653 | **PH-S718** | Ratio hold advisory snapshot | PH-S351 pattern | `--min-ratio 0.95 --advisory` **94.76%** | **✅** |
 | 654 | **PH-S719** | Horizon close band S710–S718 | §5.12 fallback | `galaxy_horizon_s710_integration` + docs sync | **✅** |
-| 655 | **PH-S720** | Galaxy concept helper stub #1 | Galaxy §4–§8 | concept wire stub + unit test | **[ ]** |
-| 656 | **PH-S721** | Galaxy concept helper stub #2 | Galaxy §4–§8 | concept wire stub + unit test | **[ ]** |
-| 657 | **PH-S722** | Admin panel wasm glue | poolai-ui-core | admin JSON/metrics fetch glue | **[ ]** |
-| 658 | **PH-S723** | Stand smoke JSON metric export | poolai-http-stand-smoke | `/metrics` + JSON metric API export shape | **[ ]** |
-| 659 | **PH-S724** | Galaxy concept helper stub | band 7 concept wire | unit test scope | **[ ]** |
-| 660 | **PH-S725** | Rust ratio loc-audit refresh | §5.13 fallback | `poolai-loc-audit` → `rust_ratio.json` sprint zriz | **[ ]** |
-| 661 | **PH-S726** | Docs INDEX canon sync | docs canon | INDEX + HANDOFF + NEXT + STABLE + GALAXY sync | **[ ]** |
+| 655 | **PH-S720** | `re_migrate_policy_depth_stub` | Galaxy **§4.3** | unit test; dispatch/scheduler hook | **[ ]** |
+| 656 | **PH-S721** | `routing_policy_locality_gate` | Galaxy **§4.1** | strict routing helper + unit test | **[ ]** |
+| 657 | **PH-S722** | Admin settlement/trust metrics wasm strip | poolai-ui-core | fetch JSON metrics + wasm render | **[ ]** |
+| 658 | **PH-S723** | Stand smoke settlement/trust JSON↔Prom parity | poolai-http-stand-smoke | unit tests in stand smoke bin | **[ ]** |
+| 659 | **PH-S724** | Concept stub extend (§4–§8) | band 7 depth | unit test | **[ ]** |
+| 660 | **PH-S725** | Rust ratio loc-audit refresh | §5.13 fallback | `poolai-loc-audit` → `rust_ratio.json` PH-S725 zriz | **[ ]** |
+| 661 | **PH-S726** | Docs INDEX canon sync | docs canon | INDEX + HANDOFF + NEXT + STABLE + GALAXY + completion roadmap | **[ ]** |
 | 662 | **PH-S727** | poolai-vision-sync drift gate | ops | `poolai-vision-sync --check` green | **[ ]** |
 | 663 | **PH-S728** | Ratio hold advisory snapshot | PH-S351 pattern | `--min-ratio 0.95 --advisory` | **[ ]** |
-| 664 | **PH-S729** | Horizon close band S720–S728 | §5.12 fallback | `galaxy_horizon_s720_integration` + docs sync | **[ ]** |
+| 664 | **PH-S729** | Horizon close band S720–S728 | Galaxy **§4** routing | `galaxy_horizon_s720_integration` + docs sync | **[ ]** |
 
 **Відкритих у §5.12:** **10** (PH-S720…S729). **Master backlog:** **291** pending PH-S720…S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · **§5.14**. Vision rev **272** (after sync). rust_ratio **94.76%**.
 
 **Наступна сесія:** **`абракадабра`** — drain PH-S720…S729 → promote PH-S730…S739 з §5.14 → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
-### 5.14 Master backlog PH-S660…S1010 (351 pending, 2026-06-20)
+### 5.14 Master backlog PH-S720…S1010 (291 pending → product-complete, 2026-06-20)
 
-**Призначення:** повний реєстр **351** спринта з project scan «що ще не зроблено» (concept, roadmaps, §5.3, wasm slim, ui-core blockers). **Не** дублювати в §5.12 — там max **10** `[ ]` активних. **Slots 1–2 theme-aware** — regen [`generate-ph-s-master-backlog-351.sh`](../../scripts/generate-ph-s-master-backlog-351.sh).
+**Призначення:** **completion roadmap v2** — конкретний шлях до **product-complete** (code + docs + ratio **95–96%**). **Не** дублювати в §5.12 — там max **10** `[ ]` активних.
 
 | Поле | Значення |
 |------|----------|
-| **Діапазон** | PH-S660…PH-S1010 |
-| **Кількість** | **351** |
-| **Активна смуга §5.12** | PH-S720…S729 `[ ]` (band 7) |
-| **Наступна promote** | PH-S730…S739 (band 8) після drain band 7 |
-| **Сесій `абракадабра`** | **36** (35×10 + tail S1010) |
-| **Артефакт** | [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) |
+| **Pending** | **291** (PH-S720…S1010) |
+| **Drained bands 1–6** | PH-S660…S719 ✅ |
+| **Активна §5.12** | PH-S720…S729 `[ ]` — band 7 Galaxy **§4** routing / re-migrate |
+| **Наступна promote** | PH-S730…S739 — band 8 Galaxy **§8.1** network_profile persist |
+| **Сесій `абракадабра`** | **30** (29×10 + tail PH-S1010) |
+| **План фаз** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md) |
+| **Реєстр sprint×acceptance** | [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) |
 | **Regen** | `bash scripts/generate-ph-s-master-backlog-351.sh` |
+
+**Фази до S1010:**
+
+| Фаза | Bands | Sprints | Фокус |
+|------|-------|---------|--------|
+| **A — Galaxy depth** | 7–14 | S720–S789 | §4 routing, §8 profile, §6.6 caps, §5 prefetch/locality, §8.2 payout, §1 fees, §9 governance |
+| **B — wasm + wire** | 15–19 | S800–S849 | admin wasm slim panels, stand smoke v2, OpenAPI gap 0 |
+| **C — Job/Memory/Solana** | 20–22 | S850–S879 | RAID job store, memory persist, on-chain cleared |
+| **D — Production gates** | 23–26 | S880–S919 | verification lifecycle, replication quorum, pricing live, trust persist |
+| **E — Ratio 95–96%** | 27–29 | S920–S949 | admin_charts → wasm, JS glue removal, ratio gates |
+| **F — Docs complete** | 30–33 | S950–S989 | DIGEST, DOCS_LEGACY, Galaxy ✅ markers, STABLE |
+| **G — Final verify** | 34–35 | S990–S1009 | integration gap fill, multi-module horizon close |
+| **H — Closure** | 36 | S1010 | FM **§5.15** product-complete |
 
 **Workflow promote (після drain + push):**
 
 1. Закрити band у §5.12 → ✅
-2. Взяти **наступні 10** з §5.14 / master backlog → записати в §5.12 як `[ ]`
-3. Оновити HANDOFF + NEXT (`next promote: PH-S…`)
-4. **BLOCKED/Deferred** (FM-003 LAN, FM-041 Cloud SDK) — поза 351 backlog
+2. Взяти **наступні 10** з master backlog → §5.12 `[ ]` з **конкретним** Focus + Acceptance
+3. Оновити HANDOFF + NEXT + GALAXY + completion roadmap zriz
+4. **BLOCKED/Deferred** (FM-003 LAN, FM-041 Cloud SDK, ZK/TEE) — поза backlog
 
-**Після PH-S1010 ✅:** новий project scan → новий master backlog або FM-horizon.
+**Після PH-S1010 ✅:** FM **§5.15**; maintenance mode; новий scan лише для BLOCKED/Deferred або явного FM-horizon v2.
+
+### 5.15 Product-complete closure (PH-S1010)
+
+**Статус:** `[ ]` — ціль після drain bands 7–35.
+
+**Acceptance (PH-S1010):**
+
+| Критерій | Перевірка |
+|----------|-----------|
+| Galaxy concept gaps (§4–§9 wire) | roadmap + concept ✅ markers |
+| OpenAPI gap | `poolai-openapi-gap-audit` → **0** |
+| Integration coverage | top FM gaps closed (band 34) |
+| Rust ratio | **≥95%** formal; **96%** stretch advisory logged |
+| Docs canon | STABLE «development complete»; INDEX + DIGEST synced |
+| Vision | `poolai-vision-sync --check` green |
+| Ops | `cargo test-ci` green; HANDOFF → maintenance mode |
+
+**Поза product-complete (не блокує S1010):** FM-003 LAN 2-host · FM-041 Cloud SDK prod · ZK/TEE attestation roadmap.
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S262)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-06-20):** PH-S720…S729 **[ ]** drain · **`абракадабра`** = drain → vision close → push.
+**Активна смуга (2026-06-20):** PH-S720…S729 **[ ]** drain band 7 (Galaxy **§4** routing) · **`абракадабра`** = drain → vision close → push · ratio formal gate bands **28–29** per [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md).
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

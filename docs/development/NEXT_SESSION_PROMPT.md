@@ -1,11 +1,12 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-20 (master backlog **291** · theme-aware slots · active **PH-S720…S729** · vision **rev 272** · rust_ratio **94.76%**)
+**Оновлено:** 2026-06-20 (completion v2 · master backlog **291** · active **PH-S720…S729** · vision **rev 272** · rust_ratio **94.76%**)
 
 | **← наступний** | **`абракадабра`** (drain band 7 PH-S720…S729) |
-| **Master backlog** | **291** pending — [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · FM **§5.14** |
-| **Активних §5.12** | **10** (PH-S720…S729, band 7 concept wire) |
-| **Після band 7** | promote PH-S730…S739 (band 8 ops loc-audit) |
+| **Completion plan** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.14–§5.15** |
+| **Master backlog** | **291** pending — [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) |
+| **Активних §5.12** | **10** (PH-S720…S729, band 7 Galaxy **§4** routing / re-migrate) |
+| **Після band 7** | promote PH-S730…S739 (band 8 Galaxy **§8.1** network_profile persist) |
 | **Сесій drain** | **30** (`291÷10` + tail PH-S1010) |
 
 ---
@@ -23,7 +24,7 @@
 ## S0 + drain (канон)
 
 1. `git fetch`; HANDOFF; FM §5.12 + **§5.14**; `poolai-vision-sync --check`; `df -h /s`
-2. **Drain** активних 10 з §5.12 (зараз PH-S720…S729) — деталі в master backlog band 7
+2. **Drain** активних 10 з §5.12 (PH-S720…S729) — acceptance у [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) band 7
 3. Vision close → `poolai-vision-sync` → `--check`
 4. `cargo fmt --all` → `K8S_OPENAPI_ENABLED_VERSION=1.28 cargo test-ci`
 5. Commit + `git push origin main` + самарі
@@ -39,44 +40,44 @@ cd /s/rust/poolAI
 
 ---
 
-## Master backlog 291 (PH-S720…S1010)
+## Master backlog 291 → product-complete (PH-S720…S1010)
 
-Повний реєстр: [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · FM [`§5.14`](../catalog/FUNCTION_MANAGEMENT.md#514-master-backlog-ph-s660s1010-351-pending-2026-06-20).
+План фаз: [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · реєстр: [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · FM [`§5.14`](../catalog/FUNCTION_MANAGEMENT.md#514-master-backlog-ph-s720s1010-291-pending--product-complete-2026-06-20) · closure [`§5.15`](../catalog/FUNCTION_MANAGEMENT.md#515-product-complete-closure-ph-s1010).
 
-| Band | Sprints | Статус |
-|------|---------|--------|
-| 1 | PH-S660…S669 | ✅ drained |
-| 2 | PH-S670…S679 | ✅ drained |
-| 3 | PH-S680…S689 | ✅ drained |
-| 4 | PH-S690…S699 | ✅ drained |
-| 5 | PH-S700…S709 | ✅ drained |
-| 6 | PH-S710…S719 | ✅ drained |
-| 7 | PH-S720…S729 | **активна §5.12** `[ ]` |
-| 8–35 | PH-S730…S1009 | queued |
-| 36 | PH-S1010 | tail / replenish |
+| Band | Sprints | Theme |
+|------|---------|-------|
+| 1–6 | PH-S660…S719 | ✅ drained |
+| 7 | PH-S720…S729 | **активна §5.12** — Galaxy **§4** routing / re-migrate |
+| 8–14 | PH-S730…S789 | Galaxy depth (profile, caps, prefetch, payout, fees, governance) |
+| 15–19 | PH-S800…S849 | Admin wasm slim + stand smoke v2 + OpenAPI |
+| 20–26 | PH-S850…S919 | Job/Memory/Solana + production gates |
+| 27–29 | PH-S920…S949 | Ratio **95–96%** |
+| 30–33 | PH-S950…S989 | Docs product-complete |
+| 34–35 | PH-S990…S1009 | Final integration horizon |
+| 36 | PH-S1010 | Product-complete (FM §5.15) |
 
-**Не в backlog:** FM-003 LAN · FM-041 Cloud SDK (BLOCKED/Deferred).
+**Не в backlog:** FM-003 LAN · FM-041 Cloud SDK · ZK/TEE (BLOCKED/Deferred/roadmap).
 
-**Band slot map:** slots 1–2 = theme (Concept wire stub / …); regen `bash scripts/generate-ph-s-master-backlog-351.sh`.
+**Regen:** `bash scripts/generate-ph-s-master-backlog-351.sh`.
 
 ---
 
 ## Активна смуга (band 7 — drain зараз)
 
-| Sprint | Фокус | Acceptance |
+| Sprint | Focus | Acceptance |
 |--------|--------|------------|
-| **PH-S720** | Galaxy concept helper stub #1 | scope test green |
-| **PH-S721** | Galaxy concept helper stub #2 | scope test green |
-| **PH-S722** | Admin panel wasm glue | poolai-ui-core + admin JSON/metrics fetch |
-| **PH-S723** | Stand smoke /metrics export | poolai-http-stand-smoke JSON metric API |
-| **PH-S724** | Galaxy concept helper stub | unit test |
-| **PH-S725** | loc-audit → `rust_ratio.json` | sprint zriz PH-S725 |
-| **PH-S726** | INDEX / HANDOFF / NEXT / STABLE / GALAXY sync | docs canon |
+| **PH-S720** | `re_migrate_policy_depth_stub` | Galaxy §4.3; unit test; dispatch/scheduler hook |
+| **PH-S721** | `routing_policy_locality_gate` | Galaxy §4.1 strict routing helper + unit test |
+| **PH-S722** | Admin settlement/trust metrics wasm strip | ui-core; fetch JSON metrics + wasm render |
+| **PH-S723** | Stand smoke settlement/trust JSON↔Prom parity | unit tests in `poolai-http-stand-smoke` |
+| **PH-S724** | Concept stub extend (§4–§8) | unit test |
+| **PH-S725** | `poolai-loc-audit` → `rust_ratio.json` | sprint zriz PH-S725 |
+| **PH-S726** | INDEX / HANDOFF / NEXT / STABLE / GALAXY sync | docs canon + completion roadmap |
 | **PH-S727** | `poolai-vision-sync --check` | drift gate green |
 | **PH-S728** | ratio advisory | `--min-ratio 0.95 --advisory` |
-| **PH-S729** | `galaxy_horizon_s720_integration` | horizon close + docs |
+| **PH-S729** | `galaxy_horizon_s720_integration` | §4 routing band close + docs |
 
-**Після band 7 promote:** PH-S730…S739 (band 8 — **Ops loc-audit + ratio advisory**).
+**Після band 7 promote:** PH-S730…S739 (band 8 — Galaxy **§8.1** network_profile full persist).
 
 ---
 

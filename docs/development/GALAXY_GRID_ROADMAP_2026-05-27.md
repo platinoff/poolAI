@@ -1,44 +1,48 @@
 # Galaxy Grid roadmap (зріз)
 
-**Оновлено:** 2026-06-20 · **Master backlog:** **291** PH-S720…S1010 · **§5.12 active:** 10 · **`абракадабра`** = drain + promote
+**Оновлено:** 2026-06-20 · **Completion v2:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · **291** pending PH-S720…S1010 · **§5.12 active:** 10
 
 | Зріз | Значення |
 |------|----------|
-| **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · FM **§5.14** |
-| **Active drain (band 7)** | PH-S720…S729 — concept wire stub (Galaxy §4–§8) |
-| **Next promote (band 7)** | PH-S720…S729 — concept wire stub |
-| **Tail** | PH-S1010 replenish marker |
-| **Rust ratio** | **94.75%** hold **95%** advisory |
+| **Completion plan** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.14–§5.15** |
+| **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) |
+| **Active drain (band 7)** | PH-S720…S729 — Galaxy **§4** routing / re-migrate depth |
+| **Next promote (band 8)** | PH-S730…S739 — Galaxy **§8.1** network_profile full persist |
+| **Product-complete tail** | PH-S1010 — FM **§5.15** |
+| **Rust ratio** | **94.76%** · hold **95%** advisory (bands 27–29 formal gate) |
 
 **291** pending · **30** `абракадабра` sessions · остання закрита **PH-S710…S719** ✅.
 
 ---
 
-## 4. Концепт ↔ код (horizon)
+## 4. Концепт ↔ код (horizon + completion bands)
 
-| Тема | Джерело | Статус |
-|------|---------|--------|
+| Тема | Джерело | Статус / band |
+|------|---------|---------------|
 | LAN replication benchmarks | Architect P4 / FM-003 §4 | **BLOCKED** (2 хости) |
 | Cloud SDK live (AWS/Azure/GCP) | FM-041 Deferred | infra only |
-| ZK / TEE attestation | Galaxy §6.6 | roadmap only |
+| ZK / TEE attestation | Galaxy §6.6 | roadmap only (не блокує S1010) |
 | **Verification/replay metrics HTTP** | Galaxy **§6.2–6.3** | PH-S670/S671 ✅ |
 | **Settlement/trust metrics HTTP** | Galaxy **§6.4–6.5** | PH-S680/S681 ✅ |
 | **Replication/pricing metrics HTTP** | Galaxy **§6.4 / §4.2** | PH-S690/S691 ✅ |
-| **Replay resolved + replay history wire** | Galaxy **§6.3** | PH-S640/S641 ✅ |
-| **Verification checker enqueue wire** | Galaxy **§6.2** | PH-S642 ✅ |
-| **Trust payout-eligible + settlement resolved** | Galaxy **§6.5 / §6.4** | PH-S643/S644 ✅ |
-| **Strict-locality prefetch metric wire** | Galaxy **§5.5** | PH-S645 ✅ |
-| **Wasm-only admin slim (dashboard/updates/jobs)** | RUST_RATIO **§5.13** | PH-S646…S648 ✅ |
-| **network_profile persist stub** | Galaxy **§8** L916 | PH-S664 ✅ |
-| **Horizon integration close band** | §5.12 fallback | S649/S669/S679/S689/S699 ✅ |
-| **Signed capabilities / full network_profile persist** | Galaxy **§6.6 / §8.1** | post-S1010 scan |
+| **Stand smoke JSON↔Prom parity** | ops / PROMETHEUS_METRICS | PH-S710…S719 ✅ |
+| **§4 routing / re-migrate depth** | Galaxy **§4.1–§4.3** | band 7 **active** PH-S720…S729 |
+| **§8.1 network_profile full persist** | Galaxy **§8.1** | band 8 PH-S730…S739 |
+| **§6.6 signed capability admission** | Galaxy **§6.6** | band 9 PH-S740…S749 |
+| **§5.5 prefetch live pull depth** | Galaxy **§5.5** | band 10 PH-S750…S759 |
+| **§5.2–5.4 locality / hot-tier** | Galaxy **§5.2–5.4** | band 11 PH-S760…S769 |
+| **§8.2 payout / settlement batch** | Galaxy **§8.2** | band 12 PH-S770…S779 |
+| **§1.2 fee split production** | Galaxy **§1.2** | band 13 PH-S780…S789 |
+| **§9.5–9.6 governance ops** | Galaxy **§9.5–9.6** | band 14 PH-S790…S799 |
+| **network_profile persist stub** | Galaxy **§8** | PH-S664 ✅ (stub); full persist → band 8 |
 
-**§5.5 prefetch:** live pull + backpressure + strict-mode HTTP wire ✅. **Master backlog:** theme-aware slots 1–2 ([`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md)).
+**§5.5 prefetch:** live pull + backpressure + strict-mode HTTP wire ✅ (baseline); live pull **depth** → band 10.
 
 ---
 
 ## 5. Пов’язані документи
 
 - [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md) — концепт v1
+- [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) — фази A–H до S1010
 - [`PROMETHEUS_METRICS.md`](./PROMETHEUS_METRICS.md) — stand smoke bands + governance gauges
-- [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md) — ratio **94.73%**
+- [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md) — ratio **94.76%**; formal **95%** gate bands 28–29

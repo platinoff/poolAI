@@ -14406,49 +14406,49 @@
       "title": "Horizon close band S710–S718"
     },
     {
-      "acceptance": "concept wire stub + unit test",
-      "deps": "Galaxy §4–§8",
+      "acceptance": "Galaxy §4.3; unit test; dispatch/scheduler hook",
+      "deps": "re_migrate_policy_depth_stub",
       "id": "PH-S720",
       "open": true,
       "row": 655,
       "status": "open",
-      "title": "Galaxy concept helper stub #1"
+      "title": "re_migrate_policy_depth_stub"
     },
     {
-      "acceptance": "concept wire stub + unit test",
-      "deps": "Galaxy §4–§8",
+      "acceptance": "Galaxy §4.1 strict routing helper + unit test",
+      "deps": "routing_policy_locality_gate",
       "id": "PH-S721",
       "open": true,
       "row": 656,
       "status": "open",
-      "title": "Galaxy concept helper stub #2"
+      "title": "routing_policy_locality_gate"
     },
     {
-      "acceptance": "admin JSON/metrics fetch glue",
+      "acceptance": "fetch JSON metrics + wasm render",
       "deps": "poolai-ui-core",
       "id": "PH-S722",
       "open": true,
       "row": 657,
       "status": "open",
-      "title": "Admin panel wasm glue"
+      "title": "Admin settlement/trust metrics wasm strip"
     },
     {
-      "acceptance": "/metrics` + JSON metric API export shape",
+      "acceptance": "unit tests in poolai-http-stand-smoke",
       "deps": "poolai-http-stand-smoke",
       "id": "PH-S723",
       "open": true,
       "row": 658,
       "status": "open",
-      "title": "Stand smoke JSON metric export"
+      "title": "Stand smoke settlement/trust JSON↔Prom parity"
     },
     {
-      "acceptance": "unit test scope",
-      "deps": "band 7 concept wire",
+      "acceptance": "unit test",
+      "deps": "band 7 depth §4–§8",
       "id": "PH-S724",
       "open": true,
       "row": 659,
       "status": "open",
-      "title": "Galaxy concept helper stub"
+      "title": "Concept stub extend (§4–§8)"
     },
     {
       "acceptance": "poolai-loc-audit` → `rust_ratio.json` sprint zriz",
@@ -14460,7 +14460,7 @@
       "title": "Rust ratio loc-audit refresh"
     },
     {
-      "acceptance": "INDEX + HANDOFF + NEXT + STABLE + GALAXY sync",
+      "acceptance": "INDEX + HANDOFF + NEXT + STABLE + GALAXY + completion roadmap",
       "deps": "docs canon",
       "id": "PH-S726",
       "open": true,
@@ -14487,8 +14487,8 @@
       "title": "Ratio hold advisory snapshot"
     },
     {
-      "acceptance": "galaxy_horizon_s720_integration` + docs sync",
-      "deps": "§5.12 fallback",
+      "acceptance": "galaxy_horizon_s720_integration + docs sync",
+      "deps": "Galaxy §4 routing",
       "id": "PH-S729",
       "open": true,
       "row": 664,
@@ -14497,6 +14497,6 @@
     }
   ],
   "sprint_queue_open_count": 10,
-  "updated_at": "2026-06-19",
+  "updated_at": "2026-06-20",
   "vision_ui_rev": 59
 }

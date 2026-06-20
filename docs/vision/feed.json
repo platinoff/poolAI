@@ -8,8 +8,8 @@
       "next": true,
       "published": "2026-05-28",
       "status": "open",
-      "summary": "concept wire stub + unit test",
-      "title": "Galaxy concept helper stub #1"
+      "summary": "unit test; dispatch/scheduler hook",
+      "title": "re_migrate_policy_depth_stub"
     },
     {
       "category": "open",
@@ -17,8 +17,8 @@
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "concept wire stub + unit test",
-      "title": "Galaxy concept helper stub #2"
+      "summary": "strict routing helper + unit test",
+      "title": "routing_policy_locality_gate"
     },
     {
       "category": "open",
@@ -26,8 +26,8 @@
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "admin JSON/metrics fetch glue",
-      "title": "Admin panel wasm glue"
+      "summary": "fetch JSON metrics + wasm render",
+      "title": "Admin settlement/trust metrics wasm strip"
     },
     {
       "category": "open",
@@ -35,8 +35,8 @@
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "/metrics` + JSON metric API export shape",
-      "title": "Stand smoke JSON metric export"
+      "summary": "unit tests in stand smoke bin",
+      "title": "Stand smoke settlement/trust JSON↔Prom parity"
     },
     {
       "category": "open",
@@ -44,8 +44,8 @@
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "unit test scope",
-      "title": "Galaxy concept helper stub"
+      "summary": "unit test",
+      "title": "Concept stub extend (§4–§8)"
     },
     {
       "category": "open",
@@ -53,7 +53,7 @@
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "poolai-loc-audit` → `rust_ratio.json` sprint zriz",
+      "summary": "poolai-loc-audit` → `rust_ratio.json` PH-S725 zriz",
       "title": "Rust ratio loc-audit refresh"
     },
     {
@@ -62,7 +62,7 @@
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "INDEX + HANDOFF + NEXT + STABLE + GALAXY sync",
+      "summary": "INDEX + HANDOFF + NEXT + STABLE + GALAXY + completion roadmap",
       "title": "Docs INDEX canon sync"
     },
     {

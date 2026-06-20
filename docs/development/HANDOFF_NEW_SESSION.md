@@ -4,7 +4,9 @@
 
 **Cursor 3.8.11 (2026-06-20):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-06-20.md`](./CURSOR_UPDATE_RESEARCH_2026-06-20.md); `poolai-vision-sync --check` ok; baseline rule оновлено. **Наступна сесія:** **`абракадабра`** (drain PH-S720…S729).
 
-**Master backlog 291 (2026-06-20):** theme-aware slots 1–2 ([`generate-ph-s-master-backlog-351.sh`](../../scripts/generate-ph-s-master-backlog-351.sh)) · [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · FM **§5.14**. Активна §5.12: **PH-S720…S729** (band 7 concept wire). **`абракадабра`** = drain 10 → promote **PH-S730…S739** (band 8 ops).
+**Completion roadmap v2 (2026-06-20):** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) — **291** спринтів до **product-complete** (PH-S1010 / FM **§5.15**); **30** сесій `абракадабра` × 10 PH-S*. Реєстр: [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · regen `bash scripts/generate-ph-s-master-backlog-351.sh`.
+
+**Master backlog 291 (2026-06-20):** FM **§5.14**. Активна §5.12: **PH-S720…S729** (band 7 — Galaxy **§4** routing / re-migrate). **`абракадабра`** = drain 10 → promote **PH-S730…S739** (band 8 — Galaxy **§8.1** network_profile persist).
 
 **PH-S710…S719 ✅ (2026-06-20):** `stand_smoke_metrics_parity` JSON↔Prometheus parity (PH-S710/S711); ui-core `stand_smoke_metrics` + admin verification-metrics wasm strip (PH-S712); stand smoke `grid_metrics_json_prometheus_parity_band6` (PH-S713); `stand_smoke_metrics_parity_depth_stub` (PH-S714); `poolai-loc-audit` → `rust_ratio.json` **94.76%**; hold advisory `--min-ratio 0.95`; `galaxy_horizon_s710_integration`; FM/HANDOFF/NEXT/STABLE/GALAXY sync; vision **rev 272**.
 
