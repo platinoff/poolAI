@@ -1,8 +1,10 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-20 (PH-S660…S669 ✅ · master backlog **341** PH-S670…S1010 · active **10** · vision **rev 266** · rust_ratio **94.70%**)
+**Оновлено:** 2026-06-20 (PH-S670…S679 ✅ · master backlog **331** PH-S680…S1010 · active **10** · vision **rev 267** · rust_ratio **94.72%**)
 
-**Master backlog 341 (2026-06-20):** project scan «не зроблено» → [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) (PH-S670…S1010) · FM **§5.14**. Активна §5.12: **PH-S670…S679** (band 2). **`абракадабра`** = drain 10 → promote наступні 10 (**35** сесій до S1010). **BLOCKED/Deferred** поза backlog: FM-003, FM-041.
+**Master backlog 331 (2026-06-20):** project scan «не зроблено» → [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) (PH-S680…S1010) · FM **§5.14**. Активна §5.12: **PH-S680…S689** (band 3). **`абракадабра`** = drain 10 → promote наступні 10 (**34** сесій до S1010). **BLOCKED/Deferred** поза backlog: FM-003, FM-041.
+
+**PH-S670…S679 ✅ (2026-06-20):** `GET /api/v1/grid/verification-metrics` + `GET /api/v1/grid/replay-metrics`; `verification_replay_depth_stub` (PH-S674); `parsePrometheusGauge` wasm glue (grid-verification); stand smoke verification/replay API; `poolai-loc-audit` → `rust_ratio.json` **94.72%**; hold advisory `--min-ratio 0.95`; `galaxy_horizon_s670_integration`; FM/HANDOFF/NEXT/STABLE/GALAXY sync; vision **rev 267**.
 
 **PH-S660…S669 ✅ (2026-06-20):** ui-core UTC timestamp fix (`format_unix_timestamp_display_ph_s628`); ML metric URL encode (`cpu%2Eusage`); `cargo test -p poolai-ui-core` 0 failed; wasm-only `formatIsoDatetime` (drop `toLocaleString` in `src/ui/mod.rs`); network_profile heartbeat persist stub + `heartbeat_network_profile_persist_stub_ph_s664`; `poolai-loc-audit` → `rust_ratio.json` **94.70%**; hold advisory `--min-ratio 0.95`; `galaxy_horizon_s660_integration`; FM/HANDOFF/NEXT/STABLE/GALAXY sync; vision **rev 266**.
 

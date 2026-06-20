@@ -142,6 +142,29 @@ pub fn verification_checker_pending_total() -> u64 {
     CHECKER_TASKS.lock().map(|g| g.len() as u64).unwrap_or(0)
 }
 
+/// Read-only verification counters snapshot for `GET /api/v1/grid/verification-metrics` (PH-S670).
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
+pub struct VerificationMetricsSnapshot {
+    pub sample_total: u64,
+    pub mismatch_total: u64,
+    pub match_total: u64,
+    pub sample_completed_total: u64,
+    pub checker_enqueue_total: u64,
+    pub checker_pending_total: u64,
+}
+
+/// Coordinator verification metrics snapshot (PH-S670).
+pub fn verification_metrics_snapshot() -> VerificationMetricsSnapshot {
+    VerificationMetricsSnapshot {
+        sample_total: verification_sample_total(),
+        mismatch_total: verification_mismatch_total(),
+        match_total: verification_match_total(),
+        sample_completed_total: verification_sample_completed_total(),
+        checker_enqueue_total: verification_checker_enqueue_total(),
+        checker_pending_total: verification_checker_pending_total(),
+    }
+}
+
 /// Remove pending checker task after verdict (PH-S495).
 pub fn drain_verification_checker_task(job_id: &str) -> bool {
     if let Ok(mut tasks) = CHECKER_TASKS.lock() {

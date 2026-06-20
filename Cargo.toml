@@ -456,6 +456,11 @@ path = "tests/galaxy_horizon_s620_integration.rs"
 required-features = ["test-utils", "prometheus"]
 
 [[test]]
+name = "galaxy_horizon_s670_integration"
+path = "tests/galaxy_horizon_s670_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
 name = "galaxy_horizon_s660_integration"
 path = "tests/galaxy_horizon_s660_integration.rs"
 required-features = ["test-utils", "prometheus"]

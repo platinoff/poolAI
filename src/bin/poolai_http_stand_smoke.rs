@@ -1097,6 +1097,63 @@ async fn smoke_grid_verification_checker_tasks(client: &Client, base: &str) -> R
     Ok(())
 }
 
+async fn smoke_grid_verification_metrics_api(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/api/v1/grid/verification-metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("verification-metrics request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("verification-metrics status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    if body.get("ok").and_then(|v| v.as_bool()) != Some(true) {
+        return Err(format!("verification-metrics body: {body}"));
+    }
+    let metrics = body
+        .get("metrics")
+        .ok_or_else(|| format!("verification-metrics missing metrics: {body}"))?;
+    for key in [
+        "sample_total",
+        "mismatch_total",
+        "match_total",
+        "checker_pending_total",
+    ] {
+        if !metrics.get(key).and_then(|v| v.as_u64()).is_some() {
+            return Err(format!("verification-metrics missing {key}: {body}"));
+        }
+    }
+    Ok(())
+}
+
+async fn smoke_grid_replay_metrics_api(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/api/v1/grid/replay-metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("replay-metrics request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("replay-metrics status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    if body.get("ok").and_then(|v| v.as_bool()) != Some(true) {
+        return Err(format!("replay-metrics body: {body}"));
+    }
+    let metrics = body
+        .get("metrics")
+        .ok_or_else(|| format!("replay-metrics missing metrics: {body}"))?;
+    for key in [
+        "replay_pending",
+        "replay_pending_scheduled_total",
+        "verification_replay_record_total",
+    ] {
+        if !metrics.get(key).and_then(|v| v.as_u64()).is_some() {
+            return Err(format!("replay-metrics missing {key}: {body}"));
+        }
+    }
+    Ok(())
+}
+
 async fn smoke_grid_network_profile_read(client: &Client, base: &str) -> Result<(), String> {
     let resp = client
         .get(api_url(
@@ -1983,6 +2040,18 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
     .await;
     record(
         &mut cases,
+        "grid_verification_metrics_api",
+        smoke_grid_verification_metrics_api(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
+        "grid_replay_metrics_api",
+        smoke_grid_replay_metrics_api(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
         "grid_network_profile_read",
         smoke_grid_network_profile_read(&client, &cli.base_url).await,
     )
@@ -2508,6 +2577,20 @@ mod tests {
             "galaxy_replication_executor_enqueue_total 0\n",
         );
         metrics_text_has_replication_strict(sample).expect("sample export");
+    }
+
+    #[test]
+    fn grid_verification_metrics_api_export_shape_ph_s673() {
+        let sample = r#"{"ok":true,"metrics":{"sample_total":0,"mismatch_total":0,"match_total":0,"sample_completed_total":0,"checker_enqueue_total":0,"checker_pending_total":0}}"#;
+        let body: Value = serde_json::from_str(sample).expect("json");
+        assert_eq!(body["metrics"]["checker_pending_total"], 0);
+    }
+
+    #[test]
+    fn grid_replay_metrics_api_export_shape_ph_s673() {
+        let sample = r#"{"ok":true,"metrics":{"replay_pending":0,"replay_pending_scheduled_total":0,"replay_pending_resolved_total":0,"replay_evaluations_total":0,"replay_verification_enqueue_total":0,"verification_replay_record_total":0}}"#;
+        let body: Value = serde_json::from_str(sample).expect("json");
+        assert_eq!(body["metrics"]["replay_pending"], 0);
     }
 
     #[test]

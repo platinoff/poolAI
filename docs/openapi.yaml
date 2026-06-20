@@ -784,6 +784,34 @@ paths:
               schema:
                 $ref: '#/components/schemas/GridVerificationCheckerTasksResponse'
 
+  /grid/verification-metrics:
+    get:
+      tags:
+        - Grid
+      summary: Verification counters snapshot (PH-S670)
+      operationId: getGridVerificationMetrics
+      responses:
+        '200':
+          description: Verification metrics snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GridVerificationMetricsResponse'
+
+  /grid/replay-metrics:
+    get:
+      tags:
+        - Grid
+      summary: Replay counters snapshot (PH-S671)
+      operationId: getGridReplayMetrics
+      responses:
+        '200':
+          description: Replay metrics snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GridReplayMetricsResponse'
+
   /grid/network-profiles/{peer_id}:
     get:
       tags:
@@ -6360,6 +6388,86 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/VerificationCheckerTask'
+
+    VerificationMetricsSnapshot:
+      type: object
+      required:
+        - sample_total
+        - mismatch_total
+        - match_total
+        - sample_completed_total
+        - checker_enqueue_total
+        - checker_pending_total
+      properties:
+        sample_total:
+          type: integer
+          format: int64
+        mismatch_total:
+          type: integer
+          format: int64
+        match_total:
+          type: integer
+          format: int64
+        sample_completed_total:
+          type: integer
+          format: int64
+        checker_enqueue_total:
+          type: integer
+          format: int64
+        checker_pending_total:
+          type: integer
+          format: int64
+
+    GridVerificationMetricsResponse:
+      type: object
+      required:
+        - ok
+        - metrics
+      properties:
+        ok:
+          type: boolean
+        metrics:
+          $ref: '#/components/schemas/VerificationMetricsSnapshot'
+
+    ReplayMetricsSnapshot:
+      type: object
+      required:
+        - replay_pending
+        - replay_pending_scheduled_total
+        - replay_pending_resolved_total
+        - replay_evaluations_total
+        - replay_verification_enqueue_total
+        - verification_replay_record_total
+      properties:
+        replay_pending:
+          type: integer
+          format: int64
+        replay_pending_scheduled_total:
+          type: integer
+          format: int64
+        replay_pending_resolved_total:
+          type: integer
+          format: int64
+        replay_evaluations_total:
+          type: integer
+          format: int64
+        replay_verification_enqueue_total:
+          type: integer
+          format: int64
+        verification_replay_record_total:
+          type: integer
+          format: int64
+
+    GridReplayMetricsResponse:
+      type: object
+      required:
+        - ok
+        - metrics
+      properties:
+        ok:
+          type: boolean
+        metrics:
+          $ref: '#/components/schemas/ReplayMetricsSnapshot'
 
     GridNetworkProfileResponse:
       type: object

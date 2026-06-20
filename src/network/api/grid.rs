@@ -72,6 +72,11 @@ pub fn create_grid_routes() -> Router<ApiContext> {
             get(get_grid_verification_checker_tasks),
         )
         .route(
+            "/grid/verification-metrics",
+            get(get_grid_verification_metrics),
+        )
+        .route("/grid/replay-metrics", get(get_grid_replay_metrics))
+        .route(
             "/grid/network-profiles/{peer_id}",
             get(get_grid_network_profile).put(put_grid_network_profile),
         )
@@ -255,6 +260,42 @@ async fn get_grid_verification_checker_tasks(
         Json(GridVerificationCheckerTasksResponse {
             ok: true,
             tasks: crate::grid::galaxy_verification_metrics::verification_checker_tasks(),
+        }),
+    ))
+}
+
+#[derive(Debug, Serialize)]
+struct GridVerificationMetricsResponse {
+    ok: bool,
+    metrics: crate::grid::galaxy_verification_metrics::VerificationMetricsSnapshot,
+}
+
+async fn get_grid_verification_metrics(
+    State(_ctx): State<ApiContext>,
+) -> Result<(StatusCode, Json<GridVerificationMetricsResponse>), HttpAppError> {
+    Ok((
+        StatusCode::OK,
+        Json(GridVerificationMetricsResponse {
+            ok: true,
+            metrics: crate::grid::galaxy_verification_metrics::verification_metrics_snapshot(),
+        }),
+    ))
+}
+
+#[derive(Debug, Serialize)]
+struct GridReplayMetricsResponse {
+    ok: bool,
+    metrics: crate::grid::galaxy_replay_metrics::ReplayMetricsSnapshot,
+}
+
+async fn get_grid_replay_metrics(
+    State(_ctx): State<ApiContext>,
+) -> Result<(StatusCode, Json<GridReplayMetricsResponse>), HttpAppError> {
+    Ok((
+        StatusCode::OK,
+        Json(GridReplayMetricsResponse {
+            ok: true,
+            metrics: crate::grid::galaxy_replay_metrics::replay_metrics_snapshot(),
         }),
     ))
 }
@@ -909,6 +950,53 @@ mod tests {
 
         reset_verification_metrics_for_test();
         reset_verification_checker_tasks_for_test();
+    }
+
+    #[tokio::test]
+    async fn grid_verification_metrics_read_ph_s670() {
+        use crate::grid::galaxy_verification_metrics::{
+            record_verification_match, record_verification_mismatch,
+            reset_verification_metrics_for_test, verification_metrics_snapshot,
+        };
+
+        reset_verification_metrics_for_test();
+        record_verification_match();
+        record_verification_mismatch();
+
+        let res = get_grid_verification_metrics(State(ApiContext::default()))
+            .await
+            .expect("verification metrics")
+            .1
+             .0;
+        assert!(res.ok);
+        assert_eq!(res.metrics.match_total, 1);
+        assert_eq!(res.metrics.mismatch_total, 1);
+        assert_eq!(verification_metrics_snapshot().match_total, 1);
+
+        reset_verification_metrics_for_test();
+    }
+
+    #[tokio::test]
+    async fn grid_replay_metrics_read_ph_s671() {
+        use crate::grid::galaxy_replay_metrics::{
+            record_replay_pending_scheduled, replay_metrics_snapshot,
+            reset_replay_pending_metrics_for_test,
+        };
+
+        reset_replay_pending_metrics_for_test();
+        record_replay_pending_scheduled();
+
+        let res = get_grid_replay_metrics(State(ApiContext::default()))
+            .await
+            .expect("replay metrics")
+            .1
+             .0;
+        assert!(res.ok);
+        assert_eq!(res.metrics.replay_pending, 1);
+        assert_eq!(res.metrics.replay_pending_scheduled_total, 1);
+        assert_eq!(replay_metrics_snapshot().replay_pending, 1);
+
+        reset_replay_pending_metrics_for_test();
     }
 
     #[tokio::test]

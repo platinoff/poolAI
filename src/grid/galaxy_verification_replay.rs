@@ -42,10 +42,63 @@ pub fn build_verification_replay_record(
     }
 }
 
+/// Verification/replay depth hint for coordinator policy stubs (PH-S674, Galaxy §6.3).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum VerificationReplayDepth {
+    None,
+    RecordOnly,
+    FullReplay,
+}
+
+/// Classify replay depth from grid result metrics (PH-S674 concept wire stub).
+pub fn verification_replay_depth_stub(
+    metrics: Option<&serde_json::Value>,
+) -> VerificationReplayDepth {
+    let Some(m) = metrics else {
+        return VerificationReplayDepth::None;
+    };
+    if m.get("replay_verdict").is_some()
+        || m.get("replay_required").and_then(|v| v.as_bool()) == Some(true)
+    {
+        return VerificationReplayDepth::FullReplay;
+    }
+    match m
+        .get("verification_verdict")
+        .and_then(|v| v.as_str())
+        .map(str::to_ascii_lowercase)
+        .as_deref()
+    {
+        Some("mismatch") => VerificationReplayDepth::FullReplay,
+        Some("match") => VerificationReplayDepth::RecordOnly,
+        _ => VerificationReplayDepth::None,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use serde_json::json;
+
+    #[test]
+    fn verification_replay_depth_stub_ph_s674() {
+        assert_eq!(
+            verification_replay_depth_stub(Some(&json!({"verification_verdict": "mismatch"}))),
+            VerificationReplayDepth::FullReplay
+        );
+        assert_eq!(
+            verification_replay_depth_stub(Some(&json!({"verification_verdict": "match"}))),
+            VerificationReplayDepth::RecordOnly
+        );
+        assert_eq!(
+            verification_replay_depth_stub(Some(&json!({"replay_verdict": "accepted"}))),
+            VerificationReplayDepth::FullReplay
+        );
+        assert_eq!(
+            verification_replay_depth_stub(None),
+            VerificationReplayDepth::None
+        );
+    }
 
     #[test]
     fn build_verification_replay_record_ph_s447() {

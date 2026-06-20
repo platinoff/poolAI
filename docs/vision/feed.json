@@ -3,26 +3,26 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S670",
+      "id": "PH-S680",
       "link": "docs/vision/index.html#sprint-queue",
       "next": true,
       "published": "2026-05-28",
       "status": "open",
       "summary": "scope integration test green",
-      "title": "Galaxy verification metric HTTP wire"
+      "title": "Galaxy settlement metric HTTP wire"
     },
     {
       "category": "open",
-      "id": "PH-S671",
+      "id": "PH-S681",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
       "summary": "scope integration test green",
-      "title": "Galaxy replay metric HTTP wire"
+      "title": "Galaxy trust metric HTTP wire"
     },
     {
       "category": "open",
-      "id": "PH-S672",
+      "id": "PH-S682",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -31,7 +31,7 @@
     },
     {
       "category": "open",
-      "id": "PH-S673",
+      "id": "PH-S683",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -40,7 +40,7 @@
     },
     {
       "category": "open",
-      "id": "PH-S674",
+      "id": "PH-S684",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -49,7 +49,7 @@
     },
     {
       "category": "open",
-      "id": "PH-S675",
+      "id": "PH-S685",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -58,7 +58,7 @@
     },
     {
       "category": "open",
-      "id": "PH-S676",
+      "id": "PH-S686",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -67,7 +67,7 @@
     },
     {
       "category": "open",
-      "id": "PH-S677",
+      "id": "PH-S687",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -76,7 +76,7 @@
     },
     {
       "category": "open",
-      "id": "PH-S678",
+      "id": "PH-S688",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -85,12 +85,102 @@
     },
     {
       "category": "open",
-      "id": "PH-S679",
+      "id": "PH-S689",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
+      "summary": "galaxy_horizon_s680_integration` + docs sync",
+      "title": "Horizon close band S680–S688"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S679",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
       "summary": "galaxy_horizon_s670_integration` + docs sync",
       "title": "Horizon close band S670–S678"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S678",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--min-ratio 0.95 --advisory` 94.72%",
+      "title": "Ratio hold advisory snapshot"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S677",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "poolai-vision-sync --check` green",
+      "title": "poolai-vision-sync drift gate"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S676",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "INDEX + HANDOFF + NEXT + STABLE + GALAXY sync",
+      "title": "Docs INDEX canon sync"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S675",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "poolai-loc-audit` → `rust_ratio.json` 94.72%",
+      "title": "Rust ratio loc-audit refresh"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S674",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "verification_replay_depth_stub` + unit test",
+      "title": "Galaxy concept helper stub"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S673",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "verification/replay metrics API smoke + export shape",
+      "title": "Stand smoke /metrics export shape"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S672",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "parsePrometheusGauge` wasm; admin test",
+      "title": "Admin panel wasm glue"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S671",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "GET /api/v1/grid/replay-metrics`; integration test",
+      "title": "Galaxy replay metric HTTP wire"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S670",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "GET /api/v1/grid/verification-metrics`; integration test",
+      "title": "Galaxy verification metric HTTP wire"
     },
     {
       "category": "closed",
@@ -109,96 +199,6 @@
       "status": "closed",
       "summary": "poolai-loc-audit --min-ratio 0.95 --advisory` snapshot 94.70%",
       "title": "Ratio hold advisory snapshot"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S667",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "poolai-vision-sync --check` green",
-      "title": "poolai-vision-sync drift gate"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S666",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "INDEX §7 + rust_ratio 94.70% + vision rev from manifest",
-      "title": "Docs INDEX canon sync"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S665",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "poolai-loc-audit` → `rust_ratio.json` sprint zriz",
-      "title": "Rust ratio loc-audit refresh"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S664",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "heartbeat metadata + in-memory persist stub; unit test",
-      "title": "network_profile persist stub"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S663",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "drop `toLocaleString` fallback in shared layout helper",
-      "title": "Shared layout datetime wasm-only"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S662",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "cargo test -p poolai-ui-core` — 0 failed",
-      "title": "ui-core full test gate"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S661",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "build_metric_history_url_ph_s314/s334` green (`cpu%2Eusage`)",
-      "title": "ui-core ML metric URL encode fix"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S660",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "format_unix_timestamp_display_ph_s628` green (UTC, not local TZ)",
-      "title": "ui-core format timestamp UTC fix"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S659",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "update stable-state header/date to current §5.12/ratio snapshot",
-      "title": "STABLE_STATE header refresh"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S658",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "update top snapshot to latest closed band and next trigger",
-      "title": "NEXT session prompt sync"
     }
   ],
   "link": "docs/vision/index.html",

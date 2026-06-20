@@ -17,6 +17,7 @@ pub mod ml;
 pub mod modal;
 pub mod payout_batch;
 pub mod pricing;
+pub mod prometheus;
 pub mod table;
 pub mod theme;
 pub mod topology;

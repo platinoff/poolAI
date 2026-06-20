@@ -16,8 +16,13 @@ pub async fn admin_grid_verification() -> Html<String> {
         let pending = 0;
         try {
           const metrics = await fetch('/metrics').then(function(r) { return r.text(); });
-          var m = metrics.match(/galaxy_verification_checker_pending_total\s+(\d+)/);
-          if (m) pending = parseInt(m[1], 10) || 0;
+          var wasm = poolaiChartsWasm();
+          if (wasm && typeof wasm.parsePrometheusGauge === 'function') {
+            pending = wasm.parsePrometheusGauge(metrics, 'galaxy_verification_checker_pending_total');
+          } else {
+            var m = metrics.match(/galaxy_verification_checker_pending_total\s+(\d+)/);
+            if (m) pending = parseInt(m[1], 10) || 0;
+          }
         } catch (_) {}
         renderGridVerificationPanel(tasks, pending);
       } catch (e) {
@@ -69,4 +74,5 @@ async fn admin_grid_verification_page_api_ph_s512() {
     assert!(html.contains("/api/v1/grid/verification-checker/tasks"));
     assert!(html.contains("grid-verification-panel"));
     assert!(html.contains("poolaiRenderGridVerificationPanel"));
+    assert!(html.contains("parsePrometheusGauge"));
 }

@@ -100,6 +100,29 @@ pub fn verification_replay_record_total() -> u64 {
     VERIFICATION_REPLAY_RECORD_TOTAL.load(Ordering::Relaxed)
 }
 
+/// Read-only replay counters snapshot for `GET /api/v1/grid/replay-metrics` (PH-S671).
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
+pub struct ReplayMetricsSnapshot {
+    pub replay_pending: u64,
+    pub replay_pending_scheduled_total: u64,
+    pub replay_pending_resolved_total: u64,
+    pub replay_evaluations_total: u64,
+    pub replay_verification_enqueue_total: u64,
+    pub verification_replay_record_total: u64,
+}
+
+/// Coordinator replay metrics snapshot (PH-S671).
+pub fn replay_metrics_snapshot() -> ReplayMetricsSnapshot {
+    ReplayMetricsSnapshot {
+        replay_pending: replay_pending(),
+        replay_pending_scheduled_total: replay_pending_scheduled_total(),
+        replay_pending_resolved_total: replay_pending_resolved_total(),
+        replay_evaluations_total: replay_evaluations_total(),
+        replay_verification_enqueue_total: replay_verification_enqueue_total(),
+        verification_replay_record_total: verification_replay_record_total(),
+    }
+}
+
 /// Build structured replay record and bump emit counter (PH-S447).
 pub fn emit_verification_replay_record(
     primary_job_id: &str,

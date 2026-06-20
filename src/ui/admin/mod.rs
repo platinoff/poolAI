@@ -1296,6 +1296,13 @@ fn admin_common_ph_s14_high_contrast_theme() {
 }
 
 #[test]
+fn admin_grid_verification_wasm_glue_ph_s672() {
+    let page = include_str!("grid_verification.rs");
+    assert!(page.contains("parsePrometheusGauge"));
+    assert!(page.contains("poolaiChartsWasm"));
+}
+
+#[test]
 fn admin_layout_includes_design_tokens_css_ph_s166() {
     let html = admin_layout("admin.test.page", "Test", "<p>body</p>", "");
     let body = html.0;
