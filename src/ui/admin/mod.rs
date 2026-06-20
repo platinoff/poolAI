@@ -1296,6 +1296,15 @@ fn admin_common_ph_s14_high_contrast_theme() {
 }
 
 #[test]
+fn admin_payout_batch_wasm_glue_ph_s682() {
+    let page = include_str!("payout_batch.rs");
+    assert!(page.contains("parsePrometheusGauge"));
+    assert!(page.contains("poolaiChartsWasm"));
+    assert!(page.contains("/api/v1/grid/settlement-metrics"));
+    assert!(page.contains("/api/v1/grid/trust-metrics"));
+}
+
+#[test]
 fn admin_grid_verification_wasm_glue_ph_s672() {
     let page = include_str!("grid_verification.rs");
     assert!(page.contains("parsePrometheusGauge"));

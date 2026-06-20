@@ -1,8 +1,12 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-20 (PH-S670…S679 ✅ · master backlog **331** PH-S680…S1010 · active **10** · vision **rev 267** · rust_ratio **94.72%**)
+**Оновлено:** 2026-06-20 (PH-S680…S689 ✅ · master backlog **321** PH-S690…S1010 · active **10** · vision **rev 268** · rust_ratio **94.73%** · Cursor **3.8.11** research ✅)
 
-**Master backlog 331 (2026-06-20):** project scan «не зроблено» → [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) (PH-S680…S1010) · FM **§5.14**. Активна §5.12: **PH-S680…S689** (band 3). **`абракадабра`** = drain 10 → promote наступні 10 (**34** сесій до S1010). **BLOCKED/Deferred** поза backlog: FM-003, FM-041.
+**Cursor 3.8.11 (2026-06-20):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-06-20.md`](./CURSOR_UPDATE_RESEARCH_2026-06-20.md); `poolai-vision-sync --check` ok; baseline rule оновлено. **Наступна сесія:** **`абракадабра`** (drain PH-S690…S699).
+
+**Master backlog 321 (2026-06-20):** project scan «не зроблено» → [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) (PH-S690…S1010) · FM **§5.14**. Активна §5.12: **PH-S690…S699** (band 4). **`абракадабра`** = drain 10 → promote наступні 10 (**33** сесій до S1010). **BLOCKED/Deferred** поза backlog: FM-003, FM-041.
+
+**PH-S680…S689 ✅ (2026-06-20):** `GET /api/v1/grid/settlement-metrics` + `GET /api/v1/grid/trust-metrics`; `settlement_gate_depth_stub` (PH-S684); `parsePrometheusGauge` wasm glue (payout-batch); stand smoke settlement/trust API; `poolai-loc-audit` → `rust_ratio.json` **94.73%**; hold advisory `--min-ratio 0.95`; `galaxy_horizon_s680_integration`; FM/HANDOFF/NEXT/STABLE/GALAXY sync; vision **rev 268**.
 
 **PH-S670…S679 ✅ (2026-06-20):** `GET /api/v1/grid/verification-metrics` + `GET /api/v1/grid/replay-metrics`; `verification_replay_depth_stub` (PH-S674); `parsePrometheusGauge` wasm glue (grid-verification); stand smoke verification/replay API; `poolai-loc-audit` → `rust_ratio.json` **94.72%**; hold advisory `--min-ratio 0.95`; `galaxy_horizon_s670_integration`; FM/HANDOFF/NEXT/STABLE/GALAXY sync; vision **rev 267**.
 

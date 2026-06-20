@@ -812,6 +812,34 @@ paths:
               schema:
                 $ref: '#/components/schemas/GridReplayMetricsResponse'
 
+  /grid/settlement-metrics:
+    get:
+      tags:
+        - Grid
+      summary: Settlement counters snapshot (PH-S680)
+      operationId: getGridSettlementMetrics
+      responses:
+        '200':
+          description: Settlement metrics snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GridSettlementMetricsResponse'
+
+  /grid/trust-metrics:
+    get:
+      tags:
+        - Grid
+      summary: Trust gate counters snapshot (PH-S681)
+      operationId: getGridTrustMetrics
+      responses:
+        '200':
+          description: Trust metrics snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GridTrustMetricsResponse'
+
   /grid/network-profiles/{peer_id}:
     get:
       tags:
@@ -6468,6 +6496,102 @@ components:
           type: boolean
         metrics:
           $ref: '#/components/schemas/ReplayMetricsSnapshot'
+
+    SettlementMetricsSnapshot:
+      type: object
+      required:
+        - pending_verification_total
+        - cleared_total
+        - not_applicable_total
+        - resolved_total
+        - payout_batch_total
+        - human_review_total
+      properties:
+        pending_verification_total:
+          type: integer
+          format: int64
+        cleared_total:
+          type: integer
+          format: int64
+        not_applicable_total:
+          type: integer
+          format: int64
+        resolved_total:
+          type: integer
+          format: int64
+        payout_batch_total:
+          type: integer
+          format: int64
+        human_review_total:
+          type: integer
+          format: int64
+
+    GridSettlementMetricsResponse:
+      type: object
+      required:
+        - ok
+        - metrics
+      properties:
+        ok:
+          type: boolean
+        metrics:
+          $ref: '#/components/schemas/SettlementMetricsSnapshot'
+
+    TrustMetricsSnapshot:
+      type: object
+      required:
+        - payout_eligible_total
+        - payout_held_total
+        - payout_not_applicable_total
+        - last_trust_score
+        - gate_min_threshold
+        - gate_default_score
+        - gate_evaluations_total
+        - default_score_applied_total
+        - explicit_score_total
+        - trust_score_delta_total
+      properties:
+        payout_eligible_total:
+          type: integer
+          format: int64
+        payout_held_total:
+          type: integer
+          format: int64
+        payout_not_applicable_total:
+          type: integer
+          format: int64
+        last_trust_score:
+          type: integer
+          format: int64
+        gate_min_threshold:
+          type: integer
+          format: int64
+        gate_default_score:
+          type: integer
+          format: int64
+        gate_evaluations_total:
+          type: integer
+          format: int64
+        default_score_applied_total:
+          type: integer
+          format: int64
+        explicit_score_total:
+          type: integer
+          format: int64
+        trust_score_delta_total:
+          type: integer
+          format: int64
+
+    GridTrustMetricsResponse:
+      type: object
+      required:
+        - ok
+        - metrics
+      properties:
+        ok:
+          type: boolean
+        metrics:
+          $ref: '#/components/schemas/TrustMetricsSnapshot'
 
     GridNetworkProfileResponse:
       type: object

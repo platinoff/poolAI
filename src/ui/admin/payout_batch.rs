@@ -12,20 +12,21 @@ pub async fn admin_payout_batch() -> Html<String> {
       return JSON.stringify(window.__poolaiAdminI18nRust || {});
     }
 
-    function renderPayoutBatchPanel(latest, history) {
+    function renderPayoutBatchPanel(latest, history, settlementMetrics, trustMetrics, trustScoreGauge) {
       const el = document.getElementById('payout-batch-panel');
       if (!el) return;
+      const entry = latest.entry || null;
+      const metricsStrip = renderPayoutBatchMetricsStrip(settlementMetrics, trustMetrics, trustScoreGauge);
       const wasm = window.poolaiUiWasm;
       if (wasm && wasm.ready && typeof wasm.renderPayoutBatchPanelHtml === 'function') {
-        el.innerHTML = wasm.renderPayoutBatchPanelHtml(
+        el.innerHTML = metricsStrip + wasm.renderPayoutBatchPanelHtml(
           JSON.stringify(latest || {}),
           JSON.stringify(history || {}),
           payoutBatchI18nJson()
         );
         return;
       }
-      const entry = latest.entry || null;
-      el.innerHTML =
+      el.innerHTML = metricsStrip +
         '<div class="admin-card"><h3>' + escapeHtml(T('admin.payoutBatch.latest', 'Latest cleared entry')) + '</h3>' +
         '<dl class="admin-dl"><dt>Job</dt><dd><code>' + escapeHtml(String(entry && entry.job_id || '—')) + '</code></dd></dl></div>';
     }
@@ -33,15 +34,36 @@ pub async fn admin_payout_batch() -> Html<String> {
     async function loadPayoutBatchPanel() {
       adminShowLoading('payout-batch-panel', T('admin.payoutBatch.loading', 'Loading payout batch…'));
       try {
-        const [latest, history] = await Promise.all([
+        const [latest, history, settlementMetrics, trustMetrics] = await Promise.all([
           fetchJson('/api/v1/grid/payout-batch'),
           fetchJson('/api/v1/grid/payout-batch/history?limit=5'),
+          fetchJson('/api/v1/grid/settlement-metrics'),
+          fetchJson('/api/v1/grid/trust-metrics'),
         ]);
-        renderPayoutBatchPanel(latest || {}, history || {});
+        let trustScoreGauge = 0;
+        try {
+          const metrics = await fetch('/metrics').then(function(r) { return r.text(); });
+          var wasm = poolaiChartsWasm();
+          if (wasm && typeof wasm.parsePrometheusGauge === 'function') {
+            trustScoreGauge = wasm.parsePrometheusGauge(metrics, 'galaxy_trust_score');
+          }
+        } catch (_) {}
+        renderPayoutBatchPanel(latest || {}, history || {}, settlementMetrics || {}, trustMetrics || {}, trustScoreGauge);
       } catch (e) {
         adminShowInlineError('payout-batch-panel', e);
         showNotification(T('admin.payoutBatch.errLoad', 'Error loading payout batch: ') + e.message, 'error');
       }
+    }
+
+    function renderPayoutBatchMetricsStrip(settlementMetrics, trustMetrics, trustScoreGauge) {
+      const sm = (settlementMetrics && settlementMetrics.metrics) ? settlementMetrics.metrics : {};
+      const tm = (trustMetrics && trustMetrics.metrics) ? trustMetrics.metrics : {};
+      const score = tm.last_trust_score != null ? tm.last_trust_score : trustScoreGauge;
+      return '<div class="admin-card admin-metrics-strip">' +
+        '<span>' + escapeHtml(T('admin.payoutBatch.cleared', 'Cleared')) + ': <strong>' + escapeHtml(String(sm.cleared_total || 0)) + '</strong></span>' +
+        '<span>' + escapeHtml(T('admin.payoutBatch.eligible', 'Eligible')) + ': <strong>' + escapeHtml(String(tm.payout_eligible_total || 0)) + '</strong></span>' +
+        '<span>' + escapeHtml(T('admin.payoutBatch.trustScore', 'Trust score')) + ': <strong>' + escapeHtml(String(score || 0)) + '</strong></span>' +
+        '</div>';
     }
 
     loadPayoutBatchPanel();
@@ -76,5 +98,8 @@ mod tests {
         assert!(html.contains("/ui/wasm/poolai_ui_wasm.js"));
         assert!(html.contains("renderPayoutBatchPanelHtml"));
         assert!(html.contains("payout-batch-panel"));
+        assert!(html.contains("/api/v1/grid/settlement-metrics"));
+        assert!(html.contains("/api/v1/grid/trust-metrics"));
+        assert!(html.contains("parsePrometheusGauge"));
     }
 }

@@ -5,6 +5,7 @@
 use crate::grid::galaxy_trust_score::SettlementGateVerdict;
 use crate::grid::galaxy_verify_sampling::VerifySamplingVerdict;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
 /// Offline payout batch ledger entry stub (PH-S436, Galaxy §8.2).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -90,6 +91,53 @@ pub fn resolve_settlement_status(
     }
 }
 
+/// Settlement depth hint from grid result metrics (PH-S684, Galaxy §6.4–§6.5).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SettlementGateDepth {
+    NotApplicable,
+    Cleared,
+    PendingVerification,
+}
+
+/// Classify settlement depth from grid result metrics stub fields (PH-S684).
+pub fn settlement_gate_depth_stub(metrics: Option<&Value>) -> SettlementGateDepth {
+    let settlement_gate = metrics
+        .and_then(|m| m.get("settlement_gate_verdict"))
+        .and_then(|v| v.as_str())
+        .map(parse_settlement_gate_verdict)
+        .unwrap_or(SettlementGateVerdict::NotApplicable);
+    let verification_sample = metrics
+        .and_then(|m| m.get("verification_sample"))
+        .and_then(|v| v.as_str())
+        .map(parse_verification_sample)
+        .unwrap_or(VerifySamplingVerdict::NotApplicable);
+    match resolve_settlement_status(settlement_gate, verification_sample) {
+        SettlementStatus::NotApplicable => SettlementGateDepth::NotApplicable,
+        SettlementStatus::Cleared => SettlementGateDepth::Cleared,
+        SettlementStatus::PendingVerification => SettlementGateDepth::PendingVerification,
+    }
+}
+
+fn parse_settlement_gate_verdict(raw: &str) -> SettlementGateVerdict {
+    match raw.to_ascii_lowercase().as_str() {
+        "payout_eligible" | "eligible" => SettlementGateVerdict::PayoutEligible,
+        "payout_held" | "held" => SettlementGateVerdict::PayoutHeld,
+        _ => SettlementGateVerdict::NotApplicable,
+    }
+}
+
+fn parse_verification_sample(raw: &str) -> VerifySamplingVerdict {
+    match raw.to_ascii_lowercase().as_str() {
+        "sample_scheduled" | "scheduled" => VerifySamplingVerdict::SampleScheduled,
+        "verification_inconclusive" | "inconclusive" => {
+            VerifySamplingVerdict::VerificationInconclusive
+        }
+        "not_selected" => VerifySamplingVerdict::NotSelected,
+        _ => VerifySamplingVerdict::NotApplicable,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -135,6 +183,26 @@ mod tests {
                 VerifySamplingVerdict::SampleScheduled,
             ),
             SettlementStatus::PendingVerification
+        );
+    }
+
+    #[test]
+    fn settlement_gate_depth_stub_ph_s684() {
+        use serde_json::json;
+
+        assert_eq!(
+            settlement_gate_depth_stub(Some(&json!({
+                "settlement_gate_verdict": "payout_held",
+                "verification_sample": "not_selected",
+            }))),
+            SettlementGateDepth::PendingVerification
+        );
+        assert_eq!(
+            settlement_gate_depth_stub(Some(&json!({
+                "settlement_gate_verdict": "payout_eligible",
+                "verification_sample": "not_selected",
+            }))),
+            SettlementGateDepth::Cleared
         );
     }
 }

@@ -218,6 +218,29 @@ pub fn evaluate_semantic_hash_human_review_hold(metrics: Option<&serde_json::Val
     }
 }
 
+/// Read-only settlement counters snapshot for `GET /api/v1/grid/settlement-metrics` (PH-S680).
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
+pub struct SettlementMetricsSnapshot {
+    pub pending_verification_total: u64,
+    pub cleared_total: u64,
+    pub not_applicable_total: u64,
+    pub resolved_total: u64,
+    pub payout_batch_total: u64,
+    pub human_review_total: u64,
+}
+
+/// Coordinator settlement metrics snapshot (PH-S680).
+pub fn settlement_metrics_snapshot() -> SettlementMetricsSnapshot {
+    SettlementMetricsSnapshot {
+        pending_verification_total: settlement_pending_verification_total(),
+        cleared_total: settlement_cleared_total(),
+        not_applicable_total: settlement_not_applicable_total(),
+        resolved_total: settlement_resolved_total(),
+        payout_batch_total: settlement_payout_batch_total(),
+        human_review_total: settlement_human_review_total(),
+    }
+}
+
 #[cfg(test)]
 static SETTLEMENT_METRICS_TEST_LOCK: std::sync::OnceLock<std::sync::Mutex<()>> =
     std::sync::OnceLock::new();

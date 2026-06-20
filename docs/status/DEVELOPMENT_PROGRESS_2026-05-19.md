@@ -1,6 +1,6 @@
 # Прогрес розробки PoolAI (менеджер функціоналу)
 
-**Оновлено:** 2026-05-19 (після **S40** Horizon closure) · **Гілка:** `main`
+**Оновлено:** 2026-06-20 (master backlog зріз · Cursor 3.8.11 research) · **Гілка:** `main`
 
 ---
 
@@ -13,8 +13,12 @@
 | **A+B (офіційний autoprogon)** | **100%** | HANDOFF / README / FM §5.5 |
 | **C. Horizon (код P6)** | **100%** | S35–S40 ✅ — [`HORIZON_TO_100_PLAN.md`](../development/HORIZON_TO_100_PLAN.md) |
 | **Проєкт (A+B+C)/3** | **100%** | офіційний зріз після S40 |
+| **D. Master backlog PH-S660…S1010** | **5.7%** | 20/351 drained (band 1–2); active band 3 — 10 `[ ]` |
+| **D′. Master + in-flight** | **8.5%** | 30/351 (20 ✅ + 10 active) |
+| **E. Sprint номер до S1010** | **67.2%** | PH-S679 / 1010 (орієнтир нумерації) |
+| **F. Зважений (60% A+B+C + 40% D)** | **~63%** | horizon KPI для drain до S1010 |
 
-**Наступна фаза (2026-05-20):** Legacy backlog audit → **FM-032…042** — [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.1, §5.8 · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) (**FM-032**). Post-Horizon FM-020…031 **✅**. Ops **BLOCKED:** FM-003 §4 (2 хости).
+**Наступна фаза (2026-06-20):** master backlog **321** pending PH-S690…S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · FM **§5.14** · **`абракадабра`** drain band 4. Cursor post-update — [`CURSOR_UPDATE_RESEARCH_2026-06-20.md`](../development/CURSOR_UPDATE_RESEARCH_2026-06-20.md).
 
 ---
 

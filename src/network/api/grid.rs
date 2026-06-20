@@ -76,6 +76,8 @@ pub fn create_grid_routes() -> Router<ApiContext> {
             get(get_grid_verification_metrics),
         )
         .route("/grid/replay-metrics", get(get_grid_replay_metrics))
+        .route("/grid/settlement-metrics", get(get_grid_settlement_metrics))
+        .route("/grid/trust-metrics", get(get_grid_trust_metrics))
         .route(
             "/grid/network-profiles/{peer_id}",
             get(get_grid_network_profile).put(put_grid_network_profile),
@@ -296,6 +298,42 @@ async fn get_grid_replay_metrics(
         Json(GridReplayMetricsResponse {
             ok: true,
             metrics: crate::grid::galaxy_replay_metrics::replay_metrics_snapshot(),
+        }),
+    ))
+}
+
+#[derive(Debug, Serialize)]
+struct GridSettlementMetricsResponse {
+    ok: bool,
+    metrics: crate::grid::galaxy_settlement_metrics::SettlementMetricsSnapshot,
+}
+
+async fn get_grid_settlement_metrics(
+    State(_ctx): State<ApiContext>,
+) -> Result<(StatusCode, Json<GridSettlementMetricsResponse>), HttpAppError> {
+    Ok((
+        StatusCode::OK,
+        Json(GridSettlementMetricsResponse {
+            ok: true,
+            metrics: crate::grid::galaxy_settlement_metrics::settlement_metrics_snapshot(),
+        }),
+    ))
+}
+
+#[derive(Debug, Serialize)]
+struct GridTrustMetricsResponse {
+    ok: bool,
+    metrics: crate::grid::galaxy_trust_score::TrustMetricsSnapshot,
+}
+
+async fn get_grid_trust_metrics(
+    State(_ctx): State<ApiContext>,
+) -> Result<(StatusCode, Json<GridTrustMetricsResponse>), HttpAppError> {
+    Ok((
+        StatusCode::OK,
+        Json(GridTrustMetricsResponse {
+            ok: true,
+            metrics: crate::grid::galaxy_trust_score::trust_metrics_snapshot(),
         }),
     ))
 }
@@ -997,6 +1035,51 @@ mod tests {
         assert_eq!(replay_metrics_snapshot().replay_pending, 1);
 
         reset_replay_pending_metrics_for_test();
+    }
+
+    #[tokio::test]
+    async fn grid_settlement_metrics_read_ph_s680() {
+        use crate::grid::galaxy_settlement_metrics::{
+            record_settlement_cleared, reset_settlement_metrics_for_test,
+            settlement_metrics_snapshot,
+        };
+
+        reset_settlement_metrics_for_test();
+        record_settlement_cleared();
+
+        let res = get_grid_settlement_metrics(State(ApiContext::default()))
+            .await
+            .expect("settlement metrics")
+            .1
+             .0;
+        assert!(res.ok);
+        assert_eq!(res.metrics.cleared_total, 1);
+        assert_eq!(settlement_metrics_snapshot().cleared_total, 1);
+
+        reset_settlement_metrics_for_test();
+    }
+
+    #[tokio::test]
+    async fn grid_trust_metrics_read_ph_s681() {
+        use crate::grid::galaxy_trust_score::{
+            evaluate_result_settlement_gate, reset_settlement_gate_metrics_for_test,
+            trust_metrics_snapshot, TrustScoreGateConfig,
+        };
+
+        reset_settlement_gate_metrics_for_test();
+        let cfg = TrustScoreGateConfig::default_stub();
+        evaluate_result_settlement_gate(Some("tg-peer-1"), Some(55), &cfg);
+
+        let res = get_grid_trust_metrics(State(ApiContext::default()))
+            .await
+            .expect("trust metrics")
+            .1
+             .0;
+        assert!(res.ok);
+        assert_eq!(res.metrics.payout_eligible_total, 1);
+        assert_eq!(trust_metrics_snapshot().payout_eligible_total, 1);
+
+        reset_settlement_gate_metrics_for_test();
     }
 
     #[tokio::test]

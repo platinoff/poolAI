@@ -277,6 +277,38 @@ pub fn reset_settlement_gate_metrics_for_test() {
     DEFAULT_SCORE_APPLIED_TOTAL.store(0, Ordering::Relaxed);
     EXPLICIT_SCORE_TOTAL.store(0, Ordering::Relaxed);
     TRUST_SCORE_DELTA_TOTAL.store(0, Ordering::Relaxed);
+    reset_last_trust_score_for_test();
+}
+
+/// Read-only trust gate counters snapshot for `GET /api/v1/grid/trust-metrics` (PH-S681).
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
+pub struct TrustMetricsSnapshot {
+    pub payout_eligible_total: u64,
+    pub payout_held_total: u64,
+    pub payout_not_applicable_total: u64,
+    pub last_trust_score: u64,
+    pub gate_min_threshold: u64,
+    pub gate_default_score: u64,
+    pub gate_evaluations_total: u64,
+    pub default_score_applied_total: u64,
+    pub explicit_score_total: u64,
+    pub trust_score_delta_total: u64,
+}
+
+/// Coordinator trust metrics snapshot (PH-S681).
+pub fn trust_metrics_snapshot() -> TrustMetricsSnapshot {
+    TrustMetricsSnapshot {
+        payout_eligible_total: payout_eligible_total(),
+        payout_held_total: payout_held_total(),
+        payout_not_applicable_total: payout_not_applicable_total(),
+        last_trust_score: last_trust_score(),
+        gate_min_threshold: configured_min_trust_for_payout(),
+        gate_default_score: configured_default_trust_score(),
+        gate_evaluations_total: gate_evaluations_total(),
+        default_score_applied_total: default_score_applied_total(),
+        explicit_score_total: explicit_score_total(),
+        trust_score_delta_total: trust_score_delta_total(),
+    }
 }
 
 #[cfg(test)]

@@ -1154,6 +1154,64 @@ async fn smoke_grid_replay_metrics_api(client: &Client, base: &str) -> Result<()
     Ok(())
 }
 
+async fn smoke_grid_settlement_metrics_api(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/api/v1/grid/settlement-metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("settlement-metrics request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("settlement-metrics status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    if body.get("ok").and_then(|v| v.as_bool()) != Some(true) {
+        return Err(format!("settlement-metrics body: {body}"));
+    }
+    let metrics = body
+        .get("metrics")
+        .ok_or_else(|| format!("settlement-metrics missing metrics: {body}"))?;
+    for key in [
+        "pending_verification_total",
+        "cleared_total",
+        "resolved_total",
+        "payout_batch_total",
+    ] {
+        if !metrics.get(key).and_then(|v| v.as_u64()).is_some() {
+            return Err(format!("settlement-metrics missing {key}: {body}"));
+        }
+    }
+    Ok(())
+}
+
+async fn smoke_grid_trust_metrics_api(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/api/v1/grid/trust-metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("trust-metrics request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("trust-metrics status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    if body.get("ok").and_then(|v| v.as_bool()) != Some(true) {
+        return Err(format!("trust-metrics body: {body}"));
+    }
+    let metrics = body
+        .get("metrics")
+        .ok_or_else(|| format!("trust-metrics missing metrics: {body}"))?;
+    for key in [
+        "payout_eligible_total",
+        "payout_held_total",
+        "last_trust_score",
+        "gate_min_threshold",
+    ] {
+        if !metrics.get(key).and_then(|v| v.as_u64()).is_some() {
+            return Err(format!("trust-metrics missing {key}: {body}"));
+        }
+    }
+    Ok(())
+}
+
 async fn smoke_grid_network_profile_read(client: &Client, base: &str) -> Result<(), String> {
     let resp = client
         .get(api_url(
@@ -2052,6 +2110,18 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
     .await;
     record(
         &mut cases,
+        "grid_settlement_metrics_api",
+        smoke_grid_settlement_metrics_api(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
+        "grid_trust_metrics_api",
+        smoke_grid_trust_metrics_api(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
         "grid_network_profile_read",
         smoke_grid_network_profile_read(&client, &cli.base_url).await,
     )
@@ -2591,6 +2661,20 @@ mod tests {
         let sample = r#"{"ok":true,"metrics":{"replay_pending":0,"replay_pending_scheduled_total":0,"replay_pending_resolved_total":0,"replay_evaluations_total":0,"replay_verification_enqueue_total":0,"verification_replay_record_total":0}}"#;
         let body: Value = serde_json::from_str(sample).expect("json");
         assert_eq!(body["metrics"]["replay_pending"], 0);
+    }
+
+    #[test]
+    fn grid_settlement_metrics_api_export_shape_ph_s683() {
+        let sample = r#"{"ok":true,"metrics":{"pending_verification_total":0,"cleared_total":0,"not_applicable_total":0,"resolved_total":0,"payout_batch_total":0,"human_review_total":0}}"#;
+        let body: Value = serde_json::from_str(sample).expect("json");
+        assert_eq!(body["metrics"]["cleared_total"], 0);
+    }
+
+    #[test]
+    fn grid_trust_metrics_api_export_shape_ph_s683() {
+        let sample = r#"{"ok":true,"metrics":{"payout_eligible_total":0,"payout_held_total":0,"payout_not_applicable_total":0,"last_trust_score":0,"gate_min_threshold":40,"gate_default_score":50,"gate_evaluations_total":0,"default_score_applied_total":0,"explicit_score_total":0,"trust_score_delta_total":0}}"#;
+        let body: Value = serde_json::from_str(sample).expect("json");
+        assert_eq!(body["metrics"]["gate_min_threshold"], 40);
     }
 
     #[test]

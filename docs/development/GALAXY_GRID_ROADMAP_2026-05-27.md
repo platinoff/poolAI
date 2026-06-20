@@ -1,16 +1,16 @@
 # Galaxy Grid roadmap (зріз)
 
-**Оновлено:** 2026-06-20 · **Master backlog:** **331** PH-S680…S1010 · **§5.12 active:** 10 · **`абракадабра`** = drain + promote
+**Оновлено:** 2026-06-20 · **Master backlog:** **321** PH-S690…S1010 · **§5.12 active:** 10 · **`абракадабра`** = drain + promote
 
 | Зріз | Значення |
 |------|----------|
 | **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · FM **§5.14** |
-| **Active drain (band 3)** | PH-S680…S689 — settlement/trust wire depth |
-| **Next promote (band 4)** | PH-S690…S699 — replication/pricing wire depth |
+| **Active drain (band 4)** | PH-S690…S699 — replication/pricing wire depth |
+| **Next promote (band 5)** | PH-S700…S709 — admin wasm slim |
 | **Tail** | PH-S1010 replenish marker |
-| **Rust ratio** | **94.72%** hold **95%** advisory |
+| **Rust ratio** | **94.73%** hold **95%** advisory |
 
-**331** pending · **34** `абракадабра` sessions · остання закрита **PH-S670…S679** ✅.
+**321** pending · **33** `абракадабра` sessions · остання закрита **PH-S680…S689** ✅.
 
 ---
 
