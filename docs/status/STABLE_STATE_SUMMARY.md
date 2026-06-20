@@ -1,5 +1,5 @@
 # 📊 Стабільний стан розробки PoolAI
-## Rust Architect — оновлено 2026-06-20 (PH-S650…S659 ✅; rust_ratio **94.76%**; §5.12 **0**)
+## Rust Architect — оновлено 2026-06-20 (PH-S650…S659 ✅; черга **PH-S660…S669**; rust_ratio **94.76%**; §5.12 **10**)
 
 **Прогрес розробки:** [`DEVELOPMENT_PROGRESS_2026-05-19.md`](./DEVELOPMENT_PROGRESS_2026-05-19.md) · **Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md)
 

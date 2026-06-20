@@ -2016,7 +2016,7 @@
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S649",
+  "last_sprint_closed": "PH-S659",
   "layers": [
     {
       "id": "L0",
@@ -2049,6 +2049,7 @@
       "z": 5
     }
   ],
+  "next_sprint": "PH-S660",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -8413,9 +8414,16 @@
       "label": "galaxy_horizon_s630_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s630_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s640_integration_rs",
+      "label": "galaxy_horizon_s640_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s640_integration.rs"
     }
   ],
-  "revision": 264,
+  "revision": 265,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -13672,9 +13680,189 @@
       "row": 584,
       "status": "closed",
       "title": "Horizon close band S640–S648"
+    },
+    {
+      "acceptance": "remove unused `json` import in `poolai-ui-core` table module",
+      "deps": "RUST_RATIO §5.13 maintain",
+      "id": "PH-S650",
+      "open": false,
+      "row": 585,
+      "status": "closed",
+      "title": "ui-core warning cleanup (`table.rs`)"
+    },
+    {
+      "acceptance": "refresh `GALAXY_GRID_ROADMAP_2026-05-27.md` current band + ratio",
+      "deps": "Roadmap §4 / FM §5.12",
+      "id": "PH-S651",
+      "open": false,
+      "row": 586,
+      "status": "closed",
+      "title": "Galaxy roadmap snapshot sync to S640…S649"
+    },
+    {
+      "acceptance": "audit + cleanup `%TEMP%/cursor-sandbox-cache` disk pressure blocker",
+      "deps": "VDT S0 / shell hygiene",
+      "id": "PH-S652",
+      "open": false,
+      "row": 587,
+      "status": "closed",
+      "title": "Cursor sandbox temp cache triage"
+    },
+    {
+      "acceptance": "restore sandbox path and run `poolai-vision-sync --check` (`ok`, rev 264)",
+      "deps": "poolai-session-iteration` Vision close",
+      "id": "PH-S653",
+      "open": false,
+      "row": 588,
+      "status": "closed",
+      "title": "Vision gate recovery after temp cleanup"
+    },
+    {
+      "acceptance": "cargo fmt --all` (workspace)",
+      "deps": "VDT test gate",
+      "id": "PH-S654",
+      "open": false,
+      "row": 589,
+      "status": "closed",
+      "title": "Workspace format gate"
+    },
+    {
+      "acceptance": "cargo test -p poolai-ui-core` rerun; 3 pre-existing failing tests recorded",
+      "deps": "Rust test policy",
+      "id": "PH-S655",
+      "open": false,
+      "row": 590,
+      "status": "closed",
+      "title": "ui-core test gate rerun + blocker note"
+    },
+    {
+      "acceptance": "append PH-S650…S659 maintenance rows + close-band marker",
+      "deps": "FM journal canonical",
+      "id": "PH-S656",
+      "open": false,
+      "row": 591,
+      "status": "closed",
+      "title": "FM §5.12 maintenance close-band sync"
+    },
+    {
+      "acceptance": "add PH-S650…S659 summary + gate notes (vision/test/temp)",
+      "deps": "HANDOFF canonical",
+      "id": "PH-S657",
+      "open": false,
+      "row": 592,
+      "status": "closed",
+      "title": "HANDOFF maintenance snapshot sync"
+    },
+    {
+      "acceptance": "update top snapshot to latest closed band and next trigger",
+      "deps": "NEXT canonical",
+      "id": "PH-S658",
+      "open": false,
+      "row": 593,
+      "status": "closed",
+      "title": "NEXT session prompt sync"
+    },
+    {
+      "acceptance": "update stable-state header/date to current §5.12/ratio snapshot",
+      "deps": "status canon",
+      "id": "PH-S659",
+      "open": false,
+      "row": 594,
+      "status": "closed",
+      "title": "STABLE_STATE header refresh"
+    },
+    {
+      "acceptance": "format_unix_timestamp_display_ph_s628` green (UTC, not local TZ)",
+      "deps": "PH-S655 blocker / `format.rs",
+      "id": "PH-S660",
+      "open": true,
+      "row": 595,
+      "status": "open",
+      "title": "ui-core format timestamp UTC fix"
+    },
+    {
+      "acceptance": "build_metric_history_url_ph_s314/s334` green (`cpu%2Eusage`)",
+      "deps": "PH-S655 blocker / `ml.rs",
+      "id": "PH-S661",
+      "open": true,
+      "row": 596,
+      "status": "open",
+      "title": "ui-core ML metric URL encode fix"
+    },
+    {
+      "acceptance": "cargo test -p poolai-ui-core` — 0 failed",
+      "deps": "Rust test policy",
+      "id": "PH-S662",
+      "open": true,
+      "row": 597,
+      "status": "open",
+      "title": "ui-core full test gate"
+    },
+    {
+      "acceptance": "drop `toLocaleString` fallback in shared layout helper",
+      "deps": "RUST_RATIO §5.13 / `src/ui/mod.rs",
+      "id": "PH-S663",
+      "open": true,
+      "row": 598,
+      "status": "open",
+      "title": "Shared layout datetime wasm-only"
+    },
+    {
+      "acceptance": "heartbeat metadata + in-memory persist stub; unit test",
+      "deps": "Galaxy §8 L916",
+      "id": "PH-S664",
+      "open": true,
+      "row": 599,
+      "status": "open",
+      "title": "network_profile persist stub"
+    },
+    {
+      "acceptance": "poolai-loc-audit` → `rust_ratio.json` sprint zriz",
+      "deps": "§5.13 fallback",
+      "id": "PH-S665",
+      "open": true,
+      "row": 600,
+      "status": "open",
+      "title": "Rust ratio loc-audit refresh"
+    },
+    {
+      "acceptance": "INDEX §7 + rust_ratio 94.76% + vision rev from manifest",
+      "deps": "docs canon",
+      "id": "PH-S666",
+      "open": true,
+      "row": 601,
+      "status": "open",
+      "title": "Docs INDEX canon sync"
+    },
+    {
+      "acceptance": "poolai-vision-sync --check` green",
+      "deps": "ops / PH-S350 pattern",
+      "id": "PH-S667",
+      "open": true,
+      "row": 602,
+      "status": "open",
+      "title": "poolai-vision-sync drift gate"
+    },
+    {
+      "acceptance": "poolai-loc-audit --min-ratio 0.95 --advisory` snapshot",
+      "deps": "PH-S351 pattern",
+      "id": "PH-S668",
+      "open": true,
+      "row": 603,
+      "status": "open",
+      "title": "Ratio hold advisory snapshot"
+    },
+    {
+      "acceptance": "galaxy_horizon_s660_integration` + FM/HANDOFF/NEXT/STABLE/GALAXY sync",
+      "deps": "§5.12 fallback",
+      "id": "PH-S669",
+      "open": true,
+      "row": 604,
+      "status": "open",
+      "title": "Horizon close band S660–S668"
     }
   ],
-  "sprint_queue_open_count": 0,
+  "sprint_queue_open_count": 10,
   "updated_at": "2026-06-19",
   "vision_ui_rev": 59
 }

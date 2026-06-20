@@ -85,7 +85,7 @@ flowchart TB
 | **E — gate** | PH-S150 ✅ | CI advisory якщо ratio <88%; target 93%; stretch 96% spirit | стабільно 90–95% |
 | **F — stretch 96%** | PH-S151…S159 ✅ | wasm wiring, slim JS/i18n/charts, Rust stand/e2e bins; CI warn **93%** | **→96% spirit** |
 
-**Черга §5.12:** **0** відкритих · PH-S352 ✅ · replenish §5.13.
+**Черга §5.12:** **10** відкритих PH-S660…S669 · PH-S351 ✅ (ratio advisory шаблон) · replenish після drain.
 
 ---
 

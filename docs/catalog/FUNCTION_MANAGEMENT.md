@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-20 (PH-S650…S659 ✅ · vision **rev 264** · **0** відкритих · rust_ratio **94.76%**)
+**Оновлено:** 2026-06-20 (PH-S650…S659 ✅ · vision **rev 265** · **10** відкритих PH-S660…S669 · rust_ratio **94.76%**)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -859,16 +859,26 @@ FM-xxx (з таблиці нижче)
 | 592 | **PH-S657** | HANDOFF maintenance snapshot sync | HANDOFF canonical | add PH-S650…S659 summary + gate notes (vision/test/temp) | **✅** |
 | 593 | **PH-S658** | NEXT session prompt sync | NEXT canonical | update top snapshot to latest closed band and next trigger | **✅** |
 | 594 | **PH-S659** | STABLE_STATE header refresh | status canon | update stable-state header/date to current §5.12/ratio snapshot | **✅** |
+| 595 | **PH-S660** | ui-core format timestamp UTC fix | PH-S655 blocker / `format.rs` | `format_unix_timestamp_display_ph_s628` green (UTC, not local TZ) | **[ ]** |
+| 596 | **PH-S661** | ui-core ML metric URL encode fix | PH-S655 blocker / `ml.rs` | `build_metric_history_url_ph_s314/s334` green (`cpu%2Eusage`) | **[ ]** |
+| 597 | **PH-S662** | ui-core full test gate | Rust test policy | `cargo test -p poolai-ui-core` — 0 failed | **[ ]** |
+| 598 | **PH-S663** | Shared layout datetime wasm-only | RUST_RATIO §5.13 / `src/ui/mod.rs` | drop `toLocaleString` fallback in shared layout helper | **[ ]** |
+| 599 | **PH-S664** | network_profile persist stub | Galaxy §8 L916 | heartbeat metadata + in-memory persist stub; unit test | **[ ]** |
+| 600 | **PH-S665** | Rust ratio loc-audit refresh | §5.13 fallback | `poolai-loc-audit` → `rust_ratio.json` sprint zriz | **[ ]** |
+| 601 | **PH-S666** | Docs INDEX canon sync | docs canon | INDEX §7 + rust_ratio **94.76%** + vision rev from manifest | **[ ]** |
+| 602 | **PH-S667** | poolai-vision-sync drift gate | ops / PH-S350 pattern | `poolai-vision-sync --check` green | **[ ]** |
+| 603 | **PH-S668** | Ratio hold advisory snapshot | PH-S351 pattern | `poolai-loc-audit --min-ratio 0.95 --advisory` snapshot | **[ ]** |
+| 604 | **PH-S669** | Horizon close band S660–S668 | §5.12 fallback | `galaxy_horizon_s660_integration` + FM/HANDOFF/NEXT/STABLE/GALAXY sync | **[ ]** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S650…S659 ✅. Vision rev **264**. rust_ratio **94.76%**.
+**Відкритих у §5.12:** **10** (PH-S660…S669). **Закрито смуга:** PH-S650…S659 ✅. Vision rev **265**. rust_ratio **94.76%**. **PH-S351 ✅** (ratio hold advisory — шаблон для PH-S668).
 
-**Наступна сесія:** **`абракадабра`** — project scan → +10 PH-S* → drain → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **`абракадабра`** — drain PH-S660…S669 (10 відкритих, scan не потрібен) → vision close → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S262)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-06-18):** PH-S504…S513 ✅ закрито · **0** відкритих · **`абракадабра`** = project scan → §5.12 → drain.
+**Активна смуга (2026-06-20):** PH-S660…S669 **[ ]** drain · **`абракадабра`** = drain → vision close → push.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 
