@@ -880,6 +880,63 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn heartbeat_network_profile_persist_stub_ph_s664() {
+        use crate::grid::galaxy_network_profile_store::{
+            load_peer_network_profile, reset_network_profile_store_for_test,
+            ENV_NETWORK_PROFILE_DATA_DIR,
+        };
+        static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+        let _guard = ENV_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+        let stamp = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let dir = std::env::temp_dir().join(format!("poolai-np-hb-{stamp}"));
+        std::env::set_var(ENV_NETWORK_PROFILE_DATA_DIR, dir.to_string_lossy().as_ref());
+        reset_network_profile_store_for_test();
+
+        let addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::LOCALHOST, 8080));
+        let service = DiscoveryService::new(DiscoveryConfig::default(), addr, None);
+        let peer = PeerInfo {
+            peer_id: "np-hb-s664".to_string(),
+            address: "10.0.0.7".to_string(),
+            port: 9092,
+            last_seen: Utc::now(),
+            capabilities: PeerCapabilities::default(),
+            metadata: HashMap::from([("role".to_string(), "virtual_node".to_string())]),
+        };
+        service.register_remote_peer(peer).await.unwrap();
+        let profile = r#"{"region":"eu-central","latency_ms_p50":35,"egress_policy":"vpn_proxy"}"#;
+        service
+            .heartbeat_remote_peer(
+                "np-hb-s664",
+                None,
+                Some(HashMap::from([(
+                    "network_profile".to_string(),
+                    profile.to_string(),
+                )])),
+            )
+            .await
+            .unwrap();
+        let updated = service.get_peer("np-hb-s664").await.expect("peer");
+        let stored = updated
+            .metadata
+            .get("network_profile")
+            .expect("network_profile metadata");
+        let parsed: serde_json::Value = serde_json::from_str(stored).expect("profile json");
+        assert_eq!(parsed["region"], "eu-central");
+        assert_eq!(parsed["latency_ms_p50"], 35);
+        assert_eq!(parsed["egress_policy"], "vpn_proxy");
+        let loaded = load_peer_network_profile("np-hb-s664").expect("persisted profile");
+        let loaded_parsed: serde_json::Value =
+            serde_json::from_str(&loaded).expect("loaded profile json");
+        assert_eq!(loaded_parsed["region"], "eu-central");
+        let _ = std::fs::remove_dir_all(&dir);
+        std::env::remove_var(ENV_NETWORK_PROFILE_DATA_DIR);
+        reset_network_profile_store_for_test();
+    }
+
+    #[tokio::test]
     async fn test_register_remote_peer() {
         let addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::LOCALHOST, 8080));
         let service = DiscoveryService::new(DiscoveryConfig::default(), addr, None);

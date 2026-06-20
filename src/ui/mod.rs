@@ -929,7 +929,7 @@ function formatIsoDatetime(iso) {
     if (out && out !== '—') return out;
   }
   if (!iso) return '';
-  try { return new Date(iso).toLocaleString(); } catch (e) { return String(iso); }
+  return String(iso);
 }
 
 function formatLocaleTimeHms(iso) {

@@ -1,16 +1,16 @@
 # Galaxy Grid roadmap (зріз)
 
-**Оновлено:** 2026-06-20 · **Master backlog:** **351** PH-S660…S1010 · **§5.12 active:** 10 · **`абракадабра`** = drain + promote
+**Оновлено:** 2026-06-20 · **Master backlog:** **341** PH-S670…S1010 · **§5.12 active:** 10 · **`абракадабра`** = drain + promote
 
 | Зріз | Значення |
 |------|----------|
 | **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · FM **§5.14** |
-| **Active drain (band 1)** | PH-S660…S669 — ui-core, wasm, Galaxy §8, ops close |
-| **Next promote (band 2)** | PH-S670…S679 — verification/replay wire depth |
+| **Active drain (band 2)** | PH-S670…S679 — verification/replay wire depth |
+| **Next promote (band 3)** | PH-S680…S689 — settlement/trust wire depth |
 | **Tail** | PH-S1010 replenish marker |
-| **Rust ratio** | **94.76%** hold **95%** advisory |
+| **Rust ratio** | **94.70%** hold **95%** advisory |
 
-**351** pending · **36** `абракадабra` sessions · остання закрита **PH-S650…S659** ✅.
+**341** pending · **35** `абракадабra` sessions · остання закрита **PH-S660…S669** ✅.
 
 ---
 
@@ -26,8 +26,8 @@
 | **Trust payout-eligible + settlement resolved** | Galaxy **§6.5 / §6.4** | PH-S643/S644 ✅ |
 | **Strict-locality prefetch metric wire** | Galaxy **§5.5** | PH-S645 ✅ |
 | **Wasm-only admin slim (dashboard/updates/jobs)** | RUST_RATIO **§5.13** | PH-S646…S648 ✅ |
-| **network_profile full persist** | Galaxy **§8** L916 | PH-S664 **[ ]** |
-| **Horizon integration close band** | §5.12 fallback | PH-S649 ✅ · PH-S669 **[ ]** |
+| **network_profile full persist** | Galaxy **§8** L916 | PH-S664 ✅ |
+| **Horizon integration close band** | §5.12 fallback | PH-S649 ✅ · PH-S669 ✅ |
 
 **§5.5 prefetch:** live pull + backpressure + strict-mode HTTP wire ✅; **§8 persist** — PH-S664 у черзі drain.
 

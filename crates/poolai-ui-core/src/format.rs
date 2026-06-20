@@ -1,6 +1,6 @@
 //! HTML escaping and dashboard shell datetime formatters (PH-S146, PH-S193).
 
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, NaiveDateTime, TimeZone, Utc};
 
 /// Escape HTML special characters (`&`, `<`, `>`, `"`).
 pub fn escape_html(s: impl AsRef<str>) -> String {
@@ -87,8 +87,8 @@ pub fn format_unix_timestamp_display(secs: Option<i64>, never_label: &str) -> St
     let Some(ts) = secs.filter(|&s| s > 0) else {
         return never_label.to_string();
     };
-    if let Some(dt) = DateTime::from_timestamp(ts, 0) {
-        return dt.format("%Y-%m-%d %H:%M:%S UTC").to_string();
+    if let Some(naive) = NaiveDateTime::from_timestamp_opt(ts, 0) {
+        return naive.format("%Y-%m-%d %H:%M:%S UTC").to_string();
     }
     ts.to_string()
 }
@@ -206,7 +206,7 @@ mod tests {
     fn format_unix_timestamp_display_ph_s628() {
         assert_eq!(format_unix_timestamp_display(None, "Never"), "Never");
         assert_eq!(
-            format_unix_timestamp_display(Some(1_718_280_000), "Never"),
+            format_unix_timestamp_display(Some(1_712_998_800), "Never"),
             "2024-04-13 09:00:00 UTC"
         );
     }

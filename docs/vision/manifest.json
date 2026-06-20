@@ -2012,11 +2012,17 @@
       "from": "galaxy_grid",
       "kind": "implements",
       "to": "src_grid_galaxy_security_advisory_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_PH_S_MASTER_BACKLOG_351_md"
     }
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S659",
+  "last_sprint_closed": "PH-S669",
   "layers": [
     {
       "id": "L0",
@@ -2049,7 +2055,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S660",
+  "next_sprint": "PH-S670",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -8421,9 +8427,16 @@
       "label": "galaxy_horizon_s640_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s640_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_PH_S_MASTER_BACKLOG_351_md",
+      "label": "PH_S_MASTER_BACKLOG_351.md",
+      "layer": "L1",
+      "path": "docs/development/PH_S_MASTER_BACKLOG_351.md"
     }
   ],
-  "revision": 265,
+  "revision": 266,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -13775,91 +13788,181 @@
       "acceptance": "format_unix_timestamp_display_ph_s628` green (UTC, not local TZ)",
       "deps": "PH-S655 blocker / `format.rs",
       "id": "PH-S660",
-      "open": true,
+      "open": false,
       "row": 595,
-      "status": "open",
+      "status": "closed",
       "title": "ui-core format timestamp UTC fix"
     },
     {
       "acceptance": "build_metric_history_url_ph_s314/s334` green (`cpu%2Eusage`)",
       "deps": "PH-S655 blocker / `ml.rs",
       "id": "PH-S661",
-      "open": true,
+      "open": false,
       "row": 596,
-      "status": "open",
+      "status": "closed",
       "title": "ui-core ML metric URL encode fix"
     },
     {
       "acceptance": "cargo test -p poolai-ui-core` — 0 failed",
       "deps": "Rust test policy",
       "id": "PH-S662",
-      "open": true,
+      "open": false,
       "row": 597,
-      "status": "open",
+      "status": "closed",
       "title": "ui-core full test gate"
     },
     {
       "acceptance": "drop `toLocaleString` fallback in shared layout helper",
       "deps": "RUST_RATIO §5.13 / `src/ui/mod.rs",
       "id": "PH-S663",
-      "open": true,
+      "open": false,
       "row": 598,
-      "status": "open",
+      "status": "closed",
       "title": "Shared layout datetime wasm-only"
     },
     {
       "acceptance": "heartbeat metadata + in-memory persist stub; unit test",
       "deps": "Galaxy §8 L916",
       "id": "PH-S664",
-      "open": true,
+      "open": false,
       "row": 599,
-      "status": "open",
+      "status": "closed",
       "title": "network_profile persist stub"
     },
     {
       "acceptance": "poolai-loc-audit` → `rust_ratio.json` sprint zriz",
       "deps": "§5.13 fallback",
       "id": "PH-S665",
-      "open": true,
+      "open": false,
       "row": 600,
-      "status": "open",
+      "status": "closed",
       "title": "Rust ratio loc-audit refresh"
     },
     {
-      "acceptance": "INDEX §7 + rust_ratio 94.76% + vision rev from manifest",
+      "acceptance": "INDEX §7 + rust_ratio 94.70% + vision rev from manifest",
       "deps": "docs canon",
       "id": "PH-S666",
-      "open": true,
+      "open": false,
       "row": 601,
-      "status": "open",
+      "status": "closed",
       "title": "Docs INDEX canon sync"
     },
     {
       "acceptance": "poolai-vision-sync --check` green",
       "deps": "ops / PH-S350 pattern",
       "id": "PH-S667",
-      "open": true,
+      "open": false,
       "row": 602,
-      "status": "open",
+      "status": "closed",
       "title": "poolai-vision-sync drift gate"
     },
     {
-      "acceptance": "poolai-loc-audit --min-ratio 0.95 --advisory` snapshot",
+      "acceptance": "poolai-loc-audit --min-ratio 0.95 --advisory` snapshot 94.70%",
       "deps": "PH-S351 pattern",
       "id": "PH-S668",
-      "open": true,
+      "open": false,
       "row": 603,
-      "status": "open",
+      "status": "closed",
       "title": "Ratio hold advisory snapshot"
     },
     {
       "acceptance": "galaxy_horizon_s660_integration` + FM/HANDOFF/NEXT/STABLE/GALAXY sync",
       "deps": "§5.12 fallback",
       "id": "PH-S669",
-      "open": true,
+      "open": false,
       "row": 604,
-      "status": "open",
+      "status": "closed",
       "title": "Horizon close band S660–S668"
+    },
+    {
+      "acceptance": "scope integration test green",
+      "deps": "Galaxy verification/replay band 2",
+      "id": "PH-S670",
+      "open": true,
+      "row": 605,
+      "status": "open",
+      "title": "Galaxy verification metric HTTP wire"
+    },
+    {
+      "acceptance": "scope integration test green",
+      "deps": "Galaxy verification/replay band 2",
+      "id": "PH-S671",
+      "open": true,
+      "row": 606,
+      "status": "open",
+      "title": "Galaxy replay metric HTTP wire"
+    },
+    {
+      "acceptance": "scope test green",
+      "deps": "poolai-ui-core + admin_charts.js",
+      "id": "PH-S672",
+      "open": true,
+      "row": 607,
+      "status": "open",
+      "title": "Admin panel wasm glue"
+    },
+    {
+      "acceptance": "scope test green",
+      "deps": "poolai-http-stand-smoke",
+      "id": "PH-S673",
+      "open": true,
+      "row": 608,
+      "status": "open",
+      "title": "Stand smoke /metrics export shape"
+    },
+    {
+      "acceptance": "unit test green",
+      "deps": "Galaxy §4–§8",
+      "id": "PH-S674",
+      "open": true,
+      "row": 609,
+      "status": "open",
+      "title": "Galaxy concept helper stub"
+    },
+    {
+      "acceptance": "poolai-loc-audit` → `rust_ratio.json` sprint zriz",
+      "deps": "§5.13 fallback",
+      "id": "PH-S675",
+      "open": true,
+      "row": 610,
+      "status": "open",
+      "title": "Rust ratio loc-audit refresh"
+    },
+    {
+      "acceptance": "INDEX + HANDOFF + NEXT + STABLE + GALAXY sync",
+      "deps": "docs canon",
+      "id": "PH-S676",
+      "open": true,
+      "row": 611,
+      "status": "open",
+      "title": "Docs INDEX canon sync"
+    },
+    {
+      "acceptance": "poolai-vision-sync --check` green",
+      "deps": "ops",
+      "id": "PH-S677",
+      "open": true,
+      "row": 612,
+      "status": "open",
+      "title": "poolai-vision-sync drift gate"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory",
+      "deps": "PH-S351 pattern",
+      "id": "PH-S678",
+      "open": true,
+      "row": 613,
+      "status": "open",
+      "title": "Ratio hold advisory snapshot"
+    },
+    {
+      "acceptance": "galaxy_horizon_s670_integration` + docs sync",
+      "deps": "§5.12 fallback",
+      "id": "PH-S679",
+      "open": true,
+      "row": 614,
+      "status": "open",
+      "title": "Horizon close band S670–S678"
     }
   ],
   "sprint_queue_open_count": 10,
