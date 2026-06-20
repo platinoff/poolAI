@@ -1,17 +1,16 @@
 # Galaxy Grid roadmap (зріз)
 
-**Оновлено:** 2026-06-20 · **Канон черги:** FM §5.12 (**10** · PH-S660…S669 **[ ]**) · **`абракадабра`** = drain 10
+**Оновлено:** 2026-06-20 · **Master backlog:** **351** PH-S660…S1010 · **§5.12 active:** 10 · **`абракадабра`** = drain + promote
 
 | Зріз | Значення |
 |------|----------|
-| **ui-core test blockers** | PH-S660…S662 — format UTC, ML URL encode, full gate |
-| **Wasm-only admin slim** | PH-S663 shared layout datetime |
-| **Galaxy §8 persist stub** | PH-S664 network_profile heartbeat metadata |
-| **Ops / docs close band** | PH-S665 loc-audit · PH-S666 INDEX · PH-S667 vision-sync · PH-S668 ratio advisory (PH-S351 ✅) |
-| **Integration close band** | PH-S669 `galaxy_horizon_s660_integration` |
+| **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · FM **§5.14** |
+| **Active drain (band 1)** | PH-S660…S669 — ui-core, wasm, Galaxy §8, ops close |
+| **Next promote (band 2)** | PH-S670…S679 — verification/replay wire depth |
+| **Tail** | PH-S1010 replenish marker |
 | **Rust ratio** | **94.76%** hold **95%** advisory |
 
-**10** відкритих · остання закрита смуга **PH-S650…S659** ✅.
+**351** pending · **36** `абракадабra` sessions · остання закрита **PH-S650…S659** ✅.
 
 ---
 

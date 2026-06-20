@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-20 (PH-S650…S659 ✅ · vision **rev 265** · **10** відкритих PH-S660…S669 · rust_ratio **94.76%**)
+**Оновлено:** 2026-06-20 (PH-S650…S659 ✅ · **351** master backlog PH-S660…S1010 · active **10** · vision **rev 265** · rust_ratio **94.76%**)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -870,9 +870,32 @@ FM-xxx (з таблиці нижче)
 | 603 | **PH-S668** | Ratio hold advisory snapshot | PH-S351 pattern | `poolai-loc-audit --min-ratio 0.95 --advisory` snapshot | **[ ]** |
 | 604 | **PH-S669** | Horizon close band S660–S668 | §5.12 fallback | `galaxy_horizon_s660_integration` + FM/HANDOFF/NEXT/STABLE/GALAXY sync | **[ ]** |
 
-**Відкритих у §5.12:** **10** (PH-S660…S669). **Закрито смуга:** PH-S650…S659 ✅. Vision rev **265**. rust_ratio **94.76%**. **PH-S351 ✅** (ratio hold advisory — шаблон для PH-S668).
+**Відкритих у §5.12:** **10** (PH-S660…S669). **Master backlog:** **351** pending PH-S660…S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · **§5.14**. Vision rev **265**. rust_ratio **94.76%**.
 
-**Наступна сесія:** **`абракадабра`** — drain PH-S660…S669 (10 відкритих, scan не потрібен) → vision close → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **`абракадабра`** — drain PH-S660…S669 → promote PH-S670…S679 з §5.14 → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+
+### 5.14 Master backlog PH-S660…S1010 (351 pending, 2026-06-20)
+
+**Призначення:** повний реєстр **351** спринта з project scan «що ще не зроблено» (concept, roadmaps, §5.3, wasm slim, ui-core blockers). **Не** дублювати в §5.12 — там max **10** `[ ]` активних.
+
+| Поле | Значення |
+|------|----------|
+| **Діапазон** | PH-S660…PH-S1010 |
+| **Кількість** | **351** |
+| **Активна смуга §5.12** | PH-S660…S669 `[ ]` (band 1) |
+| **Наступна promote** | PH-S670…S679 (band 2) після drain band 1 |
+| **Сесій `абракадабра`** | **36** (35×10 + tail S1010) |
+| **Артефакт** | [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) |
+| **Regen** | `bash scripts/generate-ph-s-master-backlog-351.sh` |
+
+**Workflow promote (після drain + push):**
+
+1. Закрити band у §5.12 → ✅
+2. Взяти **наступні 10** з §5.14 / master backlog → записати в §5.12 як `[ ]`
+3. Оновити HANDOFF + NEXT (`next promote: PH-S…`)
+4. **BLOCKED/Deferred** (FM-003 LAN, FM-041 Cloud SDK) — поза 351 backlog
+
+**Після PH-S1010 ✅:** новий project scan → новий master backlog або FM-horizon.
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S262)
 

@@ -1,10 +1,12 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-20 (PH-S650…S659 ✅ · черга **PH-S660…S669** · vision **rev 265** · rust_ratio **94.76%**)
+**Оновлено:** 2026-06-20 (master backlog **351** PH-S660…S1010 · active **PH-S660…S669** · vision **rev 265** · rust_ratio **94.76%**)
 
-| **← наступний** | **`абракадабра`** (drain **10** відкритих PH-S660…S669) |
-| **Відкритих** | **10** (PH-S660…S669) |
-| **Scan** | **не потрібен** — §5.12 уже заповнено project scan 2026-06-20 |
+| **← наступний** | **`абракадабра`** (drain **10** активних → promote наступні 10 з master backlog) |
+| **Master backlog** | **351** pending — [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · FM **§5.14** |
+| **Активних §5.12** | **10** (PH-S660…S669, band 1) |
+| **Після band 1** | promote PH-S670…S679 (band 2) |
+| **Сесій drain** | **36** (`351÷10` + tail PH-S1010) |
 
 ---
 
@@ -20,11 +22,12 @@
 
 ## S0 + drain (канон)
 
-1. `git fetch`; HANDOFF; FM §5.12 (**10** відкритих PH-S660…S669); `poolai-vision-sync --check`; `df -h /s`
-2. **Drain** усіх відкритих PH-S660…S669 (код → scope-тести)
-3. Vision close: FM §5.12 ✅ + HANDOFF + NEXT → `poolai-vision-sync` → `--check`
+1. `git fetch`; HANDOFF; FM §5.12 + **§5.14**; `poolai-vision-sync --check`; `df -h /s`
+2. **Drain** активних 10 з §5.12 (зараз PH-S660…S669) — деталі в master backlog band 1
+3. Vision close → `poolai-vision-sync` → `--check`
 4. `cargo fmt --all` → `K8S_OPENAPI_ENABLED_VERSION=1.28 cargo test-ci`
-5. Один commit (`git-commit-tree-msg.sh`) + `git push origin main` + самарі
+5. Commit + `git push origin main` + самарі
+6. **Promote** наступні 10 з [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) → §5.12 `[ ]` (після push band 1: **PH-S670…S679**)
 
 ```bash
 export PATH="/c/Users/$USER/.cargo/bin:$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"
@@ -36,36 +39,40 @@ cd /s/rust/poolAI
 
 ---
 
-## Черга drain (PH-S660…S669)
+## Master backlog 351 (PH-S660…S1010)
 
-| Sprint | Фокус | Acceptance |
-|--------|--------|------------|
-| **PH-S660** | ui-core format timestamp UTC fix | `format_unix_timestamp_display_ph_s628` green |
-| **PH-S661** | ui-core ML metric URL encode fix | `build_metric_history_url_ph_s314/s334` green |
-| **PH-S662** | ui-core full test gate | `cargo test -p poolai-ui-core` 0 failed |
-| **PH-S663** | Shared layout datetime wasm-only | drop `toLocaleString` in `src/ui/mod.rs` |
-| **PH-S664** | network_profile persist stub | Galaxy §8 L916 stub + unit test |
-| **PH-S665** | Rust ratio loc-audit refresh | `rust_ratio.json` sprint zriz |
-| **PH-S666** | Docs INDEX canon sync | INDEX §7 + ratio + vision rev |
-| **PH-S667** | poolai-vision-sync drift gate | `--check` green |
-| **PH-S668** | Ratio hold advisory snapshot | `--min-ratio 0.95 --advisory` (шаблон **PH-S351** ✅) |
-| **PH-S669** | Horizon close band S660–S668 | integration + FM/HANDOFF/NEXT/STABLE/GALAXY |
+Повний реєстр: [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · FM [`§5.14`](../catalog/FUNCTION_MANAGEMENT.md#514-master-backlog-ph-s660s1010-351-pending-2026-06-20).
+
+| Band | Sprints | Статус |
+|------|---------|--------|
+| 1 | PH-S660…S669 | **активна §5.12** `[ ]` |
+| 2 | PH-S670…S679 | queued |
+| 3–35 | PH-S680…S1009 | queued |
+| 36 | PH-S1010 | tail / replenish |
+
+**Не в backlog:** FM-003 LAN · FM-041 Cloud SDK (BLOCKED/Deferred).
+
+---
+
+## Активна смуга (band 1 — drain зараз)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S660** | ui-core UTC timestamp fix |
+| **PH-S661** | ui-core ML URL encode fix |
+| **PH-S662** | `cargo test -p poolai-ui-core` green |
+| **PH-S663** | wasm-only datetime `src/ui/mod.rs` |
+| **PH-S664** | Galaxy §8 network_profile persist stub |
+| **PH-S665** | loc-audit → `rust_ratio.json` |
+| **PH-S666** | INDEX canon sync |
+| **PH-S667** | `poolai-vision-sync --check` |
+| **PH-S668** | ratio advisory `--min-ratio 0.95` |
+| **PH-S669** | horizon close band + docs sync |
 
 ---
 
 ## Закрито (PH-S650…S659)
 
-PH-S650 ✅ `poolai-ui-core` warning cleanup (`table.rs` unused import).  
-PH-S651 ✅ `GALAXY_GRID_ROADMAP` sync to S640…S649 and rust_ratio 94.76%.  
-PH-S652 ✅ cursor sandbox temp cache cleanup (disk pressure unblock).  
-PH-S653 ✅ sandbox path restore + `poolai-vision-sync --check` (ok, rev 264).  
-PH-S654 ✅ `cargo fmt --all` gate.  
-PH-S655 ✅ `cargo test -p poolai-ui-core` rerun (3 pre-existing failing tests captured).  
-PH-S656 ✅ FM §5.12 maintenance close-band sync.  
-PH-S657 ✅ HANDOFF maintenance snapshot sync.  
-PH-S658 ✅ NEXT prompt refresh for next `абракадабра`.  
-PH-S659 ✅ STABLE_STATE header refresh.
+PH-S650…S659 ✅ maintenance close band (2026-06-20).
 
 **rust_ratio:** **94.76%** · **BLOCKED:** FM-003 LAN · FM-041 Cloud SDK.
-
-**Не повторювати:** PH-S351 ✅ ratio hold advisory (дублювати лише як PH-S668 у смузі drain).

@@ -1,8 +1,8 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-20 (PH-S650…S659 ✅ · черга **PH-S660…S669** · vision **rev 265** · rust_ratio **94.76%**)
+**Оновлено:** 2026-06-20 (PH-S650…S659 ✅ · master backlog **351** PH-S660…S1010 · active **10** · vision **rev 265** · rust_ratio **94.76%**)
 
-**Project scan + черга (2026-06-20):** §5.12 поповнено **10** відкритих PH-S660…S669 (ui-core 3 fails, wasm datetime slim, Galaxy §8 persist stub, ops/docs close band). **PH-S351 ✅** — ratio hold advisory (шаблон PH-S668). Наступна сесія: **`абракадабра`** → drain без нового scan.
+**Master backlog 351 (2026-06-20):** project scan «не зроблено» → [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) (PH-S660…S1010) · FM **§5.14**. Активна §5.12: **PH-S660…S669** (band 1). **`абракадабра`** = drain 10 → promote наступні 10 (**36** сесій до S1010). **BLOCKED/Deferred** поза backlog: FM-003, FM-041.
 
 **PH-S650…S659 ✅ (2026-06-20):** ui-core warning cleanup (`table.rs`); `GALAXY_GRID_ROADMAP` sync до S640…S649; cursor sandbox temp cleanup + path restore; `poolai-vision-sync --check` (ok, rev 264); `cargo fmt --all`; `cargo test -p poolai-ui-core` rerun (3 pre-existing fails); FM/HANDOFF/NEXT/STABLE_STATE maintenance sync.
 
