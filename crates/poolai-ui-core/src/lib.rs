@@ -9,6 +9,7 @@ pub mod design_tokens;
 pub mod format;
 pub mod galaxy_telegram_seats;
 pub mod galaxy_virtual_nodes;
+pub mod grid_replication_pricing;
 pub mod grid_verification;
 pub mod i18n;
 pub mod instances;

@@ -2762,6 +2762,26 @@ mod tests {
     }
 
     #[test]
+    fn grid_replication_pricing_wasm_panel_export_shape_ph_s703() {
+        let sample = r#"{"ok":true,"metrics":{"strict_total":1,"enqueue_total":2,"executor_enqueue_total":0,"rate_limited_total":0}}"#;
+        let body: Value = serde_json::from_str(sample).expect("json");
+        assert_eq!(body["metrics"]["strict_total"], 1);
+        assert_eq!(body["metrics"]["enqueue_total"], 2);
+    }
+
+    #[test]
+    fn admin_wasm_slim_depth_stub_export_shape_ph_s703() {
+        use poolai_ui_core::grid_replication_pricing::{
+            admin_wasm_slim_depth_stub, AdminWasmSlimDepth,
+        };
+        use serde_json::json;
+        assert_eq!(
+            admin_wasm_slim_depth_stub(Some(&json!({"panel_renderer": true}))),
+            AdminWasmSlimDepth::PanelRenderer
+        );
+    }
+
+    #[test]
     fn vision_revision_fm_parity_ph_s235() {
         let root = repo_root();
         assert_vision_repo_parity(&root)

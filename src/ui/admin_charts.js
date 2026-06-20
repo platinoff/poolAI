@@ -23,10 +23,7 @@ function poolaiMetricPointValues(data) {
   if (wasm && typeof wasm.metricPointValues === 'function') {
     return wasm.metricPointValues(JSON.stringify(data || []));
   }
-  if (!Array.isArray(data)) return [];
-  return data.map(function (d) {
-    return d && d.value != null ? Number(d.value) : 0;
-  });
+  return [];
 }
 
 function poolaiChartScale(values, width, height, padding) {
@@ -232,15 +229,7 @@ async function poolaiRenderMetricsChartGrid(metricNames, opts) {
   if (wasm && typeof wasm.renderMetricsChartGridHtml === 'function') {
     return wasm.renderMetricsChartGridHtml(title, JSON.stringify(parts));
   }
-  return (
-    '<div class="admin-card">' +
-    '<h3>' +
-    escapeHtml(title) +
-    '</h3>' +
-    '<div class="metrics-charts-grid">' +
-    parts.join('') +
-    '</div></div>'
-  );
+  return '';
 }
 
 /** @returns {function} stop */
@@ -257,9 +246,7 @@ function poolaiParseMlNumeric(val) {
     var n = wasm.parseMlNumeric(val == null ? '' : String(val));
     return n == null ? null : Number(n);
   }
-  if (val == null || val === '') return null;
-  var parsed = parseFloat(String(val));
-  return isNaN(parsed) ? null : parsed;
+  return null;
 }
 
 /** Flatten `step_results` from pipeline list API into table rows. */
@@ -268,24 +255,7 @@ function poolaiFlattenMlStepRows(pipelines) {
   if (wasm && typeof wasm.flattenMlStepRows === 'function') {
     return wasm.flattenMlStepRows(JSON.stringify(pipelines || []));
   }
-  var rows = [];
-  (pipelines || []).forEach(function (p) {
-    var results = p && p.step_results ? p.step_results : {};
-    Object.keys(results).forEach(function (stepId) {
-      var sr = results[stepId] || {};
-      var out = sr.output || {};
-      rows.push({
-        pipelineId: p.id || '',
-        pipelineName: p.name || p.id || 'pipeline',
-        pipelineStatus: p.status || '',
-        stepId: stepId,
-        stepStatus: sr.status || '',
-        stepKind: out.step_kind || out.step_id || stepId,
-        output: out,
-      });
-    });
-  });
-  return rows;
+  return [];
 }
 
 function poolaiFormatMlMetricSummary(output) {
@@ -293,7 +263,6 @@ function poolaiFormatMlMetricSummary(output) {
   if (wasm && typeof wasm.formatMlMetricSummary === 'function') {
     return wasm.formatMlMetricSummary(JSON.stringify(output || {}));
   }
-  if (!output || typeof output !== 'object') return '—';
   return '—';
 }
 
@@ -333,98 +302,7 @@ function poolaiRenderMlPipelineMetricsPanel(pipelines, opts) {
       poolaiChartT('admin.charts.avg', 'Avg: '),
     );
   }
-  var rows = poolaiFlattenMlStepRows(pipelines);
-  var title =
-    opts.title ||
-    poolaiChartT('admin.mon.mlTitle', 'ML Pipeline Step Metrics');
-  if (!rows.length) {
-    return (
-      '<div class="admin-card ml-pipeline-metrics-panel">' +
-      '<h3>' +
-      escapeHtml(title) +
-      '</h3>' +
-      (typeof adminEmptyStateHtml === 'function'
-        ? adminEmptyStateHtml(
-            opts.emptyMessage ||
-              poolaiChartT('admin.mon.mlEmpty', 'No ML pipeline step metrics yet'),
-            {
-              hint: poolaiChartT(
-                'admin.mon.mlEmptyHint',
-                'Run the demo pipeline or execute a pipeline via the AI/ML API.',
-              ),
-              icon: '🧠',
-            },
-          )
-        : '<div class="muted">' +
-          escapeHtml(
-            opts.emptyMessage ||
-              poolaiChartT('admin.mon.mlEmpty', 'No ML pipeline step metrics yet'),
-          ) +
-          '</div>') +
-      '</div>'
-    );
-  }
-
-  var series = poolaiCollectMlSparklineSeries(rows);
-  var sparkParts = [];
-  Object.keys(series)
-    .slice(0, 6)
-    .forEach(function (label) {
-      var values = series[label];
-      if (values.length) {
-        sparkParts.push(poolaiRenderSparkline(label, values, { width: 220, height: 44 }));
-      }
-    });
-
-  var tableRows = rows.map(function (r) {
-    var statusCls =
-      String(r.stepStatus).toLowerCase() === 'completed'
-        ? 'active'
-        : String(r.stepStatus).toLowerCase() === 'failed'
-          ? 'error'
-          : 'warning';
-    return [
-      escapeHtml(r.pipelineName),
-      escapeHtml(r.stepId),
-      '<code>' + escapeHtml(String(r.stepKind)) + '</code>',
-      '<span class="status-badge ' +
-        statusCls +
-        '">' +
-        escapeHtml(String(r.stepStatus || '—')) +
-        '</span>',
-      escapeHtml(poolaiFormatMlMetricSummary(r.output)),
-    ];
-  });
-
-  var tableHtml =
-    typeof adminRenderTable === 'function'
-      ? adminRenderTable(
-          [
-            poolaiChartT('admin.mon.mlCol.pipeline', 'Pipeline'),
-            poolaiChartT('admin.mon.mlCol.step', 'Step'),
-            poolaiChartT('admin.mon.mlCol.kind', 'Kind'),
-            poolaiChartT('admin.mon.mlCol.status', 'Status'),
-            poolaiChartT('admin.mon.mlCol.metrics', 'Metrics'),
-          ],
-          tableRows,
-        )
-      : '';
-
-  return (
-    '<div class="admin-card ml-pipeline-metrics-panel">' +
-    '<h3>' +
-    escapeHtml(title) +
-    ' (' +
-    rows.length +
-    ')</h3>' +
-    (sparkParts.length
-      ? '<div class="metrics-sparklines-grid ml-step-sparklines">' +
-        sparkParts.join('') +
-        '</div>'
-      : '') +
-    tableHtml +
-    '</div>'
-  );
+  return '';
 }
 
 async function poolaiFetchMlPipelines() {
@@ -698,4 +576,24 @@ function poolaiRenderTelegramSeatsPanel(snapshotJson, labels) {
     );
   }
   return adminEmptyStateHtml(labels.empty || 'Seat snapshot unavailable', { icon: '📊' });
+}
+
+/** PH-S700: replication/pricing metrics strip (wasm-first). */
+function poolaiRenderGridReplicationPricingPanel(
+  replicationMetrics,
+  pricingMetrics,
+  strictGauge,
+  labels,
+) {
+  labels = labels || {};
+  var wasm = poolaiChartsWasm();
+  if (wasm && typeof wasm.renderGridReplicationPricingPanel === 'function') {
+    return wasm.renderGridReplicationPricingPanel(
+      JSON.stringify(replicationMetrics || {}),
+      JSON.stringify(pricingMetrics || {}),
+      strictGauge || 0,
+      JSON.stringify(labels),
+    );
+  }
+  return '';
 }

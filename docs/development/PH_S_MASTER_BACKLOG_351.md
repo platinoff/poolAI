@@ -109,7 +109,7 @@
 | **PH-S698** | Ratio hold advisory --min-ratio 0.95 --advisory snapshot | scope test green |
 | **PH-S699** | Horizon close galaxy_horizon_s690_integration + docs close band | scope test green |
 
-## Band 5 — PH-S700…S709 (Admin wasm slim (ui-core + poolai-ui-wasm)) (**active §5.12**)
+## Band 5 — PH-S700…S709 (Admin wasm slim (ui-core + poolai-ui-wasm)) (drained ✅)
 
 | Sprint | Focus | Acceptance |
 |--------|-------|------------|
@@ -124,7 +124,7 @@
 | **PH-S708** | Ratio hold advisory --min-ratio 0.95 --advisory snapshot | scope test green |
 | **PH-S709** | Horizon close galaxy_horizon_s700_integration + docs close band | scope test green |
 
-## Band 6 — PH-S710…S719 (Stand smoke /metrics parity)
+## Band 6 — PH-S710…S719 (Stand smoke /metrics parity) (**active §5.12**)
 
 | Sprint | Focus | Acceptance |
 |--------|-------|------------|

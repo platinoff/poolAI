@@ -12,6 +12,7 @@ use poolai_ui_core::format::{
 };
 use poolai_ui_core::galaxy_telegram_seats::render_telegram_seats_panel_html;
 use poolai_ui_core::galaxy_virtual_nodes::render_galaxy_virtual_nodes_panel_html;
+use poolai_ui_core::grid_replication_pricing::render_grid_replication_pricing_panel_html;
 use poolai_ui_core::grid_verification::render_grid_verification_panel_html;
 use poolai_ui_core::instances::render_instances_panel_html;
 use poolai_ui_core::lease::lease_state;
@@ -541,6 +542,21 @@ pub fn render_galaxy_virtual_nodes_panel_wasm(
     )
 }
 
+#[wasm_bindgen(js_name = renderGridReplicationPricingPanel)]
+pub fn render_grid_replication_pricing_panel_wasm(
+    replication_metrics_json: &str,
+    pricing_metrics_json: &str,
+    strict_gauge: u64,
+    i18n_json: &str,
+) -> String {
+    render_grid_replication_pricing_panel_html(
+        replication_metrics_json,
+        pricing_metrics_json,
+        strict_gauge,
+        i18n_json,
+    )
+}
+
 #[wasm_bindgen(js_name = renderGridVerificationPanel)]
 pub fn render_grid_verification_panel_wasm(
     tasks_json: &str,
@@ -833,6 +849,18 @@ mod tests {
             format_iso_datetime_wasm("2026-06-15T12:00:00Z"),
             "2026-06-15 12:00:00 UTC"
         );
+    }
+
+    #[test]
+    fn render_grid_replication_pricing_panel_wasm_ph_s700() {
+        let html = render_grid_replication_pricing_panel_wasm(
+            r#"{"metrics":{"strict_total":1,"enqueue_total":2}}"#,
+            r#"{"metrics":{"fresh_served_total":3,"stale_served_total":0}}"#,
+            0,
+            r#"{}"#,
+        );
+        assert!(html.contains("admin-metrics-strip"));
+        assert!(html.contains("<strong>1</strong>"));
     }
 
     #[test]

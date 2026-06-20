@@ -1,4 +1,4 @@
-//! Galaxy Grid replication/pricing metrics admin page (PH-S692).
+//! Galaxy Grid replication/pricing metrics admin page (PH-S692, PH-S700 wasm slim).
 
 use crate::ui::admin::admin_layout_grid_pricing;
 use axum::response::Html;
@@ -11,20 +11,20 @@ pub async fn admin_grid_replication_pricing() -> Html<String> {
     function renderReplicationPricingPanel(replicationMetrics, pricingMetrics, strictGauge) {
       const el = document.getElementById('grid-replication-pricing-panel');
       if (!el) return;
-      const rm = (replicationMetrics && replicationMetrics.metrics) ? replicationMetrics.metrics : {};
-      const pm = (pricingMetrics && pricingMetrics.metrics) ? pricingMetrics.metrics : {};
-      const strict = rm.strict_total != null ? rm.strict_total : strictGauge;
-      el.innerHTML =
-        '<div class="admin-card admin-metrics-strip">' +
-        '<span>' + escapeHtml(T('admin.gridReplicationPricing.strict', 'Strict tier')) +
-        ': <strong>' + escapeHtml(String(strict || 0)) + '</strong></span>' +
-        '<span>' + escapeHtml(T('admin.gridReplicationPricing.enqueue', 'Enqueue')) +
-        ': <strong>' + escapeHtml(String(rm.enqueue_total || 0)) + '</strong></span>' +
-        '<span>' + escapeHtml(T('admin.gridReplicationPricing.freshServed', 'Fresh served')) +
-        ': <strong>' + escapeHtml(String(pm.fresh_served_total || 0)) + '</strong></span>' +
-        '<span>' + escapeHtml(T('admin.gridReplicationPricing.staleServed', 'Stale served')) +
-        ': <strong>' + escapeHtml(String(pm.stale_served_total || 0)) + '</strong></span>' +
-        '</div>';
+      const labels = {
+        'admin.gridReplicationPricing.strict': T('admin.gridReplicationPricing.strict', 'Strict tier'),
+        'admin.gridReplicationPricing.enqueue': T('admin.gridReplicationPricing.enqueue', 'Enqueue'),
+        'admin.gridReplicationPricing.freshServed': T('admin.gridReplicationPricing.freshServed', 'Fresh served'),
+        'admin.gridReplicationPricing.staleServed': T('admin.gridReplicationPricing.staleServed', 'Stale served'),
+      };
+      if (typeof poolaiRenderGridReplicationPricingPanel === 'function') {
+        el.innerHTML = poolaiRenderGridReplicationPricingPanel(
+          replicationMetrics,
+          pricingMetrics,
+          strictGauge,
+          labels,
+        );
+      }
     }
 
     async function loadGridReplicationPricingPanel() {
@@ -86,5 +86,13 @@ mod tests {
         assert!(html.contains("grid-replication-pricing-panel"));
         assert!(html.contains("parsePrometheusGauge"));
         assert!(html.contains("poolaiChartsWasm"));
+    }
+
+    #[tokio::test]
+    async fn admin_grid_replication_pricing_wasm_slim_ph_s700() {
+        let html = admin_grid_replication_pricing().await.0;
+        assert!(html.contains("poolaiRenderGridReplicationPricingPanel"));
+        assert!(!html
+            .contains("el.innerHTML =\n        '<div class=\"admin-card admin-metrics-strip\">'"));
     }
 }

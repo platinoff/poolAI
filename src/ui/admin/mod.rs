@@ -1326,6 +1326,37 @@ fn admin_grid_replication_pricing_wasm_glue_ph_s692() {
 }
 
 #[test]
+fn admin_grid_replication_pricing_wasm_slim_ph_s700() {
+    let page = include_str!("grid_replication_pricing.rs");
+    assert!(page.contains("poolaiRenderGridReplicationPricingPanel"));
+    assert!(!page.contains("admin-metrics-strip'>"));
+}
+
+#[test]
+fn admin_charts_grid_replication_pricing_wasm_first_ph_s701() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("wasm.renderGridReplicationPricingPanel"));
+    assert!(js.contains("poolaiRenderGridReplicationPricingPanel"));
+    assert!(!js.contains("parts.join('')"));
+    assert!(!js.contains("pipelineId: p.id"));
+}
+
+#[test]
+fn admin_charts_ml_canvas_glue_wasm_only_ph_s701() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("wasm.flattenMlStepRows"));
+    assert!(!js.contains("parseFloat(String(val))"));
+    assert!(!js.contains("metrics-charts-grid"));
+}
+
+#[test]
+fn admin_charts_metric_point_values_wasm_only_ph_s701() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("wasm.metricPointValues"));
+    assert!(!js.contains("d.value != null ? Number(d.value)"));
+}
+
+#[test]
 fn admin_layout_includes_design_tokens_css_ph_s166() {
     let html = admin_layout("admin.test.page", "Test", "<p>body</p>", "");
     let body = html.0;
