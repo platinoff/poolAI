@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-20 (PH-S630…S639 ✅ · vision **rev 263** · **0** відкритих · rust_ratio **94.75%**)
+**Оновлено:** 2026-06-20 (PH-S640…S649 ✅ · vision **rev 264** · **0** відкритих · rust_ratio **94.76%**)
 
 | **← наступний** | **`абракадабра`** (project scan → +10 PH-S* → drain) |
 | **Відкритих** | **0** |
@@ -34,25 +34,19 @@ export CARGO_TARGET_DIR=/s/rust/poolAI/target
 cd /s/rust/poolAI
 ```
 
-Vision e2e (після `docs/vision/` scope):
-
-```bash
-bash bin/e2e-playwright.sh --start
-```
-
 ---
 
-## Закрито (PH-S630…S639)
+## Закрито (PH-S640…S649)
 
-PH-S630 ✅ verification mismatch trust delta persist (−100).  
-PH-S631 ✅ cleared settlement payout-batch HTTP `/metrics`.  
-PH-S632 ✅ prefetch seed-pull hot-tier fallback HTTP.  
-PH-S633 ✅ replication executor enqueue HTTP.  
-PH-S634 ✅ replay verification enqueue on mismatch HTTP.  
-PH-S635 ✅ worker-unhealthy heartbeat-remote HTTP.  
-PH-S636 ✅ admin topology formatters wasm-only.  
-PH-S637 ✅ admin security datetime wasm-only slim.  
-PH-S638 ✅ admin grid-pricing formatters wasm-only.  
-PH-S639 ✅ `galaxy_horizon_s630_integration` close band.
+PH-S640 ✅ replay pending resolved HTTP.  
+PH-S641 ✅ verification replay record + history API.  
+PH-S642 ✅ verification checker enqueue HTTP.  
+PH-S643 ✅ trust payout-eligible HTTP.  
+PH-S644 ✅ settlement resolved HTTP.  
+PH-S645 ✅ prefetch strict-mode HTTP.  
+PH-S646 ✅ admin dashboard datetime wasm-only.  
+PH-S647 ✅ admin updates-compat wasm-only.  
+PH-S648 ✅ admin jobs lease badge wasm-only.  
+PH-S649 ✅ `galaxy_horizon_s640_integration` close band.
 
-**rust_ratio:** **94.75%** · **BLOCKED:** FM-003 LAN · FM-041 Cloud SDK.
+**rust_ratio:** **94.76%** · **BLOCKED:** FM-003 LAN · FM-041 Cloud SDK.

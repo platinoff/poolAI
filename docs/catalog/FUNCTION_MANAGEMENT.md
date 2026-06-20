@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-20 (PH-S630…S639 ✅ · vision **rev 263** · **0** відкритих · rust_ratio **94.75%**)
+**Оновлено:** 2026-06-20 (PH-S640…S649 ✅ · vision **rev 264** · **0** відкритих · rust_ratio **94.76%**)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -839,8 +839,18 @@ FM-xxx (з таблиці нижче)
 | 572 | **PH-S637** | Admin security datetime wasm-only slim | RUST_RATIO §5.13 / PH-S628 | remove JS fallback paths in `security.rs`; wasm-only glue | **✅** |
 | 573 | **PH-S638** | Admin grid-pricing formatters wasm-only | RUST_RATIO §5.13 / PH-S151 | drop `formatUsdMicroFallback` in `grid_pricing.rs`; wasm-only USD/time formatters | **✅** |
 | 574 | **PH-S639** | Horizon close band S630–S638 | §5.12 fallback / roadmap §4 | `galaxy_horizon_s630_integration` + loc-audit + vision-sync `--check` | **✅** |
+| 575 | **PH-S640** | Replay pending resolved HTTP wire | Galaxy §6.3 | grid result `replay_verdict:accepted` → `galaxy_replay_pending_resolved_total`; integration test | **✅** |
+| 576 | **PH-S641** | Verification replay record HTTP + history API | Galaxy §6.3 PH-S460/S478 | mismatch result → `galaxy_verification_replay_record_total` + `GET /grid/verification-replay/history`; integration test | **✅** |
+| 577 | **PH-S642** | Verification checker enqueue HTTP | Galaxy §6.2 PH-S437 | sampled `telegram_edge` result → `galaxy_verification_checker_enqueue_total`; integration test | **✅** |
+| 578 | **PH-S643** | Trust payout-eligible HTTP wire | Galaxy §6.5 | high-trust `telegram_edge` cleared result → `galaxy_trust_payout_eligible_total`; integration test | **✅** |
+| 579 | **PH-S644** | Settlement resolved counter HTTP | Galaxy §6.4 PH-S404 | grid result path → `galaxy_settlement_resolved_total` on `/metrics`; integration test | **✅** |
+| 580 | **PH-S645** | Prefetch strict-mode HTTP wire | Galaxy §5.5 PH-S303 | `strict_locality` job ingest → `galaxy_prefetch_strict_mode_total`; integration test | **✅** |
+| 581 | **PH-S646** | Admin dashboard datetime wasm-only | RUST_RATIO §5.13 | `formatAuditTimestamp` wasm-only; drop `toLocaleString` fallback in `dashboard.rs` | **✅** |
+| 582 | **PH-S647** | Admin updates-compat labels wasm-only | RUST_RATIO §5.13 PH-S197 | drop compat/protocol JS fallbacks in `updates_compat.rs` | **✅** |
+| 583 | **PH-S648** | Admin jobs lease badge wasm-only | RUST_RATIO §5.13 PH-S152 | remove `leaseStateFallback`; wasm-only `leaseStateLabel` | **✅** |
+| 584 | **PH-S649** | Horizon close band S640–S648 | §5.12 fallback | `galaxy_horizon_s640_integration` + loc-audit + vision-sync `--check` | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S630…S639 ✅. Vision rev **263**. rust_ratio **94.75%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S640…S649 ✅. Vision rev **264**. rust_ratio **94.76%**.
 
 **Наступна сесія:** **`абракадабра`** — project scan → +10 PH-S* → drain → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 

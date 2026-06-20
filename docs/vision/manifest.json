@@ -2016,7 +2016,7 @@
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S639",
+  "last_sprint_closed": "PH-S649",
   "layers": [
     {
       "id": "L0",
@@ -8406,9 +8406,16 @@
       "label": "galaxy_horizon_s620_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s620_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s630_integration_rs",
+      "label": "galaxy_horizon_s630_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s630_integration.rs"
     }
   ],
-  "revision": 263,
+  "revision": 264,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -13575,6 +13582,96 @@
       "row": 574,
       "status": "closed",
       "title": "Horizon close band S630–S638"
+    },
+    {
+      "acceptance": "grid result `replay_verdict:accepted` → `galaxy_replay_pending_resolved_total`; integration test",
+      "deps": "Galaxy §6.3",
+      "id": "PH-S640",
+      "open": false,
+      "row": 575,
+      "status": "closed",
+      "title": "Replay pending resolved HTTP wire"
+    },
+    {
+      "acceptance": "mismatch result → `galaxy_verification_replay_record_total` + `GET /grid/verification-replay/history`; integration test",
+      "deps": "Galaxy §6.3 PH-S460/S478",
+      "id": "PH-S641",
+      "open": false,
+      "row": 576,
+      "status": "closed",
+      "title": "Verification replay record HTTP + history API"
+    },
+    {
+      "acceptance": "sampled `telegram_edge` result → `galaxy_verification_checker_enqueue_total`; integration test",
+      "deps": "Galaxy §6.2 PH-S437",
+      "id": "PH-S642",
+      "open": false,
+      "row": 577,
+      "status": "closed",
+      "title": "Verification checker enqueue HTTP"
+    },
+    {
+      "acceptance": "high-trust `telegram_edge` cleared result → `galaxy_trust_payout_eligible_total`; integration test",
+      "deps": "Galaxy §6.5",
+      "id": "PH-S643",
+      "open": false,
+      "row": 578,
+      "status": "closed",
+      "title": "Trust payout-eligible HTTP wire"
+    },
+    {
+      "acceptance": "grid result path → `galaxy_settlement_resolved_total` on `/metrics`; integration test",
+      "deps": "Galaxy §6.4 PH-S404",
+      "id": "PH-S644",
+      "open": false,
+      "row": 579,
+      "status": "closed",
+      "title": "Settlement resolved counter HTTP"
+    },
+    {
+      "acceptance": "strict_locality` job ingest → `galaxy_prefetch_strict_mode_total`; integration test",
+      "deps": "Galaxy §5.5 PH-S303",
+      "id": "PH-S645",
+      "open": false,
+      "row": 580,
+      "status": "closed",
+      "title": "Prefetch strict-mode HTTP wire"
+    },
+    {
+      "acceptance": "formatAuditTimestamp` wasm-only; drop `toLocaleString` fallback in `dashboard.rs",
+      "deps": "RUST_RATIO §5.13",
+      "id": "PH-S646",
+      "open": false,
+      "row": 581,
+      "status": "closed",
+      "title": "Admin dashboard datetime wasm-only"
+    },
+    {
+      "acceptance": "drop compat/protocol JS fallbacks in `updates_compat.rs",
+      "deps": "RUST_RATIO §5.13 PH-S197",
+      "id": "PH-S647",
+      "open": false,
+      "row": 582,
+      "status": "closed",
+      "title": "Admin updates-compat labels wasm-only"
+    },
+    {
+      "acceptance": "remove `leaseStateFallback`; wasm-only `leaseStateLabel",
+      "deps": "RUST_RATIO §5.13 PH-S152",
+      "id": "PH-S648",
+      "open": false,
+      "row": 583,
+      "status": "closed",
+      "title": "Admin jobs lease badge wasm-only"
+    },
+    {
+      "acceptance": "galaxy_horizon_s640_integration` + loc-audit + vision-sync `--check",
+      "deps": "§5.12 fallback",
+      "id": "PH-S649",
+      "open": false,
+      "row": 584,
+      "status": "closed",
+      "title": "Horizon close band S640–S648"
     }
   ],
   "sprint_queue_open_count": 0,

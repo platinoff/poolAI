@@ -1151,8 +1151,9 @@ fn admin_dashboard_format_iso_datetime_wasm_first_ph_s396() {
 #[test]
 fn admin_dashboard_wasm_glue_tests_ph_s398() {
     let dash = include_str!("dashboard.rs");
+    assert!(dash.contains("window.poolaiUiWasm.formatIsoDatetime"));
     assert!(dash.contains("formatAuditTimestamp"));
-    assert!(dash.contains("formatIsoDatetime"));
+    assert!(!dash.contains("toLocaleString()"));
     assert!(dash.contains("buildMonitoringActiveAlertsUrl"));
 }
 

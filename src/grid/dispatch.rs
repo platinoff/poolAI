@@ -192,6 +192,9 @@ pub fn ingest_job_prefetch_stub(
     record_prefetch_ingest();
     let inventory = coordinator_merged_seed_inventory();
     let config = PrefetchPolicyConfig::from_env();
+    if config.mode == PrefetchPolicyMode::StrictLocality {
+        record_prefetch_strict_mode();
+    }
     let plan = plan_prefetch(
         &inventory,
         required_shard_ids,

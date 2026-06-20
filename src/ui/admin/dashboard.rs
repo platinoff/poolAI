@@ -180,16 +180,7 @@ pub async fn admin_dashboard() -> Html<String> {
     }
 
     function formatAuditTimestamp(raw) {
-      const wasm = typeof window !== 'undefined' ? window.poolaiUiWasm : null;
-      if (wasm && typeof wasm.formatIsoDatetime === 'function') {
-        return wasm.formatIsoDatetime(raw == null ? '' : String(raw));
-      }
-      if (!raw) return '—';
-      try {
-        return new Date(raw).toLocaleString();
-      } catch (_) {
-        return String(raw);
-      }
+      return window.poolaiUiWasm.formatIsoDatetime(raw == null ? '' : String(raw));
     }
     
     function updateDashboardRefreshedAt() {

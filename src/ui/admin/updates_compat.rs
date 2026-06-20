@@ -150,38 +150,12 @@ pub async fn admin_updates_compat() -> Html<String> {
     );
 
     let script = r#"
-    function compatStatusLabelFallback(status) {
-      const key = String(status || '').toLowerCase();
-      const map = {
-        accepted: 'Accepted',
-        upgrade_required: 'Upgrade required',
-        unsupported: 'Unsupported',
-      };
-      return map[key] || '—';
-    }
-
-    function protocolVersionLabelFallback(raw) {
-      const v = String(raw || '').trim();
-      if (!v) return '—';
-      const core = v.split(/\s+/)[0] || v;
-      const part = core.split('-')[0] || core;
-      return part.includes('.') ? part : v;
-    }
-
     function compatStatusLabel(status) {
-      const wasm = window.poolaiUiWasm;
-      if (wasm && wasm.ready && typeof wasm.compatStatusLabel === 'function') {
-        return wasm.compatStatusLabel(String(status || ''));
-      }
-      return compatStatusLabelFallback(status);
+      return window.poolaiUiWasm.compatStatusLabel(String(status || ''));
     }
 
     function protocolVersionLabel(raw) {
-      const wasm = window.poolaiUiWasm;
-      if (wasm && wasm.ready && typeof wasm.protocolVersionLabel === 'function') {
-        return wasm.protocolVersionLabel(String(raw || ''));
-      }
-      return protocolVersionLabelFallback(raw);
+      return window.poolaiUiWasm.protocolVersionLabel(String(raw || ''));
     }
 
     function wireUpdatesCompatLabels() {
@@ -251,6 +225,7 @@ async fn admin_updates_compat_page_wires_poolai_ui_wasm_labels() {
     assert!(html.contains("/ui/wasm/poolai_ui_wasm.js"));
     assert!(html.contains("window.poolaiUiWasm"));
     assert!(html.contains("poolai-ui-wasm-ready"));
-    assert!(html.contains("compatStatusLabelFallback"));
+    assert!(html.contains("window.poolaiUiWasm.compatStatusLabel"));
+    assert!(!html.contains("compatStatusLabelFallback"));
     assert!(html.contains("protocolVersionLabel"));
 }

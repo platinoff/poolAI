@@ -109,19 +109,8 @@ pub async fn admin_jobs() -> Html<String> {
       );
     }
 
-    function leaseStateFallback(expiresAt) {
-      if (!expiresAt) return 'none';
-      const ts = Date.parse(String(expiresAt));
-      if (Number.isNaN(ts)) return 'none';
-      return Date.now() < ts ? 'active' : 'expired';
-    }
-
     function leaseStateKey(expiresAt) {
-      const wasm = window.poolaiUiWasm;
-      if (wasm && wasm.ready && typeof wasm.leaseStateLabel === 'function') {
-        return wasm.leaseStateLabel(String(expiresAt || ''), new Date().toISOString());
-      }
-      return leaseStateFallback(expiresAt);
+      return window.poolaiUiWasm.leaseStateLabel(String(expiresAt || ''), new Date().toISOString());
     }
 
     function leaseStateBadge(expiresAt) {
@@ -258,7 +247,8 @@ async fn admin_jobs_page_includes_store_badge_and_list() {
     assert!(html.contains("lease_epoch"));
     assert!(html.contains("leaseStateBadge"));
     assert!(html.contains("leaseStateKey"));
-    assert!(html.contains("leaseStateFallback"));
+    assert!(html.contains("leaseStateLabel"));
+    assert!(!html.contains("leaseStateFallback"));
     assert!(html.contains("poolai-ui-wasm-ready"));
     assert!(html.contains("leaseStateLabel"));
     assert!(html.contains("lease_expires_at"));
