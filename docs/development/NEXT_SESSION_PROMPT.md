@@ -1,8 +1,8 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-20 (master backlog **321** PH-S690…S1010 · active **PH-S690…S699** · vision **rev 268** · rust_ratio **94.73%** · Cursor **3.8.11** research ✅)
+**Оновлено:** 2026-06-20 (master backlog **321** · theme-aware slots · active **PH-S690…S699** · vision **rev 269** · rust_ratio **94.73%**)
 
-| **← наступний** | **`абракадабра`** (drain **10** активних → promote наступні 10 з master backlog) |
+| **← наступний** | **`абракадабра`** (drain band 4 PH-S690…S699) |
 | **Master backlog** | **321** pending — [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · FM **§5.14** |
 | **Активних §5.12** | **10** (PH-S690…S699, band 4) |
 | **Після band 4** | promote PH-S700…S709 (band 5) |
@@ -54,22 +54,26 @@ cd /s/rust/poolAI
 
 **Не в backlog:** FM-003 LAN · FM-041 Cloud SDK (BLOCKED/Deferred).
 
+**Band slot map:** slots 1–2 = theme (Galaxy JSON APIs / wasm / stand smoke / …); regen `bash scripts/generate-ph-s-master-backlog-351.sh`.
+
 ---
 
 ## Активна смуга (band 4 — drain зараз)
 
-| Sprint | Фокус |
-|--------|--------|
-| **PH-S690** | Galaxy replication metric HTTP wire |
-| **PH-S691** | Galaxy pricing metric HTTP wire |
-| **PH-S692** | Admin panel wasm glue |
-| **PH-S693** | Stand smoke /metrics export shape |
-| **PH-S694** | Galaxy concept helper stub |
-| **PH-S695** | loc-audit → `rust_ratio.json` |
-| **PH-S696** | INDEX canon sync |
-| **PH-S697** | `poolai-vision-sync --check` |
-| **PH-S698** | ratio advisory `--min-ratio 0.95` |
-| **PH-S699** | horizon close band + docs sync |
+| Sprint | Фокус | Acceptance |
+|--------|--------|------------|
+| **PH-S690** | `GET /api/v1/grid/replication-metrics` | Galaxy §6.4 · integration test |
+| **PH-S691** | `GET /api/v1/grid/pricing-metrics` | Galaxy §4.2 oracle snapshot · integration test |
+| **PH-S692** | Admin wasm glue (replication/pricing panels) | JSON metrics fetch / parsePrometheusGauge |
+| **PH-S693** | Stand smoke replication + pricing API | poolai-http-stand-smoke export shape |
+| **PH-S694** | Concept stub (replication/pricing depth) | unit test · Galaxy §4.2 / §6.4 |
+| **PH-S695** | loc-audit → `rust_ratio.json` | sprint zriz PH-S695 |
+| **PH-S696** | INDEX / HANDOFF / NEXT / STABLE / GALAXY sync | docs canon |
+| **PH-S697** | `poolai-vision-sync --check` | drift gate green |
+| **PH-S698** | ratio advisory | `--min-ratio 0.95 --advisory` |
+| **PH-S699** | `galaxy_horizon_s690_integration` | horizon close + docs |
+
+**Після band 4 promote:** PH-S700…S709 (band 5 — **Admin wasm slim**, slots 1–2 = wasm panels, не generic metric HTTP).
 
 ---
 

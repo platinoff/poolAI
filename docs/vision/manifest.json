@@ -8461,9 +8461,16 @@
       "label": "galaxy_horizon_s670_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s670_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s680_integration_rs",
+      "label": "galaxy_horizon_s680_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s680_integration.rs"
     }
   ],
-  "revision": 268,
+  "revision": 269,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -14082,8 +14089,8 @@
       "title": "Horizon close band S680–S688"
     },
     {
-      "acceptance": "scope integration test green",
-      "deps": "Galaxy replication/pricing band 4",
+      "acceptance": "GET /api/v1/grid/replication-metrics`; integration test",
+      "deps": "Galaxy §6.4 replication",
       "id": "PH-S690",
       "open": true,
       "row": 625,
@@ -14091,8 +14098,8 @@
       "title": "Galaxy replication metric HTTP wire"
     },
     {
-      "acceptance": "scope integration test green",
-      "deps": "Galaxy replication/pricing band 4",
+      "acceptance": "GET /api/v1/grid/pricing-metrics`; integration test",
+      "deps": "Galaxy §4.2 oracle snapshot",
       "id": "PH-S691",
       "open": true,
       "row": 626,
@@ -14100,8 +14107,8 @@
       "title": "Galaxy pricing metric HTTP wire"
     },
     {
-      "acceptance": "scope test green",
-      "deps": "poolai-ui-core + admin_charts.js",
+      "acceptance": "parsePrometheusGauge` or JSON metrics fetch; admin test",
+      "deps": "replication/pricing admin panels",
       "id": "PH-S692",
       "open": true,
       "row": 627,
@@ -14109,17 +14116,17 @@
       "title": "Admin panel wasm glue"
     },
     {
-      "acceptance": "scope test green",
+      "acceptance": "replication-metrics + pricing-metrics API shape",
       "deps": "poolai-http-stand-smoke",
       "id": "PH-S693",
       "open": true,
       "row": 628,
       "status": "open",
-      "title": "Stand smoke /metrics export shape"
+      "title": "Stand smoke replication/pricing API"
     },
     {
-      "acceptance": "unit test green",
-      "deps": "Galaxy §4–§8",
+      "acceptance": "replication/pricing depth stub + unit test",
+      "deps": "Galaxy §4.2 / §6.4",
       "id": "PH-S694",
       "open": true,
       "row": 629,

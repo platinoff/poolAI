@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-20 (PH-S680…S689 ✅ · **321** master backlog PH-S690…S1010 · active **10** · vision **rev 268** · rust_ratio **94.73%**)
+**Оновлено:** 2026-06-20 (PH-S680…S689 ✅ · **321** master backlog · active **10** · vision **rev 269** · rust_ratio **94.73%**)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -889,24 +889,24 @@ FM-xxx (з таблиці нижче)
 | 622 | **PH-S687** | poolai-vision-sync drift gate | ops | `poolai-vision-sync --check` green | **✅** |
 | 623 | **PH-S688** | Ratio hold advisory snapshot | PH-S351 pattern | `--min-ratio 0.95 --advisory` **94.73%** | **✅** |
 | 624 | **PH-S689** | Horizon close band S680–S688 | §5.12 fallback | `galaxy_horizon_s680_integration` + docs sync | **✅** |
-| 625 | **PH-S690** | Galaxy replication metric HTTP wire | Galaxy replication/pricing band 4 | scope integration test green | **[ ]** |
-| 626 | **PH-S691** | Galaxy pricing metric HTTP wire | Galaxy replication/pricing band 4 | scope integration test green | **[ ]** |
-| 627 | **PH-S692** | Admin panel wasm glue | poolai-ui-core + admin_charts.js | scope test green | **[ ]** |
-| 628 | **PH-S693** | Stand smoke /metrics export shape | poolai-http-stand-smoke | scope test green | **[ ]** |
-| 629 | **PH-S694** | Galaxy concept helper stub | Galaxy §4–§8 | unit test green | **[ ]** |
+| 625 | **PH-S690** | Galaxy replication metric HTTP wire | Galaxy §6.4 replication | `GET /api/v1/grid/replication-metrics`; integration test | **[ ]** |
+| 626 | **PH-S691** | Galaxy pricing metric HTTP wire | Galaxy §4.2 oracle snapshot | `GET /api/v1/grid/pricing-metrics`; integration test | **[ ]** |
+| 627 | **PH-S692** | Admin panel wasm glue | replication/pricing admin panels | `parsePrometheusGauge` or JSON metrics fetch; admin test | **[ ]** |
+| 628 | **PH-S693** | Stand smoke replication/pricing API | poolai-http-stand-smoke | replication-metrics + pricing-metrics API shape | **[ ]** |
+| 629 | **PH-S694** | Galaxy concept helper stub | Galaxy §4.2 / §6.4 | replication/pricing depth stub + unit test | **[ ]** |
 | 630 | **PH-S695** | Rust ratio loc-audit refresh | §5.13 fallback | `poolai-loc-audit` → `rust_ratio.json` sprint zriz | **[ ]** |
 | 631 | **PH-S696** | Docs INDEX canon sync | docs canon | INDEX + HANDOFF + NEXT + STABLE + GALAXY sync | **[ ]** |
 | 632 | **PH-S697** | poolai-vision-sync drift gate | ops | `poolai-vision-sync --check` green | **[ ]** |
 | 633 | **PH-S698** | Ratio hold advisory snapshot | PH-S351 pattern | `--min-ratio 0.95 --advisory` | **[ ]** |
 | 634 | **PH-S699** | Horizon close band S690–S698 | §5.12 fallback | `galaxy_horizon_s690_integration` + docs sync | **[ ]** |
 
-**Відкритих у §5.12:** **10** (PH-S690…S699). **Master backlog:** **321** pending PH-S690…S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · **§5.14**. Vision rev **268**. rust_ratio **94.73%**.
+**Відкритих у §5.12:** **10** (PH-S690…S699). **Master backlog:** **321** pending PH-S690…S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · **§5.14**. Vision rev **269**. rust_ratio **94.73%**.
 
 **Наступна сесія:** **`абракадабра`** — drain PH-S690…S699 → promote PH-S700…S709 з §5.14 → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.14 Master backlog PH-S660…S1010 (351 pending, 2026-06-20)
 
-**Призначення:** повний реєстр **351** спринта з project scan «що ще не зроблено» (concept, roadmaps, §5.3, wasm slim, ui-core blockers). **Не** дублювати в §5.12 — там max **10** `[ ]` активних.
+**Призначення:** повний реєстр **351** спринта з project scan «що ще не зроблено» (concept, roadmaps, §5.3, wasm slim, ui-core blockers). **Не** дублювати в §5.12 — там max **10** `[ ]` активних. **Slots 1–2 theme-aware** — regen [`generate-ph-s-master-backlog-351.sh`](../../scripts/generate-ph-s-master-backlog-351.sh).
 
 | Поле | Значення |
 |------|----------|

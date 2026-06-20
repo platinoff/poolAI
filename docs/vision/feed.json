@@ -8,7 +8,7 @@
       "next": true,
       "published": "2026-05-28",
       "status": "open",
-      "summary": "scope integration test green",
+      "summary": "GET /api/v1/grid/replication-metrics`; integration test",
       "title": "Galaxy replication metric HTTP wire"
     },
     {
@@ -17,7 +17,7 @@
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "scope integration test green",
+      "summary": "GET /api/v1/grid/pricing-metrics`; integration test",
       "title": "Galaxy pricing metric HTTP wire"
     },
     {
@@ -26,7 +26,7 @@
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "scope test green",
+      "summary": "parsePrometheusGauge` or JSON metrics fetch; admin test",
       "title": "Admin panel wasm glue"
     },
     {
@@ -35,8 +35,8 @@
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "scope test green",
-      "title": "Stand smoke /metrics export shape"
+      "summary": "replication-metrics + pricing-metrics API shape",
+      "title": "Stand smoke replication/pricing API"
     },
     {
       "category": "open",
@@ -44,7 +44,7 @@
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "unit test green",
+      "summary": "replication/pricing depth stub + unit test",
       "title": "Galaxy concept helper stub"
     },
     {
