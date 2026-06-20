@@ -19,6 +19,9 @@ pub struct PayoutBatchLedgerEntry {
     pub primary_dev_lamports: Option<u64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub secondary_admin_lamports: Option<u64>,
+    /// Worker/operator pool remainder after fee split (PH-S616, Galaxy §8.2).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub worker_lamports: Option<u64>,
     /// Resolved Solana wallet for offline batch payout (PH-S538, Galaxy §8.2).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub payout_pubkey: Option<String>,
@@ -36,6 +39,7 @@ impl PayoutBatchLedgerEntry {
             gross_lamports: None,
             primary_dev_lamports: None,
             secondary_admin_lamports: None,
+            worker_lamports: None,
             payout_pubkey: None,
             telegram_user_id: None,
         }

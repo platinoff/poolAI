@@ -72,6 +72,12 @@ pub const TRUST_DELTA_MATCH: i16 = 10;
 /// Trust delta on verification mismatch (0..=100 scale, PH-S456).
 pub const TRUST_DELTA_MISMATCH: i16 = -100;
 
+/// Trust delta on stale-epoch grid result CAS reject (Galaxy §6.5, PH-S610).
+pub const TRUST_DELTA_LEASE_EPOCH_REJECTED: i16 = -50;
+
+/// Trust delta when worker marked unhealthy after heartbeat streak (Galaxy §6.5, PH-S611).
+pub const TRUST_DELTA_WORKER_UNHEALTHY: i16 = -30;
+
 static PAYOUT_ELIGIBLE_TOTAL: AtomicU64 = AtomicU64::new(0);
 static PAYOUT_HELD_TOTAL: AtomicU64 = AtomicU64::new(0);
 static PAYOUT_NOT_APPLICABLE_TOTAL: AtomicU64 = AtomicU64::new(0);
@@ -169,6 +175,13 @@ pub fn evaluate_result_settlement_gate(
     verdict
 }
 
+/// Apply signed trust delta and record counter (PH-S456 / PH-S610 / PH-S611).
+pub fn apply_trust_delta(current: TrustScore, delta: i16) -> TrustScore {
+    TRUST_SCORE_DELTA_TOTAL.fetch_add(1, Ordering::Relaxed);
+    let adjusted = i16::from(current).saturating_add(delta);
+    clamp_trust_score(adjusted.max(0) as u16)
+}
+
 /// Apply verification verdict trust delta and record counter (PH-S456 stub).
 pub fn apply_verification_trust_delta(verdict: &str, current: TrustScore) -> TrustScore {
     let delta = if verdict.eq_ignore_ascii_case("match") {
@@ -178,9 +191,7 @@ pub fn apply_verification_trust_delta(verdict: &str, current: TrustScore) -> Tru
     } else {
         return current;
     };
-    TRUST_SCORE_DELTA_TOTAL.fetch_add(1, Ordering::Relaxed);
-    let adjusted = i16::from(current).saturating_add(delta);
-    clamp_trust_score(adjusted.max(0) as u16)
+    apply_trust_delta(current, delta)
 }
 
 pub fn trust_score_delta_total() -> u64 {

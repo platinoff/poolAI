@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-19 (PH-S600…S609 ✅ · vision **rev 260** · **0** відкритих · rust_ratio **TBD**)
+**Оновлено:** 2026-06-20 (PH-S610…S619 ✅ · vision **rev 261** · **0** відкритих · rust_ratio **94.72%**)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -809,8 +809,18 @@ FM-xxx (з таблиці нижче)
 | 542 | **PH-S607** | Fraud-proof hold grid envelope HTTP | Galaxy §6.6 | `POOLAI_GALAXY_FRAUD_PROOF=1` result mismatch → `galaxy_fraud_proof_pending_total` | **✅** |
 | 543 | **PH-S608** | Admin dashboard wasm-first formatters slim | RUST_RATIO §5.13 | remove JS `formatUptime` dup; wasm `formatPercent`/`formatMegabytes` glue | **✅** |
 | 544 | **PH-S609** | Horizon close band S600–S608 | §5.12 fallback | `galaxy_horizon_s600_integration` + loc-audit + vision-sync `--check` | **✅** |
+| 545 | **PH-S610** | Trust delta on stale-epoch grid result (−50) | Galaxy §6.5 | `lease_epoch_rejected` result path → `galaxy_trust_score_delta_total`; integration test | **✅** |
+| 546 | **PH-S611** | Trust delta on worker-unhealthy streak (−30) | Galaxy §6.5 + §4.3.3 | heartbeat miss threshold → trust store delta + metric | **✅** |
+| 547 | **PH-S612** | Hot-tier hit-ratio scheduling gate HTTP | Galaxy §5.4 | prefer `hot_tier_hit_ratio > 0.8` over zero-hit peer; `galaxy_hot_tier_gate_applied_total` | **✅** |
+| 548 | **PH-S613** | Re-migrate delta-fetch missing shards | Galaxy §5.5 | Migrating→Leased PATCH plans prefetch only for shards absent from memory | **✅** |
+| 549 | **PH-S614** | Prefetch order by shard access weight | Galaxy §5.5 + §5.3 | `POOLAI_GALAXY_SHARD_ACCESS_WEIGHTS` orders `plan_prefetch`; integration test | **✅** |
+| 550 | **PH-S615** | Replication hourly cap HTTP integration | Galaxy §6.6 | `replication_strict` over cap → `galaxy_replication_rate_limited_total` via HTTP | **✅** |
+| 551 | **PH-S616** | Primary/secondary/worker lamports payout-batch wire | Galaxy §8.2 | `GET /api/v1/grid/payout-batch` routing includes `worker_lamports` split | **✅** |
+| 552 | **PH-S617** | Checker-timeout grid result HTTP integration | Galaxy §6.2 PH-S542 | grid result `checker_timeout` retry→inconclusive; `/metrics` counters | **✅** |
+| 553 | **PH-S618** | Admin raid `formatBytes` wasm-first slim | RUST_RATIO §5.13 | `poolai-ui-core`/`poolai-ui-wasm` `formatBytes`; slim `raid.rs` JS dup | **✅** |
+| 554 | **PH-S619** | Horizon close band S610–S618 | §5.12 fallback | `galaxy_horizon_s610_integration` + loc-audit + vision-sync `--check` | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S600…S609 ✅. Vision rev **260**. rust_ratio **94.69%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S610…S619 ✅. Vision rev **261**. rust_ratio **94.72%**.
 
 **Наступна сесія:** **`абракадабра`** — project scan → +10 PH-S* → drain → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 

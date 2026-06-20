@@ -1,6 +1,8 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-19 (PH-S600…S609 ✅ · vision **rev 260** · **0** відкритих · rust_ratio **94.69%**)
+**Оновлено:** 2026-06-20 (PH-S610…S619 ✅ · vision **rev 261** · **0** відкритих · rust_ratio **94.72%**)
+
+**PH-S610…S619 ✅ (2026-06-20):** stale-epoch trust delta; worker-unhealthy trust delta; hot-tier scheduling gate; re-migrate delta-fetch; access-weight prefetch order; replication hourly cap HTTP; payout-batch worker lamports; checker-timeout HTTP; raid formatBytes wasm; `galaxy_horizon_s610_integration`.
 
 **PH-S600…S609 ✅ (2026-06-19):** strict-locality HTTP 409; semantic_hash human-review; wallet rebind cooldown; p95 tail-latency penalty; topology/white-IP prefetch admission; RAID prefetch HTTP; re-migrate PATCH; fraud-proof HTTP; dashboard wasm slim; `galaxy_horizon_s600_integration`.
 

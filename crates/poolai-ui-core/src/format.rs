@@ -69,6 +69,19 @@ pub fn format_megabytes(value: f64) -> String {
     format!("{:.0} MB", value)
 }
 
+/// Human-readable byte size for RAID artifact tables (PH-S618 wasm glue).
+pub fn format_bytes(bytes: u64) -> String {
+    if bytes == 0 {
+        return "0 B".to_string();
+    }
+    const K: f64 = 1024.0;
+    const SIZES: [&str; 5] = ["B", "KB", "MB", "GB", "TB"];
+    let bytes_f = bytes as f64;
+    let i = (bytes_f.log(K).floor() as usize).min(SIZES.len() - 1);
+    let scaled = bytes_f / K.powi(i as i32);
+    format!("{:.2} {}", scaled, SIZES[i])
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -129,5 +142,12 @@ mod tests {
     fn format_megabytes_ph_s428() {
         assert_eq!(format_megabytes(1024.6), "1025 MB");
         assert_eq!(format_megabytes(0.0), "0 MB");
+    }
+
+    #[test]
+    fn format_bytes_ph_s618() {
+        assert_eq!(format_bytes(0), "0 B");
+        assert_eq!(format_bytes(1024), "1.00 KB");
+        assert_eq!(format_bytes(1_500_000), "1.43 MB");
     }
 }

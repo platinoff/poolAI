@@ -2016,7 +2016,7 @@
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S609",
+  "last_sprint_closed": "PH-S619",
   "layers": [
     {
       "id": "L0",
@@ -8385,9 +8385,16 @@
       "label": "galaxy_horizon_s591_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s591_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s600_integration_rs",
+      "label": "galaxy_horizon_s600_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s600_integration.rs"
     }
   ],
-  "revision": 260,
+  "revision": 261,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -13284,6 +13291,96 @@
       "row": 544,
       "status": "closed",
       "title": "Horizon close band S600–S608"
+    },
+    {
+      "acceptance": "lease_epoch_rejected` result path → `galaxy_trust_score_delta_total`; integration test",
+      "deps": "Galaxy §6.5",
+      "id": "PH-S610",
+      "open": false,
+      "row": 545,
+      "status": "closed",
+      "title": "Trust delta on stale-epoch grid result (−50)"
+    },
+    {
+      "acceptance": "heartbeat miss threshold → trust store delta + metric",
+      "deps": "Galaxy §6.5 + §4.3.3",
+      "id": "PH-S611",
+      "open": false,
+      "row": 546,
+      "status": "closed",
+      "title": "Trust delta on worker-unhealthy streak (−30)"
+    },
+    {
+      "acceptance": "prefer `hot_tier_hit_ratio > 0.8` over zero-hit peer; `galaxy_hot_tier_gate_applied_total",
+      "deps": "Galaxy §5.4",
+      "id": "PH-S612",
+      "open": false,
+      "row": 547,
+      "status": "closed",
+      "title": "Hot-tier hit-ratio scheduling gate HTTP"
+    },
+    {
+      "acceptance": "Migrating→Leased PATCH plans prefetch only for shards absent from memory",
+      "deps": "Galaxy §5.5",
+      "id": "PH-S613",
+      "open": false,
+      "row": 548,
+      "status": "closed",
+      "title": "Re-migrate delta-fetch missing shards"
+    },
+    {
+      "acceptance": "POOLAI_GALAXY_SHARD_ACCESS_WEIGHTS` orders `plan_prefetch`; integration test",
+      "deps": "Galaxy §5.5 + §5.3",
+      "id": "PH-S614",
+      "open": false,
+      "row": 549,
+      "status": "closed",
+      "title": "Prefetch order by shard access weight"
+    },
+    {
+      "acceptance": "replication_strict` over cap → `galaxy_replication_rate_limited_total` via HTTP",
+      "deps": "Galaxy §6.6",
+      "id": "PH-S615",
+      "open": false,
+      "row": 550,
+      "status": "closed",
+      "title": "Replication hourly cap HTTP integration"
+    },
+    {
+      "acceptance": "GET /api/v1/grid/payout-batch` routing includes `worker_lamports` split",
+      "deps": "Galaxy §8.2",
+      "id": "PH-S616",
+      "open": false,
+      "row": 551,
+      "status": "closed",
+      "title": "Primary/secondary/worker lamports payout-batch wire"
+    },
+    {
+      "acceptance": "grid result `checker_timeout` retry→inconclusive; `/metrics` counters",
+      "deps": "Galaxy §6.2 PH-S542",
+      "id": "PH-S617",
+      "open": false,
+      "row": 552,
+      "status": "closed",
+      "title": "Checker-timeout grid result HTTP integration"
+    },
+    {
+      "acceptance": "poolai-ui-core`/`poolai-ui-wasm` `formatBytes`; slim `raid.rs` JS dup",
+      "deps": "RUST_RATIO §5.13",
+      "id": "PH-S618",
+      "open": false,
+      "row": 553,
+      "status": "closed",
+      "title": "Admin raid `formatBytes` wasm-first slim"
+    },
+    {
+      "acceptance": "galaxy_horizon_s610_integration` + loc-audit + vision-sync `--check",
+      "deps": "§5.12 fallback",
+      "id": "PH-S619",
+      "open": false,
+      "row": 554,
+      "status": "closed",
+      "title": "Horizon close band S610–S618"
     }
   ],
   "sprint_queue_open_count": 0,

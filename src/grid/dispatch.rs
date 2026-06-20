@@ -20,7 +20,8 @@ use crate::grid::galaxy_fee_split::{
 use crate::grid::galaxy_fee_split_metrics::evaluate_result_fee_split;
 use crate::grid::galaxy_fraud_proof::{evaluate_fraud_proof_hold, record_fraud_proof_pending};
 use crate::grid::galaxy_locality::{
-    observe_last_cross_region_egress_mb, pick_best_worker_by_locality,
+    observe_last_cross_region_egress_mb, observe_last_hot_tier_hit_ratio,
+    pick_best_worker_by_locality, pick_best_worker_by_locality_with_hot_tier_gate,
     record_locality_rank_empty_workers, record_locality_rank_ingest, record_locality_rank_miss,
     record_locality_rank_skip, LocalityHotTier, LocalityNetworkProfile, LocalitySeedInventory,
     LocalityTask, LocalityWorker, DEFAULT_PREFETCH_CROSS_REGION_EGRESS_MB_PER_SHARD,
@@ -63,7 +64,9 @@ use crate::grid::galaxy_trust_score::{
     apply_verification_trust_delta, clamp_trust_score, evaluate_result_settlement_gate,
     SettlementGateVerdict, TrustScore, TrustScoreGateConfig,
 };
-use crate::grid::galaxy_trust_score_store::persist_peer_trust_score;
+use crate::grid::galaxy_trust_score_store::{
+    apply_lease_epoch_rejected_trust_delta, persist_peer_trust_score,
+};
 use crate::grid::galaxy_verification_checker_jobs::submit_shadow_verification_checker_job;
 use crate::grid::galaxy_verification_metrics::{
     drain_verification_checker_task, enqueue_verification_checker_task,
@@ -264,11 +267,21 @@ pub fn lease_acquire_prefetch_stub() -> usize {
     complete_prefetch_hook(&plan, None)
 }
 
-/// Re-migrate prefetch stub on Migrating→Leased handoff (PH-S454; no enqueue wire).
+/// Re-migrate prefetch stub on Migrating→Leased handoff (PH-S454; PH-S613 delta-fetch missing shards).
 pub fn re_migrate_prefetch_stub(memory: Option<&MemoryShardStore>) -> usize {
     let inventory = coordinator_merged_seed_inventory();
     let config = PrefetchPolicyConfig::from_env();
-    let shard_ids: Vec<String> = inventory.shard_ids.iter().take(1).cloned().collect();
+    let shard_ids: Vec<String> = inventory
+        .shard_ids
+        .iter()
+        .filter(|shard_id| {
+            memory
+                .and_then(|store| store.get(shard_id).ok().flatten())
+                .is_none()
+        })
+        .take(4)
+        .cloned()
+        .collect();
     if shard_ids.is_empty() {
         return 0;
     }
@@ -340,7 +353,7 @@ pub fn ingest_job_locality_rank_stub(
         estimated_cross_region_egress_mb: 0.0,
         source_region: None,
     };
-    pick_best_worker_by_locality(&workers, &task)
+    pick_best_worker_by_locality_with_hot_tier_gate(&workers, &task)
         .map(|w| {
             record_locality_rank_ingest();
             w.worker_id.clone()
@@ -569,6 +582,34 @@ pub fn hot_hit(inventory: &SeedInventoryEntry, shard_id: &str) -> bool {
         && (inventory.hot_tier.ram_bytes_used > 0 || inventory.hot_tier.vram_bytes_used > 0)
 }
 
+/// Env: JSON map shard_id → access weight for prefetch ordering (Galaxy §5.5, PH-S614).
+pub const ENV_SHARD_ACCESS_WEIGHTS: &str = "POOLAI_GALAXY_SHARD_ACCESS_WEIGHTS";
+
+fn shard_access_weight(shard_id: &str) -> u64 {
+    shard_access_weights_from_env()
+        .get(shard_id)
+        .copied()
+        .unwrap_or(0)
+}
+
+fn shard_access_weights_from_env() -> std::collections::HashMap<String, u64> {
+    std::env::var(ENV_SHARD_ACCESS_WEIGHTS)
+        .ok()
+        .and_then(|raw| serde_json::from_str(&raw).ok())
+        .unwrap_or_default()
+}
+
+/// Order required shards by descending access weight (PH-S614).
+pub fn order_shards_by_access_weight(shard_ids: &[String]) -> Vec<String> {
+    let mut ordered = shard_ids.to_vec();
+    ordered.sort_by(|a, b| {
+        shard_access_weight(b)
+            .cmp(&shard_access_weight(a))
+            .then_with(|| a.cmp(b))
+    });
+    ordered
+}
+
 /// Task-driven prefetch plan: skip shards already hot; pick RAM/VRAM tier from capabilities.
 pub fn plan_prefetch(
     inventory: &SeedInventoryEntry,
@@ -577,12 +618,13 @@ pub fn plan_prefetch(
     gpu_capable: bool,
     config: &PrefetchPolicyConfig,
 ) -> PrefetchPlan {
+    let ordered = order_shards_by_access_weight(required_shard_ids);
     let target_tier = if gpu_capable {
         PrefetchTargetTier::Vram
     } else {
         PrefetchTargetTier::Ram
     };
-    let items: Vec<PrefetchPlanItem> = required_shard_ids
+    let items: Vec<PrefetchPlanItem> = ordered
         .iter()
         .filter(|shard_id| !hot_hit(inventory, shard_id))
         .map(|shard_id| PrefetchPlanItem {
@@ -1081,6 +1123,9 @@ fn ingest_result(
             body.lease_epoch,
             Some(409),
         );
+        if let Some(peer_id) = source_peer_id {
+            apply_lease_epoch_rejected_trust_delta(peer_id);
+        }
         return Err(AppError::RestError {
             code: "lease_epoch_rejected",
             message: format!(
@@ -1206,6 +1251,7 @@ fn build_payout_batch_entry(
         gross_lamports: None,
         primary_dev_lamports: None,
         secondary_admin_lamports: None,
+        worker_lamports: None,
         payout_pubkey: resolve_payout_pubkey(telegram_user_id.as_deref()),
         telegram_user_id,
     };
@@ -1222,6 +1268,7 @@ fn build_payout_batch_entry(
                     entry.gross_lamports = Some(gross_lamports);
                     entry.primary_dev_lamports = Some(split.primary_dev_lamports);
                     entry.secondary_admin_lamports = Some(split.secondary_admin_lamports);
+                    entry.worker_lamports = Some(split.worker_or_operator_pool_lamports);
                 }
             }
         }

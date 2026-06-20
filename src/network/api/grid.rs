@@ -145,6 +145,8 @@ struct PayoutRoutingSnapshot {
     #[serde(skip_serializing_if = "Option::is_none")]
     secondary_admin_lamports: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    worker_lamports: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     payout_pubkey: Option<String>,
 }
 
@@ -168,6 +170,7 @@ fn payout_routing_snapshot(
         settlement_mode: mode.to_string(),
         primary_dev_lamports: entry.primary_dev_lamports,
         secondary_admin_lamports: entry.secondary_admin_lamports,
+        worker_lamports: entry.worker_lamports,
         payout_pubkey: entry.payout_pubkey.clone(),
     }
 }

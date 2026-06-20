@@ -279,7 +279,11 @@ pub async fn admin_raid() -> Html<String> {
                 <tr>
                   <td><code>${escapeHtml(String(aid))}</code></td>
                   <td>${escapeHtml(a.name || 'unnamed')}</td>
-                  <td>${escapeHtml(formatBytes(a.size || 0))}</td>
+                  <td>${escapeHtml(
+                    (typeof window !== 'undefined' && window.poolaiUiWasm && typeof window.poolaiUiWasm.formatBytes === 'function')
+                      ? window.poolaiUiWasm.formatBytes(a.size || 0)
+                      : formatBytes(a.size || 0)
+                  )}</td>
                   <td>
                     <button type="button" class="btn btn-danger" onclick='deleteArtifact(${JSON.stringify(aid)})'>${escapeHtml(T('ui.delete', 'Delete'))}</button>
                   </td>

@@ -56,6 +56,7 @@ pub fn on_heartbeat_miss(peer_id: &str) -> bool {
     let mut unhealthy = UNHEALTHY_PEERS.lock().unwrap_or_else(|e| e.into_inner());
     if unhealthy.insert(peer_id.to_string(), true).is_none() {
         record_worker_unhealthy();
+        crate::grid::galaxy_trust_score_store::apply_worker_unhealthy_trust_delta(peer_id);
         return true;
     }
     false

@@ -5,7 +5,10 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::{Mutex, OnceLock};
 
-use crate::grid::galaxy_trust_score::TrustScore;
+use crate::grid::galaxy_trust_score::{
+    apply_trust_delta, TrustScore, DEFAULT_TRUST_SCORE, TRUST_DELTA_LEASE_EPOCH_REJECTED,
+    TRUST_DELTA_WORKER_UNHEALTHY,
+};
 
 fn trust_map() -> &'static Mutex<HashMap<String, TrustScore>> {
     static TRUST_BY_PEER: OnceLock<Mutex<HashMap<String, TrustScore>>> = OnceLock::new();
@@ -76,6 +79,28 @@ pub fn hydrate_register_metadata_trust_score(
             metadata.insert("trust_score".to_string(), score.to_string());
         }
     }
+}
+
+/// Apply trust delta to stored peer score (or default) and persist (PH-S610 / PH-S611).
+pub fn apply_peer_trust_delta(peer_id: &str, delta: i16) -> TrustScore {
+    let peer = peer_id.trim();
+    if peer.is_empty() {
+        return DEFAULT_TRUST_SCORE;
+    }
+    let current = lookup_peer_trust_score(peer).unwrap_or(DEFAULT_TRUST_SCORE);
+    let adjusted = apply_trust_delta(current, delta);
+    persist_peer_trust_score(peer, adjusted);
+    adjusted
+}
+
+/// Trust delta on stale-epoch grid result reject (PH-S610).
+pub fn apply_lease_epoch_rejected_trust_delta(peer_id: &str) -> TrustScore {
+    apply_peer_trust_delta(peer_id, TRUST_DELTA_LEASE_EPOCH_REJECTED)
+}
+
+/// Trust delta when worker newly marked unhealthy (PH-S611).
+pub fn apply_worker_unhealthy_trust_delta(peer_id: &str) -> TrustScore {
+    apply_peer_trust_delta(peer_id, TRUST_DELTA_WORKER_UNHEALTHY)
 }
 
 /// Lookup stored trust score for a peer (tests / admin).

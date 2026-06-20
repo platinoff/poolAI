@@ -490,6 +490,54 @@ pub fn pick_best_worker_by_locality<'a>(
     workers.iter().find(|w| w.worker_id == best_id)
 }
 
+/// Minimum hot tier hit ratio for scheduling gate over zero-hit peers (Galaxy §5.4, PH-S612).
+pub const HOT_TIER_SCHEDULE_GATE_MIN: f64 = 0.8;
+
+/// Hot-tier scheduling gate applications (PH-S612).
+pub const METRIC_HOT_TIER_GATE_APPLIED_TOTAL: &str = "galaxy_hot_tier_gate_applied_total";
+
+static HOT_TIER_GATE_APPLIED_TOTAL: AtomicU64 = AtomicU64::new(0);
+
+pub fn record_hot_tier_gate_applied() {
+    HOT_TIER_GATE_APPLIED_TOTAL.fetch_add(1, Ordering::Relaxed);
+}
+
+pub fn hot_tier_gate_applied_total() -> u64 {
+    HOT_TIER_GATE_APPLIED_TOTAL.load(Ordering::Relaxed)
+}
+
+#[cfg(any(test, feature = "test-utils"))]
+pub fn reset_hot_tier_gate_metrics_for_test() {
+    HOT_TIER_GATE_APPLIED_TOTAL.store(0, Ordering::Relaxed);
+}
+
+/// Prefer workers with hot tier hit ratio above gate when cold peers exist (PH-S612).
+pub fn pick_best_worker_by_locality_with_hot_tier_gate<'a>(
+    workers: &'a [LocalityWorker],
+    task: &LocalityTask,
+) -> Option<&'a LocalityWorker> {
+    if task.required_shard_ids.is_empty() || workers.len() < 2 {
+        return pick_best_worker_by_locality(workers, task);
+    }
+    let has_cold = workers
+        .iter()
+        .any(|w| hot_tier_hit_ratio(&w.seed_inventory, task) <= f64::EPSILON);
+    if !has_cold {
+        return pick_best_worker_by_locality(workers, task);
+    }
+    let hot_workers: Vec<LocalityWorker> = workers
+        .iter()
+        .filter(|w| hot_tier_hit_ratio(&w.seed_inventory, task) > HOT_TIER_SCHEDULE_GATE_MIN)
+        .cloned()
+        .collect();
+    if hot_workers.is_empty() || hot_workers.len() >= workers.len() {
+        return pick_best_worker_by_locality(workers, task);
+    }
+    record_hot_tier_gate_applied();
+    let best = pick_best_worker_by_locality(&hot_workers, task)?;
+    workers.iter().find(|w| w.worker_id == best.worker_id)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

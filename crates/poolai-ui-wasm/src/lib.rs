@@ -6,7 +6,8 @@ use chrono::{DateTime, Utc};
 use poolai_ui_core::admin_dom::{admin_inline_error_html, admin_loading_html};
 use poolai_ui_core::api_error::{api_error_detail_from_body, format_fetch_error};
 use poolai_ui_core::format::{
-    alert_severity_badge_class, escape_html, format_megabytes, format_percent, format_uptime,
+    alert_severity_badge_class, escape_html, format_bytes, format_megabytes, format_percent,
+    format_uptime,
 };
 use poolai_ui_core::galaxy_telegram_seats::render_telegram_seats_panel_html;
 use poolai_ui_core::galaxy_virtual_nodes::render_galaxy_virtual_nodes_panel_html;
@@ -27,6 +28,7 @@ use poolai_ui_core::ml::{
     render_monitoring_alerts_panel_html, render_monitoring_dashboards_panel_html,
     render_sparkline_html, sanitize_chart_id,
 };
+use poolai_ui_core::modal::{admin_dynamic_modal_html, trap_tab_action, MODAL_FOCUSABLE_SELECTOR};
 use poolai_ui_core::payout_batch::render_payout_batch_panel_html;
 use poolai_ui_core::pricing::{format_unix_secs, format_usd_micro};
 use poolai_ui_core::table::{
@@ -663,6 +665,11 @@ pub fn format_percent_wasm(value: f64) -> String {
 #[wasm_bindgen(js_name = formatMegabytes)]
 pub fn format_megabytes_wasm(value: f64) -> String {
     format_megabytes(value)
+}
+
+#[wasm_bindgen(js_name = formatBytes)]
+pub fn format_bytes_wasm(bytes: u64) -> String {
+    format_bytes(bytes)
 }
 
 #[wasm_bindgen(js_name = alertSeverityBadgeClass)]

@@ -28,14 +28,14 @@ use crate::grid::galaxy_governance_metrics::{
     METRIC_RELEASE_VERIFY_FAIL_TOTAL, METRIC_RELEASE_VERIFY_TOTAL, METRIC_UPDATE_NOTIFY_PENDING,
 };
 use crate::grid::galaxy_locality::{
-    last_cross_region_egress_mb, last_hot_tier_hit_ratio_bps, last_shard_local_hit_ratio_bps,
-    locality_rank_empty_workers_total, locality_rank_ingest_total, locality_rank_miss_total,
-    locality_rank_skip_total, network_profile_stale_total, tail_latency_penalty_total,
-    METRIC_CROSS_REGION_EGRESS_MB, METRIC_HOT_TIER_HIT_RATIO,
-    METRIC_LOCALITY_RANK_EMPTY_WORKERS_TOTAL, METRIC_LOCALITY_RANK_INGEST_TOTAL,
-    METRIC_LOCALITY_RANK_MISS_TOTAL, METRIC_LOCALITY_RANK_SKIP_TOTAL,
-    METRIC_NETWORK_PROFILE_STALE_TOTAL, METRIC_SHARD_LOCAL_HIT_RATIO,
-    METRIC_TAIL_LATENCY_PENALTY_TOTAL,
+    hot_tier_gate_applied_total, last_cross_region_egress_mb, last_hot_tier_hit_ratio_bps,
+    last_shard_local_hit_ratio_bps, locality_rank_empty_workers_total, locality_rank_ingest_total,
+    locality_rank_miss_total, locality_rank_skip_total, network_profile_stale_total,
+    tail_latency_penalty_total, METRIC_CROSS_REGION_EGRESS_MB, METRIC_HOT_TIER_GATE_APPLIED_TOTAL,
+    METRIC_HOT_TIER_HIT_RATIO, METRIC_LOCALITY_RANK_EMPTY_WORKERS_TOTAL,
+    METRIC_LOCALITY_RANK_INGEST_TOTAL, METRIC_LOCALITY_RANK_MISS_TOTAL,
+    METRIC_LOCALITY_RANK_SKIP_TOTAL, METRIC_NETWORK_PROFILE_STALE_TOTAL,
+    METRIC_SHARD_LOCAL_HIT_RATIO, METRIC_TAIL_LATENCY_PENALTY_TOTAL,
 };
 use crate::grid::galaxy_prefetch_metrics::{
     hot_evict_total, hot_promote_total, locality_unsatisfied_total, prefetch_backpressure_total,
@@ -169,6 +169,7 @@ pub struct PoolAiPrometheus {
     galaxy_trust_score_delta_total: IntGauge,
     galaxy_shard_local_hit_ratio: IntGauge,
     galaxy_hot_tier_hit_ratio: IntGauge,
+    galaxy_hot_tier_gate_applied_total: IntGauge,
     galaxy_cross_region_egress_mb: IntGauge,
     galaxy_prefetch_plan_total: IntGauge,
     galaxy_prefetch_planned_shards_total: IntGauge,
@@ -549,6 +550,15 @@ fn build_prometheus() -> PoolAiPrometheus {
     registry
         .register(Box::new(galaxy_hot_tier_hit_ratio.clone()))
         .expect("register galaxy_hot_tier_hit_ratio");
+
+    let galaxy_hot_tier_gate_applied_total = IntGauge::with_opts(Opts::new(
+        METRIC_HOT_TIER_GATE_APPLIED_TOTAL,
+        "Galaxy hot-tier scheduling gate applications over zero-hit peers (PH-S612)",
+    ))
+    .expect(METRIC_HOT_TIER_GATE_APPLIED_TOTAL);
+    registry
+        .register(Box::new(galaxy_hot_tier_gate_applied_total.clone()))
+        .expect("register galaxy_hot_tier_gate_applied_total");
 
     let galaxy_cross_region_egress_mb = IntGauge::with_opts(Opts::new(
         METRIC_CROSS_REGION_EGRESS_MB,
@@ -1286,6 +1296,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_trust_score_delta_total,
         galaxy_shard_local_hit_ratio,
         galaxy_hot_tier_hit_ratio,
+        galaxy_hot_tier_gate_applied_total,
         galaxy_cross_region_egress_mb,
         galaxy_prefetch_plan_total,
         galaxy_prefetch_planned_shards_total,
@@ -1419,6 +1430,8 @@ pub fn refresh_galaxy_locality_gauges() {
         .set(last_shard_local_hit_ratio_bps() as i64);
     prom.galaxy_hot_tier_hit_ratio
         .set(last_hot_tier_hit_ratio_bps() as i64);
+    prom.galaxy_hot_tier_gate_applied_total
+        .set(hot_tier_gate_applied_total() as i64);
     prom.galaxy_cross_region_egress_mb
         .set(last_cross_region_egress_mb() as i64);
     prom.galaxy_locality_rank_ingest_total
