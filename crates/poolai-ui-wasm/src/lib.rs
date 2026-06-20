@@ -6,8 +6,9 @@ use chrono::{DateTime, Utc};
 use poolai_ui_core::admin_dom::{admin_inline_error_html, admin_loading_html};
 use poolai_ui_core::api_error::{api_error_detail_from_body, format_fetch_error};
 use poolai_ui_core::format::{
-    alert_severity_badge_class, escape_html, format_bytes, format_megabytes, format_percent,
-    format_rotation_kind, format_unix_timestamp_display, format_uptime,
+    alert_severity_badge_class, escape_html, format_bytes, format_latency_ms, format_load_fraction,
+    format_megabytes, format_percent, format_rotation_kind, format_topology_timestamp,
+    format_unix_timestamp_display, format_uptime,
 };
 use poolai_ui_core::galaxy_telegram_seats::render_telegram_seats_panel_html;
 use poolai_ui_core::galaxy_virtual_nodes::render_galaxy_virtual_nodes_panel_html;
@@ -682,6 +683,24 @@ pub fn format_unix_timestamp_wasm(secs: i64, never_label: &str) -> String {
 #[wasm_bindgen(js_name = formatRotationKind)]
 pub fn format_rotation_kind_wasm(kind: &str) -> String {
     format_rotation_kind(kind)
+}
+
+/// Topology admin: ISO timestamp display (PH-S636).
+#[wasm_bindgen(js_name = formatTopologyTimestamp)]
+pub fn format_topology_timestamp_wasm(iso: &str) -> String {
+    format_topology_timestamp(empty_as_none(iso))
+}
+
+/// Topology admin: load fraction percent label (PH-S636).
+#[wasm_bindgen(js_name = formatLoadFraction)]
+pub fn format_load_fraction_wasm(x: f64) -> String {
+    format_load_fraction(x)
+}
+
+/// Topology admin: latency ms label (PH-S636).
+#[wasm_bindgen(js_name = formatLatencyMs)]
+pub fn format_latency_ms_wasm(latency: f64) -> String {
+    format_latency_ms(latency)
 }
 
 #[wasm_bindgen(js_name = alertSeverityBadgeClass)]

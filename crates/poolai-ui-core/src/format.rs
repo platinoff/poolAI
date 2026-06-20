@@ -103,6 +103,36 @@ pub fn format_rotation_kind(kind: &str) -> String {
     }
 }
 
+/// Topology admin: ISO/RFC3339 timestamp cell (PH-S636 wasm glue).
+pub fn format_topology_timestamp(iso: Option<&str>) -> String {
+    let Some(s) = iso.map(str::trim).filter(|t| !t.is_empty()) else {
+        return "-".to_string();
+    };
+    if let Ok(dt) = DateTime::parse_from_rfc3339(s) {
+        return dt
+            .with_timezone(&Utc)
+            .format("%Y-%m-%d %H:%M:%S UTC")
+            .to_string();
+    }
+    "-".to_string()
+}
+
+/// Topology admin: fractional load → percent label (PH-S636 wasm glue).
+pub fn format_load_fraction(x: f64) -> String {
+    if !x.is_finite() {
+        return "-".to_string();
+    }
+    format!("{:.1}%", x * 100.0)
+}
+
+/// Topology admin: latency milliseconds label (PH-S636 wasm glue).
+pub fn format_latency_ms(latency: f64) -> String {
+    if !latency.is_finite() {
+        return format!("{latency} ms");
+    }
+    format!("{latency:.2} ms")
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -185,5 +215,26 @@ mod tests {
     fn format_rotation_kind_ph_s628() {
         assert_eq!(format_rotation_kind("jwt"), "JWT signing secret");
         assert_eq!(format_rotation_kind("custom"), "custom");
+    }
+
+    #[test]
+    fn format_topology_timestamp_ph_s636() {
+        assert_eq!(format_topology_timestamp(None), "-");
+        assert_eq!(
+            format_topology_timestamp(Some("2026-06-20T12:34:56Z")),
+            "2026-06-20 12:34:56 UTC"
+        );
+    }
+
+    #[test]
+    fn format_load_fraction_ph_s636() {
+        assert_eq!(format_load_fraction(0.5), "50.0%");
+        assert_eq!(format_load_fraction(f64::NAN), "-");
+    }
+
+    #[test]
+    fn format_latency_ms_ph_s636() {
+        assert_eq!(format_latency_ms(12.345), "12.35 ms");
+        assert_eq!(format_latency_ms(f64::NAN), "NaN ms");
     }
 }

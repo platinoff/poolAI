@@ -2016,7 +2016,7 @@
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S629",
+  "last_sprint_closed": "PH-S639",
   "layers": [
     {
       "id": "L0",
@@ -8399,9 +8399,16 @@
       "label": "galaxy_horizon_s610_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s610_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s620_integration_rs",
+      "label": "galaxy_horizon_s620_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s620_integration.rs"
     }
   ],
-  "revision": 262,
+  "revision": 263,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -13478,6 +13485,96 @@
       "row": 564,
       "status": "closed",
       "title": "Horizon close band S620–S628"
+    },
+    {
+      "acceptance": "grid result `verification_verdict:mismatch` adjusts stored `trust_score` (−100) + `galaxy_trust_score_delta_total`; integration test",
+      "deps": "Galaxy §6.5 / §6.2",
+      "id": "PH-S630",
+      "open": false,
+      "row": 565,
+      "status": "closed",
+      "title": "Verification mismatch trust delta → persist store"
+    },
+    {
+      "acceptance": "grid Cleared result → `galaxy_settlement_payout_batch_total` on `/metrics`; integration test",
+      "deps": "Galaxy §8.2 / PH-S427",
+      "id": "PH-S631",
+      "open": false,
+      "row": 566,
+      "status": "closed",
+      "title": "Cleared settlement payout-batch HTTP wire"
+    },
+    {
+      "acceptance": "grid job ingest + hot-tier skip fallback drives `galaxy_prefetch_seed_pull_total`; integration test",
+      "deps": "Galaxy §5.5 / roadmap §4",
+      "id": "PH-S632",
+      "open": false,
+      "row": 567,
+      "status": "closed",
+      "title": "Prefetch seed-pull complete hook HTTP"
+    },
+    {
+      "acceptance": "grid job ingest → `galaxy_replication_executor_enqueue_total` on `/metrics`; integration test",
+      "deps": "Galaxy §6.4 / PH-S435",
+      "id": "PH-S633",
+      "open": false,
+      "row": 568,
+      "status": "closed",
+      "title": "Replication executor enqueue HTTP"
+    },
+    {
+      "acceptance": "grid result `verification_verdict:mismatch` → `galaxy_replay_verification_enqueue_total`; integration test",
+      "deps": "Galaxy §6.3 / PH-S438",
+      "id": "PH-S634",
+      "open": false,
+      "row": 569,
+      "status": "closed",
+      "title": "Replay verification enqueue on mismatch HTTP"
+    },
+    {
+      "acceptance": "consecutive `POST /discovery/heartbeat-remote` misses → `galaxy_worker_unhealthy_total`; integration test",
+      "deps": "Galaxy §4.3.3 / PH-S522",
+      "id": "PH-S635",
+      "open": false,
+      "row": 570,
+      "status": "closed",
+      "title": "Worker-unhealthy heartbeat-remote HTTP"
+    },
+    {
+      "acceptance": "formatTopologyTimestamp` / `formatLoadFraction` / `formatLatencyMs` wasm-only; slim `topology.rs",
+      "deps": "RUST_RATIO §5.13",
+      "id": "PH-S636",
+      "open": false,
+      "row": 571,
+      "status": "closed",
+      "title": "Admin topology formatters → ui-core/wasm"
+    },
+    {
+      "acceptance": "remove JS fallback paths in `security.rs`; wasm-only glue",
+      "deps": "RUST_RATIO §5.13 / PH-S628",
+      "id": "PH-S637",
+      "open": false,
+      "row": 572,
+      "status": "closed",
+      "title": "Admin security datetime wasm-only slim"
+    },
+    {
+      "acceptance": "drop `formatUsdMicroFallback` in `grid_pricing.rs`; wasm-only USD/time formatters",
+      "deps": "RUST_RATIO §5.13 / PH-S151",
+      "id": "PH-S638",
+      "open": false,
+      "row": 573,
+      "status": "closed",
+      "title": "Admin grid-pricing formatters wasm-only"
+    },
+    {
+      "acceptance": "galaxy_horizon_s630_integration` + loc-audit + vision-sync `--check",
+      "deps": "§5.12 fallback / roadmap §4",
+      "id": "PH-S639",
+      "open": false,
+      "row": 574,
+      "status": "closed",
+      "title": "Horizon close band S630–S638"
     }
   ],
   "sprint_queue_open_count": 0,

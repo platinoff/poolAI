@@ -1,5 +1,5 @@
 //! Galaxy Grid pricing snapshot admin page (PH-S82) — read-only `GET /api/v1/grid/pricing`.
-//! PH-S151/PH-S152: USD/time formatters via shared `poolai-ui-wasm` bootstrap; thin JS fallback otherwise.
+//! PH-S151/PH-S152: USD/time formatters via shared `poolai-ui-wasm` bootstrap (wasm-only PH-S638).
 //! PH-S154: EN/UK i18n subset in `poolai-ui-core::i18n` (injected via admin layout).
 //! PH-S217: grid-pricing page uses slim `admin_layout_grid_pricing` + `admin_grid_pricing_patch`.
 
@@ -28,36 +28,12 @@ pub async fn admin_grid_pricing() -> Html<String> {
       return '/api/v1/grid/pricing?' + qs.toString();
     }
 
-    function formatUsdMicroFallback(usdMicro) {
-      const n = Number(usdMicro);
-      if (!Number.isFinite(n)) return '—';
-      return (n / 1000000).toFixed(6) + ' USD';
-    }
-
-    function formatUnixSecsFallback(secs) {
-      const n = Number(secs);
-      if (!Number.isFinite(n) || n <= 0) return '—';
-      try {
-        return new Date(n * 1000).toISOString();
-      } catch (_) {
-        return String(secs);
-      }
-    }
-
     function formatUsdMicro(usdMicro) {
-      const wasm = window.poolaiUiWasm;
-      if (wasm && wasm.ready && typeof wasm.formatUsdMicro === 'function') {
-        return wasm.formatUsdMicro(Number(usdMicro));
-      }
-      return formatUsdMicroFallback(usdMicro);
+      return window.poolaiUiWasm.formatUsdMicro(Number(usdMicro));
     }
 
     function formatUnixSecs(secs) {
-      const wasm = window.poolaiUiWasm;
-      if (wasm && wasm.ready && typeof wasm.formatUnixSecs === 'function') {
-        return wasm.formatUnixSecs(Number(secs));
-      }
-      return formatUnixSecsFallback(secs);
+      return window.poolaiUiWasm.formatUnixSecs(Number(secs));
     }
 
     function renderGridPricingSnapshot(data) {
@@ -196,5 +172,6 @@ async fn admin_grid_pricing_page_wires_poolai_ui_wasm_module() {
     assert!(html.contains("/ui/wasm/poolai_ui_wasm.js"));
     assert!(html.contains("window.poolaiUiWasm"));
     assert!(html.contains("poolai-ui-wasm-ready"));
-    assert!(html.contains("formatUsdMicroFallback"));
+    assert!(html.contains("window.poolaiUiWasm.formatUsdMicro"));
+    assert!(!html.contains("formatUsdMicroFallback"));
 }

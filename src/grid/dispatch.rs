@@ -62,10 +62,10 @@ use crate::grid::galaxy_settlement_metrics::{
 use crate::grid::galaxy_settlement_onchain::emit_settlement_job_rewarded;
 use crate::grid::galaxy_trust_score::{
     apply_verification_trust_delta, clamp_trust_score, evaluate_result_settlement_gate,
-    SettlementGateVerdict, TrustScore, TrustScoreGateConfig,
+    SettlementGateVerdict, TrustScore, TrustScoreGateConfig, DEFAULT_TRUST_SCORE,
 };
 use crate::grid::galaxy_trust_score_store::{
-    apply_lease_epoch_rejected_trust_delta, persist_peer_trust_score,
+    apply_lease_epoch_rejected_trust_delta, lookup_peer_trust_score, persist_peer_trust_score,
 };
 use crate::grid::galaxy_verification_checker_jobs::submit_shadow_verification_checker_job;
 use crate::grid::galaxy_verification_metrics::{
@@ -200,6 +200,27 @@ pub fn ingest_job_prefetch_stub(
         &config,
     );
     let n = complete_prefetch_hook(&plan, memory);
+    // PH-S632: hot-tier skip may empty plan; still record seed-pull for inventory-resident shards.
+    if plan.items.is_empty() {
+        let target_tier = if gpu_capable {
+            PrefetchTargetTier::Vram
+        } else {
+            PrefetchTargetTier::Ram
+        };
+        let fallback_plan = PrefetchPlan {
+            items: order_shards_by_access_weight(required_shard_ids)
+                .into_iter()
+                .map(|shard_id| PrefetchPlanItem {
+                    shard_id,
+                    target_tier,
+                })
+                .collect(),
+            trigger: PrefetchTrigger::JobAdmitted,
+            deadline_ms: config.prefetch_deadline_ms,
+            mode: config.mode,
+        };
+        seed_pull_hook(&fallback_plan);
+    }
     if let Some(first) = required_shard_ids.first() {
         if let Some(co_plan) = plan_co_access_prefetch(first, gpu_capable, &config) {
             if !co_plan.items.is_empty() {
@@ -1164,15 +1185,18 @@ fn ingest_result(
         let _ = evaluate_post_mismatch_elevated_sampling(&job_id, &verify_cfg);
     }
     let mut effective_trust_score = trust_score;
-    if let (Some(score), Some(verdict)) = (
-        trust_score,
-        body.metrics
-            .as_ref()
-            .and_then(|m| m.get("verification_verdict"))
-            .and_then(|v| v.as_str()),
-    ) {
-        let adjusted = apply_verification_trust_delta(verdict, score);
-        effective_trust_score = Some(adjusted);
+    if let Some(verdict) = body
+        .metrics
+        .as_ref()
+        .and_then(|m| m.get("verification_verdict"))
+        .and_then(|v| v.as_str())
+    {
+        if verdict.eq_ignore_ascii_case("match") || verdict.eq_ignore_ascii_case("mismatch") {
+            let base = trust_score
+                .or_else(|| source_peer_id.and_then(lookup_peer_trust_score))
+                .unwrap_or(DEFAULT_TRUST_SCORE);
+            effective_trust_score = Some(apply_verification_trust_delta(verdict, base));
+        }
     }
     evaluate_result_verification_sample_completed(body.metrics.as_ref());
     let settlement_gate = evaluate_result_settlement_gate(

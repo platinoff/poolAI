@@ -322,21 +322,15 @@ pub async fn admin_topology() -> axum::response::Html<String> {
     }}
 
     function formatTopologyTimestamp(iso) {{
-      if (iso == null || iso === '') return '-';
-      const t = Date.parse(iso);
-      return Number.isFinite(t) ? new Date(t).toLocaleString() : '-';
+      return window.poolaiUiWasm.formatTopologyTimestamp(iso == null ? '' : String(iso));
     }}
 
     function formatLoadFraction(x) {{
-      const n = Number(x);
-      if (!Number.isFinite(n)) return '-';
-      return (n * 100).toFixed(1) + '%';
+      return window.poolaiUiWasm.formatLoadFraction(Number(x));
     }}
 
     function formatLatencyMs(latency) {{
-      const n = Number(latency);
-      if (!Number.isFinite(n)) return escapeHtml(String(latency)) + ' ms';
-      return n.toFixed(2) + ' ms';
+      return escapeHtml(window.poolaiUiWasm.formatLatencyMs(Number(latency)));
     }}
 
     {graph_js}
@@ -374,5 +368,14 @@ mod fm037_tests {
         assert!(html.contains(r#""admin.topo.title""#));
         assert!(!html.contains(r#""admin.jobs.leaseState.active""#));
         assert!(!html.contains(r#""admin.sec.tab.oauth""#));
+    }
+
+    #[tokio::test]
+    async fn admin_topology_formatters_wasm_only_ph_s636() {
+        let html = admin_topology().await.0;
+        assert!(html.contains("window.poolaiUiWasm.formatTopologyTimestamp"));
+        assert!(html.contains("window.poolaiUiWasm.formatLoadFraction"));
+        assert!(html.contains("window.poolaiUiWasm.formatLatencyMs"));
+        assert!(!html.contains("toLocaleString()"));
     }
 }

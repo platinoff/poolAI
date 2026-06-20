@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-20 (PH-S610…S619 ✅ · vision **rev 261** · **0** відкритих · rust_ratio **94.72%**)
+**Оновлено:** 2026-06-20 (PH-S630…S639 ✅ · vision **rev 263** · **0** відкритих · rust_ratio **94.75%**)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -829,8 +829,18 @@ FM-xxx (з таблиці нижче)
 | 562 | **PH-S627** | Admin raid drop JS `formatBytes` dup (wasm-only) | RUST_RATIO §5.13 PH-S618 | remove JS fallback in `raid.rs`; wasm `formatBytes` only | **✅** |
 | 563 | **PH-S628** | Admin security datetime helpers → ui-core/wasm | RUST_RATIO §5.13 | `formatUnixTimestamp` / `formatRotationKind` in `poolai-ui-core` + wasm; slim `security.rs` | **✅** |
 | 564 | **PH-S629** | Horizon close band S620–S628 | §5.12 fallback | `galaxy_horizon_s620_integration` + loc-audit + vision-sync `--check` | **✅** |
+| 565 | **PH-S630** | Verification mismatch trust delta → persist store | Galaxy §6.5 / §6.2 | grid result `verification_verdict:mismatch` adjusts stored `trust_score` (−100) + `galaxy_trust_score_delta_total`; integration test | **✅** |
+| 566 | **PH-S631** | Cleared settlement payout-batch HTTP wire | Galaxy §8.2 / PH-S427 | grid Cleared result → `galaxy_settlement_payout_batch_total` on `/metrics`; integration test | **✅** |
+| 567 | **PH-S632** | Prefetch seed-pull complete hook HTTP | Galaxy §5.5 / roadmap §4 | grid job ingest + hot-tier skip fallback drives `galaxy_prefetch_seed_pull_total`; integration test | **✅** |
+| 568 | **PH-S633** | Replication executor enqueue HTTP | Galaxy §6.4 / PH-S435 | grid job ingest → `galaxy_replication_executor_enqueue_total` on `/metrics`; integration test | **✅** |
+| 569 | **PH-S634** | Replay verification enqueue on mismatch HTTP | Galaxy §6.3 / PH-S438 | grid result `verification_verdict:mismatch` → `galaxy_replay_verification_enqueue_total`; integration test | **✅** |
+| 570 | **PH-S635** | Worker-unhealthy heartbeat-remote HTTP | Galaxy §4.3.3 / PH-S522 | consecutive `POST /discovery/heartbeat-remote` misses → `galaxy_worker_unhealthy_total`; integration test | **✅** |
+| 571 | **PH-S636** | Admin topology formatters → ui-core/wasm | RUST_RATIO §5.13 | `formatTopologyTimestamp` / `formatLoadFraction` / `formatLatencyMs` wasm-only; slim `topology.rs` | **✅** |
+| 572 | **PH-S637** | Admin security datetime wasm-only slim | RUST_RATIO §5.13 / PH-S628 | remove JS fallback paths in `security.rs`; wasm-only glue | **✅** |
+| 573 | **PH-S638** | Admin grid-pricing formatters wasm-only | RUST_RATIO §5.13 / PH-S151 | drop `formatUsdMicroFallback` in `grid_pricing.rs`; wasm-only USD/time formatters | **✅** |
+| 574 | **PH-S639** | Horizon close band S630–S638 | §5.12 fallback / roadmap §4 | `galaxy_horizon_s630_integration` + loc-audit + vision-sync `--check` | **✅** |
 
-**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S620…S629 ✅. Vision rev **262**. rust_ratio **94.73%**.
+**Відкритих у §5.12:** **0**. **Закрито смуга:** PH-S630…S639 ✅. Vision rev **263**. rust_ratio **94.75%**.
 
 **Наступна сесія:** **`абракадабра`** — project scan → +10 PH-S* → drain → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
