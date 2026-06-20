@@ -1,10 +1,12 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-20 (PH-S700…S709 ✅ · master backlog **301** · active **10** · vision **rev 271** · rust_ratio **94.75%**)
+**Оновлено:** 2026-06-20 (PH-S710…S719 ✅ · master backlog **291** · active **10** · vision **rev 272** · rust_ratio **94.76%**)
 
-**Cursor 3.8.11 (2026-06-20):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-06-20.md`](./CURSOR_UPDATE_RESEARCH_2026-06-20.md); `poolai-vision-sync --check` ok; baseline rule оновлено. **Наступна сесія:** **`абракадабра`** (drain PH-S710…S719).
+**Cursor 3.8.11 (2026-06-20):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-06-20.md`](./CURSOR_UPDATE_RESEARCH_2026-06-20.md); `poolai-vision-sync --check` ok; baseline rule оновлено. **Наступна сесія:** **`абракадабра`** (drain PH-S720…S729).
 
-**Master backlog 301 (2026-06-20):** theme-aware slots 1–2 ([`generate-ph-s-master-backlog-351.sh`](../../scripts/generate-ph-s-master-backlog-351.sh)) · [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · FM **§5.14**. Активна §5.12: **PH-S710…S719** (band 6 stand smoke). **`абракадабра`** = drain 10 → promote **PH-S720…S729** (band 7 concept wire).
+**Master backlog 291 (2026-06-20):** theme-aware slots 1–2 ([`generate-ph-s-master-backlog-351.sh`](../../scripts/generate-ph-s-master-backlog-351.sh)) · [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · FM **§5.14**. Активна §5.12: **PH-S720…S729** (band 7 concept wire). **`абракадабра`** = drain 10 → promote **PH-S730…S739** (band 8 ops).
+
+**PH-S710…S719 ✅ (2026-06-20):** `stand_smoke_metrics_parity` JSON↔Prometheus parity (PH-S710/S711); ui-core `stand_smoke_metrics` + admin verification-metrics wasm strip (PH-S712); stand smoke `grid_metrics_json_prometheus_parity_band6` (PH-S713); `stand_smoke_metrics_parity_depth_stub` (PH-S714); `poolai-loc-audit` → `rust_ratio.json` **94.76%**; hold advisory `--min-ratio 0.95`; `galaxy_horizon_s710_integration`; FM/HANDOFF/NEXT/STABLE/GALAXY sync; vision **rev 272**.
 
 **PH-S700…S709 ✅ (2026-06-20):** `render_grid_replication_pricing_panel_html` (ui-core → wasm PH-S700); admin_charts wasm-only canvas glue + `poolaiRenderGridReplicationPricingPanel` (PH-S701); wasm glue regression tests (PH-S702); stand smoke wasm panel export shape (PH-S703); `admin_wasm_slim_depth_stub` (PH-S704); `poolai-loc-audit` → `rust_ratio.json` **94.75%**; hold advisory `--min-ratio 0.95`; `galaxy_horizon_s700_integration`; FM/HANDOFF/NEXT/STABLE/GALAXY sync; vision **rev 271**.
 

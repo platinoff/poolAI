@@ -42,6 +42,7 @@ pub mod galaxy_worker_dto;
 pub mod galaxy_worker_health;
 mod map;
 pub mod protocol_compat;
+pub mod stand_smoke_metrics_parity;
 
 pub use dispatch::{
     all_required_shards_hot, check_strict_locality_gate, co_access_graph_from_env,

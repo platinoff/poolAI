@@ -1,16 +1,16 @@
 # Galaxy Grid roadmap (зріз)
 
-**Оновлено:** 2026-06-20 · **Master backlog:** **301** PH-S710…S1010 · **§5.12 active:** 10 · **`абракадабра`** = drain + promote
+**Оновлено:** 2026-06-20 · **Master backlog:** **291** PH-S720…S1010 · **§5.12 active:** 10 · **`абракадабра`** = drain + promote
 
 | Зріз | Значення |
 |------|----------|
 | **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · FM **§5.14** |
-| **Active drain (band 6)** | PH-S710…S719 — stand smoke /metrics parity |
+| **Active drain (band 7)** | PH-S720…S729 — concept wire stub (Galaxy §4–§8) |
 | **Next promote (band 7)** | PH-S720…S729 — concept wire stub |
 | **Tail** | PH-S1010 replenish marker |
 | **Rust ratio** | **94.75%** hold **95%** advisory |
 
-**301** pending · **31** `абракадабра` sessions · остання закрита **PH-S700…S709** ✅.
+**291** pending · **30** `абракадабра` sessions · остання закрита **PH-S710…S719** ✅.
 
 ---
 

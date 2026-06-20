@@ -124,7 +124,7 @@
 | **PH-S708** | Ratio hold advisory --min-ratio 0.95 --advisory snapshot | scope test green |
 | **PH-S709** | Horizon close galaxy_horizon_s700_integration + docs close band | scope test green |
 
-## Band 6 — PH-S710…S719 (Stand smoke /metrics parity) (**active §5.12**)
+## Band 6 — PH-S710…S719 (Stand smoke /metrics parity) (drained ✅)
 
 | Sprint | Focus | Acceptance |
 |--------|-------|------------|
@@ -139,7 +139,7 @@
 | **PH-S718** | Ratio hold advisory --min-ratio 0.95 --advisory snapshot | scope test green |
 | **PH-S719** | Horizon close galaxy_horizon_s710_integration + docs close band | scope test green |
 
-## Band 7 — PH-S720…S729 (Concept wire stub (Galaxy §4–§8))
+## Band 7 — PH-S720…S729 (Concept wire stub (Galaxy §4–§8)) (**active §5.12**)
 
 | Sprint | Focus | Acceptance |
 |--------|-------|------------|

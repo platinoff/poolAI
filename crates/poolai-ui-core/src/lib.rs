@@ -19,6 +19,7 @@ pub mod modal;
 pub mod payout_batch;
 pub mod pricing;
 pub mod prometheus;
+pub mod stand_smoke_metrics;
 pub mod table;
 pub mod theme;
 pub mod topology;

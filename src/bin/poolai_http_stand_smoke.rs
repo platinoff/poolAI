@@ -1270,6 +1270,54 @@ async fn smoke_grid_pricing_metrics_api(client: &Client, base: &str) -> Result<(
     Ok(())
 }
 
+/// PH-S713: band-6 JSON metrics export shape + Prometheus parity across all grid metric APIs.
+async fn smoke_grid_metrics_json_prometheus_parity_band6(
+    client: &Client,
+    base: &str,
+) -> Result<(), String> {
+    use poolai::grid::stand_smoke_metrics_parity::validate_band6_metrics_parity;
+
+    let prom_resp = client
+        .get(api_url(base, "/metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("/metrics request: {e}"))?;
+    if prom_resp.status() != StatusCode::OK {
+        return Err(format!("/metrics status {}", prom_resp.status()));
+    }
+    let prom_text = prom_resp.text().await.map_err(|e| e.to_string())?;
+
+    async fn fetch_metrics_json(client: &Client, base: &str, path: &str) -> Result<Value, String> {
+        let resp = client
+            .get(api_url(base, path))
+            .send()
+            .await
+            .map_err(|e| format!("{path} request: {e}"))?;
+        if resp.status() != StatusCode::OK {
+            return Err(format!("{path} status {}", resp.status()));
+        }
+        resp.json().await.map_err(|e| format!("{path} json: {e}"))
+    }
+
+    let verification =
+        fetch_metrics_json(client, base, "/api/v1/grid/verification-metrics").await?;
+    let replay = fetch_metrics_json(client, base, "/api/v1/grid/replay-metrics").await?;
+    let settlement = fetch_metrics_json(client, base, "/api/v1/grid/settlement-metrics").await?;
+    let trust = fetch_metrics_json(client, base, "/api/v1/grid/trust-metrics").await?;
+    let replication = fetch_metrics_json(client, base, "/api/v1/grid/replication-metrics").await?;
+    let pricing = fetch_metrics_json(client, base, "/api/v1/grid/pricing-metrics").await?;
+
+    validate_band6_metrics_parity(
+        &prom_text,
+        &verification,
+        &replay,
+        &settlement,
+        &trust,
+        &replication,
+        &pricing,
+    )
+}
+
 async fn smoke_grid_network_profile_read(client: &Client, base: &str) -> Result<(), String> {
     let resp = client
         .get(api_url(
@@ -2192,6 +2240,12 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
     .await;
     record(
         &mut cases,
+        "grid_metrics_json_prometheus_parity_band6",
+        smoke_grid_metrics_json_prometheus_parity_band6(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
         "grid_network_profile_read",
         smoke_grid_network_profile_read(&client, &cli.base_url).await,
     )
@@ -2779,6 +2833,117 @@ mod tests {
             admin_wasm_slim_depth_stub(Some(&json!({"panel_renderer": true}))),
             AdminWasmSlimDepth::PanelRenderer
         );
+    }
+
+    #[test]
+    fn grid_verification_replay_json_export_shape_ph_s710() {
+        use poolai::grid::stand_smoke_metrics_parity::{
+            validate_grid_metrics_json_export, REPLAY_JSON_KEYS, VERIFICATION_JSON_KEYS,
+        };
+        let verification = serde_json::json!({
+            "ok": true,
+            "metrics": {
+                "sample_total": 0,
+                "mismatch_total": 0,
+                "match_total": 0,
+                "checker_pending_total": 0,
+            }
+        });
+        validate_grid_metrics_json_export(&verification, VERIFICATION_JSON_KEYS)
+            .expect("verification");
+        let replay = serde_json::json!({
+            "ok": true,
+            "metrics": {
+                "replay_pending": 0,
+                "replay_pending_scheduled_total": 0,
+                "verification_replay_record_total": 0,
+            }
+        });
+        validate_grid_metrics_json_export(&replay, REPLAY_JSON_KEYS).expect("replay");
+    }
+
+    #[test]
+    fn grid_settlement_trust_replication_pricing_json_export_shape_ph_s711() {
+        use poolai::grid::stand_smoke_metrics_parity::{
+            validate_grid_metrics_json_export, PRICING_JSON_KEYS, REPLICATION_JSON_KEYS,
+            SETTLEMENT_JSON_KEYS, TRUST_JSON_KEYS,
+        };
+        let settlement = serde_json::json!({
+            "ok": true,
+            "metrics": {
+                "pending_verification_total": 0,
+                "cleared_total": 0,
+                "resolved_total": 0,
+                "payout_batch_total": 0,
+            }
+        });
+        validate_grid_metrics_json_export(&settlement, SETTLEMENT_JSON_KEYS).expect("settlement");
+        let trust = serde_json::json!({
+            "ok": true,
+            "metrics": {
+                "payout_eligible_total": 0,
+                "payout_held_total": 0,
+                "last_trust_score": 0,
+                "gate_min_threshold": 40,
+            }
+        });
+        validate_grid_metrics_json_export(&trust, TRUST_JSON_KEYS).expect("trust");
+        let replication = serde_json::json!({
+            "ok": true,
+            "metrics": {
+                "strict_total": 0,
+                "enqueue_total": 0,
+                "executor_enqueue_total": 0,
+                "rate_limited_total": 0,
+            }
+        });
+        validate_grid_metrics_json_export(&replication, REPLICATION_JSON_KEYS)
+            .expect("replication");
+        let pricing = serde_json::json!({
+            "ok": true,
+            "metrics": {
+                "fresh_served_total": 0,
+                "stale_served_total": 0,
+                "forced_fallback_total": 0,
+                "provider_catalog_lookups_total": 0,
+            }
+        });
+        validate_grid_metrics_json_export(&pricing, PRICING_JSON_KEYS).expect("pricing");
+    }
+
+    #[test]
+    fn grid_metrics_band6_prometheus_parity_export_shape_ph_s713() {
+        use poolai::grid::stand_smoke_metrics_parity::validate_band6_metrics_parity;
+        let prom = concat!(
+            "galaxy_verification_sample_total 0\n",
+            "galaxy_verification_checker_pending_total 0\n",
+            "galaxy_replay_pending 0\n",
+            "galaxy_verification_replay_record_total 0\n",
+            "galaxy_settlement_cleared_total 0\n",
+            "galaxy_settlement_payout_batch_total 0\n",
+            "galaxy_trust_payout_eligible_total 0\n",
+            "galaxy_trust_score 0\n",
+            "galaxy_replication_strict_total 0\n",
+            "galaxy_replication_enqueue_total 0\n",
+            "galaxy_pricing_fresh_served 0\n",
+            "galaxy_pricing_stale_served 0\n",
+        );
+        let verification = serde_json::json!({"ok": true, "metrics": {"sample_total": 0, "mismatch_total": 0, "match_total": 0, "checker_pending_total": 0}});
+        let replay = serde_json::json!({"ok": true, "metrics": {"replay_pending": 0, "replay_pending_scheduled_total": 0, "verification_replay_record_total": 0}});
+        let settlement = serde_json::json!({"ok": true, "metrics": {"pending_verification_total": 0, "cleared_total": 0, "resolved_total": 0, "payout_batch_total": 0}});
+        let trust = serde_json::json!({"ok": true, "metrics": {"payout_eligible_total": 0, "payout_held_total": 0, "last_trust_score": 0, "gate_min_threshold": 40}});
+        let replication = serde_json::json!({"ok": true, "metrics": {"strict_total": 0, "enqueue_total": 0, "executor_enqueue_total": 0, "rate_limited_total": 0}});
+        let pricing = serde_json::json!({"ok": true, "metrics": {"fresh_served_total": 0, "stale_served_total": 0, "forced_fallback_total": 0, "provider_catalog_lookups_total": 0}});
+        validate_band6_metrics_parity(
+            prom,
+            &verification,
+            &replay,
+            &settlement,
+            &trust,
+            &replication,
+            &pricing,
+        )
+        .expect("band6 parity");
     }
 
     #[test]

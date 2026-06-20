@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-20 (PH-S700…S709 ✅ · **301** master backlog · active **10** · vision **rev 270** · rust_ratio **94.75%**)
+**Оновлено:** 2026-06-20 (PH-S710…S719 ✅ · **291** master backlog · active **10** · vision **rev 271** · rust_ratio **94.76%**)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -909,20 +909,30 @@ FM-xxx (з таблиці нижче)
 | 642 | **PH-S707** | poolai-vision-sync drift gate | ops | `poolai-vision-sync --check` green | **✅** |
 | 643 | **PH-S708** | Ratio hold advisory snapshot | PH-S351 pattern | `--min-ratio 0.95 --advisory` **94.75%** | **✅** |
 | 644 | **PH-S709** | Horizon close band S700–S708 | §5.12 fallback | `galaxy_horizon_s700_integration` + docs sync | **✅** |
-| 645 | **PH-S710** | Stand smoke JSON metric API #1 | band 6 stand smoke | export shape scope test | **[ ]** |
-| 646 | **PH-S711** | Stand smoke JSON metric API #2 | band 6 stand smoke | export shape scope test | **[ ]** |
-| 647 | **PH-S712** | Admin panel wasm glue | poolai-ui-core | admin JSON/metrics fetch glue | **[ ]** |
-| 648 | **PH-S713** | Stand smoke runner extend | poolai-http-stand-smoke | band metric APIs runner | **[ ]** |
-| 649 | **PH-S714** | Galaxy concept helper stub | Galaxy §4–§8 | unit test scope | **[ ]** |
-| 650 | **PH-S715** | Rust ratio loc-audit refresh | §5.13 fallback | `poolai-loc-audit` → `rust_ratio.json` sprint zriz | **[ ]** |
-| 651 | **PH-S716** | Docs INDEX canon sync | docs canon | INDEX + HANDOFF + NEXT + STABLE + GALAXY sync | **[ ]** |
-| 652 | **PH-S717** | poolai-vision-sync drift gate | ops | `poolai-vision-sync --check` green | **[ ]** |
-| 653 | **PH-S718** | Ratio hold advisory snapshot | PH-S351 pattern | `--min-ratio 0.95 --advisory` | **[ ]** |
-| 654 | **PH-S719** | Horizon close band S710–S718 | §5.12 fallback | `galaxy_horizon_s710_integration` + docs sync | **[ ]** |
+| 645 | **PH-S710** | Stand smoke JSON metric API #1 | band 6 stand smoke | verification/replay JSON export shape parity tests | **✅** |
+| 646 | **PH-S711** | Stand smoke JSON metric API #2 | band 6 stand smoke | settlement/trust/replication/pricing JSON export shape | **✅** |
+| 647 | **PH-S712** | Admin panel wasm glue | poolai-ui-core | verification-metrics JSON + `renderGridVerificationMetricsStrip` | **✅** |
+| 648 | **PH-S713** | Stand smoke runner extend | poolai-http-stand-smoke | `grid_metrics_json_prometheus_parity_band6` live + unit tests | **✅** |
+| 649 | **PH-S714** | Galaxy concept helper stub | Galaxy §4–§8 | `stand_smoke_metrics_parity_depth_stub` + unit test | **✅** |
+| 650 | **PH-S715** | Rust ratio loc-audit refresh | §5.13 fallback | `poolai-loc-audit` → `rust_ratio.json` **94.76%** | **✅** |
+| 651 | **PH-S716** | Docs INDEX canon sync | docs canon | INDEX + HANDOFF + NEXT + STABLE + GALAXY sync | **✅** |
+| 652 | **PH-S717** | poolai-vision-sync drift gate | ops | `poolai-vision-sync --check` green | **✅** |
+| 653 | **PH-S718** | Ratio hold advisory snapshot | PH-S351 pattern | `--min-ratio 0.95 --advisory` **94.76%** | **✅** |
+| 654 | **PH-S719** | Horizon close band S710–S718 | §5.12 fallback | `galaxy_horizon_s710_integration` + docs sync | **✅** |
+| 655 | **PH-S720** | Galaxy concept helper stub #1 | Galaxy §4–§8 | concept wire stub + unit test | **[ ]** |
+| 656 | **PH-S721** | Galaxy concept helper stub #2 | Galaxy §4–§8 | concept wire stub + unit test | **[ ]** |
+| 657 | **PH-S722** | Admin panel wasm glue | poolai-ui-core | admin JSON/metrics fetch glue | **[ ]** |
+| 658 | **PH-S723** | Stand smoke JSON metric export | poolai-http-stand-smoke | `/metrics` + JSON metric API export shape | **[ ]** |
+| 659 | **PH-S724** | Galaxy concept helper stub | band 7 concept wire | unit test scope | **[ ]** |
+| 660 | **PH-S725** | Rust ratio loc-audit refresh | §5.13 fallback | `poolai-loc-audit` → `rust_ratio.json` sprint zriz | **[ ]** |
+| 661 | **PH-S726** | Docs INDEX canon sync | docs canon | INDEX + HANDOFF + NEXT + STABLE + GALAXY sync | **[ ]** |
+| 662 | **PH-S727** | poolai-vision-sync drift gate | ops | `poolai-vision-sync --check` green | **[ ]** |
+| 663 | **PH-S728** | Ratio hold advisory snapshot | PH-S351 pattern | `--min-ratio 0.95 --advisory` | **[ ]** |
+| 664 | **PH-S729** | Horizon close band S720–S728 | §5.12 fallback | `galaxy_horizon_s720_integration` + docs sync | **[ ]** |
 
-**Відкритих у §5.12:** **10** (PH-S710…S719). **Master backlog:** **301** pending PH-S710…S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · **§5.14**. Vision rev **271** (after sync). rust_ratio **94.75%**.
+**Відкритих у §5.12:** **10** (PH-S720…S729). **Master backlog:** **291** pending PH-S720…S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · **§5.14**. Vision rev **272** (after sync). rust_ratio **94.76%**.
 
-**Наступна сесія:** **`абракадабра`** — drain PH-S710…S719 → promote PH-S720…S729 з §5.14 → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **`абракадабра`** — drain PH-S720…S729 → promote PH-S730…S739 з §5.14 → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.14 Master backlog PH-S660…S1010 (351 pending, 2026-06-20)
 
@@ -932,8 +942,8 @@ FM-xxx (з таблиці нижче)
 |------|----------|
 | **Діапазон** | PH-S660…PH-S1010 |
 | **Кількість** | **351** |
-| **Активна смуга §5.12** | PH-S710…S719 `[ ]` (band 6) |
-| **Наступна promote** | PH-S710…S719 (band 6) після drain band 5 |
+| **Активна смуга §5.12** | PH-S720…S729 `[ ]` (band 7) |
+| **Наступна promote** | PH-S730…S739 (band 8) після drain band 7 |
 | **Сесій `абракадабра`** | **36** (35×10 + tail S1010) |
 | **Артефакт** | [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) |
 | **Regen** | `bash scripts/generate-ph-s-master-backlog-351.sh` |
@@ -951,7 +961,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-06-20):** PH-S710…S719 **[ ]** drain · **`абракадабра`** = drain → vision close → push.
+**Активна смуга (2026-06-20):** PH-S720…S729 **[ ]** drain · **`абракадабра`** = drain → vision close → push.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 
