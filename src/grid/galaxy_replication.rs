@@ -89,6 +89,46 @@ pub fn replication_quorum_met(digests: &[&str], config: ReplicationTierConfig) -
     counts.values().copied().max().unwrap_or(0) >= config.quorum_k as usize
 }
 
+/// Replication/pricing depth hint from grid job metrics (PH-S694, Galaxy §4.2 / §6.4).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ReplicationPricingDepth {
+    None,
+    StandardReplication,
+    StrictReplication,
+    PricingFallback,
+}
+
+/// Classify replication/pricing depth from grid job metrics stub fields (PH-S694).
+pub fn replication_pricing_depth_stub(
+    metrics: Option<&serde_json::Value>,
+) -> ReplicationPricingDepth {
+    let Some(m) = metrics else {
+        return ReplicationPricingDepth::None;
+    };
+    if m.get("pricing_forced_fallback")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        return ReplicationPricingDepth::PricingFallback;
+    }
+    match m
+        .get("replication_profile")
+        .and_then(|v| v.as_str())
+        .map(str::trim)
+        .map(|s| s.to_ascii_lowercase())
+        .as_deref()
+    {
+        Some("replication_strict" | "strict_verification") => {
+            ReplicationPricingDepth::StrictReplication
+        }
+        Some("replication_standard" | "replication_light" | "replicate-3" | "replicate-2") => {
+            ReplicationPricingDepth::StandardReplication
+        }
+        _ => ReplicationPricingDepth::None,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -149,5 +189,32 @@ mod tests {
         let cfg = REPLICATION_STANDARD;
         assert!(replication_quorum_met(&["a", "a", "b"], cfg));
         assert!(!replication_quorum_met(&["a", "b", "c"], cfg));
+    }
+
+    #[test]
+    fn replication_pricing_depth_stub_ph_s694() {
+        use super::ReplicationPricingDepth;
+        use serde_json::json;
+
+        assert_eq!(
+            replication_pricing_depth_stub(Some(
+                &json!({"replication_profile": "replication_strict"})
+            )),
+            ReplicationPricingDepth::StrictReplication
+        );
+        assert_eq!(
+            replication_pricing_depth_stub(Some(
+                &json!({"replication_profile": "replication_standard"})
+            )),
+            ReplicationPricingDepth::StandardReplication
+        );
+        assert_eq!(
+            replication_pricing_depth_stub(Some(&json!({"pricing_forced_fallback": true}))),
+            ReplicationPricingDepth::PricingFallback
+        );
+        assert_eq!(
+            replication_pricing_depth_stub(None),
+            ReplicationPricingDepth::None
+        );
     }
 }

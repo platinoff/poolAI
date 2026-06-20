@@ -17,6 +17,7 @@ pub mod galaxy_network_profile;
 pub mod galaxy_network_profile_store;
 pub mod galaxy_prefetch_metrics;
 pub mod galaxy_prefetch_peer_pull;
+pub mod galaxy_pricing_metrics;
 pub mod galaxy_pricing_oracle;
 pub mod galaxy_pricing_provider_metrics;
 pub mod galaxy_protocol_negotiation_metrics;

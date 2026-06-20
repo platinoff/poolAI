@@ -95,6 +95,25 @@ pub fn replication_rate_limited_total() -> u64 {
     REPLICATION_RATE_LIMITED_TOTAL.load(Ordering::Relaxed)
 }
 
+/// Read-only replication counters snapshot for `GET /api/v1/grid/replication-metrics` (PH-S690).
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
+pub struct ReplicationMetricsSnapshot {
+    pub strict_total: u64,
+    pub enqueue_total: u64,
+    pub executor_enqueue_total: u64,
+    pub rate_limited_total: u64,
+}
+
+/// Coordinator replication metrics snapshot (PH-S690).
+pub fn replication_metrics_snapshot() -> ReplicationMetricsSnapshot {
+    ReplicationMetricsSnapshot {
+        strict_total: replication_strict_total(),
+        enqueue_total: replication_enqueue_total(),
+        executor_enqueue_total: replication_executor_enqueue_total(),
+        rate_limited_total: replication_rate_limited_total(),
+    }
+}
+
 /// Grid job ingest executor queue stub (PH-S435); JobStore parallel fan-out (PH-S536).
 pub fn replication_executor_hook(
     replication_tier: ReplicationTierConfig,

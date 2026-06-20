@@ -1212,6 +1212,64 @@ async fn smoke_grid_trust_metrics_api(client: &Client, base: &str) -> Result<(),
     Ok(())
 }
 
+async fn smoke_grid_replication_metrics_api(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/api/v1/grid/replication-metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("replication-metrics request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("replication-metrics status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    if body.get("ok").and_then(|v| v.as_bool()) != Some(true) {
+        return Err(format!("replication-metrics body: {body}"));
+    }
+    let metrics = body
+        .get("metrics")
+        .ok_or_else(|| format!("replication-metrics missing metrics: {body}"))?;
+    for key in [
+        "strict_total",
+        "enqueue_total",
+        "executor_enqueue_total",
+        "rate_limited_total",
+    ] {
+        if !metrics.get(key).and_then(|v| v.as_u64()).is_some() {
+            return Err(format!("replication-metrics missing {key}: {body}"));
+        }
+    }
+    Ok(())
+}
+
+async fn smoke_grid_pricing_metrics_api(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/api/v1/grid/pricing-metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("pricing-metrics request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("pricing-metrics status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    if body.get("ok").and_then(|v| v.as_bool()) != Some(true) {
+        return Err(format!("pricing-metrics body: {body}"));
+    }
+    let metrics = body
+        .get("metrics")
+        .ok_or_else(|| format!("pricing-metrics missing metrics: {body}"))?;
+    for key in [
+        "fresh_served_total",
+        "stale_served_total",
+        "forced_fallback_total",
+        "provider_catalog_lookups_total",
+    ] {
+        if !metrics.get(key).and_then(|v| v.as_u64()).is_some() {
+            return Err(format!("pricing-metrics missing {key}: {body}"));
+        }
+    }
+    Ok(())
+}
+
 async fn smoke_grid_network_profile_read(client: &Client, base: &str) -> Result<(), String> {
     let resp = client
         .get(api_url(
@@ -2122,6 +2180,18 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
     .await;
     record(
         &mut cases,
+        "grid_replication_metrics_api",
+        smoke_grid_replication_metrics_api(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
+        "grid_pricing_metrics_api",
+        smoke_grid_pricing_metrics_api(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
         "grid_network_profile_read",
         smoke_grid_network_profile_read(&client, &cli.base_url).await,
     )
@@ -2675,6 +2745,20 @@ mod tests {
         let sample = r#"{"ok":true,"metrics":{"payout_eligible_total":0,"payout_held_total":0,"payout_not_applicable_total":0,"last_trust_score":0,"gate_min_threshold":40,"gate_default_score":50,"gate_evaluations_total":0,"default_score_applied_total":0,"explicit_score_total":0,"trust_score_delta_total":0}}"#;
         let body: Value = serde_json::from_str(sample).expect("json");
         assert_eq!(body["metrics"]["gate_min_threshold"], 40);
+    }
+
+    #[test]
+    fn grid_replication_metrics_api_export_shape_ph_s693() {
+        let sample = r#"{"ok":true,"metrics":{"strict_total":0,"enqueue_total":0,"executor_enqueue_total":0,"rate_limited_total":0}}"#;
+        let body: Value = serde_json::from_str(sample).expect("json");
+        assert_eq!(body["metrics"]["strict_total"], 0);
+    }
+
+    #[test]
+    fn grid_pricing_metrics_api_export_shape_ph_s693() {
+        let sample = r#"{"ok":true,"metrics":{"fresh_served_total":0,"stale_served_total":0,"forced_fallback_total":0,"provider_catalog_lookups_total":0,"provider_catalog_hits_total":0,"provider_errors_total":0}}"#;
+        let body: Value = serde_json::from_str(sample).expect("json");
+        assert_eq!(body["metrics"]["fresh_served_total"], 0);
     }
 
     #[test]

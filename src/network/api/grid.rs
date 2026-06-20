@@ -79,6 +79,11 @@ pub fn create_grid_routes() -> Router<ApiContext> {
         .route("/grid/settlement-metrics", get(get_grid_settlement_metrics))
         .route("/grid/trust-metrics", get(get_grid_trust_metrics))
         .route(
+            "/grid/replication-metrics",
+            get(get_grid_replication_metrics),
+        )
+        .route("/grid/pricing-metrics", get(get_grid_pricing_metrics))
+        .route(
             "/grid/network-profiles/{peer_id}",
             get(get_grid_network_profile).put(put_grid_network_profile),
         )
@@ -334,6 +339,42 @@ async fn get_grid_trust_metrics(
         Json(GridTrustMetricsResponse {
             ok: true,
             metrics: crate::grid::galaxy_trust_score::trust_metrics_snapshot(),
+        }),
+    ))
+}
+
+#[derive(Debug, Serialize)]
+struct GridReplicationMetricsResponse {
+    ok: bool,
+    metrics: crate::grid::galaxy_replication_metrics::ReplicationMetricsSnapshot,
+}
+
+async fn get_grid_replication_metrics(
+    State(_ctx): State<ApiContext>,
+) -> Result<(StatusCode, Json<GridReplicationMetricsResponse>), HttpAppError> {
+    Ok((
+        StatusCode::OK,
+        Json(GridReplicationMetricsResponse {
+            ok: true,
+            metrics: crate::grid::galaxy_replication_metrics::replication_metrics_snapshot(),
+        }),
+    ))
+}
+
+#[derive(Debug, Serialize)]
+struct GridPricingMetricsResponse {
+    ok: bool,
+    metrics: crate::grid::galaxy_pricing_metrics::PricingMetricsSnapshot,
+}
+
+async fn get_grid_pricing_metrics(
+    State(_ctx): State<ApiContext>,
+) -> Result<(StatusCode, Json<GridPricingMetricsResponse>), HttpAppError> {
+    Ok((
+        StatusCode::OK,
+        Json(GridPricingMetricsResponse {
+            ok: true,
+            metrics: crate::grid::galaxy_pricing_metrics::pricing_metrics_snapshot(),
         }),
     ))
 }
@@ -1080,6 +1121,52 @@ mod tests {
         assert_eq!(trust_metrics_snapshot().payout_eligible_total, 1);
 
         reset_settlement_gate_metrics_for_test();
+    }
+
+    #[tokio::test]
+    async fn grid_replication_metrics_read_ph_s690() {
+        use crate::grid::galaxy_replication::{REPLICATION_STANDARD, REPLICATION_STRICT};
+        use crate::grid::galaxy_replication_metrics::{
+            evaluate_job_replication_strict, replication_metrics_snapshot,
+            reset_replication_strict_metrics_for_test,
+        };
+
+        reset_replication_strict_metrics_for_test();
+        evaluate_job_replication_strict(REPLICATION_STANDARD);
+        evaluate_job_replication_strict(REPLICATION_STRICT);
+
+        let res = get_grid_replication_metrics(State(ApiContext::default()))
+            .await
+            .expect("replication metrics")
+            .1
+             .0;
+        assert!(res.ok);
+        assert_eq!(res.metrics.strict_total, 1);
+        assert_eq!(replication_metrics_snapshot().strict_total, 1);
+
+        reset_replication_strict_metrics_for_test();
+    }
+
+    #[tokio::test]
+    async fn grid_pricing_metrics_read_ph_s691() {
+        use crate::grid::galaxy_pricing_metrics::pricing_metrics_snapshot;
+        use crate::grid::galaxy_pricing_oracle::{
+            bump_fresh_served_for_test, reset_fresh_served_total_for_test,
+        };
+
+        reset_fresh_served_total_for_test();
+        bump_fresh_served_for_test();
+
+        let res = get_grid_pricing_metrics(State(ApiContext::default()))
+            .await
+            .expect("pricing metrics")
+            .1
+             .0;
+        assert!(res.ok);
+        assert_eq!(res.metrics.fresh_served_total, 1);
+        assert_eq!(pricing_metrics_snapshot().fresh_served_total, 1);
+
+        reset_fresh_served_total_for_test();
     }
 
     #[tokio::test]

@@ -1,10 +1,12 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-20 (PH-S680…S689 ✅ · master backlog **321** · active **10** · vision **rev 269** · rust_ratio **94.73%**)
+**Оновлено:** 2026-06-20 (PH-S690…S699 ✅ · master backlog **311** · active **10** · vision **rev 270** · rust_ratio **94.67%**)
 
-**Cursor 3.8.11 (2026-06-20):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-06-20.md`](./CURSOR_UPDATE_RESEARCH_2026-06-20.md); `poolai-vision-sync --check` ok; baseline rule оновлено. **Наступна сесія:** **`абракадабра`** (drain PH-S690…S699).
+**Cursor 3.8.11 (2026-06-20):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-06-20.md`](./CURSOR_UPDATE_RESEARCH_2026-06-20.md); `poolai-vision-sync --check` ok; baseline rule оновлено. **Наступна сесія:** **`абракадабра`** (drain PH-S700…S709).
 
-**Master backlog 321 (2026-06-20):** theme-aware slots 1–2 ([`generate-ph-s-master-backlog-351.sh`](../../scripts/generate-ph-s-master-backlog-351.sh)) · [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · FM **§5.14**. Активна §5.12: **PH-S690…S699** (band 4). **`абракадабра`** = drain 10 → promote **PH-S700…S709** (band 5 wasm slim).
+**Master backlog 311 (2026-06-20):** theme-aware slots 1–2 ([`generate-ph-s-master-backlog-351.sh`](../../scripts/generate-ph-s-master-backlog-351.sh)) · [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · FM **§5.14**. Активна §5.12: **PH-S700…S709** (band 5 wasm slim). **`абракадабра`** = drain 10 → promote **PH-S710…S719** (band 6 stand smoke).
+
+**PH-S690…S699 ✅ (2026-06-20):** `GET /api/v1/grid/replication-metrics` + `GET /api/v1/grid/pricing-metrics`; `replication_pricing_depth_stub` (PH-S694); `parsePrometheusGauge` wasm glue (grid-replication-pricing); stand smoke replication/pricing API; `poolai-loc-audit` → `rust_ratio.json` **94.67%**; hold advisory `--min-ratio 0.95`; `galaxy_horizon_s690_integration`; FM/HANDOFF/NEXT/STABLE/GALAXY sync; vision **rev 270**.
 
 **PH-S680…S689 ✅ (2026-06-20):** `GET /api/v1/grid/settlement-metrics` + `GET /api/v1/grid/trust-metrics`; `settlement_gate_depth_stub` (PH-S684); `parsePrometheusGauge` wasm glue (payout-batch); stand smoke settlement/trust API; `poolai-loc-audit` → `rust_ratio.json` **94.73%**; hold advisory `--min-ratio 0.95`; `galaxy_horizon_s680_integration`; FM/HANDOFF/NEXT/STABLE/GALAXY sync; vision **rev 268**.
 

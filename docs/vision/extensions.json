@@ -1,7 +1,7 @@
 {
-  "revision": 100,
+  "revision": 270,
   "updated_at": "2026-06-20",
-  "active_sprint": "PH-S690",
+  "active_sprint": "PH-S700",
   "ui_version": 4,
   "extension_policy": {
     ".md": {

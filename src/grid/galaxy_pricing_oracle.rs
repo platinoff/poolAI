@@ -181,7 +181,7 @@ pub fn forced_fallback_total() -> u64 {
     FORCED_FALLBACK_TOTAL.load(Ordering::Relaxed)
 }
 
-#[cfg(test)]
+#[cfg(any(test, feature = "test-utils"))]
 pub fn reset_forced_fallback_total_for_test() {
     FORCED_FALLBACK_TOTAL.store(0, Ordering::Relaxed);
 }
@@ -191,7 +191,7 @@ pub fn stale_served_total() -> u64 {
     STALE_SERVED_TOTAL.load(Ordering::Relaxed)
 }
 
-#[cfg(test)]
+#[cfg(any(test, feature = "test-utils"))]
 pub fn reset_stale_served_total_for_test() {
     STALE_SERVED_TOTAL.store(0, Ordering::Relaxed);
 }
@@ -201,22 +201,22 @@ pub fn fresh_served_total() -> u64 {
     FRESH_SERVED_TOTAL.load(Ordering::Relaxed)
 }
 
-#[cfg(test)]
+#[cfg(any(test, feature = "test-utils"))]
 pub fn reset_fresh_served_total_for_test() {
     FRESH_SERVED_TOTAL.store(0, Ordering::Relaxed);
 }
 
-#[cfg(test)]
+#[cfg(any(test, feature = "test-utils"))]
 pub fn bump_fresh_served_for_test() {
     record_fresh_served(GalaxyPriceUnitKey::InferenceBlendedToken);
 }
 
-#[cfg(test)]
+#[cfg(any(test, feature = "test-utils"))]
 pub fn bump_stale_served_for_test() {
     record_stale_served(GalaxyPriceUnitKey::InferenceBlendedToken);
 }
 
-#[cfg(test)]
+#[cfg(any(test, feature = "test-utils"))]
 pub fn bump_forced_fallback_for_test() {
     record_forced_fallback(GalaxyPriceUnitKey::InferenceBlendedToken);
 }

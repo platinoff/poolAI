@@ -840,6 +840,34 @@ paths:
               schema:
                 $ref: '#/components/schemas/GridTrustMetricsResponse'
 
+  /grid/replication-metrics:
+    get:
+      tags:
+        - Grid
+      summary: Replication counters snapshot (PH-S690)
+      operationId: getGridReplicationMetrics
+      responses:
+        '200':
+          description: Replication metrics snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GridReplicationMetricsResponse'
+
+  /grid/pricing-metrics:
+    get:
+      tags:
+        - Grid
+      summary: Pricing oracle counters snapshot (PH-S691)
+      operationId: getGridPricingMetrics
+      responses:
+        '200':
+          description: Pricing metrics snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GridPricingMetricsResponse'
+
   /grid/network-profiles/{peer_id}:
     get:
       tags:
@@ -6592,6 +6620,78 @@ components:
           type: boolean
         metrics:
           $ref: '#/components/schemas/TrustMetricsSnapshot'
+
+    ReplicationMetricsSnapshot:
+      type: object
+      required:
+        - strict_total
+        - enqueue_total
+        - executor_enqueue_total
+        - rate_limited_total
+      properties:
+        strict_total:
+          type: integer
+          format: int64
+        enqueue_total:
+          type: integer
+          format: int64
+        executor_enqueue_total:
+          type: integer
+          format: int64
+        rate_limited_total:
+          type: integer
+          format: int64
+
+    GridReplicationMetricsResponse:
+      type: object
+      required:
+        - ok
+        - metrics
+      properties:
+        ok:
+          type: boolean
+        metrics:
+          $ref: '#/components/schemas/ReplicationMetricsSnapshot'
+
+    PricingMetricsSnapshot:
+      type: object
+      required:
+        - fresh_served_total
+        - stale_served_total
+        - forced_fallback_total
+        - provider_catalog_lookups_total
+        - provider_catalog_hits_total
+        - provider_errors_total
+      properties:
+        fresh_served_total:
+          type: integer
+          format: int64
+        stale_served_total:
+          type: integer
+          format: int64
+        forced_fallback_total:
+          type: integer
+          format: int64
+        provider_catalog_lookups_total:
+          type: integer
+          format: int64
+        provider_catalog_hits_total:
+          type: integer
+          format: int64
+        provider_errors_total:
+          type: integer
+          format: int64
+
+    GridPricingMetricsResponse:
+      type: object
+      required:
+        - ok
+        - metrics
+      properties:
+        ok:
+          type: boolean
+        metrics:
+          $ref: '#/components/schemas/PricingMetricsSnapshot'
 
     GridNetworkProfileResponse:
       type: object

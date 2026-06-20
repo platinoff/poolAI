@@ -94,7 +94,7 @@
 | **PH-S688** | Ratio hold advisory --min-ratio 0.95 --advisory snapshot | scope test green |
 | **PH-S689** | Horizon close galaxy_horizon_s680_integration + docs close band | scope test green |
 
-## Band 4 — PH-S690…S699 (Galaxy replication/pricing wire depth) (**active §5.12**)
+## Band 4 — PH-S690…S699 (Galaxy replication/pricing wire depth) (drained ✅)
 
 | Sprint | Focus | Acceptance |
 |--------|-------|------------|
@@ -109,7 +109,7 @@
 | **PH-S698** | Ratio hold advisory --min-ratio 0.95 --advisory snapshot | scope test green |
 | **PH-S699** | Horizon close galaxy_horizon_s690_integration + docs close band | scope test green |
 
-## Band 5 — PH-S700…S709 (Admin wasm slim (ui-core + poolai-ui-wasm))
+## Band 5 — PH-S700…S709 (Admin wasm slim (ui-core + poolai-ui-wasm)) (**active §5.12**)
 
 | Sprint | Focus | Acceptance |
 |--------|-------|------------|

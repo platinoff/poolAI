@@ -3,53 +3,53 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S690",
+      "id": "PH-S700",
       "link": "docs/vision/index.html#sprint-queue",
       "next": true,
       "published": "2026-05-28",
       "status": "open",
-      "summary": "GET /api/v1/grid/replication-metrics`; integration test",
-      "title": "Galaxy replication metric HTTP wire"
+      "summary": "wasm slim panel scope test",
+      "title": "Admin wasm slim panel #1"
     },
     {
       "category": "open",
-      "id": "PH-S691",
+      "id": "PH-S701",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "GET /api/v1/grid/pricing-metrics`; integration test",
-      "title": "Galaxy pricing metric HTTP wire"
+      "summary": "wasm slim panel scope test",
+      "title": "Admin wasm slim panel #2"
     },
     {
       "category": "open",
-      "id": "PH-S692",
+      "id": "PH-S702",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "parsePrometheusGauge` or JSON metrics fetch; admin test",
-      "title": "Admin panel wasm glue"
+      "summary": "parsePrometheusGauge regression test",
+      "title": "Admin wasm glue regression"
     },
     {
       "category": "open",
-      "id": "PH-S693",
+      "id": "PH-S703",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "replication-metrics + pricing-metrics API shape",
-      "title": "Stand smoke replication/pricing API"
+      "summary": "band 5 metric API smoke",
+      "title": "Stand smoke /metrics export shape"
     },
     {
       "category": "open",
-      "id": "PH-S694",
+      "id": "PH-S704",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "replication/pricing depth stub + unit test",
+      "summary": "unit test scope",
       "title": "Galaxy concept helper stub"
     },
     {
       "category": "open",
-      "id": "PH-S695",
+      "id": "PH-S705",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -58,7 +58,7 @@
     },
     {
       "category": "open",
-      "id": "PH-S696",
+      "id": "PH-S706",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -67,7 +67,7 @@
     },
     {
       "category": "open",
-      "id": "PH-S697",
+      "id": "PH-S707",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -76,7 +76,7 @@
     },
     {
       "category": "open",
-      "id": "PH-S698",
+      "id": "PH-S708",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -85,12 +85,102 @@
     },
     {
       "category": "open",
-      "id": "PH-S699",
+      "id": "PH-S709",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
+      "summary": "galaxy_horizon_s700_integration` + docs sync",
+      "title": "Horizon close band S700–S708"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S699",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
       "summary": "galaxy_horizon_s690_integration` + docs sync",
       "title": "Horizon close band S690–S698"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S698",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--min-ratio 0.95 --advisory` 94.67%",
+      "title": "Ratio hold advisory snapshot"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S697",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "poolai-vision-sync --check` green",
+      "title": "poolai-vision-sync drift gate"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S696",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "INDEX + HANDOFF + NEXT + STABLE + GALAXY sync",
+      "title": "Docs INDEX canon sync"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S695",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "poolai-loc-audit` → `rust_ratio.json` 94.67%",
+      "title": "Rust ratio loc-audit refresh"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S694",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "replication_pricing_depth_stub` + unit test",
+      "title": "Galaxy concept helper stub"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S693",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "replication-metrics + pricing-metrics API shape",
+      "title": "Stand smoke replication/pricing API"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S692",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "parsePrometheusGauge` + JSON metrics fetch; admin test",
+      "title": "Admin panel wasm glue"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S691",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "GET /api/v1/grid/pricing-metrics`; integration test",
+      "title": "Galaxy pricing metric HTTP wire"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S690",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "GET /api/v1/grid/replication-metrics`; integration test",
+      "title": "Galaxy replication metric HTTP wire"
     },
     {
       "category": "closed",
@@ -108,96 +198,6 @@
       "published": "2026-05-28",
       "status": "closed",
       "summary": "--min-ratio 0.95 --advisory` 94.73%",
-      "title": "Ratio hold advisory snapshot"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S687",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "poolai-vision-sync --check` green",
-      "title": "poolai-vision-sync drift gate"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S686",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "INDEX + HANDOFF + NEXT + STABLE + GALAXY sync",
-      "title": "Docs INDEX canon sync"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S685",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "poolai-loc-audit` → `rust_ratio.json` 94.73%",
-      "title": "Rust ratio loc-audit refresh"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S684",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "settlement_gate_depth_stub` + unit test",
-      "title": "Galaxy concept helper stub"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S683",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "settlement/trust metrics API smoke + export shape",
-      "title": "Stand smoke /metrics export shape"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S682",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "parsePrometheusGauge` + settlement/trust JSON; admin test",
-      "title": "Admin panel wasm glue"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S681",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "GET /api/v1/grid/trust-metrics`; integration test",
-      "title": "Galaxy trust metric HTTP wire"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S680",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "GET /api/v1/grid/settlement-metrics`; integration test",
-      "title": "Galaxy settlement metric HTTP wire"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S679",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_horizon_s670_integration` + docs sync",
-      "title": "Horizon close band S670–S678"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S678",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--min-ratio 0.95 --advisory` 94.72%",
       "title": "Ratio hold advisory snapshot"
     }
   ],

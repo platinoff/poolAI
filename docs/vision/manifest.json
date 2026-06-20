@@ -2028,7 +2028,7 @@
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S689",
+  "last_sprint_closed": "PH-S699",
   "layers": [
     {
       "id": "L0",
@@ -2061,7 +2061,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S690",
+  "next_sprint": "PH-S700",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -8470,7 +8470,7 @@
       "path": "tests/galaxy_horizon_s680_integration.rs"
     }
   ],
-  "revision": 269,
+  "revision": 270,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -14092,91 +14092,181 @@
       "acceptance": "GET /api/v1/grid/replication-metrics`; integration test",
       "deps": "Galaxy §6.4 replication",
       "id": "PH-S690",
-      "open": true,
+      "open": false,
       "row": 625,
-      "status": "open",
+      "status": "closed",
       "title": "Galaxy replication metric HTTP wire"
     },
     {
       "acceptance": "GET /api/v1/grid/pricing-metrics`; integration test",
       "deps": "Galaxy §4.2 oracle snapshot",
       "id": "PH-S691",
-      "open": true,
+      "open": false,
       "row": 626,
-      "status": "open",
+      "status": "closed",
       "title": "Galaxy pricing metric HTTP wire"
     },
     {
-      "acceptance": "parsePrometheusGauge` or JSON metrics fetch; admin test",
+      "acceptance": "parsePrometheusGauge` + JSON metrics fetch; admin test",
       "deps": "replication/pricing admin panels",
       "id": "PH-S692",
-      "open": true,
+      "open": false,
       "row": 627,
-      "status": "open",
+      "status": "closed",
       "title": "Admin panel wasm glue"
     },
     {
       "acceptance": "replication-metrics + pricing-metrics API shape",
       "deps": "poolai-http-stand-smoke",
       "id": "PH-S693",
-      "open": true,
+      "open": false,
       "row": 628,
-      "status": "open",
+      "status": "closed",
       "title": "Stand smoke replication/pricing API"
     },
     {
-      "acceptance": "replication/pricing depth stub + unit test",
+      "acceptance": "replication_pricing_depth_stub` + unit test",
       "deps": "Galaxy §4.2 / §6.4",
       "id": "PH-S694",
-      "open": true,
+      "open": false,
       "row": 629,
-      "status": "open",
+      "status": "closed",
       "title": "Galaxy concept helper stub"
     },
     {
-      "acceptance": "poolai-loc-audit` → `rust_ratio.json` sprint zriz",
+      "acceptance": "poolai-loc-audit` → `rust_ratio.json` 94.67%",
       "deps": "§5.13 fallback",
       "id": "PH-S695",
-      "open": true,
+      "open": false,
       "row": 630,
-      "status": "open",
+      "status": "closed",
       "title": "Rust ratio loc-audit refresh"
     },
     {
       "acceptance": "INDEX + HANDOFF + NEXT + STABLE + GALAXY sync",
       "deps": "docs canon",
       "id": "PH-S696",
-      "open": true,
+      "open": false,
       "row": 631,
-      "status": "open",
+      "status": "closed",
       "title": "Docs INDEX canon sync"
     },
     {
       "acceptance": "poolai-vision-sync --check` green",
       "deps": "ops",
       "id": "PH-S697",
-      "open": true,
+      "open": false,
       "row": 632,
-      "status": "open",
+      "status": "closed",
       "title": "poolai-vision-sync drift gate"
     },
     {
-      "acceptance": "--min-ratio 0.95 --advisory",
+      "acceptance": "--min-ratio 0.95 --advisory` 94.67%",
       "deps": "PH-S351 pattern",
       "id": "PH-S698",
-      "open": true,
+      "open": false,
       "row": 633,
-      "status": "open",
+      "status": "closed",
       "title": "Ratio hold advisory snapshot"
     },
     {
       "acceptance": "galaxy_horizon_s690_integration` + docs sync",
       "deps": "§5.12 fallback",
       "id": "PH-S699",
-      "open": true,
+      "open": false,
       "row": 634,
-      "status": "open",
+      "status": "closed",
       "title": "Horizon close band S690–S698"
+    },
+    {
+      "acceptance": "wasm slim panel scope test",
+      "deps": "ui-core → poolai-ui-wasm",
+      "id": "PH-S700",
+      "open": true,
+      "row": 635,
+      "status": "open",
+      "title": "Admin wasm slim panel #1"
+    },
+    {
+      "acceptance": "wasm slim panel scope test",
+      "deps": "admin_charts canvas glue → wasm",
+      "id": "PH-S701",
+      "open": true,
+      "row": 636,
+      "status": "open",
+      "title": "Admin wasm slim panel #2"
+    },
+    {
+      "acceptance": "parsePrometheusGauge regression test",
+      "deps": "admin/mod.rs wasm render",
+      "id": "PH-S702",
+      "open": true,
+      "row": 637,
+      "status": "open",
+      "title": "Admin wasm glue regression"
+    },
+    {
+      "acceptance": "band 5 metric API smoke",
+      "deps": "poolai-http-stand-smoke",
+      "id": "PH-S703",
+      "open": true,
+      "row": 638,
+      "status": "open",
+      "title": "Stand smoke /metrics export shape"
+    },
+    {
+      "acceptance": "unit test scope",
+      "deps": "Galaxy §4–§8 horizon",
+      "id": "PH-S704",
+      "open": true,
+      "row": 639,
+      "status": "open",
+      "title": "Galaxy concept helper stub"
+    },
+    {
+      "acceptance": "poolai-loc-audit` → `rust_ratio.json` sprint zriz",
+      "deps": "§5.13 fallback",
+      "id": "PH-S705",
+      "open": true,
+      "row": 640,
+      "status": "open",
+      "title": "Rust ratio loc-audit refresh"
+    },
+    {
+      "acceptance": "INDEX + HANDOFF + NEXT + STABLE + GALAXY sync",
+      "deps": "docs canon",
+      "id": "PH-S706",
+      "open": true,
+      "row": 641,
+      "status": "open",
+      "title": "Docs INDEX canon sync"
+    },
+    {
+      "acceptance": "poolai-vision-sync --check` green",
+      "deps": "ops",
+      "id": "PH-S707",
+      "open": true,
+      "row": 642,
+      "status": "open",
+      "title": "poolai-vision-sync drift gate"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory",
+      "deps": "PH-S351 pattern",
+      "id": "PH-S708",
+      "open": true,
+      "row": 643,
+      "status": "open",
+      "title": "Ratio hold advisory snapshot"
+    },
+    {
+      "acceptance": "galaxy_horizon_s700_integration` + docs sync",
+      "deps": "§5.12 fallback",
+      "id": "PH-S709",
+      "open": true,
+      "row": 644,
+      "status": "open",
+      "title": "Horizon close band S700–S708"
     }
   ],
   "sprint_queue_open_count": 10,

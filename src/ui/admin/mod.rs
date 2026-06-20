@@ -37,6 +37,7 @@ pub mod audit;
 pub mod config;
 pub mod dashboard;
 pub mod grid_pricing;
+pub mod grid_replication_pricing;
 pub mod grid_verification;
 pub mod instances;
 pub mod jobs;
@@ -74,6 +75,10 @@ pub fn create_admin_routes() -> Router<ApiContext> {
         .route(
             "/admin/grid-verification",
             get(grid_verification::admin_grid_verification),
+        )
+        .route(
+            "/admin/grid-replication-pricing",
+            get(grid_replication_pricing::admin_grid_replication_pricing),
         )
         .route(
             "/admin/telegram-seats",
@@ -1309,6 +1314,15 @@ fn admin_grid_verification_wasm_glue_ph_s672() {
     let page = include_str!("grid_verification.rs");
     assert!(page.contains("parsePrometheusGauge"));
     assert!(page.contains("poolaiChartsWasm"));
+}
+
+#[test]
+fn admin_grid_replication_pricing_wasm_glue_ph_s692() {
+    let page = include_str!("grid_replication_pricing.rs");
+    assert!(page.contains("parsePrometheusGauge"));
+    assert!(page.contains("poolaiChartsWasm"));
+    assert!(page.contains("/api/v1/grid/replication-metrics"));
+    assert!(page.contains("/api/v1/grid/pricing-metrics"));
 }
 
 #[test]
