@@ -31,6 +31,7 @@ use poolai_ui_core::ml::{
     render_sparkline_html, sanitize_chart_id,
 };
 use poolai_ui_core::modal::{admin_dynamic_modal_html, trap_tab_action, MODAL_FOCUSABLE_SELECTOR};
+use poolai_ui_core::network_profiles::render_network_profiles_panel_html;
 use poolai_ui_core::payout_batch::render_payout_batch_panel_html;
 use poolai_ui_core::pricing::{format_unix_secs, format_usd_micro};
 use poolai_ui_core::prometheus::parse_prometheus_gauge;
@@ -598,6 +599,27 @@ pub fn render_grid_settlement_trust_metrics_strip_wasm(
         settlement_metrics_json,
         trust_metrics_json,
         trust_score_gauge,
+    )
+}
+
+#[wasm_bindgen(js_name = renderNetworkProfilesPanel)]
+pub fn render_network_profiles_panel_wasm(
+    rows_json: &str,
+    col_peer: &str,
+    col_region: &str,
+    col_latency: &str,
+    col_bandwidth: &str,
+    table_aria: &str,
+    empty_message: &str,
+) -> String {
+    render_network_profiles_panel_html(
+        rows_json,
+        col_peer,
+        col_region,
+        col_latency,
+        col_bandwidth,
+        table_aria,
+        empty_message,
     )
 }
 

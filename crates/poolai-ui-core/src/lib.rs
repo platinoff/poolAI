@@ -16,6 +16,7 @@ pub mod instances;
 pub mod lease;
 pub mod ml;
 pub mod modal;
+pub mod network_profiles;
 pub mod payout_batch;
 pub mod pricing;
 pub mod prometheus;

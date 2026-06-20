@@ -92,6 +92,15 @@ pub fn load_peer_network_profile(peer_id: &str) -> Option<String> {
     STORE.lock().ok().and_then(|g| g.get(peer_id))
 }
 
+/// Reload in-memory store from disk (PH-S730 restart stub).
+pub fn reload_network_profile_store_from_disk() -> Result<(), AppError> {
+    let mut guard = STORE
+        .lock()
+        .map_err(|_| AppError::InternalError("network_profile store lock poisoned".into()))?;
+    *guard = NetworkProfileStoreInner::open(data_dir_from_env());
+    Ok(())
+}
+
 /// All peer ids with persisted profiles (PH-S529 startup hydrate).
 pub fn list_persisted_network_profile_peer_ids() -> Vec<String> {
     STORE

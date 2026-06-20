@@ -42,7 +42,7 @@
 
 ---
 
-## Band 8 — PH-S730…S739 (Galaxy §8.1 network_profile full persist) · **active §5.12**
+## Band 8 — PH-S730…S739 (Galaxy §8.1 network_profile full persist) · **✅ drained 2026-06-20**
 
 | Sprint | Focus | Acceptance |
 |--------|-------|------------|
@@ -59,7 +59,7 @@
 
 ---
 
-## Band 9 — PH-S740…S749 (Galaxy §6.6 signed capability admission)
+## Band 9 — PH-S740…S749 (Galaxy §6.6 signed capability admission) · **active §5.12**
 
 | Sprint | Focus | Acceptance |
 |--------|-------|------------|

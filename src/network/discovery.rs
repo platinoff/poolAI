@@ -646,10 +646,19 @@ impl DiscoveryService {
         }
         if let Some(patch) = metadata_patch {
             if let Some(np_json) = patch.get("network_profile") {
+                let merged = match peer.metadata.get("network_profile") {
+                    Some(existing) => {
+                        crate::grid::galaxy_network_profile::merge_network_profile_json(
+                            existing, np_json,
+                        )
+                        .unwrap_or_else(|_| np_json.clone())
+                    }
+                    None => np_json.clone(),
+                };
                 peer.metadata
-                    .insert("network_profile".to_string(), np_json.clone());
+                    .insert("network_profile".to_string(), merged.clone());
                 let _ = crate::grid::galaxy_network_profile_store::persist_peer_network_profile(
-                    peer_id, np_json,
+                    peer_id, &merged,
                 );
             }
         }

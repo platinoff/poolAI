@@ -466,6 +466,21 @@ path = "tests/galaxy_horizon_s720_integration.rs"
 required-features = ["test-utils", "prometheus"]
 
 [[test]]
+name = "galaxy_horizon_s730_integration"
+path = "tests/galaxy_horizon_s730_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
+name = "network_profile_persist_restart_integration"
+path = "tests/network_profile_persist_restart_integration.rs"
+required-features = ["test-utils"]
+
+[[test]]
+name = "network_profile_heartbeat_merge_integration"
+path = "tests/network_profile_heartbeat_merge_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
 name = "galaxy_horizon_s700_integration"
 path = "tests/galaxy_horizon_s700_integration.rs"
 required-features = ["test-utils", "prometheus"]

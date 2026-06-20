@@ -2977,6 +2977,30 @@ mod tests {
     }
 
     #[test]
+    fn grid_network_profiles_list_put_export_shape_ph_s733() {
+        let list = serde_json::json!({
+            "ok": true,
+            "peer_ids": ["peer-a", "peer-b"],
+            "count": 2
+        });
+        assert_eq!(list["ok"], true);
+        assert_eq!(list["count"], 2);
+        let ids = list["peer_ids"].as_array().expect("peer_ids");
+        assert_eq!(ids.len(), 2);
+
+        let profile = serde_json::json!({
+            "ok": true,
+            "peer_id": "peer-a",
+            "network_profile": {
+                "region": "smoke",
+                "latency_ms_p50": 11
+            }
+        });
+        assert_eq!(profile["peer_id"], "peer-a");
+        assert_eq!(profile["network_profile"]["region"].as_str(), Some("smoke"));
+    }
+
+    #[test]
     fn vision_revision_fm_parity_ph_s235() {
         let root = repo_root();
         assert_vision_repo_parity(&root)

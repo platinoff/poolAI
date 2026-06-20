@@ -3,71 +3,71 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S730",
+      "id": "PH-S740",
       "link": "docs/vision/index.html#sprint-queue",
       "next": true,
       "published": "2026-05-28",
       "status": "open",
-      "summary": "GET profile survives restart stub + integration test",
-      "title": "network_profile_store` persist read"
+      "summary": "unsigned edge → 403 + metric",
+      "title": "signed capability strict gate"
     },
     {
       "category": "open",
-      "id": "PH-S731",
+      "id": "PH-S741",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "PUT + heartbeat merge persist + test",
-      "title": "network_profile_store` persist write"
+      "summary": "integration test register-remote OK",
+      "title": "signed capability dev fixture pass"
     },
     {
       "category": "open",
-      "id": "PH-S732",
+      "id": "PH-S742",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "fetch `/grid/network-profiles` + wasm render",
-      "title": "Admin network-profile panel wasm glue"
+      "summary": "updates-compat capability section",
+      "title": "Admin capability doc panel extend"
     },
     {
       "category": "open",
-      "id": "PH-S733",
+      "id": "PH-S743",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "live runner cases green",
-      "title": "Stand smoke network-profiles list/put"
+      "summary": "export shape unit test",
+      "title": "Stand smoke signed-cap reject shape"
     },
     {
       "category": "open",
-      "id": "PH-S734",
+      "id": "PH-S744",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "egress/locality classification + unit test",
-      "title": "network_profile_depth_stub"
+      "summary": "unit test",
+      "title": "capability_admission_depth_stub"
     },
     {
       "category": "open",
-      "id": "PH-S735",
+      "id": "PH-S745",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "poolai-loc-audit` → `rust_ratio.json` PH-S735 zriz",
+      "summary": "poolai-loc-audit` → `rust_ratio.json` PH-S745 zriz",
       "title": "Rust ratio loc-audit refresh"
     },
     {
       "category": "open",
-      "id": "PH-S736",
+      "id": "PH-S746",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "INDEX + HANDOFF + NEXT + STABLE + GALAXY + completion roadmap",
-      "title": "Docs INDEX canon sync"
+      "summary": "docs canon",
+      "title": "SECURITY_HARDENING ↔ §6.6 cross-link"
     },
     {
       "category": "open",
-      "id": "PH-S737",
+      "id": "PH-S747",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -76,7 +76,7 @@
     },
     {
       "category": "open",
-      "id": "PH-S738",
+      "id": "PH-S748",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -85,12 +85,102 @@
     },
     {
       "category": "open",
-      "id": "PH-S739",
+      "id": "PH-S749",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
+      "summary": "galaxy_horizon_s740_integration` + docs sync",
+      "title": "Horizon close band S740–S748"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S739",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
       "summary": "galaxy_horizon_s730_integration` + docs sync",
       "title": "Horizon close band S730–S738"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S738",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--min-ratio 0.95 --advisory` 94.57%",
+      "title": "Ratio hold advisory snapshot"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S737",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "poolai-vision-sync --check` green",
+      "title": "poolai-vision-sync drift gate"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S736",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "INDEX + HANDOFF + NEXT + STABLE + GALAXY + completion roadmap",
+      "title": "Docs INDEX canon sync"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S735",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "poolai-loc-audit` → `rust_ratio.json` 94.57%",
+      "title": "Rust ratio loc-audit refresh"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S734",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "egress/locality classification + unit test",
+      "title": "network_profile_depth_stub"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S733",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "live runner cases green",
+      "title": "Stand smoke network-profiles list/put"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S732",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "fetch `/grid/network-profiles` + wasm render",
+      "title": "Admin network-profile panel wasm glue"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S731",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "PUT + heartbeat merge persist + test",
+      "title": "network_profile_store` persist write"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S730",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "GET profile survives restart stub + integration test",
+      "title": "network_profile_store` persist read"
     },
     {
       "category": "closed",
@@ -108,96 +198,6 @@
       "published": "2026-05-28",
       "status": "closed",
       "summary": "--min-ratio 0.95 --advisory` 94.55%",
-      "title": "Ratio hold advisory snapshot"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S727",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "poolai-vision-sync --check` green",
-      "title": "poolai-vision-sync drift gate"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S726",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "INDEX + HANDOFF + NEXT + STABLE + GALAXY + completion roadmap",
-      "title": "Docs INDEX canon sync"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S725",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "poolai-loc-audit` → `rust_ratio.json` 94.55%",
-      "title": "Rust ratio loc-audit refresh"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S724",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "unit test",
-      "title": "Concept stub extend (§4–§8)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S723",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "unit tests in stand smoke bin",
-      "title": "Stand smoke settlement/trust JSON↔Prom parity"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S722",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "fetch JSON metrics + wasm render",
-      "title": "Admin settlement/trust metrics wasm strip"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S721",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "strict routing helper + unit test",
-      "title": "routing_policy_locality_gate"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S720",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "unit test; dispatch/scheduler hook",
-      "title": "re_migrate_policy_depth_stub"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S719",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_horizon_s710_integration` + docs sync",
-      "title": "Horizon close band S710–S718"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S718",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--min-ratio 0.95 --advisory` 94.76%",
       "title": "Ratio hold advisory snapshot"
     }
   ],

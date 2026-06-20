@@ -8,21 +8,45 @@ pub async fn admin_network_profiles() -> Html<String> {
     let script = r#"
     function T(k, fb) { return typeof poolaiT === 'function' ? poolaiT(k, fb) : fb; }
 
+    function networkProfilesI18n(key, fallback) {
+      return T(key, fallback);
+    }
+
     function renderNetworkProfilesList(peerIds, profiles) {
       const el = document.getElementById('network-profiles-panel');
       if (!el) return;
       const ids = Array.isArray(peerIds) ? peerIds : [];
+      const rows = ids.map((id) => {
+        const snap = profiles[id] || {};
+        return {
+          peer_id: id,
+          network_profile: snap.network_profile || snap,
+        };
+      });
+      const wasm = window.poolaiUiWasm;
+      if (wasm && wasm.ready && typeof wasm.renderNetworkProfilesPanel === 'function') {
+        el.innerHTML = wasm.renderNetworkProfilesPanel(
+          JSON.stringify(rows),
+          networkProfilesI18n('admin.networkProfiles.colPeer', 'Peer'),
+          networkProfilesI18n('admin.networkProfiles.colRegion', 'Region'),
+          networkProfilesI18n('admin.networkProfiles.colLatency', 'Latency p50'),
+          networkProfilesI18n('admin.networkProfiles.colBandwidth', 'Bandwidth Mbps'),
+          networkProfilesI18n('admin.networkProfiles.table', 'Network profiles'),
+          networkProfilesI18n('admin.networkProfiles.empty', 'No persisted network profiles.')
+        );
+        return;
+      }
       if (!ids.length) {
         el.innerHTML = '<p class="muted">' + escapeHtml(T('admin.networkProfiles.empty', 'No persisted network profiles.')) + '</p>';
         return;
       }
-      let rows = '';
+      let tableRows = '';
       ids.forEach((id) => {
         const snap = profiles[id] || {};
         const region = snap.region || snap.network_profile?.region || '—';
         const latency = snap.latency_ms_p50 ?? snap.network_profile?.latency_ms_p50 ?? '—';
         const bandwidth = snap.bandwidth_mbps ?? snap.network_profile?.bandwidth_mbps ?? '—';
-        rows += '<tr><td><code>' + escapeHtml(String(id)) + '</code></td>' +
+        tableRows += '<tr><td><code>' + escapeHtml(String(id)) + '</code></td>' +
           '<td>' + escapeHtml(String(region)) + '</td>' +
           '<td>' + escapeHtml(String(latency)) + '</td>' +
           '<td>' + escapeHtml(String(bandwidth)) + '</td></tr>';
@@ -33,7 +57,7 @@ pub async fn admin_network_profiles() -> Html<String> {
         '<th>' + escapeHtml(T('admin.networkProfiles.colRegion', 'Region')) + '</th>' +
         '<th>' + escapeHtml(T('admin.networkProfiles.colLatency', 'Latency p50')) + '</th>' +
         '<th>' + escapeHtml(T('admin.networkProfiles.colBandwidth', 'Bandwidth Mbps')) + '</th></tr></thead>' +
-        '<tbody>' + rows + '</tbody></table>';
+        '<tbody>' + tableRows + '</tbody></table>';
     }
 
     async function loadNetworkProfilesPanel() {
@@ -146,4 +170,5 @@ async fn admin_network_profiles_page_api_ph_s582() {
     assert!(html.contains("loadNetworkProfilesPanel"));
     assert!(html.contains("network-profile-upsert-form"));
     assert!(html.contains("saveNetworkProfileUpsert"));
+    assert!(html.contains("renderNetworkProfilesPanel"));
 }

@@ -158,6 +158,33 @@ fn validate_network_profile(
     Ok(())
 }
 
+/// Merge heartbeat patch into stored profile JSON (PH-S731).
+pub fn merge_network_profile_json(
+    existing_json: &str,
+    patch_json: &str,
+) -> Result<String, NetworkProfileParseError> {
+    let mut base: Value = serde_json::from_str(existing_json).map_err(|e| {
+        NetworkProfileParseError::new(format!("network_profile existing JSON invalid: {e}"))
+    })?;
+    let patch: Value = serde_json::from_str(patch_json).map_err(|e| {
+        NetworkProfileParseError::new(format!("network_profile patch JSON invalid: {e}"))
+    })?;
+    match (&mut base, patch) {
+        (Value::Object(ref mut existing), Value::Object(fields)) => {
+            for (key, value) in fields {
+                if !value.is_null() {
+                    existing.insert(key, value);
+                }
+            }
+        }
+        (_, patch_obj) => {
+            base = patch_obj;
+        }
+    }
+    let profile = parse_network_profile_value(&base)?;
+    profile.to_storage_json()
+}
+
 /// Load persisted peer profile from store (PH-S591/S592 prefetch gates).
 pub fn load_parsed_peer_network_profile(peer_id: &str) -> Option<GalaxyNetworkProfile> {
     crate::grid::galaxy_network_profile_store::load_peer_network_profile(peer_id).and_then(|raw| {
@@ -275,5 +302,16 @@ mod tests {
         let parsed: GalaxyNetworkProfile = serde_json::from_str(stored).unwrap();
         assert_eq!(parsed.region, "ap-south");
         assert_eq!(parsed.latency_ms_p50, 120);
+    }
+
+    #[test]
+    fn merge_network_profile_json_ph_s731() {
+        let base = r#"{"region":"eu-west","latency_ms_p50":30,"bandwidth_mbps":500}"#;
+        let patch = r#"{"region":"eu-west","latency_ms_p50":18,"egress_policy":"vpn_proxy"}"#;
+        let merged = merge_network_profile_json(base, patch).unwrap();
+        let parsed: GalaxyNetworkProfile = serde_json::from_str(&merged).unwrap();
+        assert_eq!(parsed.latency_ms_p50, 18);
+        assert_eq!(parsed.bandwidth_mbps, Some(500));
+        assert_eq!(parsed.egress_policy, Some(GalaxyEgressPolicy::VpnProxy));
     }
 }
