@@ -129,6 +129,7 @@ restart_coordinator() {
 }
 
 verify_raid_job_store() {
+  # PH-S851: optional RAID job store restart persist (VERIFY_RAID_JOB_STORE=1).
   local jobs_json backend job_json job_id detail_json got_id got_kind got_status
 
   jobs_json="$(curl -sf --max-time "$TIMEOUT" "${COORD_URL}/api/v1/jobs" || true)"

@@ -14,6 +14,7 @@ pub mod grid_replication_pricing;
 pub mod grid_verification;
 pub mod i18n;
 pub mod instances;
+pub mod jobs;
 pub mod lease;
 pub mod libs;
 pub mod ml;

@@ -1,12 +1,14 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-21 (PH-S840…S849 ✅ · master backlog **161** · active **10** · vision **rev 285** · rust_ratio **94.71%**)
+**Оновлено:** 2026-06-21 (PH-S850…S859 ✅ · master backlog **151** · active **10** · vision **rev 286** · rust_ratio **94.71%**)
 
-**Cursor 3.8.11 (2026-06-20):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-06-20.md`](./CURSOR_UPDATE_RESEARCH_2026-06-20.md). **Наступна сесія:** **`абракадабра`** (drain PH-S850…S859).
+**Cursor 3.8.11 (2026-06-20):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-06-20.md`](./CURSOR_UPDATE_RESEARCH_2026-06-20.md). **Наступна сесія:** **`абракадабра`** (drain PH-S860…S869).
 
-**Completion roadmap v2 (2026-06-20):** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) — **161** спринтів до **product-complete** (PH-S1010 / FM **§5.15**); **17** сесій `абракадабра` × 10 PH-S*. Реєстр: [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · regen `bash scripts/generate-ph-s-master-backlog-351.sh`.
+**Completion roadmap v2 (2026-06-20):** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) — **151** спринтів до **product-complete** (PH-S1010 / FM **§5.15**); **16** сесій `абракадабра` × 10 PH-S*. Реєстр: [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · regen `bash scripts/generate-ph-s-master-backlog-351.sh`.
 
-**Master backlog 161 (2026-06-21):** FM **§5.14**. Активна §5.12: **PH-S850…S859** (band 20 — Job store RAID production path). **`абракадабра`** = drain 10 → promote **PH-S860…S869** (band 21).
+**Master backlog 151 (2026-06-21):** FM **§5.14**. Активна §5.12: **PH-S860…S869** (band 21 — Memory shard persist). **`абракадабра`** = drain 10 → promote **PH-S870…S879** (band 22).
+
+**PH-S850…S859 ✅ (2026-06-21):** `job_store_raid_persistence` HTTP+RAID reload (PH-S850); `verify-dev-stand` RAID jobs path PH-S851; wasm `poolaiRenderJobsStoreBadge` (PH-S852); stand smoke `jobs_store_backend` (PH-S853); `job_store_depth_stub` (PH-S854); `poolai-loc-audit` → `rust_ratio.json` **94.71%** (PH-S855); RUN_LOCAL RAID preset sync (PH-S856); `galaxy_horizon_s850_integration` (PH-S859); vision **rev 286**.
 
 **PH-S840…S849 ✅ (2026-06-21):** openapi.yaml sync 4 missing routes + grid metrics examples (PH-S840/S844); `poolai-openapi-gap-audit` **0 missing** (PH-S841); `tests/grid_openapi_contracts.rs` (PH-S842); stand smoke OpenAPI path cases (PH-S843); `OPENAPI_GAP_AUDIT` doc sync (PH-S846); `poolai-loc-audit` → `rust_ratio.json` **94.71%** (PH-S845); `galaxy_horizon_s840_integration` (PH-S849); vision **rev 285**.
 
@@ -44,7 +46,7 @@
 
 **Rules:** **`абракадабра`** — drain 10 з §5.12 → vision close → push; [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
-**§5.12:** **10** відкритих **PH-S850…S859** (band 20). **Vision:** rev **285** · rust_ratio **94.71%** (PH-S845).
+**§5.12:** **10** відкритих **PH-S860…S869** (band 21). **Vision:** rev **286** · rust_ratio **94.71%** (PH-S855).
 
 **Роадмеп:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) · **Промпт:** [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md).
 

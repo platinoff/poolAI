@@ -15,6 +15,7 @@ use poolai_ui_core::galaxy_virtual_nodes::render_galaxy_virtual_nodes_panel_html
 use poolai_ui_core::grid_replication_pricing::render_grid_replication_pricing_panel_html;
 use poolai_ui_core::grid_verification::render_grid_verification_panel_html;
 use poolai_ui_core::instances::render_instances_panel_html;
+use poolai_ui_core::jobs::render_jobs_store_badge_html;
 use poolai_ui_core::lease::lease_state;
 use poolai_ui_core::libs::render_libs_panel_html;
 use poolai_ui_core::ml::{
@@ -105,6 +106,17 @@ pub fn modal_focusable_selector_wasm() -> String {
 #[wasm_bindgen(js_name = adminDynamicModalHtml)]
 pub fn admin_dynamic_modal_html_wasm() -> String {
     admin_dynamic_modal_html()
+}
+
+/// Jobs store backend badge HTML (PH-S852).
+#[wasm_bindgen(js_name = renderJobsStoreBadgeHtml)]
+pub fn render_jobs_store_badge_html_wasm(
+    backend: &str,
+    store_label: &str,
+    store_hint: &str,
+    backend_display: &str,
+) -> String {
+    render_jobs_store_badge_html(backend, store_label, store_hint, backend_display)
 }
 
 /// Jobs lease badge: returns `"active"`, `"expired"`, or `"none"`.

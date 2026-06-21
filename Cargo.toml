@@ -524,6 +524,16 @@ path = "tests/galaxy_horizon_s840_integration.rs"
 required-features = ["test-utils", "prometheus"]
 
 [[test]]
+name = "galaxy_horizon_s850_integration"
+path = "tests/galaxy_horizon_s850_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
+name = "job_store_raid_persistence"
+path = "tests/job_store_raid_persistence.rs"
+required-features = ["test-utils"]
+
+[[test]]
 name = "galaxy_horizon_s760_integration"
 path = "tests/galaxy_horizon_s760_integration.rs"
 required-features = ["test-utils", "prometheus"]

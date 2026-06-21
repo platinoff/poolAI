@@ -9,6 +9,7 @@ mod map;
 mod onchain;
 pub mod scheduler;
 mod store;
+mod store_depth;
 #[cfg(feature = "job-store-sqlite")]
 mod store_sqlite;
 mod types;
@@ -45,6 +46,7 @@ pub use scheduler::{
     ScheduleOutcome, VmCandidate, WorkerCandidate,
 };
 pub use store::{data_dir_from_env, JobStore};
+pub use store_depth::{job_store_depth_stub, JobStoreDepth};
 pub use types::{
     check_grid_result_lease_epoch, check_patch_lease_epoch, JobId, JobKind, JobRecord,
     JobResources, JobScheduleBinding, JobSpec, JobStatus, PatchLeaseEpochError,

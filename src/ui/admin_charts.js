@@ -494,6 +494,23 @@ function poolaiRenderInstancesPanel(instances, labels) {
 }
 
 /**
+ * PH-S852: Jobs store backend badge (wasm-only).
+ */
+function poolaiRenderJobsStoreBadge(backend, labels) {
+  labels = labels || {};
+  var wasm = poolaiChartsWasm();
+  if (wasm && typeof wasm.renderJobsStoreBadgeHtml === 'function') {
+    return wasm.renderJobsStoreBadgeHtml(
+      String(backend || 'json'),
+      labels.storeLabel || poolaiChartT('admin.jobs.storeLabel', 'Store:'),
+      labels.storeHint || poolaiChartT('admin.jobs.storeHint', 'Job persistence backend'),
+      labels.backendDisplay || String(backend || 'json'),
+    );
+  }
+  return '';
+}
+
+/**
  * PH-S499: VM instances table (wasm-only, PH-S820).
  */
 function poolaiRenderVmPanel(instances, labels) {

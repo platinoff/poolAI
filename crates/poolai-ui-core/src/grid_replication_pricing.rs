@@ -34,6 +34,8 @@ pub enum AdminWasmSlimDepth {
     WorkersPanel,
     /// Libraries admin panel wasm renderer (PH-S824).
     LibsPanel,
+    /// Jobs store backend badge wasm renderer (PH-S852).
+    JobsStoreBadge,
 }
 
 /// Classify admin wasm slim depth from optional feature stub (PH-S704).
@@ -46,6 +48,12 @@ pub fn admin_wasm_slim_depth_stub(features: Option<&Value>) -> AdminWasmSlimDept
         .unwrap_or(false)
     {
         return AdminWasmSlimDepth::LibsPanel;
+    }
+    if f.get("jobs_store_badge")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        return AdminWasmSlimDepth::JobsStoreBadge;
     }
     if f.get("workers_panel")
         .and_then(|v| v.as_bool())
@@ -224,6 +232,14 @@ mod tests {
         assert_eq!(
             admin_wasm_slim_depth_stub(Some(&json!({"vm_panel": true, "workers_panel": true}))),
             AdminWasmSlimDepth::VmPanel
+        );
+    }
+
+    #[test]
+    fn admin_wasm_slim_depth_stub_ph_s852() {
+        assert_eq!(
+            admin_wasm_slim_depth_stub(Some(&json!({"jobs_store_badge": true}))),
+            AdminWasmSlimDepth::JobsStoreBadge
         );
     }
 }

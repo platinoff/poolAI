@@ -4,6 +4,7 @@
 //! PH-S152: lease state badge via shared `poolai-ui-wasm` `leaseStateLabel`; thin JS fallback.
 //! PH-S154: EN/UK lease + table i18n in `poolai-ui-core::i18n` (injected via admin_layout).
 //! PH-S211: jobs page uses slim `admin_layout_jobs` + `admin_jobs_patch`.
+//! PH-S852: store backend badge via wasm `poolaiRenderJobsStoreBadge`.
 
 use crate::ui::admin::admin_layout_jobs;
 use axum::response::Html;
@@ -18,10 +19,20 @@ pub async fn admin_jobs() -> Html<String> {
       const el = document.getElementById('jobs-store-badge');
       if (!el) return;
       const key = String(backend || 'json').toLowerCase();
+      const storeLabel = T('admin.jobs.storeLabel', 'Store:');
+      const storeHint = T('admin.jobs.storeHint', 'Job persistence backend');
       const label = T('admin.jobs.store.' + key, key);
+      if (typeof poolaiRenderJobsStoreBadge === 'function') {
+        el.innerHTML = poolaiRenderJobsStoreBadge(key, {
+          storeLabel: storeLabel,
+          storeHint: storeHint,
+          backendDisplay: label,
+        });
+        return;
+      }
       el.innerHTML =
-        '<span class="status-badge active" title="' + escapeHtml(T('admin.jobs.storeHint', 'Job persistence backend')) + '">' +
-        escapeHtml(T('admin.jobs.storeLabel', 'Store:')) + ' ' + escapeHtml(label) +
+        '<span class="status-badge active" title="' + escapeHtml(storeHint) + '">' +
+        escapeHtml(storeLabel) + ' ' + escapeHtml(label) +
         '</span>';
     }
 
@@ -242,6 +253,7 @@ async fn admin_jobs_page_includes_store_badge_and_list() {
     assert!(html.contains("id=\"jobs-store-badge\""));
     assert!(html.contains("/api/v1/jobs"));
     assert!(html.contains("renderStoreBadge"));
+    assert!(html.contains("poolaiRenderJobsStoreBadge"));
     assert!(html.contains("Lease owner"));
     assert!(html.contains("lease_owner"));
     assert!(html.contains("lease_epoch"));

@@ -1046,6 +1046,15 @@ fn admin_charts_vm_panel_wasm_first_ph_s499() {
 }
 
 #[test]
+fn admin_jobs_store_badge_wasm_first_ph_s852() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("wasm.renderJobsStoreBadgeHtml"));
+    assert!(js.contains("poolaiRenderJobsStoreBadge"));
+    let jobs = include_str!("jobs.rs");
+    assert!(jobs.contains("poolaiRenderJobsStoreBadge"));
+}
+
+#[test]
 fn admin_charts_metric_history_url_with_hours_wasm_first_ph_s334() {
     let js = include_str!("../admin_charts.js");
     assert!(js.contains("wasm.buildMetricHistoryUrlWithHours"));

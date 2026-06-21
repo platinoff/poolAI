@@ -24,7 +24,9 @@ cd S:\rust\poolAI
 .\bin\run-poolai.ps1 stop
 ```
 
-### PH-S55: RAID jobs preset (single / lan one-liner)
+**Last updated:** 2026-06-21 (PH-S856 band 20 · RAID jobs preset · `--raid-restart` stand smoke)
+
+### PH-S55 / PH-S856: RAID jobs preset (single / lan one-liner)
 
 ```powershell
 # single node + RAID job store preset
@@ -285,4 +287,4 @@ bash bin/build-ui-wasm.sh
 | OOM при тестах Windows | `.\bin\poolai-msys.ps1 -lc 'cargo test-ci'` з `-j 1` (див. README) |
 | Admin 404 / порожній API | Запуск з `enterprise` (лаунчер робить це за замовчуванням) |
 
-**Last updated:** 2026-06-14 (PH-S156 `--raid-restart`)
+**Last updated:** 2026-06-21 (PH-S156 `--raid-restart` · PH-S853 `jobs_store_backend` smoke)

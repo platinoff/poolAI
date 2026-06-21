@@ -2166,7 +2166,7 @@
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S849",
+  "last_sprint_closed": "PH-S859",
   "layers": [
     {
       "id": "L0",
@@ -2199,7 +2199,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S850",
+  "next_sprint": "PH-S860",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -8907,9 +8907,23 @@
       "label": "galaxy_horizon_s830_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s830_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s840_integration_rs",
+      "label": "galaxy_horizon_s840_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s840_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_grid_openapi_contracts_rs",
+      "label": "grid_openapi_contracts.rs",
+      "layer": "L3",
+      "path": "tests/grid_openapi_contracts.rs"
     }
   ],
-  "revision": 285,
+  "revision": 286,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -15971,91 +15985,181 @@
       "acceptance": "integration test like PH-S52",
       "deps": "Job store RAID",
       "id": "PH-S850",
-      "open": true,
+      "open": false,
       "row": 785,
-      "status": "open",
+      "status": "closed",
       "title": "job store RAID restart persistence"
     },
     {
       "acceptance": "bin script green",
       "deps": "ops",
       "id": "PH-S851",
-      "open": true,
+      "open": false,
       "row": 786,
-      "status": "open",
+      "status": "closed",
       "title": "verify-dev-stand RAID jobs path"
     },
     {
       "acceptance": "admin jobs panel",
       "deps": "UI wasm glue",
       "id": "PH-S852",
-      "open": true,
+      "open": false,
       "row": 787,
-      "status": "open",
+      "status": "closed",
       "title": "admin jobs store_backend badge wire"
     },
     {
       "acceptance": "runner case",
       "deps": "tests",
       "id": "PH-S853",
-      "open": true,
+      "open": false,
       "row": 788,
-      "status": "open",
+      "status": "closed",
       "title": "stand smoke jobs store_backend"
     },
     {
       "acceptance": "unit test",
       "deps": "code",
       "id": "PH-S854",
-      "open": true,
+      "open": false,
       "row": 789,
-      "status": "open",
+      "status": "closed",
       "title": "job store depth stub"
     },
     {
       "acceptance": "rust_ratio.json zriz",
       "deps": "§5.13",
       "id": "PH-S855",
-      "open": true,
+      "open": false,
       "row": 790,
-      "status": "open",
+      "status": "closed",
       "title": "poolai-loc-audit PH-S855"
     },
     {
       "acceptance": "docs",
       "deps": "docs",
       "id": "PH-S856",
-      "open": true,
+      "open": false,
       "row": 791,
-      "status": "open",
+      "status": "closed",
       "title": "RUN_LOCAL.md RAID jobs preset"
     },
     {
       "acceptance": "--check` green",
       "deps": "ops",
       "id": "PH-S857",
-      "open": true,
+      "open": false,
       "row": 792,
-      "status": "open",
+      "status": "closed",
       "title": "poolai-vision-sync drift gate"
     },
     {
       "acceptance": "--min-ratio 0.95 --advisory",
       "deps": "ops",
       "id": "PH-S858",
-      "open": true,
+      "open": false,
       "row": 793,
-      "status": "open",
+      "status": "closed",
       "title": "Ratio hold advisory"
     },
     {
       "acceptance": "galaxy_horizon_s850_integration",
       "deps": "Job RAID",
       "id": "PH-S859",
-      "open": true,
+      "open": false,
       "row": 794,
-      "status": "open",
+      "status": "closed",
       "title": "Horizon close band S850–S858"
+    },
+    {
+      "acceptance": "MemoryShardStore persist + test",
+      "deps": "Memory shard persist",
+      "id": "PH-S860",
+      "open": true,
+      "row": 795,
+      "status": "open",
+      "title": "memory shard persist stub"
+    },
+    {
+      "acceptance": "GET /grid/seed-inventory extend",
+      "deps": "Galaxy §5.5",
+      "id": "PH-S861",
+      "open": true,
+      "row": 796,
+      "status": "open",
+      "title": "seed-inventory HTTP depth"
+    },
+    {
+      "acceptance": "ui-core helper",
+      "deps": "UI wasm glue",
+      "id": "PH-S862",
+      "open": true,
+      "row": 797,
+      "status": "open",
+      "title": "admin memory/seed wasm glue"
+    },
+    {
+      "acceptance": "runner",
+      "deps": "tests",
+      "id": "PH-S863",
+      "open": true,
+      "row": 798,
+      "status": "open",
+      "title": "stand smoke seed-inventory API"
+    },
+    {
+      "acceptance": "POOLAI_MEMORY_LAYER unit test",
+      "deps": "code",
+      "id": "PH-S864",
+      "open": true,
+      "row": 799,
+      "status": "open",
+      "title": "memory layer depth stub"
+    },
+    {
+      "acceptance": "rust_ratio.json zriz",
+      "deps": "§5.13",
+      "id": "PH-S865",
+      "open": true,
+      "row": 800,
+      "status": "open",
+      "title": "poolai-loc-audit PH-S865"
+    },
+    {
+      "acceptance": "docs ✅",
+      "deps": "docs",
+      "id": "PH-S866",
+      "open": true,
+      "row": 801,
+      "status": "open",
+      "title": "POOLAI_MEMORY_LAYER.md sync"
+    },
+    {
+      "acceptance": "--check` green",
+      "deps": "ops",
+      "id": "PH-S867",
+      "open": true,
+      "row": 802,
+      "status": "open",
+      "title": "poolai-vision-sync drift gate"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory",
+      "deps": "ops",
+      "id": "PH-S868",
+      "open": true,
+      "row": 803,
+      "status": "open",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "acceptance": "galaxy_horizon_s860_integration",
+      "deps": "Memory shard",
+      "id": "PH-S869",
+      "open": true,
+      "row": 804,
+      "status": "open",
+      "title": "Horizon close band S860–S868"
     }
   ],
   "sprint_queue_open_count": 10,

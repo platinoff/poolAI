@@ -2036,6 +2036,30 @@ async fn smoke_jobs_lease_renew_expired(client: &Client, base: &str) -> Result<(
     Ok(())
 }
 
+/// PH-S853: `GET /api/v1/jobs` exposes `store_backend` for admin badge wire.
+async fn smoke_jobs_store_backend(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/api/v1/jobs"))
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+    if !resp.status().is_success() {
+        return Err(format!("jobs list status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    let backend = body
+        .get("store_backend")
+        .and_then(|v| v.as_str())
+        .ok_or_else(|| format!("missing store_backend: {body}"))?;
+    if backend.trim().is_empty() {
+        return Err("empty store_backend".into());
+    }
+    if !matches!(backend, "json" | "sqlite" | "raid") {
+        return Err(format!("unexpected store_backend: {backend}"));
+    }
+    Ok(())
+}
+
 async fn smoke_jobs_migrating(client: &Client, base: &str) -> Result<(), String> {
     let id = create_unbound_job(client, base, "smoke-migrate").await?;
     let _ = client
@@ -2646,6 +2670,12 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
         &mut cases,
         "galaxy_hot_tier_hit_ratio_metrics",
         smoke_galaxy_hot_tier_hit_ratio_metrics(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
+        "jobs_store_backend",
+        smoke_jobs_store_backend(&client, &cli.base_url).await,
     )
     .await;
     record(
