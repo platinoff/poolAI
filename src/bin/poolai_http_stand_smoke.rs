@@ -1819,6 +1819,12 @@ async fn smoke_grid_payout_batch(client: &Client, base: &str) -> Result<(), Stri
     if body.get("settlement_mode").and_then(|v| v.as_str()) != Some("offline_batch") {
         return Err(format!("payout-batch missing settlement_mode: {body}"));
     }
+    if body.get("onchain_depth").and_then(|v| v.as_str()).is_none() {
+        return Err(format!("payout-batch missing onchain_depth: {body}"));
+    }
+    if body.get("solana_depth").and_then(|v| v.as_str()).is_none() {
+        return Err(format!("payout-batch missing solana_depth: {body}"));
+    }
     Ok(())
 }
 
@@ -3657,6 +3663,7 @@ mod tests {
             "poolai_update_notify_pending 0\n",
             "poolai_advisory_acknowledged_total 0\n",
             "galaxy_settlement_payout_batch_queue_depth 0\n",
+            "galaxy_settlement_onchain_submit_total 0\n",
         );
         let verification = serde_json::json!({"ok": true, "metrics": {"sample_total": 1, "mismatch_total": 0, "match_total": 0, "checker_pending_total": 0}});
         let replay = serde_json::json!({"ok": true, "metrics": {"replay_pending": 0, "replay_pending_scheduled_total": 0, "verification_replay_record_total": 0}});
@@ -3668,7 +3675,7 @@ mod tests {
         let locality = serde_json::json!({"ok": true, "metrics": {"shard_local_hit_ratio_bps": 0, "hot_tier_hit_ratio_bps": 0, "cross_region_egress_mb": 0, "hot_promote_total": 0, "hot_evict_total": 0}});
         let fee_split = serde_json::json!({"ok": true, "metrics": {"fee_split_applied_total": 0, "primary_dev_fee_bps": 10, "secondary_admin_fee_min_bps": 100, "secondary_admin_fee_max_bps": 500}});
         let governance = serde_json::json!({"ok": true, "metrics": {"release_verify_total": 0, "release_verify_fail_total": 0, "update_notify_pending": 0, "advisory_acknowledged_total": 0}});
-        let payout_batch = serde_json::json!({"ok": true, "metrics": {"payout_batch_total": 0, "payout_batch_queue_depth": 0}});
+        let payout_batch = serde_json::json!({"ok": true, "metrics": {"payout_batch_total": 0, "payout_batch_queue_depth": 0, "onchain_submit_total": 0}});
         validate_band6_metrics_parity_v2(
             prom,
             &verification,

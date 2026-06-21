@@ -108,6 +108,21 @@
 
 **Перевірка:** `cargo test -p poolai-solana-adapter -p poolai-events -j 1`
 
+## 12. PH-S870…S879 — Solana on-chain cleared depth (band 22, 2026-06-21) ✅
+
+| Sprint | Що | Де |
+|--------|-----|-----|
+| **PH-S870** | On-chain cleared mock RPC depth | `galaxy_settlement_onchain_depth.rs`, `onchain_submit_total` metric |
+| **PH-S871** | Adapter schema v1 core wire fixture | `crates/poolai-solana-adapter/src/events.rs` |
+| **PH-S872** | Domain events NDJSON persist depth | `src/job/domain_events.rs` multi-event test |
+| **PH-S873** | Stand smoke on-chain metrics | `stand_smoke_metrics_parity` + `poolai-http-stand-smoke` payout-batch depth |
+| **PH-S874** | Solana concept depth stub | `src/grid/solana_depth.rs` |
+| **PH-S875** | `poolai-loc-audit` → `rust_ratio.json` | sprint zriz |
+| **PH-S876** | This doc band 22 sync | §12 |
+| **PH-S879** | Band close | `tests/galaxy_horizon_s870_integration.rs` |
+
+**HTTP wire:** `GET /api/v1/grid/payout-batch` exposes `onchain_depth`, `solana_depth`, `onchain_events_configured`; `payout-batch-metrics` adds `onchain_submit_total` ↔ `galaxy_settlement_onchain_submit_total`.
+
 ## 11. Наступні кроки
 
 - Batch / merkle виплати; звірка з `rewards` модулем core.

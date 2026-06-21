@@ -111,6 +111,18 @@ mod tests {
     use super::*;
 
     #[test]
+    fn schema_v1_core_wire_fixture_ph_s871() {
+        let fixture = r#"{"schema_version":1,"emitted_at":"2026-06-21T12:00:00Z","event_id":"evt-s871","type":"job_completed","job_id":"j-s871","executor_peer_id":"peer-s871","payout_lamports":4200,"verification_digest":"sha256:fixture"}"#;
+        let env = DomainEventEnvelope::from_json(fixture).expect("adapter parse");
+        assert_eq!(env.schema_version, EVENT_SCHEMA_VERSION);
+        assert_eq!(env.event_id, "evt-s871");
+        assert!(matches!(env.event, DomainEvent::JobCompleted(_)));
+        let round = env.to_json().expect("serialize");
+        let back = DomainEventEnvelope::from_json(&round).expect("round trip");
+        assert_eq!(back.event_id, "evt-s871");
+    }
+
+    #[test]
     fn job_completed_round_trip() {
         let env = DomainEventEnvelope::new(
             "evt-1",

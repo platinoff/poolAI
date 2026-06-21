@@ -118,4 +118,46 @@ mod tests {
         assert!(matches!(back.event, DomainEvent::JobCompleted(_)));
         assert_eq!(back.schema_version, EVENT_SCHEMA_VERSION);
     }
+
+    #[test]
+    fn domain_events_ndjson_persist_depth_ph_s872() {
+        let events = [
+            DomainEventEnvelope::new(
+                "evt-job",
+                DomainEvent::JobCompleted(JobCompletedEvent {
+                    job_id: "j-1".into(),
+                    executor_peer_id: "peer-1".into(),
+                    payout_lamports: Some(500),
+                    verification_digest: None,
+                }),
+            ),
+            DomainEventEnvelope::new(
+                "evt-seed",
+                DomainEvent::SeedProvided(SeedProvidedEvent {
+                    shard_id: "shard-a".into(),
+                    provider_peer_id: "peer-2".into(),
+                    artifact_id: "art-1".into(),
+                }),
+            ),
+            DomainEventEnvelope::new(
+                "evt-mem",
+                DomainEvent::MemoryUpdated(MemoryUpdatedEvent {
+                    artifact_id: "art-1".into(),
+                    version: "1.0.0".into(),
+                    content_digest: "sha256:abc".into(),
+                    raid_logical_name: Some("weights".into()),
+                }),
+            ),
+        ];
+        let mut lines = Vec::new();
+        for env in &events {
+            lines.push(env.to_json_line().expect("line"));
+        }
+        assert_eq!(lines.len(), 3);
+        for (line, expected) in lines.iter().zip(events.iter()) {
+            let back: DomainEventEnvelope = serde_json::from_str(line).expect("parse");
+            assert_eq!(back.event_id, expected.event_id);
+            assert_eq!(back.schema_version, EVENT_SCHEMA_VERSION);
+        }
+    }
 }

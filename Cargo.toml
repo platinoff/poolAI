@@ -539,6 +539,11 @@ path = "tests/memory_shard_persistence.rs"
 required-features = ["test-utils"]
 
 [[test]]
+name = "galaxy_horizon_s870_integration"
+path = "tests/galaxy_horizon_s870_integration.rs"
+required-features = ["test-utils"]
+
+[[test]]
 name = "galaxy_horizon_s860_integration"
 path = "tests/galaxy_horizon_s860_integration.rs"
 required-features = ["test-utils"]

@@ -22,6 +22,10 @@ use crate::grid::galaxy_pricing_oracle::{
     MockProviderQuote, PRICING_UNAVAILABLE_ERROR_CODE,
 };
 use crate::grid::galaxy_settlement_mode::{current_settlement_mode, settlement_on_chain_pending};
+use crate::grid::galaxy_settlement_onchain_depth::{
+    current_settlement_onchain_depth, settlement_onchain_depth_wire_label,
+};
+use crate::grid::solana_depth::{solana_depth_stub, solana_depth_wire_label};
 use crate::grid::{
     coordinator_seed_inventory_snapshot, ingest_envelope, GridEnvelope, GridIngestKind,
     GridIngestOutcome,
@@ -203,6 +207,12 @@ struct GridPayoutBatchResponse {
     settlement_mode: &'static str,
     #[serde(skip_serializing_if = "Option::is_none")]
     on_chain_pending: Option<bool>,
+    /// On-chain cleared depth wire label (PH-S870).
+    onchain_depth: &'static str,
+    /// Solana adapter concept depth wire label (PH-S874).
+    solana_depth: &'static str,
+    /// Whether `POOLAI_ONCHAIN_EVENTS_DIR` is set (PH-S870).
+    onchain_events_configured: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     routing: Option<PayoutRoutingSnapshot>,
     entry: Option<crate::grid::galaxy_settlement::PayoutBatchLedgerEntry>,
@@ -227,12 +237,23 @@ async fn get_grid_payout_batch(
     let mode = current_settlement_mode();
     let entry = crate::grid::galaxy_settlement_metrics::last_payout_batch_ledger_entry();
     let routing = entry.as_ref().map(|e| payout_routing_snapshot(mode, e));
+    let onchain_depth = current_settlement_onchain_depth();
+    let events_configured = crate::grid::galaxy_settlement_onchain::onchain_events_dir_configured();
+    let solana_depth = solana_depth_stub(
+        true,
+        events_configured,
+        settlement_on_chain_pending(),
+        false,
+    );
     Ok((
         StatusCode::OK,
         Json(GridPayoutBatchResponse {
             ok: true,
             settlement_mode: mode,
             on_chain_pending: Some(settlement_on_chain_pending()),
+            onchain_depth: settlement_onchain_depth_wire_label(onchain_depth),
+            solana_depth: solana_depth_wire_label(solana_depth),
+            onchain_events_configured: events_configured,
             routing,
             entry,
         }),

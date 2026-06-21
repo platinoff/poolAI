@@ -104,7 +104,11 @@ pub const LOCALITY_HOT_TIER_PARITY: &[(&str, &str)] = &[
 ];
 
 /// Required JSON export keys for stand smoke payout-batch-metrics API (PH-S772).
-pub const PAYOUT_BATCH_JSON_KEYS: &[&str] = &["payout_batch_total", "payout_batch_queue_depth"];
+pub const PAYOUT_BATCH_JSON_KEYS: &[&str] = &[
+    "payout_batch_total",
+    "payout_batch_queue_depth",
+    "onchain_submit_total",
+];
 
 /// Required JSON export keys for stand smoke fee-split-metrics API (PH-S782).
 pub const FEE_SPLIT_JSON_KEYS: &[&str] = &[
@@ -160,6 +164,10 @@ pub const PAYOUT_BATCH_SETTLEMENT_PARITY: &[(&str, &str)] = &[
     (
         crate::grid::galaxy_settlement_payout_batch_queue::METRIC_SETTLEMENT_PAYOUT_BATCH_QUEUE_DEPTH,
         "payout_batch_queue_depth",
+    ),
+    (
+        crate::grid::galaxy_settlement_onchain::METRIC_SETTLEMENT_ONCHAIN_SUBMIT_TOTAL,
+        "onchain_submit_total",
     ),
 ];
 
@@ -242,6 +250,8 @@ pub enum StandSmokeMetricsParityDepth {
     FullGridParityV2,
     /// Memory shard persist + seed-inventory depth (PH-S863 band 21).
     MemoryShardPersist,
+    /// On-chain cleared settlement depth + metrics (PH-S873 band 22).
+    OnChainSettlement,
 }
 
 /// Classify stand smoke metrics parity depth from optional feature stub (PH-S714/PH-S724).
@@ -262,6 +272,12 @@ pub fn stand_smoke_metrics_parity_depth_stub(
         .unwrap_or(false)
     {
         return StandSmokeMetricsParityDepth::MemoryShardPersist;
+    }
+    if f.get("on_chain_settlement")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        return StandSmokeMetricsParityDepth::OnChainSettlement;
     }
     if f.get("network_profile_persist")
         .and_then(|v| v.as_bool())
@@ -711,12 +727,14 @@ mod tests {
         let prom = concat!(
             "galaxy_settlement_payout_batch_total 3\n",
             "galaxy_settlement_payout_batch_queue_depth 2\n",
+            "galaxy_settlement_onchain_submit_total 1\n",
         );
         let body = json!({
             "ok": true,
             "metrics": {
                 "payout_batch_total": 3,
                 "payout_batch_queue_depth": 2,
+                "onchain_submit_total": 1,
                 "settlement_mode": "offline_batch",
             }
         });
@@ -796,6 +814,14 @@ mod tests {
     }
 
     #[test]
+    fn stand_smoke_metrics_parity_depth_stub_band22_ph_s873() {
+        assert_eq!(
+            stand_smoke_metrics_parity_depth_stub(Some(&json!({"on_chain_settlement": true}))),
+            StandSmokeMetricsParityDepth::OnChainSettlement
+        );
+    }
+
+    #[test]
     fn stand_smoke_metrics_parity_depth_stub_band21_ph_s863() {
         assert_eq!(
             stand_smoke_metrics_parity_depth_stub(Some(&json!({"memory_shard_persist": true}))),
@@ -831,6 +857,7 @@ mod tests {
             "poolai_update_notify_pending 0\n",
             "poolai_advisory_acknowledged_total 0\n",
             "galaxy_settlement_payout_batch_queue_depth 0\n",
+            "galaxy_settlement_onchain_submit_total 0\n",
         );
         let verification = json!({"ok": true, "metrics": {"sample_total": 0, "mismatch_total": 0, "match_total": 0, "checker_pending_total": 0}});
         let replay = json!({"ok": true, "metrics": {"replay_pending": 0, "replay_pending_scheduled_total": 0, "verification_replay_record_total": 0}});
@@ -842,7 +869,7 @@ mod tests {
         let locality = json!({"ok": true, "metrics": {"shard_local_hit_ratio_bps": 0, "hot_tier_hit_ratio_bps": 0, "cross_region_egress_mb": 0, "hot_promote_total": 0, "hot_evict_total": 0}});
         let fee_split = json!({"ok": true, "metrics": {"fee_split_applied_total": 0, "primary_dev_fee_bps": 10, "secondary_admin_fee_min_bps": 100, "secondary_admin_fee_max_bps": 500}});
         let governance = json!({"ok": true, "metrics": {"release_verify_total": 0, "release_verify_fail_total": 0, "update_notify_pending": 0, "advisory_acknowledged_total": 0}});
-        let payout_batch = json!({"ok": true, "metrics": {"payout_batch_total": 0, "payout_batch_queue_depth": 0}});
+        let payout_batch = json!({"ok": true, "metrics": {"payout_batch_total": 0, "payout_batch_queue_depth": 0, "onchain_submit_total": 0}});
         validate_band6_metrics_parity_v2(
             prom,
             &verification,

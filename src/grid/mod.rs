@@ -41,6 +41,7 @@ pub mod galaxy_settlement;
 pub mod galaxy_settlement_metrics;
 pub mod galaxy_settlement_mode;
 pub mod galaxy_settlement_onchain;
+pub mod galaxy_settlement_onchain_depth;
 pub mod galaxy_settlement_payout_batch_queue;
 pub mod galaxy_settlement_payout_depth;
 pub mod galaxy_settlement_payout_metrics;
@@ -55,6 +56,7 @@ pub mod galaxy_worker_dto;
 pub mod galaxy_worker_health;
 mod map;
 pub mod protocol_compat;
+pub mod solana_depth;
 pub mod stand_smoke_metrics_parity;
 
 pub use dispatch::{
