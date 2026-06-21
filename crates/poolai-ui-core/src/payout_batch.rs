@@ -121,9 +121,52 @@ pub fn render_payout_batch_panel_html(
     )
 }
 
+/// Render payout batch history-only admin strip from history API JSON (PH-S771).
+pub fn render_payout_batch_history_strip_html(history_json: &str, i18n_json: &str) -> String {
+    let history: Value = serde_json::from_str(history_json).unwrap_or(Value::Null);
+    let i18n: Value = serde_json::from_str(i18n_json).unwrap_or(Value::Null);
+    let count = history
+        .get("entries")
+        .and_then(|v| v.as_array())
+        .map(|a| a.len())
+        .unwrap_or(0);
+    let latest_job = history
+        .get("entries")
+        .and_then(|v| v.as_array())
+        .and_then(|a| a.last())
+        .and_then(|row| row.get("job_id"))
+        .and_then(|v| v.as_str())
+        .unwrap_or("—");
+    format!(
+        r#"<div class="admin-card admin-payout-batch-history-strip"><h3>{title}</h3>
+<p><span>{count_label}</span>: <strong>{count}</strong></p>
+<p><span>{latest_label}</span>: <code>{latest_job}</code></p></div>"#,
+        title = escape_html(&t(
+            &i18n,
+            "admin.payoutBatch.historyStrip",
+            "Recent payout batch history"
+        )),
+        count_label = escape_html(&t(&i18n, "admin.payoutBatch.historyCount", "Entries")),
+        latest_label = escape_html(&t(&i18n, "admin.payoutBatch.historyLatest", "Latest job")),
+        count = count,
+        latest_job = escape_html(latest_job),
+    )
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn render_payout_batch_history_strip_html_ph_s771() {
+        let html = render_payout_batch_history_strip_html(
+            r#"{"entries":[{"job_id":"j1","cleared_at":"t"},{"job_id":"j2","cleared_at":"t2"}]}"#,
+            r#"{}"#,
+        );
+        assert!(html.contains("admin-payout-batch-history-strip"));
+        assert!(html.contains("j2"));
+        assert!(html.contains("<strong>2</strong>"));
+    }
 
     #[test]
     fn render_payout_batch_panel_html_ph_s564() {

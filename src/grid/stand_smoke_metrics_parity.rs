@@ -103,6 +103,21 @@ pub const LOCALITY_HOT_TIER_PARITY: &[(&str, &str)] = &[
     ),
 ];
 
+/// Required JSON export keys for stand smoke payout-batch-metrics API (PH-S772).
+pub const PAYOUT_BATCH_JSON_KEYS: &[&str] = &["payout_batch_total", "payout_batch_queue_depth"];
+
+/// Prometheus gauge name ↔ JSON metrics field pairs — payout batch settlement (PH-S771).
+pub const PAYOUT_BATCH_SETTLEMENT_PARITY: &[(&str, &str)] = &[
+    (
+        crate::grid::galaxy_settlement_metrics::METRIC_SETTLEMENT_PAYOUT_BATCH_TOTAL,
+        "payout_batch_total",
+    ),
+    (
+        crate::grid::galaxy_settlement_payout_batch_queue::METRIC_SETTLEMENT_PAYOUT_BATCH_QUEUE_DEPTH,
+        "payout_batch_queue_depth",
+    ),
+];
+
 /// Prometheus gauge name ↔ JSON metrics field pairs — verification + replay (PH-S710).
 pub const VERIFICATION_REPLAY_PARITY: &[(&str, &str)] = &[
     (
@@ -175,6 +190,7 @@ pub enum StandSmokeMetricsParityDepth {
     CapabilityAdmission,
     PrefetchLivePull,
     LocalityHotTier,
+    PayoutBatchSettlement,
 }
 
 /// Classify stand smoke metrics parity depth from optional feature stub (PH-S714/PH-S724).
@@ -201,6 +217,12 @@ pub fn stand_smoke_metrics_parity_depth_stub(
         .unwrap_or(false)
     {
         return StandSmokeMetricsParityDepth::LocalityHotTier;
+    }
+    if f.get("payout_batch_settlement")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        return StandSmokeMetricsParityDepth::PayoutBatchSettlement;
     }
     if f.get("capability_admission")
         .and_then(|v| v.as_bool())
@@ -360,6 +382,16 @@ pub fn validate_prefetch_metrics_parity(prom_text: &str, prefetch: &Value) -> Re
 pub fn validate_locality_metrics_parity(prom_text: &str, locality: &Value) -> Result<(), String> {
     validate_grid_metrics_json_export(locality, LOCALITY_JSON_KEYS)?;
     validate_prometheus_json_parity_pairs(prom_text, locality, LOCALITY_HOT_TIER_PARITY)?;
+    Ok(())
+}
+
+/// Validate payout-batch-metrics JSON export vs Prometheus gauges (PH-S771).
+pub fn validate_payout_batch_metrics_parity(
+    prom_text: &str,
+    payout_batch: &Value,
+) -> Result<(), String> {
+    validate_grid_metrics_json_export(payout_batch, PAYOUT_BATCH_JSON_KEYS)?;
+    validate_prometheus_json_parity_pairs(prom_text, payout_batch, PAYOUT_BATCH_SETTLEMENT_PARITY)?;
     Ok(())
 }
 
@@ -524,6 +556,31 @@ mod tests {
             stand_smoke_metrics_parity_depth_stub(Some(&json!({"locality_hot_tier": true}))),
             StandSmokeMetricsParityDepth::LocalityHotTier
         );
+    }
+
+    #[test]
+    fn stand_smoke_metrics_parity_depth_stub_band12_ph_s774() {
+        assert_eq!(
+            stand_smoke_metrics_parity_depth_stub(Some(&json!({"payout_batch_settlement": true}))),
+            StandSmokeMetricsParityDepth::PayoutBatchSettlement
+        );
+    }
+
+    #[test]
+    fn payout_batch_metrics_parity_ph_s771() {
+        let prom = concat!(
+            "galaxy_settlement_payout_batch_total 3\n",
+            "galaxy_settlement_payout_batch_queue_depth 2\n",
+        );
+        let body = json!({
+            "ok": true,
+            "metrics": {
+                "payout_batch_total": 3,
+                "payout_batch_queue_depth": 2,
+                "settlement_mode": "offline_batch",
+            }
+        });
+        validate_payout_batch_metrics_parity(prom, &body).expect("parity");
     }
 
     #[test]

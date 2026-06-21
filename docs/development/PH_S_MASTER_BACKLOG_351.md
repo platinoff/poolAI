@@ -1,6 +1,6 @@
-# PH-S master backlog (241 pending → product-complete)
+# PH-S master backlog (231 pending → product-complete)
 
-**Generated:** 2026-06-21 · **Range:** PH-S660…PH-S1010 · **Pending:** **241** (S770…S1010) · **Completion roadmap v2**
+**Generated:** 2026-06-21 · **Range:** PH-S660…PH-S1010 · **Pending:** **231** (S780…S1010) · **Completion roadmap v2**
 
 **VDT:** один `абракадабра` = drain **10** з FM §5.12 → vision close → push → promote наступні 10.
 
@@ -21,8 +21,8 @@
 | 9 | PH-S740…S749 | Galaxy §6.6 signed capability admission ✅ drained |
 | 10 | PH-S750…S759 | Galaxy §5.5 prefetch live pull depth ✅ drained |
 | 11 | PH-S760…S769 | Galaxy §5.2–5.4 locality / hot-tier ✅ drained |
-| 12 | PH-S770…S779 | Galaxy §8.2 payout / settlement batch **active §5.12** |
-| 13 | PH-S780…S789 | Galaxy §1.2 fee split production |
+| 12 | PH-S770…S779 | Galaxy §8.2 payout / settlement batch ✅ drained |
+| 13 | PH-S780…S789 | Galaxy §1.2 fee split production **active §5.12** |
 | 14 | PH-S790…S799 | Galaxy §9.5–9.6 governance ops |
 | 15 | PH-S800…S809 | Admin wasm slim: monitoring + payout-batch |
 | 16 | PH-S810…S819 | Admin wasm slim: security + topology |
@@ -214,7 +214,7 @@
 | **PH-S768** | Ratio hold advisory | hold |
 | **PH-S769** | galaxy_horizon_s760_integration | locality band close |
 
-## Band 12 — PH-S770…S779 (Galaxy §8.2 payout / settlement batch) · **active §5.12**
+## Band 12 — PH-S770…S779 (Galaxy §8.2 payout / settlement batch) · ✅ drained
 
 | Sprint | Focus | Acceptance |
 |--------|-------|------------|
@@ -229,7 +229,7 @@
 | **PH-S778** | Ratio hold advisory | hold |
 | **PH-S779** | galaxy_horizon_s770_integration | payout band close |
 
-## Band 13 — PH-S780…S789 (Galaxy §1.2 fee split production)
+## Band 13 — PH-S780…S789 (Galaxy §1.2 fee split production) · **active §5.12**
 
 | Sprint | Focus | Acceptance |
 |--------|-------|------------|

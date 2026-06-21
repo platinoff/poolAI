@@ -943,7 +943,20 @@ On-chain події потрібні, коли вони:
 
 ### 8.2 Відкриті питання (залишок)
 
-1. **Primary/secondary fee settlement**: точний механізм payout (on-chain чи офлайн batch).
+1. **Primary/secondary fee settlement**: точний механізм payout (on-chain чи офлайн batch) — **offline batch queue stub ✅ (PH-S770…S779)**; on-chain gate via `POOLAI_SETTLEMENT_ON_CHAIN` (PH-S774).
+
+**Implemented (band 12 PH-S770…S779 ✅):**
+
+| Sprint | Wire / module | Acceptance |
+|--------|---------------|------------|
+| **PH-S770** | Cleared → offline payout batch queue + `galaxy_settlement_payout_batch_queue_depth` | `enqueue_offline_payout_batch_on_cleared` + dispatch hook |
+| **PH-S771** | Admin payout-batch history wasm strip | `renderPayoutBatchHistoryStripHtml` + `/ui/admin/payout-batch` |
+| **PH-S772** | Stand smoke payout-batch/history/metrics API | `poolai-http-stand-smoke` runner |
+| **PH-S773** | `settlement_payout_depth_stub` | `src/grid/galaxy_settlement_payout_depth.rs` unit test |
+| **PH-S774** | `galaxy_settlement_mode` offline vs on-chain gate | `settlement_mode_gate_label` + unit test |
+
+**Prometheus (payout batch settlement):** `galaxy_settlement_payout_batch_total` (PH-S427 ✅), `galaxy_settlement_payout_batch_queue_depth` (PH-S770 ✅), `GET /api/v1/grid/payout-batch-metrics` snapshot (PH-S770 ✅).
+
 2. **Telegram “VM probros” на старте** *(PH-S541 limits DTO ✅ · PH-S551 ops docs)*: MVP cold mining — **CPU/RAM/Disk** probros через `GalaxyWorkerLimits` на virtual-nodes DTO (`max_cpu_cores`, `max_ram_mb`, `max_disk_mb`); **без GPU passthrough** на старті. GPU admission — окремий gate (`raid_artifact_probe` / PH-S540). Міграція до GPU passthrough: roadmap §8.2 → host passthrough + capability document §6.6; див. [`RUN_LOCAL.md`](../development/RUN_LOCAL.md) telegram edge stand.
 
 > **Закрито в концепті:** job lease / re-migrate (§4.3), unified worker DTO (§2.3), fee split (§1.2.1), pricing oracle (§4.2), Telegram seats + wallet bind (§3.1–3.2), seeds/locality + prefetch (§5.1–5.6), edge verification baseline (§6.1–6.6), open-source governance без root super-admin (§9), **network_profile contract (§8.1, PH-S132)**.

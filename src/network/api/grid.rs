@@ -93,6 +93,10 @@ pub fn create_grid_routes() -> Router<ApiContext> {
         .route("/grid/telegram-seats", get(get_grid_telegram_seats))
         .route("/grid/payout-batch", get(get_grid_payout_batch))
         .route(
+            "/grid/payout-batch-metrics",
+            get(get_grid_payout_batch_metrics),
+        )
+        .route(
             "/grid/payout-batch/history",
             get(get_grid_payout_batch_history),
         )
@@ -203,6 +207,24 @@ async fn get_grid_payout_batch(
             on_chain_pending: Some(settlement_on_chain_pending()),
             routing,
             entry,
+        }),
+    ))
+}
+
+#[derive(Debug, Serialize)]
+struct GridPayoutBatchMetricsResponse {
+    ok: bool,
+    metrics: crate::grid::galaxy_settlement_payout_metrics::PayoutBatchMetricsSnapshot,
+}
+
+async fn get_grid_payout_batch_metrics(
+    State(_ctx): State<ApiContext>,
+) -> Result<(StatusCode, Json<GridPayoutBatchMetricsResponse>), HttpAppError> {
+    Ok((
+        StatusCode::OK,
+        Json(GridPayoutBatchMetricsResponse {
+            ok: true,
+            metrics: crate::grid::galaxy_settlement_payout_metrics::payout_batch_metrics_snapshot(),
         }),
     ))
 }
@@ -1269,6 +1291,39 @@ mod tests {
         reset_last_shard_local_hit_ratio_for_test();
         reset_last_hot_tier_hit_ratio_for_test();
         reset_prefetch_metrics_for_test();
+    }
+
+    #[tokio::test]
+    async fn grid_payout_batch_metrics_read_ph_s770() {
+        use crate::grid::galaxy_settlement_metrics::{
+            record_settlement_payout_batch, reset_settlement_metrics_for_test,
+        };
+        use crate::grid::galaxy_settlement_payout_batch_queue::{
+            enqueue_offline_payout_batch_on_cleared, reset_payout_batch_queue_for_test,
+        };
+        use crate::grid::galaxy_settlement_payout_metrics::payout_batch_metrics_snapshot;
+
+        reset_settlement_metrics_for_test();
+        reset_payout_batch_queue_for_test();
+        record_settlement_payout_batch();
+        enqueue_offline_payout_batch_on_cleared("job-ph-s770");
+
+        let res = get_grid_payout_batch_metrics(State(ApiContext::default()))
+            .await
+            .expect("payout batch metrics")
+            .1
+             .0;
+        assert!(res.ok);
+        assert_eq!(res.metrics.payout_batch_total, 1);
+        assert_eq!(res.metrics.payout_batch_queue_depth, 1);
+        assert_eq!(res.metrics.settlement_mode, "offline_batch");
+        assert_eq!(
+            payout_batch_metrics_snapshot().payout_batch_total,
+            res.metrics.payout_batch_total
+        );
+
+        reset_settlement_metrics_for_test();
+        reset_payout_batch_queue_for_test();
     }
 
     #[tokio::test]

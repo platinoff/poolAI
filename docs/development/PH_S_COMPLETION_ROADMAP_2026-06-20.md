@@ -95,7 +95,7 @@
 
 ---
 
-## Band 12 — PH-S770…S779 (Galaxy §8.2 payout / settlement batch) · **active §5.12**
+## Band 12 — PH-S770…S779 (Galaxy §8.2 payout / settlement batch) · ✅ drained
 
 | Sprint | Focus | Acceptance |
 |--------|-------|------------|
@@ -112,7 +112,7 @@
 
 ---
 
-## Band 13 — PH-S780…S789 (Galaxy §1.2 fee split production)
+## Band 13 — PH-S780…S789 (Galaxy §1.2 fee split production) · **active §5.12**
 
 | Sprint | Focus | Acceptance |
 |--------|-------|------------|

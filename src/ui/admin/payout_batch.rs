@@ -17,18 +17,33 @@ pub async fn admin_payout_batch() -> Html<String> {
       if (!el) return;
       const entry = latest.entry || null;
       const metricsStrip = renderPayoutBatchMetricsStrip(settlementMetrics, trustMetrics, trustScoreGauge);
+      const historyStrip = renderPayoutBatchHistoryStrip(history || {});
       const wasm = window.poolaiUiWasm;
       if (wasm && wasm.ready && typeof wasm.renderPayoutBatchPanelHtml === 'function') {
-        el.innerHTML = metricsStrip + wasm.renderPayoutBatchPanelHtml(
+        el.innerHTML = metricsStrip + historyStrip + wasm.renderPayoutBatchPanelHtml(
           JSON.stringify(latest || {}),
           JSON.stringify(history || {}),
           payoutBatchI18nJson()
         );
         return;
       }
-      el.innerHTML = metricsStrip +
+      el.innerHTML = metricsStrip + historyStrip +
         '<div class="admin-card"><h3>' + escapeHtml(T('admin.payoutBatch.latest', 'Latest cleared entry')) + '</h3>' +
         '<dl class="admin-dl"><dt>Job</dt><dd><code>' + escapeHtml(String(entry && entry.job_id || '—')) + '</code></dd></dl></div>';
+    }
+
+    function renderPayoutBatchHistoryStrip(history) {
+      const wasm = window.poolaiUiWasm;
+      if (wasm && wasm.ready && typeof wasm.renderPayoutBatchHistoryStripHtml === 'function') {
+        return wasm.renderPayoutBatchHistoryStripHtml(
+          JSON.stringify(history || {}),
+          payoutBatchI18nJson()
+        );
+      }
+      const entries = (history && history.entries) ? history.entries : [];
+      return '<div class="admin-card"><h3>' +
+        escapeHtml(T('admin.payoutBatch.historyStrip', 'Recent payout batch history')) +
+        '</h3><p>' + escapeHtml(String(entries.length)) + ' entries</p></div>';
     }
 
     async function loadPayoutBatchPanel() {
@@ -109,6 +124,14 @@ mod tests {
         assert!(html.contains("/api/v1/grid/settlement-metrics"));
         assert!(html.contains("/api/v1/grid/trust-metrics"));
         assert!(html.contains("parsePrometheusGauge"));
+    }
+
+    #[tokio::test]
+    async fn admin_payout_batch_history_wasm_glue_ph_s771() {
+        let html = admin_payout_batch().await.0;
+        assert!(html.contains("renderPayoutBatchHistoryStripHtml"));
+        assert!(html.contains("renderPayoutBatchHistoryStrip"));
+        assert!(html.contains("/api/v1/grid/payout-batch/history"));
     }
 
     #[tokio::test]

@@ -944,6 +944,37 @@ paths:
               schema:
                 $ref: '#/components/schemas/GridPayoutBatchResponse'
 
+  /grid/payout-batch-metrics:
+    get:
+      tags:
+        - Grid
+      summary: Payout batch settlement metrics snapshot (PH-S770)
+      operationId: getGridPayoutBatchMetrics
+      responses:
+        '200':
+          description: Payout batch queue depth and ledger counters
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - ok
+                  - metrics
+                properties:
+                  ok:
+                    type: boolean
+                  metrics:
+                    type: object
+                    properties:
+                      payout_batch_total:
+                        type: integer
+                        format: int64
+                      payout_batch_queue_depth:
+                        type: integer
+                        format: int64
+                      settlement_mode:
+                        type: string
+
   /grid/payout-batch/history:
     get:
       tags:

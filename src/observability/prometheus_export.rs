@@ -107,6 +107,9 @@ use crate::grid::galaxy_settlement_metrics::{
     METRIC_SETTLEMENT_PAYOUT_BATCH_TOTAL, METRIC_SETTLEMENT_PENDING_VERIFICATION_TOTAL,
     METRIC_SETTLEMENT_RESOLVED_TOTAL,
 };
+use crate::grid::galaxy_settlement_payout_batch_queue::{
+    payout_batch_queue_depth, METRIC_SETTLEMENT_PAYOUT_BATCH_QUEUE_DEPTH,
+};
 use crate::grid::galaxy_trust_score::{
     configured_default_trust_score, configured_min_trust_for_payout, default_score_applied_total,
     explicit_score_total, gate_evaluations_total, last_trust_score, payout_eligible_total,
@@ -244,6 +247,7 @@ pub struct PoolAiPrometheus {
     galaxy_settlement_not_applicable_total: IntGauge,
     galaxy_settlement_resolved_total: IntGauge,
     galaxy_settlement_payout_batch_total: IntGauge,
+    galaxy_settlement_payout_batch_queue_depth: IntGauge,
     galaxy_settlement_human_review_total: IntGauge,
     galaxy_worker_unhealthy_total: IntGauge,
     poolai_release_verify_total: IntGauge,
@@ -1201,6 +1205,15 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_settlement_payout_batch_total.clone()))
         .expect("register galaxy_settlement_payout_batch_total");
 
+    let galaxy_settlement_payout_batch_queue_depth = IntGauge::with_opts(Opts::new(
+        METRIC_SETTLEMENT_PAYOUT_BATCH_QUEUE_DEPTH,
+        "Galaxy offline payout batch queue depth on cleared settlement (PH-S770)",
+    ))
+    .expect(METRIC_SETTLEMENT_PAYOUT_BATCH_QUEUE_DEPTH);
+    registry
+        .register(Box::new(galaxy_settlement_payout_batch_queue_depth.clone()))
+        .expect("register galaxy_settlement_payout_batch_queue_depth");
+
     let galaxy_settlement_human_review_total = IntGauge::with_opts(Opts::new(
         METRIC_SETTLEMENT_HUMAN_REVIEW_TOTAL,
         "Galaxy settlement human-review holds on non-deterministic semantic_hash (PH-S560)",
@@ -1401,6 +1414,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_settlement_not_applicable_total,
         galaxy_settlement_resolved_total,
         galaxy_settlement_payout_batch_total,
+        galaxy_settlement_payout_batch_queue_depth,
         galaxy_settlement_human_review_total,
         galaxy_worker_unhealthy_total,
         poolai_release_verify_total,
@@ -1624,6 +1638,8 @@ pub fn refresh_galaxy_verification_gauges() {
         .set(settlement_resolved_total() as i64);
     prom.galaxy_settlement_payout_batch_total
         .set(settlement_payout_batch_total() as i64);
+    prom.galaxy_settlement_payout_batch_queue_depth
+        .set(payout_batch_queue_depth() as i64);
     prom.galaxy_settlement_human_review_total
         .set(settlement_human_review_total() as i64);
     prom.galaxy_fee_split_applied_total

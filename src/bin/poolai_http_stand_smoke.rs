@@ -1458,6 +1458,8 @@ async fn smoke_grid_network_profile_put(client: &Client, base: &str) -> Result<(
 }
 
 async fn smoke_grid_payout_batch_history(client: &Client, base: &str) -> Result<(), String> {
+    use poolai::grid::stand_smoke_metrics_parity::validate_payout_batch_metrics_parity;
+
     let resp = client
         .get(api_url(base, "/api/v1/grid/payout-batch/history?limit=5"))
         .send()
@@ -1466,14 +1468,60 @@ async fn smoke_grid_payout_batch_history(client: &Client, base: &str) -> Result<
     if resp.status() != StatusCode::OK {
         return Err(format!("payout-batch/history status {}", resp.status()));
     }
-    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
-    if body.get("ok").and_then(|v| v.as_bool()) != Some(true) {
-        return Err(format!("payout-batch/history body: {body}"));
+    let history: Value = resp.json().await.map_err(|e| e.to_string())?;
+    if history.get("ok").and_then(|v| v.as_bool()) != Some(true) {
+        return Err(format!("payout-batch/history body: {history}"));
     }
-    if !body.get("entries").and_then(|v| v.as_array()).is_some() {
-        return Err(format!("payout-batch/history missing entries: {body}"));
+    if !history.get("entries").and_then(|v| v.as_array()).is_some() {
+        return Err(format!("payout-batch/history missing entries: {history}"));
     }
-    Ok(())
+
+    let latest_resp = client
+        .get(api_url(base, "/api/v1/grid/payout-batch"))
+        .send()
+        .await
+        .map_err(|e| format!("payout-batch request: {e}"))?;
+    if latest_resp.status() != StatusCode::OK {
+        return Err(format!("payout-batch status {}", latest_resp.status()));
+    }
+    let latest: Value = latest_resp.json().await.map_err(|e| e.to_string())?;
+    if latest.get("ok").and_then(|v| v.as_bool()) != Some(true) {
+        return Err(format!("payout-batch body: {latest}"));
+    }
+    if !latest
+        .get("settlement_mode")
+        .and_then(|v| v.as_str())
+        .is_some()
+    {
+        return Err(format!("payout-batch missing settlement_mode: {latest}"));
+    }
+
+    let metrics_resp = client
+        .get(api_url(base, "/api/v1/grid/payout-batch-metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("payout-batch-metrics request: {e}"))?;
+    if metrics_resp.status() != StatusCode::OK {
+        return Err(format!(
+            "payout-batch-metrics status {}",
+            metrics_resp.status()
+        ));
+    }
+    let metrics_body: Value = metrics_resp.json().await.map_err(|e| e.to_string())?;
+    if metrics_body.get("ok").and_then(|v| v.as_bool()) != Some(true) {
+        return Err(format!("payout-batch-metrics body: {metrics_body}"));
+    }
+
+    let prom_resp = client
+        .get(api_url(base, "/metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("/metrics request: {e}"))?;
+    if prom_resp.status() != StatusCode::OK {
+        return Err(format!("/metrics status {}", prom_resp.status()));
+    }
+    let prom_text = prom_resp.text().await.map_err(|e| e.to_string())?;
+    validate_payout_batch_metrics_parity(&prom_text, &metrics_body)
 }
 
 async fn smoke_grid_verification_replay_history(client: &Client, base: &str) -> Result<(), String> {

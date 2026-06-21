@@ -32,7 +32,9 @@ use poolai_ui_core::ml::{
 };
 use poolai_ui_core::modal::{admin_dynamic_modal_html, trap_tab_action, MODAL_FOCUSABLE_SELECTOR};
 use poolai_ui_core::network_profiles::render_network_profiles_panel_html;
-use poolai_ui_core::payout_batch::render_payout_batch_panel_html;
+use poolai_ui_core::payout_batch::{
+    render_payout_batch_history_strip_html, render_payout_batch_panel_html,
+};
 use poolai_ui_core::pricing::{format_unix_secs, format_usd_micro};
 use poolai_ui_core::prometheus::parse_prometheus_gauge;
 use poolai_ui_core::stand_smoke_metrics::{
@@ -848,6 +850,12 @@ pub fn render_payout_batch_panel_html_wasm(
     i18n_json: &str,
 ) -> String {
     render_payout_batch_panel_html(latest_json, history_json, i18n_json)
+}
+
+/// Admin payout batch history strip HTML (PH-S771).
+#[wasm_bindgen(js_name = renderPayoutBatchHistoryStripHtml)]
+pub fn render_payout_batch_history_strip_html_wasm(history_json: &str, i18n_json: &str) -> String {
+    render_payout_batch_history_strip_html(history_json, i18n_json)
 }
 
 /// Topology hub label helper (PH-S566).

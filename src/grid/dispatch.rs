@@ -1248,6 +1248,9 @@ fn ingest_result(
             source_peer_id,
         );
         record_payout_batch_ledger_entry(entry.clone());
+        crate::grid::galaxy_settlement_payout_batch_queue::enqueue_offline_payout_batch_on_cleared(
+            &job_id,
+        );
         emit_settlement_job_rewarded(&entry, source_peer_id.unwrap_or("coordinator"));
     }
     evaluate_result_settlement_not_applicable(settlement_status);
