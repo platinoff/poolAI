@@ -27,7 +27,10 @@ use crate::grid::{
     GridIngestOutcome,
 };
 use crate::job::{JobStatus, JobStore};
-use crate::memory::MemoryShardStore;
+use crate::memory::{
+    memory_layer_depth_stub, memory_layer_depth_wire_label, memory_store_depth_stub,
+    memory_store_depth_wire_label, MemoryShardStore,
+};
 use crate::network::api::common::HttpAppError;
 
 #[derive(Serialize)]
@@ -124,17 +127,39 @@ struct GridSeedInventoryResponse {
     ok: bool,
     entries: Vec<crate::grid::SeedInventoryPeerSnapshot>,
     generated_at: String,
+    /// Whether `POOLAI_MEMORY_DATA_DIR` is set (PH-S861).
+    memory_persist: bool,
+    /// Registered shards in `MemoryShardStore` (PH-S861).
+    registered_shard_count: u32,
+    /// Persist depth wire label: `ephemeral` | `json` | `json_restart` (PH-S861).
+    memory_store_depth: &'static str,
+    /// Memory layer depth wire label (PH-S861).
+    memory_layer_depth: &'static str,
+    /// Registered shard ids merged from memory registry (PH-S861).
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    registered_shard_ids: Vec<String>,
 }
 
 async fn get_grid_seed_inventory(
     State(_ctx): State<ApiContext>,
 ) -> Result<(StatusCode, Json<GridSeedInventoryResponse>), HttpAppError> {
+    let entries = coordinator_seed_inventory_snapshot();
+    let persist = memory().persist_enabled();
+    let registered_count = memory().registered_shard_count()?;
+    let registered_ids = memory().registered_shard_ids()?;
+    let store_depth = memory_store_depth_stub(persist, registered_count);
+    let layer_depth = memory_layer_depth_stub(persist, registered_count, entries.len() as u32);
     Ok((
         StatusCode::OK,
         Json(GridSeedInventoryResponse {
             ok: true,
-            entries: coordinator_seed_inventory_snapshot(),
+            entries,
             generated_at: chrono::Utc::now().to_rfc3339(),
+            memory_persist: persist,
+            registered_shard_count: registered_count,
+            memory_store_depth: memory_store_depth_wire_label(store_depth),
+            memory_layer_depth: memory_layer_depth_wire_label(layer_depth),
+            registered_shard_ids: registered_ids,
         }),
     ))
 }

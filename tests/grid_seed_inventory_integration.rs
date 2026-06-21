@@ -60,4 +60,8 @@ async fn grid_seed_inventory_returns_coordinator_stub_entries() {
         serde_json::json!(["eu-west"])
     );
     assert_eq!(entries[1]["peer_id"], "srv2-worker-b");
+    assert!(body["memory_persist"].is_boolean());
+    assert!(body["memory_store_depth"].is_string());
+    assert!(body["memory_layer_depth"].is_string());
+    assert_eq!(body["memory_layer_depth"], "seed_inventory_wire");
 }

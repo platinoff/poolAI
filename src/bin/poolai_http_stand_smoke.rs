@@ -334,6 +334,33 @@ async fn smoke_grid_seed_inventory(client: &Client, base: &str) -> Result<(), St
             entries[1]
         ));
     }
+    if body
+        .get("memory_store_depth")
+        .and_then(|v| v.as_str())
+        .is_none()
+    {
+        return Err(format!(
+            "grid seed-inventory missing memory_store_depth: {body}"
+        ));
+    }
+    if body
+        .get("memory_layer_depth")
+        .and_then(|v| v.as_str())
+        .is_none()
+    {
+        return Err(format!(
+            "grid seed-inventory missing memory_layer_depth: {body}"
+        ));
+    }
+    if body
+        .get("registered_shard_count")
+        .and_then(|v| v.as_u64())
+        .is_none()
+    {
+        return Err(format!(
+            "grid seed-inventory missing registered_shard_count: {body}"
+        ));
+    }
     Ok(())
 }
 

@@ -17,6 +17,7 @@ pub mod instances;
 pub mod jobs;
 pub mod lease;
 pub mod libs;
+pub mod memory;
 pub mod ml;
 pub mod modal;
 pub mod network_profiles;

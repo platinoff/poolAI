@@ -36,6 +36,8 @@ pub enum AdminWasmSlimDepth {
     LibsPanel,
     /// Jobs store backend badge wasm renderer (PH-S852).
     JobsStoreBadge,
+    /// Memory / seed inventory meta strip wasm renderer (PH-S862).
+    MemorySeedMetaStrip,
 }
 
 /// Classify admin wasm slim depth from optional feature stub (PH-S704).
@@ -54,6 +56,12 @@ pub fn admin_wasm_slim_depth_stub(features: Option<&Value>) -> AdminWasmSlimDept
         .unwrap_or(false)
     {
         return AdminWasmSlimDepth::JobsStoreBadge;
+    }
+    if f.get("memory_seed_meta_strip")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        return AdminWasmSlimDepth::MemorySeedMetaStrip;
     }
     if f.get("workers_panel")
         .and_then(|v| v.as_bool())
@@ -240,6 +248,14 @@ mod tests {
         assert_eq!(
             admin_wasm_slim_depth_stub(Some(&json!({"jobs_store_badge": true}))),
             AdminWasmSlimDepth::JobsStoreBadge
+        );
+    }
+
+    #[test]
+    fn admin_wasm_slim_depth_stub_ph_s862() {
+        assert_eq!(
+            admin_wasm_slim_depth_stub(Some(&json!({"memory_seed_meta_strip": true}))),
+            AdminWasmSlimDepth::MemorySeedMetaStrip
         );
     }
 }

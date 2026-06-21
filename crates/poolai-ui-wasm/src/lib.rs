@@ -18,6 +18,7 @@ use poolai_ui_core::instances::render_instances_panel_html;
 use poolai_ui_core::jobs::render_jobs_store_badge_html;
 use poolai_ui_core::lease::lease_state;
 use poolai_ui_core::libs::render_libs_panel_html;
+use poolai_ui_core::memory::{format_seed_inventory_ram_bytes, render_memory_seed_meta_strip_html};
 use poolai_ui_core::ml::{
     build_admin_overview_url, build_alert_rules_url, build_audit_events_url,
     build_dashboard_metrics_window_url, build_metric_history_query, build_metric_history_url,
@@ -117,6 +118,32 @@ pub fn render_jobs_store_badge_html_wasm(
     backend_display: &str,
 ) -> String {
     render_jobs_store_badge_html(backend, store_label, store_hint, backend_display)
+}
+
+/// Memory / seed inventory meta strip HTML (PH-S862).
+#[wasm_bindgen(js_name = renderMemorySeedMetaStripHtml)]
+pub fn render_memory_seed_meta_strip_html_wasm(
+    memory_persist: bool,
+    registered_shard_count: u32,
+    memory_store_depth: &str,
+    memory_layer_depth: &str,
+    persist_label: &str,
+    shards_label: &str,
+) -> String {
+    render_memory_seed_meta_strip_html(
+        memory_persist,
+        registered_shard_count,
+        memory_store_depth,
+        memory_layer_depth,
+        persist_label,
+        shards_label,
+    )
+}
+
+/// Seed inventory hot-tier RAM bytes cell (PH-S862).
+#[wasm_bindgen(js_name = formatSeedInventoryRamBytes)]
+pub fn format_seed_inventory_ram_bytes_wasm(ram_bytes: Option<f64>) -> String {
+    format_seed_inventory_ram_bytes(ram_bytes.map(|v| v as u64))
 }
 
 /// Jobs lease badge: returns `"active"`, `"expired"`, or `"none"`.

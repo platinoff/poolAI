@@ -92,3 +92,15 @@ Memory Layer додає **семантику AGI‑памʼяті** поверх
 
 **HTTP (FM-022):** `GET/POST /api/v1/memory/shards`, `GET /api/v1/memory/shards/{shard_id}`; `POOLAI_MEMORY_DATA_DIR` → `shards.json`; filter `?raid_logical_name=` для RAID map.
 
+### Implemented (PH-S860…S869 band 21, 2026-06-21)
+
+| Sprint | Capability | Code / test |
+|--------|------------|-------------|
+| **PH-S860** | JSON persist + reload | `MemoryShardStore::upsert` → `shards.json`; `tests/memory_shard_persistence.rs` |
+| **PH-S861** | Seed-inventory depth wire | `GET /api/v1/grid/seed-inventory` — `memory_persist`, `registered_shard_count`, depth labels |
+| **PH-S862** | Admin wasm meta strip | `poolai-ui-core::memory`, `poolaiRenderMemorySeedMetaStrip` |
+| **PH-S864** | Memory layer depth stub | `memory_layer_depth_stub` (`src/memory/layer_depth.rs`) |
+| **PH-S869** | Band close | `tests/galaxy_horizon_s860_integration.rs` |
+
+**Depth labels:** `memory_store_depth` (`ephemeral` \| `json` \| `json_restart`); `memory_layer_depth` (`seed_inventory_wire` \| `full_depth` \| …).
+

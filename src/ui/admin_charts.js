@@ -511,7 +511,41 @@ function poolaiRenderJobsStoreBadge(backend, labels) {
 }
 
 /**
+ * PH-S862: Seed inventory memory persist meta strip (wasm-only).
+ */
+function poolaiRenderMemorySeedMetaStrip(snapshot, labels) {
+  labels = labels || {};
+  snapshot = snapshot || {};
+  var wasm = poolaiChartsWasm();
+  if (wasm && typeof wasm.renderMemorySeedMetaStripHtml === 'function') {
+    return wasm.renderMemorySeedMetaStripHtml(
+      !!snapshot.memory_persist,
+      Number(snapshot.registered_shard_count || 0),
+      String(snapshot.memory_store_depth || 'ephemeral'),
+      String(snapshot.memory_layer_depth || 'none'),
+      labels.persistLabel || poolaiChartT('admin.seedInventory.memoryPersist', 'Memory:'),
+      labels.shardsLabel || poolaiChartT('admin.seedInventory.registered', 'Registered:'),
+    );
+  }
+  return '';
+}
+
+/**
+ * PH-S862: Seed inventory RAM bytes cell (wasm-only).
+ */
+function poolaiFormatSeedInventoryRamBytes(ramBytes) {
+  var wasm = poolaiChartsWasm();
+  if (wasm && typeof wasm.formatSeedInventoryRamBytes === 'function') {
+    return wasm.formatSeedInventoryRamBytes(
+      ramBytes == null ? null : Number(ramBytes),
+    );
+  }
+  return ramBytes == null ? '—' : String(ramBytes);
+}
+
+/**
  * PH-S499: VM instances table (wasm-only, PH-S820).
+ */
  */
 function poolaiRenderVmPanel(instances, labels) {
   labels = labels || {};

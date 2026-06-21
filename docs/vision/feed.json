@@ -3,80 +3,80 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S860",
+      "id": "PH-S870",
       "link": "docs/vision/index.html#sprint-queue",
       "next": true,
       "published": "2026-05-28",
       "status": "open",
-      "summary": "MemoryShardStore persist + test",
-      "title": "memory shard persist stub"
+      "summary": "POOLAI_SETTLEMENT_ON_CHAIN test",
+      "title": "on-chain cleared mock RPC depth"
     },
     {
       "category": "open",
-      "id": "PH-S861",
+      "id": "PH-S871",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "GET /grid/seed-inventory extend",
-      "title": "seed-inventory HTTP depth"
+      "summary": "crate test",
+      "title": "solana-adapter event schema v1"
     },
     {
       "category": "open",
-      "id": "PH-S862",
+      "id": "PH-S872",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "ui-core helper",
-      "title": "admin memory/seed wasm glue"
+      "summary": "domain_events test",
+      "title": "job onchain events NDJSON persist"
     },
     {
       "category": "open",
-      "id": "PH-S863",
+      "id": "PH-S873",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
       "summary": "runner",
-      "title": "stand smoke seed-inventory API"
+      "title": "stand smoke on-chain metrics if exposed"
     },
     {
       "category": "open",
-      "id": "PH-S864",
+      "id": "PH-S874",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "POOLAI_MEMORY_LAYER unit test",
-      "title": "memory layer depth stub"
+      "summary": "unit test",
+      "title": "solana depth stub"
     },
     {
       "category": "open",
-      "id": "PH-S865",
+      "id": "PH-S875",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
       "summary": "rust_ratio.json zriz",
-      "title": "poolai-loc-audit PH-S865"
+      "title": "poolai-loc-audit PH-S875"
     },
     {
       "category": "open",
-      "id": "PH-S866",
+      "id": "PH-S876",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
       "summary": "docs ✅",
-      "title": "POOLAI_MEMORY_LAYER.md sync"
+      "title": "SOLANA_ADAPTER_CONCEPT sync"
     },
     {
       "category": "open",
-      "id": "PH-S867",
+      "id": "PH-S877",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
       "summary": "--check` green",
-      "title": "poolai-vision-sync drift gate"
+      "title": "poolai-vision-sync --check"
     },
     {
       "category": "open",
-      "id": "PH-S868",
+      "id": "PH-S878",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -85,12 +85,102 @@
     },
     {
       "category": "open",
-      "id": "PH-S869",
+      "id": "PH-S879",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
+      "summary": "galaxy_horizon_s870_integration",
+      "title": "Horizon close band S870–S878"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S869",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
       "summary": "galaxy_horizon_s860_integration",
       "title": "Horizon close band S860–S868"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S868",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--min-ratio 0.95 --advisory",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S867",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--check` green",
+      "title": "poolai-vision-sync drift gate"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S866",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "docs ✅",
+      "title": "POOLAI_MEMORY_LAYER.md sync"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S865",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "rust_ratio.json zriz",
+      "title": "poolai-loc-audit PH-S865"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S864",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "POOLAI_MEMORY_LAYER unit test",
+      "title": "memory layer depth stub"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S863",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "runner",
+      "title": "stand smoke seed-inventory API"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S862",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "ui-core helper",
+      "title": "admin memory/seed wasm glue"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S861",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "GET /grid/seed-inventory extend",
+      "title": "seed-inventory HTTP depth"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S860",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "MemoryShardStore persist + test",
+      "title": "memory shard persist stub"
     },
     {
       "category": "closed",
@@ -109,96 +199,6 @@
       "status": "closed",
       "summary": "--min-ratio 0.95 --advisory",
       "title": "Ratio hold advisory"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S857",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--check` green",
-      "title": "poolai-vision-sync drift gate"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S856",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "docs",
-      "title": "RUN_LOCAL.md RAID jobs preset"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S855",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "rust_ratio.json zriz",
-      "title": "poolai-loc-audit PH-S855"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S854",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "unit test",
-      "title": "job store depth stub"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S853",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "runner case",
-      "title": "stand smoke jobs store_backend"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S852",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "admin jobs panel",
-      "title": "admin jobs store_backend badge wire"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S851",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "bin script green",
-      "title": "verify-dev-stand RAID jobs path"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S850",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "integration test like PH-S52",
-      "title": "job store RAID restart persistence"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S849",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_horizon_s840_integration` + docs sync",
-      "title": "Horizon close band S840–S848"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S848",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--min-ratio 0.95 --advisory",
-      "title": "Ratio hold advisory snapshot"
     }
   ],
   "link": "docs/vision/index.html",

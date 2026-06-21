@@ -6625,6 +6625,23 @@ components:
         generated_at:
           type: string
           format: date-time
+        memory_persist:
+          type: boolean
+          description: Whether POOLAI_MEMORY_DATA_DIR is configured (PH-S861)
+        registered_shard_count:
+          type: integer
+          format: int32
+          minimum: 0
+        memory_store_depth:
+          type: string
+          description: ephemeral | json | json_restart
+        memory_layer_depth:
+          type: string
+          description: Memory layer depth wire label (PH-S861)
+        registered_shard_ids:
+          type: array
+          items:
+            type: string
 
     GridVerificationReplayResponse:
       type: object

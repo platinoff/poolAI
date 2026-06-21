@@ -52,6 +52,29 @@ impl MemoryShardStore {
         Ok(guard.clone())
     }
 
+    /// Whether `POOLAI_MEMORY_DATA_DIR` is configured (PH-S860).
+    pub fn persist_enabled(&self) -> bool {
+        self.data_dir.is_some()
+    }
+
+    /// Count of registered shard refs in the in-process registry (PH-S861).
+    pub fn registered_shard_count(&self) -> Result<u32, AppError> {
+        let guard = self
+            .shards
+            .lock()
+            .map_err(|_| AppError::InternalError("memory store lock poisoned".into()))?;
+        Ok(guard.len() as u32)
+    }
+
+    /// Registered shard ids for seed-inventory depth merge (PH-S861).
+    pub fn registered_shard_ids(&self) -> Result<Vec<String>, AppError> {
+        let guard = self
+            .shards
+            .lock()
+            .map_err(|_| AppError::InternalError("memory store lock poisoned".into()))?;
+        Ok(guard.iter().map(|s| s.shard_id.0.clone()).collect())
+    }
+
     pub fn list_by_raid_logical_name(
         &self,
         logical_name: &str,

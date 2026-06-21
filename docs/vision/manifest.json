@@ -2162,11 +2162,23 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_libs_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_jobs_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_job_store_depth_rs"
     }
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S859",
+  "last_sprint_closed": "PH-S869",
   "layers": [
     {
       "id": "L0",
@@ -2199,7 +2211,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S860",
+  "next_sprint": "PH-S870",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -8921,9 +8933,30 @@
       "label": "grid_openapi_contracts.rs",
       "layer": "L3",
       "path": "tests/grid_openapi_contracts.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_jobs_rs",
+      "label": "jobs.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/jobs.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_job_store_depth_rs",
+      "label": "store_depth.rs",
+      "layer": "L3",
+      "path": "src/job/store_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s850_integration_rs",
+      "label": "galaxy_horizon_s850_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s850_integration.rs"
     }
   ],
-  "revision": 286,
+  "revision": 287,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -16075,91 +16108,181 @@
       "acceptance": "MemoryShardStore persist + test",
       "deps": "Memory shard persist",
       "id": "PH-S860",
-      "open": true,
+      "open": false,
       "row": 795,
-      "status": "open",
+      "status": "closed",
       "title": "memory shard persist stub"
     },
     {
       "acceptance": "GET /grid/seed-inventory extend",
       "deps": "Galaxy §5.5",
       "id": "PH-S861",
-      "open": true,
+      "open": false,
       "row": 796,
-      "status": "open",
+      "status": "closed",
       "title": "seed-inventory HTTP depth"
     },
     {
       "acceptance": "ui-core helper",
       "deps": "UI wasm glue",
       "id": "PH-S862",
-      "open": true,
+      "open": false,
       "row": 797,
-      "status": "open",
+      "status": "closed",
       "title": "admin memory/seed wasm glue"
     },
     {
       "acceptance": "runner",
       "deps": "tests",
       "id": "PH-S863",
-      "open": true,
+      "open": false,
       "row": 798,
-      "status": "open",
+      "status": "closed",
       "title": "stand smoke seed-inventory API"
     },
     {
       "acceptance": "POOLAI_MEMORY_LAYER unit test",
       "deps": "code",
       "id": "PH-S864",
-      "open": true,
+      "open": false,
       "row": 799,
-      "status": "open",
+      "status": "closed",
       "title": "memory layer depth stub"
     },
     {
       "acceptance": "rust_ratio.json zriz",
       "deps": "§5.13",
       "id": "PH-S865",
-      "open": true,
+      "open": false,
       "row": 800,
-      "status": "open",
+      "status": "closed",
       "title": "poolai-loc-audit PH-S865"
     },
     {
       "acceptance": "docs ✅",
       "deps": "docs",
       "id": "PH-S866",
-      "open": true,
+      "open": false,
       "row": 801,
-      "status": "open",
+      "status": "closed",
       "title": "POOLAI_MEMORY_LAYER.md sync"
     },
     {
       "acceptance": "--check` green",
       "deps": "ops",
       "id": "PH-S867",
-      "open": true,
+      "open": false,
       "row": 802,
-      "status": "open",
+      "status": "closed",
       "title": "poolai-vision-sync drift gate"
     },
     {
       "acceptance": "--min-ratio 0.95 --advisory",
       "deps": "ops",
       "id": "PH-S868",
-      "open": true,
+      "open": false,
       "row": 803,
-      "status": "open",
+      "status": "closed",
       "title": "Ratio hold advisory"
     },
     {
       "acceptance": "galaxy_horizon_s860_integration",
       "deps": "Memory shard",
       "id": "PH-S869",
-      "open": true,
+      "open": false,
       "row": 804,
-      "status": "open",
+      "status": "closed",
       "title": "Horizon close band S860–S868"
+    },
+    {
+      "acceptance": "POOLAI_SETTLEMENT_ON_CHAIN test",
+      "deps": "Solana §8",
+      "id": "PH-S870",
+      "open": true,
+      "row": 805,
+      "status": "open",
+      "title": "on-chain cleared mock RPC depth"
+    },
+    {
+      "acceptance": "crate test",
+      "deps": "crate",
+      "id": "PH-S871",
+      "open": true,
+      "row": 806,
+      "status": "open",
+      "title": "solana-adapter event schema v1"
+    },
+    {
+      "acceptance": "domain_events test",
+      "deps": "domain_events",
+      "id": "PH-S872",
+      "open": true,
+      "row": 807,
+      "status": "open",
+      "title": "job onchain events NDJSON persist"
+    },
+    {
+      "acceptance": "runner",
+      "deps": "tests",
+      "id": "PH-S873",
+      "open": true,
+      "row": 808,
+      "status": "open",
+      "title": "stand smoke on-chain metrics if exposed"
+    },
+    {
+      "acceptance": "unit test",
+      "deps": "concept",
+      "id": "PH-S874",
+      "open": true,
+      "row": 809,
+      "status": "open",
+      "title": "solana depth stub"
+    },
+    {
+      "acceptance": "rust_ratio.json zriz",
+      "deps": "§5.13",
+      "id": "PH-S875",
+      "open": true,
+      "row": 810,
+      "status": "open",
+      "title": "poolai-loc-audit PH-S875"
+    },
+    {
+      "acceptance": "docs ✅",
+      "deps": "docs",
+      "id": "PH-S876",
+      "open": true,
+      "row": 811,
+      "status": "open",
+      "title": "SOLANA_ADAPTER_CONCEPT sync"
+    },
+    {
+      "acceptance": "--check` green",
+      "deps": "ops",
+      "id": "PH-S877",
+      "open": true,
+      "row": 812,
+      "status": "open",
+      "title": "poolai-vision-sync --check"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory",
+      "deps": "ops",
+      "id": "PH-S878",
+      "open": true,
+      "row": 813,
+      "status": "open",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "acceptance": "galaxy_horizon_s870_integration",
+      "deps": "Solana",
+      "id": "PH-S879",
+      "open": true,
+      "row": 814,
+      "status": "open",
+      "title": "Horizon close band S870–S878"
     }
   ],
   "sprint_queue_open_count": 10,

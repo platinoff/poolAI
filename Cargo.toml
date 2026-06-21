@@ -534,6 +534,16 @@ path = "tests/job_store_raid_persistence.rs"
 required-features = ["test-utils"]
 
 [[test]]
+name = "memory_shard_persistence"
+path = "tests/memory_shard_persistence.rs"
+required-features = ["test-utils"]
+
+[[test]]
+name = "galaxy_horizon_s860_integration"
+path = "tests/galaxy_horizon_s860_integration.rs"
+required-features = ["test-utils"]
+
+[[test]]
 name = "galaxy_horizon_s760_integration"
 path = "tests/galaxy_horizon_s760_integration.rs"
 required-features = ["test-utils", "prometheus"]

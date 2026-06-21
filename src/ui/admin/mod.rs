@@ -1055,6 +1055,16 @@ fn admin_jobs_store_badge_wasm_first_ph_s852() {
 }
 
 #[test]
+fn admin_seed_inventory_memory_meta_wasm_first_ph_s862() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("wasm.renderMemorySeedMetaStripHtml"));
+    assert!(js.contains("poolaiRenderMemorySeedMetaStrip"));
+    assert!(js.contains("poolaiFormatSeedInventoryRamBytes"));
+    let seed = include_str!("seed_inventory.rs");
+    assert!(seed.contains("poolaiRenderMemorySeedMetaStrip"));
+}
+
+#[test]
 fn admin_charts_metric_history_url_with_hours_wasm_first_ph_s334() {
     let js = include_str!("../admin_charts.js");
     assert!(js.contains("wasm.buildMetricHistoryUrlWithHours"));

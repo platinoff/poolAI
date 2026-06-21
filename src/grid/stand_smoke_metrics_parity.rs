@@ -240,6 +240,8 @@ pub enum StandSmokeMetricsParityDepth {
     GovernanceOps,
     /// Stand smoke v2 — full grid JSON↔Prom parity (PH-S830 band 18).
     FullGridParityV2,
+    /// Memory shard persist + seed-inventory depth (PH-S863 band 21).
+    MemoryShardPersist,
 }
 
 /// Classify stand smoke metrics parity depth from optional feature stub (PH-S714/PH-S724).
@@ -254,6 +256,12 @@ pub fn stand_smoke_metrics_parity_depth_stub(
         .unwrap_or(false)
     {
         return StandSmokeMetricsParityDepth::FullGridParityV2;
+    }
+    if f.get("memory_shard_persist")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        return StandSmokeMetricsParityDepth::MemoryShardPersist;
     }
     if f.get("network_profile_persist")
         .and_then(|v| v.as_bool())
@@ -784,6 +792,14 @@ mod tests {
         assert_eq!(
             stand_smoke_metrics_parity_depth_stub(Some(&json!({"full_grid_parity_v2": true}))),
             StandSmokeMetricsParityDepth::FullGridParityV2
+        );
+    }
+
+    #[test]
+    fn stand_smoke_metrics_parity_depth_stub_band21_ph_s863() {
+        assert_eq!(
+            stand_smoke_metrics_parity_depth_stub(Some(&json!({"memory_shard_persist": true}))),
+            StandSmokeMetricsParityDepth::MemoryShardPersist
         );
     }
 

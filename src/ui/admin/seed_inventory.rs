@@ -11,6 +11,13 @@ pub async fn admin_seed_inventory() -> Html<String> {
     function renderSeedInventoryPanel(snapshot) {
       const el = document.getElementById('seed-inventory-panel');
       if (!el) return;
+      const metaEl = document.getElementById('seed-inventory-meta');
+      if (metaEl && typeof poolaiRenderMemorySeedMetaStrip === 'function') {
+        metaEl.innerHTML = poolaiRenderMemorySeedMetaStrip(snapshot || {}, {
+          persistLabel: T('admin.seedInventory.memoryPersist', 'Memory:'),
+          shardsLabel: T('admin.seedInventory.registered', 'Registered:'),
+        });
+      }
       const entries = Array.isArray(snapshot.entries) ? snapshot.entries : [];
       if (!entries.length) {
         el.innerHTML = '<p class="muted">' + escapeHtml(T('admin.seedInventory.empty', 'No seed inventory entries.')) + '</p>';
@@ -20,10 +27,13 @@ pub async fn admin_seed_inventory() -> Html<String> {
       entries.forEach((row) => {
         const inv = row.seed_inventory || {};
         const shards = (inv.shard_ids || []).join(', ') || '—';
-        const ram = inv.hot_tier && inv.hot_tier.ram_bytes_used != null ? inv.hot_tier.ram_bytes_used : '—';
+        const ram = inv.hot_tier && inv.hot_tier.ram_bytes_used != null ? inv.hot_tier.ram_bytes_used : null;
+        const ramDisplay = (typeof poolaiFormatSeedInventoryRamBytes === 'function')
+          ? poolaiFormatSeedInventoryRamBytes(ram)
+          : String(ram != null ? ram : '—');
         rows += '<tr><td><code>' + escapeHtml(String(row.peer_id || '—')) + '</code></td>' +
           '<td>' + escapeHtml(shards) + '</td>' +
-          '<td>' + escapeHtml(String(ram)) + '</td></tr>';
+          '<td>' + escapeHtml(ramDisplay) + '</td></tr>';
       });
       el.innerHTML =
         '<p class="muted">' + escapeHtml(T('admin.seedInventory.generated', 'Generated')) + ': ' +
@@ -64,6 +74,7 @@ pub async fn admin_seed_inventory() -> Html<String> {
           <p class="muted admin-hint" data-i18n="admin.seedInventory.hint">
             Read-only coordinator seed inventory stub (Galaxy §5.5, PH-S195).
           </p>
+          <div id="seed-inventory-meta" class="seed-inventory-meta-wrap"></div>
           <div id="seed-inventory-panel" class="seed-inventory-panel"></div>
         </div>
         "#,
@@ -76,5 +87,7 @@ async fn admin_seed_inventory_page_api_ph_s584() {
     let html = admin_seed_inventory().await.0;
     assert!(html.contains("/api/v1/grid/seed-inventory"));
     assert!(html.contains("seed-inventory-panel"));
+    assert!(html.contains("seed-inventory-meta"));
+    assert!(html.contains("poolaiRenderMemorySeedMetaStrip"));
     assert!(html.contains("loadSeedInventoryPanel"));
 }
