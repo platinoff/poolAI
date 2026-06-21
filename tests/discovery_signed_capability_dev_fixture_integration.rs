@@ -1,4 +1,4 @@
-//! PH-S504: mandatory signed capability for telegram_edge register-remote.
+//! PH-S741: dev fixture signed capability pass path on register-remote.
 
 use axum::body::to_bytes;
 use axum::http::{Request, StatusCode};
@@ -7,11 +7,16 @@ use ed25519_dalek::Signer;
 use ed25519_dalek::SigningKey;
 use poolai::core::discovery_handle::DiscoveryHandle;
 use poolai::core::state::ApiContext;
+use poolai::grid::galaxy_capability_admission_metrics::{
+    capability_signed_accepted_total, capability_unsigned_rejected_total,
+    reset_capability_admission_metrics_for_test,
+};
 use poolai::grid::galaxy_capability_doc::{
     capability_signing_message, GalaxyCapabilityDocument, DEV_CAPABILITY_VERIFY_PK_HEX,
 };
 use poolai::network::api::create_api_routes;
 use poolai::network::discovery::{DiscoveryConfig, DiscoveryService};
+use poolai::observability::{self, metrics_handler};
 use poolai::services::telegram_seat_service::{
     reset_telegram_seats_for_test, ENV_TELEGRAM_SEAT_LIMIT,
 };
@@ -20,17 +25,14 @@ use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 use std::sync::Arc;
 use tower::ServiceExt;
 
-fn test_discovery() -> Arc<DiscoveryService> {
+async fn app_with_discovery() -> Router {
+    observability::init_prometheus();
     let addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::LOCALHOST, 18082));
-    Arc::new(DiscoveryService::new(
+    let discovery = Arc::new(DiscoveryService::new(
         DiscoveryConfig::default(),
         addr,
         None,
-    ))
-}
-
-async fn app_with_discovery() -> Router {
-    let discovery = test_discovery();
+    ));
     let ctx = ApiContext::default();
     {
         let mut slot = ctx.discovery.write().await;
@@ -38,6 +40,7 @@ async fn app_with_discovery() -> Router {
     }
     Router::new()
         .nest("/api/v1", create_api_routes())
+        .route("/metrics", axum::routing::get(metrics_handler))
         .with_state(ctx)
 }
 
@@ -64,6 +67,21 @@ async fn post_register(app: &Router, body: Value) -> (StatusCode, Value) {
     (status, v)
 }
 
+async fn get_metrics(app: &Router) -> String {
+    let response = app
+        .clone()
+        .oneshot(
+            Request::builder()
+                .uri("/metrics")
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    let bytes = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+    String::from_utf8(bytes.to_vec()).unwrap_or_default()
+}
+
 fn signed_capability_doc(peer_id: &str) -> Value {
     let sk = SigningKey::from_bytes(&[7u8; 32]);
     assert_eq!(
@@ -88,14 +106,16 @@ fn signed_capability_doc(peer_id: &str) -> Value {
 }
 
 #[tokio::test]
-async fn register_remote_telegram_edge_requires_signed_capability_ph_s504() {
+async fn register_remote_signed_capability_dev_fixture_ph_s741() {
     static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
     let _guard = ENV_LOCK.lock().unwrap_or_else(|e| e.into_inner());
     reset_telegram_seats_for_test();
+    reset_capability_admission_metrics_for_test();
     std::env::set_var(ENV_TELEGRAM_SEAT_LIMIT, "10");
 
     let app = app_with_discovery().await;
-    let peer_id = format!("ph-s504-{}", uuid::Uuid::new_v4());
+    let peer_id = format!("ph-s741-{}", uuid::Uuid::new_v4());
+
     let (status, body) = post_register(
         &app,
         json!({
@@ -108,6 +128,7 @@ async fn register_remote_telegram_edge_requires_signed_capability_ph_s504() {
     )
     .await;
     assert_eq!(status, StatusCode::FORBIDDEN, "body={body}");
+    assert_eq!(capability_unsigned_rejected_total(), 1);
 
     let (status, body) = post_register(
         &app,
@@ -117,11 +138,18 @@ async fn register_remote_telegram_edge_requires_signed_capability_ph_s504() {
             "port": 9103,
             "protocol_version": "1.2",
             "metadata": { "origin": "telegram_edge", "role": "virtual_node" },
-            "capability_document": signed_capability_doc("edge-worker-1")
+            "capability_document": signed_capability_doc(&peer_id)
         }),
     )
     .await;
     assert_eq!(status, StatusCode::OK, "body={body}");
+    assert_eq!(capability_signed_accepted_total(), 1);
+
+    let metrics = get_metrics(&app).await;
+    assert!(metrics.contains("galaxy_capability_unsigned_rejected_total"));
+    assert!(metrics.contains("galaxy_capability_signed_accepted_total"));
+
     std::env::remove_var(ENV_TELEGRAM_SEAT_LIMIT);
     reset_telegram_seats_for_test();
+    reset_capability_admission_metrics_for_test();
 }

@@ -17,6 +17,10 @@ use prometheus::{
 use std::sync::OnceLock;
 
 use crate::core::state::ApiContext;
+use crate::grid::galaxy_capability_admission_metrics::{
+    capability_signed_accepted_total, capability_unsigned_rejected_total,
+    METRIC_CAPABILITY_SIGNED_ACCEPTED_TOTAL, METRIC_CAPABILITY_UNSIGNED_REJECTED_TOTAL,
+};
 use crate::grid::galaxy_fee_split_metrics::{
     fee_split_applied_total, METRIC_FEE_SPLIT_APPLIED_TOTAL,
 };
@@ -204,6 +208,8 @@ pub struct PoolAiPrometheus {
     galaxy_prefetch_pull_bytes_total: IntGauge,
     poolai_protocol_negotiation_rejected_total: IntGauge,
     poolai_protocol_negotiation_accepted_total: IntGauge,
+    galaxy_capability_unsigned_rejected_total: IntGauge,
+    galaxy_capability_signed_accepted_total: IntGauge,
     galaxy_locality_rank_ingest_total: IntGauge,
     galaxy_locality_rank_miss_total: IntGauge,
     galaxy_locality_rank_empty_workers_total: IntGauge,
@@ -859,6 +865,24 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(poolai_protocol_negotiation_accepted_total.clone()))
         .expect("register poolai_protocol_negotiation_accepted_total");
 
+    let galaxy_capability_unsigned_rejected_total = IntGauge::with_opts(Opts::new(
+        METRIC_CAPABILITY_UNSIGNED_REJECTED_TOTAL,
+        "Unsigned or invalid signed capability rejections on telegram_edge register-remote (PH-S740)",
+    ))
+    .expect(METRIC_CAPABILITY_UNSIGNED_REJECTED_TOTAL);
+    registry
+        .register(Box::new(galaxy_capability_unsigned_rejected_total.clone()))
+        .expect("register galaxy_capability_unsigned_rejected_total");
+
+    let galaxy_capability_signed_accepted_total = IntGauge::with_opts(Opts::new(
+        METRIC_CAPABILITY_SIGNED_ACCEPTED_TOTAL,
+        "Successful signed capability admissions on telegram_edge register-remote (PH-S741)",
+    ))
+    .expect(METRIC_CAPABILITY_SIGNED_ACCEPTED_TOTAL);
+    registry
+        .register(Box::new(galaxy_capability_signed_accepted_total.clone()))
+        .expect("register galaxy_capability_signed_accepted_total");
+
     let galaxy_locality_rank_ingest_total = IntGauge::with_opts(Opts::new(
         METRIC_LOCALITY_RANK_INGEST_TOTAL,
         "Galaxy locality rank invocations on grid job ingest (PH-S295)",
@@ -1341,6 +1365,8 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_prefetch_pull_bytes_total,
         poolai_protocol_negotiation_rejected_total,
         poolai_protocol_negotiation_accepted_total,
+        galaxy_capability_unsigned_rejected_total,
+        galaxy_capability_signed_accepted_total,
         galaxy_locality_rank_ingest_total,
         galaxy_locality_rank_miss_total,
         galaxy_locality_rank_empty_workers_total,
@@ -1526,6 +1552,10 @@ pub fn refresh_galaxy_prefetch_gauges() {
         .set(protocol_negotiation_rejected_total() as i64);
     prom.poolai_protocol_negotiation_accepted_total
         .set(protocol_negotiation_accepted_total() as i64);
+    prom.galaxy_capability_unsigned_rejected_total
+        .set(capability_unsigned_rejected_total() as i64);
+    prom.galaxy_capability_signed_accepted_total
+        .set(capability_signed_accepted_total() as i64);
 }
 
 /// Mirror in-process verification counters into Prometheus gauges (scrape snapshot).

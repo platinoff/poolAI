@@ -1,17 +1,17 @@
 # Galaxy Grid roadmap (зріз)
 
-**Оновлено:** 2026-06-20 · **Completion v2:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · **271** pending PH-S740…S1010 · **§5.12 active:** 10
+**Оновлено:** 2026-06-20 · **Completion v2:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · **261** pending PH-S750…S1010 · **§5.12 active:** 10
 
 | Зріз | Значення |
 |------|----------|
 | **Completion plan** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.14–§5.15** |
 | **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) |
-| **Active drain (band 9)** | PH-S740…S749 — Galaxy **§6.6** signed capability admission |
-| **Next promote (band 9)** | PH-S740…S749 — Galaxy **§6.6** signed capability admission |
+| **Active drain (band 10)** | PH-S750…S759 — Galaxy **§5.5** prefetch live pull depth |
+| **Next promote (band 11)** | PH-S760…S769 — Galaxy locality/hot-tier |
 | **Product-complete tail** | PH-S1010 — FM **§5.15** |
-| **Rust ratio** | **94.55%** · hold **95%** advisory (bands 27–29 formal gate) |
+| **Rust ratio** | **94.59%** · hold **95%** advisory (bands 27–29 formal gate) |
 
-**281** pending · **29** `абракадабра` sessions · остання закрита **PH-S720…S729** ✅.
+**261** pending · **27** `абракадабра` sessions · остання закрита **PH-S740…S749** ✅.
 
 ---
 
@@ -29,8 +29,8 @@
 | **§4 routing / re-migrate depth** | Galaxy **§4.1–§4.3** | band 7 ✅ PH-S720…S729 |
 | **§8.1 network_profile persist** | Galaxy **§8.1** | band 8 ✅ PH-S730…S739 |
 | **§8.1 network_profile full persist** | Galaxy **§8.1** | band 8 ✅ PH-S730…S739 |
-| **§6.6 signed capability admission** | Galaxy **§6.6** | band 9 **active** PH-S740…S749 |
-| **§6.6 signed capability admission** | Galaxy **§6.6** | band 9 PH-S740…S749 |
+| **§6.6 signed capability admission** | Galaxy **§6.6** | band 9 ✅ PH-S740…S749 |
+| **§5.5 prefetch live pull depth** | Galaxy **§5.5** | band 10 **active** PH-S750…S759 |
 | **§5.5 prefetch live pull depth** | Galaxy **§5.5** | band 10 PH-S750…S759 |
 | **§5.2–5.4 locality / hot-tier** | Galaxy **§5.2–5.4** | band 11 PH-S760…S769 |
 | **§8.2 payout / settlement batch** | Galaxy **§8.2** | band 12 PH-S770…S779 |

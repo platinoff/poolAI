@@ -3001,6 +3001,35 @@ mod tests {
     }
 
     #[test]
+    fn signed_capability_reject_export_shape_ph_s743() {
+        let reject = serde_json::json!({
+            "error": {
+                "code": "capability_signature_invalid",
+                "message": "signed capability_document required for telegram_edge origin"
+            }
+        });
+        assert_eq!(
+            reject["error"]["code"].as_str(),
+            Some("capability_signature_invalid")
+        );
+        assert!(reject["error"]["message"]
+            .as_str()
+            .unwrap_or("")
+            .contains("telegram_edge"));
+
+        let metrics = concat!(
+            "# HELP galaxy_capability_unsigned_rejected_total Unsigned or invalid signed capability rejections on telegram_edge register-remote (PH-S740)\n",
+            "# TYPE galaxy_capability_unsigned_rejected_total gauge\n",
+            "galaxy_capability_unsigned_rejected_total 1\n",
+            "# HELP galaxy_capability_signed_accepted_total Successful signed capability admissions on telegram_edge register-remote (PH-S741)\n",
+            "# TYPE galaxy_capability_signed_accepted_total gauge\n",
+            "galaxy_capability_signed_accepted_total 0\n",
+        );
+        assert!(metrics.contains("galaxy_capability_unsigned_rejected_total"));
+        assert!(metrics.contains("galaxy_capability_signed_accepted_total"));
+    }
+
+    #[test]
     fn vision_revision_fm_parity_ph_s235() {
         let root = repo_root();
         assert_vision_repo_parity(&root)

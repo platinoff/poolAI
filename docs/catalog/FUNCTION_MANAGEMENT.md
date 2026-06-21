@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-20 (PH-S730…S739 ✅ · **271** master backlog · active **10** · vision **rev 274** · rust_ratio **94.57%** · completion v2)
+**Оновлено:** 2026-06-20 (PH-S740…S749 ✅ · **261** master backlog · active **10** · vision **rev 275** · rust_ratio **94.59%** · completion v2)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -939,20 +939,30 @@ FM-xxx (з таблиці нижче)
 | 672 | **PH-S737** | poolai-vision-sync drift gate | ops | `poolai-vision-sync --check` green | **✅** |
 | 673 | **PH-S738** | Ratio hold advisory snapshot | PH-S351 pattern | `--min-ratio 0.95 --advisory` **94.57%** | **✅** |
 | 674 | **PH-S739** | Horizon close band S730–S738 | Galaxy **§8.1** profile | `galaxy_horizon_s730_integration` + docs sync | **✅** |
-| 675 | **PH-S740** | signed capability strict gate | Galaxy **§6.6** | unsigned edge → 403 + metric | **[ ]** |
-| 676 | **PH-S741** | signed capability dev fixture pass | Galaxy **§6.6** | integration test register-remote OK | **[ ]** |
-| 677 | **PH-S742** | Admin capability doc panel extend | poolai-ui-core | updates-compat capability section | **[ ]** |
-| 678 | **PH-S743** | Stand smoke signed-cap reject shape | poolai-http-stand-smoke | export shape unit test | **[ ]** |
-| 679 | **PH-S744** | `capability_admission_depth_stub` | Galaxy **§6.6** | unit test | **[ ]** |
-| 680 | **PH-S745** | Rust ratio loc-audit refresh | §5.13 fallback | `poolai-loc-audit` → `rust_ratio.json` PH-S745 zriz | **[ ]** |
-| 681 | **PH-S746** | SECURITY_HARDENING ↔ §6.6 cross-link | docs canon | docs canon | **[ ]** |
-| 682 | **PH-S747** | poolai-vision-sync drift gate | ops | `poolai-vision-sync --check` green | **[ ]** |
-| 683 | **PH-S748** | Ratio hold advisory snapshot | PH-S351 pattern | `--min-ratio 0.95 --advisory` | **[ ]** |
-| 684 | **PH-S749** | Horizon close band S740–S748 | Galaxy **§6.6** capability | `galaxy_horizon_s740_integration` + docs sync | **[ ]** |
+| 675 | **PH-S740** | signed capability strict gate | Galaxy **§6.6** | unsigned edge → 403 + metric | **✅** |
+| 676 | **PH-S741** | signed capability dev fixture pass | Galaxy **§6.6** | integration test register-remote OK | **✅** |
+| 677 | **PH-S742** | Admin capability doc panel extend | poolai-ui-core | updates-compat capability section | **✅** |
+| 678 | **PH-S743** | Stand smoke signed-cap reject shape | poolai-http-stand-smoke | export shape unit test | **✅** |
+| 679 | **PH-S744** | `capability_admission_depth_stub` | Galaxy **§6.6** | unit test | **✅** |
+| 680 | **PH-S745** | Rust ratio loc-audit refresh | §5.13 fallback | `poolai-loc-audit` → `rust_ratio.json` PH-S745 zriz | **✅** |
+| 681 | **PH-S746** | SECURITY_HARDENING ↔ §6.6 cross-link | docs canon | docs canon | **✅** |
+| 682 | **PH-S747** | poolai-vision-sync drift gate | ops | `poolai-vision-sync --check` green | **✅** |
+| 683 | **PH-S748** | Ratio hold advisory snapshot | PH-S351 pattern | `--min-ratio 0.95 --advisory` **94.59%** | **✅** |
+| 684 | **PH-S749** | Horizon close band S740–S748 | Galaxy **§6.6** capability | `galaxy_horizon_s740_integration` + docs sync | **✅** |
+| 685 | **PH-S750** | prefetch live bytes metric parity | Galaxy **§5.5** | JSON/Prometheus parity test | **[ ]** |
+| 686 | **PH-S751** | prefetch backpressure bandwidth gate | Galaxy **§5.5** | unit + integration test | **[ ]** |
+| 687 | **PH-S752** | Admin prefetch metrics wasm glue | poolai-ui-core | ui-core metrics strip | **[ ]** |
+| 688 | **PH-S753** | Stand smoke prefetch-metrics API | poolai-http-stand-smoke | runner + unit test | **[ ]** |
+| 689 | **PH-S754** | `prefetch_depth_stub` | Galaxy **§5.5** | unit test | **[ ]** |
+| 690 | **PH-S755** | Rust ratio loc-audit refresh | §5.13 fallback | `poolai-loc-audit` → `rust_ratio.json` PH-S755 zriz | **[ ]** |
+| 691 | **PH-S756** | GALAXY §5.5 implemented table | docs canon | docs canon | **[ ]** |
+| 692 | **PH-S757** | poolai-vision-sync drift gate | ops | `poolai-vision-sync --check` green | **[ ]** |
+| 693 | **PH-S758** | Ratio hold advisory snapshot | PH-S351 pattern | `--min-ratio 0.95 --advisory` | **[ ]** |
+| 694 | **PH-S759** | Horizon close band S750–S758 | Galaxy **§5.5** prefetch | `galaxy_horizon_s750_integration` + docs sync | **[ ]** |
 
-**Відкритих у §5.12:** **10** (PH-S740…S749). **Master backlog:** **271** pending PH-S740…S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · **§5.14**. Vision rev **274** (after sync). rust_ratio **94.57%**.
+**Відкритих у §5.12:** **10** (PH-S750…S759). **Master backlog:** **261** pending PH-S750…S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · **§5.14**. Vision rev **275** (after sync). rust_ratio **94.59%**.
 
-**Наступна сесія:** **`абракадабра`** — drain PH-S740…S749 → promote PH-S750…S759 з §5.14 → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **`абракадабра`** — drain PH-S750…S759 → promote PH-S760…S769 з §5.14 → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.14 Master backlog PH-S720…S1010 (291 pending → product-complete, 2026-06-20)
 
@@ -960,10 +970,10 @@ FM-xxx (з таблиці нижче)
 
 | Поле | Значення |
 |------|----------|
-| **Pending** | **271** (PH-S740…S1010) |
-| **Drained bands 1–8** | PH-S660…S739 ✅ |
-| **Активна §5.12** | PH-S740…S749 `[ ]` — band 9 Galaxy **§6.6** signed capability admission |
-| **Наступна promote** | PH-S750…S759 — band 10 Galaxy depth |
+| **Pending** | **261** (PH-S750…S1010) |
+| **Drained bands 1–9** | PH-S660…S749 ✅ |
+| **Активна §5.12** | PH-S750…S759 `[ ]` — band 10 Galaxy **§5.5** prefetch live pull depth |
+| **Наступна promote** | PH-S760…S769 — band 11 Galaxy locality/hot-tier |
 | **Сесій `абракадабра`** | **28** (27×10 + tail PH-S1010) |
 | **План фаз** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md) |
 | **Реєстр sprint×acceptance** | [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) |
@@ -1013,7 +1023,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-06-20):** PH-S740…S749 **[ ]** drain band 9 (Galaxy **§6.6** signed capability admission) · **`абракадабра`** = drain → vision close → push · ratio formal gate bands **28–29** per [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md).
+**Активна смуга (2026-06-20):** PH-S750…S759 **[ ]** drain band 10 (Galaxy **§5.5** prefetch live pull depth) · **`абракадабра`** = drain → vision close → push · ratio formal gate bands **28–29** per [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md).
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

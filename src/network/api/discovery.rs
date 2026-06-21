@@ -20,6 +20,9 @@ use crate::core::discovery_types::{PeerCapabilities, PeerInfo};
 use crate::core::error::{AppError, ErrorContext};
 use crate::core::state::ApiContext;
 use crate::grid::galaxy_capability_admission::record_peer_capabilities;
+use crate::grid::galaxy_capability_admission_metrics::{
+    record_capability_signed_accepted, record_capability_unsigned_rejected,
+};
 use crate::grid::galaxy_capability_doc::{
     capability_verify_production_mode, parse_capability_document, validate_capability_document,
     validate_telegram_edge_capability, CapabilityDocParseError,
@@ -318,6 +321,10 @@ async fn register_remote_handler(
             }
         };
         if let Err(CapabilityDocParseError { message }) = validate_capability_document(&doc) {
+            if telegram_edge {
+                record_capability_unsigned_rejected();
+                return discovery_capability_forbidden("register_remote", message).into_response();
+            }
             if capability_verify_production_mode() {
                 return discovery_capability_forbidden("register_remote", message).into_response();
             }
@@ -330,10 +337,17 @@ async fn register_remote_handler(
     if let Err(CapabilityDocParseError { message }) =
         validate_telegram_edge_capability(telegram_edge, parsed_capability.as_ref())
     {
+        if telegram_edge {
+            record_capability_unsigned_rejected();
+            return discovery_capability_forbidden("register_remote", message).into_response();
+        }
         if capability_verify_production_mode() {
             return discovery_capability_forbidden("register_remote", message).into_response();
         }
         return discovery_validation("register_remote", message).into_response();
+    }
+    if telegram_edge && parsed_capability.is_some() {
+        record_capability_signed_accepted();
     }
     if let Some(doc) = parsed_capability.as_ref() {
         record_peer_capabilities(&peer_id, &doc.capabilities);

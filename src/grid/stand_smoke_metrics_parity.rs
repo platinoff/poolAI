@@ -118,6 +118,7 @@ pub enum StandSmokeMetricsParityDepth {
     ReMigratePolicy,
     RoutingLocality,
     NetworkProfile,
+    CapabilityAdmission,
 }
 
 /// Classify stand smoke metrics parity depth from optional feature stub (PH-S714/PH-S724).
@@ -132,6 +133,12 @@ pub fn stand_smoke_metrics_parity_depth_stub(
         .unwrap_or(false)
     {
         return StandSmokeMetricsParityDepth::NetworkProfile;
+    }
+    if f.get("capability_admission")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        return StandSmokeMetricsParityDepth::CapabilityAdmission;
     }
     if f.get("routing_locality_gate")
         .and_then(|v| v.as_bool())
@@ -410,6 +417,14 @@ mod tests {
         assert_eq!(
             stand_smoke_metrics_parity_depth_stub(Some(&json!({"network_profile_persist": true}))),
             StandSmokeMetricsParityDepth::NetworkProfile
+        );
+    }
+
+    #[test]
+    fn stand_smoke_metrics_parity_depth_stub_band9_ph_s744() {
+        assert_eq!(
+            stand_smoke_metrics_parity_depth_stub(Some(&json!({"capability_admission": true}))),
+            StandSmokeMetricsParityDepth::CapabilityAdmission
         );
     }
 

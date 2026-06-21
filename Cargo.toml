@@ -468,6 +468,14 @@ required-features = ["test-utils", "prometheus"]
 [[test]]
 name = "galaxy_horizon_s730_integration"
 path = "tests/galaxy_horizon_s730_integration.rs"
+
+[[test]]
+name = "discovery_signed_capability_dev_fixture_integration"
+path = "tests/discovery_signed_capability_dev_fixture_integration.rs"
+
+[[test]]
+name = "galaxy_horizon_s740_integration"
+path = "tests/galaxy_horizon_s740_integration.rs"
 required-features = ["test-utils", "prometheus"]
 
 [[test]]

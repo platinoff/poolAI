@@ -59,7 +59,7 @@
 
 ---
 
-## Band 9 — PH-S740…S749 (Galaxy §6.6 signed capability admission) · **active §5.12**
+## Band 9 — PH-S740…S749 (Galaxy §6.6 signed capability admission) · **✅ drained 2026-06-20**
 
 | Sprint | Focus | Acceptance |
 |--------|-------|------------|
@@ -76,7 +76,7 @@
 
 ---
 
-## Band 10 — PH-S750…S759 (Galaxy §5.5 prefetch live pull depth)
+## Band 10 — PH-S750…S759 (Galaxy §5.5 prefetch live pull depth) · **active §5.12**
 
 | Sprint | Focus | Acceptance |
 |--------|-------|------------|

@@ -1,6 +1,6 @@
 # Rust codebase ratio — стратегія 90–95% (PoolAI)
 
-**Оновлено:** 2026-06-20 · **Канон:** FM **§5.13** · §5.12 **10** active PH-S740…S749 · master backlog **271** pending → [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) bands **28–29** formal **95%** / stretch **96%** · rust_ratio **94.57%**
+**Оновлено:** 2026-06-20 · **Канон:** FM **§5.13** · §5.12 **10** active PH-S750…S759 · master backlog **261** pending → [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) bands **28–29** formal **95%** / stretch **96%** · rust_ratio **94.59%**
 
 **Мета:** зростання частки **Rust** у виконуваному коді репозиторію до **90–95%** (формально), **96% stretch spirit** (орієнтир replenish PH-S150…S159) — платформа збирається і перевіряється через **`cargo`** без обов'язкового Node на edge.
 

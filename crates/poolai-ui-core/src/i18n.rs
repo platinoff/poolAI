@@ -454,6 +454,21 @@ pub const ADMIN_UPDATES_COMPAT_EN: &[I18nRow<'_>] = &[
         "admin.updatesCompat.link.matrix",
         "Galaxy §9.3 compat matrix (docs)",
     ),
+    ("admin.updatesCompat.capabilityTitle", "Signed capability documents"),
+    (
+        "admin.updatesCompat.capabilityHint",
+        "Galaxy §6.6 — telegram_edge workers must send a signed capability_document on register-remote (PH-S740).",
+    ),
+    ("admin.updatesCompat.col.devVerifyPk", "Dev verify public key"),
+    ("admin.updatesCompat.col.capEnv", "Env override"),
+    (
+        "admin.updatesCompat.link.galaxy66",
+        "Galaxy §6.6 untrusted telegram_edge",
+    ),
+    (
+        "admin.updatesCompat.link.capFixture",
+        "Dev capability verify key fixture",
+    ),
 ];
 
 /// Ukrainian updates & compatibility admin keys (PH-S197).
@@ -500,6 +515,21 @@ pub const ADMIN_UPDATES_COMPAT_UK: &[I18nRow<'_>] = &[
     (
         "admin.updatesCompat.link.matrix",
         "Galaxy §9.3 compat matrix (docs)",
+    ),
+    ("admin.updatesCompat.capabilityTitle", "Підписані capability documents"),
+    (
+        "admin.updatesCompat.capabilityHint",
+        "Galaxy §6.6 — telegram_edge воркери мають надсилати підписаний capability_document на register-remote (PH-S740).",
+    ),
+    ("admin.updatesCompat.col.devVerifyPk", "Dev verify public key"),
+    ("admin.updatesCompat.col.capEnv", "Env override"),
+    (
+        "admin.updatesCompat.link.galaxy66",
+        "Galaxy §6.6 untrusted telegram_edge",
+    ),
+    (
+        "admin.updatesCompat.link.capFixture",
+        "Dev capability verify key fixture",
     ),
 ];
 

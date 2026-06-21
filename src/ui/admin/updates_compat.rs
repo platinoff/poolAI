@@ -1,6 +1,9 @@
 //! Galaxy Grid updates & compatibility admin page (PH-S93) — read-only ops pointers.
 //! PH-S221: updates-compat page uses slim `admin_layout_updates_compat` + `admin_updates_compat_patch`.
 
+use crate::grid::galaxy_capability_doc::{
+    DEV_CAPABILITY_VERIFY_PK_HEX, ENV_CAPABILITY_VERIFY_PK_HEX,
+};
 use crate::grid::galaxy_update_policy::{
     release_manifest_url_from_env, update_policy_from_env, UpdatePolicyMode,
     ENV_RELEASE_MANIFEST_URL, ENV_UPDATE_POLICY,
@@ -21,6 +24,10 @@ const DOC_RELEASE_MANIFEST: &str =
     "https://github.com/platinoff/poolAI/blob/main/docs/development/RELEASE_MANIFEST_SAMPLE.md";
 const DOC_FIXTURES_README: &str =
     "https://github.com/platinoff/poolAI/blob/main/tests/fixtures/release/dev/README.md";
+const DOC_CAPABILITY_FIXTURE: &str =
+    "https://github.com/platinoff/poolAI/blob/main/tests/fixtures/capability/dev_pubkey.hex";
+const DOC_GALAXY_66: &str =
+    "https://github.com/platinoff/poolAI/blob/main/docs/concept/POOLAI_GALAXY_GRID.md#66-untrusted-telegram_edge";
 
 fn compat_status_wire(status: CompatStatus) -> &'static str {
     match status {
@@ -104,6 +111,29 @@ pub async fn admin_updates_compat() -> Html<String> {
             </div>
           </div>
 
+          <div class="admin-card" id="updates-compat-capability">
+            <h3 data-i18n="admin.updatesCompat.capabilityTitle">Signed capability documents</h3>
+            <p class="muted" data-i18n="admin.updatesCompat.capabilityHint">
+              Galaxy §6.6 — <code>telegram_edge</code> workers must send a signed
+              <code>capability_document</code> on <code>POST /api/v1/discovery/register-remote</code>
+              (PH-S740). Unsigned requests return HTTP 403 and increment
+              <code>galaxy_capability_unsigned_rejected_total</code>.
+            </p>
+            <div class="stat-item">
+              <span class="stat-label" data-i18n="admin.updatesCompat.col.devVerifyPk">Dev verify public key</span>
+              <span class="stat-value"><code id="updates-compat-capability-pk">{dev_verify_pk}</code></span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label" data-i18n="admin.updatesCompat.col.capEnv">Env override</span>
+              <span class="stat-value"><code>{env_capability_pk}</code>
+                <span class="muted">(<code>{env_capability_key}</code> production alias)</span></span>
+            </div>
+            <ul>
+              <li><a href="{doc_galaxy_66}" target="_blank" rel="noopener noreferrer" data-i18n="admin.updatesCompat.link.galaxy66">Galaxy §6.6 untrusted telegram_edge</a></li>
+              <li><a href="{doc_capability_fixture}" target="_blank" rel="noopener noreferrer" data-i18n="admin.updatesCompat.link.capFixture">Dev capability verify key fixture</a></li>
+            </ul>
+          </div>
+
           <div class="admin-card" id="updates-compat-verify-release">
             <h3 data-i18n="admin.updatesCompat.verifyTitle">Verify signed release</h3>
             <p class="muted" data-i18n="admin.updatesCompat.verifyHint">
@@ -147,6 +177,11 @@ pub async fn admin_updates_compat() -> Html<String> {
         manifest_url = manifest_url,
         env_update_policy = ENV_UPDATE_POLICY,
         env_manifest_url = ENV_RELEASE_MANIFEST_URL,
+        dev_verify_pk = DEV_CAPABILITY_VERIFY_PK_HEX,
+        env_capability_pk = ENV_CAPABILITY_VERIFY_PK_HEX,
+        env_capability_key = "POOLAI_CAPABILITY_VERIFY_KEY",
+        doc_galaxy_66 = DOC_GALAXY_66,
+        doc_capability_fixture = DOC_CAPABILITY_FIXTURE,
     );
 
     let script = r#"
@@ -195,6 +230,7 @@ async fn admin_updates_compat_page_includes_protocol_and_doc_blocks() {
     assert!(html.contains("id=\"updates-compat-panel\""));
     assert!(html.contains("id=\"updates-compat-protocol\""));
     assert!(html.contains("id=\"updates-compat-policy\""));
+    assert!(html.contains("id=\"updates-compat-capability\""));
     assert!(html.contains("id=\"updates-compat-verify-release\""));
     assert!(html.contains("id=\"updates-compat-matrix\""));
     assert!(html.contains("id=\"updates-compat-negotiation-status\""));
@@ -203,7 +239,9 @@ async fn admin_updates_compat_page_includes_protocol_and_doc_blocks() {
     assert!(html.contains(ENV_UPDATE_POLICY));
     assert!(html.contains(ENV_RELEASE_MANIFEST_URL));
     assert!(html.contains(MIN_COORDINATOR_VERSION_DOCS_URL));
-    assert!(html.contains(DEFAULT_COORDINATOR_PROTOCOL));
+    assert!(html.contains(DEV_CAPABILITY_VERIFY_PK_HEX));
+    assert!(html.contains(ENV_CAPABILITY_VERIFY_PK_HEX));
+    assert!(html.contains("galaxy_capability_unsigned_rejected_total"));
     assert!(html.contains("window.__poolaiAdminI18nRust="));
     assert!(html.contains(r#""admin.updatesCompat.section""#));
 }

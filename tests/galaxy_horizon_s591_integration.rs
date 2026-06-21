@@ -212,7 +212,7 @@ async fn horizon_s591_band_profile_prefetch_gpu_tee_wallet_onchain_ph_s599() {
         None,
     )
     .await;
-    assert_eq!(tee_status, StatusCode::BAD_REQUEST);
+    assert_eq!(tee_status, StatusCode::FORBIDDEN);
     std::env::remove_var(ENV_TEE_ATTEST_REQUIRED);
 
     std::env::set_var(ENV_TELEGRAM_WALLET_REBIND_COOLDOWN_SECS, "86400");
