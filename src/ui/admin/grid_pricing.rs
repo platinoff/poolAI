@@ -86,6 +86,34 @@ pub async fn admin_grid_pricing() -> Html<String> {
 
     function startGridPricingPage() {
       loadGridPricingSnapshot();
+      loadGridPricingFeeSplitStrip();
+    }
+
+    async function loadGridPricingFeeSplitStrip() {
+      const el = document.getElementById('grid-pricing-fee-split-strip');
+      if (!el) return;
+      try {
+        const metricsResp = await fetchJson('/api/v1/grid/fee-split-metrics');
+        const metricsJson = JSON.stringify(metricsResp);
+        let applied = 0;
+        try {
+          const promResp = await fetch('/metrics');
+          const promText = await promResp.text();
+          if (window.poolaiUiWasm && typeof window.poolaiUiWasm.parsePrometheusGauge === 'function') {
+            applied = window.poolaiUiWasm.parsePrometheusGauge(promText, 'galaxy_fee_split_applied_total');
+          } else {
+            var m = promText.match(/galaxy_fee_split_applied_total\\s+(\\d+)/);
+            if (m) applied = parseInt(m[1], 10) || 0;
+          }
+        } catch (_) {}
+        if (window.poolaiUiWasm && typeof window.poolaiUiWasm.renderGridFeeSplitMetricsStrip === 'function') {
+          el.innerHTML = window.poolaiUiWasm.renderGridFeeSplitMetricsStrip(metricsJson, applied || 0);
+        } else {
+          el.textContent = metricsJson;
+        }
+      } catch (e) {
+        el.textContent = String(e && e.message ? e.message : e);
+      }
     }
 
     if (window.poolaiUiWasm && (window.poolaiUiWasm.ready || window.poolaiUiWasm.failed)) {
@@ -131,6 +159,16 @@ pub async fn admin_grid_pricing() -> Html<String> {
             </label>
           </form>
           <div id="grid-pricing-panel" class="grid-pricing-panel"></div>
+          <div class="admin-section">
+            <h3 data-i18n="admin.gridPricing.feeSplitTitle">Fee split (Galaxy §1.2)</h3>
+            <p class="muted admin-hint" data-i18n="admin.gridPricing.feeSplitHint">
+              Read-only strip from <code>GET /api/v1/grid/fee-split-metrics</code>
+              reconciled with <code>/metrics</code> (PH-S780…S781).
+            </p>
+            <div id="grid-pricing-fee-split-strip" class="grid-pricing-fee-split-strip muted" data-i18n="admin.gridPricing.feeSplitLoading">
+              Loading fee split metrics…
+            </div>
+          </div>
         </div>
         "#,
         script,
@@ -174,4 +212,13 @@ async fn admin_grid_pricing_page_wires_poolai_ui_wasm_module() {
     assert!(html.contains("poolai-ui-wasm-ready"));
     assert!(html.contains("window.poolaiUiWasm.formatUsdMicro"));
     assert!(!html.contains("formatUsdMicroFallback"));
+}
+
+#[tokio::test]
+async fn admin_grid_pricing_fee_split_wasm_glue_ph_s781() {
+    let html = admin_grid_pricing().await.0;
+    assert!(html.contains("id=\"grid-pricing-fee-split-strip\""));
+    assert!(html.contains("/api/v1/grid/fee-split-metrics"));
+    assert!(html.contains("renderGridFeeSplitMetricsStrip"));
+    assert!(html.contains("loadGridPricingFeeSplitStrip"));
 }

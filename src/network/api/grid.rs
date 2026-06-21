@@ -100,6 +100,7 @@ pub fn create_grid_routes() -> Router<ApiContext> {
             "/grid/payout-batch/history",
             get(get_grid_payout_batch_history),
         )
+        .route("/grid/fee-split-metrics", get(get_grid_fee_split_metrics))
 }
 
 pub async fn ingest_grid_envelope_handler(
@@ -435,6 +436,24 @@ async fn get_grid_locality_metrics(
         Json(GridLocalityMetricsResponse {
             ok: true,
             metrics: crate::grid::galaxy_locality_metrics::locality_metrics_snapshot(),
+        }),
+    ))
+}
+
+#[derive(Debug, Serialize)]
+struct GridFeeSplitMetricsResponse {
+    ok: bool,
+    metrics: crate::grid::galaxy_fee_split_metrics::FeeSplitMetricsSnapshot,
+}
+
+async fn get_grid_fee_split_metrics(
+    State(_ctx): State<ApiContext>,
+) -> Result<(StatusCode, Json<GridFeeSplitMetricsResponse>), HttpAppError> {
+    Ok((
+        StatusCode::OK,
+        Json(GridFeeSplitMetricsResponse {
+            ok: true,
+            metrics: crate::grid::galaxy_fee_split_metrics::fee_split_metrics_snapshot(),
         }),
     ))
 }
@@ -1324,6 +1343,43 @@ mod tests {
 
         reset_settlement_metrics_for_test();
         reset_payout_batch_queue_for_test();
+    }
+
+    #[tokio::test]
+    async fn grid_fee_split_metrics_read_ph_s780() {
+        use crate::grid::galaxy_fee_split::{
+            PRIMARY_DEV_FEE_BPS, SECONDARY_ADMIN_FEE_MAX_BPS, SECONDARY_ADMIN_FEE_MIN_BPS,
+        };
+        use crate::grid::galaxy_fee_split_metrics::{
+            fee_split_metrics_snapshot, record_fee_split_applied, reset_fee_split_metrics_for_test,
+        };
+
+        let _lock = crate::grid::galaxy_fee_split_metrics::fee_split_metrics_test_lock();
+        reset_fee_split_metrics_for_test();
+        record_fee_split_applied();
+
+        let res = get_grid_fee_split_metrics(State(ApiContext::default()))
+            .await
+            .expect("fee split metrics")
+            .1
+             .0;
+        assert!(res.ok);
+        assert_eq!(res.metrics.fee_split_applied_total, 1);
+        assert_eq!(res.metrics.primary_dev_fee_bps, PRIMARY_DEV_FEE_BPS);
+        assert_eq!(
+            res.metrics.secondary_admin_fee_min_bps,
+            SECONDARY_ADMIN_FEE_MIN_BPS
+        );
+        assert_eq!(
+            res.metrics.secondary_admin_fee_max_bps,
+            SECONDARY_ADMIN_FEE_MAX_BPS
+        );
+        assert_eq!(
+            fee_split_metrics_snapshot().fee_split_applied_total,
+            res.metrics.fee_split_applied_total
+        );
+
+        reset_fee_split_metrics_for_test();
     }
 
     #[tokio::test]

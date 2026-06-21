@@ -171,6 +171,40 @@ pub fn render_grid_locality_metrics_strip_html(
     )
 }
 
+/// Primary/secondary fee hint + applied counter strip for grid-pricing admin (PH-S781).
+pub fn render_grid_fee_split_metrics_strip_html(
+    fee_split_metrics_json: &str,
+    applied_gauge: u64,
+) -> String {
+    use crate::format::escape_html;
+
+    let body: Value = serde_json::from_str(fee_split_metrics_json).unwrap_or(Value::Null);
+    let metrics = body.get("metrics").cloned().unwrap_or(body);
+    let applied = if grid_metrics_u64(&metrics, "fee_split_applied_total") > 0 {
+        grid_metrics_u64(&metrics, "fee_split_applied_total")
+    } else {
+        applied_gauge
+    };
+    let primary_bps = grid_metrics_u64(&metrics, "primary_dev_fee_bps");
+    let secondary_min = grid_metrics_u64(&metrics, "secondary_admin_fee_min_bps");
+    let secondary_max = grid_metrics_u64(&metrics, "secondary_admin_fee_max_bps");
+    let hint = crate::pricing::SECONDARY_FEE_UX_HINT;
+
+    format!(
+        r#"<div class="admin-card admin-metrics-strip">
+<span>Primary dev: <strong>{primary_bps}</strong> bps (0.1%)</span>
+<span>Secondary admin: <strong>{secondary_min}</strong>–<strong>{secondary_max}</strong> bps</span>
+<span>Applied: <strong>{applied}</strong></span>
+<p class="muted admin-hint">{hint}</p>
+</div>"#,
+        primary_bps = escape_html(&primary_bps.to_string()),
+        secondary_min = escape_html(&secondary_min.to_string()),
+        secondary_max = escape_html(&secondary_max.to_string()),
+        applied = escape_html(&applied.to_string()),
+        hint = escape_html(hint),
+    )
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -241,5 +275,16 @@ mod tests {
         assert!(html.contains("Hot tier hit"));
         assert!(html.contains("Promote"));
         assert!(html.contains("Evict"));
+    }
+
+    #[test]
+    fn render_grid_fee_split_metrics_strip_ph_s781() {
+        let json = r#"{"ok":true,"metrics":{"fee_split_applied_total":3,"primary_dev_fee_bps":10,"secondary_admin_fee_min_bps":100,"secondary_admin_fee_max_bps":500}}"#;
+        let html = render_grid_fee_split_metrics_strip_html(json, 0);
+        assert!(html.contains("admin-metrics-strip"));
+        assert!(html.contains("Primary dev"));
+        assert!(html.contains("Secondary admin"));
+        assert!(html.contains("Applied"));
+        assert!(html.contains(crate::pricing::SECONDARY_FEE_UX_HINT));
     }
 }

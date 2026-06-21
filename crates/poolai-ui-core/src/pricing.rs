@@ -2,6 +2,10 @@
 
 use std::str::FromStr;
 
+/// UX copy for secondary admin fee range (parity with `galaxy_fee_split::SECONDARY_FEE_UX_HINT`).
+pub const SECONDARY_FEE_UX_HINT: &str =
+    "Lower secondary fee (1–5%) improves market competitiveness; higher fee reduces worker payout.";
+
 /// Galaxy pricing unit keys (wire + admin `<select>` options).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PricingUnitKey {

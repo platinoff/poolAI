@@ -72,7 +72,7 @@ scrape_configs:
 | `galaxy_verification_sample_not_applicable_total` | gauge | Galaxy verification samples not applicable on local origin path (PH-S356) |
 | `galaxy_verification_sampling_evaluations_total` | gauge | Galaxy verification sampling evaluations on grid result path (PH-S414) |
 | `galaxy_replay_evaluations_total` | gauge | Galaxy replay pending evaluations on grid result path (PH-S415) |
-| `galaxy_fee_split_applied_total` | gauge | Galaxy fee split applied on grid result path (PH-S194) |
+| `galaxy_fee_split_applied_total` | gauge | Galaxy fee split applied on grid result path (PH-S194); JSON snapshot `GET /api/v1/grid/fee-split-metrics` (PH-S780) |
 | `galaxy_replication_strict_total` | gauge | Galaxy replication strict tier grid job ingests (PH-S179) |
 
 **Queued (FM §5.12 PH-S191…S200):** vision + code-first band — див. [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12.

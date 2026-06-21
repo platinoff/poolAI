@@ -112,7 +112,7 @@
 
 ---
 
-## Band 13 — PH-S780…S789 (Galaxy §1.2 fee split production) · **active §5.12**
+## Band 13 — PH-S780…S789 (Galaxy §1.2 fee split production) · **✅ drained**
 
 | Sprint | Focus | Acceptance |
 |--------|-------|------------|
@@ -129,7 +129,7 @@
 
 ---
 
-## Band 14 — PH-S790…S799 (Galaxy §9.5–9.6 governance ops)
+## Band 14 — PH-S790…S799 (Galaxy §9.5–9.6 governance ops) · **active §5.12**
 
 | Sprint | Focus | Acceptance |
 |--------|-------|------------|

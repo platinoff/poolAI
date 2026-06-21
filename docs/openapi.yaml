@@ -896,6 +896,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/GridLocalityMetricsResponse'
 
+  /grid/fee-split-metrics:
+    get:
+      tags:
+        - Grid
+      summary: Fee split applied metrics snapshot (PH-S780)
+      operationId: getGridFeeSplitMetrics
+      responses:
+        '200':
+          description: Fee split counters and bps bounds
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GridFeeSplitMetricsResponse'
+
   /grid/network-profiles/{peer_id}:
     get:
       tags:
@@ -6823,6 +6837,33 @@ components:
           type: boolean
         metrics:
           $ref: '#/components/schemas/LocalityMetricsSnapshot'
+
+    GridFeeSplitMetricsResponse:
+      type: object
+      required:
+        - ok
+        - metrics
+      properties:
+        ok:
+          type: boolean
+        metrics:
+          $ref: '#/components/schemas/FeeSplitMetricsSnapshot'
+
+    FeeSplitMetricsSnapshot:
+      type: object
+      properties:
+        fee_split_applied_total:
+          type: integer
+          format: int64
+        primary_dev_fee_bps:
+          type: integer
+          format: int32
+        secondary_admin_fee_min_bps:
+          type: integer
+          format: int32
+        secondary_admin_fee_max_bps:
+          type: integer
+          format: int32
 
     GridNetworkProfileResponse:
       type: object

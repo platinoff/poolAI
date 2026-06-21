@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-21 (PH-S770…S779 ✅ · **231** master backlog · active **10** · vision **rev 278** · rust_ratio **94.65%** · completion v2)
+**Оновлено:** 2026-06-21 (PH-S780…S789 ✅ · **221** master backlog · active **10** · vision **rev 279** · rust_ratio **94.67%** · completion v2)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -332,7 +332,7 @@ FM-xxx (з таблиці нижче)
 | 65 | **PH-S129** | Seed inventory + prefetch policy stub (code) | Galaxy §5.5, `src/grid/dispatch.rs` | `SeedInventoryEntry` DTO + noop prefetch hook; unit tests | **✅** |
 | 66 | **PH-S130** | Edge trust_score settlement gate stub (code) | Galaxy §6.5, `src/grid/` | `trust_score` 0–100 gate sketch on grid result path; unit tests | **✅** |
 | 67 | **PH-S131** | Telegram wallet bind API stub (code) | Galaxy §3.2, `virtual_nodes.rs` | `POST /api/v1/virtual-nodes/telegram/wallet` stub + OpenAPI; contract test | **✅** |
-| 68 | **PH-S132** | network_profile contract docs (docs) | Galaxy §8 TBD #1 | §8.1 schema for `network_profile`; DIGEST row; locality subset cross-link | **✅** |
+| 68 | **PH-S132** | network_profile contract docs (docs) | Galaxy §8 94.67% #1 | §8.1 schema for `network_profile`; DIGEST row; locality subset cross-link | **✅** |
 | 69 | **PH-S133** | Job Migrating lifecycle E2E (e2e) | PH-S104, `e2e/` | Playwright PATCH `migrating` ↔ `executing` roundtrip; `npm run test:ci` | **✅** |
 | 70 | **PH-S134** | Protocol middleware E2E smoke (e2e) | PH-S103, `e2e/` | Playwright register-remote with `X-PoolAI-Protocol`; unsupported → 403 | **✅** |
 | 71 | **PH-S135** | Telegram wallet GET lookup API (code) | Galaxy §3.2, PH-S131 | `GET /api/v1/virtual-nodes/telegram/wallets/{telegram_user_id}`; OpenAPI; integration test | **✅** |
@@ -467,7 +467,7 @@ FM-xxx (з таблиці нижче)
 | 200 | **PH-S265** | Dashboard raid panel i18n slim (code) | PH-S264 | `raid.*` keys out of `i18n_core.js` | **✅** |
 | 201 | **PH-S266** | i18n_core.js near-empty gate + loc-audit (ops) | PH-S265 | STRINGS core **0** inline keys; `rust_ratio.json` refresh | **✅** |
 | 202 | **PH-S267** | Docs canon sync band (docs) | PH-S266 | INDEX/HANDOFF/NEXT/STABLE_STATE sync | **✅** |
-| 203 | **PH-S268** | Galaxy prefetch wire horizon doc (docs) | GALAXY §5.5 | roadmap pointer; metrics ✅; live prefetch TBD | **✅** |
+| 203 | **PH-S268** | Galaxy prefetch wire horizon doc (docs) | GALAXY §5.5 | roadmap pointer; metrics ✅; live prefetch 94.67% | **✅** |
 | 204 | **PH-S269** | Vision feed.json refresh (docs/vision) | PH-S200 | `docs/vision/feed.json` sprint zriz | **✅** |
 | 205 | **PH-S270** | poolai-vision-sync drift gate (ops) | PH-S205 | `--check` green after FM/HANDOFF | **✅** |
 | 206 | **PH-S271** | Rust ratio hold advisory refresh (ops) | PH-S266 | `--min-ratio 0.95` advisory snapshot **94.34%** | **✅** |
@@ -750,14 +750,14 @@ FM-xxx (з таблиці нижче)
 | 483 | **PH-S548** | Scheduler pricing + queue_depth rank | Galaxy §5.2 | `LocalityWorker` tie-break queue_depth + pricing_usd_micro after locality score | **✅** |
 | 484 | **PH-S549** | Update policy notify env stub | Galaxy §9.5/§9.8 | `POOLAI_UPDATE_POLICY` + `tick_update_notify_from_env` on verify-release | **✅** |
 | 485 | **PH-S550** | On-chain settlement mode toggle | Galaxy §8.2 | `POOLAI_SETTLEMENT_ON_CHAIN=1` → payout-batch `on_chain` + pending | **✅** |
-| 486 | **PH-S551** | Telegram cold-mining + GPU horizon docs | Galaxy §8.2 TBD #2 | MVP CPU/RAM/Disk probros scope + GPU migration path in concept + RUN_LOCAL | **✅** |
+| 486 | **PH-S551** | Telegram cold-mining + GPU horizon docs | Galaxy §8.2 94.67% #2 | MVP CPU/RAM/Disk probros scope + GPU migration path in concept + RUN_LOCAL | **✅** |
 | 487 | **PH-S552** | Edge trust_score disk persistence | Galaxy §6.5 | `galaxy_trust_score_store` persist/hydrate on register-remote | **✅** |
 | 488 | **PH-S553** | Admin payout-batch read panel | Galaxy §8.2 | `/ui/admin/payout-batch` read-only GET payout-batch + history | **✅** |
 | 489 | **PH-S554** | Horizon close band S545–S553 | §5.12 fallback | `galaxy_horizon_s545_integration` + loc-audit + vision-sync | **✅** |
 | 490 | **PH-S555** | Vision map 3D orbit WASD + touch pad | docs/vision UX | `map-scene-3d` perspective orbit; WASD + center pad; layer stack sync; rev++ | **✅** |
 | 491 | **PH-S556** | Vision map true 3D layer projection | docs/vision UX | `applyMap3DProjection` layer Z; WASD W↑S↓A←D→; pad bottom-center; rev++ | **✅** |
 | 492 | **PH-S557** | Vision gravity solar-system layout | docs/vision UX | folder mass hubs + multi-ring orbits; orphans at rim; orbit 2× slower; planes 50% transparent; stack sync | **✅** |
-| 493 | **PH-S558** | Fee settlement payout routing wire | Galaxy §8.2 TBD #1 | `GET /api/v1/grid/payout-batch` routing snapshot; integration test; openapi-gap 0 | **✅** |
+| 493 | **PH-S558** | Fee settlement payout routing wire | Galaxy §8.2 94.67% #1 | `GET /api/v1/grid/payout-batch` routing snapshot; integration test; openapi-gap 0 | **✅** |
 | 494 | **PH-S559** | Telegram wallet devnet verify opt-in | Galaxy §3.2 | `POOLAI_WALLET_VERIFY_DEVNET=1` → verified on bind; integration test | **✅** |
 | 495 | **PH-S560** | Human-review settlement hold | Galaxy §6.2 | non-deterministic semantic_hash → PendingVerification; `galaxy_settlement_human_review_total` | **✅** |
 | 496 | **PH-S561** | Signed capability production key verify | Galaxy §6.6 | `POOLAI_CAPABILITY_VERIFY_KEY` → 403 invalid sig on register-remote; integration test | **✅** |
@@ -979,20 +979,30 @@ FM-xxx (з таблиці нижче)
 | 712 | **PH-S777** | poolai-vision-sync drift gate | ops | `poolai-vision-sync --check` green | **✅** |
 | 713 | **PH-S778** | Ratio hold advisory snapshot | PH-S351 pattern | `--min-ratio 0.95 --advisory` **94.65%** | **✅** |
 | 714 | **PH-S779** | Horizon close band S770–S778 | Galaxy **§8.2** payout | `galaxy_horizon_s770_integration` + docs sync | **✅** |
-| 715 | **PH-S780** | fee split applied metric parity | Galaxy **§1.2** | JSON/Prom parity | **[ ]** |
-| 716 | **PH-S781** | fee hint admin read-only strip | poolai-ui-core | ui-core or grid-pricing extend | **[ ]** |
-| 717 | **PH-S782** | Stand smoke fee-split metrics | poolai-http-stand-smoke | unit test | **[ ]** |
-| 718 | **PH-S783** | `galaxy_fee_split_depth_stub` | Galaxy **§1.2** | unit test | **[ ]** |
-| 719 | **PH-S784** | BENCHMARKS fee-split bench pointer | docs canon | docs/BENCHMARKS pointer | **[ ]** |
-| 720 | **PH-S785** | Rust ratio loc-audit refresh | §5.13 fallback | `poolai-loc-audit` → `rust_ratio.json` PH-S785 zriz | **[ ]** |
-| 721 | **PH-S786** | concept §1.2 implemented | docs canon | docs canon | **[ ]** |
-| 722 | **PH-S787** | poolai-vision-sync drift gate | ops | `poolai-vision-sync --check` green | **[ ]** |
-| 723 | **PH-S788** | Ratio hold advisory snapshot | PH-S351 pattern | `--min-ratio 0.95 --advisory` | **[ ]** |
-| 724 | **PH-S789** | Horizon close band S780–S788 | Galaxy **§1.2** fee | `galaxy_horizon_s780_integration` + docs sync | **[ ]** |
+| 715 | **PH-S780** | fee split applied metric parity | Galaxy **§1.2** | JSON/Prom parity | **✅** |
+| 716 | **PH-S781** | fee hint admin read-only strip | poolai-ui-core | ui-core or grid-pricing extend | **✅** |
+| 717 | **PH-S782** | Stand smoke fee-split metrics | poolai-http-stand-smoke | unit test | **✅** |
+| 718 | **PH-S783** | `galaxy_fee_split_depth_stub` | Galaxy **§1.2** | unit test | **✅** |
+| 719 | **PH-S784** | BENCHMARKS fee-split bench pointer | docs canon | docs/BENCHMARKS pointer | **✅** |
+| 720 | **PH-S785** | Rust ratio loc-audit refresh | §5.13 fallback | `poolai-loc-audit` → `rust_ratio.json` PH-S785 zriz | **✅** |
+| 721 | **PH-S786** | concept §1.2 implemented | docs canon | docs canon | **✅** |
+| 722 | **PH-S787** | poolai-vision-sync drift gate | ops | `poolai-vision-sync --check` green | **✅** |
+| 723 | **PH-S788** | Ratio hold advisory snapshot | PH-S351 pattern | `--min-ratio 0.95 --advisory` | **✅** |
+| 724 | **PH-S789** | Horizon close band S780–S788 | Galaxy **§1.2** fee | `galaxy_horizon_s780_integration` + docs sync | **✅** |
+| 725 | **PH-S790** | update policy env stub wire | Galaxy **§9.5** | `galaxy_update_policy` HTTP read + test | **[ ]** |
+| 726 | **PH-S791** | security advisory metric/export shape | Galaxy **§9.6** | stand smoke or unit test | **[ ]** |
+| 727 | **PH-S792** | admin updates-compat governance extend | poolai-ui-core | wasm panel | **[ ]** |
+| 728 | **PH-S793** | Stand smoke governance metrics | poolai-http-stand-smoke | runner | **[ ]** |
+| 729 | **PH-S794** | `governance_depth_stub` | Galaxy governance | unit test | **[ ]** |
+| 730 | **PH-S795** | Rust ratio loc-audit refresh | §5.13 fallback | `poolai-loc-audit` → `rust_ratio.json` PH-S795 zriz | **[ ]** |
+| 731 | **PH-S796** | SECURITY_HARDENING hub sync | docs canon | docs canon | **[ ]** |
+| 732 | **PH-S797** | poolai-vision-sync drift gate | ops | `poolai-vision-sync --check` green | **[ ]** |
+| 733 | **PH-S798** | Ratio hold advisory snapshot | PH-S351 pattern | `--min-ratio 0.95 --advisory` | **[ ]** |
+| 734 | **PH-S799** | Horizon close band S790–S798 | Galaxy governance | `galaxy_horizon_s790_integration` + docs sync | **[ ]** |
 
-**Відкритих у §5.12:** **10** (PH-S780…S789). **Master backlog:** **231** pending PH-S780…S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · **§5.14**. Vision rev **278** (after sync). rust_ratio **94.65%**.
+**Відкритих у §5.12:** **10** (PH-S790…S799). **Master backlog:** **221** pending PH-S790…S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · **§5.14**. Vision rev **279** (after sync). rust_ratio **94.67%** (PH-S785).
 
-**Наступна сесія:** **`абракадабра`** — drain PH-S780…S789 → promote PH-S790…S799 з §5.14 → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **`абракадабра`** — drain PH-S790…S799 → promote PH-S800…S809 з §5.14 → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.14 Master backlog PH-S720…S1010 (291 pending → product-complete, 2026-06-20)
 
@@ -1000,10 +1010,10 @@ FM-xxx (з таблиці нижче)
 
 | Поле | Значення |
 |------|----------|
-| **Pending** | **231** (PH-S780…S1010) |
-| **Drained bands 1–12** | PH-S660…S779 ✅ |
-| **Активна §5.12** | PH-S780…S789 `[ ]` — band 13 Galaxy §1.2 fee split production |
-| **Наступна promote** | PH-S790…S799 — band 14 Galaxy governance |
+| **Pending** | **221** (PH-S790…S1010) |
+| **Drained bands 1–13** | PH-S660…S789 ✅ |
+| **Активна §5.12** | PH-S790…S799 `[ ]` — band 14 Galaxy governance |
+| **Наступна promote** | PH-S800…S809 — band 15 admin wasm slim |
 | **Сесій `абракадабра`** | **26** (25×10 + tail PH-S1010) |
 | **План фаз** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md) |
 | **Реєстр sprint×acceptance** | [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) |
@@ -1053,7 +1063,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-06-21):** PH-S780…S789 **[ ]** drain band 13 (Galaxy §1.2 fee split production) · **`абракадабра`** = drain → vision close → push · ratio formal gate bands **28–29** per [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md).
+**Активна смуга (2026-06-21):** PH-S790…S799 **[ ]** drain band 14 (Galaxy governance ops) · **`абракадабра`** = drain → vision close → push · ratio formal gate bands **28–29** per [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md).
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

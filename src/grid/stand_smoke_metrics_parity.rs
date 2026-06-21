@@ -106,6 +106,20 @@ pub const LOCALITY_HOT_TIER_PARITY: &[(&str, &str)] = &[
 /// Required JSON export keys for stand smoke payout-batch-metrics API (PH-S772).
 pub const PAYOUT_BATCH_JSON_KEYS: &[&str] = &["payout_batch_total", "payout_batch_queue_depth"];
 
+/// Required JSON export keys for stand smoke fee-split-metrics API (PH-S782).
+pub const FEE_SPLIT_JSON_KEYS: &[&str] = &[
+    "fee_split_applied_total",
+    "primary_dev_fee_bps",
+    "secondary_admin_fee_min_bps",
+    "secondary_admin_fee_max_bps",
+];
+
+/// Prometheus gauge name ↔ JSON metrics field pairs — fee split production (PH-S780).
+pub const FEE_SPLIT_APPLIED_PARITY: &[(&str, &str)] = &[(
+    crate::grid::galaxy_fee_split_metrics::METRIC_FEE_SPLIT_APPLIED_TOTAL,
+    "fee_split_applied_total",
+)];
+
 /// Prometheus gauge name ↔ JSON metrics field pairs — payout batch settlement (PH-S771).
 pub const PAYOUT_BATCH_SETTLEMENT_PARITY: &[(&str, &str)] = &[
     (
@@ -191,6 +205,7 @@ pub enum StandSmokeMetricsParityDepth {
     PrefetchLivePull,
     LocalityHotTier,
     PayoutBatchSettlement,
+    FeeSplitProduction,
 }
 
 /// Classify stand smoke metrics parity depth from optional feature stub (PH-S714/PH-S724).
@@ -217,6 +232,12 @@ pub fn stand_smoke_metrics_parity_depth_stub(
         .unwrap_or(false)
     {
         return StandSmokeMetricsParityDepth::LocalityHotTier;
+    }
+    if f.get("fee_split_production")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        return StandSmokeMetricsParityDepth::FeeSplitProduction;
     }
     if f.get("payout_batch_settlement")
         .and_then(|v| v.as_bool())
@@ -392,6 +413,13 @@ pub fn validate_payout_batch_metrics_parity(
 ) -> Result<(), String> {
     validate_grid_metrics_json_export(payout_batch, PAYOUT_BATCH_JSON_KEYS)?;
     validate_prometheus_json_parity_pairs(prom_text, payout_batch, PAYOUT_BATCH_SETTLEMENT_PARITY)?;
+    Ok(())
+}
+
+/// Validate fee-split-metrics JSON export vs Prometheus gauges (PH-S780).
+pub fn validate_fee_split_metrics_parity(prom_text: &str, fee_split: &Value) -> Result<(), String> {
+    validate_grid_metrics_json_export(fee_split, FEE_SPLIT_JSON_KEYS)?;
+    validate_prometheus_json_parity_pairs(prom_text, fee_split, FEE_SPLIT_APPLIED_PARITY)?;
     Ok(())
 }
 
@@ -581,6 +609,29 @@ mod tests {
             }
         });
         validate_payout_batch_metrics_parity(prom, &body).expect("parity");
+    }
+
+    #[test]
+    fn stand_smoke_metrics_parity_depth_stub_band13_ph_s783() {
+        assert_eq!(
+            stand_smoke_metrics_parity_depth_stub(Some(&json!({"fee_split_production": true}))),
+            StandSmokeMetricsParityDepth::FeeSplitProduction
+        );
+    }
+
+    #[test]
+    fn fee_split_metrics_parity_ph_s780() {
+        let prom = "galaxy_fee_split_applied_total 4\n";
+        let body = json!({
+            "ok": true,
+            "metrics": {
+                "fee_split_applied_total": 4,
+                "primary_dev_fee_bps": 10,
+                "secondary_admin_fee_min_bps": 100,
+                "secondary_admin_fee_max_bps": 500,
+            }
+        });
+        validate_fee_split_metrics_parity(prom, &body).expect("parity");
     }
 
     #[test]

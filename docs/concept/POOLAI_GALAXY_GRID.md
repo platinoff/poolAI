@@ -55,6 +55,17 @@ worker    = gross − primary − secondary
 
 **Rust reference:** `src/grid/galaxy_fee_split.rs` — `split_gross_payment`, unit tests + `cargo bench --bench galaxy_fee_split_benchmarks`.
 
+**Implemented (band 13 PH-S780…S789 ✅):**
+
+| Sprint | Wire / module | Acceptance |
+|--------|---------------|------------|
+| **PH-S780** | `GET /api/v1/grid/fee-split-metrics` + `galaxy_fee_split_applied_total` JSON↔Prom parity | `stand_smoke_metrics_parity::validate_fee_split_metrics_parity` |
+| **PH-S781** | Grid-pricing admin primary/secondary fee hint wasm strip | `renderGridFeeSplitMetricsStrip` + `/ui/admin/grid-pricing` |
+| **PH-S782** | Stand smoke fee-split-metrics API | `poolai-http-stand-smoke` runner + unit shape |
+| **PH-S783** | `galaxy_fee_split_depth_stub` | `src/grid/galaxy_fee_split_depth.rs` unit test |
+
+**Prometheus (fee split production):** `galaxy_fee_split_applied_total` (PH-S194 ✅), `GET /api/v1/grid/fee-split-metrics` snapshot (PH-S780 ✅).
+
 ### 1.3 Telegram-клієнт (mining worker edge)
 
 - Telegram-користувач підключає **payout wallet** (Solana pubkey) для винагороди — у чаті через tgbot або linked UI (§3.2).

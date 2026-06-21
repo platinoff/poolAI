@@ -95,6 +95,15 @@ pub const ADMIN_GRID_PRICING_EN: &[I18nRow<'_>] = &[
     ("admin.gridPricing.col.updated", "Updated at"),
     ("admin.gridPricing.col.source", "Source"),
     ("admin.gridPricing.col.freshness", "Freshness"),
+    ("admin.gridPricing.feeSplitTitle", "Fee split (Galaxy §1.2)"),
+    (
+        "admin.gridPricing.feeSplitHint",
+        "Read-only strip from GET /api/v1/grid/fee-split-metrics reconciled with /metrics (PH-S780…S781).",
+    ),
+    (
+        "admin.gridPricing.feeSplitLoading",
+        "Loading fee split metrics…",
+    ),
 ];
 
 /// Ukrainian admin jobs keys (PH-S211).
@@ -407,6 +416,15 @@ pub const ADMIN_GRID_PRICING_UK: &[I18nRow<'_>] = &[
     ("admin.gridPricing.col.updated", "Оновлено"),
     ("admin.gridPricing.col.source", "Джерело"),
     ("admin.gridPricing.col.freshness", "Свіжість"),
+    ("admin.gridPricing.feeSplitTitle", "Fee split (Galaxy §1.2)"),
+    (
+        "admin.gridPricing.feeSplitHint",
+        "Read-only strip з GET /api/v1/grid/fee-split-metrics узгоджено з /metrics (PH-S780…S781).",
+    ),
+    (
+        "admin.gridPricing.feeSplitLoading",
+        "Завантаження fee split metrics…",
+    ),
 ];
 
 /// English updates & compatibility admin keys (PH-S197; moved from `i18n_core.js`).

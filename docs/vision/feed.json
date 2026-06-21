@@ -3,71 +3,71 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S780",
+      "id": "PH-S790",
       "link": "docs/vision/index.html#sprint-queue",
       "next": true,
       "published": "2026-05-28",
       "status": "open",
-      "summary": "JSON/Prom parity",
-      "title": "fee split applied metric parity"
+      "summary": "galaxy_update_policy` HTTP read + test",
+      "title": "update policy env stub wire"
     },
     {
       "category": "open",
-      "id": "PH-S781",
+      "id": "PH-S791",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "ui-core or grid-pricing extend",
-      "title": "fee hint admin read-only strip"
+      "summary": "stand smoke or unit test",
+      "title": "security advisory metric/export shape"
     },
     {
       "category": "open",
-      "id": "PH-S782",
+      "id": "PH-S792",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "wasm panel",
+      "title": "admin updates-compat governance extend"
+    },
+    {
+      "category": "open",
+      "id": "PH-S793",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "runner",
+      "title": "Stand smoke governance metrics"
+    },
+    {
+      "category": "open",
+      "id": "PH-S794",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
       "summary": "unit test",
-      "title": "Stand smoke fee-split metrics"
+      "title": "governance_depth_stub"
     },
     {
       "category": "open",
-      "id": "PH-S783",
+      "id": "PH-S795",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "unit test",
-      "title": "galaxy_fee_split_depth_stub"
-    },
-    {
-      "category": "open",
-      "id": "PH-S784",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "docs/BENCHMARKS pointer",
-      "title": "BENCHMARKS fee-split bench pointer"
-    },
-    {
-      "category": "open",
-      "id": "PH-S785",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "poolai-loc-audit` → `rust_ratio.json` PH-S785 zriz",
+      "summary": "poolai-loc-audit` → `rust_ratio.json` PH-S795 zriz",
       "title": "Rust ratio loc-audit refresh"
     },
     {
       "category": "open",
-      "id": "PH-S786",
+      "id": "PH-S796",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
       "summary": "docs canon",
-      "title": "concept §1.2 implemented"
+      "title": "SECURITY_HARDENING hub sync"
     },
     {
       "category": "open",
-      "id": "PH-S787",
+      "id": "PH-S797",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -76,7 +76,7 @@
     },
     {
       "category": "open",
-      "id": "PH-S788",
+      "id": "PH-S798",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -85,12 +85,102 @@
     },
     {
       "category": "open",
-      "id": "PH-S789",
+      "id": "PH-S799",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
+      "summary": "galaxy_horizon_s790_integration` + docs sync",
+      "title": "Horizon close band S790–S798"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S789",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
       "summary": "galaxy_horizon_s780_integration` + docs sync",
       "title": "Horizon close band S780–S788"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S788",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--min-ratio 0.95 --advisory",
+      "title": "Ratio hold advisory snapshot"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S787",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "poolai-vision-sync --check` green",
+      "title": "poolai-vision-sync drift gate"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S786",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "docs canon",
+      "title": "concept §1.2 implemented"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S785",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "poolai-loc-audit` → `rust_ratio.json` PH-S785 zriz",
+      "title": "Rust ratio loc-audit refresh"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S784",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "docs/BENCHMARKS pointer",
+      "title": "BENCHMARKS fee-split bench pointer"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S783",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "unit test",
+      "title": "galaxy_fee_split_depth_stub"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S782",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "unit test",
+      "title": "Stand smoke fee-split metrics"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S781",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "ui-core or grid-pricing extend",
+      "title": "fee hint admin read-only strip"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S780",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "JSON/Prom parity",
+      "title": "fee split applied metric parity"
     },
     {
       "category": "closed",
@@ -108,96 +198,6 @@
       "published": "2026-05-28",
       "status": "closed",
       "summary": "--min-ratio 0.95 --advisory` 94.65%",
-      "title": "Ratio hold advisory snapshot"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S777",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "poolai-vision-sync --check` green",
-      "title": "poolai-vision-sync drift gate"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S776",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "docs canon",
-      "title": "Galaxy §8.2 payout row ✅"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S775",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "poolai-loc-audit` → `rust_ratio.json` PH-S775 zriz",
-      "title": "Rust ratio loc-audit refresh"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S774",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "test extend",
-      "title": "settlement mode on-chain vs offline gate"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S773",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "unit test",
-      "title": "settlement_payout_depth_stub"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S772",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "runner green",
-      "title": "Stand smoke payout-batch/history"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S771",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "ui-core render + fetch",
-      "title": "payout-batch history admin wasm panel"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S770",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "cleared → batch queue stub + metric",
-      "title": "offline payout batch settlement wire"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S769",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_horizon_s760_integration` + docs sync",
-      "title": "Horizon close band S760–S768"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S768",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--min-ratio 0.95 --advisory` 94.63%",
       "title": "Ratio hold advisory snapshot"
     }
   ],

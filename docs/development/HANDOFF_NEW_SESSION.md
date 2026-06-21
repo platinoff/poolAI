@@ -1,12 +1,14 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-21 (PH-S770…S779 ✅ · master backlog **231** · active **10** · vision **rev 278** · rust_ratio **94.65%**)
+**Оновлено:** 2026-06-21 (PH-S780…S789 ✅ · master backlog **221** · active **10** · vision **rev 279** · rust_ratio **94.67%**)
 
-**Cursor 3.8.11 (2026-06-20):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-06-20.md`](./CURSOR_UPDATE_RESEARCH_2026-06-20.md). **Наступна сесія:** **`абракадабра`** (drain PH-S780…S789).
+**Cursor 3.8.11 (2026-06-20):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-06-20.md`](./CURSOR_UPDATE_RESEARCH_2026-06-20.md). **Наступна сесія:** **`абракадабра`** (drain PH-S790…S799).
 
-**Completion roadmap v2 (2026-06-20):** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) — **231** спринтів до **product-complete** (PH-S1010 / FM **§5.15**); **24** сесій `абракадабра` × 10 PH-S*. Реєстр: [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · regen `bash scripts/generate-ph-s-master-backlog-351.sh`.
+**Completion roadmap v2 (2026-06-20):** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) — **221** спринтів до **product-complete** (PH-S1010 / FM **§5.15**); **23** сесій `абракадабра` × 10 PH-S*. Реєстр: [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · regen `bash scripts/generate-ph-s-master-backlog-351.sh`.
 
-**Master backlog 231 (2026-06-21):** FM **§5.14**. Активна §5.12: **PH-S780…S789** (band 13 — Galaxy **§1.2** fee split production). **`абракадабра`** = drain 10 → promote **PH-S790…S799** (band 14).
+**Master backlog 221 (2026-06-21):** FM **§5.14**. Активна §5.12: **PH-S790…S799** (band 14 — Galaxy governance). **`абракадабра`** = drain 10 → promote **PH-S800…S809** (band 15).
+
+**PH-S780…S789 ✅ (2026-06-21):** `GET /api/v1/grid/fee-split-metrics` + JSON↔Prom parity `galaxy_fee_split_applied_total` (PH-S780); grid-pricing fee hint wasm strip (PH-S781); stand smoke fee-split-metrics API (PH-S782); `galaxy_fee_split_depth_stub` (PH-S783); BENCHMARKS fee-split bench pointer (PH-S784); `poolai-loc-audit` → `rust_ratio.json` (PH-S785); GALAXY §1.2 fee split implemented table (PH-S786); `galaxy_horizon_s780_integration`; FM/HANDOFF/NEXT/STABLE/GALAXY sync; vision **rev 279**.
 
 **PH-S770…S779 ✅ (2026-06-21):** offline payout batch queue on cleared + `galaxy_settlement_payout_batch_queue_depth` (PH-S770); `GET /api/v1/grid/payout-batch-metrics` + JSON↔Prom parity (PH-S771); admin payout-batch history wasm strip (PH-S771); stand smoke payout-batch/history/metrics API (PH-S772); `settlement_payout_depth_stub` (PH-S773); `galaxy_settlement_mode` offline vs on-chain gate (PH-S774); `poolai-loc-audit` → `rust_ratio.json` **94.65%**; hold advisory `--min-ratio 0.95`; GALAXY §8.2 payout implemented table (PH-S776); `galaxy_horizon_s770_integration`; FM/HANDOFF/NEXT/STABLE/GALAXY sync; vision **rev 278**.
 
@@ -30,7 +32,7 @@
 
 **Rules:** **`абракадабра`** — drain 10 з §5.12 → vision close → push; [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
-**§5.12:** **10** відкритих **PH-S780…S789** (band 13). **Vision:** rev **278** · rust_ratio **94.65%**.
+**§5.12:** **10** відкритих **PH-S790…S799** (band 14). **Vision:** rev **279** · rust_ratio **94.67%** (PH-S785).
 
 **Роадмеп:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) · **Промпт:** [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md).
 
