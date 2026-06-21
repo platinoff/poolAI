@@ -33,6 +33,7 @@ pub mod galaxy_re_migrate_policy;
 pub mod galaxy_replay_jobs;
 pub mod galaxy_replay_metrics;
 pub mod galaxy_replication;
+pub mod galaxy_replication_depth;
 pub mod galaxy_replication_metrics;
 pub mod galaxy_replication_quorum_gate;
 pub mod galaxy_routing_policy;

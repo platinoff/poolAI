@@ -254,6 +254,8 @@ pub enum StandSmokeMetricsParityDepth {
     OnChainSettlement,
     /// Verification checker lifecycle depth (PH-S883 band 23).
     VerificationCheckerLifecycle,
+    /// Replication quorum production depth (PH-S893 band 24).
+    ReplicationQuorumProduction,
 }
 
 /// Classify stand smoke metrics parity depth from optional feature stub (PH-S714/PH-S724).
@@ -286,6 +288,12 @@ pub fn stand_smoke_metrics_parity_depth_stub(
         .unwrap_or(false)
     {
         return StandSmokeMetricsParityDepth::VerificationCheckerLifecycle;
+    }
+    if f.get("replication_quorum_production")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        return StandSmokeMetricsParityDepth::ReplicationQuorumProduction;
     }
     if f.get("network_profile_persist")
         .and_then(|v| v.as_bool())
@@ -836,6 +844,16 @@ mod tests {
                 &json!({"verification_checker_lifecycle": true})
             )),
             StandSmokeMetricsParityDepth::VerificationCheckerLifecycle
+        );
+    }
+
+    #[test]
+    fn stand_smoke_metrics_parity_depth_stub_band24_ph_s893() {
+        assert_eq!(
+            stand_smoke_metrics_parity_depth_stub(Some(
+                &json!({"replication_quorum_production": true})
+            )),
+            StandSmokeMetricsParityDepth::ReplicationQuorumProduction
         );
     }
 

@@ -1291,6 +1291,22 @@ async fn smoke_grid_replication_metrics_api(client: &Client, base: &str) -> Resu
             return Err(format!("replication-metrics missing {key}: {body}"));
         }
     }
+    let depth = body
+        .get("replication_depth")
+        .and_then(|v| v.as_str())
+        .ok_or_else(|| format!("replication-metrics missing replication_depth: {body}"))?;
+    if depth.is_empty() {
+        return Err("replication-metrics replication_depth empty".into());
+    }
+    if body
+        .get("rate_cap_per_hour")
+        .and_then(|v| v.as_u64())
+        .is_none()
+    {
+        return Err(format!(
+            "replication-metrics missing rate_cap_per_hour: {body}"
+        ));
+    }
     Ok(())
 }
 
@@ -3307,9 +3323,38 @@ mod tests {
 
     #[test]
     fn grid_replication_metrics_api_export_shape_ph_s693() {
-        let sample = r#"{"ok":true,"metrics":{"strict_total":0,"enqueue_total":0,"executor_enqueue_total":0,"rate_limited_total":0}}"#;
+        let sample = r#"{"ok":true,"replication_depth":"none","rate_cap_per_hour":1000,"metrics":{"strict_total":0,"enqueue_total":0,"executor_enqueue_total":0,"rate_limited_total":0}}"#;
         let body: Value = serde_json::from_str(sample).expect("json");
         assert_eq!(body["metrics"]["strict_total"], 0);
+        assert_eq!(body["replication_depth"], "none");
+    }
+
+    #[test]
+    fn grid_replication_depth_export_shape_ph_s893() {
+        use poolai::grid::galaxy_replication_depth::{
+            replication_depth_stub, replication_depth_wire_label, ReplicationDepth,
+        };
+        use poolai::grid::galaxy_replication_metrics::ReplicationMetricsSnapshot;
+        use poolai::grid::stand_smoke_metrics_parity::{
+            stand_smoke_metrics_parity_depth_stub, StandSmokeMetricsParityDepth,
+        };
+        use serde_json::json;
+
+        let snap = ReplicationMetricsSnapshot {
+            strict_total: 1,
+            enqueue_total: 1,
+            executor_enqueue_total: 1,
+            rate_limited_total: 1,
+        };
+        let depth = replication_depth_stub(Some(&snap), 100);
+        assert_eq!(depth, ReplicationDepth::RateCap);
+        assert_eq!(replication_depth_wire_label(depth), "rate_cap");
+        assert_eq!(
+            stand_smoke_metrics_parity_depth_stub(Some(
+                &json!({"replication_quorum_production": true})
+            )),
+            StandSmokeMetricsParityDepth::ReplicationQuorumProduction
+        );
     }
 
     #[test]

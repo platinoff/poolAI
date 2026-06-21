@@ -21,6 +21,10 @@ use crate::grid::galaxy_pricing_oracle::{
     GalaxyPricingProviderCatalog, GalaxyPricingProviderEntry, GalaxyPricingQuote,
     MockProviderQuote, PRICING_UNAVAILABLE_ERROR_CODE,
 };
+use crate::grid::galaxy_replication_depth::{
+    current_replication_depth, replication_depth_wire_label,
+};
+use crate::grid::galaxy_replication_metrics::replication_max_per_hour_from_env;
 use crate::grid::galaxy_settlement_mode::{current_settlement_mode, settlement_on_chain_pending};
 use crate::grid::galaxy_settlement_onchain_depth::{
     current_settlement_onchain_depth, settlement_onchain_depth_wire_label,
@@ -427,16 +431,23 @@ async fn get_grid_trust_metrics(
 struct GridReplicationMetricsResponse {
     ok: bool,
     metrics: crate::grid::galaxy_replication_metrics::ReplicationMetricsSnapshot,
+    /// Replication production depth wire label (PH-S894).
+    replication_depth: &'static str,
+    /// Strict-tier hourly cap from env (PH-S891).
+    rate_cap_per_hour: u64,
 }
 
 async fn get_grid_replication_metrics(
     State(_ctx): State<ApiContext>,
 ) -> Result<(StatusCode, Json<GridReplicationMetricsResponse>), HttpAppError> {
+    let depth = current_replication_depth();
     Ok((
         StatusCode::OK,
         Json(GridReplicationMetricsResponse {
             ok: true,
             metrics: crate::grid::galaxy_replication_metrics::replication_metrics_snapshot(),
+            replication_depth: replication_depth_wire_label(depth),
+            rate_cap_per_hour: replication_max_per_hour_from_env(),
         }),
     ))
 }
@@ -1314,6 +1325,8 @@ mod tests {
         assert!(res.ok);
         assert_eq!(res.metrics.strict_total, 1);
         assert_eq!(replication_metrics_snapshot().strict_total, 1);
+        assert_eq!(res.replication_depth, "strict_ingest");
+        assert!(res.rate_cap_per_hour > 0);
 
         reset_replication_strict_metrics_for_test();
     }

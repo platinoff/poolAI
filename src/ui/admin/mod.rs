@@ -1360,6 +1360,13 @@ fn admin_grid_replication_pricing_wasm_glue_ph_s692() {
 }
 
 #[test]
+fn admin_grid_replication_pricing_wasm_slim_ph_s892() {
+    let page = include_str!("grid_replication_pricing.rs");
+    assert!(page.contains("poolaiRenderGridReplicationPricingPanel"));
+    assert!(page.contains("replication-metrics"));
+}
+
+#[test]
 fn admin_grid_replication_pricing_wasm_slim_ph_s700() {
     let page = include_str!("grid_replication_pricing.rs");
     assert!(page.contains("poolaiRenderGridReplicationPricingPanel"));

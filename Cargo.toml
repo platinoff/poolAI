@@ -539,6 +539,21 @@ path = "tests/memory_shard_persistence.rs"
 required-features = ["test-utils"]
 
 [[test]]
+name = "galaxy_horizon_s890_integration"
+path = "tests/galaxy_horizon_s890_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
+name = "galaxy_replication_quorum_production_integration"
+path = "tests/galaxy_replication_quorum_production_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
+name = "galaxy_replication_rate_cap_integration"
+path = "tests/galaxy_replication_rate_cap_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
 name = "galaxy_horizon_s880_integration"
 path = "tests/galaxy_horizon_s880_integration.rs"
 required-features = ["test-utils", "prometheus"]

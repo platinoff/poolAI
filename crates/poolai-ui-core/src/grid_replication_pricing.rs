@@ -42,6 +42,8 @@ pub enum AdminWasmSlimDepth {
     GridVerificationPanel,
     /// Grid verification metrics strip wasm renderer (PH-S882).
     GridVerificationMetricsStrip,
+    /// Grid replication-pricing rate cap strip wasm renderer (PH-S892).
+    GridReplicationPricingRateCapStrip,
 }
 
 /// Classify admin wasm slim depth from optional feature stub (PH-S704).
@@ -72,6 +74,12 @@ pub fn admin_wasm_slim_depth_stub(features: Option<&Value>) -> AdminWasmSlimDept
         .unwrap_or(false)
     {
         return AdminWasmSlimDepth::GridVerificationMetricsStrip;
+    }
+    if f.get("grid_replication_pricing_rate_cap_strip")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        return AdminWasmSlimDepth::GridReplicationPricingRateCapStrip;
     }
     if f.get("grid_verification_panel")
         .and_then(|v| v.as_bool())
@@ -150,6 +158,7 @@ pub fn render_grid_replication_pricing_panel_html(
         r#"<div class="admin-card admin-metrics-strip">
 <span>{strict_lbl}: <strong>{strict}</strong></span>
 <span>{enqueue_lbl}: <strong>{enqueue}</strong></span>
+<span>{rate_limited_lbl}: <strong>{rate_limited}</strong></span>
 <span>{fresh_lbl}: <strong>{fresh}</strong></span>
 <span>{stale_lbl}: <strong>{stale}</strong></span>
 </div>"#,
@@ -161,6 +170,12 @@ pub fn render_grid_replication_pricing_panel_html(
         strict = escape_html(&strict.to_string()),
         enqueue_lbl = escape_html(&t(&i18n, "admin.gridReplicationPricing.enqueue", "Enqueue")),
         enqueue = escape_html(&metric_u64(&rm, "enqueue_total").to_string()),
+        rate_limited_lbl = escape_html(&t(
+            &i18n,
+            "admin.gridReplicationPricing.rateLimited",
+            "Rate limited"
+        )),
+        rate_limited = escape_html(&metric_u64(&rm, "rate_limited_total").to_string()),
         fresh_lbl = escape_html(&t(
             &i18n,
             "admin.gridReplicationPricing.freshServed",
@@ -194,6 +209,17 @@ mod tests {
         assert!(html.contains("<strong>5</strong>"));
         assert!(html.contains("<strong>3</strong>"));
         assert!(html.contains("<strong>1</strong>"));
+    }
+
+    #[test]
+    fn render_grid_replication_pricing_panel_rate_limited_ph_s892() {
+        let html = render_grid_replication_pricing_panel_html(
+            r#"{"metrics":{"strict_total":1,"enqueue_total":2,"rate_limited_total":3}}"#,
+            r#"{"metrics":{"fresh_served_total":0,"stale_served_total":0}}"#,
+            0,
+            r#"{"admin.gridReplicationPricing.rateLimited":"Rate limited"}"#,
+        );
+        assert!(html.contains("<strong>3</strong>"));
     }
 
     #[test]
@@ -284,6 +310,16 @@ mod tests {
         assert_eq!(
             admin_wasm_slim_depth_stub(Some(&json!({"grid_verification_metrics_strip": true}))),
             AdminWasmSlimDepth::GridVerificationMetricsStrip
+        );
+    }
+
+    #[test]
+    fn admin_wasm_slim_depth_stub_ph_s892() {
+        assert_eq!(
+            admin_wasm_slim_depth_stub(Some(
+                &json!({"grid_replication_pricing_rate_cap_strip": true})
+            )),
+            AdminWasmSlimDepth::GridReplicationPricingRateCapStrip
         );
     }
 }

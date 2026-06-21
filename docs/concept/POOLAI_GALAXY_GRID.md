@@ -834,6 +834,16 @@ accept if count(d_i == mode(digests)) >= K
 
 **Cost guardrail:** replication множить compute — ліміт `max_replication_jobs_per_hour` per `srv_id`.
 
+**Implemented (band 24 PH-S890…S899 ✅):**
+
+| Sprint | Wire / module | Acceptance |
+|--------|---------------|------------|
+| **PH-S890** | replication quorum gate production strict tier | HTTP grid envelope + `settlement_pending_verification` |
+| **PH-S891** | replication rate cap HTTP wire | `GET /api/v1/grid/replication-metrics` + `rate_cap_per_hour` |
+| **PH-S892** | admin replication-pricing wasm rate cap strip | `poolaiRenderGridReplicationPricingPanel` + `rate_limited_total` |
+| **PH-S893** | stand smoke replication metrics parity | `replication_depth` + JSON↔Prom |
+| **PH-S894** | `replication_depth_stub` | `src/grid/galaxy_replication_depth.rs` unit test |
+
 ### 6.5 Trust score та settlement gate (PH-S62)
 
 Кожен `peer_id` з `origin=telegram_edge` має **`trust_score`** (0..1000, default 500):
@@ -889,6 +899,10 @@ elif verdict == rejected:
 | `GET /api/v1/grid/verification-metrics` + `lifecycle_depth` | ✅ HTTP wire | PH-S670, PH-S880 |
 | `/ui/admin/grid-verification` wasm panel + metrics strip | ✅ admin UI | PH-S512, PH-S882 |
 | `verification_lifecycle_depth_stub` | ✅ concept depth | PH-S884 |
+| `GET /api/v1/grid/replication-metrics` + `replication_depth` | ✅ HTTP wire | PH-S690, PH-S894 |
+| `replication_depth_stub` | ✅ concept depth | PH-S894 |
+| `galaxy_replication_rate_limited_total` | ✅ `/metrics` | PH-S457, PH-S891 |
+| `/ui/admin/grid-replication-pricing` rate cap strip | ✅ admin UI | PH-S692, PH-S892 |
 | `galaxy_settlement_cleared_total` | ✅ `/metrics` | PH-S187 |
 | `galaxy_fee_split_applied_total` | ✅ `/metrics` | PH-S194 |
 

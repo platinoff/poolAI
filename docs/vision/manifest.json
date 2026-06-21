@@ -2192,11 +2192,17 @@
       "from": "galaxy_grid",
       "kind": "implements",
       "to": "src_grid_solana_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_verification_lifecycle_depth_rs"
     }
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S889",
+  "last_sprint_closed": "PH-S899",
   "layers": [
     {
       "id": "L0",
@@ -2229,7 +2235,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S890",
+  "next_sprint": "PH-S900",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -9028,9 +9034,23 @@
       "label": "galaxy_horizon_s870_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s870_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_verification_lifecycle_depth_rs",
+      "label": "galaxy_verification_lifecycle_depth.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_verification_lifecycle_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s880_integration_rs",
+      "label": "galaxy_horizon_s880_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s880_integration.rs"
     }
   ],
-  "revision": 289,
+  "revision": 290,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -16452,91 +16472,181 @@
       "acceptance": "strict tier integration",
       "deps": "Galaxy §6.4",
       "id": "PH-S890",
-      "open": true,
+      "open": false,
       "row": 825,
-      "status": "open",
+      "status": "closed",
       "title": "replication quorum gate production"
     },
     {
       "acceptance": "integration test",
       "deps": "Galaxy §6.4",
       "id": "PH-S891",
-      "open": true,
+      "open": false,
       "row": 826,
-      "status": "open",
+      "status": "closed",
       "title": "replication rate cap HTTP wire"
     },
     {
       "acceptance": "ui-core regression",
       "deps": "ui-core",
       "id": "PH-S892",
-      "open": true,
+      "open": false,
       "row": 827,
-      "status": "open",
+      "status": "closed",
       "title": "admin replication-pricing wasm polish"
     },
     {
       "acceptance": "JSON↔Prom",
       "deps": "tests",
       "id": "PH-S893",
-      "open": true,
+      "open": false,
       "row": 828,
-      "status": "open",
+      "status": "closed",
       "title": "stand smoke replication metrics parity"
     },
     {
       "acceptance": "unit test",
       "deps": "concept",
       "id": "PH-S894",
-      "open": true,
+      "open": false,
       "row": 829,
-      "status": "open",
+      "status": "closed",
       "title": "replication depth stub"
     },
     {
       "acceptance": "rust_ratio.json zriz",
       "deps": "§5.13",
       "id": "PH-S895",
-      "open": true,
+      "open": false,
       "row": 830,
-      "status": "open",
+      "status": "closed",
       "title": "poolai-loc-audit PH-S895"
     },
     {
       "acceptance": "docs ✅",
       "deps": "docs",
       "id": "PH-S896",
-      "open": true,
+      "open": false,
       "row": 831,
-      "status": "open",
+      "status": "closed",
       "title": "Galaxy §6.4 implemented"
     },
     {
       "acceptance": "--check` green",
       "deps": "ops",
       "id": "PH-S897",
-      "open": true,
+      "open": false,
       "row": 832,
-      "status": "open",
+      "status": "closed",
       "title": "poolai-vision-sync --check"
     },
     {
       "acceptance": "--min-ratio 0.95 --advisory",
       "deps": "ops",
       "id": "PH-S898",
-      "open": true,
+      "open": false,
       "row": 833,
-      "status": "open",
+      "status": "closed",
       "title": "Ratio hold advisory"
     },
     {
       "acceptance": "galaxy_horizon_s890_integration",
       "deps": "Replication",
       "id": "PH-S899",
-      "open": true,
+      "open": false,
       "row": 834,
-      "status": "open",
+      "status": "closed",
       "title": "Horizon close band S890–S898"
+    },
+    {
+      "acceptance": "oracle unit + integration",
+      "deps": "Galaxy §4.2",
+      "id": "PH-S900",
+      "open": true,
+      "row": 835,
+      "status": "open",
+      "title": "pricing live provider timeout hardening"
+    },
+    {
+      "acceptance": "stand smoke",
+      "deps": "PH-S123 pattern",
+      "id": "PH-S901",
+      "open": true,
+      "row": 836,
+      "status": "open",
+      "title": "pricing forced-fallback stand smoke"
+    },
+    {
+      "acceptance": "freshness metadata display",
+      "deps": "ui-core",
+      "id": "PH-S902",
+      "open": true,
+      "row": 837,
+      "status": "open",
+      "title": "admin grid-pricing wasm polish"
+    },
+    {
+      "acceptance": "JSON↔Prom",
+      "deps": "tests",
+      "id": "PH-S903",
+      "open": true,
+      "row": 838,
+      "status": "open",
+      "title": "stand smoke pricing-metrics parity"
+    },
+    {
+      "acceptance": "unit test",
+      "deps": "concept",
+      "id": "PH-S904",
+      "open": true,
+      "row": 839,
+      "status": "open",
+      "title": "pricing depth stub"
+    },
+    {
+      "acceptance": "rust_ratio.json zriz",
+      "deps": "§5.13",
+      "id": "PH-S905",
+      "open": true,
+      "row": 840,
+      "status": "open",
+      "title": "poolai-loc-audit PH-S905"
+    },
+    {
+      "acceptance": "docs canon",
+      "deps": "docs",
+      "id": "PH-S906",
+      "open": true,
+      "row": 841,
+      "status": "open",
+      "title": "Galaxy §4.2 live fetch ✅ docs"
+    },
+    {
+      "acceptance": "--check` green",
+      "deps": "ops",
+      "id": "PH-S907",
+      "open": true,
+      "row": 842,
+      "status": "open",
+      "title": "poolai-vision-sync --check"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory",
+      "deps": "ops",
+      "id": "PH-S908",
+      "open": true,
+      "row": 843,
+      "status": "open",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "acceptance": "galaxy_horizon_s900_integration",
+      "deps": "Pricing",
+      "id": "PH-S909",
+      "open": true,
+      "row": 844,
+      "status": "open",
+      "title": "Horizon close band S900–S908"
     }
   ],
   "sprint_queue_open_count": 10,

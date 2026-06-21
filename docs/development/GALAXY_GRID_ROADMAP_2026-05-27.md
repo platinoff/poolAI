@@ -1,17 +1,17 @@
 # Galaxy Grid roadmap (зріз)
 
-**Оновлено:** 2026-06-21 · **Completion v2:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · **121** pending PH-S890…S1010 · **§5.12 active:** 10
+**Оновлено:** 2026-06-21 · **Completion v2:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · **111** pending PH-S910…S1010 · **§5.12 active:** 10
 
 | Зріз | Значення |
 |------|----------|
 | **Completion plan** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.14–§5.15** |
 | **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) |
-| **Active drain (band 24)** | PH-S890…S899 — Replication quorum production gates |
-| **Last closed (band 23)** | PH-S880…S889 ✅ — Verification checker lifecycle |
+| **Active drain (band 25)** | PH-S900…S909 — Pricing oracle live fetch hardening |
+| **Last closed (band 24)** | PH-S890…S899 ✅ — Replication quorum production gates |
 | **Product-complete tail** | PH-S1010 — FM **§5.15** |
-| **Rust ratio** | **94.71%** · hold **95%** advisory (bands 27–29 formal gate) |
+| **Rust ratio** | **94.74%** · hold **95%** advisory (bands 28–29 formal gate) |
 
-**121** pending · **13** `абракадабра` sessions · остання закрита **PH-S880…S889** ✅.
+**111** pending · **12** `абракадабра` sessions · остання закрита **PH-S890…S899** ✅.
 
 ---
 
@@ -44,6 +44,7 @@
 | **Memory shard persist + seed inventory** | Memory layer | band 21 ✅ PH-S860…S869 |
 | **Solana on-chain cleared depth** | FM-010 / §7 | band 22 ✅ PH-S870…S879 |
 | **§6.2 verification checker lifecycle** | Galaxy **§6.2** | band 23 ✅ PH-S880…S889 |
+| **§6.4 replication quorum production** | Galaxy **§6.4** | band 24 ✅ PH-S890…S899 |
 | **network_profile persist stub** | Galaxy **§8** | PH-S664 ✅ (stub); full persist ✅ band 8 PH-S730…S739 |
 
 **§5.5 prefetch:** live pull + backpressure + strict-mode HTTP wire ✅ (baseline); live pull **depth** ✅ band 10 (PH-S750…S759).
@@ -55,4 +56,4 @@
 - [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md) — концепт v1
 - [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) — фази A–H до S1010
 - [`PROMETHEUS_METRICS.md`](./PROMETHEUS_METRICS.md) — stand smoke bands + governance gauges
-- [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md) — ratio **94.76%**; formal **95%** gate bands 28–29
+- [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md) — ratio **94.74%**; formal **95%** gate bands 28–29
