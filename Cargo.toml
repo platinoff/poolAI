@@ -479,6 +479,16 @@ path = "tests/galaxy_horizon_s740_integration.rs"
 required-features = ["test-utils", "prometheus"]
 
 [[test]]
+name = "galaxy_horizon_s750_integration"
+path = "tests/galaxy_horizon_s750_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
+name = "prefetch_backpressure_profile_integration"
+path = "tests/prefetch_backpressure_profile_integration.rs"
+required-features = ["test-utils"]
+
+[[test]]
 name = "network_profile_persist_restart_integration"
 path = "tests/network_profile_persist_restart_integration.rs"
 required-features = ["test-utils"]

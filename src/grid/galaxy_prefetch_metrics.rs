@@ -487,6 +487,27 @@ pub fn reset_prefetch_metrics_for_test() {
     SHARD_FETCH_LATENCY_MS_P50.store(0, Ordering::Relaxed);
 }
 
+/// Read-only prefetch counters snapshot for `GET /api/v1/grid/prefetch-metrics` (PH-S750).
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
+pub struct PrefetchMetricsSnapshot {
+    pub pull_bytes_total: u64,
+    pub backpressure_total: u64,
+    pub plan_total: u64,
+    pub enqueue_total: u64,
+    pub peer_fetch_total: u64,
+}
+
+/// Coordinator prefetch metrics snapshot (PH-S750).
+pub fn prefetch_metrics_snapshot() -> PrefetchMetricsSnapshot {
+    PrefetchMetricsSnapshot {
+        pull_bytes_total: prefetch_pull_bytes_total(),
+        backpressure_total: prefetch_backpressure_total(),
+        plan_total: prefetch_plan_total(),
+        enqueue_total: prefetch_enqueue_total(),
+        peer_fetch_total: prefetch_peer_fetch_total(),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

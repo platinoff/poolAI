@@ -868,6 +868,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/GridPricingMetricsResponse'
 
+  /grid/prefetch-metrics:
+    get:
+      tags:
+        - Grid
+      summary: Prefetch live pull counters snapshot (PH-S750)
+      operationId: getGridPrefetchMetrics
+      responses:
+        '200':
+          description: Prefetch metrics snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GridPrefetchMetricsResponse'
+
   /grid/network-profiles/{peer_id}:
     get:
       tags:
@@ -6692,6 +6706,42 @@ components:
           type: boolean
         metrics:
           $ref: '#/components/schemas/PricingMetricsSnapshot'
+
+    PrefetchMetricsSnapshot:
+      type: object
+      required:
+        - pull_bytes_total
+        - backpressure_total
+        - plan_total
+        - enqueue_total
+        - peer_fetch_total
+      properties:
+        pull_bytes_total:
+          type: integer
+          format: int64
+        backpressure_total:
+          type: integer
+          format: int64
+        plan_total:
+          type: integer
+          format: int64
+        enqueue_total:
+          type: integer
+          format: int64
+        peer_fetch_total:
+          type: integer
+          format: int64
+
+    GridPrefetchMetricsResponse:
+      type: object
+      required:
+        - ok
+        - metrics
+      properties:
+        ok:
+          type: boolean
+        metrics:
+          $ref: '#/components/schemas/PrefetchMetricsSnapshot'
 
     GridNetworkProfileResponse:
       type: object

@@ -110,6 +110,35 @@ pub fn render_grid_settlement_trust_metrics_strip_html(
     )
 }
 
+/// Prefetch live pull metrics strip for admin updates panel (PH-S752).
+pub fn render_grid_prefetch_metrics_strip_html(
+    prefetch_metrics_json: &str,
+    pull_bytes_gauge: u64,
+) -> String {
+    use crate::format::escape_html;
+
+    let body: Value = serde_json::from_str(prefetch_metrics_json).unwrap_or(Value::Null);
+    let metrics = body.get("metrics").cloned().unwrap_or(body);
+    let pull_bytes = if grid_metrics_u64(&metrics, "pull_bytes_total") > 0 {
+        grid_metrics_u64(&metrics, "pull_bytes_total")
+    } else {
+        pull_bytes_gauge
+    };
+    let backpressure = grid_metrics_u64(&metrics, "backpressure_total");
+    let peer_fetch = grid_metrics_u64(&metrics, "peer_fetch_total");
+
+    format!(
+        r#"<div class="admin-card admin-metrics-strip">
+<span>Pull bytes: <strong>{pull_bytes}</strong></span>
+<span>Backpressure: <strong>{backpressure}</strong></span>
+<span>Peer fetch: <strong>{peer_fetch}</strong></span>
+</div>"#,
+        pull_bytes = escape_html(&pull_bytes.to_string()),
+        backpressure = escape_html(&backpressure.to_string()),
+        peer_fetch = escape_html(&peer_fetch.to_string()),
+    )
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -159,5 +188,15 @@ mod tests {
         assert!(html.contains("Cleared"));
         assert!(html.contains("Eligible"));
         assert!(html.contains("Trust score"));
+    }
+
+    #[test]
+    fn render_grid_prefetch_metrics_strip_ph_s752() {
+        let json = r#"{"ok":true,"metrics":{"pull_bytes_total":4194304,"backpressure_total":1,"peer_fetch_total":2}}"#;
+        let html = render_grid_prefetch_metrics_strip_html(json, 0);
+        assert!(html.contains("admin-metrics-strip"));
+        assert!(html.contains("Pull bytes"));
+        assert!(html.contains("Backpressure"));
+        assert!(html.contains("Peer fetch"));
     }
 }

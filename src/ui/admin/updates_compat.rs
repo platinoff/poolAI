@@ -26,6 +26,8 @@ const DOC_FIXTURES_README: &str =
     "https://github.com/platinoff/poolAI/blob/main/tests/fixtures/release/dev/README.md";
 const DOC_CAPABILITY_FIXTURE: &str =
     "https://github.com/platinoff/poolAI/blob/main/tests/fixtures/capability/dev_pubkey.hex";
+const DOC_GALAXY_55: &str =
+    "https://github.com/platinoff/poolAI/blob/main/docs/concept/POOLAI_GALAXY_GRID.md#55-task-driven-prefetch-ph-s61";
 const DOC_GALAXY_66: &str =
     "https://github.com/platinoff/poolAI/blob/main/docs/concept/POOLAI_GALAXY_GRID.md#66-untrusted-telegram_edge";
 
@@ -134,6 +136,20 @@ pub async fn admin_updates_compat() -> Html<String> {
             </ul>
           </div>
 
+          <div class="admin-card" id="updates-compat-prefetch">
+            <h3 data-i18n="admin.updatesCompat.prefetchTitle">Prefetch live pull metrics</h3>
+            <p class="muted" data-i18n="admin.updatesCompat.prefetchHint">
+              Galaxy §5.5 — read-only strip from <code>GET /api/v1/grid/prefetch-metrics</code>
+              reconciled with <code>/metrics</code> (PH-S750…S752).
+            </p>
+            <div id="updates-compat-prefetch-strip" class="updates-compat-prefetch-strip muted" data-i18n="admin.updatesCompat.prefetchLoading">
+              Loading prefetch metrics…
+            </div>
+            <p class="muted admin-hint">
+              <a href="{doc_galaxy_55}" target="_blank" rel="noopener noreferrer" data-i18n="admin.updatesCompat.link.galaxy55">Galaxy §5.5 task-driven prefetch</a>
+            </p>
+          </div>
+
           <div class="admin-card" id="updates-compat-verify-release">
             <h3 data-i18n="admin.updatesCompat.verifyTitle">Verify signed release</h3>
             <p class="muted" data-i18n="admin.updatesCompat.verifyHint">
@@ -182,6 +198,7 @@ pub async fn admin_updates_compat() -> Html<String> {
         env_capability_key = "POOLAI_CAPABILITY_VERIFY_KEY",
         doc_galaxy_66 = DOC_GALAXY_66,
         doc_capability_fixture = DOC_CAPABILITY_FIXTURE,
+        doc_galaxy_55 = DOC_GALAXY_55,
     );
 
     let script = r#"
@@ -205,8 +222,39 @@ pub async fn admin_updates_compat() -> Html<String> {
       }
     }
 
+    async function loadUpdatesCompatPrefetchStrip() {
+      const el = document.getElementById('updates-compat-prefetch-strip');
+      if (!el) return;
+      try {
+        let metricsJson = '{}';
+        let pullBytes = 0;
+        try {
+          const metricsResp = await fetchJson('/api/v1/grid/prefetch-metrics');
+          metricsJson = JSON.stringify(metricsResp || {});
+        } catch (_) {}
+        try {
+          const promText = await fetch('/metrics').then(function(r) { return r.text(); });
+          var wasm = window.poolaiUiWasm;
+          if (wasm && typeof wasm.parsePrometheusGauge === 'function') {
+            pullBytes = wasm.parsePrometheusGauge(promText, 'galaxy_prefetch_pull_bytes_total');
+          } else {
+            var m = promText.match(/galaxy_prefetch_pull_bytes_total\\s+(\\d+)/);
+            if (m) pullBytes = parseInt(m[1], 10) || 0;
+          }
+        } catch (_) {}
+        if (window.poolaiUiWasm && typeof window.poolaiUiWasm.renderGridPrefetchMetricsStrip === 'function') {
+          el.innerHTML = window.poolaiUiWasm.renderGridPrefetchMetricsStrip(metricsJson, pullBytes || 0);
+        } else {
+          el.textContent = metricsJson;
+        }
+      } catch (e) {
+        el.textContent = String(e && e.message ? e.message : e);
+      }
+    }
+
     function startUpdatesCompatPage() {
       wireUpdatesCompatLabels();
+      loadUpdatesCompatPrefetchStrip();
     }
 
     if (window.poolaiUiWasm && (window.poolaiUiWasm.ready || window.poolaiUiWasm.failed)) {
@@ -231,6 +279,7 @@ async fn admin_updates_compat_page_includes_protocol_and_doc_blocks() {
     assert!(html.contains("id=\"updates-compat-protocol\""));
     assert!(html.contains("id=\"updates-compat-policy\""));
     assert!(html.contains("id=\"updates-compat-capability\""));
+    assert!(html.contains("id=\"updates-compat-prefetch\""));
     assert!(html.contains("id=\"updates-compat-verify-release\""));
     assert!(html.contains("id=\"updates-compat-matrix\""));
     assert!(html.contains("id=\"updates-compat-negotiation-status\""));
@@ -266,4 +315,13 @@ async fn admin_updates_compat_page_wires_poolai_ui_wasm_labels() {
     assert!(html.contains("window.poolaiUiWasm.compatStatusLabel"));
     assert!(!html.contains("compatStatusLabelFallback"));
     assert!(html.contains("protocolVersionLabel"));
+}
+
+#[tokio::test]
+async fn admin_updates_compat_prefetch_wasm_glue_ph_s752() {
+    let html = admin_updates_compat().await.0;
+    assert!(html.contains("/api/v1/grid/prefetch-metrics"));
+    assert!(html.contains("renderGridPrefetchMetricsStrip"));
+    assert!(html.contains("updates-compat-prefetch-strip"));
+    assert!(html.contains("loadUpdatesCompatPrefetchStrip"));
 }

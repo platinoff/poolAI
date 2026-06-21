@@ -469,6 +469,22 @@ pub const ADMIN_UPDATES_COMPAT_EN: &[I18nRow<'_>] = &[
         "admin.updatesCompat.link.capFixture",
         "Dev capability verify key fixture",
     ),
+    (
+        "admin.updatesCompat.prefetchTitle",
+        "Prefetch live pull metrics",
+    ),
+    (
+        "admin.updatesCompat.prefetchHint",
+        "Galaxy §5.5 — read-only strip from GET /api/v1/grid/prefetch-metrics reconciled with /metrics (PH-S750…S752).",
+    ),
+    (
+        "admin.updatesCompat.prefetchLoading",
+        "Loading prefetch metrics…",
+    ),
+    (
+        "admin.updatesCompat.link.galaxy55",
+        "Galaxy §5.5 task-driven prefetch",
+    ),
 ];
 
 /// Ukrainian updates & compatibility admin keys (PH-S197).
@@ -530,6 +546,22 @@ pub const ADMIN_UPDATES_COMPAT_UK: &[I18nRow<'_>] = &[
     (
         "admin.updatesCompat.link.capFixture",
         "Dev capability verify key fixture",
+    ),
+    (
+        "admin.updatesCompat.prefetchTitle",
+        "Prefetch live pull metrics",
+    ),
+    (
+        "admin.updatesCompat.prefetchHint",
+        "Galaxy §5.5 — read-only strip from GET /api/v1/grid/prefetch-metrics reconciled with /metrics (PH-S750…S752).",
+    ),
+    (
+        "admin.updatesCompat.prefetchLoading",
+        "Loading prefetch metrics…",
+    ),
+    (
+        "admin.updatesCompat.link.galaxy55",
+        "Galaxy §5.5 task-driven prefetch",
     ),
 ];
 

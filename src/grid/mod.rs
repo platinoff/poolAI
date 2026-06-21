@@ -18,6 +18,7 @@ pub mod galaxy_locality;
 pub mod galaxy_network_profile;
 pub mod galaxy_network_profile_depth;
 pub mod galaxy_network_profile_store;
+pub mod galaxy_prefetch_depth;
 pub mod galaxy_prefetch_metrics;
 pub mod galaxy_prefetch_peer_pull;
 pub mod galaxy_pricing_metrics;

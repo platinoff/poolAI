@@ -83,6 +83,7 @@ pub fn create_grid_routes() -> Router<ApiContext> {
             get(get_grid_replication_metrics),
         )
         .route("/grid/pricing-metrics", get(get_grid_pricing_metrics))
+        .route("/grid/prefetch-metrics", get(get_grid_prefetch_metrics))
         .route(
             "/grid/network-profiles/{peer_id}",
             get(get_grid_network_profile).put(put_grid_network_profile),
@@ -375,6 +376,24 @@ async fn get_grid_pricing_metrics(
         Json(GridPricingMetricsResponse {
             ok: true,
             metrics: crate::grid::galaxy_pricing_metrics::pricing_metrics_snapshot(),
+        }),
+    ))
+}
+
+#[derive(Debug, Serialize)]
+struct GridPrefetchMetricsResponse {
+    ok: bool,
+    metrics: crate::grid::galaxy_prefetch_metrics::PrefetchMetricsSnapshot,
+}
+
+async fn get_grid_prefetch_metrics(
+    State(_ctx): State<ApiContext>,
+) -> Result<(StatusCode, Json<GridPrefetchMetricsResponse>), HttpAppError> {
+    Ok((
+        StatusCode::OK,
+        Json(GridPrefetchMetricsResponse {
+            ok: true,
+            metrics: crate::grid::galaxy_prefetch_metrics::prefetch_metrics_snapshot(),
         }),
     ))
 }
@@ -1167,6 +1186,33 @@ mod tests {
         assert_eq!(pricing_metrics_snapshot().fresh_served_total, 1);
 
         reset_fresh_served_total_for_test();
+    }
+
+    #[tokio::test]
+    async fn grid_prefetch_metrics_read_ph_s750() {
+        use crate::grid::galaxy_prefetch_metrics::{
+            prefetch_metrics_snapshot, record_prefetch_backpressure, record_prefetch_pull_bytes,
+            reset_prefetch_metrics_for_test,
+        };
+
+        reset_prefetch_metrics_for_test();
+        record_prefetch_pull_bytes(4_194_304);
+        record_prefetch_backpressure();
+
+        let res = get_grid_prefetch_metrics(State(ApiContext::default()))
+            .await
+            .expect("prefetch metrics")
+            .1
+             .0;
+        assert!(res.ok);
+        assert_eq!(res.metrics.pull_bytes_total, 4_194_304);
+        assert_eq!(res.metrics.backpressure_total, 1);
+        assert_eq!(
+            prefetch_metrics_snapshot().pull_bytes_total,
+            res.metrics.pull_bytes_total
+        );
+
+        reset_prefetch_metrics_for_test();
     }
 
     #[tokio::test]

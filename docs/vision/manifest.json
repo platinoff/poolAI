@@ -2078,11 +2078,23 @@
       "from": "galaxy_grid",
       "kind": "implements",
       "to": "src_grid_galaxy_network_profile_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_capability_admission_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_capability_admission_metrics_rs"
     }
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S749",
+  "last_sprint_closed": "PH-S759",
   "layers": [
     {
       "id": "L0",
@@ -2115,7 +2127,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S750",
+  "next_sprint": "PH-S760",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -8641,9 +8653,37 @@
       "label": "network_profile_persist_restart_integration.rs",
       "layer": "L3",
       "path": "tests/network_profile_persist_restart_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_capability_admission_depth_rs",
+      "label": "galaxy_capability_admission_depth.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_capability_admission_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_capability_admission_metrics_rs",
+      "label": "galaxy_capability_admission_metrics.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_capability_admission_metrics.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_discovery_signed_capability_dev_fixture_integration_rs",
+      "label": "discovery_signed_capability_dev_fixture_integration.rs",
+      "layer": "L3",
+      "path": "tests/discovery_signed_capability_dev_fixture_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s740_integration_rs",
+      "label": "galaxy_horizon_s740_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s740_integration.rs"
     }
   ],
-  "revision": 275,
+  "revision": 276,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -14805,91 +14845,181 @@
       "acceptance": "JSON/Prometheus parity test",
       "deps": "Galaxy §5.5",
       "id": "PH-S750",
-      "open": true,
+      "open": false,
       "row": 685,
-      "status": "open",
+      "status": "closed",
       "title": "prefetch live bytes metric parity"
     },
     {
       "acceptance": "unit + integration test",
       "deps": "Galaxy §5.5",
       "id": "PH-S751",
-      "open": true,
+      "open": false,
       "row": 686,
-      "status": "open",
+      "status": "closed",
       "title": "prefetch backpressure bandwidth gate"
     },
     {
       "acceptance": "ui-core metrics strip",
       "deps": "poolai-ui-core",
       "id": "PH-S752",
-      "open": true,
+      "open": false,
       "row": 687,
-      "status": "open",
+      "status": "closed",
       "title": "Admin prefetch metrics wasm glue"
     },
     {
       "acceptance": "runner + unit test",
       "deps": "poolai-http-stand-smoke",
       "id": "PH-S753",
-      "open": true,
+      "open": false,
       "row": 688,
-      "status": "open",
+      "status": "closed",
       "title": "Stand smoke prefetch-metrics API"
     },
     {
       "acceptance": "unit test",
       "deps": "Galaxy §5.5",
       "id": "PH-S754",
-      "open": true,
+      "open": false,
       "row": 689,
-      "status": "open",
+      "status": "closed",
       "title": "prefetch_depth_stub"
     },
     {
       "acceptance": "poolai-loc-audit` → `rust_ratio.json` PH-S755 zriz",
       "deps": "§5.13 fallback",
       "id": "PH-S755",
-      "open": true,
+      "open": false,
       "row": 690,
-      "status": "open",
+      "status": "closed",
       "title": "Rust ratio loc-audit refresh"
     },
     {
       "acceptance": "docs canon",
       "deps": "docs canon",
       "id": "PH-S756",
-      "open": true,
+      "open": false,
       "row": 691,
-      "status": "open",
+      "status": "closed",
       "title": "GALAXY §5.5 implemented table"
     },
     {
       "acceptance": "poolai-vision-sync --check` green",
       "deps": "ops",
       "id": "PH-S757",
-      "open": true,
+      "open": false,
       "row": 692,
-      "status": "open",
+      "status": "closed",
       "title": "poolai-vision-sync drift gate"
     },
     {
-      "acceptance": "--min-ratio 0.95 --advisory",
+      "acceptance": "--min-ratio 0.95 --advisory` 94.62%",
       "deps": "PH-S351 pattern",
       "id": "PH-S758",
-      "open": true,
+      "open": false,
       "row": 693,
-      "status": "open",
+      "status": "closed",
       "title": "Ratio hold advisory snapshot"
     },
     {
       "acceptance": "galaxy_horizon_s750_integration` + docs sync",
       "deps": "Galaxy §5.5 prefetch",
       "id": "PH-S759",
-      "open": true,
+      "open": false,
       "row": 694,
-      "status": "open",
+      "status": "closed",
       "title": "Horizon close band S750–S758"
+    },
+    {
+      "acceptance": "integration test",
+      "deps": "Galaxy §5.2–5.4",
+      "id": "PH-S760",
+      "open": true,
+      "row": 695,
+      "status": "open",
+      "title": "locality-metrics HTTP wire depth"
+    },
+    {
+      "acceptance": "JSON/Prom parity",
+      "deps": "Galaxy §5.2–5.4",
+      "id": "PH-S761",
+      "open": true,
+      "row": 696,
+      "status": "open",
+      "title": "hot-tier promote/evict metrics parity"
+    },
+    {
+      "acceptance": "ui-core metrics strip",
+      "deps": "poolai-ui-core",
+      "id": "PH-S762",
+      "open": true,
+      "row": 697,
+      "status": "open",
+      "title": "Admin locality wasm glue"
+    },
+    {
+      "acceptance": "runner extend",
+      "deps": "poolai-http-stand-smoke",
+      "id": "PH-S763",
+      "open": true,
+      "row": 698,
+      "status": "open",
+      "title": "Stand smoke locality/prefetch band"
+    },
+    {
+      "acceptance": "unit test",
+      "deps": "Galaxy §5.2–5.4",
+      "id": "PH-S764",
+      "open": true,
+      "row": 699,
+      "status": "open",
+      "title": "locality_hot_tier_depth_stub"
+    },
+    {
+      "acceptance": "poolai-loc-audit` → `rust_ratio.json` PH-S765 zriz",
+      "deps": "§5.13 fallback",
+      "id": "PH-S765",
+      "open": true,
+      "row": 700,
+      "status": "open",
+      "title": "Rust ratio loc-audit refresh"
+    },
+    {
+      "acceptance": "sync",
+      "deps": "docs canon",
+      "id": "PH-S766",
+      "open": true,
+      "row": 701,
+      "status": "open",
+      "title": "docs canon INDEX §7"
+    },
+    {
+      "acceptance": "poolai-vision-sync --check` green",
+      "deps": "ops",
+      "id": "PH-S767",
+      "open": true,
+      "row": 702,
+      "status": "open",
+      "title": "poolai-vision-sync drift gate"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory",
+      "deps": "PH-S351 pattern",
+      "id": "PH-S768",
+      "open": true,
+      "row": 703,
+      "status": "open",
+      "title": "Ratio hold advisory snapshot"
+    },
+    {
+      "acceptance": "galaxy_horizon_s760_integration` + docs sync",
+      "deps": "Galaxy §5.2–5.4 locality",
+      "id": "PH-S769",
+      "open": true,
+      "row": 704,
+      "status": "open",
+      "title": "Horizon close band S760–S768"
     }
   ],
   "sprint_queue_open_count": 10,

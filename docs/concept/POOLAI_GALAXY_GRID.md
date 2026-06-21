@@ -690,6 +690,18 @@ if not all_required_ready and policy.strict_locality:
 
 **Існуючий код (орієнтир):** `ingest_envelope` + `emit_seed_provided` (`src/grid/dispatch.rs`); memory HTTP `src/memory/` — PH-S61 політика; **PH-S129 stub:** `SeedInventoryEntry`, `plan_prefetch`, `noop_prefetch_hook` у `dispatch.rs`; **PH-S195 ✅:** read-only `GET /api/v1/grid/seed-inventory` coordinator snapshot.
 
+**Implemented (band 10 PH-S750…S759 ✅):**
+
+| Sprint | Wire / module | Acceptance |
+|--------|---------------|------------|
+| **PH-S750** | `GET /api/v1/grid/prefetch-metrics` + `galaxy_prefetch_pull_bytes_total` JSON↔Prom parity | `stand_smoke_metrics_parity::validate_prefetch_metrics_parity` |
+| **PH-S751** | Backpressure from persisted `bandwidth_mbps` | `tests/prefetch_backpressure_profile_integration.rs` |
+| **PH-S752** | Admin updates-compat prefetch wasm strip | `renderGridPrefetchMetricsStrip` + `/ui/admin/updates-compat` |
+| **PH-S753** | Stand smoke prefetch-metrics API | `poolai-http-stand-smoke` runner + unit shape |
+| **PH-S754** | `prefetch_depth_stub` | `src/grid/galaxy_prefetch_depth.rs` unit test |
+
+**Prometheus (live pull depth):** `galaxy_prefetch_pull_bytes_total` (PH-S484 ✅), `galaxy_prefetch_backpressure_total` (PH-S464/S591 ✅), `GET /api/v1/grid/prefetch-metrics` snapshot (PH-S750 ✅).
+
 ### 5.6 Ops notes (coordinator / worker)
 
 | Змінна (концепт) | Default | Опис |

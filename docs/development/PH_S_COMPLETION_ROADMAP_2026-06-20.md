@@ -76,7 +76,9 @@
 
 ---
 
-## Band 10 — PH-S750…S759 (Galaxy §5.5 prefetch live pull depth) · **active §5.12**
+## Band 10 — PH-S750…S759 (Galaxy §5.5 prefetch live pull depth) · **✅ drained**
+
+## Band 11 — PH-S760…S769 (Galaxy §5.2–5.4 locality / hot-tier depth) · **active §5.12**
 
 | Sprint | Focus | Acceptance |
 |--------|-------|------------|

@@ -1270,6 +1270,34 @@ async fn smoke_grid_pricing_metrics_api(client: &Client, base: &str) -> Result<(
     Ok(())
 }
 
+async fn smoke_grid_prefetch_metrics_api(client: &Client, base: &str) -> Result<(), String> {
+    use poolai::grid::stand_smoke_metrics_parity::validate_prefetch_metrics_parity;
+
+    let resp = client
+        .get(api_url(base, "/api/v1/grid/prefetch-metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("prefetch-metrics request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("prefetch-metrics status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    if body.get("ok").and_then(|v| v.as_bool()) != Some(true) {
+        return Err(format!("prefetch-metrics body: {body}"));
+    }
+
+    let prom_resp = client
+        .get(api_url(base, "/metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("/metrics request: {e}"))?;
+    if prom_resp.status() != StatusCode::OK {
+        return Err(format!("/metrics status {}", prom_resp.status()));
+    }
+    let prom_text = prom_resp.text().await.map_err(|e| e.to_string())?;
+    validate_prefetch_metrics_parity(&prom_text, &body)
+}
+
 /// PH-S713: band-6 JSON metrics export shape + Prometheus parity across all grid metric APIs.
 async fn smoke_grid_metrics_json_prometheus_parity_band6(
     client: &Client,
@@ -2240,6 +2268,12 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
     .await;
     record(
         &mut cases,
+        "grid_prefetch_metrics_api",
+        smoke_grid_prefetch_metrics_api(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
         "grid_metrics_json_prometheus_parity_band6",
         smoke_grid_metrics_json_prometheus_parity_band6(&client, &cli.base_url).await,
     )
@@ -2813,6 +2847,18 @@ mod tests {
         let sample = r#"{"ok":true,"metrics":{"fresh_served_total":0,"stale_served_total":0,"forced_fallback_total":0,"provider_catalog_lookups_total":0,"provider_catalog_hits_total":0,"provider_errors_total":0}}"#;
         let body: Value = serde_json::from_str(sample).expect("json");
         assert_eq!(body["metrics"]["fresh_served_total"], 0);
+    }
+
+    #[test]
+    fn grid_prefetch_metrics_api_export_shape_ph_s753() {
+        use poolai::grid::stand_smoke_metrics_parity::{
+            validate_grid_metrics_json_export, PREFETCH_JSON_KEYS,
+        };
+
+        let sample = r#"{"ok":true,"metrics":{"pull_bytes_total":0,"backpressure_total":0,"plan_total":0,"enqueue_total":0,"peer_fetch_total":0}}"#;
+        let body: Value = serde_json::from_str(sample).expect("json");
+        validate_grid_metrics_json_export(&body, PREFETCH_JSON_KEYS).expect("shape");
+        assert_eq!(body["metrics"]["pull_bytes_total"], 0);
     }
 
     #[test]

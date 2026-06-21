@@ -1,12 +1,14 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-20 (PH-S740…S749 ✅ · master backlog **261** · active **10** · vision **rev 275** · rust_ratio **94.59%**)
+**Оновлено:** 2026-06-20 (PH-S750…S759 ✅ · master backlog **251** · active **10** · vision **rev 276** · rust_ratio **94.62%**)
 
-**Cursor 3.8.11 (2026-06-20):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-06-20.md`](./CURSOR_UPDATE_RESEARCH_2026-06-20.md). **Наступна сесія:** **`абракадабра`** (drain PH-S750…S759).
+**Cursor 3.8.11 (2026-06-20):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-06-20.md`](./CURSOR_UPDATE_RESEARCH_2026-06-20.md). **Наступна сесія:** **`абракадабра`** (drain PH-S760…S769).
 
-**Completion roadmap v2 (2026-06-20):** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) — **261** спринтів до **product-complete** (PH-S1010 / FM **§5.15**); **27** сесій `абракадабра` × 10 PH-S*. Реєстр: [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · regen `bash scripts/generate-ph-s-master-backlog-351.sh`.
+**Completion roadmap v2 (2026-06-20):** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) — **251** спринтів до **product-complete** (PH-S1010 / FM **§5.15**); **26** сесій `абракадабра` × 10 PH-S*. Реєстр: [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · regen `bash scripts/generate-ph-s-master-backlog-351.sh`.
 
-**Master backlog 261 (2026-06-20):** FM **§5.14**. Активна §5.12: **PH-S750…S759** (band 10 — Galaxy **§5.5** prefetch live pull depth). **`абракадабра`** = drain 10 → promote **PH-S760…S769** (band 11).
+**Master backlog 251 (2026-06-20):** FM **§5.14**. Активна §5.12: **PH-S760…S769** (band 11 — Galaxy **§5.2–5.4** locality/hot-tier depth). **`абракадабра`** = drain 10 → promote **PH-S770…S779** (band 12).
+
+**PH-S750…S759 ✅ (2026-06-20):** `GET /api/v1/grid/prefetch-metrics` + JSON↔Prom parity `galaxy_prefetch_pull_bytes_total` (PH-S750); backpressure profile integration (PH-S751); admin updates-compat prefetch wasm strip (PH-S752); stand smoke prefetch-metrics API (PH-S753); `prefetch_depth_stub` (PH-S754); `poolai-loc-audit` → `rust_ratio.json` **94.62%**; hold advisory `--min-ratio 0.95`; GALAXY §5.5 implemented table (PH-S756); `galaxy_horizon_s750_integration`; FM/HANDOFF/NEXT/STABLE/GALAXY sync; vision **rev 276**.
 
 **PH-S740…S749 ✅ (2026-06-20):** strict signed capability gate 403 + `galaxy_capability_unsigned_rejected_total` (PH-S740); dev fixture pass integration (PH-S741); admin updates-compat capability panel (PH-S742); stand smoke signed-cap reject export shape (PH-S743); `capability_admission_depth_stub` (PH-S744); `poolai-loc-audit` → `rust_ratio.json` **94.59%**; hold advisory `--min-ratio 0.95`; SECURITY_HARDENING ↔ Galaxy §6.6 cross-link (PH-S746); `galaxy_horizon_s740_integration`; FM/HANDOFF/NEXT/STABLE/GALAXY sync; vision **rev 275**.
 

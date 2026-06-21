@@ -35,8 +35,10 @@ use poolai_ui_core::network_profiles::render_network_profiles_panel_html;
 use poolai_ui_core::payout_batch::render_payout_batch_panel_html;
 use poolai_ui_core::pricing::{format_unix_secs, format_usd_micro};
 use poolai_ui_core::prometheus::parse_prometheus_gauge;
-use poolai_ui_core::stand_smoke_metrics::render_grid_settlement_trust_metrics_strip_html;
-use poolai_ui_core::stand_smoke_metrics::render_grid_verification_metrics_strip_html;
+use poolai_ui_core::stand_smoke_metrics::{
+    render_grid_prefetch_metrics_strip_html, render_grid_settlement_trust_metrics_strip_html,
+    render_grid_verification_metrics_strip_html,
+};
 use poolai_ui_core::table::{
     build_csv, build_json_export, compare_sort_values, empty_state_html, escape_regex,
     export_filename_from_aria, form_field_html, highlight_query_html, render_table_html,
@@ -600,6 +602,14 @@ pub fn render_grid_settlement_trust_metrics_strip_wasm(
         trust_metrics_json,
         trust_score_gauge,
     )
+}
+
+#[wasm_bindgen(js_name = renderGridPrefetchMetricsStrip)]
+pub fn render_grid_prefetch_metrics_strip_wasm(
+    prefetch_metrics_json: &str,
+    pull_bytes_gauge: u64,
+) -> String {
+    render_grid_prefetch_metrics_strip_html(prefetch_metrics_json, pull_bytes_gauge)
 }
 
 #[wasm_bindgen(js_name = renderNetworkProfilesPanel)]

@@ -49,6 +49,27 @@ pub const PRICING_JSON_KEYS: &[&str] = &[
     "provider_catalog_lookups_total",
 ];
 
+/// Required JSON export keys for stand smoke prefetch-metrics API (PH-S753).
+pub const PREFETCH_JSON_KEYS: &[&str] = &[
+    "pull_bytes_total",
+    "backpressure_total",
+    "plan_total",
+    "enqueue_total",
+    "peer_fetch_total",
+];
+
+/// Prometheus gauge name ↔ JSON metrics field pairs — prefetch live pull (PH-S750).
+pub const PREFETCH_LIVE_PULL_PARITY: &[(&str, &str)] = &[
+    (
+        crate::grid::galaxy_prefetch_metrics::METRIC_PREFETCH_PULL_BYTES_TOTAL,
+        "pull_bytes_total",
+    ),
+    (
+        crate::grid::galaxy_prefetch_metrics::METRIC_PREFETCH_BACKPRESSURE_TOTAL,
+        "backpressure_total",
+    ),
+];
+
 /// Prometheus gauge name ↔ JSON metrics field pairs — verification + replay (PH-S710).
 pub const VERIFICATION_REPLAY_PARITY: &[(&str, &str)] = &[
     (
@@ -119,6 +140,7 @@ pub enum StandSmokeMetricsParityDepth {
     RoutingLocality,
     NetworkProfile,
     CapabilityAdmission,
+    PrefetchLivePull,
 }
 
 /// Classify stand smoke metrics parity depth from optional feature stub (PH-S714/PH-S724).
@@ -133,6 +155,12 @@ pub fn stand_smoke_metrics_parity_depth_stub(
         .unwrap_or(false)
     {
         return StandSmokeMetricsParityDepth::NetworkProfile;
+    }
+    if f.get("prefetch_live_pull")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        return StandSmokeMetricsParityDepth::PrefetchLivePull;
     }
     if f.get("capability_admission")
         .and_then(|v| v.as_bool())
@@ -281,6 +309,13 @@ pub fn validate_settlement_trust_metrics_parity(
     Ok(())
 }
 
+/// Prefetch live pull JSON export + Prometheus parity gate (PH-S750).
+pub fn validate_prefetch_metrics_parity(prom_text: &str, prefetch: &Value) -> Result<(), String> {
+    validate_grid_metrics_json_export(prefetch, PREFETCH_JSON_KEYS)?;
+    validate_prometheus_json_parity_pairs(prom_text, prefetch, PREFETCH_LIVE_PULL_PARITY)?;
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -426,6 +461,33 @@ mod tests {
             stand_smoke_metrics_parity_depth_stub(Some(&json!({"capability_admission": true}))),
             StandSmokeMetricsParityDepth::CapabilityAdmission
         );
+    }
+
+    #[test]
+    fn stand_smoke_metrics_parity_depth_stub_band10_ph_s754() {
+        assert_eq!(
+            stand_smoke_metrics_parity_depth_stub(Some(&json!({"prefetch_live_pull": true}))),
+            StandSmokeMetricsParityDepth::PrefetchLivePull
+        );
+    }
+
+    #[test]
+    fn prefetch_metrics_parity_ph_s750() {
+        let prom = concat!(
+            "galaxy_prefetch_pull_bytes_total 4194304\n",
+            "galaxy_prefetch_backpressure_total 2\n",
+        );
+        let body = json!({
+            "ok": true,
+            "metrics": {
+                "pull_bytes_total": 4194304,
+                "backpressure_total": 2,
+                "plan_total": 1,
+                "enqueue_total": 0,
+                "peer_fetch_total": 0,
+            }
+        });
+        validate_prefetch_metrics_parity(prom, &body).expect("parity");
     }
 
     #[test]
