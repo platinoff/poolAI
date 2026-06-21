@@ -28,6 +28,8 @@ const DOC_CAPABILITY_FIXTURE: &str =
     "https://github.com/platinoff/poolAI/blob/main/tests/fixtures/capability/dev_pubkey.hex";
 const DOC_GALAXY_55: &str =
     "https://github.com/platinoff/poolAI/blob/main/docs/concept/POOLAI_GALAXY_GRID.md#55-task-driven-prefetch-ph-s61";
+const DOC_GALAXY_52: &str =
+    "https://github.com/platinoff/poolAI/blob/main/docs/concept/POOLAI_GALAXY_GRID.md#52-locality-placement-ph-s61-canonical";
 const DOC_GALAXY_66: &str =
     "https://github.com/platinoff/poolAI/blob/main/docs/concept/POOLAI_GALAXY_GRID.md#66-untrusted-telegram_edge";
 
@@ -150,6 +152,20 @@ pub async fn admin_updates_compat() -> Html<String> {
             </p>
           </div>
 
+          <div class="admin-card" id="updates-compat-locality">
+            <h3 data-i18n="admin.updatesCompat.localityTitle">Locality / hot-tier metrics</h3>
+            <p class="muted" data-i18n="admin.updatesCompat.localityHint">
+              Galaxy §5.2–5.4 — read-only strip from <code>GET /api/v1/grid/locality-metrics</code>
+              reconciled with <code>/metrics</code> (PH-S760…S762).
+            </p>
+            <div id="updates-compat-locality-strip" class="updates-compat-locality-strip muted" data-i18n="admin.updatesCompat.localityLoading">
+              Loading locality metrics…
+            </div>
+            <p class="muted admin-hint">
+              <a href="{doc_galaxy_52}" target="_blank" rel="noopener noreferrer" data-i18n="admin.updatesCompat.link.galaxy52">Galaxy §5.2 locality placement</a>
+            </p>
+          </div>
+
           <div class="admin-card" id="updates-compat-verify-release">
             <h3 data-i18n="admin.updatesCompat.verifyTitle">Verify signed release</h3>
             <p class="muted" data-i18n="admin.updatesCompat.verifyHint">
@@ -199,6 +215,7 @@ pub async fn admin_updates_compat() -> Html<String> {
         doc_galaxy_66 = DOC_GALAXY_66,
         doc_capability_fixture = DOC_CAPABILITY_FIXTURE,
         doc_galaxy_55 = DOC_GALAXY_55,
+        doc_galaxy_52 = DOC_GALAXY_52,
     );
 
     let script = r#"
@@ -252,9 +269,37 @@ pub async fn admin_updates_compat() -> Html<String> {
       }
     }
 
+    async function loadUpdatesCompatLocalityStrip() {
+      const el = document.getElementById('updates-compat-locality-strip');
+      if (!el) return;
+      try {
+        const metricsResp = await fetchJson('/api/v1/grid/locality-metrics');
+        const metricsJson = JSON.stringify(metricsResp);
+        let hotPromote = 0;
+        try {
+          const promResp = await fetch('/metrics');
+          const promText = await promResp.text();
+          if (window.poolaiUiWasm && typeof window.poolaiUiWasm.parsePrometheusGauge === 'function') {
+            hotPromote = wasm.parsePrometheusGauge(promText, 'galaxy_hot_promote_total');
+          } else {
+            var m = promText.match(/galaxy_hot_promote_total\\s+(\\d+)/);
+            if (m) hotPromote = parseInt(m[1], 10) || 0;
+          }
+        } catch (_) {}
+        if (window.poolaiUiWasm && typeof window.poolaiUiWasm.renderGridLocalityMetricsStrip === 'function') {
+          el.innerHTML = window.poolaiUiWasm.renderGridLocalityMetricsStrip(metricsJson, hotPromote || 0);
+        } else {
+          el.textContent = metricsJson;
+        }
+      } catch (e) {
+        el.textContent = String(e && e.message ? e.message : e);
+      }
+    }
+
     function startUpdatesCompatPage() {
       wireUpdatesCompatLabels();
       loadUpdatesCompatPrefetchStrip();
+      loadUpdatesCompatLocalityStrip();
     }
 
     if (window.poolaiUiWasm && (window.poolaiUiWasm.ready || window.poolaiUiWasm.failed)) {
@@ -324,4 +369,14 @@ async fn admin_updates_compat_prefetch_wasm_glue_ph_s752() {
     assert!(html.contains("renderGridPrefetchMetricsStrip"));
     assert!(html.contains("updates-compat-prefetch-strip"));
     assert!(html.contains("loadUpdatesCompatPrefetchStrip"));
+}
+
+#[tokio::test]
+async fn admin_updates_compat_locality_wasm_glue_ph_s762() {
+    let html = admin_updates_compat().await.0;
+    assert!(html.contains("id=\"updates-compat-locality\""));
+    assert!(html.contains("/api/v1/grid/locality-metrics"));
+    assert!(html.contains("renderGridLocalityMetricsStrip"));
+    assert!(html.contains("updates-compat-locality-strip"));
+    assert!(html.contains("loadUpdatesCompatLocalityStrip"));
 }

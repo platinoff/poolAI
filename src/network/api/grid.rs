@@ -84,6 +84,7 @@ pub fn create_grid_routes() -> Router<ApiContext> {
         )
         .route("/grid/pricing-metrics", get(get_grid_pricing_metrics))
         .route("/grid/prefetch-metrics", get(get_grid_prefetch_metrics))
+        .route("/grid/locality-metrics", get(get_grid_locality_metrics))
         .route(
             "/grid/network-profiles/{peer_id}",
             get(get_grid_network_profile).put(put_grid_network_profile),
@@ -394,6 +395,24 @@ async fn get_grid_prefetch_metrics(
         Json(GridPrefetchMetricsResponse {
             ok: true,
             metrics: crate::grid::galaxy_prefetch_metrics::prefetch_metrics_snapshot(),
+        }),
+    ))
+}
+
+#[derive(Debug, Serialize)]
+struct GridLocalityMetricsResponse {
+    ok: bool,
+    metrics: crate::grid::galaxy_locality_metrics::LocalityMetricsSnapshot,
+}
+
+async fn get_grid_locality_metrics(
+    State(_ctx): State<ApiContext>,
+) -> Result<(StatusCode, Json<GridLocalityMetricsResponse>), HttpAppError> {
+    Ok((
+        StatusCode::OK,
+        Json(GridLocalityMetricsResponse {
+            ok: true,
+            metrics: crate::grid::galaxy_locality_metrics::locality_metrics_snapshot(),
         }),
     ))
 }
@@ -1212,6 +1231,43 @@ mod tests {
             res.metrics.pull_bytes_total
         );
 
+        reset_prefetch_metrics_for_test();
+    }
+
+    #[tokio::test]
+    async fn grid_locality_metrics_read_ph_s760() {
+        use crate::grid::galaxy_locality::{
+            observe_last_hot_tier_hit_ratio, observe_last_shard_local_hit_ratio,
+            reset_last_hot_tier_hit_ratio_for_test, reset_last_shard_local_hit_ratio_for_test,
+        };
+        use crate::grid::galaxy_locality_metrics::locality_metrics_snapshot;
+        use crate::grid::galaxy_prefetch_metrics::{
+            record_hot_promote, reset_prefetch_metrics_for_test,
+        };
+
+        reset_last_shard_local_hit_ratio_for_test();
+        reset_last_hot_tier_hit_ratio_for_test();
+        reset_prefetch_metrics_for_test();
+        observe_last_shard_local_hit_ratio(1.0);
+        observe_last_hot_tier_hit_ratio(0.25);
+        record_hot_promote(2);
+
+        let res = get_grid_locality_metrics(State(ApiContext::default()))
+            .await
+            .expect("locality metrics")
+            .1
+             .0;
+        assert!(res.ok);
+        assert_eq!(res.metrics.shard_local_hit_ratio_bps, 10_000);
+        assert_eq!(res.metrics.hot_tier_hit_ratio_bps, 2_500);
+        assert_eq!(res.metrics.hot_promote_total, 2);
+        assert_eq!(
+            locality_metrics_snapshot().hot_promote_total,
+            res.metrics.hot_promote_total
+        );
+
+        reset_last_shard_local_hit_ratio_for_test();
+        reset_last_hot_tier_hit_ratio_for_test();
         reset_prefetch_metrics_for_test();
     }
 

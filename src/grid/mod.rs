@@ -15,6 +15,8 @@ pub mod galaxy_fee_split_metrics;
 pub mod galaxy_fraud_proof;
 pub mod galaxy_governance_metrics;
 pub mod galaxy_locality;
+pub mod galaxy_locality_hot_tier_depth;
+pub mod galaxy_locality_metrics;
 pub mod galaxy_network_profile;
 pub mod galaxy_network_profile_depth;
 pub mod galaxy_network_profile_store;

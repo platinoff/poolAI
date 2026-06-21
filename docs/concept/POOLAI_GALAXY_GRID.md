@@ -624,7 +624,19 @@ Coordinator і worker збирають **locality telemetry** (агрегаці�
 
 **Зв’язок з `network_profile`:** `latency_ms_p50`, `region`, `bandwidth_mbps` — вхідні для `latency_factor`; нормативний wire contract — **§8.1**; **locality subset** (`region`, `latency_ms_p50`) — обов’язковий для PH-S61/PH-S128 scheduling (`src/grid/galaxy_locality.rs`).
 
-**Метрики (Prometheus, §5.12 PH-S183…S185):** `galaxy_shard_local_hit_ratio` (PH-S183 ✅), `galaxy_prefetch_bytes_total` (PH-S184 ✅), `galaxy_cross_region_egress_mb` (PH-S185 ✅).
+**Метрики (Prometheus, §5.12 PH-S183…S185):** `galaxy_shard_local_hit_ratio` (PH-S183 ✅), `galaxy_prefetch_bytes_total` (PH-S184 ✅), `galaxy_cross_region_egress_mb` (PH-S185 ✅), `GET /api/v1/grid/locality-metrics` snapshot (PH-S760 ✅).
+
+**Implemented (band 11 PH-S760…S769 ✅):**
+
+| Sprint | Wire / module | Acceptance |
+|--------|---------------|------------|
+| **PH-S760** | `GET /api/v1/grid/locality-metrics` + locality gauge JSON snapshot | `grid_locality_metrics_read_ph_s760` |
+| **PH-S761** | Hot-tier promote/evict JSON↔Prom parity | `stand_smoke_metrics_parity::validate_locality_metrics_parity` |
+| **PH-S762** | Admin updates-compat locality wasm strip | `renderGridLocalityMetricsStrip` + `/ui/admin/updates-compat` |
+| **PH-S763** | Stand smoke locality-metrics API | `poolai-http-stand-smoke` runner + unit shape |
+| **PH-S764** | `locality_hot_tier_depth_stub` | `src/grid/galaxy_locality_hot_tier_depth.rs` unit test |
+
+**Prometheus (locality / hot-tier depth):** `galaxy_shard_local_hit_ratio` (PH-S183 ✅), `galaxy_hot_tier_hit_ratio` (PH-S580 ✅), `galaxy_hot_promote_total` / `galaxy_hot_evict_total` (PH-S458 ✅), `GET /api/v1/grid/locality-metrics` snapshot (PH-S760 ✅).
 
 ### 5.4 Keep hot layers local (PH-S61)
 

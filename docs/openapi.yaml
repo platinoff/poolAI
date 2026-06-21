@@ -882,6 +882,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/GridPrefetchMetricsResponse'
 
+  /grid/locality-metrics:
+    get:
+      tags:
+        - Grid
+      summary: Locality / hot-tier metrics snapshot (PH-S760)
+      operationId: getGridLocalityMetrics
+      responses:
+        '200':
+          description: Locality metrics snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GridLocalityMetricsResponse'
+
   /grid/network-profiles/{peer_id}:
     get:
       tags:
@@ -6742,6 +6756,42 @@ components:
           type: boolean
         metrics:
           $ref: '#/components/schemas/PrefetchMetricsSnapshot'
+
+    LocalityMetricsSnapshot:
+      type: object
+      required:
+        - shard_local_hit_ratio_bps
+        - hot_tier_hit_ratio_bps
+        - cross_region_egress_mb
+        - hot_promote_total
+        - hot_evict_total
+      properties:
+        shard_local_hit_ratio_bps:
+          type: integer
+          format: int64
+        hot_tier_hit_ratio_bps:
+          type: integer
+          format: int64
+        cross_region_egress_mb:
+          type: integer
+          format: int64
+        hot_promote_total:
+          type: integer
+          format: int64
+        hot_evict_total:
+          type: integer
+          format: int64
+
+    GridLocalityMetricsResponse:
+      type: object
+      required:
+        - ok
+        - metrics
+      properties:
+        ok:
+          type: boolean
+        metrics:
+          $ref: '#/components/schemas/LocalityMetricsSnapshot'
 
     GridNetworkProfileResponse:
       type: object

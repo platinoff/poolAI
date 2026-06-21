@@ -78,30 +78,13 @@
 
 ## Band 10 — PH-S750…S759 (Galaxy §5.5 prefetch live pull depth) · **✅ drained**
 
-## Band 11 — PH-S760…S769 (Galaxy §5.2–5.4 locality / hot-tier depth) · **active §5.12**
+## Band 11 — PH-S760…S769 (Galaxy §5.2–5.4 locality / hot-tier depth) · **✅ drained 2026-06-21**
 
 | Sprint | Focus | Acceptance |
 |--------|-------|------------|
-| **PH-S750** | Prefetch live bytes pull metric wire | `galaxy_prefetch_pull_bytes_total` parity JSON/Prom |
-| **PH-S751** | Prefetch backpressure from profile bandwidth | unit + integration test |
-| **PH-S752** | Admin prefetch metrics wasm strip (if panel exists) or ui-core helper | JSON metrics fetch glue |
-| **PH-S753** | Stand smoke prefetch-metrics API shape | runner + unit test |
-| **PH-S754** | `prefetch_depth_stub` band theme | unit test |
-| **PH-S755** | loc-audit | PH-S755 zriz |
-| **PH-S756** | docs canon | GALAXY §5.5 implemented table refresh |
-| **PH-S757** | vision-sync | green |
-| **PH-S758** | ratio advisory | hold |
-| **PH-S759** | `galaxy_horizon_s750_integration` | prefetch band close |
-
----
-
-## Band 11 — PH-S760…S769 (Galaxy §5.2–5.4 locality / hot-tier)
-
-| Sprint | Focus | Acceptance |
-|--------|-------|------------|
-| **PH-S760** | GET `/grid/locality-metrics` HTTP wire (if missing) or depth stub extend | integration test |
+| **PH-S760** | GET `/grid/locality-metrics` HTTP wire | integration test |
 | **PH-S761** | Hot-tier promote/evict metrics parity | JSON + Prometheus parity test |
-| **PH-S762** | Admin locality/prefetch wasm glue | ui-core metrics strip |
+| **PH-S762** | Admin locality wasm glue | ui-core metrics strip |
 | **PH-S763** | Stand smoke locality/prefetch band | runner extend |
 | **PH-S764** | `locality_hot_tier_depth_stub` | unit test |
 | **PH-S765** | loc-audit | zriz |
@@ -112,7 +95,7 @@
 
 ---
 
-## Band 12 — PH-S770…S779 (Galaxy §8.2 payout / settlement batch)
+## Band 12 — PH-S770…S779 (Galaxy §8.2 payout / settlement batch) · **active §5.12**
 
 | Sprint | Focus | Acceptance |
 |--------|-------|------------|

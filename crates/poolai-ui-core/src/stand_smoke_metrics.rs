@@ -139,6 +139,38 @@ pub fn render_grid_prefetch_metrics_strip_html(
     )
 }
 
+/// Locality / hot-tier metrics strip for admin updates panel (PH-S762).
+pub fn render_grid_locality_metrics_strip_html(
+    locality_metrics_json: &str,
+    hot_promote_gauge: u64,
+) -> String {
+    use crate::format::escape_html;
+
+    let body: Value = serde_json::from_str(locality_metrics_json).unwrap_or(Value::Null);
+    let metrics = body.get("metrics").cloned().unwrap_or(body);
+    let shard_bps = grid_metrics_u64(&metrics, "shard_local_hit_ratio_bps");
+    let hot_bps = grid_metrics_u64(&metrics, "hot_tier_hit_ratio_bps");
+    let promote = if grid_metrics_u64(&metrics, "hot_promote_total") > 0 {
+        grid_metrics_u64(&metrics, "hot_promote_total")
+    } else {
+        hot_promote_gauge
+    };
+    let evict = grid_metrics_u64(&metrics, "hot_evict_total");
+
+    format!(
+        r#"<div class="admin-card admin-metrics-strip">
+<span>Shard local hit: <strong>{shard_bps}</strong> bps</span>
+<span>Hot tier hit: <strong>{hot_bps}</strong> bps</span>
+<span>Promote: <strong>{promote}</strong></span>
+<span>Evict: <strong>{evict}</strong></span>
+</div>"#,
+        shard_bps = escape_html(&shard_bps.to_string()),
+        hot_bps = escape_html(&hot_bps.to_string()),
+        promote = escape_html(&promote.to_string()),
+        evict = escape_html(&evict.to_string()),
+    )
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -198,5 +230,16 @@ mod tests {
         assert!(html.contains("Pull bytes"));
         assert!(html.contains("Backpressure"));
         assert!(html.contains("Peer fetch"));
+    }
+
+    #[test]
+    fn render_grid_locality_metrics_strip_ph_s762() {
+        let json = r#"{"ok":true,"metrics":{"shard_local_hit_ratio_bps":8000,"hot_tier_hit_ratio_bps":5000,"hot_promote_total":2,"hot_evict_total":1}}"#;
+        let html = render_grid_locality_metrics_strip_html(json, 0);
+        assert!(html.contains("admin-metrics-strip"));
+        assert!(html.contains("Shard local hit"));
+        assert!(html.contains("Hot tier hit"));
+        assert!(html.contains("Promote"));
+        assert!(html.contains("Evict"));
     }
 }

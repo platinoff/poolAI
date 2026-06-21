@@ -1,17 +1,17 @@
 # Galaxy Grid roadmap (зріз)
 
-**Оновлено:** 2026-06-20 · **Completion v2:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · **251** pending PH-S760…S1010 · **§5.12 active:** 10
+**Оновлено:** 2026-06-21 · **Completion v2:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · **241** pending PH-S770…S1010 · **§5.12 active:** 10
 
 | Зріз | Значення |
 |------|----------|
 | **Completion plan** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.14–§5.15** |
 | **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) |
-| **Active drain (band 11)** | PH-S760…S769 — Galaxy **§5.2–5.4** locality / hot-tier depth |
+| **Active drain (band 12)** | PH-S770…S779 — Galaxy **§8.2** payout / settlement batch |
 | **Next promote (band 12)** | PH-S770…S779 — Galaxy §8.2 payout / settlement batch |
 | **Product-complete tail** | PH-S1010 — FM **§5.15** |
 | **Rust ratio** | **94.62%** · hold **95%** advisory (bands 27–29 formal gate) |
 
-**251** pending · **26** `абракадабра` sessions · остання закрита **PH-S750…S759** ✅.
+**241** pending · **25** `абракадабра` sessions · остання закрита **PH-S760…S769** ✅.
 
 ---
 
@@ -31,8 +31,8 @@
 | **§8.1 network_profile full persist** | Galaxy **§8.1** | band 8 ✅ PH-S730…S739 |
 | **§6.6 signed capability admission** | Galaxy **§6.6** | band 9 ✅ PH-S740…S749 |
 | **§5.5 prefetch live pull depth** | Galaxy **§5.5** | band 10 PH-S750…S759 ✅ |
-| **§5.2–5.4 locality / hot-tier** | Galaxy **§5.2–5.4** | band 11 **active** PH-S760…S769 |
-| **§5.2–5.4 locality / hot-tier** | Galaxy **§5.2–5.4** | band 11 PH-S760…S769 |
+| **§5.2–5.4 locality / hot-tier** | Galaxy **§5.2–5.4** | band 11 PH-S760…S769 ✅ |
+| **§8.2 payout / settlement batch** | Galaxy **§8.2** | band 12 **active** PH-S770…S779 |
 | **§8.2 payout / settlement batch** | Galaxy **§8.2** | band 12 PH-S770…S779 |
 | **§1.2 fee split production** | Galaxy **§1.2** | band 13 PH-S780…S789 |
 | **§9.5–9.6 governance ops** | Galaxy **§9.5–9.6** | band 14 PH-S790…S799 |

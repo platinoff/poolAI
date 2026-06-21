@@ -1298,6 +1298,34 @@ async fn smoke_grid_prefetch_metrics_api(client: &Client, base: &str) -> Result<
     validate_prefetch_metrics_parity(&prom_text, &body)
 }
 
+async fn smoke_grid_locality_metrics_api(client: &Client, base: &str) -> Result<(), String> {
+    use poolai::grid::stand_smoke_metrics_parity::validate_locality_metrics_parity;
+
+    let resp = client
+        .get(api_url(base, "/api/v1/grid/locality-metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("locality-metrics request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("locality-metrics status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    if body.get("ok").and_then(|v| v.as_bool()) != Some(true) {
+        return Err(format!("locality-metrics body: {body}"));
+    }
+
+    let prom_resp = client
+        .get(api_url(base, "/metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("/metrics request: {e}"))?;
+    if prom_resp.status() != StatusCode::OK {
+        return Err(format!("/metrics status {}", prom_resp.status()));
+    }
+    let prom_text = prom_resp.text().await.map_err(|e| e.to_string())?;
+    validate_locality_metrics_parity(&prom_text, &body)
+}
+
 /// PH-S713: band-6 JSON metrics export shape + Prometheus parity across all grid metric APIs.
 async fn smoke_grid_metrics_json_prometheus_parity_band6(
     client: &Client,
@@ -2274,6 +2302,12 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
     .await;
     record(
         &mut cases,
+        "grid_locality_metrics_api",
+        smoke_grid_locality_metrics_api(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
         "grid_metrics_json_prometheus_parity_band6",
         smoke_grid_metrics_json_prometheus_parity_band6(&client, &cli.base_url).await,
     )
@@ -2859,6 +2893,18 @@ mod tests {
         let body: Value = serde_json::from_str(sample).expect("json");
         validate_grid_metrics_json_export(&body, PREFETCH_JSON_KEYS).expect("shape");
         assert_eq!(body["metrics"]["pull_bytes_total"], 0);
+    }
+
+    #[test]
+    fn grid_locality_metrics_api_export_shape_ph_s763() {
+        use poolai::grid::stand_smoke_metrics_parity::{
+            validate_grid_metrics_json_export, LOCALITY_JSON_KEYS,
+        };
+
+        let sample = r#"{"ok":true,"metrics":{"shard_local_hit_ratio_bps":0,"hot_tier_hit_ratio_bps":0,"cross_region_egress_mb":0,"hot_promote_total":0,"hot_evict_total":0}}"#;
+        let body: Value = serde_json::from_str(sample).expect("json");
+        validate_grid_metrics_json_export(&body, LOCALITY_JSON_KEYS).expect("shape");
+        assert_eq!(body["metrics"]["hot_promote_total"], 0);
     }
 
     #[test]

@@ -485,6 +485,22 @@ pub const ADMIN_UPDATES_COMPAT_EN: &[I18nRow<'_>] = &[
         "admin.updatesCompat.link.galaxy55",
         "Galaxy §5.5 task-driven prefetch",
     ),
+    (
+        "admin.updatesCompat.localityTitle",
+        "Locality / hot-tier metrics",
+    ),
+    (
+        "admin.updatesCompat.localityHint",
+        "Galaxy §5.2–5.4 — read-only strip from GET /api/v1/grid/locality-metrics reconciled with /metrics (PH-S760…S762).",
+    ),
+    (
+        "admin.updatesCompat.localityLoading",
+        "Loading locality metrics…",
+    ),
+    (
+        "admin.updatesCompat.link.galaxy52",
+        "Galaxy §5.2 locality placement",
+    ),
 ];
 
 /// Ukrainian updates & compatibility admin keys (PH-S197).
@@ -562,6 +578,22 @@ pub const ADMIN_UPDATES_COMPAT_UK: &[I18nRow<'_>] = &[
     (
         "admin.updatesCompat.link.galaxy55",
         "Galaxy §5.5 task-driven prefetch",
+    ),
+    (
+        "admin.updatesCompat.localityTitle",
+        "Locality / hot-tier metrics",
+    ),
+    (
+        "admin.updatesCompat.localityHint",
+        "Galaxy §5.2–5.4 — read-only strip from GET /api/v1/grid/locality-metrics reconciled with /metrics (PH-S760…S762).",
+    ),
+    (
+        "admin.updatesCompat.localityLoading",
+        "Loading locality metrics…",
+    ),
+    (
+        "admin.updatesCompat.link.galaxy52",
+        "Galaxy §5.2 locality placement",
     ),
 ];
 

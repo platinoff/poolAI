@@ -3,71 +3,71 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S760",
+      "id": "PH-S770",
       "link": "docs/vision/index.html#sprint-queue",
       "next": true,
       "published": "2026-05-28",
       "status": "open",
-      "summary": "integration test",
-      "title": "locality-metrics HTTP wire depth"
+      "summary": "cleared → batch stub + metric",
+      "title": "offline payout batch settlement wire"
     },
     {
       "category": "open",
-      "id": "PH-S761",
+      "id": "PH-S771",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "JSON/Prom parity",
-      "title": "hot-tier promote/evict metrics parity"
+      "summary": "ui-core render + fetch",
+      "title": "payout-batch history admin wasm panel"
     },
     {
       "category": "open",
-      "id": "PH-S762",
+      "id": "PH-S772",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "ui-core metrics strip",
-      "title": "Admin locality wasm glue"
+      "summary": "runner green",
+      "title": "Stand smoke payout-batch/history"
     },
     {
       "category": "open",
-      "id": "PH-S763",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "runner extend",
-      "title": "Stand smoke locality/prefetch band"
-    },
-    {
-      "category": "open",
-      "id": "PH-S764",
+      "id": "PH-S773",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
       "summary": "unit test",
-      "title": "locality_hot_tier_depth_stub"
+      "title": "settlement_payout_depth_stub"
     },
     {
       "category": "open",
-      "id": "PH-S765",
+      "id": "PH-S774",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "poolai-loc-audit` → `rust_ratio.json` PH-S765 zriz",
+      "summary": "test extend",
+      "title": "settlement mode on-chain vs offline gate"
+    },
+    {
+      "category": "open",
+      "id": "PH-S775",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "poolai-loc-audit` → `rust_ratio.json` PH-S775 zriz",
       "title": "Rust ratio loc-audit refresh"
     },
     {
       "category": "open",
-      "id": "PH-S766",
+      "id": "PH-S776",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "sync",
-      "title": "docs canon INDEX §7"
+      "summary": "docs canon",
+      "title": "Galaxy §8.2 payout row ✅"
     },
     {
       "category": "open",
-      "id": "PH-S767",
+      "id": "PH-S777",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -76,7 +76,7 @@
     },
     {
       "category": "open",
-      "id": "PH-S768",
+      "id": "PH-S778",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -85,12 +85,102 @@
     },
     {
       "category": "open",
-      "id": "PH-S769",
+      "id": "PH-S779",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
+      "summary": "galaxy_horizon_s770_integration` + docs sync",
+      "title": "Horizon close band S770–S778"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S769",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
       "summary": "galaxy_horizon_s760_integration` + docs sync",
       "title": "Horizon close band S760–S768"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S768",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--min-ratio 0.95 --advisory` 94.63%",
+      "title": "Ratio hold advisory snapshot"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S767",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "poolai-vision-sync --check` green",
+      "title": "poolai-vision-sync drift gate"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S766",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "sync",
+      "title": "docs canon INDEX §7"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S765",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "poolai-loc-audit` → `rust_ratio.json` PH-S765 zriz",
+      "title": "Rust ratio loc-audit refresh"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S764",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "unit test",
+      "title": "locality_hot_tier_depth_stub"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S763",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "runner extend",
+      "title": "Stand smoke locality/prefetch band"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S762",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "ui-core metrics strip",
+      "title": "Admin locality wasm glue"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S761",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "JSON/Prom parity",
+      "title": "hot-tier promote/evict metrics parity"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S760",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "integration test",
+      "title": "locality-metrics HTTP wire depth"
     },
     {
       "category": "closed",
@@ -108,96 +198,6 @@
       "published": "2026-05-28",
       "status": "closed",
       "summary": "--min-ratio 0.95 --advisory` 94.62%",
-      "title": "Ratio hold advisory snapshot"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S757",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "poolai-vision-sync --check` green",
-      "title": "poolai-vision-sync drift gate"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S756",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "docs canon",
-      "title": "GALAXY §5.5 implemented table"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S755",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "poolai-loc-audit` → `rust_ratio.json` PH-S755 zriz",
-      "title": "Rust ratio loc-audit refresh"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S754",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "unit test",
-      "title": "prefetch_depth_stub"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S753",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "runner + unit test",
-      "title": "Stand smoke prefetch-metrics API"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S752",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "ui-core metrics strip",
-      "title": "Admin prefetch metrics wasm glue"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S751",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "unit + integration test",
-      "title": "prefetch backpressure bandwidth gate"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S750",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "JSON/Prometheus parity test",
-      "title": "prefetch live bytes metric parity"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S749",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_horizon_s740_integration` + docs sync",
-      "title": "Horizon close band S740–S748"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S748",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--min-ratio 0.95 --advisory` 94.59%",
       "title": "Ratio hold advisory snapshot"
     }
   ],

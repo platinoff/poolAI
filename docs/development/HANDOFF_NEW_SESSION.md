@@ -1,12 +1,14 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-20 (PH-S750…S759 ✅ · master backlog **251** · active **10** · vision **rev 276** · rust_ratio **94.62%**)
+**Оновлено:** 2026-06-21 (PH-S760…S769 ✅ · master backlog **241** · active **10** · vision **rev 277** · rust_ratio **94.63%**)
 
-**Cursor 3.8.11 (2026-06-20):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-06-20.md`](./CURSOR_UPDATE_RESEARCH_2026-06-20.md). **Наступна сесія:** **`абракадабра`** (drain PH-S760…S769).
+**Cursor 3.8.11 (2026-06-20):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-06-20.md`](./CURSOR_UPDATE_RESEARCH_2026-06-20.md). **Наступна сесія:** **`абракадабра`** (drain PH-S770…S779).
 
-**Completion roadmap v2 (2026-06-20):** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) — **251** спринтів до **product-complete** (PH-S1010 / FM **§5.15**); **26** сесій `абракадабра` × 10 PH-S*. Реєстр: [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · regen `bash scripts/generate-ph-s-master-backlog-351.sh`.
+**Completion roadmap v2 (2026-06-20):** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) — **241** спринтів до **product-complete** (PH-S1010 / FM **§5.15**); **25** сесій `абракадабра` × 10 PH-S*. Реєстр: [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · regen `bash scripts/generate-ph-s-master-backlog-351.sh`.
 
-**Master backlog 251 (2026-06-20):** FM **§5.14**. Активна §5.12: **PH-S760…S769** (band 11 — Galaxy **§5.2–5.4** locality/hot-tier depth). **`абракадабра`** = drain 10 → promote **PH-S770…S779** (band 12).
+**Master backlog 241 (2026-06-21):** FM **§5.14**. Активна §5.12: **PH-S770…S779** (band 12 — Galaxy **§8.2** payout/settlement batch). **`абракадабра`** = drain 10 → promote **PH-S780…S789** (band 13).
+
+**PH-S760…S769 ✅ (2026-06-21):** `GET /api/v1/grid/locality-metrics` + JSON↔Prom parity hot-tier promote/evict (PH-S760/S761); admin updates-compat locality wasm strip (PH-S762); stand smoke locality-metrics API (PH-S763); `locality_hot_tier_depth_stub` (PH-S764); `poolai-loc-audit` → `rust_ratio.json` **94.63%**; hold advisory `--min-ratio 0.95`; GALAXY §5.2–5.4 implemented table (PH-S766); `galaxy_horizon_s760_integration`; FM/HANDOFF/NEXT/STABLE/GALAXY sync; vision **rev 277**.
 
 **PH-S750…S759 ✅ (2026-06-20):** `GET /api/v1/grid/prefetch-metrics` + JSON↔Prom parity `galaxy_prefetch_pull_bytes_total` (PH-S750); backpressure profile integration (PH-S751); admin updates-compat prefetch wasm strip (PH-S752); stand smoke prefetch-metrics API (PH-S753); `prefetch_depth_stub` (PH-S754); `poolai-loc-audit` → `rust_ratio.json` **94.62%**; hold advisory `--min-ratio 0.95`; GALAXY §5.5 implemented table (PH-S756); `galaxy_horizon_s750_integration`; FM/HANDOFF/NEXT/STABLE/GALAXY sync; vision **rev 276**.
 

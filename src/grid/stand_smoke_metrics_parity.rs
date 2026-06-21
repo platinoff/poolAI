@@ -70,6 +70,39 @@ pub const PREFETCH_LIVE_PULL_PARITY: &[(&str, &str)] = &[
     ),
 ];
 
+/// Required JSON export keys for stand smoke locality-metrics API (PH-S763).
+pub const LOCALITY_JSON_KEYS: &[&str] = &[
+    "shard_local_hit_ratio_bps",
+    "hot_tier_hit_ratio_bps",
+    "cross_region_egress_mb",
+    "hot_promote_total",
+    "hot_evict_total",
+];
+
+/// Prometheus gauge name ↔ JSON metrics field pairs — locality hot-tier (PH-S761).
+pub const LOCALITY_HOT_TIER_PARITY: &[(&str, &str)] = &[
+    (
+        crate::grid::galaxy_locality::METRIC_SHARD_LOCAL_HIT_RATIO,
+        "shard_local_hit_ratio_bps",
+    ),
+    (
+        crate::grid::galaxy_locality::METRIC_HOT_TIER_HIT_RATIO,
+        "hot_tier_hit_ratio_bps",
+    ),
+    (
+        crate::grid::galaxy_locality::METRIC_CROSS_REGION_EGRESS_MB,
+        "cross_region_egress_mb",
+    ),
+    (
+        crate::grid::galaxy_prefetch_metrics::METRIC_HOT_PROMOTE_TOTAL,
+        "hot_promote_total",
+    ),
+    (
+        crate::grid::galaxy_prefetch_metrics::METRIC_HOT_EVICT_TOTAL,
+        "hot_evict_total",
+    ),
+];
+
 /// Prometheus gauge name ↔ JSON metrics field pairs — verification + replay (PH-S710).
 pub const VERIFICATION_REPLAY_PARITY: &[(&str, &str)] = &[
     (
@@ -141,6 +174,7 @@ pub enum StandSmokeMetricsParityDepth {
     NetworkProfile,
     CapabilityAdmission,
     PrefetchLivePull,
+    LocalityHotTier,
 }
 
 /// Classify stand smoke metrics parity depth from optional feature stub (PH-S714/PH-S724).
@@ -161,6 +195,12 @@ pub fn stand_smoke_metrics_parity_depth_stub(
         .unwrap_or(false)
     {
         return StandSmokeMetricsParityDepth::PrefetchLivePull;
+    }
+    if f.get("locality_hot_tier")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        return StandSmokeMetricsParityDepth::LocalityHotTier;
     }
     if f.get("capability_admission")
         .and_then(|v| v.as_bool())
@@ -313,6 +353,13 @@ pub fn validate_settlement_trust_metrics_parity(
 pub fn validate_prefetch_metrics_parity(prom_text: &str, prefetch: &Value) -> Result<(), String> {
     validate_grid_metrics_json_export(prefetch, PREFETCH_JSON_KEYS)?;
     validate_prometheus_json_parity_pairs(prom_text, prefetch, PREFETCH_LIVE_PULL_PARITY)?;
+    Ok(())
+}
+
+/// Validate locality-metrics JSON export vs Prometheus gauges (PH-S761).
+pub fn validate_locality_metrics_parity(prom_text: &str, locality: &Value) -> Result<(), String> {
+    validate_grid_metrics_json_export(locality, LOCALITY_JSON_KEYS)?;
+    validate_prometheus_json_parity_pairs(prom_text, locality, LOCALITY_HOT_TIER_PARITY)?;
     Ok(())
 }
 
@@ -472,6 +519,14 @@ mod tests {
     }
 
     #[test]
+    fn stand_smoke_metrics_parity_depth_stub_band11_ph_s764() {
+        assert_eq!(
+            stand_smoke_metrics_parity_depth_stub(Some(&json!({"locality_hot_tier": true}))),
+            StandSmokeMetricsParityDepth::LocalityHotTier
+        );
+    }
+
+    #[test]
     fn prefetch_metrics_parity_ph_s750() {
         let prom = concat!(
             "galaxy_prefetch_pull_bytes_total 4194304\n",
@@ -488,6 +543,28 @@ mod tests {
             }
         });
         validate_prefetch_metrics_parity(prom, &body).expect("parity");
+    }
+
+    #[test]
+    fn locality_metrics_parity_ph_s761() {
+        let prom = concat!(
+            "galaxy_shard_local_hit_ratio 8000\n",
+            "galaxy_hot_tier_hit_ratio 5000\n",
+            "galaxy_cross_region_egress_mb 10\n",
+            "galaxy_hot_promote_total 2\n",
+            "galaxy_hot_evict_total 1\n",
+        );
+        let body = json!({
+            "ok": true,
+            "metrics": {
+                "shard_local_hit_ratio_bps": 8000,
+                "hot_tier_hit_ratio_bps": 5000,
+                "cross_region_egress_mb": 10,
+                "hot_promote_total": 2,
+                "hot_evict_total": 1,
+            }
+        });
+        validate_locality_metrics_parity(prom, &body).expect("parity");
     }
 
     #[test]

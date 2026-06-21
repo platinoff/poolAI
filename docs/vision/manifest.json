@@ -2090,11 +2090,17 @@
       "from": "galaxy_grid",
       "kind": "implements",
       "to": "src_grid_galaxy_capability_admission_metrics_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_prefetch_depth_rs"
     }
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S759",
+  "last_sprint_closed": "PH-S769",
   "layers": [
     {
       "id": "L0",
@@ -2127,7 +2133,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S760",
+  "next_sprint": "PH-S770",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -8681,9 +8687,30 @@
       "label": "galaxy_horizon_s740_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s740_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_prefetch_depth_rs",
+      "label": "galaxy_prefetch_depth.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_prefetch_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s750_integration_rs",
+      "label": "galaxy_horizon_s750_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s750_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_prefetch_backpressure_profile_integration_rs",
+      "label": "prefetch_backpressure_profile_integration.rs",
+      "layer": "L3",
+      "path": "tests/prefetch_backpressure_profile_integration.rs"
     }
   ],
-  "revision": 276,
+  "revision": 277,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -14935,91 +14962,181 @@
       "acceptance": "integration test",
       "deps": "Galaxy §5.2–5.4",
       "id": "PH-S760",
-      "open": true,
+      "open": false,
       "row": 695,
-      "status": "open",
+      "status": "closed",
       "title": "locality-metrics HTTP wire depth"
     },
     {
       "acceptance": "JSON/Prom parity",
       "deps": "Galaxy §5.2–5.4",
       "id": "PH-S761",
-      "open": true,
+      "open": false,
       "row": 696,
-      "status": "open",
+      "status": "closed",
       "title": "hot-tier promote/evict metrics parity"
     },
     {
       "acceptance": "ui-core metrics strip",
       "deps": "poolai-ui-core",
       "id": "PH-S762",
-      "open": true,
+      "open": false,
       "row": 697,
-      "status": "open",
+      "status": "closed",
       "title": "Admin locality wasm glue"
     },
     {
       "acceptance": "runner extend",
       "deps": "poolai-http-stand-smoke",
       "id": "PH-S763",
-      "open": true,
+      "open": false,
       "row": 698,
-      "status": "open",
+      "status": "closed",
       "title": "Stand smoke locality/prefetch band"
     },
     {
       "acceptance": "unit test",
       "deps": "Galaxy §5.2–5.4",
       "id": "PH-S764",
-      "open": true,
+      "open": false,
       "row": 699,
-      "status": "open",
+      "status": "closed",
       "title": "locality_hot_tier_depth_stub"
     },
     {
       "acceptance": "poolai-loc-audit` → `rust_ratio.json` PH-S765 zriz",
       "deps": "§5.13 fallback",
       "id": "PH-S765",
-      "open": true,
+      "open": false,
       "row": 700,
-      "status": "open",
+      "status": "closed",
       "title": "Rust ratio loc-audit refresh"
     },
     {
       "acceptance": "sync",
       "deps": "docs canon",
       "id": "PH-S766",
-      "open": true,
+      "open": false,
       "row": 701,
-      "status": "open",
+      "status": "closed",
       "title": "docs canon INDEX §7"
     },
     {
       "acceptance": "poolai-vision-sync --check` green",
       "deps": "ops",
       "id": "PH-S767",
-      "open": true,
+      "open": false,
       "row": 702,
-      "status": "open",
+      "status": "closed",
       "title": "poolai-vision-sync drift gate"
     },
     {
-      "acceptance": "--min-ratio 0.95 --advisory",
+      "acceptance": "--min-ratio 0.95 --advisory` 94.63%",
       "deps": "PH-S351 pattern",
       "id": "PH-S768",
-      "open": true,
+      "open": false,
       "row": 703,
-      "status": "open",
+      "status": "closed",
       "title": "Ratio hold advisory snapshot"
     },
     {
       "acceptance": "galaxy_horizon_s760_integration` + docs sync",
       "deps": "Galaxy §5.2–5.4 locality",
       "id": "PH-S769",
-      "open": true,
+      "open": false,
       "row": 704,
-      "status": "open",
+      "status": "closed",
       "title": "Horizon close band S760–S768"
+    },
+    {
+      "acceptance": "cleared → batch stub + metric",
+      "deps": "Galaxy §8.2",
+      "id": "PH-S770",
+      "open": true,
+      "row": 705,
+      "status": "open",
+      "title": "offline payout batch settlement wire"
+    },
+    {
+      "acceptance": "ui-core render + fetch",
+      "deps": "poolai-ui-core",
+      "id": "PH-S771",
+      "open": true,
+      "row": 706,
+      "status": "open",
+      "title": "payout-batch history admin wasm panel"
+    },
+    {
+      "acceptance": "runner green",
+      "deps": "poolai-http-stand-smoke",
+      "id": "PH-S772",
+      "open": true,
+      "row": 707,
+      "status": "open",
+      "title": "Stand smoke payout-batch/history"
+    },
+    {
+      "acceptance": "unit test",
+      "deps": "Galaxy §8.2",
+      "id": "PH-S773",
+      "open": true,
+      "row": 708,
+      "status": "open",
+      "title": "settlement_payout_depth_stub"
+    },
+    {
+      "acceptance": "test extend",
+      "deps": "galaxy_settlement_mode",
+      "id": "PH-S774",
+      "open": true,
+      "row": 709,
+      "status": "open",
+      "title": "settlement mode on-chain vs offline gate"
+    },
+    {
+      "acceptance": "poolai-loc-audit` → `rust_ratio.json` PH-S775 zriz",
+      "deps": "§5.13 fallback",
+      "id": "PH-S775",
+      "open": true,
+      "row": 710,
+      "status": "open",
+      "title": "Rust ratio loc-audit refresh"
+    },
+    {
+      "acceptance": "docs canon",
+      "deps": "docs canon",
+      "id": "PH-S776",
+      "open": true,
+      "row": 711,
+      "status": "open",
+      "title": "Galaxy §8.2 payout row ✅"
+    },
+    {
+      "acceptance": "poolai-vision-sync --check` green",
+      "deps": "ops",
+      "id": "PH-S777",
+      "open": true,
+      "row": 712,
+      "status": "open",
+      "title": "poolai-vision-sync drift gate"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory",
+      "deps": "PH-S351 pattern",
+      "id": "PH-S778",
+      "open": true,
+      "row": 713,
+      "status": "open",
+      "title": "Ratio hold advisory snapshot"
+    },
+    {
+      "acceptance": "galaxy_horizon_s770_integration` + docs sync",
+      "deps": "Galaxy §8.2 payout",
+      "id": "PH-S779",
+      "open": true,
+      "row": 714,
+      "status": "open",
+      "title": "Horizon close band S770–S778"
     }
   ],
   "sprint_queue_open_count": 10,

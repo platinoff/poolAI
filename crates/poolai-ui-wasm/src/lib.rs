@@ -36,8 +36,8 @@ use poolai_ui_core::payout_batch::render_payout_batch_panel_html;
 use poolai_ui_core::pricing::{format_unix_secs, format_usd_micro};
 use poolai_ui_core::prometheus::parse_prometheus_gauge;
 use poolai_ui_core::stand_smoke_metrics::{
-    render_grid_prefetch_metrics_strip_html, render_grid_settlement_trust_metrics_strip_html,
-    render_grid_verification_metrics_strip_html,
+    render_grid_locality_metrics_strip_html, render_grid_prefetch_metrics_strip_html,
+    render_grid_settlement_trust_metrics_strip_html, render_grid_verification_metrics_strip_html,
 };
 use poolai_ui_core::table::{
     build_csv, build_json_export, compare_sort_values, empty_state_html, escape_regex,
@@ -610,6 +610,14 @@ pub fn render_grid_prefetch_metrics_strip_wasm(
     pull_bytes_gauge: u64,
 ) -> String {
     render_grid_prefetch_metrics_strip_html(prefetch_metrics_json, pull_bytes_gauge)
+}
+
+#[wasm_bindgen(js_name = renderGridLocalityMetricsStrip)]
+pub fn render_grid_locality_metrics_strip_wasm(
+    locality_metrics_json: &str,
+    hot_promote_gauge: u64,
+) -> String {
+    render_grid_locality_metrics_strip_html(locality_metrics_json, hot_promote_gauge)
 }
 
 #[wasm_bindgen(js_name = renderNetworkProfilesPanel)]
