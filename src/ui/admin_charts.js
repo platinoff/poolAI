@@ -438,7 +438,7 @@ function poolaiRenderMonitoringDashboardsPanel(dashboards, labels) {
 }
 
 /**
- * PH-S480: workers table (wasm-first).
+ * PH-S480: workers table (wasm-only, PH-S821).
  * @param {Array<object>} workers
  * @param {object} labels i18n label map
  */
@@ -460,10 +460,7 @@ function poolaiRenderWorkersPanel(workers, labels) {
       labels.empty || poolaiChartT('admin.wrk.empty', 'No workers found'),
     );
   }
-  return adminEmptyStateHtml(
-    labels.empty || poolaiChartT('admin.wrk.empty', 'No workers found'),
-    { icon: '👷' },
-  );
+  return '';
 }
 
 /**
@@ -497,7 +494,7 @@ function poolaiRenderInstancesPanel(instances, labels) {
 }
 
 /**
- * PH-S499: VM instances table (wasm-first).
+ * PH-S499: VM instances table (wasm-only, PH-S820).
  */
 function poolaiRenderVmPanel(instances, labels) {
   labels = labels || {};
@@ -518,10 +515,30 @@ function poolaiRenderVmPanel(instances, labels) {
       labels.empty || poolaiChartT('admin.vmadm.empty', 'No VM instances found'),
     );
   }
-  return adminEmptyStateHtml(
-    labels.empty || poolaiChartT('admin.vmadm.empty', 'No VM instances found'),
-    { icon: '🖥' },
-  );
+  return '';
+}
+
+/** PH-S821: libraries table (wasm-only). */
+function poolaiRenderLibsPanel(libs, labels) {
+  labels = labels || {};
+  var wasm = poolaiChartsWasm();
+  if (wasm && typeof wasm.renderLibsPanel === 'function') {
+    return wasm.renderLibsPanel(
+      JSON.stringify(libs || []),
+      labels.name || poolaiChartT('admin.lib.label.name', 'Library Name'),
+      labels.version || poolaiChartT('admin.lib.label.version', 'Version'),
+      labels.status || poolaiChartT('admin.wrk.col.status', 'Status'),
+      labels.actions || poolaiChartT('admin.wrk.col.actions', 'Actions'),
+      labels.tableAria || poolaiChartT('admin.page.libs', 'Libraries'),
+      labels.installed || poolaiChartT('admin.lib.installed', 'Installed'),
+      labels.notInstalled || poolaiChartT('admin.lib.notInstalled', 'Not Installed'),
+      labels.uninstall || poolaiChartT('ui.uninstall', 'Uninstall'),
+      labels.update || poolaiChartT('ui.update', 'Update'),
+      labels.install || poolaiChartT('ui.install', 'Install'),
+      labels.empty || poolaiChartT('admin.lib.empty', 'No libraries found'),
+    );
+  }
+  return '';
 }
 
 /** PH-S508: Galaxy virtual nodes table (wasm-first). */

@@ -1398,6 +1398,40 @@ fn admin_security_topology_wasm_glue_ph_s812() {
 }
 
 #[test]
+fn admin_charts_vm_panel_wasm_only_ph_s820() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("wasm.renderVmPanel"));
+    assert!(js.contains("poolaiRenderVmPanel"));
+    assert!(!js.contains("admin.vmadm.empty', 'No VM instances found'),\n    { icon: '🖥' }"));
+}
+
+#[test]
+fn admin_charts_workers_libs_panel_wasm_only_ph_s821() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("wasm.renderWorkersPanel"));
+    assert!(js.contains("wasm.renderLibsPanel"));
+    assert!(js.contains("poolaiRenderLibsPanel"));
+    assert!(!js.contains("admin.wrk.empty', 'No workers found'),\n    { icon: '👷' }"));
+    let libs = include_str!("libs.rs");
+    assert!(libs.contains("poolaiRenderLibsPanel"));
+    assert!(!libs.contains("admin-table"));
+}
+
+#[test]
+fn admin_vm_workers_libs_wasm_glue_ph_s822() {
+    let vm = include_str!("vm.rs");
+    assert!(vm.contains("poolaiRenderVmPanel"));
+    assert!(!vm.contains("<table class=\"admin-table\">"));
+    let wrk = include_str!("workers.rs");
+    assert!(wrk.contains("poolaiRenderWorkersPanel"));
+    assert!(!wrk.contains("<table class=\"admin-table\">"));
+    let libs = include_str!("libs.rs");
+    assert!(libs.contains("poolaiRenderLibsPanel"));
+    assert!(libs.contains("data-lib-action"));
+    assert!(!libs.contains("<table class=\"admin-table\">"));
+}
+
+#[test]
 fn admin_charts_grid_replication_pricing_wasm_first_ph_s701() {
     let js = include_str!("../admin_charts.js");
     assert!(js.contains("wasm.renderGridReplicationPricingPanel"));

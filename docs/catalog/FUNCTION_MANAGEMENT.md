@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-21 (PH-S810…S819 ✅ · **191** master backlog · active **10** · vision **rev 282** · rust_ratio **94.67%** · completion v2)
+**Оновлено:** 2026-06-21 (PH-S820…S829 ✅ · **181** master backlog · active **10** · vision **rev 283** · rust_ratio **94.68%** · completion v2)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -1019,20 +1019,30 @@ FM-xxx (з таблиці нижче)
 | 752 | **PH-S817** | poolai-vision-sync drift gate | ops | `poolai-vision-sync --check` green | **✅** |
 | 753 | **PH-S818** | Ratio hold advisory snapshot | PH-S351 pattern | `--min-ratio 0.95 --advisory` | **✅** |
 | 754 | **PH-S819** | Horizon close band S810–S818 | wasm security/topology | `galaxy_horizon_s810_integration` + docs sync | **✅** |
-| 755 | **PH-S820** | wasm slim vm panel glue | poolai-ui-wasm | vm admin wasm render | **[ ]** |
-| 756 | **PH-S821** | wasm slim workers/libs panels | poolai-ui-core | ui-core → wasm | **[ ]** |
-| 757 | **PH-S822** | admin/mod.rs regression PH-S820/S821 | admin tests | wasm glue tests | **[ ]** |
-| 758 | **PH-S823** | stand smoke vm/workers API shape | poolai-http-stand-smoke | runner tests | **[ ]** |
-| 759 | **PH-S824** | concept stub vm/workers DTO | Galaxy §2.3 | unit test | **[ ]** |
-| 760 | **PH-S825** | Rust ratio loc-audit refresh | §5.13 fallback | `poolai-loc-audit` → `rust_ratio.json` PH-S825 zriz | **[ ]** |
-| 761 | **PH-S826** | docs canon sync | HANDOFF/NEXT/STABLE | docs canon | **[ ]** |
-| 762 | **PH-S827** | poolai-vision-sync drift gate | ops | `poolai-vision-sync --check` green | **[ ]** |
-| 763 | **PH-S828** | Ratio hold advisory snapshot | PH-S351 pattern | `--min-ratio 0.95 --advisory` | **[ ]** |
-| 764 | **PH-S829** | Horizon close band S820–S828 | wasm vm/workers | `galaxy_horizon_s820_integration` + docs sync | **[ ]** |
+| 755 | **PH-S820** | wasm slim vm panel glue | poolai-ui-wasm | vm admin wasm render | **✅** |
+| 756 | **PH-S821** | wasm slim workers/libs panels | poolai-ui-core | ui-core → wasm | **✅** |
+| 757 | **PH-S822** | admin/mod.rs regression PH-S820/S821 | admin tests | wasm glue tests | **✅** |
+| 758 | **PH-S823** | stand smoke vm/workers API shape | poolai-http-stand-smoke | runner tests | **✅** |
+| 759 | **PH-S824** | concept stub vm/workers DTO | Galaxy §2.3 | unit test | **✅** |
+| 760 | **PH-S825** | Rust ratio loc-audit refresh | §5.13 fallback | `poolai-loc-audit` → `rust_ratio.json` PH-S825 zriz | **✅** |
+| 761 | **PH-S826** | docs canon sync | HANDOFF/NEXT/STABLE | docs canon | **✅** |
+| 762 | **PH-S827** | poolai-vision-sync drift gate | ops | `poolai-vision-sync --check` green | **✅** |
+| 763 | **PH-S828** | Ratio hold advisory snapshot | PH-S351 pattern | `--min-ratio 0.95 --advisory` | **✅** |
+| 764 | **PH-S829** | Horizon close band S820–S828 | wasm vm/workers | `galaxy_horizon_s820_integration` + docs sync | **✅** |
+| 765 | **PH-S830** | stand_smoke_metrics_parity all 6 APIs | stand smoke v2 | validate_band6 extend v2 | **[ ]** |
+| 766 | **PH-S831** | stand smoke prefetch/locality parity | JSON↔Prom | unit tests | **[ ]** |
+| 767 | **PH-S832** | stand smoke governance/fee parity | grid metrics | unit tests | **[ ]** |
+| 768 | **PH-S833** | live runner grid_metrics_json_prometheus_parity | stand smoke | stand smoke case green | **[ ]** |
+| 769 | **PH-S834** | stand smoke export shape regression suite | poolai-http-stand-smoke | bin unit tests | **[ ]** |
+| 770 | **PH-S835** | Rust ratio loc-audit refresh | §5.13 fallback | `poolai-loc-audit` → `rust_ratio.json` PH-S835 zriz | **[ ]** |
+| 771 | **PH-S836** | PROMETHEUS_METRICS.md stand smoke sync | docs | docs | **[ ]** |
+| 772 | **PH-S837** | poolai-vision-sync drift gate | ops | `poolai-vision-sync --check` green | **[ ]** |
+| 773 | **PH-S838** | Ratio hold advisory snapshot | PH-S351 pattern | `--min-ratio 0.95 --advisory` | **[ ]** |
+| 774 | **PH-S839** | Horizon close band S830–S838 | stand smoke v2 | `galaxy_horizon_s830_integration` + docs sync | **[ ]** |
 
-**Відкритих у §5.12:** **10** (PH-S820…S829). **Master backlog:** **191** pending PH-S820…S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · **§5.14**. Vision rev **282** (after sync). rust_ratio **94.67%** (PH-S815).
+**Відкритих у §5.12:** **10** (PH-S830…S839). **Master backlog:** **181** pending PH-S830…S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · **§5.14**. Vision rev **283** (after sync). rust_ratio **94.68%** (PH-S825).
 
-**Наступна сесія:** **`абракадабра`** — drain PH-S820…S829 → promote PH-S830…S839 з §5.14 → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **`абракадабра`** — drain PH-S830…S839 → promote PH-S840…S849 з §5.14 → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.14 Master backlog PH-S720…S1010 (291 pending → product-complete, 2026-06-20)
 
@@ -1040,10 +1050,10 @@ FM-xxx (з таблиці нижче)
 
 | Поле | Значення |
 |------|----------|
-| **Pending** | **191** (PH-S820…S1010) |
-| **Drained bands 1–16** | PH-S660…S819 ✅ |
-| **Активна §5.12** | PH-S820…S829 `[ ]` — band 17 admin wasm slim vm/workers/libs |
-| **Наступна promote** | PH-S830…S839 — band 18 stand smoke v2 |
+| **Pending** | **181** (PH-S830…S1010) |
+| **Drained bands 1–17** | PH-S660…S829 ✅ |
+| **Активна §5.12** | PH-S830…S839 `[ ]` — band 18 stand smoke v2 |
+| **Наступна promote** | PH-S840…S849 — band 19 OpenAPI gap |
 | **Сесій `абракадабра`** | **20** (19×10 + tail PH-S1010) |
 | **План фаз** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md) |
 | **Реєстр sprint×acceptance** | [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) |
@@ -1093,7 +1103,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-06-21):** PH-S820…S829 **[ ]** drain band 17 (admin wasm slim vm/workers/libs) · **`абракадабра`** = drain → vision close → push · ratio formal gate bands **28–29** per [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md).
+**Активна смуга (2026-06-21):** PH-S830…S839 **[ ]** drain band 18 (stand smoke v2 full grid parity) · **`абракадабра`** = drain → vision close → push · ratio formal gate bands **28–29** per [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md).
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

@@ -25,46 +25,28 @@ pub async fn admin_libs() -> Html<String> {
     function renderLibraries(libs) {
       const el = document.getElementById('libraries-list');
       if (!el) return;
-      if (!libs || libs.length === 0) {
-        el.innerHTML = '<div class="muted">' + escapeHtml(T('admin.lib.empty', 'No libraries found')) + '</div>';
-        return;
-      }
-      el.innerHTML = `
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>${escapeHtml(T('admin.lib.label.name', 'Library Name'))}</th>
-              <th>${escapeHtml(T('admin.lib.label.version', 'Version'))}</th>
-              <th>${escapeHtml(T('admin.wrk.col.status', 'Status'))}</th>
-              <th>${escapeHtml(T('admin.wrk.col.actions', 'Actions'))}</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${libs.map(l => {
-              const key = l.name || l.id || 'unknown';
-              const isInstalled =
-                l.installed === true ||
-                Boolean(l.metadata && l.metadata.installed_at);
-              const keyJs = JSON.stringify(key);
-              return `
-              <tr>
-                <td><strong>${escapeHtml(String(key))}</strong></td>
-                <td>${escapeHtml(String(l.version || l.installed_version || T('admin.na', 'N/A')))}</td>
-                <td><span class="status-badge ${isInstalled ? 'active' : 'inactive'}">${isInstalled ? escapeHtml(T('admin.lib.installed', 'Installed')) : escapeHtml(T('admin.lib.notInstalled', 'Not Installed'))}</span></td>
-                <td>
-                  ${isInstalled ? `
-                    <button type="button" class="btn" onclick='uninstallLibrary(${keyJs})'>${escapeHtml(T('ui.uninstall', 'Uninstall'))}</button>
-                    <button type="button" class="btn" onclick='updateLibrary(${keyJs})'>${escapeHtml(T('ui.update', 'Update'))}</button>
-                  ` : `
-                    <button type="button" class="btn btn-primary" onclick='installLibrary(${keyJs})'>${escapeHtml(T('ui.install', 'Install'))}</button>
-                  `}
-                </td>
-              </tr>
-            `;
-            }).join('')}
-          </tbody>
-        </table>
-      `;
+      el.innerHTML = poolaiRenderLibsPanel(libs, {
+        name: T('admin.lib.label.name', 'Library Name'),
+        version: T('admin.lib.label.version', 'Version'),
+        status: T('admin.wrk.col.status', 'Status'),
+        actions: T('admin.wrk.col.actions', 'Actions'),
+        tableAria: T('admin.page.libs', 'Libraries'),
+        installed: T('admin.lib.installed', 'Installed'),
+        notInstalled: T('admin.lib.notInstalled', 'Not Installed'),
+        uninstall: T('ui.uninstall', 'Uninstall'),
+        update: T('ui.update', 'Update'),
+        install: T('ui.install', 'Install'),
+        empty: T('admin.lib.empty', 'No libraries found'),
+      });
+      el.querySelectorAll('[data-lib-name]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          const name = btn.getAttribute('data-lib-name');
+          const action = btn.getAttribute('data-lib-action');
+          if (action === 'install') installLibrary(name);
+          else if (action === 'uninstall') uninstallLibrary(name);
+          else if (action === 'update') updateLibrary(name);
+        });
+      });
     }
     
     async function installLibrary(name) {

@@ -180,7 +180,24 @@
 
 ---
 
-## Bands 17–35 (summary — деталі в master backlog)
+## Band 17 — PH-S820…S829 (Admin wasm slim: vm + workers + libs) · **✅ drained 2026-06-21**
+
+| Sprint | Focus | Acceptance |
+|--------|-------|------------|
+| **PH-S820** | wasm slim vm panel glue | vm admin wasm render |
+| **PH-S821** | wasm slim workers/libs panels | ui-core → wasm |
+| **PH-S822** | admin/mod.rs regression PH-S820/S821 | wasm glue tests |
+| **PH-S823** | stand smoke vm/workers API shape | runner tests |
+| **PH-S824** | concept stub vm/workers DTO | Galaxy §2.3 unit test |
+| **PH-S825** | loc-audit | zriz |
+| **PH-S826** | docs canon | HANDOFF/NEXT/STABLE |
+| **PH-S827** | vision-sync | green |
+| **PH-S828** | ratio advisory | hold |
+| **PH-S829** | `galaxy_horizon_s820_integration` | vm/workers wasm band close |
+
+---
+
+## Bands 18–35 (summary — деталі в master backlog)
 
 | Band | Sprints | Theme |
 |------|---------|-------|

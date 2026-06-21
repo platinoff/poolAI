@@ -6,7 +6,7 @@
 |------|----------|
 | **Completion plan** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.14–§5.15** |
 | **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) |
-| **Active drain (band 17)** | PH-S820…S829 — admin wasm slim vm/workers/libs |
+| **Active drain (band 18)** | PH-S830…S839 — stand smoke v2 full grid parity |
 | **Next promote (band 18)** | PH-S830…S839 — stand smoke v2 full grid parity |
 | **Product-complete tail** | PH-S1010 — FM **§5.15** |
 | **Rust ratio** | **94.68%** · hold **95%** advisory (bands 27–29 formal gate) |
@@ -37,7 +37,8 @@
 | **§9.5–9.6 governance ops** | Galaxy **§9.5–9.6** | band 14 ✅ PH-S790…S799 |
 | **Admin wasm slim (monitoring/payout)** | UI_UX / §5.13 | band 15 ✅ PH-S800…S809 |
 | **Admin wasm slim (security/topology)** | UI_UX / §5.13 | band 16 ✅ PH-S810…S819 |
-| **Admin wasm slim (vm/workers/libs)** | UI_UX / §5.13 | band 17 **active** PH-S820…S829 |
+| **Admin wasm slim (vm/workers/libs)** | UI_UX / §5.13 | band 17 ✅ PH-S820…S829 |
+| **Stand smoke v2 grid parity** | ops / §5.13 | band 18 **active** PH-S830…S839 |
 | **network_profile persist stub** | Galaxy **§8** | PH-S664 ✅ (stub); full persist ✅ band 8 PH-S730…S739 |
 
 **§5.5 prefetch:** live pull + backpressure + strict-mode HTTP wire ✅ (baseline); live pull **depth** ✅ band 10 (PH-S750…S759).

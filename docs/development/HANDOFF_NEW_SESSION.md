@@ -1,12 +1,14 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-21 (PH-S810…S819 ✅ · master backlog **191** · active **10** · vision **rev 282** · rust_ratio **94.67%**)
+**Оновлено:** 2026-06-21 (PH-S820…S829 ✅ · master backlog **181** · active **10** · vision **rev 283** · rust_ratio **94.68%**)
 
-**Cursor 3.8.11 (2026-06-20):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-06-20.md`](./CURSOR_UPDATE_RESEARCH_2026-06-20.md). **Наступна сесія:** **`абракадабра`** (drain PH-S820…S829).
+**Cursor 3.8.11 (2026-06-20):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-06-20.md`](./CURSOR_UPDATE_RESEARCH_2026-06-20.md). **Наступна сесія:** **`абракадабра`** (drain PH-S830…S839).
 
-**Completion roadmap v2 (2026-06-20):** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) — **191** спринтів до **product-complete** (PH-S1010 / FM **§5.15**); **20** сесій `абракадабра` × 10 PH-S*. Реєстр: [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · regen `bash scripts/generate-ph-s-master-backlog-351.sh`.
+**Completion roadmap v2 (2026-06-20):** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) — **181** спринтів до **product-complete** (PH-S1010 / FM **§5.15**); **19** сесій `абракадабра` × 10 PH-S*. Реєстр: [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · regen `bash scripts/generate-ph-s-master-backlog-351.sh`.
 
-**Master backlog 191 (2026-06-21):** FM **§5.14**. Активна §5.12: **PH-S820…S829** (band 17 — admin wasm slim vm/workers/libs). **`абракадабра`** = drain 10 → promote **PH-S830…S839** (band 18).
+**Master backlog 181 (2026-06-21):** FM **§5.14**. Активна §5.12: **PH-S830…S839** (band 18 — stand smoke v2 full grid parity). **`абракадабра`** = drain 10 → promote **PH-S840…S849** (band 19).
+
+**PH-S820…S829 ✅ (2026-06-21):** wasm-only vm panel `poolaiRenderVmPanel` (PH-S820); workers/libs wasm `poolaiRenderLibsPanel` + ui-core `libs.rs` (PH-S821); admin/mod.rs regression PH-S822; stand smoke vm/workers API shape (PH-S823); `admin_vm_workers` Galaxy §2.3 subset + `admin_wasm_slim_depth_stub` vm/workers/libs (PH-S824); `poolai-loc-audit` → `rust_ratio.json` **94.68%** (PH-S825); FM/HANDOFF/NEXT/STABLE/GALAXY sync (PH-S826); `galaxy_horizon_s820_integration` (PH-S829); vision **rev 283**.
 
 **PH-S810…S819 ✅ (2026-06-21):** wasm slim secret rotation `poolaiRenderSecretRotationPanel` (PH-S810); topology stats strip `poolaiRenderTopologyStatsStrip` (PH-S811); admin/mod.rs regression PH-S812; stand smoke security/topology shape (PH-S813); `admin_wasm_slim_depth_stub` Security/Topology (PH-S814); `poolai-loc-audit` → `rust_ratio.json` **94.67%** (PH-S815); FM/HANDOFF/NEXT/STABLE/GALAXY sync (PH-S816); `galaxy_horizon_s810_integration` (PH-S819); vision **rev 282**.
 
@@ -38,7 +40,7 @@
 
 **Rules:** **`абракадабра`** — drain 10 з §5.12 → vision close → push; [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
-**§5.12:** **10** відкритих **PH-S820…S829** (band 17). **Vision:** rev **282** · rust_ratio **94.67%** (PH-S815).
+**§5.12:** **10** відкритих **PH-S830…S839** (band 18). **Vision:** rev **283** · rust_ratio **94.68%** (PH-S825).
 
 **Роадмеп:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) · **Промпт:** [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md).
 

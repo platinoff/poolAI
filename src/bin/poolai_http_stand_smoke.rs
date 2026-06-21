@@ -3215,6 +3215,73 @@ mod tests {
     }
 
     #[test]
+    fn vm_workers_export_shape_ph_s823() {
+        use poolai_ui_core::admin_vm_workers::{
+            validate_vm_instances_admin_list_shape, validate_workers_admin_list_shape,
+            VM_INSTANCE_ADMIN_ROW_KEYS, WORKERS_ADMIN_ROW_KEYS,
+        };
+        use serde_json::json;
+
+        assert!(!WORKERS_ADMIN_ROW_KEYS.is_empty());
+        assert!(!VM_INSTANCE_ADMIN_ROW_KEYS.is_empty());
+
+        let workers = json!([{
+            "id": "w1",
+            "status": "idle",
+            "current_task": null,
+            "is_healthy": true,
+            "total_requests_processed": 1,
+            "queue_size": 0,
+            "active_connections": 0,
+            "average_response_time_ms": 0
+        }]);
+        validate_workers_admin_list_shape(&workers).expect("workers export shape");
+
+        let vms = json!([{
+            "id": "vm-1",
+            "name": "test-vm",
+            "status": "running",
+            "resources": { "cpu_cores": 2, "memory_mb": 1024, "gpu_required": false }
+        }]);
+        validate_vm_instances_admin_list_shape(&vms).expect("vm export shape");
+    }
+
+    #[test]
+    fn admin_wasm_slim_depth_stub_band17_export_shape_ph_s824() {
+        use poolai_ui_core::grid_replication_pricing::{
+            admin_wasm_slim_depth_stub, AdminWasmSlimDepth,
+        };
+        use poolai_ui_core::libs::render_libs_panel_html;
+        use poolai_ui_core::vm::render_vm_panel_html;
+        use poolai_ui_core::workers::render_workers_panel_html;
+        use serde_json::json;
+        assert_eq!(
+            admin_wasm_slim_depth_stub(Some(&json!({"vm_panel": true}))),
+            AdminWasmSlimDepth::VmPanel
+        );
+        assert_eq!(
+            admin_wasm_slim_depth_stub(Some(&json!({"workers_panel": true}))),
+            AdminWasmSlimDepth::WorkersPanel
+        );
+        assert_eq!(
+            admin_wasm_slim_depth_stub(Some(&json!({"libs_panel": true}))),
+            AdminWasmSlimDepth::LibsPanel
+        );
+        let vm_html = render_vm_panel_html(
+            "[]", "N", "S", "R", "A", "V", "CPU", "MEM", "Start", "Stop", "Del", "Empty",
+        );
+        assert!(vm_html.contains("admin-empty-state"));
+        let wrk_html = render_workers_panel_html(
+            "[]", "I", "S", "M", "A", "W", "H", "U", "Req", "Del", "Empty",
+        );
+        assert!(wrk_html.contains("admin-empty-state"));
+        let libs_html = render_libs_panel_html(
+            "[]", "N", "V", "S", "A", "L", "I", "NI", "U", "Up", "In", "Empty",
+        );
+        assert!(libs_html.contains("admin-empty-state"));
+    }
+
+    #[test]
     fn grid_verification_replay_json_export_shape_ph_s710() {
         use poolai::grid::stand_smoke_metrics_parity::{
             validate_grid_metrics_json_export, REPLAY_JSON_KEYS, VERIFICATION_JSON_KEYS,

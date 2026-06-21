@@ -28,6 +28,12 @@ pub enum AdminWasmSlimDepth {
     SecurityRotationPanel,
     /// Topology stats strip wasm renderer (PH-S814).
     TopologyStatsStrip,
+    /// VM instances admin panel wasm renderer (PH-S824).
+    VmPanel,
+    /// Workers admin panel wasm renderer (PH-S824).
+    WorkersPanel,
+    /// Libraries admin panel wasm renderer (PH-S824).
+    LibsPanel,
 }
 
 /// Classify admin wasm slim depth from optional feature stub (PH-S704).
@@ -35,6 +41,21 @@ pub fn admin_wasm_slim_depth_stub(features: Option<&Value>) -> AdminWasmSlimDept
     let Some(f) = features else {
         return AdminWasmSlimDepth::None;
     };
+    if f.get("libs_panel")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        return AdminWasmSlimDepth::LibsPanel;
+    }
+    if f.get("workers_panel")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        return AdminWasmSlimDepth::WorkersPanel;
+    }
+    if f.get("vm_panel").and_then(|v| v.as_bool()).unwrap_or(false) {
+        return AdminWasmSlimDepth::VmPanel;
+    }
     if f.get("charts_glue")
         .and_then(|v| v.as_bool())
         .unwrap_or(false)
@@ -183,6 +204,26 @@ mod tests {
         assert_eq!(
             admin_wasm_slim_depth_stub(Some(&json!({"topology_stats_strip": true}))),
             AdminWasmSlimDepth::TopologyStatsStrip
+        );
+    }
+
+    #[test]
+    fn admin_wasm_slim_depth_stub_ph_s824() {
+        assert_eq!(
+            admin_wasm_slim_depth_stub(Some(&json!({"vm_panel": true}))),
+            AdminWasmSlimDepth::VmPanel
+        );
+        assert_eq!(
+            admin_wasm_slim_depth_stub(Some(&json!({"workers_panel": true}))),
+            AdminWasmSlimDepth::WorkersPanel
+        );
+        assert_eq!(
+            admin_wasm_slim_depth_stub(Some(&json!({"libs_panel": true}))),
+            AdminWasmSlimDepth::LibsPanel
+        );
+        assert_eq!(
+            admin_wasm_slim_depth_stub(Some(&json!({"vm_panel": true, "workers_panel": true}))),
+            AdminWasmSlimDepth::VmPanel
         );
     }
 }

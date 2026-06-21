@@ -16,6 +16,7 @@ use poolai_ui_core::grid_replication_pricing::render_grid_replication_pricing_pa
 use poolai_ui_core::grid_verification::render_grid_verification_panel_html;
 use poolai_ui_core::instances::render_instances_panel_html;
 use poolai_ui_core::lease::lease_state;
+use poolai_ui_core::libs::render_libs_panel_html;
 use poolai_ui_core::ml::{
     build_admin_overview_url, build_alert_rules_url, build_audit_events_url,
     build_dashboard_metrics_window_url, build_metric_history_query, build_metric_history_url,
@@ -526,6 +527,38 @@ pub fn render_vm_panel_wasm(
         start_label,
         stop_label,
         delete_label,
+        empty_message,
+    )
+}
+
+/// Admin libraries panel HTML (PH-S821).
+#[wasm_bindgen(js_name = renderLibsPanel)]
+pub fn render_libs_panel_wasm(
+    libs_json: &str,
+    col_name: &str,
+    col_version: &str,
+    col_status: &str,
+    col_actions: &str,
+    table_aria: &str,
+    installed_label: &str,
+    not_installed_label: &str,
+    uninstall_label: &str,
+    update_label: &str,
+    install_label: &str,
+    empty_message: &str,
+) -> String {
+    render_libs_panel_html(
+        libs_json,
+        col_name,
+        col_version,
+        col_status,
+        col_actions,
+        table_aria,
+        installed_label,
+        not_installed_label,
+        uninstall_label,
+        update_label,
+        install_label,
         empty_message,
     )
 }
