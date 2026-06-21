@@ -203,9 +203,9 @@
 |------|---------|-------|
 | 15 | S800–S809 | Admin wasm slim: monitoring + payout-batch ✅ |
 | 16 | S810–S819 | Admin wasm slim: security + topology ✅ |
-| 17 | S820–S829 | Admin wasm slim: vm + workers + libs **active** |
-| 18 | S830–S839 | Stand smoke v2: all grid JSON↔Prom parity + runner |
-| 19 | S840–S849 | OpenAPI gap audit 0 + contract test band |
+| 17 | S820–S829 | Admin wasm slim: vm + workers + libs ✅ |
+| 18 | S830–S839 | Stand smoke v2: all grid JSON↔Prom parity + runner ✅ |
+| 19 | S840–S849 | OpenAPI gap audit 0 + contract test band **active** |
 | 20 | S850–S859 | Job store RAID production path + restart test |
 | 21 | S860–S869 | Memory shard persist + seed-inventory depth |
 | 22 | S870–S879 | Solana on-chain cleared depth (mock RPC) |

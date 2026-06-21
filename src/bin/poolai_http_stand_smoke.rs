@@ -1449,6 +1449,65 @@ async fn smoke_grid_metrics_json_prometheus_parity_band6(
     )
 }
 
+/// PH-S833: stand smoke v2 — full grid JSON metrics export + Prometheus parity.
+async fn smoke_grid_metrics_json_prometheus_parity_band6_v2(
+    client: &Client,
+    base: &str,
+) -> Result<(), String> {
+    use poolai::grid::stand_smoke_metrics_parity::validate_band6_metrics_parity_v2;
+
+    let prom_resp = client
+        .get(api_url(base, "/metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("/metrics request: {e}"))?;
+    if prom_resp.status() != StatusCode::OK {
+        return Err(format!("/metrics status {}", prom_resp.status()));
+    }
+    let prom_text = prom_resp.text().await.map_err(|e| e.to_string())?;
+
+    async fn fetch_metrics_json(client: &Client, base: &str, path: &str) -> Result<Value, String> {
+        let resp = client
+            .get(api_url(base, path))
+            .send()
+            .await
+            .map_err(|e| format!("{path} request: {e}"))?;
+        if resp.status() != StatusCode::OK {
+            return Err(format!("{path} status {}", resp.status()));
+        }
+        resp.json().await.map_err(|e| format!("{path} json: {e}"))
+    }
+
+    let verification =
+        fetch_metrics_json(client, base, "/api/v1/grid/verification-metrics").await?;
+    let replay = fetch_metrics_json(client, base, "/api/v1/grid/replay-metrics").await?;
+    let settlement = fetch_metrics_json(client, base, "/api/v1/grid/settlement-metrics").await?;
+    let trust = fetch_metrics_json(client, base, "/api/v1/grid/trust-metrics").await?;
+    let replication = fetch_metrics_json(client, base, "/api/v1/grid/replication-metrics").await?;
+    let pricing = fetch_metrics_json(client, base, "/api/v1/grid/pricing-metrics").await?;
+    let prefetch = fetch_metrics_json(client, base, "/api/v1/grid/prefetch-metrics").await?;
+    let locality = fetch_metrics_json(client, base, "/api/v1/grid/locality-metrics").await?;
+    let fee_split = fetch_metrics_json(client, base, "/api/v1/grid/fee-split-metrics").await?;
+    let governance = fetch_metrics_json(client, base, "/api/v1/grid/governance-metrics").await?;
+    let payout_batch =
+        fetch_metrics_json(client, base, "/api/v1/grid/payout-batch-metrics").await?;
+
+    validate_band6_metrics_parity_v2(
+        &prom_text,
+        &verification,
+        &replay,
+        &settlement,
+        &trust,
+        &replication,
+        &pricing,
+        &prefetch,
+        &locality,
+        &fee_split,
+        &governance,
+        &payout_batch,
+    )
+}
+
 async fn smoke_grid_network_profile_read(client: &Client, base: &str) -> Result<(), String> {
     let resp = client
         .get(api_url(
@@ -2455,6 +2514,12 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
     .await;
     record(
         &mut cases,
+        "grid_metrics_json_prometheus_parity_band6_v2",
+        smoke_grid_metrics_json_prometheus_parity_band6_v2(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
         "grid_network_profile_read",
         smoke_grid_network_profile_read(&client, &cli.base_url).await,
     )
@@ -3355,6 +3420,143 @@ mod tests {
             }
         });
         validate_grid_metrics_json_export(&pricing, PRICING_JSON_KEYS).expect("pricing");
+    }
+
+    #[test]
+    fn grid_prefetch_locality_metrics_parity_ph_s831() {
+        use poolai::grid::stand_smoke_metrics_parity::{
+            validate_locality_metrics_parity, validate_prefetch_metrics_parity,
+        };
+
+        let prefetch_prom = concat!(
+            "galaxy_prefetch_pull_bytes_total 1024\n",
+            "galaxy_prefetch_backpressure_total 1\n",
+        );
+        let prefetch = serde_json::json!({
+            "ok": true,
+            "metrics": {
+                "pull_bytes_total": 1024,
+                "backpressure_total": 1,
+                "plan_total": 0,
+                "enqueue_total": 0,
+                "peer_fetch_total": 0,
+            }
+        });
+        validate_prefetch_metrics_parity(prefetch_prom, &prefetch).expect("prefetch parity");
+
+        let locality_prom = concat!(
+            "galaxy_shard_local_hit_ratio 7500\n",
+            "galaxy_hot_tier_hit_ratio 4000\n",
+            "galaxy_cross_region_egress_mb 5\n",
+            "galaxy_hot_promote_total 1\n",
+            "galaxy_hot_evict_total 0\n",
+        );
+        let locality = serde_json::json!({
+            "ok": true,
+            "metrics": {
+                "shard_local_hit_ratio_bps": 7500,
+                "hot_tier_hit_ratio_bps": 4000,
+                "cross_region_egress_mb": 5,
+                "hot_promote_total": 1,
+                "hot_evict_total": 0,
+            }
+        });
+        validate_locality_metrics_parity(locality_prom, &locality).expect("locality parity");
+    }
+
+    #[test]
+    fn grid_governance_fee_metrics_parity_ph_s832() {
+        use poolai::grid::stand_smoke_metrics_parity::{
+            validate_fee_split_metrics_parity, validate_governance_metrics_parity,
+        };
+
+        let fee_prom = "galaxy_fee_split_applied_total 7\n";
+        let fee_split = serde_json::json!({
+            "ok": true,
+            "metrics": {
+                "fee_split_applied_total": 7,
+                "primary_dev_fee_bps": 10,
+                "secondary_admin_fee_min_bps": 100,
+                "secondary_admin_fee_max_bps": 500,
+            }
+        });
+        validate_fee_split_metrics_parity(fee_prom, &fee_split).expect("fee parity");
+
+        let gov_prom = concat!(
+            "poolai_release_verify_total 2\n",
+            "poolai_release_verify_fail_total 0\n",
+            "poolai_update_notify_pending 1\n",
+            "poolai_advisory_acknowledged_total 3\n",
+        );
+        let governance = serde_json::json!({
+            "ok": true,
+            "metrics": {
+                "release_verify_total": 2,
+                "release_verify_fail_total": 0,
+                "update_notify_pending": 1,
+                "advisory_acknowledged_total": 3,
+            }
+        });
+        validate_governance_metrics_parity(gov_prom, &governance).expect("governance parity");
+    }
+
+    #[test]
+    fn stand_smoke_export_shape_regression_suite_ph_s834() {
+        use poolai::grid::stand_smoke_metrics_parity::validate_band6_metrics_parity_v2;
+
+        let prom = concat!(
+            "galaxy_verification_sample_total 1\n",
+            "galaxy_verification_checker_pending_total 0\n",
+            "galaxy_replay_pending 0\n",
+            "galaxy_verification_replay_record_total 0\n",
+            "galaxy_settlement_cleared_total 0\n",
+            "galaxy_settlement_payout_batch_total 0\n",
+            "galaxy_trust_payout_eligible_total 0\n",
+            "galaxy_trust_score 0\n",
+            "galaxy_replication_strict_total 0\n",
+            "galaxy_replication_enqueue_total 0\n",
+            "galaxy_pricing_fresh_served 0\n",
+            "galaxy_pricing_stale_served 0\n",
+            "galaxy_prefetch_pull_bytes_total 0\n",
+            "galaxy_prefetch_backpressure_total 0\n",
+            "galaxy_shard_local_hit_ratio 0\n",
+            "galaxy_hot_tier_hit_ratio 0\n",
+            "galaxy_cross_region_egress_mb 0\n",
+            "galaxy_hot_promote_total 0\n",
+            "galaxy_hot_evict_total 0\n",
+            "galaxy_fee_split_applied_total 0\n",
+            "poolai_release_verify_total 0\n",
+            "poolai_release_verify_fail_total 0\n",
+            "poolai_update_notify_pending 0\n",
+            "poolai_advisory_acknowledged_total 0\n",
+            "galaxy_settlement_payout_batch_queue_depth 0\n",
+        );
+        let verification = serde_json::json!({"ok": true, "metrics": {"sample_total": 1, "mismatch_total": 0, "match_total": 0, "checker_pending_total": 0}});
+        let replay = serde_json::json!({"ok": true, "metrics": {"replay_pending": 0, "replay_pending_scheduled_total": 0, "verification_replay_record_total": 0}});
+        let settlement = serde_json::json!({"ok": true, "metrics": {"pending_verification_total": 0, "cleared_total": 0, "resolved_total": 0, "payout_batch_total": 0}});
+        let trust = serde_json::json!({"ok": true, "metrics": {"payout_eligible_total": 0, "payout_held_total": 0, "last_trust_score": 0, "gate_min_threshold": 40}});
+        let replication = serde_json::json!({"ok": true, "metrics": {"strict_total": 0, "enqueue_total": 0, "executor_enqueue_total": 0, "rate_limited_total": 0}});
+        let pricing = serde_json::json!({"ok": true, "metrics": {"fresh_served_total": 0, "stale_served_total": 0, "forced_fallback_total": 0, "provider_catalog_lookups_total": 0}});
+        let prefetch = serde_json::json!({"ok": true, "metrics": {"pull_bytes_total": 0, "backpressure_total": 0, "plan_total": 0, "enqueue_total": 0, "peer_fetch_total": 0}});
+        let locality = serde_json::json!({"ok": true, "metrics": {"shard_local_hit_ratio_bps": 0, "hot_tier_hit_ratio_bps": 0, "cross_region_egress_mb": 0, "hot_promote_total": 0, "hot_evict_total": 0}});
+        let fee_split = serde_json::json!({"ok": true, "metrics": {"fee_split_applied_total": 0, "primary_dev_fee_bps": 10, "secondary_admin_fee_min_bps": 100, "secondary_admin_fee_max_bps": 500}});
+        let governance = serde_json::json!({"ok": true, "metrics": {"release_verify_total": 0, "release_verify_fail_total": 0, "update_notify_pending": 0, "advisory_acknowledged_total": 0}});
+        let payout_batch = serde_json::json!({"ok": true, "metrics": {"payout_batch_total": 0, "payout_batch_queue_depth": 0}});
+        validate_band6_metrics_parity_v2(
+            prom,
+            &verification,
+            &replay,
+            &settlement,
+            &trust,
+            &replication,
+            &pricing,
+            &prefetch,
+            &locality,
+            &fee_split,
+            &governance,
+            &payout_batch,
+        )
+        .expect("band18 regression suite");
     }
 
     #[test]

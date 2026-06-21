@@ -3,71 +3,71 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S830",
+      "id": "PH-S840",
       "link": "docs/vision/index.html#sprint-queue",
       "next": true,
       "published": "2026-05-28",
       "status": "open",
-      "summary": "validate_band6 extend v2",
-      "title": "stand_smoke_metrics_parity all 6 APIs"
+      "summary": "routes match grid.rs",
+      "title": "openapi.yaml sync band APIs"
     },
     {
       "category": "open",
-      "id": "PH-S831",
+      "id": "PH-S841",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "unit tests",
-      "title": "stand smoke prefetch/locality parity"
+      "summary": "gap-audit 0",
+      "title": "poolai-openapi-gap-audit 0"
     },
     {
       "category": "open",
-      "id": "PH-S832",
+      "id": "PH-S842",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "unit tests",
-      "title": "stand smoke governance/fee parity"
+      "summary": "extend",
+      "title": "contract test band top routes"
     },
     {
       "category": "open",
-      "id": "PH-S833",
+      "id": "PH-S843",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "stand smoke case green",
-      "title": "live runner grid_metrics_json_prometheus_parity"
+      "summary": "key paths 200 shape",
+      "title": "stand smoke OpenAPI path smoke"
     },
     {
       "category": "open",
-      "id": "PH-S834",
+      "id": "PH-S844",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "bin unit tests",
-      "title": "stand smoke export shape regression suite"
+      "summary": "yaml examples",
+      "title": "OpenAPI examples for grid metrics"
     },
     {
       "category": "open",
-      "id": "PH-S835",
+      "id": "PH-S845",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "poolai-loc-audit` → `rust_ratio.json` PH-S835 zriz",
+      "summary": "poolai-loc-audit` → `rust_ratio.json` PH-S845 zriz",
       "title": "Rust ratio loc-audit refresh"
     },
     {
       "category": "open",
-      "id": "PH-S836",
+      "id": "PH-S846",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "docs",
-      "title": "PROMETHEUS_METRICS.md stand smoke sync"
+      "summary": "docs canon",
+      "title": "OPENAPI_GAP_AUDIT doc sync"
     },
     {
       "category": "open",
-      "id": "PH-S837",
+      "id": "PH-S847",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -76,7 +76,7 @@
     },
     {
       "category": "open",
-      "id": "PH-S838",
+      "id": "PH-S848",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -85,12 +85,102 @@
     },
     {
       "category": "open",
-      "id": "PH-S839",
+      "id": "PH-S849",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
+      "summary": "galaxy_horizon_s840_integration` + docs sync",
+      "title": "Horizon close band S840–S848"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S839",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
       "summary": "galaxy_horizon_s830_integration` + docs sync",
       "title": "Horizon close band S830–S838"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S838",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--min-ratio 0.95 --advisory",
+      "title": "Ratio hold advisory snapshot"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S837",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "poolai-vision-sync --check` green",
+      "title": "poolai-vision-sync drift gate"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S836",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "docs",
+      "title": "PROMETHEUS_METRICS.md stand smoke sync"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S835",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "poolai-loc-audit` → `rust_ratio.json` PH-S835 zriz",
+      "title": "Rust ratio loc-audit refresh"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S834",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "bin unit tests",
+      "title": "stand smoke export shape regression suite"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S833",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "stand smoke case green",
+      "title": "live runner grid_metrics_json_prometheus_parity"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S832",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "unit tests",
+      "title": "stand smoke governance/fee parity"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S831",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "unit tests",
+      "title": "stand smoke prefetch/locality parity"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S830",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "validate_band6 extend v2",
+      "title": "stand_smoke_metrics_parity all 6 APIs"
     },
     {
       "category": "closed",
@@ -104,96 +194,6 @@
     {
       "category": "closed",
       "id": "PH-S828",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--min-ratio 0.95 --advisory",
-      "title": "Ratio hold advisory snapshot"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S827",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "poolai-vision-sync --check` green",
-      "title": "poolai-vision-sync drift gate"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S826",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "docs canon",
-      "title": "docs canon sync"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S825",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "poolai-loc-audit` → `rust_ratio.json` PH-S825 zriz",
-      "title": "Rust ratio loc-audit refresh"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S824",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "unit test",
-      "title": "concept stub vm/workers DTO"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S823",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "runner tests",
-      "title": "stand smoke vm/workers API shape"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S822",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "wasm glue tests",
-      "title": "admin/mod.rs regression PH-S820/S821"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S821",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "ui-core → wasm",
-      "title": "wasm slim workers/libs panels"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S820",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "vm admin wasm render",
-      "title": "wasm slim vm panel glue"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S819",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_horizon_s810_integration` + docs sync",
-      "title": "Horizon close band S810–S818"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S818",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",

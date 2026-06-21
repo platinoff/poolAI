@@ -238,6 +238,8 @@ pub enum StandSmokeMetricsParityDepth {
     PayoutBatchSettlement,
     FeeSplitProduction,
     GovernanceOps,
+    /// Stand smoke v2 — full grid JSON↔Prom parity (PH-S830 band 18).
+    FullGridParityV2,
 }
 
 /// Classify stand smoke metrics parity depth from optional feature stub (PH-S714/PH-S724).
@@ -247,6 +249,12 @@ pub fn stand_smoke_metrics_parity_depth_stub(
     let Some(f) = features else {
         return StandSmokeMetricsParityDepth::None;
     };
+    if f.get("full_grid_parity_v2")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        return StandSmokeMetricsParityDepth::FullGridParityV2;
+    }
     if f.get("network_profile_persist")
         .and_then(|v| v.as_bool())
         .unwrap_or(false)
@@ -414,6 +422,38 @@ pub fn validate_band6_metrics_parity(
         &REPLICATION_PRICING_PARITY[..2],
     )?;
     validate_prometheus_json_parity_pairs(prom_text, pricing, &REPLICATION_PRICING_PARITY[2..])?;
+    Ok(())
+}
+
+/// Full grid stand smoke v2 — band-6 core + prefetch/locality/fee/governance/payout-batch (PH-S830).
+pub fn validate_band6_metrics_parity_v2(
+    prom_text: &str,
+    verification: &Value,
+    replay: &Value,
+    settlement: &Value,
+    trust: &Value,
+    replication: &Value,
+    pricing: &Value,
+    prefetch: &Value,
+    locality: &Value,
+    fee_split: &Value,
+    governance: &Value,
+    payout_batch: &Value,
+) -> Result<(), String> {
+    validate_band6_metrics_parity(
+        prom_text,
+        verification,
+        replay,
+        settlement,
+        trust,
+        replication,
+        pricing,
+    )?;
+    validate_prefetch_metrics_parity(prom_text, prefetch)?;
+    validate_locality_metrics_parity(prom_text, locality)?;
+    validate_fee_split_metrics_parity(prom_text, fee_split)?;
+    validate_governance_metrics_parity(prom_text, governance)?;
+    validate_payout_batch_metrics_parity(prom_text, payout_batch)?;
     Ok(())
 }
 
@@ -737,6 +777,71 @@ mod tests {
             }
         });
         validate_locality_metrics_parity(prom, &body).expect("parity");
+    }
+
+    #[test]
+    fn stand_smoke_metrics_parity_depth_stub_band18_ph_s834() {
+        assert_eq!(
+            stand_smoke_metrics_parity_depth_stub(Some(&json!({"full_grid_parity_v2": true}))),
+            StandSmokeMetricsParityDepth::FullGridParityV2
+        );
+    }
+
+    #[test]
+    fn validate_band6_metrics_parity_v2_ph_s830() {
+        let prom = concat!(
+            "galaxy_verification_sample_total 0\n",
+            "galaxy_verification_checker_pending_total 0\n",
+            "galaxy_replay_pending 0\n",
+            "galaxy_verification_replay_record_total 0\n",
+            "galaxy_settlement_cleared_total 0\n",
+            "galaxy_settlement_payout_batch_total 0\n",
+            "galaxy_trust_payout_eligible_total 0\n",
+            "galaxy_trust_score 0\n",
+            "galaxy_replication_strict_total 0\n",
+            "galaxy_replication_enqueue_total 0\n",
+            "galaxy_pricing_fresh_served 0\n",
+            "galaxy_pricing_stale_served 0\n",
+            "galaxy_prefetch_pull_bytes_total 0\n",
+            "galaxy_prefetch_backpressure_total 0\n",
+            "galaxy_shard_local_hit_ratio 0\n",
+            "galaxy_hot_tier_hit_ratio 0\n",
+            "galaxy_cross_region_egress_mb 0\n",
+            "galaxy_hot_promote_total 0\n",
+            "galaxy_hot_evict_total 0\n",
+            "galaxy_fee_split_applied_total 0\n",
+            "poolai_release_verify_total 0\n",
+            "poolai_release_verify_fail_total 0\n",
+            "poolai_update_notify_pending 0\n",
+            "poolai_advisory_acknowledged_total 0\n",
+            "galaxy_settlement_payout_batch_queue_depth 0\n",
+        );
+        let verification = json!({"ok": true, "metrics": {"sample_total": 0, "mismatch_total": 0, "match_total": 0, "checker_pending_total": 0}});
+        let replay = json!({"ok": true, "metrics": {"replay_pending": 0, "replay_pending_scheduled_total": 0, "verification_replay_record_total": 0}});
+        let settlement = json!({"ok": true, "metrics": {"pending_verification_total": 0, "cleared_total": 0, "resolved_total": 0, "payout_batch_total": 0}});
+        let trust = json!({"ok": true, "metrics": {"payout_eligible_total": 0, "payout_held_total": 0, "last_trust_score": 0, "gate_min_threshold": 40}});
+        let replication = json!({"ok": true, "metrics": {"strict_total": 0, "enqueue_total": 0, "executor_enqueue_total": 0, "rate_limited_total": 0}});
+        let pricing = json!({"ok": true, "metrics": {"fresh_served_total": 0, "stale_served_total": 0, "forced_fallback_total": 0, "provider_catalog_lookups_total": 0}});
+        let prefetch = json!({"ok": true, "metrics": {"pull_bytes_total": 0, "backpressure_total": 0, "plan_total": 0, "enqueue_total": 0, "peer_fetch_total": 0}});
+        let locality = json!({"ok": true, "metrics": {"shard_local_hit_ratio_bps": 0, "hot_tier_hit_ratio_bps": 0, "cross_region_egress_mb": 0, "hot_promote_total": 0, "hot_evict_total": 0}});
+        let fee_split = json!({"ok": true, "metrics": {"fee_split_applied_total": 0, "primary_dev_fee_bps": 10, "secondary_admin_fee_min_bps": 100, "secondary_admin_fee_max_bps": 500}});
+        let governance = json!({"ok": true, "metrics": {"release_verify_total": 0, "release_verify_fail_total": 0, "update_notify_pending": 0, "advisory_acknowledged_total": 0}});
+        let payout_batch = json!({"ok": true, "metrics": {"payout_batch_total": 0, "payout_batch_queue_depth": 0}});
+        validate_band6_metrics_parity_v2(
+            prom,
+            &verification,
+            &replay,
+            &settlement,
+            &trust,
+            &replication,
+            &pricing,
+            &prefetch,
+            &locality,
+            &fee_split,
+            &governance,
+            &payout_batch,
+        )
+        .expect("v2 parity");
     }
 
     #[test]

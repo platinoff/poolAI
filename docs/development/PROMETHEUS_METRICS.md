@@ -98,6 +98,6 @@ Prometheus alert rules live in your monitoring stack (Prometheus / Alertmanager 
 - [`../performance/BENCHMARKS.md`](../performance/BENCHMARKS.md) — load baselines
 - [`../performance/PROFILING.md`](../performance/PROFILING.md) — hot-path profiling
 
-- [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) — stand smoke band PH-S244…S256 (`poolai-http-stand-smoke`)
+- [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) — stand smoke band PH-S244…S256 (`poolai-http-stand-smoke`); **band 18 PH-S830…S839** — `validate_band6_metrics_parity_v2` + runner `grid_metrics_json_prometheus_parity_band6_v2`
 
-**Last updated:** 2026-06-17 (PH-S414…S415 Galaxy evaluation counters ✅; stand smoke band extended).
+**Last updated:** 2026-06-21 (PH-S830…S839 stand smoke v2 full grid JSON↔Prom parity ✅; `galaxy_horizon_s830_integration`).
