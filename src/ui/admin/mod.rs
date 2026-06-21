@@ -1475,6 +1475,13 @@ fn admin_charts_grid_replication_pricing_wasm_first_ph_s701() {
 }
 
 #[test]
+fn admin_grid_pricing_freshness_wasm_first_ph_s902() {
+    let gp = include_str!("grid_pricing.rs");
+    assert!(gp.contains("renderGridPricingFreshnessStrip"));
+    assert!(!gp.contains("cache_fresh_until_secs"));
+}
+
+#[test]
 fn admin_charts_ml_canvas_glue_wasm_only_ph_s701() {
     let js = include_str!("../admin_charts.js");
     assert!(js.contains("wasm.flattenMlStepRows"));

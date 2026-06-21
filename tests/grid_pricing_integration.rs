@@ -102,3 +102,19 @@ async fn grid_pricing_rejects_invalid_unit_key() {
     .await;
     assert_eq!(status, StatusCode::BAD_REQUEST);
 }
+
+#[tokio::test]
+async fn grid_pricing_forced_fallback_stable_quote_ph_s901() {
+    let _lock = pricing_lock();
+    reset_pricing_oracle_for_tests(true, Some(470_000));
+    let app = grid_app();
+    let model = "ph-s901-pricing-forced-fallback";
+
+    let (status, body) = get_json(&app, &pricing_uri(model, "inference_blended_token")).await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body["ok"], true);
+    assert_eq!(body["source"], "oracle");
+    assert_eq!(body["freshness"], "fresh");
+    assert_eq!(body["snapshot"]["poolai_quote_usd_micro"], 470_000);
+    assert_eq!(body["snapshot"]["provider_id_at_min"], "fallback_l2_config");
+}

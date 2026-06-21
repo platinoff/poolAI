@@ -3,71 +3,71 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S900",
+      "id": "PH-S910",
       "link": "docs/vision/index.html#sprint-queue",
       "next": true,
       "published": "2026-05-28",
       "status": "open",
-      "summary": "oracle unit + integration",
-      "title": "pricing live provider timeout hardening"
+      "summary": "galaxy_trust_score_store wire",
+      "title": "trust score SQLite persist"
     },
     {
       "category": "open",
-      "id": "PH-S901",
+      "id": "PH-S911",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "stand smoke",
-      "title": "pricing forced-fallback stand smoke"
+      "summary": "low trust → held metric",
+      "title": "trust payout gate integration"
     },
     {
       "category": "open",
-      "id": "PH-S902",
+      "id": "PH-S912",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "freshness metadata display",
-      "title": "admin grid-pricing wasm polish"
+      "summary": "trust metrics strip",
+      "title": "admin trust metrics wasm strip"
     },
     {
       "category": "open",
-      "id": "PH-S903",
+      "id": "PH-S913",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
       "summary": "JSON↔Prom",
-      "title": "stand smoke pricing-metrics parity"
+      "title": "stand smoke trust-metrics parity"
     },
     {
       "category": "open",
-      "id": "PH-S904",
+      "id": "PH-S914",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
       "summary": "unit test",
-      "title": "pricing depth stub"
+      "title": "trust persist depth stub"
     },
     {
       "category": "open",
-      "id": "PH-S905",
+      "id": "PH-S915",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
       "summary": "rust_ratio.json zriz",
-      "title": "poolai-loc-audit PH-S905"
+      "title": "poolai-loc-audit PH-S915"
     },
     {
       "category": "open",
-      "id": "PH-S906",
+      "id": "PH-S916",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
       "summary": "docs canon",
-      "title": "Galaxy §4.2 live fetch ✅ docs"
+      "title": "Galaxy §6.5 trust persist ✅ docs"
     },
     {
       "category": "open",
-      "id": "PH-S907",
+      "id": "PH-S917",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -76,7 +76,7 @@
     },
     {
       "category": "open",
-      "id": "PH-S908",
+      "id": "PH-S918",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -85,12 +85,102 @@
     },
     {
       "category": "open",
-      "id": "PH-S909",
+      "id": "PH-S919",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
+      "summary": "galaxy_horizon_s910_integration",
+      "title": "Horizon close band S910–S918"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S909",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
       "summary": "galaxy_horizon_s900_integration",
       "title": "Horizon close band S900–S908"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S908",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--min-ratio 0.95 --advisory",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S907",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--check` green",
+      "title": "poolai-vision-sync --check"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S906",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "docs canon",
+      "title": "Galaxy §4.2 live fetch ✅ docs"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S905",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "rust_ratio.json zriz",
+      "title": "poolai-loc-audit PH-S905"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S904",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "unit test",
+      "title": "pricing depth stub"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S903",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "JSON↔Prom",
+      "title": "stand smoke pricing-metrics parity"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S902",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "freshness metadata display",
+      "title": "admin grid-pricing wasm polish"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S901",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "stand smoke",
+      "title": "pricing forced-fallback stand smoke"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S900",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "oracle unit + integration",
+      "title": "pricing live provider timeout hardening"
     },
     {
       "category": "closed",
@@ -104,96 +194,6 @@
     {
       "category": "closed",
       "id": "PH-S898",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--min-ratio 0.95 --advisory",
-      "title": "Ratio hold advisory"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S897",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--check` green",
-      "title": "poolai-vision-sync --check"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S896",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "docs ✅",
-      "title": "Galaxy §6.4 implemented"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S895",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "rust_ratio.json zriz",
-      "title": "poolai-loc-audit PH-S895"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S894",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "unit test",
-      "title": "replication depth stub"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S893",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "JSON↔Prom",
-      "title": "stand smoke replication metrics parity"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S892",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "ui-core regression",
-      "title": "admin replication-pricing wasm polish"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S891",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "integration test",
-      "title": "replication rate cap HTTP wire"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S890",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "strict tier integration",
-      "title": "replication quorum gate production"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S889",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_horizon_s880_integration",
-      "title": "Horizon close band S880–S888"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S888",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",

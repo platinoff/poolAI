@@ -456,16 +456,23 @@ async fn get_grid_replication_metrics(
 struct GridPricingMetricsResponse {
     ok: bool,
     metrics: crate::grid::galaxy_pricing_metrics::PricingMetricsSnapshot,
+    /// Pricing oracle production depth wire label (PH-S904).
+    pricing_depth: &'static str,
+    /// Live provider HTTP timeout from env ms (PH-S900).
+    provider_http_timeout_ms: u64,
 }
 
 async fn get_grid_pricing_metrics(
     State(_ctx): State<ApiContext>,
 ) -> Result<(StatusCode, Json<GridPricingMetricsResponse>), HttpAppError> {
+    let depth = crate::grid::galaxy_pricing_depth::current_pricing_depth();
     Ok((
         StatusCode::OK,
         Json(GridPricingMetricsResponse {
             ok: true,
             metrics: crate::grid::galaxy_pricing_metrics::pricing_metrics_snapshot(),
+            pricing_depth: crate::grid::galaxy_pricing_depth::pricing_depth_wire_label(depth),
+            provider_http_timeout_ms: provider_http_timeout_ms_from_env(),
         }),
     ))
 }

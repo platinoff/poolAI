@@ -44,6 +44,8 @@ pub enum AdminWasmSlimDepth {
     GridVerificationMetricsStrip,
     /// Grid replication-pricing rate cap strip wasm renderer (PH-S892).
     GridReplicationPricingRateCapStrip,
+    /// Grid pricing L1 freshness metadata strip wasm renderer (PH-S902).
+    GridPricingFreshnessStrip,
 }
 
 /// Classify admin wasm slim depth from optional feature stub (PH-S704).
@@ -80,6 +82,12 @@ pub fn admin_wasm_slim_depth_stub(features: Option<&Value>) -> AdminWasmSlimDept
         .unwrap_or(false)
     {
         return AdminWasmSlimDepth::GridReplicationPricingRateCapStrip;
+    }
+    if f.get("grid_pricing_freshness_strip")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        return AdminWasmSlimDepth::GridPricingFreshnessStrip;
     }
     if f.get("grid_verification_panel")
         .and_then(|v| v.as_bool())
@@ -320,6 +328,14 @@ mod tests {
                 &json!({"grid_replication_pricing_rate_cap_strip": true})
             )),
             AdminWasmSlimDepth::GridReplicationPricingRateCapStrip
+        );
+    }
+
+    #[test]
+    fn admin_wasm_slim_depth_stub_ph_s902() {
+        assert_eq!(
+            admin_wasm_slim_depth_stub(Some(&json!({"grid_pricing_freshness_strip": true}))),
+            AdminWasmSlimDepth::GridPricingFreshnessStrip
         );
     }
 }

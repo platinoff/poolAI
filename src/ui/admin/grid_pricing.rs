@@ -47,7 +47,17 @@ pub async fn admin_grid_pricing() -> Html<String> {
       const unit = String(snap.unit_key || '—');
       const usdMicro = snap.usd_micro;
       const updatedAt = snap.updated_at;
+      let freshnessStrip = '';
+      try {
+        const i18nPatch = window.__poolaiAdminI18nRust || {};
+        const lang = (typeof poolaiGetLang === 'function' ? poolaiGetLang() : 'en') || 'en';
+        const i18nJson = JSON.stringify(i18nPatch[lang] || i18nPatch.en || {});
+        if (window.poolaiUiWasm && typeof window.poolaiUiWasm.renderGridPricingFreshnessStrip === 'function') {
+          freshnessStrip = window.poolaiUiWasm.renderGridPricingFreshnessStrip(JSON.stringify(data), i18nJson);
+        }
+      } catch (_) {}
       el.innerHTML =
+        (freshnessStrip || '') +
         '<div id="grid-pricing-result" class="admin-card">' +
         '<h3>' + escapeHtml(T('admin.gridPricing.result', 'Pricing snapshot')) + '</h3>' +
         '<dl class="admin-dl">' +
@@ -221,4 +231,10 @@ async fn admin_grid_pricing_fee_split_wasm_glue_ph_s781() {
     assert!(html.contains("/api/v1/grid/fee-split-metrics"));
     assert!(html.contains("renderGridFeeSplitMetricsStrip"));
     assert!(html.contains("loadGridPricingFeeSplitStrip"));
+}
+
+#[tokio::test]
+async fn admin_grid_pricing_freshness_wasm_glue_ph_s902() {
+    let html = admin_grid_pricing().await.0;
+    assert!(html.contains("renderGridPricingFreshnessStrip"));
 }

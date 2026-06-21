@@ -75,8 +75,9 @@ use crate::grid::galaxy_pricing_oracle::{
 };
 use crate::grid::galaxy_pricing_provider_metrics::{
     provider_catalog_hits_total, provider_catalog_lookups_total, provider_errors_total,
-    METRIC_PROVIDER_CATALOG_HITS_TOTAL, METRIC_PROVIDER_CATALOG_LOOKUPS_TOTAL,
-    METRIC_PROVIDER_ERRORS_TOTAL,
+    provider_timeouts_total, METRIC_PROVIDER_CATALOG_HITS_TOTAL,
+    METRIC_PROVIDER_CATALOG_LOOKUPS_TOTAL, METRIC_PROVIDER_ERRORS_TOTAL,
+    METRIC_PROVIDER_TIMEOUTS_TOTAL,
 };
 use crate::grid::galaxy_protocol_negotiation_metrics::{
     protocol_negotiation_accepted_total, protocol_negotiation_rejected_total,
@@ -166,6 +167,7 @@ pub struct PoolAiPrometheus {
     galaxy_pricing_provider_catalog_lookups_total: IntGauge,
     galaxy_pricing_provider_catalog_hits_total: IntGauge,
     galaxy_pricing_provider_errors_total: IntGauge,
+    galaxy_pricing_provider_timeouts_total: IntGauge,
     galaxy_trust_payout_eligible_total: IntGauge,
     galaxy_trust_payout_held_total: IntGauge,
     galaxy_trust_payout_not_applicable_total: IntGauge,
@@ -456,6 +458,15 @@ fn build_prometheus() -> PoolAiPrometheus {
     registry
         .register(Box::new(galaxy_pricing_provider_errors_total.clone()))
         .expect("register galaxy_pricing_provider_errors_total");
+
+    let galaxy_pricing_provider_timeouts_total = IntGauge::with_opts(Opts::new(
+        METRIC_PROVIDER_TIMEOUTS_TOTAL,
+        "Galaxy pricing live provider HTTP fetch timeouts (PH-S900)",
+    ))
+    .expect(METRIC_PROVIDER_TIMEOUTS_TOTAL);
+    registry
+        .register(Box::new(galaxy_pricing_provider_timeouts_total.clone()))
+        .expect("register galaxy_pricing_provider_timeouts_total");
 
     let galaxy_trust_payout_eligible_total = IntGauge::with_opts(Opts::new(
         METRIC_PAYOUT_ELIGIBLE_TOTAL,
@@ -1343,6 +1354,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_pricing_provider_catalog_lookups_total,
         galaxy_pricing_provider_catalog_hits_total,
         galaxy_pricing_provider_errors_total,
+        galaxy_pricing_provider_timeouts_total,
         galaxy_trust_payout_eligible_total,
         galaxy_trust_payout_held_total,
         galaxy_trust_payout_not_applicable_total,
@@ -1461,6 +1473,8 @@ pub fn refresh_galaxy_pricing_gauges() {
         .set(provider_catalog_hits_total() as i64);
     prom.galaxy_pricing_provider_errors_total
         .set(provider_errors_total() as i64);
+    prom.galaxy_pricing_provider_timeouts_total
+        .set(provider_timeouts_total() as i64);
 }
 
 /// Mirror in-process trust gate counters into Prometheus gauges (scrape snapshot).

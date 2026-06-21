@@ -1,17 +1,18 @@
 # Galaxy Grid roadmap (зріз)
 
-**Оновлено:** 2026-06-21 · **Completion v2:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · **111** pending PH-S910…S1010 · **§5.12 active:** 10
+**Оновлено:** 2026-06-21 · **Completion v2:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · **101** pending PH-S910…S1010 · **§5.12 active:** 10
 
 | Зріз | Значення |
 |------|----------|
 | **Completion plan** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.14–§5.15** |
 | **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) |
-| **Active drain (band 25)** | PH-S900…S909 — Pricing oracle live fetch hardening |
+| **Active drain (band 26)** | PH-S910…S919 — Trust score SQLite persist |
+| **Last closed (band 25)** | PH-S900…S909 ✅ — Pricing oracle live fetch hardening |
 | **Last closed (band 24)** | PH-S890…S899 ✅ — Replication quorum production gates |
 | **Product-complete tail** | PH-S1010 — FM **§5.15** |
-| **Rust ratio** | **94.74%** · hold **95%** advisory (bands 28–29 formal gate) |
+| **Rust ratio** | **94.74%** → PH-S905 zriz · hold **95%** advisory (bands 28–29 formal gate) |
 
-**111** pending · **12** `абракадабра` sessions · остання закрита **PH-S890…S899** ✅.
+**101** pending · **11** `абракадабра` sessions · остання закрита **PH-S900…S909** ✅.
 
 ---
 
@@ -45,6 +46,7 @@
 | **Solana on-chain cleared depth** | FM-010 / §7 | band 22 ✅ PH-S870…S879 |
 | **§6.2 verification checker lifecycle** | Galaxy **§6.2** | band 23 ✅ PH-S880…S889 |
 | **§6.4 replication quorum production** | Galaxy **§6.4** | band 24 ✅ PH-S890…S899 |
+| **§4.2 pricing live fetch hardening** | Galaxy **§4.2** | band 25 ✅ PH-S900…S909 |
 | **network_profile persist stub** | Galaxy **§8** | PH-S664 ✅ (stub); full persist ✅ band 8 PH-S730…S739 |
 
 **§5.5 prefetch:** live pull + backpressure + strict-mode HTTP wire ✅ (baseline); live pull **depth** ✅ band 10 (PH-S750…S759).

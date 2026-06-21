@@ -38,7 +38,9 @@ use poolai_ui_core::network_profiles::render_network_profiles_panel_html;
 use poolai_ui_core::payout_batch::{
     render_payout_batch_history_strip_html, render_payout_batch_panel_html,
 };
-use poolai_ui_core::pricing::{format_unix_secs, format_usd_micro};
+use poolai_ui_core::pricing::{
+    format_unix_secs, format_usd_micro, render_grid_pricing_freshness_strip_html,
+};
 use poolai_ui_core::prometheus::parse_prometheus_gauge;
 use poolai_ui_core::security::render_secret_rotation_panel_html;
 use poolai_ui_core::stand_smoke_metrics::{
@@ -71,6 +73,15 @@ pub fn format_usd_micro_wasm(usd_micro: f64) -> String {
 #[wasm_bindgen(js_name = formatUnixSecs)]
 pub fn format_unix_secs_wasm(secs: f64) -> String {
     format_unix_secs(Some(secs))
+}
+
+/// Grid pricing: L1 freshness metadata strip (PH-S902).
+#[wasm_bindgen(js_name = renderGridPricingFreshnessStrip)]
+pub fn render_grid_pricing_freshness_strip_wasm(
+    pricing_response_json: &str,
+    i18n_json: &str,
+) -> String {
+    render_grid_pricing_freshness_strip_html(pricing_response_json, i18n_json)
 }
 
 /// Admin theme: maps stored name to `dark` | `light` | `high-contrast`.

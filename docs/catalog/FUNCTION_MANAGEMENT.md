@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-21 (PH-S890…S899 ✅ · master backlog **111** · active **10** · vision **rev 290** · rust_ratio **94.74%**)
+**Оновлено:** 2026-06-21 (PH-S900…S909 ✅ · master backlog **101** · active **10** · vision **rev 291** · rust_ratio **94.77%**)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -1099,20 +1099,30 @@ FM-xxx (з таблиці нижче)
 | 832 | **PH-S897** | poolai-vision-sync --check | ops | `--check` green | **✅** |
 | 833 | **PH-S898** | Ratio hold advisory | ops | `--min-ratio 0.95 --advisory` | **✅** |
 | 834 | **PH-S899** | Horizon close band S890–S898 | Replication | `galaxy_horizon_s890_integration` | **✅** |
-| 835 | **PH-S900** | pricing live provider timeout hardening | Galaxy §4.2 | oracle unit + integration | **[ ]** |
-| 836 | **PH-S901** | pricing forced-fallback stand smoke | PH-S123 pattern | stand smoke | **[ ]** |
-| 837 | **PH-S902** | admin grid-pricing wasm polish | ui-core | freshness metadata display | **[ ]** |
-| 838 | **PH-S903** | stand smoke pricing-metrics parity | tests | JSON↔Prom | **[ ]** |
-| 839 | **PH-S904** | pricing depth stub | concept | unit test | **[ ]** |
-| 840 | **PH-S905** | poolai-loc-audit PH-S905 | §5.13 | rust_ratio.json zriz | **[ ]** |
-| 841 | **PH-S906** | Galaxy §4.2 live fetch ✅ docs | docs | docs canon | **[ ]** |
-| 842 | **PH-S907** | poolai-vision-sync --check | ops | `--check` green | **[ ]** |
-| 843 | **PH-S908** | Ratio hold advisory | ops | `--min-ratio 0.95 --advisory` | **[ ]** |
-| 844 | **PH-S909** | Horizon close band S900–S908 | Pricing | `galaxy_horizon_s900_integration` | **[ ]** |
+| 835 | **PH-S900** | pricing live provider timeout hardening | Galaxy §4.2 | oracle unit + integration | **✅** |
+| 836 | **PH-S901** | pricing forced-fallback stand smoke | PH-S123 pattern | stand smoke | **✅** |
+| 837 | **PH-S902** | admin grid-pricing wasm polish | ui-core | freshness metadata display | **✅** |
+| 838 | **PH-S903** | stand smoke pricing-metrics parity | tests | JSON↔Prom | **✅** |
+| 839 | **PH-S904** | pricing depth stub | concept | unit test | **✅** |
+| 840 | **PH-S905** | poolai-loc-audit PH-S905 | §5.13 | rust_ratio.json zriz | **✅** |
+| 841 | **PH-S906** | Galaxy §4.2 live fetch ✅ docs | docs | docs canon | **✅** |
+| 842 | **PH-S907** | poolai-vision-sync --check | ops | `--check` green | **✅** |
+| 843 | **PH-S908** | Ratio hold advisory | ops | `--min-ratio 0.95 --advisory` | **✅** |
+| 844 | **PH-S909** | Horizon close band S900–S908 | Pricing | `galaxy_horizon_s900_integration` | **✅** |
+| 845 | **PH-S910** | trust score SQLite persist | Galaxy §6.5 | galaxy_trust_score_store wire | **[ ]** |
+| 846 | **PH-S911** | trust payout gate integration | Galaxy §6.5 | low trust → held metric | **[ ]** |
+| 847 | **PH-S912** | admin trust metrics wasm strip | ui-core | trust metrics strip | **[ ]** |
+| 848 | **PH-S913** | stand smoke trust-metrics parity | tests | JSON↔Prom | **[ ]** |
+| 849 | **PH-S914** | trust persist depth stub | concept | unit test | **[ ]** |
+| 850 | **PH-S915** | poolai-loc-audit PH-S915 | §5.13 | rust_ratio.json zriz | **[ ]** |
+| 851 | **PH-S916** | Galaxy §6.5 trust persist ✅ docs | docs | docs canon | **[ ]** |
+| 852 | **PH-S917** | poolai-vision-sync --check | ops | `--check` green | **[ ]** |
+| 853 | **PH-S918** | Ratio hold advisory | ops | `--min-ratio 0.95 --advisory` | **[ ]** |
+| 854 | **PH-S919** | Horizon close band S910–S918 | Trust | `galaxy_horizon_s910_integration` | **[ ]** |
 
-**Відкритих у §5.12:** **10** (PH-S900…S909). **Master backlog:** **111** pending PH-S910…S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · **§5.14**. Vision rev **290** (after sync). rust_ratio **94.74%** (PH-S895).
+**Відкритих у §5.12:** **10** (PH-S910…S919). **Master backlog:** **101** pending PH-S920…S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · **§5.14**. Vision rev **291** (after sync). rust_ratio **94.77%** (PH-S905).
 
-**Наступна сесія:** **`абракадабра`** — drain PH-S900…S909 → promote PH-S910…S919 з §5.14 → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **`абракадабра`** — drain PH-S910…S919 → promote PH-S920…S929 з §5.14 → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.14 Master backlog PH-S720…S1010 (291 pending → product-complete, 2026-06-20)
 
@@ -1120,11 +1130,11 @@ FM-xxx (з таблиці нижче)
 
 | Поле | Значення |
 |------|----------|
-| **Pending** | **111** (PH-S910…S1010) |
-| **Drained bands 1–24** | PH-S660…S899 ✅ |
-| **Активна §5.12** | PH-S900…S909 `[ ]` — band 25 Pricing oracle live fetch hardening |
-| **Наступна promote** | PH-S910…S919 — band 26 Trust score SQLite persist |
-| **Сесій `абракадабра`** | **13** (12×10 + tail PH-S1010) |
+| **Pending** | **101** (PH-S920…S1010) |
+| **Drained bands 1–25** | PH-S660…S909 ✅ |
+| **Активна §5.12** | PH-S910…S919 `[ ]` — band 26 Trust score SQLite persist |
+| **Наступна promote** | PH-S920…S929 — band 27 wasm admin_charts migration |
+| **Сесій `абракадабра`** | **11** (10×10 + tail PH-S1010) |
 | **План фаз** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md) |
 | **Реєстр sprint×acceptance** | [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) |
 | **Regen** | `bash scripts/generate-ph-s-master-backlog-351.sh` |
@@ -1173,7 +1183,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-06-21):** PH-S900…S909 **[ ]** drain band 25 (Pricing oracle live fetch hardening) · **`абракадабра`** = drain → vision close → push · ratio formal gate bands **28–29** per [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md).
+**Активна смуга (2026-06-21):** PH-S910…S919 **[ ]** drain band 26 (Trust score SQLite persist) · **`абракадабра`** = drain → vision close → push · ratio formal gate bands **28–29** per [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md).
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

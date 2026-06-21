@@ -15,9 +15,13 @@ pub const METRIC_PROVIDER_CATALOG_HITS_TOTAL: &str = "galaxy_pricing_provider_ca
 /// Live provider HTTP fetch failures (network, non-2xx, parse, missing unit) — PH-S173.
 pub const METRIC_PROVIDER_ERRORS_TOTAL: &str = "galaxy_pricing_provider_errors_total";
 
+/// Live provider HTTP fetch timeouts (connect or request) — PH-S900.
+pub const METRIC_PROVIDER_TIMEOUTS_TOTAL: &str = "galaxy_pricing_provider_timeouts_total";
+
 static LOOKUPS_TOTAL: AtomicU64 = AtomicU64::new(0);
 static HITS_TOTAL: AtomicU64 = AtomicU64::new(0);
 static ERRORS_TOTAL: AtomicU64 = AtomicU64::new(0);
+static TIMEOUTS_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// Record one catalog lookup and how many providers matched the allow-list filters.
 pub fn record_provider_catalog_lookup(matching_count: usize) {
@@ -42,11 +46,21 @@ pub fn provider_errors_total() -> u64 {
     ERRORS_TOTAL.load(Ordering::Relaxed)
 }
 
+/// Record one timed-out live provider fetch attempt (PH-S900).
+pub fn record_provider_fetch_timeout() {
+    TIMEOUTS_TOTAL.fetch_add(1, Ordering::Relaxed);
+}
+
+pub fn provider_timeouts_total() -> u64 {
+    TIMEOUTS_TOTAL.load(Ordering::Relaxed)
+}
+
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_provider_catalog_metrics_for_test() {
     LOOKUPS_TOTAL.store(0, Ordering::Relaxed);
     HITS_TOTAL.store(0, Ordering::Relaxed);
     ERRORS_TOTAL.store(0, Ordering::Relaxed);
+    TIMEOUTS_TOTAL.store(0, Ordering::Relaxed);
 }
 
 #[cfg(test)]
@@ -69,6 +83,14 @@ mod tests {
         record_provider_fetch_error();
         record_provider_fetch_error();
         assert_eq!(provider_errors_total(), 2);
+        reset_provider_catalog_metrics_for_test();
+    }
+
+    #[test]
+    fn record_provider_fetch_timeout_increments_counter_ph_s900() {
+        reset_provider_catalog_metrics_for_test();
+        record_provider_fetch_timeout();
+        assert_eq!(provider_timeouts_total(), 1);
         reset_provider_catalog_metrics_for_test();
     }
 }

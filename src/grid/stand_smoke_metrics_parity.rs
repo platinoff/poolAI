@@ -47,6 +47,37 @@ pub const PRICING_JSON_KEYS: &[&str] = &[
     "stale_served_total",
     "forced_fallback_total",
     "provider_catalog_lookups_total",
+    "provider_catalog_hits_total",
+    "provider_errors_total",
+    "provider_timeouts_total",
+];
+
+/// Prometheus gauge name ↔ JSON metrics field pairs — pricing production (PH-S903).
+pub const PRICING_PRODUCTION_PARITY: &[(&str, &str)] = &[
+    (
+        crate::grid::galaxy_pricing_oracle::METRIC_FRESH_SERVED_TOTAL,
+        "fresh_served_total",
+    ),
+    (
+        crate::grid::galaxy_pricing_oracle::METRIC_STALE_SERVED_TOTAL,
+        "stale_served_total",
+    ),
+    (
+        crate::grid::galaxy_pricing_oracle::METRIC_FORCED_FALLBACK_TOTAL,
+        "forced_fallback_total",
+    ),
+    (
+        crate::grid::galaxy_pricing_provider_metrics::METRIC_PROVIDER_CATALOG_LOOKUPS_TOTAL,
+        "provider_catalog_lookups_total",
+    ),
+    (
+        crate::grid::galaxy_pricing_provider_metrics::METRIC_PROVIDER_ERRORS_TOTAL,
+        "provider_errors_total",
+    ),
+    (
+        crate::grid::galaxy_pricing_provider_metrics::METRIC_PROVIDER_TIMEOUTS_TOTAL,
+        "provider_timeouts_total",
+    ),
 ];
 
 /// Required JSON export keys for stand smoke prefetch-metrics API (PH-S753).
@@ -256,6 +287,8 @@ pub enum StandSmokeMetricsParityDepth {
     VerificationCheckerLifecycle,
     /// Replication quorum production depth (PH-S893 band 24).
     ReplicationQuorumProduction,
+    /// Pricing oracle live fetch production depth (PH-S903 band 25).
+    PricingProduction,
 }
 
 /// Classify stand smoke metrics parity depth from optional feature stub (PH-S714/PH-S724).
@@ -294,6 +327,12 @@ pub fn stand_smoke_metrics_parity_depth_stub(
         .unwrap_or(false)
     {
         return StandSmokeMetricsParityDepth::ReplicationQuorumProduction;
+    }
+    if f.get("pricing_production")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        return StandSmokeMetricsParityDepth::PricingProduction;
     }
     if f.get("network_profile_persist")
         .and_then(|v| v.as_bool())
@@ -541,6 +580,13 @@ pub fn validate_fee_split_metrics_parity(prom_text: &str, fee_split: &Value) -> 
     Ok(())
 }
 
+/// Validate pricing-metrics JSON export vs Prometheus gauges (PH-S903).
+pub fn validate_pricing_metrics_parity(prom_text: &str, pricing: &Value) -> Result<(), String> {
+    validate_grid_metrics_json_export(pricing, PRICING_JSON_KEYS)?;
+    validate_prometheus_json_parity_pairs(prom_text, pricing, PRICING_PRODUCTION_PARITY)?;
+    Ok(())
+}
+
 /// Validate governance-metrics JSON export vs Prometheus gauges (PH-S791).
 pub fn validate_governance_metrics_parity(
     prom_text: &str,
@@ -639,6 +685,9 @@ mod tests {
                 "stale_served_total": 0,
                 "forced_fallback_total": 0,
                 "provider_catalog_lookups_total": 0,
+                "provider_catalog_hits_total": 0,
+                "provider_errors_total": 0,
+                "provider_timeouts_total": 0
             }
         });
         validate_grid_metrics_json_export(&pricing, PRICING_JSON_KEYS).expect("pricing");
@@ -855,6 +904,10 @@ mod tests {
             )),
             StandSmokeMetricsParityDepth::ReplicationQuorumProduction
         );
+        assert_eq!(
+            stand_smoke_metrics_parity_depth_stub(Some(&json!({"pricing_production": true}))),
+            StandSmokeMetricsParityDepth::PricingProduction
+        );
     }
 
     #[test]
@@ -900,7 +953,7 @@ mod tests {
         let settlement = json!({"ok": true, "metrics": {"pending_verification_total": 0, "cleared_total": 0, "resolved_total": 0, "payout_batch_total": 0}});
         let trust = json!({"ok": true, "metrics": {"payout_eligible_total": 0, "payout_held_total": 0, "last_trust_score": 0, "gate_min_threshold": 40}});
         let replication = json!({"ok": true, "metrics": {"strict_total": 0, "enqueue_total": 0, "executor_enqueue_total": 0, "rate_limited_total": 0}});
-        let pricing = json!({"ok": true, "metrics": {"fresh_served_total": 0, "stale_served_total": 0, "forced_fallback_total": 0, "provider_catalog_lookups_total": 0}});
+        let pricing = json!({"ok": true, "metrics": {"fresh_served_total": 0, "stale_served_total": 0, "forced_fallback_total": 0, "provider_catalog_lookups_total": 0, "provider_catalog_hits_total": 0, "provider_errors_total": 0, "provider_timeouts_total": 0}});
         let prefetch = json!({"ok": true, "metrics": {"pull_bytes_total": 0, "backpressure_total": 0, "plan_total": 0, "enqueue_total": 0, "peer_fetch_total": 0}});
         let locality = json!({"ok": true, "metrics": {"shard_local_hit_ratio_bps": 0, "hot_tier_hit_ratio_bps": 0, "cross_region_egress_mb": 0, "hot_promote_total": 0, "hot_evict_total": 0}});
         let fee_split = json!({"ok": true, "metrics": {"fee_split_applied_total": 0, "primary_dev_fee_bps": 10, "secondary_admin_fee_min_bps": 100, "secondary_admin_fee_max_bps": 500}});

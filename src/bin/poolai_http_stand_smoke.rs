@@ -1331,10 +1331,87 @@ async fn smoke_grid_pricing_metrics_api(client: &Client, base: &str) -> Result<(
         "stale_served_total",
         "forced_fallback_total",
         "provider_catalog_lookups_total",
+        "provider_catalog_hits_total",
+        "provider_errors_total",
+        "provider_timeouts_total",
     ] {
         if !metrics.get(key).and_then(|v| v.as_u64()).is_some() {
             return Err(format!("pricing-metrics missing {key}: {body}"));
         }
+    }
+    if body.get("pricing_depth").and_then(|v| v.as_str()).is_none() {
+        return Err(format!("pricing-metrics missing pricing_depth: {body}"));
+    }
+    if body
+        .get("provider_http_timeout_ms")
+        .and_then(|v| v.as_u64())
+        .is_none()
+    {
+        return Err(format!(
+            "pricing-metrics missing provider_http_timeout_ms: {body}"
+        ));
+    }
+    Ok(())
+}
+
+/// PH-S903: stand smoke pricing-metrics JSON↔Prom parity.
+async fn smoke_pricing_metrics_json_prometheus_parity(
+    client: &Client,
+    base: &str,
+) -> Result<(), String> {
+    use poolai::grid::stand_smoke_metrics_parity::validate_pricing_metrics_parity;
+
+    let prom_resp = client
+        .get(api_url(base, "/metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("/metrics request: {e}"))?;
+    if prom_resp.status() != StatusCode::OK {
+        return Err(format!("/metrics status {}", prom_resp.status()));
+    }
+    let prom_text = prom_resp.text().await.map_err(|e| e.to_string())?;
+
+    let resp = client
+        .get(api_url(base, "/api/v1/grid/pricing-metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("pricing-metrics request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("pricing-metrics status {}", resp.status()));
+    }
+    let pricing: Value = resp.json().await.map_err(|e| e.to_string())?;
+    validate_pricing_metrics_parity(&prom_text, &pricing)
+}
+
+/// PH-S901: grid pricing L2 fallback stable snapshot (PH-S123 pattern).
+async fn smoke_grid_pricing_l2_fallback_stable(client: &Client, base: &str) -> Result<(), String> {
+    let model = smoke_id("smoke-pricing-fallback");
+    let url = format!(
+        "{}/api/v1/grid/pricing?task_profile=inference:text&model_profile={model}&unit_key=inference_blended_token",
+        base.trim_end_matches('/')
+    );
+    let resp = client.get(&url).send().await.map_err(|e| e.to_string())?;
+    if resp.status() == StatusCode::SERVICE_UNAVAILABLE {
+        return Ok(());
+    }
+    if resp.status() != StatusCode::OK {
+        return Err(format!("grid pricing fallback status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    if body.get("ok").and_then(|v| v.as_bool()) != Some(true) {
+        return Err(format!("grid pricing fallback body: {body}"));
+    }
+    let snap = body
+        .get("snapshot")
+        .ok_or_else(|| format!("grid pricing fallback missing snapshot: {body}"))?;
+    if snap
+        .get("poolai_quote_usd_micro")
+        .and_then(|v| v.as_u64())
+        .is_none()
+    {
+        return Err(format!(
+            "grid pricing fallback missing poolai_quote_usd_micro: {body}"
+        ));
     }
     Ok(())
 }
@@ -2641,6 +2718,18 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
     .await;
     record(
         &mut cases,
+        "pricing_metrics_json_prometheus_parity",
+        smoke_pricing_metrics_json_prometheus_parity(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
+        "grid_pricing_l2_fallback_stable",
+        smoke_grid_pricing_l2_fallback_stable(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
         "grid_prefetch_metrics_api",
         smoke_grid_prefetch_metrics_api(&client, &cli.base_url).await,
     )
@@ -3359,9 +3448,66 @@ mod tests {
 
     #[test]
     fn grid_pricing_metrics_api_export_shape_ph_s693() {
-        let sample = r#"{"ok":true,"metrics":{"fresh_served_total":0,"stale_served_total":0,"forced_fallback_total":0,"provider_catalog_lookups_total":0,"provider_catalog_hits_total":0,"provider_errors_total":0}}"#;
+        let sample = r#"{"ok":true,"pricing_depth":"none","provider_http_timeout_ms":1500,"metrics":{"fresh_served_total":0,"stale_served_total":0,"forced_fallback_total":0,"provider_catalog_lookups_total":0,"provider_catalog_hits_total":0,"provider_errors_total":0,"provider_timeouts_total":0}}"#;
         let body: Value = serde_json::from_str(sample).expect("json");
         assert_eq!(body["metrics"]["fresh_served_total"], 0);
+        assert_eq!(body["pricing_depth"], "none");
+    }
+
+    #[test]
+    fn grid_pricing_depth_export_shape_ph_s903() {
+        use poolai::grid::galaxy_pricing_depth::{
+            pricing_depth_stub, pricing_depth_wire_label, PricingDepth,
+        };
+        use poolai::grid::galaxy_pricing_metrics::PricingMetricsSnapshot;
+        use poolai::grid::stand_smoke_metrics_parity::{
+            stand_smoke_metrics_parity_depth_stub, validate_pricing_metrics_parity,
+            StandSmokeMetricsParityDepth,
+        };
+        use serde_json::json;
+
+        let snap = PricingMetricsSnapshot {
+            fresh_served_total: 1,
+            stale_served_total: 0,
+            forced_fallback_total: 0,
+            provider_catalog_lookups_total: 1,
+            provider_catalog_hits_total: 1,
+            provider_errors_total: 0,
+            provider_timeouts_total: 0,
+        };
+        assert_eq!(
+            pricing_depth_stub(Some(&snap), 1500),
+            PricingDepth::LiveFetch
+        );
+        assert_eq!(
+            pricing_depth_wire_label(PricingDepth::LiveFetch),
+            "live_fetch"
+        );
+        assert_eq!(
+            stand_smoke_metrics_parity_depth_stub(Some(&json!({"pricing_production": true}))),
+            StandSmokeMetricsParityDepth::PricingProduction
+        );
+        let prom = concat!(
+            "galaxy_pricing_fresh_served 1\n",
+            "galaxy_pricing_stale_served 0\n",
+            "galaxy_pricing_forced_fallback_total 0\n",
+            "galaxy_pricing_provider_catalog_lookups_total 1\n",
+            "galaxy_pricing_provider_errors_total 0\n",
+            "galaxy_pricing_provider_timeouts_total 0\n",
+        );
+        let pricing = json!({
+            "ok": true,
+            "metrics": {
+                "fresh_served_total": 1,
+                "stale_served_total": 0,
+                "forced_fallback_total": 0,
+                "provider_catalog_lookups_total": 1,
+                "provider_catalog_hits_total": 1,
+                "provider_errors_total": 0,
+                "provider_timeouts_total": 0
+            }
+        });
+        validate_pricing_metrics_parity(prom, &pricing).expect("parity");
     }
 
     #[test]
@@ -3692,6 +3838,9 @@ mod tests {
                 "stale_served_total": 0,
                 "forced_fallback_total": 0,
                 "provider_catalog_lookups_total": 0,
+                "provider_catalog_hits_total": 0,
+                "provider_errors_total": 0,
+                "provider_timeouts_total": 0,
             }
         });
         validate_grid_metrics_json_export(&pricing, PRICING_JSON_KEYS).expect("pricing");
@@ -3812,7 +3961,7 @@ mod tests {
         let settlement = serde_json::json!({"ok": true, "metrics": {"pending_verification_total": 0, "cleared_total": 0, "resolved_total": 0, "payout_batch_total": 0}});
         let trust = serde_json::json!({"ok": true, "metrics": {"payout_eligible_total": 0, "payout_held_total": 0, "last_trust_score": 0, "gate_min_threshold": 40}});
         let replication = serde_json::json!({"ok": true, "metrics": {"strict_total": 0, "enqueue_total": 0, "executor_enqueue_total": 0, "rate_limited_total": 0}});
-        let pricing = serde_json::json!({"ok": true, "metrics": {"fresh_served_total": 0, "stale_served_total": 0, "forced_fallback_total": 0, "provider_catalog_lookups_total": 0}});
+        let pricing = serde_json::json!({"ok": true, "metrics": {"fresh_served_total": 0, "stale_served_total": 0, "forced_fallback_total": 0, "provider_catalog_lookups_total": 0, "provider_catalog_hits_total": 0, "provider_errors_total": 0, "provider_timeouts_total": 0}});
         let prefetch = serde_json::json!({"ok": true, "metrics": {"pull_bytes_total": 0, "backpressure_total": 0, "plan_total": 0, "enqueue_total": 0, "peer_fetch_total": 0}});
         let locality = serde_json::json!({"ok": true, "metrics": {"shard_local_hit_ratio_bps": 0, "hot_tier_hit_ratio_bps": 0, "cross_region_egress_mb": 0, "hot_promote_total": 0, "hot_evict_total": 0}});
         let fee_split = serde_json::json!({"ok": true, "metrics": {"fee_split_applied_total": 0, "primary_dev_fee_bps": 10, "secondary_admin_fee_min_bps": 100, "secondary_admin_fee_max_bps": 500}});
@@ -3857,7 +4006,7 @@ mod tests {
         let settlement = serde_json::json!({"ok": true, "metrics": {"pending_verification_total": 0, "cleared_total": 0, "resolved_total": 0, "payout_batch_total": 0}});
         let trust = serde_json::json!({"ok": true, "metrics": {"payout_eligible_total": 0, "payout_held_total": 0, "last_trust_score": 0, "gate_min_threshold": 40}});
         let replication = serde_json::json!({"ok": true, "metrics": {"strict_total": 0, "enqueue_total": 0, "executor_enqueue_total": 0, "rate_limited_total": 0}});
-        let pricing = serde_json::json!({"ok": true, "metrics": {"fresh_served_total": 0, "stale_served_total": 0, "forced_fallback_total": 0, "provider_catalog_lookups_total": 0}});
+        let pricing = serde_json::json!({"ok": true, "metrics": {"fresh_served_total": 0, "stale_served_total": 0, "forced_fallback_total": 0, "provider_catalog_lookups_total": 0, "provider_catalog_hits_total": 0, "provider_errors_total": 0, "provider_timeouts_total": 0}});
         validate_band6_metrics_parity(
             prom,
             &verification,

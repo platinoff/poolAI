@@ -1,7 +1,7 @@
 {
-  "revision": 290,
+  "revision": 291,
   "updated_at": "2026-06-21",
-  "active_sprint": "PH-S900",
+  "active_sprint": "PH-S910",
   "ui_version": 4,
   "extension_policy": {
     ".md": {

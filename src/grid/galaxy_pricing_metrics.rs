@@ -5,6 +5,7 @@ use crate::grid::galaxy_pricing_oracle::{
 };
 use crate::grid::galaxy_pricing_provider_metrics::{
     provider_catalog_hits_total, provider_catalog_lookups_total, provider_errors_total,
+    provider_timeouts_total,
 };
 
 /// Read-only pricing oracle counters snapshot for `GET /api/v1/grid/pricing-metrics` (PH-S691).
@@ -16,6 +17,7 @@ pub struct PricingMetricsSnapshot {
     pub provider_catalog_lookups_total: u64,
     pub provider_catalog_hits_total: u64,
     pub provider_errors_total: u64,
+    pub provider_timeouts_total: u64,
 }
 
 /// Coordinator pricing metrics snapshot (PH-S691).
@@ -27,6 +29,7 @@ pub fn pricing_metrics_snapshot() -> PricingMetricsSnapshot {
         provider_catalog_lookups_total: provider_catalog_lookups_total(),
         provider_catalog_hits_total: provider_catalog_hits_total(),
         provider_errors_total: provider_errors_total(),
+        provider_timeouts_total: provider_timeouts_total(),
     }
 }
 

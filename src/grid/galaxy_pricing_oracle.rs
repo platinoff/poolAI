@@ -87,6 +87,12 @@ pub const ENV_PROVIDER_HTTP_TIMEOUT_MS: &str = "POOLAI_GALAXY_PRICING_TIMEOUT_MS
 /// Default timeout for provider HTTP calls (PH-S102).
 pub const DEFAULT_PROVIDER_HTTP_TIMEOUT_MS: u64 = 1500;
 
+/// Minimum clamp for `POOLAI_GALAXY_PRICING_TIMEOUT_MS` (PH-S900).
+pub const MIN_PROVIDER_HTTP_TIMEOUT_MS: u64 = 100;
+
+/// Maximum clamp for `POOLAI_GALAXY_PRICING_TIMEOUT_MS` (PH-S900).
+pub const MAX_PROVIDER_HTTP_TIMEOUT_MS: u64 = 30_000;
+
 /// Billing unit keys shared by oracle and scheduling (§4.2.1).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -506,9 +512,17 @@ pub fn pricing_provider_catalog_from_env() -> GalaxyPricingProviderCatalog {
     }
 }
 
+/// Clamp provider HTTP timeout to ops-safe bounds (PH-S900).
+#[inline]
+pub fn clamp_provider_http_timeout_ms(raw_ms: u64) -> u64 {
+    raw_ms.clamp(MIN_PROVIDER_HTTP_TIMEOUT_MS, MAX_PROVIDER_HTTP_TIMEOUT_MS)
+}
+
 /// HTTP timeout for provider fetch path (PH-S102), milliseconds.
 pub fn provider_http_timeout_ms_from_env() -> u64 {
-    env_u64(ENV_PROVIDER_HTTP_TIMEOUT_MS).unwrap_or(DEFAULT_PROVIDER_HTTP_TIMEOUT_MS)
+    clamp_provider_http_timeout_ms(
+        env_u64(ENV_PROVIDER_HTTP_TIMEOUT_MS).unwrap_or(DEFAULT_PROVIDER_HTTP_TIMEOUT_MS),
+    )
 }
 
 #[derive(Debug, Deserialize)]
@@ -543,8 +557,11 @@ pub async fn fetch_live_provider_quotes(
     unit_key: GalaxyPriceUnitKey,
     timeout_ms: u64,
 ) -> Vec<MockProviderQuote> {
+    let timeout = Duration::from_millis(timeout_ms);
+    let connect_timeout = Duration::from_millis(timeout_ms.min(5_000));
     let Ok(client) = reqwest::Client::builder()
-        .timeout(Duration::from_millis(timeout_ms))
+        .connect_timeout(connect_timeout)
+        .timeout(timeout)
         .build()
     else {
         return Vec::new();
@@ -558,9 +575,15 @@ pub async fn fetch_live_provider_quotes(
             "{endpoint}?task_profile={task_profile}&model_profile={model_profile}&unit_key={}",
             unit_key.as_str()
         );
-        let Ok(resp) = client.get(url).send().await else {
-            crate::grid::galaxy_pricing_provider_metrics::record_provider_fetch_error();
-            continue;
+        let resp = match client.get(url).send().await {
+            Ok(r) => r,
+            Err(e) => {
+                if e.is_timeout() {
+                    crate::grid::galaxy_pricing_provider_metrics::record_provider_fetch_timeout();
+                }
+                crate::grid::galaxy_pricing_provider_metrics::record_provider_fetch_error();
+                continue;
+            }
         };
         if !resp.status().is_success() {
             crate::grid::galaxy_pricing_provider_metrics::record_provider_fetch_error();
@@ -1286,6 +1309,25 @@ mod tests {
         );
         std::env::set_var(ENV_PROVIDER_HTTP_TIMEOUT_MS, "2500");
         assert_eq!(provider_http_timeout_ms_from_env(), 2500);
+        std::env::remove_var(ENV_PROVIDER_HTTP_TIMEOUT_MS);
+    }
+
+    #[test]
+    fn clamp_provider_http_timeout_ms_ph_s900() {
+        assert_eq!(
+            clamp_provider_http_timeout_ms(50),
+            MIN_PROVIDER_HTTP_TIMEOUT_MS
+        );
+        assert_eq!(clamp_provider_http_timeout_ms(2500), 2500);
+        assert_eq!(
+            clamp_provider_http_timeout_ms(99_999),
+            MAX_PROVIDER_HTTP_TIMEOUT_MS
+        );
+        std::env::set_var(ENV_PROVIDER_HTTP_TIMEOUT_MS, "10");
+        assert_eq!(
+            provider_http_timeout_ms_from_env(),
+            MIN_PROVIDER_HTTP_TIMEOUT_MS
+        );
         std::env::remove_var(ENV_PROVIDER_HTTP_TIMEOUT_MS);
     }
 
