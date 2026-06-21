@@ -14,6 +14,7 @@ pub mod galaxy_fee_split;
 pub mod galaxy_fee_split_depth;
 pub mod galaxy_fee_split_metrics;
 pub mod galaxy_fraud_proof;
+pub mod galaxy_governance_depth;
 pub mod galaxy_governance_metrics;
 pub mod galaxy_locality;
 pub mod galaxy_locality_hot_tier_depth;

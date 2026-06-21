@@ -129,7 +129,7 @@
 
 ---
 
-## Band 14 — PH-S790…S799 (Galaxy §9.5–9.6 governance ops) · **active §5.12**
+## Band 14 — PH-S790…S799 (Galaxy §9.5–9.6 governance ops) · ✅ drained
 
 | Sprint | Focus | Acceptance |
 |--------|-------|------------|
@@ -146,7 +146,24 @@
 
 ---
 
-## Bands 15–35 (summary — деталі в master backlog)
+## Band 15 — PH-S800…S809 (Admin wasm slim: monitoring + payout-batch) · **active §5.12**
+
+| Sprint | Focus | Acceptance |
+|--------|-------|------------|
+| **PH-S800** | wasm slim monitoring ML panel | `poolaiRenderMlPipelineMetricsPanel` wasm-only |
+| **PH-S801** | wasm slim payout-batch panel | ui-core → wasm export |
+| **PH-S802** | admin/mod.rs regression PH-S800/S801 | `parsePrometheusGauge` tests |
+| **PH-S803** | stand smoke monitoring/payout APIs | runner shape tests |
+| **PH-S804** | admin wasm slim depth stub extend | unit test |
+| **PH-S805** | loc-audit | zriz |
+| **PH-S806** | docs canon | HANDOFF/NEXT/STABLE |
+| **PH-S807** | vision-sync | green |
+| **PH-S808** | ratio advisory | hold |
+| **PH-S809** | `galaxy_horizon_s800_integration` | wasm monitoring band close |
+
+---
+
+## Bands 16–35 (summary — деталі в master backlog)
 
 | Band | Sprints | Theme |
 |------|---------|-------|

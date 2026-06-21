@@ -1354,6 +1354,53 @@ async fn smoke_grid_fee_split_metrics_api(client: &Client, base: &str) -> Result
     validate_fee_split_metrics_parity(&prom_text, &body)
 }
 
+async fn smoke_grid_update_policy_api(client: &Client, base: &str) -> Result<(), String> {
+    use poolai::grid::stand_smoke_metrics_parity::validate_update_policy_json_export;
+
+    let resp = client
+        .get(api_url(base, "/api/v1/grid/update-policy"))
+        .send()
+        .await
+        .map_err(|e| format!("update-policy request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("update-policy status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    validate_update_policy_json_export(&body)
+}
+
+async fn smoke_grid_governance_metrics_api(client: &Client, base: &str) -> Result<(), String> {
+    use poolai::grid::stand_smoke_metrics_parity::validate_governance_metrics_parity;
+
+    let resp = client
+        .get(api_url(base, "/api/v1/grid/governance-metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("governance-metrics request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("governance-metrics status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    if body.get("ok").and_then(|v| v.as_bool()) != Some(true) {
+        return Err(format!("governance-metrics body: {body}"));
+    }
+
+    let prom_resp = client
+        .get(api_url(base, "/metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("/metrics request: {e}"))?;
+    if prom_resp.status() != StatusCode::OK {
+        return Err(format!("/metrics status {}", prom_resp.status()));
+    }
+    let prom_text = prom_resp.text().await.map_err(|e| e.to_string())?;
+    validate_governance_metrics_parity(&prom_text, &body)?;
+    if !prom_text.contains("poolai_advisory_acknowledged_total") {
+        return Err("/metrics missing poolai_advisory_acknowledged_total".to_string());
+    }
+    Ok(())
+}
+
 /// PH-S713: band-6 JSON metrics export shape + Prometheus parity across all grid metric APIs.
 async fn smoke_grid_metrics_json_prometheus_parity_band6(
     client: &Client,
@@ -2390,6 +2437,18 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
     .await;
     record(
         &mut cases,
+        "grid_update_policy_api",
+        smoke_grid_update_policy_api(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
+        "grid_governance_metrics_api",
+        smoke_grid_governance_metrics_api(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
         "grid_metrics_json_prometheus_parity_band6",
         smoke_grid_metrics_json_prometheus_parity_band6(&client, &cli.base_url).await,
     )
@@ -3002,6 +3061,34 @@ mod tests {
         let prom =
             "# TYPE galaxy_fee_split_applied_total gauge\ngalaxy_fee_split_applied_total 0\n";
         validate_fee_split_metrics_parity(prom, &body).expect("parity");
+    }
+
+    #[test]
+    fn grid_update_policy_api_export_shape_ph_s790() {
+        use poolai::grid::stand_smoke_metrics_parity::validate_update_policy_json_export;
+
+        let sample = r#"{"ok":true,"policy":{"mode":"notify","env_update_policy":"POOLAI_UPDATE_POLICY","env_manifest_url":"POOLAI_RELEASE_MANIFEST_URL"}}"#;
+        let body: Value = serde_json::from_str(sample).expect("json");
+        validate_update_policy_json_export(&body).expect("shape");
+    }
+
+    #[test]
+    fn grid_governance_metrics_api_export_shape_ph_s793() {
+        use poolai::grid::stand_smoke_metrics_parity::{
+            validate_governance_metrics_parity, validate_grid_metrics_json_export,
+            GOVERNANCE_JSON_KEYS,
+        };
+
+        let sample = r#"{"ok":true,"metrics":{"release_verify_total":1,"release_verify_fail_total":0,"update_notify_pending":2,"advisory_acknowledged_total":1}}"#;
+        let body: Value = serde_json::from_str(sample).expect("json");
+        validate_grid_metrics_json_export(&body, GOVERNANCE_JSON_KEYS).expect("shape");
+        let prom = concat!(
+            "poolai_release_verify_total 1\n",
+            "poolai_release_verify_fail_total 0\n",
+            "poolai_update_notify_pending 2\n",
+            "poolai_advisory_acknowledged_total 1\n",
+        );
+        validate_governance_metrics_parity(prom, &body).expect("parity");
     }
 
     #[test]

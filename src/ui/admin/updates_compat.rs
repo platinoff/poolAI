@@ -30,6 +30,10 @@ const DOC_GALAXY_55: &str =
     "https://github.com/platinoff/poolAI/blob/main/docs/concept/POOLAI_GALAXY_GRID.md#55-task-driven-prefetch-ph-s61";
 const DOC_GALAXY_52: &str =
     "https://github.com/platinoff/poolAI/blob/main/docs/concept/POOLAI_GALAXY_GRID.md#52-locality-placement-ph-s61-canonical";
+const DOC_GALAXY_95: &str =
+    "https://github.com/platinoff/poolAI/blob/main/docs/concept/POOLAI_GALAXY_GRID.md#95-opt-in-auto-update-policies";
+const DOC_GALAXY_96: &str =
+    "https://github.com/platinoff/poolAI/blob/main/docs/concept/POOLAI_GALAXY_GRID.md#96-security-advisories-та-key-rotation";
 const DOC_GALAXY_66: &str =
     "https://github.com/platinoff/poolAI/blob/main/docs/concept/POOLAI_GALAXY_GRID.md#66-untrusted-telegram_edge";
 
@@ -166,6 +170,22 @@ pub async fn admin_updates_compat() -> Html<String> {
             </p>
           </div>
 
+          <div class="admin-card" id="updates-compat-governance">
+            <h3 data-i18n="admin.updatesCompat.governanceTitle">Governance ops metrics</h3>
+            <p class="muted" data-i18n="admin.updatesCompat.governanceHint">
+              Galaxy §9.5–9.6 — read-only strip from <code>GET /api/v1/grid/governance-metrics</code>
+              and <code>GET /api/v1/grid/update-policy</code> reconciled with <code>/metrics</code> (PH-S790…S792).
+            </p>
+            <div id="updates-compat-governance-strip" class="updates-compat-governance-strip muted" data-i18n="admin.updatesCompat.governanceLoading">
+              Loading governance metrics…
+            </div>
+            <p class="muted admin-hint">
+              <a href="{doc_galaxy_95}" target="_blank" rel="noopener noreferrer" data-i18n="admin.updatesCompat.link.galaxy95">Galaxy §9.5 update policy</a>
+              ·
+              <a href="{doc_galaxy_96}" target="_blank" rel="noopener noreferrer" data-i18n="admin.updatesCompat.link.galaxy96">Galaxy §9.6 advisories</a>
+            </p>
+          </div>
+
           <div class="admin-card" id="updates-compat-verify-release">
             <h3 data-i18n="admin.updatesCompat.verifyTitle">Verify signed release</h3>
             <p class="muted" data-i18n="admin.updatesCompat.verifyHint">
@@ -216,6 +236,8 @@ pub async fn admin_updates_compat() -> Html<String> {
         doc_capability_fixture = DOC_CAPABILITY_FIXTURE,
         doc_galaxy_55 = DOC_GALAXY_55,
         doc_galaxy_52 = DOC_GALAXY_52,
+        doc_galaxy_95 = DOC_GALAXY_95,
+        doc_galaxy_96 = DOC_GALAXY_96,
     );
 
     let script = r#"
@@ -296,10 +318,46 @@ pub async fn admin_updates_compat() -> Html<String> {
       }
     }
 
+    async function loadUpdatesCompatGovernanceStrip() {
+      const el = document.getElementById('updates-compat-governance-strip');
+      if (!el) return;
+      try {
+        let governanceJson = '{}';
+        let policyJson = '{}';
+        try {
+          const govResp = await fetchJson('/api/v1/grid/governance-metrics');
+          governanceJson = JSON.stringify(govResp || {});
+        } catch (_) {}
+        try {
+          const policyResp = await fetchJson('/api/v1/grid/update-policy');
+          policyJson = JSON.stringify(policyResp || {});
+        } catch (_) {}
+        let advisoryAck = 0;
+        try {
+          const promText = await fetch('/metrics').then(function(r) { return r.text(); });
+          var wasm = window.poolaiUiWasm;
+          if (wasm && typeof wasm.parsePrometheusGauge === 'function') {
+            advisoryAck = wasm.parsePrometheusGauge(promText, 'poolai_advisory_acknowledged_total');
+          } else {
+            var m = promText.match(/poolai_advisory_acknowledged_total\\s+(\\d+)/);
+            if (m) advisoryAck = parseInt(m[1], 10) || 0;
+          }
+        } catch (_) {}
+        if (window.poolaiUiWasm && typeof window.poolaiUiWasm.renderGridGovernanceMetricsStrip === 'function') {
+          el.innerHTML = window.poolaiUiWasm.renderGridGovernanceMetricsStrip(governanceJson, policyJson, advisoryAck || 0);
+        } else {
+          el.textContent = governanceJson;
+        }
+      } catch (e) {
+        el.textContent = String(e && e.message ? e.message : e);
+      }
+    }
+
     function startUpdatesCompatPage() {
       wireUpdatesCompatLabels();
       loadUpdatesCompatPrefetchStrip();
       loadUpdatesCompatLocalityStrip();
+      loadUpdatesCompatGovernanceStrip();
     }
 
     if (window.poolaiUiWasm && (window.poolaiUiWasm.ready || window.poolaiUiWasm.failed)) {
@@ -379,4 +437,15 @@ async fn admin_updates_compat_locality_wasm_glue_ph_s762() {
     assert!(html.contains("renderGridLocalityMetricsStrip"));
     assert!(html.contains("updates-compat-locality-strip"));
     assert!(html.contains("loadUpdatesCompatLocalityStrip"));
+}
+
+#[tokio::test]
+async fn admin_updates_compat_governance_wasm_glue_ph_s792() {
+    let html = admin_updates_compat().await.0;
+    assert!(html.contains("id=\"updates-compat-governance\""));
+    assert!(html.contains("/api/v1/grid/governance-metrics"));
+    assert!(html.contains("/api/v1/grid/update-policy"));
+    assert!(html.contains("renderGridGovernanceMetricsStrip"));
+    assert!(html.contains("updates-compat-governance-strip"));
+    assert!(html.contains("loadUpdatesCompatGovernanceStrip"));
 }

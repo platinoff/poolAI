@@ -1116,6 +1116,18 @@ Galaxy Grid використовує **шаровану** версійність
 
 **Audit events (локально на srvN):** `release_verify_ok|fail`, `update_policy_applied`, `protocol_negotiation_rejected`, `advisory_acknowledged`.
 
+**Implemented (band 14 PH-S790…S799 ✅):**
+
+| Sprint | Wire / module | Acceptance |
+|--------|---------------|------------|
+| **PH-S790** | `GET /api/v1/grid/update-policy` + env snapshot | `validate_update_policy_json_export` |
+| **PH-S791** | `GET /api/v1/grid/governance-metrics` + JSON↔Prom parity | `validate_governance_metrics_parity` |
+| **PH-S792** | Admin updates-compat governance wasm strip | `renderGridGovernanceMetricsStrip` + `/ui/admin/updates-compat` |
+| **PH-S793** | Stand smoke governance-metrics API | `poolai-http-stand-smoke` runner + unit shape |
+| **PH-S794** | `governance_depth_stub` | `src/grid/galaxy_governance_depth.rs` unit test |
+
+**Prometheus (governance ops):** `poolai_release_verify_total`, `poolai_release_verify_fail_total`, `poolai_update_notify_pending` (PH-S528 ✅), `poolai_advisory_acknowledged_total` (PH-S573 ✅), `GET /api/v1/grid/governance-metrics` snapshot (PH-S791 ✅).
+
 **Roadmap (не PH-S63):** in-binary auto-updater daemon, central update registry з SLA, web-of-trust між srvN адмінами.
 
 ### 9.7 Зв’язок з верифікацією edge (§6)

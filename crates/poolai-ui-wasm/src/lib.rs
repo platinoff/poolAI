@@ -38,9 +38,9 @@ use poolai_ui_core::payout_batch::{
 use poolai_ui_core::pricing::{format_unix_secs, format_usd_micro};
 use poolai_ui_core::prometheus::parse_prometheus_gauge;
 use poolai_ui_core::stand_smoke_metrics::{
-    render_grid_fee_split_metrics_strip_html, render_grid_locality_metrics_strip_html,
-    render_grid_prefetch_metrics_strip_html, render_grid_settlement_trust_metrics_strip_html,
-    render_grid_verification_metrics_strip_html,
+    render_grid_fee_split_metrics_strip_html, render_grid_governance_metrics_strip_html,
+    render_grid_locality_metrics_strip_html, render_grid_prefetch_metrics_strip_html,
+    render_grid_settlement_trust_metrics_strip_html, render_grid_verification_metrics_strip_html,
 };
 use poolai_ui_core::table::{
     build_csv, build_json_export, compare_sort_values, empty_state_html, escape_regex,
@@ -629,6 +629,19 @@ pub fn render_grid_fee_split_metrics_strip_wasm(
     applied_gauge: u64,
 ) -> String {
     render_grid_fee_split_metrics_strip_html(fee_split_metrics_json, applied_gauge)
+}
+
+#[wasm_bindgen(js_name = renderGridGovernanceMetricsStrip)]
+pub fn render_grid_governance_metrics_strip_wasm(
+    governance_metrics_json: &str,
+    update_policy_json: &str,
+    advisory_gauge: u64,
+) -> String {
+    render_grid_governance_metrics_strip_html(
+        governance_metrics_json,
+        update_policy_json,
+        advisory_gauge,
+    )
 }
 
 #[wasm_bindgen(js_name = renderNetworkProfilesPanel)]

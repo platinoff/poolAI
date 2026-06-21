@@ -205,6 +205,47 @@ pub fn render_grid_fee_split_metrics_strip_html(
     )
 }
 
+/// Governance ops metrics strip for admin updates panel (PH-S792).
+pub fn render_grid_governance_metrics_strip_html(
+    governance_metrics_json: &str,
+    update_policy_json: &str,
+    advisory_gauge: u64,
+) -> String {
+    use crate::format::escape_html;
+
+    let gov_body: Value = serde_json::from_str(governance_metrics_json).unwrap_or(Value::Null);
+    let gov_metrics = gov_body.get("metrics").cloned().unwrap_or(gov_body);
+    let policy_body: Value = serde_json::from_str(update_policy_json).unwrap_or(Value::Null);
+    let policy = policy_body.get("policy").cloned().unwrap_or(policy_body);
+    let mode = policy
+        .get("mode")
+        .and_then(|v| v.as_str())
+        .unwrap_or("notify");
+    let verify_ok = grid_metrics_u64(&gov_metrics, "release_verify_total");
+    let verify_fail = grid_metrics_u64(&gov_metrics, "release_verify_fail_total");
+    let notify_pending = grid_metrics_u64(&gov_metrics, "update_notify_pending");
+    let advisory = if grid_metrics_u64(&gov_metrics, "advisory_acknowledged_total") > 0 {
+        grid_metrics_u64(&gov_metrics, "advisory_acknowledged_total")
+    } else {
+        advisory_gauge
+    };
+
+    format!(
+        r#"<div class="admin-card admin-metrics-strip">
+<span>Policy: <strong>{mode}</strong></span>
+<span>Verify ok: <strong>{verify_ok}</strong></span>
+<span>Verify fail: <strong>{verify_fail}</strong></span>
+<span>Notify pending: <strong>{notify_pending}</strong></span>
+<span>Advisory ack: <strong>{advisory}</strong></span>
+</div>"#,
+        mode = escape_html(mode),
+        verify_ok = escape_html(&verify_ok.to_string()),
+        verify_fail = escape_html(&verify_fail.to_string()),
+        notify_pending = escape_html(&notify_pending.to_string()),
+        advisory = escape_html(&advisory.to_string()),
+    )
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -286,5 +327,16 @@ mod tests {
         assert!(html.contains("Secondary admin"));
         assert!(html.contains("Applied"));
         assert!(html.contains(crate::pricing::SECONDARY_FEE_UX_HINT));
+    }
+
+    #[test]
+    fn render_grid_governance_metrics_strip_ph_s792() {
+        let gov = r#"{"ok":true,"metrics":{"release_verify_total":2,"release_verify_fail_total":1,"update_notify_pending":3,"advisory_acknowledged_total":1}}"#;
+        let policy = r#"{"ok":true,"policy":{"mode":"notify"}}"#;
+        let html = render_grid_governance_metrics_strip_html(gov, policy, 0);
+        assert!(html.contains("admin-metrics-strip"));
+        assert!(html.contains("Policy"));
+        assert!(html.contains("notify"));
+        assert!(html.contains("Advisory ack"));
     }
 }

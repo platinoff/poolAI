@@ -39,6 +39,26 @@ pub fn set_update_notify_pending(count: u64) {
     UPDATE_NOTIFY_PENDING.store(count, Ordering::Relaxed);
 }
 
+/// Read-only governance ops snapshot for `GET /api/v1/grid/governance-metrics` (PH-S791).
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
+pub struct GovernanceMetricsSnapshot {
+    pub release_verify_total: u64,
+    pub release_verify_fail_total: u64,
+    pub update_notify_pending: u64,
+    pub advisory_acknowledged_total: u64,
+}
+
+/// Coordinator governance metrics snapshot (PH-S791).
+pub fn governance_metrics_snapshot() -> GovernanceMetricsSnapshot {
+    GovernanceMetricsSnapshot {
+        release_verify_total: release_verify_total(),
+        release_verify_fail_total: release_verify_fail_total(),
+        update_notify_pending: update_notify_pending(),
+        advisory_acknowledged_total:
+            crate::grid::galaxy_security_advisory::advisory_acknowledged_total(),
+    }
+}
+
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_governance_metrics_for_test() {
     RELEASE_VERIFY_TOTAL.store(0, Ordering::Relaxed);

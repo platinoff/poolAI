@@ -114,11 +114,42 @@ pub const FEE_SPLIT_JSON_KEYS: &[&str] = &[
     "secondary_admin_fee_max_bps",
 ];
 
+/// Required JSON export keys for stand smoke governance-metrics API (PH-S793).
+pub const GOVERNANCE_JSON_KEYS: &[&str] = &[
+    "release_verify_total",
+    "release_verify_fail_total",
+    "update_notify_pending",
+    "advisory_acknowledged_total",
+];
+
+/// Required JSON export keys for stand smoke update-policy API (PH-S790).
+pub const UPDATE_POLICY_JSON_KEYS: &[&str] = &["mode", "env_update_policy", "env_manifest_url"];
+
 /// Prometheus gauge name ↔ JSON metrics field pairs — fee split production (PH-S780).
 pub const FEE_SPLIT_APPLIED_PARITY: &[(&str, &str)] = &[(
     crate::grid::galaxy_fee_split_metrics::METRIC_FEE_SPLIT_APPLIED_TOTAL,
     "fee_split_applied_total",
 )];
+
+/// Prometheus gauge name ↔ JSON metrics field pairs — governance ops (PH-S791).
+pub const GOVERNANCE_METRICS_PARITY: &[(&str, &str)] = &[
+    (
+        crate::grid::galaxy_governance_metrics::METRIC_RELEASE_VERIFY_TOTAL,
+        "release_verify_total",
+    ),
+    (
+        crate::grid::galaxy_governance_metrics::METRIC_RELEASE_VERIFY_FAIL_TOTAL,
+        "release_verify_fail_total",
+    ),
+    (
+        crate::grid::galaxy_governance_metrics::METRIC_UPDATE_NOTIFY_PENDING,
+        "update_notify_pending",
+    ),
+    (
+        crate::grid::galaxy_security_advisory::METRIC_ADVISORY_ACKNOWLEDGED_TOTAL,
+        "advisory_acknowledged_total",
+    ),
+];
 
 /// Prometheus gauge name ↔ JSON metrics field pairs — payout batch settlement (PH-S771).
 pub const PAYOUT_BATCH_SETTLEMENT_PARITY: &[(&str, &str)] = &[
@@ -206,6 +237,7 @@ pub enum StandSmokeMetricsParityDepth {
     LocalityHotTier,
     PayoutBatchSettlement,
     FeeSplitProduction,
+    GovernanceOps,
 }
 
 /// Classify stand smoke metrics parity depth from optional feature stub (PH-S714/PH-S724).
@@ -238,6 +270,12 @@ pub fn stand_smoke_metrics_parity_depth_stub(
         .unwrap_or(false)
     {
         return StandSmokeMetricsParityDepth::FeeSplitProduction;
+    }
+    if f.get("governance_ops")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        return StandSmokeMetricsParityDepth::GovernanceOps;
     }
     if f.get("payout_batch_settlement")
         .and_then(|v| v.as_bool())
@@ -420,6 +458,32 @@ pub fn validate_payout_batch_metrics_parity(
 pub fn validate_fee_split_metrics_parity(prom_text: &str, fee_split: &Value) -> Result<(), String> {
     validate_grid_metrics_json_export(fee_split, FEE_SPLIT_JSON_KEYS)?;
     validate_prometheus_json_parity_pairs(prom_text, fee_split, FEE_SPLIT_APPLIED_PARITY)?;
+    Ok(())
+}
+
+/// Validate governance-metrics JSON export vs Prometheus gauges (PH-S791).
+pub fn validate_governance_metrics_parity(
+    prom_text: &str,
+    governance: &Value,
+) -> Result<(), String> {
+    validate_grid_metrics_json_export(governance, GOVERNANCE_JSON_KEYS)?;
+    validate_prometheus_json_parity_pairs(prom_text, governance, GOVERNANCE_METRICS_PARITY)?;
+    Ok(())
+}
+
+/// Validate update-policy JSON export shape (PH-S790).
+pub fn validate_update_policy_json_export(body: &Value) -> Result<(), String> {
+    if body.get("ok").and_then(|v| v.as_bool()) != Some(true) {
+        return Err(format!("update-policy ok=false: {body}"));
+    }
+    let policy = body
+        .get("policy")
+        .ok_or_else(|| "update-policy missing policy".to_string())?;
+    for key in UPDATE_POLICY_JSON_KEYS {
+        if policy.get(key).is_none() {
+            return Err(format!("update-policy.policy missing {key}"));
+        }
+    }
     Ok(())
 }
 

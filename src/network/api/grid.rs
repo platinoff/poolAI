@@ -101,6 +101,8 @@ pub fn create_grid_routes() -> Router<ApiContext> {
             get(get_grid_payout_batch_history),
         )
         .route("/grid/fee-split-metrics", get(get_grid_fee_split_metrics))
+        .route("/grid/update-policy", get(get_grid_update_policy))
+        .route("/grid/governance-metrics", get(get_grid_governance_metrics))
 }
 
 pub async fn ingest_grid_envelope_handler(
@@ -454,6 +456,42 @@ async fn get_grid_fee_split_metrics(
         Json(GridFeeSplitMetricsResponse {
             ok: true,
             metrics: crate::grid::galaxy_fee_split_metrics::fee_split_metrics_snapshot(),
+        }),
+    ))
+}
+
+#[derive(Debug, Serialize)]
+struct GridUpdatePolicyResponse {
+    ok: bool,
+    policy: crate::grid::galaxy_update_policy::UpdatePolicySnapshot,
+}
+
+async fn get_grid_update_policy(
+    State(_ctx): State<ApiContext>,
+) -> Result<(StatusCode, Json<GridUpdatePolicyResponse>), HttpAppError> {
+    Ok((
+        StatusCode::OK,
+        Json(GridUpdatePolicyResponse {
+            ok: true,
+            policy: crate::grid::galaxy_update_policy::update_policy_snapshot(),
+        }),
+    ))
+}
+
+#[derive(Debug, Serialize)]
+struct GridGovernanceMetricsResponse {
+    ok: bool,
+    metrics: crate::grid::galaxy_governance_metrics::GovernanceMetricsSnapshot,
+}
+
+async fn get_grid_governance_metrics(
+    State(_ctx): State<ApiContext>,
+) -> Result<(StatusCode, Json<GridGovernanceMetricsResponse>), HttpAppError> {
+    Ok((
+        StatusCode::OK,
+        Json(GridGovernanceMetricsResponse {
+            ok: true,
+            metrics: crate::grid::galaxy_governance_metrics::governance_metrics_snapshot(),
         }),
     ))
 }
@@ -1380,6 +1418,72 @@ mod tests {
         );
 
         reset_fee_split_metrics_for_test();
+    }
+
+    #[tokio::test]
+    async fn grid_update_policy_read_ph_s790() {
+        use crate::grid::galaxy_update_policy::{
+            update_policy_snapshot, ENV_RELEASE_MANIFEST_URL, ENV_UPDATE_POLICY,
+        };
+
+        static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+        let _guard = ENV_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+        std::env::set_var(ENV_UPDATE_POLICY, "notify");
+        std::env::set_var(
+            ENV_RELEASE_MANIFEST_URL,
+            "https://example.com/manifest.json",
+        );
+
+        let res = get_grid_update_policy(State(ApiContext::default()))
+            .await
+            .expect("update policy")
+            .1
+             .0;
+        assert!(res.ok);
+        assert_eq!(res.policy.mode, "notify");
+        assert_eq!(
+            res.policy.manifest_url.as_deref(),
+            Some("https://example.com/manifest.json")
+        );
+        assert_eq!(res.policy.env_update_policy, ENV_UPDATE_POLICY);
+        assert_eq!(update_policy_snapshot().mode, res.policy.mode);
+
+        std::env::remove_var(ENV_UPDATE_POLICY);
+        std::env::remove_var(ENV_RELEASE_MANIFEST_URL);
+    }
+
+    #[tokio::test]
+    async fn grid_governance_metrics_read_ph_s791() {
+        use crate::grid::galaxy_governance_metrics::{
+            governance_metrics_snapshot, record_release_verify_success,
+            reset_governance_metrics_for_test, set_update_notify_pending,
+        };
+        use crate::grid::galaxy_security_advisory::{
+            acknowledge_security_advisory, reset_security_advisory_for_test,
+        };
+
+        reset_governance_metrics_for_test();
+        reset_security_advisory_for_test();
+        record_release_verify_success();
+        set_update_notify_pending(2);
+        acknowledge_security_advisory("CVE-2026-0001");
+
+        let res = get_grid_governance_metrics(State(ApiContext::default()))
+            .await
+            .expect("governance metrics")
+            .1
+             .0;
+        assert!(res.ok);
+        assert_eq!(res.metrics.release_verify_total, 1);
+        assert_eq!(res.metrics.update_notify_pending, 2);
+        assert_eq!(res.metrics.advisory_acknowledged_total, 1);
+        assert_eq!(
+            governance_metrics_snapshot().release_verify_total,
+            res.metrics.release_verify_total
+        );
+
+        reset_governance_metrics_for_test();
+        reset_security_advisory_for_test();
     }
 
     #[tokio::test]

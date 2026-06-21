@@ -208,10 +208,13 @@ Security audits are automatically run in CI pipeline:
 |-------|----------------|------------|
 | **§9.2** Signed releases | [`POOLAI_GALAXY_GRID.md` §9.2](../concept/POOLAI_GALAXY_GRID.md#92-signed-releases-канон-ph-s63) | `poolai-verify-release` (quickstart below); [`src/release/`](../../src/release/) |
 | **§9.3** Protocol compat | [`POOLAI_GALAXY_GRID.md` §9.3](../concept/POOLAI_GALAXY_GRID.md#93-protocol-versioning-та-compat-matrix) | PH-S65 wire (`protocol_version`, `build_id`); FM [§5.12](../catalog/FUNCTION_MANAGEMENT.md#512-research-backlog-ph-s65-galaxy-wire--ops-2026-05-27) |
-| **§9.6** Advisories & keys | [`POOLAI_GALAXY_GRID.md` §9.6](../concept/POOLAI_GALAXY_GRID.md#96-security-advisories-та-key-rotation) | [`DEPENDENCY_SECURITY.md`](./DEPENDENCY_SECURITY.md) (RustSec / `cargo audit` workflow) |
+| **§9.5** Update policy | [`POOLAI_GALAXY_GRID.md` §9.5](../concept/POOLAI_GALAXY_GRID.md#95-opt-in-auto-update-policies) | `GET /api/v1/grid/update-policy`; `POOLAI_UPDATE_POLICY` env (PH-S790) |
+| **§9.6** Advisories & keys | [`POOLAI_GALAXY_GRID.md` §9.6](../concept/POOLAI_GALAXY_GRID.md#96-security-advisories-та-key-rotation) | [`DEPENDENCY_SECURITY.md`](./DEPENDENCY_SECURITY.md) (RustSec / `cargo audit` workflow); `GET /api/v1/grid/governance-metrics` + `poolai_advisory_acknowledged_total` (PH-S791) |
 | **§6.6** Signed capability admission | [`POOLAI_GALAXY_GRID.md` §6.6](../concept/POOLAI_GALAXY_GRID.md#66-untrusted-telegram_edge) | PH-S740 strict gate: unsigned `telegram_edge` → HTTP 403 + `galaxy_capability_unsigned_rejected_total`; dev verify key [`tests/fixtures/capability/dev_pubkey.hex`](../../tests/fixtures/capability/dev_pubkey.hex); admin [`/ui/admin/updates-compat`](../../src/ui/admin/updates_compat.rs) capability panel (PH-S742) |
 
 **Cross-link (PH-S746):** capability document verify uses the same ed25519 tooling family as §9.2 signed releases — trust root / manifest flow differs; see [`galaxy_capability_doc.rs`](../../src/grid/galaxy_capability_doc.rs) and operator quickstart below.
+
+**Cross-link (PH-S796):** governance ops HTTP readouts — `GET /api/v1/grid/update-policy` (§9.5 env snapshot, PH-S790), `GET /api/v1/grid/governance-metrics` (verify/notify/advisory counters, PH-S791); admin wasm strip on [`/ui/admin/updates-compat`](../../src/ui/admin/updates_compat.rs) (PH-S792); stand smoke `grid_governance_metrics_api` (PH-S793).
 
 **Verify-release CLI:** `cargo run --bin poolai-verify-release -- --manifest <path> --signature <path> [--artifact <path>]`
 

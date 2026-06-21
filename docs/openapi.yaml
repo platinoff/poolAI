@@ -910,6 +910,34 @@ paths:
               schema:
                 $ref: '#/components/schemas/GridFeeSplitMetricsResponse'
 
+  /grid/update-policy:
+    get:
+      tags:
+        - Grid
+      summary: Update policy env snapshot (PH-S790)
+      operationId: getGridUpdatePolicy
+      responses:
+        '200':
+          description: Galaxy §9.5 opt-in update policy readout
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GridUpdatePolicyResponse'
+
+  /grid/governance-metrics:
+    get:
+      tags:
+        - Grid
+      summary: Governance ops metrics snapshot (PH-S791)
+      operationId: getGridGovernanceMetrics
+      responses:
+        '200':
+          description: Release verify, notify pending, advisory ack counters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GridGovernanceMetricsResponse'
+
   /grid/network-profiles/{peer_id}:
     get:
       tags:
@@ -6848,6 +6876,58 @@ components:
           type: boolean
         metrics:
           $ref: '#/components/schemas/FeeSplitMetricsSnapshot'
+
+    GridUpdatePolicyResponse:
+      type: object
+      required:
+        - ok
+        - policy
+      properties:
+        ok:
+          type: boolean
+        policy:
+          $ref: '#/components/schemas/UpdatePolicySnapshot'
+
+    UpdatePolicySnapshot:
+      type: object
+      properties:
+        mode:
+          type: string
+          description: notify | auto | never
+        manifest_url:
+          type: string
+          nullable: true
+        env_update_policy:
+          type: string
+        env_manifest_url:
+          type: string
+
+    GridGovernanceMetricsResponse:
+      type: object
+      required:
+        - ok
+        - metrics
+      properties:
+        ok:
+          type: boolean
+        metrics:
+          $ref: '#/components/schemas/GovernanceMetricsSnapshot'
+
+    GovernanceMetricsSnapshot:
+      type: object
+      properties:
+        release_verify_total:
+          type: integer
+          format: int64
+        release_verify_fail_total:
+          type: integer
+          format: int64
+        update_notify_pending:
+          type: integer
+          format: int64
+        advisory_acknowledged_total:
+          type: integer
+          format: int64
 
     FeeSplitMetricsSnapshot:
       type: object

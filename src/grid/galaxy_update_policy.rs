@@ -37,6 +37,34 @@ pub fn release_manifest_url_from_env() -> Option<String> {
         .filter(|v| !v.is_empty())
 }
 
+fn update_policy_mode_wire(mode: UpdatePolicyMode) -> &'static str {
+    match mode {
+        UpdatePolicyMode::Notify => "notify",
+        UpdatePolicyMode::Auto => "auto",
+        UpdatePolicyMode::Never => "never",
+    }
+}
+
+/// Read-only update policy snapshot for `GET /api/v1/grid/update-policy` (PH-S790).
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
+pub struct UpdatePolicySnapshot {
+    pub mode: &'static str,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub manifest_url: Option<String>,
+    pub env_update_policy: &'static str,
+    pub env_manifest_url: &'static str,
+}
+
+/// Coordinator update policy snapshot (PH-S790).
+pub fn update_policy_snapshot() -> UpdatePolicySnapshot {
+    UpdatePolicySnapshot {
+        mode: update_policy_mode_wire(update_policy_from_env()),
+        manifest_url: release_manifest_url_from_env(),
+        env_update_policy: ENV_UPDATE_POLICY,
+        env_manifest_url: ENV_RELEASE_MANIFEST_URL,
+    }
+}
+
 /// Notify tick: bump pending gauge + audit log (PH-S549).
 pub fn tick_update_notify_from_env() {
     if update_policy_from_env() != UpdatePolicyMode::Notify {
