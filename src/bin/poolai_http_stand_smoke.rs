@@ -1124,6 +1124,32 @@ async fn smoke_grid_verification_checker_tasks(client: &Client, base: &str) -> R
     Ok(())
 }
 
+async fn smoke_grid_verification_lifecycle_depth(
+    client: &Client,
+    base: &str,
+) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/api/v1/grid/verification-metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("verification-metrics lifecycle: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!(
+            "verification-metrics lifecycle status {}",
+            resp.status()
+        ));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    let depth = body
+        .get("lifecycle_depth")
+        .and_then(|v| v.as_str())
+        .ok_or_else(|| format!("verification-metrics missing lifecycle_depth: {body}"))?;
+    if depth.is_empty() {
+        return Err("verification-metrics lifecycle_depth empty".into());
+    }
+    Ok(())
+}
+
 async fn smoke_grid_verification_metrics_api(client: &Client, base: &str) -> Result<(), String> {
     let resp = client
         .get(api_url(base, "/api/v1/grid/verification-metrics"))
@@ -2563,6 +2589,12 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
     .await;
     record(
         &mut cases,
+        "grid_verification_lifecycle_depth",
+        smoke_grid_verification_lifecycle_depth(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
         "grid_replay_metrics_api",
         smoke_grid_replay_metrics_api(&client, &cli.base_url).await,
     )
@@ -3182,9 +3214,74 @@ mod tests {
 
     #[test]
     fn grid_verification_metrics_api_export_shape_ph_s673() {
-        let sample = r#"{"ok":true,"metrics":{"sample_total":0,"mismatch_total":0,"match_total":0,"sample_completed_total":0,"checker_enqueue_total":0,"checker_pending_total":0}}"#;
+        let sample = r#"{"ok":true,"lifecycle_depth":"none","metrics":{"sample_total":0,"mismatch_total":0,"match_total":0,"sample_completed_total":0,"checker_enqueue_total":0,"checker_pending_total":0}}"#;
         let body: Value = serde_json::from_str(sample).expect("json");
         assert_eq!(body["metrics"]["checker_pending_total"], 0);
+        assert_eq!(body["lifecycle_depth"], "none");
+    }
+
+    #[test]
+    fn grid_verification_lifecycle_export_shape_ph_s883() {
+        use poolai::grid::galaxy_verification_lifecycle_depth::{
+            verification_lifecycle_depth_stub, verification_lifecycle_depth_wire_label,
+            VerificationLifecycleDepth,
+        };
+        use poolai::grid::galaxy_verification_metrics::VerificationMetricsSnapshot;
+        use poolai::grid::stand_smoke_metrics_parity::{
+            stand_smoke_metrics_parity_depth_stub, StandSmokeMetricsParityDepth,
+        };
+        use serde_json::json;
+
+        let empty = VerificationMetricsSnapshot {
+            sample_total: 0,
+            mismatch_total: 0,
+            match_total: 0,
+            sample_completed_total: 0,
+            checker_enqueue_total: 0,
+            checker_pending_total: 0,
+        };
+        let depth = verification_lifecycle_depth_stub(
+            Some(&VerificationMetricsSnapshot {
+                checker_enqueue_total: 1,
+                checker_pending_total: 1,
+                ..empty
+            }),
+            1,
+        );
+        assert_eq!(depth, VerificationLifecycleDepth::ShadowJobSubmit);
+        assert_eq!(
+            verification_lifecycle_depth_wire_label(depth),
+            "shadow_job_submit"
+        );
+        assert_eq!(
+            stand_smoke_metrics_parity_depth_stub(Some(
+                &json!({"verification_checker_lifecycle": true})
+            )),
+            StandSmokeMetricsParityDepth::VerificationCheckerLifecycle
+        );
+    }
+
+    #[test]
+    fn admin_wasm_slim_depth_stub_band23_export_shape_ph_s882() {
+        use poolai_ui_core::grid_replication_pricing::{
+            admin_wasm_slim_depth_stub, AdminWasmSlimDepth,
+        };
+        use poolai_ui_core::stand_smoke_metrics::render_grid_verification_metrics_strip_html;
+        use serde_json::json;
+        assert_eq!(
+            admin_wasm_slim_depth_stub(Some(&json!({"grid_verification_panel": true}))),
+            AdminWasmSlimDepth::GridVerificationPanel
+        );
+        assert_eq!(
+            admin_wasm_slim_depth_stub(Some(&json!({"grid_verification_metrics_strip": true}))),
+            AdminWasmSlimDepth::GridVerificationMetricsStrip
+        );
+        let strip = render_grid_verification_metrics_strip_html(
+            r#"{"metrics":{"sample_total":2,"checker_pending_total":1}}"#,
+            1,
+        );
+        assert!(strip.contains("Sample"));
+        assert!(strip.contains("Pending"));
     }
 
     #[test]

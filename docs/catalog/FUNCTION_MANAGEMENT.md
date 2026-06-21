@@ -1079,20 +1079,30 @@ FM-xxx (з таблиці нижче)
 | 812 | **PH-S877** | poolai-vision-sync --check | ops | `--check` green | **✅** |
 | 813 | **PH-S878** | Ratio hold advisory | ops | `--min-ratio 0.95 --advisory` | **✅** |
 | 814 | **PH-S879** | Horizon close band S870–S878 | Solana | `galaxy_horizon_s870_integration` | **✅** |
-| 815 | **PH-S880** | checker task drain lifecycle | Galaxy §6.2 | PH-S495 extend integration | **[ ]** |
-| 816 | **PH-S881** | checker shadow job submit depth | Galaxy §6.2 | integration test | **[ ]** |
-| 817 | **PH-S882** | admin grid-verification wasm complete | ui | metrics+tasks strip | **[ ]** |
-| 818 | **PH-S883** | stand smoke verification-checker/tasks | tests | runner | **[ ]** |
-| 819 | **PH-S884** | verification lifecycle depth stub | concept | unit test | **[ ]** |
-| 820 | **PH-S885** | poolai-loc-audit PH-S885 | §5.13 | rust_ratio.json zriz | **[ ]** |
-| 821 | **PH-S886** | Galaxy §6.2 implemented table | docs | docs ✅ | **[ ]** |
-| 822 | **PH-S887** | poolai-vision-sync --check | ops | `--check` green | **[ ]** |
-| 823 | **PH-S888** | Ratio hold advisory | ops | `--min-ratio 0.95 --advisory` | **[ ]** |
-| 824 | **PH-S889** | Horizon close band S880–S888 | Verification | `galaxy_horizon_s880_integration` | **[ ]** |
+| 815 | **PH-S880** | checker task drain lifecycle | Galaxy §6.2 | PH-S495 extend integration | **✅** |
+| 816 | **PH-S881** | checker shadow job submit depth | Galaxy §6.2 | integration test | **✅** |
+| 817 | **PH-S882** | admin grid-verification wasm complete | ui | metrics+tasks strip | **✅** |
+| 818 | **PH-S883** | stand smoke verification-checker/tasks | tests | runner | **✅** |
+| 819 | **PH-S884** | verification lifecycle depth stub | concept | unit test | **✅** |
+| 820 | **PH-S885** | poolai-loc-audit PH-S885 | §5.13 | rust_ratio.json zriz | **✅** |
+| 821 | **PH-S886** | Galaxy §6.2 implemented table | docs | docs ✅ | **✅** |
+| 822 | **PH-S887** | poolai-vision-sync --check | ops | `--check` green | **✅** |
+| 823 | **PH-S888** | Ratio hold advisory | ops | `--min-ratio 0.95 --advisory` | **✅** |
+| 824 | **PH-S889** | Horizon close band S880–S888 | Verification | `galaxy_horizon_s880_integration` | **✅** |
+| 825 | **PH-S890** | replication quorum gate production | Galaxy §6.4 | strict tier integration | **[ ]** |
+| 826 | **PH-S891** | replication rate cap HTTP wire | Galaxy §6.4 | integration test | **[ ]** |
+| 827 | **PH-S892** | admin replication-pricing wasm polish | ui-core | ui-core regression | **[ ]** |
+| 828 | **PH-S893** | stand smoke replication metrics parity | tests | JSON↔Prom | **[ ]** |
+| 829 | **PH-S894** | replication depth stub | concept | unit test | **[ ]** |
+| 830 | **PH-S895** | poolai-loc-audit PH-S895 | §5.13 | rust_ratio.json zriz | **[ ]** |
+| 831 | **PH-S896** | Galaxy §6.4 implemented | docs | docs ✅ | **[ ]** |
+| 832 | **PH-S897** | poolai-vision-sync --check | ops | `--check` green | **[ ]** |
+| 833 | **PH-S898** | Ratio hold advisory | ops | `--min-ratio 0.95 --advisory` | **[ ]** |
+| 834 | **PH-S899** | Horizon close band S890–S898 | Replication | `galaxy_horizon_s890_integration` | **[ ]** |
 
-**Відкритих у §5.12:** **10** (PH-S880…S889). **Master backlog:** **131** pending PH-S890…S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · **§5.14**. Vision rev **288** (after sync). rust_ratio **94.71%** (PH-S875).
+**Відкритих у §5.12:** **10** (PH-S890…S899). **Master backlog:** **121** pending PH-S900…S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · **§5.14**. Vision rev **289** (after sync). rust_ratio **94.73%** (PH-S885).
 
-**Наступна сесія:** **`абракадабра`** — drain PH-S880…S889 → promote PH-S890…S899 з §5.14 → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **`абракадабра`** — drain PH-S890…S899 → promote PH-S900…S909 з §5.14 → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.14 Master backlog PH-S720…S1010 (291 pending → product-complete, 2026-06-20)
 
@@ -1100,10 +1110,10 @@ FM-xxx (з таблиці нижче)
 
 | Поле | Значення |
 |------|----------|
-| **Pending** | **131** (PH-S890…S1010) |
-| **Drained bands 1–22** | PH-S660…S879 ✅ |
-| **Активна §5.12** | PH-S880…S889 `[ ]` — band 23 Verification checker lifecycle |
-| **Наступна promote** | PH-S890…S899 — band 24 Replication quorum production gates |
+| **Pending** | **121** (PH-S900…S1010) |
+| **Drained bands 1–23** | PH-S660…S889 ✅ |
+| **Активна §5.12** | PH-S890…S899 `[ ]` — band 24 Replication quorum production gates |
+| **Наступна promote** | PH-S900…S909 — band 25 Pricing oracle live fetch hardening |
 | **Сесій `абракадабра`** | **14** (13×10 + tail PH-S1010) |
 | **План фаз** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md) |
 | **Реєстр sprint×acceptance** | [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) |
@@ -1153,7 +1163,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-06-21):** PH-S880…S889 **[ ]** drain band 23 (Verification checker lifecycle) · **`абракадабра`** = drain → vision close → push · ratio formal gate bands **28–29** per [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md).
+**Активна смуга (2026-06-21):** PH-S890…S899 **[ ]** drain band 24 (Replication quorum production gates) · **`абракадабра`** = drain → vision close → push · ratio formal gate bands **28–29** per [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md).
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

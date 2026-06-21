@@ -2180,11 +2180,23 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_memory_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_settlement_onchain_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_solana_depth_rs"
     }
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S879",
+  "last_sprint_closed": "PH-S889",
   "layers": [
     {
       "id": "L0",
@@ -2217,7 +2229,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S880",
+  "next_sprint": "PH-S890",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -8995,9 +9007,30 @@
       "label": "memory_shard_persistence.rs",
       "layer": "L3",
       "path": "tests/memory_shard_persistence.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_settlement_onchain_depth_rs",
+      "label": "galaxy_settlement_onchain_depth.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_settlement_onchain_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_solana_depth_rs",
+      "label": "solana_depth.rs",
+      "layer": "L3",
+      "path": "src/grid/solana_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s870_integration_rs",
+      "label": "galaxy_horizon_s870_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s870_integration.rs"
     }
   ],
-  "revision": 288,
+  "revision": 289,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -16329,91 +16362,181 @@
       "acceptance": "PH-S495 extend integration",
       "deps": "Galaxy §6.2",
       "id": "PH-S880",
-      "open": true,
+      "open": false,
       "row": 815,
-      "status": "open",
+      "status": "closed",
       "title": "checker task drain lifecycle"
     },
     {
       "acceptance": "integration test",
       "deps": "Galaxy §6.2",
       "id": "PH-S881",
-      "open": true,
+      "open": false,
       "row": 816,
-      "status": "open",
+      "status": "closed",
       "title": "checker shadow job submit depth"
     },
     {
       "acceptance": "metrics+tasks strip",
       "deps": "ui",
       "id": "PH-S882",
-      "open": true,
+      "open": false,
       "row": 817,
-      "status": "open",
+      "status": "closed",
       "title": "admin grid-verification wasm complete"
     },
     {
       "acceptance": "runner",
       "deps": "tests",
       "id": "PH-S883",
-      "open": true,
+      "open": false,
       "row": 818,
-      "status": "open",
+      "status": "closed",
       "title": "stand smoke verification-checker/tasks"
     },
     {
       "acceptance": "unit test",
       "deps": "concept",
       "id": "PH-S884",
-      "open": true,
+      "open": false,
       "row": 819,
-      "status": "open",
+      "status": "closed",
       "title": "verification lifecycle depth stub"
     },
     {
       "acceptance": "rust_ratio.json zriz",
       "deps": "§5.13",
       "id": "PH-S885",
-      "open": true,
+      "open": false,
       "row": 820,
-      "status": "open",
+      "status": "closed",
       "title": "poolai-loc-audit PH-S885"
     },
     {
       "acceptance": "docs ✅",
       "deps": "docs",
       "id": "PH-S886",
-      "open": true,
+      "open": false,
       "row": 821,
-      "status": "open",
+      "status": "closed",
       "title": "Galaxy §6.2 implemented table"
     },
     {
       "acceptance": "--check` green",
       "deps": "ops",
       "id": "PH-S887",
-      "open": true,
+      "open": false,
       "row": 822,
-      "status": "open",
+      "status": "closed",
       "title": "poolai-vision-sync --check"
     },
     {
       "acceptance": "--min-ratio 0.95 --advisory",
       "deps": "ops",
       "id": "PH-S888",
-      "open": true,
+      "open": false,
       "row": 823,
-      "status": "open",
+      "status": "closed",
       "title": "Ratio hold advisory"
     },
     {
       "acceptance": "galaxy_horizon_s880_integration",
       "deps": "Verification",
       "id": "PH-S889",
-      "open": true,
+      "open": false,
       "row": 824,
-      "status": "open",
+      "status": "closed",
       "title": "Horizon close band S880–S888"
+    },
+    {
+      "acceptance": "strict tier integration",
+      "deps": "Galaxy §6.4",
+      "id": "PH-S890",
+      "open": true,
+      "row": 825,
+      "status": "open",
+      "title": "replication quorum gate production"
+    },
+    {
+      "acceptance": "integration test",
+      "deps": "Galaxy §6.4",
+      "id": "PH-S891",
+      "open": true,
+      "row": 826,
+      "status": "open",
+      "title": "replication rate cap HTTP wire"
+    },
+    {
+      "acceptance": "ui-core regression",
+      "deps": "ui-core",
+      "id": "PH-S892",
+      "open": true,
+      "row": 827,
+      "status": "open",
+      "title": "admin replication-pricing wasm polish"
+    },
+    {
+      "acceptance": "JSON↔Prom",
+      "deps": "tests",
+      "id": "PH-S893",
+      "open": true,
+      "row": 828,
+      "status": "open",
+      "title": "stand smoke replication metrics parity"
+    },
+    {
+      "acceptance": "unit test",
+      "deps": "concept",
+      "id": "PH-S894",
+      "open": true,
+      "row": 829,
+      "status": "open",
+      "title": "replication depth stub"
+    },
+    {
+      "acceptance": "rust_ratio.json zriz",
+      "deps": "§5.13",
+      "id": "PH-S895",
+      "open": true,
+      "row": 830,
+      "status": "open",
+      "title": "poolai-loc-audit PH-S895"
+    },
+    {
+      "acceptance": "docs ✅",
+      "deps": "docs",
+      "id": "PH-S896",
+      "open": true,
+      "row": 831,
+      "status": "open",
+      "title": "Galaxy §6.4 implemented"
+    },
+    {
+      "acceptance": "--check` green",
+      "deps": "ops",
+      "id": "PH-S897",
+      "open": true,
+      "row": 832,
+      "status": "open",
+      "title": "poolai-vision-sync --check"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory",
+      "deps": "ops",
+      "id": "PH-S898",
+      "open": true,
+      "row": 833,
+      "status": "open",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "acceptance": "galaxy_horizon_s890_integration",
+      "deps": "Replication",
+      "id": "PH-S899",
+      "open": true,
+      "row": 834,
+      "status": "open",
+      "title": "Horizon close band S890–S898"
     }
   ],
   "sprint_queue_open_count": 10,

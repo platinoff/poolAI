@@ -880,6 +880,15 @@ elif verdict == rejected:
 | `galaxy_pricing_market_min_usd_micro` | ✅ `/metrics` | PH-S181 |
 | `galaxy_trust_score` | ✅ `/metrics` | PH-S182 |
 | `galaxy_verification_sample_scheduled_total` | ✅ `/metrics` | PH-S164, PH-S186 |
+| `galaxy_verification_checker_enqueue_total` | ✅ `/metrics` | PH-S437, PH-S642 |
+| `galaxy_verification_checker_pending_total` | ✅ `/metrics` + tasks API | PH-S496, PH-S494 |
+| `galaxy_verification_checker_job_submit_total` | ✅ `/metrics` | PH-S534 |
+| `galaxy_verification_checker_timeout_inconclusive_total` | ✅ `/metrics` | PH-S569 |
+| `galaxy_verification_checker_timeout_retry_total` | ✅ `/metrics` | PH-S569 |
+| `GET /api/v1/grid/verification-checker/tasks` | ✅ read API | PH-S494 |
+| `GET /api/v1/grid/verification-metrics` + `lifecycle_depth` | ✅ HTTP wire | PH-S670, PH-S880 |
+| `/ui/admin/grid-verification` wasm panel + metrics strip | ✅ admin UI | PH-S512, PH-S882 |
+| `verification_lifecycle_depth_stub` | ✅ concept depth | PH-S884 |
 | `galaxy_settlement_cleared_total` | ✅ `/metrics` | PH-S187 |
 | `galaxy_fee_split_applied_total` | ✅ `/metrics` | PH-S194 |
 

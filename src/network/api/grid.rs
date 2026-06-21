@@ -25,6 +25,9 @@ use crate::grid::galaxy_settlement_mode::{current_settlement_mode, settlement_on
 use crate::grid::galaxy_settlement_onchain_depth::{
     current_settlement_onchain_depth, settlement_onchain_depth_wire_label,
 };
+use crate::grid::galaxy_verification_lifecycle_depth::{
+    current_verification_lifecycle_depth, verification_lifecycle_depth_wire_label,
+};
 use crate::grid::solana_depth::{solana_depth_stub, solana_depth_wire_label};
 use crate::grid::{
     coordinator_seed_inventory_snapshot, ingest_envelope, GridEnvelope, GridIngestKind,
@@ -348,16 +351,20 @@ async fn get_grid_verification_checker_tasks(
 struct GridVerificationMetricsResponse {
     ok: bool,
     metrics: crate::grid::galaxy_verification_metrics::VerificationMetricsSnapshot,
+    /// Verification checker lifecycle depth wire label (PH-S880).
+    lifecycle_depth: &'static str,
 }
 
 async fn get_grid_verification_metrics(
     State(_ctx): State<ApiContext>,
 ) -> Result<(StatusCode, Json<GridVerificationMetricsResponse>), HttpAppError> {
+    let depth = current_verification_lifecycle_depth();
     Ok((
         StatusCode::OK,
         Json(GridVerificationMetricsResponse {
             ok: true,
             metrics: crate::grid::galaxy_verification_metrics::verification_metrics_snapshot(),
+            lifecycle_depth: verification_lifecycle_depth_wire_label(depth),
         }),
     ))
 }
@@ -1214,6 +1221,7 @@ mod tests {
         assert_eq!(res.metrics.match_total, 1);
         assert_eq!(res.metrics.mismatch_total, 1);
         assert_eq!(verification_metrics_snapshot().match_total, 1);
+        assert!(res.lifecycle_depth.is_ascii());
 
         reset_verification_metrics_for_test();
     }

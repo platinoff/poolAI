@@ -21,7 +21,7 @@ const FORMAL_BAND_MAX: f64 = 0.95;
 const DEFAULT_WARN_BELOW: f64 = 0.93;
 const DEFAULT_TARGET: f64 = 0.95;
 const DEFAULT_STRETCH: f64 = 0.96;
-const SPRINT: &str = "PH-S855";
+const SPRINT: &str = "PH-S885";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize)]
 #[serde(rename_all = "snake_case")]

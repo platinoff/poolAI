@@ -1343,6 +1343,14 @@ fn admin_grid_verification_wasm_glue_ph_s712() {
 }
 
 #[test]
+fn admin_grid_verification_wasm_complete_ph_s882() {
+    let page = include_str!("grid_verification.rs");
+    assert!(page.contains("poolaiRenderGridVerificationPanel"));
+    assert!(page.contains("renderGridVerificationMetricsStrip"));
+    assert!(page.contains("loadGridVerificationTasks"));
+}
+
+#[test]
 fn admin_grid_replication_pricing_wasm_glue_ph_s692() {
     let page = include_str!("grid_replication_pricing.rs");
     assert!(page.contains("parsePrometheusGauge"));

@@ -252,6 +252,8 @@ pub enum StandSmokeMetricsParityDepth {
     MemoryShardPersist,
     /// On-chain cleared settlement depth + metrics (PH-S873 band 22).
     OnChainSettlement,
+    /// Verification checker lifecycle depth (PH-S883 band 23).
+    VerificationCheckerLifecycle,
 }
 
 /// Classify stand smoke metrics parity depth from optional feature stub (PH-S714/PH-S724).
@@ -278,6 +280,12 @@ pub fn stand_smoke_metrics_parity_depth_stub(
         .unwrap_or(false)
     {
         return StandSmokeMetricsParityDepth::OnChainSettlement;
+    }
+    if f.get("verification_checker_lifecycle")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        return StandSmokeMetricsParityDepth::VerificationCheckerLifecycle;
     }
     if f.get("network_profile_persist")
         .and_then(|v| v.as_bool())
@@ -818,6 +826,16 @@ mod tests {
         assert_eq!(
             stand_smoke_metrics_parity_depth_stub(Some(&json!({"on_chain_settlement": true}))),
             StandSmokeMetricsParityDepth::OnChainSettlement
+        );
+    }
+
+    #[test]
+    fn stand_smoke_metrics_parity_depth_stub_band23_ph_s883() {
+        assert_eq!(
+            stand_smoke_metrics_parity_depth_stub(Some(
+                &json!({"verification_checker_lifecycle": true})
+            )),
+            StandSmokeMetricsParityDepth::VerificationCheckerLifecycle
         );
     }
 

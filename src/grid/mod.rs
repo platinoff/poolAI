@@ -49,6 +49,7 @@ pub mod galaxy_trust_score;
 pub mod galaxy_trust_score_store;
 pub mod galaxy_update_policy;
 pub mod galaxy_verification_checker_jobs;
+pub mod galaxy_verification_lifecycle_depth;
 pub mod galaxy_verification_metrics;
 pub mod galaxy_verification_replay;
 pub mod galaxy_verify_sampling;

@@ -38,6 +38,10 @@ pub enum AdminWasmSlimDepth {
     JobsStoreBadge,
     /// Memory / seed inventory meta strip wasm renderer (PH-S862).
     MemorySeedMetaStrip,
+    /// Grid verification checker panel wasm renderer (PH-S882).
+    GridVerificationPanel,
+    /// Grid verification metrics strip wasm renderer (PH-S882).
+    GridVerificationMetricsStrip,
 }
 
 /// Classify admin wasm slim depth from optional feature stub (PH-S704).
@@ -62,6 +66,18 @@ pub fn admin_wasm_slim_depth_stub(features: Option<&Value>) -> AdminWasmSlimDept
         .unwrap_or(false)
     {
         return AdminWasmSlimDepth::MemorySeedMetaStrip;
+    }
+    if f.get("grid_verification_metrics_strip")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        return AdminWasmSlimDepth::GridVerificationMetricsStrip;
+    }
+    if f.get("grid_verification_panel")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        return AdminWasmSlimDepth::GridVerificationPanel;
     }
     if f.get("workers_panel")
         .and_then(|v| v.as_bool())
@@ -256,6 +272,18 @@ mod tests {
         assert_eq!(
             admin_wasm_slim_depth_stub(Some(&json!({"memory_seed_meta_strip": true}))),
             AdminWasmSlimDepth::MemorySeedMetaStrip
+        );
+    }
+
+    #[test]
+    fn admin_wasm_slim_depth_stub_ph_s882() {
+        assert_eq!(
+            admin_wasm_slim_depth_stub(Some(&json!({"grid_verification_panel": true}))),
+            AdminWasmSlimDepth::GridVerificationPanel
+        );
+        assert_eq!(
+            admin_wasm_slim_depth_stub(Some(&json!({"grid_verification_metrics_strip": true}))),
+            AdminWasmSlimDepth::GridVerificationMetricsStrip
         );
     }
 }

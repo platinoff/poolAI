@@ -1,17 +1,17 @@
 # Galaxy Grid roadmap (зріз)
 
-**Оновлено:** 2026-06-21 · **Completion v2:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · **191** pending PH-S820…S1010 · **§5.12 active:** 10
+**Оновлено:** 2026-06-21 · **Completion v2:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · **121** pending PH-S890…S1010 · **§5.12 active:** 10
 
 | Зріз | Значення |
 |------|----------|
 | **Completion plan** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.14–§5.15** |
 | **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) |
-| **Active drain (band 18)** | PH-S830…S839 — stand smoke v2 full grid parity |
-| **Next promote (band 18)** | PH-S830…S839 — stand smoke v2 full grid parity |
+| **Active drain (band 24)** | PH-S890…S899 — Replication quorum production gates |
+| **Last closed (band 23)** | PH-S880…S889 ✅ — Verification checker lifecycle |
 | **Product-complete tail** | PH-S1010 — FM **§5.15** |
-| **Rust ratio** | **94.68%** · hold **95%** advisory (bands 27–29 formal gate) |
+| **Rust ratio** | **94.71%** · hold **95%** advisory (bands 27–29 formal gate) |
 
-**201** pending · **21** `абракадабра` sessions · остання закрита **PH-S800…S809** ✅.
+**121** pending · **13** `абракадабра` sessions · остання закрита **PH-S880…S889** ✅.
 
 ---
 
@@ -38,7 +38,12 @@
 | **Admin wasm slim (monitoring/payout)** | UI_UX / §5.13 | band 15 ✅ PH-S800…S809 |
 | **Admin wasm slim (security/topology)** | UI_UX / §5.13 | band 16 ✅ PH-S810…S819 |
 | **Admin wasm slim (vm/workers/libs)** | UI_UX / §5.13 | band 17 ✅ PH-S820…S829 |
-| **Stand smoke v2 grid parity** | ops / §5.13 | band 18 **active** PH-S830…S839 |
+| **Stand smoke v2 grid parity** | ops / §5.13 | band 18 ✅ PH-S830…S839 |
+| **OpenAPI gap 0 + grid contracts** | docs/openapi.yaml | band 19 ✅ PH-S840…S849 |
+| **Job store RAID persist** | Job layer | band 20 ✅ PH-S850…S859 |
+| **Memory shard persist + seed inventory** | Memory layer | band 21 ✅ PH-S860…S869 |
+| **Solana on-chain cleared depth** | FM-010 / §7 | band 22 ✅ PH-S870…S879 |
+| **§6.2 verification checker lifecycle** | Galaxy **§6.2** | band 23 ✅ PH-S880…S889 |
 | **network_profile persist stub** | Galaxy **§8** | PH-S664 ✅ (stub); full persist ✅ band 8 PH-S730…S739 |
 
 **§5.5 prefetch:** live pull + backpressure + strict-mode HTTP wire ✅ (baseline); live pull **depth** ✅ band 10 (PH-S750…S759).
