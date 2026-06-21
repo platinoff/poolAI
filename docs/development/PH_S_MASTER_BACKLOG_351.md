@@ -1,6 +1,6 @@
-# PH-S master backlog (291 pending → product-complete)
+# PH-S master backlog (241 pending → product-complete)
 
-**Generated:** 2026-06-20 · **Range:** PH-S660…PH-S1010 · **Pending:** **291** (S720…S1010) · **Completion roadmap v2**
+**Generated:** 2026-06-21 · **Range:** PH-S660…PH-S1010 · **Pending:** **241** (S770…S1010) · **Completion roadmap v2**
 
 **VDT:** один `абракадабра` = drain **10** з FM §5.12 → vision close → push → promote наступні 10.
 
@@ -17,11 +17,11 @@
 | 5 | PH-S700…S709 | Admin wasm slim ui-core (drained) ✅ drained |
 | 6 | PH-S710…S719 | Stand smoke metrics parity (drained) ✅ drained |
 | 7 | PH-S720…S729 | Galaxy §4 routing / re-migrate depth ✅ drained |
-| 8 | PH-S730…S739 | Galaxy §8.1 network_profile full persist **active §5.12** |
-| 9 | PH-S740…S749 | Galaxy §6.6 signed capability admission |
-| 10 | PH-S750…S759 | Galaxy §5.5 prefetch live pull depth |
-| 11 | PH-S760…S769 | Galaxy §5.2–5.4 locality / hot-tier |
-| 12 | PH-S770…S779 | Galaxy §8.2 payout / settlement batch |
+| 8 | PH-S730…S739 | Galaxy §8.1 network_profile full persist ✅ drained |
+| 9 | PH-S740…S749 | Galaxy §6.6 signed capability admission ✅ drained |
+| 10 | PH-S750…S759 | Galaxy §5.5 prefetch live pull depth ✅ drained |
+| 11 | PH-S760…S769 | Galaxy §5.2–5.4 locality / hot-tier ✅ drained |
+| 12 | PH-S770…S779 | Galaxy §8.2 payout / settlement batch **active §5.12** |
 | 13 | PH-S780…S789 | Galaxy §1.2 fee split production |
 | 14 | PH-S790…S799 | Galaxy §9.5–9.6 governance ops |
 | 15 | PH-S800…S809 | Admin wasm slim: monitoring + payout-batch |
@@ -154,7 +154,7 @@
 | **PH-S728** | Ratio hold advisory | `--min-ratio 0.95 --advisory` |
 | **PH-S729** | galaxy_horizon_s720_integration | §4 routing band close |
 
-## Band 8 — PH-S730…S739 (Galaxy §8.1 network_profile full persist) · **active §5.12**
+## Band 8 — PH-S730…S739 (Galaxy §8.1 network_profile full persist) · **✅ drained**
 
 | Sprint | Focus | Acceptance |
 |--------|-------|------------|
@@ -169,7 +169,7 @@
 | **PH-S738** | Ratio hold advisory | `--min-ratio 0.95 --advisory` |
 | **PH-S739** | galaxy_horizon_s730_integration | profile persist band close |
 
-## Band 9 — PH-S740…S749 (Galaxy §6.6 signed capability admission)
+## Band 9 — PH-S740…S749 (Galaxy §6.6 signed capability admission) · **✅ drained**
 
 | Sprint | Focus | Acceptance |
 |--------|-------|------------|
@@ -184,7 +184,7 @@
 | **PH-S748** | Ratio hold advisory | hold snapshot |
 | **PH-S749** | galaxy_horizon_s740_integration | signed cap band close |
 
-## Band 10 — PH-S750…S759 (Galaxy §5.5 prefetch live pull depth)
+## Band 10 — PH-S750…S759 (Galaxy §5.5 prefetch live pull depth) · **✅ drained**
 
 | Sprint | Focus | Acceptance |
 |--------|-------|------------|
@@ -199,7 +199,7 @@
 | **PH-S758** | Ratio hold advisory | hold |
 | **PH-S759** | galaxy_horizon_s750_integration | prefetch band close |
 
-## Band 11 — PH-S760…S769 (Galaxy §5.2–5.4 locality / hot-tier)
+## Band 11 — PH-S760…S769 (Galaxy §5.2–5.4 locality / hot-tier) · **✅ drained**
 
 | Sprint | Focus | Acceptance |
 |--------|-------|------------|
@@ -214,7 +214,7 @@
 | **PH-S768** | Ratio hold advisory | hold |
 | **PH-S769** | galaxy_horizon_s760_integration | locality band close |
 
-## Band 12 — PH-S770…S779 (Galaxy §8.2 payout / settlement batch)
+## Band 12 — PH-S770…S779 (Galaxy §8.2 payout / settlement batch) · **active §5.12**
 
 | Sprint | Focus | Acceptance |
 |--------|-------|------------|

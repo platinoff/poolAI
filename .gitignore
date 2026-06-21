@@ -30,6 +30,8 @@ bin/push-*.sh
 bin/amend-*.sh
 bin/poll-*.sh
 bin/_poll-*.sh
+bin/git-commit-push.sh
+bin/test-vm-create-api.sh
 :-/
 
 # Local multi-node LAN dev stand (bin/run-lan-nodes.*)

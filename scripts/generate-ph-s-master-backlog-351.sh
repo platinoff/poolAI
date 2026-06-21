@@ -4,7 +4,7 @@
 # Canon: docs/development/PH_S_COMPLETION_ROADMAP_2026-06-20.md
 set -euo pipefail
 OUT="${1:-docs/development/PH_S_MASTER_BACKLOG_351.md}"
-TODAY="2026-06-20"
+TODAY="2026-06-21"
 
 band_theme_v2() {
   case "$1" in
@@ -431,9 +431,9 @@ EOF
 }
 
 {
-  echo "# PH-S master backlog (291 pending → product-complete)"
+  echo "# PH-S master backlog (241 pending → product-complete)"
   echo ""
-  echo "**Generated:** ${TODAY} · **Range:** PH-S660…PH-S1010 · **Pending:** **291** (S720…S1010) · **Completion roadmap v2**"
+  echo "**Generated:** ${TODAY} · **Range:** PH-S660…PH-S1010 · **Pending:** **241** (S770…S1010) · **Completion roadmap v2**"
   echo ""
   echo "**VDT:** один \`абракадабра\` = drain **10** з FM §5.12 → vision close → push → promote наступні 10."
   echo ""
@@ -448,8 +448,8 @@ EOF
     end=$((start + 9))
     theme=$(band_theme_v2 "$b")
     st=""
-    if (( b <= 6 )); then st=" ✅ drained"; fi
-    if (( b == 7 )); then st=" **active §5.12**"; fi
+    if (( b <= 11 )); then st=" ✅ drained"; fi
+    if (( b == 12 )); then st=" **active §5.12**"; fi
     printf "| %d | PH-S%d…S%d | %s%s |\n" "$b" "$start" "$end" "$theme" "$st"
   done
   echo "| 36 | PH-S1010 | Product-complete closure |"
@@ -563,7 +563,8 @@ EOF
     end=$((start + 9))
     theme=$(band_theme_v2 "$b")
     st=""
-    if (( b == 7 )); then st=" · **active §5.12**"; fi
+    if (( b <= 11 )); then st=" · **✅ drained**"; fi
+    if (( b == 12 )); then st=" · **active §5.12**"; fi
     echo "## Band ${b} — PH-S${start}…S${end} (${theme})${st}"
     echo ""
     echo "| Sprint | Focus | Acceptance |"
