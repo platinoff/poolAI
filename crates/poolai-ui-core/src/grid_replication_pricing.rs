@@ -20,6 +20,10 @@ pub enum AdminWasmSlimDepth {
     None,
     PanelRenderer,
     ChartsGlue,
+    /// ML pipeline metrics panel wasm renderer (PH-S804).
+    MlPipelinePanel,
+    /// Payout batch admin panel wasm renderer (PH-S804).
+    PayoutBatchPanel,
 }
 
 /// Classify admin wasm slim depth from optional feature stub (PH-S704).
@@ -32,6 +36,18 @@ pub fn admin_wasm_slim_depth_stub(features: Option<&Value>) -> AdminWasmSlimDept
         .unwrap_or(false)
     {
         return AdminWasmSlimDepth::ChartsGlue;
+    }
+    if f.get("payout_batch_panel")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        return AdminWasmSlimDepth::PayoutBatchPanel;
+    }
+    if f.get("ml_pipeline_panel")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        return AdminWasmSlimDepth::MlPipelinePanel;
     }
     if f.get("panel_renderer")
         .and_then(|v| v.as_bool())
@@ -122,5 +138,23 @@ mod tests {
             AdminWasmSlimDepth::ChartsGlue
         );
         assert_eq!(admin_wasm_slim_depth_stub(None), AdminWasmSlimDepth::None);
+    }
+
+    #[test]
+    fn admin_wasm_slim_depth_stub_ph_s804() {
+        assert_eq!(
+            admin_wasm_slim_depth_stub(Some(&json!({"ml_pipeline_panel": true}))),
+            AdminWasmSlimDepth::MlPipelinePanel
+        );
+        assert_eq!(
+            admin_wasm_slim_depth_stub(Some(&json!({"payout_batch_panel": true}))),
+            AdminWasmSlimDepth::PayoutBatchPanel
+        );
+        assert_eq!(
+            admin_wasm_slim_depth_stub(Some(
+                &json!({"charts_glue": true, "ml_pipeline_panel": true})
+            )),
+            AdminWasmSlimDepth::ChartsGlue
+        );
     }
 }

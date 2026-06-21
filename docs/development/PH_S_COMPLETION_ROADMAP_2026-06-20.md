@@ -146,7 +146,7 @@
 
 ---
 
-## Band 15 — PH-S800…S809 (Admin wasm slim: monitoring + payout-batch) · **active §5.12**
+## Band 15 — PH-S800…S809 (Admin wasm slim: monitoring + payout-batch) · **✅ drained 2026-06-21**
 
 | Sprint | Focus | Acceptance |
 |--------|-------|------------|
@@ -167,8 +167,8 @@
 
 | Band | Sprints | Theme |
 |------|---------|-------|
-| 15 | S800–S809 | Admin wasm slim: monitoring + payout-batch panels |
-| 16 | S810–S819 | Admin wasm slim: security + topology panels |
+| 15 | S800–S809 | Admin wasm slim: monitoring + payout-batch ✅ |
+| 16 | S810–S819 | Admin wasm slim: security + topology **active** |
 | 17 | S820–S829 | Admin wasm slim: vm + workers + libs panels |
 | 18 | S830–S839 | Stand smoke v2: all grid JSON↔Prom parity + runner |
 | 19 | S840–S849 | OpenAPI gap audit 0 + contract test band |

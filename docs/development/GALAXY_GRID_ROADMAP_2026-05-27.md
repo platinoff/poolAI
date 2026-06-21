@@ -1,17 +1,17 @@
 # Galaxy Grid roadmap (зріз)
 
-**Оновлено:** 2026-06-21 · **Completion v2:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · **211** pending PH-S800…S1010 · **§5.12 active:** 10
+**Оновлено:** 2026-06-21 · **Completion v2:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · **201** pending PH-S810…S1010 · **§5.12 active:** 10
 
 | Зріз | Значення |
 |------|----------|
 | **Completion plan** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.14–§5.15** |
 | **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) |
-| **Active drain (band 15)** | PH-S800…S809 — admin wasm slim monitoring/payout |
-| **Next promote (band 16)** | PH-S810…S819 — admin wasm slim security/topology |
+| **Active drain (band 16)** | PH-S810…S819 — admin wasm slim security/topology |
+| **Next promote (band 17)** | PH-S820…S829 — admin wasm slim vm/workers/libs |
 | **Product-complete tail** | PH-S1010 — FM **§5.15** |
-| **Rust ratio** | **94.69%** · hold **95%** advisory (bands 27–29 formal gate) |
+| **Rust ratio** | **94.68%** · hold **95%** advisory (bands 27–29 formal gate) |
 
-**211** pending · **22** `абракадабра` sessions · остання закрита **PH-S790…S799** ✅.
+**201** pending · **21** `абракадабра` sessions · остання закрита **PH-S800…S809** ✅.
 
 ---
 
@@ -35,7 +35,8 @@
 | **§8.2 payout / settlement batch** | Galaxy **§8.2** | band 12 ✅ PH-S770…S779 |
 | **§1.2 fee split production** | Galaxy **§1.2** | band 13 ✅ PH-S780…S789 |
 | **§9.5–9.6 governance ops** | Galaxy **§9.5–9.6** | band 14 ✅ PH-S790…S799 |
-| **Admin wasm slim (monitoring/payout)** | UI_UX / §5.13 | band 15 **active** PH-S800…S809 |
+| **Admin wasm slim (monitoring/payout)** | UI_UX / §5.13 | band 15 ✅ PH-S800…S809 |
+| **Admin wasm slim (security/topology)** | UI_UX / §5.13 | band 16 **active** PH-S810…S819 |
 | **network_profile persist stub** | Galaxy **§8** | PH-S664 ✅ (stub); full persist ✅ band 8 PH-S730…S739 |
 
 **§5.5 prefetch:** live pull + backpressure + strict-mode HTTP wire ✅ (baseline); live pull **depth** ✅ band 10 (PH-S750…S759).

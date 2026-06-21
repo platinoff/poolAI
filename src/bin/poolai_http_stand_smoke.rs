@@ -3112,6 +3112,61 @@ mod tests {
     }
 
     #[test]
+    fn monitoring_settlement_payout_export_shape_ph_s803() {
+        use poolai::grid::stand_smoke_metrics_parity::{
+            validate_grid_metrics_json_export, validate_settlement_trust_metrics_parity,
+            SETTLEMENT_JSON_KEYS, TRUST_JSON_KEYS,
+        };
+        let prom = concat!(
+            "galaxy_settlement_cleared_total 2\n",
+            "galaxy_settlement_payout_batch_total 1\n",
+            "galaxy_trust_payout_eligible_total 3\n",
+            "galaxy_trust_score 55\n",
+        );
+        let settlement = serde_json::json!({
+            "ok": true,
+            "metrics": {
+                "pending_verification_total": 0,
+                "cleared_total": 2,
+                "resolved_total": 0,
+                "payout_batch_total": 1,
+            }
+        });
+        let trust = serde_json::json!({
+            "ok": true,
+            "metrics": {
+                "payout_eligible_total": 3,
+                "payout_held_total": 0,
+                "last_trust_score": 55,
+                "gate_min_threshold": 40,
+            }
+        });
+        validate_grid_metrics_json_export(&settlement, SETTLEMENT_JSON_KEYS).expect("settlement");
+        validate_grid_metrics_json_export(&trust, TRUST_JSON_KEYS).expect("trust");
+        validate_settlement_trust_metrics_parity(prom, &settlement, &trust).expect("parity");
+        let ml_pipelines: serde_json::Value = serde_json::json!([]);
+        assert!(ml_pipelines.is_array());
+        let alerts: serde_json::Value = serde_json::json!([]);
+        assert!(alerts.is_array());
+    }
+
+    #[test]
+    fn admin_wasm_slim_depth_stub_band15_export_shape_ph_s804() {
+        use poolai_ui_core::grid_replication_pricing::{
+            admin_wasm_slim_depth_stub, AdminWasmSlimDepth,
+        };
+        use serde_json::json;
+        assert_eq!(
+            admin_wasm_slim_depth_stub(Some(&json!({"ml_pipeline_panel": true}))),
+            AdminWasmSlimDepth::MlPipelinePanel
+        );
+        assert_eq!(
+            admin_wasm_slim_depth_stub(Some(&json!({"payout_batch_panel": true}))),
+            AdminWasmSlimDepth::PayoutBatchPanel
+        );
+    }
+
+    #[test]
     fn grid_verification_replay_json_export_shape_ph_s710() {
         use poolai::grid::stand_smoke_metrics_parity::{
             validate_grid_metrics_json_export, REPLAY_JSON_KEYS, VERIFICATION_JSON_KEYS,

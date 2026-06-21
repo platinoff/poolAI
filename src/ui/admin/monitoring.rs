@@ -402,6 +402,14 @@ pub async fn admin_monitoring() -> Html<String> {
 }
 
 #[tokio::test]
+async fn admin_monitoring_ml_wasm_glue_ph_s800() {
+    let html = admin_monitoring().await.0;
+    assert!(html.contains("poolaiRenderMlPipelineMetricsPanel"));
+    assert!(html.contains("poolaiFetchMlPipelines"));
+    assert!(!html.contains("parseFloat(String(val))"));
+}
+
+#[tokio::test]
 async fn admin_monitoring_page_slim_monitoring_i18n_patch_ph_s220() {
     let html = admin_monitoring().await.0;
     assert!(html.contains("window.__poolaiAdminI18nRust="));

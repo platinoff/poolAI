@@ -1,7 +1,7 @@
 {
-  "revision": 280,
+  "revision": 281,
   "updated_at": "2026-06-21",
-  "active_sprint": "PH-S800",
+  "active_sprint": "PH-S810",
   "ui_version": 4,
   "extension_policy": {
     ".md": {

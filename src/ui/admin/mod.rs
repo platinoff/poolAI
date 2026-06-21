@@ -1340,6 +1340,39 @@ fn admin_grid_replication_pricing_wasm_slim_ph_s700() {
 }
 
 #[test]
+fn admin_charts_ml_pipeline_panel_wasm_only_ph_s800() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("wasm.renderMlPipelineMetricsPanel"));
+    assert!(!js.contains("pipelineId: p.id"));
+    assert!(!js.contains("parts.join('')"));
+}
+
+#[test]
+fn admin_charts_payout_batch_panel_wasm_only_ph_s801() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("wasm.renderPayoutBatchPanelHtml"));
+    assert!(js.contains("poolaiRenderPayoutBatchPanel"));
+    assert!(js.contains("wasm.renderGridSettlementTrustMetricsStrip"));
+    assert!(!js.contains("admin.payoutBatch.latest"));
+}
+
+#[test]
+fn admin_payout_batch_parse_prometheus_gauge_ph_s802() {
+    let page = include_str!("payout_batch.rs");
+    assert!(page.contains("parsePrometheusGauge"));
+    assert!(page.contains("galaxy_trust_score"));
+    let mon = include_str!("monitoring.rs");
+    assert!(mon.contains("poolaiRenderMlPipelineMetricsPanel"));
+}
+
+#[test]
+fn admin_payout_batch_wasm_slim_no_inline_html_ph_s802() {
+    let page = include_str!("payout_batch.rs");
+    assert!(page.contains("poolaiRenderPayoutBatchPanel"));
+    assert!(!page.contains("admin.payoutBatch.latest', 'Latest cleared entry'"));
+}
+
+#[test]
 fn admin_charts_grid_replication_pricing_wasm_first_ph_s701() {
     let js = include_str!("../admin_charts.js");
     assert!(js.contains("wasm.renderGridReplicationPricingPanel"));

@@ -2138,11 +2138,17 @@
       "from": "galaxy_grid",
       "kind": "implements",
       "to": "src_grid_galaxy_fee_split_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_governance_depth_rs"
     }
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S799",
+  "last_sprint_closed": "PH-S809",
   "layers": [
     {
       "id": "L0",
@@ -2175,7 +2181,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S800",
+  "next_sprint": "PH-S810",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -8820,9 +8826,23 @@
       "label": "galaxy_horizon_s780_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s780_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_governance_depth_rs",
+      "label": "galaxy_governance_depth.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_governance_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s790_integration_rs",
+      "label": "galaxy_horizon_s790_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s790_integration.rs"
     }
   ],
-  "revision": 280,
+  "revision": 281,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -15434,91 +15454,181 @@
       "acceptance": "poolaiRenderMlPipelineMetricsPanel` wasm-only",
       "deps": "poolai-ui-wasm",
       "id": "PH-S800",
-      "open": true,
+      "open": false,
       "row": 735,
-      "status": "open",
+      "status": "closed",
       "title": "wasm slim monitoring ML panel"
     },
     {
       "acceptance": "ui-core → wasm export",
       "deps": "poolai-ui-core",
       "id": "PH-S801",
-      "open": true,
+      "open": false,
       "row": 736,
-      "status": "open",
+      "status": "closed",
       "title": "wasm slim payout-batch panel"
     },
     {
       "acceptance": "parsePrometheusGauge` tests",
       "deps": "admin tests",
       "id": "PH-S802",
-      "open": true,
+      "open": false,
       "row": 737,
-      "status": "open",
+      "status": "closed",
       "title": "admin/mod.rs regression PH-S800/S801"
     },
     {
       "acceptance": "runner shape tests",
       "deps": "poolai-http-stand-smoke",
       "id": "PH-S803",
-      "open": true,
+      "open": false,
       "row": 738,
-      "status": "open",
+      "status": "closed",
       "title": "stand smoke monitoring/payout APIs"
     },
     {
       "acceptance": "unit test",
       "deps": "wasm slim",
       "id": "PH-S804",
-      "open": true,
+      "open": false,
       "row": 739,
-      "status": "open",
+      "status": "closed",
       "title": "admin wasm slim depth stub extend"
     },
     {
       "acceptance": "poolai-loc-audit` → `rust_ratio.json` PH-S805 zriz",
       "deps": "§5.13 fallback",
       "id": "PH-S805",
-      "open": true,
+      "open": false,
       "row": 740,
-      "status": "open",
+      "status": "closed",
       "title": "Rust ratio loc-audit refresh"
     },
     {
       "acceptance": "docs canon",
       "deps": "HANDOFF/NEXT/STABLE",
       "id": "PH-S806",
-      "open": true,
+      "open": false,
       "row": 741,
-      "status": "open",
+      "status": "closed",
       "title": "docs canon sync"
     },
     {
       "acceptance": "poolai-vision-sync --check` green",
       "deps": "ops",
       "id": "PH-S807",
-      "open": true,
+      "open": false,
       "row": 742,
-      "status": "open",
+      "status": "closed",
       "title": "poolai-vision-sync drift gate"
     },
     {
       "acceptance": "--min-ratio 0.95 --advisory",
       "deps": "PH-S351 pattern",
       "id": "PH-S808",
-      "open": true,
+      "open": false,
       "row": 743,
-      "status": "open",
+      "status": "closed",
       "title": "Ratio hold advisory snapshot"
     },
     {
       "acceptance": "galaxy_horizon_s800_integration` + docs sync",
       "deps": "wasm monitoring",
       "id": "PH-S809",
-      "open": true,
+      "open": false,
       "row": 744,
-      "status": "open",
+      "status": "closed",
       "title": "Horizon close band S800–S808"
+    },
+    {
+      "acceptance": "secret rotation strip wasm",
+      "deps": "poolai-ui-wasm",
+      "id": "PH-S810",
+      "open": true,
+      "row": 745,
+      "status": "open",
+      "title": "wasm slim security panel glue"
+    },
+    {
+      "acceptance": "topology timestamp wasm",
+      "deps": "poolai-ui-core",
+      "id": "PH-S811",
+      "open": true,
+      "row": 746,
+      "status": "open",
+      "title": "wasm slim topology panel glue"
+    },
+    {
+      "acceptance": "wasm glue tests",
+      "deps": "admin tests",
+      "id": "PH-S812",
+      "open": true,
+      "row": 747,
+      "status": "open",
+      "title": "admin/mod.rs regression PH-S810/S811"
+    },
+    {
+      "acceptance": "export shape if applicable",
+      "deps": "poolai-http-stand-smoke",
+      "id": "PH-S813",
+      "open": true,
+      "row": 748,
+      "status": "open",
+      "title": "stand smoke security/topology APIs"
+    },
+    {
+      "acceptance": "unit test",
+      "deps": "wasm slim",
+      "id": "PH-S814",
+      "open": true,
+      "row": 749,
+      "status": "open",
+      "title": "concept stub security/topology"
+    },
+    {
+      "acceptance": "poolai-loc-audit` → `rust_ratio.json` PH-S815 zriz",
+      "deps": "§5.13 fallback",
+      "id": "PH-S815",
+      "open": true,
+      "row": 750,
+      "status": "open",
+      "title": "Rust ratio loc-audit refresh"
+    },
+    {
+      "acceptance": "docs canon",
+      "deps": "HANDOFF/NEXT/STABLE",
+      "id": "PH-S816",
+      "open": true,
+      "row": 751,
+      "status": "open",
+      "title": "docs canon sync"
+    },
+    {
+      "acceptance": "poolai-vision-sync --check` green",
+      "deps": "ops",
+      "id": "PH-S817",
+      "open": true,
+      "row": 752,
+      "status": "open",
+      "title": "poolai-vision-sync drift gate"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory",
+      "deps": "PH-S351 pattern",
+      "id": "PH-S818",
+      "open": true,
+      "row": 753,
+      "status": "open",
+      "title": "Ratio hold advisory snapshot"
+    },
+    {
+      "acceptance": "galaxy_horizon_s810_integration` + docs sync",
+      "deps": "wasm security/topology",
+      "id": "PH-S819",
+      "open": true,
+      "row": 754,
+      "status": "open",
+      "title": "Horizon close band S810–S818"
     }
   ],
   "sprint_queue_open_count": 10,

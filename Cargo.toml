@@ -499,6 +499,11 @@ path = "tests/galaxy_horizon_s790_integration.rs"
 required-features = ["test-utils", "prometheus"]
 
 [[test]]
+name = "galaxy_horizon_s800_integration"
+path = "tests/galaxy_horizon_s800_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
 name = "galaxy_horizon_s760_integration"
 path = "tests/galaxy_horizon_s760_integration.rs"
 required-features = ["test-utils", "prometheus"]

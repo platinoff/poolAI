@@ -578,6 +578,42 @@ function poolaiRenderTelegramSeatsPanel(snapshotJson, labels) {
   return adminEmptyStateHtml(labels.empty || 'Seat snapshot unavailable', { icon: '📊' });
 }
 
+/** PH-S801: payout batch panel (metrics strip + history + latest entry, wasm-only). */
+function poolaiRenderPayoutBatchPanel(
+  latest,
+  history,
+  settlementMetrics,
+  trustMetrics,
+  trustScoreGauge,
+) {
+  var wasm = poolaiChartsWasm();
+  var metricsStrip = '';
+  var historyStrip = '';
+  var panelHtml = '';
+  var i18nJson = JSON.stringify(window.__poolaiAdminI18nRust || {});
+  if (wasm && typeof wasm.renderGridSettlementTrustMetricsStrip === 'function') {
+    metricsStrip = wasm.renderGridSettlementTrustMetricsStrip(
+      JSON.stringify(settlementMetrics || {}),
+      JSON.stringify(trustMetrics || {}),
+      trustScoreGauge || 0,
+    );
+  }
+  if (wasm && typeof wasm.renderPayoutBatchHistoryStripHtml === 'function') {
+    historyStrip = wasm.renderPayoutBatchHistoryStripHtml(
+      JSON.stringify(history || {}),
+      i18nJson,
+    );
+  }
+  if (wasm && typeof wasm.renderPayoutBatchPanelHtml === 'function') {
+    panelHtml = wasm.renderPayoutBatchPanelHtml(
+      JSON.stringify(latest || {}),
+      JSON.stringify(history || {}),
+      i18nJson,
+    );
+  }
+  return metricsStrip + historyStrip + panelHtml;
+}
+
 /** PH-S700: replication/pricing metrics strip (wasm-first). */
 function poolaiRenderGridReplicationPricingPanel(
   replicationMetrics,

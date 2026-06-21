@@ -8,42 +8,18 @@ pub async fn admin_payout_batch() -> Html<String> {
     let script = r#"
     function T(k, fb) { return typeof poolaiT === 'function' ? poolaiT(k, fb) : fb; }
 
-    function payoutBatchI18nJson() {
-      return JSON.stringify(window.__poolaiAdminI18nRust || {});
-    }
-
     function renderPayoutBatchPanel(latest, history, settlementMetrics, trustMetrics, trustScoreGauge) {
       const el = document.getElementById('payout-batch-panel');
       if (!el) return;
-      const entry = latest.entry || null;
-      const metricsStrip = renderPayoutBatchMetricsStrip(settlementMetrics, trustMetrics, trustScoreGauge);
-      const historyStrip = renderPayoutBatchHistoryStrip(history || {});
-      const wasm = window.poolaiUiWasm;
-      if (wasm && wasm.ready && typeof wasm.renderPayoutBatchPanelHtml === 'function') {
-        el.innerHTML = metricsStrip + historyStrip + wasm.renderPayoutBatchPanelHtml(
-          JSON.stringify(latest || {}),
-          JSON.stringify(history || {}),
-          payoutBatchI18nJson()
-        );
-        return;
-      }
-      el.innerHTML = metricsStrip + historyStrip +
-        '<div class="admin-card"><h3>' + escapeHtml(T('admin.payoutBatch.latest', 'Latest cleared entry')) + '</h3>' +
-        '<dl class="admin-dl"><dt>Job</dt><dd><code>' + escapeHtml(String(entry && entry.job_id || '—')) + '</code></dd></dl></div>';
-    }
-
-    function renderPayoutBatchHistoryStrip(history) {
-      const wasm = window.poolaiUiWasm;
-      if (wasm && wasm.ready && typeof wasm.renderPayoutBatchHistoryStripHtml === 'function') {
-        return wasm.renderPayoutBatchHistoryStripHtml(
-          JSON.stringify(history || {}),
-          payoutBatchI18nJson()
+      if (typeof poolaiRenderPayoutBatchPanel === 'function') {
+        el.innerHTML = poolaiRenderPayoutBatchPanel(
+          latest,
+          history,
+          settlementMetrics,
+          trustMetrics,
+          trustScoreGauge
         );
       }
-      const entries = (history && history.entries) ? history.entries : [];
-      return '<div class="admin-card"><h3>' +
-        escapeHtml(T('admin.payoutBatch.historyStrip', 'Recent payout batch history')) +
-        '</h3><p>' + escapeHtml(String(entries.length)) + ' entries</p></div>';
     }
 
     async function loadPayoutBatchPanel() {
@@ -68,25 +44,6 @@ pub async fn admin_payout_batch() -> Html<String> {
         adminShowInlineError('payout-batch-panel', e);
         showNotification(T('admin.payoutBatch.errLoad', 'Error loading payout batch: ') + e.message, 'error');
       }
-    }
-
-    function renderPayoutBatchMetricsStrip(settlementMetrics, trustMetrics, trustScoreGauge) {
-      const sm = (settlementMetrics && settlementMetrics.metrics) ? settlementMetrics.metrics : {};
-      const tm = (trustMetrics && trustMetrics.metrics) ? trustMetrics.metrics : {};
-      var wasm = poolaiChartsWasm();
-      if (wasm && typeof wasm.renderGridSettlementTrustMetricsStrip === 'function') {
-        return wasm.renderGridSettlementTrustMetricsStrip(
-          JSON.stringify(settlementMetrics || {}),
-          JSON.stringify(trustMetrics || {}),
-          trustScoreGauge || 0
-        );
-      }
-      const score = tm.last_trust_score != null ? tm.last_trust_score : trustScoreGauge;
-      return '<div class="admin-card admin-metrics-strip">' +
-        '<span>' + escapeHtml(T('admin.payoutBatch.cleared', 'Cleared')) + ': <strong>' + escapeHtml(String(sm.cleared_total || 0)) + '</strong></span>' +
-        '<span>' + escapeHtml(T('admin.payoutBatch.eligible', 'Eligible')) + ': <strong>' + escapeHtml(String(tm.payout_eligible_total || 0)) + '</strong></span>' +
-        '<span>' + escapeHtml(T('admin.payoutBatch.trustScore', 'Trust score')) + ': <strong>' + escapeHtml(String(score || 0)) + '</strong></span>' +
-        '</div>';
     }
 
     loadPayoutBatchPanel();
@@ -130,7 +87,7 @@ mod tests {
     async fn admin_payout_batch_history_wasm_glue_ph_s771() {
         let html = admin_payout_batch().await.0;
         assert!(html.contains("renderPayoutBatchHistoryStripHtml"));
-        assert!(html.contains("renderPayoutBatchHistoryStrip"));
+        assert!(html.contains("poolaiRenderPayoutBatchPanel"));
         assert!(html.contains("/api/v1/grid/payout-batch/history"));
     }
 
@@ -140,5 +97,12 @@ mod tests {
         assert!(html.contains("renderGridSettlementTrustMetricsStrip"));
         assert!(html.contains("settlement-metrics"));
         assert!(html.contains("trust-metrics"));
+    }
+
+    #[tokio::test]
+    async fn admin_payout_batch_wasm_slim_ph_s801() {
+        let html = admin_payout_batch().await.0;
+        assert!(html.contains("poolaiRenderPayoutBatchPanel"));
+        assert!(!html.contains("el.innerHTML = metricsStrip + historyStrip"));
     }
 }
