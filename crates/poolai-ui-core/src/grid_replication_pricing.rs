@@ -24,6 +24,10 @@ pub enum AdminWasmSlimDepth {
     MlPipelinePanel,
     /// Payout batch admin panel wasm renderer (PH-S804).
     PayoutBatchPanel,
+    /// Secret rotation admin panel wasm renderer (PH-S814).
+    SecurityRotationPanel,
+    /// Topology stats strip wasm renderer (PH-S814).
+    TopologyStatsStrip,
 }
 
 /// Classify admin wasm slim depth from optional feature stub (PH-S704).
@@ -36,6 +40,18 @@ pub fn admin_wasm_slim_depth_stub(features: Option<&Value>) -> AdminWasmSlimDept
         .unwrap_or(false)
     {
         return AdminWasmSlimDepth::ChartsGlue;
+    }
+    if f.get("topology_stats_strip")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        return AdminWasmSlimDepth::TopologyStatsStrip;
+    }
+    if f.get("security_rotation_panel")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        return AdminWasmSlimDepth::SecurityRotationPanel;
     }
     if f.get("payout_batch_panel")
         .and_then(|v| v.as_bool())
@@ -155,6 +171,18 @@ mod tests {
                 &json!({"charts_glue": true, "ml_pipeline_panel": true})
             )),
             AdminWasmSlimDepth::ChartsGlue
+        );
+    }
+
+    #[test]
+    fn admin_wasm_slim_depth_stub_ph_s814() {
+        assert_eq!(
+            admin_wasm_slim_depth_stub(Some(&json!({"security_rotation_panel": true}))),
+            AdminWasmSlimDepth::SecurityRotationPanel
+        );
+        assert_eq!(
+            admin_wasm_slim_depth_stub(Some(&json!({"topology_stats_strip": true}))),
+            AdminWasmSlimDepth::TopologyStatsStrip
         );
     }
 }

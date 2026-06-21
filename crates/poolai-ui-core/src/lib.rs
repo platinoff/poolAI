@@ -20,6 +20,7 @@ pub mod network_profiles;
 pub mod payout_batch;
 pub mod pricing;
 pub mod prometheus;
+pub mod security;
 pub mod stand_smoke_metrics;
 pub mod table;
 pub mod theme;

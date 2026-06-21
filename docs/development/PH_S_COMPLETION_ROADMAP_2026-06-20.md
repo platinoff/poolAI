@@ -163,13 +163,30 @@
 
 ---
 
-## Bands 16–35 (summary — деталі в master backlog)
+## Band 16 — PH-S810…S819 (Admin wasm slim: security + topology) · **✅ drained 2026-06-21**
+
+| Sprint | Focus | Acceptance |
+|--------|-------|------------|
+| **PH-S810** | wasm slim security panel glue | secret rotation strip wasm |
+| **PH-S811** | wasm slim topology panel glue | topology timestamp wasm |
+| **PH-S812** | admin/mod.rs regression PH-S810/S811 | wasm glue tests |
+| **PH-S813** | stand smoke security/topology APIs | export shape if applicable |
+| **PH-S814** | concept stub security/topology | unit test |
+| **PH-S815** | loc-audit | zriz |
+| **PH-S816** | docs canon | HANDOFF/NEXT/STABLE |
+| **PH-S817** | vision-sync | green |
+| **PH-S818** | ratio advisory | hold |
+| **PH-S819** | `galaxy_horizon_s810_integration` | security/topology wasm band close |
+
+---
+
+## Bands 17–35 (summary — деталі в master backlog)
 
 | Band | Sprints | Theme |
 |------|---------|-------|
 | 15 | S800–S809 | Admin wasm slim: monitoring + payout-batch ✅ |
-| 16 | S810–S819 | Admin wasm slim: security + topology **active** |
-| 17 | S820–S829 | Admin wasm slim: vm + workers + libs panels |
+| 16 | S810–S819 | Admin wasm slim: security + topology ✅ |
+| 17 | S820–S829 | Admin wasm slim: vm + workers + libs **active** |
 | 18 | S830–S839 | Stand smoke v2: all grid JSON↔Prom parity + runner |
 | 19 | S840–S849 | OpenAPI gap audit 0 + contract test band |
 | 20 | S850–S859 | Job store RAID production path + restart test |

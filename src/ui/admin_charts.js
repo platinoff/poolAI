@@ -614,6 +614,30 @@ function poolaiRenderPayoutBatchPanel(
   return metricsStrip + historyStrip + panelHtml;
 }
 
+/** PH-S810: secret rotation panel (wasm-only). */
+function poolaiRenderSecretRotationPanel(rows) {
+  var wasm = poolaiChartsWasm();
+  if (wasm && typeof wasm.renderSecretRotationPanelHtml === 'function') {
+    return wasm.renderSecretRotationPanelHtml(
+      JSON.stringify(rows || []),
+      JSON.stringify(window.__poolaiAdminI18nRust || {}),
+    );
+  }
+  return '';
+}
+
+/** PH-S811: topology stats strip with wasm timestamp (wasm-only). */
+function poolaiRenderTopologyStatsStrip(summary) {
+  var wasm = poolaiChartsWasm();
+  if (wasm && typeof wasm.renderTopologyStatsStripHtml === 'function') {
+    return wasm.renderTopologyStatsStripHtml(
+      JSON.stringify(summary || {}),
+      JSON.stringify(window.__poolaiAdminI18nRust || {}),
+    );
+  }
+  return '';
+}
+
 /** PH-S700: replication/pricing metrics strip (wasm-first). */
 function poolaiRenderGridReplicationPricingPanel(
   replicationMetrics,

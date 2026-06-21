@@ -37,6 +37,7 @@ use poolai_ui_core::payout_batch::{
 };
 use poolai_ui_core::pricing::{format_unix_secs, format_usd_micro};
 use poolai_ui_core::prometheus::parse_prometheus_gauge;
+use poolai_ui_core::security::render_secret_rotation_panel_html;
 use poolai_ui_core::stand_smoke_metrics::{
     render_grid_fee_split_metrics_strip_html, render_grid_governance_metrics_strip_html,
     render_grid_locality_metrics_strip_html, render_grid_prefetch_metrics_strip_html,
@@ -48,7 +49,9 @@ use poolai_ui_core::table::{
     row_matches_query, table_export_buttons_html,
 };
 use poolai_ui_core::theme::normalize_theme;
-use poolai_ui_core::topology::{short_topology_node_id, topology_hub_label};
+use poolai_ui_core::topology::{
+    render_topology_stats_strip_html, short_topology_node_id, topology_hub_label,
+};
 use poolai_ui_core::updates_compat::{compat_status_label, protocol_version_label};
 use poolai_ui_core::vm::render_vm_panel_html;
 use poolai_ui_core::workers::render_workers_panel_html;
@@ -878,6 +881,18 @@ pub fn render_payout_batch_panel_html_wasm(
 #[wasm_bindgen(js_name = renderPayoutBatchHistoryStripHtml)]
 pub fn render_payout_batch_history_strip_html_wasm(history_json: &str, i18n_json: &str) -> String {
     render_payout_batch_history_strip_html(history_json, i18n_json)
+}
+
+/// Admin secret rotation panel HTML (PH-S810).
+#[wasm_bindgen(js_name = renderSecretRotationPanelHtml)]
+pub fn render_secret_rotation_panel_html_wasm(rows_json: &str, i18n_json: &str) -> String {
+    render_secret_rotation_panel_html(rows_json, i18n_json)
+}
+
+/// Topology stats strip with formatted timestamp (PH-S811).
+#[wasm_bindgen(js_name = renderTopologyStatsStripHtml)]
+pub fn render_topology_stats_strip_html_wasm(summary_json: &str, i18n_json: &str) -> String {
+    render_topology_stats_strip_html(summary_json, i18n_json)
 }
 
 /// Topology hub label helper (PH-S566).

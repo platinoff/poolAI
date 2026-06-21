@@ -10,20 +10,7 @@ pub async fn admin_topology() -> axum::response::Html<String> {
       <h3 data-i18n="admin.topo.title">Network Topology</h3>
       <p data-i18n="admin.topo.intro">View network topology, latency matrix, and node resources.</p>
       
-      <div class="admin-stats-grid">
-        <div class="admin-stat-card">
-          <div class="stat-value" id="topology-node-count">-</div>
-          <div class="stat-label" data-i18n="admin.topo.stat.nodes">Nodes</div>
-        </div>
-        <div class="admin-stat-card">
-          <div class="stat-value" id="topology-latency-measurements">-</div>
-          <div class="stat-label" data-i18n="admin.topo.stat.latencyMs">Latency Measurements</div>
-        </div>
-        <div class="admin-stat-card">
-          <div class="stat-value" id="topology-last-updated">-</div>
-          <div class="stat-label" data-i18n="admin.topo.stat.lastUpd">Last Updated</div>
-        </div>
-      </div>
+      <div id="topology-stats-strip" class="admin-stats-grid" aria-live="polite"></div>
 
       <div class="admin-section-header">
         <h4 data-i18n="admin.topo.sectionGraph">Cluster Graph</h4>
@@ -141,11 +128,21 @@ pub async fn admin_topology() -> axum::response::Html<String> {
       }}
     }}
 
+    function renderTopologyStatsStrip(summary) {{
+      const el = document.getElementById('topology-stats-strip');
+      if (!el) return;
+      if (typeof poolaiRenderTopologyStatsStrip === 'function') {{
+        el.innerHTML = poolaiRenderTopologyStatsStrip(summary || {{}});
+      }}
+    }}
+
     function applyTopologyLiveUpdate(data) {{
       if (!data) return;
-      document.getElementById('topology-node-count').textContent = data.node_count || 0;
-      document.getElementById('topology-latency-measurements').textContent = data.latency_measurements || 0;
-      document.getElementById('topology-last-updated').textContent = formatTopologyTimestamp(data.last_updated);
+      renderTopologyStatsStrip({{
+        node_count: data.node_count || 0,
+        latency_measurements: data.latency_measurements || 0,
+        last_updated: data.last_updated || '',
+      }});
       topologyNodesCache = data.nodes || {{}};
       topologyLatencyCache = data.latency_matrix || {{}};
       renderNodesTableFromCache();
@@ -214,10 +211,12 @@ pub async fn admin_topology() -> axum::response::Html<String> {
         const response = await fetch('/api/v1/topology');
         if (!response.ok) throw new Error('Failed to load topology');
         const data = await response.json();
-        
-        document.getElementById('topology-node-count').textContent = data.node_count || 0;
-        document.getElementById('topology-latency-measurements').textContent = data.latency_measurements || 0;
-        document.getElementById('topology-last-updated').textContent = formatTopologyTimestamp(data.last_updated);
+
+        renderTopologyStatsStrip({{
+          node_count: data.node_count || 0,
+          latency_measurements: data.latency_measurements || 0,
+          last_updated: data.last_updated || '',
+        }});
         
         await loadTopologyNodes();
         await loadLatencyMatrix();
@@ -368,6 +367,14 @@ mod fm037_tests {
         assert!(html.contains(r#""admin.topo.title""#));
         assert!(!html.contains(r#""admin.jobs.leaseState.active""#));
         assert!(!html.contains(r#""admin.sec.tab.oauth""#));
+    }
+
+    #[tokio::test]
+    async fn admin_topology_wasm_stats_strip_ph_s811() {
+        let html = admin_topology().await.0;
+        assert!(html.contains("topology-stats-strip"));
+        assert!(html.contains("poolaiRenderTopologyStatsStrip"));
+        assert!(html.contains("renderTopologyStatsStrip"));
     }
 
     #[tokio::test]

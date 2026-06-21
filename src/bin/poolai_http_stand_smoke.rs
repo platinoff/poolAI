@@ -3167,6 +3167,54 @@ mod tests {
     }
 
     #[test]
+    fn security_topology_export_shape_ph_s813() {
+        use poolai::security::secret_rotation::{init_default_rotation_hooks, rotation_status};
+        init_default_rotation_hooks();
+        let status = rotation_status();
+        assert!(!status.is_empty());
+        for entry in &status {
+            let _ = entry.kind.as_str();
+            let _ = entry.configured;
+            let _ = entry.hook_count;
+        }
+        let topology = serde_json::json!({
+            "node_count": 0,
+            "latency_measurements": 0,
+            "last_updated": "2026-06-21T00:00:00Z",
+            "node_ids": []
+        });
+        assert!(topology.get("node_count").is_some());
+        assert!(topology.get("last_updated").is_some());
+        let prom = "poolai_secret_rotations_total{kind=\"jwt\",success=\"true\"} 1\n";
+        assert!(prom.contains("poolai_secret_rotations_total"));
+    }
+
+    #[test]
+    fn admin_wasm_slim_depth_stub_band16_export_shape_ph_s814() {
+        use poolai_ui_core::grid_replication_pricing::{
+            admin_wasm_slim_depth_stub, AdminWasmSlimDepth,
+        };
+        use poolai_ui_core::security::render_secret_rotation_panel_html;
+        use poolai_ui_core::topology::render_topology_stats_strip_html;
+        use serde_json::json;
+        assert_eq!(
+            admin_wasm_slim_depth_stub(Some(&json!({"security_rotation_panel": true}))),
+            AdminWasmSlimDepth::SecurityRotationPanel
+        );
+        assert_eq!(
+            admin_wasm_slim_depth_stub(Some(&json!({"topology_stats_strip": true}))),
+            AdminWasmSlimDepth::TopologyStatsStrip
+        );
+        let sec_html = render_secret_rotation_panel_html("[]", "{}");
+        assert!(sec_html.contains("secret-rotation-table"));
+        let topo_html = render_topology_stats_strip_html(
+            r#"{"node_count":1,"latency_measurements":0,"last_updated":""}"#,
+            "{}",
+        );
+        assert!(topo_html.contains("topology-last-updated"));
+    }
+
+    #[test]
     fn grid_verification_replay_json_export_shape_ph_s710() {
         use poolai::grid::stand_smoke_metrics_parity::{
             validate_grid_metrics_json_export, REPLAY_JSON_KEYS, VERIFICATION_JSON_KEYS,

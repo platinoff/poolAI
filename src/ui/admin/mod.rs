@@ -1373,6 +1373,31 @@ fn admin_payout_batch_wasm_slim_no_inline_html_ph_s802() {
 }
 
 #[test]
+fn admin_charts_secret_rotation_panel_wasm_only_ph_s810() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("wasm.renderSecretRotationPanelHtml"));
+    assert!(js.contains("poolaiRenderSecretRotationPanel"));
+    assert!(!js.contains("formatRotationKind(kind)"));
+}
+
+#[test]
+fn admin_charts_topology_stats_strip_wasm_only_ph_s811() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("wasm.renderTopologyStatsStripHtml"));
+    assert!(js.contains("poolaiRenderTopologyStatsStrip"));
+}
+
+#[test]
+fn admin_security_topology_wasm_glue_ph_s812() {
+    let sec = include_str!("security.rs");
+    assert!(sec.contains("poolaiRenderSecretRotationPanel"));
+    assert!(!sec.contains("secret-rotation-table"));
+    let topo = include_str!("topology.rs");
+    assert!(topo.contains("poolaiRenderTopologyStatsStrip"));
+    assert!(topo.contains("topology-stats-strip"));
+}
+
+#[test]
 fn admin_charts_grid_replication_pricing_wasm_first_ph_s701() {
     let js = include_str!("../admin_charts.js");
     assert!(js.contains("wasm.renderGridReplicationPricingPanel"));
