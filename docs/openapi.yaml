@@ -797,6 +797,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GridVerificationMetricsResponse'
+              example:
+                ok: true
+                metrics:
+                  sample_total: 0
+                  match_total: 0
+                  mismatch_total: 0
+                  sample_scheduled_total: 0
 
   /grid/replay-metrics:
     get:
@@ -811,6 +818,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GridReplayMetricsResponse'
+              example:
+                ok: true
+                metrics:
+                  replay_pending: 0
+                  replay_pending_scheduled_total: 0
+                  replay_pending_resolved_total: 0
+                  replay_evaluations_total: 0
+                  replay_verification_enqueue_total: 0
+                  verification_replay_record_total: 0
 
   /grid/settlement-metrics:
     get:
@@ -825,6 +841,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GridSettlementMetricsResponse'
+              example:
+                ok: true
+                metrics:
+                  pending_verification_total: 0
+                  cleared_total: 0
+                  not_applicable_total: 0
+                  resolved_total: 0
+                  payout_batch_total: 0
+                  human_review_total: 0
 
   /grid/trust-metrics:
     get:
@@ -839,6 +864,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GridTrustMetricsResponse'
+              example:
+                ok: true
+                metrics:
+                  payout_eligible_total: 0
+                  payout_held_total: 0
+                  last_trust_score: 50
+                  gate_min_threshold: 40
 
   /grid/replication-metrics:
     get:
@@ -853,6 +885,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GridReplicationMetricsResponse'
+              example:
+                ok: true
+                metrics:
+                  strict_total: 0
+                  enqueue_total: 0
+                  executor_enqueue_total: 0
+                  rate_limited_total: 0
 
   /grid/pricing-metrics:
     get:
@@ -867,6 +906,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GridPricingMetricsResponse'
+              example:
+                ok: true
+                metrics:
+                  fresh_served_total: 0
+                  stale_served_total: 0
+                  forced_fallback_total: 0
+                  provider_catalog_lookups_total: 0
 
   /grid/prefetch-metrics:
     get:
@@ -881,6 +927,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GridPrefetchMetricsResponse'
+              example:
+                ok: true
+                metrics:
+                  prefetch_pull_bytes_total: 0
+                  prefetch_plan_total: 0
 
   /grid/locality-metrics:
     get:
@@ -895,6 +946,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GridLocalityMetricsResponse'
+              example:
+                ok: true
+                metrics:
+                  hot_tier_promote_total: 0
+                  hot_tier_evict_total: 0
+                  shard_local_hit_ratio: 0.0
 
   /grid/fee-split-metrics:
     get:
@@ -909,6 +966,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GridFeeSplitMetricsResponse'
+              example:
+                ok: true
+                metrics:
+                  fee_split_applied_total: 0
+                  primary_admin_fee_bps: 500
+                  secondary_admin_fee_bps: 250
 
   /grid/update-policy:
     get:
@@ -937,6 +1000,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GridGovernanceMetricsResponse'
+              example:
+                ok: true
+                metrics:
+                  release_verify_total: 0
+                  notify_pending_total: 0
+                  advisory_acknowledged_total: 0
+
+  /grid/network-profiles:
+    get:
+      tags:
+        - Grid
+      summary: List persisted network profile peer ids (PH-S570)
+      operationId: listGridNetworkProfiles
+      responses:
+        '200':
+          description: Peer id list for network profile store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GridNetworkProfileListResponse'
+              example:
+                ok: true
+                peer_ids:
+                  - worker-1
+                  - worker-2
+                count: 2
 
   /grid/network-profiles/{peer_id}:
     get:
@@ -1016,6 +1105,12 @@ paths:
                         format: int64
                       settlement_mode:
                         type: string
+              example:
+                ok: true
+                metrics:
+                  payout_batch_total: 0
+                  payout_batch_queue_depth: 0
+                  settlement_mode: offline
 
   /grid/payout-batch/history:
     get:
@@ -1626,6 +1721,48 @@ paths:
         '400':
           description: Invalid request (empty fields, unsupported chain, invalid pubkey)
 
+  /virtual-nodes/telegram/wallet/rebind-override:
+    post:
+      tags:
+        - VirtualNodes
+      summary: Admin override Telegram wallet rebind (PH-S538)
+      description: Requires admin Bearer token. Binds payout wallet with admin_override flag.
+      operationId: adminRebindTelegramWalletOverride
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BindTelegramWalletRequest'
+            example:
+              telegram_user_id: "9001"
+              chat_id: "-1001234567890"
+              payout_pubkey: "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU"
+              chain: solana
+      responses:
+        '200':
+          description: Wallet rebound with admin override
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminRebindTelegramWalletResponse'
+        '401':
+          description: Missing Bearer token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Admin role required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Invalid request
+
   /virtual-nodes/telegram/wallets/{telegram_user_id}:
     get:
       tags:
@@ -1760,6 +1897,62 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AdminOverview'
+
+  /admin/security-advisories:
+    get:
+      tags:
+        - Admin
+      summary: Security advisory list (PH-S586)
+      description: Operator-facing advisory rows for Galaxy §9.6 ops UI.
+      operationId: listAdminSecurityAdvisories
+      responses:
+        '200':
+          description: Advisory list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SecurityAdvisoryEntry'
+              example:
+                - id: CVE-2026-0001
+                  severity: medium
+                  summary: Signed release manifest rotation advisory (Galaxy §9.2)
+                  acknowledged: false
+
+  /admin/security-advisories/{id}/acknowledge:
+    post:
+      tags:
+        - Admin
+      summary: Acknowledge security advisory (PH-S573)
+      operationId: acknowledgeAdminSecurityAdvisory
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Acknowledgement recorded (or already acknowledged)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityAdvisoryAckResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /admin/secrets/rotation:
     get:
@@ -6959,6 +7152,63 @@ components:
           type: object
           nullable: true
           additionalProperties: true
+
+    GridNetworkProfileListResponse:
+      type: object
+      required:
+        - ok
+        - peer_ids
+        - count
+      properties:
+        ok:
+          type: boolean
+        peer_ids:
+          type: array
+          items:
+            type: string
+        count:
+          type: integer
+
+    SecurityAdvisoryEntry:
+      type: object
+      required:
+        - id
+        - severity
+        - summary
+        - acknowledged
+      properties:
+        id:
+          type: string
+        severity:
+          type: string
+        summary:
+          type: string
+        acknowledged:
+          type: boolean
+
+    SecurityAdvisoryAckResponse:
+      type: object
+      required:
+        - ok
+        - advisory_id
+        - acknowledged
+      properties:
+        ok:
+          type: boolean
+        advisory_id:
+          type: string
+        acknowledged:
+          type: boolean
+
+    AdminRebindTelegramWalletResponse:
+      type: object
+      properties:
+        wallet:
+          $ref: '#/components/schemas/TelegramWalletBinding'
+        admin_override:
+          type: boolean
+        admin:
+          type: string
 
     MemoryShardRef:
       type: object

@@ -23,6 +23,12 @@
 | ~~`/raid/distributed/*`~~ | Inter-node RAID protocol | **✅ S31–S33** paths + `RaidDistributed*` DTO schemas |
 | ~~VM template body schemas~~ | `VmTemplate`, `GpuSchedulingPolicy` | **✅ FM-025** (2026-05-20) |
 | ~~VM network body schemas~~ | `VmNetwork`, `NetworkIsolationConfig` | **✅ FM-032** (2026-05-22) |
+| ~~`/grid/network-profiles`~~ | List persisted peer ids (PH-S570) | **✅ PH-S840** |
+| ~~`/admin/security-advisories`~~ | Security advisory list (PH-S586) | **✅ PH-S840** |
+| ~~`/admin/security-advisories/{id}/acknowledge`~~ | Advisory acknowledge (PH-S573) | **✅ PH-S840** |
+| ~~`/virtual-nodes/telegram/wallet/rebind-override`~~ | Admin wallet rebind override | **✅ PH-S840** |
+
+**PH-S840…S849 (2026-06-21):** OpenAPI gap **0 missing** (`poolai-openapi-gap-audit` exit 0); grid metrics examples in yaml; `tests/grid_openapi_contracts.rs`; stand smoke OpenAPI path cases; `galaxy_horizon_s840_integration`; rust_ratio **94.70%** (PH-S845 hold advisory).
 
 ## CI (PH-S19)
 

@@ -1549,6 +1549,64 @@ async fn smoke_grid_network_profiles_list(client: &Client, base: &str) -> Result
     Ok(())
 }
 
+async fn smoke_admin_security_advisories_openapi(
+    client: &Client,
+    base: &str,
+) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/api/v1/admin/security-advisories"))
+        .send()
+        .await
+        .map_err(|e| format!("security-advisories request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("security-advisories status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    let rows = body
+        .as_array()
+        .ok_or_else(|| format!("security-advisories expected array: {body}"))?;
+    if rows.is_empty() {
+        return Err("security-advisories empty".into());
+    }
+    let first = &rows[0];
+    for key in ["id", "severity", "summary", "acknowledged"] {
+        if !first.get(key).is_some() {
+            return Err(format!("security-advisories missing `{key}`: {first}"));
+        }
+    }
+    Ok(())
+}
+
+async fn smoke_virtual_nodes_wallet_rebind_override_openapi(
+    client: &Client,
+    base: &str,
+) -> Result<(), String> {
+    let resp = client
+        .post(api_url(
+            base,
+            "/api/v1/virtual-nodes/telegram/wallet/rebind-override",
+        ))
+        .json(&json!({
+            "telegram_user_id": "9001",
+            "chat_id": "-1001234567890",
+            "payout_pubkey": "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU"
+        }))
+        .send()
+        .await
+        .map_err(|e| format!("wallet rebind-override request: {e}"))?;
+    if resp.status() != StatusCode::UNAUTHORIZED {
+        return Err(format!(
+            "wallet rebind-override expected 401 without admin token, got {}",
+            resp.status()
+        ));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    if body.get("error").is_none() {
+        return Err(format!("wallet rebind-override missing error: {body}"));
+    }
+    Ok(())
+}
+
 async fn smoke_grid_telegram_seats(client: &Client, base: &str) -> Result<(), String> {
     let resp = client
         .get(api_url(base, "/api/v1/grid/telegram-seats"))
@@ -2528,6 +2586,18 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
         &mut cases,
         "grid_network_profiles_list",
         smoke_grid_network_profiles_list(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
+        "admin_security_advisories_openapi",
+        smoke_admin_security_advisories_openapi(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
+        "virtual_nodes_wallet_rebind_override_openapi",
+        smoke_virtual_nodes_wallet_rebind_override_openapi(&client, &cli.base_url).await,
     )
     .await;
     record(
@@ -3646,6 +3716,27 @@ mod tests {
         });
         assert_eq!(profile["peer_id"], "peer-a");
         assert_eq!(profile["network_profile"]["region"].as_str(), Some("smoke"));
+    }
+
+    #[test]
+    fn openapi_band_export_shape_ph_s843() {
+        let advisories = serde_json::json!([
+            {
+                "id": "CVE-2026-0001",
+                "severity": "medium",
+                "summary": "Signed release manifest rotation advisory (Galaxy §9.2)",
+                "acknowledged": false
+            }
+        ]);
+        let row = &advisories[0];
+        for key in ["id", "severity", "summary", "acknowledged"] {
+            assert!(row.get(key).is_some(), "missing {key}");
+        }
+        let rebind_err = serde_json::json!({
+            "error": "admin_required",
+            "message": "Bearer admin token required for wallet rebind override"
+        });
+        assert_eq!(rebind_err["error"].as_str(), Some("admin_required"));
     }
 
     #[test]
