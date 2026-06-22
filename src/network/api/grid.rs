@@ -413,16 +413,30 @@ async fn get_grid_settlement_metrics(
 struct GridTrustMetricsResponse {
     ok: bool,
     metrics: crate::grid::galaxy_trust_score::TrustMetricsSnapshot,
+    /// Trust persist depth wire label (PH-S913).
+    trust_persist_depth: &'static str,
+    /// Active trust store backend (PH-S910).
+    trust_store_backend: &'static str,
+    /// Peers with persisted trust scores (PH-S914).
+    persisted_peer_count: u32,
 }
 
 async fn get_grid_trust_metrics(
     State(_ctx): State<ApiContext>,
 ) -> Result<(StatusCode, Json<GridTrustMetricsResponse>), HttpAppError> {
+    let backend = crate::grid::galaxy_trust_score_store::current_trust_store_backend();
+    let depth = crate::grid::galaxy_trust_persist_depth::current_trust_persist_depth();
     Ok((
         StatusCode::OK,
         Json(GridTrustMetricsResponse {
             ok: true,
             metrics: crate::grid::galaxy_trust_score::trust_metrics_snapshot(),
+            trust_persist_depth:
+                crate::grid::galaxy_trust_persist_depth::trust_persist_depth_wire_label(depth),
+            trust_store_backend:
+                crate::grid::galaxy_trust_score_store::trust_store_backend_wire_label(backend),
+            persisted_peer_count: crate::grid::galaxy_trust_score_store::persisted_trust_peer_count(
+            ),
         }),
     ))
 }

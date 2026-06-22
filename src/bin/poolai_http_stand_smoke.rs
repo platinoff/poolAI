@@ -1262,6 +1262,14 @@ async fn smoke_grid_trust_metrics_api(client: &Client, base: &str) -> Result<(),
             return Err(format!("trust-metrics missing {key}: {body}"));
         }
     }
+    if body
+        .get("trust_persist_depth")
+        .and_then(|v| v.as_str())
+        .filter(|s| !s.is_empty())
+        .is_none()
+    {
+        return Err(format!("trust-metrics missing trust_persist_depth: {body}"));
+    }
     Ok(())
 }
 

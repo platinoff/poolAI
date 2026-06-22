@@ -1482,6 +1482,14 @@ fn admin_grid_pricing_freshness_wasm_first_ph_s902() {
 }
 
 #[test]
+fn admin_payout_batch_trust_persist_wasm_first_ph_s912() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("renderGridTrustPersistStrip"));
+    let pb = include_str!("payout_batch.rs");
+    assert!(pb.contains("/api/v1/grid/trust-metrics"));
+}
+
+#[test]
 fn admin_charts_ml_canvas_glue_wasm_only_ph_s701() {
     let js = include_str!("../admin_charts.js");
     assert!(js.contains("wasm.flattenMlStepRows"));

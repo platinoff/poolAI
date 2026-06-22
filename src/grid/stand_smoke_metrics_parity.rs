@@ -289,6 +289,8 @@ pub enum StandSmokeMetricsParityDepth {
     ReplicationQuorumProduction,
     /// Pricing oracle live fetch production depth (PH-S903 band 25).
     PricingProduction,
+    /// Trust score SQLite persist depth (PH-S913 band 26).
+    TrustPersist,
 }
 
 /// Classify stand smoke metrics parity depth from optional feature stub (PH-S714/PH-S724).
@@ -327,6 +329,12 @@ pub fn stand_smoke_metrics_parity_depth_stub(
         .unwrap_or(false)
     {
         return StandSmokeMetricsParityDepth::ReplicationQuorumProduction;
+    }
+    if f.get("trust_persist")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        return StandSmokeMetricsParityDepth::TrustPersist;
     }
     if f.get("pricing_production")
         .and_then(|v| v.as_bool())
@@ -897,16 +905,24 @@ mod tests {
     }
 
     #[test]
+    fn stand_smoke_metrics_parity_depth_stub_band26_ph_s913() {
+        assert_eq!(
+            stand_smoke_metrics_parity_depth_stub(Some(&json!({"trust_persist": true}))),
+            StandSmokeMetricsParityDepth::TrustPersist
+        );
+        assert_eq!(
+            stand_smoke_metrics_parity_depth_stub(Some(&json!({"pricing_production": true}))),
+            StandSmokeMetricsParityDepth::PricingProduction
+        );
+    }
+
+    #[test]
     fn stand_smoke_metrics_parity_depth_stub_band24_ph_s893() {
         assert_eq!(
             stand_smoke_metrics_parity_depth_stub(Some(
                 &json!({"replication_quorum_production": true})
             )),
             StandSmokeMetricsParityDepth::ReplicationQuorumProduction
-        );
-        assert_eq!(
-            stand_smoke_metrics_parity_depth_stub(Some(&json!({"pricing_production": true}))),
-            StandSmokeMetricsParityDepth::PricingProduction
         );
     }
 

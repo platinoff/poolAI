@@ -1,12 +1,14 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-21 (PH-S900…S909 ✅ · master backlog **101** · active **10** · vision **rev 291** · rust_ratio **94.77%**)
+**Оновлено:** 2026-06-22 (PH-S910…S919 ✅ · master backlog **91** · active **10** · vision **rev 292** · rust_ratio **94.78%**)
 
-**Cursor 3.8.11 (2026-06-20):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-06-20.md`](./CURSOR_UPDATE_RESEARCH_2026-06-20.md). **Наступна сесія:** **`абракадабра`** (drain PH-S910…S919).
+**Cursor 3.8.11 (2026-06-20):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-06-20.md`](./CURSOR_UPDATE_RESEARCH_2026-06-20.md). **Наступна сесія:** **`абракадабра`** (drain PH-S920…S929).
 
-**Completion roadmap v2 (2026-06-20):** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) — **101** спринтів до **product-complete** (PH-S1010 / FM **§5.15**); **11** сесій `абракадабра` × 10 PH-S*. Реєстр: [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · regen `bash scripts/generate-ph-s-master-backlog-351.sh`.
+**Completion roadmap v2 (2026-06-20):** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) — **101** спринтів до **product-complete** (PH-S1010 / FM **§5.15**); **10** сесій `абракадабра` × 10 PH-S* залишилось. Реєстр: [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · regen `bash scripts/generate-ph-s-master-backlog-351.sh`.
 
-**Master backlog 101 (2026-06-21):** FM **§5.14**. Активна §5.12: **PH-S910…S919** (band 26 — Trust score SQLite persist). **`абракадабра`** = drain 10 → promote **PH-S920…S929** (band 27).
+**Master backlog 91 (2026-06-22):** FM **§5.14**. Активна §5.12: **PH-S920…S929** (band 27 — wasm admin_charts migration). **`абракадабра`** = drain 10 → promote **PH-S930…S939** (band 28).
+
+**PH-S910…S919 ✅ (2026-06-22):** trust score SQLite persist + JSON migrate (PH-S910); payout gate uses persisted trust when metrics omit score (PH-S911); admin `renderGridTrustPersistStrip` wasm (PH-S912); stand smoke trust-metrics `trust_persist_depth` parity (PH-S913); `trust_persist_depth_stub` (PH-S914); `poolai-loc-audit` → `rust_ratio.json` **94.78%** (PH-S915); Galaxy §6.5 trust persist docs (PH-S916); `galaxy_horizon_s910_integration` (PH-S919); vision **rev 292**.
 
 **PH-S900…S909 ✅ (2026-06-21):** pricing live provider timeout hardening + `galaxy_pricing_provider_timeouts_total` (PH-S900); pricing forced-fallback stand smoke (PH-S901); admin grid-pricing wasm freshness metadata strip (PH-S902); stand smoke pricing-metrics JSON↔Prom parity (PH-S903); `pricing_depth_stub` + `pricing_depth` wire (PH-S904); `poolai-loc-audit` → `rust_ratio.json` **94.77%** (PH-S905); Galaxy §4.2 live fetch implemented table (PH-S906); `galaxy_horizon_s900_integration` (PH-S909); vision **rev 291**.
 
@@ -56,7 +58,7 @@
 
 **Rules:** **`абракадабра`** — drain 10 з §5.12 → vision close → push; [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
-**§5.12:** **10** відкритих **PH-S910…S919** (band 26). **Vision:** rev **291** · rust_ratio **94.77%** (PH-S905).
+**§5.12:** **10** відкритих **PH-S920…S929** (band 27). **Vision:** rev **292** · rust_ratio **94.78%** (PH-S915).
 
 **Роадмеп:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) · **Промпт:** [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md).
 

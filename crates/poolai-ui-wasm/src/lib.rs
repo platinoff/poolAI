@@ -57,6 +57,7 @@ use poolai_ui_core::theme::normalize_theme;
 use poolai_ui_core::topology::{
     render_topology_stats_strip_html, short_topology_node_id, topology_hub_label,
 };
+use poolai_ui_core::trust::render_grid_trust_persist_strip_html;
 use poolai_ui_core::updates_compat::{compat_status_label, protocol_version_label};
 use poolai_ui_core::vm::render_vm_panel_html;
 use poolai_ui_core::workers::render_workers_panel_html;
@@ -73,6 +74,12 @@ pub fn format_usd_micro_wasm(usd_micro: f64) -> String {
 #[wasm_bindgen(js_name = formatUnixSecs)]
 pub fn format_unix_secs_wasm(secs: f64) -> String {
     format_unix_secs(Some(secs))
+}
+
+/// Grid trust: persist depth + gate counters strip (PH-S912).
+#[wasm_bindgen(js_name = renderGridTrustPersistStrip)]
+pub fn render_grid_trust_persist_strip_wasm(trust_metrics_json: &str, i18n_json: &str) -> String {
+    render_grid_trust_persist_strip_html(trust_metrics_json, i18n_json)
 }
 
 /// Grid pricing: L1 freshness metadata strip (PH-S902).

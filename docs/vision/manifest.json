@@ -2204,11 +2204,17 @@
       "from": "galaxy_grid",
       "kind": "implements",
       "to": "src_grid_galaxy_replication_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_pricing_depth_rs"
     }
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S909",
+  "last_sprint_closed": "PH-S919",
   "layers": [
     {
       "id": "L0",
@@ -2241,7 +2247,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S910",
+  "next_sprint": "PH-S920",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -9082,9 +9088,30 @@
       "label": "galaxy_replication_rate_cap_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_replication_rate_cap_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_pricing_depth_rs",
+      "label": "galaxy_pricing_depth.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_pricing_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s900_integration_rs",
+      "label": "galaxy_horizon_s900_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s900_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_pricing_provider_timeout_integration_rs",
+      "label": "galaxy_pricing_provider_timeout_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_pricing_provider_timeout_integration.rs"
     }
   ],
-  "revision": 291,
+  "revision": 292,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -16686,91 +16713,181 @@
       "acceptance": "galaxy_trust_score_store wire",
       "deps": "Galaxy §6.5",
       "id": "PH-S910",
-      "open": true,
+      "open": false,
       "row": 845,
-      "status": "open",
+      "status": "closed",
       "title": "trust score SQLite persist"
     },
     {
       "acceptance": "low trust → held metric",
       "deps": "Galaxy §6.5",
       "id": "PH-S911",
-      "open": true,
+      "open": false,
       "row": 846,
-      "status": "open",
+      "status": "closed",
       "title": "trust payout gate integration"
     },
     {
       "acceptance": "trust metrics strip",
       "deps": "ui-core",
       "id": "PH-S912",
-      "open": true,
+      "open": false,
       "row": 847,
-      "status": "open",
+      "status": "closed",
       "title": "admin trust metrics wasm strip"
     },
     {
       "acceptance": "JSON↔Prom",
       "deps": "tests",
       "id": "PH-S913",
-      "open": true,
+      "open": false,
       "row": 848,
-      "status": "open",
+      "status": "closed",
       "title": "stand smoke trust-metrics parity"
     },
     {
       "acceptance": "unit test",
       "deps": "concept",
       "id": "PH-S914",
-      "open": true,
+      "open": false,
       "row": 849,
-      "status": "open",
+      "status": "closed",
       "title": "trust persist depth stub"
     },
     {
       "acceptance": "rust_ratio.json zriz",
       "deps": "§5.13",
       "id": "PH-S915",
-      "open": true,
+      "open": false,
       "row": 850,
-      "status": "open",
+      "status": "closed",
       "title": "poolai-loc-audit PH-S915"
     },
     {
       "acceptance": "docs canon",
       "deps": "docs",
       "id": "PH-S916",
-      "open": true,
+      "open": false,
       "row": 851,
-      "status": "open",
+      "status": "closed",
       "title": "Galaxy §6.5 trust persist ✅ docs"
     },
     {
       "acceptance": "--check` green",
       "deps": "ops",
       "id": "PH-S917",
-      "open": true,
+      "open": false,
       "row": 852,
-      "status": "open",
+      "status": "closed",
       "title": "poolai-vision-sync --check"
     },
     {
       "acceptance": "--min-ratio 0.95 --advisory",
       "deps": "ops",
       "id": "PH-S918",
-      "open": true,
+      "open": false,
       "row": 853,
-      "status": "open",
+      "status": "closed",
       "title": "Ratio hold advisory"
     },
     {
       "acceptance": "galaxy_horizon_s910_integration",
       "deps": "Trust",
       "id": "PH-S919",
-      "open": true,
+      "open": false,
       "row": 854,
-      "status": "open",
+      "status": "closed",
       "title": "Horizon close band S910–S918"
+    },
+    {
+      "acceptance": "render_sparkline_html` wasm-only",
+      "deps": "ui-core",
+      "id": "PH-S920",
+      "open": true,
+      "row": 855,
+      "status": "open",
+      "title": "admin_charts ML sparkline → wasm"
+    },
+    {
+      "acceptance": "render_line_chart_html` wasm-only",
+      "deps": "ui-core",
+      "id": "PH-S921",
+      "open": true,
+      "row": 856,
+      "status": "open",
+      "title": "admin_charts line chart → wasm"
+    },
+    {
+      "acceptance": "mod.rs PH-S920/S921",
+      "deps": "admin",
+      "id": "PH-S922",
+      "open": true,
+      "row": 857,
+      "status": "open",
+      "title": "admin_charts regression tests"
+    },
+    {
+      "acceptance": "bin verify",
+      "deps": "ops",
+      "id": "PH-S923",
+      "open": true,
+      "row": 858,
+      "status": "open",
+      "title": "build-ui-wasm.sh gate in drain doc"
+    },
+    {
+      "acceptance": "unit test",
+      "deps": "concept",
+      "id": "PH-S924",
+      "open": true,
+      "row": 859,
+      "status": "open",
+      "title": "charts depth stub"
+    },
+    {
+      "acceptance": "rust_ratio.json zriz",
+      "deps": "§5.13",
+      "id": "PH-S925",
+      "open": true,
+      "row": 860,
+      "status": "open",
+      "title": "poolai-loc-audit PH-S925"
+    },
+    {
+      "acceptance": "docs canon",
+      "deps": "docs",
+      "id": "PH-S926",
+      "open": true,
+      "row": 861,
+      "status": "open",
+      "title": "RUST_RATIO §5.13 charts row"
+    },
+    {
+      "acceptance": "--check` green",
+      "deps": "ops",
+      "id": "PH-S927",
+      "open": true,
+      "row": 862,
+      "status": "open",
+      "title": "poolai-vision-sync --check"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory",
+      "deps": "ops",
+      "id": "PH-S928",
+      "open": true,
+      "row": 863,
+      "status": "open",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "acceptance": "galaxy_horizon_s920_integration",
+      "deps": "Charts",
+      "id": "PH-S929",
+      "open": true,
+      "row": 864,
+      "status": "open",
+      "title": "Horizon close band S920–S928"
     }
   ],
   "sprint_queue_open_count": 10,

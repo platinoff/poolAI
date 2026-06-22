@@ -1,12 +1,12 @@
 # Galaxy Grid roadmap (зріз)
 
-**Оновлено:** 2026-06-21 · **Completion v2:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · **101** pending PH-S910…S1010 · **§5.12 active:** 10
+**Оновлено:** 2026-06-22 · **Completion v2:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · **91** pending PH-S930…S1010 · **§5.12 active:** 10
 
 | Зріз | Значення |
 |------|----------|
 | **Completion plan** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.14–§5.15** |
 | **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) |
-| **Active drain (band 26)** | PH-S910…S919 — Trust score SQLite persist |
+| **Active drain (band 27)** | PH-S920…S929 — wasm admin_charts migration |
 | **Last closed (band 25)** | PH-S900…S909 ✅ — Pricing oracle live fetch hardening |
 | **Last closed (band 24)** | PH-S890…S899 ✅ — Replication quorum production gates |
 | **Product-complete tail** | PH-S1010 — FM **§5.15** |

@@ -656,6 +656,7 @@ function poolaiRenderPayoutBatchPanel(
 ) {
   var wasm = poolaiChartsWasm();
   var metricsStrip = '';
+  var trustPersistStrip = '';
   var historyStrip = '';
   var panelHtml = '';
   var i18nJson = JSON.stringify(window.__poolaiAdminI18nRust || {});
@@ -664,6 +665,12 @@ function poolaiRenderPayoutBatchPanel(
       JSON.stringify(settlementMetrics || {}),
       JSON.stringify(trustMetrics || {}),
       trustScoreGauge || 0,
+    );
+  }
+  if (wasm && typeof wasm.renderGridTrustPersistStrip === 'function') {
+    trustPersistStrip = wasm.renderGridTrustPersistStrip(
+      JSON.stringify(trustMetrics || {}),
+      i18nJson,
     );
   }
   if (wasm && typeof wasm.renderPayoutBatchHistoryStripHtml === 'function') {
@@ -679,7 +686,7 @@ function poolaiRenderPayoutBatchPanel(
       i18nJson,
     );
   }
-  return metricsStrip + historyStrip + panelHtml;
+  return metricsStrip + trustPersistStrip + historyStrip + panelHtml;
 }
 
 /** PH-S810: secret rotation panel (wasm-only). */

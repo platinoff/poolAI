@@ -29,6 +29,7 @@ pub mod stand_smoke_metrics;
 pub mod table;
 pub mod theme;
 pub mod topology;
+pub mod trust;
 pub mod updates_compat;
 pub mod validate;
 pub mod vm;

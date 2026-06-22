@@ -866,6 +866,9 @@ paths:
                 $ref: '#/components/schemas/GridTrustMetricsResponse'
               example:
                 ok: true
+                trust_persist_depth: ephemeral
+                trust_store_backend: ephemeral
+                persisted_peer_count: 0
                 metrics:
                   payout_eligible_total: 0
                   payout_held_total: 0
@@ -6926,11 +6929,24 @@ components:
       required:
         - ok
         - metrics
+        - trust_persist_depth
+        - trust_store_backend
+        - persisted_peer_count
       properties:
         ok:
           type: boolean
         metrics:
           $ref: '#/components/schemas/TrustMetricsSnapshot'
+        trust_persist_depth:
+          type: string
+          description: Trust persist depth wire label (PH-S913)
+        trust_store_backend:
+          type: string
+          description: Active trust store backend (PH-S910)
+        persisted_peer_count:
+          type: integer
+          format: int32
+          description: Peers with persisted trust scores (PH-S914)
 
     ReplicationMetricsSnapshot:
       type: object

@@ -1189,7 +1189,8 @@ fn ingest_result(
     {
         let _ = evaluate_post_mismatch_elevated_sampling(&job_id, &verify_cfg);
     }
-    let mut effective_trust_score = trust_score;
+    let mut effective_trust_score =
+        trust_score.or_else(|| source_peer_id.and_then(lookup_peer_trust_score));
     if let Some(verdict) = body
         .metrics
         .as_ref()
@@ -1197,9 +1198,7 @@ fn ingest_result(
         .and_then(|v| v.as_str())
     {
         if verdict.eq_ignore_ascii_case("match") || verdict.eq_ignore_ascii_case("mismatch") {
-            let base = trust_score
-                .or_else(|| source_peer_id.and_then(lookup_peer_trust_score))
-                .unwrap_or(DEFAULT_TRUST_SCORE);
+            let base = effective_trust_score.unwrap_or(DEFAULT_TRUST_SCORE);
             effective_trust_score = Some(apply_verification_trust_delta(verdict, base));
         }
     }
@@ -1901,6 +1900,86 @@ mod tests {
                 settlement_status: SettlementStatus::PendingVerification,
             }
         );
+    }
+
+    #[test]
+    fn ingest_result_uses_persisted_trust_when_metrics_omit_score_ph_s911() {
+        use crate::grid::galaxy_trust_score::{
+            payout_held_total, reset_settlement_gate_metrics_for_test,
+        };
+        use crate::grid::galaxy_trust_score_store::{
+            persist_peer_trust_score, reset_trust_score_store_for_test,
+        };
+
+        reset_settlement_gate_metrics_for_test();
+        reset_trust_score_store_for_test();
+        std::env::remove_var(crate::grid::galaxy_trust_score_store::ENV_TRUST_SCORE_STORE_PATH);
+        std::env::remove_var(crate::grid::galaxy_trust_score_store_sqlite::ENV_TRUST_SCORE_STORE);
+        std::env::remove_var(
+            crate::grid::galaxy_trust_score_store_sqlite::ENV_TRUST_SCORE_DATA_DIR,
+        );
+        persist_peer_trust_score("tg-persist-low", 15);
+
+        let jobs = JobStore::open_for_test(None);
+        let memory = MemoryShardStore::open_for_test(None);
+        jobs.push(JobRecord {
+            spec: JobSpec {
+                id: JobId::new("grid-trust-persist"),
+                kind: JobKind::Inference,
+                resources: Default::default(),
+                priority: 0,
+                max_duration_secs: None,
+                input_artifact_ids: vec![],
+                verification_policy: None,
+                deadline: None,
+            },
+            status: JobStatus::Scheduled,
+            created_at: Utc::now(),
+            worker_id: None,
+            vm_id: None,
+            lease_owner: None,
+            lease_epoch: None,
+            lease_expires_at: None,
+            migration_count: None,
+            fail_reason: None,
+            leased_at: None,
+        })
+        .expect("push");
+
+        let env = GridEnvelope::new(
+            GridMessage::Result(crate::grid::GridResultBody {
+                job_id: "grid-trust-persist".into(),
+                status: GridResultStatus::Completed,
+                output_artifact_ids: vec![],
+                proof: None,
+                metrics: None,
+                lease_epoch: None,
+            }),
+            Some("tg-persist-low".into()),
+        );
+        let out = ingest_envelope(env, &jobs, &memory).expect("ingest");
+        let cfg_sample = VerifySamplingConfig::default_stub();
+        let expected_sample = if crate::grid::galaxy_verify_sampling::deterministic_sample_selected(
+            "grid-trust-persist",
+            cfg_sample.base_sample_rate,
+        ) {
+            VerifySamplingVerdict::SampleScheduled
+        } else {
+            VerifySamplingVerdict::NotSelected
+        };
+        assert_eq!(
+            out.kind,
+            GridIngestKind::Result {
+                job_id: "grid-trust-persist".into(),
+                status: JobStatus::Completed,
+                settlement_gate: SettlementGateVerdict::PayoutHeld,
+                verification_sample: expected_sample,
+                settlement_status: SettlementStatus::PendingVerification,
+            }
+        );
+        assert_eq!(payout_held_total(), 1);
+        reset_settlement_gate_metrics_for_test();
+        reset_trust_score_store_for_test();
     }
 
     #[test]
