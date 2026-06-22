@@ -1,6 +1,6 @@
 # Rust codebase ratio — стратегія 90–95% (PoolAI)
 
-**Оновлено:** 2026-06-20 · **Канон:** FM **§5.13** · §5.12 **10** active PH-S750…S759 · master backlog **261** pending → [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) bands **28–29** formal **95%** / stretch **96%** · rust_ratio **94.59%**
+**Оновлено:** 2026-06-22 · **Канон:** FM **§5.13** · §5.12 **10** active PH-S930…S939 · master backlog **81** pending → [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) bands **28–29** formal **95%** / stretch **96%** · rust_ratio **94.80%**
 
 **Мета:** зростання частки **Rust** у виконуваному коді репозиторію до **90–95%** (формально), **96% stretch spirit** (орієнтир replenish PH-S150…S159) — платформа збирається і перевіряється через **`cargo`** без обов'язкового Node на edge.
 
@@ -282,6 +282,16 @@ flowchart TB
 | 187 | **PH-S330** | poolai-vision-sync drift gate | `--check` green | **✅** |
 | 188 | **PH-S331** | Ratio hold advisory snapshot | **94.37%** advisory | **✅** |
 | 189 | **PH-S332** | Docs INDEX ratio maintain | INDEX §7 pointer | **✅** |
+| 190 | **PH-S920** | admin_charts sparkline wasm-only | `render_sparkline_html`; no JS SVG fallback | **✅** |
+| 191 | **PH-S921** | admin_charts line chart wasm-only | `render_line_chart_html`; no `escapeHtml` fallback | **✅** |
+| 192 | **PH-S922** | admin_charts regression tests | mod.rs PH-S920/S921 wasm-only gates | **✅** |
+| 193 | **PH-S923** | build-ui-wasm.sh gate | bin verify in mod.rs | **✅** |
+| 194 | **PH-S924** | charts depth stub | `charts_depth_stub` unit test | **✅** |
+| 195 | **PH-S925** | Rust ratio loc-audit refresh | **94.80%** sprint zriz | **✅** |
+| 196 | **PH-S926** | RUST_RATIO §5.13 charts band 27 row | docs canon | **✅** |
+| 197 | **PH-S927** | poolai-vision-sync drift gate | `--check` green | **✅** |
+| 198 | **PH-S928** | Ratio hold advisory snapshot | **94.80%** advisory | **✅** |
+| 199 | **PH-S929** | galaxy_horizon_s920_integration | charts wasm band close | **✅** |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 

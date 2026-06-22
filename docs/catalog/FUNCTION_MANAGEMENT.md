@@ -1119,20 +1119,30 @@ FM-xxx (з таблиці нижче)
 | 852 | **PH-S917** | poolai-vision-sync --check | ops | `--check` green | **✅** |
 | 853 | **PH-S918** | Ratio hold advisory | ops | `--min-ratio 0.95 --advisory` | **✅** |
 | 854 | **PH-S919** | Horizon close band S910–S918 | Trust | `galaxy_horizon_s910_integration` | **✅** |
-| 855 | **PH-S920** | admin_charts ML sparkline → wasm | ui-core | `render_sparkline_html` wasm-only | **[ ]** |
-| 856 | **PH-S921** | admin_charts line chart → wasm | ui-core | `render_line_chart_html` wasm-only | **[ ]** |
-| 857 | **PH-S922** | admin_charts regression tests | admin | mod.rs PH-S920/S921 | **[ ]** |
-| 858 | **PH-S923** | build-ui-wasm.sh gate in drain doc | ops | bin verify | **[ ]** |
-| 859 | **PH-S924** | charts depth stub | concept | unit test | **[ ]** |
-| 860 | **PH-S925** | poolai-loc-audit PH-S925 | §5.13 | rust_ratio.json zriz | **[ ]** |
-| 861 | **PH-S926** | RUST_RATIO §5.13 charts row | docs | docs canon | **[ ]** |
-| 862 | **PH-S927** | poolai-vision-sync --check | ops | `--check` green | **[ ]** |
-| 863 | **PH-S928** | Ratio hold advisory | ops | `--min-ratio 0.95 --advisory` | **[ ]** |
-| 864 | **PH-S929** | Horizon close band S920–S928 | Charts | `galaxy_horizon_s920_integration` | **[ ]** |
+| 855 | **PH-S920** | admin_charts ML sparkline → wasm | ui-core | `render_sparkline_html` wasm-only | **✅** |
+| 856 | **PH-S921** | admin_charts line chart → wasm | ui-core | `render_line_chart_html` wasm-only | **✅** |
+| 857 | **PH-S922** | admin_charts regression tests | admin | mod.rs PH-S920/S921 | **✅** |
+| 858 | **PH-S923** | build-ui-wasm.sh gate in drain doc | ops | bin verify | **✅** |
+| 859 | **PH-S924** | charts depth stub | concept | unit test | **✅** |
+| 860 | **PH-S925** | poolai-loc-audit PH-S925 | §5.13 | rust_ratio.json zriz | **✅** |
+| 861 | **PH-S926** | RUST_RATIO §5.13 charts row | docs | docs canon | **✅** |
+| 862 | **PH-S927** | poolai-vision-sync --check | ops | `--check` green | **✅** |
+| 863 | **PH-S928** | Ratio hold advisory | ops | `--min-ratio 0.95 --advisory` | **✅** |
+| 864 | **PH-S929** | Horizon close band S920–S928 | Charts | `galaxy_horizon_s920_integration` | **✅** |
+| 865 | **PH-S930** | admin_common.js table init slim | ui-core | delegate to ui-core where possible | **[ ]** |
+| 866 | **PH-S931** | admin_common.js empty state slim | ui-core | wasm/html from ui-core | **[ ]** |
+| 867 | **PH-S932** | i18n_core.js audit — no duplicate logic | ui-core | rg audit + fix | **[ ]** |
+| 868 | **PH-S933** | ratio 95% gate test | §5.13 | rust_ratio ≥ 0.95 or advisory documented | **[ ]** |
+| 869 | **PH-S934** | ui JS loc reduction stub metric | ops | loc-audit by_category ui_js down | **[ ]** |
+| 870 | **PH-S935** | poolai-loc-audit PH-S935 | §5.13 | rust_ratio.json zriz | **[ ]** |
+| 871 | **PH-S936** | RUST_RATIO_STRATEGY band 28 note | docs | docs canon | **[ ]** |
+| 872 | **PH-S937** | poolai-vision-sync --check | ops | `--check` green | **[ ]** |
+| 873 | **PH-S938** | Ratio hold advisory | ops | `--min-ratio 0.95` meets or hold | **[ ]** |
+| 874 | **PH-S939** | galaxy_horizon_s930_integration | Ratio | ratio 95% band close | **[ ]** |
 
-**Відкритих у §5.12:** **10** (PH-S920…S929). **Master backlog:** **91** pending PH-S930…S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · **§5.14**. Vision rev **292** (after sync). rust_ratio **94.78%** (PH-S915).
+**Відкритих у §5.12:** **10** (PH-S930…S939). **Master backlog:** **81** pending PH-S940…S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · **§5.14**. Vision rev **293** (after sync). rust_ratio **94.80%** (PH-S925).
 
-**Наступна сесія:** **`абракадабра`** — drain PH-S920…S929 → promote PH-S930…S939 з §5.14 → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **`абракадабра`** — drain PH-S930…S939 → promote PH-S940…S949 з §5.14 → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.14 Master backlog PH-S720…S1010 (291 pending → product-complete, 2026-06-20)
 
@@ -1140,11 +1150,11 @@ FM-xxx (з таблиці нижче)
 
 | Поле | Значення |
 |------|----------|
-| **Pending** | **91** (PH-S930…S1010) |
-| **Drained bands 1–26** | PH-S660…S919 ✅ |
-| **Активна §5.12** | PH-S920…S929 `[ ]` — band 27 wasm admin_charts migration |
-| **Наступна promote** | PH-S920…S929 — band 27 wasm admin_charts migration |
-| **Сесій `абракадабра`** | **11** (10×10 + tail PH-S1010) |
+| **Pending** | **81** (PH-S940…S1010) |
+| **Drained bands 1–27** | PH-S660…S929 ✅ |
+| **Активна §5.12** | PH-S930…S939 `[ ]` — band 28 Ratio 95% gate admin_common slim |
+| **Наступна promote** | PH-S940…S949 — band 29 Ratio 96% stretch e2e scope audit |
+| **Сесій `абракадабра`** | **10** (10×10 + tail PH-S1010) |
 | **План фаз** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md) |
 | **Реєстр sprint×acceptance** | [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) |
 | **Regen** | `bash scripts/generate-ph-s-master-backlog-351.sh` |
@@ -1193,7 +1203,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-06-22):** PH-S920…S929 **[ ]** drain band 27 (wasm admin_charts migration) · **`абракадабра`** = drain → vision close → push · ratio formal gate bands **28–29** per [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md).
+**Активна смуга (2026-06-22):** PH-S930…S939 **[ ]** drain band 28 (Ratio 95% gate admin_common slim) · **`абракадабра`** = drain → vision close → push · ratio formal gate bands **28–29** per [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md).
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

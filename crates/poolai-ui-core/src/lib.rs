@@ -6,6 +6,7 @@
 pub mod admin_dom;
 pub mod admin_vm_workers;
 pub mod api_error;
+pub mod charts_depth;
 pub mod design_tokens;
 pub mod format;
 pub mod galaxy_telegram_seats;

@@ -150,12 +150,13 @@ function poolaiMonitoringMetricLatestUrl(metricName, limit) {
 function poolaiRenderLineChart(metricName, data, opts) {
   opts = opts || {};
   var wasm = poolaiChartsWasm();
+  if (!wasm) return '';
   if (!data || data.length === 0) {
     var noData = poolaiChartT('admin.mon.noData', 'No data available');
-    if (wasm && typeof wasm.renderLineChartEmptyHtml === 'function') {
+    if (typeof wasm.renderLineChartEmptyHtml === 'function') {
       return wasm.renderLineChartEmptyHtml(noData);
     }
-    return '<div class="muted">' + escapeHtml(noData) + '</div>';
+    return '';
   }
 
   var values = poolaiMetricPointValues(data);
@@ -169,7 +170,7 @@ function poolaiRenderLineChart(metricName, data, opts) {
   var statMin = poolaiChartT('admin.mon.statMin', 'Min:');
   var statMax = poolaiChartT('admin.mon.statMax', 'Max:');
   var statAvg = poolaiChartT('admin.mon.statAvg', 'Avg:');
-  if (wasm && typeof wasm.renderLineChartHtml === 'function') {
+  if (typeof wasm.renderLineChartHtml === 'function') {
     return wasm.renderLineChartHtml(
       metricName,
       JSON.stringify(values),
@@ -182,7 +183,7 @@ function poolaiRenderLineChart(metricName, data, opts) {
       statAvg,
     );
   }
-  return '<div class="muted">' + escapeHtml(noData) + '</div>';
+  return '';
 }
 
 /**

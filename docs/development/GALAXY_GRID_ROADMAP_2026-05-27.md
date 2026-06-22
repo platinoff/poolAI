@@ -1,18 +1,18 @@
 # Galaxy Grid roadmap (зріз)
 
-**Оновлено:** 2026-06-22 · **Completion v2:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · **91** pending PH-S930…S1010 · **§5.12 active:** 10
+**Оновлено:** 2026-06-22 · **Completion v2:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · **81** pending PH-S940…S1010 · **§5.12 active:** 10
 
 | Зріз | Значення |
 |------|----------|
 | **Completion plan** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.14–§5.15** |
 | **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) |
-| **Active drain (band 27)** | PH-S920…S929 — wasm admin_charts migration |
-| **Last closed (band 25)** | PH-S900…S909 ✅ — Pricing oracle live fetch hardening |
-| **Last closed (band 24)** | PH-S890…S899 ✅ — Replication quorum production gates |
+| **Active drain (band 28)** | PH-S930…S939 — Ratio 95% gate admin_common slim |
+| **Last closed (band 27)** | PH-S920…S929 ✅ — wasm admin_charts sparkline/line migration |
+| **Last closed (band 26)** | PH-S910…S919 ✅ — Trust score SQLite persist |
 | **Product-complete tail** | PH-S1010 — FM **§5.15** |
-| **Rust ratio** | **94.74%** → PH-S905 zriz · hold **95%** advisory (bands 28–29 formal gate) |
+| **Rust ratio** | **94.80%** → PH-S925 zriz · hold **95%** advisory (bands 28–29 formal gate) |
 
-**101** pending · **11** `абракадабра` sessions · остання закрита **PH-S900…S909** ✅.
+**81** pending · **9** `абракадабра` sessions · остання закрита **PH-S920…S929** ✅.
 
 ---
 

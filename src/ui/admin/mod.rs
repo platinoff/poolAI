@@ -935,15 +935,52 @@ fn admin_charts_layer_exports() {
 }
 
 #[test]
+#[test]
 fn admin_charts_sparkline_wasm_first_ph_s275() {
+    assert_admin_charts_sparkline_wasm_only();
+}
+
+fn assert_admin_charts_sparkline_wasm_only() {
     let js = include_str!("../admin_charts.js");
     assert!(js.contains("wasm.renderSparklineHtml"));
+    assert!(!js.contains("metric-sparkline-card"));
+    assert!(!js.contains("<polyline"));
+}
+
+#[test]
+fn admin_charts_sparkline_wasm_only_ph_s920() {
+    assert_admin_charts_sparkline_wasm_only();
 }
 
 #[test]
 fn admin_charts_line_chart_wasm_first_ph_s284() {
+    assert_admin_charts_line_chart_wasm_only();
+}
+
+fn assert_admin_charts_line_chart_wasm_only() {
     let js = include_str!("../admin_charts.js");
     assert!(js.contains("wasm.renderLineChartHtml"));
+    assert!(js.contains("wasm.renderLineChartEmptyHtml"));
+    assert!(!js.contains("escapeHtml(noData)"));
+}
+
+#[test]
+fn admin_charts_line_chart_wasm_only_ph_s921() {
+    assert_admin_charts_line_chart_wasm_only();
+}
+
+#[test]
+fn admin_charts_sparkline_line_regression_ph_s922() {
+    assert_admin_charts_sparkline_wasm_only();
+    assert_admin_charts_line_chart_wasm_only();
+}
+
+#[test]
+fn build_ui_wasm_script_gate_ph_s923() {
+    let script = include_str!("../../../bin/build-ui-wasm.sh");
+    assert!(script.contains("poolai-ui-wasm"));
+    assert!(script.contains("wasm32-unknown-unknown"));
+    assert!(script.contains("wasm-bindgen"));
 }
 
 #[test]

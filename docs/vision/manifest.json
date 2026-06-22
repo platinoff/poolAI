@@ -2210,11 +2210,29 @@
       "from": "galaxy_grid",
       "kind": "implements",
       "to": "src_grid_galaxy_pricing_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_trust_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_trust_persist_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_trust_score_store_sqlite_rs"
     }
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S919",
+  "last_sprint_closed": "PH-S929",
   "layers": [
     {
       "id": "L0",
@@ -2247,7 +2265,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S920",
+  "next_sprint": "PH-S930",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -9109,9 +9127,37 @@
       "label": "galaxy_pricing_provider_timeout_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_pricing_provider_timeout_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_trust_rs",
+      "label": "trust.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/trust.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_trust_persist_depth_rs",
+      "label": "galaxy_trust_persist_depth.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_trust_persist_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_trust_score_store_sqlite_rs",
+      "label": "galaxy_trust_score_store_sqlite.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_trust_score_store_sqlite.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s910_integration_rs",
+      "label": "galaxy_horizon_s910_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s910_integration.rs"
     }
   ],
-  "revision": 292,
+  "revision": 293,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -16803,91 +16849,181 @@
       "acceptance": "render_sparkline_html` wasm-only",
       "deps": "ui-core",
       "id": "PH-S920",
-      "open": true,
+      "open": false,
       "row": 855,
-      "status": "open",
+      "status": "closed",
       "title": "admin_charts ML sparkline → wasm"
     },
     {
       "acceptance": "render_line_chart_html` wasm-only",
       "deps": "ui-core",
       "id": "PH-S921",
-      "open": true,
+      "open": false,
       "row": 856,
-      "status": "open",
+      "status": "closed",
       "title": "admin_charts line chart → wasm"
     },
     {
       "acceptance": "mod.rs PH-S920/S921",
       "deps": "admin",
       "id": "PH-S922",
-      "open": true,
+      "open": false,
       "row": 857,
-      "status": "open",
+      "status": "closed",
       "title": "admin_charts regression tests"
     },
     {
       "acceptance": "bin verify",
       "deps": "ops",
       "id": "PH-S923",
-      "open": true,
+      "open": false,
       "row": 858,
-      "status": "open",
+      "status": "closed",
       "title": "build-ui-wasm.sh gate in drain doc"
     },
     {
       "acceptance": "unit test",
       "deps": "concept",
       "id": "PH-S924",
-      "open": true,
+      "open": false,
       "row": 859,
-      "status": "open",
+      "status": "closed",
       "title": "charts depth stub"
     },
     {
       "acceptance": "rust_ratio.json zriz",
       "deps": "§5.13",
       "id": "PH-S925",
-      "open": true,
+      "open": false,
       "row": 860,
-      "status": "open",
+      "status": "closed",
       "title": "poolai-loc-audit PH-S925"
     },
     {
       "acceptance": "docs canon",
       "deps": "docs",
       "id": "PH-S926",
-      "open": true,
+      "open": false,
       "row": 861,
-      "status": "open",
+      "status": "closed",
       "title": "RUST_RATIO §5.13 charts row"
     },
     {
       "acceptance": "--check` green",
       "deps": "ops",
       "id": "PH-S927",
-      "open": true,
+      "open": false,
       "row": 862,
-      "status": "open",
+      "status": "closed",
       "title": "poolai-vision-sync --check"
     },
     {
       "acceptance": "--min-ratio 0.95 --advisory",
       "deps": "ops",
       "id": "PH-S928",
-      "open": true,
+      "open": false,
       "row": 863,
-      "status": "open",
+      "status": "closed",
       "title": "Ratio hold advisory"
     },
     {
       "acceptance": "galaxy_horizon_s920_integration",
       "deps": "Charts",
       "id": "PH-S929",
-      "open": true,
+      "open": false,
       "row": 864,
-      "status": "open",
+      "status": "closed",
       "title": "Horizon close band S920–S928"
+    },
+    {
+      "acceptance": "delegate to ui-core where possible",
+      "deps": "ui-core",
+      "id": "PH-S930",
+      "open": true,
+      "row": 865,
+      "status": "open",
+      "title": "admin_common.js table init slim"
+    },
+    {
+      "acceptance": "wasm/html from ui-core",
+      "deps": "ui-core",
+      "id": "PH-S931",
+      "open": true,
+      "row": 866,
+      "status": "open",
+      "title": "admin_common.js empty state slim"
+    },
+    {
+      "acceptance": "rg audit + fix",
+      "deps": "ui-core",
+      "id": "PH-S932",
+      "open": true,
+      "row": 867,
+      "status": "open",
+      "title": "i18n_core.js audit — no duplicate logic"
+    },
+    {
+      "acceptance": "rust_ratio ≥ 0.95 or advisory documented",
+      "deps": "§5.13",
+      "id": "PH-S933",
+      "open": true,
+      "row": 868,
+      "status": "open",
+      "title": "ratio 95% gate test"
+    },
+    {
+      "acceptance": "loc-audit by_category ui_js down",
+      "deps": "ops",
+      "id": "PH-S934",
+      "open": true,
+      "row": 869,
+      "status": "open",
+      "title": "ui JS loc reduction stub metric"
+    },
+    {
+      "acceptance": "rust_ratio.json zriz",
+      "deps": "§5.13",
+      "id": "PH-S935",
+      "open": true,
+      "row": 870,
+      "status": "open",
+      "title": "poolai-loc-audit PH-S935"
+    },
+    {
+      "acceptance": "docs canon",
+      "deps": "docs",
+      "id": "PH-S936",
+      "open": true,
+      "row": 871,
+      "status": "open",
+      "title": "RUST_RATIO_STRATEGY band 28 note"
+    },
+    {
+      "acceptance": "--check` green",
+      "deps": "ops",
+      "id": "PH-S937",
+      "open": true,
+      "row": 872,
+      "status": "open",
+      "title": "poolai-vision-sync --check"
+    },
+    {
+      "acceptance": "--min-ratio 0.95` meets or hold",
+      "deps": "ops",
+      "id": "PH-S938",
+      "open": true,
+      "row": 873,
+      "status": "open",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "acceptance": "ratio 95% band close",
+      "deps": "Ratio",
+      "id": "PH-S939",
+      "open": true,
+      "row": 874,
+      "status": "open",
+      "title": "galaxy_horizon_s930_integration"
     }
   ],
   "sprint_queue_open_count": 10,

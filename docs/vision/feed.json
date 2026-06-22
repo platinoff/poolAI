@@ -3,71 +3,71 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S920",
+      "id": "PH-S930",
       "link": "docs/vision/index.html#sprint-queue",
       "next": true,
       "published": "2026-05-28",
       "status": "open",
-      "summary": "render_sparkline_html` wasm-only",
-      "title": "admin_charts ML sparkline → wasm"
+      "summary": "delegate to ui-core where possible",
+      "title": "admin_common.js table init slim"
     },
     {
       "category": "open",
-      "id": "PH-S921",
+      "id": "PH-S931",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "render_line_chart_html` wasm-only",
-      "title": "admin_charts line chart → wasm"
+      "summary": "wasm/html from ui-core",
+      "title": "admin_common.js empty state slim"
     },
     {
       "category": "open",
-      "id": "PH-S922",
+      "id": "PH-S932",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "mod.rs PH-S920/S921",
-      "title": "admin_charts regression tests"
+      "summary": "rg audit + fix",
+      "title": "i18n_core.js audit — no duplicate logic"
     },
     {
       "category": "open",
-      "id": "PH-S923",
+      "id": "PH-S933",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "bin verify",
-      "title": "build-ui-wasm.sh gate in drain doc"
+      "summary": "rust_ratio ≥ 0.95 or advisory documented",
+      "title": "ratio 95% gate test"
     },
     {
       "category": "open",
-      "id": "PH-S924",
+      "id": "PH-S934",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "unit test",
-      "title": "charts depth stub"
+      "summary": "loc-audit by_category ui_js down",
+      "title": "ui JS loc reduction stub metric"
     },
     {
       "category": "open",
-      "id": "PH-S925",
+      "id": "PH-S935",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
       "summary": "rust_ratio.json zriz",
-      "title": "poolai-loc-audit PH-S925"
+      "title": "poolai-loc-audit PH-S935"
     },
     {
       "category": "open",
-      "id": "PH-S926",
+      "id": "PH-S936",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
       "summary": "docs canon",
-      "title": "RUST_RATIO §5.13 charts row"
+      "title": "RUST_RATIO_STRATEGY band 28 note"
     },
     {
       "category": "open",
-      "id": "PH-S927",
+      "id": "PH-S937",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -76,21 +76,111 @@
     },
     {
       "category": "open",
-      "id": "PH-S928",
+      "id": "PH-S938",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "--min-ratio 0.95 --advisory",
+      "summary": "--min-ratio 0.95` meets or hold",
       "title": "Ratio hold advisory"
     },
     {
       "category": "open",
-      "id": "PH-S929",
+      "id": "PH-S939",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
+      "summary": "ratio 95% band close",
+      "title": "galaxy_horizon_s930_integration"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S929",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
       "summary": "galaxy_horizon_s920_integration",
       "title": "Horizon close band S920–S928"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S928",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--min-ratio 0.95 --advisory",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S927",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--check` green",
+      "title": "poolai-vision-sync --check"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S926",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "docs canon",
+      "title": "RUST_RATIO §5.13 charts row"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S925",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "rust_ratio.json zriz",
+      "title": "poolai-loc-audit PH-S925"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S924",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "unit test",
+      "title": "charts depth stub"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S923",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "bin verify",
+      "title": "build-ui-wasm.sh gate in drain doc"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S922",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "mod.rs PH-S920/S921",
+      "title": "admin_charts regression tests"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S921",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "render_line_chart_html` wasm-only",
+      "title": "admin_charts line chart → wasm"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S920",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "render_sparkline_html` wasm-only",
+      "title": "admin_charts ML sparkline → wasm"
     },
     {
       "category": "closed",
@@ -104,96 +194,6 @@
     {
       "category": "closed",
       "id": "PH-S918",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--min-ratio 0.95 --advisory",
-      "title": "Ratio hold advisory"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S917",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--check` green",
-      "title": "poolai-vision-sync --check"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S916",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "docs canon",
-      "title": "Galaxy §6.5 trust persist ✅ docs"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S915",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "rust_ratio.json zriz",
-      "title": "poolai-loc-audit PH-S915"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S914",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "unit test",
-      "title": "trust persist depth stub"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S913",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "JSON↔Prom",
-      "title": "stand smoke trust-metrics parity"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S912",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "trust metrics strip",
-      "title": "admin trust metrics wasm strip"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S911",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "low trust → held metric",
-      "title": "trust payout gate integration"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S910",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_trust_score_store wire",
-      "title": "trust score SQLite persist"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S909",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_horizon_s900_integration",
-      "title": "Horizon close band S900–S908"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S908",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
