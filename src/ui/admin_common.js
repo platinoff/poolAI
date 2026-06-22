@@ -1,15 +1,5 @@
 // Admin Panel Common JavaScript
 
-/** i18n (FM-012): `PoolAiI18n` from i18n_core.js loaded before this file. */
-function poolaiT(key, enFallback) {
-  if (typeof PoolAiI18n !== 'undefined' && PoolAiI18n.t) {
-    const v = PoolAiI18n.t(key);
-    if (v !== key || enFallback === undefined) return v;
-  }
-  return enFallback !== undefined ? enFallback : key;
-}
-
-
 // API base URL
 const API_BASE = '/api/v1';
 
@@ -430,16 +420,12 @@ function adminSortTable(table, columnIndex, ascending) {
     return cell && !isNaN(parseFloat(cell.textContent));
   });
   const cmpFn = poolaiUiWasmCall('compareSortValues');
+  if (!cmpFn) return;
   rows.sort((a, b) => {
     const aCell = a.cells[columnIndex];
     const bCell = b.cells[columnIndex];
     if (!aCell || !bCell) return 0;
-    if (cmpFn) return cmpFn(aCell.textContent, bCell.textContent, isNumeric, ascending);
-    const aValue = isNumeric ? parseFloat(aCell.textContent) : aCell.textContent.trim().toLowerCase();
-    const bValue = isNumeric ? parseFloat(bCell.textContent) : bCell.textContent.trim().toLowerCase();
-    if (aValue < bValue) return ascending ? -1 : 1;
-    if (aValue > bValue) return ascending ? 1 : -1;
-    return 0;
+    return cmpFn(aCell.textContent, bCell.textContent, isNumeric, ascending);
   });
   rows.forEach((row) => row.remove());
   rows.forEach((row) => tbody.appendChild(row));
@@ -507,9 +493,8 @@ function adminExportTableCsv(table, filename) {
     Array.from(row.cells).map((cell) => cell.dataset.originalText || cell.textContent.trim()),
   );
   const buildFn = poolaiUiWasmCall('buildTableCsv');
-  const csv = buildFn
-    ? buildFn(JSON.stringify(headers), JSON.stringify(rows))
-    : [headers.join(',')].concat(rows.map((r) => r.join(','))).join('\n');
+  if (!buildFn) return;
+  const csv = buildFn(JSON.stringify(headers), JSON.stringify(rows));
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -526,19 +511,8 @@ function adminExportTableJson(table, filename) {
     Array.from(row.cells).map((cell) => cell.dataset.originalText || cell.textContent.trim()),
   );
   const buildFn = poolaiUiWasmCall('buildTableJson');
-  const json = buildFn
-    ? buildFn(JSON.stringify(headers), JSON.stringify(rows))
-    : JSON.stringify(
-        rows.map((row) => {
-          const obj = {};
-          headers.forEach((h, i) => {
-            obj[h] = row[i] || '';
-          });
-          return obj;
-        }),
-        null,
-        2,
-      );
+  if (!buildFn) return;
+  const json = buildFn(JSON.stringify(headers), JSON.stringify(rows));
   const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -595,39 +569,6 @@ function adminCreateTableToolbar(table, options) {
           else adminExportTableCsv(table, name);
         });
       });
-    } else {
-    const csvBtn = document.createElement('button');
-    csvBtn.type = 'button';
-    csvBtn.className = 'btn btn-secondary btn-sm';
-    csvBtn.textContent = poolaiT('admin.table.exportCsv', 'Export CSV');
-    csvBtn.setAttribute(
-      'aria-label',
-      poolaiT('admin.table.exportCsvAria', 'Export visible rows as CSV'),
-    );
-    csvBtn.addEventListener('click', () => {
-      const name =
-        (table.getAttribute('aria-label') || 'poolai-table').replace(/\s+/g, '-').toLowerCase() +
-        '.csv';
-      adminExportTableCsv(table, name);
-    });
-
-    const jsonBtn = document.createElement('button');
-    jsonBtn.type = 'button';
-    jsonBtn.className = 'btn btn-secondary btn-sm';
-    jsonBtn.textContent = poolaiT('admin.table.exportJson', 'Export JSON');
-    jsonBtn.setAttribute(
-      'aria-label',
-      poolaiT('admin.table.exportJsonAria', 'Export visible rows as JSON'),
-    );
-    jsonBtn.addEventListener('click', () => {
-      const name =
-        (table.getAttribute('aria-label') || 'poolai-table').replace(/\s+/g, '-').toLowerCase() +
-        '.json';
-      adminExportTableJson(table, name);
-    });
-
-    actions.appendChild(csvBtn);
-    actions.appendChild(jsonBtn);
     }
   }
 
@@ -711,56 +652,28 @@ function adminInitTablesIn(root) {
   });
 }
 
-/** PH-S42 / PH-S153: empty state via poolai-ui-wasm when ready. */
+/** PH-S42 / PH-S153 / PH-S931: empty state via poolai-ui-wasm only. */
 function adminEmptyStateHtml(message, options) {
-  const opts = options || {};
   const fn = poolaiUiWasmCall('emptyStateHtml');
+  if (!fn) return '';
+  const opts = options || {};
   const msg = message || poolaiT('admin.table.empty', 'No data to display');
-  if (fn) {
-    return fn(msg, opts.hint || '', opts.icon || '📋', opts.actionHtml || '');
-  }
-  return (
-    '<div class="admin-empty-state" role="status"><div class="admin-empty-state-icon" aria-hidden="true">' +
-    (opts.icon || '📋') +
-    '</div><p class="admin-empty-state-title">' +
-    escapeHtml(msg) +
-    '</p></div>'
-  );
+  return fn(msg, opts.hint || '', opts.icon || '📋', opts.actionHtml || '');
 }
 
-/** PH-S09 / PH-S42 / PH-S153: table HTML via poolai-ui-wasm when ready. */
+/** PH-S09 / PH-S153 / PH-S930: table HTML via poolai-ui-wasm only. */
 function adminRenderTable(headers, rows, options) {
   const fn = poolaiUiWasmCall('renderTableHtml');
-  if (fn) {
-    return fn(JSON.stringify(headers || []), JSON.stringify(rows || []), JSON.stringify(options || {}));
-  }
-  if (!rows || rows.length === 0) {
-    return adminEmptyStateHtml(
-      (options || {}).emptyMessage || poolaiT('admin.table.empty', 'No data to display'),
-      (options || {}).emptyOptions,
-    );
-  }
-  return '<div class="admin-table-container"><table class="admin-table admin-table--striped"><tbody><tr><td>' +
-    escapeHtml(String(rows.length)) +
-    ' rows</td></tr></tbody></table></div>';
+  if (!fn) return '';
+  return fn(JSON.stringify(headers || []), JSON.stringify(rows || []), JSON.stringify(options || {}));
 }
 
 /** PH-S09 / PH-S153: form field markup via poolai-ui-wasm when ready. */
 function adminFormFieldHtml(spec) {
   const fn = poolaiUiWasmCall('formFieldHtml');
+  if (!fn) return '';
   const id = (spec && spec.id) || 'fld_' + Math.random().toString(36).slice(2, 11);
-  if (fn) return fn(JSON.stringify(spec || {}), id);
-  return (
-    '<div class="form-group"><label for="' +
-    id +
-    '">' +
-    escapeHtml((spec && spec.label) || '') +
-    '</label><input type="text" id="' +
-    id +
-    '" name="' +
-    escapeHtml((spec && spec.name) || id) +
-    '" /></div>'
-  );
+  return fn(JSON.stringify(spec || {}), id);
 }
 
 window.adminEmptyStateHtml = adminEmptyStateHtml;

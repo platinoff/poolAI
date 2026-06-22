@@ -23,88 +23,28 @@
     uk: {},
   };
 
-  var rustAdmin = typeof window !== 'undefined' && window.__poolaiAdminI18nRust;
-  if (rustAdmin) {
-    if (rustAdmin.en) Object.assign(STRINGS.en, rustAdmin.en);
-    if (rustAdmin.uk) Object.assign(STRINGS.uk, rustAdmin.uk);
+  /** PH-S932: single merge path for Rust i18n patches (no duplicate Object.assign blocks). */
+  function mergeRustI18nPatch(patch) {
+    if (!patch) return;
+    if (patch.en) Object.assign(STRINGS.en, patch.en);
+    if (patch.uk) Object.assign(STRINGS.uk, patch.uk);
   }
 
-  var rustAuthDash = typeof window !== 'undefined' && window.__poolaiAuthDashI18nRust;
-  if (rustAuthDash) {
-    if (rustAuthDash.en) Object.assign(STRINGS.en, rustAuthDash.en);
-    if (rustAuthDash.uk) Object.assign(STRINGS.uk, rustAuthDash.uk);
-  }
-
-  var rustAdminTable = typeof window !== 'undefined' && window.__poolaiAdminTableI18nRust;
-  if (rustAdminTable) {
-    if (rustAdminTable.en) Object.assign(STRINGS.en, rustAdminTable.en);
-    if (rustAdminTable.uk) Object.assign(STRINGS.uk, rustAdminTable.uk);
-  }
-
-  var rustAdminStatus = typeof window !== 'undefined' && window.__poolaiAdminStatusI18nRust;
-  if (rustAdminStatus) {
-    if (rustAdminStatus.en) Object.assign(STRINGS.en, rustAdminStatus.en);
-    if (rustAdminStatus.uk) Object.assign(STRINGS.uk, rustAdminStatus.uk);
-  }
-
-  var rustAdminErr = typeof window !== 'undefined' && window.__poolaiAdminErrI18nRust;
-  if (rustAdminErr) {
-    if (rustAdminErr.en) Object.assign(STRINGS.en, rustAdminErr.en);
-    if (rustAdminErr.uk) Object.assign(STRINGS.uk, rustAdminErr.uk);
-  }
-
-  var rustVmModal = typeof window !== 'undefined' && window.__poolaiVmModalI18nRust;
-  if (rustVmModal) {
-    if (rustVmModal.en) Object.assign(STRINGS.en, rustVmModal.en);
-    if (rustVmModal.uk) Object.assign(STRINGS.uk, rustVmModal.uk);
-  }
-
-  var rustUiConfirm = typeof window !== 'undefined' && window.__poolaiAdminUiConfirmI18nRust;
-  if (rustUiConfirm) {
-    if (rustUiConfirm.en) Object.assign(STRINGS.en, rustUiConfirm.en);
-    if (rustUiConfirm.uk) Object.assign(STRINGS.uk, rustUiConfirm.uk);
-  }
-
-  var rustWorkersPanel = typeof window !== 'undefined' && window.__poolaiWorkersPanelI18nRust;
-  if (rustWorkersPanel) {
-    if (rustWorkersPanel.en) Object.assign(STRINGS.en, rustWorkersPanel.en);
-    if (rustWorkersPanel.uk) Object.assign(STRINGS.uk, rustWorkersPanel.uk);
-  }
-
-  var rustHome = typeof window !== 'undefined' && window.__poolaiHomeI18nRust;
-  if (rustHome) {
-    if (rustHome.en) Object.assign(STRINGS.en, rustHome.en);
-    if (rustHome.uk) Object.assign(STRINGS.uk, rustHome.uk);
-  }
-
-  var rustForm = typeof window !== 'undefined' && window.__poolaiAdminFormI18nRust;
-  if (rustForm) {
-    if (rustForm.en) Object.assign(STRINGS.en, rustForm.en);
-    if (rustForm.uk) Object.assign(STRINGS.uk, rustForm.uk);
-  }
-
-  var rustUiToolbar = typeof window !== 'undefined' && window.__poolaiAdminUiToolbarI18nRust;
-  if (rustUiToolbar) {
-    if (rustUiToolbar.en) Object.assign(STRINGS.en, rustUiToolbar.en);
-    if (rustUiToolbar.uk) Object.assign(STRINGS.uk, rustUiToolbar.uk);
-  }
-
-  var rustUiCommon = typeof window !== 'undefined' && window.__poolaiUiCommonI18nRust;
-  if (rustUiCommon) {
-    if (rustUiCommon.en) Object.assign(STRINGS.en, rustUiCommon.en);
-    if (rustUiCommon.uk) Object.assign(STRINGS.uk, rustUiCommon.uk);
-  }
-
-  var rustLibsPanel = typeof window !== 'undefined' && window.__poolaiLibsPanelI18nRust;
-  if (rustLibsPanel) {
-    if (rustLibsPanel.en) Object.assign(STRINGS.en, rustLibsPanel.en);
-    if (rustLibsPanel.uk) Object.assign(STRINGS.uk, rustLibsPanel.uk);
-  }
-
-  var rustRaidPanel = typeof window !== 'undefined' && window.__poolaiRaidPanelI18nRust;
-  if (rustRaidPanel) {
-    if (rustRaidPanel.en) Object.assign(STRINGS.en, rustRaidPanel.en);
-    if (rustRaidPanel.uk) Object.assign(STRINGS.uk, rustRaidPanel.uk);
+  if (typeof window !== 'undefined') {
+    mergeRustI18nPatch(window.__poolaiAdminI18nRust);
+    mergeRustI18nPatch(window.__poolaiAuthDashI18nRust);
+    mergeRustI18nPatch(window.__poolaiAdminTableI18nRust);
+    mergeRustI18nPatch(window.__poolaiAdminStatusI18nRust);
+    mergeRustI18nPatch(window.__poolaiAdminErrI18nRust);
+    mergeRustI18nPatch(window.__poolaiVmModalI18nRust);
+    mergeRustI18nPatch(window.__poolaiAdminUiConfirmI18nRust);
+    mergeRustI18nPatch(window.__poolaiWorkersPanelI18nRust);
+    mergeRustI18nPatch(window.__poolaiHomeI18nRust);
+    mergeRustI18nPatch(window.__poolaiAdminFormI18nRust);
+    mergeRustI18nPatch(window.__poolaiAdminUiToolbarI18nRust);
+    mergeRustI18nPatch(window.__poolaiUiCommonI18nRust);
+    mergeRustI18nPatch(window.__poolaiLibsPanelI18nRust);
+    mergeRustI18nPatch(window.__poolaiRaidPanelI18nRust);
   }
 
   function normalizeLang(l) {

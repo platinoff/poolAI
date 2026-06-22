@@ -292,6 +292,16 @@ flowchart TB
 | 197 | **PH-S927** | poolai-vision-sync drift gate | `--check` green | **✅** |
 | 198 | **PH-S928** | Ratio hold advisory snapshot | **94.80%** advisory | **✅** |
 | 199 | **PH-S929** | galaxy_horizon_s920_integration | charts wasm band close | **✅** |
+| 200 | **PH-S930** | admin_common table init wasm-only | `admin_common_depth_stub`; slim toolbar/export/sort glue | **✅** |
+| 201 | **PH-S931** | admin_common empty state wasm-only | `emptyStateHtml` / `renderTableHtml` wasm-only | **✅** |
+| 202 | **PH-S932** | i18n_core mergeRustI18nPatch | no duplicate `poolaiT` in admin_common | **✅** |
+| 203 | **PH-S933** | ratio 95% formal gate test | `ratio_95_formal_gate_met` in loc-audit | **✅** |
+| 204 | **PH-S934** | ui_js loc reduction metric | `ui_js_loc_reduction` vs band-28 baseline | **✅** |
+| 205 | **PH-S935** | Rust ratio loc-audit refresh | **94.88%** sprint zriz | **✅** |
+| 206 | **PH-S936** | RUST_RATIO §5.13 band 28 row | docs canon | **✅** |
+| 207 | **PH-S937** | poolai-vision-sync drift gate | `--check` green | **✅** |
+| 208 | **PH-S938** | Ratio hold advisory snapshot | **94.88%** advisory | **✅** |
+| 209 | **PH-S939** | galaxy_horizon_s930_integration | admin_common ratio 95% band close | **✅** |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 

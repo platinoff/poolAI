@@ -21,7 +21,10 @@ const FORMAL_BAND_MAX: f64 = 0.95;
 const DEFAULT_WARN_BELOW: f64 = 0.93;
 const DEFAULT_TARGET: f64 = 0.95;
 const DEFAULT_STRETCH: f64 = 0.96;
-const SPRINT: &str = "PH-S925";
+const SPRINT: &str = "PH-S935";
+/// ui_js LOC at PH-S925 zriz (band 28 baseline for PH-S934 reduction metric).
+const UI_JS_BAND28_BASELINE_LOC: u64 = 2141;
+const RATIO_95_FORMAL_GATE: f64 = 0.95;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize)]
 #[serde(rename_all = "snake_case")]
@@ -125,6 +128,14 @@ struct RustRatioReport {
     below_target: bool,
     below_stretch_spirit: bool,
     meets_min_ratio: Option<bool>,
+    /// Current `ui_js` bucket LOC (PH-S934).
+    ui_js_loc: u64,
+    /// Band-28 baseline `ui_js` LOC before admin_common slim (PH-S925 zriz).
+    ui_js_band28_baseline_loc: u64,
+    /// Positive when `ui_js` LOC decreased vs band-28 baseline (PH-S934).
+    ui_js_loc_reduction: i64,
+    /// True when rust_ratio ≥ 0.95 formal gate (PH-S933); advisory hold when false.
+    ratio_95_formal_gate_met: bool,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -314,7 +325,7 @@ fn build_report(
         rust_loc as f64 / product_loc_total as f64
     };
 
-    let by_category = by_cat
+    let by_category: BTreeMap<String, CategoryLoc> = by_cat
         .into_iter()
         .map(|(cat, loc)| (cat.label().to_string(), loc))
         .collect();
@@ -322,6 +333,10 @@ fn build_report(
     let meets_min_ratio = config
         .min_ratio
         .map(|floor| rust_ratio + f64::EPSILON >= floor);
+
+    let ui_js_loc = by_category.get("ui_js").map(|c| c.loc).unwrap_or(0);
+    let ui_js_loc_reduction = UI_JS_BAND28_BASELINE_LOC as i64 - ui_js_loc as i64;
+    let ratio_95_formal_gate_met = rust_ratio + f64::EPSILON >= RATIO_95_FORMAL_GATE;
 
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
@@ -343,11 +358,17 @@ fn build_report(
         below_target: rust_ratio + f64::EPSILON < config.target,
         below_stretch_spirit: rust_ratio + f64::EPSILON < config.stretch,
         meets_min_ratio,
+        ui_js_loc,
+        ui_js_band28_baseline_loc: UI_JS_BAND28_BASELINE_LOC,
+        ui_js_loc_reduction,
+        ratio_95_formal_gate_met,
         by_category,
         notes: vec![
             "Denominator: product code only (strategy §1); docs/yaml/png excluded",
             "GitHub Languages bar is heuristic; this report uses git-tracked LOC buckets",
             "PH-S165: CI --min-ratio 0.95 hold band (advisory); stretch spirit 96% via --stretch",
+            "PH-S933: ratio_95_formal_gate_met when rust_ratio ≥ 0.95 (advisory hold when false)",
+            "PH-S934: ui_js_loc_reduction vs band-28 baseline (PH-S925 zriz)",
         ],
     })
 }
@@ -382,6 +403,14 @@ fn print_summary(report: &RustRatioReport) {
     if let Some(ok) = report.meets_min_ratio {
         println!("  meets_min_ratio:       {ok}");
     }
+    println!(
+        "  ui_js_loc:             {} (band28 baseline {} · reduction {})",
+        report.ui_js_loc, report.ui_js_band28_baseline_loc, report.ui_js_loc_reduction
+    );
+    println!(
+        "  ratio_95_formal_gate:  {}",
+        report.ratio_95_formal_gate_met
+    );
     for (name, loc) in &report.by_category {
         println!("  {name}: {} files, {} loc", loc.files, loc.loc);
     }
@@ -637,6 +666,41 @@ mod tests {
     #[test]
     fn parse_ratio_rejects_out_of_range() {
         assert!(parse_ratio_arg("--target", "1.5").is_err());
+    }
+
+    #[test]
+    fn ratio_95_formal_gate_ph_s933() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let root = dir.path();
+        let files = vec!["src/a.rs".to_string()];
+        fs::create_dir_all(root.join("src")).unwrap();
+        fs::write(root.join("src/a.rs"), "line\n".repeat(95)).unwrap();
+        let report = build_report(root, &files, AuditConfig::default()).expect("report");
+        assert!(report.ratio_95_formal_gate_met);
+        assert!(report.rust_ratio + f64::EPSILON >= RATIO_95_FORMAL_GATE);
+
+        let files_low = vec!["src/a.rs".to_string(), "src/ui/x.js".to_string()];
+        fs::create_dir_all(root.join("src/ui")).unwrap();
+        fs::write(root.join("src/ui/x.js"), "a\n".repeat(20)).unwrap();
+        let report_low = build_report(root, &files_low, AuditConfig::default()).expect("report");
+        assert!(!report_low.ratio_95_formal_gate_met);
+        assert!(report_low.below_target);
+    }
+
+    #[test]
+    fn ui_js_loc_reduction_metric_ph_s934() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let root = dir.path();
+        let files = vec!["src/ui/admin_common.js".to_string()];
+        fs::create_dir_all(root.join("src/ui")).unwrap();
+        fs::write(root.join("src/ui/admin_common.js"), "a\nb\n").unwrap();
+        let report = build_report(root, &files, AuditConfig::default()).expect("report");
+        assert_eq!(report.ui_js_loc, 2);
+        assert_eq!(report.ui_js_band28_baseline_loc, UI_JS_BAND28_BASELINE_LOC);
+        assert_eq!(
+            report.ui_js_loc_reduction,
+            UI_JS_BAND28_BASELINE_LOC as i64 - 2
+        );
     }
 
     #[test]

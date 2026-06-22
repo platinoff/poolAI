@@ -1328,7 +1328,42 @@ fn admin_common_ph_s42_table_ux_helpers() {
     assert!(js.contains("function adminEnhanceAdminTable"));
     assert!(js.contains("function adminInitTablesIn"));
     assert!(js.contains("admin-table-toolbar"));
-    assert!(js.contains("admin-empty-state"));
+    assert!(js.contains("poolaiUiWasmCall('emptyStateHtml')"));
+}
+
+fn assert_admin_common_table_init_wasm_only() {
+    let js = include_str!("../admin_common.js");
+    assert!(js.contains("poolaiUiWasmCall('tableExportButtonsHtml')"));
+    assert!(js.contains("poolaiUiWasmCall('renderTableHtml')"));
+    assert!(js.contains("poolaiUiWasmCall('buildTableCsv')"));
+    assert!(js.contains("poolaiUiWasmCall('compareSortValues')"));
+    assert!(!js.contains("headers.join(',')"));
+}
+
+fn assert_admin_common_empty_state_wasm_only() {
+    let js = include_str!("../admin_common.js");
+    assert!(js.contains("poolaiUiWasmCall('emptyStateHtml')"));
+    assert!(!js.contains("admin-empty-state-icon"));
+    assert!(!js.contains("admin-empty-state-title"));
+}
+
+#[test]
+fn admin_common_table_init_wasm_only_ph_s930() {
+    assert_admin_common_table_init_wasm_only();
+}
+
+#[test]
+fn admin_common_empty_state_wasm_only_ph_s931() {
+    assert_admin_common_empty_state_wasm_only();
+}
+
+#[test]
+fn i18n_core_merge_patch_no_duplicate_poolai_t_ph_s932() {
+    let i18n = include_str!("../i18n_core.js");
+    let common = include_str!("../admin_common.js");
+    assert!(i18n.contains("function mergeRustI18nPatch"));
+    assert!(i18n.contains("window.poolaiT = function"));
+    assert!(!common.contains("function poolaiT("));
 }
 
 #[test]
