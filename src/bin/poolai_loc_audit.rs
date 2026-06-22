@@ -21,10 +21,13 @@ const FORMAL_BAND_MAX: f64 = 0.95;
 const DEFAULT_WARN_BELOW: f64 = 0.93;
 const DEFAULT_TARGET: f64 = 0.95;
 const DEFAULT_STRETCH: f64 = 0.96;
-const SPRINT: &str = "PH-S935";
+const SPRINT: &str = "PH-S945";
 /// ui_js LOC at PH-S925 zriz (band 28 baseline for PH-S934 reduction metric).
 const UI_JS_BAND28_BASELINE_LOC: u64 = 2141;
+/// e2e_ts LOC at PH-S940 zriz (band 29 baseline for PH-S941 reduction metric).
+const E2E_TS_BAND29_BASELINE_LOC: u64 = 1155;
 const RATIO_95_FORMAL_GATE: f64 = 0.95;
+const STRETCH_SPIRIT_GATE: f64 = 0.96;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize)]
 #[serde(rename_all = "snake_case")]
@@ -136,6 +139,16 @@ struct RustRatioReport {
     ui_js_loc_reduction: i64,
     /// True when rust_ratio ≥ 0.95 formal gate (PH-S933); advisory hold when false.
     ratio_95_formal_gate_met: bool,
+    /// True when rust_ratio ≥ 0.96 stretch spirit gate (PH-S942).
+    stretch_spirit_gate_met: bool,
+    /// Current `e2e_ts` bucket LOC (PH-S941).
+    e2e_ts_loc: u64,
+    /// Band-29 baseline `e2e_ts` LOC before API spec archive (PH-S940 zriz).
+    e2e_ts_band29_baseline_loc: u64,
+    /// Positive when `e2e_ts` LOC decreased vs band-29 baseline (PH-S941).
+    e2e_ts_loc_reduction: i64,
+    /// True when no `.rs` under `bin/` or `scripts/` (PH-S943 REPOSITORY_LAYOUT canon).
+    ops_shell_canon_met: bool,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -162,6 +175,14 @@ fn git_tracked_files(root: &Path) -> Result<Vec<String>, String> {
         .filter(|chunk| !chunk.is_empty())
         .filter_map(|chunk| std::str::from_utf8(chunk).ok().map(str::to_string))
         .collect())
+}
+
+/// REPOSITORY_LAYOUT canon: no Rust sources under `bin/` or `scripts/` (PH-S943).
+fn audit_ops_shell_canon(files: &[String]) -> bool {
+    !files.iter().any(|path| {
+        let p = path.replace('\\', "/");
+        (p.starts_with("bin/") || p.starts_with("scripts/")) && p.ends_with(".rs")
+    })
 }
 
 fn classify_product_path(path: &str) -> ProductCategory {
@@ -337,6 +358,10 @@ fn build_report(
     let ui_js_loc = by_category.get("ui_js").map(|c| c.loc).unwrap_or(0);
     let ui_js_loc_reduction = UI_JS_BAND28_BASELINE_LOC as i64 - ui_js_loc as i64;
     let ratio_95_formal_gate_met = rust_ratio + f64::EPSILON >= RATIO_95_FORMAL_GATE;
+    let stretch_spirit_gate_met = rust_ratio + f64::EPSILON >= STRETCH_SPIRIT_GATE;
+    let e2e_ts_loc = by_category.get("e2e_ts").map(|c| c.loc).unwrap_or(0);
+    let e2e_ts_loc_reduction = E2E_TS_BAND29_BASELINE_LOC as i64 - e2e_ts_loc as i64;
+    let ops_shell_canon_met = audit_ops_shell_canon(files);
 
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
@@ -362,6 +387,11 @@ fn build_report(
         ui_js_band28_baseline_loc: UI_JS_BAND28_BASELINE_LOC,
         ui_js_loc_reduction,
         ratio_95_formal_gate_met,
+        stretch_spirit_gate_met,
+        e2e_ts_loc,
+        e2e_ts_band29_baseline_loc: E2E_TS_BAND29_BASELINE_LOC,
+        e2e_ts_loc_reduction,
+        ops_shell_canon_met,
         by_category,
         notes: vec![
             "Denominator: product code only (strategy §1); docs/yaml/png excluded",
@@ -369,6 +399,10 @@ fn build_report(
             "PH-S165: CI --min-ratio 0.95 hold band (advisory); stretch spirit 96% via --stretch",
             "PH-S933: ratio_95_formal_gate_met when rust_ratio ≥ 0.95 (advisory hold when false)",
             "PH-S934: ui_js_loc_reduction vs band-28 baseline (PH-S925 zriz)",
+            "PH-S941: e2e_ts_loc_reduction vs band-29 baseline (PH-S940 zriz)",
+            "PH-S942: stretch_spirit_gate_met when rust_ratio ≥ 0.96",
+            "PH-S943: ops_shell_canon_met when no .rs under bin/ or scripts/",
+            "PH-S948: stretch advisory — below_stretch_spirit is expected until band 29+ migration",
         ],
     })
 }
@@ -411,6 +445,15 @@ fn print_summary(report: &RustRatioReport) {
         "  ratio_95_formal_gate:  {}",
         report.ratio_95_formal_gate_met
     );
+    println!(
+        "  stretch_spirit_gate:   {}",
+        report.stretch_spirit_gate_met
+    );
+    println!(
+        "  e2e_ts_loc:            {} (band29 baseline {} · reduction {})",
+        report.e2e_ts_loc, report.e2e_ts_band29_baseline_loc, report.e2e_ts_loc_reduction
+    );
+    println!("  ops_shell_canon_met:   {}", report.ops_shell_canon_met);
     for (name, loc) in &report.by_category {
         println!("  {name}: {} files, {} loc", loc.files, loc.loc);
     }
@@ -685,6 +728,52 @@ mod tests {
         let report_low = build_report(root, &files_low, AuditConfig::default()).expect("report");
         assert!(!report_low.ratio_95_formal_gate_met);
         assert!(report_low.below_target);
+    }
+
+    #[test]
+    fn stretch_spirit_gate_ph_s942() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let root = dir.path();
+        let files = vec!["src/a.rs".to_string()];
+        fs::create_dir_all(root.join("src")).unwrap();
+        fs::write(root.join("src/a.rs"), "line\n".repeat(96)).unwrap();
+        let report = build_report(root, &files, AuditConfig::default()).expect("report");
+        assert!(report.stretch_spirit_gate_met);
+        assert!(report.rust_ratio + f64::EPSILON >= STRETCH_SPIRIT_GATE);
+
+        let files_low = vec!["src/a.rs".to_string(), "e2e/t.spec.ts".to_string()];
+        fs::create_dir_all(root.join("e2e")).unwrap();
+        fs::write(root.join("e2e/t.spec.ts"), "a\n".repeat(10)).unwrap();
+        let report_low = build_report(root, &files_low, AuditConfig::default()).expect("report");
+        assert!(!report_low.stretch_spirit_gate_met);
+        assert!(report_low.below_stretch_spirit);
+    }
+
+    #[test]
+    fn ops_shell_canon_ph_s943() {
+        assert!(audit_ops_shell_canon(&["bin/run.sh".to_string()]));
+        assert!(audit_ops_shell_canon(&["scripts/setup.sh".to_string()]));
+        assert!(!audit_ops_shell_canon(&["bin/bad.rs".to_string()]));
+        assert!(!audit_ops_shell_canon(&["scripts/tool.rs".to_string()]));
+    }
+
+    #[test]
+    fn e2e_ts_loc_reduction_metric_ph_s941() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let root = dir.path();
+        let files = vec!["e2e/tests/smoke.spec.ts".to_string()];
+        fs::create_dir_all(root.join("e2e/tests")).unwrap();
+        fs::write(root.join("e2e/tests/smoke.spec.ts"), "a\nb\n").unwrap();
+        let report = build_report(root, &files, AuditConfig::default()).expect("report");
+        assert_eq!(report.e2e_ts_loc, 2);
+        assert_eq!(
+            report.e2e_ts_band29_baseline_loc,
+            E2E_TS_BAND29_BASELINE_LOC
+        );
+        assert_eq!(
+            report.e2e_ts_loc_reduction,
+            E2E_TS_BAND29_BASELINE_LOC as i64 - 2
+        );
     }
 
     #[test]

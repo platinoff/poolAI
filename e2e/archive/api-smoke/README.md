@@ -11,5 +11,6 @@ Migrated to Rust `tests/*_integration.rs` + `cargo test-ci` (канон).
 | `grid_pricing.spec.ts` | `tests/grid_pricing_integration.rs` |
 | `grid_job_lease.spec.ts` | `tests/grid_envelope_lease_integration.rs` |
 | `grid_result_lease.spec.ts` | `tests/grid_envelope_lease_integration.rs` |
+| `jobs_raid.spec.ts` | `tests/job_store_raid_persistence.rs` + `poolai-http-stand-smoke --raid-restart` (PH-S156) |
 
 Do not add new API-only Playwright specs — see [`.cursor/rules/poolai-testing-policy.mdc`](../../../.cursor/rules/poolai-testing-policy.mdc).

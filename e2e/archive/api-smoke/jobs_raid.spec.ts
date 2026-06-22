@@ -3,7 +3,7 @@ import {
   createJobViaApi,
   getJobViaApi,
   restartPoolaiE2eStand,
-} from "./helpers";
+} from "../../tests/helpers";
 
 const standRoot = process.env.POOLAI_E2E_STAND_ROOT;
 

@@ -1,31 +1,36 @@
 {
   "generated_at": "2026-06-22",
-  "sprint": "PH-S935",
+  "sprint": "PH-S945",
   "formal_band_min": 0.9,
   "formal_band_max": 0.95,
   "warn_below": 0.93,
   "target_ratio": 0.95,
   "stretch_spirit": 0.96,
-  "advisory_mode": true,
-  "min_ratio": 0.95,
-  "rust_loc": 150431,
-  "non_rust_product_loc": 8111,
-  "product_loc_total": 158542,
-  "rust_ratio": 0.9488400550011984,
-  "rust_ratio_pct": 94.88400550011984,
+  "advisory_mode": false,
+  "min_ratio": null,
+  "rust_loc": 150607,
+  "non_rust_product_loc": 8081,
+  "product_loc_total": 158688,
+  "rust_ratio": 0.9490761746319822,
+  "rust_ratio_pct": 94.90761746319822,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
   "below_stretch_spirit": true,
-  "meets_min_ratio": false,
+  "meets_min_ratio": null,
   "ui_js_loc": 2010,
   "ui_js_band28_baseline_loc": 2141,
   "ui_js_loc_reduction": 131,
   "ratio_95_formal_gate_met": false,
+  "stretch_spirit_gate_met": false,
+  "e2e_ts_loc": 1125,
+  "e2e_ts_band29_baseline_loc": 1155,
+  "e2e_ts_loc_reduction": 30,
+  "ops_shell_canon_met": true,
   "by_category": {
     "e2e_ts": {
-      "files": 9,
-      "loc": 1155
+      "files": 8,
+      "loc": 1125
     },
     "ops_ps1": {
       "files": 16,
@@ -40,16 +45,16 @@
       "loc": 608
     },
     "rust_crates": {
-      "files": 46,
-      "loc": 11602
+      "files": 47,
+      "loc": 11657
     },
     "rust_src": {
       "files": 294,
-      "loc": 105757
+      "loc": 105841
     },
     "rust_tests": {
-      "files": 206,
-      "loc": 32464
+      "files": 207,
+      "loc": 32501
     },
     "ui_css": {
       "files": 2,
@@ -65,6 +70,10 @@
     "GitHub Languages bar is heuristic; this report uses git-tracked LOC buckets",
     "PH-S165: CI --min-ratio 0.95 hold band (advisory); stretch spirit 96% via --stretch",
     "PH-S933: ratio_95_formal_gate_met when rust_ratio ≥ 0.95 (advisory hold when false)",
-    "PH-S934: ui_js_loc_reduction vs band-28 baseline (PH-S925 zriz)"
+    "PH-S934: ui_js_loc_reduction vs band-28 baseline (PH-S925 zriz)",
+    "PH-S941: e2e_ts_loc_reduction vs band-29 baseline (PH-S940 zriz)",
+    "PH-S942: stretch_spirit_gate_met when rust_ratio ≥ 0.96",
+    "PH-S943: ops_shell_canon_met when no .rs under bin/ or scripts/",
+    "PH-S948: stretch advisory — below_stretch_spirit is expected until band 29+ migration"
   ]
 }

@@ -75,4 +75,6 @@ bash bin/e2e-playwright.sh --start --update-snapshots
 
 **PH-S148 ✅:** `npm run test:ci` — лише `smoke admin a11y visual` (browser/UI); API-only TS patterns не повертаються з archive.
 
-**Last updated:** 2026-06-15 (PH-S196 Rust stand smoke `--lease-renew`).
+**PH-S941 ✅:** `jobs_raid.spec.ts` → `e2e/archive/api-smoke/`; канон — `poolai-http-stand-smoke --raid-restart` + `tests/job_store_raid_persistence` (PH-S156).
+
+**Last updated:** 2026-06-22 (PH-S941 jobs_raid archive; band 29 e2e scope audit).

@@ -1,7 +1,7 @@
 {
-  "revision": 294,
+  "revision": 295,
   "updated_at": "2026-06-22",
-  "active_sprint": "PH-S940",
+  "active_sprint": "PH-S950",
   "ui_version": 4,
   "extension_policy": {
     ".md": {
@@ -305,7 +305,7 @@
       "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md"]
     },
     "rust_ratio_stretch_band": {
-      "sprints": ["PH-S150", "PH-S151", "PH-S152", "PH-S153", "PH-S154", "PH-S155", "PH-S156", "PH-S157", "PH-S158", "PH-S159", "PH-S160", "PH-S161", "PH-S162", "PH-S163", "PH-S164", "PH-S165", "PH-S166", "PH-S167", "PH-S168", "PH-S169", "PH-S170", "PH-S171", "PH-S172", "PH-S173", "PH-S174", "PH-S175", "PH-S176", "PH-S177", "PH-S178", "PH-S179", "PH-S180", "PH-S181", "PH-S182", "PH-S183", "PH-S184", "PH-S185", "PH-S186", "PH-S187", "PH-S188", "PH-S189", "PH-S190", "PH-S191"],
+      "sprints": ["PH-S150", "PH-S151", "PH-S152", "PH-S153", "PH-S154", "PH-S155", "PH-S156", "PH-S157", "PH-S158", "PH-S159", "PH-S160", "PH-S161", "PH-S162", "PH-S163", "PH-S164", "PH-S165", "PH-S166", "PH-S167", "PH-S168", "PH-S169", "PH-S170", "PH-S171", "PH-S172", "PH-S173", "PH-S174", "PH-S175", "PH-S176", "PH-S177", "PH-S178", "PH-S179", "PH-S180", "PH-S181", "PH-S182", "PH-S183", "PH-S184", "PH-S185", "PH-S186", "PH-S187", "PH-S188", "PH-S189", "PH-S190", "PH-S191", "PH-S940", "PH-S941", "PH-S942", "PH-S943", "PH-S944", "PH-S945", "PH-S946", "PH-S947", "PH-S948", "PH-S949"],
       "docs": [
         "docs/development/RUST_RATIO_STRATEGY_2026-06-13.md",
         "docs/development/rust_ratio.json",
@@ -323,7 +323,11 @@
         "tests/galaxy_pricing_market_min_usd_micro_integration.rs",
         "tests/galaxy_settlement_pending_verification_integration.rs",
         "src/grid/galaxy_verify_sampling.rs",
-        "crates/poolai-ui-core/src/design_tokens.rs",
+        "crates/poolai-ui-core/src/stretch_depth.rs",
+        "crates/poolai-ui-core/src/admin_common_depth.rs",
+        "tests/e2e_scope_audit.rs",
+        "tests/galaxy_horizon_s940_integration.rs",
+        "e2e/archive/api-smoke/**",
         "crates/poolai-ui-core/src/theme.rs",
         "crates/poolai-ui-wasm/**",
         "src/ui/admin/**",

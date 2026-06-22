@@ -1,12 +1,14 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-22 (PH-S930…S939 ✅ · master backlog **71** · active **10** · vision **rev 294** · rust_ratio **94.88%**)
+**Оновлено:** 2026-06-22 (PH-S940…S949 ✅ · master backlog **61** · active **10** · vision **rev 295** · rust_ratio **94.91%**)
 
-**Cursor 3.8.11 (2026-06-20):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-06-20.md`](./CURSOR_UPDATE_RESEARCH_2026-06-20.md). **Наступна сесія:** **`абракадабра`** (drain PH-S940…S949).
+**Cursor 3.8.11 (2026-06-20):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-06-20.md`](./CURSOR_UPDATE_RESEARCH_2026-06-20.md). **Наступна сесія:** **`абракадабра`** (drain PH-S950…S959).
 
-**Completion roadmap v2 (2026-06-20):** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) — **101** спринтів до **product-complete** (PH-S1010 / FM **§5.15**); **8** сесій `абракадабра` × 10 PH-S* залишилось. Реєстр: [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · regen `bash scripts/generate-ph-s-master-backlog-351.sh`.
+**Completion roadmap v2 (2026-06-20):** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) — **101** спринтів до **product-complete** (PH-S1010 / FM **§5.15**); **7** сесій `абракадабра` × 10 PH-S* залишилось. Реєстр: [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · regen `bash scripts/generate-ph-s-master-backlog-351.sh`.
 
-**Master backlog 71 (2026-06-22):** FM **§5.14**. Активна §5.12: **PH-S940…S949** (band 29 — Ratio 96% stretch e2e scope audit). **`абракадабра`** = drain 10 → promote **PH-S950…S959** (band 30).
+**Master backlog 61 (2026-06-22):** FM **§5.14**. Активна §5.12: **PH-S950…S959** (band 30 — FUNCTIONALITY_DIGEST full sync). **`абракадабра`** = drain 10 → promote **PH-S960…S969** (band 31).
+
+**PH-S940…S949 ✅ (2026-06-22):** e2e scope audit `tests/e2e_scope_audit.rs` (PH-S940); `jobs_raid` archived + `e2e_ts_loc_reduction` **30** LOC (PH-S941); `stretch_spirit_gate_met` loc-audit (PH-S942); `ops_shell_canon_met` (PH-S943); `stretch_depth_stub` (PH-S944); `poolai-loc-audit` → `rust_ratio.json` **94.91%** (PH-S945); RUST_RATIO §5.13 band 29 row (PH-S946); `galaxy_horizon_s940_integration` (PH-S949); vision **rev 295**.
 
 **PH-S930…S939 ✅ (2026-06-22):** admin_common table init wasm-only (PH-S930); empty state wasm-only (PH-S931); i18n_core `mergeRustI18nPatch` audit (PH-S932); `ratio_95_formal_gate_met` loc-audit test (PH-S933); `ui_js_loc_reduction` metric **131** LOC (PH-S934); `poolai-loc-audit` → `rust_ratio.json` **94.88%** (PH-S935); RUST_RATIO §5.13 band 28 row (PH-S936); `galaxy_horizon_s930_integration` (PH-S939); vision **rev 294**.
 
@@ -62,7 +64,7 @@
 
 **Rules:** **`абракадабра`** — drain 10 з §5.12 → vision close → push; [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
-**§5.12:** **10** відкритих **PH-S940…S949** (band 29). **Vision:** rev **294** · rust_ratio **94.88%** (PH-S935).
+**§5.12:** **10** відкритих **PH-S950…S959** (band 30). **Vision:** rev **295** · rust_ratio **94.91%** (PH-S945).
 
 **Роадмеп:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) · **Промпт:** [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md).
 

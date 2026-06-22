@@ -1,6 +1,6 @@
 # Rust codebase ratio — стратегія 90–95% (PoolAI)
 
-**Оновлено:** 2026-06-22 · **Канон:** FM **§5.13** · §5.12 **10** active PH-S930…S939 · master backlog **81** pending → [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) bands **28–29** formal **95%** / stretch **96%** · rust_ratio **94.80%**
+**Оновлено:** 2026-06-22 · **Канон:** FM **§5.13** · §5.12 **10** active PH-S950…S959 · master backlog **61** pending → [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) bands **30–33** docs product-complete · rust_ratio **94.91%**
 
 **Мета:** зростання частки **Rust** у виконуваному коді репозиторію до **90–95%** (формально), **96% stretch spirit** (орієнтир replenish PH-S150…S159) — платформа збирається і перевіряється через **`cargo`** без обов'язкового Node на edge.
 
@@ -302,6 +302,16 @@ flowchart TB
 | 207 | **PH-S937** | poolai-vision-sync drift gate | `--check` green | **✅** |
 | 208 | **PH-S938** | Ratio hold advisory snapshot | **94.88%** advisory | **✅** |
 | 209 | **PH-S939** | galaxy_horizon_s930_integration | admin_common ratio 95% band close | **✅** |
+| 210 | **PH-S940** | e2e scope audit — API-only removed | `tests/e2e_scope_audit.rs`; browser-only `test:ci` | **✅** |
+| 211 | **PH-S941** | e2e TS loc reduction | `jobs_raid` archived; `e2e_ts_loc_reduction` metric | **✅** |
+| 212 | **PH-S942** | ratio 96% stretch spirit gate | `stretch_spirit_gate_met` in loc-audit | **✅** |
+| 213 | **PH-S943** | ops shell audit — no product logic | `ops_shell_canon_met`; no `.rs` in `bin/`/`scripts/` | **✅** |
+| 214 | **PH-S944** | stretch depth stub | `stretch_depth_stub` unit test | **✅** |
+| 215 | **PH-S945** | Rust ratio loc-audit refresh | **94.91%** sprint zriz | **✅** |
+| 216 | **PH-S946** | RUST_RATIO §5.13 band 29 row | docs canon | **✅** |
+| 217 | **PH-S947** | poolai-vision-sync drift gate | `--check` green | **✅** |
+| 218 | **PH-S948** | Ratio stretch advisory snapshot | **94.91%** stretch note | **✅** |
+| 219 | **PH-S949** | galaxy_horizon_s940_integration | e2e stretch band close | **✅** |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 

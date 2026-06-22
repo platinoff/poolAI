@@ -6,7 +6,7 @@
 |------|----------|
 | **Completion plan** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.14–§5.15** |
 | **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) |
-| **Active drain (band 29)** | PH-S940…S949 — Ratio 96% stretch e2e scope audit |
+| **Active drain (band 30)** | PH-S950…S959 — FUNCTIONALITY_DIGEST full sync |
 | **Last closed (band 28)** | PH-S930…S939 ✅ — admin_common table/empty wasm-only + ratio 95% gate |
 | **Last closed (band 27)** | PH-S920…S929 ✅ — wasm admin_charts sparkline/line migration |
 | **Last closed (band 26)** | PH-S910…S919 ✅ — Trust score SQLite persist |
