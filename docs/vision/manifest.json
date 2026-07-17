@@ -2246,6 +2246,12 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_stretch_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_CURSOR_UPDATE_RESEARCH_2026_07_17_md"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -9229,9 +9235,16 @@
       "label": "galaxy_horizon_s940_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s940_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_CURSOR_UPDATE_RESEARCH_2026_07_17_md",
+      "label": "CURSOR_UPDATE_RESEARCH_2026-07-17.md",
+      "layer": "L1",
+      "path": "docs/development/CURSOR_UPDATE_RESEARCH_2026-07-17.md"
     }
   ],
-  "revision": 296,
+  "revision": 297,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
