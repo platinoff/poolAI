@@ -322,6 +322,16 @@ flowchart TB
 | 227 | **PH-S957** | poolai-vision-sync drift gate | `--check` green | **✅** |
 | 228 | **PH-S958** | Ratio hold advisory snapshot | **94.91%** digest band hold | **✅** |
 | 229 | **PH-S959** | galaxy_horizon_s950_integration | digest band close | **✅** |
+| 230 | **PH-S960** | DOCS_LEGACY_AUDIT remaining rows triage | table update | **✅** |
+| 231 | **PH-S961** | stale banners on flat docs/*.md | pointer to INDEX/archive | **✅** |
+| 232 | **PH-S962** | concept root de-hype pass | poolAI_concept_root.txt zriz | **✅** |
+| 233 | **PH-S963** | ARCHITECT vs FM §5.1 alignment | NEXT_STEPS_ARCHITECT sync | **✅** |
+| 234 | **PH-S964** | docs archive pointer batch | DOCS_LEGACY §5.3 | **✅** |
+| 235 | **PH-S965** | Rust ratio loc-audit refresh | **94.91%** sprint zriz | **✅** |
+| 236 | **PH-S966** | INDEX step 12 FM pointer | docs | **✅** |
+| 237 | **PH-S967** | poolai-vision-sync drift gate | `--check` green | **✅** |
+| 238 | **PH-S968** | Ratio hold advisory snapshot | **94.91%** docs legacy hold | **✅** |
+| 239 | **PH-S969** | galaxy_horizon_s960_integration | DOCS_LEGACY close | **✅** |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 

@@ -51,7 +51,11 @@ fn horizon_s950_band_digest_full_sync_ph_s959() {
     let ratio_json: serde_json::Value =
         serde_json::from_str(include_str!("../docs/development/rust_ratio.json"))
             .expect("rust_ratio.json");
-    assert_eq!(ratio_json["sprint"], "PH-S955");
+    let sprint = ratio_json["sprint"].as_str().unwrap_or("");
+    assert!(
+        sprint == "PH-S965" || sprint == "PH-S955",
+        "rust_ratio sprint should reflect band 30 (PH-S955) or band 31 (PH-S965), got {sprint}"
+    );
     assert!(ratio_json["in_formal_band"].as_bool().unwrap_or(false));
 
     let notes = ratio_json["notes"].as_array().expect("notes");

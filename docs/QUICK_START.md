@@ -1,3 +1,5 @@
+> **⚠️ Stale / не канон (2026-07-17, PH-S961).** Історична нотатка; канон — [`INDEX_2026-03-17.md`](./INDEX_2026-03-17.md) кроки 1–12 · [`development/DOCS_LEGACY_AUDIT_2026-05-19.md`](./development/DOCS_LEGACY_AUDIT_2026-05-19.md). Не використовувати `[ ]` нижче для автопрогону.
+
 # PoolAI Quick Start Guide
 
 ## Prerequisites

@@ -1,6 +1,6 @@
 # Аудит legacy-документації (менеджер функціоналу)
 
-**Дата:** 2026-05-19 · **Після спринтів:** S21–S29 · **Канон пріоритетів:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.1** · **Прогрес:** [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md)
+**Оновлено:** 2026-07-17 (PH-S960 band 31 close) · **Після спринтів:** S21–S29 + band 31 PH-S960…S969
 
 **Призначення:** звірка **старіших** планів/статусів у `docs/` з кодом і FM-*; не читати `[ ]` з архівних файлів для автопрогону.
 
@@ -26,9 +26,10 @@
 
 | Документ | Дата | Стан | Канон / дія |
 |----------|------|------|-------------|
-| `NEXT_STEPS_ARCHITECT_2026-03-17.md` | 03-17 | **Канон P1–P6** | 2× `[ ]`: LAN (BLOCKED), cloud-sdk (Deferred) |
+| `NEXT_STEPS_ARCHITECT_2026-03-17.md` | 03-17 | **Канон P1–P6** | 2× `[ ]`: LAN (BLOCKED), cloud-sdk (Deferred); **PH-S963** FM §5.1 alignment banner |
+| `poolAI_concept_root.txt` | 2026 | **Канон concept** | **PH-S962** de-hype zriz; історичний «100% COMPLETE» ≠ операційний зріз |
+| `OPENAPI_GAP_AUDIT_2026-05-19.md` | 05-19 | **Канон OpenAPI** | v1 ✅ S28; `/raid/distributed/*` backlog; gap-audit **0** (PH-S841) |
 | `UI_QUALITY_AND_E2E_PLAN_2026-04-06.md` | 04-06 | **Канон UX/E2E** | Playwright S23–S29 ✅; axe — backlog |
-| `OPENAPI_GAP_AUDIT_2026-05-19.md` | 05-19 | **Канон OpenAPI** | v1 ✅ S28; backlog `/raid/distributed/*` |
 | `E2E_PLAYWRIGHT.md` | 05-19 | **Канон E2E** | 5 specs; raid/topology — backlog |
 | `UI_IMPROVEMENTS_PLAN.md` | — | **Archived** | банер ✅; FM §5.4 |
 | `UI_BUGFIXES_AND_OAUTH_PLAN.md` | 01-16 | **Archived** | FM-012/FM-019 канон |
@@ -42,16 +43,20 @@
 | `UI_UX_IMPROVEMENTS_PLAN.md` | 01-21 | **Stale** | банер 2026-05-19; `admin/monitoring.rs` |
 | `BUTTON_FUNCTIONS_AUDIT_2026-01-19.md` | 01-19 | **Reference** | ручна регресія |
 | `docs/openapi.yaml` | — | **Partial ✅** | S14–S28; `/raid/distributed/*` backlog |
-| Плоскі `docs/*.md` (~60) | різні | **Archive / ref** | [`STRUCTURE.md`](../STRUCTURE.md) §3; не кроки 1–12 |
+| Плоскі `docs/*.md` (~60) | різні | **Archive / ref** | **PH-S961** stale banners batch → [`INDEX_2026-03-17.md`](../INDEX_2026-03-17.md); [`STRUCTURE.md`](../STRUCTURE.md) §3 |
 
 ---
 
-## 3. Autoprogon 100% (S33–S34) — не повторювати
+## 3. Autoprogon 100% (S33–S34) + band 31 close (PH-S964) — не повторювати
 
 | Область | Стан |
 |---------|------|
 | FM-001…019, OpenAPI, pa11y, axe, Playwright admin (усі маршрути) | **✅** |
 | `run-poolai`, RUN_LOCAL, Layer A+B docs | **✅** |
+| **PH-S960…S969** DOCS_LEGACY audit close | **✅** band 31 (2026-07-17) |
+| Flat `docs/*.md` session snapshots | **PH-S961** banners → INDEX / цей файл |
+| `poolAI_concept_root.txt` de-hype | **PH-S962** zriz |
+| Architect ↔ FM §5.1 | **PH-S963** alignment note |
 
 ## 4. Horizon (поза autoprogon)
 
@@ -62,16 +67,17 @@
 | **FM-009/010**, **P6** | **Concept-only** |
 | **Layer C** | **100%** (S40; було 79% до Horizon S35–S40) |
 
-**Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md) — **PH-S51** VM Linux isolation; канон черги **§5.11** (**PH-S51…S60**); **PH-S49/S50** ✅ (2026-05-26).
+**Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md) — **PH-S970…S979** (band 32 Galaxy concept markers); канон черги **§5.12** / **§5.14**.
 
 ---
 
-## 5. Структурні правки (ця сесія FM)
+## 5. Структурні правки (band 31 PH-S960…S969, 2026-07-17)
 
-- Банери **Stale/Archived** на файлах без попереднього банера (див. git diff).
-- `development/README.md` — актуальний AUTO_RUN і §5.1.
-- `STRUCTURE.md` — посилання на цей аудит.
-- `INDEX_2026-03-17.md` — legacy taxonomy → цей файл.
-- `FUNCTION_MANAGEMENT.md` §5.1/§5.3 — синхрон з S29 і таблицею вище.
+- **PH-S960:** таблиця §2 — band 31 triage rows (Architect, concept, flat docs, OpenAPI).
+- **PH-S961:** банери **Stale/не канон** на плоских `docs/*.md` session snapshots (12+ файлів; див. `FLAT_LEGACY_DOC_SAMPLES` у `docs_legacy_depth.rs`).
+- **PH-S962:** `poolAI_concept_root.txt` — de-hype zriz (історичний hype ≠ STABLE/FM).
+- **PH-S963:** `NEXT_STEPS_ARCHITECT_2026-03-17.md` — FM §5.1 alignment banner.
+- **PH-S964:** §3 batch close (цей файл).
+- **PH-S966:** `INDEX_2026-03-17.md` — крок 12 FM §5.12 pointer.
 
 **Політика:** нові архівні нотатки → `docs/archive/`; масове перенесення плоских `docs/*.md` — окремий інкремент.

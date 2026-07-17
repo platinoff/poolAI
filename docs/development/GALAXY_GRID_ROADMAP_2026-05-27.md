@@ -6,12 +6,13 @@
 |------|----------|
 | **Completion plan** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.14–§5.15** |
 | **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) |
-| **Active drain (band 31)** | PH-S960…S969 — DOCS_LEGACY audit close |
+| **Active drain (band 32)** | PH-S970…S979 — Galaxy concept implemented markers |
+| **Last closed (band 31)** | PH-S960…S969 ✅ — DOCS_LEGACY audit close |
 | **Last closed (band 30)** | PH-S950…S959 ✅ — FUNCTIONALITY_DIGEST full sync |
 | **Last closed (band 29)** | PH-S940…S949 ✅ — e2e scope audit + ratio stretch |
 | **Last closed (band 28)** | PH-S930…S939 ✅ — admin_common table/empty wasm-only + ratio 95% gate |
 | **Product-complete tail** | PH-S1010 — FM **§5.15** |
-| **Rust ratio** | **94.91%** → PH-S955 zriz · hold **95%** advisory |
+| **Rust ratio** | **94.92%** → PH-S965 zriz · hold **95%** advisory |
 
 **51** pending · **6** `абракадабра` sessions · остання закрита **PH-S950…S959** ✅.
 

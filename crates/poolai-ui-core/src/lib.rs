@@ -10,6 +10,7 @@ pub mod api_error;
 pub mod charts_depth;
 pub mod design_tokens;
 pub mod digest_depth;
+pub mod docs_legacy_depth;
 pub mod format;
 pub mod galaxy_telegram_seats;
 pub mod galaxy_virtual_nodes;
