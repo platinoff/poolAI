@@ -54,7 +54,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 **Версія в репозиторії:** `0.2.2` (див. `Cargo.toml`). **Робоча гілка:** `main`.
 
-Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S187 ✅. **Rust ratio baseline:** **92.78%** (hold **95%**). **Vision:** manifest rev **199**. **§5.12:** **0** відкритих — смуга PH-S128…S252 ✅ · **replenish** §5.13 — [`docs/development/NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md), [`GALAXY_GRID_ROADMAP_2026-05-27.md`](docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md), [`RUST_RATIO_STRATEGY_2026-06-13.md`](docs/development/RUST_RATIO_STRATEGY_2026-06-13.md).
+Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S949 ✅. **Rust ratio:** **94.91%** (hold **95%** advisory). **Vision:** manifest rev **296**. **§5.12:** **10** active **PH-S950…S959** (band 30) · **service band** PH-SVC01…SVC10 ✅ — [`CURSOR_UPDATE_RESEARCH_2026-07-17.md`](docs/development/CURSOR_UPDATE_RESEARCH_2026-07-17.md) · product drain — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
 **Репозиторій:** [github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)
 
@@ -80,13 +80,13 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 - `cargo test --all-features` — на **Windows MSVC** можливі каскадні помилки компіляції тестів і/або `STATUS_STACK_BUFFER_OVERRUN` у `rustc` через обсяг фіч (cloud-sdk тощо); для повного матрицю краще **GNU toolchain** з `rust-toolchain.toml` або **Linux CI**. Інтеграційні тести ML прунінгу та SAML узгоджені з поточною семантикою `PruningResult` / унікальними іменами SAML-провайдерів.
 - **Архітектурні інкременти (`main`, 2026-04–05)**: **`RaidService`** + **`VirtualNode*`** services (**FM-016** ✅); ML pipeline + **TurboQuant**; **P3 / FM-005** — `json_errors.rs`, **`HttpAppError`/`RestError`** по REST, **`raid*`**, **`enterprise_api/`**, auth/WS/rate-limit ✅; **OpenAPI** enterprise sync (S14–S20); бінарі **`poolai-worker`**, **`poolai-telegram-bot`**, **`poolai_health_load`**; dev stand — `bin/verify-dev-stand.*`, `core::dev_stand`; ML-тести — **`[[test]]` + `required-features = ["ml"]`**; P2b wire — `tests/distributed_raid_wire_integration.rs`.
 
-### Next Focus (2026-06-19)
+### Next Focus (2026-07-17)
 
-**Закрито:** PH-S524…S533 (worker-unhealthy failover, governance metrics, settlement wire, horizon integration).
+**Service band ✅:** PH-SVC01…SVC10 — Cursor **3.12.17** research, rules/docs sync — [`CURSOR_UPDATE_RESEARCH_2026-07-17.md`](docs/development/CURSOR_UPDATE_RESEARCH_2026-07-17.md).
 
-**§5.12:** **0** відкритих · vision **rev 242** · rust_ratio **94.62%** (formal 90–95% ✅; hold 95% advisory).
+**§5.12:** **10** active **PH-S950…S959** (band 30) · vision **rev 296** · rust_ratio **94.91%** (formal 90–95% ✅; hold 95% advisory).
 
-**Наступна сесія:** **`абракадабра`** — project scan → 10 PH-S* → drain → push ([`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md)).
+**Наступна product-сесія:** **`абракадабра`** — drain band 30 → promote PH-S960…S969 ([`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md)).
 
 **Ops (поза чергою):** **FM-003** LAN §4 **BLOCKED** (2 хости) · **FM-041** Cloud SDK **Deferred**.
 

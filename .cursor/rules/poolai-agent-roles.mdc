@@ -12,7 +12,7 @@ alwaysApply: true
 | Роль | Хто | Відповідальність |
 |------|-----|------------------|
 | **Власник / креативний директор** | Людина | Візія, пріоритети, BLOCKED/Deferred, фінальний push за бажанням |
-| **Оркестратор** | Головний агент Cursor (Composer) | Звичайна сесія: один **PH-S***. **`абракадабра`:** S0 → **project scan всього репо** → 10 PH-S* у §5.12 → drain → push + самарі |
+| **Оркестратор** | Головний агент Cursor (Composer) | Звичайна сесія: один **PH-S***. **`абракадабра`:** S0 → **project scan всього репо** → 10 PH-S* у §5.12 → drain → push + самарі. **Service band (§5.16):** toolchain/Cursor research → rules → docs sync → vision → push |
 | **Субагенти** | Task tool | Вузькі підзадачі; результат повертається оркестратору |
 
 ## Субагенти Cursor (коли делегувати)
@@ -29,6 +29,12 @@ alwaysApply: true
 | `best-of-n-runner` | Ізольовані git worktree / паралельні спроби; **не** замість канонічного drain |
 
 **Не делегувати оркестратору:** фінальний `git push`, закриття спринту в FM §5.12, оновлення `NEXT_SESSION_PROMPT.md`, amend після push.
+
+## Cursor 3.11+ (side chats, transcript search)
+
+- **Side chats** (`/side`, `/btw`, plus у Agents): дослідження/уточнення без зупинки main drain thread.
+- **Transcript search** (Cmd+K у Agents Window): пошук минулих PH-S* / `абракадабра` сесій.
+- **Cloud agent hooks** (`beforeSubmitPrompt`, `afterAgentThought`, `subagentStart`, …): опційно для cloud; локальний VDT канон — MSYS2 + `poolai-session-iteration.mdc`.
 
 ## Канон черги (FM)
 

@@ -1,5 +1,12 @@
 # Cursor Agent Configuration Changelog
 
+## 2026-07-17 — Cursor 3.12.17 service band (PH-SVC01…SVC10)
+
+- **`cursor-environment-baseline.mdc`**: `cursor` **3.12.17**; `git` **2.50.0**; pointer to `CURSOR_UPDATE_RESEARCH_2026-07-17.md`; notes for 3.11 side chats + cloud hooks.
+- **`poolai-agent-roles.mdc`**: side chats for research tangents; transcript search; FM **§5.16** service band.
+- **Docs:** `CURSOR_UPDATE_RESEARCH_2026-07-17.md`; HANDOFF/NEXT/README/INDEX zriz; FM §5.16 journal.
+- **Vision:** `poolai-vision-sync` → rev **296**; `--check` green.
+
 ## 2026-06-18 — Cursor 3.7.42 + абракадабра vision close band
 
 - **`cursor-environment-baseline.mdc`**: `cursor` **3.7.42**; Multitask Mode, SwitchMode, нові subagent types.

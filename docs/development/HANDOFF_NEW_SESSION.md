@@ -1,8 +1,8 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-22 (PH-S940…S949 ✅ · master backlog **61** · active **10** · vision **rev 295** · rust_ratio **94.91%**)
+**Оновлено:** 2026-07-17 (PH-SVC01…SVC10 ✅ service band · active **PH-S950…S959** · vision **rev 296** · rust_ratio **94.91%**)
 
-**Cursor 3.8.11 (2026-06-20):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-06-20.md`](./CURSOR_UPDATE_RESEARCH_2026-06-20.md). **Наступна сесія:** **`абракадабра`** (drain PH-S950…S959).
+**Cursor 3.12.17 (2026-07-17):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-07-17.md`](./CURSOR_UPDATE_RESEARCH_2026-07-17.md). **Service band PH-SVC01…SVC10 ✅** — toolchain/rules/docs sync. **Наступна product-сесія:** **`абракадабра`** (drain PH-S950…S959).
 
 **Completion roadmap v2 (2026-06-20):** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) — **101** спринтів до **product-complete** (PH-S1010 / FM **§5.15**); **7** сесій `абракадабра` × 10 PH-S* залишилось. Реєстр: [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · regen `bash scripts/generate-ph-s-master-backlog-351.sh`.
 
@@ -64,7 +64,7 @@
 
 **Rules:** **`абракадабра`** — drain 10 з §5.12 → vision close → push; [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
-**§5.12:** **10** відкритих **PH-S950…S959** (band 30). **Vision:** rev **295** · rust_ratio **94.91%** (PH-S945).
+**§5.12:** **10** відкритих **PH-S950…S959** (band 30). **Vision:** rev **296** · rust_ratio **94.91%** (PH-S945). **Service:** FM §5.16 PH-SVC01…SVC10 ✅ (2026-07-17).
 
 **Роадмеп:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) · **Промпт:** [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md).
 

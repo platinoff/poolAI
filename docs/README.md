@@ -41,7 +41,7 @@
 - **Status / plans** — `status/`, `development/` (індекс планів: [development/README.md](./development/README.md)).
 - **Авторозробка** — найновіший [development/AUTO_RUN_SESSION_2026-07-01.md](./development/AUTO_RUN_SESSION_2026-07-01.md); оркестратор — [`.cursor/rules/autonomous-orchestrator.mdc`](../.cursor/rules/autonomous-orchestrator.mdc).
 - **Virtual nodes (FM-016)** — `poolai-worker`, `poolai-telegram-bot`, `src/network/api/virtual_nodes.rs`, `src/services/virtual_node_*`; dev stand — `bin/verify-dev-stand.*` (див. [HANDOFF](./development/HANDOFF_NEW_SESSION.md) §2a–2b).
-- **Середовище та Cursor-оновлення** — [development/ENVIRONMENT_AND_CURSOR_UPDATES_2026-05-05.md](./development/ENVIRONMENT_AND_CURSOR_UPDATES_2026-05-05.md).
+- **Середовище та Cursor-оновлення** — [development/CURSOR_UPDATE_RESEARCH_2026-07-17.md](./development/CURSOR_UPDATE_RESEARCH_2026-07-17.md) (актуальний зріз) · [ENVIRONMENT_AND_CURSOR_UPDATES_2026-05-05.md](./development/ENVIRONMENT_AND_CURSOR_UPDATES_2026-05-05.md).
 - **REST API** — [openapi.yaml](./openapi.yaml) (OpenAPI 3).
 - **UI / admin ↔ API** — [development/UI_QUALITY_AND_E2E_PLAN_2026-04-06.md](./development/UI_QUALITY_AND_E2E_PLAN_2026-04-06.md).
 - **Playwright E2E (S23+)** — [development/E2E_PLAYWRIGHT.md](./development/E2E_PLAYWRIGHT.md); `e2e/tests/smoke.spec.ts`, `admin.spec.ts`, `a11y.spec.ts`, `visual.spec.ts`.

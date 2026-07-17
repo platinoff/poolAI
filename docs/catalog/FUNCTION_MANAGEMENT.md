@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-21 (PH-S900…S909 ✅ · master backlog **101** · active **10** · vision **rev 291** · rust_ratio **94.77%**)
+**Оновлено:** 2026-07-17 (PH-SVC01…SVC10 ✅ service band · active **PH-S950…S959** · vision **rev 296** · rust_ratio **94.91%**)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -1160,7 +1160,7 @@ FM-xxx (з таблиці нижче)
 | 893 | **PH-S958** | Ratio hold advisory | ops | hold | **[ ]** |
 | 894 | **PH-S959** | galaxy_horizon_s950_integration | docs | digest band close | **[ ]** |
 
-**Відкритих у §5.12:** **10** (PH-S950…S959). **Master backlog:** **61** pending PH-S960…S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · **§5.14**. Vision rev **295** (after sync). rust_ratio **94.91%** (PH-S945).
+**Відкритих у §5.12:** **10** (PH-S950…S959). **Master backlog:** **61** pending PH-S960…S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · **§5.14**. Vision rev **296** (after sync). rust_ratio **94.91%** (PH-S945). **Service band:** §5.16 PH-SVC01…SVC10 ✅ (2026-07-17).
 
 **Наступна сесія:** **`абракадабра`** — drain PH-S950…S959 → promote PH-S960…S969 з §5.14 → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
@@ -1218,6 +1218,25 @@ FM-xxx (з таблиці нижче)
 | Ops | `cargo test-ci` green; HANDOFF → maintenance mode |
 
 **Поза product-complete (не блокує S1010):** FM-003 LAN 2-host · FM-041 Cloud SDK prod · ZK/TEE attestation roadmap.
+
+### 5.16 Service band (Cursor / toolchain / docs hygiene)
+
+**Призначення:** **першочерговий** research + sync поза product PH-S* drain, коли власник просить service-сесію. **Не** замінює §5.12 product backlog; **не** блокує **`абракадабра`**.
+
+| Sprint | Focus | Acceptance | Статус |
+|--------|--------|------------|--------|
+| **PH-SVC01** | Cursor 3.12.17 + toolchain research | `CURSOR_UPDATE_RESEARCH_2026-07-17.md` | **✅** |
+| **PH-SVC02** | `cursor-environment-baseline.mdc` | 3.12.17 + git 2.50.0 | **✅** |
+| **PH-SVC03** | `.cursor/CHANGELOG` + `poolai-agent-roles.mdc` | side chats + §5.16 pointer | **✅** |
+| **PH-SVC04** | HANDOFF + NEXT_SESSION | cursor + service zriz | **✅** |
+| **PH-SVC05** | README release/Next Focus | rev 296, §5.12 active 10 | **✅** |
+| **PH-SVC06** | ENVIRONMENT_AND_CURSOR_UPDATES | pointer → Jul research | **✅** |
+| **PH-SVC07** | `file_list.csv` | CURSOR_UPDATE_2026-07-17 row | **✅** |
+| **PH-SVC08** | `poolai-vision-sync --check` | drift gate green | **✅** |
+| **PH-SVC09** | INDEX + docs cross-links | INDEX zriz Jul 17 | **✅** |
+| **PH-SVC10** | git push + самарі | service commit `main` | **✅** |
+
+**Наступний service trigger:** після major Cursor/OS update або за запитом власника (повторити scan → §5.16 band).
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S262)
 

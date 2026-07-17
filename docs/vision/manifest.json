@@ -2240,6 +2240,12 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_admin_common_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_stretch_depth_rs"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -9195,9 +9201,37 @@
       "label": "galaxy_horizon_s930_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s930_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_stretch_depth_rs",
+      "label": "stretch_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/stretch_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "e2e_archive_api_smoke_jobs_raid_spec_ts",
+      "label": "jobs_raid.spec.ts",
+      "layer": "L3",
+      "path": "e2e/archive/api-smoke/jobs_raid.spec.ts"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_e2e_scope_audit_rs",
+      "label": "e2e_scope_audit.rs",
+      "layer": "L3",
+      "path": "tests/e2e_scope_audit.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s940_integration_rs",
+      "label": "galaxy_horizon_s940_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s940_integration.rs"
     }
   ],
-  "revision": 295,
+  "revision": 296,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
