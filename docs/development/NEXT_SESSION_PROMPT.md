@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-07-17 (service band PH-SVC01…SVC10 ✅ · master backlog **61** · active **PH-S950…S959** · vision **rev 296** · rust_ratio **94.91%**)
+**Оновлено:** 2026-07-17 (service band PH-SVC01…SVC10 ✅ · master backlog **61** · active **PH-S950…S959** · vision **rev 297** · rust_ratio **94.91%**)
 
 | **← наступний** | **`абракадабра`** (drain band 30 PH-S950…S959) · service band ✅ [`CURSOR_UPDATE_RESEARCH_2026-07-17.md`](./CURSOR_UPDATE_RESEARCH_2026-07-17.md) |
 | **Completion plan** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.14–§5.15** |

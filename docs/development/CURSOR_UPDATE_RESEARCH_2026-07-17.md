@@ -2,7 +2,7 @@
 
 **Дата:** 2026-07-17 (service band PH-SVC01…SVC10) · **Cursor:** 3.12.17 · **Rust:** 1.92.0 · **Git:** 2.50.0
 
-**Операційний зріз:** active §5.12 **PH-S950…S959** (band 30 FUNCTIONALITY_DIGEST) · master backlog **61** pending · vision **rev 296** · rust_ratio **94.91%** (PH-S945).
+**Операційний зріз:** active §5.12 **PH-S950…S959** (band 30 FUNCTIONALITY_DIGEST) · master backlog **61** pending · vision **rev 297** · rust_ratio **94.91%** (PH-S945).
 
 **Попередній зріз:** [`CURSOR_UPDATE_RESEARCH_2026-06-20.md`](./CURSOR_UPDATE_RESEARCH_2026-06-20.md) (Cursor 3.8.11).
 
@@ -46,7 +46,7 @@
 | 1 | `cursor --version` → baseline rule | ✅ **3.12.17** |
 | 2 | `rustc` / `cargo` / `git` | ✅ 1.92.0 / 1.92.0 / 2.50.0 |
 | 3 | MSYS2 bash для git/cargo (не PowerShell) | ✅ |
-| 4 | `poolai-vision-sync --check` | ✅ rev **296**, next **PH-S950** |
+| 4 | `poolai-vision-sync --check` | ✅ rev **297**, next **PH-S950** |
 | 5 | FM §5.12 active 10 + §5.14 master backlog | ✅ PH-S950…S959 `[ ]`, **61** pending |
 | 6 | HANDOFF / README / INDEX zriz | ✅ service band 2026-07-17 |
 | 7 | Service band §5.16 journal | ✅ PH-SVC01…SVC10 |
@@ -61,7 +61,7 @@
 | **PH-SVC02** | `cursor-environment-baseline.mdc` | 3.12.17 + git 2.50.0 |
 | **PH-SVC03** | `.cursor/CHANGELOG` + `poolai-agent-roles.mdc` | 3.11 side chats note |
 | **PH-SVC04** | HANDOFF + NEXT_SESSION | cursor pointer + service zriz |
-| **PH-SVC05** | README release/Next Focus | rev 296, §5.12 active 10 |
+| **PH-SVC05** | README release/Next Focus | rev 297, §5.12 active 10 |
 | **PH-SVC06** | ENVIRONMENT_AND_CURSOR_UPDATES | pointer → цей research |
 | **PH-SVC07** | `file_list.csv` | CURSOR_UPDATE_RESEARCH_2026-07-17 |
 | **PH-SVC08** | `poolai-vision-sync --check` | drift gate green |

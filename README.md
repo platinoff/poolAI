@@ -54,7 +54,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 **Версія в репозиторії:** `0.2.2` (див. `Cargo.toml`). **Робоча гілка:** `main`.
 
-Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S949 ✅. **Rust ratio:** **94.91%** (hold **95%** advisory). **Vision:** manifest rev **296**. **§5.12:** **10** active **PH-S950…S959** (band 30) · **service band** PH-SVC01…SVC10 ✅ — [`CURSOR_UPDATE_RESEARCH_2026-07-17.md`](docs/development/CURSOR_UPDATE_RESEARCH_2026-07-17.md) · product drain — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
+Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S949 ✅. **Rust ratio:** **94.91%** (hold **95%** advisory). **Vision:** manifest rev **297**. **§5.12:** **10** active **PH-S950…S959** (band 30) · **service band** PH-SVC01…SVC10 ✅ — [`CURSOR_UPDATE_RESEARCH_2026-07-17.md`](docs/development/CURSOR_UPDATE_RESEARCH_2026-07-17.md) · product drain — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
 **Репозиторій:** [github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)
 
@@ -84,7 +84,7 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 **Service band ✅:** PH-SVC01…SVC10 — Cursor **3.12.17** research, rules/docs sync — [`CURSOR_UPDATE_RESEARCH_2026-07-17.md`](docs/development/CURSOR_UPDATE_RESEARCH_2026-07-17.md).
 
-**§5.12:** **10** active **PH-S950…S959** (band 30) · vision **rev 296** · rust_ratio **94.91%** (formal 90–95% ✅; hold 95% advisory).
+**§5.12:** **10** active **PH-S950…S959** (band 30) · vision **rev 297** · rust_ratio **94.91%** (formal 90–95% ✅; hold 95% advisory).
 
 **Наступна product-сесія:** **`абракадабра`** — drain band 30 → promote PH-S960…S969 ([`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md)).
 

@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-17 (PH-SVC01…SVC10 ✅ service band · active **PH-S950…S959** · vision **rev 296** · rust_ratio **94.91%**)
+**Оновлено:** 2026-07-17 (PH-SVC01…SVC10 ✅ service band · active **PH-S950…S959** · vision **rev 297** · rust_ratio **94.91%**)
 
 **Cursor 3.12.17 (2026-07-17):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-07-17.md`](./CURSOR_UPDATE_RESEARCH_2026-07-17.md). **Service band PH-SVC01…SVC10 ✅** — toolchain/rules/docs sync. **Наступна product-сесія:** **`абракадабра`** (drain PH-S950…S959).
 
@@ -64,7 +64,7 @@
 
 **Rules:** **`абракадабра`** — drain 10 з §5.12 → vision close → push; [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
-**§5.12:** **10** відкритих **PH-S950…S959** (band 30). **Vision:** rev **296** · rust_ratio **94.91%** (PH-S945). **Service:** FM §5.16 PH-SVC01…SVC10 ✅ (2026-07-17).
+**§5.12:** **10** відкритих **PH-S950…S959** (band 30). **Vision:** rev **297** · rust_ratio **94.91%** (PH-S945). **Service:** FM §5.16 PH-SVC01…SVC10 ✅ (2026-07-17).
 
 **Роадмеп:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) · **Промпт:** [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md).
 
