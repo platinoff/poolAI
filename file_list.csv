@@ -281,6 +281,7 @@
 ./crates/poolai-solana-adapter/src/sidecar.rs
 ./crates/poolai-solana-adapter/src/wire_limits.rs
 ./crates/poolai-solana-adapter/wire/limits.rs
+./crates/poolai-ui-core/src/digest_depth.rs
 ./data/audit/audit_20260117_034649.log.gz
 ./data/audit/audit_20260117_043230.log.gz
 ./data/audit/audit_20260117_053542.log.gz
@@ -10274,6 +10275,7 @@
 ./tests/fixtures/release/dev/release-manifest.json
 ./tests/fixtures/release/dev/release-manifest.json.sig
 ./tests/galaxy_horizon_s524_integration.rs
+./tests/galaxy_horizon_s950_integration.rs
 ./tests/galaxy_protocol_register_integration.rs
 ./tests/grid_network_scalability_tests.rs
 ./tests/integration/cloud/aws_tests.rs

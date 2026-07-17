@@ -2256,7 +2256,7 @@
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S949",
+  "last_sprint_closed": "PH-S959",
   "layers": [
     {
       "id": "L0",
@@ -2289,7 +2289,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S950",
+  "next_sprint": "PH-S960",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -9244,7 +9244,7 @@
       "path": "docs/development/CURSOR_UPDATE_RESEARCH_2026-07-17.md"
     }
   ],
-  "revision": 297,
+  "revision": 298,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -17206,91 +17206,181 @@
       "acceptance": "all src/grid modules listed",
       "deps": "docs",
       "id": "PH-S950",
-      "open": true,
+      "open": false,
       "row": 885,
-      "status": "open",
+      "status": "closed",
       "title": "FUNCTIONALITY_DIGEST grid section sync"
     },
     {
       "acceptance": "src/job rows",
       "deps": "docs",
       "id": "PH-S951",
-      "open": true,
+      "open": false,
       "row": 886,
-      "status": "open",
+      "status": "closed",
       "title": "FUNCTIONALITY_DIGEST job/lease sync"
     },
     {
       "acceptance": "crates rows",
       "deps": "docs",
       "id": "PH-S952",
-      "open": true,
+      "open": false,
       "row": 887,
-      "status": "open",
+      "status": "closed",
       "title": "FUNCTIONALITY_DIGEST ui/wasm sync"
     },
     {
       "acceptance": "src/bin/ all listed",
       "deps": "docs",
       "id": "PH-S953",
-      "open": true,
+      "open": false,
       "row": 888,
-      "status": "open",
+      "status": "closed",
       "title": "FUNCTIONALITY_DIGEST bins table"
     },
     {
       "acceptance": "gap audit note",
       "deps": "docs",
       "id": "PH-S954",
-      "open": true,
+      "open": false,
       "row": 889,
-      "status": "open",
+      "status": "closed",
       "title": "DIGEST OpenAPI pointer refresh"
     },
     {
       "acceptance": "rust_ratio.json zriz",
       "deps": "§5.13",
       "id": "PH-S955",
-      "open": true,
+      "open": false,
       "row": 890,
-      "status": "open",
+      "status": "closed",
       "title": "poolai-loc-audit PH-S955"
     },
     {
       "acceptance": "key paths",
       "deps": "docs",
       "id": "PH-S956",
-      "open": true,
+      "open": false,
       "row": 891,
-      "status": "open",
+      "status": "closed",
       "title": "file_list.csv catalog sync"
     },
     {
       "acceptance": "--check` green",
       "deps": "ops",
       "id": "PH-S957",
-      "open": true,
+      "open": false,
       "row": 892,
-      "status": "open",
+      "status": "closed",
       "title": "poolai-vision-sync --check"
     },
     {
       "acceptance": "hold",
       "deps": "ops",
       "id": "PH-S958",
-      "open": true,
+      "open": false,
       "row": 893,
-      "status": "open",
+      "status": "closed",
       "title": "Ratio hold advisory"
     },
     {
       "acceptance": "digest band close",
       "deps": "docs",
       "id": "PH-S959",
-      "open": true,
+      "open": false,
       "row": 894,
-      "status": "open",
+      "status": "closed",
       "title": "galaxy_horizon_s950_integration"
+    },
+    {
+      "acceptance": "table update",
+      "deps": "docs",
+      "id": "PH-S960",
+      "open": true,
+      "row": 895,
+      "status": "open",
+      "title": "DOCS_LEGACY_AUDIT remaining rows triage"
+    },
+    {
+      "acceptance": "pointer to INDEX/archive",
+      "deps": "docs",
+      "id": "PH-S961",
+      "open": true,
+      "row": 896,
+      "status": "open",
+      "title": "stale banners on flat docs/*.md"
+    },
+    {
+      "acceptance": "poolAI_concept_root.txt zriz",
+      "deps": "docs",
+      "id": "PH-S962",
+      "open": true,
+      "row": 897,
+      "status": "open",
+      "title": "concept root de-hype pass"
+    },
+    {
+      "acceptance": "NEXT_STEPS_ARCHITECT sync",
+      "deps": "docs",
+      "id": "PH-S963",
+      "open": true,
+      "row": 898,
+      "status": "open",
+      "title": "ARCHITECT vs FM §5.1 alignment"
+    },
+    {
+      "acceptance": "DOCS_LEGACY §5.3",
+      "deps": "docs",
+      "id": "PH-S964",
+      "open": true,
+      "row": 899,
+      "status": "open",
+      "title": "docs archive pointer batch"
+    },
+    {
+      "acceptance": "rust_ratio.json zriz",
+      "deps": "§5.13",
+      "id": "PH-S965",
+      "open": true,
+      "row": 900,
+      "status": "open",
+      "title": "poolai-loc-audit PH-S965"
+    },
+    {
+      "acceptance": "docs",
+      "deps": "docs",
+      "id": "PH-S966",
+      "open": true,
+      "row": 901,
+      "status": "open",
+      "title": "INDEX step 12 FM pointer"
+    },
+    {
+      "acceptance": "--check` green",
+      "deps": "ops",
+      "id": "PH-S967",
+      "open": true,
+      "row": 902,
+      "status": "open",
+      "title": "poolai-vision-sync --check"
+    },
+    {
+      "acceptance": "hold",
+      "deps": "ops",
+      "id": "PH-S968",
+      "open": true,
+      "row": 903,
+      "status": "open",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "acceptance": "DOCS_LEGACY close",
+      "deps": "docs",
+      "id": "PH-S969",
+      "open": true,
+      "row": 904,
+      "status": "open",
+      "title": "galaxy_horizon_s960_integration"
     }
   ],
   "sprint_queue_open_count": 10,

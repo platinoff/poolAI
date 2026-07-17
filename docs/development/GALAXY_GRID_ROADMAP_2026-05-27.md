@@ -1,19 +1,19 @@
 # Galaxy Grid roadmap (зріз)
 
-**Оновлено:** 2026-06-22 · **Completion v2:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · **71** pending PH-S950…S1010 · **§5.12 active:** 10
+**Оновлено:** 2026-07-17 · **Completion v2:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · **51** pending PH-S970…S1010 · **§5.12 active:** 10
 
 | Зріз | Значення |
 |------|----------|
 | **Completion plan** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.14–§5.15** |
 | **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) |
-| **Active drain (band 30)** | PH-S950…S959 — FUNCTIONALITY_DIGEST full sync |
+| **Active drain (band 31)** | PH-S960…S969 — DOCS_LEGACY audit close |
+| **Last closed (band 30)** | PH-S950…S959 ✅ — FUNCTIONALITY_DIGEST full sync |
+| **Last closed (band 29)** | PH-S940…S949 ✅ — e2e scope audit + ratio stretch |
 | **Last closed (band 28)** | PH-S930…S939 ✅ — admin_common table/empty wasm-only + ratio 95% gate |
-| **Last closed (band 27)** | PH-S920…S929 ✅ — wasm admin_charts sparkline/line migration |
-| **Last closed (band 26)** | PH-S910…S919 ✅ — Trust score SQLite persist |
 | **Product-complete tail** | PH-S1010 — FM **§5.15** |
-| **Rust ratio** | **94.88%** → PH-S935 zriz · hold **95%** advisory (bands 28–29 formal gate) |
+| **Rust ratio** | **94.91%** → PH-S955 zriz · hold **95%** advisory |
 
-**71** pending · **8** `абракадабра` sessions · остання закрита **PH-S930…S939** ✅.
+**51** pending · **6** `абракадабра` sessions · остання закрита **PH-S950…S959** ✅.
 
 ---
 

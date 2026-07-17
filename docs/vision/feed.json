@@ -3,71 +3,71 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S950",
+      "id": "PH-S960",
       "link": "docs/vision/index.html#sprint-queue",
       "next": true,
       "published": "2026-05-28",
       "status": "open",
-      "summary": "all src/grid modules listed",
-      "title": "FUNCTIONALITY_DIGEST grid section sync"
+      "summary": "table update",
+      "title": "DOCS_LEGACY_AUDIT remaining rows triage"
     },
     {
       "category": "open",
-      "id": "PH-S951",
+      "id": "PH-S961",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "src/job rows",
-      "title": "FUNCTIONALITY_DIGEST job/lease sync"
+      "summary": "pointer to INDEX/archive",
+      "title": "stale banners on flat docs/*.md"
     },
     {
       "category": "open",
-      "id": "PH-S952",
+      "id": "PH-S962",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "crates rows",
-      "title": "FUNCTIONALITY_DIGEST ui/wasm sync"
+      "summary": "poolAI_concept_root.txt zriz",
+      "title": "concept root de-hype pass"
     },
     {
       "category": "open",
-      "id": "PH-S953",
+      "id": "PH-S963",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "src/bin/ all listed",
-      "title": "FUNCTIONALITY_DIGEST bins table"
+      "summary": "NEXT_STEPS_ARCHITECT sync",
+      "title": "ARCHITECT vs FM §5.1 alignment"
     },
     {
       "category": "open",
-      "id": "PH-S954",
+      "id": "PH-S964",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "gap audit note",
-      "title": "DIGEST OpenAPI pointer refresh"
+      "summary": "DOCS_LEGACY §5.3",
+      "title": "docs archive pointer batch"
     },
     {
       "category": "open",
-      "id": "PH-S955",
+      "id": "PH-S965",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
       "summary": "rust_ratio.json zriz",
-      "title": "poolai-loc-audit PH-S955"
+      "title": "poolai-loc-audit PH-S965"
     },
     {
       "category": "open",
-      "id": "PH-S956",
+      "id": "PH-S966",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "key paths",
-      "title": "file_list.csv catalog sync"
+      "summary": "docs",
+      "title": "INDEX step 12 FM pointer"
     },
     {
       "category": "open",
-      "id": "PH-S957",
+      "id": "PH-S967",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -76,7 +76,7 @@
     },
     {
       "category": "open",
-      "id": "PH-S958",
+      "id": "PH-S968",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -85,12 +85,102 @@
     },
     {
       "category": "open",
-      "id": "PH-S959",
+      "id": "PH-S969",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
+      "summary": "DOCS_LEGACY close",
+      "title": "galaxy_horizon_s960_integration"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S959",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
       "summary": "digest band close",
       "title": "galaxy_horizon_s950_integration"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S958",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "hold",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S957",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--check` green",
+      "title": "poolai-vision-sync --check"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S956",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "key paths",
+      "title": "file_list.csv catalog sync"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S955",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "rust_ratio.json zriz",
+      "title": "poolai-loc-audit PH-S955"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S954",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "gap audit note",
+      "title": "DIGEST OpenAPI pointer refresh"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S953",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "src/bin/ all listed",
+      "title": "FUNCTIONALITY_DIGEST bins table"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S952",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "crates rows",
+      "title": "FUNCTIONALITY_DIGEST ui/wasm sync"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S951",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "src/job rows",
+      "title": "FUNCTIONALITY_DIGEST job/lease sync"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S950",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "all src/grid modules listed",
+      "title": "FUNCTIONALITY_DIGEST grid section sync"
     },
     {
       "category": "closed",
@@ -108,96 +198,6 @@
       "published": "2026-05-28",
       "status": "closed",
       "summary": "stretch note",
-      "title": "Ratio hold advisory"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S947",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--check` green",
-      "title": "poolai-vision-sync --check"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S946",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "docs canon",
-      "title": "RUST_RATIO 96% spirit docs"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S945",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "rust_ratio.json zriz",
-      "title": "poolai-loc-audit PH-S945"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S944",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "unit test",
-      "title": "stretch depth stub"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S943",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "bin/ vs scripts/ canon",
-      "title": "ops shell audit — no product logic"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S942",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "loc-audit stretch flag",
-      "title": "ratio 96% stretch spirit check"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S941",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "shrink legacy API specs",
-      "title": "e2e TS loc reduction plan executed"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S940",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "no duplicate Rust tests",
-      "title": "e2e scope audit — API-only removed"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S939",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "ratio 95% band close",
-      "title": "galaxy_horizon_s930_integration"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S938",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--min-ratio 0.95` meets or hold",
       "title": "Ratio hold advisory"
     }
   ],

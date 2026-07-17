@@ -1,7 +1,7 @@
 {
-  "revision": 295,
-  "updated_at": "2026-06-22",
-  "active_sprint": "PH-S950",
+  "revision": 298,
+  "updated_at": "2026-07-17",
+  "active_sprint": "PH-S960",
   "ui_version": 4,
   "extension_policy": {
     ".md": {
@@ -303,6 +303,36 @@
       "docs": ["docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md", "docs/INDEX_2026-03-17.md", "docs/development/README.md"],
       "extensions": [".md"],
       "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md"]
+    },
+    "digest_full_sync_band30": {
+      "sprints": ["PH-S950", "PH-S951", "PH-S952", "PH-S953", "PH-S954", "PH-S955", "PH-S956", "PH-S957", "PH-S958", "PH-S959"],
+      "docs": [
+        "docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md",
+        "docs/development/RUST_RATIO_STRATEGY_2026-06-13.md",
+        "docs/development/rust_ratio.json",
+        "file_list.csv"
+      ],
+      "code_globs": [
+        "crates/poolai-ui-core/src/digest_depth.rs",
+        "tests/galaxy_horizon_s950_integration.rs",
+        "src/bin/poolai_loc_audit.rs",
+        "src/bin/poolai_openapi_gap_audit.rs",
+        "src/bin/poolai_vision_sync.rs",
+        "src/grid/**",
+        "src/job/**",
+        "crates/poolai-ui-core/**",
+        "crates/poolai-ui-wasm/**",
+        "src/bin/**"
+      ],
+      "extensions": [".md", ".rs", ".json", ".csv"],
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/development/NEXT_SESSION_PROMPT.md",
+        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md",
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json"
+      ]
     },
     "rust_ratio_stretch_band": {
       "sprints": ["PH-S150", "PH-S151", "PH-S152", "PH-S153", "PH-S154", "PH-S155", "PH-S156", "PH-S157", "PH-S158", "PH-S159", "PH-S160", "PH-S161", "PH-S162", "PH-S163", "PH-S164", "PH-S165", "PH-S166", "PH-S167", "PH-S168", "PH-S169", "PH-S170", "PH-S171", "PH-S172", "PH-S173", "PH-S174", "PH-S175", "PH-S176", "PH-S177", "PH-S178", "PH-S179", "PH-S180", "PH-S181", "PH-S182", "PH-S183", "PH-S184", "PH-S185", "PH-S186", "PH-S187", "PH-S188", "PH-S189", "PH-S190", "PH-S191", "PH-S940", "PH-S941", "PH-S942", "PH-S943", "PH-S944", "PH-S945", "PH-S946", "PH-S947", "PH-S948", "PH-S949"],

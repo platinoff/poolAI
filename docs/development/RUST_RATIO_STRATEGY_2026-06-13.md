@@ -1,6 +1,6 @@
 # Rust codebase ratio — стратегія 90–95% (PoolAI)
 
-**Оновлено:** 2026-06-22 · **Канон:** FM **§5.13** · §5.12 **10** active PH-S950…S959 · master backlog **61** pending → [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) bands **30–33** docs product-complete · rust_ratio **94.91%**
+**Оновлено:** 2026-07-17 · **Канон:** FM **§5.13** · §5.12 **10** active PH-S960…S969 · master backlog **51** pending → [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) bands **31–33** docs product-complete · rust_ratio **94.91%** (PH-S955)
 
 **Мета:** зростання частки **Rust** у виконуваному коді репозиторію до **90–95%** (формально), **96% stretch spirit** (орієнтир replenish PH-S150…S159) — платформа збирається і перевіряється через **`cargo`** без обов'язкового Node на edge.
 
@@ -312,6 +312,16 @@ flowchart TB
 | 217 | **PH-S947** | poolai-vision-sync drift gate | `--check` green | **✅** |
 | 218 | **PH-S948** | Ratio stretch advisory snapshot | **94.91%** stretch note | **✅** |
 | 219 | **PH-S949** | galaxy_horizon_s940_integration | e2e stretch band close | **✅** |
+| 220 | **PH-S950** | FUNCTIONALITY_DIGEST grid section sync | all src/grid modules listed | **✅** |
+| 221 | **PH-S951** | FUNCTIONALITY_DIGEST job/lease sync | src/job rows | **✅** |
+| 222 | **PH-S952** | FUNCTIONALITY_DIGEST ui/wasm sync | crates rows | **✅** |
+| 223 | **PH-S953** | FUNCTIONALITY_DIGEST bins table | src/bin/ all listed | **✅** |
+| 224 | **PH-S954** | DIGEST OpenAPI pointer refresh | gap audit note | **✅** |
+| 225 | **PH-S955** | Rust ratio loc-audit refresh | **94.91%** sprint zriz | **✅** |
+| 226 | **PH-S956** | file_list.csv catalog sync | key paths | **✅** |
+| 227 | **PH-S957** | poolai-vision-sync drift gate | `--check` green | **✅** |
+| 228 | **PH-S958** | Ratio hold advisory snapshot | **94.91%** digest band hold | **✅** |
+| 229 | **PH-S959** | galaxy_horizon_s950_integration | digest band close | **✅** |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 

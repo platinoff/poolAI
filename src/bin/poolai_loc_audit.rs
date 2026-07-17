@@ -21,7 +21,7 @@ const FORMAL_BAND_MAX: f64 = 0.95;
 const DEFAULT_WARN_BELOW: f64 = 0.93;
 const DEFAULT_TARGET: f64 = 0.95;
 const DEFAULT_STRETCH: f64 = 0.96;
-const SPRINT: &str = "PH-S945";
+const SPRINT: &str = "PH-S955";
 /// ui_js LOC at PH-S925 zriz (band 28 baseline for PH-S934 reduction metric).
 const UI_JS_BAND28_BASELINE_LOC: u64 = 2141;
 /// e2e_ts LOC at PH-S940 zriz (band 29 baseline for PH-S941 reduction metric).
@@ -403,6 +403,7 @@ fn build_report(
             "PH-S942: stretch_spirit_gate_met when rust_ratio ≥ 0.96",
             "PH-S943: ops_shell_canon_met when no .rs under bin/ or scripts/",
             "PH-S948: stretch advisory — below_stretch_spirit is expected until band 29+ migration",
+            "PH-S958: digest band 30 hold advisory — in_formal_band true; target 95% hold until band 31+",
         ],
     })
 }

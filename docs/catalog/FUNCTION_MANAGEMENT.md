@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-07-17 (PH-SVC01…SVC10 ✅ service band · active **PH-S950…S959** · vision **rev 297** · rust_ratio **94.91%**)
+**Оновлено:** 2026-07-17 (PH-S950…S959 ✅ band 30 · active **PH-S960…S969** · vision **rev 298** · rust_ratio **94.91%**)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -1149,20 +1149,30 @@ FM-xxx (з таблиці нижче)
 | 882 | **PH-S947** | poolai-vision-sync --check | ops | `--check` green | **✅** |
 | 883 | **PH-S948** | Ratio hold advisory | ops | stretch note | **✅** |
 | 884 | **PH-S949** | galaxy_horizon_s940_integration | Ratio | ratio stretch close | **✅** |
-| 885 | **PH-S950** | FUNCTIONALITY_DIGEST grid section sync | docs | all src/grid modules listed | **[ ]** |
-| 886 | **PH-S951** | FUNCTIONALITY_DIGEST job/lease sync | docs | src/job rows | **[ ]** |
-| 887 | **PH-S952** | FUNCTIONALITY_DIGEST ui/wasm sync | docs | crates rows | **[ ]** |
-| 888 | **PH-S953** | FUNCTIONALITY_DIGEST bins table | docs | src/bin/ all listed | **[ ]** |
-| 889 | **PH-S954** | DIGEST OpenAPI pointer refresh | docs | gap audit note | **[ ]** |
-| 890 | **PH-S955** | poolai-loc-audit PH-S955 | §5.13 | rust_ratio.json zriz | **[ ]** |
-| 891 | **PH-S956** | file_list.csv catalog sync | docs | key paths | **[ ]** |
-| 892 | **PH-S957** | poolai-vision-sync --check | ops | `--check` green | **[ ]** |
-| 893 | **PH-S958** | Ratio hold advisory | ops | hold | **[ ]** |
-| 894 | **PH-S959** | galaxy_horizon_s950_integration | docs | digest band close | **[ ]** |
+| 885 | **PH-S950** | FUNCTIONALITY_DIGEST grid section sync | docs | all src/grid modules listed | **✅** |
+| 886 | **PH-S951** | FUNCTIONALITY_DIGEST job/lease sync | docs | src/job rows | **✅** |
+| 887 | **PH-S952** | FUNCTIONALITY_DIGEST ui/wasm sync | docs | crates rows | **✅** |
+| 888 | **PH-S953** | FUNCTIONALITY_DIGEST bins table | docs | src/bin/ all listed | **✅** |
+| 889 | **PH-S954** | DIGEST OpenAPI pointer refresh | docs | gap audit note | **✅** |
+| 890 | **PH-S955** | poolai-loc-audit PH-S955 | §5.13 | rust_ratio.json zriz | **✅** |
+| 891 | **PH-S956** | file_list.csv catalog sync | docs | key paths | **✅** |
+| 892 | **PH-S957** | poolai-vision-sync --check | ops | `--check` green | **✅** |
+| 893 | **PH-S958** | Ratio hold advisory | ops | hold | **✅** |
+| 894 | **PH-S959** | galaxy_horizon_s950_integration | docs | digest band close | **✅** |
+| 895 | **PH-S960** | DOCS_LEGACY_AUDIT remaining rows triage | docs | table update | **[ ]** |
+| 896 | **PH-S961** | stale banners on flat docs/*.md | docs | pointer to INDEX/archive | **[ ]** |
+| 897 | **PH-S962** | concept root de-hype pass | docs | poolAI_concept_root.txt zriz | **[ ]** |
+| 898 | **PH-S963** | ARCHITECT vs FM §5.1 alignment | docs | NEXT_STEPS_ARCHITECT sync | **[ ]** |
+| 899 | **PH-S964** | docs archive pointer batch | docs | DOCS_LEGACY §5.3 | **[ ]** |
+| 900 | **PH-S965** | poolai-loc-audit PH-S965 | §5.13 | rust_ratio.json zriz | **[ ]** |
+| 901 | **PH-S966** | INDEX step 12 FM pointer | docs | docs | **[ ]** |
+| 902 | **PH-S967** | poolai-vision-sync --check | ops | `--check` green | **[ ]** |
+| 903 | **PH-S968** | Ratio hold advisory | ops | hold | **[ ]** |
+| 904 | **PH-S969** | galaxy_horizon_s960_integration | docs | DOCS_LEGACY close | **[ ]** |
 
-**Відкритих у §5.12:** **10** (PH-S950…S959). **Master backlog:** **61** pending PH-S960…S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · **§5.14**. Vision rev **297** (after sync). rust_ratio **94.91%** (PH-S945). **Service band:** §5.16 PH-SVC01…SVC10 ✅ (2026-07-17).
+**Відкритих у §5.12:** **10** (PH-S960…S969). **Master backlog:** **51** pending PH-S970…S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · **§5.14**. Vision rev **298** (after sync). rust_ratio **94.91%** (PH-S955). **Service band:** §5.16 PH-SVC01…SVC10 ✅ (2026-07-17).
 
-**Наступна сесія:** **`абракадабра`** — drain PH-S950…S959 → promote PH-S960…S969 з §5.14 → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **`абракадабра`** — drain PH-S960…S969 → promote PH-S970…S979 з §5.14 → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.14 Master backlog PH-S720…S1010 (291 pending → product-complete, 2026-06-20)
 
@@ -1242,7 +1252,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-06-22):** PH-S950…S959 **[ ]** drain band 30 (FUNCTIONALITY_DIGEST full sync) · **`абракадабра`** = drain → vision close → push · ratio **94.91%** (PH-S945).
+**Активна смуга (2026-07-17):** PH-S960…S969 **[ ]** drain band 31 (DOCS_LEGACY audit close) · **`абракадабра`** = drain → vision close → push · ratio **94.91%** (PH-S955).
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

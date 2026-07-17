@@ -1,6 +1,6 @@
 # PoolAI — витяг функціоналу (зведення за доками та кодом)
 
-**Оновлено:** 2026-06-19 (PH-S524…S533: lease failover health, governance metrics, settlement wire, wasm charts slim).
+**Оновлено:** 2026-07-17 (PH-S950…S959: FUNCTIONALITY_DIGEST full sync band 30 — grid/job/ui-wasm/bins).
 
 Цей документ — **не автогенерація з коду**, а структурований **витяг можливостей** системи, узгоджений з кореневим [`README.md`](../../README.md), [`docs/status/STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md), [`docs/development/HANDOFF_NEW_SESSION.md`](../development/HANDOFF_NEW_SESSION.md), модулями `src/` та (частково) [`docs/openapi.yaml`](../openapi.yaml). Для повного переліку HTTP-шляхів див. роутери в `src/network/` — OpenAPI може відставати від фактичного API.
 
@@ -37,9 +37,17 @@
 | Компонент | Опис |
 |-----------|------|
 | **`poolai` (default-run)** | Основний сервер: HTTP(S), UI, REST, WebSocket, інтеграція модулів. |
-| **`poolai-worker`** (`src/bin/poolai-worker.rs`) | **FM-016 ✅:** віртуальна нода на device — `POOLAI_COORDINATOR_URL`, реєстрація/heartbeat на coordinator, poll/complete tasks, bootstrap `ping` + `raid_health_check`, локальний `GET /health`. **PH-S65:** шле `protocol_version` / `build_id` на register-remote (`POOLAI_PROTOCOL_VERSION`, `POOLAI_BUILD_ID`). |
-| **`poolai-verify-release`** (`src/bin/poolai_verify_release.rs`) | **PH-S66 ✅:** перевірка підписаного release manifest (ed25519) + опційна SHA-256 artifact; `src/release/`; Galaxy §9.2 — [`SECURITY_HARDENING.md`](../security/SECURITY_HARDENING.md). |
-| **`poolai_health_load`** (`src/bin/poolai_health_load.rs`) | Дев-утиліта: навантажувальний **`GET /api/v1/health`** (Tokio + `reqwest`); опційно **`--json`** на stdout для baseline; див. `docs/performance/BENCHMARKS.md`. |
+| **`poolai-worker`** (`src/bin/poolai-worker.rs`) | **FM-016 ✅:** віртуальна нода — register-remote/heartbeat, tasks, RAID health; lease renew ticker (PH-S116). |
+| **`poolai-verify-release`** (`src/bin/poolai_verify_release.rs`) | **PH-S66 ✅:** ed25519 release manifest + SHA-256 artifact; Galaxy §9.2. |
+| **`poolai_health_load`** (`src/bin/poolai_health_load.rs`) | Load generator `GET /api/v1/health`; `--json` baseline — [`BENCHMARKS.md`](../performance/BENCHMARKS.md). |
+| **`poolai-openapi-gap-audit`** (`src/bin/poolai_openapi_gap_audit.rs`) | **PH-S841 ✅:** Axum routes vs `docs/openapi.yaml`; exit 0 = 0 missing (PH-S954). |
+| **`poolai-http-stand-smoke`** (`src/bin/poolai_http_stand_smoke.rs`) | Live stand HTTP smoke + metrics parity; replaces legacy Playwright API specs (PH-S145+). |
+| **`poolai-e2e-stand`** (`src/bin/poolai_e2e_stand.rs`) | E2E stand start/restart/stop lifecycle (PH-S158). |
+| **`poolai-loc-audit`** (`src/bin/poolai_loc_audit.rs`) | Rust ratio LOC audit → `docs/development/rust_ratio.json` (PH-S143+; band zriz PH-S955). |
+| **`poolai-vision-sync`** (`src/bin/poolai_vision_sync.rs`) | `docs/vision/manifest.json` merge + FM §5.12 sprint queue; `--check` drift gate (PH-S957). |
+| **`poolai-p2b-tq01-snapshot`** (`src/bin/poolai_p2b_tq01_snapshot.rs`) | Deterministic TQ01 wire size snapshot (`--features ml`; FM-028). |
+| **`poolai-telegram-bot`** (`src/bin/poolai-telegram-bot.rs`) | Telegram bot sidecar (`--features tgbot`); coordinator bridge (FM-016++). |
+| **`poolai-solana-adapter`** (`crates/poolai-solana-adapter/src/bin/`) | NDJSON domain events → mock/devnet RPC ack (FM-024/033). |
 
 ---
 
@@ -82,7 +90,7 @@
 - **Prometheus (FM-043)** — `GET /metrics` (root, `feature = prometheus`); enterprise gauges on scrape; JSON metrics лишаються на `/api/v1/metrics`.
 - **HTTPS (FM-044)** — `feature = https`: rustls TLS 1.3 (опційно 1.2), HSTS з config, `HTTPS_CERT_RELOAD_SECS` — [`security/TLS.md`](../security/TLS.md).
 - **UI/Admin UX** — FM-012 закрито (2026-05-16): i18n UA/EN + Telegram OAuth; LAN perf — FM-003 ops ([`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md)).
-- **OpenAPI** — [`docs/openapi.yaml`](../openapi.yaml) описує **частину** публічних шляхів; повний перелік — з коду роутерів і `src/network/mod.rs`.
+- **OpenAPI** — [`docs/openapi.yaml`](../openapi.yaml) синхронізовано з Axum routes (PH-S840/S841); **`cargo run --bin poolai-openapi-gap-audit`** → **0 missing**; контракти — `tests/grid_openapi_contracts.rs` (PH-S954).
 
 ---
 
@@ -142,31 +150,112 @@
 | `src/ml/turboquant.rs` | TurboQuant + optional `turboquant-simd` | ML pipeline Quantization |
 | `crates/poolai-solana-adapter/` | Events v1, sidecar, mock RPC (FM-024), `poolai-events` + devnet submit (FM-033) | Solana deps лише в sidecar crate |
 
-### Galaxy Grid — модулі в коді (PH-S67, `src/grid/` + wire)
+### Job layer — модулі в коді (PH-S951, `src/job/`)
 
-Концепт: [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md). Протокол envelope: [`GRID_PROTOCOL_CONCEPT_2026-04-06.md`](../development/GRID_PROTOCOL_CONCEPT_2026-04-06.md).
+| Модуль | Шлях | Функція |
+|--------|------|---------|
+| **Types** | `src/job/types.rs` | `JobRecord`, `JobSpec`, `JobStatus`, lease epoch CAS |
+| **Store** | `src/job/store.rs` | JSON `JobStore`, `POOLAI_JOB_DATA_DIR` |
+| **Store SQLite** | `src/job/store_sqlite.rs` | `feature job-store-sqlite` → `jobs.db` |
+| **Store depth** | `src/job/store_depth.rs` | RAID persist depth stub + metrics (PH-S854) |
+| **Scheduler** | `src/job/scheduler.rs` | `schedule_with_grid_peer`, worker/vm bind |
+| **Lifecycle** | `src/job/lifecycle.rs` | state transition guards |
+| **Lease config** | `src/job/lease_config.rs` | TTL / renew interval from env (PH-S97/S111) |
+| **Lease acquire** | `src/job/lease_acquire.rs` | acquire/renew lease on record |
+| **Lease failover** | `src/job/lease_failover.rs` | worker-unhealthy, queue starvation, max runtime (PH-S524+) |
+| **Map** | `src/job/map.rs` | Grid envelope ↔ job spec/result |
+| **Domain events** | `src/job/domain_events.rs` | NDJSON epics (`JobCompleted`, …) |
+| **On-chain** | `src/job/onchain.rs` | emit hooks → `POOLAI_ONCHAIN_EVENTS_DIR` |
 
-| Модуль | Шлях | Функція | Тести / утиліти |
-|--------|------|---------|-----------------|
-| **Grid envelope** | `src/grid/envelope.rs` | `GridEnvelope` v1, `GridMessage` (Job/Result/MemoryShard/PeerStatus), `validate()` | `envelope` unit tests |
-| **Grid map** | `src/grid/map.rs` | map ↔ `PeerInfo`, RAID `put_artifact`, memory shard bodies | `map` unit tests |
-| **Grid dispatch** | `src/grid/dispatch.rs` | `ingest_envelope` → `JobStore` / `MemoryShardStore`; epics `emit_memory_updated`, `emit_seed_provided`; schedule via `schedule_with_grid_peer` | `dispatch` unit tests |
-| **Galaxy fee split** | `src/grid/galaxy_fee_split.rs` | primary **0.1%** (10 bps) + secondary **1–5%** admin (floor bps); `GalaxyFeeSplit` lamports | unit tests; `cargo bench --bench galaxy_fee_split_benchmarks` |
-| **Pricing oracle (stub + L2 fallback)** | `src/grid/galaxy_pricing_oracle.rs` | unit keys; TTL/SWR cache (L1 fresh/stale); L2 fallback + FORCE_FALLBACK; `POOLAI_GALAXY_PRICING_PROVIDERS` catalog (PH-S92); in-process metrics fresh/stale/forced_fallback (PH-S81/S83/S91); Prometheus gauges on `GET /metrics` (PH-S127) | unit tests (`galaxy_pricing_oracle`) |
-| **Protocol compat** | `src/grid/protocol_compat.rs` | matrix coordinator↔worker `1.x`; `negotiate()` на register-remote; `CompatStatus` + docs URL | unit tests; `tests/discovery_remote_register_integration.rs` |
-| **Network profile** | `src/grid/galaxy_network_profile.rs`, `galaxy_network_profile_store.rs`, `discovery.rs` | parse `metadata.network_profile` on register-remote (§8.1); startup hydrate persisted profiles (PH-S529); canonical JSON in peer metadata | unit tests; `tests/discovery_network_profile_integration.rs`, `tests/network_profile_hydrate_integration.rs` |
-| **Signed capability doc** | `src/grid/galaxy_capability_doc.rs` | ed25519 capability documents for telegram_edge; `expires_at` enforcement (PH-S527) | `tests/discovery_telegram_edge_capability_integration.rs` |
-| **Governance metrics** | `src/grid/galaxy_governance_metrics.rs`, `src/release/verify.rs` | Prometheus `poolai_release_verify_*`, `poolai_update_notify_pending` (Galaxy §9.2, PH-S528) | unit + `/metrics` scrape |
-| **Worker health** | `src/grid/galaxy_worker_health.rs` | peer health signals for scheduler bind / failover (PH-S524…S525) | `tests/jobs_scheduler_unhealthy_integration.rs`, `tests/jobs_worker_unhealthy_failover_integration.rs` |
-| **Verify sampling** | `src/grid/galaxy_verify_sampling.rs`, `verify_sampling_middleware.rs` | `POOLAI_GALAXY_VERIFY_BASE_SAMPLE_RATE` (§6.2, default `0.05`); middleware header + result ingest stub (PH-S142/S164) | unit + integration tests |
-| **Virtual nodes API** | `src/network/api/virtual_nodes.rs`, `discovery.rs` | register-remote/heartbeat, tasks, Telegram bind/webhook, pool join | `virtual_node_*_integration` |
-| **Virtual node services** | `src/services/virtual_node_task_service.rs`, `virtual_node_telegram_binding_service.rs` | task queue, Telegram seat bind (FM-016+) | integration tests |
-| **Signed release** | `src/release/`, `poolai-verify-release` | ed25519 manifest verify + artifact SHA-256 (PH-S66) | `release::verify` unit tests |
-| **Grid pricing API** | `src/network/api/grid.rs` | `GET /api/v1/grid/pricing` (task/model/unit); oracle from `galaxy_pricing_oracle` (PH-S78…S83) | `grid.rs` + `galaxy_pricing_oracle` tests |
-| **Job lease wire** | `src/job/types.rs`, `lease_config.rs`, `lease_acquire.rs`, `lease_failover.rs`, `src/network/api/jobs.rs` | TTL env; acquire/renew; worker-unhealthy + queue-starvation failover (PH-S524/S530); max runtime cap `POOLAI_JOB_MAX_TOTAL_RUNTIME_SECS` (PH-S526); PATCH CAS → `409 lease_epoch_rejected` | `lease_tests`, `jobs_api_contracts`, `jobs_failover_budget_integration` |
-| **Worker lease ticker** | `src/bin/poolai-worker.rs` | `LeaseRenewGuard` → periodic `POST /jobs/{id}/lease/renew`; payload `job_id` + `lease_epoch`; env `POOLAI_JOB_LEASE_RENEW_INTERVAL_SECS` (PH-S116, Galaxy §4.3.1.1) | `cargo test --bin poolai-worker` |
-| **OTel lease spans** | `src/observability/lease_trace.rs` | `job.lease.acquire` / `renew` / `reject` + `job.lease.*` attrs; wired store/jobs/grid/dispatch (PH-S126); contract PH-S124 | `observability_otel` (`--features otel`) |
-| **Prometheus export** | `src/observability/prometheus_export.rs` | `GET /metrics` pull model (FM-043); galaxy pricing + governance gauges (PH-S127/S528) | `observability_prometheus` tests |
+### UI / WASM crates (PH-S952)
+
+| Crate / модуль | Шлях | Функція |
+|----------------|------|---------|
+| **poolai-ui-core** | `crates/poolai-ui-core/` | Shared admin validators, formatters, panel HTML builders |
+| **admin_common_depth** | `crates/poolai-ui-core/src/admin_common_depth.rs` | table/empty wasm depth stub (PH-S930) |
+| **charts_depth** | `crates/poolai-ui-core/src/charts_depth.rs` | sparkline/line wasm depth (PH-S924) |
+| **stretch_depth** | `crates/poolai-ui-core/src/stretch_depth.rs` | ratio 96% stretch band stub (PH-S944) |
+| **digest_depth** | `crates/poolai-ui-core/src/digest_depth.rs` | FUNCTIONALITY_DIGEST band inventory (PH-S950) |
+| **grid panels** | `grid_verification.rs`, `grid_replication_pricing.rs`, `updates_compat.rs`, … | wasm-first admin Galaxy strips |
+| **poolai-ui-wasm** | `crates/poolai-ui-wasm/` | `wasm32` exports wrapping ui-core for browser admin glue (PH-S147+) |
+| **build** | `bin/build-ui-wasm.sh` | wasm build gate for admin panels |
+
+### Galaxy Grid — модулі в коді (PH-S950, `src/grid/` + wire)
+
+Концепт: [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md). Протокол envelope: [`GRID_PROTOCOL_CONCEPT_2026-04-06.md`](../development/GRID_PROTOCOL_CONCEPT_2026-04-06.md). Повний інвентар — `digest_depth::GRID_MODULE_STEMS` (57 stems).
+
+| Модуль | Шлях | Функція |
+|--------|------|---------|
+| **Grid envelope** | `src/grid/envelope.rs` | `GridEnvelope` v1, `GridMessage`, `validate()` |
+| **Grid map** | `src/grid/map.rs` | map ↔ `PeerInfo`, RAID artifacts, memory shard bodies |
+| **Grid dispatch** | `src/grid/dispatch.rs` | `ingest_envelope`, prefetch hooks, strict locality gate |
+| **Protocol compat** | `src/grid/protocol_compat.rs` | coordinator↔worker matrix `negotiate()` |
+| **Fee split** | `src/grid/galaxy_fee_split.rs` | primary 0.1% + secondary admin bps |
+| **Fee split depth** | `src/grid/galaxy_fee_split_depth.rs` | fee-split depth stub + wire |
+| **Fee split metrics** | `src/grid/galaxy_fee_split_metrics.rs` | JSON↔Prom `galaxy_fee_split_applied_total` |
+| **Pricing oracle** | `src/grid/galaxy_pricing_oracle.rs` | L1 cache + L2 fallback + provider catalog |
+| **Pricing depth** | `src/grid/galaxy_pricing_depth.rs` | pricing depth stub |
+| **Pricing metrics** | `src/grid/galaxy_pricing_metrics.rs` | oracle served/fresh/stale counters |
+| **Pricing provider metrics** | `src/grid/galaxy_pricing_provider_metrics.rs` | provider timeout / forced-fallback metrics |
+| **Settlement** | `src/grid/galaxy_settlement.rs` | Cleared / payout gate core |
+| **Settlement mode** | `src/grid/galaxy_settlement_mode.rs` | offline vs on-chain mode gate |
+| **Settlement metrics** | `src/grid/galaxy_settlement_metrics.rs` | settlement counters on grid result |
+| **Settlement on-chain** | `src/grid/galaxy_settlement_onchain.rs` | mock RPC submit on Cleared (PH-S568+) |
+| **Settlement on-chain depth** | `src/grid/galaxy_settlement_onchain_depth.rs` | on-chain depth stub |
+| **Payout batch queue** | `src/grid/galaxy_settlement_payout_batch_queue.rs` | offline payout batch queue |
+| **Payout depth** | `src/grid/galaxy_settlement_payout_depth.rs` | payout depth stub |
+| **Payout metrics** | `src/grid/galaxy_settlement_payout_metrics.rs` | payout-batch JSON↔Prom parity |
+| **Replication** | `src/grid/galaxy_replication.rs` | replication quorum helpers |
+| **Replication depth** | `src/grid/galaxy_replication_depth.rs` | replication depth stub |
+| **Replication metrics** | `src/grid/galaxy_replication_metrics.rs` | replication rate / quorum metrics |
+| **Replication quorum gate** | `src/grid/galaxy_replication_quorum_gate.rs` | strict-tier digest quorum before Cleared |
+| **Locality** | `src/grid/galaxy_locality.rs` | `locality_score`, scheduler rank stub |
+| **Locality metrics** | `src/grid/galaxy_locality_metrics.rs` | hot-tier promote/evict metrics |
+| **Locality hot-tier depth** | `src/grid/galaxy_locality_hot_tier_depth.rs` | hot-tier depth stub |
+| **Prefetch depth** | `src/grid/galaxy_prefetch_depth.rs` | prefetch policy depth stub |
+| **Prefetch metrics** | `src/grid/galaxy_prefetch_metrics.rs` | pull bytes / backpressure counters |
+| **Prefetch peer pull** | `src/grid/galaxy_prefetch_peer_pull.rs` | live seed shard pull wire |
+| **Trust score** | `src/grid/galaxy_trust_score.rs` | payout eligibility gate stub |
+| **Trust persist depth** | `src/grid/galaxy_trust_persist_depth.rs` | SQLite trust persist depth |
+| **Trust score store** | `src/grid/galaxy_trust_score_store.rs` | in-memory / JSON trust store |
+| **Trust score store SQLite** | `src/grid/galaxy_trust_score_store_sqlite.rs` | persisted trust scores (PH-S910) |
+| **Verification metrics** | `src/grid/galaxy_verification_metrics.rs` | mismatch / sample totals |
+| **Verification lifecycle depth** | `src/grid/galaxy_verification_lifecycle_depth.rs` | checker lifecycle depth |
+| **Verification checker jobs** | `src/grid/galaxy_verification_checker_jobs.rs` | shadow checker job submit |
+| **Verification replay** | `src/grid/galaxy_verification_replay.rs` | replay record + history wire |
+| **Verify sampling** | `src/grid/galaxy_verify_sampling.rs` | base sample rate middleware |
+| **Replay jobs** | `src/grid/galaxy_replay_jobs.rs` | replay job enqueue |
+| **Replay metrics** | `src/grid/galaxy_replay_metrics.rs` | replay pending resolved counters |
+| **Capability doc** | `src/grid/galaxy_capability_doc.rs` | ed25519 telegram_edge capability |
+| **Capability admission** | `src/grid/galaxy_capability_admission.rs` | signed capability gate |
+| **Capability admission depth** | `src/grid/galaxy_capability_admission_depth.rs` | admission depth stub |
+| **Capability admission metrics** | `src/grid/galaxy_capability_admission_metrics.rs` | unsigned rejected counter |
+| **Governance metrics** | `src/grid/galaxy_governance_metrics.rs` | release verify + update notify gauges |
+| **Governance depth** | `src/grid/galaxy_governance_depth.rs` | governance depth stub |
+| **Update policy** | `src/grid/galaxy_update_policy.rs` | `GET /grid/update-policy` env snapshot |
+| **Network profile** | `src/grid/galaxy_network_profile.rs` | parse `metadata.network_profile` |
+| **Network profile store** | `src/grid/galaxy_network_profile_store.rs` | persisted profiles hydrate |
+| **Network profile depth** | `src/grid/galaxy_network_profile_depth.rs` | profile depth stub |
+| **Worker health** | `src/grid/galaxy_worker_health.rs` | unhealthy peer signals for scheduler |
+| **Worker DTO** | `src/grid/galaxy_worker_dto.rs` | worker health DTO helpers |
+| **Routing policy** | `src/grid/galaxy_routing_policy.rs` | locality routing policy gate |
+| **Re-migrate policy** | `src/grid/galaxy_re_migrate_policy.rs` | re-migrate prefetch trigger |
+| **Security advisory** | `src/grid/galaxy_security_advisory.rs` | security advisory helpers |
+| **Fraud proof** | `src/grid/galaxy_fraud_proof.rs` | fraud proof stub |
+| **Protocol negotiation metrics** | `src/grid/galaxy_protocol_negotiation_metrics.rs` | compat negotiation counters |
+| **Solana depth** | `src/grid/solana_depth.rs` | settlement on-chain depth wire |
+| **Stand smoke parity** | `src/grid/stand_smoke_metrics_parity.rs` | JSON↔Prom parity band helpers |
+
+**Wire / API (Galaxy cross-ref):**
+
+| Область | Шлях | Примітка |
+|---------|------|----------|
+| Virtual nodes API | `src/network/api/virtual_nodes.rs`, `discovery.rs` | register-remote, tasks, Telegram bind |
+| Grid pricing API | `src/network/api/grid.rs` | `GET /api/v1/grid/pricing` (PH-S78+) |
+| Job lease wire | `src/network/api/jobs.rs` | acquire/renew/PATCH CAS |
+| Signed release | `src/release/`, `poolai-verify-release` | ed25519 manifest (PH-S66) |
+| OTel lease spans | `src/observability/lease_trace.rs` | PH-S124/S126 |
+| Prometheus export | `src/observability/prometheus_export.rs` | `GET /metrics` (FM-043) |
 
 **Admin UI (Galaxy ops, read-only):**
 
@@ -199,7 +288,7 @@
 | `POOLAI_GALAXY_MIN_TRUST_PAYOUT` | coordinator | Min `trust_score` 0–100 for `telegram_edge` auto payout gate (default `40`; PH-S130) |
 | `POOLAI_GALAXY_VERIFY_BASE_SAMPLE_RATE` | coordinator | Base `telegram_edge` verification sample rate 0.0..=1.0 (default `0.05`; PH-S142) |
 
-**Pricing/lease wire (PH-S94…S127):** lease MVP + grid CAS + worker ticker + E2E negatives (PH-S107…S118); renew-interval env (PH-S111); OTel lease span contract + instrumentation (PH-S124/S126); pricing oracle Prometheus gauges (PH-S127). **Migrating lifecycle E2E (PH-S133):** `e2e/tests/jobs_migrating.spec.ts` — Playwright PATCH `leased → migrating → executing` + `executing ↔ migrating` roundtrip (PH-S104 wire); `npm run test:ci` includes `jobs_migrating`. **Protocol middleware E2E (PH-S134):** `e2e/tests/protocol_middleware.spec.ts` — Playwright `POST /discovery/register-remote` with `X-PoolAI-Protocol` (accepted compat headers; unsupported → 403 `protocol_unsupported`); `npm run test:ci` includes `protocol_middleware`. **Locality (PH-S128/S138):** `src/grid/galaxy_locality.rs` — `locality_score` + `rank_workers_by_locality` scheduler stub; integration fixture `tests/galaxy_locality_rank_integration.rs` (PH-S138); no prefetch wire. **Prefetch (PH-S129/S136):** `src/grid/dispatch.rs` — `SeedInventoryEntry` DTO + `plan_prefetch` / `noop_prefetch_hook`; `PrefetchPolicyConfig::from_env()` (`POOLAI_GALAXY_LOCALITY_MODE`, `POOLAI_GALAXY_PREFETCH_DEADLINE_MS`); unit tests; no live enqueue wire. **Trust gate (PH-S130/S137):** `src/grid/galaxy_trust_score.rs` + `dispatch.rs` result path — `trust_score` 0–100 settlement gate stub (`PayoutEligible` / `PayoutHeld` / `NotApplicable`); optional `metrics.trust_score` on grid result; Prometheus gauges `galaxy_trust_payout_eligible_total` / `galaxy_trust_payout_held_total` (PH-S137); unit tests; no payout wire. **Wallet bind (PH-S131):** `virtual_node_telegram_wallet_service.rs` + `POST /api/v1/virtual-nodes/telegram/wallet` — `telegram_user_id` + `chat_id` + `payout_pubkey` (`chain=solana`); stub `verified=true`; integration tests; no on-chain wire. **Wallet GET (PH-S135):** `GET /api/v1/virtual-nodes/telegram/wallets/{telegram_user_id}` — read-only lookup; OpenAPI `getTelegramWallet`; 404 when unbound; `poolai-openapi-gap-audit` 0. **Wallet bind E2E (PH-S139):** `e2e/tests/telegram_wallet.spec.ts` — Playwright POST wallet verified bind + invalid pubkey → 400; `npm run test:ci` includes `telegram_wallet`. **Network profile (PH-S132/S140):** `POOLAI_GALAXY_GRID.md` §8.1 — `network_profile` wire schema (`region`, `latency_ms_p50`, `bandwidth_mbps`, `egress_policy`, SmallWorld hints); cross-link §5.2 locality subset → `src/grid/galaxy_locality.rs` (`LocalityNetworkProfile`). **Register-remote parse (PH-S140):** `src/grid/galaxy_network_profile.rs` — parse `metadata.network_profile` on `POST /api/v1/discovery/register-remote` (object or JSON string); canonical JSON in peer metadata; `400` on invalid region; `tests/discovery_network_profile_integration.rs`. **Verification metrics (PH-S175…S177):** `galaxy_verification_metrics.rs` + `galaxy_replay_metrics.rs` — mismatch / sample total / replay pending on grid result → `/metrics` via `refresh_galaxy_verification_gauges`; integration tests `galaxy_verification_*_integration.rs`, `galaxy_replay_pending_integration.rs`. **Черга §5.12 (10 відкритих PH-S178…S187):** settlement/replication/verification match/pricing market min/trust score/locality-prefetch metrics stubs — FM §5.12 · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md). [`RUST_RATIO_STRATEGY_2026-06-13.md`](../development/RUST_RATIO_STRATEGY_2026-06-13.md). Роадмеп: [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
+**Band 30 digest sync (PH-S950…S959):** повний інвентар `src/grid/` (57 stems), `src/job/`, `crates/poolai-ui-{core,wasm}`, `src/bin/` ops bins; OpenAPI gap audit **0** (PH-S954); rust_ratio zriz PH-S955; master backlog band 31 → PH-S960…S969 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · [`RUST_RATIO_STRATEGY_2026-06-13.md`](../development/RUST_RATIO_STRATEGY_2026-06-13.md) · [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
 
 ---
 

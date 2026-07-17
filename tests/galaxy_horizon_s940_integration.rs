@@ -30,7 +30,11 @@ fn horizon_s940_band_e2e_stretch_ops_ph_s949() {
     let ratio_json: serde_json::Value =
         serde_json::from_str(include_str!("../docs/development/rust_ratio.json"))
             .expect("rust_ratio.json");
-    assert_eq!(ratio_json["sprint"], "PH-S945");
+    let sprint = ratio_json["sprint"].as_str().unwrap_or("");
+    assert!(
+        sprint == "PH-S955" || sprint == "PH-S945",
+        "rust_ratio sprint should reflect band 29 (PH-S945) or band 30 (PH-S955), got {sprint}"
+    );
     assert!(ratio_json["stretch_spirit_gate_met"].is_boolean());
     assert!(ratio_json["ops_shell_canon_met"].as_bool().unwrap_or(false));
     assert!(ratio_json["e2e_ts_loc_reduction"].as_i64().unwrap_or(0) >= 0);
