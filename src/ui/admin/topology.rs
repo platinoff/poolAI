@@ -30,7 +30,7 @@ pub async fn admin_topology() -> axum::response::Html<String> {
       </div>
       
       <div id="topology-nodes-list" class="admin-table-container">
-        <table class="admin-table">
+        <table class="admin-table" aria-label="Topology overview">
           <thead>
             <tr>
               <th data-i18n="admin.topo.col.nodeId">Node ID</th>
@@ -57,7 +57,7 @@ pub async fn admin_topology() -> axum::response::Html<String> {
         <h4 data-i18n="admin.topo.sectionLatency">Latency Matrix</h4>
       </div>
       <div id="topology-latency-matrix" class="admin-table-container">
-        <table class="admin-table">
+        <table class="admin-table" aria-label="Latency matrix">
           <thead>
             <tr>
               <th data-i18n="admin.topo.col.from">From Node</th>
@@ -107,6 +107,10 @@ pub async fn admin_topology() -> axum::response::Html<String> {
         `;
         tbody.appendChild(row);
       }}
+      if (typeof adminInitTablesIn === 'function') {{
+        const container = document.getElementById('topology-nodes-list');
+        if (container) adminInitTablesIn(container);
+      }}
     }}
 
     function renderLatencyTableFromCache() {{
@@ -125,6 +129,10 @@ pub async fn admin_topology() -> axum::response::Html<String> {
           <td>${{formatLatencyMs(latency)}}</td>
         `;
         tbody.appendChild(row);
+      }}
+      if (typeof adminInitTablesIn === 'function') {{
+        const container = document.getElementById('topology-latency-matrix');
+        if (container) adminInitTablesIn(container);
       }}
     }}
 
@@ -275,7 +283,7 @@ pub async fn admin_topology() -> axum::response::Html<String> {
         if (layout.heatmap_html) {{
           heatmap.innerHTML = layout.heatmap_html;
         }} else if (!Object.keys(topologyNodesCache).length) {{
-          heatmap.innerHTML = '<p class="muted">' + escapeHtml(T('admin.topo.noNodes', 'No nodes found')) + '</p>';
+          heatmap.innerHTML = adminEmptyStateHtml(T('admin.topo.noNodes', 'No nodes found'));
         }} else {{
           heatmap.innerHTML = '';
         }}

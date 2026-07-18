@@ -1632,7 +1632,9 @@ fn admin_styles_btn_primary_contrast_rules() {
 mod a11y_tests {
     use super::admin_layout;
     use crate::ui::admin::config::admin_config;
+    use crate::ui::admin::jobs::admin_jobs;
     use crate::ui::admin::security::admin_security;
+    use crate::ui::admin::tenants::admin_tenants;
     use crate::ui::admin::users::admin_users;
 
     #[test]
@@ -1699,5 +1701,29 @@ mod a11y_tests {
         assert!(html.contains("id=\"createWorkerModal\""));
         assert!(!html.contains("aria-modal=\"true\" aria-hidden=\"true\""));
         assert!(html.contains("aria-modal=\"false\" aria-hidden=\"true\""));
+    }
+
+    #[tokio::test]
+    async fn admin_tables_forms_band39_tenants_ph_s1029() {
+        let html = admin_tenants().await.0;
+        assert!(html.contains("adminEmptyStateHtml"));
+        assert!(html.contains("adminInitTablesIn"));
+        assert!(html.contains("admin-table-container"));
+        assert!(html.contains("aria-required=\"true\""));
+    }
+
+    #[tokio::test]
+    async fn admin_tables_forms_band39_security_ph_s1030() {
+        let html = admin_security().await.0;
+        assert!(html.contains("adminEmptyStateHtml"));
+        assert!(html.contains("admin-table-container"));
+        assert!(html.contains("adminInitTablesIn"));
+    }
+
+    #[tokio::test]
+    async fn admin_tables_forms_band39_jobs_ph_s1031() {
+        let html = admin_jobs().await.0;
+        assert!(html.contains("admin-table-container"));
+        assert!(html.contains("aria-label="));
     }
 }

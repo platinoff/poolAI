@@ -20,7 +20,7 @@ pub async fn admin_seed_inventory() -> Html<String> {
       }
       const entries = Array.isArray(snapshot.entries) ? snapshot.entries : [];
       if (!entries.length) {
-        el.innerHTML = '<p class="muted">' + escapeHtml(T('admin.seedInventory.empty', 'No seed inventory entries.')) + '</p>';
+        el.innerHTML = adminEmptyStateHtml(T('admin.seedInventory.empty', 'No seed inventory entries.'));
         return;
       }
       let rows = '';
@@ -38,11 +38,12 @@ pub async fn admin_seed_inventory() -> Html<String> {
       el.innerHTML =
         '<p class="muted">' + escapeHtml(T('admin.seedInventory.generated', 'Generated')) + ': ' +
         escapeHtml(String(snapshot.generated_at || '—')) + '</p>' +
-        '<table class="admin-table" aria-label="' + escapeHtml(T('admin.seedInventory.table', 'Seed inventory')) + '">' +
-        '<thead><tr><th>' + escapeHtml(T('admin.seedInventory.colPeer', 'Peer')) + '</th>' +
-        '<th>' + escapeHtml(T('admin.seedInventory.colShards', 'Shards')) + '</th>' +
-        '<th>' + escapeHtml(T('admin.seedInventory.colRam', 'Hot RAM bytes')) + '</th></tr></thead>' +
-        '<tbody>' + rows + '</tbody></table>';
+        '<div class="admin-table-container"><table class="admin-table" aria-label="' + escapeHtml(T('admin.seedInventory.table', 'Seed inventory')) + '">' +
+        '<thead><tr><th scope="col">' + escapeHtml(T('admin.seedInventory.colPeer', 'Peer')) + '</th>' +
+        '<th scope="col">' + escapeHtml(T('admin.seedInventory.colShards', 'Shards')) + '</th>' +
+        '<th scope="col">' + escapeHtml(T('admin.seedInventory.colRam', 'Hot RAM bytes')) + '</th></tr></thead>' +
+        '<tbody>' + rows + '</tbody></table></div>';
+      if (typeof adminInitTablesIn === 'function') adminInitTablesIn(el);
     }
 
     async function loadSeedInventoryPanel() {

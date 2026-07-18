@@ -70,11 +70,11 @@ pub async fn admin_config() -> Html<String> {
         <form id="generalConfigForm" onsubmit="handleSaveConfig(event, 'general')">
           <div class="form-group">
             <label for="configName">${escapeHtml(T('admin.cfg.gen.systemName', 'System Name'))}</label>
-            <input type="text" id="configName" name="name" value="${escapeHtml(config.system?.name || '')}" required />
+            <input type="text" id="configName" name="name" value="${escapeHtml(config.system?.name || '')}" required aria-required="true" />
           </div>
           <div class="form-group">
             <label for="configLogLevel">${escapeHtml(T('admin.cfg.gen.logLevel', 'Log Level'))}</label>
-            <select id="configLogLevel" name="log_level" required>
+            <select id="configLogLevel" name="log_level" required aria-required="true">
               <option value="trace" ${config.system?.log_level === 'trace' ? 'selected' : ''}>${escapeHtml(T('admin.cfg.log.trace', 'Trace'))}</option>
               <option value="debug" ${config.system?.log_level === 'debug' ? 'selected' : ''}>${escapeHtml(T('admin.cfg.log.debug', 'Debug'))}</option>
               <option value="info" ${config.system?.log_level === 'info' ? 'selected' : ''}>${escapeHtml(T('admin.cfg.log.info', 'Info'))}</option>
@@ -84,15 +84,15 @@ pub async fn admin_config() -> Html<String> {
           </div>
           <div class="form-group">
             <label for="configMaxWorkers">${escapeHtml(T('admin.cfg.gen.maxWorkers', 'Max Workers'))}</label>
-            <input type="number" id="configMaxWorkers" name="max_workers" value="${config.system?.max_workers || 16}" min="1" max="1024" required />
+            <input type="number" id="configMaxWorkers" name="max_workers" value="${config.system?.max_workers || 16}" min="1" max="1024" required aria-required="true" />
           </div>
           <div class="form-group">
             <label for="configQueueSize">${escapeHtml(T('admin.cfg.gen.queueSize', 'Queue Size'))}</label>
-            <input type="number" id="configQueueSize" name="queue_size" value="${config.system?.queue_size || 2000}" min="1" max="100000" required />
+            <input type="number" id="configQueueSize" name="queue_size" value="${config.system?.queue_size || 2000}" min="1" max="100000" required aria-required="true" />
           </div>
           <div class="form-group">
             <label for="configMetricsInterval">${escapeHtml(T('admin.cfg.gen.metricsInterval', 'Metrics Interval (seconds)'))}</label>
-            <input type="number" id="configMetricsInterval" name="metrics_interval" value="${config.system?.metrics_interval || 10}" min="1" max="3600" required />
+            <input type="number" id="configMetricsInterval" name="metrics_interval" value="${config.system?.metrics_interval || 10}" min="1" max="3600" required aria-required="true" />
           </div>
           <button type="submit" class="btn btn-primary">${escapeHtml(T('admin.cfg.saveBtn', 'Save Configuration'))}</button>
         </form>
@@ -107,11 +107,11 @@ pub async fn admin_config() -> Html<String> {
         <form id="performanceConfigForm" onsubmit="handleSaveConfig(event, 'performance')">
           <div class="form-group">
             <label for="configPoolMaxWorkers">${escapeHtml(T('admin.cfg.perf.poolMaxWorkers', 'Pool Max Workers'))}</label>
-            <input type="number" id="configPoolMaxWorkers" name="max_workers" value="${config.pool?.max_workers || 16}" min="1" max="1024" required />
+            <input type="number" id="configPoolMaxWorkers" name="max_workers" value="${config.pool?.max_workers || 16}" min="1" max="1024" required aria-required="true" />
           </div>
           <div class="form-group">
             <label for="configPoolQueueSize">${escapeHtml(T('admin.cfg.perf.poolQueue', 'Pool Queue Size'))}</label>
-            <input type="number" id="configPoolQueueSize" name="queue_size" value="${config.pool?.queue_size || 2000}" min="1" max="100000" required />
+            <input type="number" id="configPoolQueueSize" name="queue_size" value="${config.pool?.queue_size || 2000}" min="1" max="100000" required aria-required="true" />
           </div>
           <div class="form-group">
             <label for="configPoolAutoScaling">
@@ -121,11 +121,11 @@ pub async fn admin_config() -> Html<String> {
           </div>
           <div class="form-group">
             <label for="configPoolScalingThreshold">${escapeHtml(T('admin.cfg.perf.scalingThreshold', 'Scaling Threshold (0.0-1.0)'))}</label>
-            <input type="number" id="configPoolScalingThreshold" name="scaling_threshold" value="${config.pool?.scaling_threshold || 0.8}" min="0" max="1" step="0.1" required />
+            <input type="number" id="configPoolScalingThreshold" name="scaling_threshold" value="${config.pool?.scaling_threshold || 0.8}" min="0" max="1" step="0.1" required aria-required="true" />
           </div>
           <div class="form-group">
             <label for="configPoolRequestTimeout">${escapeHtml(T('admin.cfg.perf.requestTimeout', 'Request Timeout (seconds)'))}</label>
-            <input type="number" id="configPoolRequestTimeout" name="request_timeout" value="${config.pool?.request_timeout || 30}" min="1" max="3600" required />
+            <input type="number" id="configPoolRequestTimeout" name="request_timeout" value="${config.pool?.request_timeout || 30}" min="1" max="3600" required aria-required="true" />
           </div>
           <button type="submit" class="btn btn-primary">${escapeHtml(T('admin.cfg.saveBtn', 'Save Configuration'))}</button>
         </form>
@@ -165,15 +165,15 @@ pub async fn admin_config() -> Html<String> {
         <form id="monitoringConfigForm" onsubmit="handleSaveConfig(event, 'monitoring')">
           <div class="form-group">
             <label for="configMetricsIntervalMon">${escapeHtml(T('admin.cfg.mon.metricsInterval', 'Metrics Interval (seconds)'))}</label>
-            <input type="number" id="configMetricsIntervalMon" name="metrics_interval" value="${config.monitoring?.metrics_interval || 10}" min="1" max="3600" required />
+            <input type="number" id="configMetricsIntervalMon" name="metrics_interval" value="${config.monitoring?.metrics_interval || 10}" min="1" max="3600" required aria-required="true" />
           </div>
           <div class="form-group">
             <label for="configAlertThreshold">${escapeHtml(T('admin.cfg.mon.alertThreshold', 'Alert Threshold (0.0-1.0)'))}</label>
-            <input type="number" id="configAlertThreshold" name="alert_threshold" value="${config.monitoring?.alert_threshold || 0.8}" min="0" max="1" step="0.1" required />
+            <input type="number" id="configAlertThreshold" name="alert_threshold" value="${config.monitoring?.alert_threshold || 0.8}" min="0" max="1" step="0.1" required aria-required="true" />
           </div>
           <div class="form-group">
             <label for="configRetentionDays">${escapeHtml(T('admin.cfg.mon.retentionDays', 'Retention Days'))}</label>
-            <input type="number" id="configRetentionDays" name="retention_days" value="${config.monitoring?.retention_days || 30}" min="1" max="365" required />
+            <input type="number" id="configRetentionDays" name="retention_days" value="${config.monitoring?.retention_days || 30}" min="1" max="365" required aria-required="true" />
           </div>
           <div class="form-group">
             <label for="configDetailedLogging">
@@ -200,19 +200,19 @@ pub async fn admin_config() -> Html<String> {
           </div>
           <div class="form-group">
             <label for="configGpuMemoryLimit">${escapeHtml(T('admin.cfg.gpu.memLimit', 'GPU Memory Limit (MB)'))}</label>
-            <input type="number" id="configGpuMemoryLimit" name="memory_limit" value="${config.gpu?.memory_limit || 8192}" min="256" max="131072" required />
+            <input type="number" id="configGpuMemoryLimit" name="memory_limit" value="${config.gpu?.memory_limit || 8192}" min="256" max="131072" required aria-required="true" />
           </div>
           <div class="form-group">
             <label for="configGpuTemperatureLimit">${escapeHtml(T('admin.cfg.gpu.tempLimit', 'Temperature Limit (°C)'))}</label>
-            <input type="number" id="configGpuTemperatureLimit" name="temperature_limit" value="${config.gpu?.temperature_limit || 85}" min="50" max="120" required />
+            <input type="number" id="configGpuTemperatureLimit" name="temperature_limit" value="${config.gpu?.temperature_limit || 85}" min="50" max="120" required aria-required="true" />
           </div>
           <div class="form-group">
             <label for="configGpuPowerLimit">${escapeHtml(T('admin.cfg.gpu.powerLimit', 'Power Limit (Watts)'))}</label>
-            <input type="number" id="configGpuPowerLimit" name="power_limit" value="${config.gpu?.power_limit || 200}" min="50" max="1000" required />
+            <input type="number" id="configGpuPowerLimit" name="power_limit" value="${config.gpu?.power_limit || 200}" min="50" max="1000" required aria-required="true" />
           </div>
           <div class="form-group">
             <label for="configGpuCount">${escapeHtml(T('admin.cfg.gpu.count', 'GPU Count'))}</label>
-            <input type="number" id="configGpuCount" name="gpu_count" value="${config.gpu?.gpu_count || 1}" min="1" max="16" required />
+            <input type="number" id="configGpuCount" name="gpu_count" value="${config.gpu?.gpu_count || 1}" min="1" max="16" required aria-required="true" />
           </div>
           <button type="submit" class="btn btn-primary">${escapeHtml(T('admin.cfg.saveBtn', 'Save Configuration'))}</button>
         </form>
@@ -227,7 +227,7 @@ pub async fn admin_config() -> Html<String> {
         <form id="healthConfigForm" onsubmit="handleSaveConfig(event, 'health')">
           <div class="form-group">
             <label for="configExpectedWorkers">${escapeHtml(T('admin.cfg.health.expectedWorkers', 'Expected Workers'))}</label>
-            <input type="number" id="configExpectedWorkers" name="expected_workers" value="${config.health?.expected_workers || 8}" min="1" max="1024" required />
+            <input type="number" id="configExpectedWorkers" name="expected_workers" value="${config.health?.expected_workers || 8}" min="1" max="1024" required aria-required="true" />
             <small class="form-hint">${escapeHtml(T('admin.cfg.health.hint', 'Number of workers expected for health checks'))}</small>
           </div>
           <button type="submit" class="btn btn-primary">${escapeHtml(T('admin.cfg.saveBtn', 'Save Configuration'))}</button>

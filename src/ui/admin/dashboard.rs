@@ -146,7 +146,7 @@ pub async fn admin_dashboard() -> Html<String> {
       const el = document.getElementById('active-alerts');
       if (!el) return;
       if (!data || data.length === 0) {
-        el.innerHTML = '<div class="muted">' + escapeHtml(T('admin.dash.noAlerts', 'No active alerts')) + '</div>';
+        el.innerHTML = adminEmptyStateHtml(T('admin.dash.noAlerts', 'No active alerts'));
         return;
       }
       el.innerHTML = data.map(alert => {
@@ -168,7 +168,7 @@ pub async fn admin_dashboard() -> Html<String> {
       const el = document.getElementById('recent-activity');
       if (!el) return;
       if (!data || data.length === 0) {
-        el.innerHTML = '<div class="muted">' + escapeHtml(T('admin.dash.noActivity', 'No recent activity')) + '</div>';
+        el.innerHTML = adminEmptyStateHtml(T('admin.dash.noActivity', 'No recent activity'));
         return;
       }
       el.innerHTML = data.map(event => `

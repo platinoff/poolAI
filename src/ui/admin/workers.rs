@@ -182,8 +182,8 @@ pub async fn admin_workers() -> Html<String> {
             </div>
             <form id="createWorkerForm" onsubmit="handleCreateWorker(event)">
               <div class="form-group">
-                <label for="workerId"><span data-i18n="workers.label.id">Worker ID</span> <span class="required">*</span></label>
-                <input type="text" id="workerId" name="worker_id" required data-i18n-placeholder="workers.ph.id" placeholder="worker-001" pattern="[a-zA-Z0-9_-]+" />
+                <label for="workerId"><span data-i18n="workers.label.id">Worker ID</span> <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="workerId" name="worker_id" required aria-required="true" data-i18n-placeholder="workers.ph.id" placeholder="worker-001" pattern="[a-zA-Z0-9_-]+" />
                 <small class="form-hint" data-i18n="admin.wrk.hintId">Alphanumeric, hyphens, and underscores only</small>
               </div>
               <div class="form-group">

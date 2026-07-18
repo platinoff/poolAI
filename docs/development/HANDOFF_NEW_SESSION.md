@@ -1,8 +1,27 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-18 (band 38 **PH-S1019…S1028** ✅ · horizon bands 39–47)
+**Оновлено:** 2026-07-18 (band 39 **PH-S1029…S1038** ✅ · horizon bands 40–47)
 
-**Наступна сесія:** **`абракадабра`** — project scan → band 39.
+**Наступна сесія:** **`абракадабра`** — project scan → band 40.
+
+## Band 39 — Admin tables/forms polish (PH-S1029…S1038, ✅)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1029** | Empty-state parity (tenants, security) |
+| **PH-S1030** | Security tables a11y polish |
+| **PH-S1031** | Tenants + jobs table containers |
+| **PH-S1032** | Instances + topology table init |
+| **PH-S1033** | Grid panel tables (network/seed/advisories) |
+| **PH-S1034** | Raid artifacts table polish |
+| **PH-S1035** | Modal form `aria-required` parity |
+| **PH-S1036** | Config + dashboard forms/empty states |
+| **PH-S1037** | `admin_tables_forms_depth` stub |
+| **PH-S1038** | Band close |
+
+**§5.12:** **0** відкритих (band 39 ✅). **Vision:** rev **311**.
+
+**PH-S1038 ✅ (2026-07-18):** FM-019 adoption — `adminEmptyStateHtml`/`adminInitTablesIn`/`aria-label` across admin tables; modal `aria-required`; `galaxy_horizon_s1029_integration`; vision **rev 311**.
 
 ## Band 38 — UI/debug polish (PH-S1019…S1028, ✅)
 

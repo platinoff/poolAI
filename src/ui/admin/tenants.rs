@@ -26,18 +26,18 @@ pub async fn admin_tenants() -> Html<String> {
       const el = document.getElementById('tenants-list');
       if (!el) return;
       if (!tenants || tenants.length === 0) {
-        el.innerHTML = '<div class="muted">' + escapeHtml(T('admin.tenants.empty', 'No tenants found')) + '</div>';
+        el.innerHTML = adminEmptyStateHtml(T('admin.tenants.empty', 'No tenants found'));
         return;
       }
       el.innerHTML = `
-        <table class="admin-table">
+        <div class="admin-table-container"><table class="admin-table" aria-label="${escapeHtml(T('admin.tenants.section', 'Tenants'))}">
           <thead>
             <tr>
-              <th>${escapeHtml(T('admin.tenants.col.name', 'Name'))}</th>
-              <th>${escapeHtml(T('admin.tenants.col.id', 'ID'))}</th>
-              <th>${escapeHtml(T('admin.tenants.col.status', 'Status'))}</th>
-              <th>${escapeHtml(T('admin.tenants.col.resources', 'Resources'))}</th>
-              <th>${escapeHtml(T('admin.tenants.col.actions', 'Actions'))}</th>
+              <th scope="col">${escapeHtml(T('admin.tenants.col.name', 'Name'))}</th>
+              <th scope="col">${escapeHtml(T('admin.tenants.col.id', 'ID'))}</th>
+              <th scope="col">${escapeHtml(T('admin.tenants.col.status', 'Status'))}</th>
+              <th scope="col">${escapeHtml(T('admin.tenants.col.resources', 'Resources'))}</th>
+              <th scope="col" class="admin-table-actions-col" data-no-sort="1">${escapeHtml(T('admin.tenants.col.actions', 'Actions'))}</th>
             </tr>
           </thead>
           <tbody>
@@ -54,8 +54,9 @@ pub async fn admin_tenants() -> Html<String> {
               </tr>
             `).join('')}
           </tbody>
-        </table>
+        </table></div>
       `;
+      if (typeof adminInitTablesIn === 'function') adminInitTablesIn(el);
     }
     
     function showCreateTenantModal() {
@@ -244,8 +245,8 @@ pub async fn admin_tenants() -> Html<String> {
             </div>
             <form id="createTenantForm" onsubmit="handleCreateTenant(event)">
               <div class="form-group">
-                <label for="tenantName"><span data-i18n="admin.tenants.label.name">Tenant Name</span> <span class="required">*</span></label>
-                <input type="text" id="tenantName" name="name" required data-i18n-placeholder="admin.tenants.ph.name" placeholder="tenant-abc" />
+                <label for="tenantName"><span data-i18n="admin.tenants.label.name">Tenant Name</span> <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="tenantName" name="name" required aria-required="true" data-i18n-placeholder="admin.tenants.ph.name" placeholder="tenant-abc" />
               </div>
               <div class="form-group">
                 <label for="tenantMaxWorkers" data-i18n="admin.tenants.label.maxWorkers">Max Workers</label>
@@ -295,8 +296,8 @@ pub async fn admin_tenants() -> Html<String> {
             <form id="editTenantForm" onsubmit="handleEditTenant(event)">
               <input type="hidden" id="editTenantId" />
               <div class="form-group">
-                <label for="editTenantName"><span data-i18n="admin.tenants.label.name">Tenant Name</span> <span class="required">*</span></label>
-                <input type="text" id="editTenantName" name="name" required />
+                <label for="editTenantName"><span data-i18n="admin.tenants.label.name">Tenant Name</span> <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="editTenantName" name="name" required aria-required="true" />
               </div>
               <div class="form-group">
                 <label for="editTenantMaxWorkers" data-i18n="admin.tenants.label.maxWorkers">Max Workers</label>

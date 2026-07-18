@@ -27,7 +27,7 @@ pub async fn admin_instances() -> axum::response::Html<String> {
         <button type="button" class="btn btn-primary" onclick="previewPlacement()" data-i18n="admin.inst.previewBtn">Preview Placement</button>
       </div>
       <div id="placement-previews" class="admin-table-container">
-        <table class="admin-table">
+        <table class="admin-table" aria-label="Placement preview">
           <thead>
             <tr>
               <th data-i18n="admin.inst.col.strategy">Strategy</th>
@@ -74,6 +74,7 @@ pub async fn admin_instances() -> axum::response::Html<String> {
           deleteInstance(btn.getAttribute('data-instance-delete'));
         });
       });
+      if (typeof adminInitTablesIn === 'function') adminInitTablesIn(el);
     }
 
     async function loadInstances() {
@@ -138,6 +139,10 @@ pub async fn admin_instances() -> axum::response::Html<String> {
             <td>${preview.error ? escapeHtml(preview.error) : '-'}</td>
           `;
           tbody.appendChild(row);
+        }
+        if (typeof adminInitTablesIn === 'function') {
+          const container = document.getElementById('placement-previews');
+          if (container) adminInitTablesIn(container);
         }
       } catch (error) {
         console.error('Error getting placement previews:', error);

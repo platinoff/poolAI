@@ -3,93 +3,93 @@
   "items": [
     {
       "category": "closed",
-      "id": "PH-S1028",
+      "id": "PH-S1038",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "galaxy_horizon_s1019_integration`; HANDOFF/NEXT",
-      "title": "UI debug band close"
+      "summary": "galaxy_horizon_s1029_integration`; HANDOFF/NEXT",
+      "title": "Tables/forms band close"
     },
     {
       "category": "closed",
-      "id": "PH-S1027",
+      "id": "PH-S1037",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "-lc` + approved verbs; RUN_LOCAL note",
-      "title": "poolai-msys.ps1 hardening"
+      "summary": "depth enum + FM band 39 markers",
+      "title": "ui-core depth stub + docs"
     },
     {
       "category": "closed",
-      "id": "PH-S1026",
+      "id": "PH-S1036",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "toast/announce on power action; save last_run",
-      "title": "Ops power feedback UX"
+      "summary": "aria-required` on required fields; dashboard empty states",
+      "title": "Config + dashboard forms/tables"
     },
     {
       "category": "closed",
-      "id": "PH-S1025",
+      "id": "PH-S1035",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "design_tokens` parity note + unit gate",
-      "title": "Design tokens audit stub"
+      "summary": "aria-required` + `aria-hidden` on `*",
+      "title": "Modal form a11y"
     },
     {
       "category": "closed",
-      "id": "PH-S1024",
+      "id": "PH-S1034",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "fix `duplicate_macro_attributes` on PH-S920 tests",
-      "title": "admin mod.rs duplicate test attr"
+      "summary": "container, aria-label, empty state",
+      "title": "Raid artifacts table"
     },
     {
       "category": "closed",
-      "id": "PH-S1023",
+      "id": "PH-S1033",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "from_timestamp_opt` → `DateTime::from_timestamp",
-      "title": "chrono deprecations ui-core"
+      "summary": "empty → `adminEmptyStateHtml`; table init",
+      "title": "Grid panel tables"
     },
     {
       "category": "closed",
-      "id": "PH-S1022",
+      "id": "PH-S1032",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "dispatch/grid/admin unused imports; `cargo clippy -D warnings` scope",
-      "title": "Clippy unused imports batch"
+      "summary": "aria-label, container, `adminInitTablesIn",
+      "title": "Instances + topology tables"
     },
     {
       "category": "closed",
-      "id": "PH-S1021",
+      "id": "PH-S1031",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "/ui` shell power entry → same ops API",
-      "title": "Home UI power shortcut"
+      "summary": "container, aria-label, striped, explicit init",
+      "title": "Tenants + jobs tables"
     },
     {
       "category": "closed",
-      "id": "PH-S1020",
+      "id": "PH-S1030",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "showModal parity; labeled Power btn; i18n UA/EN",
-      "title": "Admin power modal polish"
+      "summary": "aria-label, container, `adminInitTablesIn`, actions `data-no-sort",
+      "title": "Security tables polish"
     },
     {
       "category": "closed",
-      "id": "PH-S1019",
+      "id": "PH-S1029",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "dropdown shutdown/reboot; localStorage; a11y keyboard",
-      "title": "Vision power menu polish"
+      "summary": "tenants + security OAuth/SAML/policies → `adminEmptyStateHtml",
+      "title": "Empty-state parity tier 1"
     },
     {
       "category": "closed",

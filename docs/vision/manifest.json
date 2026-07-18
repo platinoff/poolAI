@@ -2300,11 +2300,17 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_owner_ops_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_ui_debug_depth_rs"
     }
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S1028",
+  "last_sprint_closed": "PH-S1038",
   "layers": [
     {
       "id": "L0",
@@ -9464,9 +9470,23 @@
       "label": "ops_power_integration.rs",
       "layer": "L3",
       "path": "tests/ops_power_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_ui_debug_depth_rs",
+      "label": "ui_debug_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/ui_debug_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1019_integration_rs",
+      "label": "galaxy_horizon_s1019_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1019_integration.rs"
     }
   ],
-  "revision": 310,
+  "revision": 311,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -18046,94 +18066,94 @@
       "title": "Ops power band close"
     },
     {
-      "acceptance": "dropdown shutdown/reboot; localStorage; a11y keyboard",
-      "deps": "docs/vision/",
-      "id": "PH-S1019",
-      "open": false,
-      "row": 954,
-      "status": "closed",
-      "title": "Vision power menu polish"
-    },
-    {
-      "acceptance": "showModal parity; labeled Power btn; i18n UA/EN",
+      "acceptance": "tenants + security OAuth/SAML/policies → `adminEmptyStateHtml",
       "deps": "src/ui/admin",
-      "id": "PH-S1020",
+      "id": "PH-S1029",
       "open": false,
-      "row": 955,
+      "row": 964,
       "status": "closed",
-      "title": "Admin power modal polish"
+      "title": "Empty-state parity tier 1"
     },
     {
-      "acceptance": "/ui` shell power entry → same ops API",
-      "deps": "src/ui/",
-      "id": "PH-S1021",
+      "acceptance": "aria-label, container, `adminInitTablesIn`, actions `data-no-sort",
+      "deps": "src/ui/admin/security.rs",
+      "id": "PH-S1030",
       "open": false,
-      "row": 956,
+      "row": 965,
       "status": "closed",
-      "title": "Home UI power shortcut"
+      "title": "Security tables polish"
     },
     {
-      "acceptance": "dispatch/grid/admin unused imports; `cargo clippy -D warnings` scope",
-      "deps": "src/grid` `src/network",
-      "id": "PH-S1022",
+      "acceptance": "container, aria-label, striped, explicit init",
+      "deps": "tenants/jobs",
+      "id": "PH-S1031",
       "open": false,
-      "row": 957,
+      "row": 966,
       "status": "closed",
-      "title": "Clippy unused imports batch"
+      "title": "Tenants + jobs tables"
     },
     {
-      "acceptance": "from_timestamp_opt` → `DateTime::from_timestamp",
-      "deps": "poolai-ui-core/format.rs",
-      "id": "PH-S1023",
+      "acceptance": "aria-label, container, `adminInitTablesIn",
+      "deps": "instances/topology",
+      "id": "PH-S1032",
       "open": false,
-      "row": 958,
+      "row": 967,
       "status": "closed",
-      "title": "chrono deprecations ui-core"
+      "title": "Instances + topology tables"
     },
     {
-      "acceptance": "fix `duplicate_macro_attributes` on PH-S920 tests",
-      "deps": "src/ui/admin/mod.rs",
-      "id": "PH-S1024",
+      "acceptance": "empty → `adminEmptyStateHtml`; table init",
+      "deps": "network_profiles/seed/security_advisories",
+      "id": "PH-S1033",
       "open": false,
-      "row": 959,
+      "row": 968,
       "status": "closed",
-      "title": "admin mod.rs duplicate test attr"
+      "title": "Grid panel tables"
     },
     {
-      "acceptance": "design_tokens` parity note + unit gate",
-      "deps": "UI_UX plan",
-      "id": "PH-S1025",
+      "acceptance": "container, aria-label, empty state",
+      "deps": "src/ui/admin/raid.rs",
+      "id": "PH-S1034",
       "open": false,
-      "row": 960,
+      "row": 969,
       "status": "closed",
-      "title": "Design tokens audit stub"
+      "title": "Raid artifacts table"
     },
     {
-      "acceptance": "toast/announce on power action; save last_run",
-      "deps": "admin+vision",
-      "id": "PH-S1026",
+      "acceptance": "aria-required` + `aria-hidden` on `*",
+      "deps": "tenants/workers/vm/libs/security",
+      "id": "PH-S1035",
       "open": false,
-      "row": 961,
+      "row": 970,
       "status": "closed",
-      "title": "Ops power feedback UX"
+      "title": "Modal form a11y"
     },
     {
-      "acceptance": "-lc` + approved verbs; RUN_LOCAL note",
-      "deps": "bin/",
-      "id": "PH-S1027",
+      "acceptance": "aria-required` on required fields; dashboard empty states",
+      "deps": "config/dashboard",
+      "id": "PH-S1036",
       "open": false,
-      "row": 962,
+      "row": 971,
       "status": "closed",
-      "title": "poolai-msys.ps1 hardening"
+      "title": "Config + dashboard forms/tables"
     },
     {
-      "acceptance": "galaxy_horizon_s1019_integration`; HANDOFF/NEXT",
+      "acceptance": "depth enum + FM band 39 markers",
+      "deps": "admin_tables_forms_depth.rs",
+      "id": "PH-S1037",
+      "open": false,
+      "row": 972,
+      "status": "closed",
+      "title": "ui-core depth stub + docs"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1029_integration`; HANDOFF/NEXT",
       "deps": "tests/docs",
-      "id": "PH-S1028",
+      "id": "PH-S1038",
       "open": false,
-      "row": 963,
+      "row": 973,
       "status": "closed",
-      "title": "UI debug band close"
+      "title": "Tables/forms band close"
     }
   ],
   "sprint_queue_open_count": 0,

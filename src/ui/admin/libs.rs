@@ -218,16 +218,16 @@ pub async fn admin_libs() -> Html<String> {
             </div>
             <form id="uploadLibraryForm" onsubmit="handleUploadLibrary(event)">
               <div class="form-group">
-                <label for="libraryUploadName"><span data-i18n="admin.lib.label.name">Library Name</span> <span class="required">*</span></label>
-                <input type="text" id="libraryUploadName" name="name" required data-i18n-placeholder="admin.lib.ph.name" placeholder="my-model-lib" />
+                <label for="libraryUploadName"><span data-i18n="admin.lib.label.name">Library Name</span> <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="libraryUploadName" name="name" required aria-required="true" data-i18n-placeholder="admin.lib.ph.name" placeholder="my-model-lib" />
               </div>
               <div class="form-group">
-                <label for="libraryUploadVersion"><span data-i18n="admin.lib.label.version">Version</span> <span class="required">*</span></label>
-                <input type="text" id="libraryUploadVersion" name="version" required data-i18n-placeholder="admin.lib.ph.version" placeholder="1.0.0" />
+                <label for="libraryUploadVersion"><span data-i18n="admin.lib.label.version">Version</span> <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="libraryUploadVersion" name="version" required aria-required="true" data-i18n-placeholder="admin.lib.ph.version" placeholder="1.0.0" />
               </div>
               <div class="form-group">
-                <label for="libraryUploadFile"><span data-i18n="admin.lib.label.file">Library File (e.g., .zip, .tar.gz)</span> <span class="required">*</span></label>
-                <input type="file" id="libraryUploadFile" name="file" required />
+                <label for="libraryUploadFile"><span data-i18n="admin.lib.label.file">Library File (e.g., .zip, .tar.gz)</span> <span class="required" aria-hidden="true">*</span></label>
+                <input type="file" id="libraryUploadFile" name="file" required aria-required="true" />
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn" onclick="hideModal('uploadLibraryModal')" data-i18n="ui.cancel">Cancel</button>

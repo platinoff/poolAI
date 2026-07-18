@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-07-18 (band 38 PH-S1019…S1028 ✅ · horizon 100)
+**Оновлено:** 2026-07-18 (band 39 PH-S1029…S1038 ✅ · horizon bands 40–47)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -1221,7 +1221,22 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 38 ✅). **Master horizon:** PH-S1029…S1118 (bands 39–47). Vision rev **310** (після sync). **Наступна сесія:** **`абракадабра`** — project scan → band 39.
+**Відкритих у §5.12:** **0** (band 39 ✅). **Master horizon:** PH-S1039…S1118 (bands 40–47). Vision rev **311** (після sync). **Наступна сесія:** **`абракадабра`** — project scan → band 40.
+
+| 964 | **PH-S1029** | Empty-state parity tier 1 | `src/ui/admin` | tenants + security OAuth/SAML/policies → `adminEmptyStateHtml` | **✅** |
+| 965 | **PH-S1030** | Security tables polish | `src/ui/admin/security.rs` | aria-label, container, `adminInitTablesIn`, actions `data-no-sort` | **✅** |
+| 966 | **PH-S1031** | Tenants + jobs tables | tenants/jobs | container, aria-label, striped, explicit init | **✅** |
+| 967 | **PH-S1032** | Instances + topology tables | instances/topology | aria-label, container, `adminInitTablesIn` | **✅** |
+| 968 | **PH-S1033** | Grid panel tables | network_profiles/seed/security_advisories | empty → `adminEmptyStateHtml`; table init | **✅** |
+| 969 | **PH-S1034** | Raid artifacts table | `src/ui/admin/raid.rs` | container, aria-label, empty state | **✅** |
+| 970 | **PH-S1035** | Modal form a11y | tenants/workers/vm/libs/security | `aria-required` + `aria-hidden` on `*` | **✅** |
+| 971 | **PH-S1036** | Config + dashboard forms/tables | config/dashboard | `aria-required` on required fields; dashboard empty states | **✅** |
+| 972 | **PH-S1037** | ui-core depth stub + docs | `admin_tables_forms_depth.rs` | depth enum + FM band 39 markers | **✅** |
+| 973 | **PH-S1038** | Tables/forms band close | tests/docs | `galaxy_horizon_s1029_integration`; HANDOFF/NEXT | **✅** |
+
+### 5.20 Admin tables/forms polish queue — band 39 (PH-S1029…S1038, 2026-07-18)
+
+**Джерело:** project scan band 39 — FM-019 baseline adoption gaps (empty states, table aria-label, form `aria-required`).
 
 | 954 | **PH-S1019** | Vision power menu polish | `docs/vision/` | dropdown shutdown/reboot; localStorage; a11y keyboard | **✅** |
 | 955 | **PH-S1020** | Admin power modal polish | `src/ui/admin` | showModal parity; labeled Power btn; i18n UA/EN | **✅** |
@@ -1243,7 +1258,7 @@ FM-xxx (з таблиці нижче)
 | Band | PH-S range | Фокус |
 |------|------------|--------|
 | **38** | S1019…S1028 | Power UX + clippy/ui-core hygiene ✅ |
-| 39 | S1029…S1038 | Admin tables/forms polish (FM-019) |
+| **39** | S1029…S1038 | Admin tables/forms polish (FM-019) ✅ |
 | 40 | S1039…S1048 | Vision map/a11y/perf |
 | 41 | S1049…S1058 | E2E visual/axe regression band |
 | 42 | S1059…S1068 | OpenAPI/docs wire sync |
@@ -1360,7 +1375,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-18):** band 38 **PH-S1019…S1028** ✅ · §5.12 **0** · наступна **`абракадабра`** → project scan → band 39.
+**Активна смуга (2026-07-18):** band 39 **PH-S1029…S1038** ✅ · §5.12 **0** · наступна **`абракадабра`** → project scan → band 40.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

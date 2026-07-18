@@ -155,10 +155,10 @@ pub async fn admin_jobs() -> Html<String> {
         return;
       }
       el.innerHTML = `
-        <table class="admin-table admin-table--striped">
+        <div class="admin-table-container"><table class="admin-table admin-table--striped" aria-label="${escapeHtml(T('admin.jobs.section', 'Jobs'))}">
           <thead>
             <tr>
-              <th>${escapeHtml(T('admin.jobs.col.id', 'ID'))}</th>
+              <th scope="col">${escapeHtml(T('admin.jobs.col.id', 'ID'))}</th>
               <th>${escapeHtml(T('admin.jobs.col.kind', 'Kind'))}</th>
               <th>${escapeHtml(T('admin.jobs.col.status', 'Status'))}</th>
               <th>${escapeHtml(T('admin.jobs.col.created', 'Created'))}</th>
@@ -189,7 +189,7 @@ pub async fn admin_jobs() -> Html<String> {
               </tr>`;
             }).join('')}
           </tbody>
-        </table>
+        </table></div>
       `;
       if (typeof adminInitTablesIn === 'function') adminInitTablesIn(el);
     }

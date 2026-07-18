@@ -261,15 +261,15 @@ pub async fn admin_raid() -> Html<String> {
       if (!el) return;
       
       const artifactsHtml = !artifacts || artifacts.length === 0 
-        ? '<div class="muted">' + escapeHtml(T('admin.raidadm.emptyArt', 'No artifacts found')) + '</div>'
+        ? adminEmptyStateHtml(T('admin.raidadm.emptyArt', 'No artifacts found'))
         : `
-          <table class="admin-table">
+          <div class="admin-table-container"><table class="admin-table" aria-label="${escapeHtml(T('admin.raidadm.artTitle', 'Artifacts'))}">
             <thead>
               <tr>
-                <th>${escapeHtml(T('admin.raidadm.col.id', 'ID'))}</th>
-                <th>${escapeHtml(T('admin.raidadm.col.name', 'Name'))}</th>
-                <th>${escapeHtml(T('admin.raidadm.col.size', 'Size'))}</th>
-                <th>${escapeHtml(T('admin.wrk.col.actions', 'Actions'))}</th>
+                <th scope="col">${escapeHtml(T('admin.raidadm.col.id', 'ID'))}</th>
+                <th scope="col">${escapeHtml(T('admin.raidadm.col.name', 'Name'))}</th>
+                <th scope="col">${escapeHtml(T('admin.raidadm.col.size', 'Size'))}</th>
+                <th scope="col" class="admin-table-actions-col" data-no-sort="1">${escapeHtml(T('admin.wrk.col.actions', 'Actions'))}</th>
               </tr>
             </thead>
             <tbody>
@@ -289,7 +289,7 @@ pub async fn admin_raid() -> Html<String> {
               `;
               }).join('')}
             </tbody>
-          </table>
+          </table></div>
         `;
       
       const snapshotHtml = snapshot 
@@ -310,6 +310,7 @@ pub async fn admin_raid() -> Html<String> {
         </div>
         ${snapshotHtml}
       `;
+      if (typeof adminInitTablesIn === 'function') adminInitTablesIn(el);
     }
     
     function showUploadArtifactModal() {

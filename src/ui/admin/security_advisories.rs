@@ -13,7 +13,7 @@ pub async fn admin_security_advisories() -> Html<String> {
       if (!el) return;
       const list = Array.isArray(rows) ? rows : [];
       if (!list.length) {
-        el.innerHTML = '<p class="muted">' + escapeHtml(T('admin.securityAdvisories.empty', 'No advisories.')) + '</p>';
+        el.innerHTML = adminEmptyStateHtml(T('admin.securityAdvisories.empty', 'No advisories.'));
         return;
       }
       let body = '';
@@ -29,12 +29,13 @@ pub async fn admin_security_advisories() -> Html<String> {
           '<td>' + btn + '</td></tr>';
       });
       el.innerHTML =
-        '<table class="admin-table" aria-label="' + escapeHtml(T('admin.securityAdvisories.table', 'Security advisories')) + '">' +
-        '<thead><tr><th>' + escapeHtml(T('admin.securityAdvisories.colId', 'ID')) + '</th>' +
-        '<th>' + escapeHtml(T('admin.securityAdvisories.colSeverity', 'Severity')) + '</th>' +
-        '<th>' + escapeHtml(T('admin.securityAdvisories.colSummary', 'Summary')) + '</th>' +
-        '<th>' + escapeHtml(T('admin.securityAdvisories.colAction', 'Action')) + '</th></tr></thead>' +
-        '<tbody>' + body + '</tbody></table>';
+        '<div class="admin-table-container"><table class="admin-table" aria-label="' + escapeHtml(T('admin.securityAdvisories.table', 'Security advisories')) + '">' +
+        '<thead><tr><th scope="col">' + escapeHtml(T('admin.securityAdvisories.colId', 'ID')) + '</th>' +
+        '<th scope="col">' + escapeHtml(T('admin.securityAdvisories.colSeverity', 'Severity')) + '</th>' +
+        '<th scope="col">' + escapeHtml(T('admin.securityAdvisories.colSummary', 'Summary')) + '</th>' +
+        '<th scope="col" class="admin-table-actions-col" data-no-sort="1">' + escapeHtml(T('admin.securityAdvisories.colAction', 'Action')) + '</th></tr></thead>' +
+        '<tbody>' + body + '</tbody></table></div>';
+      if (typeof adminInitTablesIn === 'function') adminInitTablesIn(el);
     }
 
     async function loadSecurityAdvisoriesPanel() {

@@ -5,6 +5,7 @@
 
 pub mod admin_common_depth;
 pub mod admin_dom;
+pub mod admin_tables_forms_depth;
 pub mod admin_vm_workers;
 pub mod api_error;
 pub mod charts_depth;

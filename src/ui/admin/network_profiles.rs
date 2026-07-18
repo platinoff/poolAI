@@ -37,7 +37,7 @@ pub async fn admin_network_profiles() -> Html<String> {
         return;
       }
       if (!ids.length) {
-        el.innerHTML = '<p class="muted">' + escapeHtml(T('admin.networkProfiles.empty', 'No persisted network profiles.')) + '</p>';
+        el.innerHTML = adminEmptyStateHtml(T('admin.networkProfiles.empty', 'No persisted network profiles.'));
         return;
       }
       let tableRows = '';
@@ -52,12 +52,13 @@ pub async fn admin_network_profiles() -> Html<String> {
           '<td>' + escapeHtml(String(bandwidth)) + '</td></tr>';
       });
       el.innerHTML =
-        '<table class="admin-table" aria-label="' + escapeHtml(T('admin.networkProfiles.table', 'Network profiles')) + '">' +
-        '<thead><tr><th>' + escapeHtml(T('admin.networkProfiles.colPeer', 'Peer')) + '</th>' +
-        '<th>' + escapeHtml(T('admin.networkProfiles.colRegion', 'Region')) + '</th>' +
-        '<th>' + escapeHtml(T('admin.networkProfiles.colLatency', 'Latency p50')) + '</th>' +
-        '<th>' + escapeHtml(T('admin.networkProfiles.colBandwidth', 'Bandwidth Mbps')) + '</th></tr></thead>' +
-        '<tbody>' + tableRows + '</tbody></table>';
+        '<div class="admin-table-container"><table class="admin-table" aria-label="' + escapeHtml(T('admin.networkProfiles.table', 'Network profiles')) + '">' +
+        '<thead><tr><th scope="col">' + escapeHtml(T('admin.networkProfiles.colPeer', 'Peer')) + '</th>' +
+        '<th scope="col">' + escapeHtml(T('admin.networkProfiles.colRegion', 'Region')) + '</th>' +
+        '<th scope="col">' + escapeHtml(T('admin.networkProfiles.colLatency', 'Latency p50')) + '</th>' +
+        '<th scope="col">' + escapeHtml(T('admin.networkProfiles.colBandwidth', 'Bandwidth Mbps')) + '</th></tr></thead>' +
+        '<tbody>' + tableRows + '</tbody></table></div>';
+      if (typeof adminInitTablesIn === 'function') adminInitTablesIn(el);
     }
 
     async function loadNetworkProfilesPanel() {
@@ -138,9 +139,9 @@ pub async fn admin_network_profiles() -> Html<String> {
           </p>
           <form id="network-profile-upsert-form" class="admin-form admin-form-inline" onsubmit="saveNetworkProfileUpsert(event)">
             <label for="network-profile-peer" data-i18n="admin.networkProfiles.colPeer">Peer</label>
-            <input id="network-profile-peer" name="peer_id" type="text" required autocomplete="off" />
+            <input id="network-profile-peer" name="peer_id" type="text" required aria-required="true" autocomplete="off" />
             <label for="network-profile-region" data-i18n="admin.networkProfiles.colRegion">Region</label>
-            <input id="network-profile-region" name="region" type="text" required autocomplete="off" />
+            <input id="network-profile-region" name="region" type="text" required aria-required="true" autocomplete="off" />
             <label for="network-profile-latency" data-i18n="admin.networkProfiles.colLatency">Latency p50</label>
             <input id="network-profile-latency" name="latency_ms_p50" type="number" min="0" value="20" />
             <label for="network-profile-bandwidth" data-i18n="admin.networkProfiles.colBandwidth">Bandwidth Mbps</label>

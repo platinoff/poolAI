@@ -142,16 +142,16 @@ pub async fn admin_vm() -> Html<String> {
             </div>
             <form id="createVmForm" onsubmit="handleCreateVm(event)">
               <div class="form-group">
-                <label for="vmName"><span data-i18n="vm.label.name">Instance Name</span> <span class="required">*</span></label>
-                <input type="text" id="vmName" name="name" required data-i18n-placeholder="vm.ph.name" placeholder="my-vm-instance" />
+                <label for="vmName"><span data-i18n="vm.label.name">Instance Name</span> <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="vmName" name="name" required aria-required="true" data-i18n-placeholder="vm.ph.name" placeholder="my-vm-instance" />
               </div>
               <div class="form-group">
-                <label for="vmCpuCores"><span data-i18n="vm.label.cpu">CPU Cores</span> <span class="required">*</span></label>
-                <input type="number" id="vmCpuCores" name="cpu_cores" required min="1" max="64" value="2" />
+                <label for="vmCpuCores"><span data-i18n="vm.label.cpu">CPU Cores</span> <span class="required" aria-hidden="true">*</span></label>
+                <input type="number" id="vmCpuCores" name="cpu_cores" required aria-required="true" min="1" max="64" value="2" />
               </div>
               <div class="form-group">
-                <label for="vmMemoryMb"><span data-i18n="vm.label.memory">Memory (MB)</span> <span class="required">*</span></label>
-                <input type="number" id="vmMemoryMb" name="memory_mb" required min="256" max="131072" value="2048" />
+                <label for="vmMemoryMb"><span data-i18n="vm.label.memory">Memory (MB)</span> <span class="required" aria-hidden="true">*</span></label>
+                <input type="number" id="vmMemoryMb" name="memory_mb" required aria-required="true" min="256" max="131072" value="2048" />
               </div>
               <div class="form-group">
                 <label for="vmGpuRequired">
@@ -160,8 +160,8 @@ pub async fn admin_vm() -> Html<String> {
                 </label>
               </div>
               <div class="form-group">
-                <label for="vmIsolation"><span data-i18n="vm.label.isolation">Isolation Type</span> <span class="required">*</span></label>
-                <select id="vmIsolation" name="isolation" required>
+                <label for="vmIsolation"><span data-i18n="vm.label.isolation">Isolation Type</span> <span class="required" aria-hidden="true">*</span></label>
+                <select id="vmIsolation" name="isolation" required aria-required="true">
                   <option value="ProcessSandbox" data-i18n="vm.iso.process">Process sandbox</option>
                   <option value="HardwareVm" data-i18n="vm.iso.hardware">Hardware VM</option>
                 </select>
