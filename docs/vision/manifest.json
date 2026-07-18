@@ -2258,11 +2258,17 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_digest_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_docs_legacy_depth_rs"
     }
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S969",
+  "last_sprint_closed": "PH-S979",
   "layers": [
     {
       "id": "L0",
@@ -2295,7 +2301,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S970",
+  "next_sprint": "PH-S980",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -9262,9 +9268,23 @@
       "label": "galaxy_horizon_s950_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s950_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_docs_legacy_depth_rs",
+      "label": "docs_legacy_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/docs_legacy_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s960_integration_rs",
+      "label": "galaxy_horizon_s960_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s960_integration.rs"
     }
   ],
-  "revision": 300,
+  "revision": 302,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -17406,91 +17426,181 @@
       "acceptance": "POOLAI_GALAXY_GRID.md",
       "deps": "docs",
       "id": "PH-S970",
-      "open": true,
+      "open": false,
       "row": 905,
-      "status": "open",
+      "status": "closed",
       "title": "Galaxy §1–3 implemented markers"
     },
     {
       "acceptance": "same",
       "deps": "docs",
       "id": "PH-S971",
-      "open": true,
+      "open": false,
       "row": 906,
-      "status": "open",
+      "status": "closed",
       "title": "Galaxy §4–6 implemented markers"
     },
     {
       "acceptance": "same",
       "deps": "docs",
       "id": "PH-S972",
-      "open": true,
+      "open": false,
       "row": 907,
-      "status": "open",
+      "status": "closed",
       "title": "Galaxy §7–9 implemented markers"
     },
     {
       "acceptance": "§8.2 payout ✅; LAN blocked",
       "deps": "docs",
       "id": "PH-S973",
-      "open": true,
+      "open": false,
       "row": 908,
-      "status": "open",
+      "status": "closed",
       "title": "§8 TBD closed or BLOCKED noted"
     },
     {
       "acceptance": "all rows ✅ or BLOCKED",
       "deps": "docs",
       "id": "PH-S974",
-      "open": true,
+      "open": false,
       "row": 909,
-      "status": "open",
+      "status": "closed",
       "title": "GALAXY_GRID_ROADMAP horizon table final"
     },
     {
       "acceptance": "rust_ratio.json zriz",
       "deps": "§5.13",
       "id": "PH-S975",
-      "open": true,
+      "open": false,
       "row": 910,
-      "status": "open",
+      "status": "closed",
       "title": "poolai-loc-audit PH-S975"
     },
     {
       "acceptance": "docs",
       "deps": "docs",
       "id": "PH-S976",
-      "open": true,
+      "open": false,
       "row": 911,
-      "status": "open",
+      "status": "closed",
       "title": "concept cross-links INDEX"
     },
     {
       "acceptance": "--check` green",
       "deps": "ops",
       "id": "PH-S977",
-      "open": true,
+      "open": false,
       "row": 912,
-      "status": "open",
+      "status": "closed",
       "title": "poolai-vision-sync --check"
     },
     {
       "acceptance": "hold",
       "deps": "ops",
       "id": "PH-S978",
-      "open": true,
+      "open": false,
       "row": 913,
-      "status": "open",
+      "status": "closed",
       "title": "Ratio hold advisory"
     },
     {
       "acceptance": "concept markers close",
       "deps": "docs",
       "id": "PH-S979",
-      "open": true,
+      "open": false,
       "row": 914,
-      "status": "open",
+      "status": "closed",
       "title": "galaxy_horizon_s970_integration"
+    },
+    {
+      "acceptance": "development complete section",
+      "deps": "docs",
+      "id": "PH-S980",
+      "open": true,
+      "row": 915,
+      "status": "open",
+      "title": "STABLE_STATE product-complete draft"
+    },
+    {
+      "acceptance": "step 1–12 final",
+      "deps": "docs",
+      "id": "PH-S981",
+      "open": true,
+      "row": 916,
+      "status": "open",
+      "title": "INDEX product-complete zriz"
+    },
+    {
+      "acceptance": "root README",
+      "deps": "docs",
+      "id": "PH-S982",
+      "open": true,
+      "row": 917,
+      "status": "open",
+      "title": "README Next Focus → maintenance"
+    },
+    {
+      "acceptance": "post-S1010 prep",
+      "deps": "docs",
+      "id": "PH-S983",
+      "open": true,
+      "row": 918,
+      "status": "open",
+      "title": "HANDOFF maintenance mode template"
+    },
+    {
+      "acceptance": "honest scope note",
+      "deps": "docs",
+      "id": "PH-S984",
+      "open": true,
+      "row": 919,
+      "status": "open",
+      "title": "DEVELOPMENT_PROGRESS 100% code scope"
+    },
+    {
+      "acceptance": "rust_ratio.json zriz",
+      "deps": "§5.13",
+      "id": "PH-S985",
+      "open": true,
+      "row": 920,
+      "status": "open",
+      "title": "poolai-loc-audit PH-S985"
+    },
+    {
+      "acceptance": "FM catalog",
+      "deps": "docs",
+      "id": "PH-S986",
+      "open": true,
+      "row": 921,
+      "status": "open",
+      "title": "FM §5.15 draft product-complete"
+    },
+    {
+      "acceptance": "--check` green",
+      "deps": "ops",
+      "id": "PH-S987",
+      "open": true,
+      "row": 922,
+      "status": "open",
+      "title": "poolai-vision-sync --check"
+    },
+    {
+      "acceptance": "final hold",
+      "deps": "ops",
+      "id": "PH-S988",
+      "open": true,
+      "row": 923,
+      "status": "open",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "acceptance": "STABLE band close",
+      "deps": "docs",
+      "id": "PH-S989",
+      "open": true,
+      "row": 924,
+      "status": "open",
+      "title": "galaxy_horizon_s980_integration"
     }
   ],
   "sprint_queue_open_count": 10,

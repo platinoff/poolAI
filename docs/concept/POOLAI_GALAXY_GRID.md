@@ -11,6 +11,8 @@
 
 Цей документ — продуктово-архітектурна специфікація рівня концепту/протоколу (без деталей UI/E2E), узгоджена з наявними модулями: **virtual nodes (FM-016)**, **RAID/SmallWorld**, **Jobs**, **VM isolation**, **Telegram bot** та **Solana adapter (sidecar)**.
 
+**Оновлено:** 2026-07-17 (band 32 PH-S970…S979 — concept implemented markers sync).
+
 ## 1. Ролі та економіка
 
 ### 1.1 Засновник / dev (primary fee)
@@ -84,6 +86,16 @@ worker    = gross − primary − secondary
   - оплачує виконання (billing/settlement на стороні srvN).
 
 > Примітка: конкретний вибір “який саме IDE/white-label UI” лишається відкритим; це не впливає на мережевий контракт job’ів.
+
+**Implemented markers (band 32 PH-S970 — §1 ✅):**
+
+| Concept § | Wire / module | Sprint / band |
+|-----------|---------------|---------------|
+| §1.1 primary dev fee (0.1%) | `src/grid/galaxy_fee_split.rs` | PH-S58 |
+| §1.2 secondary fee + admin | fee split bps config | PH-S58 |
+| §1.2.1 payout formula | `GET /api/v1/grid/fee-split-metrics` | band 13 PH-S780…S789 |
+| §1.3 telegram payout route | fee split + seats (§3.1) | PH-S475 |
+| §1.4 AI client ingress | grid job ingest + pricing oracle (§4.2) | PH-S78…S83 |
 
 ## 2. Модель worker’ів і discovery
 
@@ -160,6 +172,14 @@ Worker’и мають:
 2. Фільтри: `origin`, `region`, `gpu_units > 0`, `status`.
 3. Сортування за `latency_ms_p50` і `last_heartbeat_at` (дефолт для troubleshooting).
 4. Розкритий рядок worker-а: ownership (`admin_id`, `srv_id`) + caps (`max_concurrent_jobs`, `max_gpu_jobs`).
+
+**Implemented markers (band 32 PH-S970 — §2 ✅):**
+
+| Concept § | Wire / module | Sprint / band |
+|-----------|---------------|---------------|
+| §2.1 unified worker entity | `galaxy_worker_dto.rs` | PH-S516 |
+| §2.2 caps / auto-scale | `GalaxyWorkerLimits` on DTO | PH-S541 |
+| §2.3 discovery DTO + UI labels | `GET /api/v1/virtual-nodes`, capabilities + `seed_inventory` | PH-S516, PH-S820…S829 |
 
 ## 3. Telegram edge mining: worker як “VM-aware” isolated capacity
 
@@ -273,6 +293,14 @@ sequenceDiagram
 | `/stop` | unbind + graceful worker stop hint |
 
 **Env (worker, наявне):** `POOLAI_TELEGRAM_ID`, `POOLAI_COORDINATOR_URL` — див. `HANDOFF` §2a.
+
+**Implemented markers (band 32 PH-S970 — §3 ✅):**
+
+| Concept § | Wire / module | Sprint / band |
+|-----------|---------------|---------------|
+| §3.1 worker seats | `GET /api/v1/grid/telegram-seats`, `POOLAI_TELEGRAM_SEAT_*` | PH-S475/S486 |
+| §3.2 wallet bind | `POST /api/v1/virtual-nodes/telegram/bind` | PH-S60, PH-S514 |
+| §3.2 tgbot ops | `/status` seats snapshot, `/stop` unbind | PH-S514/S515 |
 
 ## 4. Grid scheduling, re-migration та pricing
 
@@ -560,6 +588,14 @@ Retry budget:
 
 Після вичерпання budget job переводиться у `Failed` з reason-кодом (`lease-timeout`, `worker-unhealthy`, `budget-exhausted`).
 
+**Implemented markers (band 32 PH-S971 — §4 ✅):**
+
+| Concept § | Wire / module | Sprint / band |
+|-----------|---------------|---------------|
+| §4.1 global routing | `galaxy_routing_policy.rs`, locality gate | band 7 PH-S720…S729 |
+| §4.2 pricing oracle | `GET /api/v1/grid/pricing`, live fetch depth | PH-S78…S83, band 25 PH-S900…S909 |
+| §4.3 job lease / re-migrate | lease acquire/renew, `Migrating` state | PH-S94…S108, PH-S524…S526 |
+
 ## 5. Seeds / shards / locality-aware placement
 
 Узгоджено з [`POOLAI_MEMORY_LAYER.md`](./POOLAI_MEMORY_LAYER.md) (seed = нода з shard) і wire у `src/grid/` (`MemoryShard`, `emit_seed_provided` / `emit_memory_updated`).
@@ -739,6 +775,15 @@ if not all_required_ready and policy.strict_locality:
 
 **Логи:** `locality_placement_pick`, `prefetch_enqueued`, `prefetch_timeout`, `hot_promote`, `hot_evict`.
 
+**Implemented markers (band 32 PH-S971 — §5 ✅):**
+
+| Concept § | Wire / module | Sprint / band |
+|-----------|---------------|---------------|
+| §5.1–5.2 seeds + locality | `galaxy_locality.rs`, locality-metrics API | PH-S128, band 11 PH-S760…S769 |
+| §5.3–5.4 hot tier | hot promote/evict metrics | PH-S458, PH-S580 |
+| §5.5 prefetch | prefetch-metrics + live pull depth | band 10 PH-S750…S759 |
+| §5.6 strict locality HTTP | `POST /grid/envelope` strict gate | PH-S600 |
+
 ## 6. Security та верифікація (edge untrusted)
 
 **Trust model (PH-S62):**
@@ -870,6 +915,16 @@ elif verdict == rejected:
 
 **Інтеграція з lease:** навіть при `verification_inconclusive`, result **не** фіналізується без активного `lease_epoch` match (§4.3.1) — replay не скасовує at-most-once.
 
+**Implemented markers (band 32 PH-S971 — §6 ✅):**
+
+| Concept § | Wire / module | Sprint / band |
+|-----------|---------------|---------------|
+| §6.1 capability admission | signed capability gate, unsigned reject | band 9 PH-S740…S749 |
+| §6.2–6.3 verification lifecycle | checker tasks, shadow/replay jobs | band 23 PH-S880…S889 |
+| §6.4 replication quorum | strict tier production gate | band 24 PH-S890…S899 |
+| §6.5 trust score persist | SQLite store + payout gate | PH-S910…S919 |
+| §6.6 capability verify env | `POOLAI_GALAXY_CAPABILITY_VERIFY_PK_HEX` | PH-S476 |
+
 ### 6.6 Ops notes та roadmap
 
 | Змінна (концепт) | Default | Опис |
@@ -923,6 +978,18 @@ On-chain події потрібні, коли вони:
 - або є “обов’язковим” proof layer для безпеки routing.
 
 У routing (швидке прийняття рішення де виконувати) основна логіка має бути off-chain.
+
+**Implemented (band 22 PH-S870…S879 ✅, marker sync PH-S972):**
+
+| Sprint | Wire / module | Acceptance |
+|--------|---------------|------------|
+| **PH-S870** | On-chain Cleared → mock RPC submit | `POOLAI_SETTLEMENT_ON_CHAIN=1` + `galaxy_settlement_onchain_submit_total` |
+| **PH-S871** | solana-adapter schema v1 fixture | `crates/poolai-solana-adapter/` |
+| **PH-S872** | domain events NDJSON persist depth | `src/job/domain_events.rs` |
+| **PH-S873** | stand smoke on-chain payout-batch depth | `poolai-http-stand-smoke` |
+| **PH-S874** | `solana_depth_stub` | `src/grid/solana_depth.rs` |
+
+**Off-chain default:** routing + settlement batch (§8.2); on-chain — opt-in via env (PH-S774).
 
 ## 8. Відкриті питання (TBD)
 
@@ -995,7 +1062,9 @@ On-chain події потрібні, коли вони:
 
 2. **Telegram “VM probros” на старте** *(PH-S541 limits DTO ✅ · PH-S551 ops docs)*: MVP cold mining — **CPU/RAM/Disk** probros через `GalaxyWorkerLimits` на virtual-nodes DTO (`max_cpu_cores`, `max_ram_mb`, `max_disk_mb`); **без GPU passthrough** на старті. GPU admission — окремий gate (`raid_artifact_probe` / PH-S540). Міграція до GPU passthrough: roadmap §8.2 → host passthrough + capability document §6.6; див. [`RUN_LOCAL.md`](../development/RUN_LOCAL.md) telegram edge stand.
 
-> **Закрито в концепті:** job lease / re-migrate (§4.3), unified worker DTO (§2.3), fee split (§1.2.1), pricing oracle (§4.2), Telegram seats + wallet bind (§3.1–3.2), seeds/locality + prefetch (§5.1–5.6), edge verification baseline (§6.1–6.6), open-source governance без root super-admin (§9), **network_profile contract (§8.1, PH-S132)**.
+3. **LAN replication / multi-host benchmarks** — **BLOCKED** (FM-003 §4, 2 hosts required; `egress_policy=lan_only` wire ✅ PH-S600).
+
+> **Закрито в концепті:** job lease / re-migrate (§4.3), unified worker DTO (§2.3), fee split (§1.2.1), pricing oracle (§4.2), Telegram seats + wallet bind (§3.1–3.2), seeds/locality + prefetch (§5.1–5.6), edge verification baseline (§6.1–6.6), open-source governance без root super-admin (§9), **network_profile contract (§8.1, PH-S132)**, **on-chain opt-in settlement (§7, PH-S870…S879)**, **LAN benchmarks (BLOCKED, FM-003)**.
 
 ## 9. Open-source governance: signed releases та оновлення (PH-S63)
 
@@ -1172,4 +1241,6 @@ Signed capability documents (§6.6 roadmap) — наступний спринт;
 **Документи-орієнтири:** [`SECURITY_HARDENING.md`](../security/SECURITY_HARDENING.md) (signed releases checklist), [`DISTRIBUTED_RAID_PROTOCOL.md`](../DISTRIBUTED_RAID_PROTOCOL.md) §Versioning, OpenAPI `/api/v1/*`.
 
 **Код:** `poolai-verify-release` (PH-S66 ✅, `src/release/`). **Admin UI (PH-S93 ✅):** read-only `/ui/admin/updates-compat` — protocol version, verify-release pointers, compat matrix link (без дублювання governance prose). **Middleware (PH-S103 ✅):** `X-PoolAI-Protocol` negotiation на selected wire routes.
+
+**Implemented markers (band 32 PH-S972 — §9 ✅):** cross-ref band 14 PH-S790…S799 table (§9.5–9.6 above); signed releases + compat matrix + governance-metrics wire закриті в band 14.
 

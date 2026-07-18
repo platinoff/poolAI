@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-17",
-  "sprint": "PH-S965",
+  "generated_at": "2026-07-18",
+  "sprint": "PH-S975",
   "formal_band_min": 0.9,
   "formal_band_max": 0.95,
   "warn_below": 0.93,
@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": false,
   "min_ratio": null,
-  "rust_loc": 150990,
+  "rust_loc": 151148,
   "non_rust_product_loc": 8081,
-  "product_loc_total": 159071,
-  "rust_ratio": 0.9491987854480075,
-  "rust_ratio_pct": 94.91987854480075,
+  "product_loc_total": 159229,
+  "rust_ratio": 0.949249194556268,
+  "rust_ratio_pct": 94.92491945562679,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -45,16 +45,16 @@
       "loc": 608
     },
     "rust_crates": {
-      "files": 49,
-      "loc": 11871
+      "files": 50,
+      "loc": 11962
     },
     "rust_src": {
       "files": 294,
-      "loc": 105843
+      "loc": 105844
     },
     "rust_tests": {
-      "files": 210,
-      "loc": 32668
+      "files": 211,
+      "loc": 32734
     },
     "ui_css": {
       "files": 2,
@@ -76,6 +76,7 @@
     "PH-S943: ops_shell_canon_met when no .rs under bin/ or scripts/",
     "PH-S948: stretch advisory — below_stretch_spirit is expected until band 29+ migration",
     "PH-S958: digest band 30 hold advisory — in_formal_band true; target 95% hold until band 31+",
-    "PH-S968: docs legacy band 31 hold advisory — in_formal_band true; target 95% hold until band 32+"
+    "PH-S968: docs legacy band 31 hold advisory — in_formal_band true; target 95% hold until band 32+",
+    "PH-S978: concept band 32 hold advisory — in_formal_band true; target 95% hold until band 33+"
   ]
 }

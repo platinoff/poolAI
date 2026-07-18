@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-07-17 (PH-S960…S969 ✅ band 31 · active **PH-S970…S979** · vision **rev 300** · rust_ratio **94.92%**)
+**Оновлено:** 2026-07-18 (PH-S970…S979 ✅ band 32 · active **PH-S980…S989** · vision **rev 302** · rust_ratio **94.92%**)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -1169,20 +1169,30 @@ FM-xxx (з таблиці нижче)
 | 902 | **PH-S967** | poolai-vision-sync --check | ops | `--check` green | **✅** |
 | 903 | **PH-S968** | Ratio hold advisory | ops | hold | **✅** |
 | 904 | **PH-S969** | galaxy_horizon_s960_integration | docs | DOCS_LEGACY close | **✅** |
-| 905 | **PH-S970** | Galaxy §1–3 implemented markers | docs | POOLAI_GALAXY_GRID.md | **[ ]** |
-| 906 | **PH-S971** | Galaxy §4–6 implemented markers | docs | same | **[ ]** |
-| 907 | **PH-S972** | Galaxy §7–9 implemented markers | docs | same | **[ ]** |
-| 908 | **PH-S973** | §8 TBD closed or BLOCKED noted | docs | §8.2 payout ✅; LAN blocked | **[ ]** |
-| 909 | **PH-S974** | GALAXY_GRID_ROADMAP horizon table final | docs | all rows ✅ or BLOCKED | **[ ]** |
-| 910 | **PH-S975** | poolai-loc-audit PH-S975 | §5.13 | rust_ratio.json zriz | **[ ]** |
-| 911 | **PH-S976** | concept cross-links INDEX | docs | docs | **[ ]** |
-| 912 | **PH-S977** | poolai-vision-sync --check | ops | `--check` green | **[ ]** |
-| 913 | **PH-S978** | Ratio hold advisory | ops | hold | **[ ]** |
-| 914 | **PH-S979** | galaxy_horizon_s970_integration | docs | concept markers close | **[ ]** |
+| 905 | **PH-S970** | Galaxy §1–3 implemented markers | docs | POOLAI_GALAXY_GRID.md | **✅** |
+| 906 | **PH-S971** | Galaxy §4–6 implemented markers | docs | same | **✅** |
+| 907 | **PH-S972** | Galaxy §7–9 implemented markers | docs | same | **✅** |
+| 908 | **PH-S973** | §8 TBD closed or BLOCKED noted | docs | §8.2 payout ✅; LAN blocked | **✅** |
+| 909 | **PH-S974** | GALAXY_GRID_ROADMAP horizon table final | docs | all rows ✅ or BLOCKED | **✅** |
+| 910 | **PH-S975** | poolai-loc-audit PH-S975 | §5.13 | rust_ratio.json zriz | **✅** |
+| 911 | **PH-S976** | concept cross-links INDEX | docs | docs | **✅** |
+| 912 | **PH-S977** | poolai-vision-sync --check | ops | `--check` green | **✅** |
+| 913 | **PH-S978** | Ratio hold advisory | ops | hold | **✅** |
+| 914 | **PH-S979** | galaxy_horizon_s970_integration | docs | concept markers close | **✅** |
+| 915 | **PH-S980** | STABLE_STATE product-complete draft | docs | development complete section | **[ ]** |
+| 916 | **PH-S981** | INDEX product-complete zriz | docs | step 1–12 final | **[ ]** |
+| 917 | **PH-S982** | README Next Focus → maintenance | docs | root README | **[ ]** |
+| 918 | **PH-S983** | HANDOFF maintenance mode template | docs | post-S1010 prep | **[ ]** |
+| 919 | **PH-S984** | DEVELOPMENT_PROGRESS 100% code scope | docs | honest scope note | **[ ]** |
+| 920 | **PH-S985** | poolai-loc-audit PH-S985 | §5.13 | rust_ratio.json zriz | **[ ]** |
+| 921 | **PH-S986** | FM §5.15 draft product-complete | docs | FM catalog | **[ ]** |
+| 922 | **PH-S987** | poolai-vision-sync --check | ops | `--check` green | **[ ]** |
+| 923 | **PH-S988** | Ratio hold advisory | ops | final hold | **[ ]** |
+| 924 | **PH-S989** | galaxy_horizon_s980_integration | docs | STABLE band close | **[ ]** |
 
-**Відкритих у §5.12:** **10** (PH-S970…S979). **Master backlog:** **41** pending PH-S980…S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · **§5.14**. Vision rev **300** (after sync). rust_ratio **94.92%** (PH-S965). **Service band:** §5.16 PH-SVC01…SVC10 ✅ (2026-07-17).
+**Відкритих у §5.12:** **10** (PH-S980…S989). **Master backlog:** **31** pending PH-S990…S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · **§5.14**. Vision rev **302** (after sync). rust_ratio **94.92%** (PH-S975). **Service band:** §5.16 PH-SVC01…SVC10 ✅ (2026-07-17).
 
-**Наступна сесія:** **`абракадабра`** — drain PH-S970…S979 → promote PH-S980…S989 з §5.14 → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **`абракадабра`** — drain PH-S980…S989 → promote PH-S990…S999 з §5.14 → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.14 Master backlog PH-S720…S1010 (291 pending → product-complete, 2026-06-20)
 
@@ -1190,11 +1200,11 @@ FM-xxx (з таблиці нижче)
 
 | Поле | Значення |
 |------|----------|
-| **Pending** | **51** (PH-S970…S1010) |
-| **Drained bands 1–30** | PH-S660…S969 ✅ |
-| **Активна §5.12** | PH-S970…S979 `[ ]` — band 32 Galaxy concept implemented markers |
-| **Наступна promote** | PH-S980…S989 — band 33 STABLE + INDEX product-complete |
-| **Сесій `абракадабра`** | **8** (8×10 + tail PH-S1010) |
+| **Pending** | **31** (PH-S990…S1010) |
+| **Drained bands 1–32** | PH-S660…S979 ✅ |
+| **Активна §5.12** | PH-S980…S989 `[ ]` — band 33 STABLE + INDEX product-complete |
+| **Наступна promote** | PH-S990…S999 — band 34 integration gap fill |
+| **Сесій `абракадабра`** | **4** (3×10 + tail PH-S1010) |
 | **План фаз** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md) |
 | **Реєстр sprint×acceptance** | [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) |
 | **Regen** | `bash scripts/generate-ph-s-master-backlog-351.sh` |
@@ -1262,7 +1272,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-17):** PH-S970…S979 **[ ]** drain band 32 (Galaxy concept markers) · **`абракадабра`** = drain → vision close → push · ratio **94.92%** (PH-S965).
+**Активна смуга (2026-07-18):** PH-S980…S989 **[ ]** drain band 33 (STABLE + INDEX product-complete) · **`абракадабра`** = drain → vision close → push · ratio **94.92%** (PH-S975).
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

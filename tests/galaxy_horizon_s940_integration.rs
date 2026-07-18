@@ -32,8 +32,8 @@ fn horizon_s940_band_e2e_stretch_ops_ph_s949() {
             .expect("rust_ratio.json");
     let sprint = ratio_json["sprint"].as_str().unwrap_or("");
     assert!(
-        sprint == "PH-S965" || sprint == "PH-S955" || sprint == "PH-S945",
-        "rust_ratio sprint should reflect band 29–31 (PH-S945/955/965), got {sprint}"
+        sprint == "PH-S975" || sprint == "PH-S965" || sprint == "PH-S955" || sprint == "PH-S945",
+        "rust_ratio sprint should reflect band 29–32 loc-audit zriz, got {sprint}"
     );
     assert!(ratio_json["stretch_spirit_gate_met"].is_boolean());
     assert!(ratio_json["ops_shell_canon_met"].as_bool().unwrap_or(false));

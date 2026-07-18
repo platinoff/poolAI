@@ -3,71 +3,71 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S970",
+      "id": "PH-S980",
       "link": "docs/vision/index.html#sprint-queue",
       "next": true,
       "published": "2026-05-28",
       "status": "open",
-      "summary": "POOLAI_GALAXY_GRID.md",
-      "title": "Galaxy §1–3 implemented markers"
+      "summary": "development complete section",
+      "title": "STABLE_STATE product-complete draft"
     },
     {
       "category": "open",
-      "id": "PH-S971",
+      "id": "PH-S981",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "same",
-      "title": "Galaxy §4–6 implemented markers"
+      "summary": "step 1–12 final",
+      "title": "INDEX product-complete zriz"
     },
     {
       "category": "open",
-      "id": "PH-S972",
+      "id": "PH-S982",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "same",
-      "title": "Galaxy §7–9 implemented markers"
+      "summary": "root README",
+      "title": "README Next Focus → maintenance"
     },
     {
       "category": "open",
-      "id": "PH-S973",
+      "id": "PH-S983",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "§8.2 payout ✅; LAN blocked",
-      "title": "§8 TBD closed or BLOCKED noted"
+      "summary": "post-S1010 prep",
+      "title": "HANDOFF maintenance mode template"
     },
     {
       "category": "open",
-      "id": "PH-S974",
+      "id": "PH-S984",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "all rows ✅ or BLOCKED",
-      "title": "GALAXY_GRID_ROADMAP horizon table final"
+      "summary": "honest scope note",
+      "title": "DEVELOPMENT_PROGRESS 100% code scope"
     },
     {
       "category": "open",
-      "id": "PH-S975",
+      "id": "PH-S985",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
       "summary": "rust_ratio.json zriz",
-      "title": "poolai-loc-audit PH-S975"
+      "title": "poolai-loc-audit PH-S985"
     },
     {
       "category": "open",
-      "id": "PH-S976",
+      "id": "PH-S986",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "docs",
-      "title": "concept cross-links INDEX"
+      "summary": "FM catalog",
+      "title": "FM §5.15 draft product-complete"
     },
     {
       "category": "open",
-      "id": "PH-S977",
+      "id": "PH-S987",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -76,21 +76,111 @@
     },
     {
       "category": "open",
-      "id": "PH-S978",
+      "id": "PH-S988",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "hold",
+      "summary": "final hold",
       "title": "Ratio hold advisory"
     },
     {
       "category": "open",
-      "id": "PH-S979",
+      "id": "PH-S989",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
+      "summary": "STABLE band close",
+      "title": "galaxy_horizon_s980_integration"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S979",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
       "summary": "concept markers close",
       "title": "galaxy_horizon_s970_integration"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S978",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "hold",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S977",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--check` green",
+      "title": "poolai-vision-sync --check"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S976",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "docs",
+      "title": "concept cross-links INDEX"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S975",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "rust_ratio.json zriz",
+      "title": "poolai-loc-audit PH-S975"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S974",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "all rows ✅ or BLOCKED",
+      "title": "GALAXY_GRID_ROADMAP horizon table final"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S973",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "§8.2 payout ✅; LAN blocked",
+      "title": "§8 TBD closed or BLOCKED noted"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S972",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "same",
+      "title": "Galaxy §7–9 implemented markers"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S971",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "same",
+      "title": "Galaxy §4–6 implemented markers"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S970",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "POOLAI_GALAXY_GRID.md",
+      "title": "Galaxy §1–3 implemented markers"
     },
     {
       "category": "closed",
@@ -104,96 +194,6 @@
     {
       "category": "closed",
       "id": "PH-S968",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "hold",
-      "title": "Ratio hold advisory"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S967",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--check` green",
-      "title": "poolai-vision-sync --check"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S966",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "docs",
-      "title": "INDEX step 12 FM pointer"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S965",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "rust_ratio.json zriz",
-      "title": "poolai-loc-audit PH-S965"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S964",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "DOCS_LEGACY §5.3",
-      "title": "docs archive pointer batch"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S963",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "NEXT_STEPS_ARCHITECT sync",
-      "title": "ARCHITECT vs FM §5.1 alignment"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S962",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "poolAI_concept_root.txt zriz",
-      "title": "concept root de-hype pass"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S961",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "pointer to INDEX/archive",
-      "title": "stale banners on flat docs/*.md"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S960",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "table update",
-      "title": "DOCS_LEGACY_AUDIT remaining rows triage"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S959",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "digest band close",
-      "title": "galaxy_horizon_s950_integration"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S958",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",

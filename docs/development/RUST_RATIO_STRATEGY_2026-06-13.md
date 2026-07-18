@@ -332,6 +332,16 @@ flowchart TB
 | 237 | **PH-S967** | poolai-vision-sync drift gate | `--check` green | **✅** |
 | 238 | **PH-S968** | Ratio hold advisory snapshot | **94.91%** docs legacy hold | **✅** |
 | 239 | **PH-S969** | galaxy_horizon_s960_integration | DOCS_LEGACY close | **✅** |
+| 240 | **PH-S970** | Galaxy §1–3 implemented markers | POOLAI_GALAXY_GRID.md | **✅** |
+| 241 | **PH-S971** | Galaxy §4–6 implemented markers | same | **✅** |
+| 242 | **PH-S972** | Galaxy §7–9 implemented markers | same | **✅** |
+| 243 | **PH-S973** | §8 TBD closed or BLOCKED noted | §8.2 payout ✅; LAN blocked | **✅** |
+| 244 | **PH-S974** | GALAXY_GRID_ROADMAP horizon table final | all rows ✅ or BLOCKED | **✅** |
+| 245 | **PH-S975** | Rust ratio loc-audit refresh | **94.92%** sprint zriz | **✅** |
+| 246 | **PH-S976** | concept cross-links INDEX | docs | **✅** |
+| 247 | **PH-S977** | poolai-vision-sync drift gate | `--check` green | **✅** |
+| 248 | **PH-S978** | Ratio hold advisory snapshot | **94.92%** concept band hold | **✅** |
+| 249 | **PH-S979** | galaxy_horizon_s970_integration | concept markers close | **✅** |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 

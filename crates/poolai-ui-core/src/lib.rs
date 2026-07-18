@@ -8,6 +8,7 @@ pub mod admin_dom;
 pub mod admin_vm_workers;
 pub mod api_error;
 pub mod charts_depth;
+pub mod concept_markers_depth;
 pub mod design_tokens;
 pub mod digest_depth;
 pub mod docs_legacy_depth;
