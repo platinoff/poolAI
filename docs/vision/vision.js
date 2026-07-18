@@ -275,6 +275,43 @@
     }
   }
 
+  function visionSoftReload() {
+    saveMapPrefs();
+    location.reload();
+  }
+
+  function visionHardReset() {
+    try {
+      localStorage.removeItem(MAP_PREFS_KEY);
+    } catch (_) {
+      /* ignore */
+    }
+    location.reload();
+  }
+
+  function visionPowerPoolai(action) {
+    saveMapPrefs();
+    fetch("http://127.0.0.1:8080/api/v1/ops/power", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: action }),
+    }).catch(function () {
+      /* poolai stand may be down */
+    });
+  }
+
+  function openVisionPowerMenu() {
+    const choice = window.prompt(
+      "Vision power (PH-S1017):\n1 = soft reload (keep prefs)\n2 = hard reset (clear map prefs)\n3 = PoolAI shutdown\n4 = PoolAI reboot",
+      "1"
+    );
+    if (!choice) return;
+    if (choice === "1") visionSoftReload();
+    else if (choice === "2") visionHardReset();
+    else if (choice === "3") visionPowerPoolai("shutdown");
+    else if (choice === "4") visionPowerPoolai("reboot");
+  }
+
   function clusterStoreId(layer, key) {
     return layer + "::" + key;
   }
@@ -4322,6 +4359,8 @@
   document.getElementById("btn-sidebar").addEventListener("click", toggleSidebar);
   document.getElementById("btn-sidebar2").addEventListener("click", toggleSidebar);
   document.getElementById("btn-reload").addEventListener("click", () => reloadAll(true));
+  const btnPower = document.getElementById("btn-power");
+  if (btnPower) btnPower.addEventListener("click", openVisionPowerMenu);
   document.getElementById("btn-auto").addEventListener("click", toggleAutoReload);
   const btnEco = document.getElementById("btn-eco");
   if (btnEco) btnEco.addEventListener("click", cycleVisionMode);

@@ -448,6 +448,8 @@ pub fn admin_layout_with_module_script(
     let ui_confirm_patch = poolai_ui_core::i18n::admin_ui_confirm_patch_script();
     let theme_patch = poolai_ui_core::theme::admin_theme_patch_script();
     let modal_patch = poolai_ui_core::modal::admin_modal_patch_script();
+    let power_panel_script = poolai_ui_core::owner_ops_depth::admin_power_panel_script();
+    let power_modal_html = poolai_ui_core::owner_ops_depth::admin_power_modal_html();
     let module_block = if module_script.is_empty() {
         String::new()
     } else {
@@ -505,6 +507,7 @@ pub fn admin_layout_with_module_script(
       <header class="admin-header-bar">
         <h2 data-i18n="{title_key}">{title_fallback}</h2>
         <div class="admin-user-menu">
+          <button type="button" class="btn-icon" title="PoolAI power" aria-label="PoolAI power" onclick="poolaiOpenAdminPowerModal()">⏻</button>
           <div id="poolai-lang-toggle" class="admin-lang-bar"></div>
           <span id="admin-user-name">Admin</span>
           <button type="button" class="btn-icon" onclick="logout()" data-i18n-aria="admin.logout" aria-label="Log out">🚪</button>
@@ -518,6 +521,7 @@ pub fn admin_layout_with_module_script(
     </main>
   </div>
   <div id="admin-aria-live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+  {power_modal_html}
   
   <script>{i18n_patch}</script>
   <script>{auth_dash_patch}</script>
@@ -531,6 +535,7 @@ pub fn admin_layout_with_module_script(
   <script>{ui_confirm_patch}</script>
   <script>{theme_patch}</script>
   <script>{modal_patch}</script>
+  <script>{power_panel_script}</script>
   <script>{i18n_js}</script>
   <script>{theme_js}</script>
   <script>{common_js}</script>

@@ -10,7 +10,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 | Що | Де |
 |----|-----|
-| **Запуск** | PowerShell у корені: `.\bin\open-docs-vision.ps1` |
+| **Запуск** | PowerShell: `.\bin\open-docs-vision.ps1` · MSYS2: `/usr/bin/bash bin/open-docs-vision.sh` |
 | **URL** | `http://127.0.0.1:8765/docs/vision/index.html` (Cursor Simple Browser — лише localhost, не `S:/…`) |
 | **Панелі** | 3D-шари **L0–L5** (concept → workspace TOML) · Galaxy map · граф зв’язків · preview |
 | **Map UX** | pan/zoom · **Eco** (GPU save) · **Layers/Types** filters · **⊟ Folders** · **◎ Sprint** |
@@ -82,11 +82,11 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 ### Next Focus (2026-07-18)
 
-**Product-complete:** bands 1–36 ✅ · FM **§5.15** ✅ (PH-S1010) · **maintenance mode**.
+**Product-complete:** PH-S1010 ✅ · FM **§5.15** ✅ · **maintenance mode**.
 
-**§5.12:** **0** active · vision **rev 306** · rust_ratio **≥95%** (`ratio_95_formal_gate_met`).
+**Наступна сесія (owner):** **`абракадабра`** — drain band 37 **PH-S1011…S1018** (легка збірка/запуск, vision launch, poweroff/reset UI) · [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
-**Нові PH-S*:** лише за явним scan власника (BLOCKED/Deferred / FM-horizon v2) — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
+**§5.12:** **8** active (band 37) · vision **rev 306**.
 
 **Ops (поза чергою):** **FM-003** LAN §4 **BLOCKED** (2 хости) · **FM-041** Cloud SDK **Deferred**.
 

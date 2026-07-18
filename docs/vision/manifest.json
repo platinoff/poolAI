@@ -2288,11 +2288,17 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_multi_module_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_product_complete_depth_rs"
     }
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S1010",
+  "last_sprint_closed": "PH-S1018",
   "layers": [
     {
       "id": "L0",
@@ -9396,9 +9402,23 @@
       "label": "multi_module_wire_smoke.rs",
       "layer": "L3",
       "path": "tests/multi_module_wire_smoke.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_product_complete_depth_rs",
+      "label": "product_complete_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/product_complete_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1010_integration_rs",
+      "label": "galaxy_horizon_s1010_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1010_integration.rs"
     }
   ],
-  "revision": 306,
+  "revision": 308,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -17904,6 +17924,78 @@
       "row": 945,
       "status": "closed",
       "title": "FM §5.15 product-complete closure"
+    },
+    {
+      "acceptance": "--light` minimal-features build",
+      "deps": "ops `RUN_LOCAL.md",
+      "id": "PH-S1011",
+      "open": false,
+      "row": 946,
+      "status": "closed",
+      "title": "Light compile profile"
+    },
+    {
+      "acceptance": "preset `quick` + health wait",
+      "deps": "bin/run-poolai.*",
+      "id": "PH-S1012",
+      "open": false,
+      "row": 947,
+      "status": "closed",
+      "title": "Light full-stack launch preset"
+    },
+    {
+      "acceptance": "PS1 + MSYS2 shim localhost URL",
+      "deps": "README `open-docs-vision",
+      "id": "PH-S1013",
+      "open": false,
+      "row": 948,
+      "status": "closed",
+      "title": "Vision easy launch"
+    },
+    {
+      "acceptance": "save on stop; restore on quick; unit test",
+      "deps": "data/dev/last_run.json",
+      "id": "PH-S1014",
+      "open": false,
+      "row": 949,
+      "status": "closed",
+      "title": "Runtime state snapshot persist"
+    },
+    {
+      "acceptance": "toolbar modal Виключити/Перезавантажити",
+      "deps": "src/ui/admin",
+      "id": "PH-S1015",
+      "open": false,
+      "row": 950,
+      "status": "closed",
+      "title": "PoolAI admin power panel UI"
+    },
+    {
+      "acceptance": "shutdown/reboot dev-safe; integration test",
+      "deps": "POST /api/v1/ops/power",
+      "id": "PH-S1016",
+      "open": false,
+      "row": 951,
+      "status": "closed",
+      "title": "PoolAI power ops wire"
+    },
+    {
+      "acceptance": "power menu; localStorage; soft/hard reload",
+      "deps": "docs/vision/index.html",
+      "id": "PH-S1017",
+      "open": false,
+      "row": 952,
+      "status": "closed",
+      "title": "Vision poweroff/reset controls"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1011_integration`; RUN_LOCAL sync",
+      "deps": "tests/docs band 37",
+      "id": "PH-S1018",
+      "open": false,
+      "row": 953,
+      "status": "closed",
+      "title": "Ops power band close"
     }
   ],
   "sprint_queue_open_count": 0,

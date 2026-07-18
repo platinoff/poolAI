@@ -6,6 +6,7 @@
 |------|----------|
 | **Completion plan** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.14–§5.15** ✅ |
 | **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) — **351/351** ✅ |
+| **Last closed (band 37)** | PH-S1018 ✅ — owner ops UX v2 · `run-poolai quick` · `/api/v1/ops/power` |
 | **Last closed (band 36)** | PH-S1010 ✅ — FM **§5.15** product-complete · band 36 PH-S1010 |
 | **Last closed (band 35)** | PH-S1000…S1009 ✅ — final multi-module horizon · band 35 PH-S1000 |
 | **Last closed (band 34)** | PH-S990…S999 ✅ — integration gap fill · band 34 PH-S990 |

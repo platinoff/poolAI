@@ -1,8 +1,25 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-18 (PH-S1010 ✅ band 36 product-complete · FM **§5.15** ✅ · vision **rev 306** · rust_ratio **≥95%** · **maintenance mode**)
+**Оновлено:** 2026-07-18 (PH-S1018 ✅ · band 37 drained · maintenance mode)
 
-**Cursor 3.12.17 (2026-07-17):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-07-17.md`](./CURSOR_UPDATE_RESEARCH_2026-07-17.md). **PH-S1010 ✅ band 36** — FM **§5.15** product-complete. **Режим:** **maintenance mode** (нові PH-S* лише за scan власника).
+**Cursor 3.12.17 (2026-07-17):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-07-17.md`](./CURSOR_UPDATE_RESEARCH_2026-07-17.md). **PH-S1018 ✅** — band 37 owner ops UX v2. **Наступна сесія:** **`абракадабра`** — project scan replenish.
+
+## Band 37 — owner ops UX v2 (PH-S1011…S1018, ✅)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1011** | Light compile profile (minimal features, швидша збірка) |
+| **PH-S1012** | `run-poolai quick` — легкий запуск повного стенду |
+| **PH-S1013** | Vision easy launch у README + `open-docs-vision` |
+| **PH-S1014** | Збереження останніх параметрів запуску (`last_run.json`) |
+| **PH-S1015** | Admin UI: кнопка power → modal виключити/перезавантажити |
+| **PH-S1016** | API wire `POST /api/v1/ops/power` + integration test |
+| **PH-S1017** | Vision UI: poweroff/reset + `localStorage` стану |
+| **PH-S1018** | Band close: docs + `galaxy_horizon_s1011_integration` |
+
+**§5.12:** **0** відкритих (band 37 ✅). **Vision:** rev **308**. Деталі — FM **§5.17** · [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md).
+
+**PH-S1018 ✅ (2026-07-18):** band 37 close — `run-poolai quick`/`--light`; `last_run.json`; `POST /api/v1/ops/power`; admin + vision power UI; `galaxy_horizon_s1011_integration`; vision **rev 308**.
 
 ## Maintenance mode (PH-S1010)
 
@@ -88,7 +105,7 @@
 
 **Rules:** **`абракадабра`** — drain 10 з §5.12 → vision close → push; [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
-**§5.12:** **0** відкритих (maintenance mode). **Vision:** rev **306** · rust_ratio **≥95%** (PH-S1010). **Service:** FM §5.16 PH-SVC01…SVC10 ✅ (2026-07-17).
+**§5.12:** **0** відкритих. **Vision:** rev **308**. **Наступна:** **`абракадабра`** project scan.
 
 **Роадмеп:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) · **Промпт:** [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md).
 

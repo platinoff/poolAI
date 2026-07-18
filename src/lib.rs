@@ -130,6 +130,7 @@ pub mod job;
 pub mod memory;
 pub mod monitoring;
 pub mod observability;
+pub mod ops;
 pub mod platform;
 pub mod pool;
 pub mod release;

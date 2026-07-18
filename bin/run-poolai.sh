@@ -29,10 +29,13 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
 FEATURES="${FEATURES:-enterprise,ml,cloud,test-utils}"
+LIGHT_FEATURES="${LIGHT_FEATURES:-enterprise,test-utils}"
 PORT="${POOLAI_HTTP_PORT:-8080}"
 SKIP_BUILD="${SKIP_BUILD:-0}"
+LIGHT_BUILD="${LIGHT_BUILD:-0}"
 JOB_STORE="${POOLAI_JOB_STORE:-}"
 BG=0
+LAST_RUN_PATH="$ROOT/data/dev/last_run.json"
 
 usage() {
   cat <<'EOF'
@@ -41,6 +44,7 @@ Usage: /usr/bin/bash bin/run-poolai.sh <command> [options]
 
 Commands:
   single          One coordinator (default). UI: http://127.0.0.1:8080/ui
+  quick           Light build (optional) + single --bg + health wait (PH-S1012)
   lan             Two+ nodes on one host (FM-003 dev stand)
   virtual-node    Coordinator + poolai-worker (FM-016 dev stand)
   docker          docker compose up (docker/docker-compose.yml)
@@ -53,11 +57,13 @@ Options (single):
   --bg            Run in background (logs under data/dev/logs/)
   --port N        HTTP port (default 8080)
   --skip-build    Skip cargo build
+  --light         Use LIGHT_FEATURES for faster compile (PH-S1011)
   --raid-jobs     Preset POOLAI_JOB_STORE=raid + auto RAID path
   --job-store X   Set POOLAI_JOB_STORE (json|sqlite|raid)
 
 Environment:
   FEATURES        Cargo features (default: enterprise,ml,cloud,test-utils)
+  LIGHT_FEATURES  Light profile (default: enterprise,test-utils)
   POOLAI_HTTP_PORT, POOLAI_DATA_PATH, POOLAI_RAID_BASE_PATH, RUST_LOG
 
 Examples:
@@ -82,13 +88,63 @@ poolai_bin() {
 }
 
 cmd_build() {
-  echo "Building poolai (--features $FEATURES)..."
-  cargo build --features "$FEATURES"
+  local feats="$FEATURES"
+  if [[ "$LIGHT_BUILD" == "1" ]]; then
+    feats="$LIGHT_FEATURES"
+  fi
+  echo "Building poolai (--features $feats)..."
+  cargo build --features "$feats"
   cargo build --bin poolai-worker 2>/dev/null || true
+}
+
+save_last_run_snapshot() {
+  local preset="$1" port="$2" feats="$3" job_store="${4:-}" pid="${5:-}"
+  mkdir -p "$(dirname "$LAST_RUN_PATH")"
+  local js="${job_store:-null}"
+  if [[ -n "$job_store" ]]; then
+    js="\"$job_store\""
+  fi
+  local pid_json="${pid:-null}"
+  cat >"$LAST_RUN_PATH" <<EOF
+{
+  "preset": "$preset",
+  "port": $port,
+  "features": "$feats",
+  "job_store": $js,
+  "pid": $pid_json,
+  "saved_at": "$(date +%s)"
+}
+EOF
+}
+
+load_last_run_port() {
+  if [[ ! -f "$LAST_RUN_PATH" ]]; then
+    return 1
+  fi
+  local p
+  p="$(sed -n 's/.*"port"[[:space:]]*:[[:space:]]*\([0-9][0-9]*\).*/\1/p' "$LAST_RUN_PATH" | head -1)"
+  [[ -n "$p" ]] || return 1
+  PORT="$p"
+}
+
+wait_health() {
+  local port="$1" tries="${2:-30}"
+  local i=1
+  while [[ "$i" -le "$tries" ]]; do
+    if curl -sf --max-time 3 "http://127.0.0.1:${port}/api/v1/health" >/dev/null 2>&1; then
+      echo "Health OK http://127.0.0.1:${port}/api/v1/health"
+      return 0
+    fi
+    sleep 1
+    i=$((i + 1))
+  done
+  echo "Health wait timeout on port $port" >&2
+  return 1
 }
 
 cmd_stop() {
   echo "Stopping PoolAI processes..."
+  save_last_run_snapshot "stop" "$PORT" "$FEATURES" "${POOLAI_JOB_STORE:-}" ""
   if command -v pkill >/dev/null 2>&1; then
     pkill -f 'target/debug/poolai' 2>/dev/null || true
     pkill -f 'poolai-worker' 2>/dev/null || true
@@ -117,6 +173,7 @@ cmd_single() {
       --bg) BG=1; shift ;;
       --port) PORT="$2"; shift 2 ;;
       --skip-build) SKIP_BUILD=1; shift ;;
+      --light) LIGHT_BUILD=1; shift ;;
       --raid-jobs) JOB_STORE="raid"; shift ;;
       --job-store) JOB_STORE="$2"; shift 2 ;;
       *) echo "Unknown option: $1"; usage; exit 1 ;;
@@ -157,7 +214,9 @@ cmd_single() {
   if [[ "$BG" == "1" ]]; then
     local log="$logs/single-${PORT}.log"
     nohup "$exe" >"$log" 2>&1 &
-    echo "Background PID $! — log: $log"
+    local pid=$!
+    save_last_run_snapshot "single" "$PORT" "${FEATURES}" "${POOLAI_JOB_STORE:-}" "$pid"
+    echo "Background PID $pid — log: $log"
     echo "Stop: bash bin/run-poolai.sh stop"
     sleep 3
     cmd_status "$PORT"
@@ -165,6 +224,19 @@ cmd_single() {
     echo "Foreground (Ctrl+C to stop)..."
     exec "$exe"
   fi
+}
+
+cmd_quick() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --skip-build) SKIP_BUILD=1; shift ;;
+      --port) PORT="$2"; shift 2 ;;
+      *) echo "Unknown option: $1"; usage; exit 1 ;;
+    esac
+  done
+  load_last_run_port || true
+  cmd_single --bg --port "$PORT" --light ${SKIP_BUILD:+--skip-build}
+  wait_health "$PORT"
 }
 
 cmd_docker() {
@@ -188,6 +260,7 @@ case "$CMD" in
   stop) cmd_stop ;;
   status) cmd_status "${*:-}" ;;
   single) cmd_single "$@" ;;
+  quick) cmd_quick "$@" ;;
   lan) exec "$POOLAI_BASH" "$ROOT/bin/run-lan-nodes.sh" "$@" ;;
   virtual-node|vn) exec "$POOLAI_BASH" "$ROOT/bin/run-virtual-node-dev.sh" "$@" ;;
   docker) cmd_docker "$@" ;;

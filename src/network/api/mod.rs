@@ -25,6 +25,7 @@ pub mod instances;
 pub mod jobs;
 pub mod libraries;
 pub mod memory;
+pub mod ops;
 mod protocol_middleware;
 #[cfg(feature = "raft")]
 pub mod raft_rpc;
@@ -72,6 +73,7 @@ pub fn create_api_routes() -> Router<ApiContext> {
         .merge(completions::create_completions_routes())
         .merge(topology::create_topology_routes())
         .merge(ui::create_ui_routes())
+        .merge(ops::create_ops_routes())
         .layer(middleware::from_fn(
             protocol_middleware::protocol_header_middleware,
         ))

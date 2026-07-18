@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-07-18 (PH-S1010 ✅ band 36 product-complete · FM **§5.15** ✅ · vision **rev 306** · rust_ratio **≥95%** · maintenance mode)
+**Оновлено:** 2026-07-18 (PH-S1018 ✅ · band 37 drained · maintenance mode)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -1212,10 +1212,31 @@ FM-xxx (з таблиці нижче)
 | 943 | **PH-S1008** | Ratio hold advisory | ops | final pre-S1010 | **✅** |
 | 944 | **PH-S1009** | galaxy_horizon_s1000_integration | tests | final code band close | **✅** |
 | 945 | **PH-S1010** | FM §5.15 product-complete closure | docs | STABLE maintenance mode | **✅** |
+| 946 | **PH-S1011** | Light compile profile | ops `RUN_LOCAL.md` | `--light` minimal-features build | **✅** |
+| 947 | **PH-S1012** | Light full-stack launch preset | `bin/run-poolai.*` | preset `quick` + health wait | **✅** |
+| 948 | **PH-S1013** | Vision easy launch | README `open-docs-vision` | PS1 + MSYS2 shim localhost URL | **✅** |
+| 949 | **PH-S1014** | Runtime state snapshot persist | `data/dev/last_run.json` | save on stop; restore on quick; unit test | **✅** |
+| 950 | **PH-S1015** | PoolAI admin power panel UI | `src/ui/admin` | toolbar modal Виключити/Перезавантажити | **✅** |
+| 951 | **PH-S1016** | PoolAI power ops wire | `POST /api/v1/ops/power` | shutdown/reboot dev-safe; integration test | **✅** |
+| 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
+| 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (maintenance mode). **Master backlog:** **0** pending — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · **§5.14** ✅. Vision rev **306** (after sync). rust_ratio **≥95%** (PH-S1010). **Service band:** §5.16 PH-SVC01…SVC10 ✅ (2026-07-17).
+**Відкритих у §5.12:** **0** (band 37 PH-S1011…S1018 ✅). **Master backlog:** PH-S660…S1018 ✅. Vision rev **308** (post-sync). **Наступна сесія:** **`абракадабра`** — project scan replenish · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
-**Наступна сесія:** **maintenance mode** — BLOCKED/Deferred або явний scan власника · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+### 5.17 Post-maintenance owner queue — band 37 (PH-S1011…S1018, 2026-07-18)
+
+**Джерело:** явний запит власника (light compile/launch, vision README launch, poweroff/reset для PoolAI і Vision зі збереженням останнього стану). **Band 37 ✅** — light launch + power controls drained.
+
+| Тема | Спринти |
+|------|---------|
+| Легка збірка + запуск повного проєкту | PH-S1011, PH-S1012 |
+| Легкий запуск Vision (README) | PH-S1013 |
+| Збереження останніх параметрів | PH-S1014 |
+| Кнопки poweroff/reset PoolAI | PH-S1015, PH-S1016 |
+| Кнопки poweroff/reset Vision | PH-S1017 |
+| Закриття смуги | PH-S1018 |
+
+**Не в scope:** FM-003 LAN · FM-041 Cloud SDK · production host reboot без dev guard.
 
 ### 5.14 Master backlog PH-S720…S1010 (291 pending → product-complete, 2026-06-20)
 
@@ -1307,7 +1328,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-18):** **maintenance mode** — FM **§5.15** ✅ · PH-S1010 product-complete · ratio **≥95%** (PH-S1010).
+**Активна смуга (2026-07-18):** band 37 **PH-S1011…S1018** ✅ — owner ops UX v2 drained · **`абракадабра`** → project scan replenish.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

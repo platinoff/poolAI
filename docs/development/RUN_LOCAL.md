@@ -24,7 +24,44 @@ cd S:\rust\poolAI
 .\bin\run-poolai.ps1 stop
 ```
 
-**Last updated:** 2026-06-21 (PH-S856 band 20 · RAID jobs preset · `--raid-restart` stand smoke)
+**Last updated:** 2026-07-18 (PH-S1018 band 37 · quick preset · `--light` · vision launch)
+
+### PH-S1011 / PH-S1012: Light compile + quick preset
+
+```powershell
+# fastest dev loop — light features + background + health wait
+.\bin\run-poolai.ps1 quick
+
+# explicit light build
+.\bin\run-poolai.ps1 build -Light
+.\bin\run-poolai.ps1 single -Background -SkipBuild -Light
+```
+
+```bash
+/usr/bin/bash bin/run-poolai.sh quick
+/usr/bin/bash bin/run-poolai.sh build --light
+/usr/bin/bash bin/run-poolai.sh single --bg --skip-build --light
+```
+
+| Preset | Features (default) | Notes |
+|--------|-------------------|--------|
+| **full** | `enterprise,ml,cloud,test-utils` | `run-poolai build` default |
+| **light** (`--light`) | `enterprise,test-utils` | PH-S1011 faster compile |
+
+`quick` restores `data/dev/last_run.json` port when present (PH-S1014), runs light build unless `--skip-build`, starts `single --bg`, waits for `/api/v1/health`.
+
+### PH-S1013: Vision easy launch
+
+| Shell | Command |
+|-------|---------|
+| PowerShell | `.\bin\open-docs-vision.ps1` |
+| MSYS2 | `/usr/bin/bash bin/open-docs-vision.sh` |
+
+URL: `http://127.0.0.1:8765/docs/vision/index.html` — see README § Galaxy docs vision.
+
+### PH-S1015 / PH-S1016: Admin power UI + API
+
+Admin toolbar **⏻** → modal «Виключити» / «Перезавантажити» (`/ui/admin`). Wire: `POST /api/v1/ops/power` with `{"action":"shutdown"|"reboot"}` — dev-stand safe (host reboot skipped). Rust integration: `tests/ops_power_integration.rs`.
 
 ### PH-S55 / PH-S856: RAID jobs preset (single / lan one-liner)
 

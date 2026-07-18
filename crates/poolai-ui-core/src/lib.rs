@@ -28,6 +28,7 @@ pub mod ml;
 pub mod modal;
 pub mod multi_module_depth;
 pub mod network_profiles;
+pub mod owner_ops_depth;
 pub mod payout_batch;
 pub mod pricing;
 pub mod product_complete_depth;

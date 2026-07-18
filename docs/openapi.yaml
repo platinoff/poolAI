@@ -102,6 +102,8 @@ tags:
     description: Multi-tenant lifecycle and quotas (`enterprise_api/tenants.rs`)
   - name: EnterpriseAudit
     description: Audit log query (`enterprise_api/audit.rs`)
+  - name: Ops
+    description: Dev-stand operator controls (PH-S1016 power)
 
 paths:
   /status:
@@ -137,6 +139,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HealthResponse'
+
+  /ops/power:
+    post:
+      tags:
+        - Ops
+      summary: Dev-stand power control
+      description: |
+        Queue shutdown or reboot for the PoolAI coordinator (dev-stand safe — host reboot skipped).
+      operationId: postOpsPower
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OpsPowerRequest'
+      responses:
+        '202':
+          description: Power action accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpsPowerResponse'
+        '400':
+          description: Invalid action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /login:
     post:
@@ -5740,6 +5770,32 @@ components:
               $ref: '#/components/schemas/HealthCheck'
             gpu:
               $ref: '#/components/schemas/HealthCheck'
+
+    OpsPowerRequest:
+      type: object
+      required:
+        - action
+      properties:
+        action:
+          type: string
+          enum: [shutdown, reboot]
+          description: Power action for dev stand
+
+    OpsPowerResponse:
+      type: object
+      properties:
+        accepted:
+          type: boolean
+          example: true
+        action:
+          type: string
+          example: shutdown
+        dev_guard:
+          type: boolean
+          example: true
+        note:
+          type: string
+          description: Dev-stand safety note (host reboot skipped)
 
     HealthCheck:
       type: object

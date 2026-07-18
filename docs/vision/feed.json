@@ -3,6 +3,78 @@
   "items": [
     {
       "category": "closed",
+      "id": "PH-S1018",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_horizon_s1011_integration`; RUN_LOCAL sync",
+      "title": "Ops power band close"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1017",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "power menu; localStorage; soft/hard reload",
+      "title": "Vision poweroff/reset controls"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1016",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "shutdown/reboot dev-safe; integration test",
+      "title": "PoolAI power ops wire"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1015",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "toolbar modal Виключити/Перезавантажити",
+      "title": "PoolAI admin power panel UI"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1014",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "save on stop; restore on quick; unit test",
+      "title": "Runtime state snapshot persist"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1013",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "PS1 + MSYS2 shim localhost URL",
+      "title": "Vision easy launch"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1012",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "preset `quick` + health wait",
+      "title": "Light full-stack launch preset"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1011",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--light` minimal-features build",
+      "title": "Light compile profile"
+    },
+    {
+      "category": "closed",
       "id": "PH-S1010",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
@@ -36,78 +108,6 @@
       "status": "closed",
       "summary": "--check` green",
       "title": "poolai-vision-sync --check"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1006",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "poolai-vision-sync",
-      "title": "vision manifest final sprint_queue"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1005",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "rust_ratio.json zriz",
-      "title": "poolai-loc-audit PH-S1005"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1004",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "FM",
-      "title": "openapi-gap + test-ci dual gate doc"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1003",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "HANDOFF",
-      "title": "cargo test-ci scope note final"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1002",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "bin --json all green",
-      "title": "multi-module stand smoke full suite"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1001",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "ui-core full test gate",
-      "title": "multi-module admin wasm regression"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1000",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "top 5 grid APIs one test",
-      "title": "multi-module wire smoke harness"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S999",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "integration gap close",
-      "title": "galaxy_horizon_s990_integration"
     }
   ],
   "link": "docs/vision/index.html",
