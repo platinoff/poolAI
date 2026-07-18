@@ -262,6 +262,105 @@ pub const REPLICATION_PRICING_PARITY: &[(&str, &str)] = &[
     ),
 ];
 
+/// Extended verification verdict parity — keys in JSON export but not band-6 core (PH-S1069).
+pub const VERIFICATION_EXTENDED_PARITY: &[(&str, &str)] = &[
+    (
+        crate::grid::galaxy_verification_metrics::METRIC_VERIFICATION_MISMATCH_TOTAL,
+        "mismatch_total",
+    ),
+    (
+        crate::grid::galaxy_verification_metrics::METRIC_VERIFICATION_MATCH_TOTAL,
+        "match_total",
+    ),
+];
+
+/// Extended replication executor/rate-cap parity (PH-S1070).
+pub const REPLICATION_EXTENDED_PARITY: &[(&str, &str)] = &[
+    (
+        crate::grid::galaxy_replication_metrics::METRIC_REPLICATION_EXECUTOR_ENQUEUE_TOTAL,
+        "executor_enqueue_total",
+    ),
+    (
+        crate::grid::galaxy_replication_metrics::METRIC_REPLICATION_RATE_LIMITED_TOTAL,
+        "rate_limited_total",
+    ),
+];
+
+/// Extended pricing provider parity (PH-S1071).
+pub const PRICING_EXTENDED_PARITY: &[(&str, &str)] = &[
+    (
+        crate::grid::galaxy_pricing_oracle::METRIC_FORCED_FALLBACK_TOTAL,
+        "forced_fallback_total",
+    ),
+    (
+        crate::grid::galaxy_pricing_provider_metrics::METRIC_PROVIDER_CATALOG_HITS_TOTAL,
+        "provider_catalog_hits_total",
+    ),
+    (
+        crate::grid::galaxy_pricing_provider_metrics::METRIC_PROVIDER_ERRORS_TOTAL,
+        "provider_errors_total",
+    ),
+    (
+        crate::grid::galaxy_pricing_provider_metrics::METRIC_PROVIDER_TIMEOUTS_TOTAL,
+        "provider_timeouts_total",
+    ),
+];
+
+/// Extended prefetch plan/enqueue/peer parity (PH-S1072).
+pub const PREFETCH_EXTENDED_PARITY: &[(&str, &str)] = &[
+    (
+        crate::grid::galaxy_prefetch_metrics::METRIC_PREFETCH_PLAN_TOTAL,
+        "plan_total",
+    ),
+    (
+        crate::grid::galaxy_prefetch_metrics::METRIC_PREFETCH_ENQUEUE_TOTAL,
+        "enqueue_total",
+    ),
+    (
+        crate::grid::galaxy_prefetch_metrics::METRIC_PREFETCH_PEER_FETCH_TOTAL,
+        "peer_fetch_total",
+    ),
+];
+
+/// Extended settlement pending/resolved parity (PH-S1072).
+pub const SETTLEMENT_EXTENDED_PARITY: &[(&str, &str)] = &[
+    (
+        crate::grid::galaxy_settlement_metrics::METRIC_SETTLEMENT_PENDING_VERIFICATION_TOTAL,
+        "pending_verification_total",
+    ),
+    (
+        crate::grid::galaxy_settlement_metrics::METRIC_SETTLEMENT_RESOLVED_TOTAL,
+        "resolved_total",
+    ),
+];
+
+/// Extended trust held/gate parity (PH-S1072).
+pub const TRUST_EXTENDED_PARITY: &[(&str, &str)] = &[
+    (
+        crate::grid::galaxy_trust_score::METRIC_PAYOUT_HELD_TOTAL,
+        "payout_held_total",
+    ),
+    (
+        crate::grid::galaxy_trust_score::METRIC_TRUST_GATE_MIN_THRESHOLD,
+        "gate_min_threshold",
+    ),
+];
+
+/// All 12 grid `*-metrics` API paths for parity hardening band (PH-S1073).
+pub const GRID_METRICS_API_PATHS: &[&str] = &[
+    "/api/v1/grid/verification-metrics",
+    "/api/v1/grid/replay-metrics",
+    "/api/v1/grid/settlement-metrics",
+    "/api/v1/grid/trust-metrics",
+    "/api/v1/grid/replication-metrics",
+    "/api/v1/grid/pricing-metrics",
+    "/api/v1/grid/prefetch-metrics",
+    "/api/v1/grid/locality-metrics",
+    "/api/v1/grid/fee-split-metrics",
+    "/api/v1/grid/governance-metrics",
+    "/api/v1/grid/payout-batch-metrics",
+];
+
 /// Stand smoke metrics parity depth classification (PH-S714; band 7 PH-S724).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StandSmokeMetricsParityDepth {
@@ -279,6 +378,8 @@ pub enum StandSmokeMetricsParityDepth {
     GovernanceOps,
     /// Stand smoke v2 — full grid JSON↔Prom parity (PH-S830 band 18).
     FullGridParityV2,
+    /// Stand smoke v3 — extended JSON↔Prom parity hardening (PH-S1069 band 43).
+    FullGridParityV3,
     /// Memory shard persist + seed-inventory depth (PH-S863 band 21).
     MemoryShardPersist,
     /// On-chain cleared settlement depth + metrics (PH-S873 band 22).
@@ -300,6 +401,12 @@ pub fn stand_smoke_metrics_parity_depth_stub(
     let Some(f) = features else {
         return StandSmokeMetricsParityDepth::None;
     };
+    if f.get("full_grid_parity_v3")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        return StandSmokeMetricsParityDepth::FullGridParityV3;
+    }
     if f.get("full_grid_parity_v2")
         .and_then(|v| v.as_bool())
         .unwrap_or(false)
@@ -541,6 +648,44 @@ pub fn validate_band6_metrics_parity_v2(
     validate_fee_split_metrics_parity(prom_text, fee_split)?;
     validate_governance_metrics_parity(prom_text, governance)?;
     validate_payout_batch_metrics_parity(prom_text, payout_batch)?;
+    Ok(())
+}
+
+/// Full grid stand smoke v3 — v2 + extended parity pairs across all metric APIs (PH-S1073).
+pub fn validate_band6_metrics_parity_v3(
+    prom_text: &str,
+    verification: &Value,
+    replay: &Value,
+    settlement: &Value,
+    trust: &Value,
+    replication: &Value,
+    pricing: &Value,
+    prefetch: &Value,
+    locality: &Value,
+    fee_split: &Value,
+    governance: &Value,
+    payout_batch: &Value,
+) -> Result<(), String> {
+    validate_band6_metrics_parity_v2(
+        prom_text,
+        verification,
+        replay,
+        settlement,
+        trust,
+        replication,
+        pricing,
+        prefetch,
+        locality,
+        fee_split,
+        governance,
+        payout_batch,
+    )?;
+    validate_prometheus_json_parity_pairs(prom_text, verification, VERIFICATION_EXTENDED_PARITY)?;
+    validate_prometheus_json_parity_pairs(prom_text, replication, REPLICATION_EXTENDED_PARITY)?;
+    validate_prometheus_json_parity_pairs(prom_text, pricing, PRICING_EXTENDED_PARITY)?;
+    validate_prometheus_json_parity_pairs(prom_text, prefetch, PREFETCH_EXTENDED_PARITY)?;
+    validate_prometheus_json_parity_pairs(prom_text, settlement, SETTLEMENT_EXTENDED_PARITY)?;
+    validate_prometheus_json_parity_pairs(prom_text, trust, TRUST_EXTENDED_PARITY)?;
     Ok(())
 }
 
@@ -990,6 +1135,83 @@ mod tests {
             &payout_batch,
         )
         .expect("v2 parity");
+    }
+
+    #[test]
+    fn validate_band6_metrics_parity_v3_ph_s1073() {
+        let prom = concat!(
+            "galaxy_verification_sample_total 0\n",
+            "galaxy_verification_checker_pending_total 0\n",
+            "galaxy_verification_mismatch_total 0\n",
+            "galaxy_verification_match_total 0\n",
+            "galaxy_replay_pending 0\n",
+            "galaxy_verification_replay_record_total 0\n",
+            "galaxy_settlement_cleared_total 0\n",
+            "galaxy_settlement_payout_batch_total 0\n",
+            "galaxy_settlement_pending_verification_total 0\n",
+            "galaxy_settlement_resolved_total 0\n",
+            "galaxy_trust_payout_eligible_total 0\n",
+            "galaxy_trust_score 0\n",
+            "galaxy_trust_payout_held_total 0\n",
+            "galaxy_trust_gate_min_threshold 40\n",
+            "galaxy_replication_strict_total 0\n",
+            "galaxy_replication_enqueue_total 0\n",
+            "galaxy_replication_executor_enqueue_total 0\n",
+            "galaxy_replication_rate_limited_total 0\n",
+            "galaxy_pricing_fresh_served 0\n",
+            "galaxy_pricing_stale_served 0\n",
+            "galaxy_pricing_forced_fallback_total 0\n",
+            "galaxy_pricing_provider_catalog_hits_total 0\n",
+            "galaxy_pricing_provider_errors_total 0\n",
+            "galaxy_pricing_provider_timeouts_total 0\n",
+            "galaxy_prefetch_pull_bytes_total 0\n",
+            "galaxy_prefetch_backpressure_total 0\n",
+            "galaxy_prefetch_plan_total 0\n",
+            "galaxy_prefetch_enqueue_total 0\n",
+            "galaxy_prefetch_peer_fetch_total 0\n",
+            "galaxy_shard_local_hit_ratio 0\n",
+            "galaxy_hot_tier_hit_ratio 0\n",
+            "galaxy_cross_region_egress_mb 0\n",
+            "galaxy_hot_promote_total 0\n",
+            "galaxy_hot_evict_total 0\n",
+            "galaxy_fee_split_applied_total 0\n",
+            "poolai_release_verify_total 0\n",
+            "poolai_release_verify_fail_total 0\n",
+            "poolai_update_notify_pending 0\n",
+            "poolai_advisory_acknowledged_total 0\n",
+            "galaxy_settlement_payout_batch_queue_depth 0\n",
+            "galaxy_settlement_onchain_submit_total 0\n",
+        );
+        let verification = json!({"ok": true, "metrics": {"sample_total": 0, "mismatch_total": 0, "match_total": 0, "checker_pending_total": 0}});
+        let replay = json!({"ok": true, "metrics": {"replay_pending": 0, "replay_pending_scheduled_total": 0, "verification_replay_record_total": 0}});
+        let settlement = json!({"ok": true, "metrics": {"pending_verification_total": 0, "cleared_total": 0, "resolved_total": 0, "payout_batch_total": 0}});
+        let trust = json!({"ok": true, "metrics": {"payout_eligible_total": 0, "payout_held_total": 0, "last_trust_score": 0, "gate_min_threshold": 40}});
+        let replication = json!({"ok": true, "metrics": {"strict_total": 0, "enqueue_total": 0, "executor_enqueue_total": 0, "rate_limited_total": 0}});
+        let pricing = json!({"ok": true, "metrics": {"fresh_served_total": 0, "stale_served_total": 0, "forced_fallback_total": 0, "provider_catalog_lookups_total": 0, "provider_catalog_hits_total": 0, "provider_errors_total": 0, "provider_timeouts_total": 0}});
+        let prefetch = json!({"ok": true, "metrics": {"pull_bytes_total": 0, "backpressure_total": 0, "plan_total": 0, "enqueue_total": 0, "peer_fetch_total": 0}});
+        let locality = json!({"ok": true, "metrics": {"shard_local_hit_ratio_bps": 0, "hot_tier_hit_ratio_bps": 0, "cross_region_egress_mb": 0, "hot_promote_total": 0, "hot_evict_total": 0}});
+        let fee_split = json!({"ok": true, "metrics": {"fee_split_applied_total": 0, "primary_dev_fee_bps": 10, "secondary_admin_fee_min_bps": 100, "secondary_admin_fee_max_bps": 500}});
+        let governance = json!({"ok": true, "metrics": {"release_verify_total": 0, "release_verify_fail_total": 0, "update_notify_pending": 0, "advisory_acknowledged_total": 0}});
+        let payout_batch = json!({"ok": true, "metrics": {"payout_batch_total": 0, "payout_batch_queue_depth": 0, "onchain_submit_total": 0}});
+        validate_band6_metrics_parity_v3(
+            prom,
+            &verification,
+            &replay,
+            &settlement,
+            &trust,
+            &replication,
+            &pricing,
+            &prefetch,
+            &locality,
+            &fee_split,
+            &governance,
+            &payout_batch,
+        )
+        .expect("v3 parity");
+        assert_eq!(
+            stand_smoke_metrics_parity_depth_stub(Some(&json!({"full_grid_parity_v3": true}))),
+            StandSmokeMetricsParityDepth::FullGridParityV3
+        );
     }
 
     #[test]

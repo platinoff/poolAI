@@ -17,6 +17,7 @@ pub mod e2e_visual_axe_depth;
 pub mod format;
 pub mod galaxy_telegram_seats;
 pub mod galaxy_virtual_nodes;
+pub mod grid_metrics_parity_depth;
 pub mod grid_replication_pricing;
 pub mod grid_verification;
 pub mod i18n;

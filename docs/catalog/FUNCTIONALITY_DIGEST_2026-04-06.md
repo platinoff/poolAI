@@ -244,7 +244,7 @@
 | **Fraud proof** | `src/grid/galaxy_fraud_proof.rs` | fraud proof stub |
 | **Protocol negotiation metrics** | `src/grid/galaxy_protocol_negotiation_metrics.rs` | compat negotiation counters |
 | **Solana depth** | `src/grid/solana_depth.rs` | settlement on-chain depth wire |
-| **Stand smoke parity** | `src/grid/stand_smoke_metrics_parity.rs` | JSON↔Prom parity band helpers |
+| **Stand smoke parity** | `src/grid/stand_smoke_metrics_parity.rs` | JSON↔Prom parity band helpers; **v3** extended pairs (band 43 PH-S1069…S1078) |
 
 **Wire / API (Galaxy cross-ref):**
 

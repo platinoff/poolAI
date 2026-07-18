@@ -6,6 +6,7 @@
 |------|----------|
 | **Completion plan** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.14–§5.15** ✅ |
 | **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) — **351/351** ✅ |
+| **Last closed (band 43)** | PH-S1078 ✅ — Grid metrics parity hardening · `validate_band6_metrics_parity_v3` + stand smoke v3 |
 | **Last closed (band 42)** | PH-S1068 ✅ — OpenAPI/docs wire sync · contracts + stand smoke ops/power |
 | **Last closed (band 41)** | PH-S1058 ✅ — E2E visual/axe regression · Playwright snapshots + vision axe |
 | **Last closed (band 40)** | PH-S1048 ✅ — Vision map/a11y/perf · skip links + tree keyboard |
@@ -67,6 +68,7 @@
 | **Vision map/a11y/perf** | skip links + tree keyboard | band 40 ✅ PH-S1039…S1048 · `vision_map_depth.rs` |
 | **E2E visual/axe regression** | Playwright snapshots | band 41 ✅ PH-S1049…S1058 · `e2e_visual_axe_depth.rs` |
 | **OpenAPI/docs wire sync** | contracts + stand smoke | band 42 ✅ PH-S1059…S1068 · `grid_openapi_contracts.rs` · `memory_api_contracts.rs` · `openapi_wire_depth.rs` |
+| **Grid metrics parity hardening** | extended JSON↔Prom v3 | band 43 ✅ PH-S1069…S1078 · `validate_band6_metrics_parity_v3` · `grid_metrics_parity_depth.rs` |
 | **network_profile persist stub** | Galaxy **§8** | PH-S664 ✅ (stub); full persist ✅ band 8 PH-S730…S739 |
 
 **§5.5 prefetch:** live pull + backpressure + strict-mode HTTP wire ✅ (baseline); live pull **depth** ✅ band 10 (PH-S750…S759).

@@ -1662,6 +1662,65 @@ async fn smoke_grid_metrics_json_prometheus_parity_band6_v2(
     )
 }
 
+/// PH-S1073: stand smoke v3 — extended grid JSON metrics export + Prometheus parity.
+async fn smoke_grid_metrics_json_prometheus_parity_band6_v3(
+    client: &Client,
+    base: &str,
+) -> Result<(), String> {
+    use poolai::grid::stand_smoke_metrics_parity::validate_band6_metrics_parity_v3;
+
+    let prom_resp = client
+        .get(api_url(base, "/metrics"))
+        .send()
+        .await
+        .map_err(|e| format!("/metrics request: {e}"))?;
+    if prom_resp.status() != StatusCode::OK {
+        return Err(format!("/metrics status {}", prom_resp.status()));
+    }
+    let prom_text = prom_resp.text().await.map_err(|e| e.to_string())?;
+
+    async fn fetch_metrics_json(client: &Client, base: &str, path: &str) -> Result<Value, String> {
+        let resp = client
+            .get(api_url(base, path))
+            .send()
+            .await
+            .map_err(|e| format!("{path} request: {e}"))?;
+        if resp.status() != StatusCode::OK {
+            return Err(format!("{path} status {}", resp.status()));
+        }
+        resp.json().await.map_err(|e| format!("{path} json: {e}"))
+    }
+
+    let verification =
+        fetch_metrics_json(client, base, "/api/v1/grid/verification-metrics").await?;
+    let replay = fetch_metrics_json(client, base, "/api/v1/grid/replay-metrics").await?;
+    let settlement = fetch_metrics_json(client, base, "/api/v1/grid/settlement-metrics").await?;
+    let trust = fetch_metrics_json(client, base, "/api/v1/grid/trust-metrics").await?;
+    let replication = fetch_metrics_json(client, base, "/api/v1/grid/replication-metrics").await?;
+    let pricing = fetch_metrics_json(client, base, "/api/v1/grid/pricing-metrics").await?;
+    let prefetch = fetch_metrics_json(client, base, "/api/v1/grid/prefetch-metrics").await?;
+    let locality = fetch_metrics_json(client, base, "/api/v1/grid/locality-metrics").await?;
+    let fee_split = fetch_metrics_json(client, base, "/api/v1/grid/fee-split-metrics").await?;
+    let governance = fetch_metrics_json(client, base, "/api/v1/grid/governance-metrics").await?;
+    let payout_batch =
+        fetch_metrics_json(client, base, "/api/v1/grid/payout-batch-metrics").await?;
+
+    validate_band6_metrics_parity_v3(
+        &prom_text,
+        &verification,
+        &replay,
+        &settlement,
+        &trust,
+        &replication,
+        &pricing,
+        &prefetch,
+        &locality,
+        &fee_split,
+        &governance,
+        &payout_batch,
+    )
+}
+
 async fn smoke_grid_network_profile_read(client: &Client, base: &str) -> Result<(), String> {
     let resp = client
         .get(api_url(
@@ -2804,6 +2863,12 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
         &mut cases,
         "grid_metrics_json_prometheus_parity_band6_v2",
         smoke_grid_metrics_json_prometheus_parity_band6_v2(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
+        "grid_metrics_json_prometheus_parity_band6_v3",
+        smoke_grid_metrics_json_prometheus_parity_band6_v3(&client, &cli.base_url).await,
     )
     .await;
     record(

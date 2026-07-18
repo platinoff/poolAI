@@ -2324,6 +2324,12 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_e2e_visual_axe_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_openapi_wire_depth_rs"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -9544,9 +9550,30 @@
       "label": "galaxy_horizon_s1049_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s1049_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_openapi_wire_depth_rs",
+      "label": "openapi_wire_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/openapi_wire_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1059_integration_rs",
+      "label": "galaxy_horizon_s1059_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1059_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_memory_api_contracts_rs",
+      "label": "memory_api_contracts.rs",
+      "layer": "L3",
+      "path": "tests/memory_api_contracts.rs"
     }
   ],
-  "revision": 314,
+  "revision": 315,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -18124,6 +18151,96 @@
       "row": 953,
       "status": "closed",
       "title": "Ops power band close"
+    },
+    {
+      "acceptance": "VERIFICATION_EXTENDED_PARITY` mismatch/match JSON↔Prom",
+      "deps": "stand_smoke_metrics_parity.rs",
+      "id": "PH-S1069",
+      "open": false,
+      "row": 1004,
+      "status": "closed",
+      "title": "Verification extended parity"
+    },
+    {
+      "acceptance": "REPLICATION_EXTENDED_PARITY` executor/rate-cap",
+      "deps": "stand_smoke_metrics_parity.rs",
+      "id": "PH-S1070",
+      "open": false,
+      "row": 1005,
+      "status": "closed",
+      "title": "Replication extended parity"
+    },
+    {
+      "acceptance": "PRICING_EXTENDED_PARITY` forced_fallback + provider hits/errors",
+      "deps": "stand_smoke_metrics_parity.rs",
+      "id": "PH-S1071",
+      "open": false,
+      "row": 1006,
+      "status": "closed",
+      "title": "Pricing extended parity"
+    },
+    {
+      "acceptance": "PREFETCH_EXTENDED_PARITY` + settlement/trust extended pairs",
+      "deps": "stand_smoke_metrics_parity.rs",
+      "id": "PH-S1072",
+      "open": false,
+      "row": 1007,
+      "status": "closed",
+      "title": "Prefetch/settlement/trust extended parity"
+    },
+    {
+      "acceptance": "grid_metrics_json_prometheus_parity_band6_v3` live runner",
+      "deps": "poolai_http_stand_smoke.rs",
+      "id": "PH-S1073",
+      "open": false,
+      "row": 1008,
+      "status": "closed",
+      "title": "validate_band6_metrics_parity_v3` + stand smoke v3"
+    },
+    {
+      "acceptance": "all 11 `*-metrics` APIs shape + v3 synthetic gate",
+      "deps": "grid_metrics_parity_contracts.rs",
+      "id": "PH-S1074",
+      "open": false,
+      "row": 1009,
+      "status": "closed",
+      "title": "Grid metrics parity contracts"
+    },
+    {
+      "acceptance": "v3 extended parity pointer",
+      "deps": "PROMETHEUS_METRICS.md",
+      "id": "PH-S1075",
+      "open": false,
+      "row": 1010,
+      "status": "closed",
+      "title": "PROMETHEUS_METRICS band 43 sync"
+    },
+    {
+      "acceptance": "band 43 closed row",
+      "deps": "roadmap §4",
+      "id": "PH-S1076",
+      "open": false,
+      "row": 1011,
+      "status": "closed",
+      "title": "GALAXY_GRID_ROADMAP + concept markers"
+    },
+    {
+      "acceptance": "depth enum + FM band 43 markers",
+      "deps": "grid_metrics_parity_depth.rs",
+      "id": "PH-S1077",
+      "open": false,
+      "row": 1012,
+      "status": "closed",
+      "title": "grid_metrics_parity_depth` ui-core stub"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1069_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1078",
+      "open": false,
+      "row": 1013,
+      "status": "closed",
+      "title": "Grid metrics parity band close"
     },
     {
       "acceptance": "exit 0; no missing Axum routes",

@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-07-18 (band 42 **PH-S1059…S1068** ✅ · horizon bands 43–47)
+**Оновлено:** 2026-07-18 (band 43 **PH-S1069…S1078** ✅ · horizon bands 44–47)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -1221,7 +1221,18 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 42 ✅). **Master horizon:** PH-S1069…S1118 (bands 43–47). Vision rev **314** (після sync). **Наступна сесія:** **`абракадабра`** — project scan → band 43.
+**Відкритих у §5.12:** **0** (band 43 ✅). **Master horizon:** PH-S1079…S1118 (bands 44–47). Vision rev **315** (після sync). **Наступна сесія:** **`абракадабра`** — project scan → band 44.
+
+| 1004 | **PH-S1069** | Verification extended parity | `stand_smoke_metrics_parity.rs` | `VERIFICATION_EXTENDED_PARITY` mismatch/match JSON↔Prom | **✅** |
+| 1005 | **PH-S1070** | Replication extended parity | `stand_smoke_metrics_parity.rs` | `REPLICATION_EXTENDED_PARITY` executor/rate-cap | **✅** |
+| 1006 | **PH-S1071** | Pricing extended parity | `stand_smoke_metrics_parity.rs` | `PRICING_EXTENDED_PARITY` forced_fallback + provider hits/errors | **✅** |
+| 1007 | **PH-S1072** | Prefetch/settlement/trust extended parity | `stand_smoke_metrics_parity.rs` | `PREFETCH_EXTENDED_PARITY` + settlement/trust extended pairs | **✅** |
+| 1008 | **PH-S1073** | `validate_band6_metrics_parity_v3` + stand smoke v3 | `poolai_http_stand_smoke.rs` | `grid_metrics_json_prometheus_parity_band6_v3` live runner | **✅** |
+| 1009 | **PH-S1074** | Grid metrics parity contracts | `grid_metrics_parity_contracts.rs` | all 11 `*-metrics` APIs shape + v3 synthetic gate | **✅** |
+| 1010 | **PH-S1075** | PROMETHEUS_METRICS band 43 sync | `PROMETHEUS_METRICS.md` | v3 extended parity pointer | **✅** |
+| 1011 | **PH-S1076** | GALAXY_GRID_ROADMAP + concept markers | roadmap §4 | band 43 closed row | **✅** |
+| 1012 | **PH-S1077** | `grid_metrics_parity_depth` ui-core stub | `grid_metrics_parity_depth.rs` | depth enum + FM band 43 markers | **✅** |
+| 1013 | **PH-S1078** | Grid metrics parity band close | tests/docs | `galaxy_horizon_s1069_integration`; HANDOFF/NEXT | **✅** |
 
 | 994 | **PH-S1059** | OpenAPI gap audit regression gate | `poolai-openapi-gap-audit` | exit 0; no missing Axum routes | **✅** |
 | 995 | **PH-S1060** | Grid OpenAPI contract extend | `grid_openapi_contracts.rs` | seed-inventory, verification-replay, checker tasks shape | **✅** |
@@ -1255,6 +1266,10 @@ FM-xxx (з таблиці нижче)
 | 981 | **PH-S1046** | ui-core depth stub | `vision_map_depth.rs` | depth enum + FM band 40 markers | **✅** |
 | 982 | **PH-S1047** | Vision Playwright smoke | `e2e/tests/vision.spec.ts` | skip-link focus; `#map-scene-3d`; tree role | **✅** |
 | 983 | **PH-S1048** | Vision map band close | tests/docs | `galaxy_horizon_s1039_integration`; HANDOFF/NEXT | **✅** |
+
+### 5.24 Grid metrics parity hardening queue — band 43 (PH-S1069…S1078, 2026-07-18)
+
+**Джерело:** project scan band 43 — extended JSON↔Prom pairs beyond band-6 v2; stand smoke v3 runner.
 
 ### 5.23 OpenAPI/docs wire sync queue — band 42 (PH-S1059…S1068, 2026-07-18)
 
@@ -1307,7 +1322,7 @@ FM-xxx (з таблиці нижче)
 | **40** | S1039…S1048 | Vision map/a11y/perf ✅ |
 | **41** | S1049…S1058 | E2E visual/axe regression band ✅ |
 | **42** | S1059…S1068 | OpenAPI/docs wire sync ✅ |
-| 43 | S1069…S1078 | Grid metrics parity hardening |
+| 43 | S1069…S1078 | Grid metrics parity hardening ✅ |
 | 44 | S1079…S1088 | wasm admin slim panels |
 | 45 | S1089…S1098 | stand smoke + RUN_LOCAL ops |
 | 46 | S1099…S1108 | ratio/rust migration advisory |
@@ -1340,7 +1355,7 @@ FM-xxx (з таблиці нижче)
 | **Drained bands 1–36** | PH-S660…S1010 ✅ |
 | **Активна §5.12** | — (maintenance mode) |
 | **Наступна promote** | — (owner scan only) |
-| **Сесій `абракадабра`** | band 42 drained (PH-S1059…S1068) |
+| **Сесій `абракадабра`** | band 43 drained (PH-S1069…S1078) |
 | **План фаз** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md) |
 | **Реєстр sprint×acceptance** | [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) |
 | **Regen** | `bash scripts/generate-ph-s-master-backlog-351.sh` |
@@ -1420,7 +1435,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-18):** band 42 **PH-S1059…S1068** ✅ · §5.12 **0** · наступна **`абракадабра`** → project scan → band 43.
+**Активна смуга (2026-07-18):** band 43 **PH-S1069…S1078** ✅ · §5.12 **0** · наступна **`абракадабра`** → project scan → band 44.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

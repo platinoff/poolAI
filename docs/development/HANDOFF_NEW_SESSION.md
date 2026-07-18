@@ -1,8 +1,27 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-18 (band 42 **PH-S1059…S1068** ✅ · horizon bands 43–47)
+**Оновлено:** 2026-07-18 (band 43 **PH-S1069…S1078** ✅ · horizon bands 44–47)
 
-**Наступна сесія:** **`абракадабра`** — project scan → band 43.
+**Наступна сесія:** **`абракадабра`** — project scan → band 44.
+
+## Band 43 — Grid metrics parity hardening (PH-S1069…S1078, ✅)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1069** | Verification extended parity (mismatch/match) |
+| **PH-S1070** | Replication extended parity (executor/rate-cap) |
+| **PH-S1071** | Pricing extended parity (forced_fallback + provider) |
+| **PH-S1072** | Prefetch + settlement/trust extended parity |
+| **PH-S1073** | `validate_band6_metrics_parity_v3` + stand smoke v3 |
+| **PH-S1074** | Grid metrics parity contract tests |
+| **PH-S1075** | PROMETHEUS_METRICS band 43 sync |
+| **PH-S1076** | GALAXY_GRID_ROADMAP maintenance rows |
+| **PH-S1077** | `grid_metrics_parity_depth` ui-core stub |
+| **PH-S1078** | Band close |
+
+**§5.12:** **0** відкритих (band 43 ✅). **Vision:** rev **315**.
+
+**PH-S1078 ✅ (2026-07-18):** `validate_band6_metrics_parity_v3`; extended parity pairs; stand smoke `grid_metrics_json_prometheus_parity_band6_v3`; `grid_metrics_parity_contracts`; `galaxy_horizon_s1069_integration`; vision **rev 315**.
 
 ## Band 42 — OpenAPI/docs wire sync (PH-S1059…S1068, ✅)
 
