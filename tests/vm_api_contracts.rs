@@ -90,7 +90,7 @@ fn assert_vm_instance_shape(o: &serde_json::Map<String, Value>) {
 }
 
 #[tokio::test]
-async fn vm_write_lifecycle_with_admin_auth() {
+async fn vm_write_lifecycle_with_admin_auth_ph_s994() {
     let app = vm_app_with_manager().await;
     let auth = admin_bearer();
     let name = format!("contract-vm-{}", uuid::Uuid::new_v4());

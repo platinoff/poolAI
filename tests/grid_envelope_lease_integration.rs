@@ -205,3 +205,12 @@ async fn grid_envelope_result_matching_epoch_completes_job() {
     let (_, final_job) = request_json(&app, "GET", &format!("/api/v1/jobs/{job_id}"), None).await;
     assert_eq!(final_job["job"]["status"], "completed");
 }
+
+/// PH-S991: band-34 registry — grid job lease canon covers archived `grid_job_lease.spec.ts`.
+#[test]
+fn integration_gap_grid_job_lease_canon_ph_s991() {
+    let src = include_str!("grid_envelope_lease_integration.rs");
+    assert!(src.contains("grid_envelope_job_with_peer_leases_job"));
+    assert!(src.contains("grid_envelope_job_without_peer_stays_scheduled"));
+    assert!(src.contains("grid_envelope_result_matching_epoch_completes_job"));
+}

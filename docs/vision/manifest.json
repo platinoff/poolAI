@@ -2270,11 +2270,17 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_concept_markers_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_stable_depth_rs"
     }
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S989",
+  "last_sprint_closed": "PH-S999",
   "layers": [
     {
       "id": "L0",
@@ -2307,7 +2313,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S990",
+  "next_sprint": "PH-S1000",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -9302,9 +9308,23 @@
       "label": "galaxy_horizon_s970_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s970_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_stable_depth_rs",
+      "label": "stable_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/stable_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s980_integration_rs",
+      "label": "galaxy_horizon_s980_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s980_integration.rs"
     }
   ],
-  "revision": 303,
+  "revision": 304,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -17626,91 +17646,181 @@
       "acceptance": "tests/* if missing",
       "deps": "tests",
       "id": "PH-S990",
-      "open": true,
+      "open": false,
       "row": 925,
-      "status": "open",
+      "status": "closed",
       "title": "integration gap: telegram wallet"
     },
     {
       "acceptance": "extend if gap",
       "deps": "tests",
       "id": "PH-S991",
-      "open": true,
+      "open": false,
       "row": 926,
-      "status": "open",
+      "status": "closed",
       "title": "integration gap: grid job lease"
     },
     {
       "acceptance": "extend if gap",
       "deps": "tests",
       "id": "PH-S992",
-      "open": true,
+      "open": false,
       "row": 927,
-      "status": "open",
+      "status": "closed",
       "title": "integration gap: protocol middleware"
     },
     {
       "acceptance": "extend if gap",
       "deps": "tests",
       "id": "PH-S993",
-      "open": true,
+      "open": false,
       "row": 928,
-      "status": "open",
+      "status": "closed",
       "title": "integration gap: jobs raid restart"
     },
     {
       "acceptance": "extend if gap",
       "deps": "tests",
       "id": "PH-S994",
-      "open": true,
+      "open": false,
       "row": 929,
-      "status": "open",
+      "status": "closed",
       "title": "integration gap: vm write lifecycle"
     },
     {
       "acceptance": "rust_ratio.json zriz",
       "deps": "§5.13",
       "id": "PH-S995",
-      "open": true,
+      "open": false,
       "row": 930,
-      "status": "open",
+      "status": "closed",
       "title": "poolai-loc-audit PH-S995"
     },
     {
       "acceptance": "docs",
       "deps": "docs",
       "id": "PH-S996",
-      "open": true,
+      "open": false,
       "row": 931,
-      "status": "open",
+      "status": "closed",
       "title": "poolai-testing-policy gap note"
     },
     {
       "acceptance": "--check` green",
       "deps": "ops",
       "id": "PH-S997",
-      "open": true,
+      "open": false,
       "row": 932,
-      "status": "open",
+      "status": "closed",
       "title": "poolai-vision-sync --check"
     },
     {
       "acceptance": "hold",
       "deps": "ops",
       "id": "PH-S998",
-      "open": true,
+      "open": false,
       "row": 933,
-      "status": "open",
+      "status": "closed",
       "title": "Ratio hold advisory"
     },
     {
       "acceptance": "integration gap close",
       "deps": "tests",
       "id": "PH-S999",
-      "open": true,
+      "open": false,
       "row": 934,
-      "status": "open",
+      "status": "closed",
       "title": "galaxy_horizon_s990_integration"
+    },
+    {
+      "acceptance": "top 5 grid APIs one test",
+      "deps": "tests",
+      "id": "PH-S1000",
+      "open": true,
+      "row": 935,
+      "status": "open",
+      "title": "multi-module wire smoke harness"
+    },
+    {
+      "acceptance": "ui-core full test gate",
+      "deps": "tests",
+      "id": "PH-S1001",
+      "open": true,
+      "row": 936,
+      "status": "open",
+      "title": "multi-module admin wasm regression"
+    },
+    {
+      "acceptance": "bin --json all green",
+      "deps": "ops",
+      "id": "PH-S1002",
+      "open": true,
+      "row": 937,
+      "status": "open",
+      "title": "multi-module stand smoke full suite"
+    },
+    {
+      "acceptance": "HANDOFF",
+      "deps": "docs",
+      "id": "PH-S1003",
+      "open": true,
+      "row": 938,
+      "status": "open",
+      "title": "cargo test-ci scope note final"
+    },
+    {
+      "acceptance": "FM",
+      "deps": "docs",
+      "id": "PH-S1004",
+      "open": true,
+      "row": 939,
+      "status": "open",
+      "title": "openapi-gap + test-ci dual gate doc"
+    },
+    {
+      "acceptance": "rust_ratio.json zriz",
+      "deps": "§5.13",
+      "id": "PH-S1005",
+      "open": true,
+      "row": 940,
+      "status": "open",
+      "title": "poolai-loc-audit PH-S1005"
+    },
+    {
+      "acceptance": "poolai-vision-sync",
+      "deps": "ops",
+      "id": "PH-S1006",
+      "open": true,
+      "row": 941,
+      "status": "open",
+      "title": "vision manifest final sprint_queue"
+    },
+    {
+      "acceptance": "--check` green",
+      "deps": "ops",
+      "id": "PH-S1007",
+      "open": true,
+      "row": 942,
+      "status": "open",
+      "title": "poolai-vision-sync --check"
+    },
+    {
+      "acceptance": "final pre-S1010",
+      "deps": "ops",
+      "id": "PH-S1008",
+      "open": true,
+      "row": 943,
+      "status": "open",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "acceptance": "final code band close",
+      "deps": "tests",
+      "id": "PH-S1009",
+      "open": true,
+      "row": 944,
+      "status": "open",
+      "title": "galaxy_horizon_s1000_integration"
     }
   ],
   "sprint_queue_open_count": 10,

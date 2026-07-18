@@ -1,8 +1,8 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-18 (PH-S980…S989 ✅ band 33 · active **PH-S990…S999** · vision **rev 303** · rust_ratio **94.92%**)
+**Оновлено:** 2026-07-18 (PH-S990…S999 ✅ band 34 · active **PH-S1000…S1009** · vision **rev 304** · rust_ratio **94.94%**)
 
-**Cursor 3.12.17 (2026-07-17):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-07-17.md`](./CURSOR_UPDATE_RESEARCH_2026-07-17.md). **PH-S980…S989 ✅ band 33** — STABLE product-complete draft. **Наступна product-сесія:** **`абракадабра`** (drain PH-S990…S999).
+**Cursor 3.12.17 (2026-07-17):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-07-17.md`](./CURSOR_UPDATE_RESEARCH_2026-07-17.md). **PH-S990…S999 ✅ band 34** — integration test gap fill. **Наступна product-сесія:** **`абракадабра`** (drain PH-S1000…S1009).
 
 ## Maintenance mode (template, PH-S983 — post-S1010)
 
@@ -16,11 +16,13 @@
 | Docs | STABLE «development complete»; INDEX/DIGEST без нових PH-S* у §5.12 |
 | **Не** | Автоматичний project scan / replenish §5.12 без запиту власника |
 
-**До PH-S1010:** продовжувати **`абракадабра`** drain з [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) bands 34–36.
+**До PH-S1010:** продовжувати **`абракадабра`** drain з [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) bands 35–36.
 
-**Completion roadmap v2 (2026-06-20):** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) — **101** спринтів до **product-complete** (PH-S1010 / FM **§5.15**); **3** сесій `абракадабра` × 10 PH-S* залишилось. Реєстр: [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · regen `bash scripts/generate-ph-s-master-backlog-351.sh`.
+**Completion roadmap v2 (2026-06-20):** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) — **101** спринтів до **product-complete** (PH-S1010 / FM **§5.15**); **2** сесій `абракадабра` × 10 PH-S* + tail S1010 залишилось. Реєстр: [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · regen `bash scripts/generate-ph-s-master-backlog-351.sh`.
 
-**Master backlog 21 (2026-07-18):** FM **§5.14**. Активна §5.12: **PH-S990…S999** (band 34 — integration gap fill). **`абракадабра`** = drain 10 → promote **PH-S1000…S1009** (band 35).
+**Master backlog 11 (2026-07-18):** FM **§5.14**. Активна §5.12: **PH-S1000…S1009** (band 35 — final multi-module horizon). **`абракадабра`** = drain 10 → promote **PH-S1010** (band 36).
+
+**PH-S990…S999 ✅ (2026-07-18):** `telegram_wallet_integration.rs` (PH-S990); grid job lease canon extend (PH-S991); protocol middleware canon (PH-S992); jobs RAID restart canon (PH-S993); vm write lifecycle PH-S994; `poolai-loc-audit` → `rust_ratio.json` **94.94%** (PH-S995); `poolai-testing-policy` band 34 gap note (PH-S996); `integration_gap_depth_stub` + `galaxy_horizon_s990_integration` (PH-S999); vision **rev 304**.
 
 **PH-S980…S989 ✅ (2026-07-18):** STABLE «Development complete (draft)» (PH-S980); INDEX product-complete zriz steps 1–12 (PH-S981); README Next Focus → maintenance prep (PH-S982); HANDOFF maintenance template (PH-S983); DEVELOPMENT_PROGRESS 100% code scope note (PH-S984); `poolai-loc-audit` → `rust_ratio.json` **94.92%** (PH-S985); FM **§5.15** draft (PH-S986); `stable_depth_stub` + `galaxy_horizon_s980_integration` (PH-S989); vision **rev 303**.
 
@@ -86,7 +88,7 @@
 
 **Rules:** **`абракадабра`** — drain 10 з §5.12 → vision close → push; [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
-**§5.12:** **10** відкритих **PH-S990…S999** (band 34). **Vision:** rev **303** · rust_ratio **94.92%** (PH-S985). **Service:** FM §5.16 PH-SVC01…SVC10 ✅ (2026-07-17).
+**§5.12:** **10** відкритих **PH-S1000…S1009** (band 35). **Vision:** rev **304** · rust_ratio **94.94%** (PH-S995). **Service:** FM §5.16 PH-SVC01…SVC10 ✅ (2026-07-17).
 
 **Роадмеп:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) · **Промпт:** [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md).
 

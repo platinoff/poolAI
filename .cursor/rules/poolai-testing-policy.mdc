@@ -55,6 +55,20 @@ bash bin/e2e-playwright.sh --start   # API smoke + UI; встановлює node
 
 **Node/npm зламаний у MSYS2** (`node.exe` missing, `Could not determine Node.js install directory`): `pacman -S mingw-w64-ucrt-x86_64-nodejs` у UCRT64; до ремонту — API scope закривати лише `cargo test-ci`.
 
+## Integration gap fill (band 34, PH-S996)
+
+**Канон:** archived Playwright API-smoke → Rust `tests/*_integration.rs`; реєстр — **`tests/integration_gap_audit.rs`** + `poolai_ui_core::integration_gap_depth`.
+
+| Sprint | Archived (legacy) | Rust canon |
+|--------|-------------------|------------|
+| PH-S990 | `telegram_wallet.spec.ts` | `tests/telegram_wallet_integration.rs` |
+| PH-S991 | `grid_job_lease.spec.ts` | `tests/grid_envelope_lease_integration.rs` |
+| PH-S992 | `protocol_middleware.spec.ts` | `tests/protocol_middleware_integration.rs` |
+| PH-S993 | `jobs_raid.spec.ts` | `tests/job_store_raid_persistence.rs` + `poolai-http-stand-smoke --raid-restart` |
+| PH-S994 | — (PH-S03 contracts) | `tests/vm_api_contracts.rs` |
+
+**Не дублювати** новими Playwright API specs — `e2e/archive/api-smoke/` + `tests/e2e_scope_audit.rs` gate browser-only `test:ci`.
+
 ## Заборонено (як Python у runtime-stack)
 
 - Нові **API-only** Playwright specs замість Rust integration tests.

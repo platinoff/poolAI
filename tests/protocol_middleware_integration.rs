@@ -116,3 +116,11 @@ async fn register_remote_unsupported_protocol_header_returns_403() {
         Some("unsupported")
     );
 }
+
+/// PH-S992: band-34 registry — protocol middleware canon covers archived `protocol_middleware.spec.ts`.
+#[test]
+fn integration_gap_protocol_middleware_canon_ph_s992() {
+    let src = include_str!("protocol_middleware_integration.rs");
+    assert!(src.contains("register_remote_protocol_header_1_2_adds_compat_headers"));
+    assert!(src.contains("register_remote_unsupported_protocol_header_returns_403"));
+}

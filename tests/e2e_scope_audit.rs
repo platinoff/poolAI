@@ -11,7 +11,7 @@ const RUST_WIRE_CANON: &[(&str, &str)] = &[
     ),
     (
         "telegram_wallet.spec.ts",
-        "tests/virtual_node_telegram_binding_integration.rs",
+        "tests/telegram_wallet_integration.rs",
     ),
     ("grid_pricing.spec.ts", "tests/grid_pricing_integration.rs"),
     (

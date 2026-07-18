@@ -1,12 +1,13 @@
 # Galaxy Grid roadmap (зріз)
 
-**Оновлено:** 2026-07-18 · **Completion v2:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · **21** pending PH-S1000…S1010 · **§5.12 active:** 10
+**Оновлено:** 2026-07-18 · **Completion v2:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · **11** pending PH-S1010… · **§5.12 active:** 10
 
 | Зріз | Значення |
 |------|----------|
 | **Completion plan** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.14–§5.15** |
 | **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) |
-| **Active drain (band 34)** | PH-S990…S999 — integration gap fill |
+| **Active drain (band 35)** | PH-S1000…S1009 — final multi-module horizon |
+| **Last closed (band 34)** | PH-S990…S999 ✅ — integration gap fill · band 34 PH-S990 |
 | **Last closed (band 33)** | PH-S980…S989 ✅ — STABLE + INDEX product-complete draft |
 | **Last closed (band 32)** | PH-S970…S979 ✅ — Galaxy concept implemented markers |
 | **Last closed (band 31)** | PH-S960…S969 ✅ — DOCS_LEGACY audit close |
@@ -16,7 +17,7 @@
 | **Product-complete tail** | PH-S1010 — FM **§5.15** |
 | **Rust ratio** | **94.92%** → PH-S975 zriz · hold **95%** advisory |
 
-**21** pending · **3** `абракадабра` sessions · остання закрита **PH-S980…S989** ✅.
+**11** pending · **2** `абракадабра` sessions · остання закрита **PH-S990…S999** ✅.
 
 ---
 
@@ -52,6 +53,7 @@
 | **§6.4 replication quorum production** | Galaxy **§6.4** | band 24 ✅ PH-S890…S899 |
 | **§4.2 pricing live fetch hardening** | Galaxy **§4.2** | band 25 ✅ PH-S900…S909 |
 | **Galaxy concept implemented markers** | POOLAI_GALAXY_GRID **§1–9** | band 32 ✅ PH-S970…S979 |
+| **Integration test gap fill** | archived API-smoke → Rust wire | band 34 ✅ PH-S990…S999 · `integration_gap_audit.rs` · `telegram_wallet_integration.rs` · `grid_envelope_lease_integration.rs` · `protocol_middleware_integration.rs` · `job_store_raid_persistence.rs` · `vm_api_contracts.rs` |
 | **network_profile persist stub** | Galaxy **§8** | PH-S664 ✅ (stub); full persist ✅ band 8 PH-S730…S739 |
 
 **§5.5 prefetch:** live pull + backpressure + strict-mode HTTP wire ✅ (baseline); live pull **depth** ✅ band 10 (PH-S750…S759).

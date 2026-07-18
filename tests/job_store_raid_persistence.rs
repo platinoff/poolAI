@@ -158,3 +158,15 @@ async fn job_store_raid_http_persist_survives_reload_ph_s850() {
     assert_eq!(row.spec.id.0, job_id);
     assert_eq!(row.spec.kind, JobKind::Inference);
 }
+
+/// PH-S993: band-34 registry — jobs RAID restart canon: store reload + stand-smoke `--raid-restart`.
+#[test]
+fn integration_gap_jobs_raid_restart_canon_ph_s993() {
+    let src = include_str!("job_store_raid_persistence.rs");
+    assert!(src.contains("job_store_raid_http_persist_survives_reload_ph_s850"));
+    let stand = include_str!("../src/bin/poolai_http_stand_smoke.rs");
+    assert!(stand.contains("smoke_jobs_raid"));
+    assert!(stand.contains("--raid-restart"));
+    let e2e = include_str!("../bin/e2e-playwright.sh");
+    assert!(e2e.contains("poolai-http-stand-smoke --raid-restart"));
+}
