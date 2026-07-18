@@ -18,7 +18,7 @@ test.describe("Vision solar layout (PH-S565)", () => {
   });
 
   test("solar hub nodes and orphan rim render", async ({ page }) => {
-    await expect(page.locator("#map-scene, .map-scene, #vision-map")).toBeVisible({
+    await expect(page.locator("#map-scene-3d, #map-scene, .map-scene, #vision-map")).toBeVisible({
       timeout: 20_000,
     });
     const nodes = page.locator(".map-node, [data-node-id], .vision-map-node");
@@ -45,7 +45,7 @@ test.describe("Vision solar layout (PH-S565)", () => {
   });
 
   test("auto-orbit rotY changes on play and holds on pause (PH-S590)", async ({ page }) => {
-    await expect(page.locator("#map-scene, .map-scene, #vision-map")).toBeVisible({
+    await expect(page.locator("#map-scene-3d, #map-scene, .map-scene, #vision-map")).toBeVisible({
       timeout: 20_000,
     });
     const orbitBtn = page.locator("#map-orbit-auto");
@@ -74,5 +74,17 @@ test.describe("Vision solar layout (PH-S565)", () => {
     await page.waitForTimeout(700);
     const rotYAfter = await readRotY();
     expect(Math.abs((rotYAfter as number) - (rotYPause as number))).toBeLessThan(0.05);
+  });
+
+  test("skip links and map orbit aria-pressed (PH-S1047)", async ({ page }) => {
+    const skip = page.locator(".vision-skip-link").first();
+    await expect(skip).toBeAttached();
+    await skip.focus();
+    await expect(skip).toBeFocused();
+    const orbitBtn = page.locator("#map-orbit-auto");
+    await expect(orbitBtn).toBeVisible({ timeout: 10_000 });
+    await expect(orbitBtn).toHaveAttribute("aria-pressed", /true|false/);
+    const tree = page.locator("#file-tree[role='tree']");
+    await expect(tree).toBeVisible();
   });
 });

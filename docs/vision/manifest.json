@@ -2306,11 +2306,17 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_ui_debug_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_admin_tables_forms_depth_rs"
     }
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S1038",
+  "last_sprint_closed": "PH-S1048",
   "layers": [
     {
       "id": "L0",
@@ -9484,9 +9490,23 @@
       "label": "galaxy_horizon_s1019_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s1019_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_admin_tables_forms_depth_rs",
+      "label": "admin_tables_forms_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/admin_tables_forms_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1029_integration_rs",
+      "label": "galaxy_horizon_s1029_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1029_integration.rs"
     }
   ],
-  "revision": 311,
+  "revision": 312,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -18066,94 +18086,94 @@
       "title": "Ops power band close"
     },
     {
-      "acceptance": "tenants + security OAuth/SAML/policies → `adminEmptyStateHtml",
-      "deps": "src/ui/admin",
-      "id": "PH-S1029",
+      "acceptance": "skip to map/queue/preview; `role=\"main\"",
+      "deps": "docs/vision/index.html",
+      "id": "PH-S1039",
       "open": false,
-      "row": 964,
+      "row": 974,
       "status": "closed",
-      "title": "Empty-state parity tier 1"
+      "title": "Skip links + landmarks"
     },
     {
-      "acceptance": "aria-label, container, `adminInitTablesIn`, actions `data-no-sort",
-      "deps": "src/ui/admin/security.rs",
-      "id": "PH-S1030",
+      "acceptance": "header/map/panel icon buttons labeled; `aria-pressed` toggles",
+      "deps": "docs/vision/",
+      "id": "PH-S1040",
       "open": false,
-      "row": 965,
+      "row": 975,
       "status": "closed",
-      "title": "Security tables polish"
+      "title": "Icon control aria-label parity"
     },
     {
-      "acceptance": "container, aria-label, striped, explicit init",
-      "deps": "tenants/jobs",
-      "id": "PH-S1031",
+      "acceptance": "role=\"tree\"` / `treeitem`; Arrow/Home/End nav",
+      "deps": "vision.js` file-tree",
+      "id": "PH-S1041",
       "open": false,
-      "row": 966,
+      "row": 976,
       "status": "closed",
-      "title": "Tenants + jobs tables"
+      "title": "Explorer tree keyboard"
     },
     {
-      "acceptance": "aria-label, container, `adminInitTablesIn",
-      "deps": "instances/topology",
-      "id": "PH-S1032",
+      "acceptance": "focusable neighbours; Enter select; focus restore",
+      "deps": "#link-graph",
+      "id": "PH-S1042",
       "open": false,
-      "row": 967,
+      "row": 977,
       "status": "closed",
-      "title": "Instances + topology tables"
+      "title": "Link graph neighbour a11y"
     },
     {
-      "acceptance": "empty → `adminEmptyStateHtml`; table init",
-      "deps": "network_profiles/seed/security_advisories",
-      "id": "PH-S1033",
+      "acceptance": "updateMapSprintDim` without full `renderMap",
+      "deps": "vision.js",
+      "id": "PH-S1043",
       "open": false,
-      "row": 968,
+      "row": 978,
       "status": "closed",
-      "title": "Grid panel tables"
+      "title": "Map sprint-dim incremental"
     },
     {
-      "acceptance": "container, aria-label, empty state",
-      "deps": "src/ui/admin/raid.rs",
-      "id": "PH-S1034",
+      "acceptance": "adaptive threshold when layer >120 nodes",
+      "deps": "isMapOverviewMode",
+      "id": "PH-S1044",
       "open": false,
-      "row": 969,
+      "row": 979,
       "status": "closed",
-      "title": "Raid artifacts table"
+      "title": "Dense-map LOD hardening"
     },
     {
-      "acceptance": "aria-required` + `aria-hidden` on `*",
-      "deps": "tenants/workers/vm/libs/security",
-      "id": "PH-S1035",
+      "acceptance": "pause starfield + orbit on `visibilitychange",
+      "deps": "vision.js",
+      "id": "PH-S1045",
       "open": false,
-      "row": 970,
+      "row": 980,
       "status": "closed",
-      "title": "Modal form a11y"
+      "title": "Background tab perf"
     },
     {
-      "acceptance": "aria-required` on required fields; dashboard empty states",
-      "deps": "config/dashboard",
-      "id": "PH-S1036",
+      "acceptance": "depth enum + FM band 40 markers",
+      "deps": "vision_map_depth.rs",
+      "id": "PH-S1046",
       "open": false,
-      "row": 971,
+      "row": 981,
       "status": "closed",
-      "title": "Config + dashboard forms/tables"
+      "title": "ui-core depth stub"
     },
     {
-      "acceptance": "depth enum + FM band 39 markers",
-      "deps": "admin_tables_forms_depth.rs",
-      "id": "PH-S1037",
+      "acceptance": "skip-link focus; `#map-scene-3d`; tree role",
+      "deps": "e2e/tests/vision.spec.ts",
+      "id": "PH-S1047",
       "open": false,
-      "row": 972,
+      "row": 982,
       "status": "closed",
-      "title": "ui-core depth stub + docs"
+      "title": "Vision Playwright smoke"
     },
     {
-      "acceptance": "galaxy_horizon_s1029_integration`; HANDOFF/NEXT",
+      "acceptance": "galaxy_horizon_s1039_integration`; HANDOFF/NEXT",
       "deps": "tests/docs",
-      "id": "PH-S1038",
+      "id": "PH-S1048",
       "open": false,
-      "row": 973,
+      "row": 983,
       "status": "closed",
-      "title": "Tables/forms band close"
+      "title": "Vision map band close"
     }
   ],
   "sprint_queue_open_count": 0,

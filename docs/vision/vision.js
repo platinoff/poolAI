@@ -649,6 +649,26 @@
     );
   }
 
+  /** PH-S1043: sprint-dim without full map rebuild. */
+  function updateMapSprintDim() {
+    const svg = document.getElementById("map-svg");
+    if (!svg || !manifest) return;
+    document.querySelectorAll("#map-svg .node").forEach((el) => {
+      const n = nodeById(el.dataset.id);
+      if (!n) return;
+      el.classList.toggle("sprint-dim", mapNodeDimmed(n));
+    });
+    document.querySelectorAll("#map-svg .edge").forEach((el) => {
+      const a = nodeById(el.dataset.from);
+      const b = nodeById(el.dataset.to);
+      el.classList.toggle(
+        "sprint-dim",
+        !!(a && b && mapNodeDimmed(a) && mapNodeDimmed(b))
+      );
+    });
+    updateMapSelection();
+  }
+
   function mapNodeShortLabel(n, pos) {
     if (pos.clusterHub) {
       return clusterDisplayName(pos.cluster) + " (" + pos.clusterCount + ")";
@@ -906,7 +926,11 @@
   function isMapOverviewMode() {
     const dense =
       manifest && manifest.nodes.length >= MAP_DENSE_NODE_THRESHOLD;
-    const threshold = dense ? 1.05 : MAP_OVERVIEW_ZOOM;
+    let threshold = dense ? 1.05 : MAP_OVERVIEW_ZOOM;
+    const maxLayerCount = layerNodeCounts
+      ? Math.max(0, ...Array.from(layerNodeCounts.values()))
+      : 0;
+    if (maxLayerCount > 120) threshold = Math.max(threshold, 1.12);
     return mapView.scale <= threshold;
   }
 
@@ -1230,6 +1254,12 @@
           : visionMode === "fx"
             ? "FX — full glow. Click → Ms (hover trace)."
             : "Ms — 1-hop edge highlight on hover. Click → Eco.";
+      btn.setAttribute("aria-label", "Vision GPU mode — " + visionMode.toUpperCase());
+      btn.setAttribute("aria-pressed", visionMode === "eco" ? "true" : "false");
+    }
+    const autoBtn = document.getElementById("btn-auto");
+    if (autoBtn) {
+      autoBtn.setAttribute("aria-pressed", autoReloadEnabled ? "true" : "false");
     }
     if (!isVisionMs()) hoverTraceId = null;
     restartStarfield();
@@ -2301,6 +2331,9 @@
           const n = val._node;
           const div = document.createElement("div");
           div.className = "tree-file";
+          div.setAttribute("role", "treeitem");
+          div.setAttribute("tabindex", "-1");
+          div.setAttribute("aria-label", n.label + " — " + (n.path || n.id));
           if (nodeInActiveSprint(n)) div.classList.add("sprint-scope");
           if (nodeInNextSprint(n)) div.classList.add("sprint-next");
           div.dataset.id = n.id;
@@ -2312,20 +2345,67 @@
             escapeHtml(n.label) +
             "</span>";
           div.addEventListener("click", () => selectNode(n));
+          div.addEventListener("keydown", (ev) => {
+            if (ev.key === "Enter" || ev.key === " ") {
+              ev.preventDefault();
+              selectNode(n);
+            }
+          });
           container.appendChild(div);
           return;
         }
         const det = document.createElement("details");
         det.className = "tree-folder";
+        det.setAttribute("role", "group");
         det.open = depth < 2;
         const sum = document.createElement("summary");
         sum.textContent = key;
         det.appendChild(sum);
         const inner = document.createElement("div");
+        inner.setAttribute("role", "group");
         renderTree(val, inner, depth + 1);
         det.appendChild(inner);
         container.appendChild(det);
       });
+  }
+
+  function treeFileItems() {
+    const tree = document.getElementById("file-tree");
+    if (!tree) return [];
+    return Array.from(tree.querySelectorAll('.tree-file[role="treeitem"]'));
+  }
+
+  function focusTreeFileItem(el) {
+    if (!el) return;
+    treeFileItems().forEach((item) => item.setAttribute("tabindex", "-1"));
+    el.setAttribute("tabindex", "0");
+    el.focus();
+  }
+
+  function initTreeKeyboardNav() {
+    const tree = document.getElementById("file-tree");
+    if (!tree || tree.dataset.kbBound) return;
+    tree.dataset.kbBound = "1";
+    tree.addEventListener("keydown", (ev) => {
+      const items = treeFileItems();
+      if (!items.length) return;
+      const idx = items.indexOf(document.activeElement);
+      if (ev.key === "ArrowDown") {
+        ev.preventDefault();
+        const next = items[Math.min(items.length - 1, idx < 0 ? 0 : idx + 1)];
+        focusTreeFileItem(next);
+      } else if (ev.key === "ArrowUp") {
+        ev.preventDefault();
+        const prev = items[Math.max(0, idx <= 0 ? 0 : idx - 1)];
+        focusTreeFileItem(prev);
+      } else if (ev.key === "Home") {
+        ev.preventDefault();
+        focusTreeFileItem(items[0]);
+      } else if (ev.key === "End") {
+        ev.preventDefault();
+        focusTreeFileItem(items[items.length - 1]);
+      }
+    });
   }
 
   function escapeHtml(s) {
@@ -2350,6 +2430,11 @@
         el.setAttribute("role", "button");
         el.setAttribute("tabindex", "0");
         el.title = "Click: focus this tier in the layer stack";
+        el.setAttribute("aria-label", layer.id + " — " + layer.name);
+        el.setAttribute(
+          "aria-pressed",
+          stackLayerFocus === layer.id ? "true" : "false"
+        );
         el.addEventListener("click", () => setStackLayerFocus(layer.id));
         el.addEventListener("keydown", (ev) => {
           if (ev.key === "Enter" || ev.key === " ") {
@@ -3611,11 +3696,14 @@
   function renderLinkGraph(node) {
     const svg = document.getElementById("link-graph");
     const ns = "http://www.w3.org/2000/svg";
+    const prevFocusId = document.activeElement?.dataset?.neighborId || null;
     while (svg.firstChild) svg.removeChild(svg.firstChild);
 
     const w = svg.clientWidth || 220;
     const h = svg.clientHeight || 180;
     svg.setAttribute("viewBox", "0 0 " + w + " " + h);
+    svg.setAttribute("role", "group");
+    svg.setAttribute("aria-label", "Neighbour graph for " + node.label);
 
     const cx = w / 2;
     const cy = h / 2;
@@ -3642,8 +3730,23 @@
       dot.setAttribute("fill", LAYER_COLORS[l.node.layer] || "#666");
       dot.setAttribute("stroke", "#fff");
       dot.setAttribute("stroke-width", "1");
+      dot.setAttribute("class", "link-neighbor");
+      dot.setAttribute("role", "button");
+      dot.setAttribute("tabindex", "0");
+      dot.dataset.neighborId = l.node.id;
+      const lbl =
+        l.node.label.length > 14
+          ? l.node.label.slice(0, 12) + "…"
+          : l.node.label;
+      dot.setAttribute("aria-label", "Open neighbour " + l.node.label);
       dot.style.cursor = "pointer";
       dot.addEventListener("click", () => selectNode(l.node));
+      dot.addEventListener("keydown", (ev) => {
+        if (ev.key === "Enter" || ev.key === " ") {
+          ev.preventDefault();
+          selectNode(l.node);
+        }
+      });
       svg.appendChild(dot);
       const t = document.createElementNS(ns, "text");
       t.setAttribute("x", x2);
@@ -3652,10 +3755,6 @@
       t.setAttribute("fill", "#9aa0a6");
       t.setAttribute("font-size", "8");
       t.setAttribute("font-family", "Segoe UI, system-ui, sans-serif");
-      const lbl =
-        l.node.label.length > 14
-          ? l.node.label.slice(0, 12) + "…"
-          : l.node.label;
       if (links.length <= 5) {
         t.textContent = lbl;
         svg.appendChild(t);
@@ -3693,6 +3792,11 @@
       empty.setAttribute("font-size", "9");
       empty.textContent = "no edges in manifest";
       svg.appendChild(empty);
+    }
+
+    if (prevFocusId) {
+      const restore = svg.querySelector('[data-neighbor-id="' + prevFocusId + '"]');
+      if (restore) restore.focus();
     }
   }
 
@@ -4045,6 +4149,7 @@
     if (activeTreeFileEl) {
       activeTreeFileEl.classList.add("active");
       revealTreeFile(activeTreeFileEl);
+      focusTreeFileItem(activeTreeFileEl);
     }
 
     highlightLayer(node.layer);
@@ -4172,7 +4277,6 @@
     function draw(ts) {
       if (!running) return;
       if (document.hidden) {
-        requestAnimationFrame(draw);
         return;
       }
       if (reducedMotion.matches) {
@@ -4315,6 +4419,7 @@
     const tree = document.getElementById("file-tree");
     tree.innerHTML = "";
     renderTree(buildTree(manifest.nodes), tree, 0);
+    initTreeKeyboardNav();
 
     const target =
       (prevId && nodeById(prevId)) ||
@@ -4394,6 +4499,7 @@
     btn.title = autoReloadEnabled
       ? "Auto-reload ON (" + watchIntervalMs() / 1000 + "s)"
       : "Auto-reload OFF";
+    btn.setAttribute("aria-pressed", autoReloadEnabled ? "true" : "false");
     if (autoReloadEnabled) startAutoReload();
     else stopAutoReload();
   }
@@ -4424,11 +4530,39 @@
     }
   }
 
+  function initVisionVisibilityPerf() {
+    if (document.body.dataset.visPerfBound) return;
+    document.body.dataset.visPerfBound = "1";
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        pauseMapOrbitAuto();
+        if (starfieldStop) starfieldStop();
+      } else {
+        applyVisionMode();
+        if (mapOrbitAutoPlay && manifest) startMapOrbitAuto();
+      }
+    });
+  }
+
   function syncMapToolbar() {
     const btnSprint = document.getElementById("btn-map-sprint");
     const btnClusters = document.getElementById("btn-map-clusters");
-    if (btnSprint) btnSprint.classList.toggle("on", mapSprintFocus);
-    if (btnClusters) btnClusters.classList.toggle("on", autoCollapseDense);
+    if (btnSprint) {
+      btnSprint.classList.toggle("on", mapSprintFocus);
+      btnSprint.setAttribute("aria-pressed", mapSprintFocus ? "true" : "false");
+      btnSprint.setAttribute(
+        "aria-label",
+        mapSprintFocus ? "Sprint focus on — dim out-of-scope nodes" : "Sprint focus off"
+      );
+    }
+    if (btnClusters) {
+      btnClusters.classList.toggle("on", autoCollapseDense);
+      btnClusters.setAttribute("aria-pressed", autoCollapseDense ? "true" : "false");
+      btnClusters.setAttribute(
+        "aria-label",
+        autoCollapseDense ? "Folder clustering on" : "Folder clustering off"
+      );
+    }
   }
 
   function initMapToolbar() {
@@ -4440,7 +4574,7 @@
         mapSprintFocus = !mapSprintFocus;
         saveMapPrefs();
         syncMapToolbar();
-        renderMap();
+        updateMapSprintDim();
       });
     }
     if (btnClusters) {
@@ -4500,6 +4634,7 @@
   initMapToolbar();
   initMapKeyboardNav();
   initMapOrbitControls();
+  initVisionVisibilityPerf();
   applyMapOrbitTransform();
   reloadAll(false)
     .then(() => startAutoReload())

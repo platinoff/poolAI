@@ -45,5 +45,6 @@ pub mod trust;
 pub mod ui_debug_depth;
 pub mod updates_compat;
 pub mod validate;
+pub mod vision_map_depth;
 pub mod vm;
 pub mod workers;

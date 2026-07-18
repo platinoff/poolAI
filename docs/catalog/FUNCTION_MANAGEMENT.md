@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-07-18 (band 39 PH-S1029…S1038 ✅ · horizon bands 40–47)
+**Оновлено:** 2026-07-18 (band 40 PH-S1039…S1048 ✅ · horizon bands 41–47)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -1221,7 +1221,22 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 39 ✅). **Master horizon:** PH-S1039…S1118 (bands 40–47). Vision rev **311** (після sync). **Наступна сесія:** **`абракадабра`** — project scan → band 40.
+**Відкритих у §5.12:** **0** (band 40 ✅). **Master horizon:** PH-S1049…S1118 (bands 41–47). Vision rev **312** (після sync). **Наступна сесія:** **`абракадабра`** — project scan → band 41.
+
+| 974 | **PH-S1039** | Skip links + landmarks | `docs/vision/index.html` | skip to map/queue/preview; `role="main"` | **✅** |
+| 975 | **PH-S1040** | Icon control aria-label parity | `docs/vision/` | header/map/panel icon buttons labeled; `aria-pressed` toggles | **✅** |
+| 976 | **PH-S1041** | Explorer tree keyboard | `vision.js` file-tree | `role="tree"` / `treeitem`; Arrow/Home/End nav | **✅** |
+| 977 | **PH-S1042** | Link graph neighbour a11y | `#link-graph` | focusable neighbours; Enter select; focus restore | **✅** |
+| 978 | **PH-S1043** | Map sprint-dim incremental | `vision.js` | `updateMapSprintDim` without full `renderMap` | **✅** |
+| 979 | **PH-S1044** | Dense-map LOD hardening | `isMapOverviewMode` | adaptive threshold when layer >120 nodes | **✅** |
+| 980 | **PH-S1045** | Background tab perf | `vision.js` | pause starfield + orbit on `visibilitychange` | **✅** |
+| 981 | **PH-S1046** | ui-core depth stub | `vision_map_depth.rs` | depth enum + FM band 40 markers | **✅** |
+| 982 | **PH-S1047** | Vision Playwright smoke | `e2e/tests/vision.spec.ts` | skip-link focus; `#map-scene-3d`; tree role | **✅** |
+| 983 | **PH-S1048** | Vision map band close | tests/docs | `galaxy_horizon_s1039_integration`; HANDOFF/NEXT | **✅** |
+
+### 5.21 Vision map/a11y/perf queue — band 40 (PH-S1039…S1048, 2026-07-18)
+
+**Джерело:** project scan band 40 — Vision map UX gaps (skip links, tree keyboard, link graph, perf).
 
 | 964 | **PH-S1029** | Empty-state parity tier 1 | `src/ui/admin` | tenants + security OAuth/SAML/policies → `adminEmptyStateHtml` | **✅** |
 | 965 | **PH-S1030** | Security tables polish | `src/ui/admin/security.rs` | aria-label, container, `adminInitTablesIn`, actions `data-no-sort` | **✅** |
@@ -1259,7 +1274,7 @@ FM-xxx (з таблиці нижче)
 |------|------------|--------|
 | **38** | S1019…S1028 | Power UX + clippy/ui-core hygiene ✅ |
 | **39** | S1029…S1038 | Admin tables/forms polish (FM-019) ✅ |
-| 40 | S1039…S1048 | Vision map/a11y/perf |
+| **40** | S1039…S1048 | Vision map/a11y/perf ✅ |
 | 41 | S1049…S1058 | E2E visual/axe regression band |
 | 42 | S1059…S1068 | OpenAPI/docs wire sync |
 | 43 | S1069…S1078 | Grid metrics parity hardening |
@@ -1375,7 +1390,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-18):** band 39 **PH-S1029…S1038** ✅ · §5.12 **0** · наступна **`абракадабра`** → project scan → band 40.
+**Активна смуга (2026-07-18):** band 40 **PH-S1039…S1048** ✅ · §5.12 **0** · наступна **`абракадабра`** → project scan → band 41.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

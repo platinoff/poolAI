@@ -1,8 +1,27 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-18 (band 39 **PH-S1029…S1038** ✅ · horizon bands 40–47)
+**Оновлено:** 2026-07-18 (band 40 **PH-S1039…S1048** ✅ · horizon bands 41–47)
 
-**Наступна сесія:** **`абракадабра`** — project scan → band 40.
+**Наступна сесія:** **`абракадабра`** — project scan → band 41.
+
+## Band 40 — Vision map/a11y/perf (PH-S1039…S1048, ✅)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1039** | Skip links + landmarks (`role="main"`) |
+| **PH-S1040** | Icon control `aria-label` / `aria-pressed` parity |
+| **PH-S1041** | Explorer tree keyboard (`role="tree"`, Arrow keys) |
+| **PH-S1042** | Link graph neighbour focus + Enter select |
+| **PH-S1043** | Sprint-dim incremental (`updateMapSprintDim`) |
+| **PH-S1044** | Dense-map LOD threshold hardening (>120 nodes/layer) |
+| **PH-S1045** | Background tab perf (pause starfield + orbit) |
+| **PH-S1046** | `vision_map_depth` ui-core stub |
+| **PH-S1047** | Vision Playwright smoke extend |
+| **PH-S1048** | Band close |
+
+**§5.12:** **0** відкритих (band 40 ✅). **Vision:** rev **312**.
+
+**PH-S1048 ✅ (2026-07-18):** Vision skip links/landmarks; tree + link-graph a11y; sprint-dim incremental; dense LOD; tab-hidden perf; `galaxy_horizon_s1039_integration`; vision **rev 312**.
 
 ## Band 39 — Admin tables/forms polish (PH-S1029…S1038, ✅)
 

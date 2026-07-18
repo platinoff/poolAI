@@ -3,93 +3,93 @@
   "items": [
     {
       "category": "closed",
-      "id": "PH-S1038",
+      "id": "PH-S1048",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "galaxy_horizon_s1029_integration`; HANDOFF/NEXT",
-      "title": "Tables/forms band close"
+      "summary": "galaxy_horizon_s1039_integration`; HANDOFF/NEXT",
+      "title": "Vision map band close"
     },
     {
       "category": "closed",
-      "id": "PH-S1037",
+      "id": "PH-S1047",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "depth enum + FM band 39 markers",
-      "title": "ui-core depth stub + docs"
+      "summary": "skip-link focus; `#map-scene-3d`; tree role",
+      "title": "Vision Playwright smoke"
     },
     {
       "category": "closed",
-      "id": "PH-S1036",
+      "id": "PH-S1046",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "aria-required` on required fields; dashboard empty states",
-      "title": "Config + dashboard forms/tables"
+      "summary": "depth enum + FM band 40 markers",
+      "title": "ui-core depth stub"
     },
     {
       "category": "closed",
-      "id": "PH-S1035",
+      "id": "PH-S1045",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "aria-required` + `aria-hidden` on `*",
-      "title": "Modal form a11y"
+      "summary": "pause starfield + orbit on `visibilitychange",
+      "title": "Background tab perf"
     },
     {
       "category": "closed",
-      "id": "PH-S1034",
+      "id": "PH-S1044",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "container, aria-label, empty state",
-      "title": "Raid artifacts table"
+      "summary": "adaptive threshold when layer >120 nodes",
+      "title": "Dense-map LOD hardening"
     },
     {
       "category": "closed",
-      "id": "PH-S1033",
+      "id": "PH-S1043",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "empty → `adminEmptyStateHtml`; table init",
-      "title": "Grid panel tables"
+      "summary": "updateMapSprintDim` without full `renderMap",
+      "title": "Map sprint-dim incremental"
     },
     {
       "category": "closed",
-      "id": "PH-S1032",
+      "id": "PH-S1042",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "aria-label, container, `adminInitTablesIn",
-      "title": "Instances + topology tables"
+      "summary": "focusable neighbours; Enter select; focus restore",
+      "title": "Link graph neighbour a11y"
     },
     {
       "category": "closed",
-      "id": "PH-S1031",
+      "id": "PH-S1041",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "container, aria-label, striped, explicit init",
-      "title": "Tenants + jobs tables"
+      "summary": "role=\"tree\"` / `treeitem`; Arrow/Home/End nav",
+      "title": "Explorer tree keyboard"
     },
     {
       "category": "closed",
-      "id": "PH-S1030",
+      "id": "PH-S1040",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "aria-label, container, `adminInitTablesIn`, actions `data-no-sort",
-      "title": "Security tables polish"
+      "summary": "header/map/panel icon buttons labeled; `aria-pressed` toggles",
+      "title": "Icon control aria-label parity"
     },
     {
       "category": "closed",
-      "id": "PH-S1029",
+      "id": "PH-S1039",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "tenants + security OAuth/SAML/policies → `adminEmptyStateHtml",
-      "title": "Empty-state parity tier 1"
+      "summary": "skip to map/queue/preview; `role=\"main\"",
+      "title": "Skip links + landmarks"
     },
     {
       "category": "closed",

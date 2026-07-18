@@ -4,9 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PoolAI Galaxy Starwalker Vision</title>
-  <link rel="stylesheet" href="vision.css?v=83" />
+  <link rel="stylesheet" href="vision.css?v=84" />
 </head>
 <body>
+  <nav class="vision-skip-links" aria-label="Skip links">
+    <a href="#map-svg" class="vision-skip-link">Skip to map</a>
+    <a href="#sprint-queue" class="vision-skip-link">Skip to sprint queue</a>
+    <a href="#doc-preview" class="vision-skip-link">Skip to preview</a>
+  </nav>
   <div id="galaxy-backdrop" class="galaxy-backdrop" aria-hidden="true">
     <img class="galaxy-backdrop-img" src="" alt="" />
   </div>
@@ -19,14 +24,14 @@
       </div>
     </div>
     <div class="header-main">
-      <button type="button" id="btn-sidebar" title="Toggle Explorer (overlay in fullscreen)">☰</button>
+      <button type="button" id="btn-sidebar" title="Toggle Explorer (overlay in fullscreen)" aria-label="Toggle explorer sidebar">☰</button>
       <h1>PoolAI Galaxy Starwalker Vision</h1>
       <span class="meta" id="meta-rev">…</span>
       <span class="meta-trail" id="meta-trail" aria-label="Git HEAD and next sprint"></span>
       <div class="header-actions" aria-label="Vision controls">
-        <button type="button" id="btn-eco" class="btn-eco on" title="Eco — low GPU. Click → FX → Ms">Eco</button>
-        <button type="button" id="btn-auto" class="btn-auto on" title="Auto-reload when vision files change">Auto</button>
-        <button type="button" id="btn-reload" title="Reload manifest.json">↻ Reload</button>
+        <button type="button" id="btn-eco" class="btn-eco on" title="Eco — low GPU. Click → FX → Ms" aria-label="Vision GPU mode — Eco, FX, or Ms" aria-pressed="true">Eco</button>
+        <button type="button" id="btn-auto" class="btn-auto on" title="Auto-reload when vision files change" aria-label="Toggle auto-reload" aria-pressed="true">Auto</button>
+        <button type="button" id="btn-reload" title="Reload manifest.json" aria-label="Reload manifest">↻ Reload</button>
         <button type="button" id="btn-power" class="btn-power" title="PoolAI power — вимкнути або перезавантажити" aria-haspopup="true" aria-expanded="false" aria-controls="vision-power-menu">⏻ Power</button>
         <div id="vision-power-status" class="vision-power-status" aria-live="polite" aria-atomic="true"></div>
         <div id="vision-power-menu" class="vision-power-menu" role="menu" aria-label="PoolAI power" hidden>
@@ -42,12 +47,12 @@
   <div class="workspace">
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-head">
-        <button type="button" id="btn-sidebar2" title="Collapse">◀</button>
+        <button type="button" id="btn-sidebar2" title="Collapse" aria-label="Collapse explorer sidebar">◀</button>
         <span class="sidebar-title"><span>Explorer</span> <span class="sprint-pill" id="sidebar-sprint" hidden></span></span>
       </div>
-      <div class="sidebar-body" id="file-tree"></div>
+      <div class="sidebar-body" id="file-tree" role="tree" aria-label="Documentation file tree" tabindex="-1"></div>
     </aside>
-    <div class="main-col">
+    <div class="main-col" role="main" id="vision-main">
       <div class="panel-dock" id="panel-dock" hidden aria-label="Collapsed panels — click to restore"></div>
       <div class="diagram-row">
         <section class="panel" data-panel="layers" aria-label="Layer stack">
@@ -80,8 +85,8 @@
               <span class="map-orbit-pad-label" aria-hidden="true">WASD</span>
             </div>
             <div class="map-toolbar" aria-label="Map filters">
-              <button type="button" id="btn-map-sprint" class="btn-map-toggle" title="Dim nodes outside active sprint (PH-S*)">◎ Sprint</button>
-              <button type="button" id="btn-map-clusters" class="btn-map-toggle on" title="Collapse dense folders">⊟ Folders</button>
+              <button type="button" id="btn-map-sprint" class="btn-map-toggle" title="Dim nodes outside active sprint (PH-S*)" aria-label="Sprint focus off" aria-pressed="false">◎ Sprint</button>
+              <button type="button" id="btn-map-clusters" class="btn-map-toggle on" title="Collapse dense folders" aria-label="Folder clustering on" aria-pressed="true">⊟ Folders</button>
             </div>
             <div class="map-filter-bar" id="map-filter-bar" aria-label="Layer and file-type filters">
               <div class="map-filter-drop">
@@ -117,10 +122,10 @@
             </div>
             <div class="map-bottom-bar" aria-label="Map navigation">
               <div class="map-controls" aria-label="Map zoom">
-                <button type="button" id="map-zoom-in" title="Zoom in">+</button>
-                <button type="button" id="map-zoom-out" title="Zoom out">−</button>
+                <button type="button" id="map-zoom-in" title="Zoom in" aria-label="Zoom in">+</button>
+                <button type="button" id="map-zoom-out" title="Zoom out" aria-label="Zoom out">−</button>
                 <button type="button" id="map-orbit-auto" class="on" title="Pause auto-orbit (~30% WASD speed)" aria-pressed="true" aria-label="Pause auto-orbit">⏸</button>
-                <button type="button" id="map-zoom-reset" title="Reset view — fit all nodes, resume auto-orbit">⌂</button>
+                <button type="button" id="map-zoom-reset" title="Reset view — fit all nodes, resume auto-orbit" aria-label="Reset map view">⌂</button>
                 <button type="button" id="map-zoom-back" title="Back to previous view" disabled aria-label="Back to previous view">←</button>
               </div>
               <span class="map-hint">▶/⏸ orbit · W↑ S↓ A← D→ · drag pad · Tab · Eco→FX→Ms · ⌂ fit all</span>
@@ -149,6 +154,6 @@
       </section>
     </div>
   </div>
-  <script src="vision.js?v=83"></script>
+  <script src="vision.js?v=84"></script>
 </body>
 </html>
