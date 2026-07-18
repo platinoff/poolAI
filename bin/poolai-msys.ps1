@@ -36,7 +36,20 @@ $UnixRepo = "/" + $Drive + ($RepoRoot.Substring(2) -replace '\\', '/')
 $k8s = $env:K8S_OPENAPI_ENABLED_VERSION
 if (-not $k8s) { $k8s = "1.28" }
 
-$userCmd = ($Rest | ForEach-Object { $_.Replace("'", "'\''") }) -join ' '
+function ConvertTo-BashSingleQuoted {
+    param([string]$Text)
+    return $Text.Replace("'", "'\''")
+}
+
+if ($Rest[0] -eq "-lc") {
+    if ($Rest.Count -eq 2) {
+        $userCmd = $Rest[1]
+    } else {
+        $userCmd = (($Rest | Select-Object -Skip 1) | ForEach-Object { ConvertTo-BashSingleQuoted $_ }) -join " "
+    }
+} else {
+    $userCmd = ($Rest | ForEach-Object { ConvertTo-BashSingleQuoted $_ }) -join " "
+}
 $bashScript = "export PATH=`"`$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:`$PATH`"; " +
     "export K8S_OPENAPI_ENABLED_VERSION=$k8s; " +
     "cd '$UnixRepo' || cd 'S:/rust/poolAI' || exit 1; " +

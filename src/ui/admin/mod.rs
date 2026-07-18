@@ -507,7 +507,7 @@ pub fn admin_layout_with_module_script(
       <header class="admin-header-bar">
         <h2 data-i18n="{title_key}">{title_fallback}</h2>
         <div class="admin-user-menu">
-          <button type="button" class="btn-icon" title="PoolAI power" aria-label="PoolAI power" onclick="poolaiOpenAdminPowerModal()">⏻</button>
+          <button type="button" class="btn btn-outline admin-power-btn" title="PoolAI power" aria-label="PoolAI power" onclick="poolaiOpenAdminPowerModal()">⏻ Power</button>
           <div id="poolai-lang-toggle" class="admin-lang-bar"></div>
           <span id="admin-user-name">Admin</span>
           <button type="button" class="btn-icon" onclick="logout()" data-i18n-aria="admin.logout" aria-label="Log out">🚪</button>

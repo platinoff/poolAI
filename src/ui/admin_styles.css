@@ -729,6 +729,27 @@ button.btn.btn-danger:focus-visible,
   font-size: 14px;
 }
 
+.admin-user-menu {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-power-btn {
+  font-size: 0.8rem;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-secondary, rgba(255, 255, 255, 0.04));
+  color: var(--admin-text);
+  cursor: pointer;
+}
+
+.admin-power-btn:hover {
+  border-color: rgba(248, 113, 113, 0.45);
+  color: #fecaca;
+}
+
 /* Closed dialogs: out of layout + axe (FM-019 / post-PH a11y) */
 .modal[aria-hidden="true"] {
   display: none !important;

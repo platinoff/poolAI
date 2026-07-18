@@ -2,6 +2,97 @@
   "description": "RSS-style ticker of FM §5.12 sprint queue (open + recent closed)",
   "items": [
     {
+      "category": "open",
+      "id": "PH-S1019",
+      "link": "docs/vision/index.html#sprint-queue",
+      "next": true,
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "dropdown shutdown/reboot; localStorage; a11y keyboard",
+      "title": "Vision power menu polish"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1020",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "showModal parity; labeled Power btn; i18n UA/EN",
+      "title": "Admin power modal polish"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1021",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "/ui` shell power entry → same ops API",
+      "title": "Home UI power shortcut"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1022",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "dispatch/grid/admin unused imports; `cargo clippy -D warnings` scope",
+      "title": "Clippy unused imports batch"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1023",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "from_timestamp_opt` → `DateTime::from_timestamp",
+      "title": "chrono deprecations ui-core"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1024",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "fix `duplicate_macro_attributes` on PH-S920 tests",
+      "title": "admin mod.rs duplicate test attr"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1025",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "design_tokens` parity note + unit gate",
+      "title": "Design tokens audit stub"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1026",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "toast/announce on power action; save last_run",
+      "title": "Ops power feedback UX"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1027",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "-lc` + approved verbs; RUN_LOCAL note",
+      "title": "poolai-msys.ps1 hardening"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1028",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "galaxy_horizon_s1019_integration`; HANDOFF/NEXT",
+      "title": "UI debug band close"
+    },
+    {
       "category": "closed",
       "id": "PH-S1018",
       "link": "docs/vision/index.html#sprint-queue",

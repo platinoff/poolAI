@@ -119,18 +119,14 @@ pub fn admin_power_panel_script() -> String {
     }).then(function (r) { return r.json(); });
   };
   window.poolaiOpenAdminPowerModal = function () {
-    var modal = document.getElementById("poolaiAdminPowerModal");
-    if (!modal) return;
-    modal.classList.add("show");
-    modal.setAttribute("aria-hidden", "false");
-    modal.setAttribute("aria-modal", "true");
+    if (typeof showModal === "function") {
+      showModal("poolaiAdminPowerModal");
+    }
   };
   window.poolaiCloseAdminPowerModal = function () {
-    var modal = document.getElementById("poolaiAdminPowerModal");
-    if (!modal) return;
-    modal.classList.remove("show");
-    modal.setAttribute("aria-hidden", "true");
-    modal.setAttribute("aria-modal", "false");
+    if (typeof hideModal === "function") {
+      hideModal("poolaiAdminPowerModal");
+    }
   };
   window.poolaiConfirmAdminPower = function (action) {
     poolaiAdminPowerAction(action).then(function (body) {
@@ -197,7 +193,7 @@ mod tests {
     #[test]
     fn admin_power_panel_script_ph_s1015() {
         let script = admin_power_panel_script();
-        assert!(script.contains("poolaiAdminPowerAction"));
+        assert!(script.contains("showModal(\"poolaiAdminPowerModal\")"));
         assert!(script.contains("/api/v1/ops/power"));
     }
 }

@@ -1,19 +1,17 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-07-18 (band 37 **PH-S1011…S1018** ✅ · vision **rev 308**)
+**Оновлено:** 2026-07-18 (band 38 **PH-S1019…S1028** queued · horizon **100** спринтів S1019…S1118)
 
-Maintenance mode active (FM §5.15) — owner ops band 37 drained; next **`абракадабра`** = project scan replenish.
+Maintenance mode (FM §5.15) · **hotfix:** power menu Vision + admin `showModal` (pre-band-38).
 
-| **← наступний** | **`абракадабра`** (project scan → replenish §5.12) |
-| **§5.12 active** | **0** |
-| **FM band** | maintenance + owner queue drained |
-| **Сесій drain** | band 37 closed |
+| **← наступний** | **`абракадабра`** (drain band 38 — UI/debug polish) |
+| **§5.12 active** | **10** (PH-S1019…S1028) |
+| **Horizon** | bands 38–47 → **100** PH-S (FM §5.19) |
+| **Vision** | rev **309** |
 
 ---
 
-## Тригер «абракадабра»
-
-Скопіюй у **новий чат**:
+## Тригер
 
 ```
 абракадабра
@@ -21,24 +19,23 @@ Maintenance mode active (FM §5.15) — owner ops band 37 drained; next **`аб�
 
 ---
 
-## S0 + project scan
+## Band 38 (drain)
 
-1. `git fetch`; HANDOFF; FM **§5.12**; `poolai-vision-sync --check`; `df -h /s`
-2. **Project scan** (§5.12 < 10) → top 10 PH-S* → drain
-3. Vision close → `poolai-vision-sync` → `--check`
-4. `cargo fmt --all` → `K8S_OPENAPI_ENABLED_VERSION=1.28 cargo test-ci`
-5. Commit + `git push origin main` + самарі
-
-```bash
-export PATH="/c/Users/$USER/.cargo/bin:$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"
-export RUSTUP_TOOLCHAIN=stable-x86_64-pc-windows-gnu
-export K8S_OPENAPI_ENABLED_VERSION=1.28
-export CARGO_TARGET_DIR=/s/rust/poolAI/target
-cd /s/rust/poolAI
-```
+| Sprint | Focus |
+|--------|--------|
+| PH-S1019 | Vision power dropdown polish (a11y, feedback) |
+| PH-S1020 | Admin power modal i18n + styling |
+| PH-S1021 | Home `/ui` power shortcut |
+| PH-S1022 | Clippy unused imports batch |
+| PH-S1023 | chrono deprecations ui-core |
+| PH-S1024 | admin duplicate `#[test]` fix |
+| PH-S1025 | Design tokens audit stub |
+| PH-S1026 | Ops power feedback UX |
+| PH-S1027 | poolai-msys hardening |
+| PH-S1028 | Band close integration |
 
 ---
 
 ## Не повторювати
 
-PH-S1018 ✅ band 37 · PH-S1010 ✅ product-complete · bands 1–36 drained. FM-003 LAN · FM-041 Cloud SDK — поза scope.
+Band 37 ✅ · product-complete S1010 ✅ · FM-003 LAN · FM-041 Cloud SDK.

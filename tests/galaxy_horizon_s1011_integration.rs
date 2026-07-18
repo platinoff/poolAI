@@ -59,9 +59,10 @@ fn horizon_s1011_band_owner_ops_close_ph_s1018() {
     assert!(Path::new("crates/poolai-ui-core/src/owner_ops_depth.rs").exists());
 
     let vision_js = include_str!("../docs/vision/vision.js");
-    assert!(vision_js.contains("openVisionPowerMenu"));
-    assert!(vision_js.contains("visionHardReset"));
+    assert!(vision_js.contains("bindVisionPowerMenu"));
+    assert!(vision_js.contains("vision-power-menu"));
 
     let admin = include_str!("../src/ui/admin/mod.rs");
     assert!(admin.contains("poolaiOpenAdminPowerModal"));
+    assert!(admin.contains("admin-power-btn"));
 }

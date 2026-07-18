@@ -291,7 +291,15 @@
 
   function visionPowerPoolai(action) {
     saveMapPrefs();
-    fetch("http://127.0.0.1:8080/api/v1/ops/power", {
+    try {
+      localStorage.setItem(
+        "poolai.vision.lastPower",
+        JSON.stringify({ action: action, saved_at: Date.now() })
+      );
+    } catch (_) {
+      /* ignore */
+    }
+    return fetch("http://127.0.0.1:8080/api/v1/ops/power", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: action }),
@@ -300,16 +308,62 @@
     });
   }
 
-  function openVisionPowerMenu() {
-    const choice = window.prompt(
-      "Vision power (PH-S1017):\n1 = soft reload (keep prefs)\n2 = hard reset (clear map prefs)\n3 = PoolAI shutdown\n4 = PoolAI reboot",
-      "1"
-    );
-    if (!choice) return;
-    if (choice === "1") visionSoftReload();
-    else if (choice === "2") visionHardReset();
-    else if (choice === "3") visionPowerPoolai("shutdown");
-    else if (choice === "4") visionPowerPoolai("reboot");
+  function closeVisionPowerMenu() {
+    const menu = document.getElementById("vision-power-menu");
+    const btn = document.getElementById("btn-power");
+    if (menu) menu.hidden = true;
+    if (btn) {
+      btn.classList.remove("on");
+      btn.setAttribute("aria-expanded", "false");
+    }
+  }
+
+  function toggleVisionPowerMenu() {
+    const menu = document.getElementById("vision-power-menu");
+    const btn = document.getElementById("btn-power");
+    if (!menu || !btn) return;
+    const open = menu.hidden;
+    if (open) {
+      menu.hidden = false;
+      btn.classList.add("on");
+      btn.setAttribute("aria-expanded", "true");
+    } else {
+      closeVisionPowerMenu();
+    }
+  }
+
+  function bindVisionPowerMenu() {
+    const btn = document.getElementById("btn-power");
+    const menu = document.getElementById("vision-power-menu");
+    if (!btn || !menu) return;
+    btn.addEventListener("click", function (ev) {
+      ev.stopPropagation();
+      toggleVisionPowerMenu();
+    });
+    document.getElementById("vision-power-shutdown")?.addEventListener("click", function () {
+      visionPowerPoolai("shutdown");
+      closeVisionPowerMenu();
+    });
+    document.getElementById("vision-power-reboot")?.addEventListener("click", function () {
+      visionPowerPoolai("reboot");
+      closeVisionPowerMenu();
+    });
+    document.getElementById("vision-power-soft")?.addEventListener("click", function () {
+      closeVisionPowerMenu();
+      visionSoftReload();
+    });
+    document.getElementById("vision-power-hard")?.addEventListener("click", function () {
+      closeVisionPowerMenu();
+      visionHardReset();
+    });
+    document.addEventListener("click", function (ev) {
+      if (menu.hidden) return;
+      if (ev.target === btn || menu.contains(ev.target)) return;
+      closeVisionPowerMenu();
+    });
+    document.addEventListener("keydown", function (ev) {
+      if (ev.key === "Escape") closeVisionPowerMenu();
+    });
   }
 
   function clusterStoreId(layer, key) {
@@ -4360,7 +4414,7 @@
   document.getElementById("btn-sidebar2").addEventListener("click", toggleSidebar);
   document.getElementById("btn-reload").addEventListener("click", () => reloadAll(true));
   const btnPower = document.getElementById("btn-power");
-  if (btnPower) btnPower.addEventListener("click", openVisionPowerMenu);
+  if (btnPower) bindVisionPowerMenu();
   document.getElementById("btn-auto").addEventListener("click", toggleAutoReload);
   const btnEco = document.getElementById("btn-eco");
   if (btnEco) btnEco.addEventListener("click", cycleVisionMode);

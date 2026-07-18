@@ -2294,6 +2294,12 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_product_complete_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_owner_ops_depth_rs"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -2331,6 +2337,7 @@
       "z": 5
     }
   ],
+  "next_sprint": "PH-S1019",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -9416,9 +9423,51 @@
       "label": "galaxy_horizon_s1010_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s1010_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_owner_ops_depth_rs",
+      "label": "owner_ops_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/owner_ops_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_api_ops_rs",
+      "label": "ops.rs",
+      "layer": "L3",
+      "path": "src/network/api/ops.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ops_last_run_rs",
+      "label": "last_run.rs",
+      "layer": "L3",
+      "path": "src/ops/last_run.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ops_power_rs",
+      "label": "power.rs",
+      "layer": "L3",
+      "path": "src/ops/power.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1011_integration_rs",
+      "label": "galaxy_horizon_s1011_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1011_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_ops_power_integration_rs",
+      "label": "ops_power_integration.rs",
+      "layer": "L3",
+      "path": "tests/ops_power_integration.rs"
     }
   ],
-  "revision": 308,
+  "revision": 309,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -17996,9 +18045,99 @@
       "row": 953,
       "status": "closed",
       "title": "Ops power band close"
+    },
+    {
+      "acceptance": "dropdown shutdown/reboot; localStorage; a11y keyboard",
+      "deps": "docs/vision/",
+      "id": "PH-S1019",
+      "open": true,
+      "row": 954,
+      "status": "open",
+      "title": "Vision power menu polish"
+    },
+    {
+      "acceptance": "showModal parity; labeled Power btn; i18n UA/EN",
+      "deps": "src/ui/admin",
+      "id": "PH-S1020",
+      "open": true,
+      "row": 955,
+      "status": "open",
+      "title": "Admin power modal polish"
+    },
+    {
+      "acceptance": "/ui` shell power entry → same ops API",
+      "deps": "src/ui/",
+      "id": "PH-S1021",
+      "open": true,
+      "row": 956,
+      "status": "open",
+      "title": "Home UI power shortcut"
+    },
+    {
+      "acceptance": "dispatch/grid/admin unused imports; `cargo clippy -D warnings` scope",
+      "deps": "src/grid` `src/network",
+      "id": "PH-S1022",
+      "open": true,
+      "row": 957,
+      "status": "open",
+      "title": "Clippy unused imports batch"
+    },
+    {
+      "acceptance": "from_timestamp_opt` → `DateTime::from_timestamp",
+      "deps": "poolai-ui-core/format.rs",
+      "id": "PH-S1023",
+      "open": true,
+      "row": 958,
+      "status": "open",
+      "title": "chrono deprecations ui-core"
+    },
+    {
+      "acceptance": "fix `duplicate_macro_attributes` on PH-S920 tests",
+      "deps": "src/ui/admin/mod.rs",
+      "id": "PH-S1024",
+      "open": true,
+      "row": 959,
+      "status": "open",
+      "title": "admin mod.rs duplicate test attr"
+    },
+    {
+      "acceptance": "design_tokens` parity note + unit gate",
+      "deps": "UI_UX plan",
+      "id": "PH-S1025",
+      "open": true,
+      "row": 960,
+      "status": "open",
+      "title": "Design tokens audit stub"
+    },
+    {
+      "acceptance": "toast/announce on power action; save last_run",
+      "deps": "admin+vision",
+      "id": "PH-S1026",
+      "open": true,
+      "row": 961,
+      "status": "open",
+      "title": "Ops power feedback UX"
+    },
+    {
+      "acceptance": "-lc` + approved verbs; RUN_LOCAL note",
+      "deps": "bin/",
+      "id": "PH-S1027",
+      "open": true,
+      "row": 962,
+      "status": "open",
+      "title": "poolai-msys.ps1 hardening"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1019_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1028",
+      "open": true,
+      "row": 963,
+      "status": "open",
+      "title": "UI debug band close"
     }
   ],
-  "sprint_queue_open_count": 0,
+  "sprint_queue_open_count": 10,
   "updated_at": "2026-06-20",
   "vision_ui_rev": 59
 }
