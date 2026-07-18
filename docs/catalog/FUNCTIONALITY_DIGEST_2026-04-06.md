@@ -1,6 +1,6 @@
 # PoolAI — витяг функціоналу (зведення за доками та кодом)
 
-**Оновлено:** 2026-07-18 (PH-S1066: FUNCTIONALITY_DIGEST band 42 zriz — OpenAPI contracts + ops power stand smoke).
+**Оновлено:** 2026-07-18 (PH-S1087: admin wasm slim depth band 44 — `admin_wasm_slim_depth.rs`).
 
 Цей документ — **не автогенерація з коду**, а структурований **витяг можливостей** системи, узгоджений з кореневим [`README.md`](../../README.md), [`docs/status/STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md), [`docs/development/HANDOFF_NEW_SESSION.md`](../development/HANDOFF_NEW_SESSION.md), модулями `src/` та (частково) [`docs/openapi.yaml`](../openapi.yaml). Для повного переліку HTTP-шляхів див. роутери в `src/network/` — OpenAPI може відставати від фактичного API.
 
@@ -173,6 +173,7 @@
 |----------------|------|---------|
 | **poolai-ui-core** | `crates/poolai-ui-core/` | Shared admin validators, formatters, panel HTML builders |
 | **admin_common_depth** | `crates/poolai-ui-core/src/admin_common_depth.rs` | table/empty wasm depth stub (PH-S930) |
+| **admin_wasm_slim_depth** | `crates/poolai-ui-core/src/admin_wasm_slim_depth.rs` | wasm panel depth classification band 44 (PH-S1086) |
 | **charts_depth** | `crates/poolai-ui-core/src/charts_depth.rs` | sparkline/line wasm depth (PH-S924) |
 | **stretch_depth** | `crates/poolai-ui-core/src/stretch_depth.rs` | ratio 96% stretch band stub (PH-S944) |
 | **digest_depth** | `crates/poolai-ui-core/src/digest_depth.rs` | FUNCTIONALITY_DIGEST band inventory (PH-S950) |

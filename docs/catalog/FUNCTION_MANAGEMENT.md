@@ -1221,7 +1221,18 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 43 ✅). **Master horizon:** PH-S1079…S1118 (bands 44–47). Vision rev **315** (після sync). **Наступна сесія:** **`абракадабра`** — project scan → band 44.
+**Відкритих у §5.12:** **0** (band 44 ✅). **Master horizon:** PH-S1089…S1118 (bands 45–47). Vision rev **316** (після sync). **Наступна сесія:** **`абракадабра`** — project scan → band 45.
+
+| 1014 | **PH-S1079** | Monitoring alerts wasm slim depth | `admin_wasm_slim_depth.rs` | `MonitoringAlertsPanel` flag + renderer smoke | **✅** |
+| 1015 | **PH-S1080** | Monitoring dashboards wasm slim depth | `admin_wasm_slim_depth.rs` | `MonitoringDashboardsPanel` flag + renderer smoke | **✅** |
+| 1016 | **PH-S1081** | Instances + Telegram seats depth | `admin_wasm_slim_depth.rs` | `InstancesPanel` + `TelegramSeatsPanel` flags | **✅** |
+| 1017 | **PH-S1082** | Virtual nodes + network profiles depth | `admin_wasm_slim_depth.rs` | `GalaxyVirtualNodesPanel` + `NetworkProfilesPanel` | **✅** |
+| 1018 | **PH-S1083** | Grid prefetch/locality strips depth | `stand_smoke_metrics.rs` | `GridPrefetchMetricsStrip` + `GridLocalityMetricsStrip` | **✅** |
+| 1019 | **PH-S1084** | Grid governance/fee-split strips depth | `stand_smoke_metrics.rs` | stand smoke band44 export-shape + strip flags | **✅** |
+| 1020 | **PH-S1085** | `admin/mod.rs` wasm glue regression | `src/ui/admin/mod.rs` | band-44 `poolaiRender*` / `render*` asserts | **✅** |
+| 1021 | **PH-S1086** | `admin_wasm_slim_depth` ui-core module | `admin_wasm_slim_depth.rs` | extract from `grid_replication_pricing` + FM band 44 | **✅** |
+| 1022 | **PH-S1087** | GALAXY_GRID_ROADMAP + rust ratio | docs + loc-audit | band 44 closed row; `rust_ratio.json` zriz | **✅** |
+| 1023 | **PH-S1088** | Admin wasm slim band close | tests/docs | `galaxy_horizon_s1079_integration`; HANDOFF/NEXT | **✅** |
 
 | 1004 | **PH-S1069** | Verification extended parity | `stand_smoke_metrics_parity.rs` | `VERIFICATION_EXTENDED_PARITY` mismatch/match JSON↔Prom | **✅** |
 | 1005 | **PH-S1070** | Replication extended parity | `stand_smoke_metrics_parity.rs` | `REPLICATION_EXTENDED_PARITY` executor/rate-cap | **✅** |
@@ -1266,6 +1277,21 @@ FM-xxx (з таблиці нижче)
 | 981 | **PH-S1046** | ui-core depth stub | `vision_map_depth.rs` | depth enum + FM band 40 markers | **✅** |
 | 982 | **PH-S1047** | Vision Playwright smoke | `e2e/tests/vision.spec.ts` | skip-link focus; `#map-scene-3d`; tree role | **✅** |
 | 983 | **PH-S1048** | Vision map band close | tests/docs | `galaxy_horizon_s1039_integration`; HANDOFF/NEXT | **✅** |
+
+### 5.25 Admin wasm slim panels queue — band 44 (PH-S1079…S1088, 2026-07-18)
+
+**Джерело:** project scan band 44 — wasm-first admin panels without `admin_wasm_slim_depth` classification.
+
+| 1014 | **PH-S1079** | Monitoring alerts wasm slim depth | `admin_wasm_slim_depth.rs` | `MonitoringAlertsPanel` flag + renderer smoke | **✅** |
+| 1015 | **PH-S1080** | Monitoring dashboards wasm slim depth | `admin_wasm_slim_depth.rs` | `MonitoringDashboardsPanel` flag + renderer smoke | **✅** |
+| 1016 | **PH-S1081** | Instances + Telegram seats depth | `admin_wasm_slim_depth.rs` | `InstancesPanel` + `TelegramSeatsPanel` flags | **✅** |
+| 1017 | **PH-S1082** | Virtual nodes + network profiles depth | `admin_wasm_slim_depth.rs` | `GalaxyVirtualNodesPanel` + `NetworkProfilesPanel` | **✅** |
+| 1018 | **PH-S1083** | Grid prefetch/locality strips depth | `stand_smoke_metrics.rs` | `GridPrefetchMetricsStrip` + `GridLocalityMetricsStrip` | **✅** |
+| 1019 | **PH-S1084** | Grid governance/fee-split strips depth | `stand_smoke_metrics.rs` | stand smoke band44 export-shape + strip flags | **✅** |
+| 1020 | **PH-S1085** | `admin/mod.rs` wasm glue regression | `src/ui/admin/mod.rs` | band-44 `poolaiRender*` / `render*` asserts | **✅** |
+| 1021 | **PH-S1086** | `admin_wasm_slim_depth` ui-core module | `admin_wasm_slim_depth.rs` | extract from `grid_replication_pricing` + FM band 44 | **✅** |
+| 1022 | **PH-S1087** | GALAXY_GRID_ROADMAP + rust ratio | docs + loc-audit | band 44 closed row; `rust_ratio.json` zriz | **✅** |
+| 1023 | **PH-S1088** | Admin wasm slim band close | tests/docs | `galaxy_horizon_s1079_integration`; HANDOFF/NEXT | **✅** |
 
 ### 5.24 Grid metrics parity hardening queue — band 43 (PH-S1069…S1078, 2026-07-18)
 
@@ -1323,7 +1349,7 @@ FM-xxx (з таблиці нижче)
 | **41** | S1049…S1058 | E2E visual/axe regression band ✅ |
 | **42** | S1059…S1068 | OpenAPI/docs wire sync ✅ |
 | 43 | S1069…S1078 | Grid metrics parity hardening ✅ |
-| 44 | S1079…S1088 | wasm admin slim panels |
+| 44 | S1079…S1088 | wasm admin slim panels ✅ |
 | 45 | S1089…S1098 | stand smoke + RUN_LOCAL ops |
 | 46 | S1099…S1108 | ratio/rust migration advisory |
 | 47 | S1109…S1118 | horizon close + STABLE touch-up |
@@ -1355,7 +1381,7 @@ FM-xxx (з таблиці нижче)
 | **Drained bands 1–36** | PH-S660…S1010 ✅ |
 | **Активна §5.12** | — (maintenance mode) |
 | **Наступна promote** | — (owner scan only) |
-| **Сесій `абракадабра`** | band 43 drained (PH-S1069…S1078) |
+| **Сесій `абракадабра`** | band 44 drained (PH-S1079…S1088) |
 | **План фаз** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md) |
 | **Реєстр sprint×acceptance** | [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) |
 | **Regen** | `bash scripts/generate-ph-s-master-backlog-351.sh` |
@@ -1435,7 +1461,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-18):** band 43 **PH-S1069…S1078** ✅ · §5.12 **0** · наступна **`абракадабра`** → project scan → band 44.
+**Активна смуга (2026-07-18):** band 44 **PH-S1079…S1088** ✅ · §5.12 **0** · наступна **`абракадабра`** → project scan → band 45.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

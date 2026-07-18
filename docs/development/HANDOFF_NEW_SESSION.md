@@ -1,8 +1,27 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-18 (band 43 **PH-S1069…S1078** ✅ · horizon bands 44–47)
+**Оновлено:** 2026-07-18 (band 44 **PH-S1079…S1088** ✅ · horizon bands 45–47)
 
-**Наступна сесія:** **`абракадабра`** — project scan → band 44.
+**Наступна сесія:** **`абракадабра`** — project scan → band 45.
+
+## Band 44 — Admin wasm slim panels (PH-S1079…S1088, ✅)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1079** | Monitoring alerts wasm slim depth |
+| **PH-S1080** | Monitoring dashboards wasm slim depth |
+| **PH-S1081** | Instances + Telegram seats depth |
+| **PH-S1082** | Virtual nodes + network profiles depth |
+| **PH-S1083** | Grid prefetch/locality strips depth |
+| **PH-S1084** | Grid governance/fee-split strips depth |
+| **PH-S1085** | `admin/mod.rs` wasm glue regression |
+| **PH-S1086** | `admin_wasm_slim_depth` ui-core module |
+| **PH-S1087** | GALAXY_GRID_ROADMAP + rust ratio advisory |
+| **PH-S1088** | Band close |
+
+**§5.12:** **0** відкритих (band 44 ✅). **Vision:** rev **316**.
+
+**PH-S1088 ✅ (2026-07-18):** `admin_wasm_slim_depth.rs`; band-44 depth flags for monitoring/instances/telegram/virtual-nodes/network-profiles/grid strips; `admin_wasm_slim_depth_stub_band44_export_shape_ph_s1084`; `galaxy_horizon_s1079_integration`; vision **rev 316**.
 
 ## Band 43 — Grid metrics parity hardening (PH-S1069…S1078, ✅)
 

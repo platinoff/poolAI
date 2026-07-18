@@ -2330,6 +2330,12 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_openapi_wire_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_grid_metrics_parity_depth_rs"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -9571,9 +9577,30 @@
       "label": "memory_api_contracts.rs",
       "layer": "L3",
       "path": "tests/memory_api_contracts.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_grid_metrics_parity_depth_rs",
+      "label": "grid_metrics_parity_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/grid_metrics_parity_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1069_integration_rs",
+      "label": "galaxy_horizon_s1069_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1069_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_grid_metrics_parity_contracts_rs",
+      "label": "grid_metrics_parity_contracts.rs",
+      "layer": "L3",
+      "path": "tests/grid_metrics_parity_contracts.rs"
     }
   ],
-  "revision": 315,
+  "revision": 316,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -18151,6 +18178,96 @@
       "row": 953,
       "status": "closed",
       "title": "Ops power band close"
+    },
+    {
+      "acceptance": "MonitoringAlertsPanel` flag + renderer smoke",
+      "deps": "admin_wasm_slim_depth.rs",
+      "id": "PH-S1079",
+      "open": false,
+      "row": 1014,
+      "status": "closed",
+      "title": "Monitoring alerts wasm slim depth"
+    },
+    {
+      "acceptance": "MonitoringDashboardsPanel` flag + renderer smoke",
+      "deps": "admin_wasm_slim_depth.rs",
+      "id": "PH-S1080",
+      "open": false,
+      "row": 1015,
+      "status": "closed",
+      "title": "Monitoring dashboards wasm slim depth"
+    },
+    {
+      "acceptance": "InstancesPanel` + `TelegramSeatsPanel` flags",
+      "deps": "admin_wasm_slim_depth.rs",
+      "id": "PH-S1081",
+      "open": false,
+      "row": 1016,
+      "status": "closed",
+      "title": "Instances + Telegram seats depth"
+    },
+    {
+      "acceptance": "GalaxyVirtualNodesPanel` + `NetworkProfilesPanel",
+      "deps": "admin_wasm_slim_depth.rs",
+      "id": "PH-S1082",
+      "open": false,
+      "row": 1017,
+      "status": "closed",
+      "title": "Virtual nodes + network profiles depth"
+    },
+    {
+      "acceptance": "GridPrefetchMetricsStrip` + `GridLocalityMetricsStrip",
+      "deps": "stand_smoke_metrics.rs",
+      "id": "PH-S1083",
+      "open": false,
+      "row": 1018,
+      "status": "closed",
+      "title": "Grid prefetch/locality strips depth"
+    },
+    {
+      "acceptance": "stand smoke band44 export-shape + strip flags",
+      "deps": "stand_smoke_metrics.rs",
+      "id": "PH-S1084",
+      "open": false,
+      "row": 1019,
+      "status": "closed",
+      "title": "Grid governance/fee-split strips depth"
+    },
+    {
+      "acceptance": "band-44 `poolaiRender*` / `render*` asserts",
+      "deps": "src/ui/admin/mod.rs",
+      "id": "PH-S1085",
+      "open": false,
+      "row": 1020,
+      "status": "closed",
+      "title": "admin/mod.rs` wasm glue regression"
+    },
+    {
+      "acceptance": "extract from `grid_replication_pricing` + FM band 44",
+      "deps": "admin_wasm_slim_depth.rs",
+      "id": "PH-S1086",
+      "open": false,
+      "row": 1021,
+      "status": "closed",
+      "title": "admin_wasm_slim_depth` ui-core module"
+    },
+    {
+      "acceptance": "band 44 closed row; `rust_ratio.json` zriz",
+      "deps": "docs + loc-audit",
+      "id": "PH-S1087",
+      "open": false,
+      "row": 1022,
+      "status": "closed",
+      "title": "GALAXY_GRID_ROADMAP + rust ratio"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1079_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1088",
+      "open": false,
+      "row": 1023,
+      "status": "closed",
+      "title": "Admin wasm slim band close"
     },
     {
       "acceptance": "VERIFICATION_EXTENDED_PARITY` mismatch/match JSON↔Prom",

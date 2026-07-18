@@ -1122,6 +1122,48 @@ fn admin_seed_inventory_memory_meta_wasm_first_ph_s862() {
 }
 
 #[test]
+fn admin_telegram_seats_panel_wasm_first_ph_s1081() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("poolaiRenderTelegramSeatsPanel"));
+    let page = include_str!("telegram_seats.rs");
+    assert!(page.contains("poolaiRenderTelegramSeatsPanel"));
+}
+
+#[test]
+fn admin_galaxy_virtual_nodes_panel_wasm_first_ph_s1082() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("poolaiRenderGalaxyVirtualNodesPanel"));
+    let wrk = include_str!("workers.rs");
+    assert!(wrk.contains("poolaiRenderGalaxyVirtualNodesPanel"));
+}
+
+#[test]
+fn admin_network_profiles_panel_wasm_first_ph_s1082() {
+    let page = include_str!("network_profiles.rs");
+    assert!(page.contains("renderNetworkProfilesPanel"));
+}
+
+#[test]
+fn admin_grid_metric_strips_wasm_first_ph_s1083() {
+    let updates = include_str!("updates_compat.rs");
+    assert!(updates.contains("renderGridPrefetchMetricsStrip"));
+    assert!(updates.contains("renderGridLocalityMetricsStrip"));
+    assert!(updates.contains("renderGridGovernanceMetricsStrip"));
+    let pricing = include_str!("grid_pricing.rs");
+    assert!(pricing.contains("renderGridFeeSplitMetricsStrip"));
+}
+
+#[test]
+fn admin_wasm_slim_band44_regression_ph_s1085() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("wasm.renderMonitoringAlertsPanel"));
+    assert!(js.contains("wasm.renderMonitoringDashboardsPanel"));
+    assert!(js.contains("wasm.renderInstancesPanel"));
+    assert!(js.contains("poolaiRenderTelegramSeatsPanel"));
+    assert!(js.contains("poolaiRenderGalaxyVirtualNodesPanel"));
+}
+
+#[test]
 fn admin_charts_metric_history_url_with_hours_wasm_first_ph_s334() {
     let js = include_str!("../admin_charts.js");
     assert!(js.contains("wasm.buildMetricHistoryUrlWithHours"));

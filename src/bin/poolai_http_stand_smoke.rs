@@ -3875,6 +3875,103 @@ mod tests {
     }
 
     #[test]
+    fn admin_wasm_slim_depth_stub_band44_export_shape_ph_s1084() {
+        use poolai_ui_core::admin_wasm_slim_depth::{
+            admin_wasm_slim_depth_stub, AdminWasmSlimDepth,
+        };
+        use poolai_ui_core::galaxy_telegram_seats::render_telegram_seats_panel_html;
+        use poolai_ui_core::galaxy_virtual_nodes::render_galaxy_virtual_nodes_panel_html;
+        use poolai_ui_core::instances::render_instances_panel_html;
+        use poolai_ui_core::ml::{
+            render_monitoring_alerts_panel_html, render_monitoring_dashboards_panel_html,
+        };
+        use poolai_ui_core::network_profiles::render_network_profiles_panel_html;
+        use poolai_ui_core::stand_smoke_metrics::{
+            render_grid_fee_split_metrics_strip_html, render_grid_governance_metrics_strip_html,
+            render_grid_locality_metrics_strip_html, render_grid_prefetch_metrics_strip_html,
+        };
+        use serde_json::json;
+        assert_eq!(
+            admin_wasm_slim_depth_stub(Some(&json!({"monitoring_alerts_panel": true}))),
+            AdminWasmSlimDepth::MonitoringAlertsPanel
+        );
+        assert_eq!(
+            admin_wasm_slim_depth_stub(Some(&json!({"grid_fee_split_metrics_strip": true}))),
+            AdminWasmSlimDepth::GridFeeSplitMetricsStrip
+        );
+        let alerts_html = render_monitoring_alerts_panel_html(
+            "[]",
+            "N/A",
+            "Ack",
+            "Active",
+            "Ack",
+            "Sev",
+            "Metric",
+            "Cur",
+            "Thr",
+            "Trig",
+            "Status",
+            "Act",
+            "Alerts",
+            "No alerts",
+        );
+        assert!(alerts_html.contains("admin-empty-state"));
+        let dash_html = render_monitoring_dashboards_panel_html(
+            "[]",
+            "Name",
+            "Desc",
+            "Metrics",
+            "Public",
+            "Created",
+            "Dash",
+            "—",
+            "N/A",
+            "Yes",
+            "No",
+            "{n} metrics",
+            "No dashboards",
+        );
+        assert!(dash_html.contains("admin-empty-state"));
+        let inst_html = render_instances_panel_html(
+            "[]", "ID", "Model", "St", "Str", "Nodes", "Created", "Act", "Inst", "View", "Del",
+            "Empty",
+        );
+        assert!(inst_html.contains("admin-empty-state"));
+        let tg_html = render_telegram_seats_panel_html(
+            r#"{"seat_policy":"open","seat_limit":10,"active_seats":0,"bound_wallets":[]}"#,
+            "Policy",
+            "Limit",
+            "Active",
+            "Bound",
+            "Seats",
+        );
+        assert!(tg_html.contains("admin-table"));
+        let vn_html = render_galaxy_virtual_nodes_panel_html(
+            "[]", "Peer", "Origin", "Region", "Latency", "Stale", "Nodes", "Empty",
+        );
+        assert!(vn_html.contains("admin-empty-state"));
+        let np_html = render_network_profiles_panel_html(
+            "[]", "Peer", "Region", "Latency", "BW", "Profiles", "Empty",
+        );
+        assert!(np_html.contains("muted"));
+        let prefetch_html =
+            render_grid_prefetch_metrics_strip_html(r#"{"metrics":{"pull_bytes_total":1}}"#, 0);
+        assert!(prefetch_html.contains("admin-metrics-strip"));
+        let locality_html =
+            render_grid_locality_metrics_strip_html(r#"{"metrics":{"hot_promote_total":2}}"#, 0);
+        assert!(locality_html.contains("admin-metrics-strip"));
+        let gov_html = render_grid_governance_metrics_strip_html(
+            r#"{"metrics":{"advisory_ack_total":1}}"#,
+            r#"{"mode":"advisory"}"#,
+            0,
+        );
+        assert!(gov_html.contains("admin-metrics-strip"));
+        let fee_html =
+            render_grid_fee_split_metrics_strip_html(r#"{"metrics":{"applied_total":3}}"#, 0);
+        assert!(fee_html.contains("admin-metrics-strip"));
+    }
+
+    #[test]
     fn grid_verification_replay_json_export_shape_ph_s710() {
         use poolai::grid::stand_smoke_metrics_parity::{
             validate_grid_metrics_json_export, REPLAY_JSON_KEYS, VERIFICATION_JSON_KEYS,
