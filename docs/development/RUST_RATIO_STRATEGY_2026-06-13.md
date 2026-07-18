@@ -342,6 +342,16 @@ flowchart TB
 | 247 | **PH-S977** | poolai-vision-sync drift gate | `--check` green | **✅** |
 | 248 | **PH-S978** | Ratio hold advisory snapshot | **94.92%** concept band hold | **✅** |
 | 249 | **PH-S979** | galaxy_horizon_s970_integration | concept markers close | **✅** |
+| 250 | **PH-S980** | STABLE_STATE product-complete draft | development complete section | **✅** |
+| 251 | **PH-S981** | INDEX product-complete zriz | step 1–12 final | **✅** |
+| 252 | **PH-S982** | README Next Focus → maintenance | root README | **✅** |
+| 253 | **PH-S983** | HANDOFF maintenance mode template | post-S1010 prep | **✅** |
+| 254 | **PH-S984** | DEVELOPMENT_PROGRESS 100% code scope | honest scope note | **✅** |
+| 255 | **PH-S985** | Rust ratio loc-audit refresh | **94.92%** sprint zriz | **✅** |
+| 256 | **PH-S986** | FM §5.15 draft product-complete | FM catalog | **✅** |
+| 257 | **PH-S987** | poolai-vision-sync drift gate | `--check` green | **✅** |
+| 258 | **PH-S988** | Ratio hold advisory snapshot | **94.92%** STABLE band hold | **✅** |
+| 259 | **PH-S989** | galaxy_horizon_s980_integration | STABLE band close | **✅** |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 

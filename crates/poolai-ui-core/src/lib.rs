@@ -30,6 +30,7 @@ pub mod payout_batch;
 pub mod pricing;
 pub mod prometheus;
 pub mod security;
+pub mod stable_depth;
 pub mod stand_smoke_metrics;
 pub mod stretch_depth;
 pub mod table;

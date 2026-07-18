@@ -1,6 +1,21 @@
 # Прогрес розробки PoolAI (менеджер функціоналу)
 
-**Оновлено:** 2026-06-20 (master backlog зріз · Cursor 3.8.11 research) · **Гілка:** `main`
+**Оновлено:** 2026-07-18 (band 33 zriz · PH-S984 honest scope) · **Гілка:** `main`
+
+---
+
+## 100% code scope (PH-S984)
+
+| Шар | % | Примітка |
+|-----|---|----------|
+| **A. FM-001…019 (autoprogon)** | **100%** | Продуктовий шар закритий |
+| **B. Architect P1–P5** | **100%** | Код + CI; LAN/cloud-sdk deep — BLOCKED/Deferred |
+| **C. Horizon P6 (S35–S40)** | **100%** | [`HORIZON_TO_100_PLAN.md`](../development/HORIZON_TO_100_PLAN.md) |
+| **A+B+C (офіційний code scope)** | **100%** | README / HANDOFF / FM §5.5 |
+| **D. Master backlog bands 1–33** | **✅ drained** | PH-S660…S989 |
+| **D′. Bands 34–36 + S1010** | **pending** | integration gap + final horizon + FM §5.15 |
+
+**Чесна примітка:** відсотки A+B+C = **100%** за autoprogon; master backlog D до **PH-S1010** ще не закритий — див. [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md).
 
 ---
 
@@ -13,12 +28,12 @@
 | **A+B (офіційний autoprogon)** | **100%** | HANDOFF / README / FM §5.5 |
 | **C. Horizon (код P6)** | **100%** | S35–S40 ✅ — [`HORIZON_TO_100_PLAN.md`](../development/HORIZON_TO_100_PLAN.md) |
 | **Проєкт (A+B+C)/3** | **100%** | офіційний зріз після S40 |
-| **D. Master backlog PH-S660…S1010** | **5.7%** | 20/351 drained (band 1–2); active band 3 — 10 `[ ]` |
-| **D′. Master + in-flight** | **8.5%** | 30/351 (20 ✅ + 10 active) |
-| **E. Sprint номер до S1010** | **67.2%** | PH-S679 / 1010 (орієнтир нумерації) |
-| **F. Зважений (60% A+B+C + 40% D)** | **~63%** | horizon KPI для drain до S1010 |
+| **D. Master backlog PH-S660…S1010** | **94.3%** | 330/351 drained (bands 1–33); active band 34 — 10 `[ ]` |
+| **D′. Master + in-flight** | **96.9%** | 340/351 (330 ✅ + 10 active) |
+| **E. Sprint номер до S1010** | **97.0%** | PH-S989 / 1010 (орієнтир нумерації) |
+| **F. Зважений (60% A+B+C + 40% D)** | **~97.7%** | horizon KPI для drain до S1010 |
 
-**Наступна фаза (2026-06-20):** master backlog **321** pending PH-S690…S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · FM **§5.14** · **`абракадабра`** drain band 4. Cursor post-update — [`CURSOR_UPDATE_RESEARCH_2026-06-20.md`](../development/CURSOR_UPDATE_RESEARCH_2026-06-20.md).
+**Наступна фаза (2026-07-18):** master backlog **21** pending PH-S1000…S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · FM **§5.14** · **`абракадабра`** drain band 34.
 
 ---
 

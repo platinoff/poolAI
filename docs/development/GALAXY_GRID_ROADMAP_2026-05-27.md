@@ -1,12 +1,13 @@
 # Galaxy Grid roadmap (зріз)
 
-**Оновлено:** 2026-07-17 · **Completion v2:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · **41** pending PH-S980…S1010 · **§5.12 active:** 10
+**Оновлено:** 2026-07-18 · **Completion v2:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · **21** pending PH-S1000…S1010 · **§5.12 active:** 10
 
 | Зріз | Значення |
 |------|----------|
 | **Completion plan** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.14–§5.15** |
 | **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) |
-| **Active drain (band 33)** | PH-S980…S989 — STABLE + INDEX product-complete |
+| **Active drain (band 34)** | PH-S990…S999 — integration gap fill |
+| **Last closed (band 33)** | PH-S980…S989 ✅ — STABLE + INDEX product-complete draft |
 | **Last closed (band 32)** | PH-S970…S979 ✅ — Galaxy concept implemented markers |
 | **Last closed (band 31)** | PH-S960…S969 ✅ — DOCS_LEGACY audit close |
 | **Last closed (band 30)** | PH-S950…S959 ✅ — FUNCTIONALITY_DIGEST full sync |
@@ -15,7 +16,7 @@
 | **Product-complete tail** | PH-S1010 — FM **§5.15** |
 | **Rust ratio** | **94.92%** → PH-S975 zriz · hold **95%** advisory |
 
-**41** pending · **5** `абракадабра` sessions · остання закрита **PH-S970…S979** ✅.
+**21** pending · **3** `абракадабра` sessions · остання закрита **PH-S980…S989** ✅.
 
 ---
 

@@ -53,8 +53,8 @@ fn horizon_s950_band_digest_full_sync_ph_s959() {
             .expect("rust_ratio.json");
     let sprint = ratio_json["sprint"].as_str().unwrap_or("");
     assert!(
-        sprint == "PH-S975" || sprint == "PH-S965" || sprint == "PH-S955",
-        "rust_ratio sprint should reflect band 30–32 loc-audit zriz, got {sprint}"
+        sprint == "PH-S985" || sprint == "PH-S975" || sprint == "PH-S965" || sprint == "PH-S955",
+        "rust_ratio sprint should reflect band 30–33 loc-audit zriz, got {sprint}"
     );
     assert!(ratio_json["in_formal_band"].as_bool().unwrap_or(false));
 

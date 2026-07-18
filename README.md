@@ -80,13 +80,15 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 - `cargo test --all-features` — на **Windows MSVC** можливі каскадні помилки компіляції тестів і/або `STATUS_STACK_BUFFER_OVERRUN` у `rustc` через обсяг фіч (cloud-sdk тощо); для повного матрицю краще **GNU toolchain** з `rust-toolchain.toml` або **Linux CI**. Інтеграційні тести ML прунінгу та SAML узгоджені з поточною семантикою `PruningResult` / унікальними іменами SAML-провайдерів.
 - **Архітектурні інкременти (`main`, 2026-04–05)**: **`RaidService`** + **`VirtualNode*`** services (**FM-016** ✅); ML pipeline + **TurboQuant**; **P3 / FM-005** — `json_errors.rs`, **`HttpAppError`/`RestError`** по REST, **`raid*`**, **`enterprise_api/`**, auth/WS/rate-limit ✅; **OpenAPI** enterprise sync (S14–S20); бінарі **`poolai-worker`**, **`poolai-telegram-bot`**, **`poolai_health_load`**; dev stand — `bin/verify-dev-stand.*`, `core::dev_stand`; ML-тести — **`[[test]]` + `required-features = ["ml"]`**; P2b wire — `tests/distributed_raid_wire_integration.rs`.
 
-### Next Focus (2026-07-17)
+### Next Focus (2026-07-18)
 
-**Service band ✅:** PH-SVC01…SVC10 — Cursor **3.12.17** research, rules/docs sync — [`CURSOR_UPDATE_RESEARCH_2026-07-17.md`](docs/development/CURSOR_UPDATE_RESEARCH_2026-07-17.md).
+**Product-complete path:** bands 1–33 ✅ · active **PH-S990…S999** (band 34 integration gap) · tail **PH-S1010** / FM **§5.15**.
 
-**§5.12:** **10** active **PH-S950…S959** (band 30) · vision **rev 297** · rust_ratio **94.91%** (formal 90–95% ✅; hold 95% advisory).
+**§5.12:** **10** active **PH-S990…S999** (band 34) · vision **rev 303** · rust_ratio **94.92%** (formal 90–95% ✅; hold 95% advisory PH-S988).
 
-**Наступна product-сесія:** **`абракадабра`** — drain band 30 → promote PH-S960…S969 ([`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md)).
+**Наступна product-сесія:** **`абракадабра`** — drain band 34 → promote PH-S1000…S1009 ([`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md)).
+
+**Maintenance mode (PH-S982):** після **PH-S1010** — HANDOFF/NEXT переходять на maintenance template; нові PH-S* лише за явним scan власника (BLOCKED/Deferred horizon).
 
 **Ops (поза чергою):** **FM-003** LAN §4 **BLOCKED** (2 хости) · **FM-041** Cloud SDK **Deferred**.
 

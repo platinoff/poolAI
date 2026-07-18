@@ -1,9 +1,27 @@
 # 📊 Стабільний стан розробки PoolAI
-## Rust Architect — оновлено 2026-06-21 (PH-S860…S869 ✅ band 21; черга **PH-S870…S879** band 22; **141→S1010** completion v2; rust_ratio **94.70%**; §5.12 **10**)
+## Rust Architect — оновлено 2026-07-18 (PH-S970…S979 ✅ band 32; **band 33 PH-S980** product-complete draft; черга **PH-S990…S999** band 34; rust_ratio **94.92%**; §5.12 **10**)
 
 **Completion plan:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.15** at PH-S1010.
 
 **Прогрес розробки:** [`DEVELOPMENT_PROGRESS_2026-05-19.md`](./DEVELOPMENT_PROGRESS_2026-05-19.md) · **Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md)
+
+---
+
+## Development complete (draft, band 33 PH-S980)
+
+**Статус:** Code + docs scope для **product-complete** — bands 1–33 drained; формальна декларація — **PH-S1010** / FM **§5.15**.
+
+| Критерій | Зріз (PH-S980) |
+|----------|----------------|
+| Galaxy concept gaps (§4–§9 wire) | ✅ implemented markers bands 7–32 |
+| OpenAPI gap | ✅ `poolai-openapi-gap-audit` → **0** (PH-S841) |
+| Rust ratio | **94.92%** — formal 90–95% ✅; target **95%** advisory hold (PH-S988) |
+| Integration coverage | bands **34–35** pending (PH-S990…S1009) |
+| Docs canon | STABLE draft + INDEX step 1–12 zriz (PH-S981) |
+| Vision | `poolai-vision-sync --check` green after band close |
+| **BLOCKED / Deferred** | FM-003 LAN 2-host · FM-041 Cloud SDK prod · ZK/TEE roadmap |
+
+**Чесний scope (PH-S984):** шари A+B+C autoprogon = **100%**; master backlog D = bands 1–33 ✅; залишилось bands 34–36 + **PH-S1010**.
 
 ---
 

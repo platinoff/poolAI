@@ -1,12 +1,28 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-18 (PH-S970…S979 ✅ band 32 · active **PH-S980…S989** · vision **rev 302** · rust_ratio **94.92%**)
+**Оновлено:** 2026-07-18 (PH-S980…S989 ✅ band 33 · active **PH-S990…S999** · vision **rev 303** · rust_ratio **94.92%**)
 
-**Cursor 3.12.17 (2026-07-17):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-07-17.md`](./CURSOR_UPDATE_RESEARCH_2026-07-17.md). **PH-S970…S979 ✅ band 32** — Galaxy concept implemented markers. **Наступна product-сесія:** **`абракадабра`** (drain PH-S980…S989).
+**Cursor 3.12.17 (2026-07-17):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-07-17.md`](./CURSOR_UPDATE_RESEARCH_2026-07-17.md). **PH-S980…S989 ✅ band 33** — STABLE product-complete draft. **Наступна product-сесія:** **`абракадабра`** (drain PH-S990…S999).
 
-**Completion roadmap v2 (2026-06-20):** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) — **101** спринтів до **product-complete** (PH-S1010 / FM **§5.15**); **4** сесій `абракадабра` × 10 PH-S* залишилось. Реєстр: [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · regen `bash scripts/generate-ph-s-master-backlog-351.sh`.
+## Maintenance mode (template, PH-S983 — post-S1010)
 
-**Master backlog 31 (2026-07-18):** FM **§5.14**. Активна §5.12: **PH-S980…S989** (band 33 — STABLE + INDEX product-complete). **`абракадабра`** = drain 10 → promote **PH-S990…S999** (band 34).
+Після **PH-S1010** / FM **§5.15** ✅ сесії переходять у **maintenance mode**:
+
+| Крок | Дія |
+|------|-----|
+| S0 | `git fetch`; HANDOFF; FM **§5.15**; `poolai-vision-sync --check`; `df -h /s` |
+| Scope | Лише BLOCKED/Deferred (FM-003 LAN, FM-041 Cloud SDK) або явний FM-horizon v2 за запитом власника |
+| Тести | `cargo fmt --all` → `cargo test-ci` перед push |
+| Docs | STABLE «development complete»; INDEX/DIGEST без нових PH-S* у §5.12 |
+| **Не** | Автоматичний project scan / replenish §5.12 без запиту власника |
+
+**До PH-S1010:** продовжувати **`абракадабра`** drain з [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) bands 34–36.
+
+**Completion roadmap v2 (2026-06-20):** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) — **101** спринтів до **product-complete** (PH-S1010 / FM **§5.15**); **3** сесій `абракадабра` × 10 PH-S* залишилось. Реєстр: [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · regen `bash scripts/generate-ph-s-master-backlog-351.sh`.
+
+**Master backlog 21 (2026-07-18):** FM **§5.14**. Активна §5.12: **PH-S990…S999** (band 34 — integration gap fill). **`абракадабра`** = drain 10 → promote **PH-S1000…S1009** (band 35).
+
+**PH-S980…S989 ✅ (2026-07-18):** STABLE «Development complete (draft)» (PH-S980); INDEX product-complete zriz steps 1–12 (PH-S981); README Next Focus → maintenance prep (PH-S982); HANDOFF maintenance template (PH-S983); DEVELOPMENT_PROGRESS 100% code scope note (PH-S984); `poolai-loc-audit` → `rust_ratio.json` **94.92%** (PH-S985); FM **§5.15** draft (PH-S986); `stable_depth_stub` + `galaxy_horizon_s980_integration` (PH-S989); vision **rev 303**.
 
 **PH-S970…S979 ✅ (2026-07-18):** Galaxy §1–3 implemented markers (PH-S970); §4–6 markers (PH-S971); §7–9 markers + §8 TBD/LAN BLOCKED (PH-S972/S973); GALAXY_GRID_ROADMAP horizon final (PH-S974); `poolai-loc-audit` → `rust_ratio.json` **94.92%** (PH-S975); INDEX concept cross-links (PH-S976); `concept_markers_depth_stub` + `galaxy_horizon_s970_integration` (PH-S979); vision **rev 302**.
 
@@ -70,7 +86,7 @@
 
 **Rules:** **`абракадабра`** — drain 10 з §5.12 → vision close → push; [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
-**§5.12:** **10** відкритих **PH-S980…S989** (band 33). **Vision:** rev **302** · rust_ratio **94.92%** (PH-S975). **Service:** FM §5.16 PH-SVC01…SVC10 ✅ (2026-07-17).
+**§5.12:** **10** відкритих **PH-S990…S999** (band 34). **Vision:** rev **303** · rust_ratio **94.92%** (PH-S985). **Service:** FM §5.16 PH-SVC01…SVC10 ✅ (2026-07-17).
 
 **Роадмеп:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) · **Промпт:** [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md).
 
