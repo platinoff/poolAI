@@ -30,6 +30,7 @@ pub mod ml;
 pub mod modal;
 pub mod multi_module_depth;
 pub mod network_profiles;
+pub mod openapi_wire_depth;
 pub mod owner_ops_depth;
 pub mod payout_batch;
 pub mod pricing;

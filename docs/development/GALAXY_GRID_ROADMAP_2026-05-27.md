@@ -6,6 +6,11 @@
 |------|----------|
 | **Completion plan** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.14–§5.15** ✅ |
 | **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) — **351/351** ✅ |
+| **Last closed (band 42)** | PH-S1068 ✅ — OpenAPI/docs wire sync · contracts + stand smoke ops/power |
+| **Last closed (band 41)** | PH-S1058 ✅ — E2E visual/axe regression · Playwright snapshots + vision axe |
+| **Last closed (band 40)** | PH-S1048 ✅ — Vision map/a11y/perf · skip links + tree keyboard |
+| **Last closed (band 39)** | PH-S1038 ✅ — Admin tables/forms FM-019 adoption |
+| **Last closed (band 38)** | PH-S1028 ✅ — Power UX + ui-core hygiene |
 | **Last closed (band 37)** | PH-S1018 ✅ — owner ops UX v2 · `run-poolai quick` · `/api/v1/ops/power` |
 | **Last closed (band 36)** | PH-S1010 ✅ — FM **§5.15** product-complete · band 36 PH-S1010 |
 | **Last closed (band 35)** | PH-S1000…S1009 ✅ — final multi-module horizon · band 35 PH-S1000 |
@@ -57,6 +62,11 @@
 | **Galaxy concept implemented markers** | POOLAI_GALAXY_GRID **§1–9** | band 32 ✅ PH-S970…S979 |
 | **Integration test gap fill** | archived API-smoke → Rust wire | band 34 ✅ PH-S990…S999 · `integration_gap_audit.rs` · `telegram_wallet_integration.rs` · `grid_envelope_lease_integration.rs` · `protocol_middleware_integration.rs` · `job_store_raid_persistence.rs` · `vm_api_contracts.rs` |
 | **Final multi-module horizon** | wire + wasm + stand smoke | band 35 ✅ PH-S1000…S1009 · `multi_module_wire_smoke.rs` · `multi_module_admin_wasm_regression.rs` · `multi_module_stand_smoke_audit.rs` · `multi_module_depth.rs` · `galaxy_horizon_s1000_integration.rs` |
+| **Power UX + ui-core hygiene** | owner ops + clippy | band 38 ✅ PH-S1019…S1028 · `POST /api/v1/ops/power` · `owner_ops_depth.rs` |
+| **Admin tables/forms FM-019** | empty states + aria | band 39 ✅ PH-S1029…S1038 · `admin_tables_forms_depth.rs` |
+| **Vision map/a11y/perf** | skip links + tree keyboard | band 40 ✅ PH-S1039…S1048 · `vision_map_depth.rs` |
+| **E2E visual/axe regression** | Playwright snapshots | band 41 ✅ PH-S1049…S1058 · `e2e_visual_axe_depth.rs` |
+| **OpenAPI/docs wire sync** | contracts + stand smoke | band 42 ✅ PH-S1059…S1068 · `grid_openapi_contracts.rs` · `memory_api_contracts.rs` · `openapi_wire_depth.rs` |
 | **network_profile persist stub** | Galaxy **§8** | PH-S664 ✅ (stub); full persist ✅ band 8 PH-S730…S739 |
 
 **§5.5 prefetch:** live pull + backpressure + strict-mode HTTP wire ✅ (baseline); live pull **depth** ✅ band 10 (PH-S750…S759).

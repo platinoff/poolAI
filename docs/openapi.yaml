@@ -154,6 +154,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/OpsPowerRequest'
+            example:
+              action: shutdown
       responses:
         '202':
           description: Power action accepted
@@ -161,6 +163,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OpsPowerResponse'
+              example:
+                accepted: true
+                action: shutdown
+                dev_guard: true
+                note: Dev-stand safe — host reboot skipped
         '400':
           description: Invalid action
           content:
@@ -5780,6 +5787,7 @@ components:
           type: string
           enum: [shutdown, reboot]
           description: Power action for dev stand
+          example: shutdown
 
     OpsPowerResponse:
       type: object
@@ -6677,6 +6685,7 @@ components:
       properties:
         ok:
           type: boolean
+          example: true
         entries:
           type: array
           items:
@@ -6684,23 +6693,29 @@ components:
         generated_at:
           type: string
           format: date-time
+          example: "2026-07-18T12:00:00Z"
         memory_persist:
           type: boolean
           description: Whether POOLAI_MEMORY_DATA_DIR is configured (PH-S861)
+          example: false
         registered_shard_count:
           type: integer
           format: int32
           minimum: 0
+          example: 2
         memory_store_depth:
           type: string
           description: ephemeral | json | json_restart
+          example: ephemeral
         memory_layer_depth:
           type: string
           description: Memory layer depth wire label (PH-S861)
+          example: seed_inventory_wire
         registered_shard_ids:
           type: array
           items:
             type: string
+          example: ["w:emb-1", "w:ckpt-7"]
 
     GridVerificationReplayResponse:
       type: object
@@ -7309,20 +7324,25 @@ components:
         shard_id:
           type: string
           description: Shard id (often `{raid_logical_name}:{version}`)
+          example: weights:1.0.0
         artifact_id:
           type: string
           description: RAID artifact UUID or stable id
+          example: art-mem-1061
         version:
           type: string
+          example: "1.0.0"
         raid_logical_name:
           type: string
           nullable: true
           description: RAID logical name for map/filter queries
+          example: weights
         seed_hints:
           type: array
           items:
             type: string
           nullable: true
+          example: ["emb"]
 
     MemoryShardsListResponse:
       type: object
@@ -7331,6 +7351,13 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/MemoryShardRef'
+      example:
+        shards:
+          - shard_id: weights:1.0.0
+            artifact_id: art-mem-1061
+            version: "1.0.0"
+            raid_logical_name: weights
+            seed_hints: ["emb"]
 
     MemoryShardResponse:
       type: object
@@ -7348,19 +7375,29 @@ components:
       properties:
         artifact_id:
           type: string
+          example: art-mem-1061
         version:
           type: string
+          example: "1.0.0"
         shard_id:
           type: string
           description: Explicit shard id; omit when using `raid_logical_name` builder
+          example: weights:1.0.0
         raid_logical_name:
           type: string
           description: Builds `shard_id` as `{raid_logical_name}:{version}`
+          example: weights
         seed_hints:
           type: array
           items:
             type: string
           nullable: true
+          example: ["emb"]
+      example:
+        raid_logical_name: weights
+        artifact_id: art-mem-1061
+        version: "1.0.0"
+        seed_hints: ["emb"]
 
     VmInstance:
       type: object

@@ -1,6 +1,6 @@
 # PoolAI — витяг функціоналу (зведення за доками та кодом)
 
-**Оновлено:** 2026-07-17 (PH-S950…S959: FUNCTIONALITY_DIGEST full sync band 30 — grid/job/ui-wasm/bins).
+**Оновлено:** 2026-07-18 (PH-S1066: FUNCTIONALITY_DIGEST band 42 zriz — OpenAPI contracts + ops power stand smoke).
 
 Цей документ — **не автогенерація з коду**, а структурований **витяг можливостей** системи, узгоджений з кореневим [`README.md`](../../README.md), [`docs/status/STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md), [`docs/development/HANDOFF_NEW_SESSION.md`](../development/HANDOFF_NEW_SESSION.md), модулями `src/` та (частково) [`docs/openapi.yaml`](../openapi.yaml). Для повного переліку HTTP-шляхів див. роутери в `src/network/` — OpenAPI може відставати від фактичного API.
 
@@ -90,7 +90,7 @@
 - **Prometheus (FM-043)** — `GET /metrics` (root, `feature = prometheus`); enterprise gauges on scrape; JSON metrics лишаються на `/api/v1/metrics`.
 - **HTTPS (FM-044)** — `feature = https`: rustls TLS 1.3 (опційно 1.2), HSTS з config, `HTTPS_CERT_RELOAD_SECS` — [`security/TLS.md`](../security/TLS.md).
 - **UI/Admin UX** — FM-012 закрито (2026-05-16): i18n UA/EN + Telegram OAuth; LAN perf — FM-003 ops ([`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md)).
-- **OpenAPI** — [`docs/openapi.yaml`](../openapi.yaml) синхронізовано з Axum routes (PH-S840/S841); **`cargo run --bin poolai-openapi-gap-audit`** → **0 missing**; контракти — `tests/grid_openapi_contracts.rs` (PH-S954).
+- **OpenAPI** — [`docs/openapi.yaml`](../openapi.yaml) синхронізовано з Axum routes (PH-S840/S841); **`cargo run --bin poolai-openapi-gap-audit`** → **0 missing**; контракти — `tests/grid_openapi_contracts.rs` (PH-S954); band 42 — `memory_api_contracts.rs` (PH-S1061), stand smoke `ops_power_openapi` (PH-S1062).
 
 ---
 

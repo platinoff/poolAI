@@ -1,8 +1,27 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-18 (band 41 **PH-S1049…S1058** ✅ · horizon bands 42–47)
+**Оновлено:** 2026-07-18 (band 42 **PH-S1059…S1068** ✅ · horizon bands 43–47)
 
-**Наступна сесія:** **`абракадабра`** — project scan → band 42.
+**Наступна сесія:** **`абракадабра`** — project scan → band 43.
+
+## Band 42 — OpenAPI/docs wire sync (PH-S1059…S1068, ✅)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1059** | OpenAPI gap audit regression gate |
+| **PH-S1060** | Grid OpenAPI contract extend (seed/verification) |
+| **PH-S1061** | Memory shards OpenAPI contract |
+| **PH-S1062** | Ops power stand smoke OpenAPI |
+| **PH-S1063** | OpenAPI examples depth tier-2 |
+| **PH-S1064** | POOLAI_GALAXY_GRID maintenance markers |
+| **PH-S1065** | GALAXY_GRID_ROADMAP maintenance rows |
+| **PH-S1066** | DIGEST + DOCS_LEGACY + INDEX refresh |
+| **PH-S1067** | `openapi_wire_depth` ui-core stub |
+| **PH-S1068** | Band close |
+
+**§5.12:** **0** відкритих (band 42 ✅). **Vision:** rev **314**.
+
+**PH-S1068 ✅ (2026-07-18):** `grid_openapi_contracts` + `memory_api_contracts`; stand smoke `ops_power_openapi`; openapi.yaml examples; `galaxy_horizon_s1059_integration`; vision **rev 314**.
 
 ## Band 41 — E2E visual/axe regression (PH-S1049…S1058, ✅)
 

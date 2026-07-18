@@ -78,6 +78,47 @@ async fn virtual_nodes_wallet_rebind_override_requires_admin_ph_s842() {
 }
 
 #[tokio::test]
+async fn grid_seed_inventory_openapi_shape_ph_s1060() {
+    let app = api_app();
+    let (status, v) = get_json(&app, "/api/v1/grid/seed-inventory").await;
+    assert_eq!(status, StatusCode::OK);
+    let o = v.as_object().expect("seed-inventory object");
+    for key in [
+        "ok",
+        "entries",
+        "generated_at",
+        "memory_store_depth",
+        "memory_layer_depth",
+    ] {
+        assert!(o.contains_key(key), "seed-inventory missing `{key}`: {o:?}");
+    }
+    assert!(o["entries"].is_array());
+}
+
+#[tokio::test]
+async fn grid_verification_replay_openapi_shape_ph_s1060() {
+    let app = api_app();
+    let (status, v) = get_json(&app, "/api/v1/grid/verification-replay").await;
+    assert_eq!(status, StatusCode::OK);
+    let o = v.as_object().expect("verification-replay object");
+    assert_eq!(o.get("ok"), Some(&Value::Bool(true)));
+    match o.get("record") {
+        None | Some(Value::Null) => {}
+        Some(record) => assert!(record.is_object(), "record must be object when set: {v:?}"),
+    }
+}
+
+#[tokio::test]
+async fn grid_verification_checker_tasks_openapi_shape_ph_s1060() {
+    let app = api_app();
+    let (status, v) = get_json(&app, "/api/v1/grid/verification-checker/tasks").await;
+    assert_eq!(status, StatusCode::OK);
+    let o = v.as_object().expect("verification-checker tasks object");
+    assert_eq!(o.get("ok"), Some(&Value::Bool(true)));
+    assert!(o["tasks"].is_array(), "tasks must be array: {v:?}");
+}
+
+#[tokio::test]
 async fn grid_metrics_band_openapi_shape_ph_s842() {
     let app = api_app();
     for path in [

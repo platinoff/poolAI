@@ -11,7 +11,7 @@
 
 Цей документ — продуктово-архітектурна специфікація рівня концепту/протоколу (без деталей UI/E2E), узгоджена з наявними модулями: **virtual nodes (FM-016)**, **RAID/SmallWorld**, **Jobs**, **VM isolation**, **Telegram bot** та **Solana adapter (sidecar)**.
 
-**Оновлено:** 2026-07-17 (band 32 PH-S970…S979 — concept implemented markers sync).
+**Оновлено:** 2026-07-18 (band 42 PH-S1066 — maintenance wire markers: ops power PH-S1016, E2E visual PH-S1049…S1058, OpenAPI contracts PH-S1060/S1061).
 
 ## 1. Ролі та економіка
 

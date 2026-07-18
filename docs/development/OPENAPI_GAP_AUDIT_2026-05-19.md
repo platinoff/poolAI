@@ -30,6 +30,8 @@
 
 **PH-S840…S849 (2026-06-21):** OpenAPI gap **0 missing** (`poolai-openapi-gap-audit` exit 0); grid metrics examples in yaml; `tests/grid_openapi_contracts.rs`; stand smoke OpenAPI path cases; `galaxy_horizon_s840_integration`; rust_ratio **94.70%** (PH-S845 hold advisory).
 
+**PH-S1059…S1068 (2026-07-18, band 42):** OpenAPI gap **0 missing** (regression gate); contract extend `grid_openapi_contracts` + `memory_api_contracts`; stand smoke `ops_power_openapi`; openapi.yaml tier-2 examples (ops power, memory shards, seed-inventory); `galaxy_horizon_s1059_integration`.
+
 ## CI (PH-S19)
 
 Job **`openapi-gap-audit`** у [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) — `cargo run --bin poolai-openapi-gap-audit` (fail PR/push on exit 1).

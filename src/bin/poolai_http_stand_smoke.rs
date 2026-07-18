@@ -1703,6 +1703,34 @@ async fn smoke_grid_network_profiles_list(client: &Client, base: &str) -> Result
     Ok(())
 }
 
+async fn smoke_ops_power_openapi(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .post(api_url(base, "/api/v1/ops/power"))
+        .json(&json!({"action": "shutdown"}))
+        .send()
+        .await
+        .map_err(|e| format!("ops power request: {e}"))?;
+    if resp.status() != StatusCode::ACCEPTED {
+        return Err(format!(
+            "ops power expected 202 Accepted, got {}",
+            resp.status()
+        ));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    for key in ["accepted", "action", "dev_guard"] {
+        if body.get(key).is_none() {
+            return Err(format!("ops power missing `{key}`: {body}"));
+        }
+    }
+    if body.get("accepted") != Some(&json!(true)) {
+        return Err(format!("ops power accepted != true: {body}"));
+    }
+    if body.get("action") != Some(&json!("shutdown")) {
+        return Err(format!("ops power action mismatch: {body}"));
+    }
+    Ok(())
+}
+
 async fn smoke_admin_security_advisories_openapi(
     client: &Client,
     base: &str,
@@ -2788,6 +2816,12 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
         &mut cases,
         "grid_network_profiles_list",
         smoke_grid_network_profiles_list(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
+        "ops_power_openapi",
+        smoke_ops_power_openapi(&client, &cli.base_url).await,
     )
     .await;
     record(

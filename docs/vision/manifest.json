@@ -2318,6 +2318,12 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_vision_map_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_e2e_visual_axe_depth_rs"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -9524,9 +9530,23 @@
       "label": "galaxy_horizon_s1039_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s1039_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_e2e_visual_axe_depth_rs",
+      "label": "e2e_visual_axe_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/e2e_visual_axe_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1049_integration_rs",
+      "label": "galaxy_horizon_s1049_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1049_integration.rs"
     }
   ],
-  "revision": 313,
+  "revision": 314,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -18104,6 +18124,96 @@
       "row": 953,
       "status": "closed",
       "title": "Ops power band close"
+    },
+    {
+      "acceptance": "exit 0; no missing Axum routes",
+      "deps": "poolai-openapi-gap-audit",
+      "id": "PH-S1059",
+      "open": false,
+      "row": 994,
+      "status": "closed",
+      "title": "OpenAPI gap audit regression gate"
+    },
+    {
+      "acceptance": "seed-inventory, verification-replay, checker tasks shape",
+      "deps": "grid_openapi_contracts.rs",
+      "id": "PH-S1060",
+      "open": false,
+      "row": 995,
+      "status": "closed",
+      "title": "Grid OpenAPI contract extend"
+    },
+    {
+      "acceptance": "list/register/get shard keys per OpenAPI",
+      "deps": "memory_api_contracts.rs",
+      "id": "PH-S1061",
+      "open": false,
+      "row": 996,
+      "status": "closed",
+      "title": "Memory shards OpenAPI contract"
+    },
+    {
+      "acceptance": "POST `/ops/power` → 202 + structured body",
+      "deps": "poolai_http_stand_smoke.rs",
+      "id": "PH-S1062",
+      "open": false,
+      "row": 997,
+      "status": "closed",
+      "title": "Ops power stand smoke OpenAPI"
+    },
+    {
+      "acceptance": "ops power, memory shards, seed-inventory examples",
+      "deps": "docs/openapi.yaml",
+      "id": "PH-S1063",
+      "open": false,
+      "row": 998,
+      "status": "closed",
+      "title": "OpenAPI examples depth tier-2"
+    },
+    {
+      "acceptance": "power ops PH-S1016 + E2E visual PH-S1049…S1058 ✅",
+      "deps": "concept",
+      "id": "PH-S1064",
+      "open": false,
+      "row": 999,
+      "status": "closed",
+      "title": "POOLAI_GALAXY_GRID maintenance markers"
+    },
+    {
+      "acceptance": "bands 38–41 closed; band 42 in progress row",
+      "deps": "roadmap §4",
+      "id": "PH-S1065",
+      "open": false,
+      "row": 1000,
+      "status": "closed",
+      "title": "GALAXY_GRID_ROADMAP maintenance rows"
+    },
+    {
+      "acceptance": "bands 38–42 zriz; openapi audit + ops power",
+      "deps": "docs canon",
+      "id": "PH-S1066",
+      "open": false,
+      "row": 1001,
+      "status": "closed",
+      "title": "DIGEST + DOCS_LEGACY + INDEX refresh"
+    },
+    {
+      "acceptance": "depth enum + FM band 42 markers",
+      "deps": "openapi_wire_depth.rs",
+      "id": "PH-S1067",
+      "open": false,
+      "row": 1002,
+      "status": "closed",
+      "title": "openapi_wire_depth` stub"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1059_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1068",
+      "open": false,
+      "row": 1003,
+      "status": "closed",
+      "title": "OpenAPI wire band close"
     },
     {
       "acceptance": "config + jobs snapshots",
