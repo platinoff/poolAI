@@ -53,6 +53,11 @@ Commands:
   status          curl health on common dev ports
   help            This message
 
+Options (quick):
+  --stand-smoke   After health wait, run poolai-http-stand-smoke --run-local-smoke (PH-S1095)
+  --skip-build    Skip cargo build
+  --port N        HTTP port (default 8080)
+
 Options (single):
   --bg            Run in background (logs under data/dev/logs/)
   --port N        HTTP port (default 8080)
@@ -227,9 +232,11 @@ cmd_single() {
 }
 
 cmd_quick() {
+  local stand_smoke=0
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --skip-build) SKIP_BUILD=1; shift ;;
+      --stand-smoke) stand_smoke=1; shift ;;
       --port) PORT="$2"; shift 2 ;;
       *) echo "Unknown option: $1"; usage; exit 1 ;;
     esac
@@ -237,6 +244,11 @@ cmd_quick() {
   load_last_run_port || true
   cmd_single --bg --port "$PORT" --light ${SKIP_BUILD:+--skip-build}
   wait_health "$PORT"
+  if [[ "$stand_smoke" == "1" ]]; then
+    export POOLAI_BASE_URL="http://127.0.0.1:${PORT}"
+    echo "Running poolai-http-stand-smoke --run-local-smoke (PH-S1095)..."
+    cargo run --quiet --bin poolai-http-stand-smoke -- --run-local-smoke
+  fi
 }
 
 cmd_docker() {

@@ -1,13 +1,13 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-07-18 (band 44 **PH-S1079…S1088** ✅ · horizon bands 45–47)
+**Оновлено:** 2026-07-18 (band 45 **PH-S1089…S1098** ✅ · horizon bands 46–47)
 
-Maintenance mode (FM §5.15) · band 44 drained.
+Maintenance mode (FM §5.15) · band 45 drained.
 
-| **← наступний** | **`абракадабра`** (project scan → band 45) |
-| **§5.12 active** | **0** (band 44 ✅) |
-| **Horizon** | bands 45–47 → **40** PH-S (FM §5.19) |
-| **Vision** | rev **316** |
+| **← наступний** | **`абракадабра`** (project scan → band 46) |
+| **§5.12 active** | **0** (band 45 ✅) |
+| **Horizon** | bands 46–47 → **20** PH-S (FM §5.19) |
+| **Vision** | rev **317** |
 
 ---
 
@@ -19,14 +19,14 @@ Maintenance mode (FM §5.15) · band 44 drained.
 
 ---
 
-## Band 45 (очікуваний фокус — project scan)
+## Band 46 (очікуваний фокус — project scan)
 
 | Sprint range | Focus (FM §5.19) |
 |--------------|------------------|
-| PH-S1089…S1098 | stand smoke + RUN_LOCAL ops |
+| PH-S1099…S1108 | ratio/rust migration advisory |
 
 ---
 
 ## Не повторювати
 
-Band 44 ✅ · band 43 ✅ · band 42 ✅ · product-complete S1010 ✅ · FM-003 LAN · FM-041 Cloud SDK.
+Band 45 ✅ · band 44 ✅ · band 43 ✅ · product-complete S1010 ✅ · FM-003 LAN · FM-041 Cloud SDK.

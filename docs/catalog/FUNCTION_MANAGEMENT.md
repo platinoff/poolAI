@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-07-18 (band 43 **PH-S1069…S1078** ✅ · horizon bands 44–47)
+**Оновлено:** 2026-07-18 (band 45 **PH-S1089…S1098** ✅ · horizon bands 46–47)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -1221,7 +1221,18 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 44 ✅). **Master horizon:** PH-S1089…S1118 (bands 45–47). Vision rev **316** (після sync). **Наступна сесія:** **`абракадабра`** — project scan → band 45.
+**Відкритих у §5.12:** **0** (band 45 ✅). **Master horizon:** PH-S1099…S1118 (bands 46–47). Vision rev **317** (після sync). **Наступна сесія:** **`абракадабра`** — project scan → band 46.
+
+| 1024 | **PH-S1089** | RUN_LOCAL health export shape | `stand_smoke_run_local_depth.rs` | `RUN_LOCAL_HEALTH_KEYS` + enhanced `smoke_health` | **✅** |
+| 1025 | **PH-S1090** | Monitoring alerts stand smoke | `poolai_http_stand_smoke.rs` | GET `/api/enterprise/monitoring/alerts` array | **✅** |
+| 1026 | **PH-S1091** | Monitoring dashboards stand smoke | `poolai_http_stand_smoke.rs` | GET `/api/enterprise/monitoring/dashboards` array | **✅** |
+| 1027 | **PH-S1092** | VM instances stand smoke | `poolai_http_stand_smoke.rs` | GET `/api/v1/vm/instances` list shape | **✅** |
+| 1028 | **PH-S1093** | `--run-local-smoke` CLI subset | `poolai_http_stand_smoke.rs` | 6-case RUN_LOCAL gate; env `POOLAI_STAND_SMOKE_RUN_LOCAL` | **✅** |
+| 1029 | **PH-S1094** | `verify-dev-stand` stand smoke hook | `bin/verify-dev-stand.sh` | `VERIFY_STAND_SMOKE=1` → `--run-local-smoke` | **✅** |
+| 1030 | **PH-S1095** | `run-poolai quick --stand-smoke` | `bin/run-poolai.*` | post-health `--run-local-smoke` | **✅** |
+| 1031 | **PH-S1096** | RUN_LOCAL.md band 45 ops sync | docs | `--run-local-smoke`, `VERIFY_STAND_SMOKE`, `--stand-smoke` | **✅** |
+| 1032 | **PH-S1097** | GALAXY_GRID_ROADMAP + rust ratio advisory | docs | band 45 closed row; ratio hold → band 46 | **✅** |
+| 1033 | **PH-S1098** | Stand smoke RUN_LOCAL band close | tests/docs | `galaxy_horizon_s1089_integration`; HANDOFF/NEXT | **✅** |
 
 | 1014 | **PH-S1079** | Monitoring alerts wasm slim depth | `admin_wasm_slim_depth.rs` | `MonitoringAlertsPanel` flag + renderer smoke | **✅** |
 | 1015 | **PH-S1080** | Monitoring dashboards wasm slim depth | `admin_wasm_slim_depth.rs` | `MonitoringDashboardsPanel` flag + renderer smoke | **✅** |
@@ -1277,6 +1288,21 @@ FM-xxx (з таблиці нижче)
 | 981 | **PH-S1046** | ui-core depth stub | `vision_map_depth.rs` | depth enum + FM band 40 markers | **✅** |
 | 982 | **PH-S1047** | Vision Playwright smoke | `e2e/tests/vision.spec.ts` | skip-link focus; `#map-scene-3d`; tree role | **✅** |
 | 983 | **PH-S1048** | Vision map band close | tests/docs | `galaxy_horizon_s1039_integration`; HANDOFF/NEXT | **✅** |
+
+### 5.26 Stand smoke + RUN_LOCAL ops queue — band 45 (PH-S1089…S1098, 2026-07-18)
+
+**Джерело:** project scan band 45 — RUN_LOCAL quick/verify hooks without live stand smoke subset; monitoring/vm API gaps.
+
+| 1024 | **PH-S1089** | RUN_LOCAL health export shape | `stand_smoke_run_local_depth.rs` | `RUN_LOCAL_HEALTH_KEYS` + enhanced `smoke_health` | **✅** |
+| 1025 | **PH-S1090** | Monitoring alerts stand smoke | `poolai_http_stand_smoke.rs` | GET `/api/enterprise/monitoring/alerts` array | **✅** |
+| 1026 | **PH-S1091** | Monitoring dashboards stand smoke | `poolai_http_stand_smoke.rs` | GET `/api/enterprise/monitoring/dashboards` array | **✅** |
+| 1027 | **PH-S1092** | VM instances stand smoke | `poolai_http_stand_smoke.rs` | GET `/api/v1/vm/instances` list shape | **✅** |
+| 1028 | **PH-S1093** | `--run-local-smoke` CLI subset | `poolai_http_stand_smoke.rs` | 6-case RUN_LOCAL gate; env `POOLAI_STAND_SMOKE_RUN_LOCAL` | **✅** |
+| 1029 | **PH-S1094** | `verify-dev-stand` stand smoke hook | `bin/verify-dev-stand.sh` | `VERIFY_STAND_SMOKE=1` → `--run-local-smoke` | **✅** |
+| 1030 | **PH-S1095** | `run-poolai quick --stand-smoke` | `bin/run-poolai.*` | post-health `--run-local-smoke` | **✅** |
+| 1031 | **PH-S1096** | RUN_LOCAL.md band 45 ops sync | docs | `--run-local-smoke`, `VERIFY_STAND_SMOKE`, `--stand-smoke` | **✅** |
+| 1032 | **PH-S1097** | GALAXY_GRID_ROADMAP + rust ratio advisory | docs | band 45 closed row; ratio hold → band 46 | **✅** |
+| 1033 | **PH-S1098** | Stand smoke RUN_LOCAL band close | tests/docs | `galaxy_horizon_s1089_integration`; HANDOFF/NEXT | **✅** |
 
 ### 5.25 Admin wasm slim panels queue — band 44 (PH-S1079…S1088, 2026-07-18)
 
@@ -1350,7 +1376,7 @@ FM-xxx (з таблиці нижче)
 | **42** | S1059…S1068 | OpenAPI/docs wire sync ✅ |
 | 43 | S1069…S1078 | Grid metrics parity hardening ✅ |
 | 44 | S1079…S1088 | wasm admin slim panels ✅ |
-| 45 | S1089…S1098 | stand smoke + RUN_LOCAL ops |
+| 45 | S1089…S1098 | stand smoke + RUN_LOCAL ops ✅ |
 | 46 | S1099…S1108 | ratio/rust migration advisory |
 | 47 | S1109…S1118 | horizon close + STABLE touch-up |
 
@@ -1461,7 +1487,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-18):** band 44 **PH-S1079…S1088** ✅ · §5.12 **0** · наступна **`абракадабра`** → project scan → band 45.
+**Активна смуга (2026-07-18):** band 45 **PH-S1089…S1098** ✅ · §5.12 **0** · наступна **`абракадабра`** → project scan → band 46.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

@@ -24,7 +24,7 @@ cd S:\rust\poolAI
 .\bin\run-poolai.ps1 stop
 ```
 
-**Last updated:** 2026-07-18 (PH-S1018 band 37 · quick preset · `--light` · vision launch)
+**Last updated:** 2026-07-18 (PH-S1098 band 45 · `--run-local-smoke` · `VERIFY_STAND_SMOKE` · `quick --stand-smoke`)
 
 ### PH-S1011 / PH-S1012: Light compile + quick preset
 
@@ -48,7 +48,13 @@ cd S:\rust\poolAI
 | **full** | `enterprise,ml,cloud,test-utils` | `run-poolai build` default |
 | **light** (`--light`) | `enterprise,test-utils` | PH-S1011 faster compile |
 
-`quick` restores `data/dev/last_run.json` port when present (PH-S1014), runs light build unless `--skip-build`, starts `single --bg`, waits for `/api/v1/health`.
+`quick` restores `data/dev/last_run.json` port when present (PH-S1014), runs light build unless `--skip-build`, starts `single --bg`, waits for `/api/v1/health`. Optional **`--stand-smoke`** (PH-S1095) runs `poolai-http-stand-smoke --run-local-smoke` after health OK.
+
+```bash
+/usr/bin/bash bin/run-poolai.sh quick --stand-smoke
+# PowerShell:
+.\bin\run-poolai.ps1 quick -StandSmoke
+```
 
 ### PH-S1013: Vision easy launch
 
@@ -263,6 +269,12 @@ cargo run --bin poolai-http-stand-smoke -- --raid
 
 # JSON звіт на stdout:
 cargo run --bin poolai-http-stand-smoke -- --json
+
+# RUN_LOCAL quick subset (health + monitoring + vm + ops; PH-S1093):
+cargo run --bin poolai-http-stand-smoke -- --run-local-smoke
+
+# Після verify-dev-stand (опційно):
+VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 ```
 
 | Env | Призначення |
@@ -272,6 +284,8 @@ cargo run --bin poolai-http-stand-smoke -- --json
 | `POOLAI_STAND_SMOKE_RAID_RESTART=1` | Альтернатива прапорцю `--raid-restart` |
 | `POOLAI_STAND_SMOKE_LEASE_RENEW=1` | Альтернатива прапорцю `--lease-renew` |
 | `POOLAI_STAND_SMOKE_RAID=1` | Альтернатива прапорцю `--raid` (full suite + raid) |
+| `POOLAI_STAND_SMOKE_RUN_LOCAL=1` | Альтернатива `--run-local-smoke` (PH-S1093) |
+| `VERIFY_STAND_SMOKE=1` | `verify-dev-stand.sh` → `--run-local-smoke` після bootstrap (PH-S1094) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 Default stand smoke includes **`vision_revision_parity`** (PH-S208, PH-S235): repo `manifest.revision` vs FM §5.12 `Vision rev`, `extensions.active_sprint` vs `manifest.next_sprint`, then `GET /docs/vision/manifest.json` with `X-PoolAI-Vision-Revision` header vs JSON body.

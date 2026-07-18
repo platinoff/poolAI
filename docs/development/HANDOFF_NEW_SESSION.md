@@ -1,8 +1,27 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-18 (band 44 **PH-S1079…S1088** ✅ · horizon bands 45–47)
+**Оновлено:** 2026-07-18 (band 45 **PH-S1089…S1098** ✅ · horizon bands 46–47)
 
-**Наступна сесія:** **`абракадабра`** — project scan → band 45.
+**Наступна сесія:** **`абракадабра`** — project scan → band 46.
+
+## Band 45 — Stand smoke + RUN_LOCAL ops (PH-S1089…S1098, ✅)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1089** | RUN_LOCAL health export shape |
+| **PH-S1090** | Monitoring alerts stand smoke |
+| **PH-S1091** | Monitoring dashboards stand smoke |
+| **PH-S1092** | VM instances stand smoke |
+| **PH-S1093** | `--run-local-smoke` CLI subset |
+| **PH-S1094** | `verify-dev-stand` stand smoke hook |
+| **PH-S1095** | `run-poolai quick --stand-smoke` |
+| **PH-S1096** | RUN_LOCAL.md band 45 ops sync |
+| **PH-S1097** | GALAXY_GRID_ROADMAP + rust ratio |
+| **PH-S1098** | Band close |
+
+**§5.12:** **0** відкритих (band 45 ✅). **Vision:** rev **317**.
+
+**PH-S1098 ✅ (2026-07-18):** `stand_smoke_run_local_depth.rs`; `--run-local-smoke`; `VERIFY_STAND_SMOKE`; `quick --stand-smoke`; `galaxy_horizon_s1089_integration`; vision **rev 317**.
 
 ## Band 44 — Admin wasm slim panels (PH-S1079…S1088, ✅)
 

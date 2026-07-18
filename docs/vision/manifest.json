@@ -2336,6 +2336,12 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_grid_metrics_parity_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_admin_wasm_slim_depth_rs"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -9598,9 +9604,23 @@
       "label": "grid_metrics_parity_contracts.rs",
       "layer": "L3",
       "path": "tests/grid_metrics_parity_contracts.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_admin_wasm_slim_depth_rs",
+      "label": "admin_wasm_slim_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/admin_wasm_slim_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1079_integration_rs",
+      "label": "galaxy_horizon_s1079_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1079_integration.rs"
     }
   ],
-  "revision": 316,
+  "revision": 317,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -18178,6 +18198,96 @@
       "row": 953,
       "status": "closed",
       "title": "Ops power band close"
+    },
+    {
+      "acceptance": "RUN_LOCAL_HEALTH_KEYS` + enhanced `smoke_health",
+      "deps": "stand_smoke_run_local_depth.rs",
+      "id": "PH-S1089",
+      "open": false,
+      "row": 1024,
+      "status": "closed",
+      "title": "RUN_LOCAL health export shape"
+    },
+    {
+      "acceptance": "GET `/api/enterprise/monitoring/alerts` array",
+      "deps": "poolai_http_stand_smoke.rs",
+      "id": "PH-S1090",
+      "open": false,
+      "row": 1025,
+      "status": "closed",
+      "title": "Monitoring alerts stand smoke"
+    },
+    {
+      "acceptance": "GET `/api/enterprise/monitoring/dashboards` array",
+      "deps": "poolai_http_stand_smoke.rs",
+      "id": "PH-S1091",
+      "open": false,
+      "row": 1026,
+      "status": "closed",
+      "title": "Monitoring dashboards stand smoke"
+    },
+    {
+      "acceptance": "GET `/api/v1/vm/instances` list shape",
+      "deps": "poolai_http_stand_smoke.rs",
+      "id": "PH-S1092",
+      "open": false,
+      "row": 1027,
+      "status": "closed",
+      "title": "VM instances stand smoke"
+    },
+    {
+      "acceptance": "6-case RUN_LOCAL gate; env `POOLAI_STAND_SMOKE_RUN_LOCAL",
+      "deps": "poolai_http_stand_smoke.rs",
+      "id": "PH-S1093",
+      "open": false,
+      "row": 1028,
+      "status": "closed",
+      "title": "--run-local-smoke` CLI subset"
+    },
+    {
+      "acceptance": "VERIFY_STAND_SMOKE=1` → `--run-local-smoke",
+      "deps": "bin/verify-dev-stand.sh",
+      "id": "PH-S1094",
+      "open": false,
+      "row": 1029,
+      "status": "closed",
+      "title": "verify-dev-stand` stand smoke hook"
+    },
+    {
+      "acceptance": "post-health `--run-local-smoke",
+      "deps": "bin/run-poolai.*",
+      "id": "PH-S1095",
+      "open": false,
+      "row": 1030,
+      "status": "closed",
+      "title": "run-poolai quick --stand-smoke"
+    },
+    {
+      "acceptance": "--run-local-smoke`, `VERIFY_STAND_SMOKE`, `--stand-smoke",
+      "deps": "docs",
+      "id": "PH-S1096",
+      "open": false,
+      "row": 1031,
+      "status": "closed",
+      "title": "RUN_LOCAL.md band 45 ops sync"
+    },
+    {
+      "acceptance": "band 45 closed row; `rust_ratio.json` zriz",
+      "deps": "docs + loc-audit",
+      "id": "PH-S1097",
+      "open": false,
+      "row": 1032,
+      "status": "closed",
+      "title": "GALAXY_GRID_ROADMAP + rust ratio"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1089_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1098",
+      "open": false,
+      "row": 1033,
+      "status": "closed",
+      "title": "Stand smoke RUN_LOCAL band close"
     },
     {
       "acceptance": "MonitoringAlertsPanel` flag + renderer smoke",

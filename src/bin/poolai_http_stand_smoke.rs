@@ -19,6 +19,9 @@
 //!
 //! cargo run --bin poolai-http-stand-smoke -- --json
 //!
+//! # RUN_LOCAL quick subset (PH-S1093):
+//! cargo run --bin poolai-http-stand-smoke -- --run-local-smoke
+//!
 //! # Vision revision parity (PH-S208, PH-S235):
 //! export POOLAI_VISION_BASE_URL=http://127.0.0.1:8765   # open-docs-vision.ps1
 //! cargo run --bin poolai-http-stand-smoke   # repo manifest vs FM footer + extensions + optional HTTP header
@@ -49,6 +52,8 @@ struct Cli {
     include_raid: bool,
     raid_restart_only: bool,
     lease_renew_only: bool,
+    /// PH-S1093: RUN_LOCAL quick subset (health + monitoring + vm + ops).
+    run_local_smoke_only: bool,
     base_url: String,
 }
 
@@ -221,12 +226,14 @@ fn parse_cli() -> Cli {
     let mut include_raid = false;
     let mut raid_restart_only = false;
     let mut lease_renew_only = false;
+    let mut run_local_smoke_only = false;
     for arg in std::env::args().skip(1) {
         match arg.as_str() {
             "--json" => json_out = true,
             "--raid-restart" => raid_restart_only = true,
             "--raid" => include_raid = true,
             "--lease-renew" => lease_renew_only = true,
+            "--run-local-smoke" => run_local_smoke_only = true,
             _ if arg.starts_with('-') => {}
             _ => {}
         }
@@ -246,11 +253,17 @@ fn parse_cli() -> Cli {
             .ok()
             .is_some_and(|v| matches!(v.as_str(), "1" | "true" | "yes"));
     }
+    if !run_local_smoke_only {
+        run_local_smoke_only = std::env::var("POOLAI_STAND_SMOKE_RUN_LOCAL")
+            .ok()
+            .is_some_and(|v| matches!(v.as_str(), "1" | "true" | "yes"));
+    }
     Cli {
         json_out,
         include_raid,
         raid_restart_only,
         lease_renew_only,
+        run_local_smoke_only,
         base_url: base_url_from_env(),
     }
 }
@@ -289,6 +302,71 @@ async fn smoke_health(client: &Client, base: &str) -> Result<(), String> {
         .map_err(|e| e.to_string())?;
     if !resp.status().is_success() {
         return Err(format!("health status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    for key in ["status", "version", "checks"] {
+        if body.get(key).is_none() {
+            return Err(format!("health missing `{key}`: {body}"));
+        }
+    }
+    if body.get("status").and_then(Value::as_str) != Some("healthy") {
+        return Err(format!("health status != healthy: {body}"));
+    }
+    Ok(())
+}
+
+/// PH-S1090: enterprise monitoring alerts list (RUN_LOCAL / admin wasm slim).
+async fn smoke_monitoring_alerts_api(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/api/enterprise/monitoring/alerts"))
+        .send()
+        .await
+        .map_err(|e| format!("monitoring alerts request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("monitoring alerts status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    body.as_array()
+        .ok_or_else(|| format!("monitoring alerts expected array: {body}"))?;
+    Ok(())
+}
+
+/// PH-S1091: enterprise monitoring dashboards list.
+async fn smoke_monitoring_dashboards_api(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/api/enterprise/monitoring/dashboards"))
+        .send()
+        .await
+        .map_err(|e| format!("monitoring dashboards request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("monitoring dashboards status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    body.as_array()
+        .ok_or_else(|| format!("monitoring dashboards expected array: {body}"))?;
+    Ok(())
+}
+
+/// PH-S1092: VM instances list shape (`run-poolai` dev stand).
+async fn smoke_vm_instances_api(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/api/v1/vm/instances"))
+        .send()
+        .await
+        .map_err(|e| format!("vm instances request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("vm instances status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    let rows = body
+        .as_array()
+        .ok_or_else(|| format!("vm instances expected array: {body}"))?;
+    if let Some(first) = rows.first() {
+        for key in ["id", "name", "status"] {
+            if first.get(key).is_none() {
+                return Err(format!("vm instances row missing `{key}`: {first}"));
+            }
+        }
     }
     Ok(())
 }
@@ -2600,6 +2678,75 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
         };
     }
 
+    if cli.run_local_smoke_only {
+        async fn record(
+            cases: &mut Vec<SmokeCaseResult>,
+            name: &'static str,
+            result: Result<(), String>,
+        ) {
+            cases.push(match result {
+                Ok(()) => SmokeCaseResult {
+                    name,
+                    ok: true,
+                    detail: None,
+                },
+                Err(e) => SmokeCaseResult {
+                    name,
+                    ok: false,
+                    detail: Some(e),
+                },
+            });
+        }
+
+        record(
+            &mut cases,
+            "health",
+            smoke_health(&client, &cli.base_url).await,
+        )
+        .await;
+        record(
+            &mut cases,
+            "monitoring_alerts",
+            smoke_monitoring_alerts_api(&client, &cli.base_url).await,
+        )
+        .await;
+        record(
+            &mut cases,
+            "monitoring_dashboards",
+            smoke_monitoring_dashboards_api(&client, &cli.base_url).await,
+        )
+        .await;
+        record(
+            &mut cases,
+            "vm_instances",
+            smoke_vm_instances_api(&client, &cli.base_url).await,
+        )
+        .await;
+        record(
+            &mut cases,
+            "ops_power_openapi",
+            smoke_ops_power_openapi(&client, &cli.base_url).await,
+        )
+        .await;
+        record(
+            &mut cases,
+            "jobs_store_backend",
+            smoke_jobs_store_backend(&client, &cli.base_url).await,
+        )
+        .await;
+        let passed = cases.iter().filter(|c| c.ok).count() as u32;
+        let failed = cases.iter().filter(|c| !c.ok).count() as u32;
+        return SmokeReport {
+            base_url: cli.base_url.clone(),
+            stand_root,
+            ok: failed == 0,
+            passed,
+            failed,
+            cases,
+            tool: "poolai-http-stand-smoke",
+        };
+    }
+
     async fn record(
         cases: &mut Vec<SmokeCaseResult>,
         name: &'static str,
@@ -2887,6 +3034,24 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
         &mut cases,
         "ops_power_openapi",
         smoke_ops_power_openapi(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
+        "monitoring_alerts",
+        smoke_monitoring_alerts_api(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
+        "monitoring_dashboards",
+        smoke_monitoring_dashboards_api(&client, &cli.base_url).await,
+    )
+    .await;
+    record(
+        &mut cases,
+        "vm_instances",
+        smoke_vm_instances_api(&client, &cli.base_url).await,
     )
     .await;
     record(
@@ -3969,6 +4134,61 @@ mod tests {
         let fee_html =
             render_grid_fee_split_metrics_strip_html(r#"{"metrics":{"applied_total":3}}"#, 0);
         assert!(fee_html.contains("admin-metrics-strip"));
+    }
+
+    #[test]
+    fn run_local_health_export_shape_ph_s1089() {
+        use poolai_ui_core::stand_smoke_run_local_depth::RUN_LOCAL_HEALTH_KEYS;
+        let health = json!({
+            "status": "healthy",
+            "version": "0.2.2",
+            "timestamp": "2026-07-18T00:00:00Z",
+            "uptime": 42,
+            "checks": {
+                "database": { "status": "healthy", "message": "ok", "response_time_ms": 1 },
+                "memory": { "status": "healthy", "message": "ok", "response_time_ms": 1 },
+                "workers": { "status": "healthy", "message": "ok", "response_time_ms": 1 },
+                "gpu": { "status": "healthy", "message": "ok", "response_time_ms": 0 }
+            }
+        });
+        for key in RUN_LOCAL_HEALTH_KEYS {
+            assert!(health.get(key).is_some(), "health missing {key}");
+        }
+        assert_eq!(
+            health.get("status").and_then(Value::as_str),
+            Some("healthy")
+        );
+    }
+
+    #[test]
+    fn stand_smoke_run_local_band45_export_shape_ph_s1095() {
+        use poolai_ui_core::stand_smoke_run_local_depth::{
+            stand_smoke_run_local_depth_stub, StandSmokeRunLocalDepth, FM_BAND45_ROWS,
+            RUN_LOCAL_SMOKE_CASES,
+        };
+        use serde_json::json;
+        assert_eq!(
+            stand_smoke_run_local_depth_stub(Some(&json!({"run_local_smoke": true}))),
+            StandSmokeRunLocalDepth::RunLocalSmoke
+        );
+        assert_eq!(
+            stand_smoke_run_local_depth_stub(Some(&json!({
+                "run_local_smoke": true,
+                "verify_dev_stand_hook": true,
+                "quick_stand_smoke": true,
+            }))),
+            StandSmokeRunLocalDepth::FullRunLocalBand45
+        );
+        assert!(RUN_LOCAL_SMOKE_CASES.contains(&"health"));
+        assert!(RUN_LOCAL_SMOKE_CASES.contains(&"monitoring_alerts"));
+        assert!(RUN_LOCAL_SMOKE_CASES.contains(&"ops_power_openapi"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND45_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band45 row {row}"
+            );
+        }
     }
 
     #[test]

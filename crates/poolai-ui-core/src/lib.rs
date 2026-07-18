@@ -41,6 +41,7 @@ pub mod prometheus;
 pub mod security;
 pub mod stable_depth;
 pub mod stand_smoke_metrics;
+pub mod stand_smoke_run_local_depth;
 pub mod stretch_depth;
 pub mod table;
 pub mod theme;

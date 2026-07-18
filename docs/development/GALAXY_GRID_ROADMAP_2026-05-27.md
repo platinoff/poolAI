@@ -6,6 +6,7 @@
 |------|----------|
 | **Completion plan** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.14–§5.15** ✅ |
 | **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) — **351/351** ✅ |
+| **Last closed (band 45)** | PH-S1098 ✅ — stand smoke + RUN_LOCAL ops · `stand_smoke_run_local_depth` + `--run-local-smoke` |
 | **Last closed (band 44)** | PH-S1088 ✅ — Admin wasm slim panels · `admin_wasm_slim_depth` + band-44 depth flags |
 | **Last closed (band 43)** | PH-S1078 ✅ — Grid metrics parity hardening · `validate_band6_metrics_parity_v3` + stand smoke v3 |
 | **Last closed (band 42)** | PH-S1068 ✅ — OpenAPI/docs wire sync · contracts + stand smoke ops/power |
@@ -70,6 +71,7 @@
 | **E2E visual/axe regression** | Playwright snapshots | band 41 ✅ PH-S1049…S1058 · `e2e_visual_axe_depth.rs` |
 | **OpenAPI/docs wire sync** | contracts + stand smoke | band 42 ✅ PH-S1059…S1068 · `grid_openapi_contracts.rs` · `memory_api_contracts.rs` · `openapi_wire_depth.rs` |
 | **Grid metrics parity hardening** | extended JSON↔Prom v3 | band 43 ✅ PH-S1069…S1078 · `validate_band6_metrics_parity_v3` · `grid_metrics_parity_depth.rs` |
+| **Stand smoke + RUN_LOCAL ops** | ops / RUN_LOCAL | band 45 ✅ PH-S1089…S1098 · `stand_smoke_run_local_depth.rs` · `--run-local-smoke` |
 | **network_profile persist stub** | Galaxy **§8** | PH-S664 ✅ (stub); full persist ✅ band 8 PH-S730…S739 |
 
 **§5.5 prefetch:** live pull + backpressure + strict-mode HTTP wire ✅ (baseline); live pull **depth** ✅ band 10 (PH-S750…S759).

@@ -16,6 +16,7 @@ TASK_SLEEP="${VERIFY_TASK_SLEEP:-5}"
 MIN_COMPLETED="${VERIFY_MIN_COMPLETED:-4}"
 VERIFY_ML_PIPELINE="${VERIFY_ML_PIPELINE:-1}"
 VERIFY_RAID_JOB_STORE="${VERIFY_RAID_JOB_STORE:-0}"
+VERIFY_STAND_SMOKE="${VERIFY_STAND_SMOKE:-0}"
 HEALTH_RETRIES="${VERIFY_HEALTH_RETRIES:-45}"
 HEALTH_SLEEP="${VERIFY_HEALTH_SLEEP:-2}"
 
@@ -254,8 +255,19 @@ if [[ "$VERIFY_RAID_JOB_STORE" == "1" ]]; then
   verify_raid_job_store || fail=1
 fi
 
+if [[ "$VERIFY_STAND_SMOKE" == "1" ]]; then
+  export POOLAI_BASE_URL="$COORD_URL"
+  echo "Running poolai-http-stand-smoke --run-local-smoke (PH-S1094)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-http-stand-smoke -- --run-local-smoke); then
+    echo "OK  stand smoke run-local subset"
+  else
+    echo "FAIL stand smoke run-local subset"
+    fail=1
+  fi
+fi
+
 if [[ "$fail" -ne 0 ]]; then
   echo "Dev stand verification failed."
   exit 1
 fi
-echo "Dev stand verification passed (health + virtual-node bootstrap + ML pipeline demo when enabled + optional RAID job store)."
+echo "Dev stand verification passed (health + virtual-node bootstrap + ML pipeline demo when enabled + optional RAID job store + optional stand smoke)."

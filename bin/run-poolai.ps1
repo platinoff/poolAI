@@ -10,6 +10,7 @@ param(
     [switch]$SkipBuild,
     [switch]$Light,
     [switch]$RaidJobs,
+    [switch]$StandSmoke,
     [int]$Port = 8080,
     [string]$Features = "enterprise,ml,cloud,test-utils",
     [ValidateSet("json", "sqlite", "raid")]
@@ -207,6 +208,12 @@ function Invoke-Quick {
     $Background = $true
     Invoke-Single
     if (-not (Wait-Health -ListenPort $Port)) { exit 1 }
+    if ($StandSmoke) {
+        $env:POOLAI_BASE_URL = "http://127.0.0.1:$Port"
+        Write-Host "Running poolai-http-stand-smoke --run-local-smoke (PH-S1095)..."
+        & $MsysWrapper cargo run --quiet --bin poolai-http-stand-smoke -- --run-local-smoke
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    }
 }
 
 switch ($Command) {
