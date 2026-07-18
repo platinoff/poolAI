@@ -1,10 +1,10 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-18 (band 38 **PH-S1019…S1028** queued · horizon 100 · hotfix power UX)
+**Оновлено:** 2026-07-18 (band 38 **PH-S1019…S1028** ✅ · horizon bands 39–47)
 
-**Наступна сесія:** **`абракадабра`** — drain band 38 (UI/debug polish).
+**Наступна сесія:** **`абракадабра`** — project scan → band 39.
 
-## Band 38 — UI/debug polish (PH-S1019…S1028, queued)
+## Band 38 — UI/debug polish (PH-S1019…S1028, ✅)
 
 | Sprint | Фокус |
 |--------|--------|
@@ -19,9 +19,9 @@
 | **PH-S1027** | poolai-msys hardening |
 | **PH-S1028** | Band close |
 
-**Horizon FM §5.19:** PH-S1019…S1118 (**100** спринтів, bands 38–47).
+**§5.12:** **0** відкритих (band 38 ✅). **Vision:** rev **310**.
 
-**§5.12:** **10** відкритих. **Vision:** rev **309**.
+**PH-S1028 ✅ (2026-07-18):** Vision power a11y + announce; admin/home power i18n; `galaxy_horizon_s1019_integration`; `ui_debug_depth`; vision **rev 310**.
 
 ## Band 37 — owner ops UX v2 (PH-S1011…S1018, ✅)
 

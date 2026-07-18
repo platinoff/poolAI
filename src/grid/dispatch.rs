@@ -20,8 +20,7 @@ use crate::grid::galaxy_fee_split::{
 use crate::grid::galaxy_fee_split_metrics::evaluate_result_fee_split;
 use crate::grid::galaxy_fraud_proof::{evaluate_fraud_proof_hold, record_fraud_proof_pending};
 use crate::grid::galaxy_locality::{
-    observe_last_cross_region_egress_mb, observe_last_hot_tier_hit_ratio,
-    pick_best_worker_by_locality, pick_best_worker_by_locality_with_hot_tier_gate,
+    observe_last_cross_region_egress_mb, pick_best_worker_by_locality_with_hot_tier_gate,
     record_locality_rank_empty_workers, record_locality_rank_ingest, record_locality_rank_miss,
     record_locality_rank_skip, LocalityHotTier, LocalityNetworkProfile, LocalitySeedInventory,
     LocalityTask, LocalityWorker, DEFAULT_PREFETCH_CROSS_REGION_EGRESS_MB_PER_SHARD,
@@ -43,9 +42,7 @@ use crate::grid::galaxy_prefetch_metrics::{
 use crate::grid::galaxy_prefetch_peer_pull::fetch_seed_shards_from_peer_http;
 use crate::grid::galaxy_replay_jobs::submit_replay_verification_job;
 use crate::grid::galaxy_replay_metrics::evaluate_result_replay_pending;
-use crate::grid::galaxy_replication::{
-    replication_tier_from_policy, ReplicationTierConfig, REPLICATION_STANDARD, REPLICATION_STRICT,
-};
+use crate::grid::galaxy_replication::{replication_tier_from_policy, ReplicationTierConfig};
 use crate::grid::galaxy_replication_metrics::replication_executor_hook;
 use crate::grid::galaxy_replication_quorum_gate::{
     record_result_executor_digest, replication_quorum_allows_cleared,
@@ -1321,6 +1318,7 @@ fn trust_score_from_result_metrics(metrics: Option<&serde_json::Value>) -> Optio
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::grid::galaxy_replication::{REPLICATION_STANDARD, REPLICATION_STRICT};
     use crate::grid::galaxy_settlement::{resolve_settlement_status, SettlementStatus};
     use crate::grid::galaxy_trust_score::SettlementGateVerdict;
     use crate::grid::{GridEnvelope, GridJobBody, GridMessage, GridResultStatus};

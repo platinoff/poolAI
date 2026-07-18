@@ -40,6 +40,7 @@
     mergeRustI18nPatch(window.__poolaiAdminUiConfirmI18nRust);
     mergeRustI18nPatch(window.__poolaiWorkersPanelI18nRust);
     mergeRustI18nPatch(window.__poolaiHomeI18nRust);
+    mergeRustI18nPatch(window.__poolaiAdminPowerI18nRust);
     mergeRustI18nPatch(window.__poolaiAdminFormI18nRust);
     mergeRustI18nPatch(window.__poolaiAdminUiToolbarI18nRust);
     mergeRustI18nPatch(window.__poolaiUiCommonI18nRust);

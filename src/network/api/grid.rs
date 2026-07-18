@@ -3,7 +3,7 @@
 use axum::{
     extract::{Query, State},
     http::StatusCode,
-    routing::{get, post, put},
+    routing::{get, post},
     Json, Router,
 };
 use serde::{Deserialize, Serialize};
@@ -17,9 +17,8 @@ use crate::grid::galaxy_pricing_oracle::{
     cache_metadata, fetch_live_provider_quotes, observe_l1_cache_age_secs,
     provider_http_timeout_ms_from_env, record_l1_fresh_served, record_l1_stale_served,
     CacheFreshness, GalaxyPriceUnitKey, GalaxyPricingCacheEntry, GalaxyPricingCacheKey,
-    GalaxyPricingCacheMetadata, GalaxyPricingConfig, GalaxyPricingOracle,
-    GalaxyPricingProviderCatalog, GalaxyPricingProviderEntry, GalaxyPricingQuote,
-    MockProviderQuote, PRICING_UNAVAILABLE_ERROR_CODE,
+    GalaxyPricingCacheMetadata, GalaxyPricingConfig, GalaxyPricingOracle, GalaxyPricingQuote,
+    PRICING_UNAVAILABLE_ERROR_CODE,
 };
 use crate::grid::galaxy_replication_depth::{
     current_replication_depth, replication_depth_wire_label,
@@ -924,7 +923,9 @@ pub fn reset_pricing_oracle_for_tests(force_fallback: bool, fallback_quote_micro
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::grid::galaxy_pricing_oracle::MockProviderQuote;
+    use crate::grid::galaxy_pricing_oracle::{
+        GalaxyPricingProviderCatalog, GalaxyPricingProviderEntry, MockProviderQuote,
+    };
     use axum::{routing::get, Router};
     use serde_json::json;
     use std::collections::HashMap;

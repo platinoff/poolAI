@@ -7,7 +7,7 @@ use std::collections::HashMap;
 use std::sync::{Mutex, OnceLock};
 
 use crate::grid::galaxy_replication::{
-    replication_quorum_met, replication_tier_from_policy, ReplicationProfile, ReplicationTierConfig,
+    replication_quorum_met, replication_tier_from_policy, ReplicationProfile,
 };
 
 fn digests_map() -> &'static Mutex<HashMap<String, Vec<String>>> {

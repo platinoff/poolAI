@@ -1,7 +1,7 @@
 {
-  "revision": 309,
+  "revision": 310,
   "updated_at": "2026-07-18",
-  "active_sprint": "PH-S1019",
+  "active_sprint": null,
   "ui_version": 4,
   "extension_policy": {
     ".md": {

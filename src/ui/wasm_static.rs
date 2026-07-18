@@ -8,7 +8,7 @@ use axum::{
     routing::get,
     Router,
 };
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 use crate::core::state::ApiContext;
 
@@ -98,6 +98,7 @@ fn is_safe_wasm_filename(name: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::path::Path;
 
     #[test]
     fn wasm_dir_under_manifest() {

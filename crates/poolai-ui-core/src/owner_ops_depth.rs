@@ -1,4 +1,4 @@
-//! Owner ops UX band depth (PH-S1011…S1018, band 37).
+//! Owner ops UX band depth (PH-S1011…S1018, band 37) + UI polish (PH-S1019…S1026, band 38).
 
 use serde_json::Value;
 
@@ -96,72 +96,166 @@ pub fn owner_ops_depth_stub(features: Option<&Value>) -> OwnerOpsDepth {
     }
 }
 
-/// Admin power panel markup + fetch glue (PH-S1015).
-pub fn admin_power_panel_script() -> String {
-    r#"(function () {
-  function poolaiSaveAdminLaunchPrefs() {
-    try {
-      var prefs = {
-        port: window.location.port || "8080",
-        path: window.location.pathname,
-        saved_at: Date.now()
-      };
-      localStorage.setItem("poolai.admin.lastLaunch", JSON.stringify(prefs));
-    } catch (e) { /* ignore */ }
-  }
-  window.poolaiSaveAdminLaunchPrefs = poolaiSaveAdminLaunchPrefs;
-  window.poolaiAdminPowerAction = function (action) {
-    poolaiSaveAdminLaunchPrefs();
-    return fetch("/api/v1/ops/power", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: action })
-    }).then(function (r) { return r.json(); });
-  };
-  window.poolaiOpenAdminPowerModal = function () {
-    if (typeof showModal === "function") {
-      showModal("poolaiAdminPowerModal");
-    }
-  };
-  window.poolaiCloseAdminPowerModal = function () {
-    if (typeof hideModal === "function") {
-      hideModal("poolaiAdminPowerModal");
-    }
-  };
-  window.poolaiConfirmAdminPower = function (action) {
-    poolaiAdminPowerAction(action).then(function (body) {
-      if (typeof poolaiAdminAnnounce === "function") {
-        poolaiAdminAnnounce("Power " + action + ": " + (body.note || "accepted"));
-      }
-      poolaiCloseAdminPowerModal();
-    }).catch(function () {
-      if (typeof poolaiAdminAnnounce === "function") {
-        poolaiAdminAnnounce("Power action failed");
-      }
-    });
-  };
-})();"#
-        .to_string()
+fn poolai_power_t_helper() -> &'static str {
+    r#"function poolaiPowerT(key, fallback) {
+  return (typeof poolaiT === "function") ? poolaiT(key, fallback) : fallback;
+}"#
 }
 
-/// Admin power modal HTML fragment (PH-S1015).
+fn poolai_power_announce_helper() -> &'static str {
+    r#"function poolaiPowerAnnounce(message, priority) {
+  if (typeof adminAnnounceLive === "function") {
+    adminAnnounceLive(message, priority);
+    return;
+  }
+  var live = document.getElementById("aria_live_region") || document.getElementById("vision-power-status");
+  if (live && message) live.textContent = message;
+}"#
+}
+
+fn poolai_save_launch_prefs_helper() -> &'static str {
+    r#"function poolaiSaveLaunchPrefs(storageKey) {
+  try {
+    var prefs = {
+      port: window.location.port || "8080",
+      path: window.location.pathname,
+      saved_at: Date.now()
+    };
+    localStorage.setItem(storageKey || "poolai.ui.lastLaunch", JSON.stringify(prefs));
+  } catch (e) { /* ignore */ }
+}"#
+}
+
+/// Admin power panel markup + fetch glue (PH-S1015, PH-S1020/S1026).
+pub fn admin_power_panel_script() -> String {
+    format!(
+        r#"(function () {{
+  {poolai_power_t_helper}
+  {poolai_power_announce_helper}
+  {poolai_save_launch_prefs_helper}
+  window.poolaiSaveAdminLaunchPrefs = function () {{
+    poolaiSaveLaunchPrefs("poolai.admin.lastLaunch");
+  }};
+  window.poolaiAdminPowerAction = function (action) {{
+    poolaiSaveAdminLaunchPrefs();
+    try {{
+      localStorage.setItem("poolai.admin.lastPower", JSON.stringify({{ action: action, saved_at: Date.now() }}));
+    }} catch (e) {{ /* ignore */ }}
+    return fetch("/api/v1/ops/power", {{
+      method: "POST",
+      headers: {{ "Content-Type": "application/json" }},
+      body: JSON.stringify({{ action: action }})
+    }}).then(function (r) {{ return r.json(); }});
+  }};
+  window.poolaiOpenAdminPowerModal = function () {{
+    if (typeof showModal === "function") {{
+      showModal("poolaiAdminPowerModal");
+    }}
+  }};
+  window.poolaiCloseAdminPowerModal = function () {{
+    if (typeof hideModal === "function") {{
+      hideModal("poolaiAdminPowerModal");
+    }}
+  }};
+  window.poolaiConfirmAdminPower = function (action) {{
+    poolaiAdminPowerAction(action).then(function (body) {{
+      var label = poolaiPowerT("admin.power.accepted", "accepted");
+      poolaiPowerAnnounce(
+        poolaiPowerT("admin.power.result", "Power {{action}}: {{note}}")
+          .replace("{{action}}", action)
+          .replace("{{note}}", body.note || label),
+        "polite"
+      );
+      poolaiCloseAdminPowerModal();
+    }}).catch(function () {{
+      poolaiPowerAnnounce(poolaiPowerT("admin.power.failed", "Power action failed"), "assertive");
+    }});
+  }};
+}})();"#,
+        poolai_power_t_helper = poolai_power_t_helper(),
+        poolai_power_announce_helper = poolai_power_announce_helper(),
+        poolai_save_launch_prefs_helper = poolai_save_launch_prefs_helper(),
+    )
+}
+
+/// Admin power modal HTML fragment (PH-S1015, PH-S1020 i18n).
 pub fn admin_power_modal_html() -> String {
-    r#"<div id="poolaiAdminPowerModal" class="modal" role="dialog" aria-labelledby="poolaiAdminPowerTitle" aria-modal="false" aria-hidden="true">
-  <motion.div class="modal-content">
+    r#"<motion.div id="poolaiAdminPowerModal" class="modal" role="dialog" aria-labelledby="poolaiAdminPowerTitle" aria-modal="false" aria-hidden="true">
+  <div class="modal-content">
     <motion.div class="modal-header">
-      <h3 id="poolaiAdminPowerTitle">PoolAI power</h3>
-      <button type="button" class="modal-close" aria-label="Close" onclick="poolaiCloseAdminPowerModal()">&times;</button>
+      <h3 id="poolaiAdminPowerTitle" data-i18n="admin.power.title">PoolAI power</h3>
+      <button type="button" class="modal-close" data-i18n-aria="admin.power.close" aria-label="Close" onclick="poolaiCloseAdminPowerModal()">&times;</button>
     </motion.div>
-    <p>Оберіть дію для локального стенду (dev guard — без reboot хоста).</p>
+    <p data-i18n="admin.power.body">Choose an action for the local stand (dev guard — no host reboot).</p>
     <div class="modal-footer">
-      <button type="button" class="btn btn-danger" onclick="poolaiConfirmAdminPower('shutdown')">Виключити</button>
-      <button type="button" class="btn btn-secondary" onclick="poolaiConfirmAdminPower('reboot')">Перезавантажити</button>
-      <button type="button" class="btn" onclick="poolaiCloseAdminPowerModal()">Скасувати</button>
+      <button type="button" class="btn btn-danger" data-i18n="admin.power.shutdown" onclick="poolaiConfirmAdminPower('shutdown')">Shutdown</button>
+      <button type="button" class="btn btn-secondary" data-i18n="admin.power.reboot" onclick="poolaiConfirmAdminPower('reboot')">Reboot</button>
+      <button type="button" class="btn" data-i18n="admin.power.cancel" onclick="poolaiCloseAdminPowerModal()">Cancel</button>
     </div>
-  </motion.div>
+  </div>
 </motion.div>"#
         .replace("<motion.", "<")
         .replace("</motion.", "</")
+}
+
+/// Home `/ui` shell power shortcut glue (PH-S1021).
+pub fn home_power_shell_script() -> String {
+    format!(
+        r#"(function () {{
+  {poolai_power_t_helper}
+  {poolai_power_announce_helper}
+  {poolai_save_launch_prefs_helper}
+  function poolaiHomePowerAction(action) {{
+    poolaiSaveLaunchPrefs("poolai.home.lastLaunch");
+    try {{
+      localStorage.setItem("poolai.home.lastPower", JSON.stringify({{ action: action, saved_at: Date.now() }}));
+    }} catch (e) {{ /* ignore */ }}
+    return fetch("/api/v1/ops/power", {{
+      method: "POST",
+      headers: {{ "Content-Type": "application/json" }},
+      body: JSON.stringify({{ action: action }})
+    }}).then(function (r) {{ return r.json(); }});
+  }}
+  function bindHomePowerButtons() {{
+    var shutdown = document.getElementById("home-power-shutdown");
+    var reboot = document.getElementById("home-power-reboot");
+    if (shutdown) {{
+      shutdown.addEventListener("click", function () {{
+        poolaiHomePowerAction("shutdown").then(function (body) {{
+          var label = poolaiPowerT("home.power.accepted", "accepted");
+          poolaiPowerAnnounce(
+            poolaiPowerT("home.power.result", "Power shutdown: {{note}}").replace("{{note}}", body.note || label),
+            "polite"
+          );
+        }}).catch(function () {{
+          poolaiPowerAnnounce(poolaiPowerT("home.power.failed", "Power action failed"), "assertive");
+        }});
+      }});
+    }}
+    if (reboot) {{
+      reboot.addEventListener("click", function () {{
+        poolaiHomePowerAction("reboot").then(function (body) {{
+          var label = poolaiPowerT("home.power.accepted", "accepted");
+          poolaiPowerAnnounce(
+            poolaiPowerT("home.power.result", "Power reboot: {{note}}").replace("{{note}}", body.note || label),
+            "polite"
+          );
+        }}).catch(function () {{
+          poolaiPowerAnnounce(poolaiPowerT("home.power.failed", "Power action failed"), "assertive");
+        }});
+      }});
+    }}
+  }}
+  if (document.readyState === "loading") {{
+    document.addEventListener("DOMContentLoaded", bindHomePowerButtons);
+  }} else {{
+    bindHomePowerButtons();
+  }}
+}})();"#,
+        poolai_power_t_helper = poolai_power_t_helper(),
+        poolai_power_announce_helper = poolai_power_announce_helper(),
+        poolai_save_launch_prefs_helper = poolai_save_launch_prefs_helper(),
+    )
 }
 
 #[cfg(test)]
@@ -195,5 +289,15 @@ mod tests {
         let script = admin_power_panel_script();
         assert!(script.contains("showModal(\"poolaiAdminPowerModal\")"));
         assert!(script.contains("/api/v1/ops/power"));
+        assert!(script.contains("adminAnnounceLive"));
+        assert!(script.contains("admin.power.result"));
+    }
+
+    #[test]
+    fn home_power_shell_script_ph_s1021() {
+        let script = home_power_shell_script();
+        assert!(script.contains("home-power-shutdown"));
+        assert!(script.contains("/api/v1/ops/power"));
+        assert!(script.contains("poolai.home.lastPower"));
     }
 }

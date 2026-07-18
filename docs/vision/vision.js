@@ -289,12 +289,34 @@
     location.reload();
   }
 
+  function visionAnnouncePower(message) {
+    const el = document.getElementById("vision-power-status");
+    if (el && message) el.textContent = message;
+  }
+
+  function visionPowerMenuItems() {
+    const menu = document.getElementById("vision-power-menu");
+    if (!menu) return [];
+    return Array.from(menu.querySelectorAll('[role="menuitem"]'));
+  }
+
+  function focusVisionPowerItem(index) {
+    const items = visionPowerMenuItems();
+    if (!items.length) return;
+    const i = ((index % items.length) + items.length) % items.length;
+    items[i].focus();
+  }
+
   function visionPowerPoolai(action) {
     saveMapPrefs();
     try {
       localStorage.setItem(
         "poolai.vision.lastPower",
         JSON.stringify({ action: action, saved_at: Date.now() })
+      );
+      localStorage.setItem(
+        "poolai.vision.lastLaunch",
+        JSON.stringify({ saved_at: Date.now(), path: window.location.pathname })
       );
     } catch (_) {
       /* ignore */
@@ -303,9 +325,16 @@
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: action }),
-    }).catch(function () {
-      /* poolai stand may be down */
-    });
+    })
+      .then(function (r) {
+        return r.json();
+      })
+      .then(function (body) {
+        visionAnnouncePower("Power " + action + ": " + (body.note || "accepted"));
+      })
+      .catch(function () {
+        visionAnnouncePower("Power " + action + ": queued (stand may be down)");
+      });
   }
 
   function closeVisionPowerMenu() {
@@ -327,6 +356,8 @@
       menu.hidden = false;
       btn.classList.add("on");
       btn.setAttribute("aria-expanded", "true");
+      const first = visionPowerMenuItems()[0];
+      if (first) first.focus();
     } else {
       closeVisionPowerMenu();
     }
@@ -362,7 +393,27 @@
       closeVisionPowerMenu();
     });
     document.addEventListener("keydown", function (ev) {
-      if (ev.key === "Escape") closeVisionPowerMenu();
+      if (menu.hidden) return;
+      if (ev.key === "Escape") {
+        closeVisionPowerMenu();
+        btn.focus();
+        return;
+      }
+      const items = visionPowerMenuItems();
+      const idx = items.indexOf(document.activeElement);
+      if (ev.key === "ArrowDown") {
+        ev.preventDefault();
+        focusVisionPowerItem(idx < 0 ? 0 : idx + 1);
+      } else if (ev.key === "ArrowUp") {
+        ev.preventDefault();
+        focusVisionPowerItem(idx <= 0 ? items.length - 1 : idx - 1);
+      } else if (ev.key === "Home") {
+        ev.preventDefault();
+        focusVisionPowerItem(0);
+      } else if (ev.key === "End") {
+        ev.preventDefault();
+        focusVisionPowerItem(items.length - 1);
+      }
     });
   }
 

@@ -448,6 +448,7 @@ pub fn admin_layout_with_module_script(
     let ui_confirm_patch = poolai_ui_core::i18n::admin_ui_confirm_patch_script();
     let theme_patch = poolai_ui_core::theme::admin_theme_patch_script();
     let modal_patch = poolai_ui_core::modal::admin_modal_patch_script();
+    let power_patch = poolai_ui_core::i18n::admin_power_patch_script();
     let power_panel_script = poolai_ui_core::owner_ops_depth::admin_power_panel_script();
     let power_modal_html = poolai_ui_core::owner_ops_depth::admin_power_modal_html();
     let module_block = if module_script.is_empty() {
@@ -507,7 +508,7 @@ pub fn admin_layout_with_module_script(
       <header class="admin-header-bar">
         <h2 data-i18n="{title_key}">{title_fallback}</h2>
         <div class="admin-user-menu">
-          <button type="button" class="btn btn-outline admin-power-btn" title="PoolAI power" aria-label="PoolAI power" onclick="poolaiOpenAdminPowerModal()">⏻ Power</button>
+          <button type="button" class="btn btn-outline admin-power-btn" data-i18n="admin.power.btn" data-i18n-title="admin.power.btnTitle" data-i18n-aria="admin.power.btnAria" onclick="poolaiOpenAdminPowerModal()">⏻ Power</button>
           <div id="poolai-lang-toggle" class="admin-lang-bar"></div>
           <span id="admin-user-name">Admin</span>
           <button type="button" class="btn-icon" onclick="logout()" data-i18n-aria="admin.logout" aria-label="Log out">🚪</button>
@@ -535,6 +536,7 @@ pub fn admin_layout_with_module_script(
   <script>{ui_confirm_patch}</script>
   <script>{theme_patch}</script>
   <script>{modal_patch}</script>
+  <script>{power_patch}</script>
   <script>{power_panel_script}</script>
   <script>{i18n_js}</script>
   <script>{theme_js}</script>
@@ -579,10 +581,23 @@ pub fn admin_layout_with_module_script(
         body = body_html,
         i18n_patch = i18n_patch,
         auth_dash_patch = auth_dash_patch,
+        table_patch = table_patch,
+        status_patch = status_patch,
+        err_patch = err_patch,
+        form_patch = form_patch,
+        ui_toolbar_patch = ui_toolbar_patch,
+        ui_common_patch = ui_common_patch,
+        vm_modal_patch = vm_modal_patch,
+        ui_confirm_patch = ui_confirm_patch,
         theme_patch = theme_patch,
         modal_patch = modal_patch,
+        power_patch = power_patch,
+        power_panel_script = power_panel_script,
+        power_modal_html = power_modal_html,
         i18n_js = i18n_js,
+        theme_js = theme_js,
         common_js = common_js,
+        modal_js = modal_js,
         charts_js = charts_js,
         module_block = module_block,
         script = script_js
@@ -940,7 +955,6 @@ fn admin_charts_layer_exports() {
     assert!(js.contains("PH-S1010"));
 }
 
-#[test]
 #[test]
 fn admin_charts_sparkline_wasm_first_ph_s275() {
     assert_admin_charts_sparkline_wasm_only();

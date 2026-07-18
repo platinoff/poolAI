@@ -41,6 +41,7 @@ pub mod table;
 pub mod theme;
 pub mod topology;
 pub mod trust;
+pub mod ui_debug_depth;
 pub mod updates_compat;
 pub mod validate;
 pub mod vm;

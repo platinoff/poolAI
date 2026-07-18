@@ -5,7 +5,7 @@
 | Що | Команда |
 |----|---------|
 | **Запуск / stop** (PowerShell) | `.\bin\run-poolai.ps1` |
-| **Bash-скрипти** з PowerShell | `.\bin\poolai-msys.ps1 …` |
+| **Bash-скрипти** з PowerShell | `.\bin\poolai-msys.ps1 …` (inline: `-lc` або `-Command "cargo test-ci"`) |
 | **MSYS2 UCRT64** (зовнішнє вікно) | `/usr/bin/bash bin/run-poolai.sh …` |
 | **Git / cargo test-ci** | зовнішнє MSYS2 — [`.cursor/commands/git-push.md`](../../.cursor/commands/git-push.md) |
 

@@ -2019,6 +2019,16 @@ pub const HOME_SHELL_EN: &[I18nRow<'_>] = &[
         "home.notesBody",
         "Write operations are available for authenticated users with appropriate permissions.",
     ),
+    ("home.powerTitle", "PoolAI power"),
+    (
+        "home.powerHint",
+        "Dev-stand shutdown/reboot (no host reboot).",
+    ),
+    ("home.powerShutdown", "Shutdown"),
+    ("home.powerReboot", "Reboot"),
+    ("home.power.accepted", "accepted"),
+    ("home.power.result", "Power {action}: {note}"),
+    ("home.power.failed", "Power action failed"),
 ];
 
 /// Ukrainian home shell keys (PH-S258).
@@ -2034,6 +2044,54 @@ pub const HOME_SHELL_UK: &[I18nRow<'_>] = &[
         "home.notesBody",
         "Операції запису доступні автентифікованим користувачам з відповідними правами.",
     ),
+    ("home.powerTitle", "Живлення PoolAI"),
+    (
+        "home.powerHint",
+        "Вимкнення/перезавантаження dev-стенду (без reboot хоста).",
+    ),
+    ("home.powerShutdown", "Виключити"),
+    ("home.powerReboot", "Перезавантажити"),
+    ("home.power.accepted", "прийнято"),
+    ("home.power.result", "Живлення {action}: {note}"),
+    ("home.power.failed", "Не вдалося виконати дію живлення"),
+];
+
+/// English admin power modal keys (PH-S1020).
+pub const ADMIN_POWER_EN: &[I18nRow<'_>] = &[
+    ("admin.power.btn", "Power"),
+    ("admin.power.btnTitle", "PoolAI power"),
+    ("admin.power.btnAria", "PoolAI power controls"),
+    ("admin.power.title", "PoolAI power"),
+    ("admin.power.close", "Close"),
+    (
+        "admin.power.body",
+        "Choose an action for the local stand (dev guard — no host reboot).",
+    ),
+    ("admin.power.shutdown", "Shutdown"),
+    ("admin.power.reboot", "Reboot"),
+    ("admin.power.cancel", "Cancel"),
+    ("admin.power.accepted", "accepted"),
+    ("admin.power.result", "Power {action}: {note}"),
+    ("admin.power.failed", "Power action failed"),
+];
+
+/// Ukrainian admin power modal keys (PH-S1020).
+pub const ADMIN_POWER_UK: &[I18nRow<'_>] = &[
+    ("admin.power.btn", "Живлення"),
+    ("admin.power.btnTitle", "Живлення PoolAI"),
+    ("admin.power.btnAria", "Керування живленням PoolAI"),
+    ("admin.power.title", "Живлення PoolAI"),
+    ("admin.power.close", "Закрити"),
+    (
+        "admin.power.body",
+        "Оберіть дію для локального стенду (dev guard — без reboot хоста).",
+    ),
+    ("admin.power.shutdown", "Виключити"),
+    ("admin.power.reboot", "Перезавантажити"),
+    ("admin.power.cancel", "Скасувати"),
+    ("admin.power.accepted", "прийнято"),
+    ("admin.power.result", "Живлення {action}: {note}"),
+    ("admin.power.failed", "Не вдалося виконати дію живлення"),
 ];
 
 /// English form validation keys (PH-S259).
@@ -3193,6 +3251,25 @@ pub fn admin_home_patch_json() -> String {
 
 pub fn admin_home_patch_script() -> String {
     format!("window.__poolaiHomeI18nRust={};", admin_home_patch_json())
+}
+
+/// Admin power modal — slim `admin.power.*` patch (PH-S1020).
+pub fn admin_power_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_POWER_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_POWER_UK));
+    root
+}
+
+pub fn admin_power_patch_json() -> String {
+    serde_json::to_string(&admin_power_patch()).expect("admin power i18n patch serializes")
+}
+
+pub fn admin_power_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminPowerI18nRust={};",
+        admin_power_patch_json()
+    )
 }
 
 /// Shared form validation — slim `form.*` patch (PH-S259).

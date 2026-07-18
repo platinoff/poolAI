@@ -329,6 +329,23 @@ header .meta {
   text-align: left;
 }
 
+.vision-power-menu button[role="menuitem"]:focus-visible {
+  outline: 2px solid rgba(56, 189, 248, 0.85);
+  outline-offset: 2px;
+}
+
+.vision-power-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .vision-power-danger {
   border-color: rgba(248, 113, 113, 0.55) !important;
   color: #fecaca !important;

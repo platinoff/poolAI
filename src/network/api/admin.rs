@@ -3,7 +3,7 @@
 use crate::core::error::AppError;
 use crate::core::state::ApiContext;
 use crate::grid::galaxy_security_advisory::{
-    acknowledge_security_advisory, list_security_advisories, SecurityAdvisoryEntry,
+    acknowledge_security_advisory, list_security_advisories,
 };
 use crate::network::api::common::{check_permission, HttpAppError};
 use crate::network::auth::{auth_middleware, Claims};
@@ -119,6 +119,7 @@ pub fn create_admin_routes() -> Router<ApiContext> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::grid::galaxy_security_advisory::SecurityAdvisoryEntry;
     use axum::body::Body;
     use axum::http::{Request, StatusCode};
     use tower::ServiceExt;

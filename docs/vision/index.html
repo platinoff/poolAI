@@ -28,6 +28,7 @@
         <button type="button" id="btn-auto" class="btn-auto on" title="Auto-reload when vision files change">Auto</button>
         <button type="button" id="btn-reload" title="Reload manifest.json">↻ Reload</button>
         <button type="button" id="btn-power" class="btn-power" title="PoolAI power — вимкнути або перезавантажити" aria-haspopup="true" aria-expanded="false" aria-controls="vision-power-menu">⏻ Power</button>
+        <div id="vision-power-status" class="vision-power-status" aria-live="polite" aria-atomic="true"></div>
         <div id="vision-power-menu" class="vision-power-menu" role="menu" aria-label="PoolAI power" hidden>
           <p class="vision-power-hint">Збереже map prefs і викличе <code>POST /api/v1/ops/power</code> (dev guard).</p>
           <button type="button" role="menuitem" id="vision-power-shutdown" class="vision-power-danger">Виключити PoolAI</button>

@@ -2,95 +2,94 @@
   "description": "RSS-style ticker of FM §5.12 sprint queue (open + recent closed)",
   "items": [
     {
-      "category": "open",
-      "id": "PH-S1019",
-      "link": "docs/vision/index.html#sprint-queue",
-      "next": true,
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "dropdown shutdown/reboot; localStorage; a11y keyboard",
-      "title": "Vision power menu polish"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1020",
+      "category": "closed",
+      "id": "PH-S1028",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
-      "status": "open",
-      "summary": "showModal parity; labeled Power btn; i18n UA/EN",
-      "title": "Admin power modal polish"
+      "status": "closed",
+      "summary": "galaxy_horizon_s1019_integration`; HANDOFF/NEXT",
+      "title": "UI debug band close"
     },
     {
-      "category": "open",
-      "id": "PH-S1021",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "/ui` shell power entry → same ops API",
-      "title": "Home UI power shortcut"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1022",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "dispatch/grid/admin unused imports; `cargo clippy -D warnings` scope",
-      "title": "Clippy unused imports batch"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1023",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "from_timestamp_opt` → `DateTime::from_timestamp",
-      "title": "chrono deprecations ui-core"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1024",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "fix `duplicate_macro_attributes` on PH-S920 tests",
-      "title": "admin mod.rs duplicate test attr"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1025",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "design_tokens` parity note + unit gate",
-      "title": "Design tokens audit stub"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1026",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "toast/announce on power action; save last_run",
-      "title": "Ops power feedback UX"
-    },
-    {
-      "category": "open",
+      "category": "closed",
       "id": "PH-S1027",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
-      "status": "open",
+      "status": "closed",
       "summary": "-lc` + approved verbs; RUN_LOCAL note",
       "title": "poolai-msys.ps1 hardening"
     },
     {
-      "category": "open",
-      "id": "PH-S1028",
+      "category": "closed",
+      "id": "PH-S1026",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
-      "status": "open",
-      "summary": "galaxy_horizon_s1019_integration`; HANDOFF/NEXT",
-      "title": "UI debug band close"
+      "status": "closed",
+      "summary": "toast/announce on power action; save last_run",
+      "title": "Ops power feedback UX"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1025",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "design_tokens` parity note + unit gate",
+      "title": "Design tokens audit stub"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1024",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "fix `duplicate_macro_attributes` on PH-S920 tests",
+      "title": "admin mod.rs duplicate test attr"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1023",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "from_timestamp_opt` → `DateTime::from_timestamp",
+      "title": "chrono deprecations ui-core"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1022",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "dispatch/grid/admin unused imports; `cargo clippy -D warnings` scope",
+      "title": "Clippy unused imports batch"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1021",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "/ui` shell power entry → same ops API",
+      "title": "Home UI power shortcut"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1020",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "showModal parity; labeled Power btn; i18n UA/EN",
+      "title": "Admin power modal polish"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1019",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "dropdown shutdown/reboot; localStorage; a11y keyboard",
+      "title": "Vision power menu polish"
     },
     {
       "category": "closed",
@@ -109,96 +108,6 @@
       "status": "closed",
       "summary": "power menu; localStorage; soft/hard reload",
       "title": "Vision poweroff/reset controls"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1016",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "shutdown/reboot dev-safe; integration test",
-      "title": "PoolAI power ops wire"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1015",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "toolbar modal Виключити/Перезавантажити",
-      "title": "PoolAI admin power panel UI"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1014",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "save on stop; restore on quick; unit test",
-      "title": "Runtime state snapshot persist"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1013",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "PS1 + MSYS2 shim localhost URL",
-      "title": "Vision easy launch"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1012",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "preset `quick` + health wait",
-      "title": "Light full-stack launch preset"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1011",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--light` minimal-features build",
-      "title": "Light compile profile"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1010",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "STABLE maintenance mode",
-      "title": "FM §5.15 product-complete closure"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1009",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "final code band close",
-      "title": "galaxy_horizon_s1000_integration"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1008",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "final pre-S1010",
-      "title": "Ratio hold advisory"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1007",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--check` green",
-      "title": "poolai-vision-sync --check"
     }
   ],
   "link": "docs/vision/index.html",

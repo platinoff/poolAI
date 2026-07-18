@@ -3896,15 +3896,18 @@ async fn login_page() -> Html<String> {
 }
 
 async fn home_handler() -> Html<String> {
+    let home_power_script = poolai_ui_core::owner_ops_depth::home_power_shell_script();
     let script = format!(
         r#"{}
+{}
 // Protected route check for home
 (async function() {{
   await requireAuth();
   setUpdated();
 }})();
 "#,
-        common_js()
+        common_js(),
+        home_power_script
     );
     #[cfg(feature = "enterprise")]
     let home_admin_quick = r#" · <a href="/ui/admin" data-i18n="dash.nav.admin">Admin</a>"#;
@@ -3926,6 +3929,14 @@ async fn home_handler() -> Html<String> {
 </div>
 
 <div class="grid">
+  <div class="item">
+    <div><b data-i18n="home.powerTitle">PoolAI power</b></div>
+    <div class="muted" data-i18n="home.powerHint">Dev-stand shutdown/reboot (no host reboot).</div>
+    <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap">
+      <button type="button" class="btn" id="home-power-shutdown" data-i18n="home.powerShutdown">Shutdown</button>
+      <button type="button" class="btn btn-secondary" id="home-power-reboot" data-i18n="home.powerReboot">Reboot</button>
+    </div>
+  </div>
   <div class="item"><b data-i18n="home.quickLinks">Quick links</b><div style="margin-top:8px">
     <a href="/ui/metrics" data-i18n="dash.nav.metrics">Metrics</a> ·
     <a href="/ui/workers" data-i18n="dash.nav.workers">Workers</a> ·

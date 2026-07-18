@@ -129,6 +129,20 @@ pub fn admin_base_css() -> String {
     format!("{}\n{}", design_tokens_css(), admin_color_root_css())
 }
 
+/// UI_UX plan parity note — structural token audit gate (PH-S1025).
+pub const DESIGN_TOKENS_AUDIT_NOTE: &str =
+    "PH-S1025: structural tokens in poolai-ui-core/design_tokens.rs; admin palette via DARK theme.";
+
+/// Returns true when structural token map and CSS export are in sync.
+pub fn design_tokens_parity_gate() -> bool {
+    !STRUCTURAL.is_empty()
+        && STRUCTURAL.iter().all(|(name, value)| {
+            !name.is_empty()
+                && !value.is_empty()
+                && design_tokens_css().contains(&format!("--{name}:"))
+        })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -154,5 +168,12 @@ mod tests {
         let css = admin_base_css();
         assert!(css.contains("--spacing-4: 16px"));
         assert!(css.contains("--primary: #67e480"));
+    }
+
+    #[test]
+    fn design_tokens_parity_gate_ph_s1025() {
+        assert!(design_tokens_parity_gate());
+        assert!(DESIGN_TOKENS_AUDIT_NOTE.contains("PH-S1025"));
+        assert!(design_tokens_css().contains("--font-size-base: 16px"));
     }
 }

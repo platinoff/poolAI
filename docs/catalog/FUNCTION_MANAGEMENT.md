@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-07-18 (band 38 PH-S1019…S1028 queued · horizon 100 · power UX hotfix)
+**Оновлено:** 2026-07-18 (band 38 PH-S1019…S1028 ✅ · horizon 100)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -1221,18 +1221,18 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **10** (band 38 PH-S1019…S1028 — UI/debug polish). **Master horizon:** PH-S1019…S1118 (bands 38–47, **100** спринтів maintenance). Vision rev **309**. **Наступна сесія:** **`абракадабра`** — drain band 38.
+**Відкритих у §5.12:** **0** (band 38 ✅). **Master horizon:** PH-S1029…S1118 (bands 39–47). Vision rev **310** (після sync). **Наступна сесія:** **`абракадабра`** — project scan → band 39.
 
-| 954 | **PH-S1019** | Vision power menu polish | `docs/vision/` | dropdown shutdown/reboot; localStorage; a11y keyboard | **[ ]** |
-| 955 | **PH-S1020** | Admin power modal polish | `src/ui/admin` | showModal parity; labeled Power btn; i18n UA/EN | **[ ]** |
-| 956 | **PH-S1021** | Home UI power shortcut | `src/ui/` | `/ui` shell power entry → same ops API | **[ ]** |
-| 957 | **PH-S1022** | Clippy unused imports batch | `src/grid` `src/network` | dispatch/grid/admin unused imports; `cargo clippy -D warnings` scope | **[ ]** |
-| 958 | **PH-S1023** | chrono deprecations ui-core | `poolai-ui-core/format.rs` | `from_timestamp_opt` → `DateTime::from_timestamp` | **[ ]** |
-| 959 | **PH-S1024** | admin mod.rs duplicate test attr | `src/ui/admin/mod.rs` | fix `duplicate_macro_attributes` on PH-S920 tests | **[ ]** |
-| 960 | **PH-S1025** | Design tokens audit stub | UI_UX plan | `design_tokens` parity note + unit gate | **[ ]** |
-| 961 | **PH-S1026** | Ops power feedback UX | admin+vision | toast/announce on power action; save last_run | **[ ]** |
-| 962 | **PH-S1027** | poolai-msys.ps1 hardening | `bin/` | `-lc` + approved verbs; RUN_LOCAL note | **[ ]** |
-| 963 | **PH-S1028** | UI debug band close | tests/docs | `galaxy_horizon_s1019_integration`; HANDOFF/NEXT | **[ ]** |
+| 954 | **PH-S1019** | Vision power menu polish | `docs/vision/` | dropdown shutdown/reboot; localStorage; a11y keyboard | **✅** |
+| 955 | **PH-S1020** | Admin power modal polish | `src/ui/admin` | showModal parity; labeled Power btn; i18n UA/EN | **✅** |
+| 956 | **PH-S1021** | Home UI power shortcut | `src/ui/` | `/ui` shell power entry → same ops API | **✅** |
+| 957 | **PH-S1022** | Clippy unused imports batch | `src/grid` `src/network` | dispatch/grid/admin unused imports; `cargo clippy -D warnings` scope | **✅** |
+| 958 | **PH-S1023** | chrono deprecations ui-core | `poolai-ui-core/format.rs` | `from_timestamp_opt` → `DateTime::from_timestamp` | **✅** |
+| 959 | **PH-S1024** | admin mod.rs duplicate test attr | `src/ui/admin/mod.rs` | fix `duplicate_macro_attributes` on PH-S920 tests | **✅** |
+| 960 | **PH-S1025** | Design tokens audit stub | UI_UX plan | `design_tokens` parity note + unit gate | **✅** |
+| 961 | **PH-S1026** | Ops power feedback UX | admin+vision | toast/announce on power action; save last_run | **✅** |
+| 962 | **PH-S1027** | poolai-msys.ps1 hardening | `bin/` | `-lc` + approved verbs; RUN_LOCAL note | **✅** |
+| 963 | **PH-S1028** | UI debug band close | tests/docs | `galaxy_horizon_s1019_integration`; HANDOFF/NEXT | **✅** |
 
 ### 5.18 UI/debug polish queue — band 38 (PH-S1019…S1028, 2026-07-18)
 
@@ -1242,7 +1242,7 @@ FM-xxx (з таблиці нижче)
 
 | Band | PH-S range | Фокус |
 |------|------------|--------|
-| **38** | S1019…S1028 | Power UX + clippy/ui-core hygiene (active) |
+| **38** | S1019…S1028 | Power UX + clippy/ui-core hygiene ✅ |
 | 39 | S1029…S1038 | Admin tables/forms polish (FM-019) |
 | 40 | S1039…S1048 | Vision map/a11y/perf |
 | 41 | S1049…S1058 | E2E visual/axe regression band |
@@ -1360,7 +1360,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-18):** band 38 **PH-S1019…S1028** `[ ]` — UI/debug polish · horizon **100** (FM §5.19) · **`абракадабра`** drain.
+**Активна смуга (2026-07-18):** band 38 **PH-S1019…S1028** ✅ · §5.12 **0** · наступна **`абракадабра`** → project scan → band 39.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 
