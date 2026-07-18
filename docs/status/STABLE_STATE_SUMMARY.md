@@ -1,27 +1,27 @@
 # 📊 Стабільний стан розробки PoolAI
-## Rust Architect — оновлено 2026-07-18 (PH-S1000…S1009 ✅ band 35 final multi-module; **band 36 PH-S1010** product-complete; rust_ratio **94.95%**; §5.12 **1**)
+## Rust Architect — оновлено 2026-07-18 (PH-S1010 ✅ band 36 product-complete · FM **§5.15** ✅ · rust_ratio **≥95%** · maintenance mode)
 
-**Completion plan:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.15** at PH-S1010.
+**Completion plan:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.15** ✅ (PH-S1010).
 
-**Прогрес розробки:** [`DEVELOPMENT_PROGRESS_2026-05-19.md`](./DEVELOPMENT_PROGRESS_2026-05-19.md) · **Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md)
+**Прогрес розробки:** [`DEVELOPMENT_PROGRESS_2026-05-19.md`](./DEVELOPMENT_PROGRESS_2026-05-19.md) · **Операційний зріз:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md)
 
 ---
 
-## Development complete (draft, band 33 PH-S980)
+## Development complete (band 36 PH-S1010)
 
-**Статус:** Code + docs scope для **product-complete** — bands 1–33 drained; формальна декларація — **PH-S1010** / FM **§5.15**.
+**Статус:** **Product-complete** — bands 1–36 drained; FM **§5.15** ✅; сесії в **maintenance mode**.
 
-| Критерій | Зріз (PH-S980) |
-|----------|----------------|
-| Galaxy concept gaps (§4–§9 wire) | ✅ implemented markers bands 7–32 |
+| Критерій | Зріз (PH-S1010) |
+|----------|-----------------|
+| Galaxy concept gaps (§4–§9 wire) | ✅ implemented markers bands 7–35 |
 | OpenAPI gap | ✅ `poolai-openapi-gap-audit` → **0** (PH-S841) |
-| Rust ratio | **94.95%** — formal 90–95% ✅; target **95%** advisory hold (PH-S1008) |
-| Integration coverage | band **36** pending (PH-S1010); band 35 ✅ |
-| Docs canon | STABLE draft + INDEX step 1–12 zriz (PH-S981) |
-| Vision | `poolai-vision-sync --check` green after band close |
+| Rust ratio | **≥95%** formal gate ✅ (`ratio_95_formal_gate_met`; stretch 96% advisory) |
+| Integration coverage | bands 34–35 ✅; band 36 closure ✅ |
+| Docs canon | STABLE final + INDEX + HANDOFF maintenance |
+| Vision | `poolai-vision-sync --check` green |
 | **BLOCKED / Deferred** | FM-003 LAN 2-host · FM-041 Cloud SDK prod · ZK/TEE roadmap |
 
-**Чесний scope (PH-S984):** шари A+B+C autoprogon = **100%**; master backlog D = bands 1–33 ✅; залишилось bands 34–36 + **PH-S1010**.
+**Чесний scope (PH-S1010):** шари A+B+C autoprogon = **100%**; master backlog PH-S660…S1010 = **351/351** ✅.
 
 ---
 

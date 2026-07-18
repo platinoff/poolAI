@@ -1,12 +1,12 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-18 (PH-S1000…S1009 ✅ band 35 · active **PH-S1010** · vision **rev 305** · rust_ratio **94.95%**)
+**Оновлено:** 2026-07-18 (PH-S1010 ✅ band 36 product-complete · FM **§5.15** ✅ · vision **rev 306** · rust_ratio **≥95%** · **maintenance mode**)
 
-**Cursor 3.12.17 (2026-07-17):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-07-17.md`](./CURSOR_UPDATE_RESEARCH_2026-07-17.md). **PH-S1000…S1009 ✅ band 35** — final multi-module horizon. **Наступна product-сесія:** **`абракадабра`** (drain PH-S1010 product-complete).
+**Cursor 3.12.17 (2026-07-17):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-07-17.md`](./CURSOR_UPDATE_RESEARCH_2026-07-17.md). **PH-S1010 ✅ band 36** — FM **§5.15** product-complete. **Режим:** **maintenance mode** (нові PH-S* лише за scan власника).
 
-## Maintenance mode (template, PH-S983 — post-S1010)
+## Maintenance mode (PH-S1010)
 
-Після **PH-S1010** / FM **§5.15** ✅ сесії переходять у **maintenance mode**:
+Після **PH-S1010** / FM **§5.15** ✅ сесії працюють у **maintenance mode**:
 
 | Крок | Дія |
 |------|-----|
@@ -16,11 +16,9 @@
 | Docs | STABLE «development complete»; INDEX/DIGEST без нових PH-S* у §5.12 |
 | **Не** | Автоматичний project scan / replenish §5.12 без запиту власника |
 
-**До PH-S1010:** продовжувати **`абракадабра`** drain з [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) bands 35–36.
+**Completion roadmap v2 (2026-06-20):** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) — **351/351** PH-S660…S1010 ✅ · FM **§5.15** ✅. Реєстр: [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md).
 
-**Completion roadmap v2 (2026-06-20):** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) — **101** спринтів до **product-complete** (PH-S1010 / FM **§5.15**); **2** сесій `абракадабра` × 10 PH-S* + tail S1010 залишилось. Реєстр: [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · regen `bash scripts/generate-ph-s-master-backlog-351.sh`.
-
-**Master backlog 11 (2026-07-18):** FM **§5.14**. Активна §5.12: **PH-S1010** (band 36 — product-complete closure). **`абракадабра`** = drain PH-S1010 → maintenance mode.
+**PH-S1010 ✅ (2026-07-18):** STABLE «development complete» final; HANDOFF maintenance active; `admin_charts.js` wasm-only zriz; `product_complete_depth` + `galaxy_horizon_s1010_integration`; `poolai-loc-audit` → `rust_ratio.json` **≥95%**; vision **rev 306**.
 
 **PH-S1000…S1009 ✅ (2026-07-18):** `multi_module_wire_smoke.rs` top 5 grid APIs (PH-S1000); `multi_module_admin_wasm_regression.rs` ui-core gate (PH-S1001); `multi_module_stand_smoke_audit.rs` + stand smoke `--json` (PH-S1002); cargo test-ci scope note final HANDOFF (PH-S1003); openapi-gap + test-ci dual gate FM (PH-S1004); `poolai-loc-audit` → `rust_ratio.json` **94.95%** (PH-S1005); `multi_module_depth_stub` + `galaxy_horizon_s1000_integration` (PH-S1009); vision **rev 305**.
 
@@ -90,7 +88,7 @@
 
 **Rules:** **`абракадабра`** — drain 10 з §5.12 → vision close → push; [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
-**§5.12:** **1** відкритий **PH-S1010** (band 36). **Vision:** rev **305** · rust_ratio **94.95%** (PH-S1005). **Service:** FM §5.16 PH-SVC01…SVC10 ✅ (2026-07-17).
+**§5.12:** **0** відкритих (maintenance mode). **Vision:** rev **306** · rust_ratio **≥95%** (PH-S1010). **Service:** FM §5.16 PH-SVC01…SVC10 ✅ (2026-07-17).
 
 **Роадмеп:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) · **Промпт:** [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md).
 

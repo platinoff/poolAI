@@ -82,13 +82,11 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 ### Next Focus (2026-07-18)
 
-**Product-complete path:** bands 1–35 ✅ · active **PH-S1010** (band 36 product-complete) · FM **§5.15**.
+**Product-complete:** bands 1–36 ✅ · FM **§5.15** ✅ (PH-S1010) · **maintenance mode**.
 
-**§5.12:** **1** active **PH-S1010** (band 36) · vision **rev 305** · rust_ratio **94.95%** (formal 90–95% ✅; hold 95% advisory PH-S1008).
+**§5.12:** **0** active · vision **rev 306** · rust_ratio **≥95%** (`ratio_95_formal_gate_met`).
 
-**Наступна product-сесія:** **`абракадабра`** — drain PH-S1010 product-complete ([`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md)).
-
-**Maintenance mode (PH-S982):** після **PH-S1010** — HANDOFF/NEXT переходять на maintenance template; нові PH-S* лише за явним scan власника (BLOCKED/Deferred horizon).
+**Нові PH-S*:** лише за явним scan власника (BLOCKED/Deferred / FM-horizon v2) — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
 **Ops (поза чергою):** **FM-003** LAN §4 **BLOCKED** (2 хости) · **FM-041** Cloud SDK **Deferred**.
 

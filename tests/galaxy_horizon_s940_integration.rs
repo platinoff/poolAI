@@ -32,7 +32,8 @@ fn horizon_s940_band_e2e_stretch_ops_ph_s949() {
             .expect("rust_ratio.json");
     let sprint = ratio_json["sprint"].as_str().unwrap_or("");
     assert!(
-        sprint == "PH-S1005"
+        sprint == "PH-S1010"
+            || sprint == "PH-S1005"
             || sprint == "PH-S995"
             || sprint == "PH-S985"
             || sprint == "PH-S975"

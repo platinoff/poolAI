@@ -1,6 +1,6 @@
 {
   "generated_at": "2026-07-18",
-  "sprint": "PH-S1005",
+  "sprint": "PH-S1010",
   "formal_band_min": 0.9,
   "formal_band_max": 0.95,
   "warn_below": 0.93,
@@ -8,20 +8,20 @@
   "stretch_spirit": 0.96,
   "advisory_mode": false,
   "min_ratio": null,
-  "rust_loc": 151819,
-  "non_rust_product_loc": 8081,
-  "product_loc_total": 159900,
-  "rust_ratio": 0.9494621638524078,
-  "rust_ratio_pct": 94.94621638524077,
-  "in_formal_band": true,
+  "rust_loc": 152118,
+  "non_rust_product_loc": 7992,
+  "product_loc_total": 160110,
+  "rust_ratio": 0.9500843170320404,
+  "rust_ratio_pct": 95.00843170320404,
+  "in_formal_band": false,
   "below_warn_threshold": false,
-  "below_target": true,
+  "below_target": false,
   "below_stretch_spirit": true,
   "meets_min_ratio": null,
-  "ui_js_loc": 2010,
+  "ui_js_loc": 1921,
   "ui_js_band28_baseline_loc": 2141,
-  "ui_js_loc_reduction": 131,
-  "ratio_95_formal_gate_met": false,
+  "ui_js_loc_reduction": 220,
+  "ratio_95_formal_gate_met": true,
   "stretch_spirit_gate_met": false,
   "e2e_ts_loc": 1125,
   "e2e_ts_band29_baseline_loc": 1155,
@@ -45,16 +45,16 @@
       "loc": 608
     },
     "rust_crates": {
-      "files": 53,
-      "loc": 12251
+      "files": 54,
+      "loc": 12367
     },
     "rust_src": {
       "files": 294,
-      "loc": 105862
+      "loc": 105863
     },
     "rust_tests": {
-      "files": 216,
-      "loc": 33098
+      "files": 220,
+      "loc": 33280
     },
     "ui_css": {
       "files": 2,
@@ -62,7 +62,7 @@
     },
     "ui_js": {
       "files": 6,
-      "loc": 2010
+      "loc": 1921
     }
   },
   "notes": [
@@ -80,6 +80,7 @@
     "PH-S978: concept band 32 hold advisory — in_formal_band true; target 95% hold until band 33+",
     "PH-S988: STABLE band 33 hold advisory — in_formal_band true; target 95% hold until band 34+",
     "PH-S998: integration gap band 34 hold advisory — in_formal_band true; target 95% hold until band 35+",
-    "PH-S1008: multi-module band 35 hold advisory — in_formal_band true; target 95% hold until PH-S1010"
+    "PH-S1008: multi-module band 35 hold advisory — in_formal_band true; target 95% hold until PH-S1010",
+    "PH-S1010: product-complete band 36 — ratio_95_formal_gate_met; stretch 96% advisory if below_stretch_spirit"
   ]
 }

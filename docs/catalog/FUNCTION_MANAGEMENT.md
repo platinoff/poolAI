@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-07-18 (PH-S1000…S1009 ✅ band 35 · active **PH-S1010** · vision **rev 305** · rust_ratio **94.95%**)
+**Оновлено:** 2026-07-18 (PH-S1010 ✅ band 36 product-complete · FM **§5.15** ✅ · vision **rev 306** · rust_ratio **≥95%** · maintenance mode)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -1211,11 +1211,11 @@ FM-xxx (з таблиці нижче)
 | 942 | **PH-S1007** | poolai-vision-sync --check | ops | `--check` green | **✅** |
 | 943 | **PH-S1008** | Ratio hold advisory | ops | final pre-S1010 | **✅** |
 | 944 | **PH-S1009** | galaxy_horizon_s1000_integration | tests | final code band close | **✅** |
-| 945 | **PH-S1010** | FM §5.15 product-complete closure | docs | STABLE maintenance mode | **[ ]** |
+| 945 | **PH-S1010** | FM §5.15 product-complete closure | docs | STABLE maintenance mode | **✅** |
 
-**Відкритих у §5.12:** **1** (PH-S1010). **Master backlog:** **1** pending PH-S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · **§5.14**. Vision rev **305** (after sync). rust_ratio **94.95%** (PH-S1005). **Service band:** §5.16 PH-SVC01…SVC10 ✅ (2026-07-17).
+**Відкритих у §5.12:** **0** (maintenance mode). **Master backlog:** **0** pending — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · **§5.14** ✅. Vision rev **306** (after sync). rust_ratio **≥95%** (PH-S1010). **Service band:** §5.16 PH-SVC01…SVC10 ✅ (2026-07-17).
 
-**Наступна сесія:** **`абракадабра`** — drain PH-S1010 product-complete → maintenance mode · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **maintenance mode** — BLOCKED/Deferred або явний scan власника · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.14 Master backlog PH-S720…S1010 (291 pending → product-complete, 2026-06-20)
 
@@ -1223,11 +1223,11 @@ FM-xxx (з таблиці нижче)
 
 | Поле | Значення |
 |------|----------|
-| **Pending** | **1** (PH-S1010) |
-| **Drained bands 1–35** | PH-S660…S1009 ✅ |
-| **Активна §5.12** | PH-S1010 `[ ]` — band 36 product-complete closure |
-| **Наступна promote** | — (maintenance mode after S1010) |
-| **Сесій `абракадабра`** | **1** (tail PH-S1010) |
+| **Pending** | **0** |
+| **Drained bands 1–36** | PH-S660…S1010 ✅ |
+| **Активна §5.12** | — (maintenance mode) |
+| **Наступна promote** | — (owner scan only) |
+| **Сесій `абракадабра`** | — (maintenance mode) |
 | **План фаз** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md) |
 | **Реєстр sprint×acceptance** | [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) |
 | **Regen** | `bash scripts/generate-ph-s-master-backlog-351.sh` |
@@ -1256,7 +1256,7 @@ FM-xxx (з таблиці нижче)
 
 ### 5.15 Product-complete closure (PH-S1010)
 
-**Статус:** **draft (PH-S986)** — bands 1–33 ✅; формальне закриття після bands 34–35 + **PH-S1010**.
+**Статус:** **✅ product-complete (PH-S1010)** — bands 1–36 drained; FM **§5.15** closed.
 
 **Draft checklist (band 33 PH-S986):**
 
@@ -1265,7 +1265,7 @@ FM-xxx (з таблиці нижче)
 | Galaxy concept gaps (§4–§9 wire) | ✅ roadmap + concept markers bands 7–32 |
 | OpenAPI gap | ✅ `poolai-openapi-gap-audit` → **0** |
 | Integration coverage | ✅ band 34 (PH-S990…S999) |
-| Rust ratio | **94.95%** — formal 90–95% ✅; **≥95%** target at S1010 |
+| Rust ratio | **≥95%** formal gate ✅ (`ratio_95_formal_gate_met`; stretch 96% advisory) |
 | Docs canon | ✅ STABLE draft + INDEX zriz (band 33) |
 | Vision | ✅ `poolai-vision-sync --check` after band close |
 | Ops | `cargo test-ci` green; HANDOFF maintenance template ready |
@@ -1307,7 +1307,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-18):** PH-S1010 **[ ]** drain band 36 (product-complete closure) · **`абракадабра`** = drain → vision close → push · ratio **94.95%** (PH-S1005).
+**Активна смуга (2026-07-18):** **maintenance mode** — FM **§5.15** ✅ · PH-S1010 product-complete · ratio **≥95%** (PH-S1010).
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

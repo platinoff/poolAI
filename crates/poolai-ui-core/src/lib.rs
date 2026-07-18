@@ -30,6 +30,7 @@ pub mod multi_module_depth;
 pub mod network_profiles;
 pub mod payout_batch;
 pub mod pricing;
+pub mod product_complete_depth;
 pub mod prometheus;
 pub mod security;
 pub mod stable_depth;

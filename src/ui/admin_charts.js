@@ -1,4 +1,4 @@
-// PoolAI admin metrics charts (PH-S10) — SVG canvas glue; data parse via poolai-ui-wasm (PH-S155)
+// PoolAI admin metrics charts (PH-S10) — SVG canvas glue; data parse via poolai-ui-wasm (PH-S155; PH-S1010 wasm-only zriz)
 
 function poolaiChartT(key, enFallback) {
   return typeof poolaiT === 'function' ? poolaiT(key, enFallback) : enFallback;
@@ -43,25 +43,10 @@ async function poolaiFetchMetricHistory(metricName, opts) {
   var hours = opts.hours != null ? opts.hours : 24;
   var limit = opts.limit != null ? opts.limit : 200;
   try {
-    var endTime = new Date().toISOString();
-    var startTime = new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
     var wasm = poolaiChartsWasm();
-    var url =
-      wasm && typeof wasm.buildMetricHistoryUrlWithHours === 'function'
-        ? wasm.buildMetricHistoryUrlWithHours(metricName, hours, limit, endTime)
-        : wasm && typeof wasm.buildMetricHistoryQuery === 'function'
-          ? '/api/enterprise/monitoring/metrics?' +
-            wasm.buildMetricHistoryQuery(metricName, startTime, endTime, limit)
-          : wasm && typeof wasm.buildMetricHistoryUrl === 'function'
-            ? wasm.buildMetricHistoryUrl(metricName, startTime, endTime, limit)
-            : '/api/enterprise/monitoring/metrics?metric=' +
-              encodeURIComponent(metricName) +
-              '&start_time=' +
-              encodeURIComponent(startTime) +
-              '&end_time=' +
-              encodeURIComponent(endTime) +
-              '&limit=' +
-              limit;
+    if (!wasm || typeof wasm.buildMetricHistoryUrlWithHours !== 'function') return [];
+    var endTime = new Date().toISOString();
+    var url = wasm.buildMetricHistoryUrlWithHours(metricName, hours, limit, endTime);
     var data = await fetchJson(url);
     return data || [];
   } catch (e) {
@@ -76,23 +61,10 @@ async function poolaiFetchMetricsWindow(opts) {
   var hours = opts.hours != null ? opts.hours : 1;
   var limit = opts.limit != null ? opts.limit : 60;
   try {
-    var endTime = new Date().toISOString();
     var wasm = poolaiChartsWasm();
-    var url =
-      wasm && typeof wasm.buildMetricsWindowUrlWithHours === 'function'
-        ? wasm.buildMetricsWindowUrlWithHours(hours, limit, endTime)
-        : wasm && typeof wasm.buildMetricsWindowUrl === 'function'
-          ? wasm.buildMetricsWindowUrl(
-              new Date(Date.now() - hours * 60 * 60 * 1000).toISOString(),
-              endTime,
-              limit,
-            )
-          : '/api/enterprise/monitoring/metrics?start_time=' +
-            encodeURIComponent(new Date(Date.now() - hours * 60 * 60 * 1000).toISOString()) +
-            '&end_time=' +
-            encodeURIComponent(endTime) +
-            '&limit=' +
-            limit;
+    if (!wasm || typeof wasm.buildMetricsWindowUrlWithHours !== 'function') return [];
+    var endTime = new Date().toISOString();
+    var url = wasm.buildMetricsWindowUrlWithHours(hours, limit, endTime);
     var data = await fetchJson(url);
     return data || [];
   } catch (e) {
@@ -111,23 +83,21 @@ function poolaiGroupMetricsByName(metrics) {
 
 function poolaiAlertRulesUrl() {
   var wasm = poolaiChartsWasm();
-  return wasm && typeof wasm.buildAlertRulesUrl === 'function'
-    ? wasm.buildAlertRulesUrl()
-    : '/api/enterprise/monitoring/alert-rules';
+  return wasm && typeof wasm.buildAlertRulesUrl === 'function' ? wasm.buildAlertRulesUrl() : '';
 }
 
 function poolaiMonitoringDashboardsUrl() {
   var wasm = poolaiChartsWasm();
   return wasm && typeof wasm.buildMonitoringDashboardsUrl === 'function'
     ? wasm.buildMonitoringDashboardsUrl()
-    : '/api/enterprise/monitoring/dashboards';
+    : '';
 }
 
 function poolaiMonitoringAlertAcknowledgeUrl(alertId) {
   var wasm = poolaiChartsWasm();
   return wasm && typeof wasm.buildMonitoringAlertAcknowledgeUrl === 'function'
     ? wasm.buildMonitoringAlertAcknowledgeUrl(String(alertId || ''))
-    : '/api/enterprise/monitoring/alerts/' + encodeURIComponent(String(alertId || '')) + '/acknowledge';
+    : '';
 }
 
 function poolaiMonitoringMetricLatestUrl(metricName, limit) {
@@ -135,10 +105,7 @@ function poolaiMonitoringMetricLatestUrl(metricName, limit) {
   var lim = limit != null ? limit : 10;
   return wasm && typeof wasm.buildMonitoringMetricLatestUrl === 'function'
     ? wasm.buildMonitoringMetricLatestUrl(String(metricName || ''), lim)
-    : '/api/enterprise/monitoring/metrics?metric=' +
-        encodeURIComponent(String(metricName || '')) +
-        '&limit=' +
-        lim;
+    : '';
 }
 
 /**
@@ -241,40 +208,6 @@ function poolaiStartMetricsPolling(fn, intervalMs) {
   };
 }
 
-function poolaiParseMlNumeric(val) {
-  var wasm = poolaiChartsWasm();
-  if (wasm && typeof wasm.parseMlNumeric === 'function') {
-    var n = wasm.parseMlNumeric(val == null ? '' : String(val));
-    return n == null ? null : Number(n);
-  }
-  return null;
-}
-
-/** Flatten `step_results` from pipeline list API into table rows. */
-function poolaiFlattenMlStepRows(pipelines) {
-  var wasm = poolaiChartsWasm();
-  if (wasm && typeof wasm.flattenMlStepRows === 'function') {
-    return wasm.flattenMlStepRows(JSON.stringify(pipelines || []));
-  }
-  return [];
-}
-
-function poolaiFormatMlMetricSummary(output) {
-  var wasm = poolaiChartsWasm();
-  if (wasm && typeof wasm.formatMlMetricSummary === 'function') {
-    return wasm.formatMlMetricSummary(JSON.stringify(output || {}));
-  }
-  return '—';
-}
-
-function poolaiCollectMlSparklineSeries(rows) {
-  var wasm = poolaiChartsWasm();
-  if (wasm && typeof wasm.collectMlSparklineSeries === 'function') {
-    return wasm.collectMlSparklineSeries(JSON.stringify(rows || []));
-  }
-  return {};
-}
-
 /**
  * PH-S43: ML pipeline step metrics panel (table + sparklines).
  * @param {Array<object>} pipelines
@@ -309,11 +242,8 @@ function poolaiRenderMlPipelineMetricsPanel(pipelines, opts) {
 async function poolaiFetchMlPipelines() {
   try {
     var wasm = poolaiChartsWasm();
-    var url =
-      wasm && typeof wasm.buildMlPipelinesUrl === 'function'
-        ? wasm.buildMlPipelinesUrl()
-        : '/api/enterprise/ai-ml/pipeline';
-    var data = await fetchJson(url);
+    if (!wasm || typeof wasm.buildMlPipelinesUrl !== 'function') return [];
+    var data = await fetchJson(wasm.buildMlPipelinesUrl());
     return data || [];
   } catch (e) {
     console.warn('poolaiFetchMlPipelines:', e);
@@ -327,23 +257,14 @@ async function poolaiFetchMonitoringAlerts(opts) {
   var limit = opts.limit != null ? opts.limit : 20;
   try {
     var wasm = poolaiChartsWasm();
-    var url;
-    if (opts.acknowledged === false) {
-      url =
-        wasm && typeof wasm.buildMonitoringActiveAlertsUrl === 'function'
-          ? wasm.buildMonitoringActiveAlertsUrl(limit)
-          : '/api/enterprise/monitoring/alerts?limit=' +
-            limit +
-            '&acknowledged=false';
-    } else {
-      url =
-        wasm && typeof wasm.buildMonitoringAlertsUrl === 'function'
-          ? wasm.buildMonitoringAlertsUrl(
-              limit,
-              opts.acknowledged != null ? opts.acknowledged : null,
-            )
-          : '/api/enterprise/monitoring/alerts?limit=' + limit;
-    }
+    if (!wasm) return [];
+    var url =
+      opts.acknowledged === false
+        ? wasm.buildMonitoringActiveAlertsUrl &&
+          wasm.buildMonitoringActiveAlertsUrl(limit)
+        : wasm.buildMonitoringAlertsUrl &&
+          wasm.buildMonitoringAlertsUrl(limit, opts.acknowledged != null ? opts.acknowledged : null);
+    if (!url) return [];
     var data = await fetchJson(url);
     return data || [];
   } catch (e) {
@@ -354,11 +275,8 @@ async function poolaiFetchMonitoringAlerts(opts) {
 
 async function poolaiFetchAlertRules() {
   try {
-    var wasm = poolaiChartsWasm();
-    var url =
-      wasm && typeof wasm.buildAlertRulesUrl === 'function'
-        ? wasm.buildAlertRulesUrl()
-        : '/api/enterprise/monitoring/alert-rules';
+    var url = poolaiAlertRulesUrl();
+    if (!url) return [];
     return (await fetchJson(url)) || [];
   } catch (e) {
     console.warn('poolaiFetchAlertRules:', e);
@@ -368,11 +286,10 @@ async function poolaiFetchAlertRules() {
 
 async function poolaiRunMlPipelineDemo() {
   var wasm = poolaiChartsWasm();
-  var url =
-    wasm && typeof wasm.buildMlPipelineDemoUrl === 'function'
-      ? wasm.buildMlPipelineDemoUrl()
-      : '/api/enterprise/ai-ml/pipeline/demo';
-  return fetchJson(url);
+  if (!wasm || typeof wasm.buildMlPipelineDemoUrl !== 'function') {
+    throw new Error('poolaiRunMlPipelineDemo: wasm unavailable');
+  }
+  return fetchJson(wasm.buildMlPipelineDemoUrl());
 }
 
 /**
@@ -401,14 +318,11 @@ function poolaiRenderMonitoringAlertsPanel(alerts, labels) {
       labels.empty || poolaiChartT('admin.mon.noAlerts', 'No active alerts'),
     );
   }
-  return adminEmptyStateHtml(
-    labels.empty || poolaiChartT('admin.mon.noAlerts', 'No active alerts'),
-    { icon: '✅' },
-  );
+  return '';
 }
 
 /**
- * PH-S470: monitoring dashboards table (wasm-first).
+ * PH-S470: monitoring dashboards table (wasm-only, PH-S1010).
  * @param {Array<object>} dashboards
  * @param {object} labels i18n label map
  */
@@ -432,10 +346,7 @@ function poolaiRenderMonitoringDashboardsPanel(dashboards, labels) {
       labels.empty || poolaiChartT('admin.mon.noDashboards', 'No dashboards created'),
     );
   }
-  return adminEmptyStateHtml(
-    labels.empty || poolaiChartT('admin.mon.noDashboards', 'No dashboards created'),
-    { icon: '📊' },
-  );
+  return '';
 }
 
 /**
@@ -465,7 +376,7 @@ function poolaiRenderWorkersPanel(workers, labels) {
 }
 
 /**
- * PH-S490: instances table (wasm-first).
+ * PH-S490: instances table (wasm-only, PH-S1010).
  * @param {Array<object>} instances
  * @param {object} labels i18n label map
  */
@@ -488,10 +399,7 @@ function poolaiRenderInstancesPanel(instances, labels) {
       labels.empty || poolaiChartT('admin.inst.empty', 'No instances found'),
     );
   }
-  return adminEmptyStateHtml(
-    labels.empty || poolaiChartT('admin.inst.empty', 'No instances found'),
-    { icon: '🧠' },
-  );
+  return '';
 }
 
 /**
@@ -547,7 +455,6 @@ function poolaiFormatSeedInventoryRamBytes(ramBytes) {
 /**
  * PH-S499: VM instances table (wasm-only, PH-S820).
  */
- */
 function poolaiRenderVmPanel(instances, labels) {
   labels = labels || {};
   var wasm = poolaiChartsWasm();
@@ -593,7 +500,7 @@ function poolaiRenderLibsPanel(libs, labels) {
   return '';
 }
 
-/** PH-S508: Galaxy virtual nodes table (wasm-first). */
+/** PH-S508: Galaxy virtual nodes table (wasm-only, PH-S1010). */
 function poolaiRenderGalaxyVirtualNodesPanel(nodes, labels) {
   labels = labels || {};
   var wasm = poolaiChartsWasm();
@@ -609,10 +516,10 @@ function poolaiRenderGalaxyVirtualNodesPanel(nodes, labels) {
       labels.empty || 'No virtual nodes',
     );
   }
-  return adminEmptyStateHtml(labels.empty || 'No virtual nodes', { icon: '🌐' });
+  return '';
 }
 
-/** PH-S512: verification checker tasks table (wasm-first). */
+/** PH-S512: verification checker tasks table (wasm-only, PH-S1010). */
 function poolaiRenderGridVerificationPanel(tasks, pendingTotal, labels) {
   labels = labels || {};
   var wasm = poolaiChartsWasm();
@@ -627,10 +534,10 @@ function poolaiRenderGridVerificationPanel(tasks, pendingTotal, labels) {
       labels.empty || 'No pending checker tasks',
     );
   }
-  return adminEmptyStateHtml(labels.empty || 'No pending checker tasks', { icon: '🔍' });
+  return '';
 }
 
-/** PH-S517: Telegram seats snapshot table (wasm-first). */
+/** PH-S517: Telegram seats snapshot table (wasm-only, PH-S1010). */
 function poolaiRenderTelegramSeatsPanel(snapshotJson, labels) {
   labels = labels || {};
   var wasm = poolaiChartsWasm();
@@ -644,7 +551,7 @@ function poolaiRenderTelegramSeatsPanel(snapshotJson, labels) {
       labels.tableAria || 'Telegram seats',
     );
   }
-  return adminEmptyStateHtml(labels.empty || 'Seat snapshot unavailable', { icon: '📊' });
+  return '';
 }
 
 /** PH-S801: payout batch panel (metrics strip + history + latest entry, wasm-only). */

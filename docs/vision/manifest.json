@@ -2282,11 +2282,17 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_integration_gap_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_multi_module_depth_rs"
     }
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S1009",
+  "last_sprint_closed": "PH-S1010",
   "layers": [
     {
       "id": "L0",
@@ -2319,7 +2325,6 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1010",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -9356,9 +9361,44 @@
       "label": "telegram_wallet_integration.rs",
       "layer": "L3",
       "path": "tests/telegram_wallet_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_multi_module_depth_rs",
+      "label": "multi_module_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/multi_module_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1000_integration_rs",
+      "label": "galaxy_horizon_s1000_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1000_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_multi_module_admin_wasm_regression_rs",
+      "label": "multi_module_admin_wasm_regression.rs",
+      "layer": "L3",
+      "path": "tests/multi_module_admin_wasm_regression.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_multi_module_stand_smoke_audit_rs",
+      "label": "multi_module_stand_smoke_audit.rs",
+      "layer": "L3",
+      "path": "tests/multi_module_stand_smoke_audit.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_multi_module_wire_smoke_rs",
+      "label": "multi_module_wire_smoke.rs",
+      "layer": "L3",
+      "path": "tests/multi_module_wire_smoke.rs"
     }
   ],
-  "revision": 305,
+  "revision": 306,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -17860,13 +17900,13 @@
       "acceptance": "STABLE maintenance mode",
       "deps": "docs",
       "id": "PH-S1010",
-      "open": true,
+      "open": false,
       "row": 945,
-      "status": "open",
+      "status": "closed",
       "title": "FM §5.15 product-complete closure"
     }
   ],
-  "sprint_queue_open_count": 1,
+  "sprint_queue_open_count": 0,
   "updated_at": "2026-06-20",
   "vision_ui_rev": 59
 }

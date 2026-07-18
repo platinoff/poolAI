@@ -61,8 +61,13 @@ fn horizon_s1000_band_multi_module_horizon_close_ph_s1009() {
     let ratio_json: serde_json::Value =
         serde_json::from_str(include_str!("../docs/development/rust_ratio.json"))
             .expect("rust_ratio.json");
-    assert_eq!(ratio_json["sprint"].as_str().unwrap(), "PH-S1005");
-    assert!(ratio_json["in_formal_band"].as_bool().unwrap_or(false));
+    assert_eq!(ratio_json["sprint"].as_str().unwrap(), "PH-S1010");
+    assert!(
+        ratio_json["ratio_95_formal_gate_met"]
+            .as_bool()
+            .unwrap_or(false),
+        "ratio_95_formal_gate_met expected true at band 35 close"
+    );
 
     let notes = ratio_json["notes"].as_array().expect("notes");
     let joined = notes

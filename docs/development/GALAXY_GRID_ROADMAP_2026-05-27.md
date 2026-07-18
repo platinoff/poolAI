@@ -1,12 +1,12 @@
 # Galaxy Grid roadmap (зріз)
 
-**Оновлено:** 2026-07-18 · **Completion v2:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · **11** pending PH-S1010… · **§5.12 active:** 10
+**Оновлено:** 2026-07-18 · **Completion v2:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · **0** pending · **§5.12:** maintenance mode
 
 | Зріз | Значення |
 |------|----------|
-| **Completion plan** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.14–§5.15** |
-| **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) |
-| **Active drain (band 35)** | PH-S1000…S1009 — final multi-module horizon |
+| **Completion plan** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.14–§5.15** ✅ |
+| **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) — **351/351** ✅ |
+| **Last closed (band 36)** | PH-S1010 ✅ — FM **§5.15** product-complete · band 36 PH-S1010 |
 | **Last closed (band 35)** | PH-S1000…S1009 ✅ — final multi-module horizon · band 35 PH-S1000 |
 | **Last closed (band 34)** | PH-S990…S999 ✅ — integration gap fill · band 34 PH-S990 |
 | **Last closed (band 33)** | PH-S980…S989 ✅ — STABLE + INDEX product-complete draft |
@@ -15,10 +15,10 @@
 | **Last closed (band 30)** | PH-S950…S959 ✅ — FUNCTIONALITY_DIGEST full sync |
 | **Last closed (band 29)** | PH-S940…S949 ✅ — e2e scope audit + ratio stretch |
 | **Last closed (band 28)** | PH-S930…S939 ✅ — admin_common table/empty wasm-only + ratio 95% gate |
-| **Product-complete tail** | PH-S1010 — FM **§5.15** |
-| **Rust ratio** | **94.92%** → PH-S975 zriz · hold **95%** advisory |
+| **Product-complete** | PH-S1010 ✅ — FM **§5.15** · maintenance mode |
+| **Rust ratio** | **≥95%** formal gate (PH-S1010) · stretch 96% advisory |
 
-**11** pending · **1** `абракадабра` session · остання закрита **PH-S1000…S1009** ✅.
+**0** pending · **maintenance mode** · остання закрита **PH-S1010** ✅.
 
 ---
 

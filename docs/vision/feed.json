@@ -2,12 +2,11 @@
   "description": "RSS-style ticker of FM §5.12 sprint queue (open + recent closed)",
   "items": [
     {
-      "category": "open",
+      "category": "closed",
       "id": "PH-S1010",
       "link": "docs/vision/index.html#sprint-queue",
-      "next": true,
       "published": "2026-05-28",
-      "status": "open",
+      "status": "closed",
       "summary": "STABLE maintenance mode",
       "title": "FM §5.15 product-complete closure"
     },
@@ -109,15 +108,6 @@
       "status": "closed",
       "summary": "integration gap close",
       "title": "galaxy_horizon_s990_integration"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S998",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "hold",
-      "title": "Ratio hold advisory"
     }
   ],
   "link": "docs/vision/index.html",

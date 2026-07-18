@@ -1,10 +1,10 @@
 # Прогрес розробки PoolAI (менеджер функціоналу)
 
-**Оновлено:** 2026-07-18 (band 33 zriz · PH-S984 honest scope) · **Гілка:** `main`
+**Оновлено:** 2026-07-18 (PH-S1010 ✅ band 36 · FM **§5.15** ✅) · **Гілка:** `main`
 
 ---
 
-## 100% code scope (PH-S984)
+## 100% code scope (PH-S1010)
 
 | Шар | % | Примітка |
 |-----|---|----------|
@@ -12,10 +12,10 @@
 | **B. Architect P1–P5** | **100%** | Код + CI; LAN/cloud-sdk deep — BLOCKED/Deferred |
 | **C. Horizon P6 (S35–S40)** | **100%** | [`HORIZON_TO_100_PLAN.md`](../development/HORIZON_TO_100_PLAN.md) |
 | **A+B+C (офіційний code scope)** | **100%** | README / HANDOFF / FM §5.5 |
-| **D. Master backlog bands 1–33** | **✅ drained** | PH-S660…S989 |
-| **D′. Bands 34–36 + S1010** | **pending** | integration gap + final horizon + FM §5.15 |
+| **D. Master backlog bands 1–36** | **✅ drained** | PH-S660…S1010 (351/351) |
+| **D′. FM §5.15 product-complete** | **✅** | PH-S1010 |
 
-**Чесна примітка:** відсотки A+B+C = **100%** за autoprogon; master backlog D до **PH-S1010** ще не закритий — див. [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md).
+**Чесна примітка:** відсотки A+B+C+D = **100%**; maintenance mode — нові PH-S* лише за scan власника.
 
 ---
 
@@ -28,12 +28,11 @@
 | **A+B (офіційний autoprogon)** | **100%** | HANDOFF / README / FM §5.5 |
 | **C. Horizon (код P6)** | **100%** | S35–S40 ✅ — [`HORIZON_TO_100_PLAN.md`](../development/HORIZON_TO_100_PLAN.md) |
 | **Проєкт (A+B+C)/3** | **100%** | офіційний зріз після S40 |
-| **D. Master backlog PH-S660…S1010** | **96.9%** | 340/351 drained (bands 1–34); active band 35 — 10 `[ ]` |
-| **D′. Master + in-flight** | **96.9%** | 340/351 (330 ✅ + 10 active) |
-| **E. Sprint номер до S1010** | **97.0%** | PH-S989 / 1010 (орієнтир нумерації) |
-| **F. Зважений (60% A+B+C + 40% D)** | **~97.7%** | horizon KPI для drain до S1010 |
+| **D. Master backlog PH-S660…S1010** | **100%** | 351/351 drained |
+| **E. Sprint номер до S1010** | **100%** | PH-S1010 / 1010 |
+| **F. Зважений (60% A+B+C + 40% D)** | **100%** | product-complete KPI |
 
-**Наступна фаза (2026-07-18):** master backlog **11** pending PH-S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · FM **§5.14** · **`абракадабра`** drain band 35.
+**Режим (2026-07-18):** **maintenance mode** — [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · FM **§5.15** ✅.
 
 ---
 

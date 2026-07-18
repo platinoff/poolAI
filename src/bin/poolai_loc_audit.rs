@@ -21,7 +21,7 @@ const FORMAL_BAND_MAX: f64 = 0.95;
 const DEFAULT_WARN_BELOW: f64 = 0.93;
 const DEFAULT_TARGET: f64 = 0.95;
 const DEFAULT_STRETCH: f64 = 0.96;
-const SPRINT: &str = "PH-S1005";
+const SPRINT: &str = "PH-S1010";
 /// ui_js LOC at PH-S925 zriz (band 28 baseline for PH-S934 reduction metric).
 const UI_JS_BAND28_BASELINE_LOC: u64 = 2141;
 /// e2e_ts LOC at PH-S940 zriz (band 29 baseline for PH-S941 reduction metric).
@@ -409,6 +409,7 @@ fn build_report(
             "PH-S988: STABLE band 33 hold advisory — in_formal_band true; target 95% hold until band 34+",
             "PH-S998: integration gap band 34 hold advisory — in_formal_band true; target 95% hold until band 35+",
             "PH-S1008: multi-module band 35 hold advisory — in_formal_band true; target 95% hold until PH-S1010",
+            "PH-S1010: product-complete band 36 — ratio_95_formal_gate_met; stretch 96% advisory if below_stretch_spirit",
         ],
     })
 }

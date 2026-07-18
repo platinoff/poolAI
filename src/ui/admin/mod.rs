@@ -923,15 +923,16 @@ fn admin_charts_layer_exports() {
     assert!(js.contains("function poolaiFetchMlPipelines"));
     assert!(js.contains("poolaiChartsWasm"));
     assert!(js.contains("chartScale"));
-    assert!(js.contains("flattenMlStepRows"));
+    assert!(js.contains("renderMlPipelineMetricsPanel"));
     assert!(js.contains("renderSparklineHtml"));
     assert!(js.contains("renderLineChartHtml"));
     assert!(js.contains("groupMetricsByName"));
     assert!(js.contains("renderMetricsChartGridHtml"));
     assert!(js.contains("sanitizeChartId"));
     assert!(js.contains("renderLineChartEmptyHtml"));
-    assert!(js.contains("buildMetricHistoryUrl"));
-    assert!(js.contains("buildMetricsWindowUrl"));
+    assert!(js.contains("buildMetricHistoryUrlWithHours"));
+    assert!(js.contains("buildMetricsWindowUrlWithHours"));
+    assert!(js.contains("PH-S1010"));
 }
 
 #[test]
@@ -1124,7 +1125,7 @@ fn admin_charts_monitoring_alerts_url_wasm_first_ph_s344() {
 fn admin_charts_monitoring_active_alerts_url_wasm_first_ph_s355() {
     let js = include_str!("../admin_charts.js");
     assert!(js.contains("wasm.buildMonitoringActiveAlertsUrl"));
-    assert!(js.contains("acknowledged=false"));
+    assert!(!js.contains("acknowledged=false"));
 }
 
 #[test]
@@ -1564,7 +1565,7 @@ fn admin_payout_batch_trust_persist_wasm_first_ph_s912() {
 #[test]
 fn admin_charts_ml_canvas_glue_wasm_only_ph_s701() {
     let js = include_str!("../admin_charts.js");
-    assert!(js.contains("wasm.flattenMlStepRows"));
+    assert!(js.contains("wasm.renderMlPipelineMetricsPanel"));
     assert!(!js.contains("parseFloat(String(val))"));
     assert!(!js.contains("metrics-charts-grid"));
 }
