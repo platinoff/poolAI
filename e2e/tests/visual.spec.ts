@@ -7,6 +7,8 @@ import {
   TOPOLOGY_VISUAL_MASKS,
   visualMaskLocators,
   waitForAdminContentReady,
+  waitForAdminVisualReady,
+  waitForVisualSnapshotReady,
   type VisualLang,
   type VisualTheme,
 } from "./helpers";
@@ -80,6 +82,31 @@ const ADMIN_VISUAL_PAGES: Array<{
     masks: [...TOPOLOGY_VISUAL_MASKS],
     afterReady: "#topology-graph-svg",
   },
+  {
+    path: "/ui/admin/config",
+    name: "config",
+    content: "#config-content",
+  },
+  {
+    path: "/ui/admin/jobs",
+    name: "jobs",
+    content: "#jobs-list",
+  },
+  {
+    path: "/ui/admin/updates-compat",
+    name: "updates-compat",
+    content: "#updates-compat-panel",
+  },
+  {
+    path: "/ui/admin/seed-inventory",
+    name: "seed-inventory",
+    content: "#seed-inventory-panel",
+  },
+  {
+    path: "/ui/admin/security-advisories",
+    name: "security-advisories",
+    content: "#security-advisories-panel",
+  },
 ];
 
 test.describe("PoolAI admin visual regression (PH-S11)", () => {
@@ -90,12 +117,7 @@ test.describe("PoolAI admin visual regression (PH-S11)", () => {
   for (const { path, name, content, masks, afterReady } of ADMIN_VISUAL_PAGES) {
     test(`snapshot ${name}`, async ({ page }) => {
       await page.goto(path);
-      await waitForAdminContentReady(page, content);
-      if (afterReady) {
-        await expect(page.locator(afterReady).first()).toBeVisible({
-          timeout: 20_000,
-        });
-      }
+      await waitForAdminVisualReady(page, content, afterReady);
       const mask = masks?.length ? visualMaskLocators(page, masks) : undefined;
       await expect(page.locator("main.admin-main")).toHaveScreenshot(
         `${name}.png`,
@@ -114,7 +136,7 @@ test.describe("PoolAI login visual (PH-S11)", () => {
     await expect(page.locator("#loginForm, form")).toBeVisible({
       timeout: 15_000,
     });
-    await page.evaluate(() => document.fonts?.ready);
+    await waitForVisualSnapshotReady(page);
     await expect(page).toHaveScreenshot("login.png", {
       animations: "disabled",
       fullPage: true,
@@ -157,7 +179,7 @@ test.describe("PoolAI theme/i18n visual matrix (PH-S12)", () => {
           timeout: 15_000,
         });
         await expectVisualLang(page, lang);
-        await page.evaluate(() => document.fonts?.ready);
+        await waitForVisualSnapshotReady(page);
         await expect(page).toHaveScreenshot(
           matrixSnapshotName("login", theme, lang),
           { animations: "disabled", fullPage: true },
@@ -173,6 +195,7 @@ test.describe("PoolAI theme/i18n visual matrix (PH-S12)", () => {
         const mask = spec.masks?.length
           ? visualMaskLocators(page, spec.masks)
           : undefined;
+        await waitForVisualSnapshotReady(page);
         await expect(page.locator("main.admin-main")).toHaveScreenshot(
           matrixSnapshotName("users", theme, lang),
           { animations: "disabled", mask },
@@ -193,6 +216,7 @@ test.describe("PoolAI theme/i18n visual matrix (PH-S12)", () => {
         const mask = spec.masks?.length
           ? visualMaskLocators(page, spec.masks)
           : undefined;
+        await waitForVisualSnapshotReady(page);
         await expect(page.locator("main.admin-main")).toHaveScreenshot(
           matrixSnapshotName("dashboard", theme, lang),
           { animations: "disabled", mask },

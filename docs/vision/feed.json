@@ -93,21 +93,21 @@
     },
     {
       "category": "closed",
-      "id": "PH-S1018",
+      "id": "PH-S1058",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "galaxy_horizon_s1011_integration`; RUN_LOCAL sync",
-      "title": "Ops power band close"
+      "summary": "galaxy_horizon_s1049_integration`; HANDOFF/NEXT",
+      "title": "E2E visual/axe band close"
     },
     {
       "category": "closed",
-      "id": "PH-S1017",
+      "id": "PH-S1057",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "power menu; localStorage; soft/hard reload",
-      "title": "Vision poweroff/reset controls"
+      "summary": "depth enum + FM band 41 markers",
+      "title": "ui-core depth stub"
     }
   ],
   "link": "docs/vision/index.html",

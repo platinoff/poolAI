@@ -2312,6 +2312,12 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_admin_tables_forms_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_vision_map_depth_rs"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -9504,9 +9510,23 @@
       "label": "galaxy_horizon_s1029_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s1029_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_vision_map_depth_rs",
+      "label": "vision_map_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/vision_map_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1039_integration_rs",
+      "label": "galaxy_horizon_s1039_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1039_integration.rs"
     }
   ],
-  "revision": 312,
+  "revision": 313,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -18084,6 +18104,96 @@
       "row": 953,
       "status": "closed",
       "title": "Ops power band close"
+    },
+    {
+      "acceptance": "config + jobs snapshots",
+      "deps": "e2e/tests/visual.spec.ts",
+      "id": "PH-S1049",
+      "open": false,
+      "row": 984,
+      "status": "closed",
+      "title": "Visual parity tier-1"
+    },
+    {
+      "acceptance": "updates-compat, seed, advisories",
+      "deps": "visual.spec.ts",
+      "id": "PH-S1050",
+      "open": false,
+      "row": 985,
+      "status": "closed",
+      "title": "Visual parity tier-2 grid panels"
+    },
+    {
+      "acceptance": "axe on vision map; skip when server down",
+      "deps": "e2e/tests/a11y.spec.ts",
+      "id": "PH-S1051",
+      "open": false,
+      "row": 986,
+      "status": "closed",
+      "title": "Vision axe smoke"
+    },
+    {
+      "acceptance": "masked starfield/orbit shell baseline",
+      "deps": "e2e/tests/vision.spec.ts",
+      "id": "PH-S1052",
+      "open": false,
+      "row": 987,
+      "status": "closed",
+      "title": "Vision map visual snapshot"
+    },
+    {
+      "acceptance": "config, jobs, tenants HC color-contrast",
+      "deps": "a11y.spec.ts",
+      "id": "PH-S1053",
+      "open": false,
+      "row": 988,
+      "status": "closed",
+      "title": "High-contrast axe extend"
+    },
+    {
+      "acceptance": "waitForVisualSnapshotReady` fonts+rAF",
+      "deps": "e2e/tests/helpers.ts",
+      "id": "PH-S1054",
+      "open": false,
+      "row": 989,
+      "status": "closed",
+      "title": "Visual snapshot ready helper"
+    },
+    {
+      "acceptance": "tier1/tier2 routes + baseline PNG gate",
+      "deps": "tests/e2e_scope_audit.rs",
+      "id": "PH-S1055",
+      "open": false,
+      "row": 990,
+      "status": "closed",
+      "title": "e2e scope visual/axe parity"
+    },
+    {
+      "acceptance": "poolai-loc-audit band 41 zriz",
+      "deps": "rust_ratio.json",
+      "id": "PH-S1056",
+      "open": false,
+      "row": 991,
+      "status": "closed",
+      "title": "rust_ratio loc-audit"
+    },
+    {
+      "acceptance": "depth enum + FM band 41 markers",
+      "deps": "e2e_visual_axe_depth.rs",
+      "id": "PH-S1057",
+      "open": false,
+      "row": 992,
+      "status": "closed",
+      "title": "ui-core depth stub"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1049_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1058",
+      "open": false,
+      "row": 993,
+      "status": "closed",
+      "title": "E2E visual/axe band close"
     },
     {
       "acceptance": "skip to map/queue/preview; `role=\"main\"",

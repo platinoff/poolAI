@@ -1,8 +1,27 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-18 (band 40 **PH-S1039…S1048** ✅ · horizon bands 41–47)
+**Оновлено:** 2026-07-18 (band 41 **PH-S1049…S1058** ✅ · horizon bands 42–47)
 
-**Наступна сесія:** **`абракадабра`** — project scan → band 41.
+**Наступна сесія:** **`абракадабра`** — project scan → band 42.
+
+## Band 41 — E2E visual/axe regression (PH-S1049…S1058, ✅)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1049** | Visual parity tier-1 (config, jobs) |
+| **PH-S1050** | Visual parity tier-2 grid panels (updates, seed, advisories) |
+| **PH-S1051** | Vision axe smoke |
+| **PH-S1052** | Vision map visual snapshot |
+| **PH-S1053** | High-contrast axe extend |
+| **PH-S1054** | `waitForVisualSnapshotReady` helper |
+| **PH-S1055** | e2e scope visual/axe parity gate |
+| **PH-S1056** | rust_ratio loc-audit |
+| **PH-S1057** | `e2e_visual_axe_depth` ui-core stub |
+| **PH-S1058** | Band close |
+
+**§5.12:** **0** відкритих (band 41 ✅). **Vision:** rev **313**.
+
+**PH-S1058 ✅ (2026-07-18):** Visual snapshots for 8 admin routes; vision axe + HC extend; `galaxy_horizon_s1049_integration`; vision **rev 313**.
 
 ## Band 40 — Vision map/a11y/perf (PH-S1039…S1048, ✅)
 

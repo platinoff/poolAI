@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-07-18 (band 40 PH-S1039…S1048 ✅ · horizon bands 41–47)
+**Оновлено:** 2026-07-18 (band 41 PH-S1049…S1058 ✅ · horizon bands 42–47)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -1221,7 +1221,18 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 40 ✅). **Master horizon:** PH-S1049…S1118 (bands 41–47). Vision rev **312** (після sync). **Наступна сесія:** **`абракадабра`** — project scan → band 41.
+**Відкритих у §5.12:** **0** (band 41 ✅). **Master horizon:** PH-S1059…S1118 (bands 42–47). Vision rev **313** (після sync). **Наступна сесія:** **`абракадабра`** — project scan → band 42.
+
+| 984 | **PH-S1049** | Visual parity tier-1 | `e2e/tests/visual.spec.ts` | config + jobs snapshots | **✅** |
+| 985 | **PH-S1050** | Visual parity tier-2 grid panels | `visual.spec.ts` | updates-compat, seed, advisories | **✅** |
+| 986 | **PH-S1051** | Vision axe smoke | `e2e/tests/a11y.spec.ts` | axe on vision map; skip when server down | **✅** |
+| 987 | **PH-S1052** | Vision map visual snapshot | `e2e/tests/vision.spec.ts` | masked starfield/orbit shell baseline | **✅** |
+| 988 | **PH-S1053** | High-contrast axe extend | `a11y.spec.ts` | config, jobs, tenants HC color-contrast | **✅** |
+| 989 | **PH-S1054** | Visual snapshot ready helper | `e2e/tests/helpers.ts` | `waitForVisualSnapshotReady` fonts+rAF | **✅** |
+| 990 | **PH-S1055** | e2e scope visual/axe parity | `tests/e2e_scope_audit.rs` | tier1/tier2 routes + baseline PNG gate | **✅** |
+| 991 | **PH-S1056** | rust_ratio loc-audit | `rust_ratio.json` | poolai-loc-audit band 41 zriz | **✅** |
+| 992 | **PH-S1057** | ui-core depth stub | `e2e_visual_axe_depth.rs` | depth enum + FM band 41 markers | **✅** |
+| 993 | **PH-S1058** | E2E visual/axe band close | tests/docs | `galaxy_horizon_s1049_integration`; HANDOFF/NEXT | **✅** |
 
 | 974 | **PH-S1039** | Skip links + landmarks | `docs/vision/index.html` | skip to map/queue/preview; `role="main"` | **✅** |
 | 975 | **PH-S1040** | Icon control aria-label parity | `docs/vision/` | header/map/panel icon buttons labeled; `aria-pressed` toggles | **✅** |
@@ -1233,6 +1244,10 @@ FM-xxx (з таблиці нижче)
 | 981 | **PH-S1046** | ui-core depth stub | `vision_map_depth.rs` | depth enum + FM band 40 markers | **✅** |
 | 982 | **PH-S1047** | Vision Playwright smoke | `e2e/tests/vision.spec.ts` | skip-link focus; `#map-scene-3d`; tree role | **✅** |
 | 983 | **PH-S1048** | Vision map band close | tests/docs | `galaxy_horizon_s1039_integration`; HANDOFF/NEXT | **✅** |
+
+### 5.22 E2E visual/axe regression queue — band 41 (PH-S1049…S1058, 2026-07-18)
+
+**Джерело:** project scan band 41 — visual snapshots missing grid panels; vision axe gap; HC axe thin.
 
 ### 5.21 Vision map/a11y/perf queue — band 40 (PH-S1039…S1048, 2026-07-18)
 
@@ -1275,7 +1290,7 @@ FM-xxx (з таблиці нижче)
 | **38** | S1019…S1028 | Power UX + clippy/ui-core hygiene ✅ |
 | **39** | S1029…S1038 | Admin tables/forms polish (FM-019) ✅ |
 | **40** | S1039…S1048 | Vision map/a11y/perf ✅ |
-| 41 | S1049…S1058 | E2E visual/axe regression band |
+| **41** | S1049…S1058 | E2E visual/axe regression band ✅ |
 | 42 | S1059…S1068 | OpenAPI/docs wire sync |
 | 43 | S1069…S1078 | Grid metrics parity hardening |
 | 44 | S1079…S1088 | wasm admin slim panels |
@@ -1310,7 +1325,7 @@ FM-xxx (з таблиці нижче)
 | **Drained bands 1–36** | PH-S660…S1010 ✅ |
 | **Активна §5.12** | — (maintenance mode) |
 | **Наступна promote** | — (owner scan only) |
-| **Сесій `абракадабра`** | — (maintenance mode) |
+| **Сесій `абракадабра`** | band 41 drained (PH-S1049…S1058) |
 | **План фаз** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md) |
 | **Реєстр sprint×acceptance** | [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) |
 | **Regen** | `bash scripts/generate-ph-s-master-backlog-351.sh` |
@@ -1390,7 +1405,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-18):** band 40 **PH-S1039…S1048** ✅ · §5.12 **0** · наступна **`абракадабра`** → project scan → band 41.
+**Активна смуга (2026-07-18):** band 41 **PH-S1049…S1058** ✅ · §5.12 **0** · наступна **`абракадабра`** → project scan → band 42.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

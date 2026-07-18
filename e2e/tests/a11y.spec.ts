@@ -61,6 +61,9 @@ const HC_AXE_PAGES: {
   { path: "/ui/login", waitFor: "#loginForm", auth: false },
   { path: "/ui/admin/users", waitFor: "#users-list", auth: true },
   { path: "/ui/admin/monitoring", waitFor: "#monitoring-content", auth: true },
+  { path: "/ui/admin/config", waitFor: "#config-content", auth: true },
+  { path: "/ui/admin/jobs", waitFor: "#jobs-list", auth: true },
+  { path: "/ui/admin/tenants", waitFor: "#tenants-list", auth: true },
 ];
 
 test.describe("axe accessibility (S33, FM-031)", () => {
@@ -115,4 +118,31 @@ test.describe("axe high-contrast color-contrast (PH-S14)", () => {
       expect(criticalAndSerious(results.violations)).toEqual([]);
     });
   }
+});
+
+const visionUrl =
+  process.env.POOLAI_VISION_URL ??
+  "http://127.0.0.1:8765/docs/vision/index.html";
+
+test.describe("axe vision map (PH-S1051)", () => {
+  test("vision index — no critical/serious violations", async ({ page }) => {
+    test.skip(
+      process.env.POOLAI_VISION_SKIP === "1",
+      "vision server not started",
+    );
+    try {
+      await page.goto(visionUrl, { waitUntil: "domcontentloaded", timeout: 15_000 });
+    } catch {
+      test.skip(true, "vision server unavailable");
+    }
+    await page.locator("#map-scene-3d, #map-scene, .map-scene, #vision-map").first().waitFor({
+      state: "visible",
+      timeout: 20_000,
+    });
+    const results = await new AxeBuilder({ page })
+      .withTags(AXE_TAGS)
+      .exclude("#map-starfield, .map-orbit-layer")
+      .analyze();
+    expect(criticalAndSerious(results.violations)).toEqual([]);
+  });
 });

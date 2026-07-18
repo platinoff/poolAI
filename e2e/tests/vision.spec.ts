@@ -87,4 +87,18 @@ test.describe("Vision solar layout (PH-S565)", () => {
     const tree = page.locator("#file-tree[role='tree']");
     await expect(tree).toBeVisible();
   });
+
+  test("vision map shell visual snapshot (PH-S1052)", async ({ page }) => {
+    const map = page.locator("#map-scene-3d, #map-scene, .map-scene, #vision-map").first();
+    await expect(map).toBeVisible({ timeout: 20_000 });
+    await page.evaluate(() => document.fonts?.ready);
+    await expect(page.locator("body")).toHaveScreenshot("vision-map-shell.png", {
+      animations: "disabled",
+      mask: [
+        page.locator("#map-starfield"),
+        page.locator(".map-orbit-layer"),
+        page.locator("#map-svg"),
+      ],
+    });
+  });
 });

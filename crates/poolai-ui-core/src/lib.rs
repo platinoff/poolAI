@@ -13,6 +13,7 @@ pub mod concept_markers_depth;
 pub mod design_tokens;
 pub mod digest_depth;
 pub mod docs_legacy_depth;
+pub mod e2e_visual_axe_depth;
 pub mod format;
 pub mod galaxy_telegram_seats;
 pub mod galaxy_virtual_nodes;

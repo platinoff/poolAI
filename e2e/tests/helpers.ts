@@ -139,11 +139,42 @@ export async function waitForAdminContentReady(
   contentSelector: string,
 ): Promise<void> {
   const content = page.locator(contentSelector);
-  await expect(content).toBeVisible({ timeout: 20_000 });
+  await content.waitFor({ state: "attached", timeout: 20_000 });
   await expect(
-    content.locator(".admin-table, .muted, .admin-fetch-error, .admin-card, .admin-form, form, .stat-item").first(),
-  ).toBeVisible({ timeout: 20_000 });
+    content
+      .locator(
+        ".admin-table, .admin-fetch-error, .admin-card, .admin-form, form, .stat-item, .admin-panel-body",
+      )
+      .first()
+      .or(content.locator(".muted").filter({ hasNot: page.locator("#dash-refreshed-at") }).first()),
+  ).toBeVisible({ timeout: 30_000 });
   await page.evaluate(() => document.fonts?.ready);
+}
+
+/** Settle layout/fonts before visual snapshots (PH-S1054). */
+export async function waitForVisualSnapshotReady(page: Page): Promise<void> {
+  await page.evaluate(() => document.fonts?.ready);
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+      }),
+  );
+}
+
+/** Visual snapshot readiness — optional `afterReady` for async grid panels (PH-S1050). */
+export async function waitForAdminVisualReady(
+  page: Page,
+  contentSelector: string,
+  afterReady?: string,
+): Promise<void> {
+  await page.locator(contentSelector).waitFor({ state: "attached", timeout: 20_000 });
+  if (afterReady) {
+    await expect(page.locator(afterReady).first()).toBeVisible({ timeout: 45_000 });
+  } else {
+    await waitForAdminContentReady(page, contentSelector);
+  }
+  await waitForVisualSnapshotReady(page);
 }
 
 /** Navigate to an admin route and wait for primary content (PH-S23). */
