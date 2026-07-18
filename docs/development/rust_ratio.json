@@ -1,6 +1,6 @@
 {
   "generated_at": "2026-07-18",
-  "sprint": "PH-S995",
+  "sprint": "PH-S1005",
   "formal_band_min": 0.9,
   "formal_band_max": 0.95,
   "warn_below": 0.93,
@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": false,
   "min_ratio": null,
-  "rust_loc": 151491,
+  "rust_loc": 151819,
   "non_rust_product_loc": 8081,
-  "product_loc_total": 159572,
-  "rust_ratio": 0.9493582834081167,
-  "rust_ratio_pct": 94.93582834081167,
+  "product_loc_total": 159900,
+  "rust_ratio": 0.9494621638524078,
+  "rust_ratio_pct": 94.94621638524077,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -45,16 +45,16 @@
       "loc": 608
     },
     "rust_crates": {
-      "files": 52,
-      "loc": 12139
+      "files": 53,
+      "loc": 12251
     },
     "rust_src": {
       "files": 294,
-      "loc": 105846
+      "loc": 105862
     },
     "rust_tests": {
-      "files": 213,
-      "loc": 32898
+      "files": 216,
+      "loc": 33098
     },
     "ui_css": {
       "files": 2,
@@ -79,6 +79,7 @@
     "PH-S968: docs legacy band 31 hold advisory — in_formal_band true; target 95% hold until band 32+",
     "PH-S978: concept band 32 hold advisory — in_formal_band true; target 95% hold until band 33+",
     "PH-S988: STABLE band 33 hold advisory — in_formal_band true; target 95% hold until band 34+",
-    "PH-S998: integration gap band 34 hold advisory — in_formal_band true; target 95% hold until band 35+"
+    "PH-S998: integration gap band 34 hold advisory — in_formal_band true; target 95% hold until band 35+",
+    "PH-S1008: multi-module band 35 hold advisory — in_formal_band true; target 95% hold until PH-S1010"
   ]
 }

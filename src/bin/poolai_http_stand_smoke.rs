@@ -3993,6 +3993,23 @@ mod tests {
     }
 
     #[test]
+    fn multi_module_stand_smoke_full_suite_ph_s1002() {
+        use poolai_ui_core::multi_module_depth::{
+            multi_module_depth_stub, MultiModuleDepth, MULTI_MODULE_BAND35_TOP5_GRID_APIS,
+            STAND_SMOKE_FULL_SUITE,
+        };
+        use serde_json::json;
+
+        assert_eq!(
+            multi_module_depth_stub(Some(&json!({"stand_smoke": true}))),
+            MultiModuleDepth::StandSmoke
+        );
+        assert_eq!(MULTI_MODULE_BAND35_TOP5_GRID_APIS.len(), 5);
+        assert!(STAND_SMOKE_FULL_SUITE.contains("--json"));
+        stand_smoke_export_shape_regression_suite_ph_s834();
+    }
+
+    #[test]
     fn grid_metrics_band6_prometheus_parity_export_shape_ph_s713() {
         use poolai::grid::stand_smoke_metrics_parity::validate_band6_metrics_parity;
         let prom = concat!(

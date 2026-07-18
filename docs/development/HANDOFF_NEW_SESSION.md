@@ -1,8 +1,8 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-18 (PH-S990…S999 ✅ band 34 · active **PH-S1000…S1009** · vision **rev 304** · rust_ratio **94.94%**)
+**Оновлено:** 2026-07-18 (PH-S1000…S1009 ✅ band 35 · active **PH-S1010** · vision **rev 305** · rust_ratio **94.95%**)
 
-**Cursor 3.12.17 (2026-07-17):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-07-17.md`](./CURSOR_UPDATE_RESEARCH_2026-07-17.md). **PH-S990…S999 ✅ band 34** — integration test gap fill. **Наступна product-сесія:** **`абракадабра`** (drain PH-S1000…S1009).
+**Cursor 3.12.17 (2026-07-17):** post-update research — [`CURSOR_UPDATE_RESEARCH_2026-07-17.md`](./CURSOR_UPDATE_RESEARCH_2026-07-17.md). **PH-S1000…S1009 ✅ band 35** — final multi-module horizon. **Наступна product-сесія:** **`абракадабра`** (drain PH-S1010 product-complete).
 
 ## Maintenance mode (template, PH-S983 — post-S1010)
 
@@ -20,7 +20,9 @@
 
 **Completion roadmap v2 (2026-06-20):** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) — **101** спринтів до **product-complete** (PH-S1010 / FM **§5.15**); **2** сесій `абракадабра` × 10 PH-S* + tail S1010 залишилось. Реєстр: [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) · regen `bash scripts/generate-ph-s-master-backlog-351.sh`.
 
-**Master backlog 11 (2026-07-18):** FM **§5.14**. Активна §5.12: **PH-S1000…S1009** (band 35 — final multi-module horizon). **`абракадабра`** = drain 10 → promote **PH-S1010** (band 36).
+**Master backlog 11 (2026-07-18):** FM **§5.14**. Активна §5.12: **PH-S1010** (band 36 — product-complete closure). **`абракадабра`** = drain PH-S1010 → maintenance mode.
+
+**PH-S1000…S1009 ✅ (2026-07-18):** `multi_module_wire_smoke.rs` top 5 grid APIs (PH-S1000); `multi_module_admin_wasm_regression.rs` ui-core gate (PH-S1001); `multi_module_stand_smoke_audit.rs` + stand smoke `--json` (PH-S1002); cargo test-ci scope note final HANDOFF (PH-S1003); openapi-gap + test-ci dual gate FM (PH-S1004); `poolai-loc-audit` → `rust_ratio.json` **94.95%** (PH-S1005); `multi_module_depth_stub` + `galaxy_horizon_s1000_integration` (PH-S1009); vision **rev 305**.
 
 **PH-S990…S999 ✅ (2026-07-18):** `telegram_wallet_integration.rs` (PH-S990); grid job lease canon extend (PH-S991); protocol middleware canon (PH-S992); jobs RAID restart canon (PH-S993); vm write lifecycle PH-S994; `poolai-loc-audit` → `rust_ratio.json` **94.94%** (PH-S995); `poolai-testing-policy` band 34 gap note (PH-S996); `integration_gap_depth_stub` + `galaxy_horizon_s990_integration` (PH-S999); vision **rev 304**.
 
@@ -88,7 +90,7 @@
 
 **Rules:** **`абракадабра`** — drain 10 з §5.12 → vision close → push; [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
-**§5.12:** **10** відкритих **PH-S1000…S1009** (band 35). **Vision:** rev **304** · rust_ratio **94.94%** (PH-S995). **Service:** FM §5.16 PH-SVC01…SVC10 ✅ (2026-07-17).
+**§5.12:** **1** відкритий **PH-S1010** (band 36). **Vision:** rev **305** · rust_ratio **94.95%** (PH-S1005). **Service:** FM §5.16 PH-SVC01…SVC10 ✅ (2026-07-17).
 
 **Роадмеп:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) · **Промпт:** [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md).
 
@@ -186,6 +188,7 @@ Runbook: [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) �
 - **Priority 3 / FM-005 (HTTP-шар)** ✅: `json_errors.rs` — **`HttpAppError`**, **`IntoResponse`**; **`AppError::RestError`**. Покриття: **`api/*`**, **`raid*`** (**`raid_api_err`**), **`enterprise_api`**, **`authenticate_user`** / **`refresh_access_token`** / **`login`/`refresh` handlers**, **`check_permission`**, **`auth_middleware`** / **`permission_middleware`**.
 - **P3 (auth / WS / rate limit)**: **`auth.rs`**, **`ws.rs`**, **`rate_limit.rs`** — той самий JSON-формат помилок (`src/network/json_errors.rs`); UI читає `error.message`. **`http_status_for_app_error`**, **`IntoResponse`** для **`AppError`** / **`HttpAppError`**. Приклад змішаного стилю: **`api/rewards.rs`** — частина GET → **`Result<Json<_>, AppError>`**, **`/rewards/progress/*`** → **`Result<_, HttpAppError>`** (**`ApiNotFound`** / **`NOT_FOUND`**).
 - **Перевірка тестів (як CI)**: `K8S_OPENAPI_ENABLED_VERSION=1.28` + `cargo test-ci` (alias у `.cargo/config.toml`: `ml,enterprise,cloud,test-utils,job-store-sqlite,prometheus`). **Raft (PH-S04…S06, PH-S21):** `cargo test-raft-ci` — `raft_wire_integration` + `raft_multi_node_harness` + `raft_membership_log` (`--features raft,test-utils`). Інжектований `AppState`: `tests/appstate_http_injection_integration.rs`, `vm_api_contracts.rs`, `distributed_raid_wire_integration`. На Windows при OOM: `-j 1 -- --test-threads=1`.
+- **cargo test-ci scope note final (PH-S1003, band 35):** API/grid/job/telegram wire → `cargo test-ci` (+ `poolai-openapi-gap-audit` після API); Raft scope → `cargo test-raft-ci`; Admin UI / axe / visual → `bash bin/e2e-playwright.sh --start`; API-only band — Playwright skip не блокує push якщо `cargo test-ci` green. Див. [`.cursor/rules/poolai-testing-policy.mdc`](../../.cursor/rules/poolai-testing-policy.mdc) band 35.
 - **Clippy (2026-04-10):** перед push доцільно прогнати ті самі команди, що в [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml): `cargo clippy --all-targets --no-default-features -- -D warnings`, `cargo clippy --all-targets --features jwt,https -- -D warnings`, і з `K8S_OPENAPI_ENABLED_VERSION=1.28` — `cargo clippy --all-targets --features cloud,cloud-sdk -- -D warnings`. Для змін у **enterprise** / UI — також `cargo clippy -p poolai --features enterprise -- -D warnings`. Код і `tests/*` вирівняні під ці матриці.
 - **FM-012 ✅ (2026-05-16):** i18n UA/EN + Telegram OAuth hardening — [`oauth.rs`](../../src/network/enterprise_api/oauth.rs), [`security.rs`](../../src/enterprise/security.rs), [`i18n_core.js`](../../src/ui/i18n_core.js); unit-тести allowlist/expiry/RBAC.
 

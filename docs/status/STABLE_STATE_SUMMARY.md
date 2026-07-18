@@ -1,5 +1,5 @@
 # 📊 Стабільний стан розробки PoolAI
-## Rust Architect — оновлено 2026-07-18 (PH-S990…S999 ✅ band 34 integration gap; **band 35 PH-S1000** final multi-module; rust_ratio **94.94%**; §5.12 **10**)
+## Rust Architect — оновлено 2026-07-18 (PH-S1000…S1009 ✅ band 35 final multi-module; **band 36 PH-S1010** product-complete; rust_ratio **94.95%**; §5.12 **1**)
 
 **Completion plan:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.15** at PH-S1010.
 
@@ -15,8 +15,8 @@
 |----------|----------------|
 | Galaxy concept gaps (§4–§9 wire) | ✅ implemented markers bands 7–32 |
 | OpenAPI gap | ✅ `poolai-openapi-gap-audit` → **0** (PH-S841) |
-| Rust ratio | **94.94%** — formal 90–95% ✅; target **95%** advisory hold (PH-S998) |
-| Integration coverage | band **35** pending (PH-S1000…S1009); band 34 ✅ |
+| Rust ratio | **94.95%** — formal 90–95% ✅; target **95%** advisory hold (PH-S1008) |
+| Integration coverage | band **36** pending (PH-S1010); band 35 ✅ |
 | Docs canon | STABLE draft + INDEX step 1–12 zriz (PH-S981) |
 | Vision | `poolai-vision-sync --check` green after band close |
 | **BLOCKED / Deferred** | FM-003 LAN 2-host · FM-041 Cloud SDK prod · ZK/TEE roadmap |

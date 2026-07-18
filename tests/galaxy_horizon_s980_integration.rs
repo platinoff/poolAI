@@ -64,7 +64,11 @@ fn horizon_s980_band_stable_product_complete_close_ph_s989() {
     let ratio_json: serde_json::Value =
         serde_json::from_str(include_str!("../docs/development/rust_ratio.json"))
             .expect("rust_ratio.json");
-    assert_eq!(ratio_json["sprint"].as_str().unwrap(), "PH-S995");
+    let sprint = ratio_json["sprint"].as_str().unwrap();
+    assert!(
+        sprint == "PH-S1005" || sprint == "PH-S995",
+        "rust_ratio sprint should reflect band 33–35 loc-audit zriz, got {sprint}"
+    );
     assert!(ratio_json["in_formal_band"].as_bool().unwrap_or(false));
 
     let notes = ratio_json["notes"].as_array().expect("notes");

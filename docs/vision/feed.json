@@ -3,94 +3,103 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S1000",
+      "id": "PH-S1010",
       "link": "docs/vision/index.html#sprint-queue",
       "next": true,
       "published": "2026-05-28",
       "status": "open",
-      "summary": "top 5 grid APIs one test",
-      "title": "multi-module wire smoke harness"
+      "summary": "STABLE maintenance mode",
+      "title": "FM §5.15 product-complete closure"
     },
     {
-      "category": "open",
-      "id": "PH-S1001",
+      "category": "closed",
+      "id": "PH-S1009",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
-      "status": "open",
-      "summary": "ui-core full test gate",
-      "title": "multi-module admin wasm regression"
+      "status": "closed",
+      "summary": "final code band close",
+      "title": "galaxy_horizon_s1000_integration"
     },
     {
-      "category": "open",
-      "id": "PH-S1002",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "bin --json all green",
-      "title": "multi-module stand smoke full suite"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1003",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "HANDOFF",
-      "title": "cargo test-ci scope note final"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1004",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "FM",
-      "title": "openapi-gap + test-ci dual gate doc"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1005",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "rust_ratio.json zriz",
-      "title": "poolai-loc-audit PH-S1005"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1006",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "poolai-vision-sync",
-      "title": "vision manifest final sprint_queue"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1007",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "--check` green",
-      "title": "poolai-vision-sync --check"
-    },
-    {
-      "category": "open",
+      "category": "closed",
       "id": "PH-S1008",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
-      "status": "open",
+      "status": "closed",
       "summary": "final pre-S1010",
       "title": "Ratio hold advisory"
     },
     {
-      "category": "open",
-      "id": "PH-S1009",
+      "category": "closed",
+      "id": "PH-S1007",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
-      "status": "open",
-      "summary": "final code band close",
-      "title": "galaxy_horizon_s1000_integration"
+      "status": "closed",
+      "summary": "--check` green",
+      "title": "poolai-vision-sync --check"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1006",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "poolai-vision-sync",
+      "title": "vision manifest final sprint_queue"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1005",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "rust_ratio.json zriz",
+      "title": "poolai-loc-audit PH-S1005"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1004",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "FM",
+      "title": "openapi-gap + test-ci dual gate doc"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1003",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "HANDOFF",
+      "title": "cargo test-ci scope note final"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1002",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "bin --json all green",
+      "title": "multi-module stand smoke full suite"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1001",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "ui-core full test gate",
+      "title": "multi-module admin wasm regression"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1000",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "top 5 grid APIs one test",
+      "title": "multi-module wire smoke harness"
     },
     {
       "category": "closed",
@@ -108,96 +117,6 @@
       "published": "2026-05-28",
       "status": "closed",
       "summary": "hold",
-      "title": "Ratio hold advisory"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S997",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--check` green",
-      "title": "poolai-vision-sync --check"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S996",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "docs",
-      "title": "poolai-testing-policy gap note"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S995",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "rust_ratio.json zriz",
-      "title": "poolai-loc-audit PH-S995"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S994",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "extend if gap",
-      "title": "integration gap: vm write lifecycle"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S993",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "extend if gap",
-      "title": "integration gap: jobs raid restart"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S992",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "extend if gap",
-      "title": "integration gap: protocol middleware"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S991",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "extend if gap",
-      "title": "integration gap: grid job lease"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S990",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "tests/* if missing",
-      "title": "integration gap: telegram wallet"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S989",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "STABLE band close",
-      "title": "galaxy_horizon_s980_integration"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S988",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "final hold",
       "title": "Ratio hold advisory"
     }
   ],

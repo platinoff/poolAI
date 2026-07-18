@@ -82,11 +82,11 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 ### Next Focus (2026-07-18)
 
-**Product-complete path:** bands 1–34 ✅ · active **PH-S1000…S1009** (band 35 final multi-module) · tail **PH-S1010** / FM **§5.15**.
+**Product-complete path:** bands 1–35 ✅ · active **PH-S1010** (band 36 product-complete) · FM **§5.15**.
 
-**§5.12:** **10** active **PH-S1000…S1009** (band 35) · vision **rev 304** · rust_ratio **94.94%** (formal 90–95% ✅; hold 95% advisory PH-S998).
+**§5.12:** **1** active **PH-S1010** (band 36) · vision **rev 305** · rust_ratio **94.95%** (formal 90–95% ✅; hold 95% advisory PH-S1008).
 
-**Наступна product-сесія:** **`абракадабра`** — drain band 35 → promote PH-S1010 ([`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md)).
+**Наступна product-сесія:** **`абракадабра`** — drain PH-S1010 product-complete ([`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md)).
 
 **Maintenance mode (PH-S982):** після **PH-S1010** — HANDOFF/NEXT переходять на maintenance template; нові PH-S* лише за явним scan власника (BLOCKED/Deferred horizon).
 

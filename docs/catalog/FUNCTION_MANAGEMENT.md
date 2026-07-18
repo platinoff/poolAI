@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-07-18 (PH-S990…S999 ✅ band 34 · active **PH-S1000…S1009** · vision **rev 304** · rust_ratio **94.94%**)
+**Оновлено:** 2026-07-18 (PH-S1000…S1009 ✅ band 35 · active **PH-S1010** · vision **rev 305** · rust_ratio **94.95%**)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -237,6 +237,8 @@ FM-xxx (з таблиці нижче)
 ### 5.11 Наступні 10 спринтів PH-S55…S64 (Galaxy Grid + ops/docs, 2026-05-26)
 
 **VDT / локальний CI:** одна сесія = один PH-S*; верифікація — `cargo test-ci` (+ scope: raft, openapi-gap, e2e). GitHub Actions — довідково. Правила — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc). Якщо відкритих <10 — **project scan** всього репо (не лише §5.12) і доповнити §5.12 (**max 10**).
+
+**Dual gate (PH-S1004, band 35):** API scope перед push — **`cargo test-ci`** **і** **`cargo run --bin poolai-openapi-gap-audit`** (0 missing). Playwright лише browser scope; див. [`.cursor/rules/poolai-testing-policy.mdc`](../../.cursor/rules/poolai-testing-policy.mdc) band 35 multi-module.
 
 **Джерела (пріоритет):** локальні failures → §5.10 → [`DOCS_LEGACY_AUDIT_2026-05-19.md`](../development/DOCS_LEGACY_AUDIT_2026-05-19.md) → Architect / UI_UX / [`E2E_PLAYWRIGHT.md`](../development/E2E_PLAYWRIGHT.md).
 
@@ -1199,20 +1201,21 @@ FM-xxx (з таблиці нижче)
 | 932 | **PH-S997** | poolai-vision-sync --check | ops | `--check` green | **✅** |
 | 933 | **PH-S998** | Ratio hold advisory | ops | hold | **✅** |
 | 934 | **PH-S999** | galaxy_horizon_s990_integration | tests | integration gap close | **✅** |
-| 935 | **PH-S1000** | multi-module wire smoke harness | tests | top 5 grid APIs one test | **[ ]** |
-| 936 | **PH-S1001** | multi-module admin wasm regression | tests | ui-core full test gate | **[ ]** |
-| 937 | **PH-S1002** | multi-module stand smoke full suite | ops | bin --json all green | **[ ]** |
-| 938 | **PH-S1003** | cargo test-ci scope note final | docs | HANDOFF | **[ ]** |
-| 939 | **PH-S1004** | openapi-gap + test-ci dual gate doc | docs | FM | **[ ]** |
-| 940 | **PH-S1005** | poolai-loc-audit PH-S1005 | §5.13 | rust_ratio.json zriz | **[ ]** |
-| 941 | **PH-S1006** | vision manifest final sprint_queue | ops | poolai-vision-sync | **[ ]** |
-| 942 | **PH-S1007** | poolai-vision-sync --check | ops | `--check` green | **[ ]** |
-| 943 | **PH-S1008** | Ratio hold advisory | ops | final pre-S1010 | **[ ]** |
-| 944 | **PH-S1009** | galaxy_horizon_s1000_integration | tests | final code band close | **[ ]** |
+| 935 | **PH-S1000** | multi-module wire smoke harness | tests | top 5 grid APIs one test | **✅** |
+| 936 | **PH-S1001** | multi-module admin wasm regression | tests | ui-core full test gate | **✅** |
+| 937 | **PH-S1002** | multi-module stand smoke full suite | ops | bin --json all green | **✅** |
+| 938 | **PH-S1003** | cargo test-ci scope note final | docs | HANDOFF | **✅** |
+| 939 | **PH-S1004** | openapi-gap + test-ci dual gate doc | docs | FM | **✅** |
+| 940 | **PH-S1005** | poolai-loc-audit PH-S1005 | §5.13 | rust_ratio.json zriz | **✅** |
+| 941 | **PH-S1006** | vision manifest final sprint_queue | ops | poolai-vision-sync | **✅** |
+| 942 | **PH-S1007** | poolai-vision-sync --check | ops | `--check` green | **✅** |
+| 943 | **PH-S1008** | Ratio hold advisory | ops | final pre-S1010 | **✅** |
+| 944 | **PH-S1009** | galaxy_horizon_s1000_integration | tests | final code band close | **✅** |
+| 945 | **PH-S1010** | FM §5.15 product-complete closure | docs | STABLE maintenance mode | **[ ]** |
 
-**Відкритих у §5.12:** **10** (PH-S1000…S1009). **Master backlog:** **11** pending PH-S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · **§5.14**. Vision rev **304** (after sync). rust_ratio **94.94%** (PH-S995). **Service band:** §5.16 PH-SVC01…SVC10 ✅ (2026-07-17).
+**Відкритих у §5.12:** **1** (PH-S1010). **Master backlog:** **1** pending PH-S1010 — [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) · **§5.14**. Vision rev **305** (after sync). rust_ratio **94.95%** (PH-S1005). **Service band:** §5.16 PH-SVC01…SVC10 ✅ (2026-07-17).
 
-**Наступна сесія:** **`абракадабра`** — drain PH-S1000…S1009 → promote PH-S1010 з §5.14 → push · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **`абракадабра`** — drain PH-S1010 product-complete → maintenance mode · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.14 Master backlog PH-S720…S1010 (291 pending → product-complete, 2026-06-20)
 
@@ -1220,11 +1223,11 @@ FM-xxx (з таблиці нижче)
 
 | Поле | Значення |
 |------|----------|
-| **Pending** | **11** (PH-S1010) |
-| **Drained bands 1–34** | PH-S660…S999 ✅ |
-| **Активна §5.12** | PH-S1000…S1009 `[ ]` — band 35 final multi-module horizon |
-| **Наступна promote** | PH-S1010 — band 36 product-complete closure |
-| **Сесій `абракадабра`** | **2** (1×10 + tail PH-S1010) |
+| **Pending** | **1** (PH-S1010) |
+| **Drained bands 1–35** | PH-S660…S1009 ✅ |
+| **Активна §5.12** | PH-S1010 `[ ]` — band 36 product-complete closure |
+| **Наступна promote** | — (maintenance mode after S1010) |
+| **Сесій `абракадабра`** | **1** (tail PH-S1010) |
 | **План фаз** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md) |
 | **Реєстр sprint×acceptance** | [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) |
 | **Regen** | `bash scripts/generate-ph-s-master-backlog-351.sh` |
@@ -1262,7 +1265,7 @@ FM-xxx (з таблиці нижче)
 | Galaxy concept gaps (§4–§9 wire) | ✅ roadmap + concept markers bands 7–32 |
 | OpenAPI gap | ✅ `poolai-openapi-gap-audit` → **0** |
 | Integration coverage | ✅ band 34 (PH-S990…S999) |
-| Rust ratio | **94.94%** — formal 90–95% ✅; **≥95%** target at S1010 |
+| Rust ratio | **94.95%** — formal 90–95% ✅; **≥95%** target at S1010 |
 | Docs canon | ✅ STABLE draft + INDEX zriz (band 33) |
 | Vision | ✅ `poolai-vision-sync --check` after band close |
 | Ops | `cargo test-ci` green; HANDOFF maintenance template ready |
@@ -1304,7 +1307,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-18):** PH-S1000…S1009 **[ ]** drain band 35 (final multi-module horizon) · **`абракадабра`** = drain → vision close → push · ratio **94.94%** (PH-S995).
+**Активна смуга (2026-07-18):** PH-S1010 **[ ]** drain band 36 (product-complete closure) · **`абракадабра`** = drain → vision close → push · ratio **94.95%** (PH-S1005).
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

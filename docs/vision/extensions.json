@@ -1,7 +1,7 @@
 {
-  "revision": 304,
+  "revision": 305,
   "updated_at": "2026-07-18",
-  "active_sprint": "PH-S1000",
+  "active_sprint": "PH-S1010",
   "ui_version": 4,
   "extension_policy": {
     ".md": {
@@ -380,6 +380,31 @@
         "docs/vision/manifest.json",
         "docs/vision/extensions.json",
         "docs/vision/vision.svg"
+      ]
+    },
+    "multi_module_horizon_band35": {
+      "sprints": ["PH-S1000", "PH-S1001", "PH-S1002", "PH-S1003", "PH-S1004", "PH-S1005", "PH-S1006", "PH-S1007", "PH-S1008", "PH-S1009"],
+      "docs": [
+        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md",
+        "docs/development/rust_ratio.json",
+        ".cursor/rules/poolai-testing-policy.mdc"
+      ],
+      "code_globs": [
+        "crates/poolai-ui-core/src/multi_module_depth.rs",
+        "tests/multi_module_wire_smoke.rs",
+        "tests/multi_module_admin_wasm_regression.rs",
+        "tests/multi_module_stand_smoke_audit.rs",
+        "tests/galaxy_horizon_s1000_integration.rs",
+        "src/bin/poolai_http_stand_smoke.rs",
+        "src/bin/poolai_loc_audit.rs"
+      ],
+      "extensions": [".md", ".rs", ".mdc", ".json"],
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/development/NEXT_SESSION_PROMPT.md",
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json"
       ]
     }
   },

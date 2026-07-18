@@ -7,6 +7,7 @@
 | **Completion plan** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.14–§5.15** |
 | **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) |
 | **Active drain (band 35)** | PH-S1000…S1009 — final multi-module horizon |
+| **Last closed (band 35)** | PH-S1000…S1009 ✅ — final multi-module horizon · band 35 PH-S1000 |
 | **Last closed (band 34)** | PH-S990…S999 ✅ — integration gap fill · band 34 PH-S990 |
 | **Last closed (band 33)** | PH-S980…S989 ✅ — STABLE + INDEX product-complete draft |
 | **Last closed (band 32)** | PH-S970…S979 ✅ — Galaxy concept implemented markers |
@@ -17,7 +18,7 @@
 | **Product-complete tail** | PH-S1010 — FM **§5.15** |
 | **Rust ratio** | **94.92%** → PH-S975 zriz · hold **95%** advisory |
 
-**11** pending · **2** `абракадабра` sessions · остання закрита **PH-S990…S999** ✅.
+**11** pending · **1** `абракадабра` session · остання закрита **PH-S1000…S1009** ✅.
 
 ---
 
@@ -54,6 +55,7 @@
 | **§4.2 pricing live fetch hardening** | Galaxy **§4.2** | band 25 ✅ PH-S900…S909 |
 | **Galaxy concept implemented markers** | POOLAI_GALAXY_GRID **§1–9** | band 32 ✅ PH-S970…S979 |
 | **Integration test gap fill** | archived API-smoke → Rust wire | band 34 ✅ PH-S990…S999 · `integration_gap_audit.rs` · `telegram_wallet_integration.rs` · `grid_envelope_lease_integration.rs` · `protocol_middleware_integration.rs` · `job_store_raid_persistence.rs` · `vm_api_contracts.rs` |
+| **Final multi-module horizon** | wire + wasm + stand smoke | band 35 ✅ PH-S1000…S1009 · `multi_module_wire_smoke.rs` · `multi_module_admin_wasm_regression.rs` · `multi_module_stand_smoke_audit.rs` · `multi_module_depth.rs` · `galaxy_horizon_s1000_integration.rs` |
 | **network_profile persist stub** | Galaxy **§8** | PH-S664 ✅ (stub); full persist ✅ band 8 PH-S730…S739 |
 
 **§5.5 prefetch:** live pull + backpressure + strict-mode HTTP wire ✅ (baseline); live pull **depth** ✅ band 10 (PH-S750…S759).

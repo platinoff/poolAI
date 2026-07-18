@@ -69,6 +69,18 @@ bash bin/e2e-playwright.sh --start   # API smoke + UI; встановлює node
 
 **Не дублювати** новими Playwright API specs — `e2e/archive/api-smoke/` + `tests/e2e_scope_audit.rs` gate browser-only `test:ci`.
 
+## Multi-module horizon close (band 35, PH-S1004)
+
+**Канон:** top 5 grid APIs wire harness + ui-core wasm regression + stand smoke `--json` suite; реєстр — **`tests/multi_module_stand_smoke_audit.rs`** + `poolai_ui_core::multi_module_depth`.
+
+| Sprint | Module | Rust canon |
+|--------|--------|------------|
+| PH-S1000 | wire smoke harness | `tests/multi_module_wire_smoke.rs` (top 5 grid `*-metrics`) |
+| PH-S1001 | admin wasm regression | `tests/multi_module_admin_wasm_regression.rs` + `cargo test -p poolai-ui-core` |
+| PH-S1002 | stand smoke full suite | `tests/multi_module_stand_smoke_audit.rs` + `poolai-http-stand-smoke --json` |
+
+**Dual gate (PH-S1004):** `cargo test-ci` **and** `cargo run --bin poolai-openapi-gap-audit` (0 missing) — FM §5.12 band 35; API scope обов'язково обидва перед push.
+
 ## Заборонено (як Python у runtime-stack)
 
 - Нові **API-only** Playwright specs замість Rust integration tests.
