@@ -15,6 +15,7 @@ param(
     [switch]$StableTouchup,
     [switch]$EdgeVerification,
     [switch]$PrePushCanon,
+    [switch]$CiCanon,
     [int]$Port = 8080,
     [string]$Features = "enterprise,ml,cloud,test-utils",
     [ValidateSet("json", "sqlite", "raid")]
@@ -236,6 +237,14 @@ function Invoke-Quick {
     if ($PrePushCanon) {
         Write-Host "Running poolai-loc-audit --pre-push-canon (PH-S1134)..."
         & $MsysWrapper cargo run --quiet --bin poolai-loc-audit -- --pre-push-canon
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    }
+    if ($CiCanon) {
+        Write-Host "Running poolai-loc-audit --ci-canon (PH-S1143)..."
+        & $MsysWrapper cargo run --quiet --bin poolai-loc-audit -- --ci-canon
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        Write-Host "Running poolai-openapi-gap-audit (PH-S1143)..."
+        & $MsysWrapper cargo run --quiet --bin poolai-openapi-gap-audit
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     }
 }

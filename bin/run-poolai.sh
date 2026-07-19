@@ -59,6 +59,7 @@ Options (quick):
   --stable-touchup      After health wait, run poolai-loc-audit --stable-touchup (PH-S1114)
   --edge-verification   After health wait, run poolai-loc-audit --edge-verification-advisory (PH-S1125)
   --pre-push-canon      After health wait, run poolai-loc-audit --pre-push-canon (PH-S1134)
+  --ci-canon            After health wait, run CI canon gate (PH-S1143)
   --skip-build    Skip cargo build
   --port N        HTTP port (default 8080)
 
@@ -241,6 +242,7 @@ cmd_quick() {
   local stable_touchup=0
   local edge_verification=0
   local pre_push_canon=0
+  local ci_canon=0
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --skip-build) SKIP_BUILD=1; shift ;;
@@ -249,6 +251,7 @@ cmd_quick() {
       --stable-touchup) stable_touchup=1; shift ;;
       --edge-verification) edge_verification=1; shift ;;
       --pre-push-canon) pre_push_canon=1; shift ;;
+      --ci-canon) ci_canon=1; shift ;;
       --port) PORT="$2"; shift 2 ;;
       *) echo "Unknown option: $1"; usage; exit 1 ;;
     esac
@@ -276,6 +279,12 @@ cmd_quick() {
   if [[ "$pre_push_canon" == "1" ]]; then
     echo "Running poolai-loc-audit --pre-push-canon (PH-S1134)..."
     cargo run --quiet --bin poolai-loc-audit -- --pre-push-canon
+  fi
+  if [[ "$ci_canon" == "1" ]]; then
+    echo "Running poolai-loc-audit --ci-canon (PH-S1143)..."
+    cargo run --quiet --bin poolai-loc-audit -- --ci-canon
+    echo "Running poolai-openapi-gap-audit (PH-S1143)..."
+    cargo run --quiet --bin poolai-openapi-gap-audit
   fi
 }
 

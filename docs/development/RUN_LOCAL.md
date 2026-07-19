@@ -24,7 +24,7 @@ cd S:\rust\poolAI
 .\bin\run-poolai.ps1 stop
 ```
 
-**Last updated:** 2026-07-19 (PH-S1138 band 49 · `--pre-push-canon` · `VERIFY_PRE_PUSH_CANON` · `quick --pre-push-canon`)
+**Last updated:** 2026-07-19 (PH-S1148 band 50 · `--ci-canon` · `VERIFY_CI_CANON` · `quick --ci-canon`)
 
 ### PH-S1011 / PH-S1012: Light compile + quick preset
 
@@ -48,7 +48,7 @@ cd S:\rust\poolAI
 | **full** | `enterprise,ml,cloud,test-utils` | `run-poolai build` default |
 | **light** (`--light`) | `enterprise,test-utils` | PH-S1011 faster compile |
 
-`quick` restores `data/dev/last_run.json` port when present (PH-S1014), runs light build unless `--skip-build`, starts `single --bg`, waits for `/api/v1/health`. Optional **`--stand-smoke`** (PH-S1095) runs `poolai-http-stand-smoke --run-local-smoke` after health OK. Optional **`--migration-advisory`** (PH-S1104) runs `poolai-loc-audit --migration-advisory` after health OK. Optional **`--stable-touchup`** (PH-S1114) runs `poolai-loc-audit --stable-touchup` after health OK. Optional **`--edge-verification`** (PH-S1125) runs `poolai-loc-audit --edge-verification-advisory` after health OK. Optional **`--pre-push-canon`** (PH-S1134) runs `poolai-loc-audit --pre-push-canon` after health OK.
+`quick` restores `data/dev/last_run.json` port when present (PH-S1014), runs light build unless `--skip-build`, starts `single --bg`, waits for `/api/v1/health`. Optional **`--stand-smoke`** (PH-S1095) runs `poolai-http-stand-smoke --run-local-smoke` after health OK. Optional **`--migration-advisory`** (PH-S1104) runs `poolai-loc-audit --migration-advisory` after health OK. Optional **`--stable-touchup`** (PH-S1114) runs `poolai-loc-audit --stable-touchup` after health OK. Optional **`--edge-verification`** (PH-S1125) runs `poolai-loc-audit --edge-verification-advisory` after health OK. Optional **`--pre-push-canon`** (PH-S1134) runs `poolai-loc-audit --pre-push-canon` after health OK. Optional **`--ci-canon`** (PH-S1143) runs `poolai-loc-audit --ci-canon` + `poolai-openapi-gap-audit` after health OK.
 
 ```bash
 /usr/bin/bash bin/run-poolai.sh quick --stand-smoke
@@ -56,6 +56,7 @@ cd S:\rust\poolAI
 /usr/bin/bash bin/run-poolai.sh quick --stable-touchup
 /usr/bin/bash bin/run-poolai.sh quick --edge-verification
 /usr/bin/bash bin/run-poolai.sh quick --pre-push-canon
+/usr/bin/bash bin/run-poolai.sh quick --ci-canon
 # PowerShell:
 .\bin\run-poolai.ps1 quick -StandSmoke
 .\bin\run-poolai.ps1 quick -MigrationAdvisory
@@ -296,6 +297,7 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `VERIFY_STABLE_TOUCHUP=1` | `verify-dev-stand.sh` → `poolai-loc-audit --stable-touchup` (PH-S1113) |
 | `VERIFY_EDGE_VERIFICATION=1` | `verify-dev-stand.sh` → `poolai-loc-audit --edge-verification-advisory` (PH-S1125) |
 | `VERIFY_PRE_PUSH_CANON=1` | `verify-dev-stand.sh` → `poolai-loc-audit --pre-push-canon` (PH-S1134) |
+| `VERIFY_CI_CANON=1` | `verify-dev-stand.sh` → openapi-gap-audit + `poolai-loc-audit --ci-canon` + rust-ratio advisory (PH-S1142) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 ### PH-S1100: Rust migration advisory (band 46)
@@ -375,6 +377,27 @@ VERIFY_PRE_PUSH_CANON=1 bash bin/verify-dev-stand.sh
 | `pre_push_criteria_met_count` | Criteria with marker present in canonical doc path |
 
 Module: [`pre_push_hook_depth.rs`](../../crates/poolai-ui-core/src/pre_push_hook_depth.rs) · tests: `pre_push_hook_audit.rs`, `galaxy_horizon_s1129_integration.rs` · docs: [`PRE_PUSH_HOOK.md`](./PRE_PUSH_HOOK.md).
+
+### PH-S1140: CI canon gate (band 50)
+
+Local dual-gate workflow mirroring GitHub CI: `cargo test-ci` + `poolai-openapi-gap-audit` + rust-ratio advisory.
+
+```bash
+cargo run --bin poolai-loc-audit -- --ci-canon
+cargo run --bin poolai-loc-audit -- --ci-canon --advisory --min-ratio 0.95
+cargo run --bin poolai-openapi-gap-audit
+
+VERIFY_CI_CANON=1 bash bin/verify-dev-stand.sh
+/usr/bin/bash bin/run-poolai.sh quick --ci-canon
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `ci_canon_mode` | `true` when `--ci-canon` (PH-S1140) |
+| `ci_canon_criteria_total` | CI canon criteria registry size (PH-S1141) |
+| `ci_canon_criteria_met_count` | Criteria with marker present in canonical doc path |
+
+Module: [`ci_canon_depth.rs`](../../crates/poolai-ui-core/src/ci_canon_depth.rs) · tests: `ci_canon_audit.rs`, `galaxy_horizon_s1139_integration.rs` · docs: [`CI_CANON.md`](./CI_CANON.md).
 
 Default stand smoke includes **`vision_revision_parity`** (PH-S208, PH-S235): repo `manifest.revision` vs FM §5.12 `Vision rev`, `extensions.active_sprint` vs `manifest.next_sprint`, then `GET /docs/vision/manifest.json` with `X-PoolAI-Vision-Revision` header vs JSON body.
 

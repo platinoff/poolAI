@@ -1,8 +1,27 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-19 (band 49 **PH-S1129…S1138** ✅ · horizon band 50)
+**Оновлено:** 2026-07-19 (band 50 **PH-S1139…S1148** ✅ · horizon band 51)
 
-**Наступна сесія:** **`абракадабра`** — project scan → band 50.
+**Наступна сесія:** **`абракадабра`** — project scan → band 51.
+
+## Band 50 — CI canon gate (PH-S1139…S1148, ✅)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1139** | `ci_canon_depth` ui-core module |
+| **PH-S1140** | `poolai-loc-audit --ci-canon` |
+| **PH-S1141** | `ci_canon_audit` test |
+| **PH-S1142** | `VERIFY_CI_CANON` + verify-dev-stand hook |
+| **PH-S1143** | `quick --ci-canon` + openapi-gap-audit |
+| **PH-S1144** | Stand smoke CI canon export shape |
+| **PH-S1145** | RUN_LOCAL.md band 50 ops sync |
+| **PH-S1146** | RUST_RATIO + GALAXY_GRID_ROADMAP band 50 sync |
+| **PH-S1147** | `CI_CANON.md` canon gate docs |
+| **PH-S1148** | Band close |
+
+**§5.12:** **0** відкритих (band 50 ✅). **Vision:** rev **324**.
+
+**PH-S1148 ✅ (2026-07-19):** `ci_canon_depth.rs`; `--ci-canon`; `VERIFY_CI_CANON`; `quick --ci-canon`; `galaxy_horizon_s1139_integration`; local dual-gate (test-ci + openapi-gap + rust-ratio advisory).
 
 ## Band 49 — Pre-push vision canon gate (PH-S1129…S1138, ✅)
 

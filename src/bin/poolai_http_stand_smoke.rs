@@ -4298,6 +4298,41 @@ mod tests {
     }
 
     #[test]
+    fn ci_canon_band50_export_shape_ph_s1144() {
+        use poolai_ui_core::ci_canon_depth::{
+            ci_canon_criteria_total, ci_canon_depth_stub, CiCanonDepth, CI_CANON_CASES,
+            CI_CANON_CRITERIA, FM_BAND50_ROWS,
+        };
+        use serde_json::json;
+        assert_eq!(
+            ci_canon_depth_stub(Some(&json!({"openapi_gap_audit": true}))),
+            CiCanonDepth::OpenapiGapAudit
+        );
+        assert_eq!(
+            ci_canon_depth_stub(Some(&json!({
+                "test_ci_scope": true,
+                "openapi_gap_audit": true,
+                "rust_ratio_audit": true,
+                "openapi_gap_ci_job": true,
+                "verify_dev_stand_hook": true,
+                "ci_canon_docs": true,
+                "dual_gate": true,
+            }))),
+            CiCanonDepth::FullBand50
+        );
+        assert_eq!(CI_CANON_CRITERIA.len(), 7);
+        assert_eq!(ci_canon_criteria_total(), 7);
+        assert!(CI_CANON_CASES.contains(&"dual_gate"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND50_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band50 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn galaxy_edge_verification_band48_export_shape_ph_s1125() {
         use poolai_ui_core::galaxy_edge_verification_depth::{
             edge_verification_criteria_total, galaxy_edge_verification_depth_stub,

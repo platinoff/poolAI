@@ -10,6 +10,7 @@ pub mod admin_vm_workers;
 pub mod admin_wasm_slim_depth;
 pub mod api_error;
 pub mod charts_depth;
+pub mod ci_canon_depth;
 pub mod concept_markers_depth;
 pub mod design_tokens;
 pub mod digest_depth;

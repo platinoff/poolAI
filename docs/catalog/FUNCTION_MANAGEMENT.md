@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-07-19 (band 49 **PH-S1129…S1138** ✅ · maintenance band 50)
+**Оновлено:** 2026-07-19 (band 50 **PH-S1139…S1148** ✅ · maintenance band 51)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -1221,7 +1221,22 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 49 ✅). **Master horizon:** PH-S1139…S1148 (band 50). Vision rev **323** (після sync). **Наступна сесія:** **`абракадабра`** — project scan → band 50.
+**Відкритих у §5.12:** **0** (band 50 ✅). **Master horizon:** PH-S1149…S1158 (band 51). Vision rev **324** (після sync). **Наступна сесія:** **`абракадабра`** — project scan → band 51.
+
+### 5.31 CI canon gate queue — band 50 (PH-S1139…S1148, 2026-07-19)
+
+**Джерело:** project scan band 50 — local dual-gate (test-ci + openapi-gap + rust-ratio advisory) mirroring GitHub CI jobs.
+
+| 1074 | **PH-S1139** | `ci_canon_depth` ui-core module | `ci_canon_depth.rs` | depth enum + CI canon criteria registry constants | **✅** |
+| 1075 | **PH-S1140** | `poolai-loc-audit --ci-canon` | `poolai_loc_audit.rs` | ci_canon fields in `rust_ratio.json` | **✅** |
+| 1076 | **PH-S1141** | CI canon gate audit | `ci_canon_audit.rs` | criteria registry + maintenance markers | **✅** |
+| 1077 | **PH-S1142** | `verify-dev-stand` CI canon hook | `bin/verify-dev-stand.sh` | `VERIFY_CI_CANON=1`; openapi-gap + loc-audit `--ci-canon` + rust-ratio advisory | **✅** |
+| 1078 | **PH-S1143** | `run-poolai quick --ci-canon` | `bin/run-poolai.sh`, `bin/run-poolai.ps1` | post-health `--ci-canon` + openapi-gap-audit | **✅** |
+| 1079 | **PH-S1144** | Stand smoke CI canon export shape | `poolai_http_stand_smoke.rs` | `ci_canon_depth` JSON field on export shape test | **✅** |
+| 1080 | **PH-S1145** | RUN_LOCAL.md band 50 ops sync | docs | `--ci-canon`, `VERIFY_CI_CANON` | **✅** |
+| 1081 | **PH-S1146** | RUST_RATIO + GALAXY_GRID_ROADMAP band 50 sync | docs | `--ci-canon` pointer + loc-audit flag | **✅** |
+| 1082 | **PH-S1147** | `CI_CANON.md` canon gate docs | docs | local dual-gate workflow doc | **✅** |
+| 1083 | **PH-S1148** | CI canon gate band close | tests/docs | `galaxy_horizon_s1139_integration`; HANDOFF/NEXT | **✅** |
 
 ### 5.30 Pre-push vision canon gate queue — band 49 (PH-S1129…S1138, 2026-07-19)
 
@@ -1558,7 +1573,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-19):** band 49 **PH-S1129…S1138** ✅ · §5.12 **0** · наступна **`абракадабра`** → project scan → band 50.
+**Активна смуга (2026-07-19):** band 50 **PH-S1139…S1148** ✅ · §5.12 **0** · наступна **`абракадабра`** → project scan → band 51.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

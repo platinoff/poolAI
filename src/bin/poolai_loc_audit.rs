@@ -8,6 +8,7 @@
 //! cargo run --bin poolai-loc-audit -- --min-ratio 0.91
 //! ```
 
+use poolai_ui_core::ci_canon_depth::{ci_canon_criteria_total, CI_CANON_CASES, CI_CANON_CRITERIA};
 use poolai_ui_core::galaxy_edge_verification_depth::{
     edge_verification_criteria_total, EDGE_VERIFICATION_CASES, EDGE_VERIFICATION_CRITERIA,
 };
@@ -105,6 +106,8 @@ struct AuditConfig {
     edge_verification_advisory: bool,
     /// Emit band-49 pre-push canon gate fields (PH-S1130).
     pre_push_canon: bool,
+    /// Emit band-50 CI canon gate fields (PH-S1140).
+    ci_canon: bool,
 }
 
 impl Default for AuditConfig {
@@ -119,6 +122,7 @@ impl Default for AuditConfig {
             stable_touchup: false,
             edge_verification_advisory: false,
             pre_push_canon: false,
+            ci_canon: false,
         }
     }
 }
@@ -200,6 +204,12 @@ struct RustRatioReport {
     pre_push_criteria_total: usize,
     /// Pre-push canon criteria met count (PH-S1131).
     pre_push_criteria_met_count: usize,
+    /// Band-50 CI canon gate mode (PH-S1140).
+    ci_canon_mode: bool,
+    /// CI canon criteria registry size (PH-S1141).
+    ci_canon_criteria_total: usize,
+    /// CI canon criteria met count (PH-S1141).
+    ci_canon_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -272,6 +282,22 @@ fn audit_pre_push_criteria_met(root: &Path) -> (usize, usize) {
     let total = pre_push_hook_criteria_total();
     let mut met = 0usize;
     for (_, marker, rel) in PRE_PUSH_HOOK_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
+fn audit_ci_canon_criteria_met(root: &Path) -> (usize, usize) {
+    let total = ci_canon_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in CI_CANON_CRITERIA {
         let path = root.join(rel);
         if path.is_file() {
             if let Ok(content) = fs::read_to_string(&path) {
@@ -379,6 +405,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--stable-touchup" => config.stable_touchup = true,
             "--edge-verification-advisory" => config.edge_verification_advisory = true,
             "--pre-push-canon" => config.pre_push_canon = true,
+            "--ci-canon" => config.ci_canon = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
                 print_help();
@@ -405,6 +432,7 @@ fn print_help() {
            --stable-touchup      band-47 STABLE touch-up criteria fields (PH-S1110)\n\
            --edge-verification-advisory  band-48 edge verification horizon fields (PH-S1120)\n\
            --pre-push-canon            band-49 pre-push vision canon gate fields (PH-S1130)\n\
+           --ci-canon                  band-50 CI canon gate fields (PH-S1140)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -532,6 +560,16 @@ fn build_report(
         );
         notes.push("PH-S1138: band 49 pre-push vision canon gate — criteria met vs registry");
     }
+    let (ci_canon_criteria_met_count, ci_canon_criteria_total_count) = if config.ci_canon {
+        audit_ci_canon_criteria_met(root)
+    } else {
+        (0, ci_canon_criteria_total())
+    };
+    if config.ci_canon {
+        notes
+            .push("PH-S1140: ci_canon_mode — local dual-gate (test-ci + openapi-gap + rust-ratio)");
+        notes.push("PH-S1148: band 50 CI canon gate — criteria met vs registry");
+    }
 
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
@@ -575,6 +613,9 @@ fn build_report(
         pre_push_canon_mode: config.pre_push_canon,
         pre_push_criteria_total: pre_push_criteria_total_count,
         pre_push_criteria_met_count,
+        ci_canon_mode: config.ci_canon,
+        ci_canon_criteria_total: ci_canon_criteria_total_count,
+        ci_canon_criteria_met_count,
         by_category,
         notes,
     })
@@ -672,6 +713,14 @@ fn print_summary(report: &RustRatioReport) {
             "  pre_push_canon_cases:  {}",
             PRE_PUSH_HOOK_CASES.join(", ")
         );
+    }
+    if report.ci_canon_mode {
+        println!("  ci_canon:              true (PH-S1140 band 50)");
+        println!(
+            "  ci_canon_criteria:     {}/{} met",
+            report.ci_canon_criteria_met_count, report.ci_canon_criteria_total
+        );
+        println!("  ci_canon_cases:        {}", CI_CANON_CASES.join(", "));
     }
     for (name, loc) in &report.by_category {
         println!("  {name}: {} files, {} loc", loc.files, loc.loc);
