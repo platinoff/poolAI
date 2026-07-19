@@ -19,9 +19,11 @@
 | **PH-S1117** | GALAXY_GRID_ROADMAP + STABLE touch-up |
 | **PH-S1118** | Band close |
 
-**§5.12:** **0** відкритих (band 47 ✅). **Vision:** rev **319**.
+**§5.12:** **0** відкритих (band 47 ✅). **Vision:** rev **320**.
 
-**PH-S1118 ✅ (2026-07-18):** `stable_state_touchup_depth.rs`; `--stable-touchup`; `VERIFY_STABLE_TOUCHUP`; `quick --stable-touchup`; `galaxy_horizon_s1109_integration`; vision **rev 319**.
+**PH-S1118 ✅ (2026-07-18):** `stable_state_touchup_depth.rs`; `--stable-touchup`; `VERIFY_STABLE_TOUCHUP`; `quick --stable-touchup`; `galaxy_horizon_s1109_integration`; vision **rev 320**.
+
+**Vision feed fix (2026-07-18):** `poolai-vision-sync` — `last_sprint_closed` / feed ticker by highest PH-S serial; `next_sprint` from Master horizon when §5.12 open=0.
 
 ## Band 46 — Ratio/rust migration advisory (PH-S1099…S1108, ✅)
 

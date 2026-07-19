@@ -3,111 +3,111 @@
   "items": [
     {
       "category": "closed",
-      "id": "PH-S1048",
+      "id": "PH-S1118",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "galaxy_horizon_s1039_integration`; HANDOFF/NEXT",
-      "title": "Vision map band close"
+      "summary": "galaxy_horizon_s1109_integration`; HANDOFF/NEXT",
+      "title": "STABLE touch-up band close"
     },
     {
       "category": "closed",
-      "id": "PH-S1047",
+      "id": "PH-S1117",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "skip-link focus; `#map-scene-3d`; tree role",
-      "title": "Vision Playwright smoke"
+      "summary": "band 47 closed row; maintenance criteria",
+      "title": "GALAXY_GRID_ROADMAP + STABLE touch-up"
     },
     {
       "category": "closed",
-      "id": "PH-S1046",
+      "id": "PH-S1116",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "depth enum + FM band 40 markers",
-      "title": "ui-core depth stub"
+      "summary": "STABLE touch-up pointer + loc-audit flag",
+      "title": "RUST_RATIO_STRATEGY band 47 sync"
     },
     {
       "category": "closed",
-      "id": "PH-S1045",
+      "id": "PH-S1115",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "pause starfield + orbit on `visibilitychange",
-      "title": "Background tab perf"
+      "summary": "--stable-touchup`, `VERIFY_STABLE_TOUCHUP",
+      "title": "RUN_LOCAL.md band 47 ops sync"
     },
     {
       "category": "closed",
-      "id": "PH-S1044",
+      "id": "PH-S1114",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "adaptive threshold when layer >120 nodes",
-      "title": "Dense-map LOD hardening"
+      "summary": "post-health `--stable-touchup` + stand smoke export shape",
+      "title": "run-poolai quick --stable-touchup"
     },
     {
       "category": "closed",
-      "id": "PH-S1043",
+      "id": "PH-S1113",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "updateMapSprintDim` without full `renderMap",
-      "title": "Map sprint-dim incremental"
+      "summary": "VERIFY_STABLE_TOUCHUP=1` → loc-audit",
+      "title": "verify-dev-stand` STABLE hook"
     },
     {
       "category": "closed",
-      "id": "PH-S1042",
+      "id": "PH-S1112",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "focusable neighbours; Enter select; focus restore",
-      "title": "Link graph neighbour a11y"
+      "summary": "7 maintenance-mode criteria ids",
+      "title": "STABLE criteria registry"
     },
     {
       "category": "closed",
-      "id": "PH-S1041",
+      "id": "PH-S1111",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "role=\"tree\"` / `treeitem`; Arrow/Home/End nav",
-      "title": "Explorer tree keyboard"
+      "summary": "criteria registry + maintenance markers",
+      "title": "STABLE touch-up audit"
     },
     {
       "category": "closed",
-      "id": "PH-S1040",
+      "id": "PH-S1110",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "header/map/panel icon buttons labeled; `aria-pressed` toggles",
-      "title": "Icon control aria-label parity"
+      "summary": "stable_touchup fields in `rust_ratio.json",
+      "title": "poolai-loc-audit --stable-touchup"
     },
     {
       "category": "closed",
-      "id": "PH-S1039",
+      "id": "PH-S1109",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "skip to map/queue/preview; `role=\"main\"",
-      "title": "Skip links + landmarks"
+      "summary": "depth enum + STABLE criteria registry constants",
+      "title": "stable_state_touchup_depth` ui-core module"
     },
     {
       "category": "closed",
-      "id": "PH-S1058",
+      "id": "PH-S1108",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "galaxy_horizon_s1049_integration`; HANDOFF/NEXT",
-      "title": "E2E visual/axe band close"
+      "summary": "galaxy_horizon_s1099_integration`; HANDOFF/NEXT",
+      "title": "Ratio migration advisory band close"
     },
     {
       "category": "closed",
-      "id": "PH-S1057",
+      "id": "PH-S1107",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "depth enum + FM band 41 markers",
-      "title": "ui-core depth stub"
+      "summary": "band 46 closed row; stretch 96% hold",
+      "title": "GALAXY_GRID_ROADMAP + rust ratio"
     }
   ],
   "link": "docs/vision/index.html",

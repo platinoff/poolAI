@@ -84,9 +84,9 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 **Product-complete:** PH-S1010 ✅ · FM **§5.15** ✅ · **maintenance mode**.
 
-**Наступна сесія (owner):** **`абракадабра`** — drain band 37 **PH-S1011…S1018** (легка збірка/запуск, vision launch, poweroff/reset UI) · [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія (owner):** **`абракадабра`** — project scan → band 48 **PH-S1119…S1128** · [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
-**§5.12:** **8** active (band 37) · vision **rev 306**.
+**§5.12:** **0** відкритих (band 47 ✅) · vision **rev 320** · last **PH-S1118** · next **PH-S1119**.
 
 **Ops (поза чергою):** **FM-003** LAN §4 **BLOCKED** (2 хости) · **FM-041** Cloud SDK **Deferred**.
 

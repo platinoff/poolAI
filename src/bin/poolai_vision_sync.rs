@@ -329,6 +329,45 @@ fn strip_md_cell(raw: &str) -> String {
         .to_string()
 }
 
+/// Numeric suffix from `PH-S1109` → `1109`.
+fn parse_sprint_serial(id: &str) -> Option<u32> {
+    let rest = id.strip_prefix("PH-S")?;
+    rest.parse().ok()
+}
+
+/// When §5.12 has 0 open, next band start from `Master horizon: PH-S1119…S1128`.
+fn parse_master_horizon_next(section: &str) -> Option<String> {
+    for line in section.lines() {
+        if !line.contains("Master horizon") {
+            continue;
+        }
+        let marker = "PH-S";
+        let idx = line.find(marker)?;
+        let rest = &line[idx..];
+        let digit_end = rest[4..]
+            .find(|c: char| !c.is_ascii_digit())
+            .map(|i| 4 + i)
+            .unwrap_or(rest.len());
+        let id = &rest[..digit_end];
+        if id.len() > 4 {
+            return Some(id.to_string());
+        }
+    }
+    None
+}
+
+/// Closed sprints sorted by PH-S serial descending (deduped by id).
+fn closed_entries_by_serial_desc<'a>(entries: &'a [SprintQueueEntry]) -> Vec<&'a SprintQueueEntry> {
+    let mut closed: Vec<&SprintQueueEntry> = entries
+        .iter()
+        .filter(|e| !e.open && e.status == "closed")
+        .collect();
+    closed.sort_by_key(|e| std::cmp::Reverse(parse_sprint_serial(&e.id).unwrap_or(0)));
+    let mut seen = BTreeSet::new();
+    closed.retain(|e| seen.insert(e.id.as_str()));
+    closed
+}
+
 fn sprint_status_from_cell(cell: &str) -> (String, bool) {
     let plain = strip_md_cell(cell).to_ascii_lowercase();
     if plain.contains('✅') || plain.contains("closed") {
@@ -424,14 +463,19 @@ fn sprint_queue_json(entries: &[SprintQueueEntry]) -> Value {
     )
 }
 
-fn derive_sprint_meta(entries: &[SprintQueueEntry]) -> (Option<String>, Option<String>, u32) {
+fn derive_sprint_meta(
+    entries: &[SprintQueueEntry],
+    fm_section: Option<&str>,
+) -> (Option<String>, Option<String>, u32) {
     let open_count = entries.iter().filter(|e| e.open).count() as u32;
-    let next_sprint = entries.iter().find(|e| e.open).map(|e| e.id.clone());
-    let last_closed = entries
-        .iter()
-        .filter(|e| !e.open && e.status == "closed")
-        .map(|e| e.id.clone())
-        .last();
+    let next_sprint = match entries.iter().find(|e| e.open).map(|e| e.id.clone()) {
+        Some(open) => Some(open),
+        None if open_count == 0 => fm_section.and_then(parse_master_horizon_next),
+        None => None,
+    };
+    let last_closed = closed_entries_by_serial_desc(entries)
+        .first()
+        .map(|e| e.id.clone());
     (next_sprint, last_closed, open_count)
 }
 
@@ -445,24 +489,30 @@ fn bump_manifest_revision(manifest: &mut Value) {
     manifest["auto_sync_at"] = json!(today_iso());
 }
 
-fn read_fm_sprint_entries(root: &Path) -> Vec<SprintQueueEntry> {
+fn read_fm_sprint_bundle(root: &Path) -> (Vec<SprintQueueEntry>, String) {
     let fm_path = root.join(FM_REL);
     let content = match fs::read_to_string(&fm_path) {
         Ok(c) => c,
         Err(e) => {
             eprintln!("warn: read {}: {e}", fm_path.display());
-            return Vec::new();
+            return (Vec::new(), String::new());
         }
     };
-    parse_fm_sprint_queue(&content)
+    let section = extract_fm_section_512(&content).unwrap_or("").to_string();
+    let entries = parse_fm_sprint_queue_section(&section);
+    (entries, section)
 }
 
-fn sync_fm_sprint_queue(manifest: &mut Value, entries: &[SprintQueueEntry]) -> bool {
+fn sync_fm_sprint_queue(
+    manifest: &mut Value,
+    entries: &[SprintQueueEntry],
+    fm_section: Option<&str>,
+) -> bool {
     if entries.is_empty() {
         return false;
     }
     let queue = sprint_queue_json(entries);
-    let (next_sprint, last_closed, open_count) = derive_sprint_meta(entries);
+    let (next_sprint, last_closed, open_count) = derive_sprint_meta(entries, fm_section);
     let prev_next = manifest.get("next_sprint").and_then(Value::as_str);
     let prev_last = manifest.get("last_sprint_closed").and_then(Value::as_str);
     let changed = manifest.get("sprint_queue") != Some(&queue)
@@ -505,22 +555,19 @@ fn feed_item_json(entry: &SprintQueueEntry, next_sprint: Option<&str>) -> Value 
     item
 }
 
-/// RSS-style sprint feed for the vision ticker (open queue + recent closed).
-fn build_sprint_feed(entries: &[SprintQueueEntry]) -> Value {
-    let (next_sprint, _, _) = derive_sprint_meta(entries);
+/// RSS-style sprint feed for the vision ticker (open queue + recent closed by PH-S serial).
+fn build_sprint_feed(entries: &[SprintQueueEntry], fm_section: Option<&str>) -> Value {
+    let (next_sprint, _, _) = derive_sprint_meta(entries, fm_section);
     let next_ref = next_sprint.as_deref();
     let mut items: Vec<Value> = entries
         .iter()
         .filter(|e| e.open)
         .map(|e| feed_item_json(e, next_ref))
         .collect();
-    let closed_recent: Vec<&SprintQueueEntry> = entries
-        .iter()
-        .filter(|e| !e.open && e.status == "closed")
-        .rev()
+    for entry in closed_entries_by_serial_desc(entries)
+        .into_iter()
         .take(FEED_CLOSED_CAP)
-        .collect();
-    for entry in closed_recent {
+    {
         items.push(feed_item_json(entry, None));
     }
     json!({
@@ -532,11 +579,40 @@ fn build_sprint_feed(entries: &[SprintQueueEntry]) -> Value {
     })
 }
 
-fn sync_sprint_feed(root: &Path, entries: &[SprintQueueEntry]) -> bool {
+fn sync_extensions_active_sprint(root: &Path, next_sprint: Option<&str>) -> bool {
+    let path = root.join(EXTENSIONS_REL);
+    let mut ext = match fs::read_to_string(&path)
+        .ok()
+        .and_then(|raw| serde_json::from_str::<Value>(&raw).ok())
+    {
+        Some(v) => v,
+        None => return false,
+    };
+    let prev = ext.get("active_sprint").and_then(Value::as_str);
+    if prev == next_sprint {
+        return false;
+    }
+    match next_sprint {
+        Some(ns) => ext["active_sprint"] = json!(ns),
+        None => {
+            ext.as_object_mut()
+                .expect("extensions object")
+                .remove("active_sprint");
+        }
+    }
+    ext["updated_at"] = json!(today_iso());
+    if let Err(e) = write_json_file(&path, &ext) {
+        eprintln!("warn: write {}: {e}", path.display());
+        return false;
+    }
+    true
+}
+
+fn sync_sprint_feed(root: &Path, entries: &[SprintQueueEntry], fm_section: Option<&str>) -> bool {
     if entries.is_empty() {
         return false;
     }
-    let feed = build_sprint_feed(entries);
+    let feed = build_sprint_feed(entries, fm_section);
     let feed_path = root.join(FEED_REL);
     let prev = fs::read_to_string(&feed_path)
         .ok()
@@ -712,7 +788,7 @@ fn collect_manifest_fm_drift(
         );
     }
 
-    let (next_sprint, last_closed, open_count) = derive_sprint_meta(entries);
+    let (next_sprint, last_closed, open_count) = derive_sprint_meta(entries, Some(fm_section));
     let manifest_next = manifest.get("next_sprint").and_then(Value::as_str);
     if manifest_next != next_sprint.as_deref() {
         errors.push(format!(
@@ -838,14 +914,16 @@ fn main() -> ExitCode {
     };
 
     let (added_nodes, added_edges) = sync_manifest(&mut manifest, &paths);
-    let entries = read_fm_sprint_entries(&root);
-    let queue_changed = sync_fm_sprint_queue(&mut manifest, &entries);
-    let feed_changed = sync_sprint_feed(&root, &entries);
-    if queue_changed && added_nodes == 0 && added_edges == 0 {
+    let (entries, fm_section) = read_fm_sprint_bundle(&root);
+    let queue_changed = sync_fm_sprint_queue(&mut manifest, &entries, Some(&fm_section));
+    let feed_changed = sync_sprint_feed(&root, &entries, Some(&fm_section));
+    let (next_sprint, _, _) = derive_sprint_meta(&entries, Some(&fm_section));
+    let ext_changed = sync_extensions_active_sprint(&root, next_sprint.as_deref());
+    if (queue_changed || feed_changed || ext_changed) && added_nodes == 0 && added_edges == 0 {
         bump_manifest_revision(&mut manifest);
     }
     println!(
-        "vision sync: +{added_nodes} nodes, +{added_edges} edges, sprint_queue {}, feed {} (revision {})",
+        "vision sync: +{added_nodes} nodes, +{added_edges} edges, sprint_queue {}, feed {}, extensions {} (revision {})",
         if queue_changed {
             "updated"
         } else {
@@ -856,13 +934,18 @@ fn main() -> ExitCode {
         } else {
             "unchanged"
         },
+        if ext_changed {
+            "updated"
+        } else {
+            "unchanged"
+        },
         manifest
             .get("revision")
             .and_then(Value::as_u64)
             .unwrap_or(0)
     );
 
-    if added_nodes == 0 && added_edges == 0 && !queue_changed && !feed_changed {
+    if added_nodes == 0 && added_edges == 0 && !queue_changed && !feed_changed && !ext_changed {
         return ExitCode::SUCCESS;
     }
 
@@ -871,7 +954,7 @@ fn main() -> ExitCode {
         return ExitCode::SUCCESS;
     }
 
-    if queue_changed || added_nodes > 0 || added_edges > 0 {
+    if queue_changed || added_nodes > 0 || added_edges > 0 || feed_changed {
         if let Err(e) = write_manifest(&manifest_path, &manifest) {
             eprintln!("error: {e}");
             return ExitCode::from(2);
@@ -916,10 +999,49 @@ mod tests {
         assert_eq!(entries[0].id, "PH-S190");
         assert!(entries[1].open);
         assert_eq!(entries[1].id, "PH-S191");
-        let (next, last, open) = derive_sprint_meta(&entries);
+        let (next, last, open) = derive_sprint_meta(&entries, None);
         assert_eq!(next.as_deref(), Some("PH-S191"));
         assert_eq!(last.as_deref(), Some("PH-S190"));
         assert_eq!(open, 2);
+    }
+
+    #[test]
+    fn derive_sprint_meta_uses_highest_serial_not_file_order() {
+        let entries = vec![
+            SprintQueueEntry {
+                row: 1,
+                id: "PH-S1118".into(),
+                title: "Band close".into(),
+                deps: String::new(),
+                acceptance: "close".into(),
+                status: "closed".into(),
+                open: false,
+            },
+            SprintQueueEntry {
+                row: 2,
+                id: "PH-S1048".into(),
+                title: "Older close".into(),
+                deps: String::new(),
+                acceptance: "close".into(),
+                status: "closed".into(),
+                open: false,
+            },
+        ];
+        let section =
+            "**Відкритих у §5.12:** **0** (band 47 ✅). **Master horizon:** PH-S1119…S1128 (band 48).";
+        let (next, last, open) = derive_sprint_meta(&entries, Some(section));
+        assert_eq!(last.as_deref(), Some("PH-S1118"));
+        assert_eq!(next.as_deref(), Some("PH-S1119"));
+        assert_eq!(open, 0);
+    }
+
+    #[test]
+    fn parse_master_horizon_next_from_fm_footer() {
+        let section = "**Відкритих у §5.12:** **0**. **Master horizon:** PH-S1119…S1128 (band 48). Vision rev **319**.";
+        assert_eq!(
+            parse_master_horizon_next(section).as_deref(),
+            Some("PH-S1119")
+        );
     }
 
     #[test]
@@ -962,7 +1084,7 @@ mod tests {
                 open: true,
             },
         ];
-        let feed = build_sprint_feed(&entries);
+        let feed = build_sprint_feed(&entries, None);
         let items = feed["items"].as_array().unwrap();
         assert_eq!(items.len(), 4);
         assert_eq!(items[0]["id"], "PH-S200");

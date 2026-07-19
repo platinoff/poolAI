@@ -1,316 +1,120 @@
 {
-  "revision": 310,
-  "updated_at": "2026-07-18",
-  "active_sprint": null,
-  "ui_version": 4,
+  "active_sprint": "PH-S1119",
+  "browser_panels": [
+    {
+      "id": "map",
+      "source": "vision.svg",
+      "title": "Isometric map"
+    },
+    {
+      "id": "graph",
+      "source": "manifest.json",
+      "title": "Graph (manifest)"
+    },
+    {
+      "id": "scope",
+      "source": "extensions.json",
+      "title": "Sprint extensions"
+    },
+    {
+      "id": "docs",
+      "source": "node_link",
+      "title": "Open doc"
+    }
+  ],
   "extension_policy": {
+    ".html": {
+      "sync_on": [
+        "manifest_or_extensions_change"
+      ],
+      "vision_files": [
+        "index.html"
+      ]
+    },
+    ".json": {
+      "sync_on": [
+        "graph_change"
+      ],
+      "vision_files": [
+        "manifest.json",
+        "extensions.json"
+      ]
+    },
     ".md": {
-      "sync_on": ["sprint_close", "handoff_update", "fm_5_11_update", "galaxy_grid_section_change"],
-      "vision_files": ["manifest.json", "vision.svg", "extensions.json"]
+      "sync_on": [
+        "sprint_close",
+        "handoff_update",
+        "fm_5_11_update",
+        "galaxy_grid_section_change"
+      ],
+      "vision_files": [
+        "manifest.json",
+        "vision.svg",
+        "extensions.json"
+      ]
+    },
+    ".mdc": {
+      "sync_on": [
+        "vision_rule_change"
+      ],
+      "vision_files": [
+        ".cursor/rules/docs-vision.mdc"
+      ]
     },
     ".rs": {
-      "sync_on": ["src_in_sprint_scope", "cargo_toml_bin_bench"],
-      "vision_files": ["manifest.json"]
+      "sync_on": [
+        "src_in_sprint_scope",
+        "cargo_toml_bin_bench"
+      ],
+      "vision_files": [
+        "manifest.json"
+      ]
     },
-    ".html": { "sync_on": ["manifest_or_extensions_change"], "vision_files": ["index.html"] },
-    ".json": { "sync_on": ["graph_change"], "vision_files": ["manifest.json", "extensions.json"] },
-    ".svg": { "sync_on": ["major_node_or_layer_change"], "vision_files": ["vision.svg"] },
-    ".mdc": { "sync_on": ["vision_rule_change"], "vision_files": [".cursor/rules/docs-vision.mdc"] }
+    ".svg": {
+      "sync_on": [
+        "major_node_or_layer_change"
+      ],
+      "vision_files": [
+        "vision.svg"
+      ]
+    }
   },
+  "revision": 310,
   "scopes": {
-    "galaxy_grid_concept": {
-      "sprints": ["PH-S55", "PH-S56", "PH-S57", "PH-S59", "PH-S60", "PH-S61", "PH-S62", "PH-S63", "PH-S64"],
-      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md"],
-      "code_globs": ["src/grid/**", "src/network/api/virtual_nodes.rs", "src/services/virtual_node_telegram_binding_service.rs"],
-      "extensions": [".md", ".rs"],
-      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "README.md", "docs/README.md", "docs/INDEX_2026-03-17.md", "docs/STRUCTURE.md"]
-    },
-    "galaxy_grid_protocol_wire": {
-      "sprints": ["PH-S65"],
-      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md"],
-      "code_globs": ["src/network/api/virtual_nodes.rs", "src/network/api/workers.rs", "docs/openapi.yaml"],
-      "extensions": [".rs", ".yaml", ".md"],
-      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md"]
-    },
-    "verify_release_cli": {
-      "sprints": ["PH-S66"],
-      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md", "docs/security/SECURITY_HARDENING.md"],
-      "code_globs": ["src/release/**", "src/bin/poolai_verify_release.rs"],
-      "extensions": [".rs", ".md"],
-      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "Cargo.toml", "README.md"]
-    },
-    "security_governance_docs": {
-      "sprints": ["PH-S69", "PH-S71", "PH-S72", "PH-S73", "PH-S74", "PH-S75", "PH-S76", "PH-S77"],
-      "docs": ["docs/security/SECURITY_HARDENING.md", "docs/security/DEPENDENCY_SECURITY.md", "docs/concept/POOLAI_GALAXY_GRID.md"],
-      "code_globs": ["src/release/**", "src/grid/protocol_compat.rs"],
-      "extensions": [".md", ".rs", ".json"],
-      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/vision/manifest.json", "docs/vision/extensions.json"]
-    },
-    "digest_galaxy_modules": {
-      "sprints": ["PH-S67"],
-      "docs": ["docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md", "docs/INDEX_2026-03-17.md"],
-      "code_globs": ["src/grid/**", "src/network/api/virtual_nodes.rs", "src/release/**"],
-      "extensions": [".md", ".rs"],
-      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md"]
-    },
-    "galaxy_pricing_oracle_stub": {
-      "sprints": ["PH-S68"],
-      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md"],
-      "code_globs": ["src/grid/**"],
-      "extensions": [".rs", ".md"],
-      "also_update": ["docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md"]
-    },
-    "galaxy_grid_code": {
-      "sprints": ["PH-S58"],
-      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md", "docs/performance/BENCHMARKS.md"],
-      "code_globs": ["src/grid/galaxy_fee_split.rs", "benches/galaxy_fee_split_benchmarks.rs"],
-      "extensions": [".rs", ".md", ".toml"]
-    },
-    "docs_vision_meta": {
-      "sprints": ["PH-S63", "PH-S64", "PH-S188", "PH-S189", "PH-S190", "PH-S191"],
-      "docs": ["docs/vision/**", ".cursor/rules/docs-vision.mdc"],
-      "extensions": [".svg", ".html", ".json", ".md", ".mdc"]
-    },
-    "job_lease_wire_stub": {
-      "sprints": ["PH-S94", "PH-S95"],
-      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md"],
-      "code_globs": ["src/job/types.rs", "src/network/api/jobs.rs", "docs/openapi.yaml", "tests/jobs_api_contracts.rs"],
-      "extensions": [".rs", ".yaml", ".md"],
-      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/vision/manifest.json", "docs/vision/extensions.json"]
-    },
     "admin_jobs_lease_ui": {
-      "sprints": ["PH-S96", "PH-S105", "PH-S119"],
-      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md"],
-      "code_globs": ["src/ui/admin/jobs.rs", "src/ui/i18n_core.js", "e2e/tests/admin.spec.ts"],
-      "extensions": [".rs", ".js", ".ts", ".md"],
-      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"]
-    },
-    "job_lease_ttl_env": {
-      "sprints": ["PH-S97"],
-      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md", "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"],
-      "code_globs": ["src/job/lease_config.rs", "src/job/mod.rs"],
-      "extensions": [".rs", ".md"],
-      "also_update": ["docs/development/HANDOFF_NEW_SESSION.md", "docs/catalog/FUNCTION_MANAGEMENT.md", "docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md"]
-    },
-    "job_lease_acquire": {
-      "sprints": ["PH-S98", "PH-S100"],
-      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md"],
-      "code_globs": ["src/job/lease_acquire.rs", "src/job/store.rs", "src/network/api/jobs.rs", "docs/openapi.yaml", "tests/jobs_api_contracts.rs"],
-      "extensions": [".rs", ".yaml", ".md"],
-      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md"]
-    },
-    "job_lease_renew": {
-      "sprints": ["PH-S99"],
-      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md"],
-      "code_globs": ["src/job/**", "src/network/api/jobs.rs"],
-      "extensions": [".rs", ".md"],
-      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md"]
-    },
-    "job_failover_stub": {
-      "sprints": ["PH-S101"],
-      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md", "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"],
-      "code_globs": ["src/job/store.rs", "src/job/scheduler.rs"],
-      "extensions": [".rs", ".md"],
-      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/vision/manifest.json", "docs/vision/extensions.json"]
-    },
-    "pricing_live_fetch": {
-      "sprints": ["PH-S102"],
-      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md", "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"],
-      "code_globs": ["src/grid/galaxy_pricing_oracle.rs", "src/network/api/grid.rs"],
-      "extensions": [".rs", ".md", ".json"],
-      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/vision/manifest.json", "docs/vision/extensions.json"]
-    },
-    "protocol_header_middleware": {
-      "sprints": ["PH-S103", "PH-S134"],
-      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md", "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"],
-      "code_globs": ["src/network/api/protocol_middleware.rs", "src/network/api/mod.rs", "src/grid/protocol_compat.rs", "e2e/tests/protocol_middleware.spec.ts", "e2e/package.json"],
-      "extensions": [".rs", ".md", ".json"],
-      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/vision/manifest.json", "docs/vision/extensions.json"]
-    },
-    "job_migrating_lifecycle": {
-      "sprints": ["PH-S104", "PH-S133"],
-      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md", "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"],
-      "code_globs": ["src/job/types.rs", "src/job/lifecycle.rs", "src/network/api/jobs.rs", "tests/jobs_api_contracts.rs", "e2e/tests/jobs_migrating.spec.ts", "e2e/package.json", "docs/openapi.yaml"],
-      "extensions": [".rs", ".yaml", ".md", ".json"],
-      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/vision/manifest.json", "docs/vision/extensions.json"]
-    },
-    "worker_lease_renew_stub": {
-      "sprints": ["PH-S106"],
-      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md", "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"],
-      "code_globs": ["src/bin/poolai-worker.rs"],
-      "extensions": [".rs", ".md", ".json"],
-      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/vision/manifest.json", "docs/vision/extensions.json"]
-    },
-    "grid_result_lease_cas": {
-      "sprints": ["PH-S110"],
-      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md"],
-      "code_globs": ["src/grid/dispatch.rs", "src/grid/envelope.rs", "src/job/types.rs", "src/network/json_errors.rs"],
-      "extensions": [".rs", ".md"],
-      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md"]
-    },
-    "grid_ingest_leased": {
-      "sprints": ["PH-S108"],
-      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md", "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"],
-      "code_globs": ["src/grid/dispatch.rs", "src/job/scheduler.rs"],
-      "extensions": [".rs", ".md"],
-      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md"]
-    },
-    "galaxy_lease_wire_docs": {
-      "sprints": ["PH-S109"],
-      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md", "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"],
-      "extensions": [".md"],
-      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/INDEX_2026-03-17.md", "README.md"]
-    },
-    "jobs_migrating_e2e": {
-      "sprints": ["PH-S133"],
-      "docs": ["docs/development/E2E_PLAYWRIGHT.md", "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"],
-      "code_globs": ["e2e/tests/jobs_migrating.spec.ts", "e2e/package.json"],
-      "extensions": [".ts", ".json", ".md"],
-      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md", "docs/vision/manifest.json", "docs/vision/extensions.json"]
-    },
-    "jobs_lease_e2e": {
-      "sprints": ["PH-S107"],
-      "docs": ["docs/development/E2E_PLAYWRIGHT.md", "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"],
-      "code_globs": ["e2e/tests/jobs_lease.spec.ts", "e2e/package.json"],
-      "extensions": [".ts", ".json", ".md"],
-      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md", "docs/INDEX_2026-03-17.md", "README.md"]
-    },
-    "grid_job_lease_e2e": {
-      "sprints": ["PH-S112"],
-      "docs": ["docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"],
-      "code_globs": ["e2e/tests/grid_job_lease.spec.ts", "e2e/package.json", "src/grid/dispatch.rs"],
-      "extensions": [".ts", ".json", ".rs", ".md"],
-      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/vision/manifest.json"]
-    },
-    "worker_lease_renew_ticker": {
-      "sprints": ["PH-S116"],
-      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md", "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"],
-      "code_globs": ["src/bin/poolai-worker.rs", "src/job/lease_config.rs"],
-      "extensions": [".rs", ".md", ".json"],
-      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/vision/manifest.json", "docs/vision/extensions.json"]
-    },
-    "grid_result_lease_e2e": {
-      "sprints": ["PH-S117"],
-      "docs": ["docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"],
-      "code_globs": ["e2e/tests/grid_result_lease.spec.ts", "e2e/package.json", "src/grid/dispatch.rs"],
-      "extensions": [".ts", ".json", ".rs", ".md"],
-      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/vision/manifest.json"]
-    },
-    "jobs_lease_negative_e2e": {
-      "sprints": ["PH-S118"],
-      "docs": ["docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"],
-      "code_globs": ["e2e/tests/jobs_lease.spec.ts", "bin/e2e-playwright.sh"],
-      "extensions": [".ts", ".sh", ".md"],
-      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/vision/manifest.json", "bin/open-docs-vision.ps1"]
-    },
-    "galaxy_lease_worker_heartbeat_docs": {
-      "sprints": ["PH-S121"],
-      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md", "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"],
-      "code_globs": ["src/bin/poolai-worker.rs", "src/job/lease_config.rs"],
-      "extensions": [".md", ".rs"],
-      "also_update": [
-        "docs/catalog/FUNCTION_MANAGEMENT.md",
-        "docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md",
-        "docs/development/HANDOFF_NEW_SESSION.md",
-        "docs/development/NEXT_SESSION_PROMPT.md",
-        "docs/vision/manifest.json"
-      ]
-    },
-    "openapi_lease_schemas_audit": {
-      "sprints": ["PH-S122"],
-      "docs": ["docs/openapi.yaml", "docs/development/OPENAPI_GAP_AUDIT_2026-05-19.md"],
-      "code_globs": ["src/bin/poolai_openapi_gap_audit.rs", "src/bin/poolai_vision_sync.rs", "src/grid/envelope.rs", "src/network/api/jobs.rs"],
-      "extensions": [".yaml", ".rs", ".md"],
       "also_update": [
         "docs/catalog/FUNCTION_MANAGEMENT.md",
         "docs/development/HANDOFF_NEW_SESSION.md",
-        "docs/development/NEXT_SESSION_PROMPT.md",
-        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md",
-        "docs/vision/manifest.json",
-        "docs/vision/extensions.json",
-        "bin/open-docs-vision.ps1"
-      ]
-    },
-    "grid_pricing_e2e_force_fallback": {
-      "sprints": ["PH-S123"],
-      "docs": ["docs/development/E2E_PLAYWRIGHT.md"],
-      "code_globs": ["e2e/tests/grid_pricing.spec.ts", "e2e/tests/helpers.ts", "bin/e2e-playwright.sh"],
-      "extensions": [".ts", ".sh", ".md"],
-      "also_update": [
-        "docs/catalog/FUNCTION_MANAGEMENT.md",
-        "docs/development/HANDOFF_NEW_SESSION.md",
-        "docs/development/NEXT_SESSION_PROMPT.md",
-        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md",
-        "docs/vision/manifest.json",
-        "docs/vision/extensions.json"
-      ]
-    },
-    "fm_replenish_post_galaxy_mvp": {
-      "sprints": ["PH-S124", "PH-S126", "PH-S127", "PH-S128", "PH-S129", "PH-S130", "PH-S131", "PH-S132", "PH-S133", "PH-S134", "PH-S135", "PH-S136", "PH-S137", "PH-S138", "PH-S139", "PH-S140", "PH-S141", "PH-S142"],
-      "docs": [
-        "docs/concept/POOLAI_GALAXY_GRID.md",
-        "docs/development/OPENTELEMETRY_TRACING.md",
-        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md",
-        "docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md"
+        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"
       ],
       "code_globs": [
-        "src/job/**",
-        "src/grid/**",
-        "src/observability/**",
-        "src/network/api/virtual_nodes.rs",
-        "e2e/tests/**"
+        "src/ui/admin/jobs.rs",
+        "src/ui/i18n_core.js",
+        "e2e/tests/admin.spec.ts"
       ],
-      "extensions": [".md", ".rs", ".ts"],
-      "also_update": [
-        "docs/catalog/FUNCTION_MANAGEMENT.md",
-        "docs/development/HANDOFF_NEW_SESSION.md",
-        "docs/development/NEXT_SESSION_PROMPT.md",
-        "docs/vision/manifest.json",
-        "docs/vision/extensions.json",
-        "README.md"
-      ]
-    },
-    "solana_adapter_vision": {
-      "sprints": ["PH-S120"],
       "docs": [
-        "docs/development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md",
-        "docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md",
-        "crates/poolai-solana-adapter/README.md"
+        "docs/concept/POOLAI_GALAXY_GRID.md"
       ],
-      "code_globs": [
-        "crates/poolai-solana-adapter/**",
-        "src/job/domain_events.rs",
-        "src/job/onchain.rs"
+      "extensions": [
+        ".rs",
+        ".js",
+        ".ts",
+        ".md"
       ],
-      "extensions": [".md", ".rs", ".toml", ".json"],
-      "also_update": [
-        "docs/catalog/FUNCTION_MANAGEMENT.md",
-        "docs/development/HANDOFF_NEW_SESSION.md",
-        "docs/development/NEXT_SESSION_PROMPT.md",
-        "docs/vision/manifest.json",
-        "docs/vision/extensions.json"
+      "sprints": [
+        "PH-S96",
+        "PH-S105",
+        "PH-S119"
       ]
-    },
-    "vision_ux_band": {
-      "sprints": ["PH-S188", "PH-S189", "PH-S190", "PH-S191", "PH-S200", "PH-S201", "PH-S202", "PH-S203", "PH-S204", "PH-S205", "PH-S206", "PH-S207", "PH-S208", "PH-S209", "PH-S226", "PH-S227"],
-      "docs": ["docs/vision/**", "docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/NEXT_SESSION_PROMPT.md"],
-      "code_globs": ["docs/vision/vision.js", "docs/vision/vision.css", "docs/vision/index.html", "src/bin/poolai_vision_sync.rs", ".cursor/hooks/**"],
-      "extensions": [".js", ".css", ".html", ".json", ".rs", ".md", ".mdc"],
-      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/vision/manifest.json", "docs/vision/extensions.json", "docs/vision/README.md"]
-    },
-    "galaxy_grid_roadmap_doc": {
-      "sprints": ["PH-S*"],
-      "docs": ["docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md", "docs/INDEX_2026-03-17.md", "docs/development/README.md"],
-      "extensions": [".md"],
-      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md"]
     },
     "digest_full_sync_band30": {
-      "sprints": ["PH-S950", "PH-S951", "PH-S952", "PH-S953", "PH-S954", "PH-S955", "PH-S956", "PH-S957", "PH-S958", "PH-S959"],
-      "docs": [
-        "docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md",
-        "docs/development/RUST_RATIO_STRATEGY_2026-06-13.md",
-        "docs/development/rust_ratio.json",
-        "file_list.csv"
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/development/NEXT_SESSION_PROMPT.md",
+        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md",
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json"
       ],
       "code_globs": [
         "crates/poolai-ui-core/src/digest_depth.rs",
@@ -324,7 +128,322 @@
         "crates/poolai-ui-wasm/**",
         "src/bin/**"
       ],
-      "extensions": [".md", ".rs", ".json", ".csv"],
+      "docs": [
+        "docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md",
+        "docs/development/RUST_RATIO_STRATEGY_2026-06-13.md",
+        "docs/development/rust_ratio.json",
+        "file_list.csv"
+      ],
+      "extensions": [
+        ".md",
+        ".rs",
+        ".json",
+        ".csv"
+      ],
+      "sprints": [
+        "PH-S950",
+        "PH-S951",
+        "PH-S952",
+        "PH-S953",
+        "PH-S954",
+        "PH-S955",
+        "PH-S956",
+        "PH-S957",
+        "PH-S958",
+        "PH-S959"
+      ]
+    },
+    "digest_galaxy_modules": {
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md"
+      ],
+      "code_globs": [
+        "src/grid/**",
+        "src/network/api/virtual_nodes.rs",
+        "src/release/**"
+      ],
+      "docs": [
+        "docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md",
+        "docs/INDEX_2026-03-17.md"
+      ],
+      "extensions": [
+        ".md",
+        ".rs"
+      ],
+      "sprints": [
+        "PH-S67"
+      ]
+    },
+    "docs_vision_meta": {
+      "docs": [
+        "docs/vision/**",
+        ".cursor/rules/docs-vision.mdc"
+      ],
+      "extensions": [
+        ".svg",
+        ".html",
+        ".json",
+        ".md",
+        ".mdc"
+      ],
+      "sprints": [
+        "PH-S63",
+        "PH-S64",
+        "PH-S188",
+        "PH-S189",
+        "PH-S190",
+        "PH-S191"
+      ]
+    },
+    "fm_replenish_post_galaxy_mvp": {
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/development/NEXT_SESSION_PROMPT.md",
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json",
+        "README.md"
+      ],
+      "code_globs": [
+        "src/job/**",
+        "src/grid/**",
+        "src/observability/**",
+        "src/network/api/virtual_nodes.rs",
+        "e2e/tests/**"
+      ],
+      "docs": [
+        "docs/concept/POOLAI_GALAXY_GRID.md",
+        "docs/development/OPENTELEMETRY_TRACING.md",
+        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md",
+        "docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md"
+      ],
+      "extensions": [
+        ".md",
+        ".rs",
+        ".ts"
+      ],
+      "sprints": [
+        "PH-S124",
+        "PH-S126",
+        "PH-S127",
+        "PH-S128",
+        "PH-S129",
+        "PH-S130",
+        "PH-S131",
+        "PH-S132",
+        "PH-S133",
+        "PH-S134",
+        "PH-S135",
+        "PH-S136",
+        "PH-S137",
+        "PH-S138",
+        "PH-S139",
+        "PH-S140",
+        "PH-S141",
+        "PH-S142"
+      ]
+    },
+    "galaxy_grid_code": {
+      "code_globs": [
+        "src/grid/galaxy_fee_split.rs",
+        "benches/galaxy_fee_split_benchmarks.rs"
+      ],
+      "docs": [
+        "docs/concept/POOLAI_GALAXY_GRID.md",
+        "docs/performance/BENCHMARKS.md"
+      ],
+      "extensions": [
+        ".rs",
+        ".md",
+        ".toml"
+      ],
+      "sprints": [
+        "PH-S58"
+      ]
+    },
+    "galaxy_grid_concept": {
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/development/NEXT_SESSION_PROMPT.md",
+        "README.md",
+        "docs/README.md",
+        "docs/INDEX_2026-03-17.md",
+        "docs/STRUCTURE.md"
+      ],
+      "code_globs": [
+        "src/grid/**",
+        "src/network/api/virtual_nodes.rs",
+        "src/services/virtual_node_telegram_binding_service.rs"
+      ],
+      "docs": [
+        "docs/concept/POOLAI_GALAXY_GRID.md"
+      ],
+      "extensions": [
+        ".md",
+        ".rs"
+      ],
+      "sprints": [
+        "PH-S55",
+        "PH-S56",
+        "PH-S57",
+        "PH-S59",
+        "PH-S60",
+        "PH-S61",
+        "PH-S62",
+        "PH-S63",
+        "PH-S64"
+      ]
+    },
+    "galaxy_grid_protocol_wire": {
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md"
+      ],
+      "code_globs": [
+        "src/network/api/virtual_nodes.rs",
+        "src/network/api/workers.rs",
+        "docs/openapi.yaml"
+      ],
+      "docs": [
+        "docs/concept/POOLAI_GALAXY_GRID.md"
+      ],
+      "extensions": [
+        ".rs",
+        ".yaml",
+        ".md"
+      ],
+      "sprints": [
+        "PH-S65"
+      ]
+    },
+    "galaxy_grid_roadmap_doc": {
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md"
+      ],
+      "docs": [
+        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md",
+        "docs/INDEX_2026-03-17.md",
+        "docs/development/README.md"
+      ],
+      "extensions": [
+        ".md"
+      ],
+      "sprints": [
+        "PH-S*"
+      ]
+    },
+    "galaxy_lease_wire_docs": {
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/development/NEXT_SESSION_PROMPT.md",
+        "docs/INDEX_2026-03-17.md",
+        "README.md"
+      ],
+      "docs": [
+        "docs/concept/POOLAI_GALAXY_GRID.md",
+        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"
+      ],
+      "extensions": [
+        ".md"
+      ],
+      "sprints": [
+        "PH-S109"
+      ]
+    },
+    "galaxy_lease_worker_heartbeat_docs": {
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md",
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/development/NEXT_SESSION_PROMPT.md",
+        "docs/vision/manifest.json"
+      ],
+      "code_globs": [
+        "src/bin/poolai-worker.rs",
+        "src/job/lease_config.rs"
+      ],
+      "docs": [
+        "docs/concept/POOLAI_GALAXY_GRID.md",
+        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"
+      ],
+      "extensions": [
+        ".md",
+        ".rs"
+      ],
+      "sprints": [
+        "PH-S121"
+      ]
+    },
+    "galaxy_pricing_oracle_stub": {
+      "also_update": [
+        "docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md"
+      ],
+      "code_globs": [
+        "src/grid/**"
+      ],
+      "docs": [
+        "docs/concept/POOLAI_GALAXY_GRID.md"
+      ],
+      "extensions": [
+        ".rs",
+        ".md"
+      ],
+      "sprints": [
+        "PH-S68"
+      ]
+    },
+    "grid_ingest_leased": {
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/development/NEXT_SESSION_PROMPT.md"
+      ],
+      "code_globs": [
+        "src/grid/dispatch.rs",
+        "src/job/scheduler.rs"
+      ],
+      "docs": [
+        "docs/concept/POOLAI_GALAXY_GRID.md",
+        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"
+      ],
+      "extensions": [
+        ".rs",
+        ".md"
+      ],
+      "sprints": [
+        "PH-S108"
+      ]
+    },
+    "grid_job_lease_e2e": {
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/development/NEXT_SESSION_PROMPT.md",
+        "docs/vision/manifest.json"
+      ],
+      "code_globs": [
+        "e2e/tests/grid_job_lease.spec.ts",
+        "e2e/package.json",
+        "src/grid/dispatch.rs"
+      ],
+      "docs": [
+        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"
+      ],
+      "extensions": [
+        ".ts",
+        ".json",
+        ".rs",
+        ".md"
+      ],
+      "sprints": [
+        "PH-S112"
+      ]
+    },
+    "grid_pricing_e2e_force_fallback": {
       "also_update": [
         "docs/catalog/FUNCTION_MANAGEMENT.md",
         "docs/development/HANDOFF_NEW_SESSION.md",
@@ -332,15 +451,430 @@
         "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md",
         "docs/vision/manifest.json",
         "docs/vision/extensions.json"
+      ],
+      "code_globs": [
+        "e2e/tests/grid_pricing.spec.ts",
+        "e2e/tests/helpers.ts",
+        "bin/e2e-playwright.sh"
+      ],
+      "docs": [
+        "docs/development/E2E_PLAYWRIGHT.md"
+      ],
+      "extensions": [
+        ".ts",
+        ".sh",
+        ".md"
+      ],
+      "sprints": [
+        "PH-S123"
+      ]
+    },
+    "grid_result_lease_cas": {
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md"
+      ],
+      "code_globs": [
+        "src/grid/dispatch.rs",
+        "src/grid/envelope.rs",
+        "src/job/types.rs",
+        "src/network/json_errors.rs"
+      ],
+      "docs": [
+        "docs/concept/POOLAI_GALAXY_GRID.md"
+      ],
+      "extensions": [
+        ".rs",
+        ".md"
+      ],
+      "sprints": [
+        "PH-S110"
+      ]
+    },
+    "grid_result_lease_e2e": {
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/development/NEXT_SESSION_PROMPT.md",
+        "docs/vision/manifest.json"
+      ],
+      "code_globs": [
+        "e2e/tests/grid_result_lease.spec.ts",
+        "e2e/package.json",
+        "src/grid/dispatch.rs"
+      ],
+      "docs": [
+        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"
+      ],
+      "extensions": [
+        ".ts",
+        ".json",
+        ".rs",
+        ".md"
+      ],
+      "sprints": [
+        "PH-S117"
+      ]
+    },
+    "job_failover_stub": {
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/development/NEXT_SESSION_PROMPT.md",
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json"
+      ],
+      "code_globs": [
+        "src/job/store.rs",
+        "src/job/scheduler.rs"
+      ],
+      "docs": [
+        "docs/concept/POOLAI_GALAXY_GRID.md",
+        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"
+      ],
+      "extensions": [
+        ".rs",
+        ".md"
+      ],
+      "sprints": [
+        "PH-S101"
+      ]
+    },
+    "job_lease_acquire": {
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md"
+      ],
+      "code_globs": [
+        "src/job/lease_acquire.rs",
+        "src/job/store.rs",
+        "src/network/api/jobs.rs",
+        "docs/openapi.yaml",
+        "tests/jobs_api_contracts.rs"
+      ],
+      "docs": [
+        "docs/concept/POOLAI_GALAXY_GRID.md"
+      ],
+      "extensions": [
+        ".rs",
+        ".yaml",
+        ".md"
+      ],
+      "sprints": [
+        "PH-S98",
+        "PH-S100"
+      ]
+    },
+    "job_lease_renew": {
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md"
+      ],
+      "code_globs": [
+        "src/job/**",
+        "src/network/api/jobs.rs"
+      ],
+      "docs": [
+        "docs/concept/POOLAI_GALAXY_GRID.md"
+      ],
+      "extensions": [
+        ".rs",
+        ".md"
+      ],
+      "sprints": [
+        "PH-S99"
+      ]
+    },
+    "job_lease_ttl_env": {
+      "also_update": [
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md"
+      ],
+      "code_globs": [
+        "src/job/lease_config.rs",
+        "src/job/mod.rs"
+      ],
+      "docs": [
+        "docs/concept/POOLAI_GALAXY_GRID.md",
+        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"
+      ],
+      "extensions": [
+        ".rs",
+        ".md"
+      ],
+      "sprints": [
+        "PH-S97"
+      ]
+    },
+    "job_lease_wire_stub": {
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/development/NEXT_SESSION_PROMPT.md",
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json"
+      ],
+      "code_globs": [
+        "src/job/types.rs",
+        "src/network/api/jobs.rs",
+        "docs/openapi.yaml",
+        "tests/jobs_api_contracts.rs"
+      ],
+      "docs": [
+        "docs/concept/POOLAI_GALAXY_GRID.md"
+      ],
+      "extensions": [
+        ".rs",
+        ".yaml",
+        ".md"
+      ],
+      "sprints": [
+        "PH-S94",
+        "PH-S95"
+      ]
+    },
+    "job_migrating_lifecycle": {
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/development/NEXT_SESSION_PROMPT.md",
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json"
+      ],
+      "code_globs": [
+        "src/job/types.rs",
+        "src/job/lifecycle.rs",
+        "src/network/api/jobs.rs",
+        "tests/jobs_api_contracts.rs",
+        "e2e/tests/jobs_migrating.spec.ts",
+        "e2e/package.json",
+        "docs/openapi.yaml"
+      ],
+      "docs": [
+        "docs/concept/POOLAI_GALAXY_GRID.md",
+        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"
+      ],
+      "extensions": [
+        ".rs",
+        ".yaml",
+        ".md",
+        ".json"
+      ],
+      "sprints": [
+        "PH-S104",
+        "PH-S133"
+      ]
+    },
+    "jobs_lease_e2e": {
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/development/NEXT_SESSION_PROMPT.md",
+        "docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md",
+        "docs/INDEX_2026-03-17.md",
+        "README.md"
+      ],
+      "code_globs": [
+        "e2e/tests/jobs_lease.spec.ts",
+        "e2e/package.json"
+      ],
+      "docs": [
+        "docs/development/E2E_PLAYWRIGHT.md",
+        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"
+      ],
+      "extensions": [
+        ".ts",
+        ".json",
+        ".md"
+      ],
+      "sprints": [
+        "PH-S107"
+      ]
+    },
+    "jobs_lease_negative_e2e": {
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/development/NEXT_SESSION_PROMPT.md",
+        "docs/vision/manifest.json",
+        "bin/open-docs-vision.ps1"
+      ],
+      "code_globs": [
+        "e2e/tests/jobs_lease.spec.ts",
+        "bin/e2e-playwright.sh"
+      ],
+      "docs": [
+        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"
+      ],
+      "extensions": [
+        ".ts",
+        ".sh",
+        ".md"
+      ],
+      "sprints": [
+        "PH-S118"
+      ]
+    },
+    "jobs_migrating_e2e": {
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/development/NEXT_SESSION_PROMPT.md",
+        "docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md",
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json"
+      ],
+      "code_globs": [
+        "e2e/tests/jobs_migrating.spec.ts",
+        "e2e/package.json"
+      ],
+      "docs": [
+        "docs/development/E2E_PLAYWRIGHT.md",
+        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"
+      ],
+      "extensions": [
+        ".ts",
+        ".json",
+        ".md"
+      ],
+      "sprints": [
+        "PH-S133"
+      ]
+    },
+    "multi_module_horizon_band35": {
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/development/NEXT_SESSION_PROMPT.md",
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json"
+      ],
+      "code_globs": [
+        "crates/poolai-ui-core/src/multi_module_depth.rs",
+        "tests/multi_module_wire_smoke.rs",
+        "tests/multi_module_admin_wasm_regression.rs",
+        "tests/multi_module_stand_smoke_audit.rs",
+        "tests/galaxy_horizon_s1000_integration.rs",
+        "src/bin/poolai_http_stand_smoke.rs",
+        "src/bin/poolai_loc_audit.rs"
+      ],
+      "docs": [
+        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md",
+        "docs/development/rust_ratio.json",
+        ".cursor/rules/poolai-testing-policy.mdc"
+      ],
+      "extensions": [
+        ".md",
+        ".rs",
+        ".mdc",
+        ".json"
+      ],
+      "sprints": [
+        "PH-S1000",
+        "PH-S1001",
+        "PH-S1002",
+        "PH-S1003",
+        "PH-S1004",
+        "PH-S1005",
+        "PH-S1006",
+        "PH-S1007",
+        "PH-S1008",
+        "PH-S1009"
+      ]
+    },
+    "openapi_lease_schemas_audit": {
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/development/NEXT_SESSION_PROMPT.md",
+        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md",
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json",
+        "bin/open-docs-vision.ps1"
+      ],
+      "code_globs": [
+        "src/bin/poolai_openapi_gap_audit.rs",
+        "src/bin/poolai_vision_sync.rs",
+        "src/grid/envelope.rs",
+        "src/network/api/jobs.rs"
+      ],
+      "docs": [
+        "docs/openapi.yaml",
+        "docs/development/OPENAPI_GAP_AUDIT_2026-05-19.md"
+      ],
+      "extensions": [
+        ".yaml",
+        ".rs",
+        ".md"
+      ],
+      "sprints": [
+        "PH-S122"
+      ]
+    },
+    "pricing_live_fetch": {
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/development/NEXT_SESSION_PROMPT.md",
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json"
+      ],
+      "code_globs": [
+        "src/grid/galaxy_pricing_oracle.rs",
+        "src/network/api/grid.rs"
+      ],
+      "docs": [
+        "docs/concept/POOLAI_GALAXY_GRID.md",
+        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"
+      ],
+      "extensions": [
+        ".rs",
+        ".md",
+        ".json"
+      ],
+      "sprints": [
+        "PH-S102"
+      ]
+    },
+    "protocol_header_middleware": {
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/development/NEXT_SESSION_PROMPT.md",
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json"
+      ],
+      "code_globs": [
+        "src/network/api/protocol_middleware.rs",
+        "src/network/api/mod.rs",
+        "src/grid/protocol_compat.rs",
+        "e2e/tests/protocol_middleware.spec.ts",
+        "e2e/package.json"
+      ],
+      "docs": [
+        "docs/concept/POOLAI_GALAXY_GRID.md",
+        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"
+      ],
+      "extensions": [
+        ".rs",
+        ".md",
+        ".json"
+      ],
+      "sprints": [
+        "PH-S103",
+        "PH-S134"
       ]
     },
     "rust_ratio_stretch_band": {
-      "sprints": ["PH-S150", "PH-S151", "PH-S152", "PH-S153", "PH-S154", "PH-S155", "PH-S156", "PH-S157", "PH-S158", "PH-S159", "PH-S160", "PH-S161", "PH-S162", "PH-S163", "PH-S164", "PH-S165", "PH-S166", "PH-S167", "PH-S168", "PH-S169", "PH-S170", "PH-S171", "PH-S172", "PH-S173", "PH-S174", "PH-S175", "PH-S176", "PH-S177", "PH-S178", "PH-S179", "PH-S180", "PH-S181", "PH-S182", "PH-S183", "PH-S184", "PH-S185", "PH-S186", "PH-S187", "PH-S188", "PH-S189", "PH-S190", "PH-S191", "PH-S940", "PH-S941", "PH-S942", "PH-S943", "PH-S944", "PH-S945", "PH-S946", "PH-S947", "PH-S948", "PH-S949"],
-      "docs": [
-        "docs/development/RUST_RATIO_STRATEGY_2026-06-13.md",
-        "docs/development/rust_ratio.json",
-        "docs/development/E2E_PLAYWRIGHT.md",
-        "docs/development/RUN_LOCAL.md"
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/development/NEXT_SESSION_PROMPT.md",
+        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md",
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json",
+        "docs/vision/vision.svg"
       ],
       "code_globs": [
         "src/bin/poolai_loc_audit.rs",
@@ -371,47 +905,259 @@
         "bin/e2e-playwright.sh",
         ".github/workflows/ci.yml"
       ],
-      "extensions": [".md", ".rs", ".js", ".json", ".yml", ".sh"],
-      "also_update": [
-        "docs/catalog/FUNCTION_MANAGEMENT.md",
-        "docs/development/HANDOFF_NEW_SESSION.md",
-        "docs/development/NEXT_SESSION_PROMPT.md",
-        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md",
-        "docs/vision/manifest.json",
-        "docs/vision/extensions.json",
-        "docs/vision/vision.svg"
+      "docs": [
+        "docs/development/RUST_RATIO_STRATEGY_2026-06-13.md",
+        "docs/development/rust_ratio.json",
+        "docs/development/E2E_PLAYWRIGHT.md",
+        "docs/development/RUN_LOCAL.md"
+      ],
+      "extensions": [
+        ".md",
+        ".rs",
+        ".js",
+        ".json",
+        ".yml",
+        ".sh"
+      ],
+      "sprints": [
+        "PH-S150",
+        "PH-S151",
+        "PH-S152",
+        "PH-S153",
+        "PH-S154",
+        "PH-S155",
+        "PH-S156",
+        "PH-S157",
+        "PH-S158",
+        "PH-S159",
+        "PH-S160",
+        "PH-S161",
+        "PH-S162",
+        "PH-S163",
+        "PH-S164",
+        "PH-S165",
+        "PH-S166",
+        "PH-S167",
+        "PH-S168",
+        "PH-S169",
+        "PH-S170",
+        "PH-S171",
+        "PH-S172",
+        "PH-S173",
+        "PH-S174",
+        "PH-S175",
+        "PH-S176",
+        "PH-S177",
+        "PH-S178",
+        "PH-S179",
+        "PH-S180",
+        "PH-S181",
+        "PH-S182",
+        "PH-S183",
+        "PH-S184",
+        "PH-S185",
+        "PH-S186",
+        "PH-S187",
+        "PH-S188",
+        "PH-S189",
+        "PH-S190",
+        "PH-S191",
+        "PH-S940",
+        "PH-S941",
+        "PH-S942",
+        "PH-S943",
+        "PH-S944",
+        "PH-S945",
+        "PH-S946",
+        "PH-S947",
+        "PH-S948",
+        "PH-S949"
       ]
     },
-    "multi_module_horizon_band35": {
-      "sprints": ["PH-S1000", "PH-S1001", "PH-S1002", "PH-S1003", "PH-S1004", "PH-S1005", "PH-S1006", "PH-S1007", "PH-S1008", "PH-S1009"],
-      "docs": [
-        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md",
-        "docs/development/rust_ratio.json",
-        ".cursor/rules/poolai-testing-policy.mdc"
-      ],
-      "code_globs": [
-        "crates/poolai-ui-core/src/multi_module_depth.rs",
-        "tests/multi_module_wire_smoke.rs",
-        "tests/multi_module_admin_wasm_regression.rs",
-        "tests/multi_module_stand_smoke_audit.rs",
-        "tests/galaxy_horizon_s1000_integration.rs",
-        "src/bin/poolai_http_stand_smoke.rs",
-        "src/bin/poolai_loc_audit.rs"
-      ],
-      "extensions": [".md", ".rs", ".mdc", ".json"],
+    "security_governance_docs": {
       "also_update": [
         "docs/catalog/FUNCTION_MANAGEMENT.md",
         "docs/development/HANDOFF_NEW_SESSION.md",
         "docs/development/NEXT_SESSION_PROMPT.md",
         "docs/vision/manifest.json",
         "docs/vision/extensions.json"
+      ],
+      "code_globs": [
+        "src/release/**",
+        "src/grid/protocol_compat.rs"
+      ],
+      "docs": [
+        "docs/security/SECURITY_HARDENING.md",
+        "docs/security/DEPENDENCY_SECURITY.md",
+        "docs/concept/POOLAI_GALAXY_GRID.md"
+      ],
+      "extensions": [
+        ".md",
+        ".rs",
+        ".json"
+      ],
+      "sprints": [
+        "PH-S69",
+        "PH-S71",
+        "PH-S72",
+        "PH-S73",
+        "PH-S74",
+        "PH-S75",
+        "PH-S76",
+        "PH-S77"
+      ]
+    },
+    "solana_adapter_vision": {
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/development/NEXT_SESSION_PROMPT.md",
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json"
+      ],
+      "code_globs": [
+        "crates/poolai-solana-adapter/**",
+        "src/job/domain_events.rs",
+        "src/job/onchain.rs"
+      ],
+      "docs": [
+        "docs/development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md",
+        "docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md",
+        "crates/poolai-solana-adapter/README.md"
+      ],
+      "extensions": [
+        ".md",
+        ".rs",
+        ".toml",
+        ".json"
+      ],
+      "sprints": [
+        "PH-S120"
+      ]
+    },
+    "verify_release_cli": {
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/development/NEXT_SESSION_PROMPT.md",
+        "Cargo.toml",
+        "README.md"
+      ],
+      "code_globs": [
+        "src/release/**",
+        "src/bin/poolai_verify_release.rs"
+      ],
+      "docs": [
+        "docs/concept/POOLAI_GALAXY_GRID.md",
+        "docs/security/SECURITY_HARDENING.md"
+      ],
+      "extensions": [
+        ".rs",
+        ".md"
+      ],
+      "sprints": [
+        "PH-S66"
+      ]
+    },
+    "vision_ux_band": {
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/development/NEXT_SESSION_PROMPT.md",
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json",
+        "docs/vision/README.md"
+      ],
+      "code_globs": [
+        "docs/vision/vision.js",
+        "docs/vision/vision.css",
+        "docs/vision/index.html",
+        "src/bin/poolai_vision_sync.rs",
+        ".cursor/hooks/**"
+      ],
+      "docs": [
+        "docs/vision/**",
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/NEXT_SESSION_PROMPT.md"
+      ],
+      "extensions": [
+        ".js",
+        ".css",
+        ".html",
+        ".json",
+        ".rs",
+        ".md",
+        ".mdc"
+      ],
+      "sprints": [
+        "PH-S188",
+        "PH-S189",
+        "PH-S190",
+        "PH-S191",
+        "PH-S200",
+        "PH-S201",
+        "PH-S202",
+        "PH-S203",
+        "PH-S204",
+        "PH-S205",
+        "PH-S206",
+        "PH-S207",
+        "PH-S208",
+        "PH-S209",
+        "PH-S226",
+        "PH-S227"
+      ]
+    },
+    "worker_lease_renew_stub": {
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/development/NEXT_SESSION_PROMPT.md",
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json"
+      ],
+      "code_globs": [
+        "src/bin/poolai-worker.rs"
+      ],
+      "docs": [
+        "docs/concept/POOLAI_GALAXY_GRID.md",
+        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"
+      ],
+      "extensions": [
+        ".rs",
+        ".md",
+        ".json"
+      ],
+      "sprints": [
+        "PH-S106"
+      ]
+    },
+    "worker_lease_renew_ticker": {
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/development/NEXT_SESSION_PROMPT.md",
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json"
+      ],
+      "code_globs": [
+        "src/bin/poolai-worker.rs",
+        "src/job/lease_config.rs"
+      ],
+      "docs": [
+        "docs/concept/POOLAI_GALAXY_GRID.md",
+        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"
+      ],
+      "extensions": [
+        ".rs",
+        ".md",
+        ".json"
+      ],
+      "sprints": [
+        "PH-S116"
       ]
     }
   },
-  "browser_panels": [
-    { "id": "map", "title": "Isometric map", "source": "vision.svg" },
-    { "id": "graph", "title": "Graph (manifest)", "source": "manifest.json" },
-    { "id": "scope", "title": "Sprint extensions", "source": "extensions.json" },
-    { "id": "docs", "title": "Open doc", "source": "node_link" }
-  ]
+  "ui_version": 4,
+  "updated_at": "2026-05-28"
 }

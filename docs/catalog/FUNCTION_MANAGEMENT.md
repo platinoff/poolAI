@@ -1221,7 +1221,7 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 47 ✅). **Master horizon:** PH-S1119…S1128 (band 48). Vision rev **319** (після sync). **Наступна сесія:** **`абракадабра`** — project scan → band 48.
+**Відкритих у §5.12:** **0** (band 47 ✅). **Master horizon:** PH-S1119…S1128 (band 48). Vision rev **320** (після sync). **Наступна сесія:** **`абракадабра`** — project scan → band 48.
 
 | 1044 | **PH-S1109** | `stable_state_touchup_depth` ui-core module | `stable_state_touchup_depth.rs` | depth enum + STABLE criteria registry constants | **✅** |
 | 1045 | **PH-S1110** | `poolai-loc-audit --stable-touchup` | `poolai_loc_audit.rs` | stable_touchup fields in `rust_ratio.json` | **✅** |
