@@ -1,6 +1,6 @@
 # Rust codebase ratio — стратегія 90–95% (PoolAI)
 
-**Оновлено:** 2026-07-18 · **Канон:** FM **§5.13** · band 46 **PH-S1099…S1108** ✅ · rust_ratio **≥95%** formal · stretch **96%** advisory
+**Оновлено:** 2026-07-18 · **Канон:** FM **§5.13** · band 47 **PH-S1109…S1118** ✅ · rust_ratio **≥95%** formal · stretch **96%** advisory
 
 **Мета:** зростання частки **Rust** у виконуваному коді репозиторію до **90–95%** (формально), **96% stretch spirit** (орієнтир replenish PH-S150…S159) — платформа збирається і перевіряється через **`cargo`** без обов'язкового Node на edge.
 
@@ -16,7 +16,7 @@
 
 **Орієнтовний зріз (2026-06-20, PH-S715):** **`94.76%`** Rust LOC (`cargo run --bin poolai-loc-audit` → [`rust_ratio.json`](./rust_ratio.json)). Formal **≥95%** gate — completion bands **28–29** (PH-S930…S949). Non-Rust «шум»: **`i18n_core.js`**, **`admin_common.js`**, **`admin_charts.js`**, browser-only `e2e/tests/`, ops shell.
 
-**Audit:** `cargo run --bin poolai-loc-audit` — звіт `docs/development/rust_ratio.json` для FM §5.13 / PH-S151…S170 gates. CI hold advisory (PH-S165): `cargo run --bin poolai-loc-audit -- --warn-below 0.93 --target 0.95 --stretch 0.96 --min-ratio 0.95 --advisory`. Band 46 (PH-S1100): `cargo run --bin poolai-loc-audit -- --migration-advisory` — ui_js + archived e2e migration registry у `rust_migration_advisory_depth.rs`.
+**Audit:** `cargo run --bin poolai-loc-audit` — звіт `docs/development/rust_ratio.json` для FM §5.13 / PH-S151…S170 gates. CI hold advisory (PH-S165): `cargo run --bin poolai-loc-audit -- --warn-below 0.93 --target 0.95 --stretch 0.96 --min-ratio 0.95 --advisory`. Band 46 (PH-S1100): `cargo run --bin poolai-loc-audit -- --migration-advisory` — ui_js + archived e2e migration registry у `rust_migration_advisory_depth.rs`. Band 47 (PH-S1110): `cargo run --bin poolai-loc-audit -- --stable-touchup` — STABLE maintenance criteria registry у `stable_state_touchup_depth.rs`.
 
 ---
 

@@ -2348,6 +2348,12 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_stand_smoke_run_local_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_rust_migration_advisory_depth_rs"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -9638,9 +9644,30 @@
       "label": "galaxy_horizon_s1089_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s1089_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_rust_migration_advisory_depth_rs",
+      "label": "rust_migration_advisory_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/rust_migration_advisory_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1099_integration_rs",
+      "label": "galaxy_horizon_s1099_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1099_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_rust_migration_advisory_audit_rs",
+      "label": "rust_migration_advisory_audit.rs",
+      "layer": "L3",
+      "path": "tests/rust_migration_advisory_audit.rs"
     }
   ],
-  "revision": 318,
+  "revision": 319,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -18218,6 +18245,96 @@
       "row": 953,
       "status": "closed",
       "title": "Ops power band close"
+    },
+    {
+      "acceptance": "depth enum + STABLE criteria registry constants",
+      "deps": "stable_state_touchup_depth.rs",
+      "id": "PH-S1109",
+      "open": false,
+      "row": 1044,
+      "status": "closed",
+      "title": "stable_state_touchup_depth` ui-core module"
+    },
+    {
+      "acceptance": "stable_touchup fields in `rust_ratio.json",
+      "deps": "poolai_loc_audit.rs",
+      "id": "PH-S1110",
+      "open": false,
+      "row": 1045,
+      "status": "closed",
+      "title": "poolai-loc-audit --stable-touchup"
+    },
+    {
+      "acceptance": "criteria registry + maintenance markers",
+      "deps": "stable_state_touchup_audit.rs",
+      "id": "PH-S1111",
+      "open": false,
+      "row": 1046,
+      "status": "closed",
+      "title": "STABLE touch-up audit"
+    },
+    {
+      "acceptance": "7 maintenance-mode criteria ids",
+      "deps": "stable_state_touchup_depth.rs",
+      "id": "PH-S1112",
+      "open": false,
+      "row": 1047,
+      "status": "closed",
+      "title": "STABLE criteria registry"
+    },
+    {
+      "acceptance": "VERIFY_STABLE_TOUCHUP=1` → loc-audit",
+      "deps": "bin/verify-dev-stand.sh",
+      "id": "PH-S1113",
+      "open": false,
+      "row": 1048,
+      "status": "closed",
+      "title": "verify-dev-stand` STABLE hook"
+    },
+    {
+      "acceptance": "post-health `--stable-touchup` + stand smoke export shape",
+      "deps": "bin/run-poolai.*",
+      "id": "PH-S1114",
+      "open": false,
+      "row": 1049,
+      "status": "closed",
+      "title": "run-poolai quick --stable-touchup"
+    },
+    {
+      "acceptance": "--stable-touchup`, `VERIFY_STABLE_TOUCHUP",
+      "deps": "docs",
+      "id": "PH-S1115",
+      "open": false,
+      "row": 1050,
+      "status": "closed",
+      "title": "RUN_LOCAL.md band 47 ops sync"
+    },
+    {
+      "acceptance": "STABLE touch-up pointer + loc-audit flag",
+      "deps": "docs",
+      "id": "PH-S1116",
+      "open": false,
+      "row": 1051,
+      "status": "closed",
+      "title": "RUST_RATIO_STRATEGY band 47 sync"
+    },
+    {
+      "acceptance": "band 47 closed row; maintenance criteria",
+      "deps": "docs + loc-audit",
+      "id": "PH-S1117",
+      "open": false,
+      "row": 1052,
+      "status": "closed",
+      "title": "GALAXY_GRID_ROADMAP + STABLE touch-up"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1109_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1118",
+      "open": false,
+      "row": 1053,
+      "status": "closed",
+      "title": "STABLE touch-up band close"
     },
     {
       "acceptance": "depth enum + ui_js/e2e registry constants",

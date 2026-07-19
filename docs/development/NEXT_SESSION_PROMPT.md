@@ -1,13 +1,13 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-07-18 (band 46 **PH-S1099…S1108** ✅ · horizon band 47)
+**Оновлено:** 2026-07-18 (band 47 **PH-S1109…S1118** ✅ · horizon band 48)
 
-Maintenance mode (FM §5.15) · band 46 drained.
+Maintenance mode (FM §5.15) · band 47 drained.
 
-| **← наступний** | **`абракадабра`** (project scan → band 47) |
-| **§5.12 active** | **0** (band 46 ✅) |
-| **Horizon** | band 47 → **PH-S1109…S1118** |
-| **Vision** | rev **318** |
+| **← наступний** | **`абракадабра`** (project scan → band 48) |
+| **§5.12 active** | **0** (band 47 ✅) |
+| **Horizon** | band 48 → **PH-S1119…S1128** |
+| **Vision** | rev **319** |
 
 ---
 
@@ -19,14 +19,14 @@ Maintenance mode (FM §5.15) · band 46 drained.
 
 ---
 
-## Band 47 (очікуваний фокус — project scan)
+## Band 48 (очікуваний фокус — project scan)
 
 | Sprint range | Focus (FM §5.19) |
 |--------------|------------------|
-| PH-S1109…S1118 | horizon close + STABLE touch-up |
+| PH-S1119…S1128 | horizon close + maintenance ops |
 
 ---
 
 ## Не повторювати
 
-Band 46 ✅ · band 45 ✅ · band 44 ✅ · product-complete S1010 ✅ · FM-003 LAN · FM-041 Cloud SDK.
+Band 47 ✅ · band 46 ✅ · band 45 ✅ · product-complete S1010 ✅ · FM-003 LAN · FM-041 Cloud SDK.

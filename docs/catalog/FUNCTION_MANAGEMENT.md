@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-07-18 (band 46 **PH-S1099…S1108** ✅ · horizon band 47)
+**Оновлено:** 2026-07-18 (band 47 **PH-S1109…S1118** ✅ · maintenance band 48)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -1221,7 +1221,18 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 46 ✅). **Master horizon:** PH-S1109…S1118 (band 47). Vision rev **318** (після sync). **Наступна сесія:** **`абракадабра`** — project scan → band 47.
+**Відкритих у §5.12:** **0** (band 47 ✅). **Master horizon:** PH-S1119…S1128 (band 48). Vision rev **319** (після sync). **Наступна сесія:** **`абракадабра`** — project scan → band 48.
+
+| 1044 | **PH-S1109** | `stable_state_touchup_depth` ui-core module | `stable_state_touchup_depth.rs` | depth enum + STABLE criteria registry constants | **✅** |
+| 1045 | **PH-S1110** | `poolai-loc-audit --stable-touchup` | `poolai_loc_audit.rs` | stable_touchup fields in `rust_ratio.json` | **✅** |
+| 1046 | **PH-S1111** | STABLE touch-up audit | `stable_state_touchup_audit.rs` | criteria registry + maintenance markers | **✅** |
+| 1047 | **PH-S1112** | STABLE criteria registry | `stable_state_touchup_depth.rs` | 7 maintenance-mode criteria ids | **✅** |
+| 1048 | **PH-S1113** | `verify-dev-stand` STABLE hook | `bin/verify-dev-stand.sh` | `VERIFY_STABLE_TOUCHUP=1` → loc-audit | **✅** |
+| 1049 | **PH-S1114** | `run-poolai quick --stable-touchup` | `bin/run-poolai.*` | post-health `--stable-touchup` + stand smoke export shape | **✅** |
+| 1050 | **PH-S1115** | RUN_LOCAL.md band 47 ops sync | docs | `--stable-touchup`, `VERIFY_STABLE_TOUCHUP` | **✅** |
+| 1051 | **PH-S1116** | RUST_RATIO_STRATEGY band 47 sync | docs | STABLE touch-up pointer + loc-audit flag | **✅** |
+| 1052 | **PH-S1117** | GALAXY_GRID_ROADMAP + STABLE touch-up | docs + loc-audit | band 47 closed row; maintenance criteria | **✅** |
+| 1053 | **PH-S1118** | STABLE touch-up band close | tests/docs | `galaxy_horizon_s1109_integration`; HANDOFF/NEXT | **✅** |
 
 | 1034 | **PH-S1099** | `rust_migration_advisory_depth` ui-core module | `rust_migration_advisory_depth.rs` | depth enum + ui_js/e2e registry constants | **✅** |
 | 1035 | **PH-S1100** | `poolai-loc-audit --migration-advisory` | `poolai_loc_audit.rs` | migration fields in `rust_ratio.json` | **✅** |
@@ -1299,6 +1310,21 @@ FM-xxx (з таблиці нижче)
 | 981 | **PH-S1046** | ui-core depth stub | `vision_map_depth.rs` | depth enum + FM band 40 markers | **✅** |
 | 982 | **PH-S1047** | Vision Playwright smoke | `e2e/tests/vision.spec.ts` | skip-link focus; `#map-scene-3d`; tree role | **✅** |
 | 983 | **PH-S1048** | Vision map band close | tests/docs | `galaxy_horizon_s1039_integration`; HANDOFF/NEXT | **✅** |
+
+### 5.28 STABLE touch-up queue — band 47 (PH-S1109…S1118, 2026-07-18)
+
+**Джерело:** project scan band 47 — maintenance-mode STABLE criteria registry touch-up after band 46 migration advisory.
+
+| 1044 | **PH-S1109** | `stable_state_touchup_depth` ui-core module | `stable_state_touchup_depth.rs` | depth enum + STABLE criteria registry constants | **✅** |
+| 1045 | **PH-S1110** | `poolai-loc-audit --stable-touchup` | `poolai_loc_audit.rs` | stable_touchup fields in `rust_ratio.json` | **✅** |
+| 1046 | **PH-S1111** | STABLE touch-up audit | `stable_state_touchup_audit.rs` | criteria registry + maintenance markers | **✅** |
+| 1047 | **PH-S1112** | STABLE criteria registry | `stable_state_touchup_depth.rs` | 7 maintenance-mode criteria ids | **✅** |
+| 1048 | **PH-S1113** | `verify-dev-stand` STABLE hook | `bin/verify-dev-stand.sh` | `VERIFY_STABLE_TOUCHUP=1` → loc-audit | **✅** |
+| 1049 | **PH-S1114** | `run-poolai quick --stable-touchup` | `bin/run-poolai.*` | post-health `--stable-touchup` + stand smoke export shape | **✅** |
+| 1050 | **PH-S1115** | RUN_LOCAL.md band 47 ops sync | docs | `--stable-touchup`, `VERIFY_STABLE_TOUCHUP` | **✅** |
+| 1051 | **PH-S1116** | RUST_RATIO_STRATEGY band 47 sync | docs | STABLE touch-up pointer + loc-audit flag | **✅** |
+| 1052 | **PH-S1117** | GALAXY_GRID_ROADMAP + STABLE touch-up | docs + loc-audit | band 47 closed row; maintenance criteria | **✅** |
+| 1053 | **PH-S1118** | STABLE touch-up band close | tests/docs | `galaxy_horizon_s1109_integration`; HANDOFF/NEXT | **✅** |
 
 ### 5.27 Ratio/rust migration advisory queue — band 46 (PH-S1099…S1108, 2026-07-18)
 
@@ -1404,7 +1430,7 @@ FM-xxx (з таблиці нижче)
 | 44 | S1079…S1088 | wasm admin slim panels ✅ |
 | 45 | S1089…S1098 | stand smoke + RUN_LOCAL ops ✅ |
 | 46 | S1099…S1108 | ratio/rust migration advisory ✅ |
-| 47 | S1109…S1118 | horizon close + STABLE touch-up |
+| 47 | S1109…S1118 | horizon close + STABLE touch-up ✅ |
 
 **Не в scope:** FM-003 LAN · FM-041 Cloud SDK.
 
@@ -1513,7 +1539,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-18):** band 46 **PH-S1099…S1108** ✅ · §5.12 **0** · наступна **`абракадабра`** → project scan → band 47.
+**Активна смуга (2026-07-18):** band 47 **PH-S1109…S1118** ✅ · §5.12 **0** · наступна **`абракадабра`** → project scan → band 48.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

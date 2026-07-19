@@ -1,8 +1,27 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-18 (band 46 **PH-S1099…S1108** ✅ · horizon band 47)
+**Оновлено:** 2026-07-18 (band 47 **PH-S1109…S1118** ✅ · horizon band 48)
 
-**Наступна сесія:** **`абракадабра`** — project scan → band 47.
+**Наступна сесія:** **`абракадабра`** — project scan → band 48.
+
+## Band 47 — STABLE touch-up (PH-S1109…S1118, ✅)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1109** | `stable_state_touchup_depth` ui-core module |
+| **PH-S1110** | `poolai-loc-audit --stable-touchup` |
+| **PH-S1111** | `stable_state_touchup_audit` test |
+| **PH-S1112** | STABLE criteria registry |
+| **PH-S1113** | `VERIFY_STABLE_TOUCHUP` verify hook |
+| **PH-S1114** | `quick --stable-touchup` + stand smoke export shape |
+| **PH-S1115** | RUN_LOCAL.md band 47 ops sync |
+| **PH-S1116** | RUST_RATIO_STRATEGY band 47 sync |
+| **PH-S1117** | GALAXY_GRID_ROADMAP + STABLE touch-up |
+| **PH-S1118** | Band close |
+
+**§5.12:** **0** відкритих (band 47 ✅). **Vision:** rev **319**.
+
+**PH-S1118 ✅ (2026-07-18):** `stable_state_touchup_depth.rs`; `--stable-touchup`; `VERIFY_STABLE_TOUCHUP`; `quick --stable-touchup`; `galaxy_horizon_s1109_integration`; vision **rev 319**.
 
 ## Band 46 — Ratio/rust migration advisory (PH-S1099…S1108, ✅)
 

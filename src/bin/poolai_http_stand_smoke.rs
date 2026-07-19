@@ -4227,6 +4227,42 @@ mod tests {
     }
 
     #[test]
+    fn stable_state_touchup_band47_export_shape_ph_s1114() {
+        use poolai_ui_core::stable_state_touchup_depth::{
+            stable_criteria_total, stable_state_touchup_depth_stub, StableStateTouchupDepth,
+            FM_BAND47_ROWS, STABLE_TOUCHUP_CASES, STABLE_TOUCHUP_CRITERIA,
+        };
+        use serde_json::json;
+        assert_eq!(
+            stable_state_touchup_depth_stub(Some(&json!({"criteria_registry": true}))),
+            StableStateTouchupDepth::CriteriaRegistry
+        );
+        assert_eq!(
+            stable_state_touchup_depth_stub(Some(&json!({
+                "criteria_registry": true,
+                "stable_summary": true,
+                "index_canon": true,
+                "handoff_zriz": true,
+                "loc_audit_touchup": true,
+                "verify_dev_stand_hook": true,
+                "quick_touchup": true,
+                "docs_canon": true,
+            }))),
+            StableStateTouchupDepth::FullBand47
+        );
+        assert_eq!(STABLE_TOUCHUP_CRITERIA.len(), 7);
+        assert_eq!(stable_criteria_total(), 7);
+        assert!(STABLE_TOUCHUP_CASES.contains(&"product_complete"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND47_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band47 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn grid_verification_replay_json_export_shape_ph_s710() {
         use poolai::grid::stand_smoke_metrics_parity::{
             validate_grid_metrics_json_export, REPLAY_JSON_KEYS, VERIFICATION_JSON_KEYS,

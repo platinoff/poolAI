@@ -12,6 +12,9 @@ use poolai_ui_core::rust_migration_advisory_depth::{
     migration_registry_total, ADMIN_JS_MIGRATION_CANDIDATES, ARCHIVED_E2E_MIGRATION_CANON,
     MIGRATION_ADVISORY_CASES,
 };
+use poolai_ui_core::stable_state_touchup_depth::{
+    stable_criteria_total, STABLE_TOUCHUP_CASES, STABLE_TOUCHUP_CRITERIA,
+};
 use serde::Serialize;
 use std::collections::BTreeMap;
 use std::fs;
@@ -90,6 +93,8 @@ struct AuditConfig {
     min_ratio: Option<f64>,
     /// Emit band-46 migration advisory fields (PH-S1100).
     migration_advisory: bool,
+    /// Emit band-47 STABLE touch-up fields (PH-S1110).
+    stable_touchup: bool,
 }
 
 impl Default for AuditConfig {
@@ -101,6 +106,7 @@ impl Default for AuditConfig {
             advisory: false,
             min_ratio: None,
             migration_advisory: false,
+            stable_touchup: false,
         }
     }
 }
@@ -164,6 +170,12 @@ struct RustRatioReport {
     migration_ui_js_candidate_count: usize,
     /// Archived Playwright API specs with Rust wire canon (PH-S1103).
     migration_e2e_archived_count: usize,
+    /// Band-47 STABLE touch-up mode (PH-S1110).
+    stable_touchup_mode: bool,
+    /// STABLE maintenance criteria registry size (PH-S1112).
+    stable_criteria_total: usize,
+    /// Criteria with marker present in canonical doc path (PH-S1112).
+    stable_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -198,6 +210,22 @@ fn audit_ops_shell_canon(files: &[String]) -> bool {
         let p = path.replace('\\', "/");
         (p.starts_with("bin/") || p.starts_with("scripts/")) && p.ends_with(".rs")
     })
+}
+
+fn audit_stable_touchup_criteria_met(root: &Path) -> (usize, usize) {
+    let total = stable_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in STABLE_TOUCHUP_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
 }
 
 fn classify_product_path(path: &str) -> ProductCategory {
@@ -292,6 +320,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             }
             "--advisory" => config.advisory = true,
             "--migration-advisory" => config.migration_advisory = true,
+            "--stable-touchup" => config.stable_touchup = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
                 print_help();
@@ -315,6 +344,7 @@ fn print_help() {
            --min-ratio RATIO     hold/regression floor (fail unless --advisory)\n\
            --advisory            warn below floors but exit 0 (PH-S165 CI hold gate)\n\
            --migration-advisory  band-46 rust migration advisory fields (PH-S1100)\n\
+           --stable-touchup      band-47 STABLE touch-up criteria fields (PH-S1110)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -410,6 +440,15 @@ fn build_report(
             "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
         );
     }
+    let (stable_criteria_met_count, stable_criteria_total_count) = if config.stable_touchup {
+        audit_stable_touchup_criteria_met(root)
+    } else {
+        (0, stable_criteria_total())
+    };
+    if config.stable_touchup {
+        notes.push("PH-S1110: stable_touchup_mode — maintenance STABLE criteria registry touch-up");
+        notes.push("PH-S1118: band 47 STABLE touch-up — criteria met count vs registry total");
+    }
 
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
@@ -444,6 +483,9 @@ fn build_report(
         migration_candidate_total,
         migration_ui_js_candidate_count,
         migration_e2e_archived_count,
+        stable_touchup_mode: config.stable_touchup,
+        stable_criteria_total: stable_criteria_total_count,
+        stable_criteria_met_count,
         by_category,
         notes,
     })
@@ -507,6 +549,17 @@ fn print_summary(report: &RustRatioReport) {
         println!(
             "  migration_cases:       {}",
             MIGRATION_ADVISORY_CASES.join(", ")
+        );
+    }
+    if report.stable_touchup_mode {
+        println!("  stable_touchup:        true (PH-S1110 band 47)");
+        println!(
+            "  stable_criteria:       {}/{} met",
+            report.stable_criteria_met_count, report.stable_criteria_total
+        );
+        println!(
+            "  stable_touchup_cases:  {}",
+            STABLE_TOUCHUP_CASES.join(", ")
         );
     }
     for (name, loc) in &report.by_category {

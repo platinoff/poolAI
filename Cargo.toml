@@ -644,6 +644,16 @@ path = "tests/rust_migration_advisory_audit.rs"
 required-features = ["test-utils"]
 
 [[test]]
+name = "stable_state_touchup_audit"
+path = "tests/stable_state_touchup_audit.rs"
+required-features = ["test-utils"]
+
+[[test]]
+name = "galaxy_horizon_s1109_integration"
+path = "tests/galaxy_horizon_s1109_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
 name = "galaxy_prefetch_peer_http_integration"
 path = "tests/galaxy_prefetch_peer_http_integration.rs"
 required-features = ["test-utils"]

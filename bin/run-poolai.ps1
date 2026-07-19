@@ -12,6 +12,7 @@ param(
     [switch]$RaidJobs,
     [switch]$StandSmoke,
     [switch]$MigrationAdvisory,
+    [switch]$StableTouchup,
     [int]$Port = 8080,
     [string]$Features = "enterprise,ml,cloud,test-utils",
     [ValidateSet("json", "sqlite", "raid")]
@@ -218,6 +219,11 @@ function Invoke-Quick {
     if ($MigrationAdvisory) {
         Write-Host "Running poolai-loc-audit --migration-advisory (PH-S1104)..."
         & $MsysWrapper cargo run --quiet --bin poolai-loc-audit -- --migration-advisory
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    }
+    if ($StableTouchup) {
+        Write-Host "Running poolai-loc-audit --stable-touchup (PH-S1114)..."
+        & $MsysWrapper cargo run --quiet --bin poolai-loc-audit -- --stable-touchup
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     }
 }

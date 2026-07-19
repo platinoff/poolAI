@@ -41,6 +41,7 @@ pub mod prometheus;
 pub mod rust_migration_advisory_depth;
 pub mod security;
 pub mod stable_depth;
+pub mod stable_state_touchup_depth;
 pub mod stand_smoke_metrics;
 pub mod stand_smoke_run_local_depth;
 pub mod stretch_depth;

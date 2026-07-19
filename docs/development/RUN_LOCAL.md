@@ -24,7 +24,7 @@ cd S:\rust\poolAI
 .\bin\run-poolai.ps1 stop
 ```
 
-**Last updated:** 2026-07-18 (PH-S1108 band 46 · `--migration-advisory` · `VERIFY_MIGRATION_ADVISORY` · `quick --migration-advisory`)
+**Last updated:** 2026-07-18 (PH-S1118 band 47 · `--stable-touchup` · `VERIFY_STABLE_TOUCHUP` · `quick --stable-touchup`)
 
 ### PH-S1011 / PH-S1012: Light compile + quick preset
 
@@ -48,14 +48,16 @@ cd S:\rust\poolAI
 | **full** | `enterprise,ml,cloud,test-utils` | `run-poolai build` default |
 | **light** (`--light`) | `enterprise,test-utils` | PH-S1011 faster compile |
 
-`quick` restores `data/dev/last_run.json` port when present (PH-S1014), runs light build unless `--skip-build`, starts `single --bg`, waits for `/api/v1/health`. Optional **`--stand-smoke`** (PH-S1095) runs `poolai-http-stand-smoke --run-local-smoke` after health OK. Optional **`--migration-advisory`** (PH-S1104) runs `poolai-loc-audit --migration-advisory` after health OK.
+`quick` restores `data/dev/last_run.json` port when present (PH-S1014), runs light build unless `--skip-build`, starts `single --bg`, waits for `/api/v1/health`. Optional **`--stand-smoke`** (PH-S1095) runs `poolai-http-stand-smoke --run-local-smoke` after health OK. Optional **`--migration-advisory`** (PH-S1104) runs `poolai-loc-audit --migration-advisory` after health OK. Optional **`--stable-touchup`** (PH-S1114) runs `poolai-loc-audit --stable-touchup` after health OK.
 
 ```bash
 /usr/bin/bash bin/run-poolai.sh quick --stand-smoke
 /usr/bin/bash bin/run-poolai.sh quick --migration-advisory
+/usr/bin/bash bin/run-poolai.sh quick --stable-touchup
 # PowerShell:
 .\bin\run-poolai.ps1 quick -StandSmoke
 .\bin\run-poolai.ps1 quick -MigrationAdvisory
+.\bin\run-poolai.ps1 quick -StableTouchup
 ```
 
 ### PH-S1013: Vision easy launch
@@ -289,6 +291,7 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `POOLAI_STAND_SMOKE_RUN_LOCAL=1` | Альтернатива `--run-local-smoke` (PH-S1093) |
 | `VERIFY_STAND_SMOKE=1` | `verify-dev-stand.sh` → `--run-local-smoke` після bootstrap (PH-S1094) |
 | `VERIFY_MIGRATION_ADVISORY=1` | `verify-dev-stand.sh` → `poolai-loc-audit --migration-advisory` (PH-S1103) |
+| `VERIFY_STABLE_TOUCHUP=1` | `verify-dev-stand.sh` → `poolai-loc-audit --stable-touchup` (PH-S1113) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 ### PH-S1100: Rust migration advisory (band 46)
@@ -310,6 +313,25 @@ VERIFY_MIGRATION_ADVISORY=1 bash bin/verify-dev-stand.sh
 | `migration_e2e_archived_count` | Archived Playwright API specs with Rust canon (PH-S1103) |
 
 Module: [`rust_migration_advisory_depth.rs`](../../crates/poolai-ui-core/src/rust_migration_advisory_depth.rs) · tests: `rust_migration_advisory_audit.rs`, `galaxy_horizon_s1099_integration.rs`.
+
+### PH-S1110: STABLE touch-up (band 47)
+
+Maintenance-mode STABLE criteria registry touch-up; validates canonical doc markers for product-complete checklist.
+
+```bash
+cargo run --bin poolai-loc-audit -- --stable-touchup
+cargo run --bin poolai-loc-audit -- --stable-touchup --advisory --min-ratio 0.95
+
+VERIFY_STABLE_TOUCHUP=1 bash bin/verify-dev-stand.sh
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `stable_touchup_mode` | `true` when `--stable-touchup` (PH-S1110) |
+| `stable_criteria_total` | STABLE maintenance criteria registry size (PH-S1112) |
+| `stable_criteria_met_count` | Criteria with marker present in canonical doc path |
+
+Module: [`stable_state_touchup_depth.rs`](../../crates/poolai-ui-core/src/stable_state_touchup_depth.rs) · tests: `stable_state_touchup_audit.rs`, `galaxy_horizon_s1109_integration.rs`.
 
 Default stand smoke includes **`vision_revision_parity`** (PH-S208, PH-S235): repo `manifest.revision` vs FM §5.12 `Vision rev`, `extensions.active_sprint` vs `manifest.next_sprint`, then `GET /docs/vision/manifest.json` with `X-PoolAI-Vision-Revision` header vs JSON body.
 
