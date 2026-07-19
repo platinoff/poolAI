@@ -1,11 +1,12 @@
 # Galaxy Grid roadmap (зріз)
 
-**Оновлено:** 2026-07-18 · **Completion v2:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · **0** pending · **§5.12:** maintenance mode
+**Оновлено:** 2026-07-19 · **Completion v2:** [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · **0** pending · **§5.12:** maintenance mode
 
 | Зріз | Значення |
 |------|----------|
 | **Completion plan** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.14–§5.15** ✅ |
 | **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) — **351/351** ✅ |
+| **Last closed (band 49)** | PH-S1138 ✅ — Pre-push vision canon gate · `pre_push_hook_depth` + `--pre-push-canon` + `bin/pre-push-hook.sh` |
 | **Last closed (band 48)** | PH-S1128 ✅ — Galaxy edge verification horizon · `galaxy_edge_verification_depth` + `--edge-verification-advisory` + `GET /grid/edge-verification-metrics` |
 | **Last closed (band 47)** | PH-S1118 ✅ — STABLE touch-up · `stable_state_touchup_depth` + `--stable-touchup` |
 | **Last closed (band 46)** | PH-S1108 ✅ — ratio/rust migration advisory · `rust_migration_advisory_depth` + `--migration-advisory` |

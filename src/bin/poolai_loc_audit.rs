@@ -11,6 +11,9 @@
 use poolai_ui_core::galaxy_edge_verification_depth::{
     edge_verification_criteria_total, EDGE_VERIFICATION_CASES, EDGE_VERIFICATION_CRITERIA,
 };
+use poolai_ui_core::pre_push_hook_depth::{
+    pre_push_hook_criteria_total, PRE_PUSH_HOOK_CASES, PRE_PUSH_HOOK_CRITERIA,
+};
 use poolai_ui_core::rust_migration_advisory_depth::{
     migration_registry_total, ADMIN_JS_MIGRATION_CANDIDATES, ARCHIVED_E2E_MIGRATION_CANON,
     MIGRATION_ADVISORY_CASES,
@@ -100,6 +103,8 @@ struct AuditConfig {
     stable_touchup: bool,
     /// Emit band-48 edge verification advisory fields (PH-S1120).
     edge_verification_advisory: bool,
+    /// Emit band-49 pre-push canon gate fields (PH-S1130).
+    pre_push_canon: bool,
 }
 
 impl Default for AuditConfig {
@@ -113,6 +118,7 @@ impl Default for AuditConfig {
             migration_advisory: false,
             stable_touchup: false,
             edge_verification_advisory: false,
+            pre_push_canon: false,
         }
     }
 }
@@ -188,6 +194,12 @@ struct RustRatioReport {
     edge_verification_criteria_total: usize,
     /// Edge verification criteria met count (PH-S1121).
     edge_verification_criteria_met_count: usize,
+    /// Band-49 pre-push canon gate mode (PH-S1130).
+    pre_push_canon_mode: bool,
+    /// Pre-push canon criteria registry size (PH-S1131).
+    pre_push_criteria_total: usize,
+    /// Pre-push canon criteria met count (PH-S1131).
+    pre_push_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -244,6 +256,22 @@ fn audit_edge_verification_criteria_met(root: &Path) -> (usize, usize) {
     let total = edge_verification_criteria_total();
     let mut met = 0usize;
     for (_, marker, rel) in EDGE_VERIFICATION_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
+fn audit_pre_push_criteria_met(root: &Path) -> (usize, usize) {
+    let total = pre_push_hook_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in PRE_PUSH_HOOK_CRITERIA {
         let path = root.join(rel);
         if path.is_file() {
             if let Ok(content) = fs::read_to_string(&path) {
@@ -350,6 +378,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--migration-advisory" => config.migration_advisory = true,
             "--stable-touchup" => config.stable_touchup = true,
             "--edge-verification-advisory" => config.edge_verification_advisory = true,
+            "--pre-push-canon" => config.pre_push_canon = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
                 print_help();
@@ -375,6 +404,7 @@ fn print_help() {
            --migration-advisory  band-46 rust migration advisory fields (PH-S1100)\n\
            --stable-touchup      band-47 STABLE touch-up criteria fields (PH-S1110)\n\
            --edge-verification-advisory  band-48 edge verification horizon fields (PH-S1120)\n\
+           --pre-push-canon            band-49 pre-push vision canon gate fields (PH-S1130)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -491,6 +521,17 @@ fn build_report(
         );
         notes.push("PH-S1128: band 48 edge verification horizon — criteria met vs registry");
     }
+    let (pre_push_criteria_met_count, pre_push_criteria_total_count) = if config.pre_push_canon {
+        audit_pre_push_criteria_met(root)
+    } else {
+        (0, pre_push_hook_criteria_total())
+    };
+    if config.pre_push_canon {
+        notes.push(
+            "PH-S1130: pre_push_canon_mode — git pre-push hook + poolai-vision-sync canon docs",
+        );
+        notes.push("PH-S1138: band 49 pre-push vision canon gate — criteria met vs registry");
+    }
 
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
@@ -531,6 +572,9 @@ fn build_report(
         edge_verification_advisory_mode: config.edge_verification_advisory,
         edge_verification_criteria_total: edge_verification_criteria_total_count,
         edge_verification_criteria_met_count,
+        pre_push_canon_mode: config.pre_push_canon,
+        pre_push_criteria_total: pre_push_criteria_total_count,
+        pre_push_criteria_met_count,
         by_category,
         notes,
     })
@@ -616,6 +660,17 @@ fn print_summary(report: &RustRatioReport) {
         println!(
             "  edge_verification_cases: {}",
             EDGE_VERIFICATION_CASES.join(", ")
+        );
+    }
+    if report.pre_push_canon_mode {
+        println!("  pre_push_canon:        true (PH-S1130 band 49)");
+        println!(
+            "  pre_push_criteria:     {}/{} met",
+            report.pre_push_criteria_met_count, report.pre_push_criteria_total
+        );
+        println!(
+            "  pre_push_canon_cases:  {}",
+            PRE_PUSH_HOOK_CASES.join(", ")
         );
     }
     for (name, loc) in &report.by_category {

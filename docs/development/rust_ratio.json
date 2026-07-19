@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": null,
-  "rust_loc": 156655,
-  "non_rust_product_loc": 8368,
-  "product_loc_total": 165023,
-  "rust_ratio": 0.9492919168843131,
-  "rust_ratio_pct": 94.92919168843132,
+  "rust_loc": 157689,
+  "non_rust_product_loc": 8392,
+  "product_loc_total": 166081,
+  "rust_ratio": 0.9494704391230785,
+  "rust_ratio_pct": 94.94704391230785,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -37,6 +37,9 @@
   "edge_verification_advisory_mode": true,
   "edge_verification_criteria_total": 7,
   "edge_verification_criteria_met_count": 7,
+  "pre_push_canon_mode": true,
+  "pre_push_criteria_total": 7,
+  "pre_push_criteria_met_count": 5,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -44,27 +47,27 @@
     },
     "ops_ps1": {
       "files": 16,
-      "loc": 1448
+      "loc": 1454
     },
     "ops_shell": {
       "files": 35,
-      "loc": 2716
+      "loc": 2734
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 66,
-      "loc": 14122
+      "files": 67,
+      "loc": 14293
     },
     "rust_src": {
-      "files": 298,
-      "loc": 107356
+      "files": 300,
+      "loc": 108105
     },
     "rust_tests": {
-      "files": 237,
-      "loc": 34569
+      "files": 239,
+      "loc": 34683
     },
     "ui_css": {
       "files": 2,
@@ -96,6 +99,8 @@
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
     "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
     "PH-S1120: edge_verification_advisory_mode — Galaxy §6.6 fraud-proof/capability wire",
-    "PH-S1128: band 48 edge verification horizon — criteria met vs registry"
+    "PH-S1128: band 48 edge verification horizon — criteria met vs registry",
+    "PH-S1130: pre_push_canon_mode — git pre-push hook + poolai-vision-sync canon docs",
+    "PH-S1138: band 49 pre-push vision canon gate — criteria met vs registry"
   ]
 }

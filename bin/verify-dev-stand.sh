@@ -20,6 +20,7 @@ VERIFY_STAND_SMOKE="${VERIFY_STAND_SMOKE:-0}"
 VERIFY_MIGRATION_ADVISORY="${VERIFY_MIGRATION_ADVISORY:-0}"
 VERIFY_STABLE_TOUCHUP="${VERIFY_STABLE_TOUCHUP:-0}"
 VERIFY_EDGE_VERIFICATION="${VERIFY_EDGE_VERIFICATION:-0}"
+VERIFY_PRE_PUSH_CANON="${VERIFY_PRE_PUSH_CANON:-0}"
 HEALTH_RETRIES="${VERIFY_HEALTH_RETRIES:-45}"
 HEALTH_SLEEP="${VERIFY_HEALTH_SLEEP:-2}"
 
@@ -295,6 +296,16 @@ if [[ "$VERIFY_EDGE_VERIFICATION" == "1" ]]; then
     echo "OK  edge verification advisory loc-audit"
   else
     echo "FAIL edge verification advisory loc-audit"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_PRE_PUSH_CANON" == "1" ]]; then
+  echo "Running poolai-loc-audit --pre-push-canon (PH-S1134)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --pre-push-canon); then
+    echo "OK  pre-push canon gate loc-audit"
+  else
+    echo "FAIL pre-push canon gate loc-audit"
     fail=1
   fi
 fi

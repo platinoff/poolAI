@@ -14,6 +14,7 @@ param(
     [switch]$MigrationAdvisory,
     [switch]$StableTouchup,
     [switch]$EdgeVerification,
+    [switch]$PrePushCanon,
     [int]$Port = 8080,
     [string]$Features = "enterprise,ml,cloud,test-utils",
     [ValidateSet("json", "sqlite", "raid")]
@@ -230,6 +231,11 @@ function Invoke-Quick {
     if ($EdgeVerification) {
         Write-Host "Running poolai-loc-audit --edge-verification-advisory (PH-S1125)..."
         & $MsysWrapper cargo run --quiet --bin poolai-loc-audit -- --edge-verification-advisory
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    }
+    if ($PrePushCanon) {
+        Write-Host "Running poolai-loc-audit --pre-push-canon (PH-S1134)..."
+        & $MsysWrapper cargo run --quiet --bin poolai-loc-audit -- --pre-push-canon
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     }
 }

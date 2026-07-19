@@ -36,6 +36,7 @@ pub mod network_profiles;
 pub mod openapi_wire_depth;
 pub mod owner_ops_depth;
 pub mod payout_batch;
+pub mod pre_push_hook_depth;
 pub mod pricing;
 pub mod product_complete_depth;
 pub mod prometheus;

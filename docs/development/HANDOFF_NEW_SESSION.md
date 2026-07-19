@@ -1,8 +1,27 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-18 (band 48 **PH-S1119…S1128** ✅ · horizon band 49)
+**Оновлено:** 2026-07-19 (band 49 **PH-S1129…S1138** ✅ · horizon band 50)
 
-**Наступна сесія:** **`абракадабра`** — project scan → band 49.
+**Наступна сесія:** **`абракадабра`** — project scan → band 50.
+
+## Band 49 — Pre-push vision canon gate (PH-S1129…S1138, ✅)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1129** | `pre_push_hook_depth` ui-core module |
+| **PH-S1130** | `poolai-loc-audit --pre-push-canon` |
+| **PH-S1131** | `pre_push_hook_audit` test |
+| **PH-S1132** | `poolai-vision-sync` canon doc validation |
+| **PH-S1133** | `bin/pre-push-hook.sh` + install script |
+| **PH-S1134** | `VERIFY_PRE_PUSH_CANON` + `quick --pre-push-canon` |
+| **PH-S1135** | RUN_LOCAL.md band 49 ops sync |
+| **PH-S1136** | RUST_RATIO + GALAXY_GRID_ROADMAP band 49 sync |
+| **PH-S1137** | PRE_PUSH_HOOK.md canon gate docs |
+| **PH-S1138** | Band close |
+
+**§5.12:** **0** відкритих (band 49 ✅). **Vision:** rev **322**.
+
+**PH-S1138 ✅ (2026-07-19):** `pre_push_hook_depth.rs`; `--pre-push-canon`; `VERIFY_PRE_PUSH_CANON`; `quick --pre-push-canon`; `galaxy_horizon_s1129_integration`; `poolai-vision-sync` canon doc `--check`.
 
 ## Band 48 — Galaxy edge verification horizon (PH-S1119…S1128, ✅)
 

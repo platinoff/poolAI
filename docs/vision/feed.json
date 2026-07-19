@@ -3,111 +3,111 @@
   "items": [
     {
       "category": "closed",
-      "id": "PH-S1118",
+      "id": "PH-S1018",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "galaxy_horizon_s1109_integration`; HANDOFF/NEXT",
-      "title": "STABLE touch-up band close"
+      "summary": "galaxy_horizon_s1011_integration`; RUN_LOCAL sync",
+      "title": "Ops power band close"
     },
     {
       "category": "closed",
-      "id": "PH-S1117",
+      "id": "PH-S1017",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "band 47 closed row; maintenance criteria",
-      "title": "GALAXY_GRID_ROADMAP + STABLE touch-up"
+      "summary": "power menu; localStorage; soft/hard reload",
+      "title": "Vision poweroff/reset controls"
     },
     {
       "category": "closed",
-      "id": "PH-S1116",
+      "id": "PH-S1016",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "STABLE touch-up pointer + loc-audit flag",
-      "title": "RUST_RATIO_STRATEGY band 47 sync"
+      "summary": "shutdown/reboot dev-safe; integration test",
+      "title": "PoolAI power ops wire"
     },
     {
       "category": "closed",
-      "id": "PH-S1115",
+      "id": "PH-S1015",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "--stable-touchup`, `VERIFY_STABLE_TOUCHUP",
-      "title": "RUN_LOCAL.md band 47 ops sync"
+      "summary": "toolbar modal Виключити/Перезавантажити",
+      "title": "PoolAI admin power panel UI"
     },
     {
       "category": "closed",
-      "id": "PH-S1114",
+      "id": "PH-S1014",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "post-health `--stable-touchup` + stand smoke export shape",
-      "title": "run-poolai quick --stable-touchup"
+      "summary": "save on stop; restore on quick; unit test",
+      "title": "Runtime state snapshot persist"
     },
     {
       "category": "closed",
-      "id": "PH-S1113",
+      "id": "PH-S1013",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "VERIFY_STABLE_TOUCHUP=1` → loc-audit",
-      "title": "verify-dev-stand` STABLE hook"
+      "summary": "PS1 + MSYS2 shim localhost URL",
+      "title": "Vision easy launch"
     },
     {
       "category": "closed",
-      "id": "PH-S1112",
+      "id": "PH-S1012",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "7 maintenance-mode criteria ids",
-      "title": "STABLE criteria registry"
+      "summary": "preset `quick` + health wait",
+      "title": "Light full-stack launch preset"
     },
     {
       "category": "closed",
-      "id": "PH-S1111",
+      "id": "PH-S1011",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "criteria registry + maintenance markers",
-      "title": "STABLE touch-up audit"
+      "summary": "--light` minimal-features build",
+      "title": "Light compile profile"
     },
     {
       "category": "closed",
-      "id": "PH-S1110",
+      "id": "PH-S1010",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "stable_touchup fields in `rust_ratio.json",
-      "title": "poolai-loc-audit --stable-touchup"
+      "summary": "STABLE maintenance mode",
+      "title": "FM §5.15 product-complete closure"
     },
     {
       "category": "closed",
-      "id": "PH-S1109",
+      "id": "PH-S1009",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "depth enum + STABLE criteria registry constants",
-      "title": "stable_state_touchup_depth` ui-core module"
+      "summary": "final code band close",
+      "title": "galaxy_horizon_s1000_integration"
     },
     {
       "category": "closed",
-      "id": "PH-S1108",
+      "id": "PH-S1008",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "galaxy_horizon_s1099_integration`; HANDOFF/NEXT",
-      "title": "Ratio migration advisory band close"
+      "summary": "final pre-S1010",
+      "title": "Ratio hold advisory"
     },
     {
       "category": "closed",
-      "id": "PH-S1107",
+      "id": "PH-S1007",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "band 46 closed row; stretch 96% hold",
-      "title": "GALAXY_GRID_ROADMAP + rust ratio"
+      "summary": "--check` green",
+      "title": "poolai-vision-sync --check"
     }
   ],
   "link": "docs/vision/index.html",

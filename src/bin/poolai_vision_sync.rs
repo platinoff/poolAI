@@ -5,6 +5,9 @@
 //! cargo run --bin poolai-vision-sync -- --dry-run
 //! cargo run --bin poolai-vision-sync -- --check
 //! ```
+//!
+//! `--check` validates FM ↔ manifest ↔ extensions ↔ VDT `.mdc` cross-links **and**
+//! README / INDEX / development README / NEXT_SESSION / `vision.svg` canon fields.
 
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, BTreeSet};
@@ -836,6 +839,508 @@ fn collect_manifest_fm_drift(
     errors
 }
 
+const VISION_CANON_DOC_PATHS: &[&str] = &[
+    "README.md",
+    "docs/INDEX_2026-03-17.md",
+    "docs/development/README.md",
+    "docs/development/NEXT_SESSION_PROMPT.md",
+    "docs/vision/vision.svg",
+];
+
+const RUST_RATIO_REL: &str = "docs/development/rust_ratio.json";
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct VisionCanonSnapshot {
+    revision: u64,
+    closed_band: u32,
+    closed_range: String,
+    closed_band_title: String,
+    next_band: u32,
+    next_range: String,
+    next_sprint: String,
+    last_closed: String,
+    open_count: u32,
+    rust_ratio_pct: String,
+}
+
+fn sprint_serial_suffix(id: &str) -> &str {
+    id.strip_prefix("PH-S").unwrap_or(id)
+}
+
+fn band_title_slug(raw: &str) -> String {
+    let trimmed = raw.trim();
+    let without_galaxy = trimmed
+        .strip_prefix("Galaxy ")
+        .or_else(|| trimmed.strip_prefix("galaxy "))
+        .unwrap_or(trimmed);
+    without_galaxy.to_ascii_lowercase()
+}
+
+fn parse_fm_closed_band(section: &str) -> Option<u32> {
+    for line in section.lines() {
+        if !line.contains("Відкритих у §5.12") {
+            continue;
+        }
+        let marker = "(band ";
+        let idx = line.find(marker)?;
+        let rest = &line[idx + marker.len()..];
+        let end = rest.find(|c: char| !c.is_ascii_digit())?;
+        return rest[..end].parse().ok();
+    }
+    None
+}
+
+fn parse_fm_master_horizon(section: &str) -> Option<(String, u32)> {
+    let marker = "**Master horizon:**";
+    for line in section.lines() {
+        let Some(after) = line.split(marker).nth(1) else {
+            continue;
+        };
+        let trimmed = after.trim();
+        let ph_idx = trimmed.find("PH-S")?;
+        let range_end = trimmed[ph_idx..]
+            .find('(')
+            .map(|i| ph_idx + i)
+            .unwrap_or(trimmed.len());
+        let range = trimmed[ph_idx..range_end]
+            .trim()
+            .trim_end_matches('.')
+            .to_string();
+        let band_marker = "(band ";
+        let band_idx = trimmed.find(band_marker)?;
+        let band_rest = &trimmed[band_idx + band_marker.len()..];
+        let band_end = band_rest.find(')')?;
+        let band: u32 = band_rest[..band_end].parse().ok()?;
+        return Some((range, band));
+    }
+    None
+}
+
+fn parse_fm_closed_range(fm_content: &str, closed_band: u32) -> Option<String> {
+    for pattern in [
+        format!("band {closed_band} **PH-S"),
+        format!("band {closed_band} (PH-S"),
+    ] {
+        let Some(idx) = fm_content.find(&pattern) else {
+            continue;
+        };
+        let start = idx + pattern.len() - 4;
+        let rest = &fm_content[start..];
+        let close_marker = rest.find("**").or_else(|| rest.find(')'))?;
+        let range = rest[..close_marker].trim();
+        if range.contains('…') {
+            return Some(range.to_string());
+        }
+    }
+    None
+}
+
+fn parse_fm_band_title(fm_content: &str, closed_band: u32) -> Option<String> {
+    let marker = format!(" queue — band {closed_band}");
+    let idx = fm_content.find(&marker)?;
+    let before = &fm_content[..idx];
+    let line_start = before.rfind('\n').map(|i| i + 1).unwrap_or(0);
+    let header = before[line_start..].trim();
+    let after_hash = header.strip_prefix("### ")?;
+    let space_idx = after_hash.find(' ')?;
+    Some(after_hash[space_idx + 1..].trim().to_string())
+}
+
+fn read_rust_ratio_pct(root: &Path) -> Result<String, String> {
+    let path = root.join(RUST_RATIO_REL);
+    let raw = fs::read_to_string(&path).map_err(|e| format!("read {}: {e}", path.display()))?;
+    let value: Value =
+        serde_json::from_str(&raw).map_err(|e| format!("parse {}: {e}", path.display()))?;
+    let pct = value
+        .get("rust_ratio_pct")
+        .and_then(Value::as_f64)
+        .or_else(|| {
+            value
+                .get("rust_ratio")
+                .and_then(Value::as_f64)
+                .map(|r| r * 100.0)
+        })
+        .ok_or_else(|| format!("{} missing rust_ratio_pct", path.display()))?;
+    Ok(format!("{pct:.2}"))
+}
+
+fn closed_range_end(range: &str) -> Option<String> {
+    let last_s = range.rfind('S')?;
+    let serial: String = range[last_s + 1..]
+        .chars()
+        .take_while(|c| c.is_ascii_digit())
+        .collect();
+    if serial.is_empty() {
+        return None;
+    }
+    Some(format!("PH-S{serial}"))
+}
+
+fn build_vision_canon_snapshot(
+    manifest: &Value,
+    entries: &[SprintQueueEntry],
+    fm_section: &str,
+    fm_content: &str,
+    root: &Path,
+) -> Result<VisionCanonSnapshot, String> {
+    let revision =
+        parse_fm_vision_revision(fm_section).unwrap_or_else(|| manifest_revision(manifest));
+    let (next_sprint, last_closed_meta, open_count) = derive_sprint_meta(entries, Some(fm_section));
+    let next_sprint = next_sprint.ok_or("canon snapshot: missing next_sprint")?;
+    let closed_band =
+        parse_fm_closed_band(fm_section).ok_or("canon snapshot: FM §5.12 missing closed band")?;
+    let (next_range, next_band) = parse_fm_master_horizon(fm_section)
+        .ok_or("canon snapshot: FM §5.12 missing Master horizon range")?;
+    let closed_range = parse_fm_closed_range(fm_content, closed_band)
+        .ok_or("canon snapshot: FM missing closed band sprint range")?;
+    let last_closed = if open_count == 0 {
+        closed_range_end(&closed_range)
+            .or(last_closed_meta)
+            .ok_or("canon snapshot: missing last_closed")?
+    } else {
+        last_closed_meta.ok_or("canon snapshot: missing last_closed")?
+    };
+    let closed_title_raw = parse_fm_band_title(fm_content, closed_band)
+        .ok_or("canon snapshot: FM missing band section title")?;
+    let closed_band_title = band_title_slug(&closed_title_raw);
+    let rust_ratio_pct = read_rust_ratio_pct(root)?;
+    Ok(VisionCanonSnapshot {
+        revision,
+        closed_band,
+        closed_range,
+        closed_band_title,
+        next_band,
+        next_range,
+        next_sprint,
+        last_closed,
+        open_count,
+        rust_ratio_pct,
+    })
+}
+
+fn replace_between_markers(
+    content: &str,
+    start_marker: &str,
+    end_marker: &str,
+    replacement: &str,
+) -> String {
+    let mut out = content.to_string();
+    let mut search_from = 0usize;
+    while let Some(rel) = out[search_from..].find(start_marker) {
+        let start = search_from + rel + start_marker.len();
+        let Some(rel_end) = out[start..].find(end_marker) else {
+            break;
+        };
+        out.replace_range(start..start + rel_end, replacement);
+        search_from = start + replacement.len() + end_marker.len();
+    }
+    out
+}
+
+fn replace_number_after_marker(content: &str, marker: &str, new_value: u32) -> String {
+    let Some(idx) = content.find(marker) else {
+        return content.to_string();
+    };
+    let num_start = idx + marker.len();
+    let rest = &content[num_start..];
+    let Some(digit_rel) = rest.find(|c: char| c.is_ascii_digit()) else {
+        return content.to_string();
+    };
+    let digit_start = num_start + digit_rel;
+    let digit_end = digit_start
+        + content[digit_start..]
+            .find(|c: char| !c.is_ascii_digit())
+            .unwrap_or(content[digit_start..].len());
+    let mut out = content.to_string();
+    out.replace_range(digit_start..digit_end, &new_value.to_string());
+    out
+}
+
+fn replace_galaxy_wire_end(content: &str, last_closed: &str) -> String {
+    let marker = "PH-S65…S";
+    let Some(idx) = content.find(marker) else {
+        return content.to_string();
+    };
+    let serial_start = idx + marker.len();
+    let serial_end = serial_start
+        + content[serial_start..]
+            .find(|c: char| !c.is_ascii_digit())
+            .unwrap_or(content[serial_start..].len());
+    let mut out = content.to_string();
+    out.replace_range(serial_start..serial_end, sprint_serial_suffix(last_closed));
+    out
+}
+
+fn replace_closed_band_badges(content: &str, closed_band: u32) -> String {
+    let mut out = content.to_string();
+    let marker = "(band ";
+    let mut search_from = 0usize;
+    while let Some(rel) = out[search_from..].find(marker) {
+        let idx = search_from + rel;
+        let after = idx + marker.len();
+        let Some(space_rel) = out[after..].find(' ') else {
+            break;
+        };
+        if !out[after + space_rel..].starts_with("✅)") {
+            search_from = after + 1;
+            continue;
+        }
+        let digit_end = after + space_rel;
+        if out[after..digit_end].chars().all(|c| c.is_ascii_digit()) {
+            out.replace_range(after..digit_end, &closed_band.to_string());
+        }
+        search_from = digit_end + 1;
+    }
+    out
+}
+
+fn replace_ph_s_range_after(content: &str, prefix: &str, new_range: &str) -> String {
+    let Some(idx) = content.find(prefix) else {
+        return content.to_string();
+    };
+    let range_start = idx + prefix.len();
+    let rest = &content[range_start..];
+    let range_end = range_start
+        + rest
+            .find(|c: char| {
+                !(c.is_ascii_digit() || c == '…' || c == 'S' || c == 'P' || c == 'H' || c == '-')
+            })
+            .unwrap_or(rest.len());
+    let mut out = content.to_string();
+    out.replace_range(range_start..range_end, new_range);
+    out
+}
+
+fn sync_readme_canon(content: &str, snap: &VisionCanonSnapshot) -> String {
+    let mut out = replace_galaxy_wire_end(content, &snap.last_closed);
+    out = replace_between_markers(&out, "manifest rev **", "**", &snap.revision.to_string());
+    out = replace_between_markers(&out, "vision **rev ", "**", &snap.revision.to_string());
+    out = replace_between_markers(&out, "**Rust ratio:** **", "%**", &snap.rust_ratio_pct);
+    out = replace_closed_band_badges(&out, snap.closed_band);
+    out = replace_number_after_marker(&out, "→ band ", snap.next_band);
+    out = replace_between_markers(
+        &out,
+        "project scan → band ",
+        " **",
+        &snap.next_band.to_string(),
+    );
+    out = replace_ph_s_range_after(
+        &out,
+        &format!("band {} **", snap.next_band),
+        &snap.next_range,
+    );
+    out = replace_between_markers(&out, "last **", "**", &snap.last_closed);
+    out = replace_between_markers(&out, "next **", "**", &snap.next_sprint);
+    out = replace_between_markers(
+        &out,
+        "**§5.12:** **",
+        "** відкритих",
+        &snap.open_count.to_string(),
+    );
+    out
+}
+
+fn sync_index_canon(content: &str, snap: &VisionCanonSnapshot) -> String {
+    let zriz = format!(
+        "**Зріз:** {} ✅ (band {} {}) · **§5.12:** **{}** (maintenance mode) · rust_ratio **{}%** · vision **rev {}** · **HEAD:** maintenance mode — [`NEXT_SESSION_PROMPT.md`](./development/NEXT_SESSION_PROMPT.md)",
+        snap.last_closed,
+        snap.closed_band,
+        snap.closed_band_title,
+        snap.open_count,
+        snap.rust_ratio_pct,
+        snap.revision
+    );
+    replace_line_with_prefix(content, "**Зріз:**", &zriz)
+}
+
+fn sync_development_readme_canon(content: &str, snap: &VisionCanonSnapshot) -> String {
+    replace_between_markers(content, "vision rev **", "**", &snap.revision.to_string())
+}
+
+fn normalize_newlines(content: &str) -> String {
+    content.replace("\r\n", "\n")
+}
+
+fn canon_content_eq(left: &str, right: &str) -> bool {
+    normalize_newlines(left) == normalize_newlines(right)
+}
+
+fn replace_line_with_prefix(content: &str, prefix: &str, new_line: &str) -> String {
+    let trailing_newline = content.ends_with('\n');
+    let mut lines: Vec<&str> = content.lines().collect();
+    for line in &mut lines {
+        if line.starts_with(prefix) {
+            *line = new_line;
+        }
+    }
+    let mut out = lines.join("\n");
+    if trailing_newline {
+        out.push('\n');
+    }
+    out
+}
+
+fn parse_fm_updated_date(fm_content: &str) -> Option<String> {
+    let line = fm_content
+        .lines()
+        .find(|l| l.starts_with("**Оновлено:**"))?;
+    let rest = line.strip_prefix("**Оновлено:**")?.trim();
+    let end = rest.find(' ')?;
+    Some(rest[..end].to_string())
+}
+
+fn sync_next_session_canon(content: &str, snap: &VisionCanonSnapshot, fm_content: &str) -> String {
+    let updated_on = parse_fm_updated_date(fm_content).unwrap_or_else(today_iso);
+    let header = format!(
+        "**Оновлено:** {updated_on} (band {} **{}** ✅ · horizon band {})",
+        snap.closed_band, snap.closed_range, snap.next_band
+    );
+    let mut out = replace_line_with_prefix(content, "**Оновлено:**", &header);
+    out = replace_line_with_prefix(
+        &out,
+        "Maintenance mode",
+        &format!(
+            "Maintenance mode (FM §5.15) · band {} drained.",
+            snap.closed_band
+        ),
+    );
+    out = replace_line_with_prefix(
+        &out,
+        "| **← наступний** |",
+        &format!(
+            "| **← наступний** | **`абракадабра`** (project scan → band {}) |",
+            snap.next_band
+        ),
+    );
+    out = replace_line_with_prefix(
+        &out,
+        "| **§5.12 active** |",
+        &format!(
+            "| **§5.12 active** | **{}** (band {} ✅) |",
+            snap.open_count, snap.closed_band
+        ),
+    );
+    out = replace_line_with_prefix(
+        &out,
+        "| **Horizon** |",
+        &format!(
+            "| **Horizon** | band {} → **{}** |",
+            snap.next_band, snap.next_range
+        ),
+    );
+    out = replace_line_with_prefix(
+        &out,
+        "| **Vision** |",
+        &format!("| **Vision** | rev **{}** |", snap.revision),
+    );
+    out = replace_line_with_prefix(
+        &out,
+        "## Band ",
+        &format!(
+            "## Band {} (очікуваний фокус — project scan)",
+            snap.next_band
+        ),
+    );
+    out = replace_line_with_prefix(
+        &out,
+        "| PH-S",
+        &format!("| {} | horizon close + maintenance ops |", snap.next_range),
+    );
+    out
+}
+
+fn sync_vision_svg_canon(content: &str, snap: &VisionCanonSnapshot) -> String {
+    let mut out = content.to_string();
+    let desc = format!(
+        "Isometric L0-L3 layers with Galaxy Grid at center. {} done, next {}.",
+        snap.last_closed, snap.next_sprint
+    );
+    out = replace_between_markers(&out, "<desc id=\"desc\">", "</desc>", &desc);
+    let footer = format!(
+        "{} done {} - {} next - {} open - rev {}",
+        snap.last_closed, snap.closed_band_title, snap.next_sprint, snap.open_count, snap.revision
+    );
+    out = replace_line_with_prefix(
+        &out,
+        "  <text x=\"600\" y=\"738\"",
+        &format!(
+            "  <text x=\"600\" y=\"738\" text-anchor=\"middle\" fill=\"#6a7a9a\" font-family=\"Segoe UI, system-ui, sans-serif\" font-size=\"12\">{footer}</text>"
+        ),
+    );
+    out
+}
+
+fn apply_canon_snapshot(
+    rel: &str,
+    content: &str,
+    snap: &VisionCanonSnapshot,
+    fm_content: &str,
+) -> String {
+    match rel {
+        "README.md" => sync_readme_canon(content, snap),
+        "docs/INDEX_2026-03-17.md" => sync_index_canon(content, snap),
+        "docs/development/README.md" => sync_development_readme_canon(content, snap),
+        "docs/development/NEXT_SESSION_PROMPT.md" => {
+            sync_next_session_canon(content, snap, fm_content)
+        }
+        "docs/vision/vision.svg" => sync_vision_svg_canon(content, snap),
+        _ => content.to_string(),
+    }
+}
+
+fn collect_canon_docs_drift(
+    root: &Path,
+    manifest: &Value,
+    entries: &[SprintQueueEntry],
+    fm_section: &str,
+    fm_content: &str,
+) -> Vec<String> {
+    let snap = match build_vision_canon_snapshot(manifest, entries, fm_section, fm_content, root) {
+        Ok(s) => s,
+        Err(e) => return vec![e],
+    };
+    let mut errors = Vec::new();
+    for rel in VISION_CANON_DOC_PATHS {
+        let path = root.join(rel);
+        let content = match fs::read_to_string(&path) {
+            Ok(c) => c,
+            Err(e) => {
+                errors.push(format!("read {rel}: {e}"));
+                continue;
+            }
+        };
+        let synced = apply_canon_snapshot(rel, &content, &snap, fm_content);
+        if !canon_content_eq(&synced, &content) {
+            errors.push(format!(
+                "{rel}: stale vision canon fields (revision {}, band {}, next {})",
+                snap.revision, snap.closed_band, snap.next_sprint
+            ));
+        }
+    }
+    errors
+}
+
+fn sync_vision_canon_docs(
+    root: &Path,
+    manifest: &Value,
+    entries: &[SprintQueueEntry],
+    fm_section: &str,
+    fm_content: &str,
+) -> Result<Vec<String>, String> {
+    let snap = build_vision_canon_snapshot(manifest, entries, fm_section, fm_content, root)?;
+    let mut changed = Vec::new();
+    for rel in VISION_CANON_DOC_PATHS {
+        let path = root.join(rel);
+        let content = fs::read_to_string(&path).map_err(|e| format!("read {rel}: {e}"))?;
+        let updated = apply_canon_snapshot(rel, &content, &snap, fm_content);
+        if !canon_content_eq(&updated, &content) {
+            fs::write(&path, &updated).map_err(|e| format!("write {rel}: {e}"))?;
+            changed.push(rel.to_string());
+        }
+    }
+    Ok(changed)
+}
+
 fn run_drift_check(root: &Path) -> ExitCode {
     let manifest_path = root.join(MANIFEST_REL);
     let fm_path = root.join(FM_REL);
@@ -867,6 +1372,13 @@ fn run_drift_check(root: &Path) -> ExitCode {
         root,
         &manifest,
         extensions.as_ref(),
+    ));
+    errors.extend(collect_canon_docs_drift(
+        root,
+        &manifest,
+        &entries,
+        fm_section,
+        &fm_content,
     ));
     if errors.is_empty() {
         let rev = manifest_revision(&manifest);
@@ -945,12 +1457,8 @@ fn main() -> ExitCode {
             .unwrap_or(0)
     );
 
-    if added_nodes == 0 && added_edges == 0 && !queue_changed && !feed_changed && !ext_changed {
-        return ExitCode::SUCCESS;
-    }
-
     if dry_run {
-        println!("dry-run: manifest/feed not written");
+        println!("dry-run: manifest/feed/canon docs not written");
         return ExitCode::SUCCESS;
     }
 
@@ -959,6 +1467,16 @@ fn main() -> ExitCode {
             eprintln!("error: {e}");
             return ExitCode::from(2);
         }
+    }
+
+    let fm_path = root.join(FM_REL);
+    let fm_content = fs::read_to_string(&fm_path).unwrap_or_default();
+    match sync_vision_canon_docs(&root, &manifest, &entries, &fm_section, &fm_content) {
+        Ok(changed) if !changed.is_empty() => {
+            println!("vision canon docs: updated {}", changed.join(", "));
+        }
+        Ok(_) => {}
+        Err(e) => eprintln!("warn: vision canon docs sync: {e}"),
     }
 
     ExitCode::SUCCESS
@@ -1299,5 +1817,49 @@ mod tests {
             js.contains("MAP_ORBIT_STEP_DEG = 2") && js.contains("MAP_ORBIT_PAD_SENS = 0.08"),
             "orbit should be 2x slower"
         );
+    }
+
+    #[test]
+    fn closed_range_end_parses_last_sprint() {
+        assert_eq!(
+            closed_range_end("PH-S1119…S1128").as_deref(),
+            Some("PH-S1128")
+        );
+    }
+
+    #[test]
+    fn parse_fm_master_horizon_band_and_range() {
+        let section = "**Відкритих у §5.12:** **0** (band 48 ✅). **Master horizon:** PH-S1129…S1138 (band 49). Vision rev **321**.";
+        assert_eq!(parse_fm_closed_band(section), Some(48));
+        assert_eq!(
+            parse_fm_master_horizon(section),
+            Some(("PH-S1129…S1138".to_string(), 49))
+        );
+    }
+
+    #[test]
+    fn canon_readme_sync_is_idempotent() {
+        let root = repo_root();
+        let fm_content = fs::read_to_string(root.join(FM_REL)).expect("FM");
+        let fm_section = extract_fm_section_512(&fm_content).unwrap();
+        let entries = parse_fm_sprint_queue(&fm_content);
+        let manifest = load_manifest(&root.join(MANIFEST_REL)).expect("manifest");
+        let snap = build_vision_canon_snapshot(&manifest, &entries, fm_section, &fm_content, &root)
+            .expect("snapshot");
+        let readme = fs::read_to_string(root.join("README.md")).expect("README");
+        let once = sync_readme_canon(&readme, &snap);
+        let twice = sync_readme_canon(&once, &snap);
+        assert_eq!(once, twice, "README canon sync must be idempotent");
+    }
+
+    #[test]
+    fn canon_docs_drift_empty_when_repo_aligned() {
+        let root = repo_root();
+        let fm_content = fs::read_to_string(root.join(FM_REL)).expect("FM");
+        let fm_section = extract_fm_section_512(&fm_content).unwrap();
+        let entries = parse_fm_sprint_queue(&fm_content);
+        let manifest = load_manifest(&root.join(MANIFEST_REL)).expect("manifest");
+        let errors = collect_canon_docs_drift(&root, &manifest, &entries, fm_section, &fm_content);
+        assert!(errors.is_empty(), "{errors:?}");
     }
 }

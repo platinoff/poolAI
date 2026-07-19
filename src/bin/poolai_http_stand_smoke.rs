@@ -4263,6 +4263,41 @@ mod tests {
     }
 
     #[test]
+    fn pre_push_canon_band49_export_shape_ph_s1134() {
+        use poolai_ui_core::pre_push_hook_depth::{
+            pre_push_hook_criteria_total, pre_push_hook_depth_stub, PrePushHookDepth,
+            FM_BAND49_ROWS, PRE_PUSH_HOOK_CASES, PRE_PUSH_HOOK_CRITERIA,
+        };
+        use serde_json::json;
+        assert_eq!(
+            pre_push_hook_depth_stub(Some(&json!({"vision_sync_canon": true}))),
+            PrePushHookDepth::VisionSyncCanon
+        );
+        assert_eq!(
+            pre_push_hook_depth_stub(Some(&json!({
+                "pre_push_hook_script": true,
+                "install_hook": true,
+                "vision_sync_canon": true,
+                "vision_sync_check": true,
+                "cargo_fmt_gate": true,
+                "pre_push_hook_docs": true,
+                "verify_dev_stand_hook": true,
+            }))),
+            PrePushHookDepth::FullBand49
+        );
+        assert_eq!(PRE_PUSH_HOOK_CRITERIA.len(), 7);
+        assert_eq!(pre_push_hook_criteria_total(), 7);
+        assert!(PRE_PUSH_HOOK_CASES.contains(&"verify_dev_stand_hook"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND49_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band49 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn galaxy_edge_verification_band48_export_shape_ph_s1125() {
         use poolai_ui_core::galaxy_edge_verification_depth::{
             edge_verification_criteria_total, galaxy_edge_verification_depth_stub,

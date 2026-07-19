@@ -1,93 +1,72 @@
-# Pre-Push Hook - Automatic Code Formatting
+# Pre-Push Hook — Vision Canon + Formatting
 
-## 📝 Overview
+## Overview
 
-The pre-push git hook automatically runs `cargo fmt --all --check` before every `git push` to ensure all code is properly formatted.
+The pre-push git hook runs **before every `git push`**:
 
-## 🔧 Location
+1. **`cargo run --bin poolai-vision-sync`** — sync manifest/feed/extensions **and** canon docs (`README.md`, `docs/INDEX_2026-03-17.md`, `docs/development/README.md`, `NEXT_SESSION_PROMPT.md`, `docs/vision/vision.svg`)
+2. **Fail if sync modified tracked files** — commit canon updates before push
+3. **`poolai-vision-sync --check`** — FM ↔ manifest ↔ extensions ↔ `.mdc` + canon doc drift
+4. **`cargo fmt --all --check`** — Rust formatting gate
 
-- **Hook file**: `.git/hooks/pre-push`
-- **Script type**: Bash script (works with MSYS2 bash)
+## Location
 
-## ⚙️ How It Works
+| File | Role |
+|------|------|
+| `bin/pre-push-hook.sh` | Canonical script (tracked in git) |
+| `bin/install-pre-push-hook.sh` | Installs hook into `.git/hooks/pre-push` |
+| `.git/hooks/pre-push` | Thin wrapper → `bin/pre-push-hook.sh` |
 
-1. **Before push**: Hook automatically runs `cargo fmt --all --check`
-2. **If formatting is OK**: Push proceeds normally
-3. **If formatting fails**:
-   - Hook auto-formats code with `cargo fmt --all`
-   - Exits with error code
-   - Requires you to commit formatted changes before pushing
+Install or refresh after clone:
 
-## 🚀 Usage
-
-### Normal Push (Formatted Code)
 ```bash
-# In MSYS2 bash terminal
-git push
-# Output:
-# 🔍 Running pre-push checks...
-# 📝 Running cargo fmt --all...
-# ✅ Code is properly formatted!
-# ✅ Pre-push checks passed!
+bash bin/install-pre-push-hook.sh
 ```
 
-### Push with Formatting Issues
+## Usage
+
+### Normal push (canon + fmt OK)
+
 ```bash
-# In MSYS2 bash terminal
+# MSYS2 UCRT64 bash recommended
+export PATH="$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"
+export RUSTUP_TOOLCHAIN=stable-x86_64-pc-windows-gnu
 git push
-# Output:
-# 🔍 Running pre-push checks...
-# 📝 Running cargo fmt --all...
-# ❌ Code formatting check failed!
-# 
-# Running cargo fmt --all to fix formatting...
-# 
-# ⚠️  Code has been auto-formatted. Please review changes and commit them:
-#    git add -A
-#    git commit -m 'style: auto-format code'
-#    git push
 ```
 
-### Bypass Hook (Not Recommended)
+### Push blocked — canon sync updated files
+
 ```bash
-# Only use if absolutely necessary
+git push
+# vision sync updated README.md, docs/vision/vision.svg, ...
+git add README.md docs/INDEX_2026-03-17.md docs/development/README.md docs/development/NEXT_SESSION_PROMPT.md docs/vision/
+git commit -m 'docs: vision canon sync'
+git push
+```
+
+### Bypass (not recommended)
+
+```bash
 git push --no-verify
 ```
 
-## 📋 Manual Formatting
+## Troubleshooting
 
-You can manually format code before pushing:
+### `cargo not found`
+
+Hook **fails** (no silent skip). Use MSYS2 UCRT64 or ensure `~/.cargo/bin` is on `PATH`.
+
+### Vision drift after band close
+
+Run manually before commit:
 
 ```bash
-# In MSYS2 bash terminal
-cargo fmt --all
+cargo run --bin poolai-vision-sync
+cargo run --bin poolai-vision-sync -- --check
 ```
 
-## 🔍 Troubleshooting
+## Related
 
-### Hook Not Running
-- Check if file exists: `ls -la .git/hooks/pre-push`
-- Ensure file has execute permissions (on Linux/Mac)
-- On Windows, git hooks should work without chmod
-
-### Cargo Not Found
-- Hook will skip format check if `cargo` is not in PATH
-- Ensure MSYS2 bash has cargo in PATH: `export PATH="$HOME/.cargo/bin:$PATH"`
-
-### Formatting Fails
-- Review auto-formatted changes: `git diff`
-- Commit formatted changes: `git add -A && git commit -m 'style: auto-format code'`
-- Push again: `git push`
-
-## 📚 Related Documentation
-
-- **Git Workflow**: `.cursor/rules/git-workflow.md`
-- **Rust Architect Rules**: `.cursor/rules/rust-architect.md`
-- **MSYS2 Setup**: `docs/troubleshooting/QUICK_FIX_MSYS2.md`
-
-## ✅ Benefits
-
-- ✅ Ensures consistent code formatting across all commits
-- ✅ Prevents unformatted code from being pushed
-- ✅ Automatic formatting saves time
-- ✅ Works seamlessly with MSYS2 bash environment
+- `docs/development/HANDOFF_NEW_SESSION.md` — vision close band
+- `.cursor/rules/docs-vision.mdc` — vision map rules
+- `.cursor/rules/git-workflow.md` — push workflow
