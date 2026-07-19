@@ -19,7 +19,7 @@
 | **PH-S1147** | `CI_CANON.md` canon gate docs |
 | **PH-S1148** | Band close |
 
-**§5.12:** **0** відкритих (band 50 ✅). **Vision:** rev **324**.
+**§5.12:** **0** відкритих (band 50 ✅). **Vision:** rev **325**.
 
 **PH-S1148 ✅ (2026-07-19):** `ci_canon_depth.rs`; `--ci-canon`; `VERIFY_CI_CANON`; `quick --ci-canon`; `galaxy_horizon_s1139_integration`; local dual-gate (test-ci + openapi-gap + rust-ratio advisory).
 

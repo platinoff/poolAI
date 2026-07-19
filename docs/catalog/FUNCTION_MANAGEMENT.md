@@ -1221,7 +1221,7 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 50 ✅). **Master horizon:** PH-S1149…S1158 (band 51). Vision rev **324** (після sync). **Наступна сесія:** **`абракадабра`** — project scan → band 51.
+**Відкритих у §5.12:** **0** (band 50 ✅). **Master horizon:** PH-S1149…S1158 (band 51). Vision rev **325** (після sync). **Наступна сесія:** **`абракадабра`** — project scan → band 51.
 
 ### 5.31 CI canon gate queue — band 50 (PH-S1139…S1148, 2026-07-19)
 

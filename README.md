@@ -54,7 +54,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 **Версія в репозиторії:** `0.2.2` (див. `Cargo.toml`). **Робоча гілка:** `main`.
 
-Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S1148 ✅. **Rust ratio:** **94.89%** (hold **95%** advisory). **Vision:** manifest rev **324**. **§5.12:** **0** відкритих (band 48 ✅) · наступна сесія **`абракадабра`** → band 51 — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
+Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S1148 ✅. **Rust ratio:** **94.89%** (hold **95%** advisory). **Vision:** manifest rev **325**. **§5.12:** **0** відкритих (band 50 ✅) · наступна сесія **`абракадабра`** → band 51 — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
 **Репозиторій:** [github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)
 
@@ -86,7 +86,7 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 **Наступна сесія (owner):** **`абракадабра`** — project scan → band 51 **PH-S1149…S1158** · [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
-**§5.12:** **0** відкритих (band 48 ✅) · vision **rev 324** · last **PH-S1148** · next **PH-S1149**.
+**§5.12:** **0** відкритих (band 50 ✅) · vision **rev 325** · last **PH-S1148** · next **PH-S1149**.
 
 **Ops (поза чергою):** **FM-003** LAN §4 **BLOCKED** (2 хости) · **FM-041** Cloud SDK **Deferred**.
 
