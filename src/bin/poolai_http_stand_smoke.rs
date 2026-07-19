@@ -4137,6 +4137,7 @@ mod tests {
     }
 
     #[test]
+    #[test]
     fn run_local_health_export_shape_ph_s1089() {
         use poolai_ui_core::stand_smoke_run_local_depth::RUN_LOCAL_HEALTH_KEYS;
         let health = json!({
@@ -4187,6 +4188,40 @@ mod tests {
             assert!(
                 fm.contains(row) || row.starts_with("PH-S"),
                 "FM band45 row {row}"
+            );
+        }
+    }
+
+    #[test]
+    fn rust_migration_advisory_band46_export_shape_ph_s1104() {
+        use poolai_ui_core::rust_migration_advisory_depth::{
+            migration_registry_total, rust_migration_advisory_depth_stub,
+            RustMigrationAdvisoryDepth, ADMIN_JS_MIGRATION_CANDIDATES,
+            ARCHIVED_E2E_MIGRATION_CANON, FM_BAND46_ROWS, MIGRATION_ADVISORY_CASES,
+        };
+        use serde_json::json;
+        assert_eq!(
+            rust_migration_advisory_depth_stub(Some(&json!({"ui_js_candidates": true}))),
+            RustMigrationAdvisoryDepth::UiJsCandidates
+        );
+        assert_eq!(
+            rust_migration_advisory_depth_stub(Some(&json!({
+                "ui_js_candidates": true,
+                "e2e_archived_canon": true,
+                "loc_audit_advisory": true,
+                "ops_shell_canon": true,
+            }))),
+            RustMigrationAdvisoryDepth::FullBand46
+        );
+        assert_eq!(ADMIN_JS_MIGRATION_CANDIDATES.len(), 6);
+        assert_eq!(ARCHIVED_E2E_MIGRATION_CANON.len(), 8);
+        assert!(migration_registry_total() >= 14);
+        assert!(MIGRATION_ADVISORY_CASES.contains(&"stretch_spirit_hold"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND46_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band46 row {row}"
             );
         }
     }

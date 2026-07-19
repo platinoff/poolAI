@@ -1,8 +1,27 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-18 (band 45 **PH-S1089…S1098** ✅ · horizon bands 46–47)
+**Оновлено:** 2026-07-18 (band 46 **PH-S1099…S1108** ✅ · horizon band 47)
 
-**Наступна сесія:** **`абракадабра`** — project scan → band 46.
+**Наступна сесія:** **`абракадабра`** — project scan → band 47.
+
+## Band 46 — Ratio/rust migration advisory (PH-S1099…S1108, ✅)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1099** | `rust_migration_advisory_depth` ui-core module |
+| **PH-S1100** | `poolai-loc-audit --migration-advisory` |
+| **PH-S1101** | `rust_migration_advisory_audit` test |
+| **PH-S1102** | Admin JS migration candidate registry |
+| **PH-S1103** | `VERIFY_MIGRATION_ADVISORY` verify hook |
+| **PH-S1104** | `quick --migration-advisory` + stand smoke export shape |
+| **PH-S1105** | RUN_LOCAL.md band 46 ops sync |
+| **PH-S1106** | RUST_RATIO_STRATEGY band 46 sync |
+| **PH-S1107** | GALAXY_GRID_ROADMAP + rust ratio |
+| **PH-S1108** | Band close |
+
+**§5.12:** **0** відкритих (band 46 ✅). **Vision:** rev **318**.
+
+**PH-S1108 ✅ (2026-07-18):** `rust_migration_advisory_depth.rs`; `--migration-advisory`; `VERIFY_MIGRATION_ADVISORY`; `quick --migration-advisory`; `galaxy_horizon_s1099_integration`; vision **rev 318**.
 
 ## Band 45 — Stand smoke + RUN_LOCAL ops (PH-S1089…S1098, ✅)
 

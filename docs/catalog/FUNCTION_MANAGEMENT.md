@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-07-18 (band 45 **PH-S1089…S1098** ✅ · horizon bands 46–47)
+**Оновлено:** 2026-07-18 (band 46 **PH-S1099…S1108** ✅ · horizon band 47)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -1221,7 +1221,18 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 45 ✅). **Master horizon:** PH-S1099…S1118 (bands 46–47). Vision rev **317** (після sync). **Наступна сесія:** **`абракадабра`** — project scan → band 46.
+**Відкритих у §5.12:** **0** (band 46 ✅). **Master horizon:** PH-S1109…S1118 (band 47). Vision rev **318** (після sync). **Наступна сесія:** **`абракадабра`** — project scan → band 47.
+
+| 1034 | **PH-S1099** | `rust_migration_advisory_depth` ui-core module | `rust_migration_advisory_depth.rs` | depth enum + ui_js/e2e registry constants | **✅** |
+| 1035 | **PH-S1100** | `poolai-loc-audit --migration-advisory` | `poolai_loc_audit.rs` | migration fields in `rust_ratio.json` | **✅** |
+| 1036 | **PH-S1101** | Rust migration advisory audit | `rust_migration_advisory_audit.rs` | ui_js candidates + archived e2e canon paths | **✅** |
+| 1037 | **PH-S1102** | Admin JS migration candidate registry | `rust_migration_advisory_depth.rs` | 6 ui_js → wasm targets | **✅** |
+| 1038 | **PH-S1103** | `verify-dev-stand` migration hook | `bin/verify-dev-stand.sh` | `VERIFY_MIGRATION_ADVISORY=1` → loc-audit | **✅** |
+| 1039 | **PH-S1104** | `run-poolai quick --migration-advisory` | `bin/run-poolai.*` | post-health `--migration-advisory` + stand smoke export shape | **✅** |
+| 1040 | **PH-S1105** | RUN_LOCAL.md band 46 ops sync | docs | `--migration-advisory`, `VERIFY_MIGRATION_ADVISORY` | **✅** |
+| 1041 | **PH-S1106** | RUST_RATIO_STRATEGY band 46 sync | docs | migration advisory pointer + loc-audit flag | **✅** |
+| 1042 | **PH-S1107** | GALAXY_GRID_ROADMAP + rust ratio | docs + loc-audit | band 46 closed row; stretch 96% hold | **✅** |
+| 1043 | **PH-S1108** | Ratio migration advisory band close | tests/docs | `galaxy_horizon_s1099_integration`; HANDOFF/NEXT | **✅** |
 
 | 1024 | **PH-S1089** | RUN_LOCAL health export shape | `stand_smoke_run_local_depth.rs` | `RUN_LOCAL_HEALTH_KEYS` + enhanced `smoke_health` | **✅** |
 | 1025 | **PH-S1090** | Monitoring alerts stand smoke | `poolai_http_stand_smoke.rs` | GET `/api/enterprise/monitoring/alerts` array | **✅** |
@@ -1288,6 +1299,21 @@ FM-xxx (з таблиці нижче)
 | 981 | **PH-S1046** | ui-core depth stub | `vision_map_depth.rs` | depth enum + FM band 40 markers | **✅** |
 | 982 | **PH-S1047** | Vision Playwright smoke | `e2e/tests/vision.spec.ts` | skip-link focus; `#map-scene-3d`; tree role | **✅** |
 | 983 | **PH-S1048** | Vision map band close | tests/docs | `galaxy_horizon_s1039_integration`; HANDOFF/NEXT | **✅** |
+
+### 5.27 Ratio/rust migration advisory queue — band 46 (PH-S1099…S1108, 2026-07-18)
+
+**Джерело:** project scan band 46 — stretch 96% spirit hold; ui_js glue + archived e2e migration registry without new Playwright API specs.
+
+| 1034 | **PH-S1099** | `rust_migration_advisory_depth` ui-core module | `rust_migration_advisory_depth.rs` | depth enum + ui_js/e2e registry constants | **✅** |
+| 1035 | **PH-S1100** | `poolai-loc-audit --migration-advisory` | `poolai_loc_audit.rs` | migration fields in `rust_ratio.json` | **✅** |
+| 1036 | **PH-S1101** | Rust migration advisory audit | `rust_migration_advisory_audit.rs` | ui_js candidates + archived e2e canon paths | **✅** |
+| 1037 | **PH-S1102** | Admin JS migration candidate registry | `rust_migration_advisory_depth.rs` | 6 ui_js → wasm targets | **✅** |
+| 1038 | **PH-S1103** | `verify-dev-stand` migration hook | `bin/verify-dev-stand.sh` | `VERIFY_MIGRATION_ADVISORY=1` → loc-audit | **✅** |
+| 1039 | **PH-S1104** | `run-poolai quick --migration-advisory` | `bin/run-poolai.*` | post-health `--migration-advisory` + stand smoke export shape | **✅** |
+| 1040 | **PH-S1105** | RUN_LOCAL.md band 46 ops sync | docs | `--migration-advisory`, `VERIFY_MIGRATION_ADVISORY` | **✅** |
+| 1041 | **PH-S1106** | RUST_RATIO_STRATEGY band 46 sync | docs | migration advisory pointer + loc-audit flag | **✅** |
+| 1042 | **PH-S1107** | GALAXY_GRID_ROADMAP + rust ratio | docs + loc-audit | band 46 closed row; stretch 96% hold | **✅** |
+| 1043 | **PH-S1108** | Ratio migration advisory band close | tests/docs | `galaxy_horizon_s1099_integration`; HANDOFF/NEXT | **✅** |
 
 ### 5.26 Stand smoke + RUN_LOCAL ops queue — band 45 (PH-S1089…S1098, 2026-07-18)
 
@@ -1377,7 +1403,7 @@ FM-xxx (з таблиці нижче)
 | 43 | S1069…S1078 | Grid metrics parity hardening ✅ |
 | 44 | S1079…S1088 | wasm admin slim panels ✅ |
 | 45 | S1089…S1098 | stand smoke + RUN_LOCAL ops ✅ |
-| 46 | S1099…S1108 | ratio/rust migration advisory |
+| 46 | S1099…S1108 | ratio/rust migration advisory ✅ |
 | 47 | S1109…S1118 | horizon close + STABLE touch-up |
 
 **Не в scope:** FM-003 LAN · FM-041 Cloud SDK.
@@ -1487,7 +1513,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-18):** band 45 **PH-S1089…S1098** ✅ · §5.12 **0** · наступна **`абракадабра`** → project scan → band 46.
+**Активна смуга (2026-07-18):** band 46 **PH-S1099…S1108** ✅ · §5.12 **0** · наступна **`абракадабра`** → project scan → band 47.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

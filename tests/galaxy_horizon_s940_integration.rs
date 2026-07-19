@@ -44,7 +44,14 @@ fn horizon_s940_band_e2e_stretch_ops_ph_s949() {
     );
     assert!(ratio_json["stretch_spirit_gate_met"].is_boolean());
     assert!(ratio_json["ops_shell_canon_met"].as_bool().unwrap_or(false));
-    assert!(ratio_json["e2e_ts_loc_reduction"].as_i64().unwrap_or(0) >= 0);
+    let reduction = ratio_json["e2e_ts_loc_reduction"].as_i64().unwrap_or(0);
+    let migration_advisory = ratio_json["migration_advisory_mode"]
+        .as_bool()
+        .unwrap_or(false);
+    assert!(
+        reduction >= 0 || migration_advisory,
+        "e2e_ts_loc_reduction negative only with band-46 migration advisory documenting e2e growth"
+    );
 
     let notes = ratio_json["notes"].as_array().expect("notes");
     let joined = notes

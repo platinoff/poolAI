@@ -6,6 +6,7 @@
 |------|----------|
 | **Completion plan** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.14–§5.15** ✅ |
 | **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) — **351/351** ✅ |
+| **Last closed (band 46)** | PH-S1108 ✅ — ratio/rust migration advisory · `rust_migration_advisory_depth` + `--migration-advisory` |
 | **Last closed (band 45)** | PH-S1098 ✅ — stand smoke + RUN_LOCAL ops · `stand_smoke_run_local_depth` + `--run-local-smoke` |
 | **Last closed (band 44)** | PH-S1088 ✅ — Admin wasm slim panels · `admin_wasm_slim_depth` + band-44 depth flags |
 | **Last closed (band 43)** | PH-S1078 ✅ — Grid metrics parity hardening · `validate_band6_metrics_parity_v3` + stand smoke v3 |

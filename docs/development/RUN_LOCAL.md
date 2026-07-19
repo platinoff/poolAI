@@ -24,7 +24,7 @@ cd S:\rust\poolAI
 .\bin\run-poolai.ps1 stop
 ```
 
-**Last updated:** 2026-07-18 (PH-S1098 band 45 · `--run-local-smoke` · `VERIFY_STAND_SMOKE` · `quick --stand-smoke`)
+**Last updated:** 2026-07-18 (PH-S1108 band 46 · `--migration-advisory` · `VERIFY_MIGRATION_ADVISORY` · `quick --migration-advisory`)
 
 ### PH-S1011 / PH-S1012: Light compile + quick preset
 
@@ -48,12 +48,14 @@ cd S:\rust\poolAI
 | **full** | `enterprise,ml,cloud,test-utils` | `run-poolai build` default |
 | **light** (`--light`) | `enterprise,test-utils` | PH-S1011 faster compile |
 
-`quick` restores `data/dev/last_run.json` port when present (PH-S1014), runs light build unless `--skip-build`, starts `single --bg`, waits for `/api/v1/health`. Optional **`--stand-smoke`** (PH-S1095) runs `poolai-http-stand-smoke --run-local-smoke` after health OK.
+`quick` restores `data/dev/last_run.json` port when present (PH-S1014), runs light build unless `--skip-build`, starts `single --bg`, waits for `/api/v1/health`. Optional **`--stand-smoke`** (PH-S1095) runs `poolai-http-stand-smoke --run-local-smoke` after health OK. Optional **`--migration-advisory`** (PH-S1104) runs `poolai-loc-audit --migration-advisory` after health OK.
 
 ```bash
 /usr/bin/bash bin/run-poolai.sh quick --stand-smoke
+/usr/bin/bash bin/run-poolai.sh quick --migration-advisory
 # PowerShell:
 .\bin\run-poolai.ps1 quick -StandSmoke
+.\bin\run-poolai.ps1 quick -MigrationAdvisory
 ```
 
 ### PH-S1013: Vision easy launch
@@ -286,7 +288,28 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `POOLAI_STAND_SMOKE_RAID=1` | Альтернатива прапорцю `--raid` (full suite + raid) |
 | `POOLAI_STAND_SMOKE_RUN_LOCAL=1` | Альтернатива `--run-local-smoke` (PH-S1093) |
 | `VERIFY_STAND_SMOKE=1` | `verify-dev-stand.sh` → `--run-local-smoke` після bootstrap (PH-S1094) |
+| `VERIFY_MIGRATION_ADVISORY=1` | `verify-dev-stand.sh` → `poolai-loc-audit --migration-advisory` (PH-S1103) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
+
+### PH-S1100: Rust migration advisory (band 46)
+
+Registry ui_js → wasm targets + archived e2e → Rust wire canon; stretch **96%** spirit hold advisory.
+
+```bash
+cargo run --bin poolai-loc-audit -- --migration-advisory
+cargo run --bin poolai-loc-audit -- --migration-advisory --advisory --min-ratio 0.95
+
+VERIFY_MIGRATION_ADVISORY=1 bash bin/verify-dev-stand.sh
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `migration_advisory_mode` | `true` when `--migration-advisory` (PH-S1100) |
+| `migration_candidate_total` | ui_js + archived e2e registry count |
+| `migration_ui_js_candidate_count` | Admin JS glue files pending wasm (PH-S1102) |
+| `migration_e2e_archived_count` | Archived Playwright API specs with Rust canon (PH-S1103) |
+
+Module: [`rust_migration_advisory_depth.rs`](../../crates/poolai-ui-core/src/rust_migration_advisory_depth.rs) · tests: `rust_migration_advisory_audit.rs`, `galaxy_horizon_s1099_integration.rs`.
 
 Default stand smoke includes **`vision_revision_parity`** (PH-S208, PH-S235): repo `manifest.revision` vs FM §5.12 `Vision rev`, `extensions.active_sprint` vs `manifest.next_sprint`, then `GET /docs/vision/manifest.json` with `X-PoolAI-Vision-Revision` header vs JSON body.
 

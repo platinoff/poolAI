@@ -17,6 +17,7 @@ MIN_COMPLETED="${VERIFY_MIN_COMPLETED:-4}"
 VERIFY_ML_PIPELINE="${VERIFY_ML_PIPELINE:-1}"
 VERIFY_RAID_JOB_STORE="${VERIFY_RAID_JOB_STORE:-0}"
 VERIFY_STAND_SMOKE="${VERIFY_STAND_SMOKE:-0}"
+VERIFY_MIGRATION_ADVISORY="${VERIFY_MIGRATION_ADVISORY:-0}"
 HEALTH_RETRIES="${VERIFY_HEALTH_RETRIES:-45}"
 HEALTH_SLEEP="${VERIFY_HEALTH_SLEEP:-2}"
 
@@ -262,6 +263,16 @@ if [[ "$VERIFY_STAND_SMOKE" == "1" ]]; then
     echo "OK  stand smoke run-local subset"
   else
     echo "FAIL stand smoke run-local subset"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_MIGRATION_ADVISORY" == "1" ]]; then
+  echo "Running poolai-loc-audit --migration-advisory (PH-S1103)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --migration-advisory); then
+    echo "OK  rust migration advisory loc-audit"
+  else
+    echo "FAIL rust migration advisory loc-audit"
     fail=1
   fi
 fi

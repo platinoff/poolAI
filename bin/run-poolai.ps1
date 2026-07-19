@@ -11,6 +11,7 @@ param(
     [switch]$Light,
     [switch]$RaidJobs,
     [switch]$StandSmoke,
+    [switch]$MigrationAdvisory,
     [int]$Port = 8080,
     [string]$Features = "enterprise,ml,cloud,test-utils",
     [ValidateSet("json", "sqlite", "raid")]
@@ -212,6 +213,11 @@ function Invoke-Quick {
         $env:POOLAI_BASE_URL = "http://127.0.0.1:$Port"
         Write-Host "Running poolai-http-stand-smoke --run-local-smoke (PH-S1095)..."
         & $MsysWrapper cargo run --quiet --bin poolai-http-stand-smoke -- --run-local-smoke
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    }
+    if ($MigrationAdvisory) {
+        Write-Host "Running poolai-loc-audit --migration-advisory (PH-S1104)..."
+        & $MsysWrapper cargo run --quiet --bin poolai-loc-audit -- --migration-advisory
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     }
 }

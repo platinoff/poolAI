@@ -2342,6 +2342,12 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_admin_wasm_slim_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_stand_smoke_run_local_depth_rs"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -9618,9 +9624,23 @@
       "label": "galaxy_horizon_s1079_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s1079_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_stand_smoke_run_local_depth_rs",
+      "label": "stand_smoke_run_local_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/stand_smoke_run_local_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1089_integration_rs",
+      "label": "galaxy_horizon_s1089_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1089_integration.rs"
     }
   ],
-  "revision": 317,
+  "revision": 318,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -18200,6 +18220,96 @@
       "title": "Ops power band close"
     },
     {
+      "acceptance": "depth enum + ui_js/e2e registry constants",
+      "deps": "rust_migration_advisory_depth.rs",
+      "id": "PH-S1099",
+      "open": false,
+      "row": 1034,
+      "status": "closed",
+      "title": "rust_migration_advisory_depth` ui-core module"
+    },
+    {
+      "acceptance": "migration fields in `rust_ratio.json",
+      "deps": "poolai_loc_audit.rs",
+      "id": "PH-S1100",
+      "open": false,
+      "row": 1035,
+      "status": "closed",
+      "title": "poolai-loc-audit --migration-advisory"
+    },
+    {
+      "acceptance": "ui_js candidates + archived e2e canon paths",
+      "deps": "rust_migration_advisory_audit.rs",
+      "id": "PH-S1101",
+      "open": false,
+      "row": 1036,
+      "status": "closed",
+      "title": "Rust migration advisory audit"
+    },
+    {
+      "acceptance": "6 ui_js → wasm targets",
+      "deps": "rust_migration_advisory_depth.rs",
+      "id": "PH-S1102",
+      "open": false,
+      "row": 1037,
+      "status": "closed",
+      "title": "Admin JS migration candidate registry"
+    },
+    {
+      "acceptance": "VERIFY_MIGRATION_ADVISORY=1` → loc-audit",
+      "deps": "bin/verify-dev-stand.sh",
+      "id": "PH-S1103",
+      "open": false,
+      "row": 1038,
+      "status": "closed",
+      "title": "verify-dev-stand` migration hook"
+    },
+    {
+      "acceptance": "post-health `--migration-advisory` + stand smoke export shape",
+      "deps": "bin/run-poolai.*",
+      "id": "PH-S1104",
+      "open": false,
+      "row": 1039,
+      "status": "closed",
+      "title": "run-poolai quick --migration-advisory"
+    },
+    {
+      "acceptance": "--migration-advisory`, `VERIFY_MIGRATION_ADVISORY",
+      "deps": "docs",
+      "id": "PH-S1105",
+      "open": false,
+      "row": 1040,
+      "status": "closed",
+      "title": "RUN_LOCAL.md band 46 ops sync"
+    },
+    {
+      "acceptance": "migration advisory pointer + loc-audit flag",
+      "deps": "docs",
+      "id": "PH-S1106",
+      "open": false,
+      "row": 1041,
+      "status": "closed",
+      "title": "RUST_RATIO_STRATEGY band 46 sync"
+    },
+    {
+      "acceptance": "band 46 closed row; stretch 96% hold",
+      "deps": "docs + loc-audit",
+      "id": "PH-S1107",
+      "open": false,
+      "row": 1042,
+      "status": "closed",
+      "title": "GALAXY_GRID_ROADMAP + rust ratio"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1099_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1108",
+      "open": false,
+      "row": 1043,
+      "status": "closed",
+      "title": "Ratio migration advisory band close"
+    },
+    {
       "acceptance": "RUN_LOCAL_HEALTH_KEYS` + enhanced `smoke_health",
       "deps": "stand_smoke_run_local_depth.rs",
       "id": "PH-S1089",
@@ -18272,13 +18382,13 @@
       "title": "RUN_LOCAL.md band 45 ops sync"
     },
     {
-      "acceptance": "band 45 closed row; `rust_ratio.json` zriz",
-      "deps": "docs + loc-audit",
+      "acceptance": "band 45 closed row; ratio hold → band 46",
+      "deps": "docs",
       "id": "PH-S1097",
       "open": false,
       "row": 1032,
       "status": "closed",
-      "title": "GALAXY_GRID_ROADMAP + rust ratio"
+      "title": "GALAXY_GRID_ROADMAP + rust ratio advisory"
     },
     {
       "acceptance": "galaxy_horizon_s1089_integration`; HANDOFF/NEXT",

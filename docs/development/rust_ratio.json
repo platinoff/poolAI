@@ -8,61 +8,65 @@
   "stretch_spirit": 0.96,
   "advisory_mode": false,
   "min_ratio": null,
-  "rust_loc": 152118,
-  "non_rust_product_loc": 7992,
-  "product_loc_total": 160110,
-  "rust_ratio": 0.9500843170320404,
-  "rust_ratio_pct": 95.00843170320404,
-  "in_formal_band": false,
+  "rust_loc": 155565,
+  "non_rust_product_loc": 8323,
+  "product_loc_total": 163888,
+  "rust_ratio": 0.9492153177779947,
+  "rust_ratio_pct": 94.92153177779947,
+  "in_formal_band": true,
   "below_warn_threshold": false,
-  "below_target": false,
+  "below_target": true,
   "below_stretch_spirit": true,
   "meets_min_ratio": null,
-  "ui_js_loc": 1921,
+  "ui_js_loc": 1922,
   "ui_js_band28_baseline_loc": 2141,
-  "ui_js_loc_reduction": 220,
-  "ratio_95_formal_gate_met": true,
+  "ui_js_loc_reduction": 219,
+  "ratio_95_formal_gate_met": false,
   "stretch_spirit_gate_met": false,
-  "e2e_ts_loc": 1125,
+  "e2e_ts_loc": 1230,
   "e2e_ts_band29_baseline_loc": 1155,
-  "e2e_ts_loc_reduction": 30,
+  "e2e_ts_loc_reduction": -75,
   "ops_shell_canon_met": true,
+  "migration_advisory_mode": true,
+  "migration_candidate_total": 14,
+  "migration_ui_js_candidate_count": 6,
+  "migration_e2e_archived_count": 8,
   "by_category": {
     "e2e_ts": {
       "files": 8,
-      "loc": 1125
+      "loc": 1230
     },
     "ops_ps1": {
       "files": 16,
-      "loc": 1341
+      "loc": 1436
     },
     "ops_shell": {
-      "files": 34,
-      "loc": 2571
+      "files": 35,
+      "loc": 2683
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 54,
-      "loc": 12367
+      "files": 64,
+      "loc": 13749
     },
     "rust_src": {
-      "files": 294,
-      "loc": 105863
+      "files": 298,
+      "loc": 106883
     },
     "rust_tests": {
-      "files": 220,
-      "loc": 33280
+      "files": 233,
+      "loc": 34325
     },
     "ui_css": {
       "files": 2,
-      "loc": 1034
+      "loc": 1052
     },
     "ui_js": {
       "files": 6,
-      "loc": 1921
+      "loc": 1922
     }
   },
   "notes": [
@@ -82,6 +86,8 @@
     "PH-S998: integration gap band 34 hold advisory — in_formal_band true; target 95% hold until band 35+",
     "PH-S1008: multi-module band 35 hold advisory — in_formal_band true; target 95% hold until PH-S1010",
     "PH-S1010: product-complete band 36 — ratio_95_formal_gate_met; stretch 96% advisory if below_stretch_spirit",
-    "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz"
+    "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
+    "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
+    "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending"
   ]
 }

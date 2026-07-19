@@ -55,6 +55,7 @@ Commands:
 
 Options (quick):
   --stand-smoke   After health wait, run poolai-http-stand-smoke --run-local-smoke (PH-S1095)
+  --migration-advisory  After health wait, run poolai-loc-audit --migration-advisory (PH-S1104)
   --skip-build    Skip cargo build
   --port N        HTTP port (default 8080)
 
@@ -233,10 +234,12 @@ cmd_single() {
 
 cmd_quick() {
   local stand_smoke=0
+  local migration_advisory=0
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --skip-build) SKIP_BUILD=1; shift ;;
       --stand-smoke) stand_smoke=1; shift ;;
+      --migration-advisory) migration_advisory=1; shift ;;
       --port) PORT="$2"; shift 2 ;;
       *) echo "Unknown option: $1"; usage; exit 1 ;;
     esac
@@ -248,6 +251,10 @@ cmd_quick() {
     export POOLAI_BASE_URL="http://127.0.0.1:${PORT}"
     echo "Running poolai-http-stand-smoke --run-local-smoke (PH-S1095)..."
     cargo run --quiet --bin poolai-http-stand-smoke -- --run-local-smoke
+  fi
+  if [[ "$migration_advisory" == "1" ]]; then
+    echo "Running poolai-loc-audit --migration-advisory (PH-S1104)..."
+    cargo run --quiet --bin poolai-loc-audit -- --migration-advisory
   fi
 }
 

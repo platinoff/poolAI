@@ -8,6 +8,10 @@
 //! cargo run --bin poolai-loc-audit -- --min-ratio 0.91
 //! ```
 
+use poolai_ui_core::rust_migration_advisory_depth::{
+    migration_registry_total, ADMIN_JS_MIGRATION_CANDIDATES, ARCHIVED_E2E_MIGRATION_CANON,
+    MIGRATION_ADVISORY_CASES,
+};
 use serde::Serialize;
 use std::collections::BTreeMap;
 use std::fs;
@@ -84,6 +88,8 @@ struct AuditConfig {
     advisory: bool,
     /// Optional hold/regression floor (PH-S165: 0.95 hold band top with `--advisory` in CI).
     min_ratio: Option<f64>,
+    /// Emit band-46 migration advisory fields (PH-S1100).
+    migration_advisory: bool,
 }
 
 impl Default for AuditConfig {
@@ -94,6 +100,7 @@ impl Default for AuditConfig {
             stretch: DEFAULT_STRETCH,
             advisory: false,
             min_ratio: None,
+            migration_advisory: false,
         }
     }
 }
@@ -149,6 +156,14 @@ struct RustRatioReport {
     e2e_ts_loc_reduction: i64,
     /// True when no `.rs` under `bin/` or `scripts/` (PH-S943 REPOSITORY_LAYOUT canon).
     ops_shell_canon_met: bool,
+    /// Band-46 migration advisory mode (PH-S1100).
+    migration_advisory_mode: bool,
+    /// Total ui_js + archived e2e migration registry entries (PH-S1100).
+    migration_candidate_total: usize,
+    /// Admin JS glue files pending wasm migration (PH-S1102).
+    migration_ui_js_candidate_count: usize,
+    /// Archived Playwright API specs with Rust wire canon (PH-S1103).
+    migration_e2e_archived_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -276,6 +291,7 @@ fn parse_cli() -> Result<AuditCli, String> {
                 )?);
             }
             "--advisory" => config.advisory = true,
+            "--migration-advisory" => config.migration_advisory = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
                 print_help();
@@ -298,6 +314,7 @@ fn print_help() {
            --stretch RATIO       spirit goal (default {DEFAULT_STRETCH})\n\
            --min-ratio RATIO     hold/regression floor (fail unless --advisory)\n\
            --advisory            warn below floors but exit 0 (PH-S165 CI hold gate)\n\
+           --migration-advisory  band-46 rust migration advisory fields (PH-S1100)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -362,6 +379,37 @@ fn build_report(
     let e2e_ts_loc = by_category.get("e2e_ts").map(|c| c.loc).unwrap_or(0);
     let e2e_ts_loc_reduction = E2E_TS_BAND29_BASELINE_LOC as i64 - e2e_ts_loc as i64;
     let ops_shell_canon_met = audit_ops_shell_canon(files);
+    let migration_ui_js_candidate_count = ADMIN_JS_MIGRATION_CANDIDATES.len();
+    let migration_e2e_archived_count = ARCHIVED_E2E_MIGRATION_CANON.len();
+    let migration_candidate_total = migration_registry_total();
+
+    let mut notes = vec![
+        "Denominator: product code only (strategy §1); docs/yaml/png excluded",
+        "GitHub Languages bar is heuristic; this report uses git-tracked LOC buckets",
+        "PH-S165: CI --min-ratio 0.95 hold band (advisory); stretch spirit 96% via --stretch",
+        "PH-S933: ratio_95_formal_gate_met when rust_ratio ≥ 0.95 (advisory hold when false)",
+        "PH-S934: ui_js_loc_reduction vs band-28 baseline (PH-S925 zriz)",
+        "PH-S941: e2e_ts_loc_reduction vs band-29 baseline (PH-S940 zriz)",
+        "PH-S942: stretch_spirit_gate_met when rust_ratio ≥ 0.96",
+        "PH-S943: ops_shell_canon_met when no .rs under bin/ or scripts/",
+        "PH-S948: stretch advisory — below_stretch_spirit is expected until band 29+ migration",
+        "PH-S958: digest band 30 hold advisory — in_formal_band true; target 95% hold until band 31+",
+        "PH-S968: docs legacy band 31 hold advisory — in_formal_band true; target 95% hold until band 32+",
+        "PH-S978: concept band 32 hold advisory — in_formal_band true; target 95% hold until band 33+",
+        "PH-S988: STABLE band 33 hold advisory — in_formal_band true; target 95% hold until band 34+",
+        "PH-S998: integration gap band 34 hold advisory — in_formal_band true; target 95% hold until band 35+",
+        "PH-S1008: multi-module band 35 hold advisory — in_formal_band true; target 95% hold until PH-S1010",
+        "PH-S1010: product-complete band 36 — ratio_95_formal_gate_met; stretch 96% advisory if below_stretch_spirit",
+        "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
+    ];
+    if config.migration_advisory {
+        notes.push(
+            "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
+        );
+        notes.push(
+            "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
+        );
+    }
 
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
@@ -392,25 +440,12 @@ fn build_report(
         e2e_ts_band29_baseline_loc: E2E_TS_BAND29_BASELINE_LOC,
         e2e_ts_loc_reduction,
         ops_shell_canon_met,
+        migration_advisory_mode: config.migration_advisory,
+        migration_candidate_total,
+        migration_ui_js_candidate_count,
+        migration_e2e_archived_count,
         by_category,
-        notes: vec![
-            "Denominator: product code only (strategy §1); docs/yaml/png excluded",
-            "GitHub Languages bar is heuristic; this report uses git-tracked LOC buckets",
-            "PH-S165: CI --min-ratio 0.95 hold band (advisory); stretch spirit 96% via --stretch",
-            "PH-S933: ratio_95_formal_gate_met when rust_ratio ≥ 0.95 (advisory hold when false)",
-            "PH-S934: ui_js_loc_reduction vs band-28 baseline (PH-S925 zriz)",
-            "PH-S941: e2e_ts_loc_reduction vs band-29 baseline (PH-S940 zriz)",
-            "PH-S942: stretch_spirit_gate_met when rust_ratio ≥ 0.96",
-            "PH-S943: ops_shell_canon_met when no .rs under bin/ or scripts/",
-            "PH-S948: stretch advisory — below_stretch_spirit is expected until band 29+ migration",
-            "PH-S958: digest band 30 hold advisory — in_formal_band true; target 95% hold until band 31+",
-            "PH-S968: docs legacy band 31 hold advisory — in_formal_band true; target 95% hold until band 32+",
-            "PH-S978: concept band 32 hold advisory — in_formal_band true; target 95% hold until band 33+",
-            "PH-S988: STABLE band 33 hold advisory — in_formal_band true; target 95% hold until band 34+",
-            "PH-S998: integration gap band 34 hold advisory — in_formal_band true; target 95% hold until band 35+",
-            "PH-S1008: multi-module band 35 hold advisory — in_formal_band true; target 95% hold until PH-S1010",
-            "PH-S1010: product-complete band 36 — ratio_95_formal_gate_met; stretch 96% advisory if below_stretch_spirit",
-        ],
+        notes,
     })
 }
 
@@ -461,6 +496,19 @@ fn print_summary(report: &RustRatioReport) {
         report.e2e_ts_loc, report.e2e_ts_band29_baseline_loc, report.e2e_ts_loc_reduction
     );
     println!("  ops_shell_canon_met:   {}", report.ops_shell_canon_met);
+    if report.migration_advisory_mode {
+        println!("  migration_advisory:    true (PH-S1100 band 46)");
+        println!(
+            "  migration_candidates:  {} (ui_js {} · e2e archived {})",
+            report.migration_candidate_total,
+            report.migration_ui_js_candidate_count,
+            report.migration_e2e_archived_count
+        );
+        println!(
+            "  migration_cases:       {}",
+            MIGRATION_ADVISORY_CASES.join(", ")
+        );
+    }
     for (name, loc) in &report.by_category {
         println!("  {name}: {} files, {} loc", loc.files, loc.loc);
     }
