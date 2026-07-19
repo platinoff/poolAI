@@ -7,7 +7,7 @@ Maintenance mode (FM §5.15) · band 49 drained.
 | **← наступний** | **`абракадабра`** (project scan → band 50) |
 | **§5.12 active** | **0** (band 49 ✅) |
 | **Horizon** | band 50 → **PH-S1139…S1148** |
-| **Vision** | rev **322** |
+| **Vision** | rev **323** |
 
 ---
 

@@ -19,7 +19,7 @@
 | **PH-S1137** | PRE_PUSH_HOOK.md canon gate docs |
 | **PH-S1138** | Band close |
 
-**§5.12:** **0** відкритих (band 49 ✅). **Vision:** rev **322**.
+**§5.12:** **0** відкритих (band 49 ✅). **Vision:** rev **323**.
 
 **PH-S1138 ✅ (2026-07-19):** `pre_push_hook_depth.rs`; `--pre-push-canon`; `VERIFY_PRE_PUSH_CANON`; `quick --pre-push-canon`; `galaxy_horizon_s1129_integration`; `poolai-vision-sync` canon doc `--check`.
 
