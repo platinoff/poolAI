@@ -13,6 +13,7 @@ param(
     [switch]$StandSmoke,
     [switch]$MigrationAdvisory,
     [switch]$StableTouchup,
+    [switch]$EdgeVerification,
     [int]$Port = 8080,
     [string]$Features = "enterprise,ml,cloud,test-utils",
     [ValidateSet("json", "sqlite", "raid")]
@@ -224,6 +225,11 @@ function Invoke-Quick {
     if ($StableTouchup) {
         Write-Host "Running poolai-loc-audit --stable-touchup (PH-S1114)..."
         & $MsysWrapper cargo run --quiet --bin poolai-loc-audit -- --stable-touchup
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    }
+    if ($EdgeVerification) {
+        Write-Host "Running poolai-loc-audit --edge-verification-advisory (PH-S1125)..."
+        & $MsysWrapper cargo run --quiet --bin poolai-loc-audit -- --edge-verification-advisory
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     }
 }

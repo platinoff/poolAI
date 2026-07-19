@@ -142,6 +142,20 @@ pub async fn admin_updates_compat() -> Html<String> {
             </ul>
           </div>
 
+          <div class="admin-card" id="updates-compat-edge-verification">
+            <h3 data-i18n="admin.updatesCompat.edgeVerificationTitle">Edge verification metrics</h3>
+            <p class="muted" data-i18n="admin.updatesCompat.edgeVerificationHint">
+              Galaxy §6.6 — read-only strip from <code>GET /api/v1/grid/edge-verification-metrics</code>
+              reconciled with <code>/metrics</code> (PH-S1122…S1124).
+            </p>
+            <div id="updates-compat-edge-verification-strip" class="updates-compat-edge-verification-strip muted" data-i18n="admin.updatesCompat.edgeVerificationLoading">
+              Loading edge verification metrics…
+            </div>
+            <p class="muted admin-hint">
+              <a href="{doc_galaxy_66}" target="_blank" rel="noopener noreferrer" data-i18n="admin.updatesCompat.link.galaxy66">Galaxy §6.6 edge verification</a>
+            </p>
+          </div>
+
           <div class="admin-card" id="updates-compat-prefetch">
             <h3 data-i18n="admin.updatesCompat.prefetchTitle">Prefetch live pull metrics</h3>
             <p class="muted" data-i18n="admin.updatesCompat.prefetchHint">
@@ -318,6 +332,36 @@ pub async fn admin_updates_compat() -> Html<String> {
       }
     }
 
+    async function loadUpdatesCompatEdgeVerificationStrip() {
+      const el = document.getElementById('updates-compat-edge-verification-strip');
+      if (!el) return;
+      try {
+        let metricsJson = '{}';
+        let fraudProof = 0;
+        try {
+          const metricsResp = await fetchJson('/api/v1/grid/edge-verification-metrics');
+          metricsJson = JSON.stringify(metricsResp || {});
+        } catch (_) {}
+        try {
+          const promText = await fetch('/metrics').then(function(r) { return r.text(); });
+          var wasm = window.poolaiUiWasm;
+          if (wasm && typeof wasm.parsePrometheusGauge === 'function') {
+            fraudProof = wasm.parsePrometheusGauge(promText, 'galaxy_fraud_proof_pending_total');
+          } else {
+            var m = promText.match(/galaxy_fraud_proof_pending_total\\s+(\\d+)/);
+            if (m) fraudProof = parseInt(m[1], 10) || 0;
+          }
+        } catch (_) {}
+        if (window.poolaiUiWasm && typeof window.poolaiUiWasm.renderGridEdgeVerificationMetricsStrip === 'function') {
+          el.innerHTML = window.poolaiUiWasm.renderGridEdgeVerificationMetricsStrip(metricsJson, fraudProof || 0);
+        } else {
+          el.textContent = metricsJson;
+        }
+      } catch (e) {
+        el.textContent = String(e && e.message ? e.message : e);
+      }
+    }
+
     async function loadUpdatesCompatGovernanceStrip() {
       const el = document.getElementById('updates-compat-governance-strip');
       if (!el) return;
@@ -355,6 +399,7 @@ pub async fn admin_updates_compat() -> Html<String> {
 
     function startUpdatesCompatPage() {
       wireUpdatesCompatLabels();
+      loadUpdatesCompatEdgeVerificationStrip();
       loadUpdatesCompatPrefetchStrip();
       loadUpdatesCompatLocalityStrip();
       loadUpdatesCompatGovernanceStrip();
@@ -448,4 +493,14 @@ async fn admin_updates_compat_governance_wasm_glue_ph_s792() {
     assert!(html.contains("renderGridGovernanceMetricsStrip"));
     assert!(html.contains("updates-compat-governance-strip"));
     assert!(html.contains("loadUpdatesCompatGovernanceStrip"));
+}
+
+#[tokio::test]
+async fn admin_updates_compat_edge_verification_wasm_glue_ph_s1124() {
+    let html = admin_updates_compat().await.0;
+    assert!(html.contains("id=\"updates-compat-edge-verification\""));
+    assert!(html.contains("/api/v1/grid/edge-verification-metrics"));
+    assert!(html.contains("renderGridEdgeVerificationMetricsStrip"));
+    assert!(html.contains("updates-compat-edge-verification-strip"));
+    assert!(html.contains("loadUpdatesCompatEdgeVerificationStrip"));
 }

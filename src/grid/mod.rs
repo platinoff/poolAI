@@ -10,6 +10,8 @@ pub mod galaxy_capability_admission;
 pub mod galaxy_capability_admission_depth;
 pub mod galaxy_capability_admission_metrics;
 pub mod galaxy_capability_doc;
+pub mod galaxy_edge_verification_depth;
+pub mod galaxy_edge_verification_metrics;
 pub mod galaxy_fee_split;
 pub mod galaxy_fee_split_depth;
 pub mod galaxy_fee_split_metrics;

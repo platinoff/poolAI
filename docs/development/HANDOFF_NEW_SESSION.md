@@ -1,8 +1,27 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-18 (band 47 **PH-S1109…S1118** ✅ · horizon band 48)
+**Оновлено:** 2026-07-18 (band 48 **PH-S1119…S1128** ✅ · horizon band 49)
 
-**Наступна сесія:** **`абракадабра`** — project scan → band 48.
+**Наступна сесія:** **`абракадабра`** — project scan → band 49.
+
+## Band 48 — Galaxy edge verification horizon (PH-S1119…S1128, ✅)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1119** | `galaxy_edge_verification_depth` ui-core module |
+| **PH-S1120** | `poolai-loc-audit --edge-verification-advisory` |
+| **PH-S1121** | `galaxy_edge_verification_audit` test |
+| **PH-S1122** | `GET /api/v1/grid/edge-verification-metrics` |
+| **PH-S1123** | Grid stub + stand smoke parity v4 |
+| **PH-S1124** | Admin updates-compat edge-verification wasm strip |
+| **PH-S1125** | `VERIFY_EDGE_VERIFICATION` + `quick --edge-verification` |
+| **PH-S1126** | RUN_LOCAL.md band 48 ops sync |
+| **PH-S1127** | RUST_RATIO + GALAXY_GRID_ROADMAP band 48 sync |
+| **PH-S1128** | Band close |
+
+**§5.12:** **0** відкритих (band 48 ✅). **Vision:** rev **321**.
+
+**PH-S1128 ✅ (2026-07-18):** `galaxy_edge_verification_depth.rs`; `--edge-verification-advisory`; `VERIFY_EDGE_VERIFICATION`; `quick --edge-verification`; `galaxy_horizon_s1119_integration`; edge-verification-metrics HTTP wire.
 
 ## Band 47 — STABLE touch-up (PH-S1109…S1118, ✅)
 

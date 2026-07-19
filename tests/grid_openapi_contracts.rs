@@ -132,6 +132,7 @@ async fn grid_metrics_band_openapi_shape_ph_s842() {
         "/api/v1/grid/locality-metrics",
         "/api/v1/grid/fee-split-metrics",
         "/api/v1/grid/governance-metrics",
+        "/api/v1/grid/edge-verification-metrics",
         "/api/v1/grid/payout-batch-metrics",
     ] {
         let (status, v) = get_json(&app, path).await;

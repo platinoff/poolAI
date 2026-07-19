@@ -8,6 +8,9 @@
 //! cargo run --bin poolai-loc-audit -- --min-ratio 0.91
 //! ```
 
+use poolai_ui_core::galaxy_edge_verification_depth::{
+    edge_verification_criteria_total, EDGE_VERIFICATION_CASES, EDGE_VERIFICATION_CRITERIA,
+};
 use poolai_ui_core::rust_migration_advisory_depth::{
     migration_registry_total, ADMIN_JS_MIGRATION_CANDIDATES, ARCHIVED_E2E_MIGRATION_CANON,
     MIGRATION_ADVISORY_CASES,
@@ -95,6 +98,8 @@ struct AuditConfig {
     migration_advisory: bool,
     /// Emit band-47 STABLE touch-up fields (PH-S1110).
     stable_touchup: bool,
+    /// Emit band-48 edge verification advisory fields (PH-S1120).
+    edge_verification_advisory: bool,
 }
 
 impl Default for AuditConfig {
@@ -107,6 +112,7 @@ impl Default for AuditConfig {
             min_ratio: None,
             migration_advisory: false,
             stable_touchup: false,
+            edge_verification_advisory: false,
         }
     }
 }
@@ -176,6 +182,12 @@ struct RustRatioReport {
     stable_criteria_total: usize,
     /// Criteria with marker present in canonical doc path (PH-S1112).
     stable_criteria_met_count: usize,
+    /// Band-48 edge verification advisory mode (PH-S1120).
+    edge_verification_advisory_mode: bool,
+    /// Edge verification criteria registry size (PH-S1121).
+    edge_verification_criteria_total: usize,
+    /// Edge verification criteria met count (PH-S1121).
+    edge_verification_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -216,6 +228,22 @@ fn audit_stable_touchup_criteria_met(root: &Path) -> (usize, usize) {
     let total = stable_criteria_total();
     let mut met = 0usize;
     for (_, marker, rel) in STABLE_TOUCHUP_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
+fn audit_edge_verification_criteria_met(root: &Path) -> (usize, usize) {
+    let total = edge_verification_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in EDGE_VERIFICATION_CRITERIA {
         let path = root.join(rel);
         if path.is_file() {
             if let Ok(content) = fs::read_to_string(&path) {
@@ -321,6 +349,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--advisory" => config.advisory = true,
             "--migration-advisory" => config.migration_advisory = true,
             "--stable-touchup" => config.stable_touchup = true,
+            "--edge-verification-advisory" => config.edge_verification_advisory = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
                 print_help();
@@ -345,6 +374,7 @@ fn print_help() {
            --advisory            warn below floors but exit 0 (PH-S165 CI hold gate)\n\
            --migration-advisory  band-46 rust migration advisory fields (PH-S1100)\n\
            --stable-touchup      band-47 STABLE touch-up criteria fields (PH-S1110)\n\
+           --edge-verification-advisory  band-48 edge verification horizon fields (PH-S1120)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -449,6 +479,18 @@ fn build_report(
         notes.push("PH-S1110: stable_touchup_mode — maintenance STABLE criteria registry touch-up");
         notes.push("PH-S1118: band 47 STABLE touch-up — criteria met count vs registry total");
     }
+    let (edge_verification_criteria_met_count, edge_verification_criteria_total_count) =
+        if config.edge_verification_advisory {
+            audit_edge_verification_criteria_met(root)
+        } else {
+            (0, edge_verification_criteria_total())
+        };
+    if config.edge_verification_advisory {
+        notes.push(
+            "PH-S1120: edge_verification_advisory_mode — Galaxy §6.6 fraud-proof/capability wire",
+        );
+        notes.push("PH-S1128: band 48 edge verification horizon — criteria met vs registry");
+    }
 
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
@@ -486,6 +528,9 @@ fn build_report(
         stable_touchup_mode: config.stable_touchup,
         stable_criteria_total: stable_criteria_total_count,
         stable_criteria_met_count,
+        edge_verification_advisory_mode: config.edge_verification_advisory,
+        edge_verification_criteria_total: edge_verification_criteria_total_count,
+        edge_verification_criteria_met_count,
         by_category,
         notes,
     })
@@ -560,6 +605,17 @@ fn print_summary(report: &RustRatioReport) {
         println!(
             "  stable_touchup_cases:  {}",
             STABLE_TOUCHUP_CASES.join(", ")
+        );
+    }
+    if report.edge_verification_advisory_mode {
+        println!("  edge_verification:     true (PH-S1120 band 48)");
+        println!(
+            "  edge_criteria:         {}/{} met",
+            report.edge_verification_criteria_met_count, report.edge_verification_criteria_total
+        );
+        println!(
+            "  edge_verification_cases: {}",
+            EDGE_VERIFICATION_CASES.join(", ")
         );
     }
     for (name, loc) in &report.by_category {

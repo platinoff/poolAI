@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-07-18 (band 47 **PH-S1109…S1118** ✅ · maintenance band 48)
+**Оновлено:** 2026-07-18 (band 48 **PH-S1119…S1128** ✅ · maintenance band 49)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -1221,7 +1221,7 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 47 ✅). **Master horizon:** PH-S1119…S1128 (band 48). Vision rev **320** (після sync). **Наступна сесія:** **`абракадабра`** — project scan → band 48.
+**Відкритих у §5.12:** **0** (band 48 ✅). **Master horizon:** PH-S1129…S1138 (band 49). Vision rev **321** (після sync). **Наступна сесія:** **`абракадабра`** — project scan → band 49.
 
 | 1044 | **PH-S1109** | `stable_state_touchup_depth` ui-core module | `stable_state_touchup_depth.rs` | depth enum + STABLE criteria registry constants | **✅** |
 | 1045 | **PH-S1110** | `poolai-loc-audit --stable-touchup` | `poolai_loc_audit.rs` | stable_touchup fields in `rust_ratio.json` | **✅** |
@@ -1310,6 +1310,21 @@ FM-xxx (з таблиці нижче)
 | 981 | **PH-S1046** | ui-core depth stub | `vision_map_depth.rs` | depth enum + FM band 40 markers | **✅** |
 | 982 | **PH-S1047** | Vision Playwright smoke | `e2e/tests/vision.spec.ts` | skip-link focus; `#map-scene-3d`; tree role | **✅** |
 | 983 | **PH-S1048** | Vision map band close | tests/docs | `galaxy_horizon_s1039_integration`; HANDOFF/NEXT | **✅** |
+
+### 5.29 Galaxy edge verification horizon queue — band 48 (PH-S1119…S1128, 2026-07-18)
+
+**Джерело:** project scan band 48 — Galaxy §6.6 edge verification metrics HTTP wire + maintenance ops scaffold.
+
+| 1054 | **PH-S1119** | `galaxy_edge_verification_depth` ui-core module | `galaxy_edge_verification_depth.rs` | depth enum + edge verification criteria registry constants | **✅** |
+| 1055 | **PH-S1120** | `poolai-loc-audit --edge-verification-advisory` | `poolai_loc_audit.rs` | edge_verification fields in `rust_ratio.json` | **✅** |
+| 1056 | **PH-S1121** | Edge verification advisory audit | `galaxy_edge_verification_audit.rs` | criteria registry + maintenance markers | **✅** |
+| 1057 | **PH-S1122** | `GET /api/v1/grid/edge-verification-metrics` | Galaxy §6.6 | JSON snapshot fraud-proof/capability/network/TEE + OpenAPI | **✅** |
+| 1058 | **PH-S1123** | `galaxy_edge_verification_depth` grid stub + parity v4 | `stand_smoke_metrics_parity.rs` | `validate_band6_metrics_parity_v4` + horizon depth wire | **✅** |
+| 1059 | **PH-S1124** | Admin updates-compat edge-verification wasm strip | `updates_compat.rs` | `renderGridEdgeVerificationMetricsStrip` on updates-compat | **✅** |
+| 1060 | **PH-S1125** | `verify-dev-stand` + `quick` edge-verification hooks | `bin/verify-dev-stand.sh`, `bin/run-poolai.*` | `VERIFY_EDGE_VERIFICATION=1`; `quick --edge-verification` | **✅** |
+| 1061 | **PH-S1126** | RUN_LOCAL.md band 48 ops sync | docs | `--edge-verification`, `VERIFY_EDGE_VERIFICATION` | **✅** |
+| 1062 | **PH-S1127** | RUST_RATIO + GALAXY_GRID_ROADMAP band 48 sync | docs | edge-verification pointer + loc-audit flag | **✅** |
+| 1063 | **PH-S1128** | Edge verification horizon band close | tests/docs | `galaxy_horizon_s1119_integration`; HANDOFF/NEXT | **✅** |
 
 ### 5.28 STABLE touch-up queue — band 47 (PH-S1109…S1118, 2026-07-18)
 
@@ -1539,7 +1554,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-18):** band 47 **PH-S1109…S1118** ✅ · §5.12 **0** · наступна **`абракадабра`** → project scan → band 48.
+**Активна смуга (2026-07-18):** band 48 **PH-S1119…S1128** ✅ · §5.12 **0** · наступна **`абракадабра`** → project scan → band 49.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

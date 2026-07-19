@@ -246,6 +246,44 @@ pub fn render_grid_governance_metrics_strip_html(
     )
 }
 
+/// Edge verification horizon metrics strip for admin updates panel (PH-S1124).
+pub fn render_grid_edge_verification_metrics_strip_html(
+    edge_metrics_json: &str,
+    fraud_proof_gauge: u64,
+) -> String {
+    use crate::format::escape_html;
+
+    let body: Value = serde_json::from_str(edge_metrics_json).unwrap_or(Value::Null);
+    let metrics = body.get("metrics").cloned().unwrap_or(body);
+    let fraud = if grid_metrics_u64(&metrics, "fraud_proof_pending") > 0 {
+        grid_metrics_u64(&metrics, "fraud_proof_pending")
+    } else {
+        fraud_proof_gauge
+    };
+    let unsigned = grid_metrics_u64(&metrics, "capability_unsigned_rejected");
+    let signed = grid_metrics_u64(&metrics, "capability_signed_accepted");
+    let stale = grid_metrics_u64(&metrics, "network_profile_stale");
+    let tee = metrics
+        .get("tee_attestation_required")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false);
+
+    format!(
+        r#"<div class="admin-card admin-metrics-strip">
+<span>Fraud proof pending: <strong>{fraud}</strong></span>
+<span>Capability unsigned: <strong>{unsigned}</strong></span>
+<span>Capability signed: <strong>{signed}</strong></span>
+<span>Network profile stale: <strong>{stale}</strong></span>
+<span>TEE required: <strong>{tee}</strong></span>
+</div>"#,
+        fraud = escape_html(&fraud.to_string()),
+        unsigned = escape_html(&unsigned.to_string()),
+        signed = escape_html(&signed.to_string()),
+        stale = escape_html(&stale.to_string()),
+        tee = escape_html(if tee { "yes" } else { "no" }),
+    )
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -80,7 +80,37 @@ pub const PRICING_PRODUCTION_PARITY: &[(&str, &str)] = &[
     ),
 ];
 
-/// Required JSON export keys for stand smoke prefetch-metrics API (PH-S753).
+/// Required JSON export keys for stand smoke edge-verification-metrics API (PH-S1122).
+pub const EDGE_VERIFICATION_JSON_KEYS: &[&str] = &[
+    "fraud_proof_pending",
+    "capability_unsigned_rejected",
+    "capability_signed_accepted",
+    "network_profile_stale",
+];
+
+/// Boolean JSON export key for edge-verification-metrics (PH-S1122).
+pub const EDGE_VERIFICATION_BOOL_KEY: &str = "tee_attestation_required";
+
+/// Prometheus gauge name ↔ JSON metrics field pairs — edge verification horizon (PH-S1123).
+pub const EDGE_VERIFICATION_PARITY: &[(&str, &str)] = &[
+    (
+        crate::grid::galaxy_fraud_proof::METRIC_FRAUD_PROOF_PENDING_TOTAL,
+        "fraud_proof_pending",
+    ),
+    (
+        crate::grid::galaxy_capability_admission_metrics::METRIC_CAPABILITY_UNSIGNED_REJECTED_TOTAL,
+        "capability_unsigned_rejected",
+    ),
+    (
+        crate::grid::galaxy_capability_admission_metrics::METRIC_CAPABILITY_SIGNED_ACCEPTED_TOTAL,
+        "capability_signed_accepted",
+    ),
+    (
+        crate::grid::galaxy_locality::METRIC_NETWORK_PROFILE_STALE_TOTAL,
+        "network_profile_stale",
+    ),
+];
+
 pub const PREFETCH_JSON_KEYS: &[&str] = &[
     "pull_bytes_total",
     "backpressure_total",
@@ -689,6 +719,63 @@ pub fn validate_band6_metrics_parity_v3(
     Ok(())
 }
 
+/// Edge verification JSON export + Prometheus parity gate (PH-S1123).
+pub fn validate_edge_verification_metrics_parity(
+    prom_text: &str,
+    edge_verification: &Value,
+) -> Result<(), String> {
+    validate_grid_metrics_json_export(edge_verification, EDGE_VERIFICATION_JSON_KEYS)?;
+    let metrics = edge_verification
+        .get("metrics")
+        .ok_or_else(|| format!("metrics body missing metrics: {edge_verification}"))?;
+    if metrics
+        .get(EDGE_VERIFICATION_BOOL_KEY)
+        .and_then(|v| v.as_bool())
+        .is_none()
+    {
+        return Err(format!(
+            "metrics missing bool key {}: {edge_verification}",
+            EDGE_VERIFICATION_BOOL_KEY
+        ));
+    }
+    validate_prometheus_json_parity_pairs(prom_text, edge_verification, EDGE_VERIFICATION_PARITY)?;
+    Ok(())
+}
+
+/// Full grid stand smoke v4 — v3 + edge-verification-metrics horizon parity (PH-S1123).
+pub fn validate_band6_metrics_parity_v4(
+    prom_text: &str,
+    verification: &Value,
+    replay: &Value,
+    settlement: &Value,
+    trust: &Value,
+    replication: &Value,
+    pricing: &Value,
+    prefetch: &Value,
+    locality: &Value,
+    fee_split: &Value,
+    governance: &Value,
+    payout_batch: &Value,
+    edge_verification: &Value,
+) -> Result<(), String> {
+    validate_band6_metrics_parity_v3(
+        prom_text,
+        verification,
+        replay,
+        settlement,
+        trust,
+        replication,
+        pricing,
+        prefetch,
+        locality,
+        fee_split,
+        governance,
+        payout_batch,
+    )?;
+    validate_edge_verification_metrics_parity(prom_text, edge_verification)?;
+    Ok(())
+}
+
 /// Settlement + trust JSON export + Prometheus parity gate (PH-S723).
 pub fn validate_settlement_trust_metrics_parity(
     prom_text: &str,
@@ -1241,5 +1328,26 @@ mod tests {
             }
         });
         validate_settlement_trust_metrics_parity(prom, &settlement, &trust).expect("parity");
+    }
+
+    #[test]
+    fn validate_band6_metrics_parity_v4_ph_s1123() {
+        let prom = concat!(
+            "galaxy_fraud_proof_pending_total 1\n",
+            "galaxy_capability_unsigned_rejected_total 2\n",
+            "galaxy_capability_signed_accepted_total 3\n",
+            "galaxy_network_profile_stale_total 4\n",
+        );
+        let edge = json!({
+            "ok": true,
+            "metrics": {
+                "fraud_proof_pending": 1,
+                "capability_unsigned_rejected": 2,
+                "capability_signed_accepted": 3,
+                "network_profile_stale": 4,
+                "tee_attestation_required": false,
+            }
+        });
+        validate_edge_verification_metrics_parity(prom, &edge).expect("edge parity");
     }
 }

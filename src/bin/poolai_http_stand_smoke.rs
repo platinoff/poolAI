@@ -4263,6 +4263,41 @@ mod tests {
     }
 
     #[test]
+    fn galaxy_edge_verification_band48_export_shape_ph_s1125() {
+        use poolai_ui_core::galaxy_edge_verification_depth::{
+            edge_verification_criteria_total, galaxy_edge_verification_depth_stub,
+            GalaxyEdgeVerificationDepth, EDGE_VERIFICATION_CASES, EDGE_VERIFICATION_CRITERIA,
+            FM_BAND48_ROWS,
+        };
+        use serde_json::json;
+        assert_eq!(
+            galaxy_edge_verification_depth_stub(Some(&json!({"fraud_proof_stub": true}))),
+            GalaxyEdgeVerificationDepth::FraudProofStub
+        );
+        assert_eq!(
+            galaxy_edge_verification_depth_stub(Some(&json!({
+                "fraud_proof_stub": true,
+                "capability_admission": true,
+                "network_profile_stale": true,
+                "tee_attestation": true,
+                "metrics_http": true,
+                "stand_smoke_parity": true,
+            }))),
+            GalaxyEdgeVerificationDepth::FullBand48
+        );
+        assert_eq!(EDGE_VERIFICATION_CRITERIA.len(), 7);
+        assert_eq!(edge_verification_criteria_total(), 7);
+        assert!(EDGE_VERIFICATION_CASES.contains(&"openapi_wire"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND48_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band48 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn grid_verification_replay_json_export_shape_ph_s710() {
         use poolai::grid::stand_smoke_metrics_parity::{
             validate_grid_metrics_json_export, REPLAY_JSON_KEYS, VERIFICATION_JSON_KEYS,

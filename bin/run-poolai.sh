@@ -237,12 +237,14 @@ cmd_quick() {
   local stand_smoke=0
   local migration_advisory=0
   local stable_touchup=0
+  local edge_verification=0
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --skip-build) SKIP_BUILD=1; shift ;;
       --stand-smoke) stand_smoke=1; shift ;;
       --migration-advisory) migration_advisory=1; shift ;;
       --stable-touchup) stable_touchup=1; shift ;;
+      --edge-verification) edge_verification=1; shift ;;
       --port) PORT="$2"; shift 2 ;;
       *) echo "Unknown option: $1"; usage; exit 1 ;;
     esac
@@ -262,6 +264,10 @@ cmd_quick() {
   if [[ "$stable_touchup" == "1" ]]; then
     echo "Running poolai-loc-audit --stable-touchup (PH-S1114)..."
     cargo run --quiet --bin poolai-loc-audit -- --stable-touchup
+  fi
+  if [[ "$edge_verification" == "1" ]]; then
+    echo "Running poolai-loc-audit --edge-verification-advisory (PH-S1125)..."
+    cargo run --quiet --bin poolai-loc-audit -- --edge-verification-advisory
   fi
 }
 

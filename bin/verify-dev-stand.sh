@@ -19,6 +19,7 @@ VERIFY_RAID_JOB_STORE="${VERIFY_RAID_JOB_STORE:-0}"
 VERIFY_STAND_SMOKE="${VERIFY_STAND_SMOKE:-0}"
 VERIFY_MIGRATION_ADVISORY="${VERIFY_MIGRATION_ADVISORY:-0}"
 VERIFY_STABLE_TOUCHUP="${VERIFY_STABLE_TOUCHUP:-0}"
+VERIFY_EDGE_VERIFICATION="${VERIFY_EDGE_VERIFICATION:-0}"
 HEALTH_RETRIES="${VERIFY_HEALTH_RETRIES:-45}"
 HEALTH_SLEEP="${VERIFY_HEALTH_SLEEP:-2}"
 
@@ -284,6 +285,16 @@ if [[ "$VERIFY_STABLE_TOUCHUP" == "1" ]]; then
     echo "OK  STABLE touch-up loc-audit"
   else
     echo "FAIL STABLE touch-up loc-audit"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_EDGE_VERIFICATION" == "1" ]]; then
+  echo "Running poolai-loc-audit --edge-verification-advisory (PH-S1125)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --edge-verification-advisory); then
+    echo "OK  edge verification advisory loc-audit"
+  else
+    echo "FAIL edge verification advisory loc-audit"
     fail=1
   fi
 fi

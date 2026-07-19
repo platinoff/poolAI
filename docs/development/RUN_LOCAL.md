@@ -24,7 +24,7 @@ cd S:\rust\poolAI
 .\bin\run-poolai.ps1 stop
 ```
 
-**Last updated:** 2026-07-18 (PH-S1118 band 47 · `--stable-touchup` · `VERIFY_STABLE_TOUCHUP` · `quick --stable-touchup`)
+**Last updated:** 2026-07-18 (PH-S1128 band 48 · `--edge-verification` · `VERIFY_EDGE_VERIFICATION` · `quick --edge-verification`)
 
 ### PH-S1011 / PH-S1012: Light compile + quick preset
 
@@ -48,12 +48,13 @@ cd S:\rust\poolAI
 | **full** | `enterprise,ml,cloud,test-utils` | `run-poolai build` default |
 | **light** (`--light`) | `enterprise,test-utils` | PH-S1011 faster compile |
 
-`quick` restores `data/dev/last_run.json` port when present (PH-S1014), runs light build unless `--skip-build`, starts `single --bg`, waits for `/api/v1/health`. Optional **`--stand-smoke`** (PH-S1095) runs `poolai-http-stand-smoke --run-local-smoke` after health OK. Optional **`--migration-advisory`** (PH-S1104) runs `poolai-loc-audit --migration-advisory` after health OK. Optional **`--stable-touchup`** (PH-S1114) runs `poolai-loc-audit --stable-touchup` after health OK.
+`quick` restores `data/dev/last_run.json` port when present (PH-S1014), runs light build unless `--skip-build`, starts `single --bg`, waits for `/api/v1/health`. Optional **`--stand-smoke`** (PH-S1095) runs `poolai-http-stand-smoke --run-local-smoke` after health OK. Optional **`--migration-advisory`** (PH-S1104) runs `poolai-loc-audit --migration-advisory` after health OK. Optional **`--stable-touchup`** (PH-S1114) runs `poolai-loc-audit --stable-touchup` after health OK. Optional **`--edge-verification`** (PH-S1125) runs `poolai-loc-audit --edge-verification-advisory` after health OK.
 
 ```bash
 /usr/bin/bash bin/run-poolai.sh quick --stand-smoke
 /usr/bin/bash bin/run-poolai.sh quick --migration-advisory
 /usr/bin/bash bin/run-poolai.sh quick --stable-touchup
+/usr/bin/bash bin/run-poolai.sh quick --edge-verification
 # PowerShell:
 .\bin\run-poolai.ps1 quick -StandSmoke
 .\bin\run-poolai.ps1 quick -MigrationAdvisory
@@ -292,6 +293,7 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `VERIFY_STAND_SMOKE=1` | `verify-dev-stand.sh` → `--run-local-smoke` після bootstrap (PH-S1094) |
 | `VERIFY_MIGRATION_ADVISORY=1` | `verify-dev-stand.sh` → `poolai-loc-audit --migration-advisory` (PH-S1103) |
 | `VERIFY_STABLE_TOUCHUP=1` | `verify-dev-stand.sh` → `poolai-loc-audit --stable-touchup` (PH-S1113) |
+| `VERIFY_EDGE_VERIFICATION=1` | `verify-dev-stand.sh` → `poolai-loc-audit --edge-verification-advisory` (PH-S1125) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 ### PH-S1100: Rust migration advisory (band 46)
@@ -332,6 +334,25 @@ VERIFY_STABLE_TOUCHUP=1 bash bin/verify-dev-stand.sh
 | `stable_criteria_met_count` | Criteria with marker present in canonical doc path |
 
 Module: [`stable_state_touchup_depth.rs`](../../crates/poolai-ui-core/src/stable_state_touchup_depth.rs) · tests: `stable_state_touchup_audit.rs`, `galaxy_horizon_s1109_integration.rs`.
+
+### PH-S1120: Edge verification horizon (band 48)
+
+Galaxy §6.6 edge verification criteria registry; validates fraud-proof/capability/TEE wire markers and `GET /api/v1/grid/edge-verification-metrics`.
+
+```bash
+cargo run --bin poolai-loc-audit -- --edge-verification-advisory
+cargo run --bin poolai-loc-audit -- --edge-verification-advisory --advisory --min-ratio 0.95
+
+VERIFY_EDGE_VERIFICATION=1 bash bin/verify-dev-stand.sh
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `edge_verification_advisory_mode` | `true` when `--edge-verification-advisory` (PH-S1120) |
+| `edge_verification_criteria_total` | Edge verification criteria registry size (PH-S1121) |
+| `edge_verification_criteria_met_count` | Criteria with marker present in canonical doc path |
+
+Module: [`galaxy_edge_verification_depth.rs`](../../crates/poolai-ui-core/src/galaxy_edge_verification_depth.rs) · tests: `galaxy_edge_verification_audit.rs`, `galaxy_horizon_s1119_integration.rs`.
 
 Default stand smoke includes **`vision_revision_parity`** (PH-S208, PH-S235): repo `manifest.revision` vs FM §5.12 `Vision rev`, `extensions.active_sprint` vs `manifest.next_sprint`, then `GET /docs/vision/manifest.json` with `X-PoolAI-Vision-Revision` header vs JSON body.
 

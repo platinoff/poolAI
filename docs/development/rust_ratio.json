@@ -6,13 +6,13 @@
   "warn_below": 0.93,
   "target_ratio": 0.95,
   "stretch_spirit": 0.96,
-  "advisory_mode": false,
+  "advisory_mode": true,
   "min_ratio": null,
-  "rust_loc": 155921,
-  "non_rust_product_loc": 8346,
-  "product_loc_total": 164267,
-  "rust_ratio": 0.9491924732295592,
-  "rust_ratio_pct": 94.91924732295593,
+  "rust_loc": 156655,
+  "non_rust_product_loc": 8368,
+  "product_loc_total": 165023,
+  "rust_ratio": 0.9492919168843131,
+  "rust_ratio_pct": 94.92919168843132,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -31,9 +31,12 @@
   "migration_candidate_total": 14,
   "migration_ui_js_candidate_count": 6,
   "migration_e2e_archived_count": 8,
-  "stable_touchup_mode": true,
+  "stable_touchup_mode": false,
   "stable_criteria_total": 7,
-  "stable_criteria_met_count": 4,
+  "stable_criteria_met_count": 0,
+  "edge_verification_advisory_mode": true,
+  "edge_verification_criteria_total": 7,
+  "edge_verification_criteria_met_count": 7,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -41,27 +44,27 @@
     },
     "ops_ps1": {
       "files": 16,
-      "loc": 1442
+      "loc": 1448
     },
     "ops_shell": {
       "files": 35,
-      "loc": 2700
+      "loc": 2716
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 65,
-      "loc": 13896
+      "files": 66,
+      "loc": 14122
     },
     "rust_src": {
       "files": 298,
-      "loc": 106970
+      "loc": 107356
     },
     "rust_tests": {
-      "files": 235,
-      "loc": 34447
+      "files": 237,
+      "loc": 34569
     },
     "ui_css": {
       "files": 2,
@@ -92,7 +95,7 @@
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
     "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
-    "PH-S1110: stable_touchup_mode — maintenance STABLE criteria registry touch-up",
-    "PH-S1118: band 47 STABLE touch-up — criteria met count vs registry total"
+    "PH-S1120: edge_verification_advisory_mode — Galaxy §6.6 fraud-proof/capability wire",
+    "PH-S1128: band 48 edge verification horizon — criteria met vs registry"
   ]
 }

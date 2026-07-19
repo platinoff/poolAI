@@ -1047,6 +1047,29 @@ paths:
                   notify_pending_total: 0
                   advisory_acknowledged_total: 0
 
+  /grid/edge-verification-metrics:
+    get:
+      tags:
+        - Grid
+      summary: Edge verification horizon metrics snapshot (PH-S1122)
+      operationId: getGridEdgeVerificationMetrics
+      responses:
+        '200':
+          description: Fraud-proof, capability admission, network profile stale counters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GridEdgeVerificationMetricsResponse'
+              example:
+                ok: true
+                metrics:
+                  fraud_proof_pending: 0
+                  capability_unsigned_rejected: 0
+                  capability_signed_accepted: 0
+                  network_profile_stale: 0
+                  tee_attestation_required: false
+                horizon_depth: none
+
   /grid/network-profiles:
     get:
       tags:
@@ -7225,6 +7248,38 @@ components:
         advisory_acknowledged_total:
           type: integer
           format: int64
+
+    GridEdgeVerificationMetricsResponse:
+      type: object
+      required:
+        - ok
+        - metrics
+        - horizon_depth
+      properties:
+        ok:
+          type: boolean
+        metrics:
+          $ref: '#/components/schemas/EdgeVerificationMetricsSnapshot'
+        horizon_depth:
+          type: string
+
+    EdgeVerificationMetricsSnapshot:
+      type: object
+      properties:
+        fraud_proof_pending:
+          type: integer
+          format: int64
+        capability_unsigned_rejected:
+          type: integer
+          format: int64
+        capability_signed_accepted:
+          type: integer
+          format: int64
+        network_profile_stale:
+          type: integer
+          format: int64
+        tee_attestation_required:
+          type: boolean
 
     FeeSplitMetricsSnapshot:
       type: object

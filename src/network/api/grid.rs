@@ -88,6 +88,10 @@ pub fn create_grid_routes() -> Router<ApiContext> {
             "/grid/verification-metrics",
             get(get_grid_verification_metrics),
         )
+        .route(
+            "/grid/edge-verification-metrics",
+            get(get_grid_edge_verification_metrics),
+        )
         .route("/grid/replay-metrics", get(get_grid_replay_metrics))
         .route("/grid/settlement-metrics", get(get_grid_settlement_metrics))
         .route("/grid/trust-metrics", get(get_grid_trust_metrics))
@@ -368,6 +372,29 @@ async fn get_grid_verification_metrics(
             ok: true,
             metrics: crate::grid::galaxy_verification_metrics::verification_metrics_snapshot(),
             lifecycle_depth: verification_lifecycle_depth_wire_label(depth),
+        }),
+    ))
+}
+
+#[derive(Debug, Serialize)]
+struct GridEdgeVerificationMetricsResponse {
+    ok: bool,
+    metrics: crate::grid::galaxy_edge_verification_metrics::EdgeVerificationMetricsSnapshot,
+    /// Edge verification horizon depth wire label (PH-S1123).
+    horizon_depth: &'static str,
+}
+
+async fn get_grid_edge_verification_metrics(
+    State(_ctx): State<ApiContext>,
+) -> Result<(StatusCode, Json<GridEdgeVerificationMetricsResponse>), HttpAppError> {
+    let depth =
+        crate::grid::galaxy_edge_verification_depth::current_edge_verification_horizon_depth();
+    Ok((
+        StatusCode::OK,
+        Json(GridEdgeVerificationMetricsResponse {
+            ok: true,
+            metrics: crate::grid::galaxy_edge_verification_metrics::edge_verification_metrics_snapshot(),
+            horizon_depth: crate::grid::galaxy_edge_verification_depth::edge_verification_horizon_depth_wire_label(depth),
         }),
     ))
 }
