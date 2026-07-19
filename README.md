@@ -54,7 +54,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 **Версія в репозиторії:** `0.2.2` (див. `Cargo.toml`). **Робоча гілка:** `main`.
 
-Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S949 ✅. **Rust ratio:** **94.91%** (hold **95%** advisory). **Vision:** manifest rev **297**. **§5.12:** **10** active **PH-S950…S959** (band 30) · **service band** PH-SVC01…SVC10 ✅ — [`CURSOR_UPDATE_RESEARCH_2026-07-17.md`](docs/development/CURSOR_UPDATE_RESEARCH_2026-07-17.md) · product drain — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
+Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S1128 ✅. **Rust ratio:** **94.93%** (hold **95%** advisory). **Vision:** manifest rev **321**. **§5.12:** **0** відкритих (band 48 ✅) · наступна сесія **`абракадабра`** → band 49 — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
 **Репозиторій:** [github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)
 
@@ -84,9 +84,9 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 **Product-complete:** PH-S1010 ✅ · FM **§5.15** ✅ · **maintenance mode**.
 
-**Наступна сесія (owner):** **`абракадабра`** — project scan → band 48 **PH-S1119…S1128** · [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія (owner):** **`абракадабра`** — project scan → band 49 **PH-S1129…S1138** · [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
-**§5.12:** **0** відкритих (band 47 ✅) · vision **rev 320** · last **PH-S1118** · next **PH-S1119**.
+**§5.12:** **0** відкритих (band 48 ✅) · vision **rev 321** · last **PH-S1128** · next **PH-S1129**.
 
 **Ops (поза чергою):** **FM-003** LAN §4 **BLOCKED** (2 хости) · **FM-041** Cloud SDK **Deferred**.
 
