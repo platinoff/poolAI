@@ -1,8 +1,27 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-20 (band 52 **PH-S1159…S1168** ✅ · enterprise horizon band 53)
+**Оновлено:** 2026-07-20 (band 53 **PH-S1169…S1178** ✅ · enterprise horizon band 54)
 
-**Наступна сесія:** **`абракадабра`** — promote band 53 з [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md).
+**Наступна сесія:** **`абракадабра`** — promote band 54 з [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md).
+
+## Band 53 — Tenant API contracts (PH-S1169…S1178, ✅)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1169** | `tenant_api_contracts_depth` ui-core module |
+| **PH-S1170** | HTTP CRUD lifecycle contracts |
+| **PH-S1171** | Quota + usage HTTP contracts |
+| **PH-S1172** | Cross-tenant isolation API |
+| **PH-S1173** | `GET /tenants/store` wire read |
+| **PH-S1174** | OpenAPI `TenantStoreWire` + errors |
+| **PH-S1175** | `VERIFY_TENANT_API` + quick `--tenant-api` |
+| **PH-S1176** | Stand smoke + loc-audit `--tenant-api` |
+| **PH-S1177** | `TENANT_API.md` + canon sync |
+| **PH-S1178** | Band close |
+
+**§5.12:** **0** відкритих (band 53 ✅). **Vision:** rev **330** (після sync). **Enterprise pending:** 970 (→ PH-S2148).
+
+**PH-S1178 ✅ (2026-07-20):** `tenant_api_contracts_depth.rs`; HTTP CRUD/quota/isolation; `GET /tenants/store`; `VERIFY_TENANT_API`; `TENANT_API.md`; `galaxy_horizon_s1169_integration`.
 
 ## Band 52 — Tenant store wire (PH-S1159…S1168, ✅)
 

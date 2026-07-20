@@ -1221,7 +1221,24 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 52 ✅). **Master horizon:** PH-S1169…S1178 (band 53) · enterprise backlog PH-S1149…S2148. Vision rev **329** (після sync). **Наступна сесія:** **`абракадабра`** — promote band 53.
+**Відкритих у §5.12:** **0** (band 53 ✅). **Master horizon:** PH-S1179…S1188 (band 54) · enterprise backlog PH-S1149…S2148. Vision rev **330** (після sync). **Наступна сесія:** **`абракадабра`** — promote band 54.
+
+### 5.34 Tenant API contracts queue — band 53 (PH-S1169…S1178, 2026-07-20)
+
+**Джерело:** FM-horizon v2 / enterprise phase A — tenant HTTP API contracts (CRUD / quota / isolation / store-wire read).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1104 | **PH-S1169** | `tenant_api_contracts_depth` ui-core module | `tenant_api_contracts_depth.rs` | depth enum + HTTP API criteria registry | **✅** |
+| 1105 | **PH-S1170** | HTTP CRUD lifecycle contracts | `tenant_api_contracts_integration.rs` | POST→GET→update→DELETE via AppState router | **✅** |
+| 1106 | **PH-S1171** | Quota + usage HTTP contracts | same suite | `GET …/usage` + `POST …/quota` allow/deny shapes | **✅** |
+| 1107 | **PH-S1172** | Cross-tenant isolation API | same suite | mutate A; B unchanged; foreign UUID → 404 | **✅** |
+| 1108 | **PH-S1173** | Store-wire status HTTP read | `GET /tenants/store` | `{mode,durable_path,configured}` memory/sqlite | **✅** |
+| 1109 | **PH-S1174** | OpenAPI `TenantStoreWire` + errors | `docs/openapi.yaml` | store schema + 400/404/503; gap-audit 0 | **✅** |
+| 1110 | **PH-S1175** | `verify-dev-stand` / quick `--tenant-api` | `bin/verify-dev-stand.sh` | `VERIFY_TENANT_API=1` + `--tenant-api` | **✅** |
+| 1111 | **PH-S1176** | Stand smoke + `poolai-loc-audit --tenant-api` | stand smoke / loc-audit | export shape + `rust_ratio.json` tenant_api fields | **✅** |
+| 1112 | **PH-S1177** | Docs `TENANT_API.md` + canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | HTTP contract matrix + master backlog override | **✅** |
+| 1113 | **PH-S1178** | Tenant API band close | tests/docs | `galaxy_horizon_s1169_integration`; HANDOFF/NEXT | **✅** |
 
 ### 5.33 Tenant store wire queue — band 52 (PH-S1159…S1168, 2026-07-20)
 
@@ -1558,10 +1575,10 @@ FM-xxx (з таблиці нижче)
 
 | Поле | Значення |
 |------|----------|
-| **Pending** | **980** (band 52 ✅ · S1169…S2148) |
-| **Drained** | band 51–52 PH-S1149…S1168 ✅ |
-| **Активна §5.12** | — (promote band 53 next) |
-| **Наступна promote** | PH-S1159…S1168 |
+| **Pending** | **970** (band 53 ✅ · S1179…S2148) |
+| **Drained** | band 51–53 PH-S1149…S1178 ✅ |
+| **Активна §5.12** | — (promote band 54 next) |
+| **Наступна promote** | PH-S1179…S1188 |
 | **План фаз** | [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md) |
 | **Реєстр sprint×acceptance** | [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md) |
 | **Regen** | `bash scripts/generate-ph-s-master-backlog-1000.sh` |
@@ -1601,7 +1618,7 @@ FM-xxx (з таблиці нижче)
 
 ### 5.17 Enterprise-complete closure (PH-S2148 target)
 
-**Статус:** **in progress** — band 52 ✅ · pending PH-S1169…S2148 · roadmap [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md).
+**Статус:** **in progress** — band 53 ✅ · pending PH-S1179…S2148 · roadmap [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md).
 
 | Критерій | Ціль |
 |----------|------|
@@ -1641,7 +1658,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-20):** band 52 **PH-S1159…S1168** ✅ · §5.12 **0** · наступна **`абракадабра`** → promote band 53 (enterprise).
+**Активна смуга (2026-07-20):** band 53 **PH-S1169…S1178** ✅ · §5.12 **0** · наступна **`абракадабра`** → promote band 54 (enterprise).
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

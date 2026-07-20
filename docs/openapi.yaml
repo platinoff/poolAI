@@ -4321,6 +4321,44 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /tenants/store:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseTenants
+      summary: Tenant store wire status
+      description: |
+        Returns the band-52 durable-path wire snapshot (`mode`, `durable_path`, `configured`).
+        Unauthenticated read for ops / admin glue (PH-S1173).
+      operationId: getTenantStoreWire
+      responses:
+        '200':
+          description: Tenant store wire snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantStoreWire'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Subsystem unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /tenants:
     servers:
       - url: http://localhost:8080/api/enterprise
@@ -9207,6 +9245,24 @@ components:
           nullable: true
         active:
           type: boolean
+
+    TenantStoreWire:
+      type: object
+      description: Band-52 tenant store wire snapshot exposed over HTTP (PH-S1173/S1174)
+      required:
+        - mode
+        - configured
+      properties:
+        mode:
+          type: string
+          description: "`memory` or `sqlite`"
+        durable_path:
+          type: string
+          nullable: true
+          description: Resolved sqlite file path when configured
+        configured:
+          type: boolean
+          description: True when sqlite mode has a durable path
 
     TenantResourceUsage:
       type: object

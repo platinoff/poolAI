@@ -2469,7 +2469,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1169",
+  "next_sprint": "PH-S1179",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -9928,7 +9928,7 @@
       "path": "tests/tenant_store_wire_integration.rs"
     }
   ],
-  "revision": 329,
+  "revision": 330,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",

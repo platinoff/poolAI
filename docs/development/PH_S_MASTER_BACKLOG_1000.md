@@ -12,8 +12,8 @@
 |------|---------|-------|
 | 51 | PH-S1149…S1158 | A Tenants · depth scaffold ✅ drained |
 | 52 | PH-S1159…S1168 | A Tenants · store wire **✅ drained** |
-| 53 | PH-S1169…S1178 | A Tenants · API contracts **active next** |
-| 54 | PH-S1179…S1188 | A Tenants · admin/ops glue |
+| 53 | PH-S1169…S1178 | A Tenants · API contracts **✅ drained** |
+| 54 | PH-S1179…S1188 | A Tenants · admin/ops glue **active next** |
 | 55 | PH-S1189…S1198 | A Tenants · stand smoke |
 | 56 | PH-S1199…S1208 | A Tenants · loc-audit |
 | 57 | PH-S1209…S1218 | A Tenants · docs canon |
@@ -147,16 +147,16 @@
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1169** | `tenant_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1170** | `tenant` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1171** | `tenant` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1172** | `tenant` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1173** | Stand smoke `tenant` export | export shape unit test | **[ ]** |
-| **PH-S1174** | poolai-loc-audit PH-S1174 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1175** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1176** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1177** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1178** | galaxy_horizon_s1169_integration | band close | **[ ]** |
+| **PH-S1169** | `tenant_api_contracts_depth` | ui-core depth enum + HTTP API criteria registry | **✅** |
+| **PH-S1170** | HTTP CRUD lifecycle | POST→GET→update→DELETE via AppState router | **✅** |
+| **PH-S1171** | Quota + usage HTTP | `GET …/usage` + `POST …/quota` allow/deny | **✅** |
+| **PH-S1172** | Cross-tenant isolation | mutate A; B unchanged; foreign UUID → 404 | **✅** |
+| **PH-S1173** | Store-wire HTTP read | `GET /tenants/store` wire snapshot | **✅** |
+| **PH-S1174** | OpenAPI TenantStoreWire | schema + 400/404/503; gap-audit 0 | **✅** |
+| **PH-S1175** | verify / quick `--tenant-api` | `VERIFY_TENANT_API=1` + quick flag | **✅** |
+| **PH-S1176** | Stand smoke + loc-audit | export shape + `rust_ratio.json` tenant_api | **✅** |
+| **PH-S1177** | Docs `TENANT_API.md` | HTTP contract matrix + canon sync | **✅** |
+| **PH-S1178** | galaxy_horizon_s1169_integration | band close | **✅** |
 
 ## Band 54 — PH-S1179…S1188 (A Tenants · admin/ops glue)
 

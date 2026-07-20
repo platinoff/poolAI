@@ -62,6 +62,7 @@ Options (quick):
   --ci-canon            After health wait, run CI canon gate (PH-S1143)
   --tenant-persist      After health wait, run poolai-loc-audit --tenant-persist (PH-S1154)
   --tenant-store        After health wait, run poolai-loc-audit --tenant-store (PH-S1162)
+  --tenant-api          After health wait, run poolai-loc-audit --tenant-api (PH-S1175)
   --skip-build    Skip cargo build
   --port N        HTTP port (default 8080)
 
@@ -247,6 +248,7 @@ cmd_quick() {
   local ci_canon=0
   local tenant_persist=0
   local tenant_store=0
+  local tenant_api=0
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --skip-build) SKIP_BUILD=1; shift ;;
@@ -258,6 +260,7 @@ cmd_quick() {
       --ci-canon) ci_canon=1; shift ;;
       --tenant-persist) tenant_persist=1; shift ;;
       --tenant-store) tenant_store=1; shift ;;
+      --tenant-api) tenant_api=1; shift ;;
       --port) PORT="$2"; shift 2 ;;
       *) echo "Unknown option: $1"; usage; exit 1 ;;
     esac
@@ -299,6 +302,10 @@ cmd_quick() {
   if [[ "$tenant_store" == "1" ]]; then
     echo "Running poolai-loc-audit --tenant-store (PH-S1162)..."
     cargo run --quiet --bin poolai-loc-audit -- --tenant-store
+  fi
+  if [[ "$tenant_api" == "1" ]]; then
+    echo "Running poolai-loc-audit --tenant-api (PH-S1175)..."
+    cargo run --quiet --bin poolai-loc-audit -- --tenant-api
   fi
 }
 

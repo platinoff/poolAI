@@ -27,6 +27,11 @@ pub(super) async fn tenants_list_handler(State(ctx): State<ApiContext>) -> impl 
     }
 }
 
+/// GET /tenants/store — band-52 wire snapshot over HTTP (PH-S1173).
+pub(super) async fn tenant_store_wire_handler() -> impl IntoResponse {
+    Json(enterprise::multi_tenancy::tenant_store_wire())
+}
+
 #[derive(Deserialize)]
 pub(super) struct TenantCreateRequest {
     name: String,

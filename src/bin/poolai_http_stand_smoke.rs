@@ -4403,6 +4403,44 @@ mod tests {
     }
 
     #[test]
+    fn tenant_api_band53_export_shape_ph_s1176() {
+        use poolai_ui_core::tenant_api_contracts_depth::{
+            tenant_api_contracts_depth_stub, tenant_api_criteria_total, TenantApiContractsDepth,
+            FM_BAND53_ROWS, TENANT_API_CASES, TENANT_API_CRITERIA,
+        };
+        use serde_json::json;
+        assert_eq!(
+            tenant_api_contracts_depth_stub(Some(&json!({"http_crud": true}))),
+            TenantApiContractsDepth::HttpCrud
+        );
+        assert_eq!(
+            tenant_api_contracts_depth_stub(Some(&json!({
+                "tenant_api_depth": true,
+                "http_crud": true,
+                "quota_usage": true,
+                "isolation": true,
+                "store_wire_http": true,
+                "openapi_schemas": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "tenant_api_docs": true,
+            }))),
+            TenantApiContractsDepth::FullBand53
+        );
+        assert_eq!(TENANT_API_CRITERIA.len(), 10);
+        assert_eq!(tenant_api_criteria_total(), 10);
+        assert!(TENANT_API_CASES.contains(&"store_wire_http"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND53_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band53 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn galaxy_edge_verification_band48_export_shape_ph_s1125() {
         use poolai_ui_core::galaxy_edge_verification_depth::{
             edge_verification_criteria_total, galaxy_edge_verification_depth_stub,

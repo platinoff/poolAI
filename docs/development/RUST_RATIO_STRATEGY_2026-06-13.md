@@ -1,6 +1,6 @@
 # Rust codebase ratio — стратегія 90–95% (PoolAI)
 
-**Оновлено:** 2026-07-20 · band 52 **PH-S1159…S1168** ✅ · enterprise store wire · rust_ratio formal hold · stretch **96%** advisory
+**Оновлено:** 2026-07-20 · band 53 **PH-S1169…S1178** ✅ · enterprise HTTP API contracts · rust_ratio formal hold · stretch **96%** advisory
 
 **Мета:** зростання частки **Rust** у виконуваному коді репозиторію до **90–95%** (формально), **96% stretch spirit** (орієнтир replenish PH-S150…S159) — платформа збирається і перевіряється через **`cargo`** без обов'язкового Node на edge.
 

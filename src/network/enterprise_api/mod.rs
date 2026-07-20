@@ -63,6 +63,8 @@ pub fn create_enterprise_api_routes() -> Router<ApiContext> {
             "/tenants",
             post(tenant_create_handler).layer(middleware::from_fn(auth_middleware)),
         )
+        // Static path before `{id}` so "store" is not parsed as a UUID (PH-S1173).
+        .route("/tenants/store", get(tenant_store_wire_handler))
         .route("/tenants/{id}", get(tenant_get_handler))
         .route(
             "/tenants/{id}",
