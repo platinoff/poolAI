@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-19",
+  "generated_at": "2026-07-20",
   "sprint": "PH-S1010",
   "formal_band_min": 0.9,
   "formal_band_max": 0.95,
@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": false,
   "min_ratio": null,
-  "rust_loc": 158066,
-  "non_rust_product_loc": 8512,
-  "product_loc_total": 166578,
-  "rust_ratio": 0.9489008152337043,
-  "rust_ratio_pct": 94.89008152337043,
+  "rust_loc": 158459,
+  "non_rust_product_loc": 8535,
+  "product_loc_total": 166994,
+  "rust_ratio": 0.9488903792950645,
+  "rust_ratio_pct": 94.88903792950644,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -40,9 +40,12 @@
   "pre_push_canon_mode": false,
   "pre_push_criteria_total": 7,
   "pre_push_criteria_met_count": 0,
-  "ci_canon_mode": true,
+  "ci_canon_mode": false,
   "ci_canon_criteria_total": 7,
-  "ci_canon_criteria_met_count": 7,
+  "ci_canon_criteria_met_count": 0,
+  "tenant_persist_mode": true,
+  "tenant_persist_criteria_total": 7,
+  "tenant_persist_criteria_met_count": 7,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -50,27 +53,27 @@
     },
     "ops_ps1": {
       "files": 16,
-      "loc": 1463
+      "loc": 1469
     },
     "ops_shell": {
       "files": 37,
-      "loc": 2845
+      "loc": 2862
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 68,
-      "loc": 14468
+      "files": 69,
+      "loc": 14634
     },
     "rust_src": {
       "files": 300,
-      "loc": 108187
+      "loc": 108301
     },
     "rust_tests": {
-      "files": 241,
-      "loc": 34803
+      "files": 243,
+      "loc": 34916
     },
     "ui_css": {
       "files": 2,
@@ -101,7 +104,7 @@
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
     "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
-    "PH-S1140: ci_canon_mode — local dual-gate (test-ci + openapi-gap + rust-ratio)",
-    "PH-S1148: band 50 CI canon gate — criteria met vs registry"
+    "PH-S1150: tenant_persist_mode — durable tenant store scaffold (POOLAI_TENANT_STORE)",
+    "PH-S1158: band 51 tenant persistence — criteria met vs registry"
   ]
 }

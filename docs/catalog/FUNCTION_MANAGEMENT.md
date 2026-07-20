@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-07-19 (band 50 **PH-S1139…S1148** ✅ · maintenance band 51)
+**Оновлено:** 2026-07-19 (band 51 **PH-S1149…S1158** ✅ · enterprise horizon band 52)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -1221,7 +1221,22 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 50 ✅). **Master horizon:** PH-S1149…S1158 (band 51). Vision rev **325** (після sync). **Наступна сесія:** **`абракадабра`** — project scan → band 51.
+**Відкритих у §5.12:** **0** (band 51 ✅). **Master horizon:** PH-S1159…S1168 (band 52) · enterprise backlog PH-S1149…S2148. Vision rev **326** (після sync). **Наступна сесія:** **`абракадабра`** — promote band 52.
+
+### 5.32 Tenant persistence queue — band 51 (PH-S1149…S1158, 2026-07-19)
+
+**Джерело:** FM-horizon v2 / enterprise phase A — tenant persist depth scaffold (`POOLAI_TENANT_STORE`).
+
+| 1084 | **PH-S1149** | `tenant_persistence_depth` ui-core module | `tenant_persistence_depth.rs` | depth enum + tenant persist criteria registry | **✅** |
+| 1085 | **PH-S1150** | `poolai-loc-audit --tenant-persist` | `poolai_loc_audit.rs` | tenant_persist fields in `rust_ratio.json` | **✅** |
+| 1086 | **PH-S1151** | Tenant persist gate audit | `tenant_persistence_audit.rs` | criteria registry + FM markers | **✅** |
+| 1087 | **PH-S1152** | `multi_tenancy` store env hint | `multi_tenancy.rs` | `POOLAI_TENANT_STORE` + `tenant_store_mode()` | **✅** |
+| 1088 | **PH-S1153** | `verify-dev-stand` tenant persist hook | `bin/verify-dev-stand.sh` | `VERIFY_TENANT_PERSIST=1` | **✅** |
+| 1089 | **PH-S1154** | `run-poolai quick --tenant-persist` | `bin/run-poolai.*` | post-health `--tenant-persist` | **✅** |
+| 1090 | **PH-S1155** | Stand smoke tenant persist export shape | `poolai_http_stand_smoke.rs` | export shape unit test | **✅** |
+| 1091 | **PH-S1156** | RUN_LOCAL + RUST_RATIO + GALAXY sync | docs | band 51 ops + enterprise roadmap pointer | **✅** |
+| 1092 | **PH-S1157** | `TENANT_PERSIST.md` + master backlog 1000 | docs/scripts | durable tenant workflow + PH-S1149…S2148 registry | **✅** |
+| 1093 | **PH-S1158** | Tenant persist band close | tests/docs | `galaxy_horizon_s1149_integration`; HANDOFF/NEXT | **✅** |
 
 ### 5.31 CI canon gate queue — band 50 (PH-S1139…S1148, 2026-07-19)
 
@@ -1520,6 +1535,23 @@ FM-xxx (з таблиці нижче)
 
 **Після PH-S1010 ✅:** FM **§5.15**; maintenance mode; новий scan лише для BLOCKED/Deferred або явного FM-horizon v2.
 
+### 5.14b Enterprise master backlog PH-S1149…S2148 (1000 → enterprise 100%, 2026-07-19)
+
+**Призначення:** **FM-horizon v2** — durable single-host enterprise 100% (tenancy/SSO/audit/monitoring/ratio/Galaxy ops). **Не** дублювати всі 1000 у §5.12 — там max **10** `[ ]` активних.
+
+| Поле | Значення |
+|------|----------|
+| **Pending** | **990** (band 51 ✅ · S1159…S2148) |
+| **Drained** | band 51 PH-S1149…S1158 ✅ |
+| **Активна §5.12** | — (promote band 52 next) |
+| **Наступна promote** | PH-S1159…S1168 |
+| **План фаз** | [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md) |
+| **Реєстр sprint×acceptance** | [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md) |
+| **Regen** | `bash scripts/generate-ph-s-master-backlog-1000.sh` |
+| **Closure** | FM **§5.17** at PH-S2148 |
+
+**Поза backlog:** FM-003 LAN · FM-041 Cloud SDK · mandatory ZK/TEE.
+
 ### 5.15 Product-complete closure (PH-S1010)
 
 **Статус:** **✅ product-complete (PH-S1010)** — bands 1–36 drained; FM **§5.15** closed.
@@ -1550,6 +1582,25 @@ FM-xxx (з таблиці нижче)
 
 **Поза product-complete (не блокує S1010):** FM-003 LAN 2-host · FM-041 Cloud SDK prod · ZK/TEE attestation roadmap.
 
+### 5.17 Enterprise-complete closure (PH-S2148 target)
+
+**Статус:** **in progress** — band 51 ✅ · pending PH-S1159…S2148 · roadmap [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md).
+
+| Критерій | Ціль |
+|----------|------|
+| Tenants + quotas durable | restart-safe + isolation tests |
+| SSO production path | SAML verify + OAuth fixtures |
+| Durable audit | queryable + retention |
+| Policies / secrets | persist + rotation wire |
+| Monitoring durable | rules + dashboards when env set |
+| OpenAPI enterprise | gap-audit **0** for `/api/enterprise/*` |
+| Rust ratio | ≥95% hold; 96% met or advisory |
+| Galaxy single-host | capability + network_profile + offline settlement |
+| Governance | signed-release verify |
+| Gates | `cargo test-ci` + vision `--check`; §5.17 ✅ at **PH-S2148** |
+
+**Поза enterprise-complete:** FM-003 LAN · FM-041 Cloud SDK · mandatory ZK/TEE.
+
 ### 5.16 Service band (Cursor / toolchain / docs hygiene)
 
 **Призначення:** **першочерговий** research + sync поза product PH-S* drain, коли власник просить service-сесію. **Не** замінює §5.12 product backlog; **не** блокує **`абракадабра`**.
@@ -1573,7 +1624,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-19):** band 50 **PH-S1139…S1148** ✅ · §5.12 **0** · наступна **`абракадабра`** → project scan → band 51.
+**Активна смуга (2026-07-19):** band 51 **PH-S1149…S1158** ✅ · §5.12 **0** · наступна **`абракадабра`** → promote band 52 (enterprise).
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

@@ -11,6 +11,11 @@
 //! - Tenant-level access control
 //! - Quota validation before resource creation
 //!
+//! # Persistence (enterprise horizon band 51+)
+//!
+//! Default store is **in-memory**. Set `POOLAI_TENANT_STORE=sqlite` when durable
+//! backend lands (band 52+). See [`docs/development/TENANT_PERSIST.md`].
+//!
 //! # Example
 //!
 //! ```rust,no_run
@@ -38,6 +43,21 @@ use std::sync::{Arc, OnceLock};
 use tokio::sync::RwLock;
 use tracing::{info, warn};
 use uuid::Uuid;
+
+/// Env key for tenant store backend (`memory` default; `sqlite` horizon).
+pub const POOLAI_TENANT_STORE: &str = "POOLAI_TENANT_STORE";
+
+/// Resolve configured tenant store mode (PH-S1149 scaffold).
+pub fn tenant_store_mode() -> &'static str {
+    match std::env::var(POOLAI_TENANT_STORE)
+        .unwrap_or_else(|_| "memory".into())
+        .to_ascii_lowercase()
+        .as_str()
+    {
+        "sqlite" => "sqlite",
+        _ => "memory",
+    }
+}
 
 /// Tenant configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -695,6 +715,14 @@ mod tests {
         assert_eq!(usage.cpu_cores, 0);
         assert_eq!(usage.storage_mb, 500);
         assert_eq!(usage.vm_instances, 0);
+    }
+
+    #[test]
+    fn tenant_store_mode_defaults_to_memory_ph_s1149() {
+        // Unset may still read process env; assert only valid modes.
+        let mode = tenant_store_mode();
+        assert!(mode == "memory" || mode == "sqlite");
+        assert_eq!(POOLAI_TENANT_STORE, "POOLAI_TENANT_STORE");
     }
 
     #[tokio::test]

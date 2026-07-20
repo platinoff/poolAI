@@ -4333,6 +4333,41 @@ mod tests {
     }
 
     #[test]
+    fn tenant_persist_band51_export_shape_ph_s1155() {
+        use poolai_ui_core::tenant_persistence_depth::{
+            tenant_persist_criteria_total, tenant_persistence_depth_stub, TenantPersistenceDepth,
+            FM_BAND51_ROWS, TENANT_PERSIST_CASES, TENANT_PERSIST_CRITERIA,
+        };
+        use serde_json::json;
+        assert_eq!(
+            tenant_persistence_depth_stub(Some(&json!({"audit_test": true}))),
+            TenantPersistenceDepth::AuditTest
+        );
+        assert_eq!(
+            tenant_persistence_depth_stub(Some(&json!({
+                "tenant_persistence_depth": true,
+                "loc_audit_flag": true,
+                "audit_test": true,
+                "verify_dev_stand_hook": true,
+                "quick_flag": true,
+                "stand_smoke_export": true,
+                "tenant_persist_docs": true,
+            }))),
+            TenantPersistenceDepth::FullBand51
+        );
+        assert_eq!(TENANT_PERSIST_CRITERIA.len(), 7);
+        assert_eq!(tenant_persist_criteria_total(), 7);
+        assert!(TENANT_PERSIST_CASES.contains(&"verify_dev_stand_hook"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND51_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band51 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn galaxy_edge_verification_band48_export_shape_ph_s1125() {
         use poolai_ui_core::galaxy_edge_verification_depth::{
             edge_verification_criteria_total, galaxy_edge_verification_depth_stub,

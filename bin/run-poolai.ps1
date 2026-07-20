@@ -16,6 +16,7 @@ param(
     [switch]$EdgeVerification,
     [switch]$PrePushCanon,
     [switch]$CiCanon,
+    [switch]$TenantPersist,
     [int]$Port = 8080,
     [string]$Features = "enterprise,ml,cloud,test-utils",
     [ValidateSet("json", "sqlite", "raid")]
@@ -245,6 +246,11 @@ function Invoke-Quick {
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         Write-Host "Running poolai-openapi-gap-audit (PH-S1143)..."
         & $MsysWrapper cargo run --quiet --bin poolai-openapi-gap-audit
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    }
+    if ($TenantPersist) {
+        Write-Host "Running poolai-loc-audit --tenant-persist (PH-S1154)..."
+        & $MsysWrapper cargo run --quiet --bin poolai-loc-audit -- --tenant-persist
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     }
 }

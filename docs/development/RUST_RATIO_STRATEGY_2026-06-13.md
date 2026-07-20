@@ -1,6 +1,6 @@
 # Rust codebase ratio — стратегія 90–95% (PoolAI)
 
-**Оновлено:** 2026-07-19 · band 50 **PH-S1139…S1148** ✅ · rust_ratio **≥95%** formal · stretch **96%** advisory
+**Оновлено:** 2026-07-19 · band 51 **PH-S1149…S1158** ✅ · enterprise horizon · rust_ratio formal hold · stretch **96%** advisory
 
 **Мета:** зростання частки **Rust** у виконуваному коді репозиторію до **90–95%** (формально), **96% stretch spirit** (орієнтир replenish PH-S150…S159) — платформа збирається і перевіряється через **`cargo`** без обов'язкового Node на edge.
 
@@ -16,7 +16,7 @@
 
 **Орієнтовний зріз (2026-06-20, PH-S715):** **`94.76%`** Rust LOC (`cargo run --bin poolai-loc-audit` → [`rust_ratio.json`](./rust_ratio.json)). Formal **≥95%** gate — completion bands **28–29** (PH-S930…S949). Non-Rust «шум»: **`i18n_core.js`**, **`admin_common.js`**, **`admin_charts.js`**, browser-only `e2e/tests/`, ops shell.
 
-**Audit:** `cargo run --bin poolai-loc-audit` — звіт `docs/development/rust_ratio.json` для FM §5.13 / PH-S151…S170 gates. CI hold advisory (PH-S165): `cargo run --bin poolai-loc-audit -- --warn-below 0.93 --target 0.95 --stretch 0.96 --min-ratio 0.95 --advisory`. Band 46 (PH-S1100): `cargo run --bin poolai-loc-audit -- --migration-advisory` — ui_js + archived e2e migration registry у `rust_migration_advisory_depth.rs`. Band 47 (PH-S1110): `cargo run --bin poolai-loc-audit -- --stable-touchup` — STABLE maintenance criteria registry у `stable_state_touchup_depth.rs`. Band 48 (PH-S1120): `cargo run --bin poolai-loc-audit -- --edge-verification-advisory` — Galaxy §6.6 edge verification criteria registry у `galaxy_edge_verification_depth.rs`. Band 49 (PH-S1130): `cargo run --bin poolai-loc-audit -- --pre-push-canon` — git pre-push canon gate criteria registry у `pre_push_hook_depth.rs`. Band 50 (PH-S1140): `cargo run --bin poolai-loc-audit -- --ci-canon` — local CI dual-gate criteria registry у `ci_canon_depth.rs`.
+**Audit:** `cargo run --bin poolai-loc-audit` — звіт `docs/development/rust_ratio.json` для FM §5.13 / PH-S151…S170 gates. CI hold advisory (PH-S165): `cargo run --bin poolai-loc-audit -- --warn-below 0.93 --target 0.95 --stretch 0.96 --min-ratio 0.95 --advisory`. Band 46 (PH-S1100): `cargo run --bin poolai-loc-audit -- --migration-advisory` — ui_js + archived e2e migration registry у `rust_migration_advisory_depth.rs`. Band 47 (PH-S1110): `cargo run --bin poolai-loc-audit -- --stable-touchup` — STABLE maintenance criteria registry у `stable_state_touchup_depth.rs`. Band 48 (PH-S1120): `cargo run --bin poolai-loc-audit -- --edge-verification-advisory` — Galaxy §6.6 edge verification criteria registry у `galaxy_edge_verification_depth.rs`. Band 49 (PH-S1130): `cargo run --bin poolai-loc-audit -- --pre-push-canon` — git pre-push canon gate criteria registry у `pre_push_hook_depth.rs`. Band 50 (PH-S1140): `cargo run --bin poolai-loc-audit -- --ci-canon` — local CI dual-gate criteria registry у `ci_canon_depth.rs`. Band 51 (PH-S1150): `cargo run --bin poolai-loc-audit -- --tenant-persist` — enterprise tenant persist criteria registry у `tenant_persistence_depth.rs`.
 
 ---
 

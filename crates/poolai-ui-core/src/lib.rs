@@ -49,6 +49,7 @@ pub mod stand_smoke_metrics;
 pub mod stand_smoke_run_local_depth;
 pub mod stretch_depth;
 pub mod table;
+pub mod tenant_persistence_depth;
 pub mod theme;
 pub mod topology;
 pub mod trust;

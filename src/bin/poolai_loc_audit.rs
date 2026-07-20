@@ -22,6 +22,9 @@ use poolai_ui_core::rust_migration_advisory_depth::{
 use poolai_ui_core::stable_state_touchup_depth::{
     stable_criteria_total, STABLE_TOUCHUP_CASES, STABLE_TOUCHUP_CRITERIA,
 };
+use poolai_ui_core::tenant_persistence_depth::{
+    tenant_persist_criteria_total, TENANT_PERSIST_CASES, TENANT_PERSIST_CRITERIA,
+};
 use serde::Serialize;
 use std::collections::BTreeMap;
 use std::fs;
@@ -108,6 +111,8 @@ struct AuditConfig {
     pre_push_canon: bool,
     /// Emit band-50 CI canon gate fields (PH-S1140).
     ci_canon: bool,
+    /// Emit band-51 tenant persist fields (PH-S1150).
+    tenant_persist: bool,
 }
 
 impl Default for AuditConfig {
@@ -123,6 +128,7 @@ impl Default for AuditConfig {
             edge_verification_advisory: false,
             pre_push_canon: false,
             ci_canon: false,
+            tenant_persist: false,
         }
     }
 }
@@ -210,6 +216,12 @@ struct RustRatioReport {
     ci_canon_criteria_total: usize,
     /// CI canon criteria met count (PH-S1141).
     ci_canon_criteria_met_count: usize,
+    /// Band-51 tenant persist mode (PH-S1150).
+    tenant_persist_mode: bool,
+    /// Tenant persist criteria registry size (PH-S1151).
+    tenant_persist_criteria_total: usize,
+    /// Tenant persist criteria met count (PH-S1151).
+    tenant_persist_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -298,6 +310,22 @@ fn audit_ci_canon_criteria_met(root: &Path) -> (usize, usize) {
     let total = ci_canon_criteria_total();
     let mut met = 0usize;
     for (_, marker, rel) in CI_CANON_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
+fn audit_tenant_persist_criteria_met(root: &Path) -> (usize, usize) {
+    let total = tenant_persist_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in TENANT_PERSIST_CRITERIA {
         let path = root.join(rel);
         if path.is_file() {
             if let Ok(content) = fs::read_to_string(&path) {
@@ -406,6 +434,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--edge-verification-advisory" => config.edge_verification_advisory = true,
             "--pre-push-canon" => config.pre_push_canon = true,
             "--ci-canon" => config.ci_canon = true,
+            "--tenant-persist" => config.tenant_persist = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
                 print_help();
@@ -433,6 +462,7 @@ fn print_help() {
            --edge-verification-advisory  band-48 edge verification horizon fields (PH-S1120)\n\
            --pre-push-canon            band-49 pre-push vision canon gate fields (PH-S1130)\n\
            --ci-canon                  band-50 CI canon gate fields (PH-S1140)\n\
+           --tenant-persist            band-51 tenant persistence fields (PH-S1150)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -570,6 +600,18 @@ fn build_report(
             .push("PH-S1140: ci_canon_mode — local dual-gate (test-ci + openapi-gap + rust-ratio)");
         notes.push("PH-S1148: band 50 CI canon gate — criteria met vs registry");
     }
+    let (tenant_persist_criteria_met_count, tenant_persist_criteria_total_count) =
+        if config.tenant_persist {
+            audit_tenant_persist_criteria_met(root)
+        } else {
+            (0, tenant_persist_criteria_total())
+        };
+    if config.tenant_persist {
+        notes.push(
+            "PH-S1150: tenant_persist_mode — durable tenant store scaffold (POOLAI_TENANT_STORE)",
+        );
+        notes.push("PH-S1158: band 51 tenant persistence — criteria met vs registry");
+    }
 
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
@@ -616,6 +658,9 @@ fn build_report(
         ci_canon_mode: config.ci_canon,
         ci_canon_criteria_total: ci_canon_criteria_total_count,
         ci_canon_criteria_met_count,
+        tenant_persist_mode: config.tenant_persist,
+        tenant_persist_criteria_total: tenant_persist_criteria_total_count,
+        tenant_persist_criteria_met_count,
         by_category,
         notes,
     })
@@ -721,6 +766,17 @@ fn print_summary(report: &RustRatioReport) {
             report.ci_canon_criteria_met_count, report.ci_canon_criteria_total
         );
         println!("  ci_canon_cases:        {}", CI_CANON_CASES.join(", "));
+    }
+    if report.tenant_persist_mode {
+        println!("  tenant_persist:        true (PH-S1150 band 51)");
+        println!(
+            "  tenant_persist_criteria: {}/{} met",
+            report.tenant_persist_criteria_met_count, report.tenant_persist_criteria_total
+        );
+        println!(
+            "  tenant_persist_cases:  {}",
+            TENANT_PERSIST_CASES.join(", ")
+        );
     }
     for (name, loc) in &report.by_category {
         println!("  {name}: {} files, {} loc", loc.files, loc.loc);

@@ -1,8 +1,27 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-19 (band 50 **PH-S1139…S1148** ✅ · horizon band 51)
+**Оновлено:** 2026-07-19 (band 51 **PH-S1149…S1158** ✅ · enterprise horizon band 52)
 
-**Наступна сесія:** **`абракадабра`** — project scan → band 51.
+**Наступна сесія:** **`абракадабра`** — promote band 52 з [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md).
+
+## Band 51 — Tenant persistence scaffold (PH-S1149…S1158, ✅)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1149** | `tenant_persistence_depth` ui-core module |
+| **PH-S1150** | `poolai-loc-audit --tenant-persist` |
+| **PH-S1151** | `tenant_persistence_audit` test |
+| **PH-S1152** | `POOLAI_TENANT_STORE` + `tenant_store_mode()` |
+| **PH-S1153** | `VERIFY_TENANT_PERSIST` verify hook |
+| **PH-S1154** | `quick --tenant-persist` |
+| **PH-S1155** | Stand smoke export shape |
+| **PH-S1156** | RUN_LOCAL / RUST_RATIO / GALAXY sync |
+| **PH-S1157** | `TENANT_PERSIST.md` + master backlog 1000 |
+| **PH-S1158** | Band close |
+
+**§5.12:** **0** відкритих (band 51 ✅). **Vision:** rev **326**. **Enterprise pending:** 990 (→ PH-S2148).
+
+**PH-S1158 ✅ (2026-07-19):** `tenant_persistence_depth.rs`; `--tenant-persist`; `VERIFY_TENANT_PERSIST`; `PH_S_MASTER_BACKLOG_1000.md`; FM §5.14b/§5.17; `galaxy_horizon_s1149_integration`.
 
 ## Band 50 — CI canon gate (PH-S1139…S1148, ✅)
 
