@@ -19,7 +19,7 @@
 | **PH-S1167** | Ratio hold advisory |
 | **PH-S1168** | Band close |
 
-**§5.12:** **0** відкритих (band 52 ✅). **Vision:** rev **328** (після sync). **Enterprise pending:** 980 (→ PH-S2148).
+**§5.12:** **0** відкритих (band 52 ✅). **Vision:** rev **329** (після sync). **Enterprise pending:** 980 (→ PH-S2148).
 
 **PH-S1168 ✅ (2026-07-20):** `tenant_depth.rs`; `tenant_store_wire()`; `--tenant-store`; `VERIFY_TENANT_STORE`; `TENANT_STORE.md`; `galaxy_horizon_s1159_integration`.
 
