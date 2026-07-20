@@ -9,7 +9,7 @@ Enterprise horizon v2 (FM §5.14b / §5.17) · backlog PH-S1149…S2148 · pendi
 | **← наступний** | **`абракадабра`** (project scan → band 52) |
 | **§5.12 active** | **0** (band 51 ✅) |
 | **Horizon** | band 52 → **PH-S1159…S1168** |
-| **Vision** | rev **326** |
+| **Vision** | rev **327** |
 
 ---
 

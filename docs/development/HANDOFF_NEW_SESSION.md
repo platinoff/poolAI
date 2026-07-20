@@ -19,7 +19,7 @@
 | **PH-S1157** | `TENANT_PERSIST.md` + master backlog 1000 |
 | **PH-S1158** | Band close |
 
-**§5.12:** **0** відкритих (band 51 ✅). **Vision:** rev **326**. **Enterprise pending:** 990 (→ PH-S2148).
+**§5.12:** **0** відкритих (band 51 ✅). **Vision:** rev **327**. **Enterprise pending:** 990 (→ PH-S2148).
 
 **PH-S1158 ✅ (2026-07-19):** `tenant_persistence_depth.rs`; `--tenant-persist`; `VERIFY_TENANT_PERSIST`; `PH_S_MASTER_BACKLOG_1000.md`; FM §5.14b/§5.17; `galaxy_horizon_s1149_integration`.
 
