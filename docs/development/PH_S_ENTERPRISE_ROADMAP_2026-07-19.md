@@ -4,9 +4,9 @@
 
 **Канон drain:** FM **§5.12** (max 10 відкритих) · реєстр — [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md) · regen: `bash scripts/generate-ph-s-master-backlog-1000.sh`
 
-**Попередній горизонт:** product-complete PH-S1010 / FM §5.15 ✅ · maintenance bands 37–50 ✅ · enterprise bands 51–53 ✅ (persist + store wire + API contracts)
+**Попередній горизонт:** product-complete PH-S1010 / FM §5.15 ✅ · maintenance bands 37–50 ✅ · enterprise bands 51–54 ✅ (persist + store wire + API contracts + admin/ops glue)
 
-**Активна смуга:** band 54 **PH-S1179…S1188** (A Tenants · admin/ops glue)
+**Активна смуга:** band 55 **PH-S1189…S1198** (A Tenants · stand smoke)
 
 **Поза scope (не в backlog):** FM-003 LAN 2-host (**BLOCKED**) · FM-041 Cloud SDK prod (**Deferred**) · mandatory ZK/TEE
 

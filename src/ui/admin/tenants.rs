@@ -1,6 +1,7 @@
 //! Tenant Management page
 //!
 //! Provides tenant CRUD operations with resource quota management.
+//! PH-S1180/S1181: store-wire status strip + usage/quota ops glue (band 54).
 
 use crate::ui::admin::admin_layout_tenants;
 use axum::response::Html;
@@ -10,6 +11,71 @@ pub async fn admin_tenants() -> Html<String> {
     let script = r#"
     function T(k, fb) { return typeof poolaiT === 'function' ? poolaiT(k, fb) : fb; }
     function Ep() { return typeof poolaiT === 'function' ? poolaiT('err.errorPrefix', 'Error: ') : 'Error: '; }
+
+    function renderTenantStoreBadge(wire) {
+      const el = document.getElementById('tenant-store-badge');
+      if (!el) return;
+      const mode = String((wire && wire.mode) || 'memory').toLowerCase();
+      const configured = !!(wire && wire.configured);
+      const path = (wire && wire.durable_path) ? String(wire.durable_path) : '';
+      const storeLabel = T('admin.tenants.storeLabel', 'Store:');
+      const storeHint = T('admin.tenants.storeHint', 'Tenant persistence backend (POOLAI_TENANT_STORE / POOLAI_TENANT_DATA_DIR)');
+      const modeLabel = T('admin.tenants.store.' + mode, mode);
+      const cfg = configured
+        ? T('admin.tenants.store.configured', 'configured')
+        : T('admin.tenants.store.unconfigured', 'unconfigured');
+      const pathBit = path ? (' · ' + escapeHtml(path)) : '';
+      el.innerHTML =
+        '<span class="status-badge ' + (configured ? 'active' : 'inactive') + '" title="' + escapeHtml(storeHint) + '">' +
+        escapeHtml(storeLabel) + ' ' + escapeHtml(modeLabel) + ' (' + escapeHtml(cfg) + ')' + pathBit +
+        '</span>';
+    }
+
+    async function loadTenantStoreWire() {
+      const el = document.getElementById('tenant-store-badge');
+      if (el) {
+        el.textContent = T('admin.tenants.storeLoading', 'Loading store…');
+      }
+      try {
+        const wire = await fetchJson('/api/enterprise/tenants/store');
+        renderTenantStoreBadge(wire);
+      } catch (e) {
+        if (el) {
+          el.innerHTML = '<span class="status-badge inactive">' +
+            escapeHtml(T('admin.tenants.storeErr', 'Store wire unavailable')) + '</span>';
+        }
+      }
+    }
+
+    async function refreshTenantUsage(id) {
+      try {
+        const usage = await fetchJson('/api/enterprise/tenants/' + encodeURIComponent(id) + '/usage');
+        const msg = T('admin.tenants.usageOk', 'Usage:') +
+          ' workers=' + (usage.workers || 0) +
+          ', memory_mb=' + (usage.memory_mb || 0) +
+          ', cpu_cores=' + (usage.cpu_cores || 0);
+        showNotification(msg, 'success');
+      } catch (e) {
+        showNotification(T('admin.tenants.usageErr', 'Usage refresh failed: ') + e.message, 'error');
+      }
+    }
+
+    async function probeTenantQuota(id) {
+      try {
+        const result = await fetchJson('/api/enterprise/tenants/' + encodeURIComponent(id) + '/quota', {
+          method: 'POST',
+          body: JSON.stringify({ workers: 1, memory_mb: 1 })
+        });
+        const allowed = !!(result && result.allowed);
+        const reason = (result && result.reason) ? String(result.reason) : '';
+        const msg = allowed
+          ? T('admin.tenants.quotaAllow', 'Quota probe: allow')
+          : (T('admin.tenants.quotaDeny', 'Quota probe: deny') + (reason ? (' — ' + reason) : ''));
+        showNotification(msg, allowed ? 'success' : 'warning');
+      } catch (e) {
+        showNotification(T('admin.tenants.quotaErr', 'Quota probe failed: ') + e.message, 'error');
+      }
+    }
 
     async function loadTenants() {
       adminShowLoading('tenants-list', T('admin.tenants.loading', 'Loading tenants…'));
@@ -49,6 +115,8 @@ pub async fn admin_tenants() -> Html<String> {
                 <td>${escapeHtml(T('admin.tenants.resWorkers', 'Workers:'))} ${t.usage.workers}/${t.config.max_workers || '∞'}, ${escapeHtml(T('admin.tenants.resMemory', 'Memory:'))} ${t.usage.memory_mb}MB/${t.config.max_memory_mb || '∞'}MB</td>
                 <td>
                   <button type="button" class="btn" onclick='editTenant(${JSON.stringify(t.id)})'>${escapeHtml(T('admin.btn.edit', 'Edit'))}</button>
+                  <button type="button" class="btn" onclick='refreshTenantUsage(${JSON.stringify(t.id)})'>${escapeHtml(T('admin.tenants.btn.usage', 'Usage'))}</button>
+                  <button type="button" class="btn" onclick='probeTenantQuota(${JSON.stringify(t.id)})'>${escapeHtml(T('admin.tenants.btn.quota', 'Quota'))}</button>
                   <button type="button" class="btn btn-danger" onclick='deleteTenant(${JSON.stringify(t.id)})'>${escapeHtml(T('ui.delete', 'Delete'))}</button>
                 </td>
               </tr>
@@ -222,6 +290,7 @@ pub async fn admin_tenants() -> Html<String> {
       }
     }
     
+    loadTenantStoreWire();
     loadTenants();
     "#;
 
@@ -232,6 +301,7 @@ pub async fn admin_tenants() -> Html<String> {
         <div class="admin-section">
           <div class="admin-header">
             <h2 data-i18n="admin.tenants.section">Tenants</h2>
+            <span id="tenant-store-badge" class="tenant-store-badge muted" data-i18n="admin.tenants.storeLoading">Loading store…</span>
             <button class="btn btn-primary" onclick="showCreateTenantModal()" data-i18n="admin.tenants.createBtn" data-i18n-aria="admin.tenants.createBtn">Create Tenant</button>
           </div>
           <div id="tenants-list"></div>
@@ -350,4 +420,16 @@ async fn admin_tenants_page_slim_tenants_i18n_patch_ph_s230() {
     assert!(html.contains(r#""admin.tenants.section""#));
     assert!(!html.contains(r#""admin.jobs.leaseState.active""#));
     assert!(!html.contains(r#""admin.sec.tab.oauth""#));
+}
+
+#[tokio::test]
+async fn admin_tenants_store_strip_and_quota_glue_ph_s1180() {
+    let html = admin_tenants().await.0;
+    assert!(html.contains("id=\"tenant-store-badge\""));
+    assert!(html.contains("loadTenantStoreWire"));
+    assert!(html.contains("/api/enterprise/tenants/store"));
+    assert!(html.contains("refreshTenantUsage"));
+    assert!(html.contains("probeTenantQuota"));
+    assert!(html.contains("/usage"));
+    assert!(html.contains("/quota"));
 }

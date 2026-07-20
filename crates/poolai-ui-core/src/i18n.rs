@@ -747,9 +747,27 @@ pub const ADMIN_TENANTS_EN: &[I18nRow<'_>] = &[
         "admin.tenants.confirmDel",
         "Are you sure you want to delete this tenant? This action cannot be undone.",
     ),
+    ("admin.tenants.storeLoading", "Loading store…"),
+    ("admin.tenants.storeLabel", "Store:"),
+    (
+        "admin.tenants.storeHint",
+        "Tenant persistence backend (POOLAI_TENANT_STORE / POOLAI_TENANT_DATA_DIR)",
+    ),
+    ("admin.tenants.store.memory", "memory"),
+    ("admin.tenants.store.sqlite", "sqlite"),
+    ("admin.tenants.store.configured", "configured"),
+    ("admin.tenants.store.unconfigured", "unconfigured"),
+    ("admin.tenants.storeErr", "Store wire unavailable"),
+    ("admin.tenants.btn.usage", "Usage"),
+    ("admin.tenants.btn.quota", "Quota"),
+    ("admin.tenants.usageOk", "Usage:"),
+    ("admin.tenants.usageErr", "Usage refresh failed: "),
+    ("admin.tenants.quotaAllow", "Quota probe: allow"),
+    ("admin.tenants.quotaDeny", "Quota probe: deny"),
+    ("admin.tenants.quotaErr", "Quota probe failed: "),
 ];
 
-/// Ukrainian tenants admin keys (PH-S230).
+/// Ukrainian tenants admin keys (PH-S230; store/usage/quota ops PH-S1180/S1181).
 pub const ADMIN_TENANTS_UK: &[I18nRow<'_>] = &[
     ("admin.page.tenants", "Керування орендарями"),
     ("admin.tenants.loading", "Завантаження орендарів…"),
@@ -785,6 +803,24 @@ pub const ADMIN_TENANTS_UK: &[I18nRow<'_>] = &[
         "admin.tenants.confirmDel",
         "Видалити цього орендаря? Дію не скасувати.",
     ),
+    ("admin.tenants.storeLoading", "Завантаження сховища…"),
+    ("admin.tenants.storeLabel", "Сховище:"),
+    (
+        "admin.tenants.storeHint",
+        "Бекенд персистентності орендарів (POOLAI_TENANT_STORE / POOLAI_TENANT_DATA_DIR)",
+    ),
+    ("admin.tenants.store.memory", "memory"),
+    ("admin.tenants.store.sqlite", "sqlite"),
+    ("admin.tenants.store.configured", "налаштовано"),
+    ("admin.tenants.store.unconfigured", "не налаштовано"),
+    ("admin.tenants.storeErr", "Store wire недоступний"),
+    ("admin.tenants.btn.usage", "Usage"),
+    ("admin.tenants.btn.quota", "Quota"),
+    ("admin.tenants.usageOk", "Usage:"),
+    ("admin.tenants.usageErr", "Помилка оновлення usage: "),
+    ("admin.tenants.quotaAllow", "Quota probe: allow"),
+    ("admin.tenants.quotaDeny", "Quota probe: deny"),
+    ("admin.tenants.quotaErr", "Помилка quota probe: "),
 ];
 
 /// English security admin keys (PH-S231; moved from `i18n_core.js`).

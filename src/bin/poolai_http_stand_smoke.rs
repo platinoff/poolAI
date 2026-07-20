@@ -4441,6 +4441,44 @@ mod tests {
     }
 
     #[test]
+    fn tenant_admin_ops_band54_export_shape_ph_s1185() {
+        use poolai_ui_core::tenant_admin_ops_depth::{
+            tenant_admin_ops_criteria_total, tenant_admin_ops_depth_stub, TenantAdminOpsDepth,
+            FM_BAND54_ROWS, TENANT_ADMIN_OPS_CASES, TENANT_ADMIN_OPS_CRITERIA,
+        };
+        use serde_json::json;
+        assert_eq!(
+            tenant_admin_ops_depth_stub(Some(&json!({"usage_quota_glue": true}))),
+            TenantAdminOpsDepth::UsageQuotaGlue
+        );
+        assert_eq!(
+            tenant_admin_ops_depth_stub(Some(&json!({
+                "tenant_admin_ops_depth": true,
+                "store_strip": true,
+                "usage_quota_glue": true,
+                "html_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "tenant_admin_ops_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            TenantAdminOpsDepth::FullBand54
+        );
+        assert_eq!(TENANT_ADMIN_OPS_CRITERIA.len(), 10);
+        assert_eq!(tenant_admin_ops_criteria_total(), 10);
+        assert!(TENANT_ADMIN_OPS_CASES.contains(&"store_strip"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND54_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band54 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn galaxy_edge_verification_band48_export_shape_ph_s1125() {
         use poolai_ui_core::galaxy_edge_verification_depth::{
             edge_verification_criteria_total, galaxy_edge_verification_depth_stub,

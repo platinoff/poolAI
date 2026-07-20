@@ -1,6 +1,6 @@
 # PH-S master backlog 1000 (enterprise horizon v2)
 
-**Generated:** 2026-07-20 · **Range:** PH-S1149…PH-S2148 · **Pending:** **980** (band 52 ✅) · **Enterprise roadmap v2**
+**Generated:** 2026-07-20 · **Range:** PH-S1149…PH-S2148 · **Pending:** **960** (band 54 ✅) · **Enterprise roadmap v2**
 
 **VDT:** один `абракадабра` = drain **10** з FM §5.12 → vision close → push → promote наступні 10.
 
@@ -13,8 +13,8 @@
 | 51 | PH-S1149…S1158 | A Tenants · depth scaffold ✅ drained |
 | 52 | PH-S1159…S1168 | A Tenants · store wire **✅ drained** |
 | 53 | PH-S1169…S1178 | A Tenants · API contracts **✅ drained** |
-| 54 | PH-S1179…S1188 | A Tenants · admin/ops glue **active next** |
-| 55 | PH-S1189…S1198 | A Tenants · stand smoke |
+| 54 | PH-S1179…S1188 | A Tenants · admin/ops glue **✅** |
+| 55 | PH-S1189…S1198 | A Tenants · stand smoke **active next** |
 | 56 | PH-S1199…S1208 | A Tenants · loc-audit |
 | 57 | PH-S1209…S1218 | A Tenants · docs canon |
 | 58 | PH-S1219…S1228 | A Tenants · vision-sync |
@@ -162,16 +162,16 @@
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1179** | `tenant_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1180** | `tenant` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1181** | `tenant` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1182** | `tenant` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1183** | Stand smoke `tenant` export | export shape unit test | **[ ]** |
-| **PH-S1184** | poolai-loc-audit PH-S1184 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1185** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1186** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1187** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1188** | galaxy_horizon_s1179_integration | band close | **[ ]** |
+| **PH-S1179** | `tenant_admin_ops_depth` | ui-core depth enum + criteria registry | **✅** |
+| **PH-S1180** | Admin store-wire strip | `#tenant-store-badge` ← `GET /tenants/store` | **✅** |
+| **PH-S1181** | Admin usage + quota glue | `refreshTenantUsage` + `probeTenantQuota` | **✅** |
+| **PH-S1182** | Admin ops HTML contracts | `tenant_admin_ops_integration.rs` | **✅** |
+| **PH-S1183** | i18n store/usage/quota | ADMIN_TENANTS EN/UK keys | **✅** |
+| **PH-S1184** | verify / quick `--tenant-admin-ops` | `VERIFY_TENANT_ADMIN_OPS=1` + quick flag | **✅** |
+| **PH-S1185** | Stand smoke + loc-audit | export shape + `rust_ratio.json` tenant_admin_ops | **✅** |
+| **PH-S1186** | Docs `TENANT_ADMIN_OPS.md` | ops matrix + canon sync | **✅** |
+| **PH-S1187** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
+| **PH-S1188** | galaxy_horizon_s1179_integration | band close | **✅** |
 
 ## Band 55 — PH-S1189…S1198 (A Tenants · stand smoke)
 

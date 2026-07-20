@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 159397,
-  "non_rust_product_loc": 8741,
-  "product_loc_total": 168138,
-  "rust_ratio": 0.948012941750229,
-  "rust_ratio_pct": 94.8012941750229,
+  "rust_loc": 160311,
+  "non_rust_product_loc": 8764,
+  "product_loc_total": 169075,
+  "rust_ratio": 0.9481650155256542,
+  "rust_ratio_pct": 94.81650155256543,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -49,9 +49,12 @@
   "tenant_store_mode": false,
   "tenant_store_criteria_total": 7,
   "tenant_store_criteria_met_count": 0,
-  "tenant_api_mode": true,
+  "tenant_api_mode": false,
   "tenant_api_criteria_total": 10,
-  "tenant_api_criteria_met_count": 10,
+  "tenant_api_criteria_met_count": 0,
+  "tenant_admin_ops_mode": true,
+  "tenant_admin_ops_criteria_total": 10,
+  "tenant_admin_ops_criteria_met_count": 10,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -59,27 +62,27 @@
     },
     "ops_ps1": {
       "files": 16,
-      "loc": 1481
+      "loc": 1487
     },
     "ops_shell": {
       "files": 38,
-      "loc": 3056
+      "loc": 3073
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 71,
-      "loc": 14993
+      "files": 72,
+      "loc": 15259
     },
     "rust_src": {
       "files": 300,
-      "loc": 108570
+      "loc": 108737
     },
     "rust_tests": {
-      "files": 248,
-      "loc": 35226
+      "files": 250,
+      "loc": 35707
     },
     "ui_css": {
       "files": 2,
@@ -110,7 +113,7 @@
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
     "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
-    "PH-S1176: tenant_api_mode — HTTP CRUD/quota/isolation + store-wire read contracts",
-    "PH-S1178: band 53 tenant API contracts — criteria met vs registry"
+    "PH-S1185: tenant_admin_ops_mode — store strip / usage+quota / verify hooks",
+    "PH-S1188: band 54 tenant admin/ops — criteria met vs registry"
   ]
 }

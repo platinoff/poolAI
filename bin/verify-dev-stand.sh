@@ -25,6 +25,7 @@ VERIFY_CI_CANON="${VERIFY_CI_CANON:-0}"
 VERIFY_TENANT_PERSIST="${VERIFY_TENANT_PERSIST:-0}"
 VERIFY_TENANT_STORE="${VERIFY_TENANT_STORE:-0}"
 VERIFY_TENANT_API="${VERIFY_TENANT_API:-0}"
+VERIFY_TENANT_ADMIN_OPS="${VERIFY_TENANT_ADMIN_OPS:-0}"
 HEALTH_RETRIES="${VERIFY_HEALTH_RETRIES:-45}"
 HEALTH_SLEEP="${VERIFY_HEALTH_SLEEP:-2}"
 
@@ -364,6 +365,16 @@ if [[ "$VERIFY_TENANT_API" == "1" ]]; then
     echo "OK  tenant HTTP API contracts gate loc-audit"
   else
     echo "FAIL tenant HTTP API contracts gate loc-audit"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_TENANT_ADMIN_OPS" == "1" ]]; then
+  echo "Running poolai-loc-audit --tenant-admin-ops (PH-S1184)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --tenant-admin-ops); then
+    echo "OK  tenant admin/ops gate loc-audit"
+  else
+    echo "FAIL tenant admin/ops gate loc-audit"
     fail=1
   fi
 fi

@@ -24,7 +24,7 @@ cd S:\rust\poolAI
 .\bin\run-poolai.ps1 stop
 ```
 
-**Last updated:** 2026-07-20 (PH-S1178 band 53 · `--tenant-api` · `VERIFY_TENANT_API` · enterprise HTTP API contracts)
+**Last updated:** 2026-07-20 (PH-S1188 band 54 · `--tenant-admin-ops` · `VERIFY_TENANT_ADMIN_OPS` · enterprise admin/ops glue)
 
 ### PH-S1011 / PH-S1012: Light compile + quick preset
 
@@ -60,6 +60,7 @@ cd S:\rust\poolAI
 /usr/bin/bash bin/run-poolai.sh quick --tenant-persist
 /usr/bin/bash bin/run-poolai.sh quick --tenant-store
 /usr/bin/bash bin/run-poolai.sh quick --tenant-api
+/usr/bin/bash bin/run-poolai.sh quick --tenant-admin-ops
 # PowerShell:
 .\bin\run-poolai.ps1 quick -StandSmoke
 .\bin\run-poolai.ps1 quick -MigrationAdvisory
@@ -304,6 +305,7 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `VERIFY_TENANT_PERSIST=1` | `verify-dev-stand.sh` → `poolai-loc-audit --tenant-persist` (PH-S1153) |
 | `VERIFY_TENANT_STORE=1` | `verify-dev-stand.sh` → `poolai-loc-audit --tenant-store` (PH-S1162) |
 | `VERIFY_TENANT_API=1` | `verify-dev-stand.sh` → `poolai-loc-audit --tenant-api` (PH-S1175) |
+| `VERIFY_TENANT_ADMIN_OPS=1` | `verify-dev-stand.sh` → `poolai-loc-audit --tenant-admin-ops` (PH-S1184) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 ### PH-S1100: Rust migration advisory (band 46)
@@ -464,6 +466,26 @@ VERIFY_TENANT_API=1 bash bin/verify-dev-stand.sh
 | `tenant_api_criteria_met_count` | Criteria with marker present in canonical doc path |
 
 Module: [`tenant_api_contracts_depth.rs`](../../crates/poolai-ui-core/src/tenant_api_contracts_depth.rs) · tests: `tenant_api_contracts_integration.rs`, `galaxy_horizon_s1169_integration.rs` · docs: [`TENANT_API.md`](./TENANT_API.md).
+
+### PH-S1185: Tenant admin/ops glue (band 54)
+
+Enterprise phase A admin UI + ops hooks: store-wire strip, usage refresh, quota probe.
+
+```bash
+cargo run --bin poolai-loc-audit -- --tenant-admin-ops
+cargo run --bin poolai-loc-audit -- --tenant-admin-ops --advisory --min-ratio 0.95
+
+VERIFY_TENANT_ADMIN_OPS=1 bash bin/verify-dev-stand.sh
+/usr/bin/bash bin/run-poolai.sh quick --tenant-admin-ops
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `tenant_admin_ops_mode` | `true` when `--tenant-admin-ops` (PH-S1185) |
+| `tenant_admin_ops_criteria_total` | Tenant admin/ops criteria registry size |
+| `tenant_admin_ops_criteria_met_count` | Criteria with marker present in canonical doc path |
+
+Module: [`tenant_admin_ops_depth.rs`](../../crates/poolai-ui-core/src/tenant_admin_ops_depth.rs) · tests: `tenant_admin_ops_integration.rs`, `galaxy_horizon_s1179_integration.rs` · docs: [`TENANT_ADMIN_OPS.md`](./TENANT_ADMIN_OPS.md).
 
 Default stand smoke includes **`vision_revision_parity`** (PH-S208, PH-S235): repo `manifest.revision` vs FM §5.12 `Vision rev`, `extensions.active_sprint` vs `manifest.next_sprint`, then `GET /docs/vision/manifest.json` with `X-PoolAI-Vision-Revision` header vs JSON body.
 
