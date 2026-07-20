@@ -22,6 +22,7 @@ use poolai_ui_core::rust_migration_advisory_depth::{
 use poolai_ui_core::stable_state_touchup_depth::{
     stable_criteria_total, STABLE_TOUCHUP_CASES, STABLE_TOUCHUP_CRITERIA,
 };
+use poolai_ui_core::tenant_depth::{tenant_criteria_total, TENANT_CASES, TENANT_CRITERIA};
 use poolai_ui_core::tenant_persistence_depth::{
     tenant_persist_criteria_total, TENANT_PERSIST_CASES, TENANT_PERSIST_CRITERIA,
 };
@@ -113,6 +114,8 @@ struct AuditConfig {
     ci_canon: bool,
     /// Emit band-51 tenant persist fields (PH-S1150).
     tenant_persist: bool,
+    /// Emit band-52 tenant store-wire fields (PH-S1164).
+    tenant_store: bool,
 }
 
 impl Default for AuditConfig {
@@ -129,6 +132,7 @@ impl Default for AuditConfig {
             pre_push_canon: false,
             ci_canon: false,
             tenant_persist: false,
+            tenant_store: false,
         }
     }
 }
@@ -222,6 +226,12 @@ struct RustRatioReport {
     tenant_persist_criteria_total: usize,
     /// Tenant persist criteria met count (PH-S1151).
     tenant_persist_criteria_met_count: usize,
+    /// Band-52 tenant store-wire mode (PH-S1164).
+    tenant_store_mode: bool,
+    /// Tenant store-wire criteria registry size (PH-S1164).
+    tenant_store_criteria_total: usize,
+    /// Tenant store-wire criteria met count (PH-S1164).
+    tenant_store_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -338,6 +348,22 @@ fn audit_tenant_persist_criteria_met(root: &Path) -> (usize, usize) {
     (met, total)
 }
 
+fn audit_tenant_store_criteria_met(root: &Path) -> (usize, usize) {
+    let total = tenant_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in TENANT_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
 fn classify_product_path(path: &str) -> ProductCategory {
     let p = path.replace('\\', "/");
     if p.starts_with("src/") && p.ends_with(".rs") {
@@ -435,6 +461,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--pre-push-canon" => config.pre_push_canon = true,
             "--ci-canon" => config.ci_canon = true,
             "--tenant-persist" => config.tenant_persist = true,
+            "--tenant-store" => config.tenant_store = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
                 print_help();
@@ -463,6 +490,7 @@ fn print_help() {
            --pre-push-canon            band-49 pre-push vision canon gate fields (PH-S1130)\n\
            --ci-canon                  band-50 CI canon gate fields (PH-S1140)\n\
            --tenant-persist            band-51 tenant persistence fields (PH-S1150)\n\
+           --tenant-store              band-52 tenant store-wire fields (PH-S1164)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -612,6 +640,16 @@ fn build_report(
         );
         notes.push("PH-S1158: band 51 tenant persistence — criteria met vs registry");
     }
+    let (tenant_store_criteria_met_count, tenant_store_criteria_total_count) =
+        if config.tenant_store {
+            audit_tenant_store_criteria_met(root)
+        } else {
+            (0, tenant_criteria_total())
+        };
+    if config.tenant_store {
+        notes.push("PH-S1164: tenant_store_mode — durable path wire stub (POOLAI_TENANT_DATA_DIR)");
+        notes.push("PH-S1168: band 52 tenant store wire — criteria met vs registry");
+    }
 
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
@@ -661,6 +699,9 @@ fn build_report(
         tenant_persist_mode: config.tenant_persist,
         tenant_persist_criteria_total: tenant_persist_criteria_total_count,
         tenant_persist_criteria_met_count,
+        tenant_store_mode: config.tenant_store,
+        tenant_store_criteria_total: tenant_store_criteria_total_count,
+        tenant_store_criteria_met_count,
         by_category,
         notes,
     })
@@ -777,6 +818,14 @@ fn print_summary(report: &RustRatioReport) {
             "  tenant_persist_cases:  {}",
             TENANT_PERSIST_CASES.join(", ")
         );
+    }
+    if report.tenant_store_mode {
+        println!("  tenant_store:          true (PH-S1164 band 52)");
+        println!(
+            "  tenant_store_criteria: {}/{} met",
+            report.tenant_store_criteria_met_count, report.tenant_store_criteria_total
+        );
+        println!("  tenant_store_cases:    {}", TENANT_CASES.join(", "));
     }
     for (name, loc) in &report.by_category {
         println!("  {name}: {} files, {} loc", loc.files, loc.loc);

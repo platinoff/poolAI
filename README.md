@@ -54,7 +54,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 **Версія в репозиторії:** `0.2.2` (див. `Cargo.toml`). **Робоча гілка:** `main`.
 
-Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S1158 ✅. **Rust ratio:** **94.89%** (hold **95%** advisory). **Vision:** manifest rev **327**. **§5.12:** **0** відкритих (band 51 ✅) · наступна сесія **`абракадабра`** → band 52 — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
+Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S1168 ✅. **Rust ratio:** **94.80%** (hold **95%** advisory). **Vision:** manifest rev **328**. **§5.12:** **0** відкритих (band 52 ✅) · наступна сесія **`абракадабра`** → band 53 — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
 **Репозиторій:** [github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)
 
@@ -84,9 +84,9 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 **Product-complete:** PH-S1010 ✅ · FM **§5.15** ✅ · **maintenance mode**.
 
-**Наступна сесія (owner):** **`абракадабра`** — project scan → band 52 **PH-S1159…S1168** · [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія (owner):** **`абракадабра`** — project scan → band 53 **PH-S1169…S1178** · [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
-**§5.12:** **0** відкритих (band 51 ✅) · vision **rev 327** · last **PH-S1158** · next **PH-S1159**.
+**§5.12:** **0** відкритих (band 52 ✅) · vision **rev 328** · last **PH-S1168** · next **PH-S1169**.
 
 **Ops (поза чергою):** **FM-003** LAN §4 **BLOCKED** (2 хости) · **FM-041** Cloud SDK **Deferred**.
 

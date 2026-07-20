@@ -6,18 +6,18 @@
   "warn_below": 0.93,
   "target_ratio": 0.95,
   "stretch_spirit": 0.96,
-  "advisory_mode": false,
-  "min_ratio": null,
-  "rust_loc": 158459,
-  "non_rust_product_loc": 8535,
-  "product_loc_total": 166994,
-  "rust_ratio": 0.9488903792950645,
-  "rust_ratio_pct": 94.88903792950644,
+  "advisory_mode": true,
+  "min_ratio": 0.95,
+  "rust_loc": 158937,
+  "non_rust_product_loc": 8718,
+  "product_loc_total": 167655,
+  "rust_ratio": 0.9480003578777847,
+  "rust_ratio_pct": 94.80003578777847,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
   "below_stretch_spirit": true,
-  "meets_min_ratio": null,
+  "meets_min_ratio": false,
   "ui_js_loc": 1922,
   "ui_js_band28_baseline_loc": 2141,
   "ui_js_loc_reduction": 219,
@@ -43,9 +43,12 @@
   "ci_canon_mode": false,
   "ci_canon_criteria_total": 7,
   "ci_canon_criteria_met_count": 0,
-  "tenant_persist_mode": true,
+  "tenant_persist_mode": false,
   "tenant_persist_criteria_total": 7,
-  "tenant_persist_criteria_met_count": 7,
+  "tenant_persist_criteria_met_count": 0,
+  "tenant_store_mode": true,
+  "tenant_store_criteria_total": 7,
+  "tenant_store_criteria_met_count": 7,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -53,27 +56,27 @@
     },
     "ops_ps1": {
       "files": 16,
-      "loc": 1469
+      "loc": 1475
     },
     "ops_shell": {
-      "files": 37,
-      "loc": 2862
+      "files": 38,
+      "loc": 3039
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 69,
-      "loc": 14634
+      "files": 70,
+      "loc": 14813
     },
     "rust_src": {
       "files": 300,
-      "loc": 108301
+      "loc": 108476
     },
     "rust_tests": {
-      "files": 243,
-      "loc": 34916
+      "files": 245,
+      "loc": 35040
     },
     "ui_css": {
       "files": 2,
@@ -104,7 +107,7 @@
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
     "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
-    "PH-S1150: tenant_persist_mode — durable tenant store scaffold (POOLAI_TENANT_STORE)",
-    "PH-S1158: band 51 tenant persistence — criteria met vs registry"
+    "PH-S1164: tenant_store_mode — durable path wire stub (POOLAI_TENANT_DATA_DIR)",
+    "PH-S1168: band 52 tenant store wire — criteria met vs registry"
   ]
 }

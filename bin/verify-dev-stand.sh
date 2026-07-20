@@ -23,6 +23,7 @@ VERIFY_EDGE_VERIFICATION="${VERIFY_EDGE_VERIFICATION:-0}"
 VERIFY_PRE_PUSH_CANON="${VERIFY_PRE_PUSH_CANON:-0}"
 VERIFY_CI_CANON="${VERIFY_CI_CANON:-0}"
 VERIFY_TENANT_PERSIST="${VERIFY_TENANT_PERSIST:-0}"
+VERIFY_TENANT_STORE="${VERIFY_TENANT_STORE:-0}"
 HEALTH_RETRIES="${VERIFY_HEALTH_RETRIES:-45}"
 HEALTH_SLEEP="${VERIFY_HEALTH_SLEEP:-2}"
 
@@ -342,6 +343,16 @@ if [[ "$VERIFY_TENANT_PERSIST" == "1" ]]; then
     echo "OK  tenant persist gate loc-audit"
   else
     echo "FAIL tenant persist gate loc-audit"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_TENANT_STORE" == "1" ]]; then
+  echo "Running poolai-loc-audit --tenant-store (PH-S1162)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --tenant-store); then
+    echo "OK  tenant store-wire gate loc-audit"
+  else
+    echo "FAIL tenant store-wire gate loc-audit"
     fail=1
   fi
 fi

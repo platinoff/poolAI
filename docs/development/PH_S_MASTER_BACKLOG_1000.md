@@ -1,6 +1,6 @@
 # PH-S master backlog 1000 (enterprise horizon v2)
 
-**Generated:** 2026-07-19 · **Range:** PH-S1149…PH-S2148 · **Pending:** **990** (band 51 ✅) · **Enterprise roadmap v2**
+**Generated:** 2026-07-20 · **Range:** PH-S1149…PH-S2148 · **Pending:** **980** (band 52 ✅) · **Enterprise roadmap v2**
 
 **VDT:** один `абракадабра` = drain **10** з FM §5.12 → vision close → push → promote наступні 10.
 
@@ -11,8 +11,8 @@
 | Band | Sprints | Theme |
 |------|---------|-------|
 | 51 | PH-S1149…S1158 | A Tenants · depth scaffold ✅ drained |
-| 52 | PH-S1159…S1168 | A Tenants · store wire **active next** |
-| 53 | PH-S1169…S1178 | A Tenants · API contracts |
+| 52 | PH-S1159…S1168 | A Tenants · store wire **✅ drained** |
+| 53 | PH-S1169…S1178 | A Tenants · API contracts **active next** |
 | 54 | PH-S1179…S1188 | A Tenants · admin/ops glue |
 | 55 | PH-S1189…S1198 | A Tenants · stand smoke |
 | 56 | PH-S1199…S1208 | A Tenants · loc-audit |
@@ -132,16 +132,16 @@
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1159** | `tenant_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1160** | `tenant` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1161** | `tenant` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1162** | `tenant` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1163** | Stand smoke `tenant` export | export shape unit test | **[ ]** |
-| **PH-S1164** | poolai-loc-audit PH-S1164 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1165** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1166** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1167** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1168** | galaxy_horizon_s1159_integration | band close | **[ ]** |
+| **PH-S1159** | `tenant_depth` scaffold | ui-core depth enum + criteria registry | **✅** |
+| **PH-S1160** | `tenant` store/wire slice | durable path or production verify stub + unit test | **✅** |
+| **PH-S1161** | `tenant` API contracts | `tests/*_integration.rs` or contract test | **✅** |
+| **PH-S1162** | `tenant` admin/ops glue | verify-dev-stand or admin strip | **✅** |
+| **PH-S1163** | Stand smoke `tenant` export | export shape unit test | **✅** |
+| **PH-S1164** | poolai-loc-audit PH-S1164 | `rust_ratio.json` zriz | **✅** |
+| **PH-S1165** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **✅** |
+| **PH-S1166** | poolai-vision-sync --check | drift gate green | **✅** |
+| **PH-S1167** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
+| **PH-S1168** | galaxy_horizon_s1159_integration | band close | **✅** |
 
 ## Band 53 — PH-S1169…S1178 (A Tenants · API contracts)
 

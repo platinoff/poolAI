@@ -1,8 +1,27 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-19 (band 51 **PH-S1149…S1158** ✅ · enterprise horizon band 52)
+**Оновлено:** 2026-07-20 (band 52 **PH-S1159…S1168** ✅ · enterprise horizon band 53)
 
-**Наступна сесія:** **`абракадабра`** — promote band 52 з [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md).
+**Наступна сесія:** **`абракадабра`** — promote band 53 з [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md).
+
+## Band 52 — Tenant store wire (PH-S1159…S1168, ✅)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1159** | `tenant_depth` ui-core module |
+| **PH-S1160** | `tenant_store_wire()` + `POOLAI_TENANT_DATA_DIR` |
+| **PH-S1161** | `tenant_store_wire_integration` contracts |
+| **PH-S1162** | `VERIFY_TENANT_STORE` + quick `--tenant-store` |
+| **PH-S1163** | Stand smoke export shape |
+| **PH-S1164** | `poolai-loc-audit --tenant-store` |
+| **PH-S1165** | RUN_LOCAL / RUST_RATIO / TENANT_STORE sync |
+| **PH-S1166** | vision-sync --check |
+| **PH-S1167** | Ratio hold advisory |
+| **PH-S1168** | Band close |
+
+**§5.12:** **0** відкритих (band 52 ✅). **Vision:** rev **328** (після sync). **Enterprise pending:** 980 (→ PH-S2148).
+
+**PH-S1168 ✅ (2026-07-20):** `tenant_depth.rs`; `tenant_store_wire()`; `--tenant-store`; `VERIFY_TENANT_STORE`; `TENANT_STORE.md`; `galaxy_horizon_s1159_integration`.
 
 ## Band 51 — Tenant persistence scaffold (PH-S1149…S1158, ✅)
 
@@ -19,7 +38,7 @@
 | **PH-S1157** | `TENANT_PERSIST.md` + master backlog 1000 |
 | **PH-S1158** | Band close |
 
-**§5.12:** **0** відкритих (band 51 ✅). **Vision:** rev **327**. **Enterprise pending:** 990 (→ PH-S2148).
+**§5.12:** **0** відкритих (band 51 ✅). **Vision:** rev **327**.
 
 **PH-S1158 ✅ (2026-07-19):** `tenant_persistence_depth.rs`; `--tenant-persist`; `VERIFY_TENANT_PERSIST`; `PH_S_MASTER_BACKLOG_1000.md`; FM §5.14b/§5.17; `galaxy_horizon_s1149_integration`.
 

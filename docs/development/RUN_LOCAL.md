@@ -24,7 +24,7 @@ cd S:\rust\poolAI
 .\bin\run-poolai.ps1 stop
 ```
 
-**Last updated:** 2026-07-19 (PH-S1158 band 51 · `--tenant-persist` · `VERIFY_TENANT_PERSIST` · enterprise horizon)
+**Last updated:** 2026-07-20 (PH-S1168 band 52 · `--tenant-store` · `VERIFY_TENANT_STORE` · enterprise store wire)
 
 ### PH-S1011 / PH-S1012: Light compile + quick preset
 
@@ -48,7 +48,7 @@ cd S:\rust\poolAI
 | **full** | `enterprise,ml,cloud,test-utils` | `run-poolai build` default |
 | **light** (`--light`) | `enterprise,test-utils` | PH-S1011 faster compile |
 
-`quick` restores `data/dev/last_run.json` port when present (PH-S1014), runs light build unless `--skip-build`, starts `single --bg`, waits for `/api/v1/health`. Optional **`--stand-smoke`** (PH-S1095) runs `poolai-http-stand-smoke --run-local-smoke` after health OK. Optional **`--migration-advisory`** (PH-S1104) runs `poolai-loc-audit --migration-advisory` after health OK. Optional **`--stable-touchup`** (PH-S1114) runs `poolai-loc-audit --stable-touchup` after health OK. Optional **`--edge-verification`** (PH-S1125) runs `poolai-loc-audit --edge-verification-advisory` after health OK. Optional **`--pre-push-canon`** (PH-S1134) runs `poolai-loc-audit --pre-push-canon` after health OK. Optional **`--ci-canon`** (PH-S1143) runs `poolai-loc-audit --ci-canon` + `poolai-openapi-gap-audit` after health OK. Optional **`--tenant-persist`** (PH-S1154) runs `poolai-loc-audit --tenant-persist` after health OK.
+`quick` restores `data/dev/last_run.json` port when present (PH-S1014), runs light build unless `--skip-build`, starts `single --bg`, waits for `/api/v1/health`. Optional **`--stand-smoke`** (PH-S1095) runs `poolai-http-stand-smoke --run-local-smoke` after health OK. Optional **`--migration-advisory`** (PH-S1104) runs `poolai-loc-audit --migration-advisory` after health OK. Optional **`--stable-touchup`** (PH-S1114) runs `poolai-loc-audit --stable-touchup` after health OK. Optional **`--edge-verification`** (PH-S1125) runs `poolai-loc-audit --edge-verification-advisory` after health OK. Optional **`--pre-push-canon`** (PH-S1134) runs `poolai-loc-audit --pre-push-canon` after health OK. Optional **`--ci-canon`** (PH-S1143) runs `poolai-loc-audit --ci-canon` + `poolai-openapi-gap-audit` after health OK. Optional **`--tenant-persist`** (PH-S1154) runs `poolai-loc-audit --tenant-persist` after health OK. Optional **`--tenant-store`** (PH-S1162) runs `poolai-loc-audit --tenant-store` after health OK.
 
 ```bash
 /usr/bin/bash bin/run-poolai.sh quick --stand-smoke
@@ -58,6 +58,7 @@ cd S:\rust\poolAI
 /usr/bin/bash bin/run-poolai.sh quick --pre-push-canon
 /usr/bin/bash bin/run-poolai.sh quick --ci-canon
 /usr/bin/bash bin/run-poolai.sh quick --tenant-persist
+/usr/bin/bash bin/run-poolai.sh quick --tenant-store
 # PowerShell:
 .\bin\run-poolai.ps1 quick -StandSmoke
 .\bin\run-poolai.ps1 quick -MigrationAdvisory
@@ -300,6 +301,7 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `VERIFY_PRE_PUSH_CANON=1` | `verify-dev-stand.sh` → `poolai-loc-audit --pre-push-canon` (PH-S1134) |
 | `VERIFY_CI_CANON=1` | `verify-dev-stand.sh` → openapi-gap-audit + `poolai-loc-audit --ci-canon` + rust-ratio advisory (PH-S1142) |
 | `VERIFY_TENANT_PERSIST=1` | `verify-dev-stand.sh` → `poolai-loc-audit --tenant-persist` (PH-S1153) |
+| `VERIFY_TENANT_STORE=1` | `verify-dev-stand.sh` → `poolai-loc-audit --tenant-store` (PH-S1162) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 ### PH-S1100: Rust migration advisory (band 46)
@@ -420,6 +422,26 @@ VERIFY_TENANT_PERSIST=1 bash bin/verify-dev-stand.sh
 | `tenant_persist_criteria_met_count` | Criteria with marker present in canonical doc path |
 
 Module: [`tenant_persistence_depth.rs`](../../crates/poolai-ui-core/src/tenant_persistence_depth.rs) · tests: `tenant_persistence_audit.rs`, `galaxy_horizon_s1149_integration.rs` · docs: [`TENANT_PERSIST.md`](./TENANT_PERSIST.md) · roadmap: [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](./PH_S_ENTERPRISE_ROADMAP_2026-07-19.md).
+
+### PH-S1164: Tenant store wire (band 52)
+
+Enterprise phase A store wire: `POOLAI_TENANT_DATA_DIR` + `tenant_store_wire()` durable-path stub (no restart-safe CRUD yet).
+
+```bash
+cargo run --bin poolai-loc-audit -- --tenant-store
+cargo run --bin poolai-loc-audit -- --tenant-store --advisory --min-ratio 0.95
+
+VERIFY_TENANT_STORE=1 bash bin/verify-dev-stand.sh
+/usr/bin/bash bin/run-poolai.sh quick --tenant-store
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `tenant_store_mode` | `true` when `--tenant-store` (PH-S1164) |
+| `tenant_store_criteria_total` | Tenant store-wire criteria registry size |
+| `tenant_store_criteria_met_count` | Criteria with marker present in canonical doc path |
+
+Module: [`tenant_depth.rs`](../../crates/poolai-ui-core/src/tenant_depth.rs) · tests: `tenant_store_audit.rs`, `tenant_store_wire_integration.rs`, `galaxy_horizon_s1159_integration.rs` · docs: [`TENANT_STORE.md`](./TENANT_STORE.md).
 
 Default stand smoke includes **`vision_revision_parity`** (PH-S208, PH-S235): repo `manifest.revision` vs FM §5.12 `Vision rev`, `extensions.active_sprint` vs `manifest.next_sprint`, then `GET /docs/vision/manifest.json` with `X-PoolAI-Vision-Revision` header vs JSON body.
 

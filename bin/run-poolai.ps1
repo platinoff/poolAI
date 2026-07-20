@@ -17,6 +17,7 @@ param(
     [switch]$PrePushCanon,
     [switch]$CiCanon,
     [switch]$TenantPersist,
+    [switch]$TenantStore,
     [int]$Port = 8080,
     [string]$Features = "enterprise,ml,cloud,test-utils",
     [ValidateSet("json", "sqlite", "raid")]
@@ -251,6 +252,11 @@ function Invoke-Quick {
     if ($TenantPersist) {
         Write-Host "Running poolai-loc-audit --tenant-persist (PH-S1154)..."
         & $MsysWrapper cargo run --quiet --bin poolai-loc-audit -- --tenant-persist
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    }
+    if ($TenantStore) {
+        Write-Host "Running poolai-loc-audit --tenant-store (PH-S1162)..."
+        & $MsysWrapper cargo run --quiet --bin poolai-loc-audit -- --tenant-store
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     }
 }

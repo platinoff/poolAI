@@ -4368,6 +4368,41 @@ mod tests {
     }
 
     #[test]
+    fn tenant_store_band52_export_shape_ph_s1163() {
+        use poolai_ui_core::tenant_depth::{
+            tenant_criteria_total, tenant_depth_stub, TenantDepth, FM_BAND52_ROWS, TENANT_CASES,
+            TENANT_CRITERIA,
+        };
+        use serde_json::json;
+        assert_eq!(
+            tenant_depth_stub(Some(&json!({"api_contracts": true}))),
+            TenantDepth::ApiContracts
+        );
+        assert_eq!(
+            tenant_depth_stub(Some(&json!({
+                "tenant_depth": true,
+                "store_wire": true,
+                "api_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "tenant_store_docs": true,
+            }))),
+            TenantDepth::FullBand52
+        );
+        assert_eq!(TENANT_CRITERIA.len(), 7);
+        assert_eq!(tenant_criteria_total(), 7);
+        assert!(TENANT_CASES.contains(&"store_wire"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND52_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band52 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn galaxy_edge_verification_band48_export_shape_ph_s1125() {
         use poolai_ui_core::galaxy_edge_verification_depth::{
             edge_verification_criteria_total, galaxy_edge_verification_depth_stub,

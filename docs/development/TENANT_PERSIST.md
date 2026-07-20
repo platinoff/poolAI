@@ -11,7 +11,7 @@ Today `TenantManager` defaults to **in-memory** storage. Horizon path:
 | Mode | Env | Status |
 |------|-----|--------|
 | `memory` | `POOLAI_TENANT_STORE=memory` (default) | Current |
-| `sqlite` | `POOLAI_TENANT_STORE=sqlite` | Band 52+ store wire |
+| `sqlite` | `POOLAI_TENANT_STORE=sqlite` | Band 52+ store wire — see [`TENANT_STORE.md`](./TENANT_STORE.md) |
 
 ## Loc-audit / verify hooks
 

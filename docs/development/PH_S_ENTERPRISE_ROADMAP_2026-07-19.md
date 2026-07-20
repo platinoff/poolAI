@@ -1,10 +1,12 @@
 # PH-S enterprise roadmap v2 (PH-S1149…S2148)
 
-**Оновлено:** 2026-07-19 · **Мета:** durable single-host **enterprise 100%** (FM §5.17) за **1000** спринтами · **100** сесій `абракадабра` (10 PH-S* / сесія)
+**Оновлено:** 2026-07-20 · **Мета:** durable single-host **enterprise 100%** (FM §5.17) за **1000** спринтами · **100** сесій `абракадабра` (10 PH-S* / сесія)
 
 **Канон drain:** FM **§5.12** (max 10 відкритих) · реєстр — [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md) · regen: `bash scripts/generate-ph-s-master-backlog-1000.sh`
 
-**Попередній горизонт:** product-complete PH-S1010 / FM §5.15 ✅ · maintenance bands 37–50 ✅
+**Попередній горизонт:** product-complete PH-S1010 / FM §5.15 ✅ · maintenance bands 37–50 ✅ · enterprise bands 51–52 ✅ (tenant persist + store wire)
+
+**Активна смуга:** band 53 **PH-S1169…S1178** (A Tenants · API contracts)
 
 **Поза scope (не в backlog):** FM-003 LAN 2-host (**BLOCKED**) · FM-041 Cloud SDK prod (**Deferred**) · mandatory ZK/TEE
 

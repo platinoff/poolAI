@@ -11,10 +11,12 @@
 //! - Tenant-level access control
 //! - Quota validation before resource creation
 //!
-//! # Persistence (enterprise horizon band 51+)
+//! # Persistence (enterprise horizon band 51–52+)
 //!
-//! Default store is **in-memory**. Set `POOLAI_TENANT_STORE=sqlite` when durable
-//! backend lands (band 52+). See [`docs/development/TENANT_PERSIST.md`].
+//! Default store is **in-memory**. Band 52 wires `POOLAI_TENANT_STORE=sqlite` +
+//! optional `POOLAI_TENANT_DATA_DIR` as a **production verify stub** (durable path
+//! resolution only — restart-safe CRUD lands in later phase-A bands).
+//! See [`docs/development/TENANT_STORE.md`] and [`docs/development/TENANT_PERSIST.md`].
 //!
 //! # Example
 //!
@@ -39,6 +41,7 @@
 use crate::core::error::AppError;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::path::PathBuf;
 use std::sync::{Arc, OnceLock};
 use tokio::sync::RwLock;
 use tracing::{info, warn};
@@ -46,6 +49,9 @@ use uuid::Uuid;
 
 /// Env key for tenant store backend (`memory` default; `sqlite` horizon).
 pub const POOLAI_TENANT_STORE: &str = "POOLAI_TENANT_STORE";
+
+/// Env key for durable tenant data directory (band 52 store wire).
+pub const POOLAI_TENANT_DATA_DIR: &str = "POOLAI_TENANT_DATA_DIR";
 
 /// Resolve configured tenant store mode (PH-S1149 scaffold).
 pub fn tenant_store_mode() -> &'static str {
@@ -56,6 +62,63 @@ pub fn tenant_store_mode() -> &'static str {
     {
         "sqlite" => "sqlite",
         _ => "memory",
+    }
+}
+
+/// Optional durable data directory from env (PH-S1160).
+pub fn tenant_store_data_dir_from_env() -> Option<PathBuf> {
+    std::env::var(POOLAI_TENANT_DATA_DIR)
+        .ok()
+        .map(|v| v.trim().to_string())
+        .filter(|v| !v.is_empty())
+        .map(PathBuf::from)
+}
+
+/// Canonical sqlite DB file name under the configured data dir (band 52 wire).
+pub const TENANT_STORE_SQLITE_FILE: &str = "tenants.sqlite";
+
+/// Band-52 tenant store wire snapshot (mode + durable path; no CRUD yet).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TenantStoreWire {
+    /// `memory` or `sqlite`.
+    pub mode: String,
+    /// Resolved sqlite file path when mode is sqlite and data dir is set.
+    pub durable_path: Option<String>,
+    /// True when sqlite mode has a durable path (production-ready wire).
+    pub configured: bool,
+}
+
+/// Resolve tenant store wire for ops / verify / contracts (PH-S1160).
+pub fn tenant_store_wire() -> TenantStoreWire {
+    let mode = tenant_store_mode().to_string();
+    if mode != "sqlite" {
+        return TenantStoreWire {
+            mode,
+            durable_path: None,
+            configured: false,
+        };
+    }
+    let durable_path = tenant_store_data_dir_from_env().map(|dir| {
+        dir.join(TENANT_STORE_SQLITE_FILE)
+            .to_string_lossy()
+            .replace('\\', "/")
+    });
+    let configured = durable_path.is_some();
+    TenantStoreWire {
+        mode,
+        durable_path,
+        configured,
+    }
+}
+
+/// Wire label for admin / metrics depth fields (PH-S1160).
+pub fn tenant_store_wire_label(wire: &TenantStoreWire) -> &'static str {
+    if wire.mode == "sqlite" && wire.configured {
+        "sqlite"
+    } else if wire.mode == "sqlite" {
+        "sqlite_unconfigured"
+    } else {
+        "memory"
     }
 }
 
@@ -723,6 +786,45 @@ mod tests {
         let mode = tenant_store_mode();
         assert!(mode == "memory" || mode == "sqlite");
         assert_eq!(POOLAI_TENANT_STORE, "POOLAI_TENANT_STORE");
+    }
+
+    #[test]
+    fn tenant_store_wire_memory_default_ph_s1160() {
+        std::env::remove_var(POOLAI_TENANT_STORE);
+        std::env::remove_var(POOLAI_TENANT_DATA_DIR);
+        let wire = tenant_store_wire();
+        assert_eq!(wire.mode, "memory");
+        assert!(wire.durable_path.is_none());
+        assert!(!wire.configured);
+        assert_eq!(tenant_store_wire_label(&wire), "memory");
+        assert_eq!(POOLAI_TENANT_DATA_DIR, "POOLAI_TENANT_DATA_DIR");
+        assert_eq!(TENANT_STORE_SQLITE_FILE, "tenants.sqlite");
+    }
+
+    #[test]
+    fn tenant_store_wire_sqlite_unconfigured_ph_s1160() {
+        std::env::set_var(POOLAI_TENANT_STORE, "sqlite");
+        std::env::remove_var(POOLAI_TENANT_DATA_DIR);
+        let wire = tenant_store_wire();
+        assert_eq!(wire.mode, "sqlite");
+        assert!(wire.durable_path.is_none());
+        assert!(!wire.configured);
+        assert_eq!(tenant_store_wire_label(&wire), "sqlite_unconfigured");
+        std::env::remove_var(POOLAI_TENANT_STORE);
+    }
+
+    #[test]
+    fn tenant_store_wire_sqlite_configured_ph_s1160() {
+        std::env::set_var(POOLAI_TENANT_STORE, "sqlite");
+        std::env::set_var(POOLAI_TENANT_DATA_DIR, "/tmp/poolai-tenant-wire");
+        let wire = tenant_store_wire();
+        assert_eq!(wire.mode, "sqlite");
+        assert!(wire.configured);
+        assert_eq!(tenant_store_wire_label(&wire), "sqlite");
+        let path = wire.durable_path.as_deref().expect("durable path");
+        assert!(path.contains("tenants.sqlite"));
+        std::env::remove_var(POOLAI_TENANT_STORE);
+        std::env::remove_var(POOLAI_TENANT_DATA_DIR);
     }
 
     #[tokio::test]

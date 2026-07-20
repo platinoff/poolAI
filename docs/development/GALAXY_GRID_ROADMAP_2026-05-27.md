@@ -6,7 +6,7 @@
 |------|----------|
 | **Completion plan** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.14–§5.15** ✅ |
 | **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) — **351/351** ✅ |
-| **Last closed (band 51)** | PH-S1158 ✅ — Tenant persistence scaffold · `tenant_persistence_depth` + `--tenant-persist` · enterprise roadmap v2 |
+| **Last closed (band 52)** | PH-S1168 ✅ — Tenant store wire · `tenant_depth` + `--tenant-store` · `tenant_store_wire()` durable path stub |
 | **Last closed (band 50)** | PH-S1148 ✅ — CI canon gate · `ci_canon_depth` + `--ci-canon` + `VERIFY_CI_CANON` |
 | **Last closed (band 49)** | PH-S1138 ✅ — Pre-push vision canon gate · `pre_push_hook_depth` + `--pre-push-canon` + `bin/pre-push-hook.sh` |
 | **Last closed (band 48)** | PH-S1128 ✅ — Galaxy edge verification horizon · `galaxy_edge_verification_depth` + `--edge-verification-advisory` + `GET /grid/edge-verification-metrics` |

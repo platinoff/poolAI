@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-07-19 (band 51 **PH-S1149…S1158** ✅ · enterprise horizon band 52)
+**Оновлено:** 2026-07-20 (band 52 **PH-S1159…S1168** ✅ · enterprise horizon band 53)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -1221,7 +1221,24 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 51 ✅). **Master horizon:** PH-S1159…S1168 (band 52) · enterprise backlog PH-S1149…S2148. Vision rev **327** (після sync). **Наступна сесія:** **`абракадабра`** — promote band 52.
+**Відкритих у §5.12:** **0** (band 52 ✅). **Master horizon:** PH-S1169…S1178 (band 53) · enterprise backlog PH-S1149…S2148. Vision rev **328** (після sync). **Наступна сесія:** **`абракадабра`** — promote band 53.
+
+### 5.33 Tenant store wire queue — band 52 (PH-S1159…S1168, 2026-07-20)
+
+**Джерело:** FM-horizon v2 / enterprise phase A — tenant store wire (`POOLAI_TENANT_DATA_DIR` + `tenant_store_wire`).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1094 | **PH-S1159** | `tenant_depth` ui-core module | `tenant_depth.rs` | depth enum + tenant store criteria registry | **✅** |
+| 1095 | **PH-S1160** | `tenant_store_wire` durable path stub | `multi_tenancy.rs` | `POOLAI_TENANT_DATA_DIR` + wire snapshot + unit tests | **✅** |
+| 1096 | **PH-S1161** | Tenant store API contracts | `tenant_store_wire_integration.rs` | wire contract + lifecycle isolation | **✅** |
+| 1097 | **PH-S1162** | `verify-dev-stand` / quick tenant store | `bin/verify-dev-stand.sh` | `VERIFY_TENANT_STORE=1` + `--tenant-store` | **✅** |
+| 1098 | **PH-S1163** | Stand smoke tenant store export shape | `poolai_http_stand_smoke.rs` | `tenant_store_band52_export_shape` | **✅** |
+| 1099 | **PH-S1164** | `poolai-loc-audit --tenant-store` | `poolai_loc_audit.rs` | tenant_store fields in `rust_ratio.json` | **✅** |
+| 1100 | **PH-S1165** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | band 52 ops + `TENANT_STORE.md` | **✅** |
+| 1101 | **PH-S1166** | poolai-vision-sync --check | docs/vision | drift gate green | **✅** |
+| 1102 | **PH-S1167** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **✅** |
+| 1103 | **PH-S1168** | Tenant store band close | tests/docs | `galaxy_horizon_s1159_integration`; HANDOFF/NEXT | **✅** |
 
 ### 5.32 Tenant persistence queue — band 51 (PH-S1149…S1158, 2026-07-19)
 
@@ -1541,9 +1558,9 @@ FM-xxx (з таблиці нижче)
 
 | Поле | Значення |
 |------|----------|
-| **Pending** | **990** (band 51 ✅ · S1159…S2148) |
-| **Drained** | band 51 PH-S1149…S1158 ✅ |
-| **Активна §5.12** | — (promote band 52 next) |
+| **Pending** | **980** (band 52 ✅ · S1169…S2148) |
+| **Drained** | band 51–52 PH-S1149…S1168 ✅ |
+| **Активна §5.12** | — (promote band 53 next) |
 | **Наступна promote** | PH-S1159…S1168 |
 | **План фаз** | [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md) |
 | **Реєстр sprint×acceptance** | [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md) |
@@ -1584,7 +1601,7 @@ FM-xxx (з таблиці нижче)
 
 ### 5.17 Enterprise-complete closure (PH-S2148 target)
 
-**Статус:** **in progress** — band 51 ✅ · pending PH-S1159…S2148 · roadmap [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md).
+**Статус:** **in progress** — band 52 ✅ · pending PH-S1169…S2148 · roadmap [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md).
 
 | Критерій | Ціль |
 |----------|------|
@@ -1624,7 +1641,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-19):** band 51 **PH-S1149…S1158** ✅ · §5.12 **0** · наступна **`абракадабра`** → promote band 52 (enterprise).
+**Активна смуга (2026-07-20):** band 52 **PH-S1159…S1168** ✅ · §5.12 **0** · наступна **`абракадабра`** → promote band 53 (enterprise).
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 
