@@ -1221,7 +1221,7 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 58 ✅). **Master horizon:** PH-S1229…S1238 (band 59) · enterprise backlog PH-S1149…S2148. Vision rev **341**. **Наступна сесія:** **`абракадабра`** — promote band 59.
+**Відкритих у §5.12:** **0** (band 58 ✅). **Master horizon:** PH-S1229…S1238 (band 59) · enterprise backlog PH-S1149…S2148. Vision rev **342**. **Наступна сесія:** **`абракадабра`** — promote band 59.
 
 ### 5.39 Tenant vision sync queue — band 58 (PH-S1219…S1228, 2026-07-21)
 

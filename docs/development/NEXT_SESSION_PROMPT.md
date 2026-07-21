@@ -1,15 +1,15 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-07-21 (service **PH-SVC11…SVC20** ✅ · Cursor **3.12.29** · band 58 ✅ · horizon band 59)
+**Оновлено:** 2026-07-21 (band 58 **PH-S1219…S1228** ✅ · horizon band 59)
 
-Maintenance mode (FM §5.15) · band 58 drained · Cursor rules re-checked (FM §5.16).
+Maintenance mode (FM §5.15) · band 58 drained.
 
 Enterprise horizon v2 (FM §5.14b / §5.17) · backlog PH-S1149…S2148 · pending 920.
 
 | **← наступний** | **`абракадабра`** (project scan → band 59) |
 | **§5.12 active** | **0** (band 58 ✅) |
 | **Horizon** | band 59 → **PH-S1229…S1238** |
-| **Vision** | rev **341** |
+| **Vision** | rev **342** |
 | **Cursor** | local **3.12.29** · [`CURSOR_UPDATE_RESEARCH_2026-07-21.md`](./CURSOR_UPDATE_RESEARCH_2026-07-21.md) |
 
 ---

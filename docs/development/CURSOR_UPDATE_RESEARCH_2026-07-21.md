@@ -2,7 +2,7 @@
 
 **Дата:** 2026-07-21 (service band PH-SVC11…SVC20) · **Cursor:** 3.12.29 · **Rust:** 1.92.0 · **Git:** 2.50.0
 
-**Операційний зріз:** §5.12 **0** (band 58 **PH-S1219…S1228** ✅) · horizon band 59 → **PH-S1229…S1238** · vision **rev 341** (`--check` ok) · rust_ratio **94.83%**.
+**Операційний зріз:** §5.12 **0** (band 58 **PH-S1219…S1228** ✅) · horizon band 59 → **PH-S1229…S1238** · vision **rev 342** (`--check` ok) · rust_ratio **94.83%**.
 
 **Попередній зріз:** [`CURSOR_UPDATE_RESEARCH_2026-07-17.md`](./CURSOR_UPDATE_RESEARCH_2026-07-17.md) (Cursor 3.12.17).
 

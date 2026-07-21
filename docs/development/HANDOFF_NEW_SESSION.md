@@ -21,7 +21,7 @@
 | **PH-S1227** | Ratio hold advisory |
 | **PH-S1228** | Band close |
 
-**§5.12:** **0** відкритих (band 58 ✅). **Vision:** rev **341** (після sync). **Enterprise pending:** 920 (→ PH-S2148).
+**§5.12:** **0** відкритих (band 58 ✅). **Vision:** rev **342** (після sync). **Enterprise pending:** 920 (→ PH-S2148).
 
 **PH-S1228 ✅ (2026-07-21):** `tenant_vision_sync_depth.rs`; slice aggregate; `--tenant-vision-sync`; `VERIFY_TENANT_VISION_SYNC`; `TENANT_VISION_SYNC.md`; `galaxy_horizon_s1219_integration`.
 

@@ -2504,6 +2504,12 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_development_TENANT_VISION_SYNC_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_CURSOR_UPDATE_RESEARCH_2026_07_21_md"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -10166,9 +10172,16 @@
       "label": "tenant_vision_sync_integration.rs",
       "layer": "L3",
       "path": "tests/tenant_vision_sync_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_CURSOR_UPDATE_RESEARCH_2026_07_21_md",
+      "label": "CURSOR_UPDATE_RESEARCH_2026-07-21.md",
+      "layer": "L1",
+      "path": "docs/development/CURSOR_UPDATE_RESEARCH_2026-07-21.md"
     }
   ],
-  "revision": 341,
+  "revision": 342,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
