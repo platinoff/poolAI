@@ -64,6 +64,7 @@ Options (quick):
   --tenant-store        After health wait, run poolai-loc-audit --tenant-store (PH-S1162)
   --tenant-api          After health wait, run poolai-loc-audit --tenant-api (PH-S1175)
   --tenant-admin-ops    After health wait, run poolai-loc-audit --tenant-admin-ops (PH-S1184)
+  --tenant-stand-smoke  After health wait, live stand-smoke + loc-audit --tenant-stand-smoke (PH-S1194)
   --skip-build    Skip cargo build
   --port N        HTTP port (default 8080)
 
@@ -251,6 +252,7 @@ cmd_quick() {
   local tenant_store=0
   local tenant_api=0
   local tenant_admin_ops=0
+  local tenant_stand_smoke=0
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --skip-build) SKIP_BUILD=1; shift ;;
@@ -264,6 +266,7 @@ cmd_quick() {
       --tenant-store) tenant_store=1; shift ;;
       --tenant-api) tenant_api=1; shift ;;
       --tenant-admin-ops) tenant_admin_ops=1; shift ;;
+      --tenant-stand-smoke) tenant_stand_smoke=1; shift ;;
       --port) PORT="$2"; shift 2 ;;
       *) echo "Unknown option: $1"; usage; exit 1 ;;
     esac
@@ -313,6 +316,13 @@ cmd_quick() {
   if [[ "$tenant_admin_ops" == "1" ]]; then
     echo "Running poolai-loc-audit --tenant-admin-ops (PH-S1184)..."
     cargo run --quiet --bin poolai-loc-audit -- --tenant-admin-ops
+  fi
+  if [[ "$tenant_stand_smoke" == "1" ]]; then
+    export POOLAI_BASE_URL="http://127.0.0.1:${PORT}"
+    echo "Running poolai-http-stand-smoke --tenant-stand-smoke (PH-S1195)..."
+    cargo run --quiet --bin poolai-http-stand-smoke -- --tenant-stand-smoke
+    echo "Running poolai-loc-audit --tenant-stand-smoke (PH-S1194)..."
+    cargo run --quiet --bin poolai-loc-audit -- --tenant-stand-smoke
   fi
 }
 

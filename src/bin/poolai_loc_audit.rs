@@ -32,6 +32,9 @@ use poolai_ui_core::tenant_depth::{tenant_criteria_total, TENANT_CASES, TENANT_C
 use poolai_ui_core::tenant_persistence_depth::{
     tenant_persist_criteria_total, TENANT_PERSIST_CASES, TENANT_PERSIST_CRITERIA,
 };
+use poolai_ui_core::tenant_stand_smoke_depth::{
+    tenant_stand_smoke_criteria_total, TENANT_STAND_SMOKE_CASES, TENANT_STAND_SMOKE_CRITERIA,
+};
 use serde::Serialize;
 use std::collections::BTreeMap;
 use std::fs;
@@ -126,6 +129,8 @@ struct AuditConfig {
     tenant_api: bool,
     /// Emit band-54 tenant admin/ops fields (PH-S1185).
     tenant_admin_ops: bool,
+    /// Emit band-55 tenant stand-smoke fields (PH-S1194).
+    tenant_stand_smoke: bool,
 }
 
 impl Default for AuditConfig {
@@ -145,6 +150,7 @@ impl Default for AuditConfig {
             tenant_store: false,
             tenant_api: false,
             tenant_admin_ops: false,
+            tenant_stand_smoke: false,
         }
     }
 }
@@ -256,6 +262,12 @@ struct RustRatioReport {
     tenant_admin_ops_criteria_total: usize,
     /// Tenant admin/ops criteria met count (PH-S1185).
     tenant_admin_ops_criteria_met_count: usize,
+    /// Band-55 tenant stand-smoke mode (PH-S1194).
+    tenant_stand_smoke_mode: bool,
+    /// Tenant stand-smoke criteria registry size (PH-S1194).
+    tenant_stand_smoke_criteria_total: usize,
+    /// Tenant stand-smoke criteria met count (PH-S1194).
+    tenant_stand_smoke_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -420,6 +432,22 @@ fn audit_tenant_admin_ops_criteria_met(root: &Path) -> (usize, usize) {
     (met, total)
 }
 
+fn audit_tenant_stand_smoke_criteria_met(root: &Path) -> (usize, usize) {
+    let total = tenant_stand_smoke_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in TENANT_STAND_SMOKE_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
 fn classify_product_path(path: &str) -> ProductCategory {
     let p = path.replace('\\', "/");
     if p.starts_with("src/") && p.ends_with(".rs") {
@@ -520,6 +548,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--tenant-store" => config.tenant_store = true,
             "--tenant-api" => config.tenant_api = true,
             "--tenant-admin-ops" => config.tenant_admin_ops = true,
+            "--tenant-stand-smoke" => config.tenant_stand_smoke = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
                 print_help();
@@ -551,6 +580,7 @@ fn print_help() {
            --tenant-store              band-52 tenant store-wire fields (PH-S1164)\n\
            --tenant-api                band-53 tenant HTTP API contracts fields (PH-S1176)\n\
            --tenant-admin-ops          band-54 tenant admin/ops fields (PH-S1185)\n\
+           --tenant-stand-smoke        band-55 tenant stand-smoke fields (PH-S1194)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -731,6 +761,17 @@ fn build_report(
         notes.push("PH-S1185: tenant_admin_ops_mode — store strip / usage+quota / verify hooks");
         notes.push("PH-S1188: band 54 tenant admin/ops — criteria met vs registry");
     }
+    let (tenant_stand_smoke_criteria_met_count, tenant_stand_smoke_criteria_total_count) =
+        if config.tenant_stand_smoke {
+            audit_tenant_stand_smoke_criteria_met(root)
+        } else {
+            (0, tenant_stand_smoke_criteria_total())
+        };
+    if config.tenant_stand_smoke {
+        notes
+            .push("PH-S1194: tenant_stand_smoke_mode — live store/CRUD/usage+quota + verify hooks");
+        notes.push("PH-S1198: band 55 tenant stand-smoke — criteria met vs registry");
+    }
 
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
@@ -789,6 +830,9 @@ fn build_report(
         tenant_admin_ops_mode: config.tenant_admin_ops,
         tenant_admin_ops_criteria_total: tenant_admin_ops_criteria_total_count,
         tenant_admin_ops_criteria_met_count,
+        tenant_stand_smoke_mode: config.tenant_stand_smoke,
+        tenant_stand_smoke_criteria_total: tenant_stand_smoke_criteria_total_count,
+        tenant_stand_smoke_criteria_met_count,
         by_category,
         notes,
     })
@@ -931,6 +975,17 @@ fn print_summary(report: &RustRatioReport) {
         println!(
             "  tenant_admin_ops_cases: {}",
             TENANT_ADMIN_OPS_CASES.join(", ")
+        );
+    }
+    if report.tenant_stand_smoke_mode {
+        println!("  tenant_stand_smoke:    true (PH-S1194 band 55)");
+        println!(
+            "  tenant_stand_smoke_criteria: {}/{} met",
+            report.tenant_stand_smoke_criteria_met_count, report.tenant_stand_smoke_criteria_total
+        );
+        println!(
+            "  tenant_stand_smoke_cases: {}",
+            TENANT_STAND_SMOKE_CASES.join(", ")
         );
     }
     for (name, loc) in &report.by_category {

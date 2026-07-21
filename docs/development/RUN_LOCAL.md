@@ -24,7 +24,7 @@ cd S:\rust\poolAI
 .\bin\run-poolai.ps1 stop
 ```
 
-**Last updated:** 2026-07-20 (PH-S1188 band 54 · `--tenant-admin-ops` · `VERIFY_TENANT_ADMIN_OPS` · enterprise admin/ops glue)
+**Last updated:** 2026-07-21 (PH-S1198 band 55 · `--tenant-stand-smoke` · `VERIFY_TENANT_STAND_SMOKE` · enterprise live tenant stand smoke)
 
 ### PH-S1011 / PH-S1012: Light compile + quick preset
 
@@ -48,7 +48,7 @@ cd S:\rust\poolAI
 | **full** | `enterprise,ml,cloud,test-utils` | `run-poolai build` default |
 | **light** (`--light`) | `enterprise,test-utils` | PH-S1011 faster compile |
 
-`quick` restores `data/dev/last_run.json` port when present (PH-S1014), runs light build unless `--skip-build`, starts `single --bg`, waits for `/api/v1/health`. Optional **`--stand-smoke`** (PH-S1095) runs `poolai-http-stand-smoke --run-local-smoke` after health OK. Optional **`--migration-advisory`** (PH-S1104) runs `poolai-loc-audit --migration-advisory` after health OK. Optional **`--stable-touchup`** (PH-S1114) runs `poolai-loc-audit --stable-touchup` after health OK. Optional **`--edge-verification`** (PH-S1125) runs `poolai-loc-audit --edge-verification-advisory` after health OK. Optional **`--pre-push-canon`** (PH-S1134) runs `poolai-loc-audit --pre-push-canon` after health OK. Optional **`--ci-canon`** (PH-S1143) runs `poolai-loc-audit --ci-canon` + `poolai-openapi-gap-audit` after health OK. Optional **`--tenant-persist`** (PH-S1154) runs `poolai-loc-audit --tenant-persist` after health OK. Optional **`--tenant-store`** (PH-S1162) runs `poolai-loc-audit --tenant-store` after health OK. Optional **`--tenant-api`** (PH-S1175) runs `poolai-loc-audit --tenant-api` after health OK.
+`quick` restores `data/dev/last_run.json` port when present (PH-S1014), runs light build unless `--skip-build`, starts `single --bg`, waits for `/api/v1/health`. Optional **`--stand-smoke`** (PH-S1095) runs `poolai-http-stand-smoke --run-local-smoke` after health OK. Optional **`--migration-advisory`** (PH-S1104) runs `poolai-loc-audit --migration-advisory` after health OK. Optional **`--stable-touchup`** (PH-S1114) runs `poolai-loc-audit --stable-touchup` after health OK. Optional **`--edge-verification`** (PH-S1125) runs `poolai-loc-audit --edge-verification-advisory` after health OK. Optional **`--pre-push-canon`** (PH-S1134) runs `poolai-loc-audit --pre-push-canon` after health OK. Optional **`--ci-canon`** (PH-S1143) runs `poolai-loc-audit --ci-canon` + `poolai-openapi-gap-audit` after health OK. Optional **`--tenant-persist`** (PH-S1154) runs `poolai-loc-audit --tenant-persist` after health OK. Optional **`--tenant-store`** (PH-S1162) runs `poolai-loc-audit --tenant-store` after health OK. Optional **`--tenant-api`** (PH-S1175) runs `poolai-loc-audit --tenant-api` after health OK. Optional **`--tenant-admin-ops`** (PH-S1184) runs `poolai-loc-audit --tenant-admin-ops` after health OK. Optional **`--tenant-stand-smoke`** (PH-S1195) runs live `poolai-http-stand-smoke --tenant-stand-smoke` + `poolai-loc-audit --tenant-stand-smoke` after health OK.
 
 ```bash
 /usr/bin/bash bin/run-poolai.sh quick --stand-smoke
@@ -61,10 +61,12 @@ cd S:\rust\poolAI
 /usr/bin/bash bin/run-poolai.sh quick --tenant-store
 /usr/bin/bash bin/run-poolai.sh quick --tenant-api
 /usr/bin/bash bin/run-poolai.sh quick --tenant-admin-ops
+/usr/bin/bash bin/run-poolai.sh quick --tenant-stand-smoke
 # PowerShell:
 .\bin\run-poolai.ps1 quick -StandSmoke
 .\bin\run-poolai.ps1 quick -MigrationAdvisory
 .\bin\run-poolai.ps1 quick -StableTouchup
+.\bin\run-poolai.ps1 quick -TenantStandSmoke
 ```
 
 ### PH-S1013: Vision easy launch
@@ -306,6 +308,7 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `VERIFY_TENANT_STORE=1` | `verify-dev-stand.sh` → `poolai-loc-audit --tenant-store` (PH-S1162) |
 | `VERIFY_TENANT_API=1` | `verify-dev-stand.sh` → `poolai-loc-audit --tenant-api` (PH-S1175) |
 | `VERIFY_TENANT_ADMIN_OPS=1` | `verify-dev-stand.sh` → `poolai-loc-audit --tenant-admin-ops` (PH-S1184) |
+| `VERIFY_TENANT_STAND_SMOKE=1` | `verify-dev-stand.sh` → live `--tenant-stand-smoke` + loc-audit (PH-S1195) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 ### PH-S1100: Rust migration advisory (band 46)
@@ -486,6 +489,30 @@ VERIFY_TENANT_ADMIN_OPS=1 bash bin/verify-dev-stand.sh
 | `tenant_admin_ops_criteria_met_count` | Criteria with marker present in canonical doc path |
 
 Module: [`tenant_admin_ops_depth.rs`](../../crates/poolai-ui-core/src/tenant_admin_ops_depth.rs) · tests: `tenant_admin_ops_integration.rs`, `galaxy_horizon_s1179_integration.rs` · docs: [`TENANT_ADMIN_OPS.md`](./TENANT_ADMIN_OPS.md).
+
+### PH-S1194: Tenant live stand smoke (band 55)
+
+Enterprise phase A live HTTP stand smoke for tenants (store / CRUD / usage+quota) plus loc-audit gate.
+
+```bash
+export POOLAI_BASE_URL=http://127.0.0.1:8080
+cargo run --bin poolai-http-stand-smoke -- --tenant-stand-smoke
+# or: POOLAI_STAND_SMOKE_TENANT=1
+
+cargo run --bin poolai-loc-audit -- --tenant-stand-smoke
+cargo run --bin poolai-loc-audit -- --tenant-stand-smoke --advisory --min-ratio 0.95
+
+VERIFY_TENANT_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
+/usr/bin/bash bin/run-poolai.sh quick --tenant-stand-smoke
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `tenant_stand_smoke_mode` | `true` when `--tenant-stand-smoke` (PH-S1194) |
+| `tenant_stand_smoke_criteria_total` | Tenant stand-smoke criteria registry size |
+| `tenant_stand_smoke_criteria_met_count` | Criteria with marker present in canonical doc path |
+
+Module: [`tenant_stand_smoke_depth.rs`](../../crates/poolai-ui-core/src/tenant_stand_smoke_depth.rs) · tests: `tenant_stand_smoke_integration.rs`, `galaxy_horizon_s1189_integration.rs` · docs: [`TENANT_STAND_SMOKE.md`](./TENANT_STAND_SMOKE.md).
 
 Default stand smoke includes **`vision_revision_parity`** (PH-S208, PH-S235): repo `manifest.revision` vs FM §5.12 `Vision rev`, `extensions.active_sprint` vs `manifest.next_sprint`, then `GET /docs/vision/manifest.json` with `X-PoolAI-Vision-Revision` header vs JSON body.
 

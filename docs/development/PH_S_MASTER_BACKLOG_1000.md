@@ -1,6 +1,6 @@
 # PH-S master backlog 1000 (enterprise horizon v2)
 
-**Generated:** 2026-07-20 · **Range:** PH-S1149…PH-S2148 · **Pending:** **960** (band 54 ✅) · **Enterprise roadmap v2**
+**Generated:** 2026-07-21 · **Range:** PH-S1149…PH-S2148 · **Pending:** **950** (band 55 ✅) · **Enterprise roadmap v2**
 
 **VDT:** один `абракадабра` = drain **10** з FM §5.12 → vision close → push → promote наступні 10.
 
@@ -14,8 +14,8 @@
 | 52 | PH-S1159…S1168 | A Tenants · store wire **✅ drained** |
 | 53 | PH-S1169…S1178 | A Tenants · API contracts **✅ drained** |
 | 54 | PH-S1179…S1188 | A Tenants · admin/ops glue **✅** |
-| 55 | PH-S1189…S1198 | A Tenants · stand smoke **active next** |
-| 56 | PH-S1199…S1208 | A Tenants · loc-audit |
+| 55 | PH-S1189…S1198 | A Tenants · stand smoke **✅** |
+| 56 | PH-S1199…S1208 | A Tenants · loc-audit **active next** |
 | 57 | PH-S1209…S1218 | A Tenants · docs canon |
 | 58 | PH-S1219…S1228 | A Tenants · vision-sync |
 | 59 | PH-S1229…S1238 | A Tenants · ratio advisory |
@@ -177,16 +177,16 @@
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1189** | `tenant_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1190** | `tenant` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1191** | `tenant` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1192** | `tenant` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1193** | Stand smoke `tenant` export | export shape unit test | **[ ]** |
-| **PH-S1194** | poolai-loc-audit PH-S1194 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1195** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1196** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1197** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1198** | galaxy_horizon_s1189_integration | band close | **[ ]** |
+| **PH-S1189** | `tenant_stand_smoke_depth` | ui-core depth enum + criteria registry | **✅** |
+| **PH-S1190** | Live store wire smoke | `GET /tenants/store` shape + integration | **✅** |
+| **PH-S1191** | Live CRUD smoke | list→create→get→delete | **✅** |
+| **PH-S1192** | Live usage/quota/isolation | allow/deny + foreign 404 | **✅** |
+| **PH-S1193** | CLI `--tenant-stand-smoke` | live suite + export shape | **✅** |
+| **PH-S1194** | `poolai-loc-audit --tenant-stand-smoke` | `rust_ratio.json` fields | **✅** |
+| **PH-S1195** | `VERIFY_TENANT_STAND_SMOKE` | live + loc-audit verify | **✅** |
+| **PH-S1196** | `TENANT_STAND_SMOKE.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | **✅** |
+| **PH-S1197** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
+| **PH-S1198** | `galaxy_horizon_s1189_integration` | band close | **✅** |
 
 ## Band 56 — PH-S1199…S1208 (A Tenants · loc-audit)
 

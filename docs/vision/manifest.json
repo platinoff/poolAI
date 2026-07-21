@@ -2493,7 +2493,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1189",
+  "next_sprint": "PH-S1199",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -10008,7 +10008,7 @@
       "path": "tests/tenant_admin_ops_integration.rs"
     }
   ],
-  "revision": 333,
+  "revision": 334,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",

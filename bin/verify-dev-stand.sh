@@ -26,6 +26,7 @@ VERIFY_TENANT_PERSIST="${VERIFY_TENANT_PERSIST:-0}"
 VERIFY_TENANT_STORE="${VERIFY_TENANT_STORE:-0}"
 VERIFY_TENANT_API="${VERIFY_TENANT_API:-0}"
 VERIFY_TENANT_ADMIN_OPS="${VERIFY_TENANT_ADMIN_OPS:-0}"
+VERIFY_TENANT_STAND_SMOKE="${VERIFY_TENANT_STAND_SMOKE:-0}"
 HEALTH_RETRIES="${VERIFY_HEALTH_RETRIES:-45}"
 HEALTH_SLEEP="${VERIFY_HEALTH_SLEEP:-2}"
 
@@ -375,6 +376,24 @@ if [[ "$VERIFY_TENANT_ADMIN_OPS" == "1" ]]; then
     echo "OK  tenant admin/ops gate loc-audit"
   else
     echo "FAIL tenant admin/ops gate loc-audit"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_TENANT_STAND_SMOKE" == "1" ]]; then
+  export POOLAI_BASE_URL="$COORD_URL"
+  echo "Running poolai-http-stand-smoke --tenant-stand-smoke (PH-S1195)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-http-stand-smoke -- --tenant-stand-smoke); then
+    echo "OK  tenant stand-smoke live suite"
+  else
+    echo "FAIL tenant stand-smoke live suite"
+    fail=1
+  fi
+  echo "Running poolai-loc-audit --tenant-stand-smoke (PH-S1194)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --tenant-stand-smoke); then
+    echo "OK  tenant stand-smoke gate loc-audit"
+  else
+    echo "FAIL tenant stand-smoke gate loc-audit"
     fail=1
   fi
 fi

@@ -6,6 +6,7 @@
 |------|----------|
 | **Completion plan** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.14–§5.15** ✅ |
 | **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) — **351/351** ✅ |
+| **Last closed (band 55)** | PH-S1198 ✅ — Tenant live stand smoke · `tenant_stand_smoke_depth` + `--tenant-stand-smoke` · store/CRUD/usage live suite |
 | **Last closed (band 54)** | PH-S1188 ✅ — Tenant admin/ops glue · `tenant_admin_ops_depth` + `--tenant-admin-ops` · store strip + usage/quota |
 | **Last closed (band 52)** | PH-S1168 ✅ — Tenant store wire · `tenant_depth` + `--tenant-store` · `tenant_store_wire()` durable path stub |
 | **Last closed (band 50)** | PH-S1148 ✅ — CI canon gate · `ci_canon_depth` + `--ci-canon` + `VERIFY_CI_CANON` |

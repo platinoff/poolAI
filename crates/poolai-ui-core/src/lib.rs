@@ -53,6 +53,7 @@ pub mod tenant_admin_ops_depth;
 pub mod tenant_api_contracts_depth;
 pub mod tenant_depth;
 pub mod tenant_persistence_depth;
+pub mod tenant_stand_smoke_depth;
 pub mod theme;
 pub mod topology;
 pub mod trust;

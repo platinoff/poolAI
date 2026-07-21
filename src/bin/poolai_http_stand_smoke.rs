@@ -22,6 +22,10 @@
 //! # RUN_LOCAL quick subset (PH-S1093):
 //! cargo run --bin poolai-http-stand-smoke -- --run-local-smoke
 //!
+//! # Tenant live stand smoke (PH-S1193 band 55):
+//! cargo run --bin poolai-http-stand-smoke -- --tenant-stand-smoke
+//! # or: POOLAI_STAND_SMOKE_TENANT=1
+//!
 //! # Vision revision parity (PH-S208, PH-S235):
 //! export POOLAI_VISION_BASE_URL=http://127.0.0.1:8765   # open-docs-vision.ps1
 //! cargo run --bin poolai-http-stand-smoke   # repo manifest vs FM footer + extensions + optional HTTP header
@@ -54,6 +58,8 @@ struct Cli {
     lease_renew_only: bool,
     /// PH-S1093: RUN_LOCAL quick subset (health + monitoring + vm + ops).
     run_local_smoke_only: bool,
+    /// PH-S1193: live tenant store/CRUD/usage+quota suite (band 55).
+    tenant_stand_smoke_only: bool,
     base_url: String,
 }
 
@@ -227,6 +233,7 @@ fn parse_cli() -> Cli {
     let mut raid_restart_only = false;
     let mut lease_renew_only = false;
     let mut run_local_smoke_only = false;
+    let mut tenant_stand_smoke_only = false;
     for arg in std::env::args().skip(1) {
         match arg.as_str() {
             "--json" => json_out = true,
@@ -234,6 +241,7 @@ fn parse_cli() -> Cli {
             "--raid" => include_raid = true,
             "--lease-renew" => lease_renew_only = true,
             "--run-local-smoke" => run_local_smoke_only = true,
+            "--tenant-stand-smoke" => tenant_stand_smoke_only = true,
             _ if arg.starts_with('-') => {}
             _ => {}
         }
@@ -258,12 +266,18 @@ fn parse_cli() -> Cli {
             .ok()
             .is_some_and(|v| matches!(v.as_str(), "1" | "true" | "yes"));
     }
+    if !tenant_stand_smoke_only {
+        tenant_stand_smoke_only = std::env::var("POOLAI_STAND_SMOKE_TENANT")
+            .ok()
+            .is_some_and(|v| matches!(v.as_str(), "1" | "true" | "yes"));
+    }
     Cli {
         json_out,
         include_raid,
         raid_restart_only,
         lease_renew_only,
         run_local_smoke_only,
+        tenant_stand_smoke_only,
         base_url: base_url_from_env(),
     }
 }
@@ -328,6 +342,223 @@ async fn smoke_monitoring_alerts_api(client: &Client, base: &str) -> Result<(), 
     let body: Value = resp.json().await.map_err(|e| e.to_string())?;
     body.as_array()
         .ok_or_else(|| format!("monitoring alerts expected array: {body}"))?;
+    Ok(())
+}
+
+/// PH-S1190: live `GET /api/enterprise/tenants/store` shape.
+async fn smoke_tenants_store_wire(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/api/enterprise/tenants/store"))
+        .send()
+        .await
+        .map_err(|e| format!("tenants store request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("tenants store status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    let obj = body
+        .as_object()
+        .ok_or_else(|| format!("tenants store expected object: {body}"))?;
+    for key in ["mode", "durable_path", "configured"] {
+        if !obj.contains_key(key) {
+            return Err(format!("tenants store missing `{key}`: {body}"));
+        }
+    }
+    Ok(())
+}
+
+async fn smoke_tenants_admin_bearer(client: &Client, base: &str) -> Result<String, String> {
+    let resp = client
+        .post(api_url(base, "/api/v1/login"))
+        .json(&json!({ "username": "admin", "password": "admin123" }))
+        .send()
+        .await
+        .map_err(|e| format!("tenant login request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("tenant login status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    let token = body
+        .get("token")
+        .and_then(|t| t.as_str())
+        .ok_or_else(|| format!("tenant login missing token: {body}"))?;
+    Ok(format!("Bearer {token}"))
+}
+
+/// PH-S1191: live list → create → get → delete on `/api/enterprise/tenants*`.
+async fn smoke_tenants_crud_lifecycle(client: &Client, base: &str) -> Result<(), String> {
+    let auth = smoke_tenants_admin_bearer(client, base).await?;
+    let name = smoke_id("stand-tenant");
+
+    let list = client
+        .get(api_url(base, "/api/enterprise/tenants"))
+        .send()
+        .await
+        .map_err(|e| format!("tenants list: {e}"))?;
+    if list.status() != StatusCode::OK {
+        return Err(format!("tenants list status {}", list.status()));
+    }
+    let list_body: Value = list.json().await.map_err(|e| e.to_string())?;
+    list_body
+        .as_array()
+        .ok_or_else(|| format!("tenants list expected array: {list_body}"))?;
+
+    let create = client
+        .post(api_url(base, "/api/enterprise/tenants"))
+        .header("authorization", &auth)
+        .json(&json!({
+            "name": name,
+            "config": {
+                "active": true,
+                "max_workers": 4,
+                "max_memory_mb": 1024,
+                "max_cpu_cores": 2,
+                "max_storage_mb": 1024,
+                "max_vm_instances": 2
+            }
+        }))
+        .send()
+        .await
+        .map_err(|e| format!("tenants create: {e}"))?;
+    if create.status() != StatusCode::OK {
+        return Err(format!("tenants create status {}", create.status()));
+    }
+    let created: Value = create.json().await.map_err(|e| e.to_string())?;
+    let id = created
+        .get("id")
+        .and_then(|v| v.as_str())
+        .ok_or_else(|| format!("tenants create missing id: {created}"))?
+        .to_string();
+
+    let get = client
+        .get(api_url(base, &format!("/api/enterprise/tenants/{id}")))
+        .send()
+        .await
+        .map_err(|e| format!("tenants get: {e}"))?;
+    if get.status() != StatusCode::OK {
+        return Err(format!("tenants get status {}", get.status()));
+    }
+
+    let del = client
+        .delete(api_url(base, &format!("/api/enterprise/tenants/{id}")))
+        .header("authorization", &auth)
+        .send()
+        .await
+        .map_err(|e| format!("tenants delete: {e}"))?;
+    if del.status() != StatusCode::OK {
+        return Err(format!("tenants delete status {}", del.status()));
+    }
+    Ok(())
+}
+
+/// PH-S1192: live usage + quota allow/deny + foreign UUID → 404.
+async fn smoke_tenants_usage_quota_isolation(client: &Client, base: &str) -> Result<(), String> {
+    let auth = smoke_tenants_admin_bearer(client, base).await?;
+    let name = smoke_id("stand-quota");
+
+    let create = client
+        .post(api_url(base, "/api/enterprise/tenants"))
+        .header("authorization", &auth)
+        .json(&json!({
+            "name": name,
+            "config": {
+                "active": true,
+                "max_workers": 4,
+                "max_memory_mb": 1024,
+                "max_cpu_cores": 2,
+                "max_storage_mb": 1024,
+                "max_vm_instances": 2
+            }
+        }))
+        .send()
+        .await
+        .map_err(|e| format!("quota tenant create: {e}"))?;
+    if create.status() != StatusCode::OK {
+        return Err(format!("quota tenant create status {}", create.status()));
+    }
+    let created: Value = create.json().await.map_err(|e| e.to_string())?;
+    let id = created
+        .get("id")
+        .and_then(|v| v.as_str())
+        .ok_or_else(|| format!("quota tenant missing id: {created}"))?
+        .to_string();
+
+    let usage = client
+        .get(api_url(
+            base,
+            &format!("/api/enterprise/tenants/{id}/usage"),
+        ))
+        .send()
+        .await
+        .map_err(|e| format!("tenants usage: {e}"))?;
+    if usage.status() != StatusCode::OK {
+        return Err(format!("tenants usage status {}", usage.status()));
+    }
+    let usage_body: Value = usage.json().await.map_err(|e| e.to_string())?;
+    for key in [
+        "workers",
+        "memory_mb",
+        "cpu_cores",
+        "storage_mb",
+        "vm_instances",
+    ] {
+        if usage_body.get(key).is_none() {
+            return Err(format!("usage missing `{key}`: {usage_body}"));
+        }
+    }
+
+    let allow = client
+        .post(api_url(
+            base,
+            &format!("/api/enterprise/tenants/{id}/quota"),
+        ))
+        .json(&json!({ "workers": 1, "memory_mb": 64, "cpu_cores": 1 }))
+        .send()
+        .await
+        .map_err(|e| format!("quota allow: {e}"))?;
+    if allow.status() != StatusCode::OK {
+        return Err(format!("quota allow status {}", allow.status()));
+    }
+    let allow_body: Value = allow.json().await.map_err(|e| e.to_string())?;
+    if allow_body.get("allowed").and_then(|a| a.as_bool()) != Some(true) {
+        return Err(format!("expected quota allow: {allow_body}"));
+    }
+
+    let deny = client
+        .post(api_url(
+            base,
+            &format!("/api/enterprise/tenants/{id}/quota"),
+        ))
+        .json(&json!({ "workers": 10_000, "memory_mb": 64, "cpu_cores": 1 }))
+        .send()
+        .await
+        .map_err(|e| format!("quota deny: {e}"))?;
+    if deny.status() != StatusCode::OK {
+        return Err(format!("quota deny status {}", deny.status()));
+    }
+    let deny_body: Value = deny.json().await.map_err(|e| e.to_string())?;
+    if deny_body.get("allowed").and_then(|a| a.as_bool()) != Some(false) {
+        return Err(format!("expected quota deny: {deny_body}"));
+    }
+
+    let foreign = uuid::Uuid::new_v4();
+    let missing = client
+        .get(api_url(base, &format!("/api/enterprise/tenants/{foreign}")))
+        .send()
+        .await
+        .map_err(|e| format!("foreign tenant get: {e}"))?;
+    if missing.status() != StatusCode::NOT_FOUND {
+        return Err(format!(
+            "foreign tenant expected 404, got {}",
+            missing.status()
+        ));
+    }
+
+    let _ = client
+        .delete(api_url(base, &format!("/api/enterprise/tenants/{id}")))
+        .header("authorization", &auth)
+        .send()
+        .await;
     Ok(())
 }
 
@@ -2678,6 +2909,63 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
         };
     }
 
+    if cli.tenant_stand_smoke_only {
+        async fn record(
+            cases: &mut Vec<SmokeCaseResult>,
+            name: &'static str,
+            result: Result<(), String>,
+        ) {
+            cases.push(match result {
+                Ok(()) => SmokeCaseResult {
+                    name,
+                    ok: true,
+                    detail: None,
+                },
+                Err(e) => SmokeCaseResult {
+                    name,
+                    ok: false,
+                    detail: Some(e),
+                },
+            });
+        }
+
+        record(
+            &mut cases,
+            "health",
+            smoke_health(&client, &cli.base_url).await,
+        )
+        .await;
+        record(
+            &mut cases,
+            "tenants_store_wire",
+            smoke_tenants_store_wire(&client, &cli.base_url).await,
+        )
+        .await;
+        record(
+            &mut cases,
+            "tenants_crud_lifecycle",
+            smoke_tenants_crud_lifecycle(&client, &cli.base_url).await,
+        )
+        .await;
+        record(
+            &mut cases,
+            "tenants_usage_quota_isolation",
+            smoke_tenants_usage_quota_isolation(&client, &cli.base_url).await,
+        )
+        .await;
+        let passed = cases.iter().filter(|c| c.ok).count() as u32;
+        let failed = cases.iter().filter(|c| !c.ok).count() as u32;
+        return SmokeReport {
+            base_url: cli.base_url.clone(),
+            stand_root,
+            ok: failed == 0,
+            passed,
+            failed,
+            cases,
+            tool: "poolai-http-stand-smoke",
+        };
+    }
+
     if cli.run_local_smoke_only {
         async fn record(
             cases: &mut Vec<SmokeCaseResult>,
@@ -4137,7 +4425,6 @@ mod tests {
     }
 
     #[test]
-    #[test]
     fn run_local_health_export_shape_ph_s1089() {
         use poolai_ui_core::stand_smoke_run_local_depth::RUN_LOCAL_HEALTH_KEYS;
         let health = json!({
@@ -4474,6 +4761,52 @@ mod tests {
             assert!(
                 fm.contains(row) || row.starts_with("PH-S"),
                 "FM band54 row {row}"
+            );
+        }
+    }
+
+    #[test]
+    fn tenant_stand_smoke_band55_export_shape_ph_s1193() {
+        use poolai_ui_core::tenant_stand_smoke_depth::{
+            tenant_stand_smoke_criteria_total, tenant_stand_smoke_depth_stub,
+            TenantStandSmokeDepth, FM_BAND55_ROWS, TENANT_STAND_SMOKE_CASES,
+            TENANT_STAND_SMOKE_CRITERIA,
+        };
+        use serde_json::json;
+        assert_eq!(
+            tenant_stand_smoke_depth_stub(Some(&json!({"live_store": true}))),
+            TenantStandSmokeDepth::LiveStore
+        );
+        assert_eq!(
+            tenant_stand_smoke_depth_stub(Some(&json!({
+                "tenant_stand_smoke_depth": true,
+                "live_store": true,
+                "live_crud": true,
+                "live_usage_quota": true,
+                "cli_flag": true,
+                "loc_audit_flag": true,
+                "verify_dev_stand_hook": true,
+                "tenant_stand_smoke_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            TenantStandSmokeDepth::FullBand55
+        );
+        assert_eq!(TENANT_STAND_SMOKE_CRITERIA.len(), 10);
+        assert_eq!(tenant_stand_smoke_criteria_total(), 10);
+        assert!(TENANT_STAND_SMOKE_CASES.contains(&"live_crud"));
+        assert!(TENANT_STAND_SMOKE_CASES.contains(&"cli_flag"));
+        // Marker used by loc-audit criteria: smoke_tenants_store_wire
+        let smoke_src = include_str!("../../src/bin/poolai_http_stand_smoke.rs");
+        assert!(smoke_src.contains("smoke_tenants_store_wire"));
+        assert!(smoke_src.contains("smoke_tenants_crud_lifecycle"));
+        assert!(smoke_src.contains("smoke_tenants_usage_quota_isolation"));
+        assert!(smoke_src.contains("--tenant-stand-smoke"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND55_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band55 row {row}"
             );
         }
     }

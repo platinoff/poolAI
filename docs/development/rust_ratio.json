@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-20",
+  "generated_at": "2026-07-21",
   "sprint": "PH-S1010",
   "formal_band_min": 0.9,
   "formal_band_max": 0.95,
@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 160311,
-  "non_rust_product_loc": 8764,
-  "product_loc_total": 169075,
-  "rust_ratio": 0.9481650155256542,
-  "rust_ratio_pct": 94.81650155256543,
+  "rust_loc": 161017,
+  "non_rust_product_loc": 8802,
+  "product_loc_total": 169819,
+  "rust_ratio": 0.9481683439426684,
+  "rust_ratio_pct": 94.81683439426683,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -52,9 +52,12 @@
   "tenant_api_mode": false,
   "tenant_api_criteria_total": 10,
   "tenant_api_criteria_met_count": 0,
-  "tenant_admin_ops_mode": true,
+  "tenant_admin_ops_mode": false,
   "tenant_admin_ops_criteria_total": 10,
-  "tenant_admin_ops_criteria_met_count": 10,
+  "tenant_admin_ops_criteria_met_count": 0,
+  "tenant_stand_smoke_mode": true,
+  "tenant_stand_smoke_criteria_total": 10,
+  "tenant_stand_smoke_criteria_met_count": 10,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -62,27 +65,27 @@
     },
     "ops_ps1": {
       "files": 16,
-      "loc": 1487
+      "loc": 1497
     },
     "ops_shell": {
       "files": 38,
-      "loc": 3073
+      "loc": 3101
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 72,
-      "loc": 15259
+      "files": 73,
+      "loc": 15472
     },
     "rust_src": {
       "files": 300,
-      "loc": 108737
+      "loc": 109107
     },
     "rust_tests": {
-      "files": 250,
-      "loc": 35707
+      "files": 252,
+      "loc": 35830
     },
     "ui_css": {
       "files": 2,
@@ -113,7 +116,7 @@
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
     "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
-    "PH-S1185: tenant_admin_ops_mode — store strip / usage+quota / verify hooks",
-    "PH-S1188: band 54 tenant admin/ops — criteria met vs registry"
+    "PH-S1194: tenant_stand_smoke_mode — live store/CRUD/usage+quota + verify hooks",
+    "PH-S1198: band 55 tenant stand-smoke — criteria met vs registry"
   ]
 }
