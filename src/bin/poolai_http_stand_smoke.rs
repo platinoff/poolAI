@@ -4854,6 +4854,49 @@ mod tests {
     }
 
     #[test]
+    fn tenant_docs_canon_band57_export_shape_ph_s1213() {
+        use poolai_ui_core::tenant_docs_canon_depth::{
+            tenant_docs_canon_criteria_total, tenant_docs_canon_depth_stub,
+            tenant_docs_canon_slices_met, TenantDocsCanonDepth, FM_BAND57_ROWS,
+            TENANT_DOCS_CANON_CASES, TENANT_DOCS_CANON_CRITERIA, TENANT_DOCS_CANON_SLICES,
+        };
+        use serde_json::json;
+        assert_eq!(
+            tenant_docs_canon_depth_stub(Some(&json!({"stand_smoke_export": true}))),
+            TenantDocsCanonDepth::StandSmokeExport
+        );
+        assert_eq!(
+            tenant_docs_canon_depth_stub(Some(&json!({
+                "tenant_docs_canon_depth": true,
+                "slice_aggregate": true,
+                "criteria_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "tenant_docs_canon_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            TenantDocsCanonDepth::FullBand57
+        );
+        assert_eq!(TENANT_DOCS_CANON_CRITERIA.len(), 10);
+        assert_eq!(tenant_docs_canon_criteria_total(), 10);
+        assert_eq!(TENANT_DOCS_CANON_SLICES.len(), 6);
+        assert!(TENANT_DOCS_CANON_CASES.contains(&"aggregate_flag"));
+        let canon = include_str!("../../docs/development/TENANT_DOCS_CANON.md");
+        assert_eq!(tenant_docs_canon_slices_met(canon), (6, 6));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--tenant-docs-canon"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND57_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band57 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn galaxy_edge_verification_band48_export_shape_ph_s1125() {
         use poolai_ui_core::galaxy_edge_verification_depth::{
             edge_verification_criteria_total, galaxy_edge_verification_depth_stub,

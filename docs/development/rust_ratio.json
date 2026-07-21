@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 161647,
-  "non_rust_product_loc": 8825,
-  "product_loc_total": 170472,
-  "rust_ratio": 0.9482319677131729,
-  "rust_ratio_pct": 94.82319677131728,
+  "rust_loc": 162130,
+  "non_rust_product_loc": 8848,
+  "product_loc_total": 170978,
+  "rust_ratio": 0.9482506521306835,
+  "rust_ratio_pct": 94.82506521306834,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -55,12 +55,15 @@
   "tenant_admin_ops_mode": false,
   "tenant_admin_ops_criteria_total": 10,
   "tenant_admin_ops_criteria_met_count": 0,
-  "tenant_stand_smoke_mode": true,
+  "tenant_stand_smoke_mode": false,
   "tenant_stand_smoke_criteria_total": 10,
-  "tenant_stand_smoke_criteria_met_count": 10,
-  "tenant_loc_audit_mode": true,
+  "tenant_stand_smoke_criteria_met_count": 0,
+  "tenant_loc_audit_mode": false,
   "tenant_loc_audit_criteria_total": 10,
-  "tenant_loc_audit_criteria_met_count": 10,
+  "tenant_loc_audit_criteria_met_count": 0,
+  "tenant_docs_canon_mode": true,
+  "tenant_docs_canon_criteria_total": 10,
+  "tenant_docs_canon_criteria_met_count": 10,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -68,27 +71,27 @@
     },
     "ops_ps1": {
       "files": 16,
-      "loc": 1503
+      "loc": 1509
     },
     "ops_shell": {
       "files": 38,
-      "loc": 3118
+      "loc": 3135
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 74,
-      "loc": 15687
+      "files": 75,
+      "loc": 15918
     },
     "rust_src": {
       "files": 300,
-      "loc": 109203
+      "loc": 109299
     },
     "rust_tests": {
-      "files": 254,
-      "loc": 36149
+      "files": 256,
+      "loc": 36305
     },
     "ui_css": {
       "files": 2,
@@ -119,9 +122,7 @@
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
     "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
-    "PH-S1194: tenant_stand_smoke_mode — live store/CRUD/usage+quota + verify hooks",
-    "PH-S1198: band 55 tenant stand-smoke — criteria met vs registry",
-    "PH-S1204: tenant_loc_audit_mode — aggregate band 51–55 --tenant-* loc-audit slices",
-    "PH-S1208: band 56 tenant loc-audit — criteria met vs registry"
+    "PH-S1214: tenant_docs_canon_mode — aggregate band 51–56 TENANT_*.md canon docs",
+    "PH-S1218: band 57 tenant docs-canon — criteria met vs registry"
   ]
 }

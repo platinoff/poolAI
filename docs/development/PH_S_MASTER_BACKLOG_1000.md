@@ -16,9 +16,8 @@
 | 54 | PH-S1179…S1188 | A Tenants · admin/ops glue **✅** |
 | 55 | PH-S1189…S1198 | A Tenants · stand smoke **✅** |
 | 56 | PH-S1199…S1208 | A Tenants · loc-audit **✅ drained** |
-| 57 | PH-S1209…S1218 | A Tenants · docs canon **active next** |
-| 57 | PH-S1209…S1218 | A Tenants · docs canon |
-| 58 | PH-S1219…S1228 | A Tenants · vision-sync |
+| 57 | PH-S1209…S1218 | A Tenants · docs canon **✅ drained** |
+| 58 | PH-S1219…S1228 | A Tenants · vision-sync **active next** |
 | 59 | PH-S1229…S1238 | A Tenants · ratio advisory |
 | 60 | PH-S1239…S1248 | A Tenants · horizon close |
 | 61 | PH-S1249…S1258 | B SSO · depth scaffold |
@@ -208,16 +207,16 @@
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1209** | `tenant_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1210** | `tenant` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1211** | `tenant` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1212** | `tenant` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1213** | Stand smoke `tenant` export | export shape unit test | **[ ]** |
-| **PH-S1214** | poolai-loc-audit PH-S1214 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1215** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1216** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1217** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1218** | galaxy_horizon_s1209_integration | band close | **[ ]** |
+| **PH-S1209** | `tenant_docs_canon_depth` scaffold | ui-core depth enum + criteria registry | **✅** |
+| **PH-S1210** | `TENANT_DOCS_CANON_SLICES` | six `TENANT_*.md` present + unit test | **✅** |
+| **PH-S1211** | `tenant_docs_canon_integration` | criteria totals consistent | **✅** |
+| **PH-S1212** | `VERIFY_TENANT_DOCS_CANON` | verify-dev-stand + quick flag | **✅** |
+| **PH-S1213** | Stand smoke `tenant` export | `tenant_docs_canon_band57_export_shape` | **✅** |
+| **PH-S1214** | `poolai-loc-audit --tenant-docs-canon` | `tenant_docs_canon_*` in rust_ratio.json | **✅** |
+| **PH-S1215** | Docs `TENANT_DOCS_CANON.md` | RUN_LOCAL/INDEX/HANDOFF/NEXT | **✅** |
+| **PH-S1216** | poolai-vision-sync --check | drift gate green | **✅** |
+| **PH-S1217** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
+| **PH-S1218** | galaxy_horizon_s1209_integration | band close | **✅** |
 
 ## Band 58 — PH-S1219…S1228 (A Tenants · vision-sync)
 
