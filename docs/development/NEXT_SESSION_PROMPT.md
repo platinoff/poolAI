@@ -1,8 +1,8 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-07-21 (band 58 **PH-S1219…S1228** ✅ · horizon band 59)
+**Оновлено:** 2026-07-21 (service **PH-SVC11…SVC20** ✅ · Cursor **3.12.29** · band 58 ✅ · horizon band 59)
 
-Maintenance mode (FM §5.15) · band 58 drained.
+Maintenance mode (FM §5.15) · band 58 drained · Cursor rules re-checked (FM §5.16).
 
 Enterprise horizon v2 (FM §5.14b / §5.17) · backlog PH-S1149…S2148 · pending 920.
 
@@ -10,6 +10,7 @@ Enterprise horizon v2 (FM §5.14b / §5.17) · backlog PH-S1149…S2148 · pendi
 | **§5.12 active** | **0** (band 58 ✅) |
 | **Horizon** | band 59 → **PH-S1229…S1238** |
 | **Vision** | rev **341** |
+| **Cursor** | local **3.12.29** · [`CURSOR_UPDATE_RESEARCH_2026-07-21.md`](./CURSOR_UPDATE_RESEARCH_2026-07-21.md) |
 
 ---
 
@@ -33,4 +34,4 @@ Enterprise horizon v2 (FM §5.14b / §5.17) · backlog PH-S1149…S2148 · pendi
 
 ## Не повторювати
 
-Band 58 ✅ · band 57 ✅ · band 56 ✅ · band 55 ✅ · product-complete S1010 ✅ · FM-003 LAN · FM-041 Cloud SDK · mandatory ZK/TEE.
+Service PH-SVC11…SVC20 ✅ · band 58 ✅ · band 57 ✅ · band 56 ✅ · band 55 ✅ · product-complete S1010 ✅ · FM-003 LAN · FM-041 Cloud SDK · mandatory ZK/TEE.

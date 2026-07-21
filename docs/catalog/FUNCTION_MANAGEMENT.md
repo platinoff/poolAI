@@ -1736,6 +1736,16 @@ FM-xxx (з таблиці нижче)
 | **PH-SVC08** | `poolai-vision-sync --check` | drift gate green | **✅** |
 | **PH-SVC09** | INDEX + docs cross-links | INDEX zriz Jul 17 | **✅** |
 | **PH-SVC10** | git push + самарі | service commit `main` | **✅** |
+| **PH-SVC11** | Cursor 3.12.29 + changelog re-check | `CURSOR_UPDATE_RESEARCH_2026-07-21.md` | **✅** |
+| **PH-SVC12** | `cursor-environment-baseline.mdc` | 3.12.29 + changelog 3.11 note | **✅** |
+| **PH-SVC13** | `.cursor/CHANGELOG` + `poolai-agent-roles.mdc` | local-only side chats; mode picker | **✅** |
+| **PH-SVC14** | HANDOFF + NEXT_SESSION | service zriz; next `абракадабра` | **✅** |
+| **PH-SVC15** | README Next Focus | Cursor 3.12.29 service note | **✅** |
+| **PH-SVC16** | ENVIRONMENT_AND_CURSOR_UPDATES | pointer → Jul 21 research | **✅** |
+| **PH-SVC17** | `file_list.csv` | CURSOR_UPDATE_2026-07-21 row | **✅** |
+| **PH-SVC18** | `poolai-vision-sync --check` | drift gate green | **✅** |
+| **PH-SVC19** | INDEX + docs/README cross-links | zriz Jul 21 | **✅** |
+| **PH-SVC20** | git push + самарі | service commit `main` | **✅** |
 
 **Наступний service trigger:** після major Cursor/OS update або за запитом власника (повторити scan → §5.16 band).
 

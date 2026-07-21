@@ -1,8 +1,10 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-21 (band 58 **PH-S1219…S1228** ✅ · enterprise horizon band 59)
+**Оновлено:** 2026-07-21 (service band **PH-SVC11…SVC20** ✅ · Cursor **3.12.29** · band 58 ✅ · horizon band 59)
 
 **Наступна сесія:** **`абракадабра`** — promote band 59 з [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md).
+
+**Cursor / toolchain (service):** local desktop **3.12.29** · public changelog latest numbered IDE **3.11** · research [`CURSOR_UPDATE_RESEARCH_2026-07-21.md`](./CURSOR_UPDATE_RESEARCH_2026-07-21.md) · FM **§5.16**.
 
 ## Band 58 — Tenant vision sync (PH-S1219…S1228, ✅)
 

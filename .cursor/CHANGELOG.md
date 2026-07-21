@@ -1,5 +1,12 @@
 # Cursor Agent Configuration Changelog
 
+## 2026-07-21 — Cursor 3.12.29 service band (PH-SVC11…SVC20)
+
+- **`cursor-environment-baseline.mdc`**: local `cursor` **3.12.29**; note that public changelog latest numbered IDE = **3.11**; Jul 17 = Slack-only; pointer to `CURSOR_UPDATE_RESEARCH_2026-07-21.md`.
+- **`poolai-agent-roles.mdc`**: side chats **local-only**; mode picker (Shift+Tab); `/multitask`; cloud hooks list includes `afterAgentResponse` / `stop`.
+- **Docs:** `CURSOR_UPDATE_RESEARCH_2026-07-21.md`; HANDOFF/NEXT/README/INDEX/ENV zriz; FM §5.16 PH-SVC11…SVC20.
+- **Product queue unchanged:** §5.12 **0** · next session **`абракадабра`** → band 59.
+
 ## 2026-07-17 — Cursor 3.12.17 service band (PH-SVC01…SVC10)
 
 - **`cursor-environment-baseline.mdc`**: `cursor` **3.12.17**; `git` **2.50.0**; pointer to `CURSOR_UPDATE_RESEARCH_2026-07-17.md`; notes for 3.11 side chats + cloud hooks.

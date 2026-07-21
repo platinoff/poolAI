@@ -7,8 +7,8 @@ alwaysApply: false
 # Cursor Environment Baseline
 
 - Keep Cursor workflows aligned with the installed local stack before making automation changes.
-- Baseline for this machine (verified 2026-07-17):
-  - `cursor`: 3.12.17 (`C:\Program Files\cursor\resources\app\bin\cursor.cmd` — not in MSYS2 PATH)
+- Baseline for this machine (verified 2026-07-21):
+  - `cursor`: **3.12.29** (`C:\Program Files\cursor\resources\app\bin\cursor.cmd` — not in MSYS2 PATH; confirm via `resources/app/package.json` `version`)
   - `rustc`: 1.92.0
   - `cargo`: 1.92.0
   - `git`: 2.50.0 (MSYS2 UCRT64)
@@ -17,17 +17,19 @@ alwaysApply: false
 
 - When updating `.cursor/commands/`, `.cursor/hooks.json`, or `.cursor/rules/`, validate current CLI output first.
 - Re-check tool versions after OS/package updates using:
-  - `cursor --version`
+  - Cursor: `package.json` under `C:\Program Files\cursor\resources\app\` (or `cursor.cmd --version` outside MSYS2)
   - `rustc --version`
   - `cargo --version`
   - `git --version`
 
 ## Cursor release alignment (latest known)
 
-- Account for Cursor **3.12.x** (desktop **3.12.17**, 2026-07-17): carries **3.11** side chats (`/side`, `/btw`), agent transcript search (Cmd+K), cloud-agent conversation hooks; **3.9–3.10** Customize page, Team MCPs. Post-update research: [`docs/development/CURSOR_UPDATE_RESEARCH_2026-07-17.md`](../../docs/development/CURSOR_UPDATE_RESEARCH_2026-07-17.md).
-- **3.7.x** carry-over: Agents Window, tiled layout, **Task** subagents, **Multitask Mode**.
-- **Multitask Mode:** фонові Task subagents (`run_in_background: true`); довгі `cargo test-ci` — через `shell` subagent або `Await` на background shell; оркестратор не блокується на drain.
-- **SwitchMode:** Plan — лише для неоднозначного scope; **`абракадабра`** і drain — **Agent** (реалізація + MSYS2).
-- Нові subagent types (лише за явним запитом, не в drain): `bugbot`, `security-review`, `best-of-n-runner`; див. [`poolai-agent-roles.mdc`](poolai-agent-roles.mdc).
+- **Local desktop build:** **3.12.29** (2026-07-21). Patch bump from 3.12.17 — **not** a new public agent-feature release.
+- **Public changelog:** latest **numbered** IDE release is **3.11** (Jul 10, 2026): side chats (`/side`, `/btw`), Agents Window transcript search (Cmd/Ctrl+K), cloud conversation hooks. Jul 17 entry is **Slack-only** (ops, поза PoolAI drain).
+- Post-update research: [`docs/development/CURSOR_UPDATE_RESEARCH_2026-07-21.md`](../../docs/development/CURSOR_UPDATE_RESEARCH_2026-07-21.md) · previous [`…2026-07-17.md`](../../docs/development/CURSOR_UPDATE_RESEARCH_2026-07-17.md).
+- **3.7.x** carry-over: Agents Window, tiled layout, **Task** subagents, **`/multitask`**.
+- **Multitask:** `/multitask` + фонові Task subagents; довгі `cargo test-ci` — через `shell` subagent або background shell; оркестратор не блокується на drain.
+- **Modes (Shift+Tab / mode picker):** Plan — лише для неоднозначного scope; **`абракадабра`** і drain — **Agent** (реалізація + MSYS2). Mode switch = fresh context.
+- Subagent types (лише за явним запитом, не в drain): `bugbot`, `security-review`, `best-of-n-runner`; див. [`poolai-agent-roles.mdc`](poolai-agent-roles.mdc).
 - Prefer rules that are resilient to UI updates: focus on repository conventions, not fragile UI click paths.
 - Skills live under user `~/.cursor/skills-cursor/`; repo rules under `.cursor/rules/` — do not duplicate skill content in rules.
