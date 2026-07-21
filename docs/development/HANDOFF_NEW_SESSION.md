@@ -19,7 +19,7 @@
 | **PH-S1197** | Ratio hold advisory |
 | **PH-S1198** | Band close |
 
-**§5.12:** **0** відкритих (band 55 ✅). **Vision:** rev **334** (після sync). **Enterprise pending:** 950 (→ PH-S2148).
+**§5.12:** **0** відкритих (band 55 ✅). **Vision:** rev **335** (після sync). **Enterprise pending:** 950 (→ PH-S2148).
 
 **PH-S1198 ✅ (2026-07-21):** `tenant_stand_smoke_depth.rs`; live store/CRUD/usage; `--tenant-stand-smoke`; `VERIFY_TENANT_STAND_SMOKE`; `TENANT_STAND_SMOKE.md`; `galaxy_horizon_s1189_integration`.
 

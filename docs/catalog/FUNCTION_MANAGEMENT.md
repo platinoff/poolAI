@@ -1221,7 +1221,7 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 55 ✅). **Master horizon:** PH-S1199…S1208 (band 56) · enterprise backlog PH-S1149…S2148. Vision rev **334** (після sync). **Наступна сесія:** **`абракадабра`** — promote band 56.
+**Відкритих у §5.12:** **0** (band 55 ✅). **Master horizon:** PH-S1199…S1208 (band 56) · enterprise backlog PH-S1149…S2148. Vision rev **335** (після sync). **Наступна сесія:** **`абракадабра`** — promote band 56.
 
 ### 5.36 Tenant stand smoke queue — band 55 (PH-S1189…S1198, 2026-07-21)
 

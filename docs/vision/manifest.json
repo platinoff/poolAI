@@ -2456,6 +2456,18 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_development_TENANT_ADMIN_OPS_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_tenant_stand_smoke_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_TENANT_STAND_SMOKE_md"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -10006,9 +10018,37 @@
       "label": "tenant_admin_ops_integration.rs",
       "layer": "L3",
       "path": "tests/tenant_admin_ops_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_tenant_stand_smoke_depth_rs",
+      "label": "tenant_stand_smoke_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/tenant_stand_smoke_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_TENANT_STAND_SMOKE_md",
+      "label": "TENANT_STAND_SMOKE.md",
+      "layer": "L1",
+      "path": "docs/development/TENANT_STAND_SMOKE.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1189_integration_rs",
+      "label": "galaxy_horizon_s1189_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1189_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_tenant_stand_smoke_integration_rs",
+      "label": "tenant_stand_smoke_integration.rs",
+      "layer": "L3",
+      "path": "tests/tenant_stand_smoke_integration.rs"
     }
   ],
-  "revision": 334,
+  "revision": 335,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
