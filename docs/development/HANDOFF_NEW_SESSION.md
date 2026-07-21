@@ -19,7 +19,7 @@
 | **PH-S1207** | Ratio hold advisory |
 | **PH-S1208** | Band close |
 
-**§5.12:** **0** відкритих (band 56 ✅). **Vision:** rev **336** (після sync). **Enterprise pending:** 940 (→ PH-S2148).
+**§5.12:** **0** відкритих (band 56 ✅). **Vision:** rev **337** (після sync). **Enterprise pending:** 940 (→ PH-S2148).
 
 **PH-S1208 ✅ (2026-07-21):** `tenant_loc_audit_depth.rs`; slice aggregate; `--tenant-loc-audit`; `VERIFY_TENANT_LOC_AUDIT`; `TENANT_LOC_AUDIT.md`; `galaxy_horizon_s1199_integration`.
 

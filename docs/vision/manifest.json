@@ -2468,6 +2468,18 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_development_TENANT_STAND_SMOKE_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_tenant_loc_audit_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_TENANT_LOC_AUDIT_md"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -10046,9 +10058,37 @@
       "label": "tenant_stand_smoke_integration.rs",
       "layer": "L3",
       "path": "tests/tenant_stand_smoke_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_tenant_loc_audit_depth_rs",
+      "label": "tenant_loc_audit_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/tenant_loc_audit_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_TENANT_LOC_AUDIT_md",
+      "label": "TENANT_LOC_AUDIT.md",
+      "layer": "L1",
+      "path": "docs/development/TENANT_LOC_AUDIT.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1199_integration_rs",
+      "label": "galaxy_horizon_s1199_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1199_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_tenant_loc_audit_integration_rs",
+      "label": "tenant_loc_audit_integration.rs",
+      "layer": "L3",
+      "path": "tests/tenant_loc_audit_integration.rs"
     }
   ],
-  "revision": 336,
+  "revision": 337,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
