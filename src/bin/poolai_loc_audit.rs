@@ -38,6 +38,10 @@ use poolai_ui_core::tenant_loc_audit_depth::{
 use poolai_ui_core::tenant_persistence_depth::{
     tenant_persist_criteria_total, TENANT_PERSIST_CASES, TENANT_PERSIST_CRITERIA,
 };
+use poolai_ui_core::tenant_ratio_advisory_depth::{
+    tenant_ratio_advisory_criteria_total, TENANT_RATIO_ADVISORY_CASES,
+    TENANT_RATIO_ADVISORY_CRITERIA,
+};
 use poolai_ui_core::tenant_stand_smoke_depth::{
     tenant_stand_smoke_criteria_total, TENANT_STAND_SMOKE_CASES, TENANT_STAND_SMOKE_CRITERIA,
 };
@@ -146,6 +150,8 @@ struct AuditConfig {
     tenant_docs_canon: bool,
     /// Emit band-58 tenant vision-sync fields (PH-S1224).
     tenant_vision_sync: bool,
+    /// Emit band-59 tenant ratio-advisory fields (PH-S1234).
+    tenant_ratio_advisory: bool,
 }
 
 impl Default for AuditConfig {
@@ -169,6 +175,7 @@ impl Default for AuditConfig {
             tenant_loc_audit: false,
             tenant_docs_canon: false,
             tenant_vision_sync: false,
+            tenant_ratio_advisory: false,
         }
     }
 }
@@ -304,6 +311,12 @@ struct RustRatioReport {
     tenant_vision_sync_criteria_total: usize,
     /// Tenant vision-sync criteria met count (PH-S1224).
     tenant_vision_sync_criteria_met_count: usize,
+    /// Band-59 tenant ratio-advisory mode (PH-S1234).
+    tenant_ratio_advisory_mode: bool,
+    /// Tenant ratio-advisory criteria registry size (PH-S1234).
+    tenant_ratio_advisory_criteria_total: usize,
+    /// Tenant ratio-advisory criteria met count (PH-S1234).
+    tenant_ratio_advisory_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -532,6 +545,22 @@ fn audit_tenant_vision_sync_criteria_met(root: &Path) -> (usize, usize) {
     (met, total)
 }
 
+fn audit_tenant_ratio_advisory_criteria_met(root: &Path) -> (usize, usize) {
+    let total = tenant_ratio_advisory_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in TENANT_RATIO_ADVISORY_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
 fn classify_product_path(path: &str) -> ProductCategory {
     let p = path.replace('\\', "/");
     if p.starts_with("src/") && p.ends_with(".rs") {
@@ -636,6 +665,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--tenant-loc-audit" => config.tenant_loc_audit = true,
             "--tenant-docs-canon" => config.tenant_docs_canon = true,
             "--tenant-vision-sync" => config.tenant_vision_sync = true,
+            "--tenant-ratio-advisory" => config.tenant_ratio_advisory = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
                 print_help();
@@ -671,6 +701,7 @@ fn print_help() {
            --tenant-loc-audit          band-56 tenant loc-audit aggregate fields (PH-S1204)\n\
            --tenant-docs-canon         band-57 tenant docs-canon fields (PH-S1214)\n\
            --tenant-vision-sync        band-58 tenant vision-sync fields (PH-S1224)\n\
+           --tenant-ratio-advisory     band-59 tenant ratio-advisory fields (PH-S1234)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -897,6 +928,18 @@ fn build_report(
         );
         notes.push("PH-S1228: band 58 tenant vision-sync — criteria met vs registry");
     }
+    let (tenant_ratio_advisory_criteria_met_count, tenant_ratio_advisory_criteria_total_count) =
+        if config.tenant_ratio_advisory {
+            audit_tenant_ratio_advisory_criteria_met(root)
+        } else {
+            (0, tenant_ratio_advisory_criteria_total())
+        };
+    if config.tenant_ratio_advisory {
+        notes.push(
+            "PH-S1234: tenant_ratio_advisory_mode — aggregate band 51–58 tenant slices + sqlite CRUD",
+        );
+        notes.push("PH-S1238: band 59 tenant ratio-advisory — criteria met vs registry");
+    }
 
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
@@ -967,6 +1010,9 @@ fn build_report(
         tenant_vision_sync_mode: config.tenant_vision_sync,
         tenant_vision_sync_criteria_total: tenant_vision_sync_criteria_total_count,
         tenant_vision_sync_criteria_met_count,
+        tenant_ratio_advisory_mode: config.tenant_ratio_advisory,
+        tenant_ratio_advisory_criteria_total: tenant_ratio_advisory_criteria_total_count,
+        tenant_ratio_advisory_criteria_met_count,
         by_category,
         notes,
     })
@@ -1153,6 +1199,18 @@ fn print_summary(report: &RustRatioReport) {
         println!(
             "  tenant_vision_sync_cases: {}",
             TENANT_VISION_SYNC_CASES.join(", ")
+        );
+    }
+    if report.tenant_ratio_advisory_mode {
+        println!("  tenant_ratio_advisory: true (PH-S1234 band 59)");
+        println!(
+            "  tenant_ratio_advisory_criteria: {}/{} met",
+            report.tenant_ratio_advisory_criteria_met_count,
+            report.tenant_ratio_advisory_criteria_total
+        );
+        println!(
+            "  tenant_ratio_advisory_cases: {}",
+            TENANT_RATIO_ADVISORY_CASES.join(", ")
         );
     }
     for (name, loc) in &report.by_category {

@@ -11,12 +11,12 @@
 //! - Tenant-level access control
 //! - Quota validation before resource creation
 //!
-//! # Persistence (enterprise horizon band 51–52+)
+//! # Persistence (enterprise horizon band 51–52, band 59 CRUD)
 //!
 //! Default store is **in-memory**. Band 52 wires `POOLAI_TENANT_STORE=sqlite` +
-//! optional `POOLAI_TENANT_DATA_DIR` as a **production verify stub** (durable path
-//! resolution only — restart-safe CRUD lands in later phase-A bands).
-//! See [`docs/development/TENANT_STORE.md`] and [`docs/development/TENANT_PERSIST.md`].
+//! optional `POOLAI_TENANT_DATA_DIR` as the durable path. Band 59 adds
+//! **restart-safe SQLite CRUD** (`persist_tenant_to_sqlite` / load on `initialize`).
+//! See [`docs/development/TENANT_STORE.md`] and [`docs/development/TENANT_RATIO_ADVISORY.md`].
 //!
 //! # Example
 //!
@@ -39,9 +39,10 @@
 //! ```
 
 use crate::core::error::AppError;
+use rusqlite::Connection;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::{Arc, OnceLock};
 use tokio::sync::RwLock;
 use tracing::{info, warn};
@@ -77,14 +78,14 @@ pub fn tenant_store_data_dir_from_env() -> Option<PathBuf> {
 /// Canonical sqlite DB file name under the configured data dir (band 52 wire).
 pub const TENANT_STORE_SQLITE_FILE: &str = "tenants.sqlite";
 
-/// Band-52 tenant store wire snapshot (mode + durable path; no CRUD yet).
+/// Tenant store wire snapshot (mode + durable path; band 59 CRUD when configured).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TenantStoreWire {
     /// `memory` or `sqlite`.
     pub mode: String,
     /// Resolved sqlite file path when mode is sqlite and data dir is set.
     pub durable_path: Option<String>,
-    /// True when sqlite mode has a durable path (production-ready wire).
+    /// True when sqlite mode has a durable path (restart-safe CRUD enabled).
     pub configured: bool,
 }
 
@@ -203,26 +204,146 @@ pub struct QuotaCheckResult {
 pub struct TenantManager {
     tenants: Arc<RwLock<HashMap<Uuid, Tenant>>>,
     initialized: Arc<RwLock<bool>>,
+    /// Durable SQLite path when `POOLAI_TENANT_STORE=sqlite` + data dir (band 59).
+    db_path: Option<PathBuf>,
 }
 
 impl TenantManager {
-    /// Creates a new tenant manager
+    /// Creates a new in-memory tenant manager (tests / default).
     pub fn new() -> Self {
         Self {
             tenants: Arc::new(RwLock::new(HashMap::new())),
             initialized: Arc::new(RwLock::new(false)),
+            db_path: None,
         }
     }
 
-    /// Initializes the tenant manager
+    /// Creates a manager that persists when the store wire is sqlite-configured.
+    pub fn new_from_env() -> Self {
+        let wire = tenant_store_wire();
+        let db_path = wire
+            .durable_path
+            .as_ref()
+            .filter(|_| wire.configured)
+            .map(PathBuf::from);
+        Self {
+            tenants: Arc::new(RwLock::new(HashMap::new())),
+            initialized: Arc::new(RwLock::new(false)),
+            db_path,
+        }
+    }
+
+    /// Explicit path for tests / tools (enables restart-safe CRUD).
+    pub fn new_with_sqlite_path(db_path: PathBuf) -> Self {
+        Self {
+            tenants: Arc::new(RwLock::new(HashMap::new())),
+            initialized: Arc::new(RwLock::new(false)),
+            db_path: Some(db_path),
+        }
+    }
+
+    fn init_sqlite_schema(conn: &Connection) -> Result<(), AppError> {
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS tenants (
+                id TEXT PRIMARY KEY NOT NULL,
+                payload TEXT NOT NULL
+            )",
+            [],
+        )
+        .map_err(|e| AppError::InternalError(format!("tenant sqlite schema: {e}")))?;
+        Ok(())
+    }
+
+    fn open_sqlite(path: &Path) -> Result<Connection, AppError> {
+        if let Some(parent) = path.parent() {
+            std::fs::create_dir_all(parent).map_err(|e| {
+                AppError::InternalError(format!("create tenant data dir {}: {e}", parent.display()))
+            })?;
+        }
+        let conn = Connection::open(path).map_err(|e| {
+            AppError::InternalError(format!("open tenant sqlite {}: {e}", path.display()))
+        })?;
+        Self::init_sqlite_schema(&conn)?;
+        Ok(conn)
+    }
+
+    fn load_tenants_from_sqlite(path: &Path) -> Result<HashMap<Uuid, Tenant>, AppError> {
+        let conn = Self::open_sqlite(path)?;
+        let mut stmt = conn
+            .prepare("SELECT id, payload FROM tenants")
+            .map_err(|e| AppError::InternalError(format!("prepare tenant load: {e}")))?;
+        let rows = stmt
+            .query_map([], |row| {
+                let id: String = row.get(0)?;
+                let payload: String = row.get(1)?;
+                Ok((id, payload))
+            })
+            .map_err(|e| AppError::InternalError(format!("query tenants: {e}")))?;
+        let mut out = HashMap::new();
+        for row in rows {
+            let (id_str, payload) =
+                row.map_err(|e| AppError::InternalError(format!("tenant row: {e}")))?;
+            let id = Uuid::parse_str(&id_str).map_err(|e| {
+                AppError::InternalError(format!("invalid tenant id in sqlite: {e}"))
+            })?;
+            let tenant: Tenant = serde_json::from_str(&payload)
+                .map_err(|e| AppError::InternalError(format!("decode tenant {id}: {e}")))?;
+            out.insert(id, tenant);
+        }
+        Ok(out)
+    }
+
+    /// Upsert one tenant into the durable sqlite file (band 59 restart-safe CRUD).
+    pub fn persist_tenant_to_sqlite(path: &Path, tenant: &Tenant) -> Result<(), AppError> {
+        let conn = Self::open_sqlite(path)?;
+        let payload = serde_json::to_string(tenant)
+            .map_err(|e| AppError::InternalError(format!("encode tenant {}: {e}", tenant.id)))?;
+        conn.execute(
+            "INSERT INTO tenants (id, payload) VALUES (?1, ?2)
+             ON CONFLICT(id) DO UPDATE SET payload = excluded.payload",
+            rusqlite::params![tenant.id.to_string(), payload],
+        )
+        .map_err(|e| AppError::InternalError(format!("persist tenant {}: {e}", tenant.id)))?;
+        Ok(())
+    }
+
+    fn delete_tenant_from_sqlite(path: &Path, id: Uuid) -> Result<(), AppError> {
+        let conn = Self::open_sqlite(path)?;
+        conn.execute(
+            "DELETE FROM tenants WHERE id = ?1",
+            rusqlite::params![id.to_string()],
+        )
+        .map_err(|e| AppError::InternalError(format!("delete tenant {id}: {e}")))?;
+        Ok(())
+    }
+
+    fn persist_tenant_locked(&self, tenant: &Tenant) -> Result<(), AppError> {
+        if let Some(path) = self.db_path.as_ref() {
+            Self::persist_tenant_to_sqlite(path, tenant)?;
+        }
+        Ok(())
+    }
+
+    /// Initializes the tenant manager (loads sqlite rows when configured).
     pub async fn initialize(&self) -> Result<(), AppError> {
         let mut initialized = self.initialized.write().await;
         if *initialized {
             return Ok(());
         }
 
+        if let Some(path) = self.db_path.as_ref() {
+            let loaded = Self::load_tenants_from_sqlite(path)?;
+            let count = loaded.len();
+            *self.tenants.write().await = loaded;
+            info!(
+                "Tenant manager initialized from sqlite ({count} tenants, {})",
+                path.display()
+            );
+        } else {
+            info!("Tenant manager initialized (memory)");
+        }
+
         *initialized = true;
-        info!("Tenant manager initialized");
         Ok(())
     }
 
@@ -254,6 +375,7 @@ impl TenantManager {
 
         let mut tenants = self.tenants.write().await;
         tenants.insert(tenant.id, tenant.clone());
+        self.persist_tenant_locked(&tenant)?;
 
         info!("Created tenant: {} ({})", tenant.name, tenant.id);
         Ok(tenant)
@@ -302,6 +424,7 @@ impl TenantManager {
 
         tenant.updated_at = chrono::Utc::now();
         let updated_tenant = tenant.clone();
+        self.persist_tenant_locked(&updated_tenant)?;
 
         info!("Updated tenant: {} ({})", updated_tenant.name, id);
         Ok(updated_tenant)
@@ -355,6 +478,9 @@ impl TenantManager {
         // Now remove with write lock
         let mut tenants = self.tenants.write().await;
         tenants.remove(&id);
+        if let Some(path) = self.db_path.as_ref() {
+            Self::delete_tenant_from_sqlite(path, id)?;
+        }
         info!("Deleted tenant: {} ({})", tenant_name, id);
         Ok(())
     }
@@ -537,6 +663,9 @@ impl TenantManager {
 
         tenant.usage = usage;
         tenant.updated_at = chrono::Utc::now();
+        let snapshot = tenant.clone();
+        drop(tenants);
+        self.persist_tenant_locked(&snapshot)?;
         Ok(())
     }
 
@@ -595,6 +724,9 @@ impl TenantManager {
             tenant.usage.vm_instances += vm_inst;
         }
         tenant.updated_at = chrono::Utc::now();
+        let snapshot = tenant.clone();
+        drop(tenants);
+        self.persist_tenant_locked(&snapshot)?;
 
         Ok(())
     }
@@ -681,6 +813,9 @@ impl TenantManager {
         }
 
         tenant.updated_at = chrono::Utc::now();
+        let snapshot = tenant.clone();
+        drop(tenants);
+        self.persist_tenant_locked(&snapshot)?;
         Ok(())
     }
 
@@ -856,6 +991,27 @@ mod tests {
         // Now delete should succeed
         assert!(manager.delete_tenant(tenant.id).await.is_ok());
     }
+
+    #[tokio::test]
+    async fn sqlite_restart_safe_create_get_ph_s1230() {
+        let dir = std::env::temp_dir().join(format!("poolai-tenant-sqlite-{}", Uuid::new_v4()));
+        let db = dir.join(TENANT_STORE_SQLITE_FILE);
+        let manager = TenantManager::new_with_sqlite_path(db.clone());
+        manager.initialize().await.unwrap();
+        let created = manager
+            .create_tenant("durable-tenant".to_string(), TenantConfig::default())
+            .await
+            .unwrap();
+        let id = created.id;
+        drop(manager);
+
+        let reloaded = TenantManager::new_with_sqlite_path(db);
+        reloaded.initialize().await.unwrap();
+        let found = reloaded.get_tenant(id).await.unwrap();
+        assert!(found.is_some(), "tenant must survive manager recreate");
+        assert_eq!(found.unwrap().name, "durable-tenant");
+        let _ = std::fs::remove_dir_all(&dir);
+    }
 }
 
 /// Global tenant manager instance
@@ -892,6 +1048,6 @@ pub fn try_install_global_tenant_manager(mgr: Arc<TenantManager>) {
 /// ```
 pub fn get_global_tenant_manager() -> Arc<TenantManager> {
     TENANT_MANAGER
-        .get_or_init(|| Arc::new(TenantManager::new()))
+        .get_or_init(|| Arc::new(TenantManager::new_from_env()))
         .clone()
 }

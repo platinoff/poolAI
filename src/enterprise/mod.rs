@@ -74,7 +74,7 @@ impl EnterpriseManager {
     pub fn new() -> Self {
         Self {
             audit_logger: Arc::new(audit::AuditLogger::new()),
-            tenant_manager: Arc::new(multi_tenancy::TenantManager::new()),
+            tenant_manager: Arc::new(multi_tenancy::TenantManager::new_from_env()),
             security_manager: Arc::new(security::SecurityManager::new()),
             monitoring_manager: Arc::new(monitoring::MonitoringManager::new_from_env()),
         }

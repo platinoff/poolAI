@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
   <title id="title">PoolAI Galaxy Starwalker Vision</title>
-  <desc id="desc">Isometric L0-L3 layers with Galaxy Grid at center. PH-S1228 done, next PH-S1229.</desc>
+  <desc id="desc">Isometric L0-L3 layers with Galaxy Grid at center. PH-S1238 done, next PH-S1239.</desc>
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#06080f"/>
@@ -107,5 +107,5 @@
     <text x="0" y="108" fill="#a78bfa">? implements / session-tracks</text>
   </g>
 
-  <text x="600" y="738" text-anchor="middle" fill="#6a7a9a" font-family="Segoe UI, system-ui, sans-serif" font-size="12">PH-S1228 done tenant vision sync - PH-S1229 next - 0 open - rev 342</text>
+  <text x="600" y="738" text-anchor="middle" fill="#6a7a9a" font-family="Segoe UI, system-ui, sans-serif" font-size="12">PH-S1238 done tenant ratio advisory - PH-S1239 next - 0 open - rev 344</text>
 </svg>

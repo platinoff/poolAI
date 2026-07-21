@@ -24,6 +24,7 @@ param(
     [switch]$TenantLocAudit,
     [switch]$TenantDocsCanon,
     [switch]$TenantVisionSync,
+    [switch]$TenantRatioAdvisory,
     [int]$Port = 8080,
     [string]$Features = "enterprise,ml,cloud,test-utils",
     [ValidateSet("json", "sqlite", "raid")]
@@ -297,6 +298,11 @@ function Invoke-Quick {
     if ($TenantVisionSync) {
         Write-Host "Running poolai-loc-audit --tenant-vision-sync (PH-S1222)..."
         & $MsysWrapper cargo run --quiet --bin poolai-loc-audit -- --tenant-vision-sync
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    }
+    if ($TenantRatioAdvisory) {
+        Write-Host "Running poolai-loc-audit --tenant-ratio-advisory (PH-S1232)..."
+        & $MsysWrapper cargo run --quiet --bin poolai-loc-audit -- --tenant-ratio-advisory
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     }
 }

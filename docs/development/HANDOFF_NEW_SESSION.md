@@ -1,10 +1,29 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-21 (service band **PH-SVC11…SVC20** ✅ · Cursor **3.12.29** · band 58 ✅ · horizon band 59)
+**Оновлено:** 2026-07-21 (band 59 **PH-S1229…S1238** ✅ · Cursor **3.12.29** · horizon band 60)
 
-**Наступна сесія:** **`абракадабра`** — promote band 59 з [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md).
+**Наступна сесія:** **`абракадабра`** — promote band 60 з [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md).
 
 **Cursor / toolchain (service):** local desktop **3.12.29** · public changelog latest numbered IDE **3.11** · research [`CURSOR_UPDATE_RESEARCH_2026-07-21.md`](./CURSOR_UPDATE_RESEARCH_2026-07-21.md) · FM **§5.16**.
+
+## Band 59 — Tenant ratio advisory (PH-S1229…S1238, ✅)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1229** | `tenant_ratio_advisory_depth` ui-core module |
+| **PH-S1230** | SQLite restart-safe CRUD + slice aggregate (`TENANT_RATIO_ADVISORY_SLICES`) |
+| **PH-S1231** | Criteria contracts (`tenant_ratio_advisory_integration` + sqlite durable) |
+| **PH-S1232** | `VERIFY_TENANT_RATIO_ADVISORY` + quick `--tenant-ratio-advisory` |
+| **PH-S1233** | Stand smoke export shape band 59 |
+| **PH-S1234** | `poolai-loc-audit --tenant-ratio-advisory` |
+| **PH-S1235** | `TENANT_RATIO_ADVISORY.md` + canon sync |
+| **PH-S1236** | vision-sync --check |
+| **PH-S1237** | Ratio hold advisory |
+| **PH-S1238** | Band close |
+
+**§5.12:** **0** відкритих (band 59 ✅). **Vision:** rev **344** (після sync). **Enterprise pending:** 910 (→ PH-S2148).
+
+**PH-S1238 ✅ (2026-07-21):** `tenant_ratio_advisory_depth.rs`; `persist_tenant_to_sqlite`; `--tenant-ratio-advisory`; `VERIFY_TENANT_RATIO_ADVISORY`; `TENANT_RATIO_ADVISORY.md`; `galaxy_horizon_s1229_integration`.
 
 ## Band 58 — Tenant vision sync (PH-S1219…S1228, ✅)
 

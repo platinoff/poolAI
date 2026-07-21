@@ -5,16 +5,17 @@ Canonical doc: [`TENANT_STORE.md`](./TENANT_STORE.md) (band 52, PH-S1165).
 ## Overview
 
 Band 52 wires the durable-path / production-verify stub for multi-tenancy
-(FM-horizon v2). Restart-safe SQLite CRUD lands in later phase-A bands.
+(FM-horizon v2). **Restart-safe SQLite CRUD** landed in band 59
+([`TENANT_RATIO_ADVISORY.md`](./TENANT_RATIO_ADVISORY.md)).
 
 | Mode | Env | Status |
 |------|-----|--------|
-| `memory` | `POOLAI_TENANT_STORE=memory` (default) | Current runtime |
+| `memory` | `POOLAI_TENANT_STORE=memory` (default) | In-memory CRUD |
 | `sqlite` unconfigured | `POOLAI_TENANT_STORE=sqlite` without data dir | Wire label `sqlite_unconfigured` |
-| `sqlite` configured | `POOLAI_TENANT_STORE=sqlite` + `POOLAI_TENANT_DATA_DIR=…` | Durable path → `…/tenants.sqlite` |
+| `sqlite` configured | `POOLAI_TENANT_STORE=sqlite` + `POOLAI_TENANT_DATA_DIR=…` | Durable path → `…/tenants.sqlite` + restart-safe CRUD |
 
-**Boundary:** band 52 resolves and verifies the wire (`tenant_store_wire()`);
-it does **not** persist tenant CRUD yet.
+**Boundary:** band 52 resolves the wire (`tenant_store_wire()`);
+band 59 persists create/get/update/delete via `persist_tenant_to_sqlite`.
 
 ## Loc-audit / verify hooks
 

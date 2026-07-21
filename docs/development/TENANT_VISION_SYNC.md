@@ -18,7 +18,8 @@ aligned with the enterprise tenant journal.
 | Contracts | `tenant_vision_sync_integration` | slice presence + criteria totals |
 
 **Boundary:** band 58 = vision-sync gate for tenant phase A; prior docs-canon remains
-[`TENANT_DOCS_CANON.md`](./TENANT_DOCS_CANON.md) (band 57). Next: band 59 ratio advisory.
+[`TENANT_DOCS_CANON.md`](./TENANT_DOCS_CANON.md) (band 57). Next: band 59
+[`TENANT_RATIO_ADVISORY.md`](./TENANT_RATIO_ADVISORY.md) ✅.
 
 ## Loc-audit / verify
 

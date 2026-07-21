@@ -4940,6 +4940,52 @@ mod tests {
     }
 
     #[test]
+    fn tenant_ratio_advisory_band59_export_shape_ph_s1233() {
+        use poolai_ui_core::tenant_ratio_advisory_depth::{
+            tenant_ratio_advisory_criteria_total, tenant_ratio_advisory_depth_stub,
+            tenant_ratio_advisory_slices_met, TenantRatioAdvisoryDepth, FM_BAND59_ROWS,
+            TENANT_RATIO_ADVISORY_CASES, TENANT_RATIO_ADVISORY_CRITERIA,
+            TENANT_RATIO_ADVISORY_SLICES,
+        };
+        use serde_json::json;
+        assert_eq!(
+            tenant_ratio_advisory_depth_stub(Some(&json!({"stand_smoke_export": true}))),
+            TenantRatioAdvisoryDepth::StandSmokeExport
+        );
+        assert_eq!(
+            tenant_ratio_advisory_depth_stub(Some(&json!({
+                "tenant_ratio_advisory_depth": true,
+                "slice_aggregate": true,
+                "criteria_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "tenant_ratio_advisory_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            TenantRatioAdvisoryDepth::FullBand59
+        );
+        assert_eq!(TENANT_RATIO_ADVISORY_CRITERIA.len(), 10);
+        assert_eq!(tenant_ratio_advisory_criteria_total(), 10);
+        assert_eq!(TENANT_RATIO_ADVISORY_SLICES.len(), 6);
+        assert!(TENANT_RATIO_ADVISORY_CASES.contains(&"aggregate_flag"));
+        let canon = include_str!("../../docs/development/TENANT_RATIO_ADVISORY.md");
+        assert_eq!(tenant_ratio_advisory_slices_met(canon), (6, 6));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--tenant-ratio-advisory"));
+        let multi = include_str!("../../src/enterprise/multi_tenancy.rs");
+        assert!(multi.contains("persist_tenant_to_sqlite"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND59_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band59 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn galaxy_edge_verification_band48_export_shape_ph_s1125() {
         use poolai_ui_core::galaxy_edge_verification_depth::{
             edge_verification_criteria_total, galaxy_edge_verification_depth_stub,

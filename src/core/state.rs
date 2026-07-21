@@ -367,7 +367,7 @@ impl AppState {
             #[cfg(feature = "enterprise")]
             oauth2_pending_states: Arc::new(tokio::sync::RwLock::new(HashMap::new())),
             #[cfg(feature = "enterprise")]
-            tenant_manager: Arc::new(TenantManager::new()),
+            tenant_manager: Arc::new(TenantManager::new_from_env()),
             #[cfg(feature = "enterprise")]
             audit_logger: Arc::new(AuditLogger::new()),
             #[cfg(feature = "enterprise")]

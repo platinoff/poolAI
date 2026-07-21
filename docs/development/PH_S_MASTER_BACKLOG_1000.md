@@ -1,6 +1,6 @@
 # PH-S master backlog 1000 (enterprise horizon v2)
 
-**Generated:** 2026-07-21 · **Range:** PH-S1149…PH-S2148 · **Pending:** **940** (band 56 ✅) · **Enterprise roadmap v2**
+**Generated:** 2026-07-21 · **Range:** PH-S1149…PH-S2148 · **Pending:** **910** (band 59 ✅) · **Enterprise roadmap v2**
 
 **VDT:** один `абракадабра` = drain **10** з FM §5.12 → vision close → push → promote наступні 10.
 
@@ -18,8 +18,8 @@
 | 56 | PH-S1199…S1208 | A Tenants · loc-audit **✅ drained** |
 | 57 | PH-S1209…S1218 | A Tenants · docs canon **✅ drained** |
 | 58 | PH-S1219…S1228 | A Tenants · vision-sync **✅ drained** |
-| 59 | PH-S1229…S1238 | A Tenants · ratio advisory **active next** |
-| 60 | PH-S1239…S1248 | A Tenants · horizon close |
+| 59 | PH-S1229…S1238 | A Tenants · ratio advisory **✅ drained** |
+| 60 | PH-S1239…S1248 | A Tenants · horizon close **active next** |
 | 61 | PH-S1249…S1258 | B SSO · depth scaffold |
 | 62 | PH-S1259…S1268 | B SSO · store wire |
 | 63 | PH-S1269…S1278 | B SSO · API contracts |
@@ -233,20 +233,20 @@
 | **PH-S1227** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
 | **PH-S1228** | galaxy_horizon_s1219_integration | band close | **✅** |
 
-## Band 59 — PH-S1229…S1238 (A Tenants · ratio advisory)
+## Band 59 — PH-S1229…S1238 (A Tenants · ratio advisory) ✅
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1229** | `tenant_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1230** | `tenant` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1231** | `tenant` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1232** | `tenant` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1233** | Stand smoke `tenant` export | export shape unit test | **[ ]** |
-| **PH-S1234** | poolai-loc-audit PH-S1234 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1235** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1236** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1237** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1238** | galaxy_horizon_s1229_integration | band close | **[ ]** |
+| **PH-S1229** | `tenant_ratio_advisory_depth` scaffold | ui-core depth enum + criteria registry | **✅** |
+| **PH-S1230** | SQLite restart-safe CRUD + slices | `persist_tenant_to_sqlite` + unit test | **✅** |
+| **PH-S1231** | ratio-advisory + sqlite contracts | `tenant_ratio_advisory_integration` + durable | **✅** |
+| **PH-S1232** | `VERIFY_TENANT_RATIO_ADVISORY` | verify-dev-stand / quick flag | **✅** |
+| **PH-S1233** | Stand smoke export | `tenant_ratio_advisory_band59_export_shape` | **✅** |
+| **PH-S1234** | poolai-loc-audit `--tenant-ratio-advisory` | `rust_ratio.json` zriz | **✅** |
+| **PH-S1235** | Docs `TENANT_RATIO_ADVISORY.md` | RUN_LOCAL/INDEX/HANDOFF/NEXT | **✅** |
+| **PH-S1236** | poolai-vision-sync --check | drift gate green | **✅** |
+| **PH-S1237** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
+| **PH-S1238** | galaxy_horizon_s1229_integration | band close | **✅** |
 
 ## Band 60 — PH-S1239…S1248 (A Tenants · horizon close)
 

@@ -30,6 +30,7 @@ VERIFY_TENANT_STAND_SMOKE="${VERIFY_TENANT_STAND_SMOKE:-0}"
 VERIFY_TENANT_LOC_AUDIT="${VERIFY_TENANT_LOC_AUDIT:-0}"
 VERIFY_TENANT_DOCS_CANON="${VERIFY_TENANT_DOCS_CANON:-0}"
 VERIFY_TENANT_VISION_SYNC="${VERIFY_TENANT_VISION_SYNC:-0}"
+VERIFY_TENANT_RATIO_ADVISORY="${VERIFY_TENANT_RATIO_ADVISORY:-0}"
 HEALTH_RETRIES="${VERIFY_HEALTH_RETRIES:-45}"
 HEALTH_SLEEP="${VERIFY_HEALTH_SLEEP:-2}"
 
@@ -427,6 +428,16 @@ if [[ "$VERIFY_TENANT_VISION_SYNC" == "1" ]]; then
     echo "OK  tenant vision-sync gate"
   else
     echo "FAIL tenant vision-sync gate"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_TENANT_RATIO_ADVISORY" == "1" ]]; then
+  echo "Running poolai-loc-audit --tenant-ratio-advisory (PH-S1232)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --tenant-ratio-advisory); then
+    echo "OK  tenant ratio-advisory gate"
+  else
+    echo "FAIL tenant ratio-advisory gate"
     fail=1
   fi
 fi
