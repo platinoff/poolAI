@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 162130,
-  "non_rust_product_loc": 8848,
-  "product_loc_total": 170978,
-  "rust_ratio": 0.9482506521306835,
-  "rust_ratio_pct": 94.82506521306834,
+  "rust_loc": 162607,
+  "non_rust_product_loc": 8871,
+  "product_loc_total": 171478,
+  "rust_ratio": 0.9482674162283208,
+  "rust_ratio_pct": 94.82674162283207,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -61,9 +61,12 @@
   "tenant_loc_audit_mode": false,
   "tenant_loc_audit_criteria_total": 10,
   "tenant_loc_audit_criteria_met_count": 0,
-  "tenant_docs_canon_mode": true,
+  "tenant_docs_canon_mode": false,
   "tenant_docs_canon_criteria_total": 10,
-  "tenant_docs_canon_criteria_met_count": 10,
+  "tenant_docs_canon_criteria_met_count": 0,
+  "tenant_vision_sync_mode": true,
+  "tenant_vision_sync_criteria_total": 10,
+  "tenant_vision_sync_criteria_met_count": 10,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -71,27 +74,27 @@
     },
     "ops_ps1": {
       "files": 16,
-      "loc": 1509
+      "loc": 1515
     },
     "ops_shell": {
       "files": 38,
-      "loc": 3135
+      "loc": 3152
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 75,
-      "loc": 15918
+      "files": 76,
+      "loc": 16152
     },
     "rust_src": {
       "files": 300,
-      "loc": 109299
+      "loc": 109396
     },
     "rust_tests": {
-      "files": 256,
-      "loc": 36305
+      "files": 258,
+      "loc": 36451
     },
     "ui_css": {
       "files": 2,
@@ -122,7 +125,7 @@
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
     "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
-    "PH-S1214: tenant_docs_canon_mode — aggregate band 51–56 TENANT_*.md canon docs",
-    "PH-S1218: band 57 tenant docs-canon — criteria met vs registry"
+    "PH-S1224: tenant_vision_sync_mode — aggregate docs/vision/* + TENANT_DOCS_CANON",
+    "PH-S1228: band 58 tenant vision-sync — criteria met vs registry"
   ]
 }

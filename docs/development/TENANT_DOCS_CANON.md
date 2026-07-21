@@ -17,7 +17,7 @@ authoritative; the aggregate registry proves all six exist plus verify/loc-audit
 | Contracts | `tenant_docs_canon_integration` | slice presence + criteria totals |
 
 **Boundary:** band 57 = docs-canon matrix gate; prior loc-audit aggregate remains
-[`TENANT_LOC_AUDIT.md`](./TENANT_LOC_AUDIT.md) (band 56). Next: band 58 vision-sync.
+[`TENANT_LOC_AUDIT.md`](./TENANT_LOC_AUDIT.md) (band 56). Next: band 58 vision-sync → **band 59** ratio advisory.
 
 ## Loc-audit / verify
 

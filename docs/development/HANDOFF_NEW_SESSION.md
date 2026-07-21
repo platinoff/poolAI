@@ -1,8 +1,27 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-21 (band 57 **PH-S1209…S1218** ✅ · enterprise horizon band 58)
+**Оновлено:** 2026-07-21 (band 58 **PH-S1219…S1228** ✅ · enterprise horizon band 59)
 
-**Наступна сесія:** **`абракадабра`** — promote band 58 з [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md).
+**Наступна сесія:** **`абракадабра`** — promote band 59 з [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md).
+
+## Band 58 — Tenant vision sync (PH-S1219…S1228, ✅)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1219** | `tenant_vision_sync_depth` ui-core module |
+| **PH-S1220** | Slice aggregate stub (`TENANT_VISION_SYNC_SLICES`) |
+| **PH-S1221** | Criteria contracts (`tenant_vision_sync_integration`) |
+| **PH-S1222** | `VERIFY_TENANT_VISION_SYNC` + quick `--tenant-vision-sync` |
+| **PH-S1223** | Stand smoke export shape band 58 |
+| **PH-S1224** | `poolai-loc-audit --tenant-vision-sync` |
+| **PH-S1225** | `TENANT_VISION_SYNC.md` + canon sync |
+| **PH-S1226** | vision-sync --check |
+| **PH-S1227** | Ratio hold advisory |
+| **PH-S1228** | Band close |
+
+**§5.12:** **0** відкритих (band 58 ✅). **Vision:** rev **341** (після sync). **Enterprise pending:** 920 (→ PH-S2148).
+
+**PH-S1228 ✅ (2026-07-21):** `tenant_vision_sync_depth.rs`; slice aggregate; `--tenant-vision-sync`; `VERIFY_TENANT_VISION_SYNC`; `TENANT_VISION_SYNC.md`; `galaxy_horizon_s1219_integration`.
 
 ## Band 57 — Tenant docs canon (PH-S1209…S1218, ✅)
 

@@ -56,6 +56,7 @@ pub mod tenant_docs_canon_depth;
 pub mod tenant_loc_audit_depth;
 pub mod tenant_persistence_depth;
 pub mod tenant_stand_smoke_depth;
+pub mod tenant_vision_sync_depth;
 pub mod theme;
 pub mod topology;
 pub mod trust;

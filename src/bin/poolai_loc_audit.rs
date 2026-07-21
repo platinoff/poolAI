@@ -41,6 +41,9 @@ use poolai_ui_core::tenant_persistence_depth::{
 use poolai_ui_core::tenant_stand_smoke_depth::{
     tenant_stand_smoke_criteria_total, TENANT_STAND_SMOKE_CASES, TENANT_STAND_SMOKE_CRITERIA,
 };
+use poolai_ui_core::tenant_vision_sync_depth::{
+    tenant_vision_sync_criteria_total, TENANT_VISION_SYNC_CASES, TENANT_VISION_SYNC_CRITERIA,
+};
 use serde::Serialize;
 use std::collections::BTreeMap;
 use std::fs;
@@ -141,6 +144,8 @@ struct AuditConfig {
     tenant_loc_audit: bool,
     /// Emit band-57 tenant docs-canon fields (PH-S1214).
     tenant_docs_canon: bool,
+    /// Emit band-58 tenant vision-sync fields (PH-S1224).
+    tenant_vision_sync: bool,
 }
 
 impl Default for AuditConfig {
@@ -163,6 +168,7 @@ impl Default for AuditConfig {
             tenant_stand_smoke: false,
             tenant_loc_audit: false,
             tenant_docs_canon: false,
+            tenant_vision_sync: false,
         }
     }
 }
@@ -292,6 +298,12 @@ struct RustRatioReport {
     tenant_docs_canon_criteria_total: usize,
     /// Tenant docs-canon criteria met count (PH-S1214).
     tenant_docs_canon_criteria_met_count: usize,
+    /// Band-58 tenant vision-sync mode (PH-S1224).
+    tenant_vision_sync_mode: bool,
+    /// Tenant vision-sync criteria registry size (PH-S1224).
+    tenant_vision_sync_criteria_total: usize,
+    /// Tenant vision-sync criteria met count (PH-S1224).
+    tenant_vision_sync_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -504,6 +516,22 @@ fn audit_tenant_docs_canon_criteria_met(root: &Path) -> (usize, usize) {
     (met, total)
 }
 
+fn audit_tenant_vision_sync_criteria_met(root: &Path) -> (usize, usize) {
+    let total = tenant_vision_sync_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in TENANT_VISION_SYNC_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
 fn classify_product_path(path: &str) -> ProductCategory {
     let p = path.replace('\\', "/");
     if p.starts_with("src/") && p.ends_with(".rs") {
@@ -607,6 +635,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--tenant-stand-smoke" => config.tenant_stand_smoke = true,
             "--tenant-loc-audit" => config.tenant_loc_audit = true,
             "--tenant-docs-canon" => config.tenant_docs_canon = true,
+            "--tenant-vision-sync" => config.tenant_vision_sync = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
                 print_help();
@@ -641,6 +670,7 @@ fn print_help() {
            --tenant-stand-smoke        band-55 tenant stand-smoke fields (PH-S1194)\n\
            --tenant-loc-audit          band-56 tenant loc-audit aggregate fields (PH-S1204)\n\
            --tenant-docs-canon         band-57 tenant docs-canon fields (PH-S1214)\n\
+           --tenant-vision-sync        band-58 tenant vision-sync fields (PH-S1224)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -855,6 +885,18 @@ fn build_report(
             .push("PH-S1214: tenant_docs_canon_mode — aggregate band 51–56 TENANT_*.md canon docs");
         notes.push("PH-S1218: band 57 tenant docs-canon — criteria met vs registry");
     }
+    let (tenant_vision_sync_criteria_met_count, tenant_vision_sync_criteria_total_count) =
+        if config.tenant_vision_sync {
+            audit_tenant_vision_sync_criteria_met(root)
+        } else {
+            (0, tenant_vision_sync_criteria_total())
+        };
+    if config.tenant_vision_sync {
+        notes.push(
+            "PH-S1224: tenant_vision_sync_mode — aggregate docs/vision/* + TENANT_DOCS_CANON",
+        );
+        notes.push("PH-S1228: band 58 tenant vision-sync — criteria met vs registry");
+    }
 
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
@@ -922,6 +964,9 @@ fn build_report(
         tenant_docs_canon_mode: config.tenant_docs_canon,
         tenant_docs_canon_criteria_total: tenant_docs_canon_criteria_total_count,
         tenant_docs_canon_criteria_met_count,
+        tenant_vision_sync_mode: config.tenant_vision_sync,
+        tenant_vision_sync_criteria_total: tenant_vision_sync_criteria_total_count,
+        tenant_vision_sync_criteria_met_count,
         by_category,
         notes,
     })
@@ -1097,6 +1142,17 @@ fn print_summary(report: &RustRatioReport) {
         println!(
             "  tenant_docs_canon_cases: {}",
             TENANT_DOCS_CANON_CASES.join(", ")
+        );
+    }
+    if report.tenant_vision_sync_mode {
+        println!("  tenant_vision_sync:    true (PH-S1224 band 58)");
+        println!(
+            "  tenant_vision_sync_criteria: {}/{} met",
+            report.tenant_vision_sync_criteria_met_count, report.tenant_vision_sync_criteria_total
+        );
+        println!(
+            "  tenant_vision_sync_cases: {}",
+            TENANT_VISION_SYNC_CASES.join(", ")
         );
     }
     for (name, loc) in &report.by_category {

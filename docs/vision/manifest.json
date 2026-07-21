@@ -2492,6 +2492,18 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_development_TENANT_DOCS_CANON_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_tenant_vision_sync_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_TENANT_VISION_SYNC_md"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -2529,7 +2541,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1219",
+  "next_sprint": "PH-S1229",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -10126,9 +10138,37 @@
       "label": "tenant_docs_canon_integration.rs",
       "layer": "L3",
       "path": "tests/tenant_docs_canon_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_tenant_vision_sync_depth_rs",
+      "label": "tenant_vision_sync_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/tenant_vision_sync_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_TENANT_VISION_SYNC_md",
+      "label": "TENANT_VISION_SYNC.md",
+      "layer": "L1",
+      "path": "docs/development/TENANT_VISION_SYNC.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1219_integration_rs",
+      "label": "galaxy_horizon_s1219_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1219_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_tenant_vision_sync_integration_rs",
+      "label": "tenant_vision_sync_integration.rs",
+      "layer": "L3",
+      "path": "tests/tenant_vision_sync_integration.rs"
     }
   ],
-  "revision": 339,
+  "revision": 341,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",

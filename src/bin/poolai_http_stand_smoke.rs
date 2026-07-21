@@ -4897,6 +4897,49 @@ mod tests {
     }
 
     #[test]
+    fn tenant_vision_sync_band58_export_shape_ph_s1223() {
+        use poolai_ui_core::tenant_vision_sync_depth::{
+            tenant_vision_sync_criteria_total, tenant_vision_sync_depth_stub,
+            tenant_vision_sync_slices_met, TenantVisionSyncDepth, FM_BAND58_ROWS,
+            TENANT_VISION_SYNC_CASES, TENANT_VISION_SYNC_CRITERIA, TENANT_VISION_SYNC_SLICES,
+        };
+        use serde_json::json;
+        assert_eq!(
+            tenant_vision_sync_depth_stub(Some(&json!({"stand_smoke_export": true}))),
+            TenantVisionSyncDepth::StandSmokeExport
+        );
+        assert_eq!(
+            tenant_vision_sync_depth_stub(Some(&json!({
+                "tenant_vision_sync_depth": true,
+                "slice_aggregate": true,
+                "criteria_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "tenant_vision_sync_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            TenantVisionSyncDepth::FullBand58
+        );
+        assert_eq!(TENANT_VISION_SYNC_CRITERIA.len(), 10);
+        assert_eq!(tenant_vision_sync_criteria_total(), 10);
+        assert_eq!(TENANT_VISION_SYNC_SLICES.len(), 6);
+        assert!(TENANT_VISION_SYNC_CASES.contains(&"aggregate_flag"));
+        let canon = include_str!("../../docs/development/TENANT_VISION_SYNC.md");
+        assert_eq!(tenant_vision_sync_slices_met(canon), (6, 6));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--tenant-vision-sync"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND58_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band58 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn galaxy_edge_verification_band48_export_shape_ph_s1125() {
         use poolai_ui_core::galaxy_edge_verification_depth::{
             edge_verification_criteria_total, galaxy_edge_verification_depth_stub,
