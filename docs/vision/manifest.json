@@ -2505,7 +2505,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1199",
+  "next_sprint": "PH-S1209",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -10048,7 +10048,7 @@
       "path": "tests/tenant_stand_smoke_integration.rs"
     }
   ],
-  "revision": 335,
+  "revision": 336,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",

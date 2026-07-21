@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 161017,
-  "non_rust_product_loc": 8802,
-  "product_loc_total": 169819,
-  "rust_ratio": 0.9481683439426684,
-  "rust_ratio_pct": 94.81683439426683,
+  "rust_loc": 161647,
+  "non_rust_product_loc": 8825,
+  "product_loc_total": 170472,
+  "rust_ratio": 0.9482319677131729,
+  "rust_ratio_pct": 94.82319677131728,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -58,6 +58,9 @@
   "tenant_stand_smoke_mode": true,
   "tenant_stand_smoke_criteria_total": 10,
   "tenant_stand_smoke_criteria_met_count": 10,
+  "tenant_loc_audit_mode": true,
+  "tenant_loc_audit_criteria_total": 10,
+  "tenant_loc_audit_criteria_met_count": 10,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -65,27 +68,27 @@
     },
     "ops_ps1": {
       "files": 16,
-      "loc": 1497
+      "loc": 1503
     },
     "ops_shell": {
       "files": 38,
-      "loc": 3101
+      "loc": 3118
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 73,
-      "loc": 15472
+      "files": 74,
+      "loc": 15687
     },
     "rust_src": {
       "files": 300,
-      "loc": 109107
+      "loc": 109203
     },
     "rust_tests": {
-      "files": 252,
-      "loc": 35830
+      "files": 254,
+      "loc": 36149
     },
     "ui_css": {
       "files": 2,
@@ -117,6 +120,8 @@
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
     "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
     "PH-S1194: tenant_stand_smoke_mode — live store/CRUD/usage+quota + verify hooks",
-    "PH-S1198: band 55 tenant stand-smoke — criteria met vs registry"
+    "PH-S1198: band 55 tenant stand-smoke — criteria met vs registry",
+    "PH-S1204: tenant_loc_audit_mode — aggregate band 51–55 --tenant-* loc-audit slices",
+    "PH-S1208: band 56 tenant loc-audit — criteria met vs registry"
   ]
 }

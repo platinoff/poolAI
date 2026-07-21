@@ -27,6 +27,7 @@ VERIFY_TENANT_STORE="${VERIFY_TENANT_STORE:-0}"
 VERIFY_TENANT_API="${VERIFY_TENANT_API:-0}"
 VERIFY_TENANT_ADMIN_OPS="${VERIFY_TENANT_ADMIN_OPS:-0}"
 VERIFY_TENANT_STAND_SMOKE="${VERIFY_TENANT_STAND_SMOKE:-0}"
+VERIFY_TENANT_LOC_AUDIT="${VERIFY_TENANT_LOC_AUDIT:-0}"
 HEALTH_RETRIES="${VERIFY_HEALTH_RETRIES:-45}"
 HEALTH_SLEEP="${VERIFY_HEALTH_SLEEP:-2}"
 
@@ -394,6 +395,16 @@ if [[ "$VERIFY_TENANT_STAND_SMOKE" == "1" ]]; then
     echo "OK  tenant stand-smoke gate loc-audit"
   else
     echo "FAIL tenant stand-smoke gate loc-audit"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_TENANT_LOC_AUDIT" == "1" ]]; then
+  echo "Running poolai-loc-audit --tenant-loc-audit (PH-S1202)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --tenant-loc-audit); then
+    echo "OK  tenant loc-audit aggregate gate"
+  else
+    echo "FAIL tenant loc-audit aggregate gate"
     fail=1
   fi
 fi

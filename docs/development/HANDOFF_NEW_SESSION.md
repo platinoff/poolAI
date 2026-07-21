@@ -1,8 +1,27 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-21 (band 55 **PH-S1189…S1198** ✅ · enterprise horizon band 56)
+**Оновлено:** 2026-07-21 (band 56 **PH-S1199…S1208** ✅ · enterprise horizon band 57)
 
-**Наступна сесія:** **`абракадабра`** — promote band 56 з [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md).
+**Наступна сесія:** **`абракадабра`** — promote band 57 з [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md).
+
+## Band 56 — Tenant loc-audit aggregate (PH-S1199…S1208, ✅)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1199** | `tenant_loc_audit_depth` ui-core module |
+| **PH-S1200** | Slice aggregate stub (`TENANT_LOC_AUDIT_SLICES`) |
+| **PH-S1201** | Criteria contracts (`tenant_loc_audit_integration`) |
+| **PH-S1202** | `VERIFY_TENANT_LOC_AUDIT` + quick `--tenant-loc-audit` |
+| **PH-S1203** | Stand smoke export shape band 56 |
+| **PH-S1204** | `poolai-loc-audit --tenant-loc-audit` |
+| **PH-S1205** | `TENANT_LOC_AUDIT.md` + canon sync |
+| **PH-S1206** | vision-sync --check |
+| **PH-S1207** | Ratio hold advisory |
+| **PH-S1208** | Band close |
+
+**§5.12:** **0** відкритих (band 56 ✅). **Vision:** rev **336** (після sync). **Enterprise pending:** 940 (→ PH-S2148).
+
+**PH-S1208 ✅ (2026-07-21):** `tenant_loc_audit_depth.rs`; slice aggregate; `--tenant-loc-audit`; `VERIFY_TENANT_LOC_AUDIT`; `TENANT_LOC_AUDIT.md`; `galaxy_horizon_s1199_integration`.
 
 ## Band 55 — Tenant stand smoke (PH-S1189…S1198, ✅)
 

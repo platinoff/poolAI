@@ -1,6 +1,6 @@
 # PH-S master backlog 1000 (enterprise horizon v2)
 
-**Generated:** 2026-07-21 · **Range:** PH-S1149…PH-S2148 · **Pending:** **950** (band 55 ✅) · **Enterprise roadmap v2**
+**Generated:** 2026-07-21 · **Range:** PH-S1149…PH-S2148 · **Pending:** **940** (band 56 ✅) · **Enterprise roadmap v2**
 
 **VDT:** один `абракадабра` = drain **10** з FM §5.12 → vision close → push → promote наступні 10.
 
@@ -15,7 +15,8 @@
 | 53 | PH-S1169…S1178 | A Tenants · API contracts **✅ drained** |
 | 54 | PH-S1179…S1188 | A Tenants · admin/ops glue **✅** |
 | 55 | PH-S1189…S1198 | A Tenants · stand smoke **✅** |
-| 56 | PH-S1199…S1208 | A Tenants · loc-audit **active next** |
+| 56 | PH-S1199…S1208 | A Tenants · loc-audit **✅ drained** |
+| 57 | PH-S1209…S1218 | A Tenants · docs canon **active next** |
 | 57 | PH-S1209…S1218 | A Tenants · docs canon |
 | 58 | PH-S1219…S1228 | A Tenants · vision-sync |
 | 59 | PH-S1229…S1238 | A Tenants · ratio advisory |
@@ -192,16 +193,16 @@
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1199** | `tenant_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1200** | `tenant` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1201** | `tenant` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1202** | `tenant` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1203** | Stand smoke `tenant` export | export shape unit test | **[ ]** |
-| **PH-S1204** | poolai-loc-audit PH-S1204 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1205** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1206** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1207** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1208** | galaxy_horizon_s1199_integration | band close | **[ ]** |
+| **PH-S1199** | `tenant_loc_audit_depth` scaffold | ui-core depth enum + criteria registry | **✅** |
+| **PH-S1200** | slice aggregate stub | `TENANT_LOC_AUDIT_SLICES` + unit test | **✅** |
+| **PH-S1201** | criteria contracts | `tenant_loc_audit_integration` | **✅** |
+| **PH-S1202** | `VERIFY_TENANT_LOC_AUDIT` | verify-dev-stand + quick flag | **✅** |
+| **PH-S1203** | Stand smoke export | `tenant_loc_audit_band56_export_shape` | **✅** |
+| **PH-S1204** | `poolai-loc-audit --tenant-loc-audit` | `rust_ratio.json` fields | **✅** |
+| **PH-S1205** | `TENANT_LOC_AUDIT.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | **✅** |
+| **PH-S1206** | poolai-vision-sync --check | drift gate green | **✅** |
+| **PH-S1207** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
+| **PH-S1208** | galaxy_horizon_s1199_integration | band close | **✅** |
 
 ## Band 57 — PH-S1209…S1218 (A Tenants · docs canon)
 
