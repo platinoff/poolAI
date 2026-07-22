@@ -2534,6 +2534,18 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_development_TENANT_HORIZON_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_sso_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_SSO_DEPTH_md"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -10266,9 +10278,37 @@
       "label": "tenant_horizon_integration.rs",
       "layer": "L3",
       "path": "tests/tenant_horizon_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_sso_depth_rs",
+      "label": "sso_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/sso_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_SSO_DEPTH_md",
+      "label": "SSO_DEPTH.md",
+      "layer": "L1",
+      "path": "docs/development/SSO_DEPTH.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1249_integration_rs",
+      "label": "galaxy_horizon_s1249_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1249_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_sso_depth_audit_rs",
+      "label": "sso_depth_audit.rs",
+      "layer": "L3",
+      "path": "tests/sso_depth_audit.rs"
     }
   ],
-  "revision": 347,
+  "revision": 348,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",

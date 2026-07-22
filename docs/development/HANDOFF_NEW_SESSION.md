@@ -21,7 +21,7 @@
 | **PH-S1257** | Ratio hold advisory |
 | **PH-S1258** | Band close |
 
-**§5.12:** **0** відкритих (band 61 ✅). **Vision:** rev **347**. **Enterprise pending:** 890 (→ PH-S2148).
+**§5.12:** **0** відкритих (band 61 ✅). **Vision:** rev **348**. **Enterprise pending:** 890 (→ PH-S2148).
 
 **PH-S1258 ✅ (2026-07-21):** `sso_depth.rs`; `POOLAI_SSO_STORE`; SAML audience/time stub; `--sso`; `VERIFY_SSO`; `SSO_DEPTH.md`; `galaxy_horizon_s1249_integration`. Phase B SSO depth scaffold closed.
 
