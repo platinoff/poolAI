@@ -9,7 +9,7 @@ Enterprise horizon v2 (FM §5.14b / §5.17) · backlog PH-S1149…S2148 · pendi
 | **← наступний** | **`абракадабра`** (project scan → band 62) |
 | **§5.12 active** | **0** (band 61 ✅) |
 | **Horizon** | band 62 → **PH-S1259…S1268** |
-| **Vision** | rev **349** |
+| **Vision** | rev **350** |
 | **Cursor** | local **3.12.30** · [`CURSOR_UPDATE_RESEARCH_2026-07-22.md`](./CURSOR_UPDATE_RESEARCH_2026-07-22.md) |
 
 ---
