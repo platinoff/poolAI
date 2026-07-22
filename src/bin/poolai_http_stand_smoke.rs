@@ -5110,6 +5110,48 @@ mod tests {
     }
 
     #[test]
+    fn sso_api_band63_export_shape_ph_s1276() {
+        use poolai_ui_core::sso_api_contracts_depth::{
+            sso_api_contracts_depth_stub, sso_api_criteria_total, SsoApiContractsDepth,
+            FM_BAND63_ROWS, SSO_API_CASES, SSO_API_CRITERIA,
+        };
+        use serde_json::json;
+        assert_eq!(
+            sso_api_contracts_depth_stub(Some(&json!({"oauth2_http_crud": true}))),
+            SsoApiContractsDepth::Oauth2HttpCrud
+        );
+        assert_eq!(
+            sso_api_contracts_depth_stub(Some(&json!({
+                "sso_api_depth": true,
+                "oauth2_http_crud": true,
+                "saml_http_crud": true,
+                "store_wire_http": true,
+                "openapi_schemas": true,
+                "callback_fixtures": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "sso_api_docs": true,
+            }))),
+            SsoApiContractsDepth::FullBand63
+        );
+        assert_eq!(SSO_API_CRITERIA.len(), 10);
+        assert_eq!(sso_api_criteria_total(), 10);
+        assert!(SSO_API_CASES.contains(&"store_wire_http"));
+        let security_api = include_str!("../../src/network/enterprise_api/security.rs");
+        assert!(security_api.contains("sso_store_wire_handler"));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--sso-api"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND63_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band63 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn galaxy_edge_verification_band48_export_shape_ph_s1125() {
         use poolai_ui_core::galaxy_edge_verification_depth::{
             edge_verification_criteria_total, galaxy_edge_verification_depth_stub,

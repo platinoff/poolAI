@@ -1,12 +1,12 @@
 # PH-S enterprise roadmap v2 (PH-S1149…S2148)
 
-**Оновлено:** 2026-07-21 · **Мета:** durable single-host **enterprise 100%** (FM §5.17) за **1000** спринтами · **100** сесій `абракадабра` (10 PH-S* / сесія)
+**Оновлено:** 2026-07-22 · **Мета:** durable single-host **enterprise 100%** (FM §5.17) за **1000** спринтами · **100** сесій `абракадабра` (10 PH-S* / сесія)
 
 **Канон drain:** FM **§5.12** (max 10 відкритих) · реєстр — [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md) · regen: `bash scripts/generate-ph-s-master-backlog-1000.sh`
 
-**Попередній горизонт:** product-complete PH-S1010 / FM §5.15 ✅ · maintenance bands 37–50 ✅ · enterprise phase A bands 51–60 ✅ (persist · store wire · **API contracts** · **admin/ops glue** · stand smoke · loc-audit · docs canon · vision-sync · ratio advisory · **horizon close**) · phase B SSO depth band 61 ✅ · SSO store wire band 62 ✅ (`sso_store_wire` · `POOLAI_SSO_DATA_DIR`) · PH-S1149…S1268 markers preserved for horizon close tests
+**Попередній горизонт:** product-complete PH-S1010 / FM §5.15 ✅ · maintenance bands 37–50 ✅ · enterprise phase A bands 51–60 ✅ (persist · store wire · **API contracts** · **admin/ops glue** · stand smoke · loc-audit · docs canon · vision-sync · ratio advisory · **horizon close**) · phase B SSO depth band 61 ✅ · SSO store wire band 62 ✅ (`sso_store_wire` · `POOLAI_SSO_DATA_DIR`) · SSO API contracts band 63 ✅ (`sso_api_contracts_depth` · `GET /security/sso/store`) · PH-S1149…S1278 markers preserved for horizon close tests
 
-**Активна смуга:** band 63 **PH-S1269…S1278** (B SSO · API contracts)
+**Активна смуга:** band 64 **PH-S1279…S1288** (B SSO · admin/ops glue)
 
 **Поза scope (не в backlog):** FM-003 LAN 2-host (**BLOCKED**) · FM-041 Cloud SDK prod (**Deferred**) · mandatory ZK/TEE
 

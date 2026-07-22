@@ -1,10 +1,29 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-22 (band 62 **PH-S1259…S1268** ✅ · Cursor **3.12.30** · horizon band 63)
+**Оновлено:** 2026-07-22 (band 63 **PH-S1269…S1278** ✅ · Cursor **3.12.30** · horizon band 64)
 
-**Наступна сесія:** **`абракадабра`** — promote band 63 (B SSO · API contracts) з [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md).
+**Наступна сесія:** **`абракадабра`** — promote band 64 (B SSO · admin/ops glue) з [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md).
 
 **Cursor / toolchain (service):** local desktop **3.12.30** · public changelog latest numbered IDE **3.11** · research [`CURSOR_UPDATE_RESEARCH_2026-07-22.md`](./CURSOR_UPDATE_RESEARCH_2026-07-22.md) · FM **§5.16**. Vision: `poolai-vision-sync` мержить enterprise `queue — band` → Sprint queue + Feed = останні закриті PH-S*.
+
+## Band 63 — SSO API contracts (PH-S1269…S1278, ✅)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1269** | `sso_api_contracts_depth` ui-core module |
+| **PH-S1270** | OAuth2 HTTP CRUD lifecycle |
+| **PH-S1271** | SAML HTTP CRUD lifecycle |
+| **PH-S1272** | `GET /security/sso/store` wire read |
+| **PH-S1273** | OpenAPI `SsoStoreWire` |
+| **PH-S1274** | Callback fixtures (no live IdP) |
+| **PH-S1275** | `VERIFY_SSO_API` + quick `--sso-api` |
+| **PH-S1276** | Stand smoke + loc-audit `--sso-api` |
+| **PH-S1277** | `SSO_API.md` + canon sync |
+| **PH-S1278** | Band close |
+
+**§5.12:** **0** відкритих (band 63 ✅). **Vision:** rev **354**. **Enterprise pending:** 870 (→ PH-S2148).
+
+**PH-S1278 ✅ (2026-07-22):** `sso_api_contracts_depth.rs`; OAuth2/SAML HTTP CRUD; `GET /security/sso/store`; `SsoStoreWire`; `--sso-api`; `VERIFY_SSO_API`; `SSO_API.md`; `galaxy_horizon_s1269_integration`. Phase B SSO API contracts closed.
 
 ## Band 62 — SSO store wire (PH-S1259…S1268, ✅)
 

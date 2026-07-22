@@ -13,6 +13,11 @@ use serde::Deserialize;
 
 use super::{enterprise_err, enterprise_json_err};
 
+/// GET /security/sso/store — band-62 wire snapshot over HTTP (PH-S1272).
+pub(super) async fn sso_store_wire_handler() -> impl IntoResponse {
+    Json(enterprise::security::sso_store_wire())
+}
+
 #[derive(Deserialize)]
 pub(super) struct OAuth2ProviderRegisterRequest {
     name: String,

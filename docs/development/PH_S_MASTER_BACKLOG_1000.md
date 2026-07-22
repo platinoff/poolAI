@@ -22,8 +22,8 @@
 | 60 | PH-S1239…S1248 | A Tenants · horizon close **✅ drained** |
 | 61 | PH-S1249…S1258 | B SSO · depth scaffold **✅** |
 | 62 | PH-S1259…S1268 | B SSO · store wire **✅** |
-| 63 | PH-S1269…S1278 | B SSO · API contracts **active next** |
-| 64 | PH-S1279…S1288 | B SSO · admin/ops glue |
+| 63 | PH-S1269…S1278 | B SSO · API contracts **✅** |
+| 64 | PH-S1279…S1288 | B SSO · admin/ops glue **active next** |
 | 65 | PH-S1289…S1298 | B SSO · stand smoke |
 | 66 | PH-S1299…S1308 | B SSO · loc-audit |
 | 67 | PH-S1309…S1318 | B SSO · docs canon |
@@ -297,16 +297,16 @@
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1269** | `sso_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1270** | `sso` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1271** | `sso` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1272** | `sso` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1273** | Stand smoke `sso` export | export shape unit test | **[ ]** |
-| **PH-S1274** | poolai-loc-audit PH-S1274 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1275** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1276** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1277** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1278** | galaxy_horizon_s1269_integration | band close | **[ ]** |
+| **PH-S1269** | `sso_api_contracts_depth` | ui-core depth enum + criteria registry | **✅** |
+| **PH-S1270** | OAuth2 HTTP CRUD | `sso_api_contracts_integration` POST→GET→PUT→DELETE | **✅** |
+| **PH-S1271** | SAML HTTP CRUD | same suite SAML providers lifecycle | **✅** |
+| **PH-S1272** | `GET /security/sso/store` | `SsoStoreWire` memory/sqlite | **✅** |
+| **PH-S1273** | OpenAPI `SsoStoreWire` | schema + path; gap-audit 0 | **✅** |
+| **PH-S1274** | Callback fixtures | OAuth missing code + SAML invalid (no live IdP) | **✅** |
+| **PH-S1275** | `VERIFY_SSO_API` / `--sso-api` | verify-dev-stand + run-poolai quick | **✅** |
+| **PH-S1276** | Stand smoke + loc-audit | `sso_api_band63_export_shape` + rust_ratio fields | **✅** |
+| **PH-S1277** | Docs `SSO_API.md` | RUN_LOCAL/INDEX/HANDOFF/NEXT canon | **✅** |
+| **PH-S1278** | `galaxy_horizon_s1269_integration` | band close → band 64 | **✅** |
 
 ## Band 64 — PH-S1279…S1288 (B SSO · admin/ops glue)
 

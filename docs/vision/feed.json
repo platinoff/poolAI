@@ -3,6 +3,96 @@
   "items": [
     {
       "category": "closed",
+      "id": "PH-S1278",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_horizon_s1269_integration`; HANDOFF/NEXT",
+      "title": "SSO API band close"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1277",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "HTTP contract matrix + master backlog override",
+      "title": "Docs `SSO_API.md` + canon sync"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1276",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "export shape + `rust_ratio.json` sso_api fields",
+      "title": "Stand smoke + `poolai-loc-audit --sso-api"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1275",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "VERIFY_SSO_API=1` + `--sso-api",
+      "title": "verify-dev-stand` / quick `--sso-api"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1274",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "OAuth missing code + SAML invalid + audience stub",
+      "title": "Callback fixtures (no live IdP)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1273",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "store schema + path; gap-audit 0",
+      "title": "OpenAPI `SsoStoreWire` + errors"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1272",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "{mode,durable_path,configured}` memory/sqlite",
+      "title": "Store-wire status HTTP read"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1271",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "POST→GET→PUT→DELETE `/security/saml/providers",
+      "title": "SAML HTTP CRUD lifecycle"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1270",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "POST→GET→PUT→DELETE `/security/oauth2/providers",
+      "title": "OAuth2 HTTP CRUD lifecycle"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1269",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "depth enum + HTTP API criteria registry",
+      "title": "sso_api_contracts_depth` ui-core module"
+    },
+    {
+      "category": "closed",
       "id": "PH-S1268",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
@@ -17,96 +107,6 @@
       "published": "2026-05-28",
       "status": "closed",
       "summary": "--min-ratio 0.95 --advisory`; roadmap → band 63",
-      "title": "Ratio hold advisory + roadmap zriz"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1266",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "drift gate green after band 62",
-      "title": "poolai-vision-sync --check"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1265",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "matrix + RUN_LOCAL/INDEX/HANDOFF/NEXT",
-      "title": "Docs `SSO_STORE.md` + canon sync"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1264",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "sso_store_*` fields in `rust_ratio.json",
-      "title": "poolai-loc-audit --sso-store"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1263",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "sso_store_band62_export_shape",
-      "title": "Stand smoke SSO store export shape"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1262",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "SSO store gate",
-      "title": "VERIFY_SSO_STORE` + quick `--sso-store"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1261",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "wire labels + ui-core depth stub",
-      "title": "SSO store wire contracts"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1260",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "POOLAI_SSO_DATA_DIR` + `sso_store_wire()` + unit tests",
-      "title": "SSO store wire durable path"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1259",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "depth enum + SSO store criteria registry",
-      "title": "sso_store_depth` ui-core module"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1258",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_horizon_s1249_integration`; HANDOFF/NEXT → band 62",
-      "title": "SSO depth band close"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1257",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--min-ratio 0.95 --advisory`; roadmap → band 62",
       "title": "Ratio hold advisory + roadmap zriz"
     }
   ],

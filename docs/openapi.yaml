@@ -5078,6 +5078,44 @@ paths:
         '503':
           description: Monitoring manager unavailable
 
+  /security/sso/store:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseSecurity
+      summary: SSO store wire status
+      description: |
+        Returns the band-62 durable-path wire snapshot (`mode`, `durable_path`, `configured`).
+        Unauthenticated read for ops / admin glue (PH-S1272).
+      operationId: getSsoStoreWire
+      responses:
+        '200':
+          description: SSO store wire snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SsoStoreWire'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Subsystem unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /security/oauth2/providers:
     servers:
       - url: http://localhost:8080/api/enterprise
@@ -9249,6 +9287,24 @@ components:
     TenantStoreWire:
       type: object
       description: Band-52 tenant store wire snapshot exposed over HTTP (PH-S1173/S1174)
+      required:
+        - mode
+        - configured
+      properties:
+        mode:
+          type: string
+          description: "`memory` or `sqlite`"
+        durable_path:
+          type: string
+          nullable: true
+          description: Resolved sqlite file path when configured
+        configured:
+          type: boolean
+          description: True when sqlite mode has a durable path
+
+    SsoStoreWire:
+      type: object
+      description: Band-62 SSO store wire snapshot exposed over HTTP (PH-S1272/S1273)
       required:
         - mode
         - configured

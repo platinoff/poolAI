@@ -99,6 +99,8 @@ pub fn create_enterprise_api_routes() -> Router<ApiContext> {
             get(monitoring_alert_rules_handler),
         )
         // Security
+        // Static SSO store path (PH-S1272) — before provider `{name}` routes.
+        .route("/security/sso/store", get(sso_store_wire_handler))
         .route(
             "/security/oauth2/providers",
             get(security_oauth2_providers_handler),

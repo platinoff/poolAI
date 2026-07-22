@@ -2564,11 +2564,23 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_development_SSO_STORE_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_sso_api_contracts_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_SSO_API_md"
     }
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S1268",
+  "last_sprint_closed": "PH-S1278",
   "layers": [
     {
       "id": "L0",
@@ -2601,7 +2613,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1269",
+  "next_sprint": "PH-S1279",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -10359,9 +10371,37 @@
       "label": "sso_store_wire_integration.rs",
       "layer": "L3",
       "path": "tests/sso_store_wire_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_sso_api_contracts_depth_rs",
+      "label": "sso_api_contracts_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/sso_api_contracts_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_SSO_API_md",
+      "label": "SSO_API.md",
+      "layer": "L1",
+      "path": "docs/development/SSO_API.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1269_integration_rs",
+      "label": "galaxy_horizon_s1269_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1269_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_sso_api_contracts_integration_rs",
+      "label": "sso_api_contracts_integration.rs",
+      "layer": "L3",
+      "path": "tests/sso_api_contracts_integration.rs"
     }
   ],
-  "revision": 352,
+  "revision": 354,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -21189,6 +21229,96 @@
       "row": 1203,
       "status": "closed",
       "title": "SSO store band close"
+    },
+    {
+      "acceptance": "depth enum + HTTP API criteria registry",
+      "deps": "sso_api_contracts_depth.rs",
+      "id": "PH-S1269",
+      "open": false,
+      "row": 1204,
+      "status": "closed",
+      "title": "sso_api_contracts_depth` ui-core module"
+    },
+    {
+      "acceptance": "POST→GET→PUT→DELETE `/security/oauth2/providers",
+      "deps": "sso_api_contracts_integration.rs",
+      "id": "PH-S1270",
+      "open": false,
+      "row": 1205,
+      "status": "closed",
+      "title": "OAuth2 HTTP CRUD lifecycle"
+    },
+    {
+      "acceptance": "POST→GET→PUT→DELETE `/security/saml/providers",
+      "deps": "same suite",
+      "id": "PH-S1271",
+      "open": false,
+      "row": 1206,
+      "status": "closed",
+      "title": "SAML HTTP CRUD lifecycle"
+    },
+    {
+      "acceptance": "{mode,durable_path,configured}` memory/sqlite",
+      "deps": "GET /security/sso/store",
+      "id": "PH-S1272",
+      "open": false,
+      "row": 1207,
+      "status": "closed",
+      "title": "Store-wire status HTTP read"
+    },
+    {
+      "acceptance": "store schema + path; gap-audit 0",
+      "deps": "docs/openapi.yaml",
+      "id": "PH-S1273",
+      "open": false,
+      "row": 1208,
+      "status": "closed",
+      "title": "OpenAPI `SsoStoreWire` + errors"
+    },
+    {
+      "acceptance": "OAuth missing code + SAML invalid + audience stub",
+      "deps": "same suite",
+      "id": "PH-S1274",
+      "open": false,
+      "row": 1209,
+      "status": "closed",
+      "title": "Callback fixtures (no live IdP)"
+    },
+    {
+      "acceptance": "VERIFY_SSO_API=1` + `--sso-api",
+      "deps": "bin/verify-dev-stand.sh",
+      "id": "PH-S1275",
+      "open": false,
+      "row": 1210,
+      "status": "closed",
+      "title": "verify-dev-stand` / quick `--sso-api"
+    },
+    {
+      "acceptance": "export shape + `rust_ratio.json` sso_api fields",
+      "deps": "stand smoke / loc-audit",
+      "id": "PH-S1276",
+      "open": false,
+      "row": 1211,
+      "status": "closed",
+      "title": "Stand smoke + `poolai-loc-audit --sso-api"
+    },
+    {
+      "acceptance": "HTTP contract matrix + master backlog override",
+      "deps": "RUN_LOCAL/INDEX/HANDOFF/NEXT",
+      "id": "PH-S1277",
+      "open": false,
+      "row": 1212,
+      "status": "closed",
+      "title": "Docs `SSO_API.md` + canon sync"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1269_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1278",
+      "open": false,
+      "row": 1213,
+      "status": "closed",
+      "title": "SSO API band close"
     }
   ],
   "sprint_queue_open_count": 0,

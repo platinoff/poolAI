@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-07-22 (service PH-SVC21…SVC30 ✅ · Cursor **3.12.30** · band 62 **PH-S1259…S1268** ✅ · enterprise horizon band 63)
+**Оновлено:** 2026-07-22 (service PH-SVC21…SVC30 ✅ · Cursor **3.12.30** · band 63 **PH-S1269…S1278** ✅ · enterprise horizon band 64)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -1221,7 +1221,24 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 62 ✅). **Master horizon:** PH-S1269…S1278 (band 63) · enterprise backlog PH-S1149…S2148. Vision rev **352**. **Наступна сесія:** **`абракадабра`** — promote band 63.
+**Відкритих у §5.12:** **0** (band 63 ✅). **Master horizon:** PH-S1279…S1288 (band 64) · enterprise backlog PH-S1149…S2148. Vision rev **354**. **Наступна сесія:** **`абракадабра`** — promote band 64.
+
+### 5.44 SSO API contracts queue — band 63 (PH-S1269…S1278, 2026-07-22)
+
+**Джерело:** FM-horizon v2 / enterprise phase B — SSO HTTP API contracts (OAuth2/SAML CRUD / store-wire read / callback fixtures). Overrides master-backlog template (`sso_depth scaffold`) — mirror band 53 [`TENANT_API.md`](../development/TENANT_API.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1204 | **PH-S1269** | `sso_api_contracts_depth` ui-core module | `sso_api_contracts_depth.rs` | depth enum + HTTP API criteria registry | **✅** |
+| 1205 | **PH-S1270** | OAuth2 HTTP CRUD lifecycle | `sso_api_contracts_integration.rs` | POST→GET→PUT→DELETE `/security/oauth2/providers` | **✅** |
+| 1206 | **PH-S1271** | SAML HTTP CRUD lifecycle | same suite | POST→GET→PUT→DELETE `/security/saml/providers` | **✅** |
+| 1207 | **PH-S1272** | Store-wire status HTTP read | `GET /security/sso/store` | `{mode,durable_path,configured}` memory/sqlite | **✅** |
+| 1208 | **PH-S1273** | OpenAPI `SsoStoreWire` + errors | `docs/openapi.yaml` | store schema + path; gap-audit 0 | **✅** |
+| 1209 | **PH-S1274** | Callback fixtures (no live IdP) | same suite | OAuth missing code + SAML invalid + audience stub | **✅** |
+| 1210 | **PH-S1275** | `verify-dev-stand` / quick `--sso-api` | `bin/verify-dev-stand.sh` | `VERIFY_SSO_API=1` + `--sso-api` | **✅** |
+| 1211 | **PH-S1276** | Stand smoke + `poolai-loc-audit --sso-api` | stand smoke / loc-audit | export shape + `rust_ratio.json` sso_api fields | **✅** |
+| 1212 | **PH-S1277** | Docs `SSO_API.md` + canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | HTTP contract matrix + master backlog override | **✅** |
+| 1213 | **PH-S1278** | SSO API band close | tests/docs | `galaxy_horizon_s1269_integration`; HANDOFF/NEXT | **✅** |
 
 ### 5.43 SSO store wire queue — band 62 (PH-S1259…S1268, 2026-07-22)
 
@@ -1728,10 +1745,10 @@ FM-xxx (з таблиці нижче)
 
 | Поле | Значення |
 |------|----------|
-| **Pending** | **880** (band 62 ✅ · S1269…S2148) |
-| **Drained** | band 51–62 PH-S1149…S1268 ✅ (phase A Tenants + phase B SSO depth/store wire) |
-| **Активна §5.12** | — (promote band 63 next) |
-| **Наступна promote** | PH-S1269…S1278 |
+| **Pending** | **870** (band 63 ✅ · S1279…S2148) |
+| **Drained** | band 51–63 PH-S1149…S1278 ✅ (phase A Tenants + phase B SSO depth/store/API) |
+| **Активна §5.12** | — (promote band 64 next) |
+| **Наступна promote** | PH-S1279…S1288 |
 | **План фаз** | [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md) |
 | **Реєстр sprint×acceptance** | [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md) |
 | **Regen** | `bash scripts/generate-ph-s-master-backlog-1000.sh` |
@@ -1771,7 +1788,7 @@ FM-xxx (з таблиці нижче)
 
 ### 5.17 Enterprise-complete closure (PH-S2148 target)
 
-**Статус:** **in progress** — band 62 ✅ (SSO store wire) · pending PH-S1269…S2148 · roadmap [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md).
+**Статус:** **in progress** — band 63 ✅ (SSO API contracts) · pending PH-S1279…S2148 · roadmap [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md).
 
 | Критерій | Ціль |
 |----------|------|
@@ -1831,7 +1848,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-22):** band 62 **PH-S1259…S1268** ✅ · §5.12 **0** · наступна **`абракадабра`** → promote band 63 (B SSO · API contracts).
+**Активна смуга (2026-07-22):** band 63 **PH-S1269…S1278** ✅ · §5.12 **0** · наступна **`абракадабра`** → promote band 64 (B SSO · admin/ops glue).
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 
