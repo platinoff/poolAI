@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-21",
+  "generated_at": "2026-07-22",
   "sprint": "PH-S1010",
   "formal_band_min": 0.9,
   "formal_band_max": 0.95,
@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 163229,
-  "non_rust_product_loc": 8894,
-  "product_loc_total": 172123,
-  "rust_ratio": 0.9483276494135008,
-  "rust_ratio_pct": 94.83276494135008,
+  "rust_loc": 163779,
+  "non_rust_product_loc": 8911,
+  "product_loc_total": 172690,
+  "rust_ratio": 0.9483988650182408,
+  "rust_ratio_pct": 94.83988650182408,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -67,9 +67,12 @@
   "tenant_vision_sync_mode": false,
   "tenant_vision_sync_criteria_total": 10,
   "tenant_vision_sync_criteria_met_count": 0,
-  "tenant_ratio_advisory_mode": true,
+  "tenant_ratio_advisory_mode": false,
   "tenant_ratio_advisory_criteria_total": 10,
-  "tenant_ratio_advisory_criteria_met_count": 10,
+  "tenant_ratio_advisory_criteria_met_count": 0,
+  "tenant_horizon_mode": true,
+  "tenant_horizon_criteria_total": 10,
+  "tenant_horizon_criteria_met_count": 10,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -81,23 +84,23 @@
     },
     "ops_shell": {
       "files": 38,
-      "loc": 3169
+      "loc": 3186
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 77,
-      "loc": 16379
+      "files": 78,
+      "loc": 16620
     },
     "rust_src": {
       "files": 300,
-      "loc": 109643
+      "loc": 109742
     },
     "rust_tests": {
-      "files": 260,
-      "loc": 36599
+      "files": 263,
+      "loc": 36809
     },
     "ui_css": {
       "files": 2,
@@ -128,7 +131,7 @@
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
     "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
-    "PH-S1234: tenant_ratio_advisory_mode — aggregate band 51–58 tenant slices + sqlite CRUD",
-    "PH-S1238: band 59 tenant ratio-advisory — criteria met vs registry"
+    "PH-S1244: tenant_horizon_mode — aggregate band 51–59 tenant slices (phase A close)",
+    "PH-S1248: band 60 tenant horizon close — criteria met vs registry"
   ]
 }

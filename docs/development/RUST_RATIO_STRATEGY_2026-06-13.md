@@ -1,6 +1,6 @@
 # Rust codebase ratio — стратегія 90–95% (PoolAI)
 
-**Оновлено:** 2026-07-21 · band 59 **PH-S1229…S1238** ✅ · `tenant_ratio_advisory_depth` + SQLite CRUD · band 58 `tenant_vision_sync_depth` ✅ · band 57 `tenant_docs_canon_depth` ✅ · band 56 `tenant_loc_audit_depth` ✅ · band 55 `tenant_stand_smoke_depth` ✅ · band 54 `tenant_admin_ops_depth` ✅ · band 53 `tenant_api_contracts_depth` ✅ · `tenant_depth` · `tenant_persistence_depth` · rust_ratio formal hold · stretch **96%** advisory
+**Оновлено:** 2026-07-21 · band 60 **PH-S1239…S1248** ✅ · `tenant_horizon_depth` (phase A close) · band 59 `tenant_ratio_advisory_depth` ✅ · band 58 `tenant_vision_sync_depth` ✅ · band 57 `tenant_docs_canon_depth` ✅ · band 56 `tenant_loc_audit_depth` ✅ · band 55 `tenant_stand_smoke_depth` ✅ · band 54 `tenant_admin_ops_depth` ✅ · band 53 `tenant_api_contracts_depth` ✅ · `tenant_depth` · `tenant_persistence_depth` · rust_ratio formal hold · stretch **96%** advisory
 
 **Мета:** зростання частки **Rust** у виконуваному коді репозиторію до **90–95%** (формально), **96% stretch spirit** (орієнтир replenish PH-S150…S159) — платформа збирається і перевіряється через **`cargo`** без обов'язкового Node на edge.
 

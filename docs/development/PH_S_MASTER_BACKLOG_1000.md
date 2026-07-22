@@ -19,8 +19,8 @@
 | 57 | PH-S1209…S1218 | A Tenants · docs canon **✅ drained** |
 | 58 | PH-S1219…S1228 | A Tenants · vision-sync **✅ drained** |
 | 59 | PH-S1229…S1238 | A Tenants · ratio advisory **✅ drained** |
-| 60 | PH-S1239…S1248 | A Tenants · horizon close **active next** |
-| 61 | PH-S1249…S1258 | B SSO · depth scaffold |
+| 60 | PH-S1239…S1248 | A Tenants · horizon close **✅ drained** |
+| 61 | PH-S1249…S1258 | B SSO · depth scaffold **active next** |
 | 62 | PH-S1259…S1268 | B SSO · store wire |
 | 63 | PH-S1269…S1278 | B SSO · API contracts |
 | 64 | PH-S1279…S1288 | B SSO · admin/ops glue |
@@ -248,20 +248,20 @@
 | **PH-S1237** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
 | **PH-S1238** | galaxy_horizon_s1229_integration | band close | **✅** |
 
-## Band 60 — PH-S1239…S1248 (A Tenants · horizon close)
+## Band 60 — PH-S1239…S1248 (A Tenants · horizon close) ✅
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1239** | `tenant_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1240** | `tenant` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1241** | `tenant` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1242** | `tenant` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1243** | Stand smoke `tenant` export | export shape unit test | **[ ]** |
-| **PH-S1244** | poolai-loc-audit PH-S1244 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1245** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1246** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1247** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1248** | galaxy_horizon_s1239_integration | band close | **[ ]** |
+| **PH-S1239** | `tenant_horizon_depth` scaffold | ui-core depth enum + criteria registry | **✅** |
+| **PH-S1240** | Phase-A slice aggregate | `TENANT_HORIZON_SLICES` + unit test | **✅** |
+| **PH-S1241** | horizon contracts | `tenant_horizon_integration` | **✅** |
+| **PH-S1242** | verify/admin ops glue | `VERIFY_TENANT_HORIZON` + quick flag | **✅** |
+| **PH-S1243** | Stand smoke horizon export | `tenant_horizon_band60_export_shape` | **✅** |
+| **PH-S1244** | `poolai-loc-audit --tenant-horizon` | `tenant_horizon_*` in rust_ratio.json | **✅** |
+| **PH-S1245** | Docs `TENANT_HORIZON.md` | RUN_LOCAL/INDEX/HANDOFF/NEXT | **✅** |
+| **PH-S1246** | poolai-vision-sync --check | drift gate green | **✅** |
+| **PH-S1247** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
+| **PH-S1248** | galaxy_horizon_s1239_integration | band close | **✅** |
 
 ## Band 61 — PH-S1249…S1258 (B SSO · depth scaffold)
 

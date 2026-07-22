@@ -1,10 +1,29 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-21 (band 59 **PH-S1229…S1238** ✅ · Cursor **3.12.29** · horizon band 60)
+**Оновлено:** 2026-07-21 (band 60 **PH-S1239…S1248** ✅ · Cursor **3.12.29** · horizon band 61)
 
-**Наступна сесія:** **`абракадабра`** — promote band 60 з [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md).
+**Наступна сесія:** **`абракадабра`** — promote band 61 (B SSO) з [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md).
 
 **Cursor / toolchain (service):** local desktop **3.12.29** · public changelog latest numbered IDE **3.11** · research [`CURSOR_UPDATE_RESEARCH_2026-07-21.md`](./CURSOR_UPDATE_RESEARCH_2026-07-21.md) · FM **§5.16**.
+
+## Band 60 — Tenant horizon close (PH-S1239…S1248, ✅)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1239** | `tenant_horizon_depth` ui-core module |
+| **PH-S1240** | Phase-A slice aggregate (`TENANT_HORIZON_SLICES`) |
+| **PH-S1241** | Criteria contracts (`tenant_horizon_integration`) |
+| **PH-S1242** | `VERIFY_TENANT_HORIZON` + quick `--tenant-horizon` |
+| **PH-S1243** | Stand smoke export shape band 60 |
+| **PH-S1244** | `poolai-loc-audit --tenant-horizon` |
+| **PH-S1245** | `TENANT_HORIZON.md` + canon sync |
+| **PH-S1246** | vision-sync --check |
+| **PH-S1247** | Ratio hold advisory |
+| **PH-S1248** | Band close |
+
+**§5.12:** **0** відкритих (band 60 ✅). **Vision:** rev **346**. **Enterprise pending:** 900 (→ PH-S2148).
+
+**PH-S1248 ✅ (2026-07-21):** `tenant_horizon_depth.rs`; `TENANT_HORIZON_SLICES`; `--tenant-horizon`; `VERIFY_TENANT_HORIZON`; `TENANT_HORIZON.md`; `galaxy_horizon_s1239_integration`. Phase A Tenants closed.
 
 ## Band 59 — Tenant ratio advisory (PH-S1229…S1238, ✅)
 

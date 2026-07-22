@@ -20,7 +20,7 @@ and lands **restart-safe SQLite CRUD** for
 
 **Boundary:** band 59 = ratio-advisory ops gate + restart-safe tenant SQLite CRUD.
 Prior vision-sync remains [`TENANT_VISION_SYNC.md`](./TENANT_VISION_SYNC.md) (band 58).
-Store wire history: [`TENANT_STORE.md`](./TENANT_STORE.md). Next: band 60 horizon close.
+Store wire history: [`TENANT_STORE.md`](./TENANT_STORE.md). Next: [`TENANT_HORIZON.md`](./TENANT_HORIZON.md) (band 60 ✅).
 
 ## Loc-audit / verify
 

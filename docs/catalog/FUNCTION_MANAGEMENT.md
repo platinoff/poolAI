@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-07-21 (band 59 **PH-S1229…S1238** ✅ · enterprise horizon band 60)
+**Оновлено:** 2026-07-21 (band 60 **PH-S1239…S1248** ✅ · enterprise horizon band 61)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -1221,7 +1221,24 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 59 ✅). **Master horizon:** PH-S1239…S1248 (band 60) · enterprise backlog PH-S1149…S2148. Vision rev **344**. **Наступна сесія:** **`абракадабра`** — promote band 60.
+**Відкритих у §5.12:** **0** (band 60 ✅). **Master horizon:** PH-S1249…S1258 (band 61) · enterprise backlog PH-S1149…S2148. Vision rev **346**. **Наступна сесія:** **`абракадабра`** — promote band 61.
+
+### 5.41 Tenant horizon close queue — band 60 (PH-S1239…S1248, 2026-07-21)
+
+**Джерело:** FM-horizon v2 / enterprise phase A close — aggregate bands 51–59 `--tenant-*` under `--tenant-horizon`.
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1174 | **PH-S1239** | `tenant_horizon_depth` ui-core module | `tenant_horizon_depth.rs` | depth enum + criteria registry | **✅** |
+| 1175 | **PH-S1240** | Phase-A slice aggregate | FM §5.17 / `TENANT_HORIZON_SLICES` | all `--tenant-*` + `tenants.sqlite`; unit test | **✅** |
+| 1176 | **PH-S1241** | Tenant horizon contracts | FM §5.17 | `tenant_horizon_integration` criteria totals | **✅** |
+| 1177 | **PH-S1242** | `VERIFY_TENANT_HORIZON` + quick flag | RUN_LOCAL / verify-dev-stand | horizon gate | **✅** |
+| 1178 | **PH-S1243** | Stand smoke export shape | `poolai_http_stand_smoke` | `tenant_horizon_band60_export_shape` | **✅** |
+| 1179 | **PH-S1244** | `poolai-loc-audit --tenant-horizon` | RUST_RATIO / §5.13 | `tenant_horizon_*` fields in `rust_ratio.json` | **✅** |
+| 1180 | **PH-S1245** | Docs `TENANT_HORIZON.md` + canon sync | DOCS_LEGACY maintain | matrix + RUN_LOCAL/INDEX/HANDOFF/NEXT | **✅** |
+| 1181 | **PH-S1246** | `poolai-vision-sync --check` | docs-vision | drift gate green after band 60 | **✅** |
+| 1182 | **PH-S1247** | Ratio hold advisory + roadmap zriz | RUST_RATIO stretch | `--min-ratio 0.95 --advisory`; roadmap → band 61 | **✅** |
+| 1183 | **PH-S1248** | Tenant horizon band close | Enterprise band 60 | `galaxy_horizon_s1239_integration`; HANDOFF/NEXT → band 61 | **✅** |
 
 ### 5.40 Tenant ratio advisory queue — band 59 (PH-S1229…S1238, 2026-07-21)
 
@@ -1677,10 +1694,10 @@ FM-xxx (з таблиці нижче)
 
 | Поле | Значення |
 |------|----------|
-| **Pending** | **910** (band 59 ✅ · S1239…S2148) |
-| **Drained** | band 51–57 PH-S1149…S1218 ✅ |
-| **Активна §5.12** | — (promote band 60 next) |
-| **Наступна promote** | PH-S1239…S1248 |
+| **Pending** | **900** (band 60 ✅ · S1249…S2148) |
+| **Drained** | band 51–60 PH-S1149…S1248 ✅ (phase A Tenants) |
+| **Активна §5.12** | — (promote band 61 next) |
+| **Наступна promote** | PH-S1249…S1258 |
 | **План фаз** | [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md) |
 | **Реєстр sprint×acceptance** | [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md) |
 | **Regen** | `bash scripts/generate-ph-s-master-backlog-1000.sh` |
@@ -1720,7 +1737,7 @@ FM-xxx (з таблиці нижче)
 
 ### 5.17 Enterprise-complete closure (PH-S2148 target)
 
-**Статус:** **in progress** — band 59 ✅ · pending PH-S1239…S2148 · roadmap [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md).
+**Статус:** **in progress** — band 60 ✅ (phase A close) · pending PH-S1249…S2148 · roadmap [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md).
 
 | Критерій | Ціль |
 |----------|------|
@@ -1770,7 +1787,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-21):** band 59 **PH-S1229…S1238** ✅ · §5.12 **0** · наступна **`абракадабра`** → promote band 60 (enterprise).
+**Активна смуга (2026-07-21):** band 60 **PH-S1239…S1248** ✅ · §5.12 **0** · наступна **`абракадабра`** → promote band 61 (B SSO).
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

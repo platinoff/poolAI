@@ -53,6 +53,7 @@ pub mod tenant_admin_ops_depth;
 pub mod tenant_api_contracts_depth;
 pub mod tenant_depth;
 pub mod tenant_docs_canon_depth;
+pub mod tenant_horizon_depth;
 pub mod tenant_loc_audit_depth;
 pub mod tenant_persistence_depth;
 pub mod tenant_ratio_advisory_depth;

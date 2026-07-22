@@ -32,6 +32,9 @@ use poolai_ui_core::tenant_depth::{tenant_criteria_total, TENANT_CASES, TENANT_C
 use poolai_ui_core::tenant_docs_canon_depth::{
     tenant_docs_canon_criteria_total, TENANT_DOCS_CANON_CASES, TENANT_DOCS_CANON_CRITERIA,
 };
+use poolai_ui_core::tenant_horizon_depth::{
+    tenant_horizon_criteria_total, TENANT_HORIZON_CASES, TENANT_HORIZON_CRITERIA,
+};
 use poolai_ui_core::tenant_loc_audit_depth::{
     tenant_loc_audit_criteria_total, TENANT_LOC_AUDIT_CASES, TENANT_LOC_AUDIT_CRITERIA,
 };
@@ -152,6 +155,8 @@ struct AuditConfig {
     tenant_vision_sync: bool,
     /// Emit band-59 tenant ratio-advisory fields (PH-S1234).
     tenant_ratio_advisory: bool,
+    /// Emit band-60 tenant horizon-close fields (PH-S1244).
+    tenant_horizon: bool,
 }
 
 impl Default for AuditConfig {
@@ -176,6 +181,7 @@ impl Default for AuditConfig {
             tenant_docs_canon: false,
             tenant_vision_sync: false,
             tenant_ratio_advisory: false,
+            tenant_horizon: false,
         }
     }
 }
@@ -317,6 +323,12 @@ struct RustRatioReport {
     tenant_ratio_advisory_criteria_total: usize,
     /// Tenant ratio-advisory criteria met count (PH-S1234).
     tenant_ratio_advisory_criteria_met_count: usize,
+    /// Band-60 tenant horizon-close mode (PH-S1244).
+    tenant_horizon_mode: bool,
+    /// Tenant horizon criteria registry size (PH-S1244).
+    tenant_horizon_criteria_total: usize,
+    /// Tenant horizon criteria met count (PH-S1244).
+    tenant_horizon_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -561,6 +573,22 @@ fn audit_tenant_ratio_advisory_criteria_met(root: &Path) -> (usize, usize) {
     (met, total)
 }
 
+fn audit_tenant_horizon_criteria_met(root: &Path) -> (usize, usize) {
+    let total = tenant_horizon_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in TENANT_HORIZON_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
 fn classify_product_path(path: &str) -> ProductCategory {
     let p = path.replace('\\', "/");
     if p.starts_with("src/") && p.ends_with(".rs") {
@@ -666,6 +694,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--tenant-docs-canon" => config.tenant_docs_canon = true,
             "--tenant-vision-sync" => config.tenant_vision_sync = true,
             "--tenant-ratio-advisory" => config.tenant_ratio_advisory = true,
+            "--tenant-horizon" => config.tenant_horizon = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
                 print_help();
@@ -702,6 +731,7 @@ fn print_help() {
            --tenant-docs-canon         band-57 tenant docs-canon fields (PH-S1214)\n\
            --tenant-vision-sync        band-58 tenant vision-sync fields (PH-S1224)\n\
            --tenant-ratio-advisory     band-59 tenant ratio-advisory fields (PH-S1234)\n\
+           --tenant-horizon            band-60 tenant horizon-close fields (PH-S1244)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -940,6 +970,18 @@ fn build_report(
         );
         notes.push("PH-S1238: band 59 tenant ratio-advisory — criteria met vs registry");
     }
+    let (tenant_horizon_criteria_met_count, tenant_horizon_criteria_total_count) =
+        if config.tenant_horizon {
+            audit_tenant_horizon_criteria_met(root)
+        } else {
+            (0, tenant_horizon_criteria_total())
+        };
+    if config.tenant_horizon {
+        notes.push(
+            "PH-S1244: tenant_horizon_mode — aggregate band 51–59 tenant slices (phase A close)",
+        );
+        notes.push("PH-S1248: band 60 tenant horizon close — criteria met vs registry");
+    }
 
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
@@ -1013,6 +1055,9 @@ fn build_report(
         tenant_ratio_advisory_mode: config.tenant_ratio_advisory,
         tenant_ratio_advisory_criteria_total: tenant_ratio_advisory_criteria_total_count,
         tenant_ratio_advisory_criteria_met_count,
+        tenant_horizon_mode: config.tenant_horizon,
+        tenant_horizon_criteria_total: tenant_horizon_criteria_total_count,
+        tenant_horizon_criteria_met_count,
         by_category,
         notes,
     })
@@ -1211,6 +1256,17 @@ fn print_summary(report: &RustRatioReport) {
         println!(
             "  tenant_ratio_advisory_cases: {}",
             TENANT_RATIO_ADVISORY_CASES.join(", ")
+        );
+    }
+    if report.tenant_horizon_mode {
+        println!("  tenant_horizon:        true (PH-S1244 band 60)");
+        println!(
+            "  tenant_horizon_criteria: {}/{} met",
+            report.tenant_horizon_criteria_met_count, report.tenant_horizon_criteria_total
+        );
+        println!(
+            "  tenant_horizon_cases: {}",
+            TENANT_HORIZON_CASES.join(", ")
         );
     }
     for (name, loc) in &report.by_category {
