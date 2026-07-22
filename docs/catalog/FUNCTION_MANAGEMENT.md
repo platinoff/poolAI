@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-07-21 (band 61 **PH-S1249…S1258** ✅ · enterprise horizon band 62)
+**Оновлено:** 2026-07-22 (service PH-SVC21…SVC30 ✅ · Cursor **3.12.30** · band 61 **PH-S1249…S1258** ✅ · enterprise horizon band 62)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -1221,7 +1221,7 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 61 ✅). **Master horizon:** PH-S1259…S1268 (band 62) · enterprise backlog PH-S1149…S2148. Vision rev **348**. **Наступна сесія:** **`абракадабра`** — promote band 62.
+**Відкритих у §5.12:** **0** (band 61 ✅). **Master horizon:** PH-S1259…S1268 (band 62) · enterprise backlog PH-S1149…S2148. Vision rev **349**. **Наступна сесія:** **`абракадабра`** — promote band 62.
 
 ### 5.42 SSO depth scaffold queue — band 61 (PH-S1249…S1258, 2026-07-21)
 
@@ -1797,6 +1797,16 @@ FM-xxx (з таблиці нижче)
 | **PH-SVC18** | `poolai-vision-sync --check` | drift gate green | **✅** |
 | **PH-SVC19** | INDEX + docs/README cross-links | zriz Jul 21 | **✅** |
 | **PH-SVC20** | git push + самарі | service commit `main` | **✅** |
+| **PH-SVC21** | Cursor 3.12.30 + changelog re-check | `CURSOR_UPDATE_RESEARCH_2026-07-22.md` | **✅** |
+| **PH-SVC22** | `cursor-environment-baseline.mdc` | 3.12.30 + High Contrast note | **✅** |
+| **PH-SVC23** | `.cursor/CHANGELOG` + `poolai-agent-roles.mdc` | pointer Jul 22 | **✅** |
+| **PH-SVC24** | HANDOFF + NEXT_SESSION | service zriz; next `абракадабра` | **✅** |
+| **PH-SVC25** | README Next Focus | Cursor 3.12.30 service note | **✅** |
+| **PH-SVC26** | ENVIRONMENT_AND_CURSOR_UPDATES | pointer → Jul 22 research | **✅** |
+| **PH-SVC27** | `file_list.csv` | CURSOR_UPDATE_2026-07-22 row | **✅** |
+| **PH-SVC28** | Vision queue/feed enterprise bands | `poolai-vision-sync` merge `queue — band` | **✅** |
+| **PH-SVC29** | INDEX + docs/README cross-links | zriz Jul 22 | **✅** |
+| **PH-SVC30** | git push + самарі | service commit `main` | **✅** |
 
 **Наступний service trigger:** після major Cursor/OS update або за запитом власника (повторити scan → §5.16 band).
 

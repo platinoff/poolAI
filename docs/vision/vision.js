@@ -3839,7 +3839,18 @@
         : queue.filter((e) => e.open).length;
     const nextId = manifest.next_sprint || null;
     const openOnly = queue.filter((e) => e.open);
-    const show = openOnly.length ? openOnly : queue.slice(-12);
+    const sprintSerial = (id) => {
+      const m = String(id || "").match(/^PH-S(\d+)$/i);
+      return m ? parseInt(m[1], 10) : 0;
+    };
+    // When queue is drained: show recent closed by PH-S serial (not file-tail of journal).
+    const show = openOnly.length
+      ? openOnly
+      : queue
+          .filter((e) => !e.open && (e.status === "closed" || !e.status))
+          .slice()
+          .sort((a, b) => sprintSerial(b.id) - sprintSerial(a.id))
+          .slice(0, 12);
     let html =
       '<div class="sprint-queue-meta"><span><strong>' +
       escapeHtml(String(openCount)) +

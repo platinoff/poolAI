@@ -2550,7 +2550,7 @@
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S1018",
+  "last_sprint_closed": "PH-S1258",
   "layers": [
     {
       "id": "L0",
@@ -10308,7 +10308,7 @@
       "path": "tests/sso_depth_audit.rs"
     }
   ],
-  "revision": 348,
+  "revision": 349,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -18886,6 +18886,2166 @@
       "row": 953,
       "status": "closed",
       "title": "Ops power band close"
+    },
+    {
+      "acceptance": "dropdown shutdown/reboot; localStorage; a11y keyboard",
+      "deps": "docs/vision/",
+      "id": "PH-S1019",
+      "open": false,
+      "row": 954,
+      "status": "closed",
+      "title": "Vision power menu polish"
+    },
+    {
+      "acceptance": "showModal parity; labeled Power btn; i18n UA/EN",
+      "deps": "src/ui/admin",
+      "id": "PH-S1020",
+      "open": false,
+      "row": 955,
+      "status": "closed",
+      "title": "Admin power modal polish"
+    },
+    {
+      "acceptance": "/ui` shell power entry → same ops API",
+      "deps": "src/ui/",
+      "id": "PH-S1021",
+      "open": false,
+      "row": 956,
+      "status": "closed",
+      "title": "Home UI power shortcut"
+    },
+    {
+      "acceptance": "dispatch/grid/admin unused imports; `cargo clippy -D warnings` scope",
+      "deps": "src/grid` `src/network",
+      "id": "PH-S1022",
+      "open": false,
+      "row": 957,
+      "status": "closed",
+      "title": "Clippy unused imports batch"
+    },
+    {
+      "acceptance": "from_timestamp_opt` → `DateTime::from_timestamp",
+      "deps": "poolai-ui-core/format.rs",
+      "id": "PH-S1023",
+      "open": false,
+      "row": 958,
+      "status": "closed",
+      "title": "chrono deprecations ui-core"
+    },
+    {
+      "acceptance": "fix `duplicate_macro_attributes` on PH-S920 tests",
+      "deps": "src/ui/admin/mod.rs",
+      "id": "PH-S1024",
+      "open": false,
+      "row": 959,
+      "status": "closed",
+      "title": "admin mod.rs duplicate test attr"
+    },
+    {
+      "acceptance": "design_tokens` parity note + unit gate",
+      "deps": "UI_UX plan",
+      "id": "PH-S1025",
+      "open": false,
+      "row": 960,
+      "status": "closed",
+      "title": "Design tokens audit stub"
+    },
+    {
+      "acceptance": "toast/announce on power action; save last_run",
+      "deps": "admin+vision",
+      "id": "PH-S1026",
+      "open": false,
+      "row": 961,
+      "status": "closed",
+      "title": "Ops power feedback UX"
+    },
+    {
+      "acceptance": "-lc` + approved verbs; RUN_LOCAL note",
+      "deps": "bin/",
+      "id": "PH-S1027",
+      "open": false,
+      "row": 962,
+      "status": "closed",
+      "title": "poolai-msys.ps1 hardening"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1019_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1028",
+      "open": false,
+      "row": 963,
+      "status": "closed",
+      "title": "UI debug band close"
+    },
+    {
+      "acceptance": "tenants + security OAuth/SAML/policies → `adminEmptyStateHtml",
+      "deps": "src/ui/admin",
+      "id": "PH-S1029",
+      "open": false,
+      "row": 964,
+      "status": "closed",
+      "title": "Empty-state parity tier 1"
+    },
+    {
+      "acceptance": "aria-label, container, `adminInitTablesIn`, actions `data-no-sort",
+      "deps": "src/ui/admin/security.rs",
+      "id": "PH-S1030",
+      "open": false,
+      "row": 965,
+      "status": "closed",
+      "title": "Security tables polish"
+    },
+    {
+      "acceptance": "container, aria-label, striped, explicit init",
+      "deps": "tenants/jobs",
+      "id": "PH-S1031",
+      "open": false,
+      "row": 966,
+      "status": "closed",
+      "title": "Tenants + jobs tables"
+    },
+    {
+      "acceptance": "aria-label, container, `adminInitTablesIn",
+      "deps": "instances/topology",
+      "id": "PH-S1032",
+      "open": false,
+      "row": 967,
+      "status": "closed",
+      "title": "Instances + topology tables"
+    },
+    {
+      "acceptance": "empty → `adminEmptyStateHtml`; table init",
+      "deps": "network_profiles/seed/security_advisories",
+      "id": "PH-S1033",
+      "open": false,
+      "row": 968,
+      "status": "closed",
+      "title": "Grid panel tables"
+    },
+    {
+      "acceptance": "container, aria-label, empty state",
+      "deps": "src/ui/admin/raid.rs",
+      "id": "PH-S1034",
+      "open": false,
+      "row": 969,
+      "status": "closed",
+      "title": "Raid artifacts table"
+    },
+    {
+      "acceptance": "aria-required` + `aria-hidden` on `*",
+      "deps": "tenants/workers/vm/libs/security",
+      "id": "PH-S1035",
+      "open": false,
+      "row": 970,
+      "status": "closed",
+      "title": "Modal form a11y"
+    },
+    {
+      "acceptance": "aria-required` on required fields; dashboard empty states",
+      "deps": "config/dashboard",
+      "id": "PH-S1036",
+      "open": false,
+      "row": 971,
+      "status": "closed",
+      "title": "Config + dashboard forms/tables"
+    },
+    {
+      "acceptance": "depth enum + FM band 39 markers",
+      "deps": "admin_tables_forms_depth.rs",
+      "id": "PH-S1037",
+      "open": false,
+      "row": 972,
+      "status": "closed",
+      "title": "ui-core depth stub + docs"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1029_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1038",
+      "open": false,
+      "row": 973,
+      "status": "closed",
+      "title": "Tables/forms band close"
+    },
+    {
+      "acceptance": "skip to map/queue/preview; `role=\"main\"",
+      "deps": "docs/vision/index.html",
+      "id": "PH-S1039",
+      "open": false,
+      "row": 974,
+      "status": "closed",
+      "title": "Skip links + landmarks"
+    },
+    {
+      "acceptance": "header/map/panel icon buttons labeled; `aria-pressed` toggles",
+      "deps": "docs/vision/",
+      "id": "PH-S1040",
+      "open": false,
+      "row": 975,
+      "status": "closed",
+      "title": "Icon control aria-label parity"
+    },
+    {
+      "acceptance": "role=\"tree\"` / `treeitem`; Arrow/Home/End nav",
+      "deps": "vision.js` file-tree",
+      "id": "PH-S1041",
+      "open": false,
+      "row": 976,
+      "status": "closed",
+      "title": "Explorer tree keyboard"
+    },
+    {
+      "acceptance": "focusable neighbours; Enter select; focus restore",
+      "deps": "#link-graph",
+      "id": "PH-S1042",
+      "open": false,
+      "row": 977,
+      "status": "closed",
+      "title": "Link graph neighbour a11y"
+    },
+    {
+      "acceptance": "updateMapSprintDim` without full `renderMap",
+      "deps": "vision.js",
+      "id": "PH-S1043",
+      "open": false,
+      "row": 978,
+      "status": "closed",
+      "title": "Map sprint-dim incremental"
+    },
+    {
+      "acceptance": "adaptive threshold when layer >120 nodes",
+      "deps": "isMapOverviewMode",
+      "id": "PH-S1044",
+      "open": false,
+      "row": 979,
+      "status": "closed",
+      "title": "Dense-map LOD hardening"
+    },
+    {
+      "acceptance": "pause starfield + orbit on `visibilitychange",
+      "deps": "vision.js",
+      "id": "PH-S1045",
+      "open": false,
+      "row": 980,
+      "status": "closed",
+      "title": "Background tab perf"
+    },
+    {
+      "acceptance": "depth enum + FM band 40 markers",
+      "deps": "vision_map_depth.rs",
+      "id": "PH-S1046",
+      "open": false,
+      "row": 981,
+      "status": "closed",
+      "title": "ui-core depth stub"
+    },
+    {
+      "acceptance": "skip-link focus; `#map-scene-3d`; tree role",
+      "deps": "e2e/tests/vision.spec.ts",
+      "id": "PH-S1047",
+      "open": false,
+      "row": 982,
+      "status": "closed",
+      "title": "Vision Playwright smoke"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1039_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1048",
+      "open": false,
+      "row": 983,
+      "status": "closed",
+      "title": "Vision map band close"
+    },
+    {
+      "acceptance": "config + jobs snapshots",
+      "deps": "e2e/tests/visual.spec.ts",
+      "id": "PH-S1049",
+      "open": false,
+      "row": 984,
+      "status": "closed",
+      "title": "Visual parity tier-1"
+    },
+    {
+      "acceptance": "updates-compat, seed, advisories",
+      "deps": "visual.spec.ts",
+      "id": "PH-S1050",
+      "open": false,
+      "row": 985,
+      "status": "closed",
+      "title": "Visual parity tier-2 grid panels"
+    },
+    {
+      "acceptance": "axe on vision map; skip when server down",
+      "deps": "e2e/tests/a11y.spec.ts",
+      "id": "PH-S1051",
+      "open": false,
+      "row": 986,
+      "status": "closed",
+      "title": "Vision axe smoke"
+    },
+    {
+      "acceptance": "masked starfield/orbit shell baseline",
+      "deps": "e2e/tests/vision.spec.ts",
+      "id": "PH-S1052",
+      "open": false,
+      "row": 987,
+      "status": "closed",
+      "title": "Vision map visual snapshot"
+    },
+    {
+      "acceptance": "config, jobs, tenants HC color-contrast",
+      "deps": "a11y.spec.ts",
+      "id": "PH-S1053",
+      "open": false,
+      "row": 988,
+      "status": "closed",
+      "title": "High-contrast axe extend"
+    },
+    {
+      "acceptance": "waitForVisualSnapshotReady` fonts+rAF",
+      "deps": "e2e/tests/helpers.ts",
+      "id": "PH-S1054",
+      "open": false,
+      "row": 989,
+      "status": "closed",
+      "title": "Visual snapshot ready helper"
+    },
+    {
+      "acceptance": "tier1/tier2 routes + baseline PNG gate",
+      "deps": "tests/e2e_scope_audit.rs",
+      "id": "PH-S1055",
+      "open": false,
+      "row": 990,
+      "status": "closed",
+      "title": "e2e scope visual/axe parity"
+    },
+    {
+      "acceptance": "poolai-loc-audit band 41 zriz",
+      "deps": "rust_ratio.json",
+      "id": "PH-S1056",
+      "open": false,
+      "row": 991,
+      "status": "closed",
+      "title": "rust_ratio loc-audit"
+    },
+    {
+      "acceptance": "depth enum + FM band 41 markers",
+      "deps": "e2e_visual_axe_depth.rs",
+      "id": "PH-S1057",
+      "open": false,
+      "row": 992,
+      "status": "closed",
+      "title": "ui-core depth stub"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1049_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1058",
+      "open": false,
+      "row": 993,
+      "status": "closed",
+      "title": "E2E visual/axe band close"
+    },
+    {
+      "acceptance": "exit 0; no missing Axum routes",
+      "deps": "poolai-openapi-gap-audit",
+      "id": "PH-S1059",
+      "open": false,
+      "row": 994,
+      "status": "closed",
+      "title": "OpenAPI gap audit regression gate"
+    },
+    {
+      "acceptance": "seed-inventory, verification-replay, checker tasks shape",
+      "deps": "grid_openapi_contracts.rs",
+      "id": "PH-S1060",
+      "open": false,
+      "row": 995,
+      "status": "closed",
+      "title": "Grid OpenAPI contract extend"
+    },
+    {
+      "acceptance": "list/register/get shard keys per OpenAPI",
+      "deps": "memory_api_contracts.rs",
+      "id": "PH-S1061",
+      "open": false,
+      "row": 996,
+      "status": "closed",
+      "title": "Memory shards OpenAPI contract"
+    },
+    {
+      "acceptance": "POST `/ops/power` → 202 + structured body",
+      "deps": "poolai_http_stand_smoke.rs",
+      "id": "PH-S1062",
+      "open": false,
+      "row": 997,
+      "status": "closed",
+      "title": "Ops power stand smoke OpenAPI"
+    },
+    {
+      "acceptance": "ops power, memory shards, seed-inventory examples",
+      "deps": "docs/openapi.yaml",
+      "id": "PH-S1063",
+      "open": false,
+      "row": 998,
+      "status": "closed",
+      "title": "OpenAPI examples depth tier-2"
+    },
+    {
+      "acceptance": "power ops PH-S1016 + E2E visual PH-S1049…S1058 ✅",
+      "deps": "concept",
+      "id": "PH-S1064",
+      "open": false,
+      "row": 999,
+      "status": "closed",
+      "title": "POOLAI_GALAXY_GRID maintenance markers"
+    },
+    {
+      "acceptance": "bands 38–41 closed; band 42 in progress row",
+      "deps": "roadmap §4",
+      "id": "PH-S1065",
+      "open": false,
+      "row": 1000,
+      "status": "closed",
+      "title": "GALAXY_GRID_ROADMAP maintenance rows"
+    },
+    {
+      "acceptance": "bands 38–42 zriz; openapi audit + ops power",
+      "deps": "docs canon",
+      "id": "PH-S1066",
+      "open": false,
+      "row": 1001,
+      "status": "closed",
+      "title": "DIGEST + DOCS_LEGACY + INDEX refresh"
+    },
+    {
+      "acceptance": "depth enum + FM band 42 markers",
+      "deps": "openapi_wire_depth.rs",
+      "id": "PH-S1067",
+      "open": false,
+      "row": 1002,
+      "status": "closed",
+      "title": "openapi_wire_depth` stub"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1059_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1068",
+      "open": false,
+      "row": 1003,
+      "status": "closed",
+      "title": "OpenAPI wire band close"
+    },
+    {
+      "acceptance": "VERIFICATION_EXTENDED_PARITY` mismatch/match JSON↔Prom",
+      "deps": "stand_smoke_metrics_parity.rs",
+      "id": "PH-S1069",
+      "open": false,
+      "row": 1004,
+      "status": "closed",
+      "title": "Verification extended parity"
+    },
+    {
+      "acceptance": "REPLICATION_EXTENDED_PARITY` executor/rate-cap",
+      "deps": "stand_smoke_metrics_parity.rs",
+      "id": "PH-S1070",
+      "open": false,
+      "row": 1005,
+      "status": "closed",
+      "title": "Replication extended parity"
+    },
+    {
+      "acceptance": "PRICING_EXTENDED_PARITY` forced_fallback + provider hits/errors",
+      "deps": "stand_smoke_metrics_parity.rs",
+      "id": "PH-S1071",
+      "open": false,
+      "row": 1006,
+      "status": "closed",
+      "title": "Pricing extended parity"
+    },
+    {
+      "acceptance": "PREFETCH_EXTENDED_PARITY` + settlement/trust extended pairs",
+      "deps": "stand_smoke_metrics_parity.rs",
+      "id": "PH-S1072",
+      "open": false,
+      "row": 1007,
+      "status": "closed",
+      "title": "Prefetch/settlement/trust extended parity"
+    },
+    {
+      "acceptance": "grid_metrics_json_prometheus_parity_band6_v3` live runner",
+      "deps": "poolai_http_stand_smoke.rs",
+      "id": "PH-S1073",
+      "open": false,
+      "row": 1008,
+      "status": "closed",
+      "title": "validate_band6_metrics_parity_v3` + stand smoke v3"
+    },
+    {
+      "acceptance": "all 11 `*-metrics` APIs shape + v3 synthetic gate",
+      "deps": "grid_metrics_parity_contracts.rs",
+      "id": "PH-S1074",
+      "open": false,
+      "row": 1009,
+      "status": "closed",
+      "title": "Grid metrics parity contracts"
+    },
+    {
+      "acceptance": "v3 extended parity pointer",
+      "deps": "PROMETHEUS_METRICS.md",
+      "id": "PH-S1075",
+      "open": false,
+      "row": 1010,
+      "status": "closed",
+      "title": "PROMETHEUS_METRICS band 43 sync"
+    },
+    {
+      "acceptance": "band 43 closed row",
+      "deps": "roadmap §4",
+      "id": "PH-S1076",
+      "open": false,
+      "row": 1011,
+      "status": "closed",
+      "title": "GALAXY_GRID_ROADMAP + concept markers"
+    },
+    {
+      "acceptance": "depth enum + FM band 43 markers",
+      "deps": "grid_metrics_parity_depth.rs",
+      "id": "PH-S1077",
+      "open": false,
+      "row": 1012,
+      "status": "closed",
+      "title": "grid_metrics_parity_depth` ui-core stub"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1069_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1078",
+      "open": false,
+      "row": 1013,
+      "status": "closed",
+      "title": "Grid metrics parity band close"
+    },
+    {
+      "acceptance": "MonitoringAlertsPanel` flag + renderer smoke",
+      "deps": "admin_wasm_slim_depth.rs",
+      "id": "PH-S1079",
+      "open": false,
+      "row": 1014,
+      "status": "closed",
+      "title": "Monitoring alerts wasm slim depth"
+    },
+    {
+      "acceptance": "MonitoringDashboardsPanel` flag + renderer smoke",
+      "deps": "admin_wasm_slim_depth.rs",
+      "id": "PH-S1080",
+      "open": false,
+      "row": 1015,
+      "status": "closed",
+      "title": "Monitoring dashboards wasm slim depth"
+    },
+    {
+      "acceptance": "InstancesPanel` + `TelegramSeatsPanel` flags",
+      "deps": "admin_wasm_slim_depth.rs",
+      "id": "PH-S1081",
+      "open": false,
+      "row": 1016,
+      "status": "closed",
+      "title": "Instances + Telegram seats depth"
+    },
+    {
+      "acceptance": "GalaxyVirtualNodesPanel` + `NetworkProfilesPanel",
+      "deps": "admin_wasm_slim_depth.rs",
+      "id": "PH-S1082",
+      "open": false,
+      "row": 1017,
+      "status": "closed",
+      "title": "Virtual nodes + network profiles depth"
+    },
+    {
+      "acceptance": "GridPrefetchMetricsStrip` + `GridLocalityMetricsStrip",
+      "deps": "stand_smoke_metrics.rs",
+      "id": "PH-S1083",
+      "open": false,
+      "row": 1018,
+      "status": "closed",
+      "title": "Grid prefetch/locality strips depth"
+    },
+    {
+      "acceptance": "stand smoke band44 export-shape + strip flags",
+      "deps": "stand_smoke_metrics.rs",
+      "id": "PH-S1084",
+      "open": false,
+      "row": 1019,
+      "status": "closed",
+      "title": "Grid governance/fee-split strips depth"
+    },
+    {
+      "acceptance": "band-44 `poolaiRender*` / `render*` asserts",
+      "deps": "src/ui/admin/mod.rs",
+      "id": "PH-S1085",
+      "open": false,
+      "row": 1020,
+      "status": "closed",
+      "title": "admin/mod.rs` wasm glue regression"
+    },
+    {
+      "acceptance": "extract from `grid_replication_pricing` + FM band 44",
+      "deps": "admin_wasm_slim_depth.rs",
+      "id": "PH-S1086",
+      "open": false,
+      "row": 1021,
+      "status": "closed",
+      "title": "admin_wasm_slim_depth` ui-core module"
+    },
+    {
+      "acceptance": "band 44 closed row; `rust_ratio.json` zriz",
+      "deps": "docs + loc-audit",
+      "id": "PH-S1087",
+      "open": false,
+      "row": 1022,
+      "status": "closed",
+      "title": "GALAXY_GRID_ROADMAP + rust ratio"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1079_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1088",
+      "open": false,
+      "row": 1023,
+      "status": "closed",
+      "title": "Admin wasm slim band close"
+    },
+    {
+      "acceptance": "RUN_LOCAL_HEALTH_KEYS` + enhanced `smoke_health",
+      "deps": "stand_smoke_run_local_depth.rs",
+      "id": "PH-S1089",
+      "open": false,
+      "row": 1024,
+      "status": "closed",
+      "title": "RUN_LOCAL health export shape"
+    },
+    {
+      "acceptance": "GET `/api/enterprise/monitoring/alerts` array",
+      "deps": "poolai_http_stand_smoke.rs",
+      "id": "PH-S1090",
+      "open": false,
+      "row": 1025,
+      "status": "closed",
+      "title": "Monitoring alerts stand smoke"
+    },
+    {
+      "acceptance": "GET `/api/enterprise/monitoring/dashboards` array",
+      "deps": "poolai_http_stand_smoke.rs",
+      "id": "PH-S1091",
+      "open": false,
+      "row": 1026,
+      "status": "closed",
+      "title": "Monitoring dashboards stand smoke"
+    },
+    {
+      "acceptance": "GET `/api/v1/vm/instances` list shape",
+      "deps": "poolai_http_stand_smoke.rs",
+      "id": "PH-S1092",
+      "open": false,
+      "row": 1027,
+      "status": "closed",
+      "title": "VM instances stand smoke"
+    },
+    {
+      "acceptance": "6-case RUN_LOCAL gate; env `POOLAI_STAND_SMOKE_RUN_LOCAL",
+      "deps": "poolai_http_stand_smoke.rs",
+      "id": "PH-S1093",
+      "open": false,
+      "row": 1028,
+      "status": "closed",
+      "title": "--run-local-smoke` CLI subset"
+    },
+    {
+      "acceptance": "VERIFY_STAND_SMOKE=1` → `--run-local-smoke",
+      "deps": "bin/verify-dev-stand.sh",
+      "id": "PH-S1094",
+      "open": false,
+      "row": 1029,
+      "status": "closed",
+      "title": "verify-dev-stand` stand smoke hook"
+    },
+    {
+      "acceptance": "post-health `--run-local-smoke",
+      "deps": "bin/run-poolai.*",
+      "id": "PH-S1095",
+      "open": false,
+      "row": 1030,
+      "status": "closed",
+      "title": "run-poolai quick --stand-smoke"
+    },
+    {
+      "acceptance": "--run-local-smoke`, `VERIFY_STAND_SMOKE`, `--stand-smoke",
+      "deps": "docs",
+      "id": "PH-S1096",
+      "open": false,
+      "row": 1031,
+      "status": "closed",
+      "title": "RUN_LOCAL.md band 45 ops sync"
+    },
+    {
+      "acceptance": "band 45 closed row; ratio hold → band 46",
+      "deps": "docs",
+      "id": "PH-S1097",
+      "open": false,
+      "row": 1032,
+      "status": "closed",
+      "title": "GALAXY_GRID_ROADMAP + rust ratio advisory"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1089_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1098",
+      "open": false,
+      "row": 1033,
+      "status": "closed",
+      "title": "Stand smoke RUN_LOCAL band close"
+    },
+    {
+      "acceptance": "depth enum + ui_js/e2e registry constants",
+      "deps": "rust_migration_advisory_depth.rs",
+      "id": "PH-S1099",
+      "open": false,
+      "row": 1034,
+      "status": "closed",
+      "title": "rust_migration_advisory_depth` ui-core module"
+    },
+    {
+      "acceptance": "migration fields in `rust_ratio.json",
+      "deps": "poolai_loc_audit.rs",
+      "id": "PH-S1100",
+      "open": false,
+      "row": 1035,
+      "status": "closed",
+      "title": "poolai-loc-audit --migration-advisory"
+    },
+    {
+      "acceptance": "ui_js candidates + archived e2e canon paths",
+      "deps": "rust_migration_advisory_audit.rs",
+      "id": "PH-S1101",
+      "open": false,
+      "row": 1036,
+      "status": "closed",
+      "title": "Rust migration advisory audit"
+    },
+    {
+      "acceptance": "6 ui_js → wasm targets",
+      "deps": "rust_migration_advisory_depth.rs",
+      "id": "PH-S1102",
+      "open": false,
+      "row": 1037,
+      "status": "closed",
+      "title": "Admin JS migration candidate registry"
+    },
+    {
+      "acceptance": "VERIFY_MIGRATION_ADVISORY=1` → loc-audit",
+      "deps": "bin/verify-dev-stand.sh",
+      "id": "PH-S1103",
+      "open": false,
+      "row": 1038,
+      "status": "closed",
+      "title": "verify-dev-stand` migration hook"
+    },
+    {
+      "acceptance": "post-health `--migration-advisory` + stand smoke export shape",
+      "deps": "bin/run-poolai.*",
+      "id": "PH-S1104",
+      "open": false,
+      "row": 1039,
+      "status": "closed",
+      "title": "run-poolai quick --migration-advisory"
+    },
+    {
+      "acceptance": "--migration-advisory`, `VERIFY_MIGRATION_ADVISORY",
+      "deps": "docs",
+      "id": "PH-S1105",
+      "open": false,
+      "row": 1040,
+      "status": "closed",
+      "title": "RUN_LOCAL.md band 46 ops sync"
+    },
+    {
+      "acceptance": "migration advisory pointer + loc-audit flag",
+      "deps": "docs",
+      "id": "PH-S1106",
+      "open": false,
+      "row": 1041,
+      "status": "closed",
+      "title": "RUST_RATIO_STRATEGY band 46 sync"
+    },
+    {
+      "acceptance": "band 46 closed row; stretch 96% hold",
+      "deps": "docs + loc-audit",
+      "id": "PH-S1107",
+      "open": false,
+      "row": 1042,
+      "status": "closed",
+      "title": "GALAXY_GRID_ROADMAP + rust ratio"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1099_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1108",
+      "open": false,
+      "row": 1043,
+      "status": "closed",
+      "title": "Ratio migration advisory band close"
+    },
+    {
+      "acceptance": "depth enum + STABLE criteria registry constants",
+      "deps": "stable_state_touchup_depth.rs",
+      "id": "PH-S1109",
+      "open": false,
+      "row": 1044,
+      "status": "closed",
+      "title": "stable_state_touchup_depth` ui-core module"
+    },
+    {
+      "acceptance": "stable_touchup fields in `rust_ratio.json",
+      "deps": "poolai_loc_audit.rs",
+      "id": "PH-S1110",
+      "open": false,
+      "row": 1045,
+      "status": "closed",
+      "title": "poolai-loc-audit --stable-touchup"
+    },
+    {
+      "acceptance": "criteria registry + maintenance markers",
+      "deps": "stable_state_touchup_audit.rs",
+      "id": "PH-S1111",
+      "open": false,
+      "row": 1046,
+      "status": "closed",
+      "title": "STABLE touch-up audit"
+    },
+    {
+      "acceptance": "7 maintenance-mode criteria ids",
+      "deps": "stable_state_touchup_depth.rs",
+      "id": "PH-S1112",
+      "open": false,
+      "row": 1047,
+      "status": "closed",
+      "title": "STABLE criteria registry"
+    },
+    {
+      "acceptance": "VERIFY_STABLE_TOUCHUP=1` → loc-audit",
+      "deps": "bin/verify-dev-stand.sh",
+      "id": "PH-S1113",
+      "open": false,
+      "row": 1048,
+      "status": "closed",
+      "title": "verify-dev-stand` STABLE hook"
+    },
+    {
+      "acceptance": "post-health `--stable-touchup` + stand smoke export shape",
+      "deps": "bin/run-poolai.*",
+      "id": "PH-S1114",
+      "open": false,
+      "row": 1049,
+      "status": "closed",
+      "title": "run-poolai quick --stable-touchup"
+    },
+    {
+      "acceptance": "--stable-touchup`, `VERIFY_STABLE_TOUCHUP",
+      "deps": "docs",
+      "id": "PH-S1115",
+      "open": false,
+      "row": 1050,
+      "status": "closed",
+      "title": "RUN_LOCAL.md band 47 ops sync"
+    },
+    {
+      "acceptance": "STABLE touch-up pointer + loc-audit flag",
+      "deps": "docs",
+      "id": "PH-S1116",
+      "open": false,
+      "row": 1051,
+      "status": "closed",
+      "title": "RUST_RATIO_STRATEGY band 47 sync"
+    },
+    {
+      "acceptance": "band 47 closed row; maintenance criteria",
+      "deps": "docs + loc-audit",
+      "id": "PH-S1117",
+      "open": false,
+      "row": 1052,
+      "status": "closed",
+      "title": "GALAXY_GRID_ROADMAP + STABLE touch-up"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1109_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1118",
+      "open": false,
+      "row": 1053,
+      "status": "closed",
+      "title": "STABLE touch-up band close"
+    },
+    {
+      "acceptance": "depth enum + edge verification criteria registry constants",
+      "deps": "galaxy_edge_verification_depth.rs",
+      "id": "PH-S1119",
+      "open": false,
+      "row": 1054,
+      "status": "closed",
+      "title": "galaxy_edge_verification_depth` ui-core module"
+    },
+    {
+      "acceptance": "edge_verification fields in `rust_ratio.json",
+      "deps": "poolai_loc_audit.rs",
+      "id": "PH-S1120",
+      "open": false,
+      "row": 1055,
+      "status": "closed",
+      "title": "poolai-loc-audit --edge-verification-advisory"
+    },
+    {
+      "acceptance": "criteria registry + maintenance markers",
+      "deps": "galaxy_edge_verification_audit.rs",
+      "id": "PH-S1121",
+      "open": false,
+      "row": 1056,
+      "status": "closed",
+      "title": "Edge verification advisory audit"
+    },
+    {
+      "acceptance": "JSON snapshot fraud-proof/capability/network/TEE + OpenAPI",
+      "deps": "Galaxy §6.6",
+      "id": "PH-S1122",
+      "open": false,
+      "row": 1057,
+      "status": "closed",
+      "title": "GET /api/v1/grid/edge-verification-metrics"
+    },
+    {
+      "acceptance": "validate_band6_metrics_parity_v4` + horizon depth wire",
+      "deps": "stand_smoke_metrics_parity.rs",
+      "id": "PH-S1123",
+      "open": false,
+      "row": 1058,
+      "status": "closed",
+      "title": "galaxy_edge_verification_depth` grid stub + parity v4"
+    },
+    {
+      "acceptance": "renderGridEdgeVerificationMetricsStrip` on updates-compat",
+      "deps": "updates_compat.rs",
+      "id": "PH-S1124",
+      "open": false,
+      "row": 1059,
+      "status": "closed",
+      "title": "Admin updates-compat edge-verification wasm strip"
+    },
+    {
+      "acceptance": "VERIFY_EDGE_VERIFICATION=1`; `quick --edge-verification",
+      "deps": "bin/verify-dev-stand.sh`, `bin/run-poolai.*",
+      "id": "PH-S1125",
+      "open": false,
+      "row": 1060,
+      "status": "closed",
+      "title": "verify-dev-stand` + `quick` edge-verification hooks"
+    },
+    {
+      "acceptance": "--edge-verification`, `VERIFY_EDGE_VERIFICATION",
+      "deps": "docs",
+      "id": "PH-S1126",
+      "open": false,
+      "row": 1061,
+      "status": "closed",
+      "title": "RUN_LOCAL.md band 48 ops sync"
+    },
+    {
+      "acceptance": "edge-verification pointer + loc-audit flag",
+      "deps": "docs",
+      "id": "PH-S1127",
+      "open": false,
+      "row": 1062,
+      "status": "closed",
+      "title": "RUST_RATIO + GALAXY_GRID_ROADMAP band 48 sync"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1119_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1128",
+      "open": false,
+      "row": 1063,
+      "status": "closed",
+      "title": "Edge verification horizon band close"
+    },
+    {
+      "acceptance": "depth enum + pre-push canon criteria registry constants",
+      "deps": "pre_push_hook_depth.rs",
+      "id": "PH-S1129",
+      "open": false,
+      "row": 1064,
+      "status": "closed",
+      "title": "pre_push_hook_depth` ui-core module"
+    },
+    {
+      "acceptance": "pre_push fields in `rust_ratio.json",
+      "deps": "poolai_loc_audit.rs",
+      "id": "PH-S1130",
+      "open": false,
+      "row": 1065,
+      "status": "closed",
+      "title": "poolai-loc-audit --pre-push-canon"
+    },
+    {
+      "acceptance": "criteria registry + maintenance markers",
+      "deps": "pre_push_hook_audit.rs",
+      "id": "PH-S1131",
+      "open": false,
+      "row": 1066,
+      "status": "closed",
+      "title": "Pre-push canon gate audit"
+    },
+    {
+      "acceptance": "README/INDEX/NEXT/vision.svg canon sync + `--check` drift",
+      "deps": "poolai_vision_sync.rs",
+      "id": "PH-S1132",
+      "open": false,
+      "row": 1067,
+      "status": "closed",
+      "title": "poolai-vision-sync` canon doc validation"
+    },
+    {
+      "acceptance": "vision sync + fmt gate before push",
+      "deps": "bin/pre-push-hook.sh",
+      "id": "PH-S1133",
+      "open": false,
+      "row": 1068,
+      "status": "closed",
+      "title": "bin/pre-push-hook.sh` + install script"
+    },
+    {
+      "acceptance": "VERIFY_PRE_PUSH_CANON=1`; `quick --pre-push-canon",
+      "deps": "bin/verify-dev-stand.sh`, `bin/run-poolai.*",
+      "id": "PH-S1134",
+      "open": false,
+      "row": 1069,
+      "status": "closed",
+      "title": "verify-dev-stand` + `quick` pre-push hooks"
+    },
+    {
+      "acceptance": "--pre-push-canon`, `VERIFY_PRE_PUSH_CANON",
+      "deps": "docs",
+      "id": "PH-S1135",
+      "open": false,
+      "row": 1070,
+      "status": "closed",
+      "title": "RUN_LOCAL.md band 49 ops sync"
+    },
+    {
+      "acceptance": "pre-push canon pointer + loc-audit flag",
+      "deps": "docs",
+      "id": "PH-S1136",
+      "open": false,
+      "row": 1071,
+      "status": "closed",
+      "title": "RUST_RATIO + GALAXY_GRID_ROADMAP band 49 sync"
+    },
+    {
+      "acceptance": "install hook + vision sync + fmt workflow",
+      "deps": "docs",
+      "id": "PH-S1137",
+      "open": false,
+      "row": 1072,
+      "status": "closed",
+      "title": "PRE_PUSH_HOOK.md canon gate docs"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1129_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1138",
+      "open": false,
+      "row": 1073,
+      "status": "closed",
+      "title": "Pre-push canon gate band close"
+    },
+    {
+      "acceptance": "depth enum + CI canon criteria registry constants",
+      "deps": "ci_canon_depth.rs",
+      "id": "PH-S1139",
+      "open": false,
+      "row": 1074,
+      "status": "closed",
+      "title": "ci_canon_depth` ui-core module"
+    },
+    {
+      "acceptance": "ci_canon fields in `rust_ratio.json",
+      "deps": "poolai_loc_audit.rs",
+      "id": "PH-S1140",
+      "open": false,
+      "row": 1075,
+      "status": "closed",
+      "title": "poolai-loc-audit --ci-canon"
+    },
+    {
+      "acceptance": "criteria registry + maintenance markers",
+      "deps": "ci_canon_audit.rs",
+      "id": "PH-S1141",
+      "open": false,
+      "row": 1076,
+      "status": "closed",
+      "title": "CI canon gate audit"
+    },
+    {
+      "acceptance": "VERIFY_CI_CANON=1`; openapi-gap + loc-audit `--ci-canon` + rust-ratio advisory",
+      "deps": "bin/verify-dev-stand.sh",
+      "id": "PH-S1142",
+      "open": false,
+      "row": 1077,
+      "status": "closed",
+      "title": "verify-dev-stand` CI canon hook"
+    },
+    {
+      "acceptance": "post-health `--ci-canon` + openapi-gap-audit",
+      "deps": "bin/run-poolai.sh`, `bin/run-poolai.ps1",
+      "id": "PH-S1143",
+      "open": false,
+      "row": 1078,
+      "status": "closed",
+      "title": "run-poolai quick --ci-canon"
+    },
+    {
+      "acceptance": "ci_canon_depth` JSON field on export shape test",
+      "deps": "poolai_http_stand_smoke.rs",
+      "id": "PH-S1144",
+      "open": false,
+      "row": 1079,
+      "status": "closed",
+      "title": "Stand smoke CI canon export shape"
+    },
+    {
+      "acceptance": "--ci-canon`, `VERIFY_CI_CANON",
+      "deps": "docs",
+      "id": "PH-S1145",
+      "open": false,
+      "row": 1080,
+      "status": "closed",
+      "title": "RUN_LOCAL.md band 50 ops sync"
+    },
+    {
+      "acceptance": "--ci-canon` pointer + loc-audit flag",
+      "deps": "docs",
+      "id": "PH-S1146",
+      "open": false,
+      "row": 1081,
+      "status": "closed",
+      "title": "RUST_RATIO + GALAXY_GRID_ROADMAP band 50 sync"
+    },
+    {
+      "acceptance": "local dual-gate workflow doc",
+      "deps": "docs",
+      "id": "PH-S1147",
+      "open": false,
+      "row": 1082,
+      "status": "closed",
+      "title": "CI_CANON.md` canon gate docs"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1139_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1148",
+      "open": false,
+      "row": 1083,
+      "status": "closed",
+      "title": "CI canon gate band close"
+    },
+    {
+      "acceptance": "depth enum + tenant persist criteria registry",
+      "deps": "tenant_persistence_depth.rs",
+      "id": "PH-S1149",
+      "open": false,
+      "row": 1084,
+      "status": "closed",
+      "title": "tenant_persistence_depth` ui-core module"
+    },
+    {
+      "acceptance": "tenant_persist fields in `rust_ratio.json",
+      "deps": "poolai_loc_audit.rs",
+      "id": "PH-S1150",
+      "open": false,
+      "row": 1085,
+      "status": "closed",
+      "title": "poolai-loc-audit --tenant-persist"
+    },
+    {
+      "acceptance": "criteria registry + FM markers",
+      "deps": "tenant_persistence_audit.rs",
+      "id": "PH-S1151",
+      "open": false,
+      "row": 1086,
+      "status": "closed",
+      "title": "Tenant persist gate audit"
+    },
+    {
+      "acceptance": "POOLAI_TENANT_STORE` + `tenant_store_mode()",
+      "deps": "multi_tenancy.rs",
+      "id": "PH-S1152",
+      "open": false,
+      "row": 1087,
+      "status": "closed",
+      "title": "multi_tenancy` store env hint"
+    },
+    {
+      "acceptance": "VERIFY_TENANT_PERSIST=1",
+      "deps": "bin/verify-dev-stand.sh",
+      "id": "PH-S1153",
+      "open": false,
+      "row": 1088,
+      "status": "closed",
+      "title": "verify-dev-stand` tenant persist hook"
+    },
+    {
+      "acceptance": "post-health `--tenant-persist",
+      "deps": "bin/run-poolai.*",
+      "id": "PH-S1154",
+      "open": false,
+      "row": 1089,
+      "status": "closed",
+      "title": "run-poolai quick --tenant-persist"
+    },
+    {
+      "acceptance": "export shape unit test",
+      "deps": "poolai_http_stand_smoke.rs",
+      "id": "PH-S1155",
+      "open": false,
+      "row": 1090,
+      "status": "closed",
+      "title": "Stand smoke tenant persist export shape"
+    },
+    {
+      "acceptance": "band 51 ops + enterprise roadmap pointer",
+      "deps": "docs",
+      "id": "PH-S1156",
+      "open": false,
+      "row": 1091,
+      "status": "closed",
+      "title": "RUN_LOCAL + RUST_RATIO + GALAXY sync"
+    },
+    {
+      "acceptance": "durable tenant workflow + PH-S1149…S2148 registry",
+      "deps": "docs/scripts",
+      "id": "PH-S1157",
+      "open": false,
+      "row": 1092,
+      "status": "closed",
+      "title": "TENANT_PERSIST.md` + master backlog 1000"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1149_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1158",
+      "open": false,
+      "row": 1093,
+      "status": "closed",
+      "title": "Tenant persist band close"
+    },
+    {
+      "acceptance": "depth enum + tenant store criteria registry",
+      "deps": "tenant_depth.rs",
+      "id": "PH-S1159",
+      "open": false,
+      "row": 1094,
+      "status": "closed",
+      "title": "tenant_depth` ui-core module"
+    },
+    {
+      "acceptance": "POOLAI_TENANT_DATA_DIR` + wire snapshot + unit tests",
+      "deps": "multi_tenancy.rs",
+      "id": "PH-S1160",
+      "open": false,
+      "row": 1095,
+      "status": "closed",
+      "title": "tenant_store_wire` durable path stub"
+    },
+    {
+      "acceptance": "wire contract + lifecycle isolation",
+      "deps": "tenant_store_wire_integration.rs",
+      "id": "PH-S1161",
+      "open": false,
+      "row": 1096,
+      "status": "closed",
+      "title": "Tenant store API contracts"
+    },
+    {
+      "acceptance": "VERIFY_TENANT_STORE=1` + `--tenant-store",
+      "deps": "bin/verify-dev-stand.sh",
+      "id": "PH-S1162",
+      "open": false,
+      "row": 1097,
+      "status": "closed",
+      "title": "verify-dev-stand` / quick tenant store"
+    },
+    {
+      "acceptance": "tenant_store_band52_export_shape",
+      "deps": "poolai_http_stand_smoke.rs",
+      "id": "PH-S1163",
+      "open": false,
+      "row": 1098,
+      "status": "closed",
+      "title": "Stand smoke tenant store export shape"
+    },
+    {
+      "acceptance": "tenant_store fields in `rust_ratio.json",
+      "deps": "poolai_loc_audit.rs",
+      "id": "PH-S1164",
+      "open": false,
+      "row": 1099,
+      "status": "closed",
+      "title": "poolai-loc-audit --tenant-store"
+    },
+    {
+      "acceptance": "band 52 ops + `TENANT_STORE.md",
+      "deps": "RUN_LOCAL/INDEX/HANDOFF/NEXT",
+      "id": "PH-S1165",
+      "open": false,
+      "row": 1100,
+      "status": "closed",
+      "title": "Docs canon sync"
+    },
+    {
+      "acceptance": "drift gate green",
+      "deps": "docs/vision",
+      "id": "PH-S1166",
+      "open": false,
+      "row": 1101,
+      "status": "closed",
+      "title": "poolai-vision-sync --check"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory",
+      "deps": "loc-audit",
+      "id": "PH-S1167",
+      "open": false,
+      "row": 1102,
+      "status": "closed",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1159_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1168",
+      "open": false,
+      "row": 1103,
+      "status": "closed",
+      "title": "Tenant store band close"
+    },
+    {
+      "acceptance": "depth enum + HTTP API criteria registry",
+      "deps": "tenant_api_contracts_depth.rs",
+      "id": "PH-S1169",
+      "open": false,
+      "row": 1104,
+      "status": "closed",
+      "title": "tenant_api_contracts_depth` ui-core module"
+    },
+    {
+      "acceptance": "POST→GET→update→DELETE via AppState router",
+      "deps": "tenant_api_contracts_integration.rs",
+      "id": "PH-S1170",
+      "open": false,
+      "row": 1105,
+      "status": "closed",
+      "title": "HTTP CRUD lifecycle contracts"
+    },
+    {
+      "acceptance": "GET …/usage` + `POST …/quota` allow/deny shapes",
+      "deps": "same suite",
+      "id": "PH-S1171",
+      "open": false,
+      "row": 1106,
+      "status": "closed",
+      "title": "Quota + usage HTTP contracts"
+    },
+    {
+      "acceptance": "mutate A; B unchanged; foreign UUID → 404",
+      "deps": "same suite",
+      "id": "PH-S1172",
+      "open": false,
+      "row": 1107,
+      "status": "closed",
+      "title": "Cross-tenant isolation API"
+    },
+    {
+      "acceptance": "{mode,durable_path,configured}` memory/sqlite",
+      "deps": "GET /tenants/store",
+      "id": "PH-S1173",
+      "open": false,
+      "row": 1108,
+      "status": "closed",
+      "title": "Store-wire status HTTP read"
+    },
+    {
+      "acceptance": "store schema + 400/404/503; gap-audit 0",
+      "deps": "docs/openapi.yaml",
+      "id": "PH-S1174",
+      "open": false,
+      "row": 1109,
+      "status": "closed",
+      "title": "OpenAPI `TenantStoreWire` + errors"
+    },
+    {
+      "acceptance": "VERIFY_TENANT_API=1` + `--tenant-api",
+      "deps": "bin/verify-dev-stand.sh",
+      "id": "PH-S1175",
+      "open": false,
+      "row": 1110,
+      "status": "closed",
+      "title": "verify-dev-stand` / quick `--tenant-api"
+    },
+    {
+      "acceptance": "export shape + `rust_ratio.json` tenant_api fields",
+      "deps": "stand smoke / loc-audit",
+      "id": "PH-S1176",
+      "open": false,
+      "row": 1111,
+      "status": "closed",
+      "title": "Stand smoke + `poolai-loc-audit --tenant-api"
+    },
+    {
+      "acceptance": "HTTP contract matrix + master backlog override",
+      "deps": "RUN_LOCAL/INDEX/HANDOFF/NEXT",
+      "id": "PH-S1177",
+      "open": false,
+      "row": 1112,
+      "status": "closed",
+      "title": "Docs `TENANT_API.md` + canon sync"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1169_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1178",
+      "open": false,
+      "row": 1113,
+      "status": "closed",
+      "title": "Tenant API band close"
+    },
+    {
+      "acceptance": "depth enum + admin/ops criteria registry",
+      "deps": "tenant_admin_ops_depth.rs",
+      "id": "PH-S1179",
+      "open": false,
+      "row": 1114,
+      "status": "closed",
+      "title": "tenant_admin_ops_depth` ui-core module"
+    },
+    {
+      "acceptance": "#tenant-store-badge` ← `GET /tenants/store",
+      "deps": "src/ui/admin/tenants.rs",
+      "id": "PH-S1180",
+      "open": false,
+      "row": 1115,
+      "status": "closed",
+      "title": "Admin store-wire status strip"
+    },
+    {
+      "acceptance": "refreshTenantUsage` + `probeTenantQuota",
+      "deps": "same",
+      "id": "PH-S1181",
+      "open": false,
+      "row": 1116,
+      "status": "closed",
+      "title": "Admin usage + quota ops glue"
+    },
+    {
+      "acceptance": "store/usage/quota markers",
+      "deps": "tenant_admin_ops_integration.rs",
+      "id": "PH-S1182",
+      "open": false,
+      "row": 1117,
+      "status": "closed",
+      "title": "Admin ops HTML contracts"
+    },
+    {
+      "acceptance": "EN/UK patch keys",
+      "deps": "i18n.rs` ADMIN_TENANTS_*",
+      "id": "PH-S1183",
+      "open": false,
+      "row": 1118,
+      "status": "closed",
+      "title": "i18n store/usage/quota keys"
+    },
+    {
+      "acceptance": "VERIFY_TENANT_ADMIN_OPS=1` + quick flag",
+      "deps": "bin/verify-dev-stand.sh",
+      "id": "PH-S1184",
+      "open": false,
+      "row": 1119,
+      "status": "closed",
+      "title": "verify-dev-stand` / quick `--tenant-admin-ops"
+    },
+    {
+      "acceptance": "export shape + `rust_ratio.json` fields",
+      "deps": "stand smoke / loc-audit",
+      "id": "PH-S1185",
+      "open": false,
+      "row": 1120,
+      "status": "closed",
+      "title": "Stand smoke + `poolai-loc-audit --tenant-admin-ops"
+    },
+    {
+      "acceptance": "ops matrix + master backlog override",
+      "deps": "RUN_LOCAL/INDEX/HANDOFF/NEXT",
+      "id": "PH-S1186",
+      "open": false,
+      "row": 1121,
+      "status": "closed",
+      "title": "Docs `TENANT_ADMIN_OPS.md` + canon sync"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory",
+      "deps": "loc-audit",
+      "id": "PH-S1187",
+      "open": false,
+      "row": 1122,
+      "status": "closed",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1179_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1188",
+      "open": false,
+      "row": 1123,
+      "status": "closed",
+      "title": "Tenant admin/ops band close"
+    },
+    {
+      "acceptance": "depth enum + live/CLI/verify criteria registry",
+      "deps": "tenant_stand_smoke_depth.rs",
+      "id": "PH-S1189",
+      "open": false,
+      "row": 1124,
+      "status": "closed",
+      "title": "tenant_stand_smoke_depth` ui-core module"
+    },
+    {
+      "acceptance": "smoke_tenants_store_wire` + `tenant_stand_smoke_integration",
+      "deps": "TENANT_API §store · stand-smoke",
+      "id": "PH-S1190",
+      "open": false,
+      "row": 1125,
+      "status": "closed",
+      "title": "Live stand smoke `GET /tenants/store"
+    },
+    {
+      "acceptance": "list→create→get→delete; Rust integration gate",
+      "deps": "EnterpriseTenants HTTP",
+      "id": "PH-S1191",
+      "open": false,
+      "row": 1126,
+      "status": "closed",
+      "title": "Live stand smoke tenant CRUD"
+    },
+    {
+      "acceptance": "usage/quota allow/deny + foreign UUID → 404",
+      "deps": "TENANT_API §usage/quota",
+      "id": "PH-S1192",
+      "open": false,
+      "row": 1127,
+      "status": "closed",
+      "title": "Live stand smoke usage + quota + isolation"
+    },
+    {
+      "acceptance": "flag/`POOLAI_STAND_SMOKE_TENANT=1` + band55 export shape",
+      "deps": "poolai_http_stand_smoke",
+      "id": "PH-S1193",
+      "open": false,
+      "row": 1128,
+      "status": "closed",
+      "title": "CLI `--tenant-stand-smoke` + export suite"
+    },
+    {
+      "acceptance": "tenant_stand_smoke_*` fields in `rust_ratio.json",
+      "deps": "RUST_RATIO / §5.13",
+      "id": "PH-S1194",
+      "open": false,
+      "row": 1129,
+      "status": "closed",
+      "title": "poolai-loc-audit --tenant-stand-smoke"
+    },
+    {
+      "acceptance": "live smoke + loc-audit gate",
+      "deps": "RUN_LOCAL / verify-dev-stand",
+      "id": "PH-S1195",
+      "open": false,
+      "row": 1130,
+      "status": "closed",
+      "title": "VERIFY_TENANT_STAND_SMOKE` + quick flag"
+    },
+    {
+      "acceptance": "matrix + RUN_LOCAL/INDEX/HANDOFF/NEXT",
+      "deps": "DOCS_LEGACY maintain",
+      "id": "PH-S1196",
+      "open": false,
+      "row": 1131,
+      "status": "closed",
+      "title": "Docs `TENANT_STAND_SMOKE.md` + canon sync"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory`; roadmap pointer",
+      "deps": "RUST_RATIO stretch",
+      "id": "PH-S1197",
+      "open": false,
+      "row": 1132,
+      "status": "closed",
+      "title": "Ratio hold advisory + roadmap zriz"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1189_integration`; HANDOFF/NEXT → band 56",
+      "deps": "Enterprise band 55",
+      "id": "PH-S1198",
+      "open": false,
+      "row": 1133,
+      "status": "closed",
+      "title": "Tenant stand-smoke band close"
+    },
+    {
+      "acceptance": "depth enum + slice/aggregate criteria registry",
+      "deps": "tenant_loc_audit_depth.rs",
+      "id": "PH-S1199",
+      "open": false,
+      "row": 1134,
+      "status": "closed",
+      "title": "tenant_loc_audit_depth` ui-core module"
+    },
+    {
+      "acceptance": "five `--tenant-*` flags present; unit test",
+      "deps": "RUST_RATIO / `TENANT_LOC_AUDIT_SLICES",
+      "id": "PH-S1200",
+      "open": false,
+      "row": 1135,
+      "status": "closed",
+      "title": "Tenant loc-audit slice aggregate stub"
+    },
+    {
+      "acceptance": "tenant_loc_audit_integration` totals consistent",
+      "deps": "FM §5.17",
+      "id": "PH-S1201",
+      "open": false,
+      "row": 1136,
+      "status": "closed",
+      "title": "Tenant loc-audit criteria contracts"
+    },
+    {
+      "acceptance": "loc-audit aggregate gate",
+      "deps": "RUN_LOCAL / verify-dev-stand",
+      "id": "PH-S1202",
+      "open": false,
+      "row": 1137,
+      "status": "closed",
+      "title": "VERIFY_TENANT_LOC_AUDIT` + quick flag"
+    },
+    {
+      "acceptance": "tenant_loc_audit_band56_export_shape",
+      "deps": "poolai_http_stand_smoke",
+      "id": "PH-S1203",
+      "open": false,
+      "row": 1138,
+      "status": "closed",
+      "title": "Stand smoke export shape"
+    },
+    {
+      "acceptance": "tenant_loc_audit_*` fields in `rust_ratio.json",
+      "deps": "RUST_RATIO / §5.13",
+      "id": "PH-S1204",
+      "open": false,
+      "row": 1139,
+      "status": "closed",
+      "title": "poolai-loc-audit --tenant-loc-audit"
+    },
+    {
+      "acceptance": "matrix + RUN_LOCAL/INDEX/HANDOFF/NEXT",
+      "deps": "DOCS_LEGACY maintain",
+      "id": "PH-S1205",
+      "open": false,
+      "row": 1140,
+      "status": "closed",
+      "title": "Docs `TENANT_LOC_AUDIT.md` + canon sync"
+    },
+    {
+      "acceptance": "drift gate green after band 56",
+      "deps": "docs-vision",
+      "id": "PH-S1206",
+      "open": false,
+      "row": 1141,
+      "status": "closed",
+      "title": "poolai-vision-sync --check"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory`; roadmap pointer",
+      "deps": "RUST_RATIO stretch",
+      "id": "PH-S1207",
+      "open": false,
+      "row": 1142,
+      "status": "closed",
+      "title": "Ratio hold advisory + roadmap zriz"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1199_integration`; HANDOFF/NEXT → band 57",
+      "deps": "Enterprise band 56",
+      "id": "PH-S1208",
+      "open": false,
+      "row": 1143,
+      "status": "closed",
+      "title": "Tenant loc-audit band close"
+    },
+    {
+      "acceptance": "depth enum + docs/criteria registry",
+      "deps": "tenant_docs_canon_depth.rs",
+      "id": "PH-S1209",
+      "open": false,
+      "row": 1144,
+      "status": "closed",
+      "title": "tenant_docs_canon_depth` ui-core module"
+    },
+    {
+      "acceptance": "six `TENANT_*.md` present; unit test",
+      "deps": "RUST_RATIO / `TENANT_DOCS_CANON_SLICES",
+      "id": "PH-S1210",
+      "open": false,
+      "row": 1145,
+      "status": "closed",
+      "title": "Tenant docs-canon slice aggregate stub"
+    },
+    {
+      "acceptance": "tenant_docs_canon_integration` totals consistent",
+      "deps": "FM §5.17",
+      "id": "PH-S1211",
+      "open": false,
+      "row": 1146,
+      "status": "closed",
+      "title": "Tenant docs-canon criteria contracts"
+    },
+    {
+      "acceptance": "docs-canon gate",
+      "deps": "RUN_LOCAL / verify-dev-stand",
+      "id": "PH-S1212",
+      "open": false,
+      "row": 1147,
+      "status": "closed",
+      "title": "VERIFY_TENANT_DOCS_CANON` + quick flag"
+    },
+    {
+      "acceptance": "tenant_docs_canon_band57_export_shape",
+      "deps": "poolai_http_stand_smoke",
+      "id": "PH-S1213",
+      "open": false,
+      "row": 1148,
+      "status": "closed",
+      "title": "Stand smoke export shape"
+    },
+    {
+      "acceptance": "tenant_docs_canon_*` fields in `rust_ratio.json",
+      "deps": "RUST_RATIO / §5.13",
+      "id": "PH-S1214",
+      "open": false,
+      "row": 1149,
+      "status": "closed",
+      "title": "poolai-loc-audit --tenant-docs-canon"
+    },
+    {
+      "acceptance": "matrix + RUN_LOCAL/INDEX/HANDOFF/NEXT",
+      "deps": "DOCS_LEGACY maintain",
+      "id": "PH-S1215",
+      "open": false,
+      "row": 1150,
+      "status": "closed",
+      "title": "Docs `TENANT_DOCS_CANON.md` + canon sync"
+    },
+    {
+      "acceptance": "drift gate green after band 57",
+      "deps": "docs-vision",
+      "id": "PH-S1216",
+      "open": false,
+      "row": 1151,
+      "status": "closed",
+      "title": "poolai-vision-sync --check"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory`; roadmap pointer",
+      "deps": "RUST_RATIO stretch",
+      "id": "PH-S1217",
+      "open": false,
+      "row": 1152,
+      "status": "closed",
+      "title": "Ratio hold advisory + roadmap zriz"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1209_integration`; HANDOFF/NEXT → band 58",
+      "deps": "Enterprise band 57",
+      "id": "PH-S1218",
+      "open": false,
+      "row": 1153,
+      "status": "closed",
+      "title": "Tenant docs-canon band close"
+    },
+    {
+      "acceptance": "depth enum + vision/criteria registry",
+      "deps": "tenant_vision_sync_depth.rs",
+      "id": "PH-S1219",
+      "open": false,
+      "row": 1154,
+      "status": "closed",
+      "title": "tenant_vision_sync_depth` ui-core module"
+    },
+    {
+      "acceptance": "six vision slices present; unit test",
+      "deps": "RUST_RATIO / `TENANT_VISION_SYNC_SLICES",
+      "id": "PH-S1220",
+      "open": false,
+      "row": 1155,
+      "status": "closed",
+      "title": "Tenant vision-sync slice aggregate stub"
+    },
+    {
+      "acceptance": "tenant_vision_sync_integration` totals consistent",
+      "deps": "FM §5.17",
+      "id": "PH-S1221",
+      "open": false,
+      "row": 1156,
+      "status": "closed",
+      "title": "Tenant vision-sync criteria contracts"
+    },
+    {
+      "acceptance": "vision-sync gate",
+      "deps": "RUN_LOCAL / verify-dev-stand",
+      "id": "PH-S1222",
+      "open": false,
+      "row": 1157,
+      "status": "closed",
+      "title": "VERIFY_TENANT_VISION_SYNC` + quick flag"
+    },
+    {
+      "acceptance": "tenant_vision_sync_band58_export_shape",
+      "deps": "poolai_http_stand_smoke",
+      "id": "PH-S1223",
+      "open": false,
+      "row": 1158,
+      "status": "closed",
+      "title": "Stand smoke export shape"
+    },
+    {
+      "acceptance": "tenant_vision_sync_*` fields in `rust_ratio.json",
+      "deps": "RUST_RATIO / §5.13",
+      "id": "PH-S1224",
+      "open": false,
+      "row": 1159,
+      "status": "closed",
+      "title": "poolai-loc-audit --tenant-vision-sync"
+    },
+    {
+      "acceptance": "matrix + RUN_LOCAL/INDEX/HANDOFF/NEXT",
+      "deps": "DOCS_LEGACY maintain",
+      "id": "PH-S1225",
+      "open": false,
+      "row": 1160,
+      "status": "closed",
+      "title": "Docs `TENANT_VISION_SYNC.md` + canon sync"
+    },
+    {
+      "acceptance": "drift gate green after band 58",
+      "deps": "docs-vision",
+      "id": "PH-S1226",
+      "open": false,
+      "row": 1161,
+      "status": "closed",
+      "title": "poolai-vision-sync --check"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory`; roadmap pointer",
+      "deps": "RUST_RATIO stretch",
+      "id": "PH-S1227",
+      "open": false,
+      "row": 1162,
+      "status": "closed",
+      "title": "Ratio hold advisory + roadmap zriz"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1219_integration`; HANDOFF/NEXT → band 59",
+      "deps": "Enterprise band 58",
+      "id": "PH-S1228",
+      "open": false,
+      "row": 1163,
+      "status": "closed",
+      "title": "Tenant vision-sync band close"
+    },
+    {
+      "acceptance": "depth enum + criteria registry",
+      "deps": "tenant_ratio_advisory_depth.rs",
+      "id": "PH-S1229",
+      "open": false,
+      "row": 1164,
+      "status": "closed",
+      "title": "tenant_ratio_advisory_depth` ui-core module"
+    },
+    {
+      "acceptance": "persist_tenant_to_sqlite`; create/get across recreate",
+      "deps": "FM §5.17 / `TENANT_RATIO_ADVISORY_SLICES",
+      "id": "PH-S1230",
+      "open": false,
+      "row": 1165,
+      "status": "closed",
+      "title": "Tenant SQLite restart-safe CRUD + slice aggregate"
+    },
+    {
+      "acceptance": "tenant_ratio_advisory_integration` + `tenant_sqlite_durable_integration",
+      "deps": "FM §5.17",
+      "id": "PH-S1231",
+      "open": false,
+      "row": 1166,
+      "status": "closed",
+      "title": "Tenant ratio-advisory + sqlite durable contracts"
+    },
+    {
+      "acceptance": "ratio-advisory gate",
+      "deps": "RUN_LOCAL / verify-dev-stand",
+      "id": "PH-S1232",
+      "open": false,
+      "row": 1167,
+      "status": "closed",
+      "title": "VERIFY_TENANT_RATIO_ADVISORY` + quick flag"
+    },
+    {
+      "acceptance": "tenant_ratio_advisory_band59_export_shape",
+      "deps": "poolai_http_stand_smoke",
+      "id": "PH-S1233",
+      "open": false,
+      "row": 1168,
+      "status": "closed",
+      "title": "Stand smoke export shape"
+    },
+    {
+      "acceptance": "tenant_ratio_advisory_*` fields in `rust_ratio.json",
+      "deps": "RUST_RATIO / §5.13",
+      "id": "PH-S1234",
+      "open": false,
+      "row": 1169,
+      "status": "closed",
+      "title": "poolai-loc-audit --tenant-ratio-advisory"
+    },
+    {
+      "acceptance": "matrix + RUN_LOCAL/INDEX/HANDOFF/NEXT",
+      "deps": "DOCS_LEGACY maintain",
+      "id": "PH-S1235",
+      "open": false,
+      "row": 1170,
+      "status": "closed",
+      "title": "Docs `TENANT_RATIO_ADVISORY.md` + canon sync"
+    },
+    {
+      "acceptance": "drift gate green after band 59",
+      "deps": "docs-vision",
+      "id": "PH-S1236",
+      "open": false,
+      "row": 1171,
+      "status": "closed",
+      "title": "poolai-vision-sync --check"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory`; roadmap pointer",
+      "deps": "RUST_RATIO stretch",
+      "id": "PH-S1237",
+      "open": false,
+      "row": 1172,
+      "status": "closed",
+      "title": "Ratio hold advisory + roadmap zriz"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1229_integration`; HANDOFF/NEXT → band 60",
+      "deps": "Enterprise band 59",
+      "id": "PH-S1238",
+      "open": false,
+      "row": 1173,
+      "status": "closed",
+      "title": "Tenant ratio-advisory band close"
+    },
+    {
+      "acceptance": "depth enum + criteria registry",
+      "deps": "tenant_horizon_depth.rs",
+      "id": "PH-S1239",
+      "open": false,
+      "row": 1174,
+      "status": "closed",
+      "title": "tenant_horizon_depth` ui-core module"
+    },
+    {
+      "acceptance": "all `--tenant-*` + `tenants.sqlite`; unit test",
+      "deps": "FM §5.17 / `TENANT_HORIZON_SLICES",
+      "id": "PH-S1240",
+      "open": false,
+      "row": 1175,
+      "status": "closed",
+      "title": "Phase-A slice aggregate"
+    },
+    {
+      "acceptance": "tenant_horizon_integration` criteria totals",
+      "deps": "FM §5.17",
+      "id": "PH-S1241",
+      "open": false,
+      "row": 1176,
+      "status": "closed",
+      "title": "Tenant horizon contracts"
+    },
+    {
+      "acceptance": "horizon gate",
+      "deps": "RUN_LOCAL / verify-dev-stand",
+      "id": "PH-S1242",
+      "open": false,
+      "row": 1177,
+      "status": "closed",
+      "title": "VERIFY_TENANT_HORIZON` + quick flag"
+    },
+    {
+      "acceptance": "tenant_horizon_band60_export_shape",
+      "deps": "poolai_http_stand_smoke",
+      "id": "PH-S1243",
+      "open": false,
+      "row": 1178,
+      "status": "closed",
+      "title": "Stand smoke export shape"
+    },
+    {
+      "acceptance": "tenant_horizon_*` fields in `rust_ratio.json",
+      "deps": "RUST_RATIO / §5.13",
+      "id": "PH-S1244",
+      "open": false,
+      "row": 1179,
+      "status": "closed",
+      "title": "poolai-loc-audit --tenant-horizon"
+    },
+    {
+      "acceptance": "matrix + RUN_LOCAL/INDEX/HANDOFF/NEXT",
+      "deps": "DOCS_LEGACY maintain",
+      "id": "PH-S1245",
+      "open": false,
+      "row": 1180,
+      "status": "closed",
+      "title": "Docs `TENANT_HORIZON.md` + canon sync"
+    },
+    {
+      "acceptance": "drift gate green after band 60",
+      "deps": "docs-vision",
+      "id": "PH-S1246",
+      "open": false,
+      "row": 1181,
+      "status": "closed",
+      "title": "poolai-vision-sync --check"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory`; roadmap → band 61",
+      "deps": "RUST_RATIO stretch",
+      "id": "PH-S1247",
+      "open": false,
+      "row": 1182,
+      "status": "closed",
+      "title": "Ratio hold advisory + roadmap zriz"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1239_integration`; HANDOFF/NEXT → band 61",
+      "deps": "Enterprise band 60",
+      "id": "PH-S1248",
+      "open": false,
+      "row": 1183,
+      "status": "closed",
+      "title": "Tenant horizon band close"
+    },
+    {
+      "acceptance": "depth enum + SSO criteria registry",
+      "deps": "sso_depth.rs",
+      "id": "PH-S1249",
+      "open": false,
+      "row": 1184,
+      "status": "closed",
+      "title": "sso_depth` ui-core module"
+    },
+    {
+      "acceptance": "POOLAI_SSO_STORE` + audience/NotOnOrAfter unit tests",
+      "deps": "security.rs",
+      "id": "PH-S1250",
+      "open": false,
+      "row": 1185,
+      "status": "closed",
+      "title": "SSO store/verify stub"
+    },
+    {
+      "acceptance": "criteria registry + FM markers",
+      "deps": "sso_depth_audit.rs",
+      "id": "PH-S1251",
+      "open": false,
+      "row": 1186,
+      "status": "closed",
+      "title": "SSO depth gate audit"
+    },
+    {
+      "acceptance": "SSO gate",
+      "deps": "RUN_LOCAL / verify-dev-stand",
+      "id": "PH-S1252",
+      "open": false,
+      "row": 1187,
+      "status": "closed",
+      "title": "VERIFY_SSO` + quick `--sso"
+    },
+    {
+      "acceptance": "sso_band61_export_shape",
+      "deps": "poolai_http_stand_smoke",
+      "id": "PH-S1253",
+      "open": false,
+      "row": 1188,
+      "status": "closed",
+      "title": "Stand smoke SSO export shape"
+    },
+    {
+      "acceptance": "sso_*` fields in `rust_ratio.json",
+      "deps": "RUST_RATIO / §5.13",
+      "id": "PH-S1254",
+      "open": false,
+      "row": 1189,
+      "status": "closed",
+      "title": "poolai-loc-audit --sso"
+    },
+    {
+      "acceptance": "matrix + RUN_LOCAL/INDEX/HANDOFF/NEXT",
+      "deps": "DOCS_LEGACY maintain",
+      "id": "PH-S1255",
+      "open": false,
+      "row": 1190,
+      "status": "closed",
+      "title": "Docs `SSO_DEPTH.md` + canon sync"
+    },
+    {
+      "acceptance": "drift gate green after band 61",
+      "deps": "docs-vision",
+      "id": "PH-S1256",
+      "open": false,
+      "row": 1191,
+      "status": "closed",
+      "title": "poolai-vision-sync --check"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory`; roadmap → band 62",
+      "deps": "RUST_RATIO stretch",
+      "id": "PH-S1257",
+      "open": false,
+      "row": 1192,
+      "status": "closed",
+      "title": "Ratio hold advisory + roadmap zriz"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1249_integration`; HANDOFF/NEXT → band 62",
+      "deps": "Enterprise band 61",
+      "id": "PH-S1258",
+      "open": false,
+      "row": 1193,
+      "status": "closed",
+      "title": "SSO depth band close"
     }
   ],
   "sprint_queue_open_count": 0,

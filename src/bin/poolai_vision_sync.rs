@@ -440,11 +440,62 @@ fn extract_fm_section_512(content: &str) -> Option<&str> {
     Some(&rest[..end])
 }
 
+/// All `### …` markdown sections in FM (H3), for enterprise band queues outside §5.12.
+fn iter_fm_h3_sections(content: &str) -> Vec<&str> {
+    let mut starts: Vec<usize> = Vec::new();
+    let mut search = 0usize;
+    while let Some(rel) = content[search..].find("\n### ") {
+        let abs = search + rel + 1; // point at '#'
+        starts.push(abs);
+        search = abs + 4;
+    }
+    if content.starts_with("### ") {
+        starts.insert(0, 0);
+    }
+    let mut out = Vec::with_capacity(starts.len());
+    for (i, &start) in starts.iter().enumerate() {
+        let end = starts.get(i + 1).copied().unwrap_or(content.len());
+        out.push(&content[start..end]);
+    }
+    out
+}
+
+/// Enterprise / horizon band tables live in `### 5.NN … queue — band N` (after §5.12 journal).
+fn parse_fm_band_queue_sections(content: &str) -> Vec<SprintQueueEntry> {
+    let mut out = Vec::new();
+    for section in iter_fm_h3_sections(content) {
+        let header = section.lines().next().unwrap_or("");
+        if header.starts_with("### 5.12") {
+            continue;
+        }
+        let header_l = header.to_ascii_lowercase();
+        if !(header_l.contains("queue") && header_l.contains("band")) {
+            continue;
+        }
+        out.extend(parse_fm_sprint_queue_section(section));
+    }
+    out
+}
+
+fn merge_sprint_queue_entries(
+    primary: Vec<SprintQueueEntry>,
+    extra: Vec<SprintQueueEntry>,
+) -> Vec<SprintQueueEntry> {
+    let mut by_id: BTreeMap<String, SprintQueueEntry> = BTreeMap::new();
+    for e in primary.into_iter().chain(extra) {
+        by_id.insert(e.id.clone(), e);
+    }
+    let mut out: Vec<SprintQueueEntry> = by_id.into_values().collect();
+    out.sort_by_key(|e| (parse_sprint_serial(&e.id).unwrap_or(0), e.row));
+    out
+}
+
 fn parse_fm_sprint_queue(content: &str) -> Vec<SprintQueueEntry> {
-    let Some(section) = extract_fm_section_512(content) else {
-        return Vec::new();
-    };
-    parse_fm_sprint_queue_section(section)
+    let journal = extract_fm_section_512(content)
+        .map(parse_fm_sprint_queue_section)
+        .unwrap_or_default();
+    let bands = parse_fm_band_queue_sections(content);
+    merge_sprint_queue_entries(journal, bands)
 }
 
 fn sprint_queue_json(entries: &[SprintQueueEntry]) -> Value {
@@ -502,7 +553,7 @@ fn read_fm_sprint_bundle(root: &Path) -> (Vec<SprintQueueEntry>, String) {
         }
     };
     let section = extract_fm_section_512(&content).unwrap_or("").to_string();
-    let entries = parse_fm_sprint_queue_section(&section);
+    let entries = parse_fm_sprint_queue(&content);
     (entries, section)
 }
 
@@ -1521,6 +1572,40 @@ mod tests {
         assert_eq!(next.as_deref(), Some("PH-S191"));
         assert_eq!(last.as_deref(), Some("PH-S190"));
         assert_eq!(open, 2);
+    }
+
+    #[test]
+    fn parse_fm_sprint_queue_merges_enterprise_band_sections() {
+        let sample = r###"
+### 5.12 Research backlog PH-S65+ (Galaxy wire / ops, 2026-05-27)
+
+| 953 | **PH-S1018** | Ops power band close | tests | RUN_LOCAL sync | **✅** |
+
+**Відкритих у §5.12:** **0** (band 61 ✅). **Master horizon:** PH-S1259…S1268 (band 62).
+
+### 5.42 SSO depth scaffold queue — band 61 (PH-S1249…S1258, 2026-07-21)
+
+| 1192 | **PH-S1257** | Ratio hold advisory | RUST_RATIO | advisory | **✅** |
+| 1193 | **PH-S1258** | SSO depth band close | Enterprise band 61 | HANDOFF → band 62 | **✅** |
+
+### 5.16 Service band (Cursor / toolchain / docs hygiene)
+"###;
+        let entries = parse_fm_sprint_queue(sample);
+        assert_eq!(entries.len(), 3);
+        let (next, last, open) = derive_sprint_meta(&entries, extract_fm_section_512(sample));
+        assert_eq!(open, 0);
+        assert_eq!(last.as_deref(), Some("PH-S1258"));
+        assert_eq!(next.as_deref(), Some("PH-S1259"));
+        let feed = build_sprint_feed(&entries, extract_fm_section_512(sample));
+        let ids: Vec<&str> = feed["items"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter_map(|i| i.get("id").and_then(Value::as_str))
+            .collect();
+        assert_eq!(ids.first().copied(), Some("PH-S1258"));
+        assert!(ids.contains(&"PH-S1257"));
+        assert!(ids.contains(&"PH-S1018"));
     }
 
     #[test]

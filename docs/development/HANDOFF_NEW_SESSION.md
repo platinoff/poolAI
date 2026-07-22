@@ -1,10 +1,10 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-21 (band 61 **PH-S1249…S1258** ✅ · Cursor **3.12.29** · horizon band 62)
+**Оновлено:** 2026-07-22 (service **PH-SVC21…SVC30** ✅ · Cursor **3.12.30** · band 61 ✅ · horizon band 62)
 
 **Наступна сесія:** **`абракадабра`** — promote band 62 (B SSO · store wire) з [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md).
 
-**Cursor / toolchain (service):** local desktop **3.12.29** · public changelog latest numbered IDE **3.11** · research [`CURSOR_UPDATE_RESEARCH_2026-07-21.md`](./CURSOR_UPDATE_RESEARCH_2026-07-21.md) · FM **§5.16**.
+**Cursor / toolchain (service):** local desktop **3.12.30** · public changelog latest numbered IDE **3.11** · research [`CURSOR_UPDATE_RESEARCH_2026-07-22.md`](./CURSOR_UPDATE_RESEARCH_2026-07-22.md) · FM **§5.16**. Vision: `poolai-vision-sync` мержить enterprise `queue — band` → Sprint queue + Feed = останні закриті PH-S*.
 
 ## Band 61 — SSO depth scaffold (PH-S1249…S1258, ✅)
 
@@ -21,7 +21,7 @@
 | **PH-S1257** | Ratio hold advisory |
 | **PH-S1258** | Band close |
 
-**§5.12:** **0** відкритих (band 61 ✅). **Vision:** rev **348**. **Enterprise pending:** 890 (→ PH-S2148).
+**§5.12:** **0** відкритих (band 61 ✅). **Vision:** rev **349**. **Enterprise pending:** 890 (→ PH-S2148).
 
 **PH-S1258 ✅ (2026-07-21):** `sso_depth.rs`; `POOLAI_SSO_STORE`; SAML audience/time stub; `--sso`; `VERIFY_SSO`; `SSO_DEPTH.md`; `galaxy_horizon_s1249_integration`. Phase B SSO depth scaffold closed.
 

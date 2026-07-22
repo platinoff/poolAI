@@ -1,5 +1,13 @@
 # Cursor Agent Configuration Changelog
 
+## 2026-07-22 — Cursor 3.12.30 service band (PH-SVC21…SVC30)
+
+- **`cursor-environment-baseline.mdc`**: local `cursor` **3.12.30**; public changelog latest numbered IDE = **3.11**; High Contrast flicker ops note; pointer to `CURSOR_UPDATE_RESEARCH_2026-07-22.md`.
+- **`poolai-agent-roles.mdc`**: research pointer → Jul 22; High Contrast flicker note.
+- **Vision:** `poolai-vision-sync` мержить FM enterprise `queue — band` секції → Sprint queue + Feed показують останні закриті PH-S* (не лише журнал §5.12 до PH-S1018).
+- **Docs:** `CURSOR_UPDATE_RESEARCH_2026-07-22.md`; HANDOFF/NEXT/README/INDEX/ENV zriz; FM §5.16 PH-SVC21…SVC30.
+- **Product queue unchanged:** §5.12 **0** · next session **`абракадабра`** → band 62.
+
 ## 2026-07-21 — Cursor 3.12.29 service band (PH-SVC11…SVC20)
 
 - **`cursor-environment-baseline.mdc`**: local `cursor` **3.12.29**; note that public changelog latest numbered IDE = **3.11**; Jul 17 = Slack-only; pointer to `CURSOR_UPDATE_RESEARCH_2026-07-21.md`.

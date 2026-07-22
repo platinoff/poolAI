@@ -3,111 +3,111 @@
   "items": [
     {
       "category": "closed",
-      "id": "PH-S1018",
+      "id": "PH-S1258",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "galaxy_horizon_s1011_integration`; RUN_LOCAL sync",
-      "title": "Ops power band close"
+      "summary": "galaxy_horizon_s1249_integration`; HANDOFF/NEXT → band 62",
+      "title": "SSO depth band close"
     },
     {
       "category": "closed",
-      "id": "PH-S1017",
+      "id": "PH-S1257",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "power menu; localStorage; soft/hard reload",
-      "title": "Vision poweroff/reset controls"
+      "summary": "--min-ratio 0.95 --advisory`; roadmap → band 62",
+      "title": "Ratio hold advisory + roadmap zriz"
     },
     {
       "category": "closed",
-      "id": "PH-S1016",
+      "id": "PH-S1256",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "shutdown/reboot dev-safe; integration test",
-      "title": "PoolAI power ops wire"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1015",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "toolbar modal Виключити/Перезавантажити",
-      "title": "PoolAI admin power panel UI"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1014",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "save on stop; restore on quick; unit test",
-      "title": "Runtime state snapshot persist"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1013",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "PS1 + MSYS2 shim localhost URL",
-      "title": "Vision easy launch"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1012",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "preset `quick` + health wait",
-      "title": "Light full-stack launch preset"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1011",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--light` minimal-features build",
-      "title": "Light compile profile"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1010",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "STABLE maintenance mode",
-      "title": "FM §5.15 product-complete closure"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1009",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "final code band close",
-      "title": "galaxy_horizon_s1000_integration"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1008",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "final pre-S1010",
-      "title": "Ratio hold advisory"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1007",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--check` green",
+      "summary": "drift gate green after band 61",
       "title": "poolai-vision-sync --check"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1255",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "matrix + RUN_LOCAL/INDEX/HANDOFF/NEXT",
+      "title": "Docs `SSO_DEPTH.md` + canon sync"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1254",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "sso_*` fields in `rust_ratio.json",
+      "title": "poolai-loc-audit --sso"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1253",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "sso_band61_export_shape",
+      "title": "Stand smoke SSO export shape"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1252",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "SSO gate",
+      "title": "VERIFY_SSO` + quick `--sso"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1251",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "criteria registry + FM markers",
+      "title": "SSO depth gate audit"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1250",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "POOLAI_SSO_STORE` + audience/NotOnOrAfter unit tests",
+      "title": "SSO store/verify stub"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1249",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "depth enum + SSO criteria registry",
+      "title": "sso_depth` ui-core module"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1248",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_horizon_s1239_integration`; HANDOFF/NEXT → band 61",
+      "title": "Tenant horizon band close"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1247",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--min-ratio 0.95 --advisory`; roadmap → band 61",
+      "title": "Ratio hold advisory + roadmap zriz"
     }
   ],
   "link": "docs/vision/index.html",

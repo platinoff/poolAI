@@ -37,7 +37,8 @@ alwaysApply: true
 - **Modes:** Shift+Tab / mode picker — drain/`абракадабра` = **Agent**; Plan лише для неоднозначного scope.
 - **`/multitask`:** паралельні фонові Task subagents під час довгого drain (не замість канону MSYS2).
 - **Cloud agent hooks** (`beforeSubmitPrompt`, `afterAgentResponse`, `afterAgentThought`, `stop`, `subagentStart`, …): опційно для cloud; локальний VDT канон — MSYS2 + `poolai-session-iteration.mdc`.
-- Baseline / research: [`cursor-environment-baseline.mdc`](cursor-environment-baseline.mdc) · [`CURSOR_UPDATE_RESEARCH_2026-07-21.md`](../../docs/development/CURSOR_UPDATE_RESEARCH_2026-07-21.md).
+- Baseline / research: [`cursor-environment-baseline.mdc`](cursor-environment-baseline.mdc) · [`CURSOR_UPDATE_RESEARCH_2026-07-22.md`](../../docs/development/CURSOR_UPDATE_RESEARCH_2026-07-22.md) (local **3.12.30**).
+- **Ops:** Agents Window flicker з **Cursor Dark High Contrast** — змінити тему; не блокує drain.
 
 ## Канон черги (FM)
 
