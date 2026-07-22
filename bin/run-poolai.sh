@@ -71,6 +71,7 @@ Options (quick):
   --tenant-ratio-advisory  After health wait, loc-audit --tenant-ratio-advisory (PH-S1232)
   --tenant-horizon  After health wait, loc-audit --tenant-horizon (PH-S1242)
   --sso             After health wait, loc-audit --sso (PH-S1252)
+  --sso-store       After health wait, loc-audit --sso-store (PH-S1262)
   --skip-build    Skip cargo build
   --port N        HTTP port (default 8080)
 
@@ -265,6 +266,7 @@ cmd_quick() {
   local tenant_ratio_advisory=0
   local tenant_horizon=0
   local sso=0
+  local sso_store=0
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --skip-build) SKIP_BUILD=1; shift ;;
@@ -285,6 +287,7 @@ cmd_quick() {
       --tenant-ratio-advisory) tenant_ratio_advisory=1; shift ;;
       --tenant-horizon) tenant_horizon=1; shift ;;
       --sso) sso=1; shift ;;
+      --sso-store) sso_store=1; shift ;;
       --port) PORT="$2"; shift 2 ;;
       *) echo "Unknown option: $1"; usage; exit 1 ;;
     esac
@@ -365,6 +368,10 @@ cmd_quick() {
   if [[ "$sso" == "1" ]]; then
     echo "Running poolai-loc-audit --sso (PH-S1252)..."
     cargo run --quiet --bin poolai-loc-audit -- --sso
+  fi
+  if [[ "$sso_store" == "1" ]]; then
+    echo "Running poolai-loc-audit --sso-store (PH-S1262)..."
+    cargo run --quiet --bin poolai-loc-audit -- --sso-store
   fi
 }
 

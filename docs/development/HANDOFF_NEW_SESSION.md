@@ -1,10 +1,29 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-22 (service **PH-SVC21…SVC30** ✅ · Cursor **3.12.30** · band 61 ✅ · horizon band 62)
+**Оновлено:** 2026-07-22 (band 62 **PH-S1259…S1268** ✅ · Cursor **3.12.30** · horizon band 63)
 
-**Наступна сесія:** **`абракадабра`** — promote band 62 (B SSO · store wire) з [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md).
+**Наступна сесія:** **`абракадабра`** — promote band 63 (B SSO · API contracts) з [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md).
 
 **Cursor / toolchain (service):** local desktop **3.12.30** · public changelog latest numbered IDE **3.11** · research [`CURSOR_UPDATE_RESEARCH_2026-07-22.md`](./CURSOR_UPDATE_RESEARCH_2026-07-22.md) · FM **§5.16**. Vision: `poolai-vision-sync` мержить enterprise `queue — band` → Sprint queue + Feed = останні закриті PH-S*.
+
+## Band 62 — SSO store wire (PH-S1259…S1268, ✅)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1259** | `sso_store_depth` ui-core module |
+| **PH-S1260** | `sso_store_wire()` + `POOLAI_SSO_DATA_DIR` |
+| **PH-S1261** | Criteria contracts (`sso_store_wire_integration`) |
+| **PH-S1262** | `VERIFY_SSO_STORE` + quick `--sso-store` |
+| **PH-S1263** | Stand smoke export shape band 62 |
+| **PH-S1264** | `poolai-loc-audit --sso-store` |
+| **PH-S1265** | `SSO_STORE.md` + canon sync |
+| **PH-S1266** | vision-sync --check |
+| **PH-S1267** | Ratio hold advisory |
+| **PH-S1268** | Band close |
+
+**§5.12:** **0** відкритих (band 62 ✅). **Vision:** rev **352**. **Enterprise pending:** 880 (→ PH-S2148).
+
+**PH-S1268 ✅ (2026-07-22):** `sso_store_depth.rs`; `sso_store_wire()`; `POOLAI_SSO_DATA_DIR`; `--sso-store`; `VERIFY_SSO_STORE`; `SSO_STORE.md`; `galaxy_horizon_s1259_integration`. Phase B SSO store wire closed.
 
 ## Band 61 — SSO depth scaffold (PH-S1249…S1258, ✅)
 

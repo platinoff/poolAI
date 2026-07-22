@@ -21,8 +21,8 @@
 | 59 | PH-S1229…S1238 | A Tenants · ratio advisory **✅ drained** |
 | 60 | PH-S1239…S1248 | A Tenants · horizon close **✅ drained** |
 | 61 | PH-S1249…S1258 | B SSO · depth scaffold **✅** |
-| 62 | PH-S1259…S1268 | B SSO · store wire **active next** |
-| 63 | PH-S1269…S1278 | B SSO · API contracts |
+| 62 | PH-S1259…S1268 | B SSO · store wire **✅** |
+| 63 | PH-S1269…S1278 | B SSO · API contracts **active next** |
 | 64 | PH-S1279…S1288 | B SSO · admin/ops glue |
 | 65 | PH-S1289…S1298 | B SSO · stand smoke |
 | 66 | PH-S1299…S1308 | B SSO · loc-audit |
@@ -282,16 +282,16 @@
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1259** | `sso_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1260** | `sso` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1261** | `sso` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1262** | `sso` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1263** | Stand smoke `sso` export | export shape unit test | **[ ]** |
-| **PH-S1264** | poolai-loc-audit PH-S1264 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1265** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1266** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1267** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1268** | galaxy_horizon_s1259_integration | band close | **[ ]** |
+| **PH-S1259** | `sso_store_depth` ui-core | depth enum + SSO store criteria registry | **✅** |
+| **PH-S1260** | `sso_store_wire` durable path | `POOLAI_SSO_DATA_DIR` + wire snapshot + unit tests | **✅** |
+| **PH-S1261** | SSO store API contracts | `tests/sso_store_wire_integration.rs` | **✅** |
+| **PH-S1262** | `VERIFY_SSO_STORE` + quick `--sso-store` | verify-dev-stand / run-poolai | **✅** |
+| **PH-S1263** | Stand smoke SSO store export | `sso_store_band62_export_shape` | **✅** |
+| **PH-S1264** | poolai-loc-audit `--sso-store` | `sso_store_*` fields in `rust_ratio.json` | **✅** |
+| **PH-S1265** | Docs `SSO_STORE.md` + canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **✅** |
+| **PH-S1266** | poolai-vision-sync --check | drift gate green | **✅** |
+| **PH-S1267** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
+| **PH-S1268** | galaxy_horizon_s1259_integration | band close | **✅** |
 
 ## Band 63 — PH-S1269…S1278 (B SSO · API contracts)
 

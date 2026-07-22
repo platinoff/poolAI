@@ -10,6 +10,12 @@
 //! - Advanced RBAC with tenant-aware permissions
 //! - Token management and refresh
 //!
+//! # Persistence (enterprise horizon band 61 scaffold, band 62 store wire)
+//!
+//! Default store is **in-memory**. Band 62 wires `POOLAI_SSO_STORE=sqlite` +
+//! optional `POOLAI_SSO_DATA_DIR` as the durable path (restart-safe CRUD later).
+//! See [`docs/development/SSO_STORE.md`] and [`docs/development/SSO_DEPTH.md`].
+//!
 //! # Example
 //!
 //! ```rust,no_run
@@ -41,6 +47,7 @@ use hmac::{Hmac, Mac};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::collections::HashMap;
+use std::path::PathBuf;
 use std::sync::{Arc, OnceLock};
 use tokio::sync::RwLock;
 use tracing::info;
@@ -51,10 +58,16 @@ type HmacSha256 = Hmac<Sha256>;
 /// Env key for SSO provider store backend (`memory` default; `sqlite` horizon band 62+).
 pub const POOLAI_SSO_STORE: &str = "POOLAI_SSO_STORE";
 
+/// Env key for durable SSO data directory (band 62 store wire).
+pub const POOLAI_SSO_DATA_DIR: &str = "POOLAI_SSO_DATA_DIR";
+
+/// Canonical sqlite DB file name under the configured data dir (band 62 wire).
+pub const SSO_STORE_SQLITE_FILE: &str = "sso.sqlite";
+
 /// Canonical SSO store modes (band 61 scaffold).
 pub const SSO_STORE_MODES: &[&str] = &["memory", "sqlite"];
 
-/// Resolve configured SSO store mode (PH-S1250 scaffold — restart-unsafe until band 62).
+/// Resolve configured SSO store mode (PH-S1250 scaffold; durable wire PH-S1260).
 pub fn sso_store_mode() -> &'static str {
     match std::env::var(POOLAI_SSO_STORE)
         .unwrap_or_else(|_| "memory".into())
@@ -63,6 +76,60 @@ pub fn sso_store_mode() -> &'static str {
     {
         "sqlite" => "sqlite",
         _ => "memory",
+    }
+}
+
+/// Optional durable data directory from env (PH-S1260).
+pub fn sso_store_data_dir_from_env() -> Option<PathBuf> {
+    std::env::var(POOLAI_SSO_DATA_DIR)
+        .ok()
+        .map(|v| v.trim().to_string())
+        .filter(|v| !v.is_empty())
+        .map(PathBuf::from)
+}
+
+/// SSO store wire snapshot (mode + durable path; CRUD later in phase B).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SsoStoreWire {
+    /// `memory` or `sqlite`.
+    pub mode: String,
+    /// Resolved sqlite file path when mode is sqlite and data dir is set.
+    pub durable_path: Option<String>,
+    /// True when sqlite mode has a durable path.
+    pub configured: bool,
+}
+
+/// Resolve SSO store wire for ops / verify / contracts (PH-S1260).
+pub fn sso_store_wire() -> SsoStoreWire {
+    let mode = sso_store_mode().to_string();
+    if mode != "sqlite" {
+        return SsoStoreWire {
+            mode,
+            durable_path: None,
+            configured: false,
+        };
+    }
+    let durable_path = sso_store_data_dir_from_env().map(|dir| {
+        dir.join(SSO_STORE_SQLITE_FILE)
+            .to_string_lossy()
+            .replace('\\', "/")
+    });
+    let configured = durable_path.is_some();
+    SsoStoreWire {
+        mode,
+        durable_path,
+        configured,
+    }
+}
+
+/// Wire label for admin / metrics depth fields (PH-S1260).
+pub fn sso_store_wire_label(wire: &SsoStoreWire) -> &'static str {
+    if wire.mode == "sqlite" && wire.configured {
+        "sqlite"
+    } else if wire.mode == "sqlite" {
+        "sqlite_unconfigured"
+    } else {
+        "memory"
     }
 }
 
@@ -1472,6 +1539,42 @@ mod tests {
         assert_eq!(sso_store_mode(), "sqlite");
         std::env::remove_var(POOLAI_SSO_STORE);
         assert!(SSO_STORE_MODES.contains(&"memory"));
+    }
+
+    #[test]
+    fn sso_store_wire_memory_default_ph_s1260() {
+        std::env::remove_var(POOLAI_SSO_STORE);
+        std::env::remove_var(POOLAI_SSO_DATA_DIR);
+        let wire = sso_store_wire();
+        assert_eq!(wire.mode, "memory");
+        assert!(!wire.configured);
+        assert!(wire.durable_path.is_none());
+        assert_eq!(sso_store_wire_label(&wire), "memory");
+        assert_eq!(POOLAI_SSO_DATA_DIR, "POOLAI_SSO_DATA_DIR");
+    }
+
+    #[test]
+    fn sso_store_wire_sqlite_unconfigured_ph_s1260() {
+        std::env::set_var(POOLAI_SSO_STORE, "sqlite");
+        std::env::remove_var(POOLAI_SSO_DATA_DIR);
+        let wire = sso_store_wire();
+        assert_eq!(wire.mode, "sqlite");
+        assert!(!wire.configured);
+        assert_eq!(sso_store_wire_label(&wire), "sqlite_unconfigured");
+        std::env::remove_var(POOLAI_SSO_STORE);
+    }
+
+    #[test]
+    fn sso_store_wire_sqlite_configured_ph_s1260() {
+        std::env::set_var(POOLAI_SSO_STORE, "sqlite");
+        std::env::set_var(POOLAI_SSO_DATA_DIR, "/tmp/poolai-sso-wire");
+        let wire = sso_store_wire();
+        assert!(wire.configured);
+        assert_eq!(sso_store_wire_label(&wire), "sqlite");
+        let path = wire.durable_path.as_deref().expect("path");
+        assert!(path.ends_with(SSO_STORE_SQLITE_FILE) || path.contains(SSO_STORE_SQLITE_FILE));
+        std::env::remove_var(POOLAI_SSO_STORE);
+        std::env::remove_var(POOLAI_SSO_DATA_DIR);
     }
 
     #[test]

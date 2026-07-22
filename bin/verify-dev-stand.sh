@@ -33,6 +33,7 @@ VERIFY_TENANT_VISION_SYNC="${VERIFY_TENANT_VISION_SYNC:-0}"
 VERIFY_TENANT_RATIO_ADVISORY="${VERIFY_TENANT_RATIO_ADVISORY:-0}"
 VERIFY_TENANT_HORIZON="${VERIFY_TENANT_HORIZON:-0}"
 VERIFY_SSO="${VERIFY_SSO:-0}"
+VERIFY_SSO_STORE="${VERIFY_SSO_STORE:-0}"
 HEALTH_RETRIES="${VERIFY_HEALTH_RETRIES:-45}"
 HEALTH_SLEEP="${VERIFY_HEALTH_SLEEP:-2}"
 
@@ -460,6 +461,16 @@ if [[ "$VERIFY_SSO" == "1" ]]; then
     echo "OK  SSO depth gate loc-audit"
   else
     echo "FAIL SSO depth gate loc-audit"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_SSO_STORE" == "1" ]]; then
+  echo "Running poolai-loc-audit --sso-store (PH-S1262)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --sso-store); then
+    echo "OK  SSO store wire gate loc-audit"
+  else
+    echo "FAIL SSO store wire gate loc-audit"
     fail=1
   fi
 fi

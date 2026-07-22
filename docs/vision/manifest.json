@@ -2552,11 +2552,23 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_development_CURSOR_UPDATE_RESEARCH_2026_07_22_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_sso_store_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_SSO_STORE_md"
     }
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S1258",
+  "last_sprint_closed": "PH-S1268",
   "layers": [
     {
       "id": "L0",
@@ -2589,7 +2601,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1259",
+  "next_sprint": "PH-S1269",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -10319,9 +10331,37 @@
       "label": "CURSOR_UPDATE_RESEARCH_2026-07-22.md",
       "layer": "L1",
       "path": "docs/development/CURSOR_UPDATE_RESEARCH_2026-07-22.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_sso_store_depth_rs",
+      "label": "sso_store_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/sso_store_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_SSO_STORE_md",
+      "label": "SSO_STORE.md",
+      "layer": "L1",
+      "path": "docs/development/SSO_STORE.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1259_integration_rs",
+      "label": "galaxy_horizon_s1259_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1259_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_sso_store_wire_integration_rs",
+      "label": "sso_store_wire_integration.rs",
+      "layer": "L3",
+      "path": "tests/sso_store_wire_integration.rs"
     }
   ],
-  "revision": 350,
+  "revision": 352,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -21059,6 +21099,96 @@
       "row": 1193,
       "status": "closed",
       "title": "SSO depth band close"
+    },
+    {
+      "acceptance": "depth enum + SSO store criteria registry",
+      "deps": "sso_store_depth.rs",
+      "id": "PH-S1259",
+      "open": false,
+      "row": 1194,
+      "status": "closed",
+      "title": "sso_store_depth` ui-core module"
+    },
+    {
+      "acceptance": "POOLAI_SSO_DATA_DIR` + `sso_store_wire()` + unit tests",
+      "deps": "security.rs",
+      "id": "PH-S1260",
+      "open": false,
+      "row": 1195,
+      "status": "closed",
+      "title": "SSO store wire durable path"
+    },
+    {
+      "acceptance": "wire labels + ui-core depth stub",
+      "deps": "sso_store_wire_integration.rs",
+      "id": "PH-S1261",
+      "open": false,
+      "row": 1196,
+      "status": "closed",
+      "title": "SSO store wire contracts"
+    },
+    {
+      "acceptance": "SSO store gate",
+      "deps": "RUN_LOCAL / verify-dev-stand",
+      "id": "PH-S1262",
+      "open": false,
+      "row": 1197,
+      "status": "closed",
+      "title": "VERIFY_SSO_STORE` + quick `--sso-store"
+    },
+    {
+      "acceptance": "sso_store_band62_export_shape",
+      "deps": "poolai_http_stand_smoke",
+      "id": "PH-S1263",
+      "open": false,
+      "row": 1198,
+      "status": "closed",
+      "title": "Stand smoke SSO store export shape"
+    },
+    {
+      "acceptance": "sso_store_*` fields in `rust_ratio.json",
+      "deps": "RUST_RATIO / §5.13",
+      "id": "PH-S1264",
+      "open": false,
+      "row": 1199,
+      "status": "closed",
+      "title": "poolai-loc-audit --sso-store"
+    },
+    {
+      "acceptance": "matrix + RUN_LOCAL/INDEX/HANDOFF/NEXT",
+      "deps": "DOCS_LEGACY maintain",
+      "id": "PH-S1265",
+      "open": false,
+      "row": 1200,
+      "status": "closed",
+      "title": "Docs `SSO_STORE.md` + canon sync"
+    },
+    {
+      "acceptance": "drift gate green after band 62",
+      "deps": "docs-vision",
+      "id": "PH-S1266",
+      "open": false,
+      "row": 1201,
+      "status": "closed",
+      "title": "poolai-vision-sync --check"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory`; roadmap → band 63",
+      "deps": "RUST_RATIO stretch",
+      "id": "PH-S1267",
+      "open": false,
+      "row": 1202,
+      "status": "closed",
+      "title": "Ratio hold advisory + roadmap zriz"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1259_integration`; HANDOFF/NEXT → band 63",
+      "deps": "Enterprise band 62",
+      "id": "PH-S1268",
+      "open": false,
+      "row": 1203,
+      "status": "closed",
+      "title": "SSO store band close"
     }
   ],
   "sprint_queue_open_count": 0,

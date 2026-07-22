@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 164377,
-  "non_rust_product_loc": 8928,
-  "product_loc_total": 173305,
-  "rust_ratio": 0.9484838867891867,
-  "rust_ratio_pct": 94.84838867891867,
+  "rust_loc": 164921,
+  "non_rust_product_loc": 8945,
+  "product_loc_total": 173866,
+  "rust_ratio": 0.9485523334061864,
+  "rust_ratio_pct": 94.85523334061864,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -73,9 +73,12 @@
   "tenant_horizon_mode": false,
   "tenant_horizon_criteria_total": 10,
   "tenant_horizon_criteria_met_count": 0,
-  "sso_mode": true,
+  "sso_mode": false,
   "sso_criteria_total": 8,
-  "sso_criteria_met_count": 8,
+  "sso_criteria_met_count": 0,
+  "sso_store_mode": true,
+  "sso_store_criteria_total": 7,
+  "sso_store_criteria_met_count": 7,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -87,23 +90,23 @@
     },
     "ops_shell": {
       "files": 38,
-      "loc": 3203
+      "loc": 3220
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 79,
-      "loc": 16862
+      "files": 80,
+      "loc": 17028
     },
     "rust_src": {
       "files": 300,
-      "loc": 109947
+      "loc": 110205
     },
     "rust_tests": {
-      "files": 265,
-      "loc": 36960
+      "files": 267,
+      "loc": 37080
     },
     "ui_css": {
       "files": 2,
@@ -134,7 +137,7 @@
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
     "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
-    "PH-S1254: sso_mode — SSO depth scaffold (POOLAI_SSO_STORE + audience/time stub)",
-    "PH-S1258: band 61 SSO depth — criteria met vs registry"
+    "PH-S1264: sso_store_mode — durable path wire stub (POOLAI_SSO_DATA_DIR)",
+    "PH-S1268: band 62 SSO store wire — criteria met vs registry"
   ]
 }

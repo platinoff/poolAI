@@ -11,7 +11,7 @@ Today `SecurityManager` keeps OAuth2/SAML providers **in-memory**. Horizon path:
 | Mode | Env | Status |
 |------|-----|--------|
 | `memory` | `POOLAI_SSO_STORE=memory` (default) | Current — restart-unsafe |
-| `sqlite` | `POOLAI_SSO_STORE=sqlite` | Band 62+ store wire |
+| `sqlite` | `POOLAI_SSO_STORE=sqlite` | Band 62+ store wire — see [`SSO_STORE.md`](./SSO_STORE.md) |
 
 Production verify stub (PH-S1250): SAML assertion checks **Audience** + **NotOnOrAfter** under `cargo test-ci` (no live IdP). Full XML signature verify remains later in phase B.
 
