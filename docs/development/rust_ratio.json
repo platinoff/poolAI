@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 163779,
-  "non_rust_product_loc": 8911,
-  "product_loc_total": 172690,
-  "rust_ratio": 0.9483988650182408,
-  "rust_ratio_pct": 94.83988650182408,
+  "rust_loc": 164377,
+  "non_rust_product_loc": 8928,
+  "product_loc_total": 173305,
+  "rust_ratio": 0.9484838867891867,
+  "rust_ratio_pct": 94.84838867891867,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -70,9 +70,12 @@
   "tenant_ratio_advisory_mode": false,
   "tenant_ratio_advisory_criteria_total": 10,
   "tenant_ratio_advisory_criteria_met_count": 0,
-  "tenant_horizon_mode": true,
+  "tenant_horizon_mode": false,
   "tenant_horizon_criteria_total": 10,
-  "tenant_horizon_criteria_met_count": 10,
+  "tenant_horizon_criteria_met_count": 0,
+  "sso_mode": true,
+  "sso_criteria_total": 8,
+  "sso_criteria_met_count": 8,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -84,23 +87,23 @@
     },
     "ops_shell": {
       "files": 38,
-      "loc": 3186
+      "loc": 3203
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 78,
-      "loc": 16620
+      "files": 79,
+      "loc": 16862
     },
     "rust_src": {
       "files": 300,
-      "loc": 109742
+      "loc": 109947
     },
     "rust_tests": {
-      "files": 263,
-      "loc": 36809
+      "files": 265,
+      "loc": 36960
     },
     "ui_css": {
       "files": 2,
@@ -131,7 +134,7 @@
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
     "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
-    "PH-S1244: tenant_horizon_mode — aggregate band 51–59 tenant slices (phase A close)",
-    "PH-S1248: band 60 tenant horizon close — criteria met vs registry"
+    "PH-S1254: sso_mode — SSO depth scaffold (POOLAI_SSO_STORE + audience/time stub)",
+    "PH-S1258: band 61 SSO depth — criteria met vs registry"
   ]
 }

@@ -32,6 +32,7 @@ VERIFY_TENANT_DOCS_CANON="${VERIFY_TENANT_DOCS_CANON:-0}"
 VERIFY_TENANT_VISION_SYNC="${VERIFY_TENANT_VISION_SYNC:-0}"
 VERIFY_TENANT_RATIO_ADVISORY="${VERIFY_TENANT_RATIO_ADVISORY:-0}"
 VERIFY_TENANT_HORIZON="${VERIFY_TENANT_HORIZON:-0}"
+VERIFY_SSO="${VERIFY_SSO:-0}"
 HEALTH_RETRIES="${VERIFY_HEALTH_RETRIES:-45}"
 HEALTH_SLEEP="${VERIFY_HEALTH_SLEEP:-2}"
 
@@ -449,6 +450,16 @@ if [[ "$VERIFY_TENANT_HORIZON" == "1" ]]; then
     echo "OK  tenant horizon gate"
   else
     echo "FAIL tenant horizon gate"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_SSO" == "1" ]]; then
+  echo "Running poolai-loc-audit --sso (PH-S1252)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --sso); then
+    echo "OK  SSO depth gate loc-audit"
+  else
+    echo "FAIL SSO depth gate loc-audit"
     fail=1
   fi
 fi

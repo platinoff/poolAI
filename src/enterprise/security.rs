@@ -48,6 +48,94 @@ use uuid::Uuid;
 
 type HmacSha256 = Hmac<Sha256>;
 
+/// Env key for SSO provider store backend (`memory` default; `sqlite` horizon band 62+).
+pub const POOLAI_SSO_STORE: &str = "POOLAI_SSO_STORE";
+
+/// Canonical SSO store modes (band 61 scaffold).
+pub const SSO_STORE_MODES: &[&str] = &["memory", "sqlite"];
+
+/// Resolve configured SSO store mode (PH-S1250 scaffold — restart-unsafe until band 62).
+pub fn sso_store_mode() -> &'static str {
+    match std::env::var(POOLAI_SSO_STORE)
+        .unwrap_or_else(|_| "memory".into())
+        .to_ascii_lowercase()
+        .as_str()
+    {
+        "sqlite" => "sqlite",
+        _ => "memory",
+    }
+}
+
+/// Extract first XML element body between `open` and `close` tags (demo parser stub).
+fn extract_xml_element<'a>(xml: &'a str, open: &str, close: &str) -> Option<&'a str> {
+    let start = xml.find(open)? + open.len();
+    let end = xml[start..].find(close)? + start;
+    Some(xml[start..end].trim())
+}
+
+/// Extract attribute value from the first tag that carries `attr="..."`.
+fn extract_xml_attr<'a>(xml: &'a str, attr: &str) -> Option<&'a str> {
+    let needle = format!("{attr}=\"");
+    let start = xml.find(&needle)? + needle.len();
+    let end = xml[start..].find('"')? + start;
+    Some(&xml[start..end])
+}
+
+/// PH-S1250 production-verify stub: require Audience match + NotOnOrAfter not expired.
+///
+/// Full XML signature verification remains a later phase-B band (not live IdP).
+pub fn validate_saml_audience_and_time(
+    xml: &str,
+    expected_audience: &str,
+    now: chrono::DateTime<chrono::Utc>,
+) -> Result<(), AppError> {
+    let audience = extract_xml_element(xml, "<saml:Audience>", "</saml:Audience>")
+        .or_else(|| extract_xml_element(xml, "<Audience>", "</Audience>"))
+        .ok_or_else(|| {
+            AppError::ValidationError(
+                "SAML assertion missing Audience. Context: production verify stub requires Audience. \
+                Suggestion: include <saml:Audience> matching the provider entity_id."
+                    .to_string(),
+            )
+        })?;
+    if audience != expected_audience {
+        return Err(AppError::ValidationError(format!(
+            "SAML Audience mismatch: expected `{expected_audience}`, got `{audience}`. \
+            Context: production verify stub (PH-S1250). Suggestion: align IdP Audience with entity_id."
+        )));
+    }
+
+    let not_on_or_after = extract_xml_attr(xml, "NotOnOrAfter").ok_or_else(|| {
+        AppError::ValidationError(
+            "SAML assertion missing NotOnOrAfter. Context: production verify stub requires expiry. \
+            Suggestion: include Conditions NotOnOrAfter=\"…\" (RFC3339 / SAML time)."
+                .to_string(),
+        )
+    })?;
+    let expiry = chrono::DateTime::parse_from_rfc3339(not_on_or_after)
+        .map(|dt| dt.with_timezone(&chrono::Utc))
+        .or_else(|_| {
+            // SAML often uses "…Z" without fractional seconds — chrono RFC3339 covers that;
+            // also try replacing space with T for lenient fixtures.
+            let normalized = not_on_or_after.replace(' ', "T");
+            chrono::DateTime::parse_from_rfc3339(&normalized)
+                .map(|dt| dt.with_timezone(&chrono::Utc))
+        })
+        .map_err(|e| {
+            AppError::ValidationError(format!(
+                "SAML NotOnOrAfter parse failed (`{not_on_or_after}`): {e}. \
+                Suggestion: use RFC3339 timestamps."
+            ))
+        })?;
+    if now >= expiry {
+        return Err(AppError::ValidationError(format!(
+            "SAML assertion expired at {expiry} (now {now}). Context: NotOnOrAfter window. \
+            Suggestion: request a fresh assertion from the IdP."
+        )));
+    }
+    Ok(())
+}
+
 const DEFAULT_TELEGRAM_AUTH_MAX_AGE_SECS: i64 = 86_400;
 
 fn telegram_auth_max_age_secs() -> i64 {
@@ -830,16 +918,12 @@ impl SecurityManager {
             ))
         })?;
 
+        // PH-S1250: audience + NotOnOrAfter production-verify stub (signature verify = later band).
+        validate_saml_audience_and_time(&xml_str, &provider.config.entity_id, chrono::Utc::now())?;
+
         // Extract user attributes from SAML response (simplified parsing)
         // In production, use proper XML parsing library (e.g., quick-xml) and verify signature
         let mut attributes = HashMap::new();
-
-        // Simple attribute extraction (for testing/demo purposes)
-        // Production implementation should:
-        // 1. Parse XML properly
-        // 2. Verify signature using provider.config.certificate
-        // 3. Extract attributes based on provider.config.attribute_mapping
-        // 4. Validate timestamps and audience
 
         // Extract NameID (user identifier)
         if let Some(nameid_start) = xml_str.find("<saml:NameID>") {
@@ -1378,5 +1462,50 @@ mod tests {
         let perms = UserRole::Viewer.get_permissions();
         assert!(!perms.iter().any(|p| p == "admin:all"));
         assert!(!perms.iter().any(|p| p == "write:all"));
+    }
+
+    #[test]
+    fn sso_store_mode_defaults_memory_ph_s1250() {
+        std::env::remove_var(POOLAI_SSO_STORE);
+        assert_eq!(sso_store_mode(), "memory");
+        std::env::set_var(POOLAI_SSO_STORE, "sqlite");
+        assert_eq!(sso_store_mode(), "sqlite");
+        std::env::remove_var(POOLAI_SSO_STORE);
+        assert!(SSO_STORE_MODES.contains(&"memory"));
+    }
+
+    #[test]
+    fn validate_saml_audience_and_time_ok_ph_s1250() {
+        let xml = r#"<saml:Assertion>
+  <saml:Conditions NotOnOrAfter="2099-06-01T12:00:00Z">
+    <saml:AudienceRestriction>
+      <saml:Audience>poolai-sp</saml:Audience>
+    </saml:AudienceRestriction>
+  </saml:Conditions>
+</saml:Assertion>"#;
+        let now = chrono::Utc::now();
+        assert!(validate_saml_audience_and_time(xml, "poolai-sp", now).is_ok());
+    }
+
+    #[test]
+    fn validate_saml_audience_rejects_wrong_audience_ph_s1250() {
+        let xml = r#"<saml:Conditions NotOnOrAfter="2099-06-01T12:00:00Z">
+  <saml:Audience>other-sp</saml:Audience>
+</saml:Conditions>"#;
+        let err =
+            validate_saml_audience_and_time(xml, "poolai-sp", chrono::Utc::now()).unwrap_err();
+        let msg = format!("{err}");
+        assert!(msg.contains("Audience mismatch"), "{msg}");
+    }
+
+    #[test]
+    fn validate_saml_rejects_expired_not_on_or_after_ph_s1250() {
+        let xml = r#"<saml:Conditions NotOnOrAfter="2020-01-01T00:00:00Z">
+  <saml:Audience>poolai-sp</saml:Audience>
+</saml:Conditions>"#;
+        let err =
+            validate_saml_audience_and_time(xml, "poolai-sp", chrono::Utc::now()).unwrap_err();
+        let msg = format!("{err}");
+        assert!(msg.contains("expired"), "{msg}");
     }
 }

@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-07-21 (band 60 **PH-S1239…S1248** ✅ · enterprise horizon band 61)
+**Оновлено:** 2026-07-21 (band 61 **PH-S1249…S1258** ✅ · enterprise horizon band 62)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -1221,7 +1221,24 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 60 ✅). **Master horizon:** PH-S1249…S1258 (band 61) · enterprise backlog PH-S1149…S2148. Vision rev **346**. **Наступна сесія:** **`абракадабра`** — promote band 61.
+**Відкритих у §5.12:** **0** (band 61 ✅). **Master horizon:** PH-S1259…S1268 (band 62) · enterprise backlog PH-S1149…S2148. Vision rev **347**. **Наступна сесія:** **`абракадабра`** — promote band 62.
+
+### 5.42 SSO depth scaffold queue — band 61 (PH-S1249…S1258, 2026-07-21)
+
+**Джерело:** FM-horizon v2 / enterprise phase B — SSO depth scaffold (`POOLAI_SSO_STORE` + SAML audience/time stub).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1184 | **PH-S1249** | `sso_depth` ui-core module | `sso_depth.rs` | depth enum + SSO criteria registry | **✅** |
+| 1185 | **PH-S1250** | SSO store/verify stub | `security.rs` | `POOLAI_SSO_STORE` + audience/NotOnOrAfter unit tests | **✅** |
+| 1186 | **PH-S1251** | SSO depth gate audit | `sso_depth_audit.rs` | criteria registry + FM markers | **✅** |
+| 1187 | **PH-S1252** | `VERIFY_SSO` + quick `--sso` | RUN_LOCAL / verify-dev-stand | SSO gate | **✅** |
+| 1188 | **PH-S1253** | Stand smoke SSO export shape | `poolai_http_stand_smoke` | `sso_band61_export_shape` | **✅** |
+| 1189 | **PH-S1254** | `poolai-loc-audit --sso` | RUST_RATIO / §5.13 | `sso_*` fields in `rust_ratio.json` | **✅** |
+| 1190 | **PH-S1255** | Docs `SSO_DEPTH.md` + canon sync | DOCS_LEGACY maintain | matrix + RUN_LOCAL/INDEX/HANDOFF/NEXT | **✅** |
+| 1191 | **PH-S1256** | `poolai-vision-sync --check` | docs-vision | drift gate green after band 61 | **✅** |
+| 1192 | **PH-S1257** | Ratio hold advisory + roadmap zriz | RUST_RATIO stretch | `--min-ratio 0.95 --advisory`; roadmap → band 62 | **✅** |
+| 1193 | **PH-S1258** | SSO depth band close | Enterprise band 61 | `galaxy_horizon_s1249_integration`; HANDOFF/NEXT → band 62 | **✅** |
 
 ### 5.41 Tenant horizon close queue — band 60 (PH-S1239…S1248, 2026-07-21)
 
@@ -1694,8 +1711,8 @@ FM-xxx (з таблиці нижче)
 
 | Поле | Значення |
 |------|----------|
-| **Pending** | **900** (band 60 ✅ · S1249…S2148) |
-| **Drained** | band 51–60 PH-S1149…S1248 ✅ (phase A Tenants) |
+| **Pending** | **890** (band 61 ✅ · S1259…S2148) |
+| **Drained** | band 51–61 PH-S1149…S1258 ✅ (phase A Tenants + phase B SSO depth) |
 | **Активна §5.12** | — (promote band 61 next) |
 | **Наступна promote** | PH-S1249…S1258 |
 | **План фаз** | [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md) |
@@ -1737,7 +1754,7 @@ FM-xxx (з таблиці нижче)
 
 ### 5.17 Enterprise-complete closure (PH-S2148 target)
 
-**Статус:** **in progress** — band 60 ✅ (phase A close) · pending PH-S1249…S2148 · roadmap [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md).
+**Статус:** **in progress** — band 61 ✅ (SSO depth scaffold) · pending PH-S1259…S2148 · roadmap [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md).
 
 | Критерій | Ціль |
 |----------|------|
@@ -1787,7 +1804,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-21):** band 60 **PH-S1239…S1248** ✅ · §5.12 **0** · наступна **`абракадабра`** → promote band 61 (B SSO).
+**Активна смуга (2026-07-21):** band 61 **PH-S1249…S1258** ✅ · §5.12 **0** · наступна **`абракадабра`** → promote band 62 (B SSO · store wire).
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

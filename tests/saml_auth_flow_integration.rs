@@ -91,6 +91,11 @@ async fn test_saml_callback_handler_validation() {
     let mock_saml_response = base64::engine::general_purpose::STANDARD.encode(
         r#"<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
   <saml:Assertion>
+    <saml:Conditions NotOnOrAfter="2099-01-01T00:00:00Z">
+      <saml:AudienceRestriction>
+        <saml:Audience>test-entity</saml:Audience>
+      </saml:AudienceRestriction>
+    </saml:Conditions>
     <saml:Subject>
       <saml:NameID>testuser@example.com</saml:NameID>
     </saml:Subject>

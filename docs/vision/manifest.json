@@ -2571,7 +2571,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1249",
+  "next_sprint": "PH-S1259",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -10268,7 +10268,7 @@
       "path": "tests/tenant_horizon_integration.rs"
     }
   ],
-  "revision": 346,
+  "revision": 347,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",

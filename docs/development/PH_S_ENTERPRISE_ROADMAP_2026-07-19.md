@@ -4,9 +4,9 @@
 
 **Канон drain:** FM **§5.12** (max 10 відкритих) · реєстр — [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md) · regen: `bash scripts/generate-ph-s-master-backlog-1000.sh`
 
-**Попередній горизонт:** product-complete PH-S1010 / FM §5.15 ✅ · maintenance bands 37–50 ✅ · enterprise phase A bands 51–60 ✅ (persist · store wire · **API contracts** · **admin/ops glue** · stand smoke · loc-audit · docs canon · vision-sync · ratio advisory · **horizon close**) · PH-S1149…S1239 markers preserved for horizon close tests
+**Попередній горизонт:** product-complete PH-S1010 / FM §5.15 ✅ · maintenance bands 37–50 ✅ · enterprise phase A bands 51–60 ✅ (persist · store wire · **API contracts** · **admin/ops glue** · stand smoke · loc-audit · docs canon · vision-sync · ratio advisory · **horizon close**) · phase B SSO depth band 61 ✅ (`sso_depth` · `POOLAI_SSO_STORE` · audience/time stub) · PH-S1149…S1258 markers preserved for horizon close tests
 
-**Активна смуга:** band 61 **PH-S1249…S1258** (B SSO · depth scaffold)
+**Активна смуга:** band 62 **PH-S1259…S1268** (B SSO · store wire)
 
 **Поза scope (не в backlog):** FM-003 LAN 2-host (**BLOCKED**) · FM-041 Cloud SDK prod (**Deferred**) · mandatory ZK/TEE
 

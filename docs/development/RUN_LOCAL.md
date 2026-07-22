@@ -24,7 +24,7 @@ cd S:\rust\poolAI
 .\bin\run-poolai.ps1 stop
 ```
 
-**Last updated:** 2026-07-21 (PH-S1248 band 60 · `--tenant-horizon` · `VERIFY_TENANT_HORIZON` · phase A Tenants close)
+**Last updated:** 2026-07-21 (PH-S1258 band 61 · `--sso` · `VERIFY_SSO` · phase B SSO depth scaffold)
 
 ### PH-S1011 / PH-S1012: Light compile + quick preset
 
@@ -48,7 +48,7 @@ cd S:\rust\poolAI
 | **full** | `enterprise,ml,cloud,test-utils` | `run-poolai build` default |
 | **light** (`--light`) | `enterprise,test-utils` | PH-S1011 faster compile |
 
-`quick` restores `data/dev/last_run.json` port when present (PH-S1014), runs light build unless `--skip-build`, starts `single --bg`, waits for `/api/v1/health`. Optional **`--stand-smoke`** (PH-S1095) runs `poolai-http-stand-smoke --run-local-smoke` after health OK. Optional **`--migration-advisory`** (PH-S1104) runs `poolai-loc-audit --migration-advisory` after health OK. Optional **`--stable-touchup`** (PH-S1114) runs `poolai-loc-audit --stable-touchup` after health OK. Optional **`--edge-verification`** (PH-S1125) runs `poolai-loc-audit --edge-verification-advisory` after health OK. Optional **`--pre-push-canon`** (PH-S1134) runs `poolai-loc-audit --pre-push-canon` after health OK. Optional **`--ci-canon`** (PH-S1143) runs `poolai-loc-audit --ci-canon` + `poolai-openapi-gap-audit` after health OK. Optional **`--tenant-persist`** (PH-S1154) runs `poolai-loc-audit --tenant-persist` after health OK. Optional **`--tenant-store`** (PH-S1162) runs `poolai-loc-audit --tenant-store` after health OK. Optional **`--tenant-api`** (PH-S1175) runs `poolai-loc-audit --tenant-api` after health OK. Optional **`--tenant-admin-ops`** (PH-S1184) runs `poolai-loc-audit --tenant-admin-ops` after health OK. Optional **`--tenant-stand-smoke`** (PH-S1195) runs live `poolai-http-stand-smoke --tenant-stand-smoke` + `poolai-loc-audit --tenant-stand-smoke` after health OK. Optional **`--tenant-loc-audit`** (PH-S1202) runs `poolai-loc-audit --tenant-loc-audit` after health OK. Optional **`--tenant-docs-canon`** (PH-S1212) runs `poolai-loc-audit --tenant-docs-canon` after health OK. Optional **`--tenant-vision-sync`** (PH-S1222) runs `poolai-loc-audit --tenant-vision-sync` after health OK. Optional **`--tenant-ratio-advisory`** (PH-S1232) runs `poolai-loc-audit --tenant-ratio-advisory` after health OK. Optional **`--tenant-horizon`** (PH-S1242) runs `poolai-loc-audit --tenant-horizon` after health OK.
+`quick` restores `data/dev/last_run.json` port when present (PH-S1014), runs light build unless `--skip-build`, starts `single --bg`, waits for `/api/v1/health`. Optional **`--stand-smoke`** (PH-S1095) runs `poolai-http-stand-smoke --run-local-smoke` after health OK. Optional **`--migration-advisory`** (PH-S1104) runs `poolai-loc-audit --migration-advisory` after health OK. Optional **`--stable-touchup`** (PH-S1114) runs `poolai-loc-audit --stable-touchup` after health OK. Optional **`--edge-verification`** (PH-S1125) runs `poolai-loc-audit --edge-verification-advisory` after health OK. Optional **`--pre-push-canon`** (PH-S1134) runs `poolai-loc-audit --pre-push-canon` after health OK. Optional **`--ci-canon`** (PH-S1143) runs `poolai-loc-audit --ci-canon` + `poolai-openapi-gap-audit` after health OK. Optional **`--tenant-persist`** (PH-S1154) runs `poolai-loc-audit --tenant-persist` after health OK. Optional **`--tenant-store`** (PH-S1162) runs `poolai-loc-audit --tenant-store` after health OK. Optional **`--tenant-api`** (PH-S1175) runs `poolai-loc-audit --tenant-api` after health OK. Optional **`--tenant-admin-ops`** (PH-S1184) runs `poolai-loc-audit --tenant-admin-ops` after health OK. Optional **`--tenant-stand-smoke`** (PH-S1195) runs live `poolai-http-stand-smoke --tenant-stand-smoke` + `poolai-loc-audit --tenant-stand-smoke` after health OK. Optional **`--tenant-loc-audit`** (PH-S1202) runs `poolai-loc-audit --tenant-loc-audit` after health OK. Optional **`--tenant-docs-canon`** (PH-S1212) runs `poolai-loc-audit --tenant-docs-canon` after health OK. Optional **`--tenant-vision-sync`** (PH-S1222) runs `poolai-loc-audit --tenant-vision-sync` after health OK. Optional **`--tenant-ratio-advisory`** (PH-S1232) runs `poolai-loc-audit --tenant-ratio-advisory` after health OK. Optional **`--tenant-horizon`** (PH-S1242) runs `poolai-loc-audit --tenant-horizon` after health OK. Optional **`--sso`** (PH-S1252) runs `poolai-loc-audit --sso` after health OK.
 
 ```bash
 /usr/bin/bash bin/run-poolai.sh quick --stand-smoke
@@ -67,6 +67,7 @@ cd S:\rust\poolAI
 /usr/bin/bash bin/run-poolai.sh quick --tenant-vision-sync
 /usr/bin/bash bin/run-poolai.sh quick --tenant-ratio-advisory
 /usr/bin/bash bin/run-poolai.sh quick --tenant-horizon
+/usr/bin/bash bin/run-poolai.sh quick --sso
 # PowerShell:
 .\bin\run-poolai.ps1 quick -StandSmoke
 .\bin\run-poolai.ps1 quick -MigrationAdvisory
@@ -321,6 +322,7 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `VERIFY_TENANT_VISION_SYNC=1` | `verify-dev-stand.sh` → `poolai-loc-audit --tenant-vision-sync` (PH-S1222) |
 | `VERIFY_TENANT_RATIO_ADVISORY=1` | `verify-dev-stand.sh` → `poolai-loc-audit --tenant-ratio-advisory` (PH-S1232) |
 | `VERIFY_TENANT_HORIZON=1` | `verify-dev-stand.sh` → `poolai-loc-audit --tenant-horizon` (PH-S1242) |
+| `VERIFY_SSO=1` | `verify-dev-stand.sh` → `poolai-loc-audit --sso` (PH-S1252) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 ### PH-S1100: Rust migration advisory (band 46)
@@ -625,6 +627,26 @@ VERIFY_TENANT_HORIZON=1 bash bin/verify-dev-stand.sh
 | `tenant_horizon_criteria_met_count` | Criteria with marker present in canonical doc path |
 
 Module: [`tenant_horizon_depth.rs`](../../crates/poolai-ui-core/src/tenant_horizon_depth.rs) · tests: `tenant_horizon_integration.rs`, `galaxy_horizon_s1239_integration.rs` · docs: [`TENANT_HORIZON.md`](./TENANT_HORIZON.md).
+
+### PH-S1254: SSO depth scaffold (band 61)
+
+Enterprise phase B SSO depth gate — `POOLAI_SSO_STORE` + SAML audience/NotOnOrAfter stub.
+
+```bash
+cargo run --bin poolai-loc-audit -- --sso
+cargo run --bin poolai-loc-audit -- --sso --advisory --min-ratio 0.95
+
+VERIFY_SSO=1 bash bin/verify-dev-stand.sh
+/usr/bin/bash bin/run-poolai.sh quick --sso
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `sso_mode` | `true` when `--sso` (PH-S1254) |
+| `sso_criteria_total` | SSO criteria registry size |
+| `sso_criteria_met_count` | Criteria with marker present in canonical doc path |
+
+Module: [`sso_depth.rs`](../../crates/poolai-ui-core/src/sso_depth.rs) · tests: `sso_depth_audit.rs`, `galaxy_horizon_s1249_integration.rs` · docs: [`SSO_DEPTH.md`](./SSO_DEPTH.md).
 
 Default stand smoke includes **`vision_revision_parity`** (PH-S208, PH-S235): repo `manifest.revision` vs FM §5.12 `Vision rev`, `extensions.active_sprint` vs `manifest.next_sprint`, then `GET /docs/vision/manifest.json` with `X-PoolAI-Vision-Revision` header vs JSON body.
 

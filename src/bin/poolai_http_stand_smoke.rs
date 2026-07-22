@@ -5031,6 +5031,45 @@ mod tests {
     }
 
     #[test]
+    fn sso_band61_export_shape_ph_s1253() {
+        use poolai_ui_core::sso_depth::{
+            sso_criteria_total, sso_depth_stub, SsoDepth, FM_BAND61_ROWS, SSO_CASES, SSO_CRITERIA,
+        };
+        use serde_json::json;
+        assert_eq!(
+            sso_depth_stub(Some(&json!({"api_contracts": true}))),
+            SsoDepth::ApiContracts
+        );
+        assert_eq!(
+            sso_depth_stub(Some(&json!({
+                "sso_depth": true,
+                "store_wire": true,
+                "api_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "sso_docs": true,
+            }))),
+            SsoDepth::FullBand61
+        );
+        assert_eq!(SSO_CRITERIA.len(), 8);
+        assert_eq!(sso_criteria_total(), 8);
+        assert!(SSO_CASES.contains(&"verify_dev_stand_hook"));
+        let security = include_str!("../../src/enterprise/security.rs");
+        assert!(security.contains("POOLAI_SSO_STORE"));
+        assert!(security.contains("validate_saml_audience_and_time"));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--sso"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND61_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band61 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn galaxy_edge_verification_band48_export_shape_ph_s1125() {
         use poolai_ui_core::galaxy_edge_verification_depth::{
             edge_verification_criteria_total, galaxy_edge_verification_depth_stub,

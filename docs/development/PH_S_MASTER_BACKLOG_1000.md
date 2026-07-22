@@ -20,8 +20,8 @@
 | 58 | PH-S1219…S1228 | A Tenants · vision-sync **✅ drained** |
 | 59 | PH-S1229…S1238 | A Tenants · ratio advisory **✅ drained** |
 | 60 | PH-S1239…S1248 | A Tenants · horizon close **✅ drained** |
-| 61 | PH-S1249…S1258 | B SSO · depth scaffold **active next** |
-| 62 | PH-S1259…S1268 | B SSO · store wire |
+| 61 | PH-S1249…S1258 | B SSO · depth scaffold **✅** |
+| 62 | PH-S1259…S1268 | B SSO · store wire **active next** |
 | 63 | PH-S1269…S1278 | B SSO · API contracts |
 | 64 | PH-S1279…S1288 | B SSO · admin/ops glue |
 | 65 | PH-S1289…S1298 | B SSO · stand smoke |
@@ -267,16 +267,16 @@
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1249** | `sso_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1250** | `sso` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1251** | `sso` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1252** | `sso` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1253** | Stand smoke `sso` export | export shape unit test | **[ ]** |
-| **PH-S1254** | poolai-loc-audit PH-S1254 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1255** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1256** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1257** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1258** | galaxy_horizon_s1249_integration | band close | **[ ]** |
+| **PH-S1249** | `sso_depth` scaffold | ui-core depth enum + criteria registry | **✅** |
+| **PH-S1250** | `sso` store/wire slice | durable path or production verify stub + unit test | **✅** |
+| **PH-S1251** | `sso` API contracts | `tests/*_integration.rs` or contract test | **✅** |
+| **PH-S1252** | `sso` admin/ops glue | verify-dev-stand or admin strip | **✅** |
+| **PH-S1253** | Stand smoke `sso` export | export shape unit test | **✅** |
+| **PH-S1254** | poolai-loc-audit PH-S1254 | `rust_ratio.json` zriz | **✅** |
+| **PH-S1255** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **✅** |
+| **PH-S1256** | poolai-vision-sync --check | drift gate green | **✅** |
+| **PH-S1257** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
+| **PH-S1258** | galaxy_horizon_s1249_integration | band close | **✅** |
 
 ## Band 62 — PH-S1259…S1268 (B SSO · store wire)
 
