@@ -54,7 +54,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 **Версія в репозиторії:** `0.2.2` (див. `Cargo.toml`). **Робоча гілка:** `main`.
 
-Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S1278 ✅ (phase B SSO store wire). **Rust ratio:** **94.86%** (hold **95%** advisory). **Vision:** manifest rev **354**. **§5.12:** **0** відкритих (band 62 ✅) · наступна сесія **`абракадабра`** → band 64 — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
+Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S1288 ✅ (phase B SSO admin/ops glue). **Rust ratio:** **94.88%** (hold **95%** advisory). **Vision:** manifest rev **356**. **§5.12:** **10** відкритих (band 64 ✅) · наступна сесія **`абракадабра`** → band 65 — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
 **Репозиторій:** [github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)
 
@@ -86,9 +86,9 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 **Service (сьогодні):** Cursor **3.12.30** rules re-check · FM **§5.16** PH-SVC21…SVC30 ✅ · vision queue/feed enterprise bands · [`CURSOR_UPDATE_RESEARCH_2026-07-22.md`](docs/development/CURSOR_UPDATE_RESEARCH_2026-07-22.md).
 
-**Наступна сесія (owner):** **`абракадабра`** — project scan → band 64 **PH-S1279…S1288** · [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія (owner):** **`абракадабра`** — project scan → band 65 **PH-S1289…S1298** · [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
-**§5.12:** **0** відкритих (band 62 ✅) · vision **rev 354** · last **PH-S1278** · next **PH-S1279**.
+**§5.12:** **10** відкритих (band 64 ✅) · vision **rev 356** · last **PH-S1288** · next **PH-S1289**.
 
 **Ops (поза чергою):** **FM-003** LAN §4 **BLOCKED** (2 хости) · **FM-041** Cloud SDK **Deferred**.
 

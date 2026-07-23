@@ -1,6 +1,6 @@
 # SSO HTTP API Contracts — Enterprise Phase B (Band 63)
 
-Canonical doc: [`SSO_API.md`](./SSO_API.md) (band 63, PH-S1277).
+Canonical doc: [`SSO_API.md`](./SSO_API.md) (band 63, PH-S1277). Next: [`SSO_ADMIN_OPS.md`](./SSO_ADMIN_OPS.md) (band 64 ✅).
 
 ## Overview
 

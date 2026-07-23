@@ -823,6 +823,48 @@ pub const ADMIN_TENANTS_UK: &[I18nRow<'_>] = &[
     ("admin.tenants.quotaErr", "Помилка quota probe: "),
 ];
 
+/// English SSO admin/ops keys (PH-S1283 band 64).
+pub const ADMIN_SSO_EN: &[I18nRow<'_>] = &[
+    ("admin.sso.storeLoading", "Loading store…"),
+    ("admin.sso.storeLabel", "SSO store:"),
+    (
+        "admin.sso.storeHint",
+        "SSO persistence backend (POOLAI_SSO_STORE / POOLAI_SSO_DATA_DIR)",
+    ),
+    ("admin.sso.store.memory", "memory"),
+    ("admin.sso.store.sqlite", "sqlite"),
+    ("admin.sso.store.configured", "configured"),
+    ("admin.sso.store.unconfigured", "unconfigured"),
+    ("admin.sso.storeErr", "SSO store wire unavailable"),
+    ("admin.sso.btn.refreshOauth", "Refresh"),
+    ("admin.sso.btn.refreshSaml", "Refresh"),
+    ("admin.sso.refreshOauthOk", "OAuth2 providers refreshed"),
+    ("admin.sso.refreshOauthErr", "OAuth2 refresh failed: "),
+    ("admin.sso.refreshSamlOk", "SAML providers refreshed"),
+    ("admin.sso.refreshSamlErr", "SAML refresh failed: "),
+];
+
+/// Ukrainian SSO admin/ops keys (PH-S1283 band 64).
+pub const ADMIN_SSO_UK: &[I18nRow<'_>] = &[
+    ("admin.sso.storeLoading", "Завантаження сховища…"),
+    ("admin.sso.storeLabel", "SSO сховище:"),
+    (
+        "admin.sso.storeHint",
+        "Бекенд персистентності SSO (POOLAI_SSO_STORE / POOLAI_SSO_DATA_DIR)",
+    ),
+    ("admin.sso.store.memory", "memory"),
+    ("admin.sso.store.sqlite", "sqlite"),
+    ("admin.sso.store.configured", "налаштовано"),
+    ("admin.sso.store.unconfigured", "не налаштовано"),
+    ("admin.sso.storeErr", "SSO store wire недоступний"),
+    ("admin.sso.btn.refreshOauth", "Оновити"),
+    ("admin.sso.btn.refreshSaml", "Оновити"),
+    ("admin.sso.refreshOauthOk", "OAuth2 провайдери оновлено"),
+    ("admin.sso.refreshOauthErr", "Помилка оновлення OAuth2: "),
+    ("admin.sso.refreshSamlOk", "SAML провайдери оновлено"),
+    ("admin.sso.refreshSamlErr", "Помилка оновлення SAML: "),
+];
+
 /// English security admin keys (PH-S231; moved from `i18n_core.js`).
 pub const ADMIN_SECURITY_EN: &[I18nRow<'_>] = &[
     ("admin.page.security", "Security Management"),
@@ -2943,11 +2985,15 @@ pub fn admin_tenants_patch_script() -> String {
     )
 }
 
-/// Security admin page — slim `admin.sec.*` patch only (PH-S231).
+/// Security admin page — slim `admin.sec.*` + `admin.sso.*` patch (PH-S231; SSO ops PH-S1283).
 pub fn admin_security_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut en = rows_to_map(ADMIN_SECURITY_EN);
+    en.extend(rows_to_map(ADMIN_SSO_EN));
+    let mut uk = rows_to_map(ADMIN_SECURITY_UK);
+    uk.extend(rows_to_map(ADMIN_SSO_UK));
     let mut root = BTreeMap::new();
-    root.insert("en".into(), rows_to_map(ADMIN_SECURITY_EN));
-    root.insert("uk".into(), rows_to_map(ADMIN_SECURITY_UK));
+    root.insert("en".into(), en);
+    root.insert("uk".into(), uk);
     root
 }
 
@@ -3444,6 +3490,7 @@ pub fn t_en(key: &str) -> Option<&'static str> {
         ADMIN_AUDIT_EN,
         ADMIN_TENANTS_EN,
         ADMIN_SECURITY_EN,
+        ADMIN_SSO_EN,
         ADMIN_TOPOLOGY_EN,
         ADMIN_INSTANCES_EN,
         ADMIN_VM_EN,
@@ -3468,6 +3515,7 @@ pub fn t_uk(key: &str) -> Option<&'static str> {
         ADMIN_AUDIT_UK,
         ADMIN_TENANTS_UK,
         ADMIN_SECURITY_UK,
+        ADMIN_SSO_UK,
         ADMIN_TOPOLOGY_UK,
         ADMIN_INSTANCES_UK,
         ADMIN_VM_UK,
@@ -3571,6 +3619,7 @@ mod tests {
     #[test]
     fn security_patch_has_matching_en_uk_key_counts_ph_s231() {
         assert_eq!(ADMIN_SECURITY_EN.len(), ADMIN_SECURITY_UK.len());
+        assert_eq!(ADMIN_SSO_EN.len(), ADMIN_SSO_UK.len());
     }
 
     #[test]
@@ -3579,6 +3628,7 @@ mod tests {
         assert!(json.contains(r#""admin.page.security""#));
         assert!(json.contains(r#""admin.sec.tab.oauth""#));
         assert!(json.contains(r#""admin.sec.col.name""#));
+        assert!(json.contains(r#""admin.sso.storeLabel""#));
         assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
         assert!(!json.contains(r#""admin.tenants.section""#));
     }

@@ -1,12 +1,14 @@
-# PH-S enterprise roadmap v2 (PH-S1149…S2148)
+# PH-S enterprise roadmap v2 (PH-S1149…S2148) + project completion → S2278
 
-**Оновлено:** 2026-07-22 · **Мета:** durable single-host **enterprise 100%** (FM §5.17) за **1000** спринтами · **100** сесій `абракадабра` (10 PH-S* / сесія)
+**Оновлено:** 2026-07-22 · **Мета:** durable single-host **enterprise 100%** (FM §5.17) @ PH-S2148 · **project development complete** (FM §5.18) @ PH-S2278 · активний шлях **PH-S1289…S2278 = 990** спринтів · **99** сесій `абракадабра`
 
-**Канон drain:** FM **§5.12** (max 10 відкритих) · реєстр — [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md) · regen: `bash scripts/generate-ph-s-master-backlog-1000.sh`
+**Канон drain:** FM **§5.12** (max 10 відкритих) · реєстр — [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md) · completion plan — [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · regen: `bash scripts/generate-ph-s-master-backlog-1000.sh` · extension: `bash scripts/generate-ph-s-completion-extension.sh`
 
-**Попередній горизонт:** product-complete PH-S1010 / FM §5.15 ✅ · maintenance bands 37–50 ✅ · enterprise phase A bands 51–60 ✅ (persist · store wire · **API contracts** · **admin/ops glue** · stand smoke · loc-audit · docs canon · vision-sync · ratio advisory · **horizon close**) · phase B SSO depth band 61 ✅ · SSO store wire band 62 ✅ (`sso_store_wire` · `POOLAI_SSO_DATA_DIR`) · SSO API contracts band 63 ✅ (`sso_api_contracts_depth` · `GET /security/sso/store`) · PH-S1149…S1278 markers preserved for horizon close tests
+**Попередній горизонт:** product-complete PH-S1010 / FM §5.15 ✅ · maintenance bands 37–50 ✅ · enterprise phase A bands 51–60 ✅ · phase B SSO depth/store/API bands 61–63 ✅ · band 64 SSO admin/ops glue **PH-S1279…S1288** ✅ · PH-S1149…S1288 markers preserved
 
-**Активна смуга:** band 64 **PH-S1279…S1288** (B SSO · admin/ops glue)
+**Drained slice keywords (horizon close tests):** PH-S1149 · PH-S1159 · PH-S1169 · PH-S1179 · PH-S1189 · PH-S1199 · PH-S1209 · PH-S1219 · PH-S1229 · PH-S1239 · PH-S1249 · PH-S1259 · PH-S1269 · PH-S1279 · depth scaffold · store wire · API contracts · admin/ops glue · stand smoke · loc-audit · docs canon · vision-sync · ratio advisory · horizon close
+
+**Активна смуга:** band 65 **PH-S1289…S1298** (B SSO · stand smoke) — **у §5.12** · band 64 admin/ops glue ✅
 
 **Поза scope (не в backlog):** FM-003 LAN 2-host (**BLOCKED**) · FM-041 Cloud SDK prod (**Deferred**) · mandatory ZK/TEE
 
@@ -52,6 +54,6 @@
 2. Взяти **наступні 10** з [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md) → §5.12 `[ ]`
 3. Оновити HANDOFF + NEXT + GALAXY + цей roadmap zriz
 4. Vision close → `cargo test-ci` → один commit → push
-5. Повторити **`абракадабра`** до PH-S2148
+5. Повторити **`абракадабра`** до PH-S2148 (§5.17), далі bands 151–163 до PH-S2278 (§5.18)
 
-**Після PH-S2148 ✅:** FM §5.17 enterprise-complete; новий scan лише за запитом власника або BLOCKED ops.
+**Після PH-S2278 ✅:** FM §5.18 project development complete; новий scan лише за запитом власника або BLOCKED ops.

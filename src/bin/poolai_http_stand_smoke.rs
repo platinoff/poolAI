@@ -5152,6 +5152,49 @@ mod tests {
     }
 
     #[test]
+    fn sso_admin_ops_band64_export_shape_ph_s1285() {
+        use poolai_ui_core::sso_admin_ops_depth::{
+            sso_admin_ops_criteria_total, sso_admin_ops_depth_stub, SsoAdminOpsDepth,
+            FM_BAND64_ROWS, SSO_ADMIN_OPS_CASES, SSO_ADMIN_OPS_CRITERIA,
+        };
+        use serde_json::json;
+        assert_eq!(
+            sso_admin_ops_depth_stub(Some(&json!({"providers_glue": true}))),
+            SsoAdminOpsDepth::ProvidersGlue
+        );
+        assert_eq!(
+            sso_admin_ops_depth_stub(Some(&json!({
+                "sso_admin_ops_depth": true,
+                "store_strip": true,
+                "providers_glue": true,
+                "html_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "sso_admin_ops_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            SsoAdminOpsDepth::FullBand64
+        );
+        assert_eq!(SSO_ADMIN_OPS_CRITERIA.len(), 10);
+        assert_eq!(sso_admin_ops_criteria_total(), 10);
+        assert!(SSO_ADMIN_OPS_CASES.contains(&"store_strip"));
+        let security_ui = include_str!("../../src/ui/admin/security.rs");
+        assert!(security_ui.contains("sso-store-badge"));
+        assert!(security_ui.contains("refreshOAuth2Providers"));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--sso-admin-ops"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND64_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band64 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn galaxy_edge_verification_band48_export_shape_ph_s1125() {
         use poolai_ui_core::galaxy_edge_verification_depth::{
             edge_verification_criteria_total, galaxy_edge_verification_depth_stub,

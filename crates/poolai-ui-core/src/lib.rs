@@ -43,6 +43,7 @@ pub mod product_complete_depth;
 pub mod prometheus;
 pub mod rust_migration_advisory_depth;
 pub mod security;
+pub mod sso_admin_ops_depth;
 pub mod sso_api_contracts_depth;
 pub mod sso_depth;
 pub mod sso_store_depth;

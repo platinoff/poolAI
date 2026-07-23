@@ -1,12 +1,51 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-22 (band 63 **PH-S1269…S1278** ✅ · Cursor **3.12.30** · horizon band 64)
+**Оновлено:** 2026-07-22 (band 64 ✅ · band 65 **§5.12 = 10 open** · Cursor **3.12.30**)
 
-**Наступна сесія:** **`абракадабра`** — promote band 64 (B SSO · admin/ops glue) з [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md).
+**Наступна сесія:** **`абракадабра`** — drain band 65 (B SSO · stand smoke) з FM **§5.46**.
 
 **Cursor / toolchain (service):** local desktop **3.12.30** · public changelog latest numbered IDE **3.11** · research [`CURSOR_UPDATE_RESEARCH_2026-07-22.md`](./CURSOR_UPDATE_RESEARCH_2026-07-22.md) · FM **§5.16**. Vision: `poolai-vision-sync` мержить enterprise `queue — band` → Sprint queue + Feed = останні закриті PH-S*.
 
+**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **990** спринтів до FM **§5.18** @ PH-S2278 (enterprise §5.17 @ S2148 + extension Memory/Job/Solana/Wasm/close).
+
+## Band 65 — SSO stand smoke (PH-S1289…S1298, **ACTIVE**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1289** | `sso_stand_smoke_depth` ui-core module |
+| **PH-S1290** | Live store wire smoke |
+| **PH-S1291** | Live OAuth2/SAML CRUD smoke |
+| **PH-S1292** | Live callback fixture smoke |
+| **PH-S1293** | CLI `--sso-stand-smoke` |
+| **PH-S1294** | `poolai-loc-audit --sso-stand-smoke` |
+| **PH-S1295** | `VERIFY_SSO_STAND_SMOKE` |
+| **PH-S1296** | `SSO_STAND_SMOKE.md` + canon |
+| **PH-S1297** | Ratio hold advisory |
+| **PH-S1298** | Band close |
+
+**§5.12:** **10** відкритих. **Vision:** rev **356**. **Pending completion:** **990** (→ PH-S2278).
+
+## Band 64 — SSO admin/ops glue (PH-S1279…S1288, ✅)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1279** | `sso_admin_ops_depth` ui-core module |
+| **PH-S1280** | Admin SSO store-wire status strip |
+| **PH-S1281** | Admin OAuth2/SAML ops glue |
+| **PH-S1282** | `sso_admin_ops_integration` contracts |
+| **PH-S1283** | i18n ADMIN_SSO_* keys |
+| **PH-S1284** | `VERIFY_SSO_ADMIN_OPS` + quick `--sso-admin-ops` |
+| **PH-S1285** | Stand smoke + loc-audit `--sso-admin-ops` |
+| **PH-S1286** | `SSO_ADMIN_OPS.md` + canon sync |
+| **PH-S1287** | Ratio hold advisory |
+| **PH-S1288** | Band close |
+
+**§5.12:** **0** відкритих (band 64 ✅ — journal). **Vision:** rev **356**.
+
+**PH-S1288 ✅ (2026-07-22):** `sso_admin_ops_depth.rs`; `#sso-store-badge`; OAuth2/SAML refresh glue; `ADMIN_SSO_*`; `--sso-admin-ops`; `VERIFY_SSO_ADMIN_OPS`; `SSO_ADMIN_OPS.md`; `galaxy_horizon_s1279_integration`. Phase B SSO admin/ops glue closed.
+
 ## Band 63 — SSO API contracts (PH-S1269…S1278, ✅)
+
 
 | Sprint | Фокус |
 |--------|--------|

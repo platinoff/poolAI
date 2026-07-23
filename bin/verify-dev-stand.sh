@@ -35,6 +35,7 @@ VERIFY_TENANT_HORIZON="${VERIFY_TENANT_HORIZON:-0}"
 VERIFY_SSO="${VERIFY_SSO:-0}"
 VERIFY_SSO_STORE="${VERIFY_SSO_STORE:-0}"
 VERIFY_SSO_API="${VERIFY_SSO_API:-0}"
+VERIFY_SSO_ADMIN_OPS="${VERIFY_SSO_ADMIN_OPS:-0}"
 HEALTH_RETRIES="${VERIFY_HEALTH_RETRIES:-45}"
 HEALTH_SLEEP="${VERIFY_HEALTH_SLEEP:-2}"
 
@@ -482,6 +483,16 @@ if [[ "$VERIFY_SSO_API" == "1" ]]; then
     echo "OK  SSO API contracts gate loc-audit"
   else
     echo "FAIL SSO API contracts gate loc-audit"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_SSO_ADMIN_OPS" == "1" ]]; then
+  echo "Running poolai-loc-audit --sso-admin-ops (PH-S1284)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --sso-admin-ops); then
+    echo "OK  SSO admin/ops gate loc-audit"
+  else
+    echo "FAIL SSO admin/ops gate loc-audit"
     fail=1
   fi
 fi

@@ -1,6 +1,7 @@
 //! Security Management page
 //!
 //! Provides OAuth2/SAML providers and security policies management.
+//! PH-S1280/S1281: SSO store-wire status strip + OAuth2/SAML ops glue (band 64).
 
 use crate::ui::admin::admin_layout_security;
 use axum::response::Html;
@@ -12,6 +13,59 @@ pub async fn admin_security() -> Html<String> {
     function Ep() { return typeof poolaiT === 'function' ? poolaiT('err.errorPrefix', 'Error: ') : 'Error: '; }
 
     let currentTab = 'oauth2';
+
+    function renderSsoStoreBadge(wire) {
+      const el = document.getElementById('sso-store-badge');
+      if (!el) return;
+      const mode = String((wire && wire.mode) || 'memory').toLowerCase();
+      const configured = !!(wire && wire.configured);
+      const path = (wire && wire.durable_path) ? String(wire.durable_path) : '';
+      const storeLabel = T('admin.sso.storeLabel', 'SSO store:');
+      const storeHint = T('admin.sso.storeHint', 'SSO persistence backend (POOLAI_SSO_STORE / POOLAI_SSO_DATA_DIR)');
+      const modeLabel = T('admin.sso.store.' + mode, mode);
+      const cfg = configured
+        ? T('admin.sso.store.configured', 'configured')
+        : T('admin.sso.store.unconfigured', 'unconfigured');
+      const pathBit = path ? (' · ' + escapeHtml(path)) : '';
+      el.innerHTML =
+        '<span class="status-badge ' + (configured ? 'active' : 'inactive') + '" title="' + escapeHtml(storeHint) + '">' +
+        escapeHtml(storeLabel) + ' ' + escapeHtml(modeLabel) + ' (' + escapeHtml(cfg) + ')' + pathBit +
+        '</span>';
+    }
+
+    async function loadSsoStoreWire() {
+      const el = document.getElementById('sso-store-badge');
+      if (el) {
+        el.textContent = T('admin.sso.storeLoading', 'Loading store…');
+      }
+      try {
+        const wire = await fetchJson('/api/enterprise/security/sso/store');
+        renderSsoStoreBadge(wire);
+      } catch (e) {
+        if (el) {
+          el.innerHTML = '<span class="status-badge inactive">' +
+            escapeHtml(T('admin.sso.storeErr', 'SSO store wire unavailable')) + '</span>';
+        }
+      }
+    }
+
+    async function refreshOAuth2Providers() {
+      try {
+        await loadOAuth2Providers();
+        showNotification(T('admin.sso.refreshOauthOk', 'OAuth2 providers refreshed'), 'success');
+      } catch (e) {
+        showNotification(T('admin.sso.refreshOauthErr', 'OAuth2 refresh failed: ') + e.message, 'error');
+      }
+    }
+
+    async function refreshSamlProviders() {
+      try {
+        await loadSamlProviders();
+        showNotification(T('admin.sso.refreshSamlOk', 'SAML providers refreshed'), 'success');
+      } catch (e) {
+        showNotification(T('admin.sso.refreshSamlErr', 'SAML refresh failed: ') + e.message, 'error');
+      }
+    }
     
     function showTab(tabName) {
       currentTab = tabName;
@@ -67,6 +121,7 @@ pub async fn admin_security() -> Html<String> {
       el.innerHTML = `
         <div class="admin-header">
           <h3>${escapeHtml(T('admin.sec.oauthHeading', 'OAuth2 Providers'))}</h3>
+          <button type="button" class="btn" onclick="refreshOAuth2Providers()">${escapeHtml(T('admin.sso.btn.refreshOauth', 'Refresh'))}</button>
           <button type="button" class="btn btn-primary" onclick="showCreateOAuth2Modal()" aria-label="${escapeHtml(T('ui.register', 'Register'))}">${escapeHtml(T('admin.sec.registerProv', 'Register Provider'))}</button>
         </div>
         <div id="oauth2-providers-list">
@@ -276,6 +331,7 @@ pub async fn admin_security() -> Html<String> {
       el.innerHTML = `
         <div class="admin-header">
           <h3>${escapeHtml(T('admin.sec.samlHeading', 'SAML Providers'))}</h3>
+          <button type="button" class="btn" onclick="refreshSamlProviders()">${escapeHtml(T('admin.sso.btn.refreshSaml', 'Refresh'))}</button>
           <button type="button" class="btn btn-primary" onclick="showCreateSamlModal()" aria-label="${escapeHtml(T('ui.register', 'Register'))}">${escapeHtml(T('admin.sec.registerProv', 'Register Provider'))}</button>
         </div>
         <div id="saml-providers-list">
@@ -730,7 +786,8 @@ pub async fn admin_security() -> Html<String> {
     document.querySelectorAll('.tab').forEach(tab => {
       tab.addEventListener('click', () => showTab(tab.dataset.tab));
     });
-    
+
+    loadSsoStoreWire();
     loadTabContent('oauth2');
     "#;
 
@@ -739,6 +796,10 @@ pub async fn admin_security() -> Html<String> {
         "Security Management",
         r#"
         <div class="admin-section">
+          <div class="admin-header">
+            <h2 data-i18n="admin.page.security">Security Management</h2>
+            <span id="sso-store-badge" class="sso-store-badge muted" data-i18n="admin.sso.storeLoading">Loading store…</span>
+          </div>
           <div class="admin-tabs" role="tablist" aria-label="Security management">
             <button type="button" class="tab active" id="security-tab-oauth2" role="tab" aria-selected="true" aria-controls="security-content" data-tab="oauth2" data-i18n="admin.sec.tab.oauth">OAuth2 Providers</button>
             <button type="button" class="tab" id="security-tab-saml" role="tab" aria-selected="false" aria-controls="security-content" tabindex="-1" data-tab="saml" data-i18n="admin.sec.tab.saml">SAML Providers</button>
@@ -1034,4 +1095,14 @@ async fn admin_security_page_slim_security_i18n_patch_ph_s231() {
     assert!(html.contains(r#""admin.sec.tab.oauth""#));
     assert!(!html.contains(r#""admin.jobs.leaseState.active""#));
     assert!(!html.contains(r#""admin.tenants.section""#));
+}
+
+#[tokio::test]
+async fn admin_security_sso_admin_ops_glue_ph_s1280() {
+    let html = admin_security().await.0;
+    assert!(html.contains("id=\"sso-store-badge\""));
+    assert!(html.contains("loadSsoStoreWire"));
+    assert!(html.contains("/api/enterprise/security/sso/store"));
+    assert!(html.contains("refreshOAuth2Providers"));
+    assert!(html.contains("refreshSamlProviders"));
 }

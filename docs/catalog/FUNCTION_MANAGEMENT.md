@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-07-22 (service PH-SVC21…SVC30 ✅ · Cursor **3.12.30** · band 63 **PH-S1269…S1278** ✅ · enterprise horizon band 64)
+**Оновлено:** 2026-07-22 (project completion path · band 64 ✅ · band 65 **§5.12 open** · Cursor **3.12.30**)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -1221,7 +1221,41 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 63 ✅). **Master horizon:** PH-S1279…S1288 (band 64) · enterprise backlog PH-S1149…S2148. Vision rev **354**. **Наступна сесія:** **`абракадабра`** — promote band 64.
+**Відкритих у §5.12:** **10** (band 64 ✅). **Master horizon:** PH-S1289…S1298 (band 65). **Completion pending:** PH-S1289…S2278 = **990** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **356**. **Наступна сесія:** **`абракадабра`** — drain band 65.
+
+### 5.46 SSO stand smoke queue — band 65 (PH-S1289…S1298, 2026-07-22) · **ACTIVE**
+
+**Джерело:** project completion / enterprise phase B — SSO live stand smoke (store + CRUD + callbacks). Mirror band 55 [`TENANT_STAND_SMOKE.md`](../development/TENANT_STAND_SMOKE.md). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1224 | **PH-S1289** | `sso_stand_smoke_depth` ui-core module | `sso_stand_smoke_depth.rs` | depth enum + stand-smoke criteria registry | **[ ]** |
+| 1225 | **PH-S1290** | Live store wire smoke | `GET /security/sso/store` | shape + integration | **[ ]** |
+| 1226 | **PH-S1291** | Live OAuth2/SAML CRUD smoke | list→create→get→delete | providers lifecycle | **[ ]** |
+| 1227 | **PH-S1292** | Live callback fixture smoke | OAuth/SAML fixtures | no live IdP | **[ ]** |
+| 1228 | **PH-S1293** | CLI `--sso-stand-smoke` | stand smoke bin | live suite + export shape | **[ ]** |
+| 1229 | **PH-S1294** | `poolai-loc-audit --sso-stand-smoke` | loc-audit | `rust_ratio.json` fields | **[ ]** |
+| 1230 | **PH-S1295** | `VERIFY_SSO_STAND_SMOKE` | verify-dev-stand | live + loc-audit verify | **[ ]** |
+| 1231 | **PH-S1296** | Docs `SSO_STAND_SMOKE.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | stand matrix | **[ ]** |
+| 1232 | **PH-S1297** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **[ ]** |
+| 1233 | **PH-S1298** | SSO stand smoke band close | tests/docs | `galaxy_horizon_s1289_integration`; HANDOFF/NEXT | **[ ]** |
+
+### 5.45 SSO admin/ops glue queue — band 64 (PH-S1279…S1288, 2026-07-22) · **✅**
+
+**Джерело:** project completion 1000 / enterprise phase B — SSO admin UI + ops glue (store strip / providers / verify). Mirror band 54 [`TENANT_ADMIN_OPS.md`](../development/TENANT_ADMIN_OPS.md). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1214 | **PH-S1279** | `sso_admin_ops_depth` ui-core module | `sso_admin_ops_depth.rs` | depth enum + admin/ops criteria registry | **✅** |
+| 1215 | **PH-S1280** | Admin SSO store-wire status strip | `src/ui/admin` security/SSO | `#sso-store-badge` ← `GET /security/sso/store` | **✅** |
+| 1216 | **PH-S1281** | Admin OAuth2/SAML ops glue | same | list/refresh providers from HTTP contracts | **✅** |
+| 1217 | **PH-S1282** | Admin SSO ops HTML contracts | `sso_admin_ops_integration.rs` | store/providers markers | **✅** |
+| 1218 | **PH-S1283** | i18n SSO admin ops keys | `i18n.rs` ADMIN_SSO_* | EN/UK patch keys | **✅** |
+| 1219 | **PH-S1284** | `VERIFY_SSO_ADMIN_OPS` + quick `--sso-admin-ops` | `bin/verify-dev-stand.sh` | gate + RUN_LOCAL | **✅** |
+| 1220 | **PH-S1285** | Stand smoke + `poolai-loc-audit --sso-admin-ops` | stand smoke / loc-audit | export shape + `rust_ratio.json` fields | **✅** |
+| 1221 | **PH-S1286** | Docs `SSO_ADMIN_OPS.md` + canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | ops matrix + backlog override | **✅** |
+| 1222 | **PH-S1287** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **✅** |
+| 1223 | **PH-S1288** | SSO admin/ops band close | tests/docs | `galaxy_horizon_s1279_integration`; HANDOFF/NEXT | **✅** |
 
 ### 5.44 SSO API contracts queue — band 63 (PH-S1269…S1278, 2026-07-22)
 
@@ -1739,20 +1773,21 @@ FM-xxx (з таблиці нижче)
 
 **Після PH-S1010 ✅:** FM **§5.15**; maintenance mode; новий scan лише для BLOCKED/Deferred або явного FM-horizon v2.
 
-### 5.14b Enterprise master backlog PH-S1149…S2148 (1000 → enterprise 100%, 2026-07-19)
+### 5.14b Enterprise master backlog PH-S1149…S2148 + completion extension → S2278 (2026-07-22)
 
-**Призначення:** **FM-horizon v2** — durable single-host enterprise 100% (tenancy/SSO/audit/monitoring/ratio/Galaxy ops). **Не** дублювати всі 1000 у §5.12 — там max **10** `[ ]` активних.
+**Призначення:** durable single-host enterprise 100% (**§5.17** @ S2148) + project-close extension (**§5.18** @ S2278). **Активний шлях від зараз:** **PH-S1289…S2278 = 990** спринтів. **Не** дублювати всі 990 у §5.12 — там max **10** `[ ]` активних.
 
 | Поле | Значення |
 |------|----------|
-| **Pending** | **870** (band 63 ✅ · S1279…S2148) |
-| **Drained** | band 51–63 PH-S1149…S1278 ✅ (phase A Tenants + phase B SSO depth/store/API) |
-| **Активна §5.12** | — (promote band 64 next) |
-| **Наступна promote** | PH-S1279…S1288 |
-| **План фаз** | [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md) |
-| **Реєстр sprint×acceptance** | [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md) |
-| **Regen** | `bash scripts/generate-ph-s-master-backlog-1000.sh` |
-| **Closure** | FM **§5.17** at PH-S2148 |
+| **Pending (completion path)** | **1000** (S1279…S2278) |
+| **Enterprise subset pending** | **870** (S1279…S2148 → §5.17) |
+| **Extension pending** | **130** (S2149…S2278 → §5.18) |
+| **Drained** | band 51–63 PH-S1149…S1278 ✅ |
+| **Активна §5.12** | band 65 **PH-S1289…S1298** `[ ]` (§5.46) |
+| **План** | [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md) |
+| **Реєстр** | [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md) |
+| **Regen** | `bash scripts/generate-ph-s-master-backlog-1000.sh` · `bash scripts/generate-ph-s-completion-extension.sh` |
+| **Closures** | FM **§5.17** @ PH-S2148 · FM **§5.18** @ PH-S2278 |
 
 **Поза backlog:** FM-003 LAN · FM-041 Cloud SDK · mandatory ZK/TEE.
 
@@ -1788,7 +1823,7 @@ FM-xxx (з таблиці нижче)
 
 ### 5.17 Enterprise-complete closure (PH-S2148 target)
 
-**Статус:** **in progress** — band 63 ✅ (SSO API contracts) · pending PH-S1279…S2148 · roadmap [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md).
+**Статус:** **in progress** — band 65 **active** (SSO stand smoke) · pending PH-S1289…S2148 · roadmap [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md) · completion wrapper [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md).
 
 | Критерій | Ціль |
 |----------|------|
@@ -1804,6 +1839,10 @@ FM-xxx (з таблиці нижче)
 | Gates | `cargo test-ci` + vision `--check`; §5.17 ✅ at **PH-S2148** |
 
 **Поза enterprise-complete:** FM-003 LAN · FM-041 Cloud SDK · mandatory ZK/TEE.
+
+### 5.18 Project development complete (PH-S2278 target)
+
+**Статус:** **planned** — extension bands 151–163 (Memory · Job depth · Solana · Wasm/UI · project close) after §5.17. Acceptance: STABLE/DIGEST truth, openapi-gap 0, `cargo test-ci` green, vision `--check`, ratio hold; HANDOFF → owner-scan only. **Поза:** FM-003 · FM-041 · ZK/TEE.
 
 ### 5.16 Service band (Cursor / toolchain / docs hygiene)
 
@@ -1848,7 +1887,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-22):** band 63 **PH-S1269…S1278** ✅ · §5.12 **0** · наступна **`абракадабра`** → promote band 64 (B SSO · admin/ops glue).
+**Активна смуга (2026-07-22):** band 65 **PH-S1289…S1298** `[ ]` · §5.12 **10** · наступна **`абракадабра`** → drain band 65 (B SSO · stand smoke) · completion pending **990** → S2278.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

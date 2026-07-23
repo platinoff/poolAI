@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-22",
+  "generated_at": "2026-07-23",
   "sprint": "PH-S1010",
   "formal_band_min": 0.9,
   "formal_band_max": 0.95,
@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 165328,
-  "non_rust_product_loc": 8962,
-  "product_loc_total": 174290,
-  "rust_ratio": 0.9485799529519766,
-  "rust_ratio_pct": 94.85799529519767,
+  "rust_loc": 166242,
+  "non_rust_product_loc": 8979,
+  "product_loc_total": 175221,
+  "rust_ratio": 0.9487561422432242,
+  "rust_ratio_pct": 94.87561422432242,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -79,9 +79,12 @@
   "sso_store_mode": false,
   "sso_store_criteria_total": 7,
   "sso_store_criteria_met_count": 0,
-  "sso_api_mode": true,
+  "sso_api_mode": false,
   "sso_api_criteria_total": 10,
-  "sso_api_criteria_met_count": 10,
+  "sso_api_criteria_met_count": 0,
+  "sso_admin_ops_mode": true,
+  "sso_admin_ops_criteria_total": 10,
+  "sso_admin_ops_criteria_met_count": 10,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -93,23 +96,23 @@
     },
     "ops_shell": {
       "files": 38,
-      "loc": 3237
+      "loc": 3254
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 81,
-      "loc": 17204
+      "files": 82,
+      "loc": 17474
     },
     "rust_src": {
       "files": 300,
-      "loc": 110301
+      "loc": 110462
     },
     "rust_tests": {
-      "files": 269,
-      "loc": 37215
+      "files": 271,
+      "loc": 37698
     },
     "ui_css": {
       "files": 2,
@@ -140,7 +143,7 @@
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
     "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
-    "PH-S1276: sso_api_mode — OAuth2/SAML HTTP CRUD + store-wire read contracts",
-    "PH-S1278: band 63 SSO API contracts — criteria met vs registry"
+    "PH-S1285: sso_admin_ops_mode — store strip / provider refresh / verify hooks",
+    "PH-S1288: band 64 SSO admin/ops glue — criteria met vs registry"
   ]
 }

@@ -590,6 +590,9 @@
 ./docs/development/NEXT_STEPS_RELEVANT_2026-01-19.md
 ./docs/development/NEXT_STEPS_SUMMARY.md
 ./docs/development/NEXT_STEPS_UPDATED_2026-01-19.md
+./docs/development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md
+./docs/development/PH_S_MASTER_BACKLOG_1000.md
+./docs/development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md
 ./docs/development/OPENAPI_GAP_AUDIT_2026-05-19.md
 ./docs/development/OPENTELEMETRY_TRACING.md
 ./docs/development/PERFORMANCE_OPTIMIZATION_PLAN_2026-03-17.md
@@ -1547,6 +1550,8 @@
 ./scripts/fix_cargo_now.sh
 ./scripts/fix_dlltool_msys2.sh
 ./scripts/fix_gcc.sh
+./scripts/generate-ph-s-completion-extension.sh
+./scripts/generate-ph-s-master-backlog-1000.sh
 ./scripts/git-push-only.sh
 ./scripts/git-push-poolai.sh
 ./scripts/install_gcc.sh

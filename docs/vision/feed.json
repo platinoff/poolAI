@@ -2,6 +2,187 @@
   "description": "RSS-style ticker of FM §5.12 sprint queue (open + recent closed)",
   "items": [
     {
+      "category": "open",
+      "id": "PH-S1289",
+      "link": "docs/vision/index.html#sprint-queue",
+      "next": true,
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "depth enum + stand-smoke criteria registry",
+      "title": "sso_stand_smoke_depth` ui-core module"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1290",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "shape + integration",
+      "title": "Live store wire smoke"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1291",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "providers lifecycle",
+      "title": "Live OAuth2/SAML CRUD smoke"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1292",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "no live IdP",
+      "title": "Live callback fixture smoke"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1293",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "live suite + export shape",
+      "title": "CLI `--sso-stand-smoke"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1294",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "rust_ratio.json` fields",
+      "title": "poolai-loc-audit --sso-stand-smoke"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1295",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "live + loc-audit verify",
+      "title": "VERIFY_SSO_STAND_SMOKE"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1296",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "stand matrix",
+      "title": "Docs `SSO_STAND_SMOKE.md` + canon"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1297",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "--min-ratio 0.95 --advisory",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1298",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "galaxy_horizon_s1289_integration`; HANDOFF/NEXT",
+      "title": "SSO stand smoke band close"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1288",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_horizon_s1279_integration`; HANDOFF/NEXT",
+      "title": "SSO admin/ops band close"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1287",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--min-ratio 0.95 --advisory",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1286",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "ops matrix + backlog override",
+      "title": "Docs `SSO_ADMIN_OPS.md` + canon sync"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1285",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "export shape + `rust_ratio.json` fields",
+      "title": "Stand smoke + `poolai-loc-audit --sso-admin-ops"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1284",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "gate + RUN_LOCAL",
+      "title": "VERIFY_SSO_ADMIN_OPS` + quick `--sso-admin-ops"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1283",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "EN/UK patch keys",
+      "title": "i18n SSO admin ops keys"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1282",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "store/providers markers",
+      "title": "Admin SSO ops HTML contracts"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1281",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "list/refresh providers from HTTP contracts",
+      "title": "Admin OAuth2/SAML ops glue"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1280",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "#sso-store-badge` ← `GET /security/sso/store",
+      "title": "Admin SSO store-wire status strip"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1279",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "depth enum + admin/ops criteria registry",
+      "title": "sso_admin_ops_depth` ui-core module"
+    },
+    {
       "category": "closed",
       "id": "PH-S1278",
       "link": "docs/vision/index.html#sprint-queue",
@@ -18,96 +199,6 @@
       "status": "closed",
       "summary": "HTTP contract matrix + master backlog override",
       "title": "Docs `SSO_API.md` + canon sync"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1276",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "export shape + `rust_ratio.json` sso_api fields",
-      "title": "Stand smoke + `poolai-loc-audit --sso-api"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1275",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "VERIFY_SSO_API=1` + `--sso-api",
-      "title": "verify-dev-stand` / quick `--sso-api"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1274",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "OAuth missing code + SAML invalid + audience stub",
-      "title": "Callback fixtures (no live IdP)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1273",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "store schema + path; gap-audit 0",
-      "title": "OpenAPI `SsoStoreWire` + errors"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1272",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "{mode,durable_path,configured}` memory/sqlite",
-      "title": "Store-wire status HTTP read"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1271",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "POST→GET→PUT→DELETE `/security/saml/providers",
-      "title": "SAML HTTP CRUD lifecycle"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1270",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "POST→GET→PUT→DELETE `/security/oauth2/providers",
-      "title": "OAuth2 HTTP CRUD lifecycle"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1269",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "depth enum + HTTP API criteria registry",
-      "title": "sso_api_contracts_depth` ui-core module"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1268",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_horizon_s1259_integration`; HANDOFF/NEXT → band 63",
-      "title": "SSO store band close"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1267",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--min-ratio 0.95 --advisory`; roadmap → band 63",
-      "title": "Ratio hold advisory + roadmap zriz"
     }
   ],
   "link": "docs/vision/index.html",

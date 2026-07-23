@@ -24,7 +24,7 @@ cd S:\rust\poolAI
 .\bin\run-poolai.ps1 stop
 ```
 
-**Last updated:** 2026-07-22 (PH-S1278 band 63 · `--sso-api` · `VERIFY_SSO_API` · phase B SSO API contracts)
+**Last updated:** 2026-07-22 (PH-S1288 band 64 · `--sso-admin-ops` · `VERIFY_SSO_ADMIN_OPS` · phase B SSO admin/ops glue)
 
 ### PH-S1011 / PH-S1012: Light compile + quick preset
 
@@ -70,6 +70,7 @@ cd S:\rust\poolAI
 /usr/bin/bash bin/run-poolai.sh quick --sso
 /usr/bin/bash bin/run-poolai.sh quick --sso-store
 /usr/bin/bash bin/run-poolai.sh quick --sso-api
+/usr/bin/bash bin/run-poolai.sh quick --sso-admin-ops
 # PowerShell:
 .\bin\run-poolai.ps1 quick -StandSmoke
 .\bin\run-poolai.ps1 quick -MigrationAdvisory
@@ -327,6 +328,7 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `VERIFY_SSO=1` | `verify-dev-stand.sh` → `poolai-loc-audit --sso` (PH-S1252) |
 | `VERIFY_SSO_STORE=1` | `verify-dev-stand.sh` → `poolai-loc-audit --sso-store` (PH-S1262) |
 | `VERIFY_SSO_API=1` | `verify-dev-stand.sh` → `poolai-loc-audit --sso-api` (PH-S1275) |
+| `VERIFY_SSO_ADMIN_OPS=1` | `verify-dev-stand.sh` → `poolai-loc-audit --sso-admin-ops` (PH-S1284) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 ### PH-S1100: Rust migration advisory (band 46)
@@ -691,6 +693,26 @@ VERIFY_SSO_API=1 bash bin/verify-dev-stand.sh
 | `sso_api_criteria_met_count` | Criteria with marker present in canonical doc path |
 
 Module: [`sso_api_contracts_depth.rs`](../../crates/poolai-ui-core/src/sso_api_contracts_depth.rs) · tests: `sso_api_contracts_integration.rs`, `galaxy_horizon_s1269_integration.rs` · docs: [`SSO_API.md`](./SSO_API.md).
+
+### PH-S1285: SSO admin/ops glue (band 64)
+
+Admin store-wire strip + OAuth2/SAML refresh glue + verify/loc-audit hooks for phase B SSO.
+
+```bash
+cargo run --bin poolai-loc-audit -- --sso-admin-ops
+cargo run --bin poolai-loc-audit -- --sso-admin-ops --advisory --min-ratio 0.95
+
+VERIFY_SSO_ADMIN_OPS=1 bash bin/verify-dev-stand.sh
+/usr/bin/bash bin/run-poolai.sh quick --sso-admin-ops
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `sso_admin_ops_mode` | `true` when `--sso-admin-ops` (PH-S1285) |
+| `sso_admin_ops_criteria_total` | SSO admin/ops criteria registry size |
+| `sso_admin_ops_criteria_met_count` | Criteria with marker present in canonical doc path |
+
+Module: [`sso_admin_ops_depth.rs`](../../crates/poolai-ui-core/src/sso_admin_ops_depth.rs) · tests: `sso_admin_ops_integration.rs`, `galaxy_horizon_s1279_integration.rs` · docs: [`SSO_ADMIN_OPS.md`](./SSO_ADMIN_OPS.md).
 
 Default stand smoke includes **`vision_revision_parity`** (PH-S208, PH-S235): repo `manifest.revision` vs FM §5.12 `Vision rev`, `extensions.active_sprint` vs `manifest.next_sprint`, then `GET /docs/vision/manifest.json` with `X-PoolAI-Vision-Revision` header vs JSON body.
 

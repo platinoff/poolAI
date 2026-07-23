@@ -1,10 +1,10 @@
 # PH-S master backlog 1000 (enterprise horizon v2)
 
-**Generated:** 2026-07-21 · **Range:** PH-S1149…PH-S2148 · **Pending:** **910** (band 59 ✅) · **Enterprise roadmap v2**
+**Generated:** 2026-07-21 · **Extended:** 2026-07-22 · **Enterprise range:** PH-S1149…PH-S2148 · **Completion range:** PH-S1279…PH-S2278 · **Pending open path:** **990** (from band 65)
 
 **VDT:** один `абракадабра` = drain **10** з FM §5.12 → vision close → push → promote наступні 10.
 
-**Канон плану:** [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](./PH_S_ENTERPRISE_ROADMAP_2026-07-19.md) · regen: `bash scripts/generate-ph-s-master-backlog-1000.sh`
+**Канон плану:** [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](./PH_S_ENTERPRISE_ROADMAP_2026-07-19.md) · **completion:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · regen enterprise: `bash scripts/generate-ph-s-master-backlog-1000.sh` · extension: `bash scripts/generate-ph-s-completion-extension.sh`
 
 **Поза backlog:** FM-003 LAN · FM-041 Cloud SDK · mandatory ZK/TEE.
 
@@ -23,8 +23,8 @@
 | 61 | PH-S1249…S1258 | B SSO · depth scaffold **✅** |
 | 62 | PH-S1259…S1268 | B SSO · store wire **✅** |
 | 63 | PH-S1269…S1278 | B SSO · API contracts **✅** |
-| 64 | PH-S1279…S1288 | B SSO · admin/ops glue **active next** |
-| 65 | PH-S1289…S1298 | B SSO · stand smoke |
+| 64 | PH-S1279…S1288 | B SSO · admin/ops glue **✅ drained** |
+| 65 | PH-S1289…S1298 | B SSO · stand smoke **active §5.12** |
 | 66 | PH-S1299…S1308 | B SSO · loc-audit |
 | 67 | PH-S1309…S1318 | B SSO · docs canon |
 | 68 | PH-S1319…S1328 | B SSO · vision-sync |
@@ -308,35 +308,35 @@
 | **PH-S1277** | Docs `SSO_API.md` | RUN_LOCAL/INDEX/HANDOFF/NEXT canon | **✅** |
 | **PH-S1278** | `galaxy_horizon_s1269_integration` | band close → band 64 | **✅** |
 
-## Band 64 — PH-S1279…S1288 (B SSO · admin/ops glue)
+## Band 64 — PH-S1279…S1288 (B SSO · admin/ops glue) · **✅ drained** · override
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1279** | `sso_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1280** | `sso` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1281** | `sso` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1282** | `sso` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1283** | Stand smoke `sso` export | export shape unit test | **[ ]** |
-| **PH-S1284** | poolai-loc-audit PH-S1284 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1285** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1286** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1287** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1288** | galaxy_horizon_s1279_integration | band close | **[ ]** |
+| **PH-S1279** | `sso_admin_ops_depth` ui-core module | depth enum + admin/ops criteria registry | **✅** |
+| **PH-S1280** | Admin SSO store-wire status strip | `#sso-store-badge` ← `GET /security/sso/store` | **✅** |
+| **PH-S1281** | Admin OAuth2/SAML ops glue | list/refresh providers from HTTP contracts | **✅** |
+| **PH-S1282** | Admin SSO ops HTML contracts | `sso_admin_ops_integration.rs` markers | **✅** |
+| **PH-S1283** | i18n SSO admin ops keys | EN/UK `ADMIN_SSO_*` patch keys | **✅** |
+| **PH-S1284** | `VERIFY_SSO_ADMIN_OPS` + quick `--sso-admin-ops` | verify-dev-stand + RUN_LOCAL | **✅** |
+| **PH-S1285** | Stand smoke + `poolai-loc-audit --sso-admin-ops` | export shape + `rust_ratio.json` fields | **✅** |
+| **PH-S1286** | Docs `SSO_ADMIN_OPS.md` + canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **✅** |
+| **PH-S1287** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
+| **PH-S1288** | SSO admin/ops band close | `galaxy_horizon_s1279_integration`; HANDOFF/NEXT | **✅** |
 
-## Band 65 — PH-S1289…S1298 (B SSO · stand smoke)
+## Band 65 — PH-S1289…S1298 (B SSO · stand smoke) · **active §5.12** · override
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1289** | `sso_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1290** | `sso` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1291** | `sso` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1292** | `sso` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1293** | Stand smoke `sso` export | export shape unit test | **[ ]** |
-| **PH-S1294** | poolai-loc-audit PH-S1294 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1295** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1296** | poolai-vision-sync --check | drift gate green | **[ ]** |
+| **PH-S1289** | `sso_stand_smoke_depth` ui-core | depth enum + stand-smoke criteria registry | **[ ]** |
+| **PH-S1290** | Live store wire smoke | `GET /security/sso/store` shape + integration | **[ ]** |
+| **PH-S1291** | Live OAuth2/SAML CRUD smoke | list→create→get→delete | **[ ]** |
+| **PH-S1292** | Live callback fixture smoke | OAuth/SAML fixtures (no live IdP) | **[ ]** |
+| **PH-S1293** | CLI `--sso-stand-smoke` | live suite + export shape | **[ ]** |
+| **PH-S1294** | `poolai-loc-audit --sso-stand-smoke` | `rust_ratio.json` fields | **[ ]** |
+| **PH-S1295** | `VERIFY_SSO_STAND_SMOKE` | live + loc-audit verify | **[ ]** |
+| **PH-S1296** | Docs `SSO_STAND_SMOKE.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
 | **PH-S1297** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1298** | galaxy_horizon_s1289_integration | band close | **[ ]** |
+| **PH-S1298** | `galaxy_horizon_s1289_integration` | band close | **[ ]** |
 
 ## Band 66 — PH-S1299…S1308 (B SSO · loc-audit)
 
@@ -1616,3 +1616,224 @@
 ---
 
 **Після PH-S2148 ✅:** FM §5.17 enterprise-complete · FM-003 LAN / FM-041 Cloud SDK поза enterprise-complete · новий scan лише за запитом власника.
+
+<!-- PROJECT COMPLETION EXTENSION 2026-07-22 -->
+
+---
+
+# Project completion extension (bands 151–163 · PH-S2149…S2278)
+
+**Added:** 2026-07-22 · **+130 sprints** · closes FM **§5.18** @ PH-S2278 · plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md)
+
+| Band | Sprints | Theme |
+|------|---------|-------|
+| 151 | PH-S2149…S2158 | K Memory · depth scaffold |
+| 152 | PH-S2159…S2168 | K Memory · store wire |
+| 153 | PH-S2169…S2178 | K Memory · API contracts |
+| 154 | PH-S2179…S2188 | L JobDepth · depth scaffold |
+| 155 | PH-S2189…S2198 | L JobDepth · store wire |
+| 156 | PH-S2199…S2208 | L JobDepth · API contracts |
+| 157 | PH-S2209…S2218 | M Solana · depth scaffold |
+| 158 | PH-S2219…S2228 | M Solana · store wire |
+| 159 | PH-S2229…S2238 | M Solana · API contracts |
+| 160 | PH-S2239…S2248 | N WasmUI · depth scaffold |
+| 161 | PH-S2249…S2258 | N WasmUI · store wire |
+| 162 | PH-S2259…S2268 | O ProjectClose · depth scaffold |
+| 163 | PH-S2269…S2278 | O ProjectClose · store wire |
+
+## Band 151 — PH-S2149…S2158 (K Memory)
+
+| Sprint | Focus | Acceptance | Status |
+|--------|-------|------------|--------|
+| **PH-S2149** | `memory_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
+| **PH-S2150** | `memory` store/wire slice | durable path or verify stub + unit test | **[ ]** |
+| **PH-S2151** | `memory` API contracts | `tests/*_integration.rs` | **[ ]** |
+| **PH-S2152** | `memory` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
+| **PH-S2153** | Stand smoke `memory` export | export shape unit test | **[ ]** |
+| **PH-S2154** | poolai-loc-audit PH-S2154 | `rust_ratio.json` zriz | **[ ]** |
+| **PH-S2155** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
+| **PH-S2156** | poolai-vision-sync --check | drift gate green | **[ ]** |
+| **PH-S2157** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
+| **PH-S2158** | galaxy_horizon_s2149_integration | band close | **[ ]** |
+
+## Band 152 — PH-S2159…S2168 (K Memory)
+
+| Sprint | Focus | Acceptance | Status |
+|--------|-------|------------|--------|
+| **PH-S2159** | `memory_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
+| **PH-S2160** | `memory` store/wire slice | durable path or verify stub + unit test | **[ ]** |
+| **PH-S2161** | `memory` API contracts | `tests/*_integration.rs` | **[ ]** |
+| **PH-S2162** | `memory` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
+| **PH-S2163** | Stand smoke `memory` export | export shape unit test | **[ ]** |
+| **PH-S2164** | poolai-loc-audit PH-S2164 | `rust_ratio.json` zriz | **[ ]** |
+| **PH-S2165** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
+| **PH-S2166** | poolai-vision-sync --check | drift gate green | **[ ]** |
+| **PH-S2167** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
+| **PH-S2168** | galaxy_horizon_s2159_integration | band close | **[ ]** |
+
+## Band 153 — PH-S2169…S2178 (K Memory)
+
+| Sprint | Focus | Acceptance | Status |
+|--------|-------|------------|--------|
+| **PH-S2169** | `memory_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
+| **PH-S2170** | `memory` store/wire slice | durable path or verify stub + unit test | **[ ]** |
+| **PH-S2171** | `memory` API contracts | `tests/*_integration.rs` | **[ ]** |
+| **PH-S2172** | `memory` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
+| **PH-S2173** | Stand smoke `memory` export | export shape unit test | **[ ]** |
+| **PH-S2174** | poolai-loc-audit PH-S2174 | `rust_ratio.json` zriz | **[ ]** |
+| **PH-S2175** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
+| **PH-S2176** | poolai-vision-sync --check | drift gate green | **[ ]** |
+| **PH-S2177** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
+| **PH-S2178** | galaxy_horizon_s2169_integration | band close | **[ ]** |
+
+## Band 154 — PH-S2179…S2188 (L JobDepth)
+
+| Sprint | Focus | Acceptance | Status |
+|--------|-------|------------|--------|
+| **PH-S2179** | `job_depth_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
+| **PH-S2180** | `job_depth` store/wire slice | durable path or verify stub + unit test | **[ ]** |
+| **PH-S2181** | `job_depth` API contracts | `tests/*_integration.rs` | **[ ]** |
+| **PH-S2182** | `job_depth` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
+| **PH-S2183** | Stand smoke `job_depth` export | export shape unit test | **[ ]** |
+| **PH-S2184** | poolai-loc-audit PH-S2184 | `rust_ratio.json` zriz | **[ ]** |
+| **PH-S2185** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
+| **PH-S2186** | poolai-vision-sync --check | drift gate green | **[ ]** |
+| **PH-S2187** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
+| **PH-S2188** | galaxy_horizon_s2179_integration | band close | **[ ]** |
+
+## Band 155 — PH-S2189…S2198 (L JobDepth)
+
+| Sprint | Focus | Acceptance | Status |
+|--------|-------|------------|--------|
+| **PH-S2189** | `job_depth_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
+| **PH-S2190** | `job_depth` store/wire slice | durable path or verify stub + unit test | **[ ]** |
+| **PH-S2191** | `job_depth` API contracts | `tests/*_integration.rs` | **[ ]** |
+| **PH-S2192** | `job_depth` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
+| **PH-S2193** | Stand smoke `job_depth` export | export shape unit test | **[ ]** |
+| **PH-S2194** | poolai-loc-audit PH-S2194 | `rust_ratio.json` zriz | **[ ]** |
+| **PH-S2195** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
+| **PH-S2196** | poolai-vision-sync --check | drift gate green | **[ ]** |
+| **PH-S2197** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
+| **PH-S2198** | galaxy_horizon_s2189_integration | band close | **[ ]** |
+
+## Band 156 — PH-S2199…S2208 (L JobDepth)
+
+| Sprint | Focus | Acceptance | Status |
+|--------|-------|------------|--------|
+| **PH-S2199** | `job_depth_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
+| **PH-S2200** | `job_depth` store/wire slice | durable path or verify stub + unit test | **[ ]** |
+| **PH-S2201** | `job_depth` API contracts | `tests/*_integration.rs` | **[ ]** |
+| **PH-S2202** | `job_depth` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
+| **PH-S2203** | Stand smoke `job_depth` export | export shape unit test | **[ ]** |
+| **PH-S2204** | poolai-loc-audit PH-S2204 | `rust_ratio.json` zriz | **[ ]** |
+| **PH-S2205** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
+| **PH-S2206** | poolai-vision-sync --check | drift gate green | **[ ]** |
+| **PH-S2207** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
+| **PH-S2208** | galaxy_horizon_s2199_integration | band close | **[ ]** |
+
+## Band 157 — PH-S2209…S2218 (M Solana)
+
+| Sprint | Focus | Acceptance | Status |
+|--------|-------|------------|--------|
+| **PH-S2209** | `solana_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
+| **PH-S2210** | `solana` store/wire slice | durable path or verify stub + unit test | **[ ]** |
+| **PH-S2211** | `solana` API contracts | `tests/*_integration.rs` | **[ ]** |
+| **PH-S2212** | `solana` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
+| **PH-S2213** | Stand smoke `solana` export | export shape unit test | **[ ]** |
+| **PH-S2214** | poolai-loc-audit PH-S2214 | `rust_ratio.json` zriz | **[ ]** |
+| **PH-S2215** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
+| **PH-S2216** | poolai-vision-sync --check | drift gate green | **[ ]** |
+| **PH-S2217** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
+| **PH-S2218** | galaxy_horizon_s2209_integration | band close | **[ ]** |
+
+## Band 158 — PH-S2219…S2228 (M Solana)
+
+| Sprint | Focus | Acceptance | Status |
+|--------|-------|------------|--------|
+| **PH-S2219** | `solana_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
+| **PH-S2220** | `solana` store/wire slice | durable path or verify stub + unit test | **[ ]** |
+| **PH-S2221** | `solana` API contracts | `tests/*_integration.rs` | **[ ]** |
+| **PH-S2222** | `solana` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
+| **PH-S2223** | Stand smoke `solana` export | export shape unit test | **[ ]** |
+| **PH-S2224** | poolai-loc-audit PH-S2224 | `rust_ratio.json` zriz | **[ ]** |
+| **PH-S2225** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
+| **PH-S2226** | poolai-vision-sync --check | drift gate green | **[ ]** |
+| **PH-S2227** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
+| **PH-S2228** | galaxy_horizon_s2219_integration | band close | **[ ]** |
+
+## Band 159 — PH-S2229…S2238 (M Solana)
+
+| Sprint | Focus | Acceptance | Status |
+|--------|-------|------------|--------|
+| **PH-S2229** | `solana_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
+| **PH-S2230** | `solana` store/wire slice | durable path or verify stub + unit test | **[ ]** |
+| **PH-S2231** | `solana` API contracts | `tests/*_integration.rs` | **[ ]** |
+| **PH-S2232** | `solana` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
+| **PH-S2233** | Stand smoke `solana` export | export shape unit test | **[ ]** |
+| **PH-S2234** | poolai-loc-audit PH-S2234 | `rust_ratio.json` zriz | **[ ]** |
+| **PH-S2235** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
+| **PH-S2236** | poolai-vision-sync --check | drift gate green | **[ ]** |
+| **PH-S2237** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
+| **PH-S2238** | galaxy_horizon_s2229_integration | band close | **[ ]** |
+
+## Band 160 — PH-S2239…S2248 (N WasmUI)
+
+| Sprint | Focus | Acceptance | Status |
+|--------|-------|------------|--------|
+| **PH-S2239** | `wasm_ui_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
+| **PH-S2240** | `wasm_ui` store/wire slice | durable path or verify stub + unit test | **[ ]** |
+| **PH-S2241** | `wasm_ui` API contracts | `tests/*_integration.rs` | **[ ]** |
+| **PH-S2242** | `wasm_ui` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
+| **PH-S2243** | Stand smoke `wasm_ui` export | export shape unit test | **[ ]** |
+| **PH-S2244** | poolai-loc-audit PH-S2244 | `rust_ratio.json` zriz | **[ ]** |
+| **PH-S2245** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
+| **PH-S2246** | poolai-vision-sync --check | drift gate green | **[ ]** |
+| **PH-S2247** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
+| **PH-S2248** | galaxy_horizon_s2239_integration | band close | **[ ]** |
+
+## Band 161 — PH-S2249…S2258 (N WasmUI)
+
+| Sprint | Focus | Acceptance | Status |
+|--------|-------|------------|--------|
+| **PH-S2249** | `wasm_ui_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
+| **PH-S2250** | `wasm_ui` store/wire slice | durable path or verify stub + unit test | **[ ]** |
+| **PH-S2251** | `wasm_ui` API contracts | `tests/*_integration.rs` | **[ ]** |
+| **PH-S2252** | `wasm_ui` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
+| **PH-S2253** | Stand smoke `wasm_ui` export | export shape unit test | **[ ]** |
+| **PH-S2254** | poolai-loc-audit PH-S2254 | `rust_ratio.json` zriz | **[ ]** |
+| **PH-S2255** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
+| **PH-S2256** | poolai-vision-sync --check | drift gate green | **[ ]** |
+| **PH-S2257** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
+| **PH-S2258** | galaxy_horizon_s2249_integration | band close | **[ ]** |
+
+## Band 162 — PH-S2259…S2268 (O ProjectClose)
+
+| Sprint | Focus | Acceptance | Status |
+|--------|-------|------------|--------|
+| **PH-S2259** | `project_close_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
+| **PH-S2260** | `project_close` store/wire slice | durable path or verify stub + unit test | **[ ]** |
+| **PH-S2261** | `project_close` API contracts | `tests/*_integration.rs` | **[ ]** |
+| **PH-S2262** | `project_close` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
+| **PH-S2263** | Stand smoke `project_close` export | export shape unit test | **[ ]** |
+| **PH-S2264** | poolai-loc-audit PH-S2264 | `rust_ratio.json` zriz | **[ ]** |
+| **PH-S2265** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
+| **PH-S2266** | poolai-vision-sync --check | drift gate green | **[ ]** |
+| **PH-S2267** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
+| **PH-S2268** | galaxy_horizon_s2259_integration | band close | **[ ]** |
+
+## Band 163 — PH-S2269…S2278 (O ProjectClose)
+
+| Sprint | Focus | Acceptance | Status |
+|--------|-------|------------|--------|
+| **PH-S2269** | DIGEST project-complete-v3 truth | no overclaim vs code | **[ ]** |
+| **PH-S2270** | STABLE §5.18 section | checklist mirrored | **[ ]** |
+| **PH-S2271** | INDEX + STRUCTURE pointers | completion roadmap link | **[ ]** |
+| **PH-S2272** | OpenAPI final gap-audit | exit 0 | **[ ]** |
+| **PH-S2273** | Integration suite gate | `cargo test-ci` green | **[ ]** |
+| **PH-S2274** | loc-audit final zriz | `rust_ratio.json` | **[ ]** |
+| **PH-S2275** | FM §5.18 closure draft | checklist rows | **[ ]** |
+| **PH-S2276** | poolai-vision-sync --check | green | **[ ]** |
+| **PH-S2277** | Ratio hold advisory final | `--min-ratio 0.95 --advisory` | **[ ]** |
+| **PH-S2278** | FM §5.18 project-complete | PH-S2278; HANDOFF owner-scan only | **[ ]** |
+
+**Після PH-S2278 ✅:** FM §5.18 project development complete · FM-003 LAN / FM-041 Cloud SDK / ZK/TEE поза closure · новий scan лише за запитом власника.
