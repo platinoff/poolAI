@@ -18,6 +18,7 @@ authoritative; the aggregate registry proves all six exist plus verify/loc-audit
 
 **Boundary:** band 67 = docs-canon matrix gate; prior loc-audit aggregate remains
 [`SSO_LOC_AUDIT.md`](./SSO_LOC_AUDIT.md) (band 66). Mirror: [`TENANT_DOCS_CANON.md`](./TENANT_DOCS_CANON.md).
+Next: [`SSO_VISION_SYNC.md`](./SSO_VISION_SYNC.md) (band 68 ✅).
 Next: band 68 vision-sync → band 69 ratio advisory.
 
 ## Loc-audit / verify

@@ -38,6 +38,9 @@ use poolai_ui_core::sso_stand_smoke_depth::{
 use poolai_ui_core::sso_store_depth::{
     sso_store_criteria_total, SSO_STORE_CASES, SSO_STORE_CRITERIA,
 };
+use poolai_ui_core::sso_vision_sync_depth::{
+    sso_vision_sync_criteria_total, SSO_VISION_SYNC_CASES, SSO_VISION_SYNC_CRITERIA,
+};
 use poolai_ui_core::stable_state_touchup_depth::{
     stable_criteria_total, STABLE_TOUCHUP_CASES, STABLE_TOUCHUP_CRITERIA,
 };
@@ -190,6 +193,8 @@ struct AuditConfig {
     sso_loc_audit: bool,
     /// Emit band-67 SSO docs-canon fields (PH-S1314).
     sso_docs_canon: bool,
+    /// Emit band-68 SSO vision-sync fields (PH-S1324).
+    sso_vision_sync: bool,
 }
 
 impl Default for AuditConfig {
@@ -222,6 +227,7 @@ impl Default for AuditConfig {
             sso_stand_smoke: false,
             sso_loc_audit: false,
             sso_docs_canon: false,
+            sso_vision_sync: false,
         }
     }
 }
@@ -411,6 +417,12 @@ struct RustRatioReport {
     sso_docs_canon_criteria_total: usize,
     /// SSO docs-canon criteria met count (PH-S1314).
     sso_docs_canon_criteria_met_count: usize,
+    /// Band-68 SSO vision-sync mode (PH-S1324).
+    sso_vision_sync_mode: bool,
+    /// SSO vision-sync criteria registry size (PH-S1324).
+    sso_vision_sync_criteria_total: usize,
+    /// SSO vision-sync criteria met count (PH-S1324).
+    sso_vision_sync_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -783,6 +795,22 @@ fn audit_sso_docs_canon_criteria_met(root: &Path) -> (usize, usize) {
     (met, total)
 }
 
+fn audit_sso_vision_sync_criteria_met(root: &Path) -> (usize, usize) {
+    let total = sso_vision_sync_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in SSO_VISION_SYNC_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
 fn classify_product_path(path: &str) -> ProductCategory {
     let p = path.replace('\\', "/");
     if p.starts_with("src/") && p.ends_with(".rs") {
@@ -896,6 +924,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--sso-stand-smoke" => config.sso_stand_smoke = true,
             "--sso-loc-audit" => config.sso_loc_audit = true,
             "--sso-docs-canon" => config.sso_docs_canon = true,
+            "--sso-vision-sync" => config.sso_vision_sync = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
                 print_help();
@@ -940,6 +969,7 @@ fn print_help() {
            --sso-stand-smoke           band-65 SSO stand-smoke fields (PH-S1294)\n\
            --sso-loc-audit             band-66 SSO loc-audit aggregate fields (PH-S1304)\n\
            --sso-docs-canon            band-67 SSO docs-canon fields (PH-S1314)\n\
+           --sso-vision-sync           band-68 SSO vision-sync fields (PH-S1324)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -1261,6 +1291,16 @@ fn build_report(
         notes.push("PH-S1314: sso_docs_canon_mode — aggregate band 61–66 SSO_*.md canon docs");
         notes.push("PH-S1318: band 67 SSO docs-canon — criteria met vs registry");
     }
+    let (sso_vision_sync_criteria_met_count, sso_vision_sync_criteria_total_count) =
+        if config.sso_vision_sync {
+            audit_sso_vision_sync_criteria_met(root)
+        } else {
+            (0, sso_vision_sync_criteria_total())
+        };
+    if config.sso_vision_sync {
+        notes.push("PH-S1324: sso_vision_sync_mode — aggregate docs/vision/* + SSO_DOCS_CANON");
+        notes.push("PH-S1328: band 68 SSO vision-sync — criteria met vs registry");
+    }
 
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
@@ -1358,6 +1398,9 @@ fn build_report(
         sso_docs_canon_mode: config.sso_docs_canon,
         sso_docs_canon_criteria_total: sso_docs_canon_criteria_total_count,
         sso_docs_canon_criteria_met_count,
+        sso_vision_sync_mode: config.sso_vision_sync,
+        sso_vision_sync_criteria_total: sso_vision_sync_criteria_total_count,
+        sso_vision_sync_criteria_met_count,
         by_category,
         notes,
     })
@@ -1632,6 +1675,17 @@ fn print_summary(report: &RustRatioReport) {
         println!(
             "  sso_docs_canon_cases: {}",
             SSO_DOCS_CANON_CASES.join(", ")
+        );
+    }
+    if report.sso_vision_sync_mode {
+        println!("  sso_vision_sync:       true (PH-S1324 band 68)");
+        println!(
+            "  sso_vision_sync_criteria: {}/{} met",
+            report.sso_vision_sync_criteria_met_count, report.sso_vision_sync_criteria_total
+        );
+        println!(
+            "  sso_vision_sync_cases: {}",
+            SSO_VISION_SYNC_CASES.join(", ")
         );
     }
     for (name, loc) in &report.by_category {

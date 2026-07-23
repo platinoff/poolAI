@@ -1221,24 +1221,41 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **10** (band 67 ✅ · band 68 open). **Master horizon:** PH-S1319…S1328 (band 68). **Completion pending:** PH-S1319…S2278 = **960** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **362**. **Наступна сесія:** **`абракадабра`** — drain band 68.
+**Відкритих у §5.12:** **10** (band 68 ✅ · band 69 open). **Master horizon:** PH-S1329…S1338 (band 69). **Completion pending:** PH-S1329…S2278 = **950** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **363**. **Наступна сесія:** **`абракадабра`** — drain band 69.
 
-### 5.49 SSO vision sync queue — band 68 (PH-S1319…S1328, 2026-07-23) · **ACTIVE**
+### 5.50 SSO ratio advisory queue — band 69 (PH-S1329…S1338, 2026-07-23) · **ACTIVE**
+
+**Джерело:** project completion / enterprise phase B — SSO ratio-advisory (mirror band 59 [`TENANT_RATIO_ADVISORY.md`](../development/TENANT_RATIO_ADVISORY.md)). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1264 | **PH-S1329** | `sso_ratio_advisory_depth` ui-core module | `sso_ratio_advisory_depth.rs` | depth enum + criteria registry | **[ ]** |
+| 1265 | **PH-S1330** | Ratio-advisory slice aggregate stub | `SSO_RATIO_ADVISORY_SLICES` | prior `--sso*` + vision-sync slices; unit test | **[ ]** |
+| 1266 | **PH-S1331** | Criteria contracts | `sso_ratio_advisory_integration` | markers + registry | **[ ]** |
+| 1267 | **PH-S1332** | `VERIFY_SSO_RATIO_ADVISORY` + quick `--sso-ratio-advisory` | verify-dev-stand | ratio-advisory gate | **[ ]** |
+| 1268 | **PH-S1333** | Stand smoke export shape band 69 | stand smoke | `sso_ratio_advisory_band69_export_shape` | **[ ]** |
+| 1269 | **PH-S1334** | `poolai-loc-audit --sso-ratio-advisory` | loc-audit | `rust_ratio.json` fields | **[ ]** |
+| 1270 | **PH-S1335** | Docs `SSO_RATIO_ADVISORY.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | docs matrix | **[ ]** |
+| 1271 | **PH-S1336** | vision-sync --check | vision | drift gate green | **[ ]** |
+| 1272 | **PH-S1337** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **[ ]** |
+| 1273 | **PH-S1338** | SSO ratio-advisory band close | tests/docs | `galaxy_horizon_s1329_integration`; HANDOFF/NEXT | **[ ]** |
+
+### 5.49 SSO vision sync queue — band 68 (PH-S1319…S1328, 2026-07-23) · **✅**
 
 **Джерело:** project completion / enterprise phase B — SSO vision-sync (mirror band 58 [`TENANT_VISION_SYNC.md`](../development/TENANT_VISION_SYNC.md)). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
-| 1254 | **PH-S1319** | `sso_vision_sync_depth` ui-core module | `sso_vision_sync_depth.rs` | depth enum + vision/criteria registry | **[ ]** |
-| 1255 | **PH-S1320** | SSO vision-sync slice aggregate stub | `SSO_VISION_SYNC_SLICES` | six vision slices; unit test | **[ ]** |
-| 1256 | **PH-S1321** | Criteria contracts | `sso_vision_sync_integration` | markers + registry | **[ ]** |
-| 1257 | **PH-S1322** | `VERIFY_SSO_VISION_SYNC` + quick `--sso-vision-sync` | verify-dev-stand | vision-sync gate | **[ ]** |
-| 1258 | **PH-S1323** | Stand smoke export shape band 68 | stand smoke | `sso_vision_sync_band68_export_shape` | **[ ]** |
-| 1259 | **PH-S1324** | `poolai-loc-audit --sso-vision-sync` | loc-audit | `rust_ratio.json` fields | **[ ]** |
-| 1260 | **PH-S1325** | Docs `SSO_VISION_SYNC.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | docs matrix | **[ ]** |
-| 1261 | **PH-S1326** | vision-sync --check | vision | drift gate green | **[ ]** |
-| 1262 | **PH-S1327** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **[ ]** |
-| 1263 | **PH-S1328** | SSO vision-sync band close | tests/docs | `galaxy_horizon_s1319_integration`; HANDOFF/NEXT | **[ ]** |
+| 1254 | **PH-S1319** | `sso_vision_sync_depth` ui-core module | `sso_vision_sync_depth.rs` | depth enum + vision/criteria registry | **✅** |
+| 1255 | **PH-S1320** | SSO vision-sync slice aggregate stub | `SSO_VISION_SYNC_SLICES` | six vision slices; unit test | **✅** |
+| 1256 | **PH-S1321** | Criteria contracts | `sso_vision_sync_integration` | markers + registry | **✅** |
+| 1257 | **PH-S1322** | `VERIFY_SSO_VISION_SYNC` + quick `--sso-vision-sync` | verify-dev-stand | vision-sync gate | **✅** |
+| 1258 | **PH-S1323** | Stand smoke export shape band 68 | stand smoke | `sso_vision_sync_band68_export_shape` | **✅** |
+| 1259 | **PH-S1324** | `poolai-loc-audit --sso-vision-sync` | loc-audit | `rust_ratio.json` fields | **✅** |
+| 1260 | **PH-S1325** | Docs `SSO_VISION_SYNC.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | docs matrix | **✅** |
+| 1261 | **PH-S1326** | vision-sync --check | vision | drift gate green | **✅** |
+| 1262 | **PH-S1327** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **✅** |
+| 1263 | **PH-S1328** | SSO vision-sync band close | tests/docs | `galaxy_horizon_s1319_integration`; HANDOFF/NEXT | **✅** |
 
 ### 5.48 SSO docs canon queue — band 67 (PH-S1309…S1318, 2026-07-23) · **✅**
 
@@ -1826,15 +1843,15 @@ FM-xxx (з таблиці нижче)
 
 ### 5.14b Enterprise master backlog PH-S1149…S2148 + completion extension → S2278 (2026-07-22)
 
-**Призначення:** durable single-host enterprise 100% (**§5.17** @ S2148) + project-close extension (**§5.18** @ S2278). **Активний шлях від зараз:** **PH-S1319…S2278 = 960** спринтів. **Не** дублювати всі 960 у §5.12 — там max **10** `[ ]` активних.
+**Призначення:** durable single-host enterprise 100% (**§5.17** @ S2148) + project-close extension (**§5.18** @ S2278). **Активний шлях від зараз:** **PH-S1329…S2278 = 950** спринтів. **Не** дублювати всі 950 у §5.12 — там max **10** `[ ]` активних.
 
 | Поле | Значення |
 |------|----------|
-| **Pending (completion path)** | **960** (S1319…S2278) |
-| **Enterprise subset pending** | **830** (S1319…S2148 → §5.17) |
+| **Pending (completion path)** | **950** (S1329…S2278) |
+| **Enterprise subset pending** | **820** (S1329…S2148 → §5.17) |
 | **Extension pending** | **130** (S2149…S2278 → §5.18) |
-| **Drained** | band 51–67 PH-S1149…S1318 ✅ |
-| **Активна §5.12** | band 68 **PH-S1319…S1328** `[ ]` (§5.49) |
+| **Drained** | band 51–68 PH-S1149…S1328 ✅ |
+| **Активна §5.12** | band 69 **PH-S1329…S1338** `[ ]` (§5.50) |
 | **План** | [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md) |
 | **Реєстр** | [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md) |
 | **Regen** | `bash scripts/generate-ph-s-master-backlog-1000.sh` · `bash scripts/generate-ph-s-completion-extension.sh` |
@@ -1938,7 +1955,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-23):** band 68 **PH-S1319…S1328** `[ ]` · §5.12 **10** · наступна **`абракадабра`** → drain band 68 (B SSO · vision-sync) · completion pending **960** → S2278.
+**Активна смуга (2026-07-23):** band 69 **PH-S1329…S1338** `[ ]` · §5.12 **10** · наступна **`абракадабра`** → drain band 69 (B SSO · ratio advisory) · completion pending **950** → S2278.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

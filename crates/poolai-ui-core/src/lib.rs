@@ -50,6 +50,7 @@ pub mod sso_docs_canon_depth;
 pub mod sso_loc_audit_depth;
 pub mod sso_stand_smoke_depth;
 pub mod sso_store_depth;
+pub mod sso_vision_sync_depth;
 pub mod stable_depth;
 pub mod stable_state_touchup_depth;
 pub mod stand_smoke_metrics;

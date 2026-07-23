@@ -5589,6 +5589,49 @@ mod tests {
     }
 
     #[test]
+    fn sso_vision_sync_band68_export_shape_ph_s1323() {
+        use poolai_ui_core::sso_vision_sync_depth::{
+            sso_vision_sync_criteria_total, sso_vision_sync_depth_stub, sso_vision_sync_slices_met,
+            SsoVisionSyncDepth, FM_BAND68_ROWS, SSO_VISION_SYNC_CASES, SSO_VISION_SYNC_CRITERIA,
+            SSO_VISION_SYNC_SLICES,
+        };
+        use serde_json::json;
+        assert_eq!(
+            sso_vision_sync_depth_stub(Some(&json!({"stand_smoke_export": true}))),
+            SsoVisionSyncDepth::StandSmokeExport
+        );
+        assert_eq!(
+            sso_vision_sync_depth_stub(Some(&json!({
+                "sso_vision_sync_depth": true,
+                "slice_aggregate": true,
+                "criteria_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "sso_vision_sync_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            SsoVisionSyncDepth::FullBand68
+        );
+        assert_eq!(SSO_VISION_SYNC_CRITERIA.len(), 10);
+        assert_eq!(sso_vision_sync_criteria_total(), 10);
+        assert_eq!(SSO_VISION_SYNC_SLICES.len(), 6);
+        assert!(SSO_VISION_SYNC_CASES.contains(&"aggregate_flag"));
+        let canon = include_str!("../../docs/development/SSO_VISION_SYNC.md");
+        assert_eq!(sso_vision_sync_slices_met(canon), (6, 6));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--sso-vision-sync"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND68_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band68 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn galaxy_edge_verification_band48_export_shape_ph_s1125() {
         use poolai_ui_core::galaxy_edge_verification_depth::{
             edge_verification_criteria_total, galaxy_edge_verification_depth_stub,

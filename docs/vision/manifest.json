@@ -2634,7 +2634,7 @@
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S1318",
+  "last_sprint_closed": "PH-S1328",
   "layers": [
     {
       "id": "L0",
@@ -2667,7 +2667,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1319",
+  "next_sprint": "PH-S1329",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -10574,7 +10574,7 @@
       "path": "tests/sso_docs_canon_integration.rs"
     }
   ],
-  "revision": 362,
+  "revision": 363,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -21857,91 +21857,181 @@
       "acceptance": "depth enum + vision/criteria registry",
       "deps": "sso_vision_sync_depth.rs",
       "id": "PH-S1319",
-      "open": true,
+      "open": false,
       "row": 1254,
-      "status": "open",
+      "status": "closed",
       "title": "sso_vision_sync_depth` ui-core module"
     },
     {
       "acceptance": "six vision slices; unit test",
       "deps": "SSO_VISION_SYNC_SLICES",
       "id": "PH-S1320",
-      "open": true,
+      "open": false,
       "row": 1255,
-      "status": "open",
+      "status": "closed",
       "title": "SSO vision-sync slice aggregate stub"
     },
     {
       "acceptance": "markers + registry",
       "deps": "sso_vision_sync_integration",
       "id": "PH-S1321",
-      "open": true,
+      "open": false,
       "row": 1256,
-      "status": "open",
+      "status": "closed",
       "title": "Criteria contracts"
     },
     {
       "acceptance": "vision-sync gate",
       "deps": "verify-dev-stand",
       "id": "PH-S1322",
-      "open": true,
+      "open": false,
       "row": 1257,
-      "status": "open",
+      "status": "closed",
       "title": "VERIFY_SSO_VISION_SYNC` + quick `--sso-vision-sync"
     },
     {
       "acceptance": "sso_vision_sync_band68_export_shape",
       "deps": "stand smoke",
       "id": "PH-S1323",
-      "open": true,
+      "open": false,
       "row": 1258,
-      "status": "open",
+      "status": "closed",
       "title": "Stand smoke export shape band 68"
     },
     {
       "acceptance": "rust_ratio.json` fields",
       "deps": "loc-audit",
       "id": "PH-S1324",
-      "open": true,
+      "open": false,
       "row": 1259,
-      "status": "open",
+      "status": "closed",
       "title": "poolai-loc-audit --sso-vision-sync"
     },
     {
       "acceptance": "docs matrix",
       "deps": "RUN_LOCAL/INDEX/HANDOFF/NEXT",
       "id": "PH-S1325",
-      "open": true,
+      "open": false,
       "row": 1260,
-      "status": "open",
+      "status": "closed",
       "title": "Docs `SSO_VISION_SYNC.md` + canon"
     },
     {
       "acceptance": "drift gate green",
       "deps": "vision",
       "id": "PH-S1326",
-      "open": true,
+      "open": false,
       "row": 1261,
-      "status": "open",
+      "status": "closed",
       "title": "vision-sync --check"
     },
     {
       "acceptance": "--min-ratio 0.95 --advisory",
       "deps": "loc-audit",
       "id": "PH-S1327",
-      "open": true,
+      "open": false,
       "row": 1262,
-      "status": "open",
+      "status": "closed",
       "title": "Ratio hold advisory"
     },
     {
       "acceptance": "galaxy_horizon_s1319_integration`; HANDOFF/NEXT",
       "deps": "tests/docs",
       "id": "PH-S1328",
-      "open": true,
+      "open": false,
       "row": 1263,
-      "status": "open",
+      "status": "closed",
       "title": "SSO vision-sync band close"
+    },
+    {
+      "acceptance": "depth enum + criteria registry",
+      "deps": "sso_ratio_advisory_depth.rs",
+      "id": "PH-S1329",
+      "open": true,
+      "row": 1264,
+      "status": "open",
+      "title": "sso_ratio_advisory_depth` ui-core module"
+    },
+    {
+      "acceptance": "prior `--sso*` + vision-sync slices; unit test",
+      "deps": "SSO_RATIO_ADVISORY_SLICES",
+      "id": "PH-S1330",
+      "open": true,
+      "row": 1265,
+      "status": "open",
+      "title": "Ratio-advisory slice aggregate stub"
+    },
+    {
+      "acceptance": "markers + registry",
+      "deps": "sso_ratio_advisory_integration",
+      "id": "PH-S1331",
+      "open": true,
+      "row": 1266,
+      "status": "open",
+      "title": "Criteria contracts"
+    },
+    {
+      "acceptance": "ratio-advisory gate",
+      "deps": "verify-dev-stand",
+      "id": "PH-S1332",
+      "open": true,
+      "row": 1267,
+      "status": "open",
+      "title": "VERIFY_SSO_RATIO_ADVISORY` + quick `--sso-ratio-advisory"
+    },
+    {
+      "acceptance": "sso_ratio_advisory_band69_export_shape",
+      "deps": "stand smoke",
+      "id": "PH-S1333",
+      "open": true,
+      "row": 1268,
+      "status": "open",
+      "title": "Stand smoke export shape band 69"
+    },
+    {
+      "acceptance": "rust_ratio.json` fields",
+      "deps": "loc-audit",
+      "id": "PH-S1334",
+      "open": true,
+      "row": 1269,
+      "status": "open",
+      "title": "poolai-loc-audit --sso-ratio-advisory"
+    },
+    {
+      "acceptance": "docs matrix",
+      "deps": "RUN_LOCAL/INDEX/HANDOFF/NEXT",
+      "id": "PH-S1335",
+      "open": true,
+      "row": 1270,
+      "status": "open",
+      "title": "Docs `SSO_RATIO_ADVISORY.md` + canon"
+    },
+    {
+      "acceptance": "drift gate green",
+      "deps": "vision",
+      "id": "PH-S1336",
+      "open": true,
+      "row": 1271,
+      "status": "open",
+      "title": "vision-sync --check"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory",
+      "deps": "loc-audit",
+      "id": "PH-S1337",
+      "open": true,
+      "row": 1272,
+      "status": "open",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1329_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1338",
+      "open": true,
+      "row": 1273,
+      "status": "open",
+      "title": "SSO ratio-advisory band close"
     }
   ],
   "sprint_queue_open_count": 10,

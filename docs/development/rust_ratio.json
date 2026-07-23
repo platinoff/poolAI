@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 168042,
-  "non_rust_product_loc": 9160,
-  "product_loc_total": 177202,
-  "rust_ratio": 0.948307581178542,
-  "rust_ratio_pct": 94.8307581178542,
+  "rust_loc": 168503,
+  "non_rust_product_loc": 9177,
+  "product_loc_total": 177680,
+  "rust_ratio": 0.9483509680324178,
+  "rust_ratio_pct": 94.83509680324178,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -91,9 +91,12 @@
   "sso_loc_audit_mode": false,
   "sso_loc_audit_criteria_total": 10,
   "sso_loc_audit_criteria_met_count": 0,
-  "sso_docs_canon_mode": true,
+  "sso_docs_canon_mode": false,
   "sso_docs_canon_criteria_total": 10,
-  "sso_docs_canon_criteria_met_count": 10,
+  "sso_docs_canon_criteria_met_count": 0,
+  "sso_vision_sync_mode": true,
+  "sso_vision_sync_criteria_total": 10,
+  "sso_vision_sync_criteria_met_count": 10,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -105,23 +108,23 @@
     },
     "ops_shell": {
       "files": 39,
-      "loc": 3435
+      "loc": 3452
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 85,
-      "loc": 18117
+      "files": 86,
+      "loc": 18340
     },
     "rust_src": {
       "files": 300,
-      "loc": 110997
+      "loc": 111092
     },
     "rust_tests": {
-      "files": 277,
-      "loc": 38320
+      "files": 279,
+      "loc": 38463
     },
     "ui_css": {
       "files": 2,
@@ -152,7 +155,7 @@
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
     "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
-    "PH-S1314: sso_docs_canon_mode — aggregate band 61–66 SSO_*.md canon docs",
-    "PH-S1318: band 67 SSO docs-canon — criteria met vs registry"
+    "PH-S1324: sso_vision_sync_mode — aggregate docs/vision/* + SSO_DOCS_CANON",
+    "PH-S1328: band 68 SSO vision-sync — criteria met vs registry"
   ]
 }
