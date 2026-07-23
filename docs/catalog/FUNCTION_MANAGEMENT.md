@@ -1221,24 +1221,41 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **10** (band 72 ✅ · band 73 open). **Master horizon:** PH-S1369…S1378 (band 73). **Completion pending:** PH-S1369…S2278 = **910** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **373**. **Наступна сесія:** **`абракадабра`** — drain band 73.
+**Відкритих у §5.12:** **10** (band 73 ✅ · band 74 open). **Master horizon:** PH-S1379…S1388 (band 74). **Completion pending:** PH-S1379…S2278 = **900** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **375**. **Наступна сесія:** **`абракадабра`** — drain band 74.
 
-### 5.54 Audit API contracts queue — band 73 (PH-S1369…S1378, 2026-07-23) · **ACTIVE**
+### 5.55 Audit admin/ops glue queue — band 74 (PH-S1379…S1388, 2026-07-23) · **ACTIVE**
+
+**Джерело:** project completion / enterprise phase C — Audit admin UI + ops glue (store strip / query refresh / verify). Mirror band 64 [`SSO_ADMIN_OPS.md`](../development/SSO_ADMIN_OPS.md). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1314 | **PH-S1379** | `audit_admin_ops_depth` ui-core module | `audit_admin_ops_depth.rs` | depth enum + admin/ops criteria registry | **[ ]** |
+| 1315 | **PH-S1380** | Admin audit store-wire status strip | `src/ui/admin` audit | `#audit-store-badge` ← `GET /audit/store` | **[ ]** |
+| 1316 | **PH-S1381** | Admin audit query ops glue | same | refresh events from HTTP query contracts | **[ ]** |
+| 1317 | **PH-S1382** | Admin audit ops HTML contracts | `audit_admin_ops_integration.rs` | store/query markers | **[ ]** |
+| 1318 | **PH-S1383** | i18n Audit admin ops keys | `i18n.rs` ADMIN_AUDIT_* | EN/UK patch keys | **[ ]** |
+| 1319 | **PH-S1384** | `VERIFY_AUDIT_ADMIN_OPS` + quick `--audit-admin-ops` | `bin/verify-dev-stand.sh` | gate + RUN_LOCAL | **[ ]** |
+| 1320 | **PH-S1385** | Stand smoke + `poolai-loc-audit --audit-admin-ops` | stand smoke / loc-audit | export shape + `rust_ratio.json` fields | **[ ]** |
+| 1321 | **PH-S1386** | Docs `AUDIT_ADMIN_OPS.md` + canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | ops matrix + backlog override | **[ ]** |
+| 1322 | **PH-S1387** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **[ ]** |
+| 1323 | **PH-S1388** | Audit admin/ops band close | tests/docs | `galaxy_horizon_s1379_integration`; HANDOFF/NEXT | **[ ]** |
+
+### 5.54 Audit API contracts queue — band 73 (PH-S1369…S1378, 2026-07-23) · **✅**
 
 **Джерело:** project completion / enterprise phase C — Audit API contracts (mirror band 63 [`SSO_API.md`](../development/SSO_API.md)). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
-| 1304 | **PH-S1369** | `audit_api_contracts_depth` ui-core module | `audit_api_contracts_depth.rs` | depth enum + HTTP API criteria registry | **[ ]** |
-| 1305 | **PH-S1370** | Audit query HTTP lifecycle | `audit_api_contracts_integration` | GET query filters + pagination stub | **[ ]** |
-| 1306 | **PH-S1371** | Store-wire status HTTP read | `GET /audit/store` | `{mode,durable_path,configured}` file/sqlite | **[ ]** |
-| 1307 | **PH-S1372** | OpenAPI `AuditStoreWire` + errors | `docs/openapi.yaml` | store schema + path; gap-audit 0 | **[ ]** |
-| 1308 | **PH-S1373** | Event field validation fixtures | same suite | missing action/resource → 4xx | **[ ]** |
-| 1309 | **PH-S1374** | `VERIFY_AUDIT_API` + quick `--audit-api` | verify-dev-stand | API gate | **[ ]** |
-| 1310 | **PH-S1375** | Stand smoke + `poolai-loc-audit --audit-api` | stand smoke / loc-audit | export shape + rust_ratio fields | **[ ]** |
-| 1311 | **PH-S1376** | Docs `AUDIT_API.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | HTTP contract matrix | **[ ]** |
-| 1312 | **PH-S1377** | vision-sync --check + ratio hold | vision / loc-audit | drift + `--min-ratio 0.95 --advisory` | **[ ]** |
-| 1313 | **PH-S1378** | Audit API band close | tests/docs | `galaxy_horizon_s1369_integration`; HANDOFF/NEXT | **[ ]** |
+| 1304 | **PH-S1369** | `audit_api_contracts_depth` ui-core module | `audit_api_contracts_depth.rs` | depth enum + HTTP API criteria registry | **✅** |
+| 1305 | **PH-S1370** | Audit query HTTP lifecycle | `audit_api_contracts_integration` | GET query filters + pagination stub | **✅** |
+| 1306 | **PH-S1371** | Store-wire status HTTP read | `GET /audit/store` | `{mode,durable_path,configured}` file/sqlite | **✅** |
+| 1307 | **PH-S1372** | OpenAPI `AuditStoreWire` + errors | `docs/openapi.yaml` | store schema + path; gap-audit 0 | **✅** |
+| 1308 | **PH-S1373** | Event field validation fixtures | same suite | missing action/resource → 4xx | **✅** |
+| 1309 | **PH-S1374** | `VERIFY_AUDIT_API` + quick `--audit-api` | verify-dev-stand | API gate | **✅** |
+| 1310 | **PH-S1375** | Stand smoke + `poolai-loc-audit --audit-api` | stand smoke / loc-audit | export shape + rust_ratio fields | **✅** |
+| 1311 | **PH-S1376** | Docs `AUDIT_API.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | HTTP contract matrix | **✅** |
+| 1312 | **PH-S1377** | vision-sync --check + ratio hold | vision / loc-audit | drift + `--min-ratio 0.95 --advisory` | **✅** |
+| 1313 | **PH-S1378** | Audit API band close | tests/docs | `galaxy_horizon_s1369_integration`; HANDOFF/NEXT | **✅** |
 
 ### 5.53 Audit store wire queue — band 72 (PH-S1359…S1368, 2026-07-23) · **✅**
 
@@ -1915,11 +1932,11 @@ FM-xxx (з таблиці нижче)
 
 | Поле | Значення |
 |------|----------|
-| **Pending (completion path)** | **910** (S1369…S2278) |
-| **Enterprise subset pending** | **780** (S1369…S2148 → §5.17) |
+| **Pending (completion path)** | **900** (S1379…S2278) |
+| **Enterprise subset pending** | **770** (S1379…S2148 → §5.17) |
 | **Extension pending** | **130** (S2149…S2278 → §5.18) |
-| **Drained** | band 51–72 PH-S1149…S1368 ✅ |
-| **Активна §5.12** | band 73 **PH-S1369…S1378** `[ ]` (§5.54) |
+| **Drained** | band 51–73 PH-S1149…S1378 ✅ |
+| **Активна §5.12** | band 74 **PH-S1379…S1388** `[ ]` (§5.55) |
 | **План** | [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md) |
 | **Реєстр** | [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md) |
 | **Regen** | `bash scripts/generate-ph-s-master-backlog-1000.sh` · `bash scripts/generate-ph-s-completion-extension.sh` |
@@ -2023,7 +2040,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-23):** band 73 **PH-S1369…S1378** `[ ]` · §5.12 **10** · наступна **`абракадабра`** → drain band 73 (C Audit · API contracts) · completion pending **910** → S2278.
+**Активна смуга (2026-07-23):** band 74 **PH-S1379…S1388** `[ ]` · §5.12 **10** · наступна **`абракадабра`** → drain band 74 (C Audit · admin/ops glue) · completion pending **900** → S2278.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

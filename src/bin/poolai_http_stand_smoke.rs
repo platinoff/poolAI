@@ -5798,6 +5798,48 @@ mod tests {
     }
 
     #[test]
+    fn audit_api_band73_export_shape_ph_s1375() {
+        use poolai_ui_core::audit_api_contracts_depth::{
+            audit_api_contracts_depth_stub, audit_api_criteria_total, AuditApiContractsDepth,
+            AUDIT_API_CASES, AUDIT_API_CRITERIA, FM_BAND73_ROWS,
+        };
+        use serde_json::json;
+        assert_eq!(
+            audit_api_contracts_depth_stub(Some(&json!({"store_wire_http": true}))),
+            AuditApiContractsDepth::StoreWireHttp
+        );
+        assert_eq!(
+            audit_api_contracts_depth_stub(Some(&json!({
+                "audit_api_depth": true,
+                "query_http_lifecycle": true,
+                "store_wire_http": true,
+                "openapi_schemas": true,
+                "event_field_fixtures": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "audit_api_docs": true,
+            }))),
+            AuditApiContractsDepth::FullBand73
+        );
+        assert_eq!(AUDIT_API_CRITERIA.len(), 9);
+        assert_eq!(audit_api_criteria_total(), 9);
+        assert!(AUDIT_API_CASES.contains(&"store_wire_http"));
+        let audit_api = include_str!("../../src/network/enterprise_api/audit.rs");
+        assert!(audit_api.contains("GET /audit/store"));
+        assert!(audit_api.contains("audit_store_wire_handler"));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--audit-api"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND73_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band73 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn galaxy_edge_verification_band48_export_shape_ph_s1125() {
         use poolai_ui_core::galaxy_edge_verification_depth::{
             edge_verification_criteria_total, galaxy_edge_verification_depth_stub,

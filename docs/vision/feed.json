@@ -3,94 +3,184 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S1369",
+      "id": "PH-S1379",
       "link": "docs/vision/index.html#sprint-queue",
       "next": true,
       "published": "2026-05-28",
       "status": "open",
-      "summary": "depth enum + HTTP API criteria registry",
-      "title": "audit_api_contracts_depth` ui-core module"
+      "summary": "depth enum + admin/ops criteria registry",
+      "title": "audit_admin_ops_depth` ui-core module"
     },
     {
       "category": "open",
-      "id": "PH-S1370",
+      "id": "PH-S1380",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "GET query filters + pagination stub",
-      "title": "Audit query HTTP lifecycle"
+      "summary": "#audit-store-badge` ← `GET /audit/store",
+      "title": "Admin audit store-wire status strip"
     },
     {
       "category": "open",
-      "id": "PH-S1371",
+      "id": "PH-S1381",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "{mode,durable_path,configured}` file/sqlite",
-      "title": "Store-wire status HTTP read"
+      "summary": "refresh events from HTTP query contracts",
+      "title": "Admin audit query ops glue"
     },
     {
       "category": "open",
-      "id": "PH-S1372",
+      "id": "PH-S1382",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "store schema + path; gap-audit 0",
-      "title": "OpenAPI `AuditStoreWire` + errors"
+      "summary": "store/query markers",
+      "title": "Admin audit ops HTML contracts"
     },
     {
       "category": "open",
-      "id": "PH-S1373",
+      "id": "PH-S1383",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "missing action/resource → 4xx",
-      "title": "Event field validation fixtures"
+      "summary": "EN/UK patch keys",
+      "title": "i18n Audit admin ops keys"
     },
     {
       "category": "open",
-      "id": "PH-S1374",
+      "id": "PH-S1384",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "API gate",
-      "title": "VERIFY_AUDIT_API` + quick `--audit-api"
+      "summary": "gate + RUN_LOCAL",
+      "title": "VERIFY_AUDIT_ADMIN_OPS` + quick `--audit-admin-ops"
     },
     {
       "category": "open",
-      "id": "PH-S1375",
+      "id": "PH-S1385",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "export shape + rust_ratio fields",
-      "title": "Stand smoke + `poolai-loc-audit --audit-api"
+      "summary": "export shape + `rust_ratio.json` fields",
+      "title": "Stand smoke + `poolai-loc-audit --audit-admin-ops"
     },
     {
       "category": "open",
-      "id": "PH-S1376",
+      "id": "PH-S1386",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "HTTP contract matrix",
-      "title": "Docs `AUDIT_API.md` + canon"
+      "summary": "ops matrix + backlog override",
+      "title": "Docs `AUDIT_ADMIN_OPS.md` + canon sync"
     },
     {
       "category": "open",
+      "id": "PH-S1387",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "--min-ratio 0.95 --advisory",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1388",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "galaxy_horizon_s1379_integration`; HANDOFF/NEXT",
+      "title": "Audit admin/ops band close"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1378",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_horizon_s1369_integration`; HANDOFF/NEXT",
+      "title": "Audit API band close"
+    },
+    {
+      "category": "closed",
       "id": "PH-S1377",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
-      "status": "open",
+      "status": "closed",
       "summary": "drift + `--min-ratio 0.95 --advisory",
       "title": "vision-sync --check + ratio hold"
     },
     {
-      "category": "open",
-      "id": "PH-S1378",
+      "category": "closed",
+      "id": "PH-S1376",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
-      "status": "open",
-      "summary": "galaxy_horizon_s1369_integration`; HANDOFF/NEXT",
-      "title": "Audit API band close"
+      "status": "closed",
+      "summary": "HTTP contract matrix",
+      "title": "Docs `AUDIT_API.md` + canon"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1375",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "export shape + rust_ratio fields",
+      "title": "Stand smoke + `poolai-loc-audit --audit-api"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1374",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "API gate",
+      "title": "VERIFY_AUDIT_API` + quick `--audit-api"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1373",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "missing action/resource → 4xx",
+      "title": "Event field validation fixtures"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1372",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "store schema + path; gap-audit 0",
+      "title": "OpenAPI `AuditStoreWire` + errors"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1371",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "{mode,durable_path,configured}` file/sqlite",
+      "title": "Store-wire status HTTP read"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1370",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "GET query filters + pagination stub",
+      "title": "Audit query HTTP lifecycle"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1369",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "depth enum + HTTP API criteria registry",
+      "title": "audit_api_contracts_depth` ui-core module"
     },
     {
       "category": "closed",
@@ -104,96 +194,6 @@
     {
       "category": "closed",
       "id": "PH-S1367",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--min-ratio 0.95 --advisory",
-      "title": "Ratio hold advisory"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1366",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "drift gate green",
-      "title": "vision-sync --check"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1365",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "docs matrix",
-      "title": "Docs `AUDIT_STORE.md` + canon"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1364",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "rust_ratio.json` fields",
-      "title": "poolai-loc-audit --audit-store"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1363",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "audit_store_band72_export_shape",
-      "title": "Stand smoke export shape band 72"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1362",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "store gate",
-      "title": "VERIFY_AUDIT_STORE` + quick `--audit-store"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1361",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "wire labels + ui-core depth stub",
-      "title": "Audit store wire contracts"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1360",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "POOLAI_AUDIT_DATA_DIR` + `audit_store_wire()` + unit tests",
-      "title": "Audit store wire durable path"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1359",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "depth enum + store criteria registry",
-      "title": "audit_store_depth` ui-core module"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1358",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_horizon_s1349_integration`; HANDOFF/NEXT",
-      "title": "Audit depth band close"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1357",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",

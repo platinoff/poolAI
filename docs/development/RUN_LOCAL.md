@@ -24,7 +24,7 @@ cd S:\rust\poolAI
 .\bin\run-poolai.ps1 stop
 ```
 
-**Last updated:** 2026-07-23 (PH-S1368 band 72 · `--audit-store` · `VERIFY_AUDIT_STORE` · phase C Audit store wire)
+**Last updated:** 2026-07-23 (PH-S1378 band 73 · `--audit-api` · `VERIFY_AUDIT_API` · phase C Audit API contracts)
 
 ### PH-S1011 / PH-S1012: Light compile + quick preset
 
@@ -343,6 +343,7 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `VERIFY_SSO_HORIZON=1` | `verify-dev-stand.sh` → `poolai-loc-audit --sso-horizon` (PH-S1342) |
 | `VERIFY_AUDIT=1` | `verify-dev-stand.sh` → `poolai-loc-audit --audit` (PH-S1352) |
 | `VERIFY_AUDIT_STORE=1` | `verify-dev-stand.sh` → `poolai-loc-audit --audit-store` (PH-S1362) |
+| `VERIFY_AUDIT_API=1` | `verify-dev-stand.sh` → `poolai-loc-audit --audit-api` (PH-S1374) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 ### PH-S1100: Rust migration advisory (band 46)
@@ -890,6 +891,26 @@ VERIFY_AUDIT_STORE=1 bash bin/verify-dev-stand.sh
 | `audit_store_criteria_met_count` | Criteria with marker present in canonical doc path |
 
 Module: [`audit_store_depth.rs`](../../crates/poolai-ui-core/src/audit_store_depth.rs) · tests: `audit_store_wire_integration.rs`, `galaxy_horizon_s1359_integration.rs` · docs: [`AUDIT_STORE.md`](./AUDIT_STORE.md).
+
+### PH-S1375: Audit HTTP API contracts (band 73)
+
+Enterprise phase C audit HTTP API contracts gate — query + store-wire + field fixtures.
+
+```bash
+cargo run --bin poolai-loc-audit -- --audit-api
+cargo run --bin poolai-loc-audit -- --audit-api --advisory --min-ratio 0.95
+
+VERIFY_AUDIT_API=1 bash bin/verify-dev-stand.sh
+/usr/bin/bash bin/run-poolai.sh quick --audit-api
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `audit_api_mode` | `true` when `--audit-api` (PH-S1375) |
+| `audit_api_criteria_total` | Audit API criteria registry size |
+| `audit_api_criteria_met_count` | Criteria with marker present in canonical doc path |
+
+Module: [`audit_api_contracts_depth.rs`](../../crates/poolai-ui-core/src/audit_api_contracts_depth.rs) · tests: `audit_api_contracts_integration.rs`, `galaxy_horizon_s1369_integration.rs` · docs: [`AUDIT_API.md`](./AUDIT_API.md).
 
 Default stand smoke includes **`vision_revision_parity`** (PH-S208, PH-S235): repo `manifest.revision` vs FM §5.12 `Vision rev`, `extensions.active_sprint` vs `manifest.next_sprint`, then `GET /docs/vision/manifest.json` with `X-PoolAI-Vision-Revision` header vs JSON body.
 

@@ -2690,11 +2690,23 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_development_AUDIT_STORE_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_audit_api_contracts_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUDIT_API_md"
     }
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S1368",
+  "last_sprint_closed": "PH-S1378",
   "layers": [
     {
       "id": "L0",
@@ -2727,7 +2739,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1369",
+  "next_sprint": "PH-S1379",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -10772,9 +10784,37 @@
       "label": "galaxy_horizon_s1359_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s1359_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_audit_api_contracts_depth_rs",
+      "label": "audit_api_contracts_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/audit_api_contracts_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUDIT_API_md",
+      "label": "AUDIT_API.md",
+      "layer": "L1",
+      "path": "docs/development/AUDIT_API.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_audit_api_contracts_integration_rs",
+      "label": "audit_api_contracts_integration.rs",
+      "layer": "L3",
+      "path": "tests/audit_api_contracts_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1369_integration_rs",
+      "label": "galaxy_horizon_s1369_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1369_integration.rs"
     }
   ],
-  "revision": 373,
+  "revision": 375,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -22507,91 +22547,181 @@
       "acceptance": "depth enum + HTTP API criteria registry",
       "deps": "audit_api_contracts_depth.rs",
       "id": "PH-S1369",
-      "open": true,
+      "open": false,
       "row": 1304,
-      "status": "open",
+      "status": "closed",
       "title": "audit_api_contracts_depth` ui-core module"
     },
     {
       "acceptance": "GET query filters + pagination stub",
       "deps": "audit_api_contracts_integration",
       "id": "PH-S1370",
-      "open": true,
+      "open": false,
       "row": 1305,
-      "status": "open",
+      "status": "closed",
       "title": "Audit query HTTP lifecycle"
     },
     {
       "acceptance": "{mode,durable_path,configured}` file/sqlite",
       "deps": "GET /audit/store",
       "id": "PH-S1371",
-      "open": true,
+      "open": false,
       "row": 1306,
-      "status": "open",
+      "status": "closed",
       "title": "Store-wire status HTTP read"
     },
     {
       "acceptance": "store schema + path; gap-audit 0",
       "deps": "docs/openapi.yaml",
       "id": "PH-S1372",
-      "open": true,
+      "open": false,
       "row": 1307,
-      "status": "open",
+      "status": "closed",
       "title": "OpenAPI `AuditStoreWire` + errors"
     },
     {
       "acceptance": "missing action/resource → 4xx",
       "deps": "same suite",
       "id": "PH-S1373",
-      "open": true,
+      "open": false,
       "row": 1308,
-      "status": "open",
+      "status": "closed",
       "title": "Event field validation fixtures"
     },
     {
       "acceptance": "API gate",
       "deps": "verify-dev-stand",
       "id": "PH-S1374",
-      "open": true,
+      "open": false,
       "row": 1309,
-      "status": "open",
+      "status": "closed",
       "title": "VERIFY_AUDIT_API` + quick `--audit-api"
     },
     {
       "acceptance": "export shape + rust_ratio fields",
       "deps": "stand smoke / loc-audit",
       "id": "PH-S1375",
-      "open": true,
+      "open": false,
       "row": 1310,
-      "status": "open",
+      "status": "closed",
       "title": "Stand smoke + `poolai-loc-audit --audit-api"
     },
     {
       "acceptance": "HTTP contract matrix",
       "deps": "RUN_LOCAL/INDEX/HANDOFF/NEXT",
       "id": "PH-S1376",
-      "open": true,
+      "open": false,
       "row": 1311,
-      "status": "open",
+      "status": "closed",
       "title": "Docs `AUDIT_API.md` + canon"
     },
     {
       "acceptance": "drift + `--min-ratio 0.95 --advisory",
       "deps": "vision / loc-audit",
       "id": "PH-S1377",
-      "open": true,
+      "open": false,
       "row": 1312,
-      "status": "open",
+      "status": "closed",
       "title": "vision-sync --check + ratio hold"
     },
     {
       "acceptance": "galaxy_horizon_s1369_integration`; HANDOFF/NEXT",
       "deps": "tests/docs",
       "id": "PH-S1378",
-      "open": true,
+      "open": false,
       "row": 1313,
-      "status": "open",
+      "status": "closed",
       "title": "Audit API band close"
+    },
+    {
+      "acceptance": "depth enum + admin/ops criteria registry",
+      "deps": "audit_admin_ops_depth.rs",
+      "id": "PH-S1379",
+      "open": true,
+      "row": 1314,
+      "status": "open",
+      "title": "audit_admin_ops_depth` ui-core module"
+    },
+    {
+      "acceptance": "#audit-store-badge` ← `GET /audit/store",
+      "deps": "src/ui/admin` audit",
+      "id": "PH-S1380",
+      "open": true,
+      "row": 1315,
+      "status": "open",
+      "title": "Admin audit store-wire status strip"
+    },
+    {
+      "acceptance": "refresh events from HTTP query contracts",
+      "deps": "same",
+      "id": "PH-S1381",
+      "open": true,
+      "row": 1316,
+      "status": "open",
+      "title": "Admin audit query ops glue"
+    },
+    {
+      "acceptance": "store/query markers",
+      "deps": "audit_admin_ops_integration.rs",
+      "id": "PH-S1382",
+      "open": true,
+      "row": 1317,
+      "status": "open",
+      "title": "Admin audit ops HTML contracts"
+    },
+    {
+      "acceptance": "EN/UK patch keys",
+      "deps": "i18n.rs` ADMIN_AUDIT_*",
+      "id": "PH-S1383",
+      "open": true,
+      "row": 1318,
+      "status": "open",
+      "title": "i18n Audit admin ops keys"
+    },
+    {
+      "acceptance": "gate + RUN_LOCAL",
+      "deps": "bin/verify-dev-stand.sh",
+      "id": "PH-S1384",
+      "open": true,
+      "row": 1319,
+      "status": "open",
+      "title": "VERIFY_AUDIT_ADMIN_OPS` + quick `--audit-admin-ops"
+    },
+    {
+      "acceptance": "export shape + `rust_ratio.json` fields",
+      "deps": "stand smoke / loc-audit",
+      "id": "PH-S1385",
+      "open": true,
+      "row": 1320,
+      "status": "open",
+      "title": "Stand smoke + `poolai-loc-audit --audit-admin-ops"
+    },
+    {
+      "acceptance": "ops matrix + backlog override",
+      "deps": "RUN_LOCAL/INDEX/HANDOFF/NEXT",
+      "id": "PH-S1386",
+      "open": true,
+      "row": 1321,
+      "status": "open",
+      "title": "Docs `AUDIT_ADMIN_OPS.md` + canon sync"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory",
+      "deps": "loc-audit",
+      "id": "PH-S1387",
+      "open": true,
+      "row": 1322,
+      "status": "open",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1379_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1388",
+      "open": true,
+      "row": 1323,
+      "status": "open",
+      "title": "Audit admin/ops band close"
     }
   ],
   "sprint_queue_open_count": 10,

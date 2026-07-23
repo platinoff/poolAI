@@ -82,6 +82,7 @@ Options (quick):
   --sso-horizon   After health wait, loc-audit --sso-horizon (PH-S1342)
   --audit         After health wait, loc-audit --audit (PH-S1352)
   --audit-store   After health wait, loc-audit --audit-store (PH-S1362)
+  --audit-api     After health wait, loc-audit --audit-api (PH-S1374)
   --skip-build    Skip cargo build
   --port N        HTTP port (default 8080)
 
@@ -287,6 +288,7 @@ cmd_quick() {
   local sso_horizon=0
   local audit=0
   local audit_store=0
+  local audit_api=0
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --skip-build) SKIP_BUILD=1; shift ;;
@@ -317,6 +319,7 @@ cmd_quick() {
       --sso-ratio-advisory) sso_ratio_advisory=1; shift ;;
       --sso-horizon) sso_horizon=1; shift ;;
       --audit-store) audit_store=1; shift ;;
+      --audit-api) audit_api=1; shift ;;
       --audit) audit=1; shift ;;
       --port) PORT="$2"; shift 2 ;;
       *) echo "Unknown option: $1"; usage; exit 1 ;;
@@ -445,6 +448,10 @@ cmd_quick() {
   if [[ "$audit_store" == "1" ]]; then
     echo "Running poolai-loc-audit --audit-store (PH-S1362)..."
     cargo run --quiet --bin poolai-loc-audit -- --audit-store
+  fi
+  if [[ "$audit_api" == "1" ]]; then
+    echo "Running poolai-loc-audit --audit-api (PH-S1374)..."
+    cargo run --quiet --bin poolai-loc-audit -- --audit-api
   fi
 }
 

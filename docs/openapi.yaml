@@ -4626,6 +4626,96 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /audit/events/validate:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    post:
+      tags:
+        - EnterpriseAudit
+      summary: Validate audit event fields (fixture)
+      description: |
+        Band-73 field validation fixture (PH-S1373). Does not persist events.
+        Missing/blank `action` → `AUDIT_MISSING_ACTION`; missing `resource_type` → `AUDIT_MISSING_RESOURCE`.
+      operationId: validateAuditEventFields
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                resource_type:
+                  type: string
+                result:
+                  type: string
+                level:
+                  type: string
+                user_id:
+                  type: string
+                tenant_id:
+                  type: string
+                resource_id:
+                  type: string
+      responses:
+        '200':
+          description: Fields valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valid:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Missing action or resource_type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /audit/store:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseAudit
+      summary: Audit store wire status
+      description: |
+        Returns the band-72 durable-path wire snapshot (`mode`, `durable_path`, `configured`).
+        Unauthenticated read for ops / admin glue (PH-S1371/S1372).
+      operationId: getAuditStoreWire
+      responses:
+        '200':
+          description: Audit store wire snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditStoreWire'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Subsystem unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /auth/github:
     servers:
       - url: http://localhost:8080/api/enterprise
@@ -9312,6 +9402,24 @@ components:
         mode:
           type: string
           description: "`memory` or `sqlite`"
+        durable_path:
+          type: string
+          nullable: true
+          description: Resolved sqlite file path when configured
+        configured:
+          type: boolean
+          description: True when sqlite mode has a durable path
+
+    AuditStoreWire:
+      type: object
+      description: Band-72/73 audit store wire snapshot exposed over HTTP (PH-S1371/S1372)
+      required:
+        - mode
+        - configured
+      properties:
+        mode:
+          type: string
+          description: "`file` or `sqlite`"
         durable_path:
           type: string
           nullable: true

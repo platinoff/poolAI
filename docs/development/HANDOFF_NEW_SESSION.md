@@ -1,14 +1,31 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-23 (band 72 ✅ · band 73 **§5.12 = 10 open** · Cursor **3.12.30**)
+**Оновлено:** 2026-07-23 (band 73 ✅ · band 74 **§5.12 = 10 open** · Cursor **3.12.30**)
 
-**Наступна сесія:** **`абракадабра`** — drain band 73 (C Audit · API contracts) з FM **§5.54**.
+**Наступна сесія:** **`абракадабра`** — drain band 74 (C Audit · admin/ops glue) з FM **§5.55**.
 
 **Cursor / toolchain (service):** local desktop **3.12.30** · public changelog latest numbered IDE **3.11** · research [`CURSOR_UPDATE_RESEARCH_2026-07-22.md`](./CURSOR_UPDATE_RESEARCH_2026-07-22.md) · FM **§5.16**. Vision: `poolai-vision-sync` мержить enterprise `queue — band` → Sprint queue + Feed = останні закриті PH-S*.
 
-**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **910** спринтів до FM **§5.18** @ PH-S2278 (enterprise §5.17 @ S2148 + extension Memory/Job/Solana/Wasm/close).
+**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **900** спринтів до FM **§5.18** @ PH-S2278 (enterprise §5.17 @ S2148 + extension Memory/Job/Solana/Wasm/close).
 
-## Band 73 — Audit API contracts (PH-S1369…S1378, **ACTIVE**)
+## Band 74 — Audit admin/ops glue (PH-S1379…S1388, **ACTIVE**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1379** | `audit_admin_ops_depth` ui-core module |
+| **PH-S1380** | Admin audit store-wire status strip |
+| **PH-S1381** | Admin audit query ops glue |
+| **PH-S1382** | Admin audit ops HTML contracts |
+| **PH-S1383** | i18n Audit admin ops keys |
+| **PH-S1384** | `VERIFY_AUDIT_ADMIN_OPS` + quick `--audit-admin-ops` |
+| **PH-S1385** | Stand smoke + loc-audit `--audit-admin-ops` |
+| **PH-S1386** | `AUDIT_ADMIN_OPS.md` + canon |
+| **PH-S1387** | Ratio hold advisory |
+| **PH-S1388** | Band close |
+
+**§5.12:** **10** відкритих. **Vision:** rev **375**. **Pending completion:** **900** (→ PH-S2278).
+
+## Band 73 — Audit API contracts (PH-S1369…S1378, ✅)
 
 | Sprint | Фокус |
 |--------|--------|
@@ -22,8 +39,6 @@
 | **PH-S1376** | `AUDIT_API.md` + canon |
 | **PH-S1377** | vision-sync + ratio hold |
 | **PH-S1378** | Band close |
-
-**§5.12:** **10** відкритих. **Vision:** rev **373**. **Pending completion:** **910** (→ PH-S2278).
 
 ## Band 72 — Audit store wire (PH-S1359…S1368, ✅)
 

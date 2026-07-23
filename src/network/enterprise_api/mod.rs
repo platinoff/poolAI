@@ -77,7 +77,9 @@ pub fn create_enterprise_api_routes() -> Router<ApiContext> {
         .route("/tenants/{id}/usage", get(tenant_usage_handler))
         .route("/tenants/{id}/quota", post(tenant_quota_check_handler))
         // Audit logs
+        .route("/audit/store", get(audit_store_wire_handler))
         .route("/audit/events", get(audit_events_query_handler))
+        .route("/audit/events/validate", post(audit_event_validate_handler))
         // Monitoring
         .route("/monitoring/alerts", get(monitoring_alerts_handler))
         .route(

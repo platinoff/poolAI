@@ -1,7 +1,9 @@
-//! Enterprise API: audit log query.
+//! Enterprise API: audit log query + store wire + field validation fixtures.
 
 use crate::core::error::ErrorContext;
 use crate::core::state::ApiContext;
+use crate::enterprise;
+use crate::enterprise::audit::{validate_audit_event_fields, AuditEvent, AuditLevel};
 use crate::services::enterprise_service::{
     AuditEventsQuery, EnterpriseAuditError, EnterpriseService,
 };
@@ -9,9 +11,10 @@ use axum::extract::{Query, State};
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::Json;
+use serde::Deserialize;
 
 use super::enterprise_json_err;
-use serde::Deserialize;
+
 #[derive(Deserialize)]
 #[allow(dead_code)]
 pub(super) struct AuditQueryParams {
@@ -24,6 +27,30 @@ pub(super) struct AuditQueryParams {
     start_time: Option<String>,
     end_time: Option<String>,
     limit: Option<usize>,
+}
+
+/// GET /audit/store — band-72 wire snapshot over HTTP (PH-S1371).
+pub(super) async fn audit_store_wire_handler() -> impl IntoResponse {
+    Json(enterprise::audit::audit_store_wire())
+}
+
+/// Body for POST /audit/events/validate — field fixtures without durable write (PH-S1373).
+#[derive(Deserialize)]
+pub(super) struct AuditEventValidateRequest {
+    #[serde(default)]
+    action: Option<String>,
+    #[serde(default)]
+    resource_type: Option<String>,
+    #[serde(default)]
+    result: Option<String>,
+    #[serde(default)]
+    level: Option<String>,
+    #[serde(default)]
+    user_id: Option<String>,
+    #[serde(default)]
+    tenant_id: Option<String>,
+    #[serde(default)]
+    resource_id: Option<String>,
 }
 
 pub(super) async fn audit_events_query_handler(
@@ -59,5 +86,62 @@ pub(super) async fn audit_events_query_handler(
             StatusCode::INTERNAL_SERVER_ERROR,
         )
         .into_response(),
+    }
+}
+
+/// POST /audit/events/validate — missing action/resource → 400 fixtures (PH-S1373).
+pub(super) async fn audit_event_validate_handler(
+    Json(body): Json<AuditEventValidateRequest>,
+) -> impl IntoResponse {
+    let level_raw = body.level.as_deref().unwrap_or("INFO").to_ascii_uppercase();
+    let level = match level_raw.as_str() {
+        "WARNING" => AuditLevel::Warning,
+        "ERROR" => AuditLevel::Error,
+        "CRITICAL" => AuditLevel::Critical,
+        _ => AuditLevel::Info,
+    };
+    let mut event = AuditEvent::new(
+        level,
+        body.action.unwrap_or_default(),
+        body.resource_type.unwrap_or_default(),
+        body.result.unwrap_or_else(|| "success".into()),
+    );
+    if let Some(uid) = body.user_id {
+        event = event.with_user_id(uid);
+    }
+    if let Some(tid) = body.tenant_id {
+        event = event.with_tenant_id(tid);
+    }
+    if let Some(rid) = body.resource_id {
+        event = event.with_resource_id(rid);
+    }
+
+    match validate_audit_event_fields(&event) {
+        Ok(()) => (
+            StatusCode::OK,
+            Json(serde_json::json!({
+                "valid": true,
+                "message": "Audit event fields ok"
+            })),
+        )
+            .into_response(),
+        Err(e) => {
+            let msg = e.to_string();
+            let code = if msg.contains("missing action") {
+                "AUDIT_MISSING_ACTION"
+            } else if msg.contains("missing resource_type") {
+                "AUDIT_MISSING_RESOURCE"
+            } else {
+                "AUDIT_VALIDATION_FAILED"
+            };
+            enterprise_json_err(
+                code,
+                msg,
+                ErrorContext::new("audit_event_validate")
+                    .with_hint("Set non-empty action and resource_type."),
+                StatusCode::BAD_REQUEST,
+            )
+            .into_response()
+        }
     }
 }

@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 170465,
-  "non_rust_product_loc": 9245,
-  "product_loc_total": 179710,
-  "rust_ratio": 0.9485560069000055,
-  "rust_ratio_pct": 94.85560069000056,
+  "rust_loc": 170942,
+  "non_rust_product_loc": 9262,
+  "product_loc_total": 180204,
+  "rust_ratio": 0.9486026947237575,
+  "rust_ratio_pct": 94.86026947237575,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -106,9 +106,12 @@
   "audit_mode": false,
   "audit_criteria_total": 8,
   "audit_criteria_met_count": 0,
-  "audit_store_mode": true,
+  "audit_store_mode": false,
   "audit_store_criteria_total": 7,
-  "audit_store_criteria_met_count": 7,
+  "audit_store_criteria_met_count": 0,
+  "audit_api_mode": true,
+  "audit_api_criteria_total": 9,
+  "audit_api_criteria_met_count": 9,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -120,23 +123,23 @@
     },
     "ops_shell": {
       "files": 39,
-      "loc": 3520
+      "loc": 3537
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 90,
-      "loc": 19214
+      "files": 91,
+      "loc": 19390
     },
     "rust_src": {
       "files": 300,
-      "loc": 111623
+      "loc": 111794
     },
     "rust_tests": {
-      "files": 287,
-      "loc": 39020
+      "files": 289,
+      "loc": 39150
     },
     "ui_css": {
       "files": 2,
@@ -167,7 +170,7 @@
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
     "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
-    "PH-S1364: audit_store_mode — durable path wire stub (POOLAI_AUDIT_DATA_DIR)",
-    "PH-S1368: band 72 audit store wire — criteria met vs registry"
+    "PH-S1375: audit_api_mode — query/store HTTP contracts + field fixtures",
+    "PH-S1378: band 73 audit API contracts — criteria met vs registry"
   ]
 }
