@@ -74,6 +74,7 @@ Options (quick):
   --sso-store       After health wait, loc-audit --sso-store (PH-S1262)
   --sso-api         After health wait, loc-audit --sso-api (PH-S1275)
   --sso-admin-ops   After health wait, loc-audit --sso-admin-ops (PH-S1284)
+  --sso-stand-smoke After health wait, live stand-smoke + loc-audit --sso-stand-smoke (PH-S1294)
   --skip-build    Skip cargo build
   --port N        HTTP port (default 8080)
 
@@ -271,6 +272,7 @@ cmd_quick() {
   local sso_store=0
   local sso_api=0
   local sso_admin_ops=0
+  local sso_stand_smoke=0
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --skip-build) SKIP_BUILD=1; shift ;;
@@ -294,6 +296,7 @@ cmd_quick() {
       --sso-store) sso_store=1; shift ;;
       --sso-api) sso_api=1; shift ;;
       --sso-admin-ops) sso_admin_ops=1; shift ;;
+      --sso-stand-smoke) sso_stand_smoke=1; shift ;;
       --port) PORT="$2"; shift 2 ;;
       *) echo "Unknown option: $1"; usage; exit 1 ;;
     esac
@@ -386,6 +389,13 @@ cmd_quick() {
   if [[ "$sso_admin_ops" == "1" ]]; then
     echo "Running poolai-loc-audit --sso-admin-ops (PH-S1284)..."
     cargo run --quiet --bin poolai-loc-audit -- --sso-admin-ops
+  fi
+  if [[ "$sso_stand_smoke" == "1" ]]; then
+    export POOLAI_BASE_URL="http://127.0.0.1:${PORT}"
+    echo "Running poolai-http-stand-smoke --sso-stand-smoke (PH-S1295)..."
+    cargo run --quiet --bin poolai-http-stand-smoke -- --sso-stand-smoke
+    echo "Running poolai-loc-audit --sso-stand-smoke (PH-S1294)..."
+    cargo run --quiet --bin poolai-loc-audit -- --sso-stand-smoke
   fi
 }
 

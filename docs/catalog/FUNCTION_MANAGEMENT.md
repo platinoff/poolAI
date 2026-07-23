@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-07-22 (project completion path · band 64 ✅ · band 65 **§5.12 open** · Cursor **3.12.30**)
+**Оновлено:** 2026-07-22 (project completion path · band 65 ✅ · band 66 horizon · Cursor **3.12.30**)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -1221,24 +1221,41 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **10** (band 64 ✅). **Master horizon:** PH-S1289…S1298 (band 65). **Completion pending:** PH-S1289…S2278 = **990** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **356**. **Наступна сесія:** **`абракадабра`** — drain band 65.
+**Відкритих у §5.12:** **10** (band 65 ✅ · band 66 open). **Master horizon:** PH-S1299…S1308 (band 66). **Completion pending:** PH-S1299…S2278 = **980** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **358**. **Наступна сесія:** **`абракадабра`** — drain band 66.
 
-### 5.46 SSO stand smoke queue — band 65 (PH-S1289…S1298, 2026-07-22) · **ACTIVE**
+### 5.47 SSO loc-audit aggregate queue — band 66 (PH-S1299…S1308, 2026-07-22) · **ACTIVE**
+
+**Джерело:** project completion / enterprise phase B — SSO loc-audit aggregate (bands 61–65 slices). Mirror band 56 [`TENANT_LOC_AUDIT.md`](../development/TENANT_LOC_AUDIT.md). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1234 | **PH-S1299** | `sso_loc_audit_depth` ui-core module | `sso_loc_audit_depth.rs` | depth enum + aggregate criteria registry | **[ ]** |
+| 1235 | **PH-S1300** | Slice aggregate stub | `SSO_LOC_AUDIT_SLICES` | `--sso`…`--sso-stand-smoke` | **[ ]** |
+| 1236 | **PH-S1301** | Criteria contracts | `sso_loc_audit_integration` | markers + registry | **[ ]** |
+| 1237 | **PH-S1302** | `VERIFY_SSO_LOC_AUDIT` + quick `--sso-loc-audit` | verify-dev-stand | aggregate gate | **[ ]** |
+| 1238 | **PH-S1303** | Stand smoke export shape band 66 | stand smoke | unit export shape | **[ ]** |
+| 1239 | **PH-S1304** | `poolai-loc-audit --sso-loc-audit` | loc-audit | `rust_ratio.json` fields | **[ ]** |
+| 1240 | **PH-S1305** | Docs `SSO_LOC_AUDIT.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | aggregate matrix | **[ ]** |
+| 1241 | **PH-S1306** | vision-sync --check | vision | drift gate green | **[ ]** |
+| 1242 | **PH-S1307** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **[ ]** |
+| 1243 | **PH-S1308** | SSO loc-audit band close | tests/docs | `galaxy_horizon_s1299_integration`; HANDOFF/NEXT | **[ ]** |
+
+### 5.46 SSO stand smoke queue — band 65 (PH-S1289…S1298, 2026-07-22) · **✅**
 
 **Джерело:** project completion / enterprise phase B — SSO live stand smoke (store + CRUD + callbacks). Mirror band 55 [`TENANT_STAND_SMOKE.md`](../development/TENANT_STAND_SMOKE.md). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
-| 1224 | **PH-S1289** | `sso_stand_smoke_depth` ui-core module | `sso_stand_smoke_depth.rs` | depth enum + stand-smoke criteria registry | **[ ]** |
-| 1225 | **PH-S1290** | Live store wire smoke | `GET /security/sso/store` | shape + integration | **[ ]** |
-| 1226 | **PH-S1291** | Live OAuth2/SAML CRUD smoke | list→create→get→delete | providers lifecycle | **[ ]** |
-| 1227 | **PH-S1292** | Live callback fixture smoke | OAuth/SAML fixtures | no live IdP | **[ ]** |
-| 1228 | **PH-S1293** | CLI `--sso-stand-smoke` | stand smoke bin | live suite + export shape | **[ ]** |
-| 1229 | **PH-S1294** | `poolai-loc-audit --sso-stand-smoke` | loc-audit | `rust_ratio.json` fields | **[ ]** |
-| 1230 | **PH-S1295** | `VERIFY_SSO_STAND_SMOKE` | verify-dev-stand | live + loc-audit verify | **[ ]** |
-| 1231 | **PH-S1296** | Docs `SSO_STAND_SMOKE.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | stand matrix | **[ ]** |
-| 1232 | **PH-S1297** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **[ ]** |
-| 1233 | **PH-S1298** | SSO stand smoke band close | tests/docs | `galaxy_horizon_s1289_integration`; HANDOFF/NEXT | **[ ]** |
+| 1224 | **PH-S1289** | `sso_stand_smoke_depth` ui-core module | `sso_stand_smoke_depth.rs` | depth enum + stand-smoke criteria registry | **✅** |
+| 1225 | **PH-S1290** | Live store wire smoke | `GET /security/sso/store` | shape + integration | **✅** |
+| 1226 | **PH-S1291** | Live OAuth2/SAML CRUD smoke | list→create→get→delete | providers lifecycle | **✅** |
+| 1227 | **PH-S1292** | Live callback fixture smoke | OAuth/SAML fixtures | no live IdP | **✅** |
+| 1228 | **PH-S1293** | CLI `--sso-stand-smoke` | stand smoke bin | live suite + export shape | **✅** |
+| 1229 | **PH-S1294** | `poolai-loc-audit --sso-stand-smoke` | loc-audit | `rust_ratio.json` fields | **✅** |
+| 1230 | **PH-S1295** | `VERIFY_SSO_STAND_SMOKE` | verify-dev-stand | live + loc-audit verify | **✅** |
+| 1231 | **PH-S1296** | Docs `SSO_STAND_SMOKE.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | stand matrix | **✅** |
+| 1232 | **PH-S1297** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **✅** |
+| 1233 | **PH-S1298** | SSO stand smoke band close | tests/docs | `galaxy_horizon_s1289_integration`; HANDOFF/NEXT | **✅** |
 
 ### 5.45 SSO admin/ops glue queue — band 64 (PH-S1279…S1288, 2026-07-22) · **✅**
 

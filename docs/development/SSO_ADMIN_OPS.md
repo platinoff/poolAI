@@ -15,7 +15,7 @@ already verified as HTTP contracts in band 63 ([`SSO_API.md`](./SSO_API.md)).
 | Verify / quick | `VERIFY_SSO_ADMIN_OPS` / `--sso-admin-ops` | loc-audit gate |
 
 **Boundary:** band 64 = admin/ops glue + verify/loc-audit; live IdP callback flows
-remain fixture-only (band 63). Next: band 65 SSO stand smoke.
+remain fixture-only (band 63). Live stand smoke: [`SSO_STAND_SMOKE.md`](./SSO_STAND_SMOKE.md) (band 65).
 
 ## Loc-audit / verify hooks
 

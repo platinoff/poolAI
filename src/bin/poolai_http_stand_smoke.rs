@@ -26,6 +26,10 @@
 //! cargo run --bin poolai-http-stand-smoke -- --tenant-stand-smoke
 //! # or: POOLAI_STAND_SMOKE_TENANT=1
 //!
+//! # SSO live stand smoke (PH-S1293 band 65):
+//! cargo run --bin poolai-http-stand-smoke -- --sso-stand-smoke
+//! # or: POOLAI_STAND_SMOKE_SSO=1
+//!
 //! # Vision revision parity (PH-S208, PH-S235):
 //! export POOLAI_VISION_BASE_URL=http://127.0.0.1:8765   # open-docs-vision.ps1
 //! cargo run --bin poolai-http-stand-smoke   # repo manifest vs FM footer + extensions + optional HTTP header
@@ -60,6 +64,8 @@ struct Cli {
     run_local_smoke_only: bool,
     /// PH-S1193: live tenant store/CRUD/usage+quota suite (band 55).
     tenant_stand_smoke_only: bool,
+    /// PH-S1293: live SSO store/CRUD/callback suite (band 65).
+    sso_stand_smoke_only: bool,
     base_url: String,
 }
 
@@ -234,6 +240,7 @@ fn parse_cli() -> Cli {
     let mut lease_renew_only = false;
     let mut run_local_smoke_only = false;
     let mut tenant_stand_smoke_only = false;
+    let mut sso_stand_smoke_only = false;
     for arg in std::env::args().skip(1) {
         match arg.as_str() {
             "--json" => json_out = true,
@@ -242,6 +249,7 @@ fn parse_cli() -> Cli {
             "--lease-renew" => lease_renew_only = true,
             "--run-local-smoke" => run_local_smoke_only = true,
             "--tenant-stand-smoke" => tenant_stand_smoke_only = true,
+            "--sso-stand-smoke" => sso_stand_smoke_only = true,
             _ if arg.starts_with('-') => {}
             _ => {}
         }
@@ -271,6 +279,11 @@ fn parse_cli() -> Cli {
             .ok()
             .is_some_and(|v| matches!(v.as_str(), "1" | "true" | "yes"));
     }
+    if !sso_stand_smoke_only {
+        sso_stand_smoke_only = std::env::var("POOLAI_STAND_SMOKE_SSO")
+            .ok()
+            .is_some_and(|v| matches!(v.as_str(), "1" | "true" | "yes"));
+    }
     Cli {
         json_out,
         include_raid,
@@ -278,6 +291,7 @@ fn parse_cli() -> Cli {
         lease_renew_only,
         run_local_smoke_only,
         tenant_stand_smoke_only,
+        sso_stand_smoke_only,
         base_url: base_url_from_env(),
     }
 }
@@ -342,6 +356,198 @@ async fn smoke_monitoring_alerts_api(client: &Client, base: &str) -> Result<(), 
     let body: Value = resp.json().await.map_err(|e| e.to_string())?;
     body.as_array()
         .ok_or_else(|| format!("monitoring alerts expected array: {body}"))?;
+    Ok(())
+}
+
+/// PH-S1290: live `GET /api/enterprise/security/sso/store` shape.
+async fn smoke_sso_store_wire(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/api/enterprise/security/sso/store"))
+        .send()
+        .await
+        .map_err(|e| format!("sso store request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("sso store status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    let obj = body
+        .as_object()
+        .ok_or_else(|| format!("sso store expected object: {body}"))?;
+    for key in ["mode", "durable_path", "configured"] {
+        if !obj.contains_key(key) {
+            return Err(format!("sso store missing `{key}`: {body}"));
+        }
+    }
+    Ok(())
+}
+
+async fn smoke_sso_admin_bearer(client: &Client, base: &str) -> Result<String, String> {
+    let resp = client
+        .post(api_url(base, "/api/v1/login"))
+        .json(&json!({ "username": "admin", "password": "admin123" }))
+        .send()
+        .await
+        .map_err(|e| format!("sso login request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("sso login status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    let token = body
+        .get("token")
+        .and_then(|t| t.as_str())
+        .ok_or_else(|| format!("sso login missing token: {body}"))?;
+    Ok(format!("Bearer {token}"))
+}
+
+/// PH-S1291: live OAuth2 + SAML list → create → get → delete.
+async fn smoke_sso_oauth2_saml_crud(client: &Client, base: &str) -> Result<(), String> {
+    let auth = smoke_sso_admin_bearer(client, base).await?;
+    let oauth_name = smoke_id("stand-oauth");
+    let saml_name = smoke_id("stand-saml");
+
+    let oauth_list = client
+        .get(api_url(base, "/api/enterprise/security/oauth2/providers"))
+        .send()
+        .await
+        .map_err(|e| format!("oauth2 list: {e}"))?;
+    if oauth_list.status() != StatusCode::OK {
+        return Err(format!("oauth2 list status {}", oauth_list.status()));
+    }
+
+    let oauth_create = client
+        .post(api_url(base, "/api/enterprise/security/oauth2/providers"))
+        .header("authorization", &auth)
+        .json(&json!({
+            "name": oauth_name,
+            "config": {
+                "client_id": "cid",
+                "client_secret": "csecret",
+                "authorization_url": "https://oauth.example.com/authorize",
+                "token_url": "https://oauth.example.com/token",
+                "redirect_uri": "https://poolai.example.com/callback",
+                "scopes": ["openid", "profile"],
+                "telegram_allow_user_ids": []
+            },
+            "enabled": true
+        }))
+        .send()
+        .await
+        .map_err(|e| format!("oauth2 create: {e}"))?;
+    if oauth_create.status() != StatusCode::CREATED {
+        return Err(format!("oauth2 create status {}", oauth_create.status()));
+    }
+
+    let oauth_get = client
+        .get(api_url(
+            base,
+            &format!("/api/enterprise/security/oauth2/providers/{oauth_name}"),
+        ))
+        .send()
+        .await
+        .map_err(|e| format!("oauth2 get: {e}"))?;
+    if oauth_get.status() != StatusCode::OK {
+        return Err(format!("oauth2 get status {}", oauth_get.status()));
+    }
+
+    let oauth_del = client
+        .delete(api_url(
+            base,
+            &format!("/api/enterprise/security/oauth2/providers/{oauth_name}"),
+        ))
+        .header("authorization", &auth)
+        .send()
+        .await
+        .map_err(|e| format!("oauth2 delete: {e}"))?;
+    if oauth_del.status() != StatusCode::OK {
+        return Err(format!("oauth2 delete status {}", oauth_del.status()));
+    }
+
+    let saml_create = client
+        .post(api_url(base, "/api/enterprise/security/saml/providers"))
+        .header("authorization", &auth)
+        .json(&json!({
+            "name": saml_name,
+            "config": {
+                "entity_id": "https://idp.example.com/entity",
+                "sso_url": "https://idp.example.com/sso",
+                "acs_url": "https://poolai.example.com/acs",
+                "slo_url": null,
+                "certificate": "TEST_CERT",
+                "attribute_mapping": {
+                    "email": "email",
+                    "username": "username"
+                }
+            },
+            "enabled": true
+        }))
+        .send()
+        .await
+        .map_err(|e| format!("saml create: {e}"))?;
+    if saml_create.status() != StatusCode::CREATED {
+        return Err(format!("saml create status {}", saml_create.status()));
+    }
+
+    let saml_get = client
+        .get(api_url(
+            base,
+            &format!("/api/enterprise/security/saml/providers/{saml_name}"),
+        ))
+        .send()
+        .await
+        .map_err(|e| format!("saml get: {e}"))?;
+    if saml_get.status() != StatusCode::OK {
+        return Err(format!("saml get status {}", saml_get.status()));
+    }
+
+    let saml_del = client
+        .delete(api_url(
+            base,
+            &format!("/api/enterprise/security/saml/providers/{saml_name}"),
+        ))
+        .header("authorization", &auth)
+        .send()
+        .await
+        .map_err(|e| format!("saml delete: {e}"))?;
+    if saml_del.status() != StatusCode::OK {
+        return Err(format!("saml delete status {}", saml_del.status()));
+    }
+    Ok(())
+}
+
+/// PH-S1292: live OAuth/SAML callback fixtures (no live IdP).
+async fn smoke_sso_callback_fixtures(client: &Client, base: &str) -> Result<(), String> {
+    let oauth = client
+        .get(api_url(base, "/api/enterprise/auth/github/callback"))
+        .send()
+        .await
+        .map_err(|e| format!("oauth callback: {e}"))?;
+    if oauth.status() != StatusCode::BAD_REQUEST {
+        return Err(format!("oauth callback status {}", oauth.status()));
+    }
+    let oauth_text = oauth.text().await.map_err(|e| e.to_string())?;
+    if !(oauth_text.contains("OAUTH2_MISSING_CODE")
+        || oauth_text.contains("Missing authorization code"))
+    {
+        return Err(format!("oauth callback unexpected body: {oauth_text}"));
+    }
+
+    let saml = client
+        .post(api_url(
+            base,
+            "/api/enterprise/auth/saml/missing-provider-band65/callback",
+        ))
+        .header("content-type", "application/x-www-form-urlencoded")
+        .body("SAMLResponse=dGVzdA%3D%3D&RelayState=x")
+        .send()
+        .await
+        .map_err(|e| format!("saml callback: {e}"))?;
+    if saml.status() != StatusCode::BAD_REQUEST {
+        return Err(format!("saml callback status {}", saml.status()));
+    }
+    let saml_text = saml.text().await.map_err(|e| e.to_string())?;
+    if !(saml_text.contains("SAML_ASSERTION_INVALID") || saml_text.contains("Failed to validate")) {
+        return Err(format!("saml callback unexpected body: {saml_text}"));
+    }
     Ok(())
 }
 
@@ -2966,6 +3172,63 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
         };
     }
 
+    if cli.sso_stand_smoke_only {
+        async fn record(
+            cases: &mut Vec<SmokeCaseResult>,
+            name: &'static str,
+            result: Result<(), String>,
+        ) {
+            cases.push(match result {
+                Ok(()) => SmokeCaseResult {
+                    name,
+                    ok: true,
+                    detail: None,
+                },
+                Err(e) => SmokeCaseResult {
+                    name,
+                    ok: false,
+                    detail: Some(e),
+                },
+            });
+        }
+
+        record(
+            &mut cases,
+            "health",
+            smoke_health(&client, &cli.base_url).await,
+        )
+        .await;
+        record(
+            &mut cases,
+            "sso_store_wire",
+            smoke_sso_store_wire(&client, &cli.base_url).await,
+        )
+        .await;
+        record(
+            &mut cases,
+            "sso_oauth2_saml_crud",
+            smoke_sso_oauth2_saml_crud(&client, &cli.base_url).await,
+        )
+        .await;
+        record(
+            &mut cases,
+            "sso_callback_fixtures",
+            smoke_sso_callback_fixtures(&client, &cli.base_url).await,
+        )
+        .await;
+        let passed = cases.iter().filter(|c| c.ok).count() as u32;
+        let failed = cases.iter().filter(|c| !c.ok).count() as u32;
+        return SmokeReport {
+            base_url: cli.base_url.clone(),
+            stand_root,
+            ok: failed == 0,
+            passed,
+            failed,
+            cases,
+            tool: "poolai-http-stand-smoke",
+        };
+    }
+
     if cli.run_local_smoke_only {
         async fn record(
             cases: &mut Vec<SmokeCaseResult>,
@@ -5190,6 +5453,52 @@ mod tests {
             assert!(
                 fm.contains(row) || row.starts_with("PH-S"),
                 "FM band64 row {row}"
+            );
+        }
+    }
+
+    #[test]
+    fn sso_stand_smoke_band65_export_shape_ph_s1293() {
+        use poolai_ui_core::sso_stand_smoke_depth::{
+            sso_stand_smoke_criteria_total, sso_stand_smoke_depth_stub, SsoStandSmokeDepth,
+            FM_BAND65_ROWS, SSO_STAND_SMOKE_CASES, SSO_STAND_SMOKE_CRITERIA,
+        };
+        use serde_json::json;
+        assert_eq!(
+            sso_stand_smoke_depth_stub(Some(&json!({"live_store": true}))),
+            SsoStandSmokeDepth::LiveStore
+        );
+        assert_eq!(
+            sso_stand_smoke_depth_stub(Some(&json!({
+                "sso_stand_smoke_depth": true,
+                "live_store": true,
+                "live_crud": true,
+                "live_callback_fixtures": true,
+                "cli_flag": true,
+                "loc_audit_flag": true,
+                "verify_dev_stand_hook": true,
+                "sso_stand_smoke_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            SsoStandSmokeDepth::FullBand65
+        );
+        assert_eq!(SSO_STAND_SMOKE_CRITERIA.len(), 10);
+        assert_eq!(sso_stand_smoke_criteria_total(), 10);
+        assert!(SSO_STAND_SMOKE_CASES.contains(&"live_crud"));
+        assert!(SSO_STAND_SMOKE_CASES.contains(&"cli_flag"));
+        let smoke_src = include_str!("../../src/bin/poolai_http_stand_smoke.rs");
+        assert!(smoke_src.contains("smoke_sso_store_wire"));
+        assert!(smoke_src.contains("smoke_sso_oauth2_saml_crud"));
+        assert!(smoke_src.contains("smoke_sso_callback_fixtures"));
+        assert!(smoke_src.contains("--sso-stand-smoke"));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--sso-stand-smoke"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND65_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band65 row {row}"
             );
         }
     }

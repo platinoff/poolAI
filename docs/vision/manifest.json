@@ -2594,11 +2594,23 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_development_SSO_ADMIN_OPS_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_sso_stand_smoke_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_SSO_STAND_SMOKE_md"
     }
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S1288",
+  "last_sprint_closed": "PH-S1298",
   "layers": [
     {
       "id": "L0",
@@ -2631,7 +2643,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1289",
+  "next_sprint": "PH-S1299",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -10452,9 +10464,37 @@
       "label": "sso_admin_ops_integration.rs",
       "layer": "L3",
       "path": "tests/sso_admin_ops_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_sso_stand_smoke_depth_rs",
+      "label": "sso_stand_smoke_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/sso_stand_smoke_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_SSO_STAND_SMOKE_md",
+      "label": "SSO_STAND_SMOKE.md",
+      "layer": "L1",
+      "path": "docs/development/SSO_STAND_SMOKE.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1289_integration_rs",
+      "label": "galaxy_horizon_s1289_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1289_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_sso_stand_smoke_integration_rs",
+      "label": "sso_stand_smoke_integration.rs",
+      "layer": "L3",
+      "path": "tests/sso_stand_smoke_integration.rs"
     }
   ],
-  "revision": 356,
+  "revision": 358,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -21467,91 +21507,181 @@
       "acceptance": "depth enum + stand-smoke criteria registry",
       "deps": "sso_stand_smoke_depth.rs",
       "id": "PH-S1289",
-      "open": true,
+      "open": false,
       "row": 1224,
-      "status": "open",
+      "status": "closed",
       "title": "sso_stand_smoke_depth` ui-core module"
     },
     {
       "acceptance": "shape + integration",
       "deps": "GET /security/sso/store",
       "id": "PH-S1290",
-      "open": true,
+      "open": false,
       "row": 1225,
-      "status": "open",
+      "status": "closed",
       "title": "Live store wire smoke"
     },
     {
       "acceptance": "providers lifecycle",
       "deps": "list→create→get→delete",
       "id": "PH-S1291",
-      "open": true,
+      "open": false,
       "row": 1226,
-      "status": "open",
+      "status": "closed",
       "title": "Live OAuth2/SAML CRUD smoke"
     },
     {
       "acceptance": "no live IdP",
       "deps": "OAuth/SAML fixtures",
       "id": "PH-S1292",
-      "open": true,
+      "open": false,
       "row": 1227,
-      "status": "open",
+      "status": "closed",
       "title": "Live callback fixture smoke"
     },
     {
       "acceptance": "live suite + export shape",
       "deps": "stand smoke bin",
       "id": "PH-S1293",
-      "open": true,
+      "open": false,
       "row": 1228,
-      "status": "open",
+      "status": "closed",
       "title": "CLI `--sso-stand-smoke"
     },
     {
       "acceptance": "rust_ratio.json` fields",
       "deps": "loc-audit",
       "id": "PH-S1294",
-      "open": true,
+      "open": false,
       "row": 1229,
-      "status": "open",
+      "status": "closed",
       "title": "poolai-loc-audit --sso-stand-smoke"
     },
     {
       "acceptance": "live + loc-audit verify",
       "deps": "verify-dev-stand",
       "id": "PH-S1295",
-      "open": true,
+      "open": false,
       "row": 1230,
-      "status": "open",
+      "status": "closed",
       "title": "VERIFY_SSO_STAND_SMOKE"
     },
     {
       "acceptance": "stand matrix",
       "deps": "RUN_LOCAL/INDEX/HANDOFF/NEXT",
       "id": "PH-S1296",
-      "open": true,
+      "open": false,
       "row": 1231,
-      "status": "open",
+      "status": "closed",
       "title": "Docs `SSO_STAND_SMOKE.md` + canon"
     },
     {
       "acceptance": "--min-ratio 0.95 --advisory",
       "deps": "loc-audit",
       "id": "PH-S1297",
-      "open": true,
+      "open": false,
       "row": 1232,
-      "status": "open",
+      "status": "closed",
       "title": "Ratio hold advisory"
     },
     {
       "acceptance": "galaxy_horizon_s1289_integration`; HANDOFF/NEXT",
       "deps": "tests/docs",
       "id": "PH-S1298",
-      "open": true,
+      "open": false,
       "row": 1233,
-      "status": "open",
+      "status": "closed",
       "title": "SSO stand smoke band close"
+    },
+    {
+      "acceptance": "depth enum + aggregate criteria registry",
+      "deps": "sso_loc_audit_depth.rs",
+      "id": "PH-S1299",
+      "open": true,
+      "row": 1234,
+      "status": "open",
+      "title": "sso_loc_audit_depth` ui-core module"
+    },
+    {
+      "acceptance": "--sso`…`--sso-stand-smoke",
+      "deps": "SSO_LOC_AUDIT_SLICES",
+      "id": "PH-S1300",
+      "open": true,
+      "row": 1235,
+      "status": "open",
+      "title": "Slice aggregate stub"
+    },
+    {
+      "acceptance": "markers + registry",
+      "deps": "sso_loc_audit_integration",
+      "id": "PH-S1301",
+      "open": true,
+      "row": 1236,
+      "status": "open",
+      "title": "Criteria contracts"
+    },
+    {
+      "acceptance": "aggregate gate",
+      "deps": "verify-dev-stand",
+      "id": "PH-S1302",
+      "open": true,
+      "row": 1237,
+      "status": "open",
+      "title": "VERIFY_SSO_LOC_AUDIT` + quick `--sso-loc-audit"
+    },
+    {
+      "acceptance": "unit export shape",
+      "deps": "stand smoke",
+      "id": "PH-S1303",
+      "open": true,
+      "row": 1238,
+      "status": "open",
+      "title": "Stand smoke export shape band 66"
+    },
+    {
+      "acceptance": "rust_ratio.json` fields",
+      "deps": "loc-audit",
+      "id": "PH-S1304",
+      "open": true,
+      "row": 1239,
+      "status": "open",
+      "title": "poolai-loc-audit --sso-loc-audit"
+    },
+    {
+      "acceptance": "aggregate matrix",
+      "deps": "RUN_LOCAL/INDEX/HANDOFF/NEXT",
+      "id": "PH-S1305",
+      "open": true,
+      "row": 1240,
+      "status": "open",
+      "title": "Docs `SSO_LOC_AUDIT.md` + canon"
+    },
+    {
+      "acceptance": "drift gate green",
+      "deps": "vision",
+      "id": "PH-S1306",
+      "open": true,
+      "row": 1241,
+      "status": "open",
+      "title": "vision-sync --check"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory",
+      "deps": "loc-audit",
+      "id": "PH-S1307",
+      "open": true,
+      "row": 1242,
+      "status": "open",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1299_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1308",
+      "open": true,
+      "row": 1243,
+      "status": "open",
+      "title": "SSO loc-audit band close"
     }
   ],
   "sprint_queue_open_count": 10,

@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 166242,
-  "non_rust_product_loc": 8979,
-  "product_loc_total": 175221,
-  "rust_ratio": 0.9487561422432242,
-  "rust_ratio_pct": 94.87561422432242,
+  "rust_loc": 166920,
+  "non_rust_product_loc": 9126,
+  "product_loc_total": 176046,
+  "rust_ratio": 0.9481612760301285,
+  "rust_ratio_pct": 94.81612760301284,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -82,9 +82,12 @@
   "sso_api_mode": false,
   "sso_api_criteria_total": 10,
   "sso_api_criteria_met_count": 0,
-  "sso_admin_ops_mode": true,
+  "sso_admin_ops_mode": false,
   "sso_admin_ops_criteria_total": 10,
-  "sso_admin_ops_criteria_met_count": 10,
+  "sso_admin_ops_criteria_met_count": 0,
+  "sso_stand_smoke_mode": true,
+  "sso_stand_smoke_criteria_total": 10,
+  "sso_stand_smoke_criteria_met_count": 10,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -95,24 +98,24 @@
       "loc": 1521
     },
     "ops_shell": {
-      "files": 38,
-      "loc": 3254
+      "files": 39,
+      "loc": 3401
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 82,
-      "loc": 17474
+      "files": 83,
+      "loc": 17683
     },
     "rust_src": {
       "files": 300,
-      "loc": 110462
+      "loc": 110811
     },
     "rust_tests": {
-      "files": 271,
-      "loc": 37698
+      "files": 273,
+      "loc": 37818
     },
     "ui_css": {
       "files": 2,
@@ -143,7 +146,7 @@
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
     "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
-    "PH-S1285: sso_admin_ops_mode — store strip / provider refresh / verify hooks",
-    "PH-S1288: band 64 SSO admin/ops glue — criteria met vs registry"
+    "PH-S1294: sso_stand_smoke_mode — live store/CRUD/callback fixtures + verify hooks",
+    "PH-S1298: band 65 SSO stand-smoke — criteria met vs registry"
   ]
 }

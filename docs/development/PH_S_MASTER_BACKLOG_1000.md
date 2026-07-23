@@ -1,6 +1,6 @@
 # PH-S master backlog 1000 (enterprise horizon v2)
 
-**Generated:** 2026-07-21 · **Extended:** 2026-07-22 · **Enterprise range:** PH-S1149…PH-S2148 · **Completion range:** PH-S1279…PH-S2278 · **Pending open path:** **990** (from band 65)
+**Generated:** 2026-07-21 · **Extended:** 2026-07-22 · **Enterprise range:** PH-S1149…PH-S2148 · **Completion range:** PH-S1279…PH-S2278 · **Pending open path:** **980** (from band 66)
 
 **VDT:** один `абракадабра` = drain **10** з FM §5.12 → vision close → push → promote наступні 10.
 
@@ -24,8 +24,8 @@
 | 62 | PH-S1259…S1268 | B SSO · store wire **✅** |
 | 63 | PH-S1269…S1278 | B SSO · API contracts **✅** |
 | 64 | PH-S1279…S1288 | B SSO · admin/ops glue **✅ drained** |
-| 65 | PH-S1289…S1298 | B SSO · stand smoke **active §5.12** |
-| 66 | PH-S1299…S1308 | B SSO · loc-audit |
+| 65 | PH-S1289…S1298 | B SSO · stand smoke **✅ drained** |
+| 66 | PH-S1299…S1308 | B SSO · loc-audit **active §5.12** |
 | 67 | PH-S1309…S1318 | B SSO · docs canon |
 | 68 | PH-S1319…S1328 | B SSO · vision-sync |
 | 69 | PH-S1329…S1338 | B SSO · ratio advisory |
@@ -323,35 +323,35 @@
 | **PH-S1287** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
 | **PH-S1288** | SSO admin/ops band close | `galaxy_horizon_s1279_integration`; HANDOFF/NEXT | **✅** |
 
-## Band 65 — PH-S1289…S1298 (B SSO · stand smoke) · **active §5.12** · override
+## Band 65 — PH-S1289…S1298 (B SSO · stand smoke) · **✅ drained** · override
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1289** | `sso_stand_smoke_depth` ui-core | depth enum + stand-smoke criteria registry | **[ ]** |
-| **PH-S1290** | Live store wire smoke | `GET /security/sso/store` shape + integration | **[ ]** |
-| **PH-S1291** | Live OAuth2/SAML CRUD smoke | list→create→get→delete | **[ ]** |
-| **PH-S1292** | Live callback fixture smoke | OAuth/SAML fixtures (no live IdP) | **[ ]** |
-| **PH-S1293** | CLI `--sso-stand-smoke` | live suite + export shape | **[ ]** |
-| **PH-S1294** | `poolai-loc-audit --sso-stand-smoke` | `rust_ratio.json` fields | **[ ]** |
-| **PH-S1295** | `VERIFY_SSO_STAND_SMOKE` | live + loc-audit verify | **[ ]** |
-| **PH-S1296** | Docs `SSO_STAND_SMOKE.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1297** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1298** | `galaxy_horizon_s1289_integration` | band close | **[ ]** |
+| **PH-S1289** | `sso_stand_smoke_depth` ui-core | depth enum + stand-smoke criteria registry | **✅** |
+| **PH-S1290** | Live store wire smoke | `GET /security/sso/store` shape + integration | **✅** |
+| **PH-S1291** | Live OAuth2/SAML CRUD smoke | list→create→get→delete | **✅** |
+| **PH-S1292** | Live callback fixture smoke | OAuth/SAML fixtures (no live IdP) | **✅** |
+| **PH-S1293** | CLI `--sso-stand-smoke` | live suite + export shape | **✅** |
+| **PH-S1294** | `poolai-loc-audit --sso-stand-smoke` | `rust_ratio.json` fields | **✅** |
+| **PH-S1295** | `VERIFY_SSO_STAND_SMOKE` | live + loc-audit verify | **✅** |
+| **PH-S1296** | Docs `SSO_STAND_SMOKE.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | **✅** |
+| **PH-S1297** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
+| **PH-S1298** | `galaxy_horizon_s1289_integration` | band close | **✅** |
 
-## Band 66 — PH-S1299…S1308 (B SSO · loc-audit)
+## Band 66 — PH-S1299…S1308 (B SSO · loc-audit) · **active §5.12** · override
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1299** | `sso_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1300** | `sso` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1301** | `sso` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1302** | `sso` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1303** | Stand smoke `sso` export | export shape unit test | **[ ]** |
-| **PH-S1304** | poolai-loc-audit PH-S1304 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1305** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
+| **PH-S1299** | `sso_loc_audit_depth` ui-core | depth enum + aggregate criteria registry | **[ ]** |
+| **PH-S1300** | Slice aggregate stub | `SSO_LOC_AUDIT_SLICES` (`--sso`…`--sso-stand-smoke`) | **[ ]** |
+| **PH-S1301** | Criteria contracts | `sso_loc_audit_integration` | **[ ]** |
+| **PH-S1302** | `VERIFY_SSO_LOC_AUDIT` + quick `--sso-loc-audit` | verify-dev-stand + RUN_LOCAL | **[ ]** |
+| **PH-S1303** | Stand smoke export shape band 66 | unit export shape | **[ ]** |
+| **PH-S1304** | `poolai-loc-audit --sso-loc-audit` | `rust_ratio.json` fields | **[ ]** |
+| **PH-S1305** | Docs `SSO_LOC_AUDIT.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
 | **PH-S1306** | poolai-vision-sync --check | drift gate green | **[ ]** |
 | **PH-S1307** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1308** | galaxy_horizon_s1299_integration | band close | **[ ]** |
+| **PH-S1308** | `galaxy_horizon_s1299_integration` | band close | **[ ]** |
 
 ## Band 67 — PH-S1309…S1318 (B SSO · docs canon)
 
