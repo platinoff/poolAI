@@ -23,7 +23,7 @@
 | **PH-S1327** | Ratio hold advisory |
 | **PH-S1328** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **361**. **Pending completion:** **960** (→ PH-S2278).
+**§5.12:** **10** відкритих. **Vision:** rev **362**. **Pending completion:** **960** (→ PH-S2278).
 
 ## Band 67 — SSO docs canon (PH-S1309…S1318, ✅)
 
@@ -40,7 +40,7 @@
 | **PH-S1317** | Ratio hold advisory |
 | **PH-S1318** | Band close |
 
-**§5.12:** **0** відкритих (band 67 ✅ — journal). **Vision:** rev **361**.
+**§5.12:** **0** відкритих (band 67 ✅ — journal). **Vision:** rev **362**.
 
 **PH-S1318 ✅ (2026-07-23):** `sso_docs_canon_depth.rs`; `SSO_DOCS_CANON_SLICES`; `--sso-docs-canon`; `VERIFY_SSO_DOCS_CANON`; `SSO_DOCS_CANON.md`; `galaxy_horizon_s1309_integration`. Phase B SSO docs-canon closed.
 
