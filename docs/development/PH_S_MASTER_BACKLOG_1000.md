@@ -387,31 +387,31 @@
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1329** | `sso_ratio_advisory_depth` ui-core | depth enum + criteria registry | **[ ]** |
-| **PH-S1330** | Ratio-advisory slice aggregate stub | `SSO_RATIO_ADVISORY_SLICES` | **[ ]** |
-| **PH-S1331** | Criteria contracts | `sso_ratio_advisory_integration` | **[ ]** |
-| **PH-S1332** | `VERIFY_SSO_RATIO_ADVISORY` + quick `--sso-ratio-advisory` | verify-dev-stand + RUN_LOCAL | **[ ]** |
-| **PH-S1333** | Stand smoke export shape band 69 | `sso_ratio_advisory_band69_export_shape` | **[ ]** |
-| **PH-S1334** | `poolai-loc-audit --sso-ratio-advisory` | `rust_ratio.json` fields | **[ ]** |
-| **PH-S1335** | Docs `SSO_RATIO_ADVISORY.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1336** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1337** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1338** | `galaxy_horizon_s1329_integration` | band close | **[ ]** |
+| **PH-S1329** | `sso_ratio_advisory_depth` ui-core | depth enum + criteria registry | **✅** |
+| **PH-S1330** | Ratio-advisory slice aggregate stub | `SSO_RATIO_ADVISORY_SLICES` | **✅** |
+| **PH-S1331** | Criteria contracts | `sso_ratio_advisory_integration` | **✅** |
+| **PH-S1332** | `VERIFY_SSO_RATIO_ADVISORY` + quick `--sso-ratio-advisory` | verify-dev-stand + RUN_LOCAL | **✅** |
+| **PH-S1333** | Stand smoke export shape band 69 | `sso_ratio_advisory_band69_export_shape` | **✅** |
+| **PH-S1334** | `poolai-loc-audit --sso-ratio-advisory` | `rust_ratio.json` fields | **✅** |
+| **PH-S1335** | Docs `SSO_RATIO_ADVISORY.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | **✅** |
+| **PH-S1336** | poolai-vision-sync --check | drift gate green | **✅** |
+| **PH-S1337** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
+| **PH-S1338** | `galaxy_horizon_s1329_integration` | band close | **✅** |
 
 ## Band 70 — PH-S1339…S1348 (B SSO · horizon close)
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1339** | `sso_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1340** | `sso` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1341** | `sso` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1342** | `sso` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1343** | Stand smoke `sso` export | export shape unit test | **[ ]** |
-| **PH-S1344** | poolai-loc-audit PH-S1344 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1345** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
+| **PH-S1339** | `sso_horizon_depth` ui-core | depth enum + criteria registry | **[ ]** |
+| **PH-S1340** | Horizon slice aggregate stub | `SSO_HORIZON_SLICES` | **[ ]** |
+| **PH-S1341** | Criteria contracts | `sso_horizon_integration` | **[ ]** |
+| **PH-S1342** | `VERIFY_SSO_HORIZON` + quick `--sso-horizon` | verify-dev-stand + RUN_LOCAL | **[ ]** |
+| **PH-S1343** | Stand smoke export shape band 70 | `sso_horizon_band70_export_shape` | **[ ]** |
+| **PH-S1344** | `poolai-loc-audit --sso-horizon` | `rust_ratio.json` fields | **[ ]** |
+| **PH-S1345** | Docs `SSO_HORIZON.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
 | **PH-S1346** | poolai-vision-sync --check | drift gate green | **[ ]** |
 | **PH-S1347** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1348** | galaxy_horizon_s1339_integration | band close | **[ ]** |
+| **PH-S1348** | `galaxy_horizon_s1339_integration` | band close | **[ ]** |
 
 ## Band 71 — PH-S1349…S1358 (C Audit · depth scaffold)
 

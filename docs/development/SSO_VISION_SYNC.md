@@ -19,7 +19,7 @@ aligned with the enterprise SSO journal.
 
 **Boundary:** band 68 = vision-sync gate for SSO phase B; prior docs-canon remains
 [`SSO_DOCS_CANON.md`](./SSO_DOCS_CANON.md) (band 67). Mirror: [`TENANT_VISION_SYNC.md`](./TENANT_VISION_SYNC.md).
-Next: band 69 SSO ratio advisory.
+Next: [`SSO_RATIO_ADVISORY.md`](./SSO_RATIO_ADVISORY.md) (band 69).
 
 ## Loc-audit / verify
 

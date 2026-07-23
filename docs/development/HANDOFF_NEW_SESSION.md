@@ -1,14 +1,31 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-23 (band 68 ✅ · band 69 **§5.12 = 10 open** · Cursor **3.12.30**)
+**Оновлено:** 2026-07-23 (band 69 ✅ · band 70 **§5.12 = 10 open** · Cursor **3.12.30**)
 
-**Наступна сесія:** **`абракадабра`** — drain band 69 (B SSO · ratio advisory) з FM **§5.50**.
+**Наступна сесія:** **`абракадабра`** — drain band 70 (B SSO · horizon close) з FM **§5.51**.
 
 **Cursor / toolchain (service):** local desktop **3.12.30** · public changelog latest numbered IDE **3.11** · research [`CURSOR_UPDATE_RESEARCH_2026-07-22.md`](./CURSOR_UPDATE_RESEARCH_2026-07-22.md) · FM **§5.16**. Vision: `poolai-vision-sync` мержить enterprise `queue — band` → Sprint queue + Feed = останні закриті PH-S*.
 
-**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **950** спринтів до FM **§5.18** @ PH-S2278 (enterprise §5.17 @ S2148 + extension Memory/Job/Solana/Wasm/close).
+**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **940** спринтів до FM **§5.18** @ PH-S2278 (enterprise §5.17 @ S2148 + extension Memory/Job/Solana/Wasm/close).
 
-## Band 69 — SSO ratio advisory (PH-S1329…S1338, **ACTIVE**)
+## Band 70 — SSO horizon close (PH-S1339…S1348, **ACTIVE**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1339** | `sso_horizon_depth` ui-core module |
+| **PH-S1340** | Horizon slice aggregate stub (`SSO_HORIZON_SLICES`) |
+| **PH-S1341** | Criteria contracts |
+| **PH-S1342** | `VERIFY_SSO_HORIZON` + quick `--sso-horizon` |
+| **PH-S1343** | Stand smoke export shape band 70 |
+| **PH-S1344** | `poolai-loc-audit --sso-horizon` |
+| **PH-S1345** | `SSO_HORIZON.md` + canon |
+| **PH-S1346** | vision-sync --check |
+| **PH-S1347** | Ratio hold advisory |
+| **PH-S1348** | Band close |
+
+**§5.12:** **10** відкритих. **Vision:** rev **365**. **Pending completion:** **940** (→ PH-S2278).
+
+## Band 69 — SSO ratio advisory (PH-S1329…S1338, ✅)
 
 | Sprint | Фокус |
 |--------|--------|
@@ -23,7 +40,9 @@
 | **PH-S1337** | Ratio hold advisory |
 | **PH-S1338** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **364**. **Pending completion:** **950** (→ PH-S2278).
+**§5.12:** **0** відкритих (band 69 ✅ — journal). **Vision:** rev **365**.
+
+**PH-S1338 ✅ (2026-07-23):** `sso_ratio_advisory_depth.rs`; `SSO_RATIO_ADVISORY_SLICES`; `--sso-ratio-advisory`; `VERIFY_SSO_RATIO_ADVISORY`; `SSO_RATIO_ADVISORY.md`; `galaxy_horizon_s1329_integration`. Phase B SSO ratio-advisory closed.
 
 ## Band 68 — SSO vision sync (PH-S1319…S1328, ✅)
 

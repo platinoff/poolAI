@@ -40,6 +40,7 @@ VERIFY_SSO_STAND_SMOKE="${VERIFY_SSO_STAND_SMOKE:-0}"
 VERIFY_SSO_LOC_AUDIT="${VERIFY_SSO_LOC_AUDIT:-0}"
 VERIFY_SSO_DOCS_CANON="${VERIFY_SSO_DOCS_CANON:-0}"
 VERIFY_SSO_VISION_SYNC="${VERIFY_SSO_VISION_SYNC:-0}"
+VERIFY_SSO_RATIO_ADVISORY="${VERIFY_SSO_RATIO_ADVISORY:-0}"
 HEALTH_RETRIES="${VERIFY_HEALTH_RETRIES:-45}"
 HEALTH_SLEEP="${VERIFY_HEALTH_SLEEP:-2}"
 
@@ -544,6 +545,16 @@ if [[ "$VERIFY_SSO_VISION_SYNC" == "1" ]]; then
     echo "OK  SSO vision-sync gate"
   else
     echo "FAIL SSO vision-sync gate"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_SSO_RATIO_ADVISORY" == "1" ]]; then
+  echo "Running poolai-loc-audit --sso-ratio-advisory (PH-S1332)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --sso-ratio-advisory); then
+    echo "OK  SSO ratio-advisory gate"
+  else
+    echo "FAIL SSO ratio-advisory gate"
     fail=1
   fi
 fi

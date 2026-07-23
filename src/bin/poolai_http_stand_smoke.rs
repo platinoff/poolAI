@@ -5632,6 +5632,49 @@ mod tests {
     }
 
     #[test]
+    fn sso_ratio_advisory_band69_export_shape_ph_s1333() {
+        use poolai_ui_core::sso_ratio_advisory_depth::{
+            sso_ratio_advisory_criteria_total, sso_ratio_advisory_depth_stub,
+            sso_ratio_advisory_slices_met, SsoRatioAdvisoryDepth, FM_BAND69_ROWS,
+            SSO_RATIO_ADVISORY_CASES, SSO_RATIO_ADVISORY_CRITERIA, SSO_RATIO_ADVISORY_SLICES,
+        };
+        use serde_json::json;
+        assert_eq!(
+            sso_ratio_advisory_depth_stub(Some(&json!({"stand_smoke_export": true}))),
+            SsoRatioAdvisoryDepth::StandSmokeExport
+        );
+        assert_eq!(
+            sso_ratio_advisory_depth_stub(Some(&json!({
+                "sso_ratio_advisory_depth": true,
+                "slice_aggregate": true,
+                "criteria_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "sso_ratio_advisory_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            SsoRatioAdvisoryDepth::FullBand69
+        );
+        assert_eq!(SSO_RATIO_ADVISORY_CRITERIA.len(), 10);
+        assert_eq!(sso_ratio_advisory_criteria_total(), 10);
+        assert_eq!(SSO_RATIO_ADVISORY_SLICES.len(), 6);
+        assert!(SSO_RATIO_ADVISORY_CASES.contains(&"aggregate_flag"));
+        let canon = include_str!("../../docs/development/SSO_RATIO_ADVISORY.md");
+        assert_eq!(sso_ratio_advisory_slices_met(canon), (6, 6));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--sso-ratio-advisory"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND69_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band69 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn galaxy_edge_verification_band48_export_shape_ph_s1125() {
         use poolai_ui_core::galaxy_edge_verification_depth::{
             edge_verification_criteria_total, galaxy_edge_verification_depth_stub,

@@ -24,7 +24,7 @@ cd S:\rust\poolAI
 .\bin\run-poolai.ps1 stop
 ```
 
-**Last updated:** 2026-07-23 (PH-S1328 band 68 · `--sso-vision-sync` · `VERIFY_SSO_VISION_SYNC` · phase B SSO vision-sync)
+**Last updated:** 2026-07-23 (PH-S1338 band 69 · `--sso-ratio-advisory` · `VERIFY_SSO_RATIO_ADVISORY` · phase B SSO ratio-advisory)
 
 ### PH-S1011 / PH-S1012: Light compile + quick preset
 
@@ -75,6 +75,7 @@ cd S:\rust\poolAI
 /usr/bin/bash bin/run-poolai.sh quick --sso-loc-audit
 /usr/bin/bash bin/run-poolai.sh quick --sso-docs-canon
 /usr/bin/bash bin/run-poolai.sh quick --sso-vision-sync
+/usr/bin/bash bin/run-poolai.sh quick --sso-ratio-advisory
 # PowerShell:
 .\bin\run-poolai.ps1 quick -StandSmoke
 .\bin\run-poolai.ps1 quick -MigrationAdvisory
@@ -337,6 +338,7 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `VERIFY_SSO_LOC_AUDIT=1` | `verify-dev-stand.sh` → `poolai-loc-audit --sso-loc-audit` (PH-S1302) |
 | `VERIFY_SSO_DOCS_CANON=1` | `verify-dev-stand.sh` → `poolai-loc-audit --sso-docs-canon` (PH-S1312) |
 | `VERIFY_SSO_VISION_SYNC=1` | `verify-dev-stand.sh` → `poolai-loc-audit --sso-vision-sync` (PH-S1322) |
+| `VERIFY_SSO_RATIO_ADVISORY=1` | `verify-dev-stand.sh` → `poolai-loc-audit --sso-ratio-advisory` (PH-S1332) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 ### PH-S1100: Rust migration advisory (band 46)
@@ -804,6 +806,26 @@ VERIFY_SSO_VISION_SYNC=1 bash bin/verify-dev-stand.sh
 | `sso_vision_sync_criteria_met_count` | Criteria with marker present in canonical doc path |
 
 Module: [`sso_vision_sync_depth.rs`](../../crates/poolai-ui-core/src/sso_vision_sync_depth.rs) · tests: `sso_vision_sync_integration.rs`, `galaxy_horizon_s1319_integration.rs` · docs: [`SSO_VISION_SYNC.md`](./SSO_VISION_SYNC.md).
+
+### PH-S1334: SSO ratio-advisory (band 69)
+
+Ratio-advisory gate aggregating prior `--sso*` + [`SSO_VISION_SYNC.md`](./SSO_VISION_SYNC.md).
+
+```bash
+cargo run --bin poolai-loc-audit -- --sso-ratio-advisory
+cargo run --bin poolai-loc-audit -- --sso-ratio-advisory --advisory --min-ratio 0.95
+
+VERIFY_SSO_RATIO_ADVISORY=1 bash bin/verify-dev-stand.sh
+/usr/bin/bash bin/run-poolai.sh quick --sso-ratio-advisory
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `sso_ratio_advisory_mode` | `true` when `--sso-ratio-advisory` (PH-S1334) |
+| `sso_ratio_advisory_criteria_total` | SSO ratio-advisory criteria registry size |
+| `sso_ratio_advisory_criteria_met_count` | Criteria with marker present in canonical doc path |
+
+Module: [`sso_ratio_advisory_depth.rs`](../../crates/poolai-ui-core/src/sso_ratio_advisory_depth.rs) · tests: `sso_ratio_advisory_integration.rs`, `galaxy_horizon_s1329_integration.rs` · docs: [`SSO_RATIO_ADVISORY.md`](./SSO_RATIO_ADVISORY.md).
 
 Default stand smoke includes **`vision_revision_parity`** (PH-S208, PH-S235): repo `manifest.revision` vs FM §5.12 `Vision rev`, `extensions.active_sprint` vs `manifest.next_sprint`, then `GET /docs/vision/manifest.json` with `X-PoolAI-Vision-Revision` header vs JSON body.
 
