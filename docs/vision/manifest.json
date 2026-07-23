@@ -2670,7 +2670,7 @@
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S1348",
+  "last_sprint_closed": "PH-S1358",
   "layers": [
     {
       "id": "L0",
@@ -2703,7 +2703,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1349",
+  "next_sprint": "PH-S1359",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -10694,7 +10694,7 @@
       "path": "tests/sso_horizon_integration.rs"
     }
   ],
-  "revision": 368,
+  "revision": 370,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -22247,91 +22247,181 @@
       "acceptance": "depth enum + criteria registry",
       "deps": "audit_depth.rs",
       "id": "PH-S1349",
-      "open": true,
+      "open": false,
       "row": 1284,
-      "status": "open",
+      "status": "closed",
       "title": "audit_depth` ui-core module"
     },
     {
-      "acceptance": "unit test",
-      "deps": "durable path / production verify",
+      "acceptance": "POOLAI_AUDIT_STORE` + `validate_audit_event_fields` unit tests",
+      "deps": "audit.rs",
       "id": "PH-S1350",
-      "open": true,
+      "open": false,
       "row": 1285,
-      "status": "open",
+      "status": "closed",
       "title": "Audit store/wire slice stub"
     },
     {
       "acceptance": "markers + registry",
       "deps": "audit_depth_integration",
       "id": "PH-S1351",
-      "open": true,
+      "open": false,
       "row": 1286,
-      "status": "open",
+      "status": "closed",
       "title": "Criteria contracts"
     },
     {
       "acceptance": "depth gate",
       "deps": "verify-dev-stand",
       "id": "PH-S1352",
-      "open": true,
+      "open": false,
       "row": 1287,
-      "status": "open",
+      "status": "closed",
       "title": "VERIFY_AUDIT` + quick `--audit"
     },
     {
       "acceptance": "audit_band71_export_shape",
       "deps": "stand smoke",
       "id": "PH-S1353",
-      "open": true,
+      "open": false,
       "row": 1288,
-      "status": "open",
+      "status": "closed",
       "title": "Stand smoke export shape band 71"
     },
     {
       "acceptance": "rust_ratio.json` fields",
       "deps": "loc-audit",
       "id": "PH-S1354",
-      "open": true,
+      "open": false,
       "row": 1289,
-      "status": "open",
+      "status": "closed",
       "title": "poolai-loc-audit --audit"
     },
     {
       "acceptance": "docs matrix",
       "deps": "RUN_LOCAL/INDEX/HANDOFF/NEXT",
       "id": "PH-S1355",
-      "open": true,
+      "open": false,
       "row": 1290,
-      "status": "open",
+      "status": "closed",
       "title": "Docs `AUDIT_DEPTH.md` + canon"
     },
     {
       "acceptance": "drift gate green",
       "deps": "vision",
       "id": "PH-S1356",
-      "open": true,
+      "open": false,
       "row": 1291,
-      "status": "open",
+      "status": "closed",
       "title": "vision-sync --check"
     },
     {
       "acceptance": "--min-ratio 0.95 --advisory",
       "deps": "loc-audit",
       "id": "PH-S1357",
-      "open": true,
+      "open": false,
       "row": 1292,
-      "status": "open",
+      "status": "closed",
       "title": "Ratio hold advisory"
     },
     {
       "acceptance": "galaxy_horizon_s1349_integration`; HANDOFF/NEXT",
       "deps": "tests/docs",
       "id": "PH-S1358",
-      "open": true,
+      "open": false,
       "row": 1293,
-      "status": "open",
+      "status": "closed",
       "title": "Audit depth band close"
+    },
+    {
+      "acceptance": "depth enum + store criteria registry",
+      "deps": "audit_store_depth.rs",
+      "id": "PH-S1359",
+      "open": true,
+      "row": 1294,
+      "status": "open",
+      "title": "audit_store_depth` ui-core module"
+    },
+    {
+      "acceptance": "POOLAI_AUDIT_DATA_DIR` + `audit_store_wire()` + unit tests",
+      "deps": "audit.rs",
+      "id": "PH-S1360",
+      "open": true,
+      "row": 1295,
+      "status": "open",
+      "title": "Audit store wire durable path"
+    },
+    {
+      "acceptance": "wire labels + ui-core depth stub",
+      "deps": "audit_store_integration",
+      "id": "PH-S1361",
+      "open": true,
+      "row": 1296,
+      "status": "open",
+      "title": "Audit store wire contracts"
+    },
+    {
+      "acceptance": "store gate",
+      "deps": "verify-dev-stand",
+      "id": "PH-S1362",
+      "open": true,
+      "row": 1297,
+      "status": "open",
+      "title": "VERIFY_AUDIT_STORE` + quick `--audit-store"
+    },
+    {
+      "acceptance": "audit_store_band72_export_shape",
+      "deps": "stand smoke",
+      "id": "PH-S1363",
+      "open": true,
+      "row": 1298,
+      "status": "open",
+      "title": "Stand smoke export shape band 72"
+    },
+    {
+      "acceptance": "rust_ratio.json` fields",
+      "deps": "loc-audit",
+      "id": "PH-S1364",
+      "open": true,
+      "row": 1299,
+      "status": "open",
+      "title": "poolai-loc-audit --audit-store"
+    },
+    {
+      "acceptance": "docs matrix",
+      "deps": "RUN_LOCAL/INDEX/HANDOFF/NEXT",
+      "id": "PH-S1365",
+      "open": true,
+      "row": 1300,
+      "status": "open",
+      "title": "Docs `AUDIT_STORE.md` + canon"
+    },
+    {
+      "acceptance": "drift gate green",
+      "deps": "vision",
+      "id": "PH-S1366",
+      "open": true,
+      "row": 1301,
+      "status": "open",
+      "title": "vision-sync --check"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory",
+      "deps": "loc-audit",
+      "id": "PH-S1367",
+      "open": true,
+      "row": 1302,
+      "status": "open",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1359_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1368",
+      "open": true,
+      "row": 1303,
+      "status": "open",
+      "title": "Audit store band close"
     }
   ],
   "sprint_queue_open_count": 10,

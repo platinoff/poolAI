@@ -1221,24 +1221,41 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **10** (band 70 ✅ · band 71 open). **Master horizon:** PH-S1349…S1358 (band 71). **Completion pending:** PH-S1349…S2278 = **930** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **368**. **Наступна сесія:** **`абракадабра`** — drain band 71.
+**Відкритих у §5.12:** **10** (band 71 ✅ · band 72 open). **Master horizon:** PH-S1359…S1368 (band 72). **Completion pending:** PH-S1359…S2278 = **920** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **370**. **Наступна сесія:** **`абракадабра`** — drain band 72.
 
-### 5.52 Audit depth scaffold queue — band 71 (PH-S1349…S1358, 2026-07-23) · **ACTIVE**
+### 5.53 Audit store wire queue — band 72 (PH-S1359…S1368, 2026-07-23) · **ACTIVE**
 
-**Джерело:** project completion / enterprise phase C — Audit depth scaffold (mirror band 61 [`SSO_DEPTH.md`](../development/SSO_DEPTH.md)). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md).
+**Джерело:** project completion / enterprise phase C — Audit store wire (mirror band 62 [`SSO_STORE.md`](../development/SSO_STORE.md)). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
-| 1284 | **PH-S1349** | `audit_depth` ui-core module | `audit_depth.rs` | depth enum + criteria registry | **[ ]** |
-| 1285 | **PH-S1350** | Audit store/wire slice stub | durable path / production verify | unit test | **[ ]** |
-| 1286 | **PH-S1351** | Criteria contracts | `audit_depth_integration` | markers + registry | **[ ]** |
-| 1287 | **PH-S1352** | `VERIFY_AUDIT` + quick `--audit` | verify-dev-stand | depth gate | **[ ]** |
-| 1288 | **PH-S1353** | Stand smoke export shape band 71 | stand smoke | `audit_band71_export_shape` | **[ ]** |
-| 1289 | **PH-S1354** | `poolai-loc-audit --audit` | loc-audit | `rust_ratio.json` fields | **[ ]** |
-| 1290 | **PH-S1355** | Docs `AUDIT_DEPTH.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | docs matrix | **[ ]** |
-| 1291 | **PH-S1356** | vision-sync --check | vision | drift gate green | **[ ]** |
-| 1292 | **PH-S1357** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **[ ]** |
-| 1293 | **PH-S1358** | Audit depth band close | tests/docs | `galaxy_horizon_s1349_integration`; HANDOFF/NEXT | **[ ]** |
+| 1294 | **PH-S1359** | `audit_store_depth` ui-core module | `audit_store_depth.rs` | depth enum + store criteria registry | **[ ]** |
+| 1295 | **PH-S1360** | Audit store wire durable path | `audit.rs` | `POOLAI_AUDIT_DATA_DIR` + `audit_store_wire()` + unit tests | **[ ]** |
+| 1296 | **PH-S1361** | Audit store wire contracts | `audit_store_integration` | wire labels + ui-core depth stub | **[ ]** |
+| 1297 | **PH-S1362** | `VERIFY_AUDIT_STORE` + quick `--audit-store` | verify-dev-stand | store gate | **[ ]** |
+| 1298 | **PH-S1363** | Stand smoke export shape band 72 | stand smoke | `audit_store_band72_export_shape` | **[ ]** |
+| 1299 | **PH-S1364** | `poolai-loc-audit --audit-store` | loc-audit | `rust_ratio.json` fields | **[ ]** |
+| 1300 | **PH-S1365** | Docs `AUDIT_STORE.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | docs matrix | **[ ]** |
+| 1301 | **PH-S1366** | vision-sync --check | vision | drift gate green | **[ ]** |
+| 1302 | **PH-S1367** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **[ ]** |
+| 1303 | **PH-S1368** | Audit store band close | tests/docs | `galaxy_horizon_s1359_integration`; HANDOFF/NEXT | **[ ]** |
+
+### 5.52 Audit depth scaffold queue — band 71 (PH-S1349…S1358, 2026-07-23) · **✅**
+
+**Джерело:** project completion / enterprise phase C — Audit depth scaffold (`POOLAI_AUDIT_STORE` + event field stub; mirror band 61 [`SSO_DEPTH.md`](../development/SSO_DEPTH.md)). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1284 | **PH-S1349** | `audit_depth` ui-core module | `audit_depth.rs` | depth enum + criteria registry | **✅** |
+| 1285 | **PH-S1350** | Audit store/wire slice stub | `audit.rs` | `POOLAI_AUDIT_STORE` + `validate_audit_event_fields` unit tests | **✅** |
+| 1286 | **PH-S1351** | Criteria contracts | `audit_depth_integration` | markers + registry | **✅** |
+| 1287 | **PH-S1352** | `VERIFY_AUDIT` + quick `--audit` | verify-dev-stand | depth gate | **✅** |
+| 1288 | **PH-S1353** | Stand smoke export shape band 71 | stand smoke | `audit_band71_export_shape` | **✅** |
+| 1289 | **PH-S1354** | `poolai-loc-audit --audit` | loc-audit | `rust_ratio.json` fields | **✅** |
+| 1290 | **PH-S1355** | Docs `AUDIT_DEPTH.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | docs matrix | **✅** |
+| 1291 | **PH-S1356** | vision-sync --check | vision | drift gate green | **✅** |
+| 1292 | **PH-S1357** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **✅** |
+| 1293 | **PH-S1358** | Audit depth band close | tests/docs | `galaxy_horizon_s1349_integration`; HANDOFF/NEXT | **✅** |
 
 ### 5.51 SSO horizon close queue — band 70 (PH-S1339…S1348, 2026-07-23) · **✅**
 
@@ -1881,11 +1898,11 @@ FM-xxx (з таблиці нижче)
 
 | Поле | Значення |
 |------|----------|
-| **Pending (completion path)** | **930** (S1349…S2278) |
-| **Enterprise subset pending** | **800** (S1349…S2148 → §5.17) |
+| **Pending (completion path)** | **920** (S1359…S2278) |
+| **Enterprise subset pending** | **790** (S1359…S2148 → §5.17) |
 | **Extension pending** | **130** (S2149…S2278 → §5.18) |
-| **Drained** | band 51–70 PH-S1149…S1348 ✅ |
-| **Активна §5.12** | band 71 **PH-S1349…S1358** `[ ]` (§5.52) |
+| **Drained** | band 51–71 PH-S1149…S1358 ✅ |
+| **Активна §5.12** | band 72 **PH-S1359…S1368** `[ ]` (§5.53) |
 | **План** | [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md) |
 | **Реєстр** | [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md) |
 | **Regen** | `bash scripts/generate-ph-s-master-backlog-1000.sh` · `bash scripts/generate-ph-s-completion-extension.sh` |
@@ -1989,7 +2006,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-23):** band 71 **PH-S1349…S1358** `[ ]` · §5.12 **10** · наступна **`абракадабра`** → drain band 71 (C Audit · depth scaffold) · completion pending **930** → S2278.
+**Активна смуга (2026-07-23):** band 72 **PH-S1359…S1368** `[ ]` · §5.12 **10** · наступна **`абракадабра`** → drain band 72 (C Audit · store wire) · completion pending **920** → S2278.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

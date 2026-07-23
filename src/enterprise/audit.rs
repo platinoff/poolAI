@@ -44,6 +44,28 @@ use tokio::io::AsyncWriteExt;
 use tokio::sync::RwLock;
 use tracing::{info, warn};
 
+/// Env key for audit store backend (`file` default; `sqlite` horizon band 72+).
+/// Band 71 scaffold — see [`docs/development/AUDIT_DEPTH.md`].
+pub const POOLAI_AUDIT_STORE: &str = "POOLAI_AUDIT_STORE";
+
+/// Env key for durable audit data directory (band 72+ store wire).
+pub const POOLAI_AUDIT_DATA_DIR: &str = "POOLAI_AUDIT_DATA_DIR";
+
+/// Canonical audit store modes (band 71 scaffold).
+pub const AUDIT_STORE_MODES: &[&str] = &["file", "sqlite"];
+
+/// Resolve configured audit store mode (PH-S1350 scaffold; durable wire band 72+).
+pub fn audit_store_mode() -> &'static str {
+    match std::env::var(POOLAI_AUDIT_STORE)
+        .unwrap_or_else(|_| "file".into())
+        .to_ascii_lowercase()
+        .as_str()
+    {
+        "sqlite" => "sqlite",
+        _ => "file",
+    }
+}
+
 /// Audit event severity level
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 pub enum AuditLevel {
@@ -133,6 +155,25 @@ impl AuditEvent {
         self.metadata.insert(key, value);
         self
     }
+}
+
+/// PH-S1350 production-verify stub: require non-empty `action` + `resource_type`.
+pub fn validate_audit_event_fields(event: &AuditEvent) -> Result<(), AppError> {
+    if event.action.trim().is_empty() {
+        return Err(AppError::ValidationError(
+            "Audit event missing action. Context: production verify stub requires action. \
+            Suggestion: set a non-empty action string (e.g. create_instance)."
+                .to_string(),
+        ));
+    }
+    if event.resource_type.trim().is_empty() {
+        return Err(AppError::ValidationError(
+            "Audit event missing resource_type. Context: production verify stub requires resource_type. \
+            Suggestion: set a non-empty resource_type string (e.g. vm_instance)."
+                .to_string(),
+        ));
+    }
+    Ok(())
 }
 
 /// Configuration for audit logging
@@ -925,6 +966,54 @@ mod tests {
         assert_eq!(event.tenant_id, Some("tenant-abc".to_string()));
         assert_eq!(event.resource_id, Some("resource-456".to_string()));
         assert_eq!(event.metadata.get("key1"), Some(&"value1".to_string()));
+    }
+
+    #[test]
+    fn audit_store_mode_defaults_file_ph_s1350() {
+        std::env::remove_var(POOLAI_AUDIT_STORE);
+        assert_eq!(audit_store_mode(), "file");
+        std::env::set_var(POOLAI_AUDIT_STORE, "sqlite");
+        assert_eq!(audit_store_mode(), "sqlite");
+        std::env::remove_var(POOLAI_AUDIT_STORE);
+        assert!(AUDIT_STORE_MODES.contains(&"file"));
+        assert_eq!(POOLAI_AUDIT_DATA_DIR, "POOLAI_AUDIT_DATA_DIR");
+    }
+
+    #[test]
+    fn validate_audit_event_fields_ok_ph_s1350() {
+        let event = AuditEvent::new(
+            AuditLevel::Info,
+            "create_instance".to_string(),
+            "vm_instance".to_string(),
+            "success".to_string(),
+        );
+        assert!(validate_audit_event_fields(&event).is_ok());
+    }
+
+    #[test]
+    fn validate_audit_event_fields_rejects_empty_action_ph_s1350() {
+        let event = AuditEvent::new(
+            AuditLevel::Info,
+            "  ".to_string(),
+            "vm_instance".to_string(),
+            "success".to_string(),
+        );
+        let err = validate_audit_event_fields(&event).unwrap_err();
+        let msg = format!("{err}");
+        assert!(msg.contains("missing action"), "{msg}");
+    }
+
+    #[test]
+    fn validate_audit_event_fields_rejects_empty_resource_ph_s1350() {
+        let event = AuditEvent::new(
+            AuditLevel::Info,
+            "create_instance".to_string(),
+            "".to_string(),
+            "success".to_string(),
+        );
+        let err = validate_audit_event_fields(&event).unwrap_err();
+        let msg = format!("{err}");
+        assert!(msg.contains("missing resource_type"), "{msg}");
     }
 }
 

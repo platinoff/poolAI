@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 169439,
-  "non_rust_product_loc": 9211,
-  "product_loc_total": 178650,
-  "rust_ratio": 0.9484410859221942,
-  "rust_ratio_pct": 94.84410859221943,
+  "rust_loc": 169990,
+  "non_rust_product_loc": 9228,
+  "product_loc_total": 179218,
+  "rust_ratio": 0.9485096363088529,
+  "rust_ratio_pct": 94.85096363088529,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -100,9 +100,12 @@
   "sso_ratio_advisory_mode": false,
   "sso_ratio_advisory_criteria_total": 10,
   "sso_ratio_advisory_criteria_met_count": 0,
-  "sso_horizon_mode": true,
+  "sso_horizon_mode": false,
   "sso_horizon_criteria_total": 10,
-  "sso_horizon_criteria_met_count": 10,
+  "sso_horizon_criteria_met_count": 0,
+  "audit_mode": true,
+  "audit_criteria_total": 8,
+  "audit_criteria_met_count": 8,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -114,23 +117,23 @@
     },
     "ops_shell": {
       "files": 39,
-      "loc": 3486
+      "loc": 3503
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 88,
-      "loc": 18799
+      "files": 89,
+      "loc": 19041
     },
     "rust_src": {
       "files": 300,
-      "loc": 111280
+      "loc": 111448
     },
     "rust_tests": {
-      "files": 283,
-      "loc": 38752
+      "files": 285,
+      "loc": 38893
     },
     "ui_css": {
       "files": 2,
@@ -161,7 +164,7 @@
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
     "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
-    "PH-S1344: sso_horizon_mode — aggregate band 61–69 SSO slices (phase B close)",
-    "PH-S1348: band 70 SSO horizon close — criteria met vs registry"
+    "PH-S1354: audit_mode — audit depth scaffold (POOLAI_AUDIT_STORE + event metadata stub)",
+    "PH-S1358: band 71 audit depth — criteria met vs registry"
   ]
 }

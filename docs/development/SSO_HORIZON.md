@@ -19,7 +19,7 @@ loc-audit, docs canon, vision-sync, and ratio-advisory.
 
 **Boundary:** band 70 = phase B horizon close (no new SSO domain API).
 Prior ratio-advisory: [`SSO_RATIO_ADVISORY.md`](./SSO_RATIO_ADVISORY.md) (band 69).
-Mirror: [`TENANT_HORIZON.md`](./TENANT_HORIZON.md). Next: band 71 **C Audit** depth scaffold (PH-S1349…).
+Mirror: [`TENANT_HORIZON.md`](./TENANT_HORIZON.md). Next: band 72 **C Audit** store wire (PH-S1359…). Prior depth: [`AUDIT_DEPTH.md`](./AUDIT_DEPTH.md) (band 71 ✅).
 
 ## Loc-audit / verify
 
