@@ -24,7 +24,7 @@ cd S:\rust\poolAI
 .\bin\run-poolai.ps1 stop
 ```
 
-**Last updated:** 2026-07-23 (PH-S1308 band 66 · `--sso-loc-audit` · `VERIFY_SSO_LOC_AUDIT` · phase B SSO loc-audit aggregate)
+**Last updated:** 2026-07-23 (PH-S1318 band 67 · `--sso-docs-canon` · `VERIFY_SSO_DOCS_CANON` · phase B SSO docs-canon)
 
 ### PH-S1011 / PH-S1012: Light compile + quick preset
 
@@ -73,6 +73,7 @@ cd S:\rust\poolAI
 /usr/bin/bash bin/run-poolai.sh quick --sso-admin-ops
 /usr/bin/bash bin/run-poolai.sh quick --sso-stand-smoke
 /usr/bin/bash bin/run-poolai.sh quick --sso-loc-audit
+/usr/bin/bash bin/run-poolai.sh quick --sso-docs-canon
 # PowerShell:
 .\bin\run-poolai.ps1 quick -StandSmoke
 .\bin\run-poolai.ps1 quick -MigrationAdvisory
@@ -333,6 +334,7 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `VERIFY_SSO_ADMIN_OPS=1` | `verify-dev-stand.sh` → `poolai-loc-audit --sso-admin-ops` (PH-S1284) |
 | `VERIFY_SSO_STAND_SMOKE=1` | `verify-dev-stand.sh` → live `--sso-stand-smoke` + loc-audit (PH-S1295) |
 | `VERIFY_SSO_LOC_AUDIT=1` | `verify-dev-stand.sh` → `poolai-loc-audit --sso-loc-audit` (PH-S1302) |
+| `VERIFY_SSO_DOCS_CANON=1` | `verify-dev-stand.sh` → `poolai-loc-audit --sso-docs-canon` (PH-S1312) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 ### PH-S1100: Rust migration advisory (band 46)
@@ -760,6 +762,26 @@ VERIFY_SSO_LOC_AUDIT=1 bash bin/verify-dev-stand.sh
 | `sso_loc_audit_criteria_met_count` | Criteria with marker present in canonical doc path |
 
 Module: [`sso_loc_audit_depth.rs`](../../crates/poolai-ui-core/src/sso_loc_audit_depth.rs) · tests: `sso_loc_audit_integration.rs`, `galaxy_horizon_s1299_integration.rs` · docs: [`SSO_LOC_AUDIT.md`](./SSO_LOC_AUDIT.md).
+
+### PH-S1314: SSO docs-canon aggregate (band 67)
+
+Docs-canon gate for band 61–66 `SSO_*.md` slice docs.
+
+```bash
+cargo run --bin poolai-loc-audit -- --sso-docs-canon
+cargo run --bin poolai-loc-audit -- --sso-docs-canon --advisory --min-ratio 0.95
+
+VERIFY_SSO_DOCS_CANON=1 bash bin/verify-dev-stand.sh
+/usr/bin/bash bin/run-poolai.sh quick --sso-docs-canon
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `sso_docs_canon_mode` | `true` when `--sso-docs-canon` (PH-S1314) |
+| `sso_docs_canon_criteria_total` | SSO docs-canon criteria registry size |
+| `sso_docs_canon_criteria_met_count` | Criteria with marker present in canonical doc path |
+
+Module: [`sso_docs_canon_depth.rs`](../../crates/poolai-ui-core/src/sso_docs_canon_depth.rs) · tests: `sso_docs_canon_integration.rs`, `galaxy_horizon_s1309_integration.rs` · docs: [`SSO_DOCS_CANON.md`](./SSO_DOCS_CANON.md).
 
 Default stand smoke includes **`vision_revision_parity`** (PH-S208, PH-S235): repo `manifest.revision` vs FM §5.12 `Vision rev`, `extensions.active_sprint` vs `manifest.next_sprint`, then `GET /docs/vision/manifest.json` with `X-PoolAI-Vision-Revision` header vs JSON body.
 

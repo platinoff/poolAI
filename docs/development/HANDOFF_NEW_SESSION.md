@@ -1,14 +1,31 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-23 (band 66 ✅ · band 67 **§5.12 = 10 open** · Cursor **3.12.30**)
+**Оновлено:** 2026-07-23 (band 67 ✅ · band 68 **§5.12 = 10 open** · Cursor **3.12.30**)
 
-**Наступна сесія:** **`абракадабра`** — drain band 67 (B SSO · docs canon) з FM **§5.48**.
+**Наступна сесія:** **`абракадабра`** — drain band 68 (B SSO · vision-sync) з FM **§5.49**.
 
 **Cursor / toolchain (service):** local desktop **3.12.30** · public changelog latest numbered IDE **3.11** · research [`CURSOR_UPDATE_RESEARCH_2026-07-22.md`](./CURSOR_UPDATE_RESEARCH_2026-07-22.md) · FM **§5.16**. Vision: `poolai-vision-sync` мержить enterprise `queue — band` → Sprint queue + Feed = останні закриті PH-S*.
 
-**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **970** спринтів до FM **§5.18** @ PH-S2278 (enterprise §5.17 @ S2148 + extension Memory/Job/Solana/Wasm/close).
+**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **960** спринтів до FM **§5.18** @ PH-S2278 (enterprise §5.17 @ S2148 + extension Memory/Job/Solana/Wasm/close).
 
-## Band 67 — SSO docs canon (PH-S1309…S1318, **ACTIVE**)
+## Band 68 — SSO vision sync (PH-S1319…S1328, **ACTIVE**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1319** | `sso_vision_sync_depth` ui-core module |
+| **PH-S1320** | Vision-sync slice aggregate stub (`SSO_VISION_SYNC_SLICES`) |
+| **PH-S1321** | Criteria contracts |
+| **PH-S1322** | `VERIFY_SSO_VISION_SYNC` + quick `--sso-vision-sync` |
+| **PH-S1323** | Stand smoke export shape band 68 |
+| **PH-S1324** | `poolai-loc-audit --sso-vision-sync` |
+| **PH-S1325** | `SSO_VISION_SYNC.md` + canon |
+| **PH-S1326** | vision-sync --check |
+| **PH-S1327** | Ratio hold advisory |
+| **PH-S1328** | Band close |
+
+**§5.12:** **10** відкритих. **Vision:** rev **361**. **Pending completion:** **960** (→ PH-S2278).
+
+## Band 67 — SSO docs canon (PH-S1309…S1318, ✅)
 
 | Sprint | Фокус |
 |--------|--------|
@@ -23,7 +40,9 @@
 | **PH-S1317** | Ratio hold advisory |
 | **PH-S1318** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **360**. **Pending completion:** **970** (→ PH-S2278).
+**§5.12:** **0** відкритих (band 67 ✅ — journal). **Vision:** rev **361**.
+
+**PH-S1318 ✅ (2026-07-23):** `sso_docs_canon_depth.rs`; `SSO_DOCS_CANON_SLICES`; `--sso-docs-canon`; `VERIFY_SSO_DOCS_CANON`; `SSO_DOCS_CANON.md`; `galaxy_horizon_s1309_integration`. Phase B SSO docs-canon closed.
 
 ## Band 66 — SSO loc-audit aggregate (PH-S1299…S1308, ✅)
 

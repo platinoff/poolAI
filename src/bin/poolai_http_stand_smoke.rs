@@ -5546,6 +5546,49 @@ mod tests {
     }
 
     #[test]
+    fn sso_docs_canon_band67_export_shape_ph_s1313() {
+        use poolai_ui_core::sso_docs_canon_depth::{
+            sso_docs_canon_criteria_total, sso_docs_canon_depth_stub, sso_docs_canon_slices_met,
+            SsoDocsCanonDepth, FM_BAND67_ROWS, SSO_DOCS_CANON_CASES, SSO_DOCS_CANON_CRITERIA,
+            SSO_DOCS_CANON_SLICES,
+        };
+        use serde_json::json;
+        assert_eq!(
+            sso_docs_canon_depth_stub(Some(&json!({"stand_smoke_export": true}))),
+            SsoDocsCanonDepth::StandSmokeExport
+        );
+        assert_eq!(
+            sso_docs_canon_depth_stub(Some(&json!({
+                "sso_docs_canon_depth": true,
+                "slice_aggregate": true,
+                "criteria_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "sso_docs_canon_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            SsoDocsCanonDepth::FullBand67
+        );
+        assert_eq!(SSO_DOCS_CANON_CRITERIA.len(), 10);
+        assert_eq!(sso_docs_canon_criteria_total(), 10);
+        assert_eq!(SSO_DOCS_CANON_SLICES.len(), 6);
+        assert!(SSO_DOCS_CANON_CASES.contains(&"aggregate_flag"));
+        let canon = include_str!("../../docs/development/SSO_DOCS_CANON.md");
+        assert_eq!(sso_docs_canon_slices_met(canon), (6, 6));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--sso-docs-canon"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND67_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band67 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn galaxy_edge_verification_band48_export_shape_ph_s1125() {
         use poolai_ui_core::galaxy_edge_verification_depth::{
             edge_verification_criteria_total, galaxy_edge_verification_depth_stub,

@@ -26,6 +26,9 @@ use poolai_ui_core::sso_api_contracts_depth::{
     sso_api_criteria_total, SSO_API_CASES, SSO_API_CRITERIA,
 };
 use poolai_ui_core::sso_depth::{sso_criteria_total, SSO_CASES, SSO_CRITERIA};
+use poolai_ui_core::sso_docs_canon_depth::{
+    sso_docs_canon_criteria_total, SSO_DOCS_CANON_CASES, SSO_DOCS_CANON_CRITERIA,
+};
 use poolai_ui_core::sso_loc_audit_depth::{
     sso_loc_audit_criteria_total, SSO_LOC_AUDIT_CASES, SSO_LOC_AUDIT_CRITERIA,
 };
@@ -185,6 +188,8 @@ struct AuditConfig {
     sso_stand_smoke: bool,
     /// Emit band-66 SSO loc-audit aggregate fields (PH-S1304).
     sso_loc_audit: bool,
+    /// Emit band-67 SSO docs-canon fields (PH-S1314).
+    sso_docs_canon: bool,
 }
 
 impl Default for AuditConfig {
@@ -216,6 +221,7 @@ impl Default for AuditConfig {
             sso_admin_ops: false,
             sso_stand_smoke: false,
             sso_loc_audit: false,
+            sso_docs_canon: false,
         }
     }
 }
@@ -399,6 +405,12 @@ struct RustRatioReport {
     sso_loc_audit_criteria_total: usize,
     /// SSO loc-audit criteria met count (PH-S1304).
     sso_loc_audit_criteria_met_count: usize,
+    /// Band-67 SSO docs-canon mode (PH-S1314).
+    sso_docs_canon_mode: bool,
+    /// SSO docs-canon criteria registry size (PH-S1314).
+    sso_docs_canon_criteria_total: usize,
+    /// SSO docs-canon criteria met count (PH-S1314).
+    sso_docs_canon_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -755,6 +767,22 @@ fn audit_sso_loc_audit_criteria_met(root: &Path) -> (usize, usize) {
     (met, total)
 }
 
+fn audit_sso_docs_canon_criteria_met(root: &Path) -> (usize, usize) {
+    let total = sso_docs_canon_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in SSO_DOCS_CANON_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
 fn classify_product_path(path: &str) -> ProductCategory {
     let p = path.replace('\\', "/");
     if p.starts_with("src/") && p.ends_with(".rs") {
@@ -867,6 +895,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--sso-admin-ops" => config.sso_admin_ops = true,
             "--sso-stand-smoke" => config.sso_stand_smoke = true,
             "--sso-loc-audit" => config.sso_loc_audit = true,
+            "--sso-docs-canon" => config.sso_docs_canon = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
                 print_help();
@@ -910,6 +939,7 @@ fn print_help() {
            --sso-admin-ops             band-64 SSO admin/ops fields (PH-S1285)\n\
            --sso-stand-smoke           band-65 SSO stand-smoke fields (PH-S1294)\n\
            --sso-loc-audit             band-66 SSO loc-audit aggregate fields (PH-S1304)\n\
+           --sso-docs-canon            band-67 SSO docs-canon fields (PH-S1314)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -1221,6 +1251,16 @@ fn build_report(
         notes.push("PH-S1304: sso_loc_audit_mode — aggregate band 61–65 --sso* loc-audit slices");
         notes.push("PH-S1308: band 66 SSO loc-audit — criteria met vs registry");
     }
+    let (sso_docs_canon_criteria_met_count, sso_docs_canon_criteria_total_count) =
+        if config.sso_docs_canon {
+            audit_sso_docs_canon_criteria_met(root)
+        } else {
+            (0, sso_docs_canon_criteria_total())
+        };
+    if config.sso_docs_canon {
+        notes.push("PH-S1314: sso_docs_canon_mode — aggregate band 61–66 SSO_*.md canon docs");
+        notes.push("PH-S1318: band 67 SSO docs-canon — criteria met vs registry");
+    }
 
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
@@ -1315,6 +1355,9 @@ fn build_report(
         sso_loc_audit_mode: config.sso_loc_audit,
         sso_loc_audit_criteria_total: sso_loc_audit_criteria_total_count,
         sso_loc_audit_criteria_met_count,
+        sso_docs_canon_mode: config.sso_docs_canon,
+        sso_docs_canon_criteria_total: sso_docs_canon_criteria_total_count,
+        sso_docs_canon_criteria_met_count,
         by_category,
         notes,
     })
@@ -1579,6 +1622,17 @@ fn print_summary(report: &RustRatioReport) {
             report.sso_loc_audit_criteria_met_count, report.sso_loc_audit_criteria_total
         );
         println!("  sso_loc_audit_cases: {}", SSO_LOC_AUDIT_CASES.join(", "));
+    }
+    if report.sso_docs_canon_mode {
+        println!("  sso_docs_canon:        true (PH-S1314 band 67)");
+        println!(
+            "  sso_docs_canon_criteria: {}/{} met",
+            report.sso_docs_canon_criteria_met_count, report.sso_docs_canon_criteria_total
+        );
+        println!(
+            "  sso_docs_canon_cases: {}",
+            SSO_DOCS_CANON_CASES.join(", ")
+        );
     }
     for (name, loc) in &report.by_category {
         println!("  {name}: {} files, {} loc", loc.files, loc.loc);

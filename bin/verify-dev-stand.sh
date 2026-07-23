@@ -38,6 +38,7 @@ VERIFY_SSO_API="${VERIFY_SSO_API:-0}"
 VERIFY_SSO_ADMIN_OPS="${VERIFY_SSO_ADMIN_OPS:-0}"
 VERIFY_SSO_STAND_SMOKE="${VERIFY_SSO_STAND_SMOKE:-0}"
 VERIFY_SSO_LOC_AUDIT="${VERIFY_SSO_LOC_AUDIT:-0}"
+VERIFY_SSO_DOCS_CANON="${VERIFY_SSO_DOCS_CANON:-0}"
 HEALTH_RETRIES="${VERIFY_HEALTH_RETRIES:-45}"
 HEALTH_SLEEP="${VERIFY_HEALTH_SLEEP:-2}"
 
@@ -522,6 +523,16 @@ if [[ "$VERIFY_SSO_LOC_AUDIT" == "1" ]]; then
     echo "OK  SSO loc-audit aggregate gate"
   else
     echo "FAIL SSO loc-audit aggregate gate"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_SSO_DOCS_CANON" == "1" ]]; then
+  echo "Running poolai-loc-audit --sso-docs-canon (PH-S1312)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --sso-docs-canon); then
+    echo "OK  SSO docs-canon gate"
+  else
+    echo "FAIL SSO docs-canon gate"
     fail=1
   fi
 fi
