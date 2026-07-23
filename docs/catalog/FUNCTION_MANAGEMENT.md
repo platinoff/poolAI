@@ -1221,7 +1221,7 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **10** (band 69 ✅ · band 70 open). **Master horizon:** PH-S1339…S1348 (band 70). **Completion pending:** PH-S1339…S2278 = **940** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **365**. **Наступна сесія:** **`абракадабра`** — drain band 70.
+**Відкритих у §5.12:** **10** (band 69 ✅ · band 70 open). **Master horizon:** PH-S1339…S1348 (band 70). **Completion pending:** PH-S1339…S2278 = **940** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **366**. **Наступна сесія:** **`абракадабра`** — drain band 70.
 
 ### 5.51 SSO horizon close queue — band 70 (PH-S1339…S1348, 2026-07-23) · **ACTIVE**
 

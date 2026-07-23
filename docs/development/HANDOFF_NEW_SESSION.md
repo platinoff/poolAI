@@ -23,7 +23,7 @@
 | **PH-S1347** | Ratio hold advisory |
 | **PH-S1348** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **365**. **Pending completion:** **940** (→ PH-S2278).
+**§5.12:** **10** відкритих. **Vision:** rev **366**. **Pending completion:** **940** (→ PH-S2278).
 
 ## Band 69 — SSO ratio advisory (PH-S1329…S1338, ✅)
 
@@ -40,7 +40,7 @@
 | **PH-S1337** | Ratio hold advisory |
 | **PH-S1338** | Band close |
 
-**§5.12:** **0** відкритих (band 69 ✅ — journal). **Vision:** rev **365**.
+**§5.12:** **0** відкритих (band 69 ✅ — journal). **Vision:** rev **366**.
 
 **PH-S1338 ✅ (2026-07-23):** `sso_ratio_advisory_depth.rs`; `SSO_RATIO_ADVISORY_SLICES`; `--sso-ratio-advisory`; `VERIFY_SSO_RATIO_ADVISORY`; `SSO_RATIO_ADVISORY.md`; `galaxy_horizon_s1329_integration`. Phase B SSO ratio-advisory closed.
 
