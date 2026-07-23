@@ -2630,6 +2630,18 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_development_SSO_DOCS_CANON_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_sso_vision_sync_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_SSO_VISION_SYNC_md"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -10572,9 +10584,37 @@
       "label": "sso_docs_canon_integration.rs",
       "layer": "L3",
       "path": "tests/sso_docs_canon_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_sso_vision_sync_depth_rs",
+      "label": "sso_vision_sync_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/sso_vision_sync_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_SSO_VISION_SYNC_md",
+      "label": "SSO_VISION_SYNC.md",
+      "layer": "L1",
+      "path": "docs/development/SSO_VISION_SYNC.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1319_integration_rs",
+      "label": "galaxy_horizon_s1319_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1319_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_sso_vision_sync_integration_rs",
+      "label": "sso_vision_sync_integration.rs",
+      "layer": "L3",
+      "path": "tests/sso_vision_sync_integration.rs"
     }
   ],
-  "revision": 363,
+  "revision": 364,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",

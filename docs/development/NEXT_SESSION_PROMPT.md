@@ -10,7 +10,7 @@ Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.1
 | **§5.12 active** | **10** (band 68 ✅) |
 | **Completion pending** | **950** sprints PH-S1329…S2278 · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) |
 | **Horizon** | band 69 → **PH-S1329…S1338** |
-| **Vision** | rev **363** |
+| **Vision** | rev **364** |
 | **Cursor** | local **3.12.30** · [`CURSOR_UPDATE_RESEARCH_2026-07-22.md`](./CURSOR_UPDATE_RESEARCH_2026-07-22.md) |
 
 ---

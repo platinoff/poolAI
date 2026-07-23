@@ -23,7 +23,7 @@
 | **PH-S1337** | Ratio hold advisory |
 | **PH-S1338** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **363**. **Pending completion:** **950** (→ PH-S2278).
+**§5.12:** **10** відкритих. **Vision:** rev **364**. **Pending completion:** **950** (→ PH-S2278).
 
 ## Band 68 — SSO vision sync (PH-S1319…S1328, ✅)
 
@@ -40,7 +40,7 @@
 | **PH-S1327** | Ratio hold advisory |
 | **PH-S1328** | Band close |
 
-**§5.12:** **0** відкритих (band 68 ✅ — journal). **Vision:** rev **363**.
+**§5.12:** **0** відкритих (band 68 ✅ — journal). **Vision:** rev **364**.
 
 **PH-S1328 ✅ (2026-07-23):** `sso_vision_sync_depth.rs`; `SSO_VISION_SYNC_SLICES`; `--sso-vision-sync`; `VERIFY_SSO_VISION_SYNC`; `SSO_VISION_SYNC.md`; `galaxy_horizon_s1319_integration`. Phase B SSO vision-sync closed.
 
