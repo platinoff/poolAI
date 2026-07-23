@@ -1269,7 +1269,7 @@ fn build_payout_batch_entry(
     job_id: &str,
     cleared_at: String,
     metrics: Option<&serde_json::Value>,
-    source_peer_id: Option<&str>,
+    _source_peer_id: Option<&str>,
 ) -> PayoutBatchLedgerEntry {
     let telegram_user_id = metrics
         .and_then(|m| m.get("telegram_user_id"))

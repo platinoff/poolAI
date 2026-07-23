@@ -28,14 +28,15 @@
 ## ✅ Поточний стан
 
 ### Статус збірки
-- ✅ `cargo check` проходить без помилок (GNU toolchain + MSYS2 PATH)
+- ✅ `cargo check` / `cargo check --no-default-features` — без помилок (GNU + MSYS2); **PH-SVC31 (2026-07-23):** `validate_macvlan_mode` повертає `'static` literals (раніше lifetime error → червоний GitHub `Check (no features)` + каскад).
 - ✅ `cargo test --lib` — **122 unit tests** passing
 - ✅ `cargo test --test '*'` — 354+ integration tests passing
 - ✅ RAID integration tests: `raid_cross_strategy` (5), `raid_smallworld_integration` (6) — всі проходять
 - ✅ Всі модулі компілюються успішно
 - ✅ Production Deployment Documentation — **ЗАВЕРШЕНО** (100% готово) 🎉
 - ✅ Rustdoc Documentation Improvements — **ЗАВЕРШЕНО** (usage examples added) 🎉
-- ✅ CI/CD: Required test step з `--features ml,enterprise,cloud,test-utils` та `K8S_OPENAPI_ENABLED_VERSION=1.28`; інтеграційні тести проходять (перевіряти локально з `-j 1` на Windows при тиску лінкера).
+- ✅ CI/CD: Required test step з `--features ml,enterprise,cloud,test-utils` та `K8S_OPENAPI_ENABLED_VERSION=1.28`; інтеграційні тести проходять (перевіряти локально з `-j 1` на Windows при тиску лінкера). **PH-SVC34:** підтвердити GH Actions green після CI-fix push.
+- ◆ **PH-SVC35 (OWNER):** GitHub Secret scanning #1 Atlassian API Token — revoke у Atlassian; див. [`SECRETS_MANAGEMENT.md`](../security/SECRETS_MANAGEMENT.md) §4 (`target/` gitignored; без history rewrite без запиту).
 - ✅ **Clippy (як у CI, `-D warnings`):** `cargo clippy --all-targets` для `--no-default-features`, `--features jwt,https` та `--features cloud,cloud-sdk` (остання матриця — з `K8S_OPENAPI_ENABLED_VERSION=1.28`) — **без попереджень на `main` (2026-04-10)**; інтеграційні тести під ті самі правила вирівняні з `ci.yml`.
 - ✅ **Windows MSVC / FM-011:** у `Cargo.toml` профіль **`[profile.test] debug = 1`** зменшує PDB для великої кількості тестових exe (обхід **LNK1318**). Канонічний прогін як у CI: **`cargo test-ci`** у **`.cargo/config.toml`** (`--lib` + `--tests`, без doctests). Повна збірка тестових бінарників: `cargo test -j 1 --all-features --no-run` (за потреби `CARGO_INCREMENTAL=0`) — **перевірено локально** (2026-04-07).
 - ✅ **FM-012 (2026-05-16):** i18n UA/EN + Telegram OAuth (HMAC/`auth_date`/allowlist/audit, widget UA/EN, Viewer RBAC).

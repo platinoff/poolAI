@@ -8,6 +8,7 @@ Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.1
 
 | **← наступний** | **`абракадабра`** (project scan → band 74) |
 | **§5.12 active** | **10** (band 73 ✅) |
+| **P0 open** | **PH-SVC34** GH CI verify · **PH-SVC35** OWNER Atlassian revoke |
 | **Completion pending** | **900** sprints PH-S1379…S2278 · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) |
 | **Horizon** | band 74 → **PH-S1379…S1388** |
 | **Vision** | rev **375** |
@@ -20,6 +21,21 @@ Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.1
 ```
 абракадабра
 ```
+
+---
+
+## P0 (перша черга — скріншоти CI / Security)
+
+Перед drain band 74 перевірити / закрити:
+
+| Sprint | Фокус | Acceptance |
+|--------|--------|------------|
+| **PH-SVC34** | GitHub Actions green | Check (no features), Test Suite, OpenAPI gap, Pa11y contract, LOC ratio, Vision drift — green після CI-fix push |
+| **PH-SVC35** | Secret scanning #1 | **OWNER:** revoke Atlassian API Token; see [`SECRETS_MANAGEMENT.md`](../security/SECRETS_MANAGEMENT.md) §4 |
+
+**Вже зроблено (ця tech-сесія):** PH-SVC31 macvlan `'static` · PH-SVC32 unused warnings · PH-SVC33 local `test-ci` · PH-SVC36 no history rewrite.
+
+Коренева причина червоного CI: `validate_macvlan_mode` повертав `&str` з вхідного lifetime як `&'static str` → падав `Check (no features)` і каскад інших jobs.
 
 ---
 
@@ -44,4 +60,4 @@ Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.1
 
 ## Не повторювати
 
-Service PH-SVC21…SVC30 ✅ · PH-SVC11…SVC20 ✅ · band 73 ✅ · band 72 ✅ · band 71 ✅ · band 70 ✅ · band 69 ✅ · band 68 ✅ · band 67 ✅ · band 66 ✅ · band 65 ✅ · band 64 ✅ · band 63 ✅ · band 62 ✅ · band 61 ✅ · band 60 ✅ · product-complete S1010 ✅ · FM-003 LAN · FM-041 Cloud SDK · mandatory ZK/TEE.
+PH-SVC31…33 ✅ · PH-SVC36…40 ✅ (крім 34/35 open) · Service PH-SVC21…SVC30 ✅ · PH-SVC11…SVC20 ✅ · band 73 ✅ · band 72 ✅ · band 71 ✅ · band 70 ✅ · band 69 ✅ · band 68 ✅ · band 67 ✅ · band 66 ✅ · band 65 ✅ · band 64 ✅ · band 63 ✅ · band 62 ✅ · band 61 ✅ · band 60 ✅ · product-complete S1010 ✅ · FM-003 LAN · FM-041 Cloud SDK · mandatory ZK/TEE · history rewrite без явного OWNER.

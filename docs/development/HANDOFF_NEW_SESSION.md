@@ -1,8 +1,19 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-23 (band 73 ✅ · band 74 **§5.12 = 10 open** · Cursor **3.12.30**)
+**Оновлено:** 2026-07-23 (tech **PH-SVC31…SVC40** · CI compile fix ✅ · band 74 **§5.12 = 10 open** · Cursor **3.12.30**)
 
-**Наступна сесія:** **`абракадабра`** — drain band 74 (C Audit · admin/ops glue) з FM **§5.55**.
+**Наступна сесія:** **`абракадабра`** — **P0** (нижче) → drain band 74 (C Audit · admin/ops glue) з FM **§5.55**.
+
+## P0 — з скріншотів CI / Security (перед band 74)
+
+| # | Sprint | Фокус | Статус |
+|---|--------|--------|--------|
+| 1 | **PH-SVC31…33** | macvlan `'static` + unused warnings + local `test-ci` | **✅** (ця сесія) |
+| 2 | **PH-SVC34** | Підтвердити GitHub Actions green після push (Check no-features / Test / OpenAPI / Pa11y / LOC / Vision) | **[ ]** verify |
+| 3 | **PH-SVC35** | Secret scanning #1 Atlassian API Token — **revoke у Atlassian** | **[ ]** OWNER |
+| 4 | **PH-SVC36** | `target/` gitignored; без history rewrite без явного запиту | **✅** |
+
+Канон secret: [`SECRETS_MANAGEMENT.md`](../security/SECRETS_MANAGEMENT.md) §4. Сталевий стан: [`STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md).
 
 **Cursor / toolchain (service):** local desktop **3.12.30** · public changelog latest numbered IDE **3.11** · research [`CURSOR_UPDATE_RESEARCH_2026-07-22.md`](./CURSOR_UPDATE_RESEARCH_2026-07-22.md) · FM **§5.16**. Vision: `poolai-vision-sync` мержить enterprise `queue — band` → Sprint queue + Feed = останні закриті PH-S*.
 

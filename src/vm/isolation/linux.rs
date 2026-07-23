@@ -33,9 +33,11 @@ pub fn veth_link_names(process_id: u32, interface_label: &str) -> (String, Strin
 
 /// Validate Linux macvlan mode string.
 pub fn validate_macvlan_mode(mode: Option<&str>) -> Result<&'static str, AppError> {
-    let macvlan_mode = mode.unwrap_or("bridge");
-    match macvlan_mode {
-        "bridge" | "private" | "vepa" | "passthru" => Ok(macvlan_mode),
+    match mode.unwrap_or("bridge") {
+        "bridge" => Ok("bridge"),
+        "private" => Ok("private"),
+        "vepa" => Ok("vepa"),
+        "passthru" => Ok("passthru"),
         other => Err(AppError::ConfigError(format!(
             "Invalid macvlan mode: {other}. Valid modes: bridge, private, vepa, passthru"
         ))),

@@ -2033,14 +2033,24 @@ FM-xxx (з таблиці нижче)
 | **PH-SVC28** | Vision queue/feed enterprise bands | `poolai-vision-sync` merge `queue — band` | **✅** |
 | **PH-SVC29** | INDEX + docs/README cross-links | zriz Jul 22 | **✅** |
 | **PH-SVC30** | git push + самарі | service commit `main` | **✅** |
+| **PH-SVC31** | CI root: macvlan `'static` lifetime | `validate_macvlan_mode` → static literals (`src/vm/isolation/linux.rs`) | **✅** |
+| **PH-SVC32** | CI warnings: unused params | `_source_peer_id` (dispatch) · `_cgroup_path` (resources) | **✅** |
+| **PH-SVC33** | Local gate: `cargo check --no-default-features` + `cargo test-ci` | unblocks Check/Test/OpenAPI/Docs/LOC/Vision cascade | **✅** |
+| **PH-SVC34** | Confirm GitHub Actions green post-push | Check (no features) + Test Suite + OpenAPI + Pa11y contract + LOC + Vision drift | **[ ]** next |
+| **PH-SVC35** | Secret scanning #1 Atlassian API Token | **OWNER:** revoke token in Atlassian; alert path was historical `target/…/deps/` | **[ ]** OWNER |
+| **PH-SVC36** | Secret alert disposition (no history rewrite) | `target/` in `.gitignore`; no `filter-repo` without explicit owner request | **✅** |
+| **PH-SVC37** | STABLE_STATE + HANDOFF CI note | macvlan fix + GH cascade root cause | **✅** |
+| **PH-SVC38** | NEXT_SESSION P0 before band 74 | CI verify + OWNER secret; then `абракадабра` → band 74 | **✅** |
+| **PH-SVC39** | README / INDEX service zriz | PH-SVC31…SVC40 pointer | **✅** |
+| **PH-SVC40** | vision-sync --check + git push + самарі | service commit `main` | **✅** |
 
-**Наступний service trigger:** після major Cursor/OS update або за запитом власника (повторити scan → §5.16 band).
+**Наступний service trigger:** після major Cursor/OS update або за запитом власника (повторити scan → §5.16 band). **Відкриті:** PH-SVC34 (GH CI verify) · PH-SVC35 (OWNER revoke Atlassian token).
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S262)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-23):** band 74 **PH-S1379…S1388** `[ ]` · §5.12 **10** · наступна **`абракадабра`** → drain band 74 (C Audit · admin/ops glue) · completion pending **900** → S2278.
+**Активна смуга (2026-07-23):** band 74 **PH-S1379…S1388** `[ ]` · §5.12 **10** · tech **PH-SVC31…SVC40** CI fix ✅ · open **PH-SVC34/35** · наступна **`абракадабра`** → **P0** → drain band 74 · completion pending **900** → S2278.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

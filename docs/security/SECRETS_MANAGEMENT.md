@@ -79,6 +79,18 @@ export HTTPS_KEY_PATH="/etc/poolai/certs/key.pem"
 - Configuration system reads environment variables
 - Environment variables override config file values
 
+### 4. GitHub Secret Scanning (PH-SVC35/36, 2026-07-23)
+
+**Alert #1 (Atlassian API Token, opened 2023-06-25, Public leak):** detected under historical path `target/…/deps/atlassian_core-…` (build artifact). Current tree: `target/` is in `.gitignore`; no live `target/` tracked files.
+
+| Action | Who | Status |
+|--------|-----|--------|
+| Revoke the Atlassian API token in Atlassian account | **OWNER** | PH-SVC35 **[ ]** |
+| Do **not** rewrite git history (`filter-repo` / BFG) without explicit owner request | Agent | PH-SVC36 ✅ |
+| Keep `target/` ignored; never commit build deps | Agent | ✅ |
+
+After revoke, dismiss or resolve the GitHub Secret scanning alert in repo Security settings.
+
 ### 3. Use Secret Management Services
 
 #### HashiCorp Vault

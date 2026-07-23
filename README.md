@@ -54,7 +54,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 **Версія в репозиторії:** `0.2.2` (див. `Cargo.toml`). **Робоча гілка:** `main`.
 
-Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S1378 ✅ (phase C Audit depth scaffold). **Rust ratio:** **94.86%** (hold **95%** advisory). **Vision:** manifest rev **375**. **§5.12:** **10** відкритих (band 73 ✅) · наступна сесія **`абракадабра`** → band 74 — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
+Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S1378 ✅ (phase C Audit depth scaffold). **Rust ratio:** **94.86%** (hold **95%** advisory). **Vision:** manifest rev **375**. **§5.12:** **10** відкритих (band 74) · tech **PH-SVC31…SVC40** CI macvlan fix ✅ · наступна сесія **`абракадабра`** (P0 → band 74) — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
 **Репозиторій:** [github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)
 
@@ -80,15 +80,15 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 - `cargo test --all-features` — на **Windows MSVC** можливі каскадні помилки компіляції тестів і/або `STATUS_STACK_BUFFER_OVERRUN` у `rustc` через обсяг фіч (cloud-sdk тощо); для повного матрицю краще **GNU toolchain** з `rust-toolchain.toml` або **Linux CI**. Інтеграційні тести ML прунінгу та SAML узгоджені з поточною семантикою `PruningResult` / унікальними іменами SAML-провайдерів.
 - **Архітектурні інкременти (`main`, 2026-04–05)**: **`RaidService`** + **`VirtualNode*`** services (**FM-016** ✅); ML pipeline + **TurboQuant**; **P3 / FM-005** — `json_errors.rs`, **`HttpAppError`/`RestError`** по REST, **`raid*`**, **`enterprise_api/`**, auth/WS/rate-limit ✅; **OpenAPI** enterprise sync (S14–S20); бінарі **`poolai-worker`**, **`poolai-telegram-bot`**, **`poolai_health_load`**; dev stand — `bin/verify-dev-stand.*`, `core::dev_stand`; ML-тести — **`[[test]]` + `required-features = ["ml"]`**; P2b wire — `tests/distributed_raid_wire_integration.rs`.
 
-### Next Focus (2026-07-22)
+### Next Focus (2026-07-23)
 
 **Product-complete:** PH-S1010 ✅ · FM **§5.15** ✅ · **maintenance mode**.
 
-**Service (сьогодні):** Cursor **3.12.30** rules re-check · FM **§5.16** PH-SVC21…SVC30 ✅ · vision queue/feed enterprise bands · [`CURSOR_UPDATE_RESEARCH_2026-07-22.md`](docs/development/CURSOR_UPDATE_RESEARCH_2026-07-22.md).
+**Tech (сьогодні):** CI recovery **PH-SVC31…SVC40** — macvlan `'static` lifetime fix (`src/vm/isolation/linux.rs`) + unused warnings · unblocks GitHub Check/Test/OpenAPI cascade · open **PH-SVC34** (GH verify) · **PH-SVC35** OWNER Atlassian revoke ([`SECRETS_MANAGEMENT.md`](docs/security/SECRETS_MANAGEMENT.md) §4).
 
-**Наступна сесія (owner):** **`абракадабра`** — project scan → band 74 **PH-S1379…S1388** · [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія (owner):** **`абракадабра`** — **P0** CI/secret → project scan → band 74 **PH-S1379…S1388** · [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
-**§5.12:** **10** відкритих (band 73 ✅) · vision **rev 375** · last **PH-S1378** · next **PH-S1379**.
+**§5.12:** **10** відкритих (band 74) · vision **rev 375** · last **PH-S1378** · next **PH-S1379**.
 
 **Ops (поза чергою):** **FM-003** LAN §4 **BLOCKED** (2 хости) · **FM-041** Cloud SDK **Deferred**.
 

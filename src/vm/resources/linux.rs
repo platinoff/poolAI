@@ -197,7 +197,7 @@ impl LinuxCgroupLimiter {
 
     /// Get CPU usage from cgroup
     async fn get_cpu_usage(&self, process_id: Uuid) -> Result<f64, AppError> {
-        let cgroup_path = self.get_cgroup_path(process_id, "cpu");
+        let _cgroup_path = self.get_cgroup_path(process_id, "cpu");
 
         // Future improvement: Read CPU usage from cgroup files
         // 1. Detect cgroup version (v1 or v2)
