@@ -46,15 +46,19 @@ use tracing::{info, warn};
 
 /// Env key for audit store backend (`file` default; `sqlite` horizon band 72+).
 /// Band 71 scaffold — see [`docs/development/AUDIT_DEPTH.md`].
+/// Band 72 store wire — see [`docs/development/AUDIT_STORE.md`].
 pub const POOLAI_AUDIT_STORE: &str = "POOLAI_AUDIT_STORE";
 
-/// Env key for durable audit data directory (band 72+ store wire).
+/// Env key for durable audit data directory (band 72 store wire).
 pub const POOLAI_AUDIT_DATA_DIR: &str = "POOLAI_AUDIT_DATA_DIR";
+
+/// Canonical sqlite DB file name under the configured data dir (band 72 wire).
+pub const AUDIT_STORE_SQLITE_FILE: &str = "audit.sqlite";
 
 /// Canonical audit store modes (band 71 scaffold).
 pub const AUDIT_STORE_MODES: &[&str] = &["file", "sqlite"];
 
-/// Resolve configured audit store mode (PH-S1350 scaffold; durable wire band 72+).
+/// Resolve configured audit store mode (PH-S1350 scaffold; durable wire PH-S1360).
 pub fn audit_store_mode() -> &'static str {
     match std::env::var(POOLAI_AUDIT_STORE)
         .unwrap_or_else(|_| "file".into())
@@ -63,6 +67,60 @@ pub fn audit_store_mode() -> &'static str {
     {
         "sqlite" => "sqlite",
         _ => "file",
+    }
+}
+
+/// Optional durable data directory from env (PH-S1360).
+pub fn audit_store_data_dir_from_env() -> Option<PathBuf> {
+    std::env::var(POOLAI_AUDIT_DATA_DIR)
+        .ok()
+        .map(|v| v.trim().to_string())
+        .filter(|v| !v.is_empty())
+        .map(PathBuf::from)
+}
+
+/// Audit store wire snapshot (mode + durable path; CRUD later in phase C).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct AuditStoreWire {
+    /// `file` or `sqlite`.
+    pub mode: String,
+    /// Resolved sqlite file path when mode is sqlite and data dir is set.
+    pub durable_path: Option<String>,
+    /// True when sqlite mode has a durable path.
+    pub configured: bool,
+}
+
+/// Resolve audit store wire for ops / verify / contracts (PH-S1360).
+pub fn audit_store_wire() -> AuditStoreWire {
+    let mode = audit_store_mode().to_string();
+    if mode != "sqlite" {
+        return AuditStoreWire {
+            mode,
+            durable_path: None,
+            configured: false,
+        };
+    }
+    let durable_path = audit_store_data_dir_from_env().map(|dir| {
+        dir.join(AUDIT_STORE_SQLITE_FILE)
+            .to_string_lossy()
+            .replace('\\', "/")
+    });
+    let configured = durable_path.is_some();
+    AuditStoreWire {
+        mode,
+        durable_path,
+        configured,
+    }
+}
+
+/// Wire label for admin / metrics depth fields (PH-S1360).
+pub fn audit_store_wire_label(wire: &AuditStoreWire) -> &'static str {
+    if wire.mode == "sqlite" && wire.configured {
+        "sqlite"
+    } else if wire.mode == "sqlite" {
+        "sqlite_unconfigured"
+    } else {
+        "file"
     }
 }
 
@@ -977,6 +1035,43 @@ mod tests {
         std::env::remove_var(POOLAI_AUDIT_STORE);
         assert!(AUDIT_STORE_MODES.contains(&"file"));
         assert_eq!(POOLAI_AUDIT_DATA_DIR, "POOLAI_AUDIT_DATA_DIR");
+    }
+
+    #[test]
+    fn audit_store_wire_file_default_ph_s1360() {
+        std::env::remove_var(POOLAI_AUDIT_STORE);
+        std::env::remove_var(POOLAI_AUDIT_DATA_DIR);
+        let wire = audit_store_wire();
+        assert_eq!(wire.mode, "file");
+        assert!(!wire.configured);
+        assert!(wire.durable_path.is_none());
+        assert_eq!(audit_store_wire_label(&wire), "file");
+        assert_eq!(POOLAI_AUDIT_DATA_DIR, "POOLAI_AUDIT_DATA_DIR");
+        assert_eq!(AUDIT_STORE_SQLITE_FILE, "audit.sqlite");
+    }
+
+    #[test]
+    fn audit_store_wire_sqlite_unconfigured_ph_s1360() {
+        std::env::set_var(POOLAI_AUDIT_STORE, "sqlite");
+        std::env::remove_var(POOLAI_AUDIT_DATA_DIR);
+        let wire = audit_store_wire();
+        assert_eq!(wire.mode, "sqlite");
+        assert!(!wire.configured);
+        assert_eq!(audit_store_wire_label(&wire), "sqlite_unconfigured");
+        std::env::remove_var(POOLAI_AUDIT_STORE);
+    }
+
+    #[test]
+    fn audit_store_wire_sqlite_configured_ph_s1360() {
+        std::env::set_var(POOLAI_AUDIT_STORE, "sqlite");
+        std::env::set_var(POOLAI_AUDIT_DATA_DIR, "/tmp/poolai-audit-wire");
+        let wire = audit_store_wire();
+        assert!(wire.configured);
+        assert_eq!(audit_store_wire_label(&wire), "sqlite");
+        let path = wire.durable_path.as_deref().expect("path");
+        assert!(path.ends_with(AUDIT_STORE_SQLITE_FILE) || path.contains(AUDIT_STORE_SQLITE_FILE));
+        std::env::remove_var(POOLAI_AUDIT_STORE);
+        std::env::remove_var(POOLAI_AUDIT_DATA_DIR);
     }
 
     #[test]

@@ -1,14 +1,31 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-23 (band 71 ✅ · band 72 **§5.12 = 10 open** · Cursor **3.12.30**)
+**Оновлено:** 2026-07-23 (band 72 ✅ · band 73 **§5.12 = 10 open** · Cursor **3.12.30**)
 
-**Наступна сесія:** **`абракадабра`** — drain band 72 (C Audit · store wire) з FM **§5.53**.
+**Наступна сесія:** **`абракадабра`** — drain band 73 (C Audit · API contracts) з FM **§5.54**.
 
 **Cursor / toolchain (service):** local desktop **3.12.30** · public changelog latest numbered IDE **3.11** · research [`CURSOR_UPDATE_RESEARCH_2026-07-22.md`](./CURSOR_UPDATE_RESEARCH_2026-07-22.md) · FM **§5.16**. Vision: `poolai-vision-sync` мержить enterprise `queue — band` → Sprint queue + Feed = останні закриті PH-S*.
 
-**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **920** спринтів до FM **§5.18** @ PH-S2278 (enterprise §5.17 @ S2148 + extension Memory/Job/Solana/Wasm/close).
+**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **910** спринтів до FM **§5.18** @ PH-S2278 (enterprise §5.17 @ S2148 + extension Memory/Job/Solana/Wasm/close).
 
-## Band 72 — Audit store wire (PH-S1359…S1368, **ACTIVE**)
+## Band 73 — Audit API contracts (PH-S1369…S1378, **ACTIVE**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1369** | `audit_api_contracts_depth` ui-core module |
+| **PH-S1370** | Audit query HTTP lifecycle |
+| **PH-S1371** | Store-wire status HTTP read |
+| **PH-S1372** | OpenAPI `AuditStoreWire` + errors |
+| **PH-S1373** | Event field validation fixtures |
+| **PH-S1374** | `VERIFY_AUDIT_API` + quick `--audit-api` |
+| **PH-S1375** | Stand smoke + loc-audit `--audit-api` |
+| **PH-S1376** | `AUDIT_API.md` + canon |
+| **PH-S1377** | vision-sync + ratio hold |
+| **PH-S1378** | Band close |
+
+**§5.12:** **10** відкритих. **Vision:** rev **373**. **Pending completion:** **910** (→ PH-S2278).
+
+## Band 72 — Audit store wire (PH-S1359…S1368, ✅)
 
 | Sprint | Фокус |
 |--------|--------|
@@ -23,7 +40,9 @@
 | **PH-S1367** | Ratio hold advisory |
 | **PH-S1368** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **371**. **Pending completion:** **920** (→ PH-S2278).
+**§5.12:** **0** відкритих (band 72 ✅ — journal). **Vision:** rev **373**.
+
+**PH-S1368 ✅ (2026-07-23):** `audit_store_depth.rs`; `audit_store_wire()`; `POOLAI_AUDIT_DATA_DIR`; `--audit-store`; `VERIFY_AUDIT_STORE`; `AUDIT_STORE.md`; `galaxy_horizon_s1359_integration`. Phase C Audit store wire closed.
 
 ## Band 71 — Audit depth scaffold (PH-S1349…S1358, ✅)
 

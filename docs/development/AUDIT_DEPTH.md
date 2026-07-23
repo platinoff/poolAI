@@ -11,7 +11,7 @@ Today `AuditLogger` writes **file-based** events under `./data/audit`. Horizon p
 | Mode | Env | Status |
 |------|-----|--------|
 | `file` | `POOLAI_AUDIT_STORE=file` (default) | Current — rotation + query on disk |
-| `sqlite` | `POOLAI_AUDIT_STORE=sqlite` | Band 72+ store wire |
+| `sqlite` | `POOLAI_AUDIT_STORE=sqlite` | Band 72 store wire — see [`AUDIT_STORE.md`](./AUDIT_STORE.md) |
 
 Production verify stub (PH-S1350): `validate_audit_event_fields` requires non-empty **action** + **resource_type** under `cargo test-ci`. Full SIEM export / retention remains later in phase C.
 
@@ -42,5 +42,5 @@ bash bin/run-poolai.sh quick --audit
 
 - FM §5.17 enterprise 100% · §5.52 band 71 journal
 - Phase B SSO closed at band 70 — see [`SSO_HORIZON.md`](./SSO_HORIZON.md)
-- Mirror: [`SSO_DEPTH.md`](./SSO_DEPTH.md)
+- Mirror: [`SSO_DEPTH.md`](./SSO_DEPTH.md) · store wire: [`AUDIT_STORE.md`](./AUDIT_STORE.md)
 - PH-S1349 · audit_depth · POOLAI_AUDIT_STORE · PH-S1352 · VERIFY_AUDIT · PH-S1354 · --audit · PH-S1358

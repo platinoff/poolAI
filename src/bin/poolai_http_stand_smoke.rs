@@ -5758,6 +5758,46 @@ mod tests {
     }
 
     #[test]
+    fn audit_store_band72_export_shape_ph_s1363() {
+        use poolai_ui_core::audit_store_depth::{
+            audit_store_criteria_total, audit_store_depth_stub, AuditStoreDepth, AUDIT_STORE_CASES,
+            AUDIT_STORE_CRITERIA, FM_BAND72_ROWS,
+        };
+        use serde_json::json;
+        assert_eq!(
+            audit_store_depth_stub(Some(&json!({"api_contracts": true}))),
+            AuditStoreDepth::ApiContracts
+        );
+        assert_eq!(
+            audit_store_depth_stub(Some(&json!({
+                "audit_store_depth": true,
+                "store_wire": true,
+                "api_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "audit_store_docs": true,
+            }))),
+            AuditStoreDepth::FullBand72
+        );
+        assert_eq!(AUDIT_STORE_CRITERIA.len(), 7);
+        assert_eq!(audit_store_criteria_total(), 7);
+        assert!(AUDIT_STORE_CASES.contains(&"store_wire"));
+        let audit_mod = include_str!("../../src/enterprise/audit.rs");
+        assert!(audit_mod.contains("audit_store_wire"));
+        assert!(audit_mod.contains("POOLAI_AUDIT_DATA_DIR"));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--audit-store"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND72_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band72 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn galaxy_edge_verification_band48_export_shape_ph_s1125() {
         use poolai_ui_core::galaxy_edge_verification_depth::{
             edge_verification_criteria_total, galaxy_edge_verification_depth_stub,

@@ -9,6 +9,9 @@
 //! ```
 
 use poolai_ui_core::audit_depth::{audit_criteria_total, AUDIT_CASES, AUDIT_CRITERIA};
+use poolai_ui_core::audit_store_depth::{
+    audit_store_criteria_total, AUDIT_STORE_CASES, AUDIT_STORE_CRITERIA,
+};
 use poolai_ui_core::ci_canon_depth::{ci_canon_criteria_total, CI_CANON_CASES, CI_CANON_CRITERIA};
 use poolai_ui_core::galaxy_edge_verification_depth::{
     edge_verification_criteria_total, EDGE_VERIFICATION_CASES, EDGE_VERIFICATION_CRITERIA,
@@ -208,6 +211,8 @@ struct AuditConfig {
     sso_horizon: bool,
     /// Emit band-71 audit depth fields (PH-S1354).
     audit: bool,
+    /// Emit band-72 audit store-wire fields (PH-S1364).
+    audit_store: bool,
 }
 
 impl Default for AuditConfig {
@@ -244,6 +249,7 @@ impl Default for AuditConfig {
             sso_ratio_advisory: false,
             sso_horizon: false,
             audit: false,
+            audit_store: false,
         }
     }
 }
@@ -457,6 +463,12 @@ struct RustRatioReport {
     audit_criteria_total: usize,
     /// Audit depth criteria met count (PH-S1354).
     audit_criteria_met_count: usize,
+    /// Band-72 audit store-wire mode (PH-S1364).
+    audit_store_mode: bool,
+    /// Audit store-wire criteria registry size (PH-S1364).
+    audit_store_criteria_total: usize,
+    /// Audit store-wire criteria met count (PH-S1364).
+    audit_store_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -765,6 +777,22 @@ fn audit_sso_store_criteria_met(root: &Path) -> (usize, usize) {
     (met, total)
 }
 
+fn audit_store_wire_criteria_met(root: &Path) -> (usize, usize) {
+    let total = audit_store_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in AUDIT_STORE_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
 fn audit_sso_api_criteria_met(root: &Path) -> (usize, usize) {
     let total = sso_api_criteria_total();
     let mut met = 0usize;
@@ -1009,6 +1037,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--sso-vision-sync" => config.sso_vision_sync = true,
             "--sso-ratio-advisory" => config.sso_ratio_advisory = true,
             "--sso-horizon" => config.sso_horizon = true,
+            "--audit-store" => config.audit_store = true,
             "--audit" => config.audit = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
@@ -1058,6 +1087,7 @@ fn print_help() {
            --sso-ratio-advisory        band-69 SSO ratio-advisory fields (PH-S1334)\n\
            --sso-horizon               band-70 SSO horizon-close fields (PH-S1344)\n\
            --audit                     band-71 audit depth scaffold fields (PH-S1354)\n\
+           --audit-store               band-72 audit store-wire fields (PH-S1364)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -1421,6 +1451,15 @@ fn build_report(
         );
         notes.push("PH-S1358: band 71 audit depth — criteria met vs registry");
     }
+    let (audit_store_criteria_met_count, audit_store_criteria_total_count) = if config.audit_store {
+        audit_store_wire_criteria_met(root)
+    } else {
+        (0, audit_store_criteria_total())
+    };
+    if config.audit_store {
+        notes.push("PH-S1364: audit_store_mode — durable path wire stub (POOLAI_AUDIT_DATA_DIR)");
+        notes.push("PH-S1368: band 72 audit store wire — criteria met vs registry");
+    }
 
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
@@ -1530,6 +1569,9 @@ fn build_report(
         audit_mode: config.audit,
         audit_criteria_total: audit_criteria_total_count,
         audit_criteria_met_count,
+        audit_store_mode: config.audit_store,
+        audit_store_criteria_total: audit_store_criteria_total_count,
+        audit_store_criteria_met_count,
         by_category,
         notes,
     })
@@ -1843,6 +1885,14 @@ fn print_summary(report: &RustRatioReport) {
             report.audit_criteria_met_count, report.audit_criteria_total
         );
         println!("  audit_cases:           {}", AUDIT_CASES.join(", "));
+    }
+    if report.audit_store_mode {
+        println!("  audit_store:           true (PH-S1364 band 72)");
+        println!(
+            "  audit_store_criteria:  {}/{} met",
+            report.audit_store_criteria_met_count, report.audit_store_criteria_total
+        );
+        println!("  audit_store_cases:     {}", AUDIT_STORE_CASES.join(", "));
     }
     for (name, loc) in &report.by_category {
         println!("  {name}: {} files, {} loc", loc.files, loc.loc);
