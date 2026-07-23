@@ -23,7 +23,7 @@
 | **PH-S1367** | Ratio hold advisory |
 | **PH-S1368** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **370**. **Pending completion:** **920** (→ PH-S2278).
+**§5.12:** **10** відкритих. **Vision:** rev **371**. **Pending completion:** **920** (→ PH-S2278).
 
 ## Band 71 — Audit depth scaffold (PH-S1349…S1358, ✅)
 
@@ -40,7 +40,7 @@
 | **PH-S1357** | Ratio hold advisory |
 | **PH-S1358** | Band close |
 
-**§5.12:** **0** відкритих (band 71 ✅ — journal). **Vision:** rev **370**.
+**§5.12:** **0** відкритих (band 71 ✅ — journal). **Vision:** rev **371**.
 
 **PH-S1358 ✅ (2026-07-23):** `audit_depth.rs`; `POOLAI_AUDIT_STORE`; `--audit`; `VERIFY_AUDIT`; `AUDIT_DEPTH.md`; `galaxy_horizon_s1349_integration`. Phase C Audit depth scaffold closed.
 
