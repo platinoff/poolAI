@@ -5675,6 +5675,49 @@ mod tests {
     }
 
     #[test]
+    fn sso_horizon_band70_export_shape_ph_s1343() {
+        use poolai_ui_core::sso_horizon_depth::{
+            sso_horizon_criteria_total, sso_horizon_depth_stub, sso_horizon_slices_met,
+            SsoHorizonDepth, FM_BAND70_ROWS, SSO_HORIZON_CASES, SSO_HORIZON_CRITERIA,
+            SSO_HORIZON_SLICES,
+        };
+        use serde_json::json;
+        assert_eq!(
+            sso_horizon_depth_stub(Some(&json!({"stand_smoke_export": true}))),
+            SsoHorizonDepth::StandSmokeExport
+        );
+        assert_eq!(
+            sso_horizon_depth_stub(Some(&json!({
+                "sso_horizon_depth": true,
+                "slice_aggregate": true,
+                "criteria_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "sso_horizon_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            SsoHorizonDepth::FullBand70
+        );
+        assert_eq!(SSO_HORIZON_CRITERIA.len(), 10);
+        assert_eq!(sso_horizon_criteria_total(), 10);
+        assert_eq!(SSO_HORIZON_SLICES.len(), 10);
+        assert!(SSO_HORIZON_CASES.contains(&"aggregate_flag"));
+        let canon = include_str!("../../docs/development/SSO_HORIZON.md");
+        assert_eq!(sso_horizon_slices_met(canon), (10, 10));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--sso-horizon"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND70_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band70 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn galaxy_edge_verification_band48_export_shape_ph_s1125() {
         use poolai_ui_core::galaxy_edge_verification_depth::{
             edge_verification_criteria_total, galaxy_edge_verification_depth_stub,

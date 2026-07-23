@@ -1,14 +1,14 @@
 # PH-S enterprise roadmap v2 (PH-S1149…S2148) + project completion → S2278
 
-**Оновлено:** 2026-07-23 · **Мета:** durable single-host **enterprise 100%** (FM §5.17) @ PH-S2148 · **project development complete** (FM §5.18) @ PH-S2278 · активний шлях **PH-S1339…S2278 = 940** спринтів · **94** сесій `абракадабра`
+**Оновлено:** 2026-07-23 · **Мета:** durable single-host **enterprise 100%** (FM §5.17) @ PH-S2148 · **project development complete** (FM §5.18) @ PH-S2278 · активний шлях **PH-S1349…S2278 = 930** спринтів · **93** сесій `абракадабра`
 
 **Канон drain:** FM **§5.12** (max 10 відкритих) · реєстр — [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md) · completion plan — [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · regen: `bash scripts/generate-ph-s-master-backlog-1000.sh` · extension: `bash scripts/generate-ph-s-completion-extension.sh`
 
-**Попередній горизонт:** product-complete PH-S1010 / FM §5.15 ✅ · maintenance bands 37–50 ✅ · enterprise phase A bands 51–60 ✅ · phase B SSO depth/store/API/admin/ops/stand-smoke/loc-audit/docs/vision/ratio bands 61–69 ✅ · PH-S1149…S1338 markers preserved
+**Попередній горизонт:** product-complete PH-S1010 / FM §5.15 ✅ · maintenance bands 37–50 ✅ · enterprise phase A bands 51–60 ✅ · phase B SSO bands 61–70 ✅ · PH-S1149…S1348 markers preserved
 
-**Drained slice keywords (horizon close tests):** PH-S1149 · PH-S1159 · PH-S1169 · PH-S1179 · PH-S1189 · PH-S1199 · PH-S1209 · PH-S1219 · PH-S1229 · PH-S1239 · PH-S1249 · PH-S1259 · PH-S1269 · PH-S1279 · PH-S1289 · PH-S1299 · PH-S1309 · PH-S1319 · PH-S1329 · depth scaffold · store wire · API contracts · admin/ops glue · stand smoke · loc-audit · docs canon · vision-sync · ratio advisory · horizon close
+**Drained slice keywords (horizon close tests):** PH-S1149 · PH-S1159 · PH-S1169 · PH-S1179 · PH-S1189 · PH-S1199 · PH-S1209 · PH-S1219 · PH-S1229 · PH-S1239 · PH-S1249 · PH-S1259 · PH-S1269 · PH-S1279 · PH-S1289 · PH-S1299 · PH-S1309 · PH-S1319 · PH-S1329 · PH-S1339 · depth scaffold · store wire · API contracts · admin/ops glue · stand smoke · loc-audit · docs canon · vision-sync · ratio advisory · horizon close
 
-**Активна смуга:** band 70 **PH-S1339…S1348** (B SSO · horizon close) — **у §5.12** · band 69 ratio-advisory ✅
+**Активна смуга:** band 71 **PH-S1349…S1358** (C Audit · depth scaffold) — **у §5.12** · band 70 horizon ✅
 
 **Поза scope (не в backlog):** FM-003 LAN 2-host (**BLOCKED**) · FM-041 Cloud SDK prod (**Deferred**) · mandatory ZK/TEE
 

@@ -1,14 +1,31 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-23 (band 69 ✅ · band 70 **§5.12 = 10 open** · Cursor **3.12.30**)
+**Оновлено:** 2026-07-23 (band 70 ✅ · band 71 **§5.12 = 10 open** · Cursor **3.12.30**)
 
-**Наступна сесія:** **`абракадабра`** — drain band 70 (B SSO · horizon close) з FM **§5.51**.
+**Наступна сесія:** **`абракадабра`** — drain band 71 (C Audit · depth scaffold) з FM **§5.52**.
 
 **Cursor / toolchain (service):** local desktop **3.12.30** · public changelog latest numbered IDE **3.11** · research [`CURSOR_UPDATE_RESEARCH_2026-07-22.md`](./CURSOR_UPDATE_RESEARCH_2026-07-22.md) · FM **§5.16**. Vision: `poolai-vision-sync` мержить enterprise `queue — band` → Sprint queue + Feed = останні закриті PH-S*.
 
-**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **940** спринтів до FM **§5.18** @ PH-S2278 (enterprise §5.17 @ S2148 + extension Memory/Job/Solana/Wasm/close).
+**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **930** спринтів до FM **§5.18** @ PH-S2278 (enterprise §5.17 @ S2148 + extension Memory/Job/Solana/Wasm/close).
 
-## Band 70 — SSO horizon close (PH-S1339…S1348, **ACTIVE**)
+## Band 71 — Audit depth scaffold (PH-S1349…S1358, **ACTIVE**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1349** | `audit_depth` ui-core module |
+| **PH-S1350** | Audit store/wire slice stub |
+| **PH-S1351** | Criteria contracts |
+| **PH-S1352** | `VERIFY_AUDIT` + quick `--audit` |
+| **PH-S1353** | Stand smoke export shape band 71 |
+| **PH-S1354** | `poolai-loc-audit --audit` |
+| **PH-S1355** | `AUDIT_DEPTH.md` + canon |
+| **PH-S1356** | vision-sync --check |
+| **PH-S1357** | Ratio hold advisory |
+| **PH-S1358** | Band close |
+
+**§5.12:** **10** відкритих. **Vision:** rev **367**. **Pending completion:** **930** (→ PH-S2278).
+
+## Band 70 — SSO horizon close (PH-S1339…S1348, ✅)
 
 | Sprint | Фокус |
 |--------|--------|
@@ -23,7 +40,9 @@
 | **PH-S1347** | Ratio hold advisory |
 | **PH-S1348** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **366**. **Pending completion:** **940** (→ PH-S2278).
+**§5.12:** **0** відкритих (band 70 ✅ — journal). **Vision:** rev **367**.
+
+**PH-S1348 ✅ (2026-07-23):** `sso_horizon_depth.rs`; `SSO_HORIZON_SLICES`; `--sso-horizon`; `VERIFY_SSO_HORIZON`; `SSO_HORIZON.md`; `galaxy_horizon_s1339_integration`. Phase B SSO horizon closed.
 
 ## Band 69 — SSO ratio advisory (PH-S1329…S1338, ✅)
 

@@ -79,6 +79,7 @@ Options (quick):
   --sso-docs-canon  After health wait, loc-audit --sso-docs-canon (PH-S1312)
   --sso-vision-sync After health wait, loc-audit --sso-vision-sync (PH-S1322)
   --sso-ratio-advisory After health wait, loc-audit --sso-ratio-advisory (PH-S1332)
+  --sso-horizon   After health wait, loc-audit --sso-horizon (PH-S1342)
   --skip-build    Skip cargo build
   --port N        HTTP port (default 8080)
 
@@ -281,6 +282,7 @@ cmd_quick() {
   local sso_docs_canon=0
   local sso_vision_sync=0
   local sso_ratio_advisory=0
+  local sso_horizon=0
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --skip-build) SKIP_BUILD=1; shift ;;
@@ -309,6 +311,7 @@ cmd_quick() {
       --sso-docs-canon) sso_docs_canon=1; shift ;;
       --sso-vision-sync) sso_vision_sync=1; shift ;;
       --sso-ratio-advisory) sso_ratio_advisory=1; shift ;;
+      --sso-horizon) sso_horizon=1; shift ;;
       --port) PORT="$2"; shift 2 ;;
       *) echo "Unknown option: $1"; usage; exit 1 ;;
     esac
@@ -424,6 +427,10 @@ cmd_quick() {
   if [[ "$sso_ratio_advisory" == "1" ]]; then
     echo "Running poolai-loc-audit --sso-ratio-advisory (PH-S1332)..."
     cargo run --quiet --bin poolai-loc-audit -- --sso-ratio-advisory
+  fi
+  if [[ "$sso_horizon" == "1" ]]; then
+    echo "Running poolai-loc-audit --sso-horizon (PH-S1342)..."
+    cargo run --quiet --bin poolai-loc-audit -- --sso-horizon
   fi
 }
 

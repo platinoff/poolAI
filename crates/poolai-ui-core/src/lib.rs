@@ -47,6 +47,7 @@ pub mod sso_admin_ops_depth;
 pub mod sso_api_contracts_depth;
 pub mod sso_depth;
 pub mod sso_docs_canon_depth;
+pub mod sso_horizon_depth;
 pub mod sso_loc_audit_depth;
 pub mod sso_ratio_advisory_depth;
 pub mod sso_stand_smoke_depth;

@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 168967,
-  "non_rust_product_loc": 9194,
-  "product_loc_total": 178161,
-  "rust_ratio": 0.9483949910474234,
-  "rust_ratio_pct": 94.83949910474234,
+  "rust_loc": 169439,
+  "non_rust_product_loc": 9211,
+  "product_loc_total": 178650,
+  "rust_ratio": 0.9484410859221942,
+  "rust_ratio_pct": 94.84410859221943,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -97,9 +97,12 @@
   "sso_vision_sync_mode": false,
   "sso_vision_sync_criteria_total": 10,
   "sso_vision_sync_criteria_met_count": 0,
-  "sso_ratio_advisory_mode": true,
+  "sso_ratio_advisory_mode": false,
   "sso_ratio_advisory_criteria_total": 10,
-  "sso_ratio_advisory_criteria_met_count": 10,
+  "sso_ratio_advisory_criteria_met_count": 0,
+  "sso_horizon_mode": true,
+  "sso_horizon_criteria_total": 10,
+  "sso_horizon_criteria_met_count": 10,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -111,23 +114,23 @@
     },
     "ops_shell": {
       "files": 39,
-      "loc": 3469
+      "loc": 3486
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 87,
-      "loc": 18563
+      "files": 88,
+      "loc": 18799
     },
     "rust_src": {
       "files": 300,
-      "loc": 111189
+      "loc": 111280
     },
     "rust_tests": {
-      "files": 281,
-      "loc": 38607
+      "files": 283,
+      "loc": 38752
     },
     "ui_css": {
       "files": 2,
@@ -158,7 +161,7 @@
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
     "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
-    "PH-S1334: sso_ratio_advisory_mode — aggregate prior --sso* + vision-sync slices",
-    "PH-S1338: band 69 SSO ratio-advisory — criteria met vs registry"
+    "PH-S1344: sso_horizon_mode — aggregate band 61–69 SSO slices (phase B close)",
+    "PH-S1348: band 70 SSO horizon close — criteria met vs registry"
   ]
 }

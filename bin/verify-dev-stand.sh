@@ -41,6 +41,7 @@ VERIFY_SSO_LOC_AUDIT="${VERIFY_SSO_LOC_AUDIT:-0}"
 VERIFY_SSO_DOCS_CANON="${VERIFY_SSO_DOCS_CANON:-0}"
 VERIFY_SSO_VISION_SYNC="${VERIFY_SSO_VISION_SYNC:-0}"
 VERIFY_SSO_RATIO_ADVISORY="${VERIFY_SSO_RATIO_ADVISORY:-0}"
+VERIFY_SSO_HORIZON="${VERIFY_SSO_HORIZON:-0}"
 HEALTH_RETRIES="${VERIFY_HEALTH_RETRIES:-45}"
 HEALTH_SLEEP="${VERIFY_HEALTH_SLEEP:-2}"
 
@@ -555,6 +556,16 @@ if [[ "$VERIFY_SSO_RATIO_ADVISORY" == "1" ]]; then
     echo "OK  SSO ratio-advisory gate"
   else
     echo "FAIL SSO ratio-advisory gate"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_SSO_HORIZON" == "1" ]]; then
+  echo "Running poolai-loc-audit --sso-horizon (PH-S1342)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --sso-horizon); then
+    echo "OK  SSO horizon gate"
+  else
+    echo "FAIL SSO horizon gate"
     fail=1
   fi
 fi

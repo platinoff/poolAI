@@ -18,7 +18,7 @@ Prior vision-sync remains [`SSO_VISION_SYNC.md`](./SSO_VISION_SYNC.md) (band 68)
 
 **Boundary:** band 69 = ratio-advisory ops gate for SSO phase B (no new SSO durable store).
 Prior vision-sync: [`SSO_VISION_SYNC.md`](./SSO_VISION_SYNC.md) (band 68).
-Mirror: [`TENANT_RATIO_ADVISORY.md`](./TENANT_RATIO_ADVISORY.md). Next: band 70 SSO horizon close.
+Mirror: [`TENANT_RATIO_ADVISORY.md`](./TENANT_RATIO_ADVISORY.md). Next: [`SSO_HORIZON.md`](./SSO_HORIZON.md) (band 70).
 
 ## Loc-audit / verify
 
