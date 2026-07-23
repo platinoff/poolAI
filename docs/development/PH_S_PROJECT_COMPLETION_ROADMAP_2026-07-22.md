@@ -1,12 +1,12 @@
 # Project completion backlog — 1000 sprints (PH-S1279…S2278)
 
-**Оновлено:** 2026-07-22 · **Мета:** шлях **до завершення розробки проєкту** · pending **980** спринтів (PH-S1299…S2278) · **98** сесій `абракадабра` (10 PH-S* / сесія)
+**Оновлено:** 2026-07-23 · **Мета:** шлях **до завершення розробки проєкту** · pending **970** спринтів (PH-S1309…S2278) · **97** сесій `абракадабра` (10 PH-S* / сесія)
 
 **Підстави скоупу:** STABLE / FM §5.15–§5.17 · Galaxy concept · enterprise roadmap v2 · коміти **з 2026-07-12** (tenant→SSO bands 51–65, Cursor service, vision queue) · `PH_S_MASTER_BACKLOG_1000.md`
 
 **Канон drain:** FM **§5.12** (max **10** відкритих) · реєстр рядків — цей файл + [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md) · enterprise plan — [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](./PH_S_ENTERPRISE_ROADMAP_2026-07-19.md)
 
-**Активна смуга:** band 66 **PH-S1299…S1308** → FM §5.12 `[ ]` · band 65 ✅
+**Активна смуга:** band 67 **PH-S1309…S1318** → FM §5.12 `[ ]` · band 66 ✅
 
 **Поза scope:** FM-003 LAN 2-host (**BLOCKED**) · FM-041 Cloud SDK prod (**Deferred**) · mandatory ZK/TEE
 
@@ -17,8 +17,8 @@
 | Поле | Значення |
 |------|----------|
 | Last closed | band 65 PH-S1298 ✅ (SSO stand smoke) |
-| Open in §5.12 | **10** (band 66) |
-| Completion pending | **PH-S1299…S2278** = **980** |
+| Open in §5.12 | **10** (band 67) |
+| Completion pending | **PH-S1309…S2278** = **970** |
 | Enterprise subset | PH-S1299…S2148 (850) → FM **§5.17** |
 | Project-close extension | PH-S2149…S2278 (130) → FM **§5.18** |
 | Sessions remaining | **98** × `абракадабра` |

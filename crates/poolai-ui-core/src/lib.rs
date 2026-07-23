@@ -46,6 +46,7 @@ pub mod security;
 pub mod sso_admin_ops_depth;
 pub mod sso_api_contracts_depth;
 pub mod sso_depth;
+pub mod sso_loc_audit_depth;
 pub mod sso_stand_smoke_depth;
 pub mod sso_store_depth;
 pub mod stable_depth;

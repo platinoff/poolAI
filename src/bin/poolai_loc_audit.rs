@@ -26,6 +26,9 @@ use poolai_ui_core::sso_api_contracts_depth::{
     sso_api_criteria_total, SSO_API_CASES, SSO_API_CRITERIA,
 };
 use poolai_ui_core::sso_depth::{sso_criteria_total, SSO_CASES, SSO_CRITERIA};
+use poolai_ui_core::sso_loc_audit_depth::{
+    sso_loc_audit_criteria_total, SSO_LOC_AUDIT_CASES, SSO_LOC_AUDIT_CRITERIA,
+};
 use poolai_ui_core::sso_stand_smoke_depth::{
     sso_stand_smoke_criteria_total, SSO_STAND_SMOKE_CASES, SSO_STAND_SMOKE_CRITERIA,
 };
@@ -180,6 +183,8 @@ struct AuditConfig {
     sso_admin_ops: bool,
     /// Emit band-65 SSO stand-smoke fields (PH-S1294).
     sso_stand_smoke: bool,
+    /// Emit band-66 SSO loc-audit aggregate fields (PH-S1304).
+    sso_loc_audit: bool,
 }
 
 impl Default for AuditConfig {
@@ -210,6 +215,7 @@ impl Default for AuditConfig {
             sso_api: false,
             sso_admin_ops: false,
             sso_stand_smoke: false,
+            sso_loc_audit: false,
         }
     }
 }
@@ -387,6 +393,12 @@ struct RustRatioReport {
     sso_stand_smoke_criteria_total: usize,
     /// SSO stand-smoke criteria met count (PH-S1294).
     sso_stand_smoke_criteria_met_count: usize,
+    /// Band-66 SSO loc-audit aggregate mode (PH-S1304).
+    sso_loc_audit_mode: bool,
+    /// SSO loc-audit criteria registry size (PH-S1304).
+    sso_loc_audit_criteria_total: usize,
+    /// SSO loc-audit criteria met count (PH-S1304).
+    sso_loc_audit_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -727,6 +739,22 @@ fn audit_sso_stand_smoke_criteria_met(root: &Path) -> (usize, usize) {
     (met, total)
 }
 
+fn audit_sso_loc_audit_criteria_met(root: &Path) -> (usize, usize) {
+    let total = sso_loc_audit_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in SSO_LOC_AUDIT_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
 fn classify_product_path(path: &str) -> ProductCategory {
     let p = path.replace('\\', "/");
     if p.starts_with("src/") && p.ends_with(".rs") {
@@ -838,6 +866,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--sso-api" => config.sso_api = true,
             "--sso-admin-ops" => config.sso_admin_ops = true,
             "--sso-stand-smoke" => config.sso_stand_smoke = true,
+            "--sso-loc-audit" => config.sso_loc_audit = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
                 print_help();
@@ -880,6 +909,7 @@ fn print_help() {
            --sso-api                   band-63 SSO HTTP API contracts fields (PH-S1276)\n\
            --sso-admin-ops             band-64 SSO admin/ops fields (PH-S1285)\n\
            --sso-stand-smoke           band-65 SSO stand-smoke fields (PH-S1294)\n\
+           --sso-loc-audit             band-66 SSO loc-audit aggregate fields (PH-S1304)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -1181,6 +1211,16 @@ fn build_report(
         );
         notes.push("PH-S1298: band 65 SSO stand-smoke — criteria met vs registry");
     }
+    let (sso_loc_audit_criteria_met_count, sso_loc_audit_criteria_total_count) =
+        if config.sso_loc_audit {
+            audit_sso_loc_audit_criteria_met(root)
+        } else {
+            (0, sso_loc_audit_criteria_total())
+        };
+    if config.sso_loc_audit {
+        notes.push("PH-S1304: sso_loc_audit_mode — aggregate band 61–65 --sso* loc-audit slices");
+        notes.push("PH-S1308: band 66 SSO loc-audit — criteria met vs registry");
+    }
 
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
@@ -1272,6 +1312,9 @@ fn build_report(
         sso_stand_smoke_mode: config.sso_stand_smoke,
         sso_stand_smoke_criteria_total: sso_stand_smoke_criteria_total_count,
         sso_stand_smoke_criteria_met_count,
+        sso_loc_audit_mode: config.sso_loc_audit,
+        sso_loc_audit_criteria_total: sso_loc_audit_criteria_total_count,
+        sso_loc_audit_criteria_met_count,
         by_category,
         notes,
     })
@@ -1528,6 +1571,14 @@ fn print_summary(report: &RustRatioReport) {
             "  sso_stand_smoke_cases: {}",
             SSO_STAND_SMOKE_CASES.join(", ")
         );
+    }
+    if report.sso_loc_audit_mode {
+        println!("  sso_loc_audit:         true (PH-S1304 band 66)");
+        println!(
+            "  sso_loc_audit_criteria: {}/{} met",
+            report.sso_loc_audit_criteria_met_count, report.sso_loc_audit_criteria_total
+        );
+        println!("  sso_loc_audit_cases: {}", SSO_LOC_AUDIT_CASES.join(", "));
     }
     for (name, loc) in &report.by_category {
         println!("  {name}: {} files, {} loc", loc.files, loc.loc);

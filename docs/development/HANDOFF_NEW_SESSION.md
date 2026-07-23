@@ -1,14 +1,31 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-22 (band 65 ✅ · band 66 **§5.12 = 10 open** · Cursor **3.12.30**)
+**Оновлено:** 2026-07-23 (band 66 ✅ · band 67 **§5.12 = 10 open** · Cursor **3.12.30**)
 
-**Наступна сесія:** **`абракадабра`** — drain band 66 (B SSO · loc-audit aggregate) з FM **§5.47**.
+**Наступна сесія:** **`абракадабра`** — drain band 67 (B SSO · docs canon) з FM **§5.48**.
 
 **Cursor / toolchain (service):** local desktop **3.12.30** · public changelog latest numbered IDE **3.11** · research [`CURSOR_UPDATE_RESEARCH_2026-07-22.md`](./CURSOR_UPDATE_RESEARCH_2026-07-22.md) · FM **§5.16**. Vision: `poolai-vision-sync` мержить enterprise `queue — band` → Sprint queue + Feed = останні закриті PH-S*.
 
-**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **980** спринтів до FM **§5.18** @ PH-S2278 (enterprise §5.17 @ S2148 + extension Memory/Job/Solana/Wasm/close).
+**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **970** спринтів до FM **§5.18** @ PH-S2278 (enterprise §5.17 @ S2148 + extension Memory/Job/Solana/Wasm/close).
 
-## Band 66 — SSO loc-audit aggregate (PH-S1299…S1308, **ACTIVE**)
+## Band 67 — SSO docs canon (PH-S1309…S1318, **ACTIVE**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1309** | `sso_docs_canon_depth` ui-core module |
+| **PH-S1310** | Docs slice aggregate stub (`SSO_DOCS_CANON_SLICES`) |
+| **PH-S1311** | Criteria contracts |
+| **PH-S1312** | `VERIFY_SSO_DOCS_CANON` + quick `--sso-docs-canon` |
+| **PH-S1313** | Stand smoke export shape band 67 |
+| **PH-S1314** | `poolai-loc-audit --sso-docs-canon` |
+| **PH-S1315** | `SSO_DOCS_CANON.md` + canon |
+| **PH-S1316** | vision-sync --check |
+| **PH-S1317** | Ratio hold advisory |
+| **PH-S1318** | Band close |
+
+**§5.12:** **10** відкритих. **Vision:** rev **360**. **Pending completion:** **970** (→ PH-S2278).
+
+## Band 66 — SSO loc-audit aggregate (PH-S1299…S1308, ✅)
 
 | Sprint | Фокус |
 |--------|--------|
@@ -23,7 +40,9 @@
 | **PH-S1307** | Ratio hold advisory |
 | **PH-S1308** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **358**. **Pending completion:** **980** (→ PH-S2278).
+**§5.12:** **0** відкритих (band 66 ✅ — journal). **Vision:** rev **360**.
+
+**PH-S1308 ✅ (2026-07-23):** `sso_loc_audit_depth.rs`; slice aggregate; `--sso-loc-audit`; `VERIFY_SSO_LOC_AUDIT`; `SSO_LOC_AUDIT.md`; `galaxy_horizon_s1299_integration`. Phase B SSO loc-audit aggregate closed.
 
 ## Band 65 — SSO stand smoke (PH-S1289…S1298, ✅)
 
@@ -40,7 +59,7 @@
 | **PH-S1297** | Ratio hold advisory |
 | **PH-S1298** | Band close |
 
-**§5.12:** **0** відкритих (band 65 ✅ — journal). **Vision:** rev **358**.
+**§5.12:** **0** відкритих (band 65 ✅ — journal). **Vision:** rev **360**.
 
 **PH-S1298 ✅ (2026-07-22):** `sso_stand_smoke_depth.rs`; live store/CRUD/callback smoke; `--sso-stand-smoke`; `VERIFY_SSO_STAND_SMOKE`; `SSO_STAND_SMOKE.md`; `galaxy_horizon_s1289_integration`. Phase B SSO stand smoke closed.
 

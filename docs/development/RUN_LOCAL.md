@@ -24,7 +24,7 @@ cd S:\rust\poolAI
 .\bin\run-poolai.ps1 stop
 ```
 
-**Last updated:** 2026-07-22 (PH-S1298 band 65 · `--sso-stand-smoke` · `VERIFY_SSO_STAND_SMOKE` · phase B SSO stand smoke)
+**Last updated:** 2026-07-23 (PH-S1308 band 66 · `--sso-loc-audit` · `VERIFY_SSO_LOC_AUDIT` · phase B SSO loc-audit aggregate)
 
 ### PH-S1011 / PH-S1012: Light compile + quick preset
 
@@ -72,6 +72,7 @@ cd S:\rust\poolAI
 /usr/bin/bash bin/run-poolai.sh quick --sso-api
 /usr/bin/bash bin/run-poolai.sh quick --sso-admin-ops
 /usr/bin/bash bin/run-poolai.sh quick --sso-stand-smoke
+/usr/bin/bash bin/run-poolai.sh quick --sso-loc-audit
 # PowerShell:
 .\bin\run-poolai.ps1 quick -StandSmoke
 .\bin\run-poolai.ps1 quick -MigrationAdvisory
@@ -331,6 +332,7 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `VERIFY_SSO_API=1` | `verify-dev-stand.sh` → `poolai-loc-audit --sso-api` (PH-S1275) |
 | `VERIFY_SSO_ADMIN_OPS=1` | `verify-dev-stand.sh` → `poolai-loc-audit --sso-admin-ops` (PH-S1284) |
 | `VERIFY_SSO_STAND_SMOKE=1` | `verify-dev-stand.sh` → live `--sso-stand-smoke` + loc-audit (PH-S1295) |
+| `VERIFY_SSO_LOC_AUDIT=1` | `verify-dev-stand.sh` → `poolai-loc-audit --sso-loc-audit` (PH-S1302) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 ### PH-S1100: Rust migration advisory (band 46)
@@ -738,6 +740,26 @@ VERIFY_SSO_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `sso_stand_smoke_criteria_met_count` | Criteria with marker present in canonical doc path |
 
 Module: [`sso_stand_smoke_depth.rs`](../../crates/poolai-ui-core/src/sso_stand_smoke_depth.rs) · tests: `sso_stand_smoke_integration.rs`, `galaxy_horizon_s1289_integration.rs` · docs: [`SSO_STAND_SMOKE.md`](./SSO_STAND_SMOKE.md).
+
+### PH-S1304: SSO loc-audit aggregate (band 66)
+
+Aggregate gate for band 61–65 `--sso*` loc-audit slices.
+
+```bash
+cargo run --bin poolai-loc-audit -- --sso-loc-audit
+cargo run --bin poolai-loc-audit -- --sso-loc-audit --advisory --min-ratio 0.95
+
+VERIFY_SSO_LOC_AUDIT=1 bash bin/verify-dev-stand.sh
+/usr/bin/bash bin/run-poolai.sh quick --sso-loc-audit
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `sso_loc_audit_mode` | `true` when `--sso-loc-audit` (PH-S1304) |
+| `sso_loc_audit_criteria_total` | SSO loc-audit criteria registry size |
+| `sso_loc_audit_criteria_met_count` | Criteria with marker present in canonical doc path |
+
+Module: [`sso_loc_audit_depth.rs`](../../crates/poolai-ui-core/src/sso_loc_audit_depth.rs) · tests: `sso_loc_audit_integration.rs`, `galaxy_horizon_s1299_integration.rs` · docs: [`SSO_LOC_AUDIT.md`](./SSO_LOC_AUDIT.md).
 
 Default stand smoke includes **`vision_revision_parity`** (PH-S208, PH-S235): repo `manifest.revision` vs FM §5.12 `Vision rev`, `extensions.active_sprint` vs `manifest.next_sprint`, then `GET /docs/vision/manifest.json` with `X-PoolAI-Vision-Revision` header vs JSON body.
 

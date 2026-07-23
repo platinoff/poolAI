@@ -5504,6 +5504,48 @@ mod tests {
     }
 
     #[test]
+    fn sso_loc_audit_band66_export_shape_ph_s1303() {
+        use poolai_ui_core::sso_loc_audit_depth::{
+            sso_loc_audit_criteria_total, sso_loc_audit_depth_stub, sso_loc_audit_slices_met,
+            SsoLocAuditDepth, FM_BAND66_ROWS, SSO_LOC_AUDIT_CASES, SSO_LOC_AUDIT_CRITERIA,
+            SSO_LOC_AUDIT_SLICES,
+        };
+        use serde_json::json;
+        assert_eq!(
+            sso_loc_audit_depth_stub(Some(&json!({"stand_smoke_export": true}))),
+            SsoLocAuditDepth::StandSmokeExport
+        );
+        assert_eq!(
+            sso_loc_audit_depth_stub(Some(&json!({
+                "sso_loc_audit_depth": true,
+                "slice_aggregate": true,
+                "criteria_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "sso_loc_audit_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            SsoLocAuditDepth::FullBand66
+        );
+        assert_eq!(SSO_LOC_AUDIT_CRITERIA.len(), 10);
+        assert_eq!(sso_loc_audit_criteria_total(), 10);
+        assert_eq!(SSO_LOC_AUDIT_SLICES.len(), 5);
+        assert!(SSO_LOC_AUDIT_CASES.contains(&"aggregate_flag"));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert_eq!(sso_loc_audit_slices_met(loc_audit), (5, 5));
+        assert!(loc_audit.contains("--sso-loc-audit"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND66_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band66 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn galaxy_edge_verification_band48_export_shape_ph_s1125() {
         use poolai_ui_core::galaxy_edge_verification_depth::{
             edge_verification_criteria_total, galaxy_edge_verification_depth_stub,
