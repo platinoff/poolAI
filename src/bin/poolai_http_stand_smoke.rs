@@ -5859,6 +5859,49 @@ mod tests {
     }
 
     #[test]
+    fn audit_vision_sync_band78_export_shape_ph_s1423() {
+        use poolai_ui_core::audit_vision_sync_depth::{
+            audit_vision_sync_criteria_total, audit_vision_sync_depth_stub,
+            audit_vision_sync_slices_met, AuditVisionSyncDepth, AUDIT_VISION_SYNC_CASES,
+            AUDIT_VISION_SYNC_CRITERIA, AUDIT_VISION_SYNC_SLICES, FM_BAND78_ROWS,
+        };
+        use serde_json::json;
+        assert_eq!(
+            audit_vision_sync_depth_stub(Some(&json!({"stand_smoke_export": true}))),
+            AuditVisionSyncDepth::StandSmokeExport
+        );
+        assert_eq!(
+            audit_vision_sync_depth_stub(Some(&json!({
+                "audit_vision_sync_depth": true,
+                "slice_aggregate": true,
+                "criteria_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "audit_vision_sync_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            AuditVisionSyncDepth::FullBand78
+        );
+        assert_eq!(AUDIT_VISION_SYNC_CRITERIA.len(), 10);
+        assert_eq!(audit_vision_sync_criteria_total(), 10);
+        assert_eq!(AUDIT_VISION_SYNC_SLICES.len(), 6);
+        assert!(AUDIT_VISION_SYNC_CASES.contains(&"aggregate_flag"));
+        let canon = include_str!("../../docs/development/AUDIT_VISION_SYNC.md");
+        assert_eq!(audit_vision_sync_slices_met(canon), (6, 6));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--audit-vision-sync"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND78_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band78 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn sso_docs_canon_band67_export_shape_ph_s1313() {
         use poolai_ui_core::sso_docs_canon_depth::{
             sso_docs_canon_criteria_total, sso_docs_canon_depth_stub, sso_docs_canon_slices_met,

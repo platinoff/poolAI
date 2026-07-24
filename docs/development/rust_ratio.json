@@ -124,6 +124,9 @@
   "audit_docs_canon_mode": true,
   "audit_docs_canon_criteria_total": 10,
   "audit_docs_canon_criteria_met_count": 10,
+  "audit_vision_sync_mode": false,
+  "audit_vision_sync_criteria_total": 10,
+  "audit_vision_sync_criteria_met_count": 0,
   "by_category": {
     "e2e_ts": {
       "files": 8,

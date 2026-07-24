@@ -16,6 +16,7 @@ pub mod audit_docs_canon_depth;
 pub mod audit_loc_audit_depth;
 pub mod audit_stand_smoke_depth;
 pub mod audit_store_depth;
+pub mod audit_vision_sync_depth;
 pub mod charts_depth;
 pub mod ci_canon_depth;
 pub mod concept_markers_depth;

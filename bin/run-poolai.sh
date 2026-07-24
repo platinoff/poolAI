@@ -87,6 +87,7 @@ Options (quick):
   --audit-stand-smoke After health wait, live stand-smoke + loc-audit --audit-stand-smoke (PH-S1394)
   --audit-loc-audit After health wait, loc-audit --audit-loc-audit aggregate (PH-S1402)
   --audit-docs-canon After health wait, loc-audit --audit-docs-canon (PH-S1412)
+  --audit-vision-sync After health wait, loc-audit --audit-vision-sync (PH-S1422)
   --skip-build    Skip cargo build
   --port N        HTTP port (default 8080)
 
@@ -297,6 +298,7 @@ cmd_quick() {
   local audit_stand_smoke=0
   local audit_loc_audit=0
   local audit_docs_canon=0
+  local audit_vision_sync=0
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --skip-build) SKIP_BUILD=1; shift ;;
@@ -332,6 +334,7 @@ cmd_quick() {
       --audit-stand-smoke) audit_stand_smoke=1; shift ;;
       --audit-loc-audit) audit_loc_audit=1; shift ;;
       --audit-docs-canon) audit_docs_canon=1; shift ;;
+      --audit-vision-sync) audit_vision_sync=1; shift ;;
       --audit) audit=1; shift ;;
       --port) PORT="$2"; shift 2 ;;
       *) echo "Unknown option: $1"; usage; exit 1 ;;
@@ -483,6 +486,10 @@ cmd_quick() {
   if [[ "$audit_docs_canon" == "1" ]]; then
     echo "Running poolai-loc-audit --audit-docs-canon (PH-S1412)..."
     cargo run --quiet --bin poolai-loc-audit -- --audit-docs-canon
+  fi
+  if [[ "$audit_vision_sync" == "1" ]]; then
+    echo "Running poolai-loc-audit --audit-vision-sync (PH-S1422)..."
+    cargo run --quiet --bin poolai-loc-audit -- --audit-vision-sync
   fi
 }
 

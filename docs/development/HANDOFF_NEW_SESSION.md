@@ -1,8 +1,8 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-24 (security **PH-SVC55…SVC64** ✅ · band 77 ✅ · band 78 ready)
+**Оновлено:** 2026-07-24 (security **PH-SVC55…SVC64** ✅ · band 78 ✅ · band 79 ready)
 
-**Наступна сесія:** **`абракадабра`** — drain band 78 (FM **§5.59** Audit vision-sync).
+**Наступна сесія:** **`абракадабра`** — drain band 79 (FM **§5.60** Audit ratio-advisory).
 
 ## P0 / service (2026-07-24)
 
@@ -21,7 +21,7 @@
 
 **Cursor / toolchain (service):** local desktop **3.13.10** · Auto-review · research [`CURSOR_UPDATE_RESEARCH_2026-07-24.md`](./CURSOR_UPDATE_RESEARCH_2026-07-24.md) · FM **§5.16**.
 
-**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **860** спринтів → PH-S2278.
+**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **850** спринтів → PH-S2278.
 
 ## Security findings closed (PH-SVC55…64, by severity)
 
@@ -34,7 +34,24 @@
 | **Low** | Corrupted MSYS path / e2e tmp artifacts | ignore patterns widened |
 | **Open (OWNER)** | PH-SVC35 Atlassian token (historical) | revoke in Atlassian; no history rewrite |
 
-## Band 78 — Audit vision-sync (PH-S1419…S1428, **ACTIVE**)
+## Band 79 — Audit ratio-advisory (PH-S1429…S1438, **ACTIVE**)
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1429** | `audit_ratio_advisory_depth` ui-core module |
+| **PH-S1430** | Slice aggregate (prior audit*) |
+| **PH-S1431** | Criteria contracts |
+| **PH-S1432** | `VERIFY_AUDIT_RATIO_ADVISORY` + quick |
+| **PH-S1433** | Stand smoke export shape |
+| **PH-S1434** | `poolai-loc-audit --audit-ratio-advisory` |
+| **PH-S1435** | `AUDIT_RATIO_ADVISORY.md` + canon |
+| **PH-S1436** | vision-sync --check |
+| **PH-S1437** | Ratio hold advisory |
+| **PH-S1438** | Band close |
+
+**§5.12:** **10** відкритих. **Vision:** rev **386**. **Pending completion:** **850** (→ PH-S2278).
+
+## Band 78 — Audit vision-sync (PH-S1419…S1428, ✅)
+
 | Sprint | Фокус |
 |--------|--------|
 | **PH-S1419** | `audit_vision_sync_depth` ui-core module |
@@ -48,7 +65,7 @@
 | **PH-S1427** | Ratio hold advisory |
 | **PH-S1428** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **385**. **Pending completion:** **860** (→ PH-S2278).
+**PH-S1428 ✅ (2026-07-24):** `audit_vision_sync_depth.rs`; `AUDIT_VISION_SYNC_SLICES`; `--audit-vision-sync`; `VERIFY_AUDIT_VISION_SYNC`; `AUDIT_VISION_SYNC.md`; `galaxy_horizon_s1419_integration`. Phase C Audit vision-sync closed.
 
 ## Band 77 — Audit docs canon (PH-S1409…S1418, ✅)
 

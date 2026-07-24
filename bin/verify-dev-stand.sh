@@ -40,6 +40,7 @@ VERIFY_SSO_STAND_SMOKE="${VERIFY_SSO_STAND_SMOKE:-0}"
 VERIFY_AUDIT_STAND_SMOKE="${VERIFY_AUDIT_STAND_SMOKE:-0}"
 VERIFY_AUDIT_LOC_AUDIT="${VERIFY_AUDIT_LOC_AUDIT:-0}"
 VERIFY_AUDIT_DOCS_CANON="${VERIFY_AUDIT_DOCS_CANON:-0}"
+VERIFY_AUDIT_VISION_SYNC="${VERIFY_AUDIT_VISION_SYNC:-0}"
 VERIFY_SSO_LOC_AUDIT="${VERIFY_SSO_LOC_AUDIT:-0}"
 VERIFY_SSO_DOCS_CANON="${VERIFY_SSO_DOCS_CANON:-0}"
 VERIFY_SSO_VISION_SYNC="${VERIFY_SSO_VISION_SYNC:-0}"
@@ -560,6 +561,16 @@ if [[ "$VERIFY_AUDIT_DOCS_CANON" == "1" ]]; then
     echo "OK  audit docs-canon gate"
   else
     echo "FAIL audit docs-canon gate"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_AUDIT_VISION_SYNC" == "1" ]]; then
+  echo "Running poolai-loc-audit --audit-vision-sync (PH-S1422)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --audit-vision-sync); then
+    echo "OK  audit vision-sync gate"
+  else
+    echo "FAIL audit vision-sync gate"
     fail=1
   fi
 fi

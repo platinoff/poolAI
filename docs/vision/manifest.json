@@ -2760,7 +2760,7 @@
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S1418",
+  "last_sprint_closed": "PH-S1428",
   "layers": [
     {
       "id": "L0",
@@ -2793,7 +2793,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1419",
+  "next_sprint": "PH-S1429",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -10987,97 +10987,97 @@
       "path": "tests/galaxy_horizon_s1409_integration.rs"
     }
   ],
-  "revision": 385,
+  "revision": 386,
   "sprint_queue": [
     {
-      "acceptance": "depth enum + vision/criteria registry",
-      "deps": "audit_vision_sync_depth.rs",
-      "id": "PH-S1419",
+      "acceptance": "depth enum + criteria registry",
+      "deps": "audit_ratio_advisory_depth.rs",
+      "id": "PH-S1429",
       "open": true,
-      "row": 1354,
+      "row": 1364,
       "status": "open",
-      "title": "audit_vision_sync_depth` ui-core module"
+      "title": "audit_ratio_advisory_depth` ui-core module"
     },
     {
-      "acceptance": "six vision slices; unit test",
-      "deps": "AUDIT_VISION_SYNC_SLICES",
-      "id": "PH-S1420",
+      "acceptance": "prior `--audit*` + vision-sync; unit test",
+      "deps": "AUDIT_RATIO_ADVISORY_SLICES",
+      "id": "PH-S1430",
       "open": true,
-      "row": 1355,
+      "row": 1365,
       "status": "open",
-      "title": "Vision slice aggregate stub"
+      "title": "Slice aggregate (prior audit*)"
     },
     {
       "acceptance": "markers + registry",
-      "deps": "audit_vision_sync_integration",
-      "id": "PH-S1421",
+      "deps": "audit_ratio_advisory_integration",
+      "id": "PH-S1431",
       "open": true,
-      "row": 1356,
+      "row": 1366,
       "status": "open",
       "title": "Criteria contracts"
     },
     {
-      "acceptance": "vision-sync verify gate",
+      "acceptance": "ratio-advisory verify gate",
       "deps": "verify-dev-stand / run-poolai",
-      "id": "PH-S1422",
+      "id": "PH-S1432",
       "open": true,
-      "row": 1357,
+      "row": 1367,
       "status": "open",
-      "title": "VERIFY_AUDIT_VISION_SYNC` + quick"
+      "title": "VERIFY_AUDIT_RATIO_ADVISORY` + quick"
     },
     {
       "acceptance": "unit export-shape",
       "deps": "poolai_http_stand_smoke",
-      "id": "PH-S1423",
+      "id": "PH-S1433",
       "open": true,
-      "row": 1358,
+      "row": 1368,
       "status": "open",
       "title": "Stand smoke export shape"
     },
     {
       "acceptance": "rust_ratio.json` fields",
       "deps": "loc-audit",
-      "id": "PH-S1424",
+      "id": "PH-S1434",
       "open": true,
-      "row": 1359,
+      "row": 1369,
       "status": "open",
-      "title": "poolai-loc-audit --audit-vision-sync"
+      "title": "poolai-loc-audit --audit-ratio-advisory"
     },
     {
-      "acceptance": "vision-sync matrix",
+      "acceptance": "ratio-advisory matrix",
       "deps": "RUN_LOCAL/INDEX/HANDOFF/NEXT",
-      "id": "PH-S1425",
+      "id": "PH-S1435",
       "open": true,
-      "row": 1360,
+      "row": 1370,
       "status": "open",
-      "title": "Docs `AUDIT_VISION_SYNC.md` + canon"
+      "title": "Docs `AUDIT_RATIO_ADVISORY.md` + canon"
     },
     {
       "acceptance": "drift gate green",
       "deps": "docs/vision",
-      "id": "PH-S1426",
+      "id": "PH-S1436",
       "open": true,
-      "row": 1361,
+      "row": 1371,
       "status": "open",
       "title": "vision-sync --check"
     },
     {
       "acceptance": "--min-ratio 0.95 --advisory",
       "deps": "loc-audit",
-      "id": "PH-S1427",
+      "id": "PH-S1437",
       "open": true,
-      "row": 1362,
+      "row": 1372,
       "status": "open",
       "title": "Ratio hold advisory"
     },
     {
-      "acceptance": "galaxy_horizon_s1419_integration`; HANDOFF/NEXT",
+      "acceptance": "galaxy_horizon_s1429_integration`; HANDOFF/NEXT",
       "deps": "tests/docs",
-      "id": "PH-S1428",
+      "id": "PH-S1438",
       "open": true,
-      "row": 1363,
+      "row": 1373,
       "status": "open",
-      "title": "Audit vision-sync band close"
+      "title": "Audit ratio-advisory band close"
     }
   ],
   "sprint_queue_open_count": 10,

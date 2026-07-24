@@ -78,6 +78,7 @@ cd S:\rust\poolAI
 /usr/bin/bash bin/run-poolai.sh quick --sso-ratio-advisory
 /usr/bin/bash bin/run-poolai.sh quick --sso-horizon
 /usr/bin/bash bin/run-poolai.sh quick --audit-docs-canon
+/usr/bin/bash bin/run-poolai.sh quick --audit-vision-sync
 # PowerShell:
 .\bin\run-poolai.ps1 quick -StandSmoke
 .\bin\run-poolai.ps1 quick -MigrationAdvisory
@@ -349,6 +350,7 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `VERIFY_AUDIT_STAND_SMOKE=1` | `verify-dev-stand.sh` → live `--audit-stand-smoke` + loc-audit (PH-S1395) |
 | `VERIFY_AUDIT_LOC_AUDIT=1` | `verify-dev-stand.sh` → `poolai-loc-audit --audit-loc-audit` (PH-S1402) |
 | `VERIFY_AUDIT_DOCS_CANON=1` | `verify-dev-stand.sh` → `poolai-loc-audit --audit-docs-canon` (PH-S1412) |
+| `VERIFY_AUDIT_VISION_SYNC=1` | `verify-dev-stand.sh` → `poolai-loc-audit --audit-vision-sync` (PH-S1422) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 ### PH-S1100: Rust migration advisory (band 46)
@@ -997,6 +999,26 @@ VERIFY_AUDIT_DOCS_CANON=1 bash bin/verify-dev-stand.sh
 | `audit_docs_canon_criteria_met_count` | Criteria with marker present in canonical doc path |
 
 Module: [`audit_docs_canon_depth.rs`](../../crates/poolai-ui-core/src/audit_docs_canon_depth.rs) · tests: `audit_docs_canon_integration.rs`, `galaxy_horizon_s1409_integration.rs` · docs: [`AUDIT_DOCS_CANON.md`](./AUDIT_DOCS_CANON.md).
+
+### PH-S1424: Audit vision sync (band 78)
+
+Vision-sync matrix gate for `docs/vision/*` + prior [`AUDIT_DOCS_CANON.md`](./AUDIT_DOCS_CANON.md).
+
+```bash
+cargo run --bin poolai-loc-audit -- --audit-vision-sync
+cargo run --bin poolai-loc-audit -- --audit-vision-sync --advisory --min-ratio 0.95
+
+VERIFY_AUDIT_VISION_SYNC=1 bash bin/verify-dev-stand.sh
+/usr/bin/bash bin/run-poolai.sh quick --audit-vision-sync
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `audit_vision_sync_mode` | `true` when `--audit-vision-sync` (PH-S1424) |
+| `audit_vision_sync_criteria_total` | Registry size (10) |
+| `audit_vision_sync_criteria_met_count` | Criteria with marker present in canonical doc path |
+
+Module: [`audit_vision_sync_depth.rs`](../../crates/poolai-ui-core/src/audit_vision_sync_depth.rs) · tests: `audit_vision_sync_integration.rs`, `galaxy_horizon_s1419_integration.rs` · docs: [`AUDIT_VISION_SYNC.md`](./AUDIT_VISION_SYNC.md).
 
 Default stand smoke includes **`vision_revision_parity`** (PH-S208, PH-S235): repo `manifest.revision` vs FM §5.12 `Vision rev`, `extensions.active_sprint` vs `manifest.next_sprint`, then `GET /docs/vision/manifest.json` with `X-PoolAI-Vision-Revision` header vs JSON body.
 
