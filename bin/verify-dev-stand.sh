@@ -45,6 +45,7 @@ VERIFY_SSO_HORIZON="${VERIFY_SSO_HORIZON:-0}"
 VERIFY_AUDIT="${VERIFY_AUDIT:-0}"
 VERIFY_AUDIT_STORE="${VERIFY_AUDIT_STORE:-0}"
 VERIFY_AUDIT_API="${VERIFY_AUDIT_API:-0}"
+VERIFY_AUDIT_ADMIN_OPS="${VERIFY_AUDIT_ADMIN_OPS:-0}"
 HEALTH_RETRIES="${VERIFY_HEALTH_RETRIES:-45}"
 HEALTH_SLEEP="${VERIFY_HEALTH_SLEEP:-2}"
 
@@ -599,6 +600,16 @@ if [[ "$VERIFY_AUDIT_API" == "1" ]]; then
     echo "OK  audit API gate"
   else
     echo "FAIL audit API gate"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_AUDIT_ADMIN_OPS" == "1" ]]; then
+  echo "Running poolai-loc-audit --audit-admin-ops (PH-S1384)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --audit-admin-ops); then
+    echo "OK  audit admin/ops gate"
+  else
+    echo "FAIL audit admin/ops gate"
     fail=1
   fi
 fi

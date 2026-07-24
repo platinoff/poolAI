@@ -683,9 +683,24 @@ pub const ADMIN_AUDIT_EN: &[I18nRow<'_>] = &[
     ("admin.audit.empty", "No audit events found"),
     ("admin.audit.loading", "Loading audit events…"),
     ("admin.audit.errLoad", "Error loading audit logs: "),
+    ("admin.audit.storeLoading", "Loading store…"),
+    ("admin.audit.storeLabel", "Audit store:"),
+    (
+        "admin.audit.storeHint",
+        "Audit persistence backend (POOLAI_AUDIT_STORE / POOLAI_AUDIT_DATA_DIR)",
+    ),
+    ("admin.audit.store.memory", "memory"),
+    ("admin.audit.store.file", "file"),
+    ("admin.audit.store.sqlite", "sqlite"),
+    ("admin.audit.store.configured", "configured"),
+    ("admin.audit.store.unconfigured", "unconfigured"),
+    ("admin.audit.storeErr", "Audit store wire unavailable"),
+    ("admin.audit.btn.refresh", "Refresh"),
+    ("admin.audit.refreshOk", "Audit events refreshed"),
+    ("admin.audit.refreshErr", "Audit refresh failed: "),
 ];
 
-/// Ukrainian audit admin keys (PH-S229).
+/// Ukrainian audit admin keys (PH-S229; ops keys PH-S1383 band 74).
 pub const ADMIN_AUDIT_UK: &[I18nRow<'_>] = &[
     ("admin.page.audit", "Журнал аудиту"),
     ("admin.audit.sectionTitle", "Події аудиту"),
@@ -709,6 +724,21 @@ pub const ADMIN_AUDIT_UK: &[I18nRow<'_>] = &[
     ("admin.audit.empty", "Подій аудиту не знайдено"),
     ("admin.audit.loading", "Завантаження подій аудиту…"),
     ("admin.audit.errLoad", "Помилка завантаження журналу: "),
+    ("admin.audit.storeLoading", "Завантаження сховища…"),
+    ("admin.audit.storeLabel", "Сховище аудиту:"),
+    (
+        "admin.audit.storeHint",
+        "Бекенд персистентності аудиту (POOLAI_AUDIT_STORE / POOLAI_AUDIT_DATA_DIR)",
+    ),
+    ("admin.audit.store.memory", "memory"),
+    ("admin.audit.store.file", "file"),
+    ("admin.audit.store.sqlite", "sqlite"),
+    ("admin.audit.store.configured", "налаштовано"),
+    ("admin.audit.store.unconfigured", "не налаштовано"),
+    ("admin.audit.storeErr", "Audit store wire недоступний"),
+    ("admin.audit.btn.refresh", "Оновити"),
+    ("admin.audit.refreshOk", "Події аудиту оновлено"),
+    ("admin.audit.refreshErr", "Помилка оновлення аудиту: "),
 ];
 
 /// English tenants admin keys (PH-S230; moved from `i18n_core.js`).

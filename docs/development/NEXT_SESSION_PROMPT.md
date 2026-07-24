@@ -1,17 +1,17 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-07-23 (band 73 **PH-S1369…S1378, 2026-07-23) ·** ✅ · horizon band 74)
+**Оновлено:** 2026-07-23 (band 74 **PH-S1379…S1388, 2026-07-23) ·** ✅ · horizon band 75)
 
-Maintenance mode (FM §5.15) · band 73 drained.
+Maintenance mode (FM §5.15) · band 74 drained.
 
 Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.18 @ S2278).
 
-| **← наступний** | **`абракадабра`** (project scan → band 74) |
-| **§5.12 active** | **10** (band 73 ✅) |
+| **← наступний** | **`абракадабра`** (project scan → band 75) |
+| **§5.12 active** | **10** (band 74 ✅) |
 | **P0 open** | **PH-SVC34** GH CI verify · **PH-SVC35** OWNER Atlassian revoke |
-| **Completion pending** | **900** sprints PH-S1379…S2278 · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) |
-| **Horizon** | band 74 → **PH-S1379…S1388** |
-| **Vision** | rev **375** |
+| **Completion pending** | **890** sprints PH-S1389…S2278 · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) |
+| **Horizon** | band 75 → **PH-S1389…S1398** |
+| **Vision** | rev **377** |
 | **Cursor** | local **3.12.30** · [`CURSOR_UPDATE_RESEARCH_2026-07-22.md`](./CURSOR_UPDATE_RESEARCH_2026-07-22.md) |
 
 ---
@@ -26,38 +26,34 @@ Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.1
 
 ## P0 (перша черга — скріншоти CI / Security)
 
-Перед drain band 74 перевірити / закрити:
-
 | Sprint | Фокус | Acceptance |
 |--------|--------|------------|
 | **PH-SVC34** | GitHub Actions green | Check (no features), Test Suite, OpenAPI gap, Pa11y contract, LOC ratio, Vision drift — green після CI-fix push |
 | **PH-SVC35** | Secret scanning #1 | **OWNER:** revoke Atlassian API Token; see [`SECRETS_MANAGEMENT.md`](../security/SECRETS_MANAGEMENT.md) §4 |
 
-**Вже зроблено (ця tech-сесія):** PH-SVC31 macvlan `'static` · PH-SVC32 unused warnings · PH-SVC33 local `test-ci` · PH-SVC36 no history rewrite.
-
-Коренева причина червоного CI: `validate_macvlan_mode` повертав `&str` з вхідного lifetime як `&'static str` → падав `Check (no features)` і каскад інших jobs.
+`gh` CLI not on this host PATH — verify via GitHub UI or install `gh`.
 
 ---
 
-## Band 74 (очікуваний фокус — project scan)
+## Band 75 (очікуваний фокус — project scan)
 
 | Sprint | Фокус |
 |--------|--------|
-| **PH-S1379** | `audit_admin_ops_depth` ui-core |
-| **PH-S1380** | Admin audit store-wire strip |
-| **PH-S1381** | Admin audit query ops glue |
-| **PH-S1382** | Admin audit ops HTML contracts |
-| **PH-S1383** | i18n Audit admin ops keys |
-| **PH-S1384** | `VERIFY_AUDIT_ADMIN_OPS` + quick `--audit-admin-ops` |
-| **PH-S1385** | Stand smoke + loc-audit `--audit-admin-ops` |
-| **PH-S1386** | `AUDIT_ADMIN_OPS.md` + canon |
-| **PH-S1387** | Ratio hold advisory |
-| **PH-S1388** | Band close → `galaxy_horizon_s1379_integration` |
+| **PH-S1389** | `audit_stand_smoke_depth` ui-core |
+| **PH-S1390** | Live store wire smoke |
+| **PH-S1391** | Live audit events query smoke |
+| **PH-S1392** | Live event-field fixture smoke |
+| **PH-S1393** | CLI `--audit-stand-smoke` |
+| **PH-S1394** | `poolai-loc-audit --audit-stand-smoke` |
+| **PH-S1395** | `VERIFY_AUDIT_STAND_SMOKE` |
+| **PH-S1396** | `AUDIT_STAND_SMOKE.md` + canon |
+| **PH-S1397** | Ratio hold advisory |
+| **PH-S1398** | Band close → `galaxy_horizon_s1389_integration` |
 
-Канон: FM **§5.55** · [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md) · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · mirror [`SSO_ADMIN_OPS.md`](./SSO_ADMIN_OPS.md)
+Канон: FM **§5.56** · [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md) · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · mirror [`SSO_STAND_SMOKE.md`](./SSO_STAND_SMOKE.md)
 
 ---
 
 ## Не повторювати
 
-PH-SVC31…33 ✅ · PH-SVC36…40 ✅ (крім 34/35 open) · Service PH-SVC21…SVC30 ✅ · PH-SVC11…SVC20 ✅ · band 73 ✅ · band 72 ✅ · band 71 ✅ · band 70 ✅ · band 69 ✅ · band 68 ✅ · band 67 ✅ · band 66 ✅ · band 65 ✅ · band 64 ✅ · band 63 ✅ · band 62 ✅ · band 61 ✅ · band 60 ✅ · product-complete S1010 ✅ · FM-003 LAN · FM-041 Cloud SDK · mandatory ZK/TEE · history rewrite без явного OWNER.
+band 74 ✅ · band 73 ✅ · band 72 ✅ · band 71 ✅ · band 70 ✅ · band 69 ✅ · band 68 ✅ · band 67 ✅ · band 66 ✅ · band 65 ✅ · band 64 ✅ · band 63 ✅ · band 62 ✅ · band 61 ✅ · band 60 ✅ · product-complete S1010 ✅ · PH-SVC31…33 ✅ · PH-SVC36…40 ✅ (крім 34/35 open) · FM-003 LAN · FM-041 Cloud SDK · mandatory ZK/TEE · history rewrite без явного OWNER.

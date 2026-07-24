@@ -1,15 +1,15 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-23 (tech **PH-SVC31…SVC40** · CI compile fix ✅ · band 74 **§5.12 = 10 open** · Cursor **3.12.30**)
+**Оновлено:** 2026-07-23 (band 74 **PH-S1379…S1388** ✅ · band 75 **§5.12 = 10 open** · Cursor **3.12.30**)
 
-**Наступна сесія:** **`абракадабра`** — **P0** (нижче) → drain band 74 (C Audit · admin/ops glue) з FM **§5.55**.
+**Наступна сесія:** **`абракадабра`** — drain band 75 (C Audit · stand smoke) з FM **§5.56**.
 
-## P0 — з скріншотів CI / Security (перед band 74)
+## P0 — з скріншотів CI / Security
 
 | # | Sprint | Фокус | Статус |
 |---|--------|--------|--------|
-| 1 | **PH-SVC31…33** | macvlan `'static` + unused warnings + local `test-ci` | **✅** (ця сесія) |
-| 2 | **PH-SVC34** | Підтвердити GitHub Actions green після push (Check no-features / Test / OpenAPI / Pa11y / LOC / Vision) | **[ ]** verify |
+| 1 | **PH-SVC31…33** | macvlan `'static` + unused warnings + local `test-ci` | **✅** |
+| 2 | **PH-SVC34** | Підтвердити GitHub Actions green після push (Check no-features / Test / OpenAPI / Pa11y / LOC / Vision) | **[ ]** verify (`gh` N/A locally) |
 | 3 | **PH-SVC35** | Secret scanning #1 Atlassian API Token — **revoke у Atlassian** | **[ ]** OWNER |
 | 4 | **PH-SVC36** | `target/` gitignored; без history rewrite без явного запиту | **✅** |
 
@@ -17,9 +17,26 @@
 
 **Cursor / toolchain (service):** local desktop **3.12.30** · public changelog latest numbered IDE **3.11** · research [`CURSOR_UPDATE_RESEARCH_2026-07-22.md`](./CURSOR_UPDATE_RESEARCH_2026-07-22.md) · FM **§5.16**. Vision: `poolai-vision-sync` мержить enterprise `queue — band` → Sprint queue + Feed = останні закриті PH-S*.
 
-**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **900** спринтів до FM **§5.18** @ PH-S2278 (enterprise §5.17 @ S2148 + extension Memory/Job/Solana/Wasm/close).
+**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **890** спринтів до FM **§5.18** @ PH-S2278 (enterprise §5.17 @ S2148 + extension Memory/Job/Solana/Wasm/close).
 
-## Band 74 — Audit admin/ops glue (PH-S1379…S1388, **ACTIVE**)
+## Band 75 — Audit stand smoke (PH-S1389…S1398, **ACTIVE**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1389** | `audit_stand_smoke_depth` ui-core module |
+| **PH-S1390** | Live store wire smoke |
+| **PH-S1391** | Live audit events query smoke |
+| **PH-S1392** | Live event-field fixture smoke |
+| **PH-S1393** | CLI `--audit-stand-smoke` |
+| **PH-S1394** | `poolai-loc-audit --audit-stand-smoke` |
+| **PH-S1395** | `VERIFY_AUDIT_STAND_SMOKE` |
+| **PH-S1396** | `AUDIT_STAND_SMOKE.md` + canon |
+| **PH-S1397** | Ratio hold advisory |
+| **PH-S1398** | Band close |
+
+**§5.12:** **10** відкритих. **Vision:** rev **377**. **Pending completion:** **890** (→ PH-S2278).
+
+## Band 74 — Audit admin/ops glue (PH-S1379…S1388, ✅)
 
 | Sprint | Фокус |
 |--------|--------|
@@ -34,7 +51,7 @@
 | **PH-S1387** | Ratio hold advisory |
 | **PH-S1388** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **375**. **Pending completion:** **900** (→ PH-S2278).
+**PH-S1388 ✅ (2026-07-23):** `audit_admin_ops_depth.rs`; `#audit-store-badge`; `refreshAuditEvents`; `ADMIN_AUDIT_*` store/refresh; `--audit-admin-ops`; `VERIFY_AUDIT_ADMIN_OPS`; `AUDIT_ADMIN_OPS.md`; `galaxy_horizon_s1379_integration`. Phase C Audit admin/ops glue closed.
 
 ## Band 73 — Audit API contracts (PH-S1369…S1378, ✅)
 
@@ -66,7 +83,7 @@
 | **PH-S1367** | Ratio hold advisory |
 | **PH-S1368** | Band close |
 
-**§5.12:** **0** відкритих (band 72 ✅ — journal). **Vision:** rev **373**.
+**§5.12:** **0** відкритих (band 72 ✅ — journal). **Vision:** rev **377**.
 
 **PH-S1368 ✅ (2026-07-23):** `audit_store_depth.rs`; `audit_store_wire()`; `POOLAI_AUDIT_DATA_DIR`; `--audit-store`; `VERIFY_AUDIT_STORE`; `AUDIT_STORE.md`; `galaxy_horizon_s1359_integration`. Phase C Audit store wire closed.
 
@@ -85,7 +102,7 @@
 | **PH-S1357** | Ratio hold advisory |
 | **PH-S1358** | Band close |
 
-**§5.12:** **0** відкритих (band 71 ✅ — journal). **Vision:** rev **371**.
+**§5.12:** **0** відкритих (band 71 ✅ — journal). **Vision:** rev **377**.
 
 **PH-S1358 ✅ (2026-07-23):** `audit_depth.rs`; `POOLAI_AUDIT_STORE`; `--audit`; `VERIFY_AUDIT`; `AUDIT_DEPTH.md`; `galaxy_horizon_s1349_integration`. Phase C Audit depth scaffold closed.
 
@@ -104,7 +121,7 @@
 | **PH-S1347** | Ratio hold advisory |
 | **PH-S1348** | Band close |
 
-**§5.12:** **0** відкритих (band 70 ✅ — journal). **Vision:** rev **368**.
+**§5.12:** **0** відкритих (band 70 ✅ — journal). **Vision:** rev **377**.
 
 **PH-S1348 ✅ (2026-07-23):** `sso_horizon_depth.rs`; `SSO_HORIZON_SLICES`; `--sso-horizon`; `VERIFY_SSO_HORIZON`; `SSO_HORIZON.md`; `galaxy_horizon_s1339_integration`. Phase B SSO horizon closed.
 
@@ -123,7 +140,7 @@
 | **PH-S1337** | Ratio hold advisory |
 | **PH-S1338** | Band close |
 
-**§5.12:** **0** відкритих (band 69 ✅ — journal). **Vision:** rev **366**.
+**§5.12:** **0** відкритих (band 69 ✅ — journal). **Vision:** rev **377**.
 
 **PH-S1338 ✅ (2026-07-23):** `sso_ratio_advisory_depth.rs`; `SSO_RATIO_ADVISORY_SLICES`; `--sso-ratio-advisory`; `VERIFY_SSO_RATIO_ADVISORY`; `SSO_RATIO_ADVISORY.md`; `galaxy_horizon_s1329_integration`. Phase B SSO ratio-advisory closed.
 
@@ -142,7 +159,7 @@
 | **PH-S1327** | Ratio hold advisory |
 | **PH-S1328** | Band close |
 
-**§5.12:** **0** відкритих (band 68 ✅ — journal). **Vision:** rev **364**.
+**§5.12:** **0** відкритих (band 68 ✅ — journal). **Vision:** rev **377**.
 
 **PH-S1328 ✅ (2026-07-23):** `sso_vision_sync_depth.rs`; `SSO_VISION_SYNC_SLICES`; `--sso-vision-sync`; `VERIFY_SSO_VISION_SYNC`; `SSO_VISION_SYNC.md`; `galaxy_horizon_s1319_integration`. Phase B SSO vision-sync closed.
 
@@ -161,7 +178,7 @@
 | **PH-S1317** | Ratio hold advisory |
 | **PH-S1318** | Band close |
 
-**§5.12:** **0** відкритих (band 67 ✅ — journal). **Vision:** rev **362**.
+**§5.12:** **0** відкритих (band 67 ✅ — journal). **Vision:** rev **377**.
 
 **PH-S1318 ✅ (2026-07-23):** `sso_docs_canon_depth.rs`; `SSO_DOCS_CANON_SLICES`; `--sso-docs-canon`; `VERIFY_SSO_DOCS_CANON`; `SSO_DOCS_CANON.md`; `galaxy_horizon_s1309_integration`. Phase B SSO docs-canon closed.
 
@@ -180,7 +197,7 @@
 | **PH-S1307** | Ratio hold advisory |
 | **PH-S1308** | Band close |
 
-**§5.12:** **0** відкритих (band 66 ✅ — journal). **Vision:** rev **360**.
+**§5.12:** **0** відкритих (band 66 ✅ — journal). **Vision:** rev **377**.
 
 **PH-S1308 ✅ (2026-07-23):** `sso_loc_audit_depth.rs`; slice aggregate; `--sso-loc-audit`; `VERIFY_SSO_LOC_AUDIT`; `SSO_LOC_AUDIT.md`; `galaxy_horizon_s1299_integration`. Phase B SSO loc-audit aggregate closed.
 
@@ -199,7 +216,7 @@
 | **PH-S1297** | Ratio hold advisory |
 | **PH-S1298** | Band close |
 
-**§5.12:** **0** відкритих (band 65 ✅ — journal). **Vision:** rev **360**.
+**§5.12:** **0** відкритих (band 65 ✅ — journal). **Vision:** rev **377**.
 
 **PH-S1298 ✅ (2026-07-22):** `sso_stand_smoke_depth.rs`; live store/CRUD/callback smoke; `--sso-stand-smoke`; `VERIFY_SSO_STAND_SMOKE`; `SSO_STAND_SMOKE.md`; `galaxy_horizon_s1289_integration`. Phase B SSO stand smoke closed.
 
@@ -218,7 +235,7 @@
 | **PH-S1287** | Ratio hold advisory |
 | **PH-S1288** | Band close |
 
-**§5.12:** **0** відкритих (band 64 ✅ — journal). **Vision:** rev **358**.
+**§5.12:** **0** відкритих (band 64 ✅ — journal). **Vision:** rev **377**.
 
 **PH-S1288 ✅ (2026-07-22):** `sso_admin_ops_depth.rs`; `#sso-store-badge`; OAuth2/SAML refresh glue; `ADMIN_SSO_*`; `--sso-admin-ops`; `VERIFY_SSO_ADMIN_OPS`; `SSO_ADMIN_OPS.md`; `galaxy_horizon_s1279_integration`. Phase B SSO admin/ops glue closed.
 
@@ -238,7 +255,7 @@
 | **PH-S1277** | `SSO_API.md` + canon sync |
 | **PH-S1278** | Band close |
 
-**§5.12:** **0** відкритих (band 63 ✅). **Vision:** rev **358**. **Enterprise pending:** 870 (→ PH-S2148).
+**§5.12:** **0** відкритих (band 63 ✅). **Vision:** rev **377**. **Enterprise pending:** 870 (→ PH-S2148).
 
 **PH-S1278 ✅ (2026-07-22):** `sso_api_contracts_depth.rs`; OAuth2/SAML HTTP CRUD; `GET /security/sso/store`; `SsoStoreWire`; `--sso-api`; `VERIFY_SSO_API`; `SSO_API.md`; `galaxy_horizon_s1269_integration`. Phase B SSO API contracts closed.
 
@@ -257,7 +274,7 @@
 | **PH-S1267** | Ratio hold advisory |
 | **PH-S1268** | Band close |
 
-**§5.12:** **0** відкритих (band 62 ✅). **Vision:** rev **358**. **Enterprise pending:** 880 (→ PH-S2148).
+**§5.12:** **0** відкритих (band 62 ✅). **Vision:** rev **377**. **Enterprise pending:** 880 (→ PH-S2148).
 
 **PH-S1268 ✅ (2026-07-22):** `sso_store_depth.rs`; `sso_store_wire()`; `POOLAI_SSO_DATA_DIR`; `--sso-store`; `VERIFY_SSO_STORE`; `SSO_STORE.md`; `galaxy_horizon_s1259_integration`. Phase B SSO store wire closed.
 
@@ -276,7 +293,7 @@
 | **PH-S1257** | Ratio hold advisory |
 | **PH-S1258** | Band close |
 
-**§5.12:** **0** відкритих (band 61 ✅). **Vision:** rev **358**. **Enterprise pending:** 890 (→ PH-S2148).
+**§5.12:** **0** відкритих (band 61 ✅). **Vision:** rev **377**. **Enterprise pending:** 890 (→ PH-S2148).
 
 **PH-S1258 ✅ (2026-07-21):** `sso_depth.rs`; `POOLAI_SSO_STORE`; SAML audience/time stub; `--sso`; `VERIFY_SSO`; `SSO_DEPTH.md`; `galaxy_horizon_s1249_integration`. Phase B SSO depth scaffold closed.
 
@@ -295,7 +312,7 @@
 | **PH-S1247** | Ratio hold advisory |
 | **PH-S1248** | Band close |
 
-**§5.12:** **0** відкритих (band 60 ✅). **Vision:** rev **358**. **Enterprise pending:** 900 (→ PH-S2148).
+**§5.12:** **0** відкритих (band 60 ✅). **Vision:** rev **377**. **Enterprise pending:** 900 (→ PH-S2148).
 
 **PH-S1248 ✅ (2026-07-21):** `tenant_horizon_depth.rs`; `TENANT_HORIZON_SLICES`; `--tenant-horizon`; `VERIFY_TENANT_HORIZON`; `TENANT_HORIZON.md`; `galaxy_horizon_s1239_integration`. Phase A Tenants closed.
 
@@ -314,7 +331,7 @@
 | **PH-S1237** | Ratio hold advisory |
 | **PH-S1238** | Band close |
 
-**§5.12:** **0** відкритих (band 59 ✅). **Vision:** rev **358** (після sync). **Enterprise pending:** 910 (→ PH-S2148).
+**§5.12:** **0** відкритих (band 59 ✅). **Vision:** rev **377** (після sync). **Enterprise pending:** 910 (→ PH-S2148).
 
 **PH-S1238 ✅ (2026-07-21):** `tenant_ratio_advisory_depth.rs`; `persist_tenant_to_sqlite`; `--tenant-ratio-advisory`; `VERIFY_TENANT_RATIO_ADVISORY`; `TENANT_RATIO_ADVISORY.md`; `galaxy_horizon_s1229_integration`.
 
@@ -333,7 +350,7 @@
 | **PH-S1227** | Ratio hold advisory |
 | **PH-S1228** | Band close |
 
-**§5.12:** **0** відкритих (band 58 ✅). **Vision:** rev **358** (після sync). **Enterprise pending:** 920 (→ PH-S2148).
+**§5.12:** **0** відкритих (band 58 ✅). **Vision:** rev **377** (після sync). **Enterprise pending:** 920 (→ PH-S2148).
 
 **PH-S1228 ✅ (2026-07-21):** `tenant_vision_sync_depth.rs`; slice aggregate; `--tenant-vision-sync`; `VERIFY_TENANT_VISION_SYNC`; `TENANT_VISION_SYNC.md`; `galaxy_horizon_s1219_integration`.
 
@@ -352,7 +369,7 @@
 | **PH-S1217** | Ratio hold advisory |
 | **PH-S1218** | Band close |
 
-**§5.12:** **0** відкритих (band 57 ✅). **Vision:** rev **358**. **Enterprise pending:** 930 (→ PH-S2148).
+**§5.12:** **0** відкритих (band 57 ✅). **Vision:** rev **377**. **Enterprise pending:** 930 (→ PH-S2148).
 
 **PH-S1218 ✅ (2026-07-21):** `tenant_docs_canon_depth.rs`; slice aggregate; `--tenant-docs-canon`; `VERIFY_TENANT_DOCS_CANON`; `TENANT_DOCS_CANON.md`; `galaxy_horizon_s1209_integration`.
 
@@ -371,7 +388,7 @@
 | **PH-S1207** | Ratio hold advisory |
 | **PH-S1208** | Band close |
 
-**§5.12:** **0** відкритих (band 56 ✅). **Vision:** rev **358** (після sync). **Enterprise pending:** 940 (→ PH-S2148).
+**§5.12:** **0** відкритих (band 56 ✅). **Vision:** rev **377** (після sync). **Enterprise pending:** 940 (→ PH-S2148).
 
 **PH-S1208 ✅ (2026-07-21):** `tenant_loc_audit_depth.rs`; slice aggregate; `--tenant-loc-audit`; `VERIFY_TENANT_LOC_AUDIT`; `TENANT_LOC_AUDIT.md`; `galaxy_horizon_s1199_integration`.
 
@@ -390,7 +407,7 @@
 | **PH-S1197** | Ratio hold advisory |
 | **PH-S1198** | Band close |
 
-**§5.12:** **0** відкритих (band 55 ✅). **Vision:** rev **358** (після sync). **Enterprise pending:** 950 (→ PH-S2148).
+**§5.12:** **0** відкритих (band 55 ✅). **Vision:** rev **377** (після sync). **Enterprise pending:** 950 (→ PH-S2148).
 
 **PH-S1198 ✅ (2026-07-21):** `tenant_stand_smoke_depth.rs`; live store/CRUD/usage; `--tenant-stand-smoke`; `VERIFY_TENANT_STAND_SMOKE`; `TENANT_STAND_SMOKE.md`; `galaxy_horizon_s1189_integration`.
 
@@ -409,7 +426,7 @@
 | **PH-S1187** | Ratio hold advisory |
 | **PH-S1188** | Band close |
 
-**§5.12:** **0** відкритих (band 54 ✅). **Vision:** rev **358** (після sync). **Enterprise pending:** 960 (→ PH-S2148).
+**§5.12:** **0** відкритих (band 54 ✅). **Vision:** rev **377** (після sync). **Enterprise pending:** 960 (→ PH-S2148).
 
 **PH-S1188 ✅ (2026-07-20):** `tenant_admin_ops_depth.rs`; store strip; usage/quota glue; `VERIFY_TENANT_ADMIN_OPS`; `TENANT_ADMIN_OPS.md`; `galaxy_horizon_s1179_integration`.
 
@@ -428,7 +445,7 @@
 | **PH-S1177** | `TENANT_API.md` + canon sync |
 | **PH-S1178** | Band close |
 
-**§5.12:** **0** відкритих (band 53 ✅). **Vision:** rev **358** (після sync). **Enterprise pending:** 970 (→ PH-S2148).
+**§5.12:** **0** відкритих (band 53 ✅). **Vision:** rev **377** (після sync). **Enterprise pending:** 970 (→ PH-S2148).
 
 **PH-S1178 ✅ (2026-07-20):** `tenant_api_contracts_depth.rs`; HTTP CRUD/quota/isolation; `GET /tenants/store`; `VERIFY_TENANT_API`; `TENANT_API.md`; `galaxy_horizon_s1169_integration`.
 
@@ -447,7 +464,7 @@
 | **PH-S1167** | Ratio hold advisory |
 | **PH-S1168** | Band close |
 
-**§5.12:** **0** відкритих (band 52 ✅). **Vision:** rev **358** (після sync). **Enterprise pending:** 980 (→ PH-S2148).
+**§5.12:** **0** відкритих (band 52 ✅). **Vision:** rev **377** (після sync). **Enterprise pending:** 980 (→ PH-S2148).
 
 **PH-S1168 ✅ (2026-07-20):** `tenant_depth.rs`; `tenant_store_wire()`; `--tenant-store`; `VERIFY_TENANT_STORE`; `TENANT_STORE.md`; `galaxy_horizon_s1159_integration`.
 
@@ -466,7 +483,7 @@
 | **PH-S1157** | `TENANT_PERSIST.md` + master backlog 1000 |
 | **PH-S1158** | Band close |
 
-**§5.12:** **0** відкритих (band 51 ✅). **Vision:** rev **358**.
+**§5.12:** **0** відкритих (band 51 ✅). **Vision:** rev **377**.
 
 **PH-S1158 ✅ (2026-07-19):** `tenant_persistence_depth.rs`; `--tenant-persist`; `VERIFY_TENANT_PERSIST`; `PH_S_MASTER_BACKLOG_1000.md`; FM §5.14b/§5.17; `galaxy_horizon_s1149_integration`.
 
@@ -485,7 +502,7 @@
 | **PH-S1147** | `CI_CANON.md` canon gate docs |
 | **PH-S1148** | Band close |
 
-**§5.12:** **0** відкритих (band 50 ✅). **Vision:** rev **358**.
+**§5.12:** **0** відкритих (band 50 ✅). **Vision:** rev **377**.
 
 **PH-S1148 ✅ (2026-07-19):** `ci_canon_depth.rs`; `--ci-canon`; `VERIFY_CI_CANON`; `quick --ci-canon`; `galaxy_horizon_s1139_integration`; local dual-gate (test-ci + openapi-gap + rust-ratio advisory).
 
@@ -504,7 +521,7 @@
 | **PH-S1137** | PRE_PUSH_HOOK.md canon gate docs |
 | **PH-S1138** | Band close |
 
-**§5.12:** **0** відкритих (band 49 ✅). **Vision:** rev **358**.
+**§5.12:** **0** відкритих (band 49 ✅). **Vision:** rev **377**.
 
 **PH-S1138 ✅ (2026-07-19):** `pre_push_hook_depth.rs`; `--pre-push-canon`; `VERIFY_PRE_PUSH_CANON`; `quick --pre-push-canon`; `galaxy_horizon_s1129_integration`; `poolai-vision-sync` canon doc `--check`.
 
@@ -523,7 +540,7 @@
 | **PH-S1127** | RUST_RATIO + GALAXY_GRID_ROADMAP band 48 sync |
 | **PH-S1128** | Band close |
 
-**§5.12:** **0** відкритих (band 48 ✅). **Vision:** rev **358**.
+**§5.12:** **0** відкритих (band 48 ✅). **Vision:** rev **377**.
 
 **PH-S1128 ✅ (2026-07-18):** `galaxy_edge_verification_depth.rs`; `--edge-verification-advisory`; `VERIFY_EDGE_VERIFICATION`; `quick --edge-verification`; `galaxy_horizon_s1119_integration`; edge-verification-metrics HTTP wire.
 
@@ -542,7 +559,7 @@
 | **PH-S1117** | GALAXY_GRID_ROADMAP + STABLE touch-up |
 | **PH-S1118** | Band close |
 
-**§5.12:** **0** відкритих (band 47 ✅). **Vision:** rev **358**.
+**§5.12:** **0** відкритих (band 47 ✅). **Vision:** rev **377**.
 
 **PH-S1118 ✅ (2026-07-18):** `stable_state_touchup_depth.rs`; `--stable-touchup`; `VERIFY_STABLE_TOUCHUP`; `quick --stable-touchup`; `galaxy_horizon_s1109_integration`; vision **rev 320**.
 
@@ -563,7 +580,7 @@
 | **PH-S1107** | GALAXY_GRID_ROADMAP + rust ratio |
 | **PH-S1108** | Band close |
 
-**§5.12:** **0** відкритих (band 46 ✅). **Vision:** rev **358**.
+**§5.12:** **0** відкритих (band 46 ✅). **Vision:** rev **377**.
 
 **PH-S1108 ✅ (2026-07-18):** `rust_migration_advisory_depth.rs`; `--migration-advisory`; `VERIFY_MIGRATION_ADVISORY`; `quick --migration-advisory`; `galaxy_horizon_s1099_integration`; vision **rev 318**.
 
@@ -582,7 +599,7 @@
 | **PH-S1097** | GALAXY_GRID_ROADMAP + rust ratio |
 | **PH-S1098** | Band close |
 
-**§5.12:** **0** відкритих (band 45 ✅). **Vision:** rev **358**.
+**§5.12:** **0** відкритих (band 45 ✅). **Vision:** rev **377**.
 
 **PH-S1098 ✅ (2026-07-18):** `stand_smoke_run_local_depth.rs`; `--run-local-smoke`; `VERIFY_STAND_SMOKE`; `quick --stand-smoke`; `galaxy_horizon_s1089_integration`; vision **rev 317**.
 
@@ -601,7 +618,7 @@
 | **PH-S1087** | GALAXY_GRID_ROADMAP + rust ratio advisory |
 | **PH-S1088** | Band close |
 
-**§5.12:** **0** відкритих (band 44 ✅). **Vision:** rev **358**.
+**§5.12:** **0** відкритих (band 44 ✅). **Vision:** rev **377**.
 
 **PH-S1088 ✅ (2026-07-18):** `admin_wasm_slim_depth.rs`; band-44 depth flags for monitoring/instances/telegram/virtual-nodes/network-profiles/grid strips; `admin_wasm_slim_depth_stub_band44_export_shape_ph_s1084`; `galaxy_horizon_s1079_integration`; vision **rev 316**.
 
@@ -620,7 +637,7 @@
 | **PH-S1077** | `grid_metrics_parity_depth` ui-core stub |
 | **PH-S1078** | Band close |
 
-**§5.12:** **0** відкритих (band 43 ✅). **Vision:** rev **358**.
+**§5.12:** **0** відкритих (band 43 ✅). **Vision:** rev **377**.
 
 **PH-S1078 ✅ (2026-07-18):** `validate_band6_metrics_parity_v3`; extended parity pairs; stand smoke `grid_metrics_json_prometheus_parity_band6_v3`; `grid_metrics_parity_contracts`; `galaxy_horizon_s1069_integration`; vision **rev 315**.
 
@@ -639,7 +656,7 @@
 | **PH-S1067** | `openapi_wire_depth` ui-core stub |
 | **PH-S1068** | Band close |
 
-**§5.12:** **0** відкритих (band 42 ✅). **Vision:** rev **358**.
+**§5.12:** **0** відкритих (band 42 ✅). **Vision:** rev **377**.
 
 **PH-S1068 ✅ (2026-07-18):** `grid_openapi_contracts` + `memory_api_contracts`; stand smoke `ops_power_openapi`; openapi.yaml examples; `galaxy_horizon_s1059_integration`; vision **rev 314**.
 
@@ -658,7 +675,7 @@
 | **PH-S1057** | `e2e_visual_axe_depth` ui-core stub |
 | **PH-S1058** | Band close |
 
-**§5.12:** **0** відкритих (band 41 ✅). **Vision:** rev **358**.
+**§5.12:** **0** відкритих (band 41 ✅). **Vision:** rev **377**.
 
 **PH-S1058 ✅ (2026-07-18):** Visual snapshots for 8 admin routes; vision axe + HC extend; `galaxy_horizon_s1049_integration`; vision **rev 313**.
 
@@ -677,7 +694,7 @@
 | **PH-S1047** | Vision Playwright smoke extend |
 | **PH-S1048** | Band close |
 
-**§5.12:** **0** відкритих (band 40 ✅). **Vision:** rev **358**.
+**§5.12:** **0** відкритих (band 40 ✅). **Vision:** rev **377**.
 
 **PH-S1048 ✅ (2026-07-18):** Vision skip links/landmarks; tree + link-graph a11y; sprint-dim incremental; dense LOD; tab-hidden perf; `galaxy_horizon_s1039_integration`; vision **rev 312**.
 
@@ -696,7 +713,7 @@
 | **PH-S1037** | `admin_tables_forms_depth` stub |
 | **PH-S1038** | Band close |
 
-**§5.12:** **0** відкритих (band 39 ✅). **Vision:** rev **358**.
+**§5.12:** **0** відкритих (band 39 ✅). **Vision:** rev **377**.
 
 **PH-S1038 ✅ (2026-07-18):** FM-019 adoption — `adminEmptyStateHtml`/`adminInitTablesIn`/`aria-label` across admin tables; modal `aria-required`; `galaxy_horizon_s1029_integration`; vision **rev 311**.
 
@@ -715,7 +732,7 @@
 | **PH-S1027** | poolai-msys hardening |
 | **PH-S1028** | Band close |
 
-**§5.12:** **0** відкритих (band 38 ✅). **Vision:** rev **358**.
+**§5.12:** **0** відкритих (band 38 ✅). **Vision:** rev **377**.
 
 **PH-S1028 ✅ (2026-07-18):** Vision power a11y + announce; admin/home power i18n; `galaxy_horizon_s1019_integration`; `ui_debug_depth`; vision **rev 310**.
 
@@ -732,7 +749,7 @@
 | **PH-S1017** | Vision UI: poweroff/reset + `localStorage` стану |
 | **PH-S1018** | Band close: docs + `galaxy_horizon_s1011_integration` |
 
-**§5.12:** **0** відкритих (band 37 ✅). **Vision:** rev **358**. Деталі — FM **§5.17** · [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md).
+**§5.12:** **0** відкритих (band 37 ✅). **Vision:** rev **377**. Деталі — FM **§5.17** · [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md).
 
 **PH-S1018 ✅ (2026-07-18):** band 37 close — `run-poolai quick`/`--light`; `last_run.json`; `POST /api/v1/ops/power`; admin + vision power UI; `galaxy_horizon_s1011_integration`; vision **rev 308**.
 
@@ -820,7 +837,7 @@
 
 **Rules:** **`абракадабра`** — drain 10 з §5.12 → vision close → push; [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
-**§5.12:** **0** відкритих. **Vision:** rev **358**. **Наступна:** **`абракадабра`** project scan.
+**§5.12:** **0** відкритих. **Vision:** rev **377**. **Наступна:** **`абракадабра`** project scan.
 
 **Роадмеп:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) · **Промпт:** [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md).
 

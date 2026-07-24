@@ -1,6 +1,7 @@
 //! Audit Logs viewer page
 //!
 //! Provides query interface for viewing and filtering audit events.
+//! Band 74 (PH-S1380…S1381): store-wire strip + query refresh ops glue.
 
 use crate::ui::admin::admin_layout_audit;
 use axum::response::Html;
@@ -10,6 +11,50 @@ pub async fn admin_audit() -> Html<String> {
     let script = r#"
     function Ta(k, fb) {
       return typeof poolaiT === 'function' ? poolaiT(k, fb) : fb;
+    }
+
+    function renderAuditStoreBadge(wire) {
+      const el = document.getElementById('audit-store-badge');
+      if (!el) return;
+      const mode = String((wire && wire.mode) || 'memory').toLowerCase();
+      const configured = !!(wire && wire.configured);
+      const path = (wire && wire.durable_path) ? String(wire.durable_path) : '';
+      const storeLabel = Ta('admin.audit.storeLabel', 'Audit store:');
+      const storeHint = Ta('admin.audit.storeHint', 'Audit persistence backend (POOLAI_AUDIT_STORE / POOLAI_AUDIT_DATA_DIR)');
+      const modeLabel = Ta('admin.audit.store.' + mode, mode);
+      const cfg = configured
+        ? Ta('admin.audit.store.configured', 'configured')
+        : Ta('admin.audit.store.unconfigured', 'unconfigured');
+      const pathBit = path ? (' · ' + escapeHtml(path)) : '';
+      el.innerHTML =
+        '<span class="status-badge ' + (configured ? 'active' : 'inactive') + '" title="' + escapeHtml(storeHint) + '">' +
+        escapeHtml(storeLabel) + ' ' + escapeHtml(modeLabel) + ' (' + escapeHtml(cfg) + ')' + pathBit +
+        '</span>';
+    }
+
+    async function loadAuditStoreWire() {
+      const el = document.getElementById('audit-store-badge');
+      if (el) {
+        el.textContent = Ta('admin.audit.storeLoading', 'Loading store…');
+      }
+      try {
+        const wire = await fetchJson('/api/enterprise/audit/store');
+        renderAuditStoreBadge(wire);
+      } catch (e) {
+        if (el) {
+          el.innerHTML = '<span class="status-badge inactive">' +
+            escapeHtml(Ta('admin.audit.storeErr', 'Audit store wire unavailable')) + '</span>';
+        }
+      }
+    }
+
+    async function refreshAuditEvents() {
+      try {
+        await queryAuditLogs();
+        showNotification(Ta('admin.audit.refreshOk', 'Audit events refreshed'), 'success');
+      } catch (e) {
+        showNotification(Ta('admin.audit.refreshErr', 'Audit refresh failed: ') + e.message, 'error');
+      }
     }
 
     async function queryAuditLogs() {
@@ -30,6 +75,7 @@ pub async fn admin_audit() -> Html<String> {
       } catch (e) {
         adminShowInlineError('audit-events', e);
         showNotification(Ta('admin.audit.errLoad', 'Error loading audit logs: ') + e.message, 'error');
+        throw e;
       }
     }
     
@@ -75,6 +121,7 @@ pub async fn admin_audit() -> Html<String> {
       }
     }
     
+    loadAuditStoreWire();
     queryAuditLogs();
     "#;
 
@@ -85,6 +132,7 @@ pub async fn admin_audit() -> Html<String> {
         <div class="admin-section">
           <div class="admin-header">
             <h2 data-i18n="admin.audit.sectionTitle">Audit Events</h2>
+            <span id="audit-store-badge" class="audit-store-badge muted" data-i18n="admin.audit.storeLoading">Loading store…</span>
             <div class="admin-filters">
               <label for="audit-search" data-i18n="admin.audit.label.search">Search</label>
               <input type="text" id="audit-search" data-i18n-placeholder="admin.audit.searchPh" placeholder="Search…" />
@@ -101,6 +149,7 @@ pub async fn admin_audit() -> Html<String> {
               <label for="audit-end-date" data-i18n="admin.audit.label.endDate">End date</label>
               <input type="date" id="audit-end-date" />
               <button type="button" class="btn" onclick="queryAuditLogs()" data-i18n="admin.audit.query">Query</button>
+              <button type="button" class="btn" onclick="refreshAuditEvents()" data-i18n="admin.audit.btn.refresh">Refresh</button>
             </div>
           </div>
           <div id="audit-events"></div>
@@ -118,4 +167,13 @@ async fn admin_audit_page_slim_audit_i18n_patch_ph_s229() {
     assert!(html.contains(r#""admin.audit.sectionTitle""#));
     assert!(!html.contains(r#""admin.jobs.leaseState.active""#));
     assert!(!html.contains(r#""admin.dash.card.overview""#));
+}
+
+#[tokio::test]
+async fn admin_audit_admin_ops_glue_ph_s1380() {
+    let html = admin_audit().await.0;
+    assert!(html.contains("id=\"audit-store-badge\""));
+    assert!(html.contains("loadAuditStoreWire"));
+    assert!(html.contains("/api/enterprise/audit/store"));
+    assert!(html.contains("refreshAuditEvents"));
 }

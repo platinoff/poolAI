@@ -462,29 +462,29 @@
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1379** | `audit_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1380** | `audit` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1381** | `audit` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1382** | `audit` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1383** | Stand smoke `audit` export | export shape unit test | **[ ]** |
-| **PH-S1384** | poolai-loc-audit PH-S1384 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1385** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1386** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1387** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1388** | galaxy_horizon_s1379_integration | band close | **[ ]** |
+| **PH-S1379** | `audit_admin_ops_depth` ui-core | depth enum + admin/ops criteria registry | **✅** |
+| **PH-S1380** | Admin audit store-wire strip | `#audit-store-badge` ← `GET /audit/store` | **✅** |
+| **PH-S1381** | Admin audit query ops glue | `refreshAuditEvents` HTTP query contracts | **✅** |
+| **PH-S1382** | HTML contracts | `audit_admin_ops_integration.rs` markers | **✅** |
+| **PH-S1383** | i18n Audit admin ops keys | `ADMIN_AUDIT_*` store/refresh EN/UK | **✅** |
+| **PH-S1384** | `VERIFY_AUDIT_ADMIN_OPS` + quick | verify-dev-stand + RUN_LOCAL | **✅** |
+| **PH-S1385** | Stand smoke + loc-audit `--audit-admin-ops` | export shape + `rust_ratio.json` | **✅** |
+| **PH-S1386** | Docs `AUDIT_ADMIN_OPS.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | **✅** |
+| **PH-S1387** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
+| **PH-S1388** | galaxy_horizon_s1379_integration | band close | **✅** |
 
 ## Band 75 — PH-S1389…S1398 (C Audit · stand smoke)
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1389** | `audit_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1390** | `audit` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1391** | `audit` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1392** | `audit` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1393** | Stand smoke `audit` export | export shape unit test | **[ ]** |
-| **PH-S1394** | poolai-loc-audit PH-S1394 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1395** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1396** | poolai-vision-sync --check | drift gate green | **[ ]** |
+| **PH-S1389** | `audit_stand_smoke_depth` ui-core | depth enum + stand-smoke criteria registry | **[ ]** |
+| **PH-S1390** | Live store wire smoke | `GET /audit/store` shape + integration | **[ ]** |
+| **PH-S1391** | Live audit events query smoke | `GET /audit/events` filters + limit | **[ ]** |
+| **PH-S1392** | Live event-field fixture smoke | validate fixture → 4xx | **[ ]** |
+| **PH-S1393** | CLI `--audit-stand-smoke` | live suite + export shape | **[ ]** |
+| **PH-S1394** | `poolai-loc-audit --audit-stand-smoke` | `rust_ratio.json` fields | **[ ]** |
+| **PH-S1395** | `VERIFY_AUDIT_STAND_SMOKE` | verify-dev-stand live + loc-audit | **[ ]** |
+| **PH-S1396** | Docs `AUDIT_STAND_SMOKE.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
 | **PH-S1397** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
 | **PH-S1398** | galaxy_horizon_s1389_integration | band close | **[ ]** |
 

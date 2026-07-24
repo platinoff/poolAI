@@ -5840,6 +5840,49 @@ mod tests {
     }
 
     #[test]
+    fn audit_admin_ops_band74_export_shape_ph_s1385() {
+        use poolai_ui_core::audit_admin_ops_depth::{
+            audit_admin_ops_criteria_total, audit_admin_ops_depth_stub, AuditAdminOpsDepth,
+            AUDIT_ADMIN_OPS_CASES, AUDIT_ADMIN_OPS_CRITERIA, FM_BAND74_ROWS,
+        };
+        use serde_json::json;
+        assert_eq!(
+            audit_admin_ops_depth_stub(Some(&json!({"query_ops_glue": true}))),
+            AuditAdminOpsDepth::QueryOpsGlue
+        );
+        assert_eq!(
+            audit_admin_ops_depth_stub(Some(&json!({
+                "audit_admin_ops_depth": true,
+                "store_strip": true,
+                "query_ops_glue": true,
+                "html_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "audit_admin_ops_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            AuditAdminOpsDepth::FullBand74
+        );
+        assert_eq!(AUDIT_ADMIN_OPS_CRITERIA.len(), 10);
+        assert_eq!(audit_admin_ops_criteria_total(), 10);
+        assert!(AUDIT_ADMIN_OPS_CASES.contains(&"store_strip"));
+        let audit_ui = include_str!("../../src/ui/admin/audit.rs");
+        assert!(audit_ui.contains("audit-store-badge"));
+        assert!(audit_ui.contains("refreshAuditEvents"));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--audit-admin-ops"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND74_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band74 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn galaxy_edge_verification_band48_export_shape_ph_s1125() {
         use poolai_ui_core::galaxy_edge_verification_depth::{
             edge_verification_criteria_total, galaxy_edge_verification_depth_stub,
