@@ -38,6 +38,7 @@ VERIFY_SSO_API="${VERIFY_SSO_API:-0}"
 VERIFY_SSO_ADMIN_OPS="${VERIFY_SSO_ADMIN_OPS:-0}"
 VERIFY_SSO_STAND_SMOKE="${VERIFY_SSO_STAND_SMOKE:-0}"
 VERIFY_AUDIT_STAND_SMOKE="${VERIFY_AUDIT_STAND_SMOKE:-0}"
+VERIFY_AUDIT_LOC_AUDIT="${VERIFY_AUDIT_LOC_AUDIT:-0}"
 VERIFY_SSO_LOC_AUDIT="${VERIFY_SSO_LOC_AUDIT:-0}"
 VERIFY_SSO_DOCS_CANON="${VERIFY_SSO_DOCS_CANON:-0}"
 VERIFY_SSO_VISION_SYNC="${VERIFY_SSO_VISION_SYNC:-0}"
@@ -538,6 +539,16 @@ if [[ "$VERIFY_AUDIT_STAND_SMOKE" == "1" ]]; then
     echo "OK  audit stand-smoke gate loc-audit"
   else
     echo "FAIL audit stand-smoke gate loc-audit"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_AUDIT_LOC_AUDIT" == "1" ]]; then
+  echo "Running poolai-loc-audit --audit-loc-audit (PH-S1402)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --audit-loc-audit); then
+    echo "OK  audit loc-audit aggregate gate"
+  else
+    echo "FAIL audit loc-audit aggregate gate"
     fail=1
   fi
 fi

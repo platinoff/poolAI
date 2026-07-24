@@ -346,6 +346,7 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `VERIFY_AUDIT_API=1` | `verify-dev-stand.sh` → `poolai-loc-audit --audit-api` (PH-S1374) |
 | `VERIFY_AUDIT_ADMIN_OPS=1` | `verify-dev-stand.sh` → `poolai-loc-audit --audit-admin-ops` (PH-S1384) |
 | `VERIFY_AUDIT_STAND_SMOKE=1` | `verify-dev-stand.sh` → live `--audit-stand-smoke` + loc-audit (PH-S1395) |
+| `VERIFY_AUDIT_LOC_AUDIT=1` | `verify-dev-stand.sh` → `poolai-loc-audit --audit-loc-audit` (PH-S1402) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 ### PH-S1100: Rust migration advisory (band 46)
@@ -954,6 +955,26 @@ VERIFY_AUDIT_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `audit_stand_smoke_criteria_met_count` | Criteria with marker present in canonical doc path |
 
 Module: [`audit_stand_smoke_depth.rs`](../../crates/poolai-ui-core/src/audit_stand_smoke_depth.rs) · tests: `audit_stand_smoke_integration.rs`, `galaxy_horizon_s1389_integration.rs` · docs: [`AUDIT_STAND_SMOKE.md`](./AUDIT_STAND_SMOKE.md).
+
+### PH-S1404: Audit loc-audit aggregate (band 76)
+
+Aggregate gate for band 71–75 `--audit*` loc-audit slices.
+
+```bash
+cargo run --bin poolai-loc-audit -- --audit-loc-audit
+cargo run --bin poolai-loc-audit -- --audit-loc-audit --advisory --min-ratio 0.95
+
+VERIFY_AUDIT_LOC_AUDIT=1 bash bin/verify-dev-stand.sh
+/usr/bin/bash bin/run-poolai.sh quick --audit-loc-audit
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `audit_loc_audit_mode` | `true` when `--audit-loc-audit` (PH-S1404) |
+| `audit_loc_audit_criteria_total` | Registry size (10) |
+| `audit_loc_audit_criteria_met_count` | Criteria with marker present in canonical doc path |
+
+Module: [`audit_loc_audit_depth.rs`](../../crates/poolai-ui-core/src/audit_loc_audit_depth.rs) · tests: `audit_loc_audit_integration.rs`, `galaxy_horizon_s1399_integration.rs` · docs: [`AUDIT_LOC_AUDIT.md`](./AUDIT_LOC_AUDIT.md).
 
 Default stand smoke includes **`vision_revision_parity`** (PH-S208, PH-S235): repo `manifest.revision` vs FM §5.12 `Vision rev`, `extensions.active_sprint` vs `manifest.next_sprint`, then `GET /docs/vision/manifest.json` with `X-PoolAI-Vision-Revision` header vs JSON body.
 

@@ -16,7 +16,8 @@ In-process CI canon remains `tests/audit_stand_smoke_integration.rs` (no stand).
 | CLI | `--audit-stand-smoke` / `POOLAI_STAND_SMOKE_AUDIT=1` | live suite |
 | Verify / quick | `VERIFY_AUDIT_STAND_SMOKE` / `--audit-stand-smoke` | live + loc-audit |
 
-**Boundary:** band 75 = live stand smoke + ops gates. Prior: [`AUDIT_ADMIN_OPS.md`](./AUDIT_ADMIN_OPS.md)
+**Boundary:** band 75 = live stand smoke + ops gates. Prior: [`AUDIT_ADMIN_OPS.md`](./AUDIT_ADMIN_OPS.md).
+Next: [`AUDIT_LOC_AUDIT.md`](./AUDIT_LOC_AUDIT.md) (band 76).
 (band 74), [`AUDIT_API.md`](./AUDIT_API.md) (band 73), [`AUDIT_STORE.md`](./AUDIT_STORE.md) (band 72).
 Mirror: [`SSO_STAND_SMOKE.md`](./SSO_STAND_SMOKE.md) (band 65).
 

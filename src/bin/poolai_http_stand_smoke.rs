@@ -5774,6 +5774,48 @@ mod tests {
     }
 
     #[test]
+    fn audit_loc_audit_band76_export_shape_ph_s1403() {
+        use poolai_ui_core::audit_loc_audit_depth::{
+            audit_loc_audit_criteria_total, audit_loc_audit_depth_stub, audit_loc_audit_slices_met,
+            AuditLocAuditDepth, AUDIT_LOC_AUDIT_CASES, AUDIT_LOC_AUDIT_CRITERIA,
+            AUDIT_LOC_AUDIT_SLICES, FM_BAND76_ROWS,
+        };
+        use serde_json::json;
+        assert_eq!(
+            audit_loc_audit_depth_stub(Some(&json!({"stand_smoke_export": true}))),
+            AuditLocAuditDepth::StandSmokeExport
+        );
+        assert_eq!(
+            audit_loc_audit_depth_stub(Some(&json!({
+                "audit_loc_audit_depth": true,
+                "slice_aggregate": true,
+                "criteria_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "audit_loc_audit_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            AuditLocAuditDepth::FullBand76
+        );
+        assert_eq!(AUDIT_LOC_AUDIT_CRITERIA.len(), 10);
+        assert_eq!(audit_loc_audit_criteria_total(), 10);
+        assert_eq!(AUDIT_LOC_AUDIT_SLICES.len(), 5);
+        assert!(AUDIT_LOC_AUDIT_CASES.contains(&"aggregate_flag"));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert_eq!(audit_loc_audit_slices_met(loc_audit), (5, 5));
+        assert!(loc_audit.contains("--audit-loc-audit"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND76_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band76 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn sso_docs_canon_band67_export_shape_ph_s1313() {
         use poolai_ui_core::sso_docs_canon_depth::{
             sso_docs_canon_criteria_total, sso_docs_canon_depth_stub, sso_docs_canon_slices_met,

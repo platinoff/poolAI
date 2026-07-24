@@ -1,8 +1,8 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-24 (service PH-SVC45…SVC54 ✅ · Cursor **3.13.10** · vision eye/prune · band 76 ready)
+**Оновлено:** 2026-07-24 (band 76 **PH-S1399…S1408** ✅ · Audit loc-audit aggregate · band 77 ready)
 
-**Наступна сесія:** **`абракадабра`** — drain band 76 (FM **§5.57** Audit loc-audit aggregate).
+**Наступна сесія:** **`абракадабра`** — drain band 77 (FM **§5.58** Audit docs canon).
 
 ## P0 / service (2026-07-24)
 
@@ -20,9 +20,26 @@
 
 **Cursor / toolchain (service):** local desktop **3.13.10** · Auto-review · research [`CURSOR_UPDATE_RESEARCH_2026-07-24.md`](./CURSOR_UPDATE_RESEARCH_2026-07-24.md) · FM **§5.16**.
 
-**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **880** спринтів → PH-S2278.
+**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **870** спринтів → PH-S2278.
 
-## Band 76 — Audit loc-audit aggregate (PH-S1399…S1408, **ACTIVE**)
+## Band 77 — Audit docs canon (PH-S1409…S1418, **ACTIVE**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1409** | `audit_docs_canon_depth` ui-core module |
+| **PH-S1410** | Slice aggregate (`AUDIT_*.md`) |
+| **PH-S1411** | Criteria contracts |
+| **PH-S1412** | `VERIFY_AUDIT_DOCS_CANON` + quick |
+| **PH-S1413** | Stand smoke export shape |
+| **PH-S1414** | `poolai-loc-audit --audit-docs-canon` |
+| **PH-S1415** | `AUDIT_DOCS_CANON.md` + canon |
+| **PH-S1416** | vision-sync --check |
+| **PH-S1417** | Ratio hold advisory |
+| **PH-S1418** | Band close |
+
+**§5.12:** **10** відкритих. **Vision:** rev **383**. **Pending completion:** **870** (→ PH-S2278).
+
+## Band 76 — Audit loc-audit aggregate (PH-S1399…S1408, ✅)
 
 | Sprint | Фокус |
 |--------|--------|
@@ -37,7 +54,7 @@
 | **PH-S1407** | Ratio hold advisory |
 | **PH-S1408** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **381**. **Pending completion:** **880** (→ PH-S2278).
+**PH-S1408 ✅ (2026-07-24):** `audit_loc_audit_depth.rs`; `AUDIT_LOC_AUDIT_SLICES`; `--audit-loc-audit`; `VERIFY_AUDIT_LOC_AUDIT`; `AUDIT_LOC_AUDIT.md`; `galaxy_horizon_s1399_integration`. Phase C Audit loc-audit aggregate closed.
 
 ## Band 75 — Audit stand smoke (PH-S1389…S1398, ✅)
 

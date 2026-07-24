@@ -492,16 +492,16 @@
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1399** | `audit_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1400** | `audit` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1401** | `audit` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1402** | `audit` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1403** | Stand smoke `audit` export | export shape unit test | **[ ]** |
-| **PH-S1404** | poolai-loc-audit PH-S1404 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1405** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1406** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1407** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1408** | galaxy_horizon_s1399_integration | band close | **[ ]** |
+| **PH-S1399** | `audit_loc_audit_depth` ui-core | depth enum + aggregate criteria registry | **✅** |
+| **PH-S1400** | Slice aggregate (audit→stand-smoke) | `--audit`…`--audit-stand-smoke` under one gate | **✅** |
+| **PH-S1401** | Criteria contracts | `audit_loc_audit_integration` markers + registry | **✅** |
+| **PH-S1402** | `VERIFY_AUDIT_LOC_AUDIT` + quick | verify-dev-stand / run-poolai aggregate gate | **✅** |
+| **PH-S1403** | Stand smoke export shape | `audit_loc_audit_band76_export_shape` unit | **✅** |
+| **PH-S1404** | `poolai-loc-audit --audit-loc-audit` | `rust_ratio.json` fields | **✅** |
+| **PH-S1405** | Docs `AUDIT_LOC_AUDIT.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | **✅** |
+| **PH-S1406** | poolai-vision-sync --check | drift gate green | **✅** |
+| **PH-S1407** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
+| **PH-S1408** | galaxy_horizon_s1399_integration | band close | **✅** |
 
 ## Band 77 — PH-S1409…S1418 (C Audit · docs canon)
 
