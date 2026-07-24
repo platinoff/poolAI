@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["format_reply","forward_message","forward_payload","message_to_webhook_payload"],"struct":["CoordinatorConfig","ForwardResult"]};
+window.SIDEBAR_ITEMS = {"fn":["bind_wallet","fetch_telegram_seats","format_reply","format_seats_reply","format_unbind_reply","format_wallet_reply","forward_message","forward_payload","message_to_webhook_payload","unbind_telegram"],"struct":["CoordinatorConfig","ForwardResult","TelegramSeatsSnapshot","UnbindResult","WalletBindResult"]};

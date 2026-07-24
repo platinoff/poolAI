@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["PowerAction"],"fn":["apply_power_action","power_ops_invocation_count"],"struct":["PowerRequest","PowerResponse"]};

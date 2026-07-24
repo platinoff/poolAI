@@ -1,2 +1,2 @@
-window.ALL_CRATES = ["poolai","poolai_health_load","poolai_openapi_gap_audit","poolai_worker"];
-//{"start":21,"fragment_lengths":[8,21,27,16]}
+window.ALL_CRATES = ["poolai","poolai_e2e_stand","poolai_health_load","poolai_http_stand_smoke","poolai_loc_audit","poolai_openapi_gap_audit","poolai_verify_release","poolai_vision_sync","poolai_worker"];
+//{"start":21,"fragment_lengths":[8,19,21,26,19,27,24,21,16]}

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["METRIC_RELEASE_VERIFY_FAIL_TOTAL","METRIC_RELEASE_VERIFY_TOTAL","METRIC_UPDATE_NOTIFY_PENDING"],"fn":["governance_metrics_snapshot","record_release_verify_fail","record_release_verify_success","release_verify_fail_total","release_verify_total","set_update_notify_pending","update_notify_pending"],"struct":["GovernanceMetricsSnapshot"]};

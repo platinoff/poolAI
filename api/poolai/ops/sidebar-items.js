@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["FULL_FEATURES","LIGHT_FEATURES"],"mod":["last_run","power"]};

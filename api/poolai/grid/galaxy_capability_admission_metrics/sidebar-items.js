@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["METRIC_CAPABILITY_SIGNED_ACCEPTED_TOTAL","METRIC_CAPABILITY_UNSIGNED_REJECTED_TOTAL"],"fn":["capability_signed_accepted_total","capability_unsigned_rejected_total","record_capability_signed_accepted","record_capability_unsigned_rejected"]};

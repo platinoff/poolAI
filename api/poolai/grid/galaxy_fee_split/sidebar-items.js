@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["BPS_DENOMINATOR","PRIMARY_DEV_FEE_BPS","SECONDARY_ADMIN_FEE_MAX_BPS","SECONDARY_ADMIN_FEE_MIN_BPS","SECONDARY_FEE_UX_HINT"],"enum":["GalaxyFeeSplitError"],"fn":["mul_bps_floor_u64","split_gross_payment"],"struct":["GalaxyFeeSplit"]};

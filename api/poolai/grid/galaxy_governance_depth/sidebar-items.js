@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["GovernanceDepth"],"fn":["governance_depth_stub"]};

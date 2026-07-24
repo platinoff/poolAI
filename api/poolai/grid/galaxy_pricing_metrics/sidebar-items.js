@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["pricing_metrics_snapshot"],"struct":["PricingMetricsSnapshot"]};

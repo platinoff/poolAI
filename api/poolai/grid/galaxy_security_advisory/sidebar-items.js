@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["METRIC_ADVISORY_ACKNOWLEDGED_TOTAL"],"fn":["acknowledge_security_advisory","advisory_acknowledged_total","is_advisory_acknowledged","list_security_advisories"],"struct":["SecurityAdvisoryEntry"]};

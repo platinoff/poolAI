@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["default_last_run_path","load_last_run","save_last_run"],"struct":["LastRunSnapshot"]};

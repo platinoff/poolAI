@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["GalaxyWorkerOrigin"],"fn":["galaxy_worker_from_peer"],"struct":["GalaxyWorkerCapabilities","GalaxyWorkerDto","GalaxyWorkerLimits","GalaxyWorkerTelemetry"]};

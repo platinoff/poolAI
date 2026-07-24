@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["TrustPersistDepth"],"fn":["current_trust_persist_depth","trust_persist_depth_stub","trust_persist_depth_wire_label"]};

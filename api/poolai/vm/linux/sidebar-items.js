@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["macvlan_link_name","validate_macvlan_mode","veth_link_names"],"struct":["LinuxFilesystemIsolator","LinuxNetworkIsolator"]};

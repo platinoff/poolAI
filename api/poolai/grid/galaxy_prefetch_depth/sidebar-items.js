@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["PrefetchDepth"],"fn":["prefetch_depth_stub"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["SettlementOnchainDepth"],"fn":["current_settlement_onchain_depth","settlement_onchain_depth_stub","settlement_onchain_depth_wire_label"]};

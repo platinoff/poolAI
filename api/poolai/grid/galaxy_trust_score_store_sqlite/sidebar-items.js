@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ENV_TRUST_SCORE_DATA_DIR","ENV_TRUST_SCORE_STORE"],"fn":["data_dir_from_env","load","migrate_legacy_json_file","persist","sqlite_enabled"]};

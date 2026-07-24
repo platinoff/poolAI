@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["METRIC_VERIFICATION_CHECKER_JOB_SUBMIT_TOTAL","SHADOW_CHECKER_POLICY","SHADOW_CHECKER_WORKER_ID"],"fn":["shadow_checker_job_id","submit_shadow_verification_checker_job","verification_checker_job_submit_total"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["RoutingPolicyLocalityVerdict"],"fn":["enforce_routing_policy_locality_gate","routing_policy_locality_gate"]};

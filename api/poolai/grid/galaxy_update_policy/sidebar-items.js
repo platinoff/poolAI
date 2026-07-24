@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ENV_RELEASE_MANIFEST_URL","ENV_UPDATE_POLICY"],"enum":["UpdatePolicyMode"],"fn":["release_manifest_url_from_env","tick_update_notify_from_env","update_policy_from_env","update_policy_snapshot"],"struct":["UpdatePolicySnapshot"]};

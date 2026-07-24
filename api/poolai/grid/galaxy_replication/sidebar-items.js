@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["REPLICATION_LIGHT","REPLICATION_STANDARD","REPLICATION_STRICT"],"enum":["ReplicationPricingDepth","ReplicationProfile"],"fn":["parse_replication_profile","replication_pricing_depth_stub","replication_quorum_met","replication_tier_config","replication_tier_from_policy","strict_tier_allows_worker_pool"],"struct":["ReplicationTierConfig"]};

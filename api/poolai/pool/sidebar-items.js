@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["LoadBalancingStrategy"],"fn":["get_global_pool","health_check","initialize","initialize_with_config","shutdown"],"mod":["discovery_integration","placement","topology","worker"],"struct":["Pool","PoolConfig","PoolMetrics"]};
+window.SIDEBAR_ITEMS = {"enum":["LoadBalancingStrategy"],"fn":["get_global_pool","health_check","initialize","initialize_with_config","shutdown"],"mod":["discovery_integration","placement","topology","topology_graph","worker"],"struct":["Pool","PoolConfig","PoolMetrics"]};

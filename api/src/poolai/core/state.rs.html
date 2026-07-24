@@ -367,7 +367,7 @@
 <a href=#367 id=367 data-nosnippet>367</a>            <span class="attr">#[cfg(feature = <span class="string">"enterprise"</span>)]
 <a href=#368 id=368 data-nosnippet>368</a>            </span>oauth2_pending_states: Arc::new(tokio::sync::RwLock::new(HashMap::new())),
 <a href=#369 id=369 data-nosnippet>369</a>            <span class="attr">#[cfg(feature = <span class="string">"enterprise"</span>)]
-<a href=#370 id=370 data-nosnippet>370</a>            </span>tenant_manager: Arc::new(TenantManager::new()),
+<a href=#370 id=370 data-nosnippet>370</a>            </span>tenant_manager: Arc::new(TenantManager::new_from_env()),
 <a href=#371 id=371 data-nosnippet>371</a>            <span class="attr">#[cfg(feature = <span class="string">"enterprise"</span>)]
 <a href=#372 id=372 data-nosnippet>372</a>            </span>audit_logger: Arc::new(AuditLogger::new()),
 <a href=#373 id=373 data-nosnippet>373</a>            <span class="attr">#[cfg(feature = <span class="string">"enterprise"</span>)]

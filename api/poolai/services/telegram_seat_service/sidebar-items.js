@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ENV_TELEGRAM_SEAT_LIMIT","ENV_TELEGRAM_SEAT_POLICY"],"enum":["TelegramSeatPolicy"],"fn":["active_telegram_edge_seats","compute_seat_limit","is_telegram_edge_metadata","telegram_seat_coordinator_snapshot","telegram_seat_limit_from_env","telegram_seat_policy_from_env","try_admit_telegram_edge"],"struct":["TelegramSeatCoordinatorSnapshot"]};

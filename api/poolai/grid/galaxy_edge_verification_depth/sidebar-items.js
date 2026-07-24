@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["EdgeVerificationHorizonDepth"],"fn":["current_edge_verification_horizon_depth","edge_verification_horizon_depth_stub","edge_verification_horizon_depth_wire_label"]};

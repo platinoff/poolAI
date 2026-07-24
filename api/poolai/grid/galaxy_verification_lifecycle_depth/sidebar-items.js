@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["VerificationLifecycleDepth"],"fn":["current_verification_lifecycle_depth","verification_lifecycle_depth_stub","verification_lifecycle_depth_wire_label"]};

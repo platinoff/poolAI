@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["DEFAULT_COORDINATOR_PROTOCOL","ENV_ALLOWED_BUILD_IDS","ENV_PROTOCOL_SUNSET_MIN","MIN_COORDINATOR_VERSION_DOCS_URL"],"enum":["CompatStatus"],"fn":["check_build_id_allowed","check_protocol_sunset","negotiate","negotiate_with_coordinator"],"struct":["BuildIdReject","ProtocolNegotiation","ProtocolSunsetReject","ProtocolVersion"]};

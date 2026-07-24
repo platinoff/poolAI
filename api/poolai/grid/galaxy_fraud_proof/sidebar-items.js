@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ENV_FRAUD_PROOF","METRIC_FRAUD_PROOF_PENDING_TOTAL"],"fn":["evaluate_fraud_proof_hold","fraud_proof_enabled","fraud_proof_pending_total","record_fraud_proof_pending"]};

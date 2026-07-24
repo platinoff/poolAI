@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["locality_metrics_snapshot"],"struct":["LocalityMetricsSnapshot"]};

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["schedule_from_context","schedule_pending","schedule_with_workers","worker_candidates_from_pool_status"],"struct":["ScheduleOutcome","VmCandidate","WorkerCandidate"]};
+window.SIDEBAR_ITEMS = {"fn":["schedule_from_context","schedule_pending","schedule_with_grid_peer","schedule_with_workers","worker_candidates_from_pool_status"],"struct":["ScheduleOutcome","VmCandidate","WorkerCandidate"]};

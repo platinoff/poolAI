@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["core","grid","job","libs","memory","monitoring","network","observability","platform","pool","raid","rewards","runtime","services","tgbot","ui","version","vm","workers"]};
+window.SIDEBAR_ITEMS = {"mod":["core","grid","job","libs","memory","monitoring","network","observability","ops","platform","pool","raid","release","rewards","runtime","security","services","tgbot","ui","version","vm","workers"]};

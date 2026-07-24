@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ENV_SETTLEMENT_ON_CHAIN"],"fn":["current_settlement_mode","offline_batch_payout_enabled","settlement_mode_gate_label","settlement_on_chain_enabled","settlement_on_chain_pending"]};

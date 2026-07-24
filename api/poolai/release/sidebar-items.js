@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["VerifyReleaseError"],"fn":["verify_release"],"struct":["ReleaseArtifact","ReleaseManifest","VerifyReleaseOptions","VerifyReleaseReport"]};

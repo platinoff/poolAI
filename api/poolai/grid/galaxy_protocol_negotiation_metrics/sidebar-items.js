@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["METRIC_PROTOCOL_NEGOTIATION_ACCEPTED_TOTAL","METRIC_PROTOCOL_NEGOTIATION_REJECTED_TOTAL"],"fn":["protocol_negotiation_accepted_total","protocol_negotiation_rejected_total","record_protocol_negotiation_accepted","record_protocol_negotiation_rejected"]};
