@@ -1,25 +1,29 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-23 (band 74 **PH-S1379…S1388** ✅ · band 75 **§5.12 = 10 open** · Cursor **3.12.30**)
+**Оновлено:** 2026-07-24 (P0 CI red · Pa11y/Playwright `--debug` · Docs · band 75 queued · Cursor **3.12.30**)
 
-**Наступна сесія:** **`абракадабра`** — drain band 75 (C Audit · stand smoke) з FM **§5.56**.
+**Наступна сесія:** **`абракадабра`** — **P0 CI** (PH-SVC41…43 → PH-SVC34) → потім drain band 75 (FM **§5.56**).
 
-## P0 — з скріншотів CI / Security
+## P0 — скріншоти CI (2026-07-24) · перша черга
 
 | # | Sprint | Фокус | Статус |
 |---|--------|--------|--------|
-| 1 | **PH-SVC31…33** | macvlan `'static` + unused warnings + local `test-ci` | **✅** |
-| 2 | **PH-SVC34** | Підтвердити GitHub Actions green після push (Check no-features / Test / OpenAPI / Pa11y / LOC / Vision) | **[ ]** verify (`gh` N/A locally) |
-| 3 | **PH-SVC35** | Secret scanning #1 Atlassian API Token — **revoke у Atlassian** | **[ ]** OWNER |
-| 4 | **PH-SVC36** | `target/` gitignored; без history rewrite без явного запиту | **✅** |
+| 1 | **PH-SVC41** | Pa11y: `cargo build --debug` у `bin/pa11y-ci.sh` (CI) | **[ ]** |
+| 2 | **PH-SVC42** | Playwright: той самий `--debug` у `bin/e2e-playwright.sh` | **[ ]** |
+| 3 | **PH-SVC43** | Docs: `Documentation / Generate Documentation` (`docs.yml` / rustdoc) | **[ ]** |
+| 4 | **PH-SVC34** | Re-verify GH Actions green (вкл. Pa11y live + Playwright + Docs) | **[ ]** |
+| 5 | **PH-SVC35** | Secret scanning #1 Atlassian — **revoke у Atlassian** | **[ ]** OWNER |
+| 6 | **PH-SVC31…33 / 36…40** | macvlan + prior service | **✅** |
+
+**Root cause (Pa11y):** `error: unexpected argument '--debug' found` — у CI `PA11Y_PROFILE=debug` → `cargo build --debug` (невалідно; debug = default без прапора). Playwright: `E2E_PROFILE=debug` → той самий виклик.
 
 Канон secret: [`SECRETS_MANAGEMENT.md`](../security/SECRETS_MANAGEMENT.md) §4. Сталевий стан: [`STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md).
 
-**Cursor / toolchain (service):** local desktop **3.12.30** · public changelog latest numbered IDE **3.11** · research [`CURSOR_UPDATE_RESEARCH_2026-07-22.md`](./CURSOR_UPDATE_RESEARCH_2026-07-22.md) · FM **§5.16**. Vision: `poolai-vision-sync` мержить enterprise `queue — band` → Sprint queue + Feed = останні закриті PH-S*.
+**Cursor / toolchain (service):** local desktop **3.12.30** · research [`CURSOR_UPDATE_RESEARCH_2026-07-22.md`](./CURSOR_UPDATE_RESEARCH_2026-07-22.md) · FM **§5.16**.
 
-**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **890** спринтів до FM **§5.18** @ PH-S2278 (enterprise §5.17 @ S2148 + extension Memory/Job/Solana/Wasm/close).
+**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **890** спринтів → PH-S2278.
 
-## Band 75 — Audit stand smoke (PH-S1389…S1398, **ACTIVE**)
+## Band 75 — Audit stand smoke (PH-S1389…S1398, **ACTIVE** · після P0)
 
 | Sprint | Фокус |
 |--------|--------|

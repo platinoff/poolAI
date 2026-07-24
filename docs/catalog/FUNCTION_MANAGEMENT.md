@@ -2053,21 +2053,25 @@ FM-xxx (з таблиці нижче)
 | **PH-SVC31** | CI root: macvlan `'static` lifetime | `validate_macvlan_mode` → static literals (`src/vm/isolation/linux.rs`) | **✅** |
 | **PH-SVC32** | CI warnings: unused params | `_source_peer_id` (dispatch) · `_cgroup_path` (resources) | **✅** |
 | **PH-SVC33** | Local gate: `cargo check --no-default-features` + `cargo test-ci` | unblocks Check/Test/OpenAPI/Docs/LOC/Vision cascade | **✅** |
-| **PH-SVC34** | Confirm GitHub Actions green post-push | Check (no features) + Test Suite + OpenAPI + Pa11y contract + LOC + Vision drift | **[ ]** next |
+| **PH-SVC34** | Confirm GitHub Actions green post-push | Check/Test/OpenAPI/LOC/Vision + **Pa11y live + Playwright admin + Docs** after SVC41…43 | **[ ]** after P0 fixes |
 | **PH-SVC35** | Secret scanning #1 Atlassian API Token | **OWNER:** revoke token in Atlassian; alert path was historical `target/…/deps/` | **[ ]** OWNER |
 | **PH-SVC36** | Secret alert disposition (no history rewrite) | `target/` in `.gitignore`; no `filter-repo` without explicit owner request | **✅** |
 | **PH-SVC37** | STABLE_STATE + HANDOFF CI note | macvlan fix + GH cascade root cause | **✅** |
 | **PH-SVC38** | NEXT_SESSION P0 before band 74 | CI verify + OWNER secret; then `абракадабра` → band 74 | **✅** |
 | **PH-SVC39** | README / INDEX service zriz | PH-SVC31…SVC40 pointer | **✅** |
 | **PH-SVC40** | vision-sync --check + git push + самарі | service commit `main` | **✅** |
+| **PH-SVC41** | Pa11y CI: drop invalid `cargo build --debug` | `bin/pa11y-ci.sh` — CI profile → plain `cargo build` (or `--release`); Pa11y WCAG 2.2 job green | **[ ]** P0 |
+| **PH-SVC42** | Playwright CI: same `--debug` in e2e script | `bin/e2e-playwright.sh` — mirror fix; Playwright admin suite green | **[ ]** P0 |
+| **PH-SVC43** | Docs workflow: Generate Documentation | diagnose `docs.yml` / `cargo doc`; fix; Documentation job green | **[ ]** P0 |
+| **PH-SVC44** | NEXT/HANDOFF P0 queue + push | screenshots 2026-07-24 → SVC41…43 first; then `абракадабра` | **✅** |
 
-**Наступний service trigger:** після major Cursor/OS update або за запитом власника (повторити scan → §5.16 band). **Відкриті:** PH-SVC34 (GH CI verify) · PH-SVC35 (OWNER revoke Atlassian token).
+**Наступний service trigger:** **`абракадабра`** → **P0 PH-SVC41…43** → PH-SVC34 verify → band 75. **Відкриті:** PH-SVC41…43 · PH-SVC34 · PH-SVC35 (OWNER).
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S262)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-23):** band 75 **PH-S1389…S1398** `[ ]` · §5.12 **10** · band 74 ✅ · open **PH-SVC34/35** · наступна **`абракадабра`** → drain band 75 · completion pending **890** → S2278.
+**Активна смуга (2026-07-24):** band 75 **PH-S1389…S1398** `[ ]` · §5.12 **10** · band 74 ✅ · **P0 PH-SVC41…43** (Pa11y/Playwright `--debug` + Docs) · PH-SVC34/35 · наступна **`абракадабра`** → **P0 first** → band 75 · completion pending **890** → S2278.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 
