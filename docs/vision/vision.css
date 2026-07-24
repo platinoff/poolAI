@@ -2130,6 +2130,48 @@ body.vision-reduced-motion #map-svg .edge.constellation-pipe,
   color: var(--accent);
 }
 
+.sprint-queue-filter-tag {
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(126, 184, 255, 0.28);
+  color: var(--accent, #7eb8ff);
+  font-size: 0.58rem;
+  letter-spacing: 0.02em;
+}
+
+.btn-queue-eye {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--muted, #9aa4b2);
+  border-radius: 6px;
+  width: 1.55rem;
+  height: 1.55rem;
+  line-height: 1;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-queue-eye:hover,
+.btn-queue-eye.filter-queued {
+  border-color: rgba(126, 184, 255, 0.55);
+  color: #dbeafe;
+  background: rgba(126, 184, 255, 0.12);
+}
+
+.btn-queue-eye:focus-visible {
+  outline: 2px solid var(--accent, #7eb8ff);
+  outline-offset: 2px;
+}
+
+.sprint-queue-item.queued .sprint-queue-status {
+  color: #fbbf24;
+}
+
 .sprint-queue-list {
   list-style: none;
   margin: 0;

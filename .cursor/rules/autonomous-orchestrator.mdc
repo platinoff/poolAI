@@ -38,6 +38,13 @@ alwaysApply: false
 - **Не стаджити** `data/audit/*.log.gz`.
 - **Push:** зовнішній MSYS2 UCRT64, [`.cursor/commands/git-push.md`](.cursor/commands/git-push.md). Якщо в коміті є **`src/` / `tests/` / `crates/` / `Cargo.toml`** — subject + **Summary** у тілі (з `git diff --cached`); після push — короткий самарі в чат (git-push п.3b). Docs-only — короткий Summary за бажанням.
 
+## Auto-execution (Cursor Run Modes)
+
+- Prefer **Auto-review** (Settings → Agents → Approvals & Execution) for orchestrated runs / `абракадабра`.
+- Project steer: [`.cursor/permissions.json`](../permissions.json) — MSYS2/`cargo`/`git` allow; block force-push, secrets, history rewrite, Python product files.
+- Do **not** enable **Run Everything** for PoolAI without explicit owner request.
+- Chat Mode (Agent/Plan) ≠ Run Mode.
+
 ## Поза обсягом (без явного запиту)
 
 FM-004, FM-006 (Deferred), FM-009, FM-010 (Concept-only) — не реалізовувати в автопрогоні.

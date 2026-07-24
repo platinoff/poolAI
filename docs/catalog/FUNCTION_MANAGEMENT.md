@@ -1221,7 +1221,7 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **10** (band 75 ✅ · band 76 open). **Master horizon:** PH-S1399…S1408 (band 76). **Completion pending:** PH-S1399…S2278 = **880** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **379**. **Наступна сесія:** **`абракадабра`** — drain band 76.
+**Відкритих у §5.12:** **10** (band 75 ✅ · band 76 open). **Master horizon:** PH-S1399…S1408 (band 76). **Completion pending:** PH-S1399…S2278 = **880** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **380**. **Наступна сесія:** **`абракадабра`** — drain band 76.
 
 ### 5.57 Audit loc-audit aggregate queue — band 76 (PH-S1399…S1408, 2026-07-24) · **ACTIVE**
 
@@ -2081,6 +2081,16 @@ FM-xxx (з таблиці нижче)
 | **PH-SVC42** | Playwright CI: same `--debug` in e2e script | `bin/e2e-playwright.sh` — mirror fix; Playwright admin suite green | **✅** |
 | **PH-SVC43** | Docs workflow: Generate Documentation | `src/network/mod.rs` TLS reload `block_in_place`+`await`; `cargo doc --features jwt,https` green | **✅** |
 | **PH-SVC44** | NEXT/HANDOFF P0 queue + push | screenshots 2026-07-24 → SVC41…43 first; then `абракадабра` | **✅** |
+| **PH-SVC45** | Cursor 3.13.10 + Auto-review research | `CURSOR_UPDATE_RESEARCH_2026-07-24.md` | **✅** |
+| **PH-SVC46** | `cursor-environment-baseline.mdc` | 3.13.10 + Run Modes | **✅** |
+| **PH-SVC47** | `.cursor/permissions.json` + agent-roles / orchestrator | Auto-review steer for drain | **✅** |
+| **PH-SVC48** | Vision eye filter + prune closed PH-S ≤2000 | `vision.js` / `poolai-vision-sync` | **✅** |
+| **PH-SVC49** | Screenshot CI code verify | `--debug` absent (SVC41…43); GH re-verify = SVC34 | **✅** |
+| **PH-SVC50** | HANDOFF + NEXT_SESSION | service zriz; next `абракадабра` | **✅** |
+| **PH-SVC51** | README / INDEX / ENV pointer | Jul 24 research | **✅** |
+| **PH-SVC52** | `file_list.csv` + `.cursor/CHANGELOG` | CURSOR_UPDATE_2026-07-24 | **✅** |
+| **PH-SVC53** | `poolai-vision-sync --check` | drift gate green | **✅** |
+| **PH-SVC54** | git push + самарі | service commit `main` | **✅** |
 
 **Наступний service trigger:** **`абракадабра`** → drain band 76 · **PH-SVC34** re-verify GH after push · **PH-SVC35** OWNER. **Відкриті service:** PH-SVC34 · PH-SVC35 (OWNER).
 
@@ -2088,7 +2098,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-24):** band 76 **PH-S1399…S1408** `[ ]` · §5.12 **10** · band 75 ✅ · P0 PH-SVC41…43 ✅ · PH-SVC34/35 · наступна **`абракадабра`** → band 76 · completion pending **880** → S2278.
+**Активна смуга (2026-07-24):** band 76 **PH-S1399…S1408** `[ ]` · §5.12 **10** · band 75 ✅ · service PH-SVC45…SVC54 ✅ · P0 PH-SVC41…43 ✅ · PH-SVC34/35 · наступна **`абракадабра`** → band 76 · completion pending **880** → S2278.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

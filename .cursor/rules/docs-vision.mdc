@@ -33,7 +33,7 @@ alwaysApply: false
 4. **`extensions.json`:** `active_sprint` = наступний; у `scopes` — `docs`, `code_globs`, `extensions`, `also_update` для закритого спринту.
 5. **`vision.svg`:** оновити footer text (last sprint / next) якщо змінився зріз черги.
 6. **`poolai-vision-sync`:** `cargo run --bin poolai-vision-sync` + `--check` (FM §5.12 + enterprise `queue — band` секції → `sprint_queue` / `feed.json` / `last_sprint_closed`; manifest ↔ `.mdc` cross-links).
-7. **Sprint queue + Feed:** після sync завжди відображають **останні закриті PH-S*** (serial desc) і відкриті; не покладатися лише на хвіст історичного журналу §5.12.
+7. **Sprint queue + Feed:** після sync Sprint queue показує **відкриті** (+ опційно queued через eye 👁); closed `PH-S*` з serial ≤**2000** prune з `manifest.sprint_queue` (meta/feed лишають last_closed з повного FM).
 8. **Не** дублювати повний текст концепту в vision — лише посилання та шари.
 
 ## Актуальність extensions (етеншени)

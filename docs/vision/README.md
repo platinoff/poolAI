@@ -116,6 +116,7 @@ http://127.0.0.1:8765/docs/vision/index.html
 | **PH-S188** ✅ | Map filters — independent layer/type toggles; **LAYERS**/**TYPES** All/None; decouple 3D stack ↔ chips | `vision.js`, `vision.css`, `index.html` |
 | **PH-S190** ✅ | Filter **dropdowns** + panel **−** collapse strip | `vision.js`, `vision.css`, `index.html` |
 | **PH-S191** ✅ | Sprint queue panel (Rust parse FM §5.12) | `poolai-vision-sync`, `manifest.json`, `vision.js` |
+| **PH-SVC48** ✅ | Queue eye filter + prune closed ≤2000 | `vision.js` 👁 · `poolai-vision-sync` |
 | **PH-S192** ✅ | Overview LOD + minimap | `vision.js`, `vision.css`, `index.html` |
 | **PH-S193** ✅ | Dashboard wasm formatters | `poolai-ui-core`, `poolai-ui-wasm`, `src/ui/mod.rs` |
 | **PH-S194** ✅ (vision UX rev 132) | Panel dock bar + map bottom bar | `vision.js`, `vision.css`, `index.html` v61 |

@@ -1,0 +1,18 @@
+{
+  "autoRun": {
+    "allow_instructions": [
+      "Allow MSYS2 bash invocations under C:\\msys64\\usr\\bin\\bash.exe for PoolAI git, cargo, and bin/ scripts.",
+      "Allow cargo fmt, cargo test-ci, cargo test-raft-ci, cargo check, and cargo run --bin poolai-vision-sync / poolai-openapi-gap-audit / poolai-loc-audit in this workspace.",
+      "Allow git fetch, git status, git diff, git log, git add of scoped paths, git commit via bin/git-commit-tree-msg.sh or bin/amend-head-msg.sh, and git push origin main.",
+      "Allow reading and editing files under src/, tests/, crates/, docs/, e2e/, bin/, scripts/, and .cursor/ for PoolAI VDT drain.",
+      "Allow WebFetch and WebSearch for Cursor changelog, Run Modes docs, and PoolAI GitHub status checks."
+    ],
+    "block_instructions": [
+      "Every git push --force, git reset --hard, or history rewrite (filter-repo, rebase that rewrites published main) should go through approval first.",
+      "Every command that deletes .git, modifies git config, or skips hooks with --no-verify should go through approval first.",
+      "Every command that reads or prints secrets from .env, credentials, API tokens, or private keys should go through approval first.",
+      "Every Run Everything style unrestricted shell outside the workspace should go through approval first.",
+      "Do not auto-run Python interpreters or create .py product files in this repository."
+    ]
+  }
+}

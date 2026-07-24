@@ -20,6 +20,9 @@ const FEED_REL: &str = "docs/vision/feed.json";
 const FM_REL: &str = "docs/catalog/FUNCTION_MANAGEMENT.md";
 const EXTENSIONS_REL: &str = "docs/vision/extensions.json";
 const FEED_CLOSED_CAP: usize = 12;
+/// Closed `PH-S*` with serial ≤ this are omitted from `manifest.sprint_queue` (vision UI prune).
+/// Meta (`last_sprint_closed`, feed) still derives from the full FM parse.
+const SPRINT_QUEUE_CLOSED_PRUNE_MAX: u32 = 2000;
 
 const DOCS_VISION_MDC: &str = ".cursor/rules/docs-vision.mdc";
 
@@ -498,9 +501,28 @@ fn parse_fm_sprint_queue(content: &str) -> Vec<SprintQueueEntry> {
     merge_sprint_queue_entries(journal, bands)
 }
 
+/// Keep all open rows; drop closed `PH-S*` with serial ≤ [`SPRINT_QUEUE_CLOSED_PRUNE_MAX`].
+/// Non-`PH-S*` ids (e.g. future service labels) stay.
+fn filter_sprint_queue_for_manifest(entries: &[SprintQueueEntry]) -> Vec<SprintQueueEntry> {
+    entries
+        .iter()
+        .filter(|e| {
+            if e.open {
+                return true;
+            }
+            match parse_sprint_serial(&e.id) {
+                Some(n) => n > SPRINT_QUEUE_CLOSED_PRUNE_MAX,
+                None => true,
+            }
+        })
+        .cloned()
+        .collect()
+}
+
 fn sprint_queue_json(entries: &[SprintQueueEntry]) -> Value {
+    let filtered = filter_sprint_queue_for_manifest(entries);
     Value::Array(
-        entries
+        filtered
             .iter()
             .map(|e| {
                 json!({
@@ -1572,6 +1594,51 @@ mod tests {
         assert_eq!(next.as_deref(), Some("PH-S191"));
         assert_eq!(last.as_deref(), Some("PH-S190"));
         assert_eq!(open, 2);
+    }
+
+    #[test]
+    fn sprint_queue_json_prunes_closed_le_2000() {
+        let entries = vec![
+            SprintQueueEntry {
+                row: 1,
+                id: "PH-S1398".into(),
+                title: "closed low".into(),
+                deps: String::new(),
+                acceptance: String::new(),
+                status: "closed".into(),
+                open: false,
+            },
+            SprintQueueEntry {
+                row: 2,
+                id: "PH-S1399".into(),
+                title: "open".into(),
+                deps: String::new(),
+                acceptance: String::new(),
+                status: "open".into(),
+                open: true,
+            },
+            SprintQueueEntry {
+                row: 3,
+                id: "PH-S2001".into(),
+                title: "closed high".into(),
+                deps: String::new(),
+                acceptance: String::new(),
+                status: "closed".into(),
+                open: false,
+            },
+        ];
+        let q = sprint_queue_json(&entries);
+        let ids: Vec<&str> = q
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|v| v["id"].as_str().unwrap())
+            .collect();
+        assert_eq!(ids, vec!["PH-S1399", "PH-S2001"]);
+        // Meta still sees pruned closed via full entries.
+        let (_, last, open) = derive_sprint_meta(&entries, None);
+        assert_eq!(open, 1);
+        assert_eq!(last.as_deref(), Some("PH-S2001"));
     }
 
     #[test]

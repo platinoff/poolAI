@@ -11,8 +11,8 @@ Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.1
 | **P0 open** | **PH-SVC34** re-verify GH · **PH-SVC35** OWNER |
 | **Completion pending** | **880** sprints PH-S1399…S2278 · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) |
 | **Horizon** | band 76 → **PH-S1399…S1408** |
-| **Vision** | rev **379** |
-| **Cursor** | local **3.12.30** · [`CURSOR_UPDATE_RESEARCH_2026-07-22.md`](./CURSOR_UPDATE_RESEARCH_2026-07-22.md) |
+| **Vision** | rev **380** |
+| **Cursor** | local **3.13.10** · Auto-review · [`CURSOR_UPDATE_RESEARCH_2026-07-24.md`](./CURSOR_UPDATE_RESEARCH_2026-07-24.md) |
 
 ---
 
@@ -47,4 +47,4 @@ Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.1
 
 ## Не повторювати
 
-band 75 ✅ · PH-SVC41…43 ✅ (`cargo build --debug` invalid; TLS reload needs `await`) · band 74 ✅ · FM-003 LAN · FM-041 Cloud SDK · mandatory ZK/TEE · history rewrite без OWNER.
+band 75 ✅ · PH-SVC45…54 ✅ (Cursor 3.13.10 / Auto-review / vision eye+prune) · PH-SVC41…43 ✅ (`cargo build --debug` invalid; TLS reload needs `await`) · band 74 ✅ · FM-003 LAN · FM-041 Cloud SDK · mandatory ZK/TEE · history rewrite без OWNER.

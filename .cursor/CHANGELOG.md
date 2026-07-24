@@ -1,5 +1,15 @@
 # Cursor Agent Configuration Changelog
 
+## 2026-07-24 — Cursor 3.13.10 service band (PH-SVC45…SVC54)
+
+- **`cursor-environment-baseline.mdc`**: local `cursor` **3.13.10**; Run Modes / **Auto-review**; pointer to `CURSOR_UPDATE_RESEARCH_2026-07-24.md`.
+- **`.cursor/permissions.json`**: Auto-review allow/block for MSYS2 drain (force-push / secrets / Python blocked).
+- **`poolai-agent-roles.mdc`** + **`autonomous-orchestrator.mdc`**: Auto-review ≠ chat Mode; research pointer Jul 24.
+- **Vision:** eye filter (open / open+queued); `poolai-vision-sync` prunes closed `PH-S*` ≤2000 from `manifest.sprint_queue`.
+- **Docs:** `CURSOR_UPDATE_RESEARCH_2026-07-24.md`; HANDOFF/NEXT/README/INDEX/ENV zriz; FM §5.16 PH-SVC45…SVC54.
+- **Screenshot P0:** PH-SVC41…43 already on main (`--debug` removed); PH-SVC34 GH re-verify still open.
+- **Product queue unchanged:** §5.12 **10** · next session **`абракадабра`** → band 76.
+
 ## 2026-07-22 — Cursor 3.12.30 service band (PH-SVC21…SVC30)
 
 - **`cursor-environment-baseline.mdc`**: local `cursor` **3.12.30**; public changelog latest numbered IDE = **3.11**; High Contrast flicker ops note; pointer to `CURSOR_UPDATE_RESEARCH_2026-07-22.md`.

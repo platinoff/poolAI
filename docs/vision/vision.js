@@ -3823,9 +3823,56 @@
     });
   }
 
+  /** Sprint queue eye filter: `open` | `open_queued` (localStorage). */
+  const QUEUE_FILTER_KEY = "poolai-vision-queue-filter";
+  let queueFilterMode = "open";
+  try {
+    const stored = localStorage.getItem(QUEUE_FILTER_KEY);
+    if (stored === "open" || stored === "open_queued") queueFilterMode = stored;
+  } catch (_) {
+    /* ignore */
+  }
+
+  function queueFilterLabel(mode) {
+    return mode === "open_queued" ? "open + queued" : "open only";
+  }
+
+  function syncQueueEyeButton() {
+    const btn = document.getElementById("btn-queue-eye");
+    if (!btn) return;
+    const label = queueFilterLabel(queueFilterMode);
+    btn.setAttribute("aria-label", "Sprint queue filter: " + label);
+    btn.title =
+      queueFilterMode === "open"
+        ? "Filter: open only — click for open + queued"
+        : "Filter: open + queued — click for open only";
+    btn.setAttribute("aria-pressed", queueFilterMode === "open" ? "true" : "false");
+    btn.classList.toggle("filter-queued", queueFilterMode === "open_queued");
+  }
+
+  function bindQueueEyeButton() {
+    const btn = document.getElementById("btn-queue-eye");
+    if (!btn || btn.dataset.bound === "1") return;
+    btn.dataset.bound = "1";
+    btn.addEventListener("click", (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      queueFilterMode = queueFilterMode === "open" ? "open_queued" : "open";
+      try {
+        localStorage.setItem(QUEUE_FILTER_KEY, queueFilterMode);
+      } catch (_) {
+        /* ignore */
+      }
+      syncQueueEyeButton();
+      if (manifest) renderSprintQueue(manifest);
+    });
+    syncQueueEyeButton();
+  }
+
   function renderSprintQueue(manifest) {
     const box = document.getElementById("sprint-queue");
     if (!box) return;
+    bindQueueEyeButton();
     const queue =
       manifest && Array.isArray(manifest.sprint_queue) ? manifest.sprint_queue : [];
     if (!queue.length) {
@@ -3839,22 +3886,43 @@
         : queue.filter((e) => e.open).length;
     const nextId = manifest.next_sprint || null;
     const openOnly = queue.filter((e) => e.open);
+    const queuedOnly = queue.filter(
+      (e) =>
+        !e.open &&
+        (e.status === "queued" ||
+          e.status === "closed" ||
+          e.status === "in_queue" ||
+          !e.status)
+    );
     const sprintSerial = (id) => {
       const m = String(id || "").match(/^PH-S(\d+)$/i);
       return m ? parseInt(m[1], 10) : 0;
     };
-    // When queue is drained: show recent closed by PH-S serial (not file-tail of journal).
-    const show = openOnly.length
-      ? openOnly
-      : queue
-          .filter((e) => !e.open && (e.status === "closed" || !e.status))
-          .slice()
-          .sort((a, b) => sprintSerial(b.id) - sprintSerial(a.id))
-          .slice(0, 12);
+    // Eye: open only | open + queued. When drained: recent closed by serial.
+    let show;
+    if (openOnly.length) {
+      show =
+        queueFilterMode === "open_queued"
+          ? openOnly.concat(
+              queuedOnly
+                .slice()
+                .sort((a, b) => sprintSerial(b.id) - sprintSerial(a.id))
+            )
+          : openOnly;
+    } else {
+      show = queuedOnly
+        .slice()
+        .sort((a, b) => sprintSerial(b.id) - sprintSerial(a.id))
+        .slice(0, 12);
+    }
     let html =
       '<div class="sprint-queue-meta"><span><strong>' +
       escapeHtml(String(openCount)) +
       "</strong> open</span>";
+    html +=
+      '<span class="sprint-queue-filter-tag" title="Eye filter">' +
+      escapeHtml(queueFilterLabel(queueFilterMode)) +
+      "</span>";
     if (manifest.last_sprint_closed) {
       html +=
         '<span>last <strong>' +
@@ -3862,12 +3930,20 @@
         "</strong></span>";
     }
     html += '</div><ul class="sprint-queue-list">';
+    if (!show.length) {
+      html +=
+        '<li class="sprint-queue-empty-row" style="color:var(--muted)">No sprints for this filter.</li>';
+    }
     show.forEach((entry) => {
       const id = entry.id || "";
       const mapNode = pickMapNodeForSprint(id);
+      const status =
+        entry.status ||
+        (entry.open ? "open" : "queued");
       const cls = [
         "sprint-queue-item",
         entry.open ? "open" : "closed",
+        !entry.open ? "queued" : "",
         nextId && id === nextId ? "next" : "",
         mapNode ? "map-linked" : "no-map",
         activeQueueSprintId === id ? "queue-active" : "",
@@ -3889,7 +3965,7 @@
         '</span><span class="sprint-queue-title">' +
         escapeHtml(entry.title || "") +
         '</span><span class="sprint-queue-status">' +
-        escapeHtml(entry.status || (entry.open ? "open" : "closed")) +
+        escapeHtml(status) +
         "</span></li>";
     });
     html += "</ul>";

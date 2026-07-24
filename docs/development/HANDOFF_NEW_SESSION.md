@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-24 (band 75 ✅ · P0 PH-SVC41…43 ✅ · band 76 queued · Cursor **3.12.30**)
+**Оновлено:** 2026-07-24 (service PH-SVC45…SVC54 ✅ · Cursor **3.13.10** · vision eye/prune · band 76 ready)
 
 **Наступна сесія:** **`абракадабра`** — drain band 76 (FM **§5.57** Audit loc-audit aggregate).
 
@@ -11,13 +11,14 @@
 | 1 | **PH-SVC41** | Pa11y: drop invalid `cargo build --debug` | **✅** |
 | 2 | **PH-SVC42** | Playwright: same `--debug` fix | **✅** |
 | 3 | **PH-SVC43** | Docs: TLS reload `block_in_place`+`await` for `cargo doc --features jwt,https` | **✅** |
-| 4 | **PH-SVC34** | Re-verify GH Actions after push | **[ ]** |
-| 5 | **PH-SVC35** | Secret scanning #1 Atlassian — **revoke у Atlassian** | **[ ]** OWNER |
-| 6 | **PH-SVC31…33 / 36…40 / 44** | prior service | **✅** |
+| 4 | **PH-SVC45…54** | Cursor 3.13.10 + Auto-review + vision eye/prune ≤2000 | **✅** |
+| 5 | **PH-SVC34** | Re-verify GH Actions after push | **[ ]** |
+| 6 | **PH-SVC35** | Secret scanning #1 Atlassian — **revoke у Atlassian** | **[ ]** OWNER |
+| 7 | **PH-SVC31…33 / 36…40 / 44** | prior service | **✅** |
 
 Канон secret: [`SECRETS_MANAGEMENT.md`](../security/SECRETS_MANAGEMENT.md) §4. Сталевий стан: [`STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md).
 
-**Cursor / toolchain (service):** local desktop **3.12.30** · research [`CURSOR_UPDATE_RESEARCH_2026-07-22.md`](./CURSOR_UPDATE_RESEARCH_2026-07-22.md) · FM **§5.16**.
+**Cursor / toolchain (service):** local desktop **3.13.10** · Auto-review · research [`CURSOR_UPDATE_RESEARCH_2026-07-24.md`](./CURSOR_UPDATE_RESEARCH_2026-07-24.md) · FM **§5.16**.
 
 **Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **880** спринтів → PH-S2278.
 
@@ -36,7 +37,7 @@
 | **PH-S1407** | Ratio hold advisory |
 | **PH-S1408** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **379**. **Pending completion:** **880** (→ PH-S2278).
+**§5.12:** **10** відкритих. **Vision:** rev **380**. **Pending completion:** **880** (→ PH-S2278).
 
 ## Band 75 — Audit stand smoke (PH-S1389…S1398, ✅)
 
