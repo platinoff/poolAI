@@ -1,6 +1,6 @@
 # Audit HTTP API Contracts — Enterprise Phase C (Band 73)
 
-Canonical doc: [`AUDIT_API.md`](./AUDIT_API.md) (band 73, PH-S1376). Prev: [`AUDIT_STORE.md`](./AUDIT_STORE.md) (band 72 ✅). Next: [`AUDIT_ADMIN_OPS.md`](./AUDIT_ADMIN_OPS.md) (band 74 ✅).
+Canonical doc: [`AUDIT_API.md`](./AUDIT_API.md) (band 73, PH-S1376). Prev: [`AUDIT_STORE.md`](./AUDIT_STORE.md) (band 72 ✅). Next: [`AUDIT_ADMIN_OPS.md`](./AUDIT_ADMIN_OPS.md) (band 74 ✅) · [`AUDIT_STAND_SMOKE.md`](./AUDIT_STAND_SMOKE.md) (band 75).
 
 ## Overview
 

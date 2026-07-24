@@ -54,7 +54,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 **Версія в репозиторії:** `0.2.2` (див. `Cargo.toml`). **Робоча гілка:** `main`.
 
-Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S1388 ✅ (phase C Audit depth scaffold). **Rust ratio:** **94.87%** (hold **95%** advisory). **Vision:** manifest rev **377**. **§5.12:** **10** відкритих (band 75) · tech **PH-SVC31…SVC40** CI macvlan fix ✅ · наступна сесія **`абракадабра`** (P0 → band 75) — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
+Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S1398 ✅ (phase C Audit depth scaffold). **Rust ratio:** **94.87%** (hold **95%** advisory). **Vision:** manifest rev **379**. **§5.12:** **10** відкритих (band 75) · tech **PH-SVC31…SVC40** CI macvlan fix ✅ · наступна сесія **`абракадабра`** (P0 → band 76) — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
 **Репозиторій:** [github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)
 
@@ -86,9 +86,9 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 **Tech (сьогодні):** CI recovery **PH-SVC31…SVC40** — macvlan `'static` lifetime fix (`src/vm/isolation/linux.rs`) + unused warnings · unblocks GitHub Check/Test/OpenAPI cascade · open **PH-SVC34** (GH verify) · **PH-SVC35** OWNER Atlassian revoke ([`SECRETS_MANAGEMENT.md`](docs/security/SECRETS_MANAGEMENT.md) §4).
 
-**Наступна сесія (owner):** **`абракадабра`** — **P0** CI/secret → project scan → band 75 **PH-S1389…S1398** · [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія (owner):** **`абракадабра`** — **P0** CI/secret → project scan → band 76 **PH-S1399…S1408** · [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
-**§5.12:** **10** відкритих (band 74) · vision **rev 377** · last **PH-S1388** · next **PH-S1389**.
+**§5.12:** **10** відкритих (band 74) · vision **rev 379** · last **PH-S1398** · next **PH-S1399**.
 
 **Ops (поза чергою):** **FM-003** LAN §4 **BLOCKED** (2 хости) · **FM-041** Cloud SDK **Deferred**.
 

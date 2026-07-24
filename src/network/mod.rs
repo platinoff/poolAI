@@ -144,8 +144,13 @@ pub async fn start_server(addr: SocketAddr, app_state: ApiContext) {
         match tls_config::TlsServeContext::from_pem_files(cert_paths.clone(), tls_policy).await {
             Ok(ctx) => {
                 let tls_ctx = ctx.clone();
+                // Sync rotation hook → block_in_place + await reload (PH-SVC43 / rustdoc jwt,https).
                 crate::security::secret_rotation::register_tls_reload_hook(move || {
-                    tls_ctx.reload_certificates().map_err(|e| e.to_string())
+                    tokio::task::block_in_place(|| {
+                        tokio::runtime::Handle::current()
+                            .block_on(tls_ctx.reload_certificates())
+                            .map_err(|e| e.to_string())
+                    })
                 });
                 info!(
                     "Starting HTTPS server on {} (TLS {}..{})",

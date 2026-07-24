@@ -1,29 +1,44 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-24 (P0 CI red · Pa11y/Playwright `--debug` · Docs · band 75 queued · Cursor **3.12.30**)
+**Оновлено:** 2026-07-24 (band 75 ✅ · P0 PH-SVC41…43 ✅ · band 76 queued · Cursor **3.12.30**)
 
-**Наступна сесія:** **`абракадабра`** — **P0 CI** (PH-SVC41…43 → PH-SVC34) → потім drain band 75 (FM **§5.56**).
+**Наступна сесія:** **`абракадабра`** — drain band 76 (FM **§5.57** Audit loc-audit aggregate).
 
-## P0 — скріншоти CI (2026-07-24) · перша черга
+## P0 / service (2026-07-24)
 
 | # | Sprint | Фокус | Статус |
 |---|--------|--------|--------|
-| 1 | **PH-SVC41** | Pa11y: `cargo build --debug` у `bin/pa11y-ci.sh` (CI) | **[ ]** |
-| 2 | **PH-SVC42** | Playwright: той самий `--debug` у `bin/e2e-playwright.sh` | **[ ]** |
-| 3 | **PH-SVC43** | Docs: `Documentation / Generate Documentation` (`docs.yml` / rustdoc) | **[ ]** |
-| 4 | **PH-SVC34** | Re-verify GH Actions green (вкл. Pa11y live + Playwright + Docs) | **[ ]** |
+| 1 | **PH-SVC41** | Pa11y: drop invalid `cargo build --debug` | **✅** |
+| 2 | **PH-SVC42** | Playwright: same `--debug` fix | **✅** |
+| 3 | **PH-SVC43** | Docs: TLS reload `block_in_place`+`await` for `cargo doc --features jwt,https` | **✅** |
+| 4 | **PH-SVC34** | Re-verify GH Actions after push | **[ ]** |
 | 5 | **PH-SVC35** | Secret scanning #1 Atlassian — **revoke у Atlassian** | **[ ]** OWNER |
-| 6 | **PH-SVC31…33 / 36…40** | macvlan + prior service | **✅** |
-
-**Root cause (Pa11y):** `error: unexpected argument '--debug' found` — у CI `PA11Y_PROFILE=debug` → `cargo build --debug` (невалідно; debug = default без прапора). Playwright: `E2E_PROFILE=debug` → той самий виклик.
+| 6 | **PH-SVC31…33 / 36…40 / 44** | prior service | **✅** |
 
 Канон secret: [`SECRETS_MANAGEMENT.md`](../security/SECRETS_MANAGEMENT.md) §4. Сталевий стан: [`STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md).
 
 **Cursor / toolchain (service):** local desktop **3.12.30** · research [`CURSOR_UPDATE_RESEARCH_2026-07-22.md`](./CURSOR_UPDATE_RESEARCH_2026-07-22.md) · FM **§5.16**.
 
-**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **890** спринтів → PH-S2278.
+**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **880** спринтів → PH-S2278.
 
-## Band 75 — Audit stand smoke (PH-S1389…S1398, **ACTIVE** · після P0)
+## Band 76 — Audit loc-audit aggregate (PH-S1399…S1408, **ACTIVE**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1399** | `audit_loc_audit_depth` ui-core module |
+| **PH-S1400** | Slice aggregate (audit→stand-smoke) |
+| **PH-S1401** | Criteria contracts |
+| **PH-S1402** | `VERIFY_AUDIT_LOC_AUDIT` + quick |
+| **PH-S1403** | Stand smoke export shape |
+| **PH-S1404** | `poolai-loc-audit --audit-loc-audit` |
+| **PH-S1405** | `AUDIT_LOC_AUDIT.md` + canon |
+| **PH-S1406** | vision-sync --check |
+| **PH-S1407** | Ratio hold advisory |
+| **PH-S1408** | Band close |
+
+**§5.12:** **10** відкритих. **Vision:** rev **379**. **Pending completion:** **880** (→ PH-S2278).
+
+## Band 75 — Audit stand smoke (PH-S1389…S1398, ✅)
 
 | Sprint | Фокус |
 |--------|--------|
@@ -38,7 +53,7 @@
 | **PH-S1397** | Ratio hold advisory |
 | **PH-S1398** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **377**. **Pending completion:** **890** (→ PH-S2278).
+**PH-S1398 ✅ (2026-07-24):** `audit_stand_smoke_depth.rs`; `smoke_audit_*`; `--audit-stand-smoke`; `VERIFY_AUDIT_STAND_SMOKE`; `AUDIT_STAND_SMOKE.md`; `galaxy_horizon_s1389_integration`. Phase C Audit stand smoke closed.
 
 ## Band 74 — Audit admin/ops glue (PH-S1379…S1388, ✅)
 

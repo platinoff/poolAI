@@ -1221,24 +1221,41 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **10** (band 74 ✅ · band 75 open). **Master horizon:** PH-S1389…S1398 (band 75). **Completion pending:** PH-S1389…S2278 = **890** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **377**. **Наступна сесія:** **`абракадабра`** — drain band 75.
+**Відкритих у §5.12:** **10** (band 75 ✅ · band 76 open). **Master horizon:** PH-S1399…S1408 (band 76). **Completion pending:** PH-S1399…S2278 = **880** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **379**. **Наступна сесія:** **`абракадабра`** — drain band 76.
 
-### 5.56 Audit stand smoke queue — band 75 (PH-S1389…S1398, 2026-07-23) · **ACTIVE**
+### 5.57 Audit loc-audit aggregate queue — band 76 (PH-S1399…S1408, 2026-07-24) · **ACTIVE**
+
+**Джерело:** project completion / enterprise phase C — Audit loc-audit aggregate (bands 71–75 slices). Mirror band 66 [`SSO_LOC_AUDIT.md`](../development/SSO_LOC_AUDIT.md). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · master [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1334 | **PH-S1399** | `audit_loc_audit_depth` ui-core module | `audit_loc_audit_depth.rs` | depth enum + aggregate criteria registry | **[ ]** |
+| 1335 | **PH-S1400** | Slice aggregate (audit→stand-smoke) | loc-audit slices | `--audit`…`--audit-stand-smoke` under one gate | **[ ]** |
+| 1336 | **PH-S1401** | Criteria contracts | `audit_loc_audit_integration` | markers + registry | **[ ]** |
+| 1337 | **PH-S1402** | `VERIFY_AUDIT_LOC_AUDIT` + quick | verify-dev-stand / run-poolai | aggregate verify gate | **[ ]** |
+| 1338 | **PH-S1403** | Stand smoke export shape | `poolai_http_stand_smoke` | unit export-shape | **[ ]** |
+| 1339 | **PH-S1404** | `poolai-loc-audit --audit-loc-audit` | loc-audit | `rust_ratio.json` fields | **[ ]** |
+| 1340 | **PH-S1405** | Docs `AUDIT_LOC_AUDIT.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | aggregate matrix | **[ ]** |
+| 1341 | **PH-S1406** | vision-sync --check | docs/vision | drift gate green | **[ ]** |
+| 1342 | **PH-S1407** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **[ ]** |
+| 1343 | **PH-S1408** | Audit loc-audit band close | tests/docs | `galaxy_horizon_s1399_integration`; HANDOFF/NEXT | **[ ]** |
+
+### 5.56 Audit stand smoke queue — band 75 (PH-S1389…S1398, 2026-07-23) · **✅**
 
 **Джерело:** project completion / enterprise phase C — Audit live stand smoke (store/query HTTP vs coordinator). Mirror band 65 [`SSO_STAND_SMOKE.md`](../development/SSO_STAND_SMOKE.md). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
-| 1324 | **PH-S1389** | `audit_stand_smoke_depth` ui-core module | `audit_stand_smoke_depth.rs` | depth enum + stand-smoke criteria registry | **[ ]** |
-| 1325 | **PH-S1390** | Live store wire smoke | `GET /audit/store` | shape + integration | **[ ]** |
-| 1326 | **PH-S1391** | Live audit events query smoke | `GET /audit/events` | filters + limit | **[ ]** |
-| 1327 | **PH-S1392** | Live event-field fixture smoke | validate fixture | missing action/resource → 4xx | **[ ]** |
-| 1328 | **PH-S1393** | CLI `--audit-stand-smoke` | stand smoke bin | live suite + export shape | **[ ]** |
-| 1329 | **PH-S1394** | `poolai-loc-audit --audit-stand-smoke` | loc-audit | `rust_ratio.json` fields | **[ ]** |
-| 1330 | **PH-S1395** | `VERIFY_AUDIT_STAND_SMOKE` | verify-dev-stand | live + loc-audit verify | **[ ]** |
-| 1331 | **PH-S1396** | Docs `AUDIT_STAND_SMOKE.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | stand matrix | **[ ]** |
-| 1332 | **PH-S1397** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **[ ]** |
-| 1333 | **PH-S1398** | Audit stand smoke band close | tests/docs | `galaxy_horizon_s1389_integration`; HANDOFF/NEXT | **[ ]** |
+| 1324 | **PH-S1389** | `audit_stand_smoke_depth` ui-core module | `audit_stand_smoke_depth.rs` | depth enum + stand-smoke criteria registry | **✅** |
+| 1325 | **PH-S1390** | Live store wire smoke | `GET /audit/store` | shape + integration | **✅** |
+| 1326 | **PH-S1391** | Live audit events query smoke | `GET /audit/events` | filters + limit | **✅** |
+| 1327 | **PH-S1392** | Live event-field fixture smoke | validate fixture | missing action/resource → 4xx | **✅** |
+| 1328 | **PH-S1393** | CLI `--audit-stand-smoke` | stand smoke bin | live suite + export shape | **✅** |
+| 1329 | **PH-S1394** | `poolai-loc-audit --audit-stand-smoke` | loc-audit | `rust_ratio.json` fields | **✅** |
+| 1330 | **PH-S1395** | `VERIFY_AUDIT_STAND_SMOKE` | verify-dev-stand | live + loc-audit verify | **✅** |
+| 1331 | **PH-S1396** | Docs `AUDIT_STAND_SMOKE.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | stand matrix | **✅** |
+| 1332 | **PH-S1397** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **✅** |
+| 1333 | **PH-S1398** | Audit stand smoke band close | tests/docs | `galaxy_horizon_s1389_integration`; HANDOFF/NEXT | **✅** |
 
 ### 5.55 Audit admin/ops glue queue — band 74 (PH-S1379…S1388, 2026-07-23) · **✅**
 
@@ -1953,7 +1970,7 @@ FM-xxx (з таблиці нижче)
 | **Enterprise subset pending** | **760** (S1389…S2148 → §5.17) |
 | **Extension pending** | **130** (S2149…S2278 → §5.18) |
 | **Drained** | band 51–74 PH-S1149…S1388 ✅ |
-| **Активна §5.12** | band 75 **PH-S1389…S1398** `[ ]` (§5.56) |
+| **Активна §5.12** | band 76 **PH-S1399…S1408** `[ ]` (§5.57) |
 | **План** | [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md) |
 | **Реєстр** | [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md) |
 | **Regen** | `bash scripts/generate-ph-s-master-backlog-1000.sh` · `bash scripts/generate-ph-s-completion-extension.sh` |
@@ -2060,18 +2077,18 @@ FM-xxx (з таблиці нижче)
 | **PH-SVC38** | NEXT_SESSION P0 before band 74 | CI verify + OWNER secret; then `абракадабра` → band 74 | **✅** |
 | **PH-SVC39** | README / INDEX service zriz | PH-SVC31…SVC40 pointer | **✅** |
 | **PH-SVC40** | vision-sync --check + git push + самарі | service commit `main` | **✅** |
-| **PH-SVC41** | Pa11y CI: drop invalid `cargo build --debug` | `bin/pa11y-ci.sh` — CI profile → plain `cargo build` (or `--release`); Pa11y WCAG 2.2 job green | **[ ]** P0 |
-| **PH-SVC42** | Playwright CI: same `--debug` in e2e script | `bin/e2e-playwright.sh` — mirror fix; Playwright admin suite green | **[ ]** P0 |
-| **PH-SVC43** | Docs workflow: Generate Documentation | diagnose `docs.yml` / `cargo doc`; fix; Documentation job green | **[ ]** P0 |
+| **PH-SVC41** | Pa11y CI: drop invalid `cargo build --debug` | `bin/pa11y-ci.sh` — CI profile → plain `cargo build` (or `--release`); Pa11y WCAG 2.2 job green | **✅** |
+| **PH-SVC42** | Playwright CI: same `--debug` in e2e script | `bin/e2e-playwright.sh` — mirror fix; Playwright admin suite green | **✅** |
+| **PH-SVC43** | Docs workflow: Generate Documentation | `src/network/mod.rs` TLS reload `block_in_place`+`await`; `cargo doc --features jwt,https` green | **✅** |
 | **PH-SVC44** | NEXT/HANDOFF P0 queue + push | screenshots 2026-07-24 → SVC41…43 first; then `абракадабра` | **✅** |
 
-**Наступний service trigger:** **`абракадабра`** → **P0 PH-SVC41…43** → PH-SVC34 verify → band 75. **Відкриті:** PH-SVC41…43 · PH-SVC34 · PH-SVC35 (OWNER).
+**Наступний service trigger:** **`абракадабра`** → drain band 76 · **PH-SVC34** re-verify GH after push · **PH-SVC35** OWNER. **Відкриті service:** PH-SVC34 · PH-SVC35 (OWNER).
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S262)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-24):** band 75 **PH-S1389…S1398** `[ ]` · §5.12 **10** · band 74 ✅ · **P0 PH-SVC41…43** (Pa11y/Playwright `--debug` + Docs) · PH-SVC34/35 · наступна **`абракадабра`** → **P0 first** → band 75 · completion pending **890** → S2278.
+**Активна смуга (2026-07-24):** band 76 **PH-S1399…S1408** `[ ]` · §5.12 **10** · band 75 ✅ · P0 PH-SVC41…43 ✅ · PH-SVC34/35 · наступна **`абракадабра`** → band 76 · completion pending **880** → S2278.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

@@ -30,6 +30,10 @@
 //! cargo run --bin poolai-http-stand-smoke -- --sso-stand-smoke
 //! # or: POOLAI_STAND_SMOKE_SSO=1
 //!
+//! # Audit live stand smoke (PH-S1393 band 75):
+//! cargo run --bin poolai-http-stand-smoke -- --audit-stand-smoke
+//! # or: POOLAI_STAND_SMOKE_AUDIT=1
+//!
 //! # Vision revision parity (PH-S208, PH-S235):
 //! export POOLAI_VISION_BASE_URL=http://127.0.0.1:8765   # open-docs-vision.ps1
 //! cargo run --bin poolai-http-stand-smoke   # repo manifest vs FM footer + extensions + optional HTTP header
@@ -66,6 +70,8 @@ struct Cli {
     tenant_stand_smoke_only: bool,
     /// PH-S1293: live SSO store/CRUD/callback suite (band 65).
     sso_stand_smoke_only: bool,
+    /// PH-S1393: live audit store/events/validate suite (band 75).
+    audit_stand_smoke_only: bool,
     base_url: String,
 }
 
@@ -241,6 +247,7 @@ fn parse_cli() -> Cli {
     let mut run_local_smoke_only = false;
     let mut tenant_stand_smoke_only = false;
     let mut sso_stand_smoke_only = false;
+    let mut audit_stand_smoke_only = false;
     for arg in std::env::args().skip(1) {
         match arg.as_str() {
             "--json" => json_out = true,
@@ -250,6 +257,7 @@ fn parse_cli() -> Cli {
             "--run-local-smoke" => run_local_smoke_only = true,
             "--tenant-stand-smoke" => tenant_stand_smoke_only = true,
             "--sso-stand-smoke" => sso_stand_smoke_only = true,
+            "--audit-stand-smoke" => audit_stand_smoke_only = true,
             _ if arg.starts_with('-') => {}
             _ => {}
         }
@@ -284,6 +292,11 @@ fn parse_cli() -> Cli {
             .ok()
             .is_some_and(|v| matches!(v.as_str(), "1" | "true" | "yes"));
     }
+    if !audit_stand_smoke_only {
+        audit_stand_smoke_only = std::env::var("POOLAI_STAND_SMOKE_AUDIT")
+            .ok()
+            .is_some_and(|v| matches!(v.as_str(), "1" | "true" | "yes"));
+    }
     Cli {
         json_out,
         include_raid,
@@ -292,6 +305,7 @@ fn parse_cli() -> Cli {
         run_local_smoke_only,
         tenant_stand_smoke_only,
         sso_stand_smoke_only,
+        audit_stand_smoke_only,
         base_url: base_url_from_env(),
     }
 }
@@ -547,6 +561,117 @@ async fn smoke_sso_callback_fixtures(client: &Client, base: &str) -> Result<(), 
     let saml_text = saml.text().await.map_err(|e| e.to_string())?;
     if !(saml_text.contains("SAML_ASSERTION_INVALID") || saml_text.contains("Failed to validate")) {
         return Err(format!("saml callback unexpected body: {saml_text}"));
+    }
+    Ok(())
+}
+
+/// PH-S1390: live `GET /api/enterprise/audit/store` shape.
+async fn smoke_audit_store_wire(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/api/enterprise/audit/store"))
+        .send()
+        .await
+        .map_err(|e| format!("audit store request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("audit store status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    let obj = body
+        .as_object()
+        .ok_or_else(|| format!("audit store expected object: {body}"))?;
+    for key in ["mode", "durable_path", "configured"] {
+        if !obj.contains_key(key) {
+            return Err(format!("audit store missing `{key}`: {body}"));
+        }
+    }
+    Ok(())
+}
+
+/// PH-S1391: live `GET /api/enterprise/audit/events` query (+ optional action filter).
+async fn smoke_audit_events_query(client: &Client, base: &str) -> Result<(), String> {
+    let list = client
+        .get(api_url(base, "/api/enterprise/audit/events?limit=5"))
+        .send()
+        .await
+        .map_err(|e| format!("audit events list: {e}"))?;
+    if list.status() != StatusCode::OK {
+        return Err(format!("audit events list status {}", list.status()));
+    }
+    let body: Value = list.json().await.map_err(|e| e.to_string())?;
+    if !body.is_array() {
+        return Err(format!("audit events expected array: {body}"));
+    }
+
+    let filtered = client
+        .get(api_url(
+            base,
+            "/api/enterprise/audit/events?action=create_instance&limit=2",
+        ))
+        .send()
+        .await
+        .map_err(|e| format!("audit events filter: {e}"))?;
+    if filtered.status() != StatusCode::OK {
+        return Err(format!("audit events filter status {}", filtered.status()));
+    }
+    let filtered_body: Value = filtered.json().await.map_err(|e| e.to_string())?;
+    if !filtered_body.is_array() {
+        return Err(format!(
+            "audit events filter expected array: {filtered_body}"
+        ));
+    }
+    Ok(())
+}
+
+/// PH-S1392: live audit event-field validation fixtures (no durable append).
+async fn smoke_audit_event_field_fixtures(client: &Client, base: &str) -> Result<(), String> {
+    let missing_action = client
+        .post(api_url(base, "/api/enterprise/audit/events/validate"))
+        .json(&json!({
+            "action": "",
+            "resource_type": "vm_instance",
+            "result": "success"
+        }))
+        .send()
+        .await
+        .map_err(|e| format!("audit validate missing action: {e}"))?;
+    if missing_action.status() != StatusCode::BAD_REQUEST {
+        return Err(format!(
+            "audit validate missing action status {}",
+            missing_action.status()
+        ));
+    }
+    let action_body: Value = missing_action.json().await.map_err(|e| e.to_string())?;
+    let action_text = action_body.to_string();
+    if !(action_text.contains("AUDIT_MISSING_ACTION") || action_text.contains("missing action")) {
+        return Err(format!(
+            "audit validate missing action unexpected: {action_body}"
+        ));
+    }
+
+    let missing_resource = client
+        .post(api_url(base, "/api/enterprise/audit/events/validate"))
+        .json(&json!({
+            "action": "create_instance",
+            "resource_type": "  ",
+            "result": "success"
+        }))
+        .send()
+        .await
+        .map_err(|e| format!("audit validate missing resource: {e}"))?;
+    if missing_resource.status() != StatusCode::BAD_REQUEST {
+        return Err(format!(
+            "audit validate missing resource status {}",
+            missing_resource.status()
+        ));
+    }
+    let resource_body: Value = missing_resource.json().await.map_err(|e| e.to_string())?;
+    let resource_text = resource_body.to_string();
+    if !(resource_text.contains("AUDIT_MISSING_RESOURCE")
+        || resource_text.contains("missing resource_type"))
+    {
+        return Err(format!(
+            "audit validate missing resource unexpected: {resource_body}"
+        ));
     }
     Ok(())
 }
@@ -3229,6 +3354,63 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
         };
     }
 
+    if cli.audit_stand_smoke_only {
+        async fn record(
+            cases: &mut Vec<SmokeCaseResult>,
+            name: &'static str,
+            result: Result<(), String>,
+        ) {
+            cases.push(match result {
+                Ok(()) => SmokeCaseResult {
+                    name,
+                    ok: true,
+                    detail: None,
+                },
+                Err(e) => SmokeCaseResult {
+                    name,
+                    ok: false,
+                    detail: Some(e),
+                },
+            });
+        }
+
+        record(
+            &mut cases,
+            "health",
+            smoke_health(&client, &cli.base_url).await,
+        )
+        .await;
+        record(
+            &mut cases,
+            "audit_store_wire",
+            smoke_audit_store_wire(&client, &cli.base_url).await,
+        )
+        .await;
+        record(
+            &mut cases,
+            "audit_events_query",
+            smoke_audit_events_query(&client, &cli.base_url).await,
+        )
+        .await;
+        record(
+            &mut cases,
+            "audit_event_field_fixtures",
+            smoke_audit_event_field_fixtures(&client, &cli.base_url).await,
+        )
+        .await;
+        let passed = cases.iter().filter(|c| c.ok).count() as u32;
+        let failed = cases.iter().filter(|c| !c.ok).count() as u32;
+        return SmokeReport {
+            base_url: cli.base_url.clone(),
+            stand_root,
+            ok: failed == 0,
+            passed,
+            failed,
+            cases,
+            tool: "poolai-http-stand-smoke",
+        };
+    }
+
     if cli.run_local_smoke_only {
         async fn record(
             cases: &mut Vec<SmokeCaseResult>,
@@ -5453,6 +5635,52 @@ mod tests {
             assert!(
                 fm.contains(row) || row.starts_with("PH-S"),
                 "FM band64 row {row}"
+            );
+        }
+    }
+
+    #[test]
+    fn audit_stand_smoke_band75_export_shape_ph_s1393() {
+        use poolai_ui_core::audit_stand_smoke_depth::{
+            audit_stand_smoke_criteria_total, audit_stand_smoke_depth_stub, AuditStandSmokeDepth,
+            AUDIT_STAND_SMOKE_CASES, AUDIT_STAND_SMOKE_CRITERIA, FM_BAND75_ROWS,
+        };
+        use serde_json::json;
+        assert_eq!(
+            audit_stand_smoke_depth_stub(Some(&json!({"live_store": true}))),
+            AuditStandSmokeDepth::LiveStore
+        );
+        assert_eq!(
+            audit_stand_smoke_depth_stub(Some(&json!({
+                "audit_stand_smoke_depth": true,
+                "live_store": true,
+                "live_events_query": true,
+                "live_event_field_fixtures": true,
+                "cli_flag": true,
+                "loc_audit_flag": true,
+                "verify_dev_stand_hook": true,
+                "audit_stand_smoke_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            AuditStandSmokeDepth::FullBand75
+        );
+        assert_eq!(AUDIT_STAND_SMOKE_CRITERIA.len(), 10);
+        assert_eq!(audit_stand_smoke_criteria_total(), 10);
+        assert!(AUDIT_STAND_SMOKE_CASES.contains(&"live_events_query"));
+        assert!(AUDIT_STAND_SMOKE_CASES.contains(&"cli_flag"));
+        let smoke_src = include_str!("../../src/bin/poolai_http_stand_smoke.rs");
+        assert!(smoke_src.contains("smoke_audit_store_wire"));
+        assert!(smoke_src.contains("smoke_audit_events_query"));
+        assert!(smoke_src.contains("smoke_audit_event_field_fixtures"));
+        assert!(smoke_src.contains("--audit-stand-smoke"));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--audit-stand-smoke"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND75_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band75 row {row}"
             );
         }
     }

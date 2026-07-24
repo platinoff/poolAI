@@ -8,7 +8,7 @@
 
 **Drained slice keywords (horizon close tests):** PH-S1149 · PH-S1159 · PH-S1169 · PH-S1179 · PH-S1189 · PH-S1199 · PH-S1209 · PH-S1219 · PH-S1229 · PH-S1239 · PH-S1249 · PH-S1259 · PH-S1269 · PH-S1279 · PH-S1289 · PH-S1299 · PH-S1309 · PH-S1319 · PH-S1329 · PH-S1339 · PH-S1349 · PH-S1359 · depth scaffold · store wire · API contracts · admin/ops glue · stand smoke · loc-audit · docs canon · vision-sync · ratio advisory · horizon close
 
-**Активна смуга:** band 75 **PH-S1389…S1398** (C Audit · stand smoke) — **у §5.12** · band 74 admin/ops ✅
+**Активна смуга:** band 76 **PH-S1399…S1408** (C Audit · loc-audit) — **у §5.12** · band 75 stand smoke ✅ · PH-S1389
 
 **Поза scope (не в backlog):** FM-003 LAN 2-host (**BLOCKED**) · FM-041 Cloud SDK prod (**Deferred**) · mandatory ZK/TEE
 

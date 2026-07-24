@@ -56,14 +56,18 @@ done
 
 if [[ "$DO_START" == true ]]; then
   export PATH="${HOME}/.cargo/bin:/ucrt64/bin:/usr/bin:${PATH}"
+  # CI uses default (dev/debug) profile — cargo has no `--debug` flag (PH-SVC42).
   E2E_PROFILE="release"
   if [[ "${CI:-}" == "true" ]]; then
     E2E_PROFILE="debug"
     export CARGO_BUILD_JOBS="${CARGO_BUILD_JOBS:-1}"
     export CARGO_INCREMENTAL="${CARGO_INCREMENTAL:-0}"
+    export POOLAI_E2E_PROFILE="${E2E_PROFILE}"
+    cargo build --features "${FEATURES}"
+  else
+    export POOLAI_E2E_PROFILE="${E2E_PROFILE}"
+    cargo build --release --features "${FEATURES}"
   fi
-  export POOLAI_E2E_PROFILE="${E2E_PROFILE}"
-  cargo build "--${E2E_PROFILE}" --features "${FEATURES}"
   start_poolai
 fi
 

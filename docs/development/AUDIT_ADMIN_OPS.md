@@ -38,6 +38,7 @@ bash bin/run-poolai.sh quick --audit-admin-ops
 - ui-core: [`audit_admin_ops_depth.rs`](../../crates/poolai-ui-core/src/audit_admin_ops_depth.rs)
 - admin UI: [`audit.rs`](../../src/ui/admin/audit.rs)
 - tests: `audit_admin_ops_integration.rs`, `galaxy_horizon_s1379_integration.rs`
+- stand smoke (band 75): [`AUDIT_STAND_SMOKE.md`](./AUDIT_STAND_SMOKE.md)
 - API contracts (band 73): [`AUDIT_API.md`](./AUDIT_API.md)
 - store wire (band 72): [`AUDIT_STORE.md`](./AUDIT_STORE.md)
 - roadmap: [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](./PH_S_ENTERPRISE_ROADMAP_2026-07-19.md)

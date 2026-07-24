@@ -115,6 +115,9 @@
   "audit_admin_ops_mode": true,
   "audit_admin_ops_criteria_total": 10,
   "audit_admin_ops_criteria_met_count": 10,
+  "audit_stand_smoke_mode": false,
+  "audit_stand_smoke_criteria_total": 10,
+  "audit_stand_smoke_criteria_met_count": 0,
   "by_category": {
     "e2e_ts": {
       "files": 8,

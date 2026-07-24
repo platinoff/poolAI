@@ -345,6 +345,7 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `VERIFY_AUDIT_STORE=1` | `verify-dev-stand.sh` → `poolai-loc-audit --audit-store` (PH-S1362) |
 | `VERIFY_AUDIT_API=1` | `verify-dev-stand.sh` → `poolai-loc-audit --audit-api` (PH-S1374) |
 | `VERIFY_AUDIT_ADMIN_OPS=1` | `verify-dev-stand.sh` → `poolai-loc-audit --audit-admin-ops` (PH-S1384) |
+| `VERIFY_AUDIT_STAND_SMOKE=1` | `verify-dev-stand.sh` → live `--audit-stand-smoke` + loc-audit (PH-S1395) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 ### PH-S1100: Rust migration advisory (band 46)
@@ -930,6 +931,29 @@ VERIFY_AUDIT_ADMIN_OPS=1 bash bin/verify-dev-stand.sh
 | `audit_admin_ops_criteria_met_count` | Criteria with marker present in canonical doc path |
 
 Module: [`audit_admin_ops_depth.rs`](../../crates/poolai-ui-core/src/audit_admin_ops_depth.rs) · tests: `audit_admin_ops_integration.rs`, `galaxy_horizon_s1379_integration.rs` · docs: [`AUDIT_ADMIN_OPS.md`](./AUDIT_ADMIN_OPS.md).
+
+### PH-S1394: Audit stand smoke (band 75)
+
+Live store / events query / event-field validation fixtures stand smoke + verify/loc-audit hooks for phase C Audit.
+
+```bash
+cargo run --bin poolai-http-stand-smoke -- --audit-stand-smoke
+# or: POOLAI_STAND_SMOKE_AUDIT=1
+
+cargo run --bin poolai-loc-audit -- --audit-stand-smoke
+cargo run --bin poolai-loc-audit -- --audit-stand-smoke --advisory --min-ratio 0.95
+
+VERIFY_AUDIT_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
+/usr/bin/bash bin/run-poolai.sh quick --audit-stand-smoke
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `audit_stand_smoke_mode` | `true` when `--audit-stand-smoke` (PH-S1394) |
+| `audit_stand_smoke_criteria_total` | Audit stand-smoke criteria registry size |
+| `audit_stand_smoke_criteria_met_count` | Criteria with marker present in canonical doc path |
+
+Module: [`audit_stand_smoke_depth.rs`](../../crates/poolai-ui-core/src/audit_stand_smoke_depth.rs) · tests: `audit_stand_smoke_integration.rs`, `galaxy_horizon_s1389_integration.rs` · docs: [`AUDIT_STAND_SMOKE.md`](./AUDIT_STAND_SMOKE.md).
 
 Default stand smoke includes **`vision_revision_parity`** (PH-S208, PH-S235): repo `manifest.revision` vs FM §5.12 `Vision rev`, `extensions.active_sprint` vs `manifest.next_sprint`, then `GET /docs/vision/manifest.json` with `X-PoolAI-Vision-Revision` header vs JSON body.
 

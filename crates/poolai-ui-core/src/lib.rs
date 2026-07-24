@@ -12,6 +12,7 @@ pub mod api_error;
 pub mod audit_admin_ops_depth;
 pub mod audit_api_contracts_depth;
 pub mod audit_depth;
+pub mod audit_stand_smoke_depth;
 pub mod audit_store_depth;
 pub mod charts_depth;
 pub mod ci_canon_depth;

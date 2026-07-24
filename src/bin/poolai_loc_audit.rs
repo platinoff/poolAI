@@ -15,6 +15,9 @@ use poolai_ui_core::audit_api_contracts_depth::{
     audit_api_criteria_total, AUDIT_API_CASES, AUDIT_API_CRITERIA,
 };
 use poolai_ui_core::audit_depth::{audit_criteria_total, AUDIT_CASES, AUDIT_CRITERIA};
+use poolai_ui_core::audit_stand_smoke_depth::{
+    audit_stand_smoke_criteria_total, AUDIT_STAND_SMOKE_CASES, AUDIT_STAND_SMOKE_CRITERIA,
+};
 use poolai_ui_core::audit_store_depth::{
     audit_store_criteria_total, AUDIT_STORE_CASES, AUDIT_STORE_CRITERIA,
 };
@@ -223,6 +226,8 @@ struct AuditConfig {
     audit_api: bool,
     /// Emit band-74 audit admin/ops fields (PH-S1385).
     audit_admin_ops: bool,
+    /// Emit band-75 audit stand-smoke fields (PH-S1394).
+    audit_stand_smoke: bool,
 }
 
 impl Default for AuditConfig {
@@ -262,6 +267,7 @@ impl Default for AuditConfig {
             audit_store: false,
             audit_api: false,
             audit_admin_ops: false,
+            audit_stand_smoke: false,
         }
     }
 }
@@ -493,6 +499,12 @@ struct RustRatioReport {
     audit_admin_ops_criteria_total: usize,
     /// Audit admin/ops criteria met count (PH-S1385).
     audit_admin_ops_criteria_met_count: usize,
+    /// Band-75 audit stand-smoke mode (PH-S1394).
+    audit_stand_smoke_mode: bool,
+    /// Audit stand-smoke criteria registry size (PH-S1394).
+    audit_stand_smoke_criteria_total: usize,
+    /// Audit stand-smoke criteria met count (PH-S1394).
+    audit_stand_smoke_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -849,6 +861,22 @@ fn audit_audit_admin_ops_criteria_met(root: &Path) -> (usize, usize) {
     (met, total)
 }
 
+fn audit_audit_stand_smoke_criteria_met(root: &Path) -> (usize, usize) {
+    let total = audit_stand_smoke_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in AUDIT_STAND_SMOKE_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
 fn audit_sso_api_criteria_met(root: &Path) -> (usize, usize) {
     let total = sso_api_criteria_total();
     let mut met = 0usize;
@@ -1096,6 +1124,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--audit-store" => config.audit_store = true,
             "--audit-api" => config.audit_api = true,
             "--audit-admin-ops" => config.audit_admin_ops = true,
+            "--audit-stand-smoke" => config.audit_stand_smoke = true,
             "--audit" => config.audit = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
@@ -1148,6 +1177,7 @@ fn print_help() {
            --audit-store               band-72 audit store-wire fields (PH-S1364)\n\
            --audit-api                 band-73 audit HTTP API contracts fields (PH-S1375)\n\
            --audit-admin-ops           band-74 audit admin/ops fields (PH-S1385)\n\
+           --audit-stand-smoke         band-75 audit stand-smoke fields (PH-S1394)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -1542,6 +1572,19 @@ fn build_report(
         notes.push("PH-S1388: band 74 audit admin/ops glue — criteria met vs registry");
     }
 
+    let (audit_stand_smoke_criteria_met_count, audit_stand_smoke_criteria_total_count) =
+        if config.audit_stand_smoke {
+            audit_audit_stand_smoke_criteria_met(root)
+        } else {
+            (0, audit_stand_smoke_criteria_total())
+        };
+    if config.audit_stand_smoke {
+        notes.push(
+            "PH-S1394: audit_stand_smoke_mode — live store/events/validate fixtures + verify hooks",
+        );
+        notes.push("PH-S1398: band 75 audit stand-smoke — criteria met vs registry");
+    }
+
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
         sprint: SPRINT,
@@ -1659,6 +1702,9 @@ fn build_report(
         audit_admin_ops_mode: config.audit_admin_ops,
         audit_admin_ops_criteria_total: audit_admin_ops_criteria_total_count,
         audit_admin_ops_criteria_met_count,
+        audit_stand_smoke_mode: config.audit_stand_smoke,
+        audit_stand_smoke_criteria_total: audit_stand_smoke_criteria_total_count,
+        audit_stand_smoke_criteria_met_count,
         by_category,
         notes,
     })
@@ -1998,6 +2044,17 @@ fn print_summary(report: &RustRatioReport) {
         println!(
             "  audit_admin_ops_cases: {}",
             AUDIT_ADMIN_OPS_CASES.join(", ")
+        );
+    }
+    if report.audit_stand_smoke_mode {
+        println!("  audit_stand_smoke:     true (PH-S1394 band 75)");
+        println!(
+            "  audit_stand_smoke_criteria: {}/{} met",
+            report.audit_stand_smoke_criteria_met_count, report.audit_stand_smoke_criteria_total
+        );
+        println!(
+            "  audit_stand_smoke_cases: {}",
+            AUDIT_STAND_SMOKE_CASES.join(", ")
         );
     }
     for (name, loc) in &report.by_category {

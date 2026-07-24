@@ -120,16 +120,19 @@ wait_health() {
 }
 
 resolve_poolai_bin() {
+  # CI → target/debug (dev profile); local --start → target/release (PH-SVC41).
   local profile="release"
+  local build_hint="cargo build --release --features ${FEATURES}"
   if [[ "${CI:-}" == "true" ]]; then
     profile="debug"
+    build_hint="cargo build --features ${FEATURES}"
   fi
   if [[ -x "$ROOT/target/${profile}/poolai" ]]; then
     echo "$ROOT/target/${profile}/poolai"
   elif [[ -x "$ROOT/target/${profile}/poolai.exe" ]]; then
     echo "$ROOT/target/${profile}/poolai.exe"
   else
-    echo "poolai binary not found; run: cargo build --${profile} --features ${FEATURES}" >&2
+    echo "poolai binary not found; run: ${build_hint}" >&2
     return 1
   fi
 }
@@ -247,13 +250,14 @@ run_pa11y_authenticated() {
 
 if [[ "${1:-}" == "--start" ]]; then
   export PATH="${HOME}/.cargo/bin:/usr/bin:${PATH}"
-  PA11Y_PROFILE="release"
+  # CI uses default (dev/debug) profile — cargo has no `--debug` flag (PH-SVC41).
   if [[ "${CI:-}" == "true" ]]; then
-    PA11Y_PROFILE="debug"
     export CARGO_BUILD_JOBS="${CARGO_BUILD_JOBS:-1}"
     export CARGO_INCREMENTAL="${CARGO_INCREMENTAL:-0}"
+    cargo build --features "${FEATURES}"
+  else
+    cargo build --release --features "${FEATURES}"
   fi
-  cargo build "--${PA11Y_PROFILE}" --features "${FEATURES}"
   start_poolai
   shift
 fi

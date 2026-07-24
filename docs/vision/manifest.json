@@ -2714,11 +2714,23 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_development_AUDIT_ADMIN_OPS_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_audit_stand_smoke_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUDIT_STAND_SMOKE_md"
     }
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S1388",
+  "last_sprint_closed": "PH-S1398",
   "layers": [
     {
       "id": "L0",
@@ -2751,7 +2763,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1389",
+  "next_sprint": "PH-S1399",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -10852,9 +10864,37 @@
       "label": "galaxy_horizon_s1379_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s1379_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_audit_stand_smoke_depth_rs",
+      "label": "audit_stand_smoke_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/audit_stand_smoke_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUDIT_STAND_SMOKE_md",
+      "label": "AUDIT_STAND_SMOKE.md",
+      "layer": "L1",
+      "path": "docs/development/AUDIT_STAND_SMOKE.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_audit_stand_smoke_integration_rs",
+      "label": "audit_stand_smoke_integration.rs",
+      "layer": "L3",
+      "path": "tests/audit_stand_smoke_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1389_integration_rs",
+      "label": "galaxy_horizon_s1389_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1389_integration.rs"
     }
   ],
-  "revision": 377,
+  "revision": 379,
   "sprint_queue": [
     {
       "acceptance": "OpenAPI + handler; reject/upgrade response",
@@ -22767,91 +22807,181 @@
       "acceptance": "depth enum + stand-smoke criteria registry",
       "deps": "audit_stand_smoke_depth.rs",
       "id": "PH-S1389",
-      "open": true,
+      "open": false,
       "row": 1324,
-      "status": "open",
+      "status": "closed",
       "title": "audit_stand_smoke_depth` ui-core module"
     },
     {
       "acceptance": "shape + integration",
       "deps": "GET /audit/store",
       "id": "PH-S1390",
-      "open": true,
+      "open": false,
       "row": 1325,
-      "status": "open",
+      "status": "closed",
       "title": "Live store wire smoke"
     },
     {
       "acceptance": "filters + limit",
       "deps": "GET /audit/events",
       "id": "PH-S1391",
-      "open": true,
+      "open": false,
       "row": 1326,
-      "status": "open",
+      "status": "closed",
       "title": "Live audit events query smoke"
     },
     {
       "acceptance": "missing action/resource → 4xx",
       "deps": "validate fixture",
       "id": "PH-S1392",
-      "open": true,
+      "open": false,
       "row": 1327,
-      "status": "open",
+      "status": "closed",
       "title": "Live event-field fixture smoke"
     },
     {
       "acceptance": "live suite + export shape",
       "deps": "stand smoke bin",
       "id": "PH-S1393",
-      "open": true,
+      "open": false,
       "row": 1328,
-      "status": "open",
+      "status": "closed",
       "title": "CLI `--audit-stand-smoke"
     },
     {
       "acceptance": "rust_ratio.json` fields",
       "deps": "loc-audit",
       "id": "PH-S1394",
-      "open": true,
+      "open": false,
       "row": 1329,
-      "status": "open",
+      "status": "closed",
       "title": "poolai-loc-audit --audit-stand-smoke"
     },
     {
       "acceptance": "live + loc-audit verify",
       "deps": "verify-dev-stand",
       "id": "PH-S1395",
-      "open": true,
+      "open": false,
       "row": 1330,
-      "status": "open",
+      "status": "closed",
       "title": "VERIFY_AUDIT_STAND_SMOKE"
     },
     {
       "acceptance": "stand matrix",
       "deps": "RUN_LOCAL/INDEX/HANDOFF/NEXT",
       "id": "PH-S1396",
-      "open": true,
+      "open": false,
       "row": 1331,
-      "status": "open",
+      "status": "closed",
       "title": "Docs `AUDIT_STAND_SMOKE.md` + canon"
     },
     {
       "acceptance": "--min-ratio 0.95 --advisory",
       "deps": "loc-audit",
       "id": "PH-S1397",
-      "open": true,
+      "open": false,
       "row": 1332,
-      "status": "open",
+      "status": "closed",
       "title": "Ratio hold advisory"
     },
     {
       "acceptance": "galaxy_horizon_s1389_integration`; HANDOFF/NEXT",
       "deps": "tests/docs",
       "id": "PH-S1398",
-      "open": true,
+      "open": false,
       "row": 1333,
-      "status": "open",
+      "status": "closed",
       "title": "Audit stand smoke band close"
+    },
+    {
+      "acceptance": "depth enum + aggregate criteria registry",
+      "deps": "audit_loc_audit_depth.rs",
+      "id": "PH-S1399",
+      "open": true,
+      "row": 1334,
+      "status": "open",
+      "title": "audit_loc_audit_depth` ui-core module"
+    },
+    {
+      "acceptance": "--audit`…`--audit-stand-smoke` under one gate",
+      "deps": "loc-audit slices",
+      "id": "PH-S1400",
+      "open": true,
+      "row": 1335,
+      "status": "open",
+      "title": "Slice aggregate (audit→stand-smoke)"
+    },
+    {
+      "acceptance": "markers + registry",
+      "deps": "audit_loc_audit_integration",
+      "id": "PH-S1401",
+      "open": true,
+      "row": 1336,
+      "status": "open",
+      "title": "Criteria contracts"
+    },
+    {
+      "acceptance": "aggregate verify gate",
+      "deps": "verify-dev-stand / run-poolai",
+      "id": "PH-S1402",
+      "open": true,
+      "row": 1337,
+      "status": "open",
+      "title": "VERIFY_AUDIT_LOC_AUDIT` + quick"
+    },
+    {
+      "acceptance": "unit export-shape",
+      "deps": "poolai_http_stand_smoke",
+      "id": "PH-S1403",
+      "open": true,
+      "row": 1338,
+      "status": "open",
+      "title": "Stand smoke export shape"
+    },
+    {
+      "acceptance": "rust_ratio.json` fields",
+      "deps": "loc-audit",
+      "id": "PH-S1404",
+      "open": true,
+      "row": 1339,
+      "status": "open",
+      "title": "poolai-loc-audit --audit-loc-audit"
+    },
+    {
+      "acceptance": "aggregate matrix",
+      "deps": "RUN_LOCAL/INDEX/HANDOFF/NEXT",
+      "id": "PH-S1405",
+      "open": true,
+      "row": 1340,
+      "status": "open",
+      "title": "Docs `AUDIT_LOC_AUDIT.md` + canon"
+    },
+    {
+      "acceptance": "drift gate green",
+      "deps": "docs/vision",
+      "id": "PH-S1406",
+      "open": true,
+      "row": 1341,
+      "status": "open",
+      "title": "vision-sync --check"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory",
+      "deps": "loc-audit",
+      "id": "PH-S1407",
+      "open": true,
+      "row": 1342,
+      "status": "open",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1399_integration`; HANDOFF/NEXT",
+      "deps": "tests/docs",
+      "id": "PH-S1408",
+      "open": true,
+      "row": 1343,
+      "status": "open",
+      "title": "Audit loc-audit band close"
     }
   ],
   "sprint_queue_open_count": 10,
