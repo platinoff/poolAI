@@ -13,6 +13,7 @@ description: >-
 - Читай **`.cursor/rules/runtime-stack-policy.mdc`** — Rust primary; **no Python runtime**; **target 90–95% Rust** — [`RUST_RATIO_STRATEGY_2026-06-13.md`](../../docs/development/RUST_RATIO_STRATEGY_2026-06-13.md).
 - API tests — **Rust** `tests/` ([`poolai-testing-policy.mdc`](../../.cursor/rules/poolai-testing-policy.mdc)); Playwright — browser only.
 - ML/TurboQuant — `src/ml/` (Rust). Архівні docs з Python — не план імплементації.
+- **Secrets:** never stage `.env`, `*.pem`/`*.key`, `certs/*.pem`, `data/audit/*` — [`SECRETS_MANAGEMENT.md`](../../docs/security/SECRETS_MANAGEMENT.md) §1 · [`certs/README.md`](../../certs/README.md).
 
 ## Код репозиторію (не плутати папки)
 

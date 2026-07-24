@@ -54,6 +54,8 @@ alwaysApply: true
 
 **AUTO_RUN:** лише за явним запитом або [`autonomous-orchestrator.mdc`](autonomous-orchestrator.mdc) — не підміняє §5.12.
 
+**Security hygiene (PH-SVC55…):** ніколи не стаджити `.env`, `*.pem`/`*.key`, `certs/*.pem`, `data/audit/*` (крім `.gitkeep`). Канон — [`SECRETS_MANAGEMENT.md`](../../docs/security/SECRETS_MANAGEMENT.md) §1 · [`certs/README.md`](../../certs/README.md). History rewrite — лише OWNER.
+
 ## Поза чергою
 
 - **BLOCKED:** PH-S35 / PH-S16 / PH-S02 (LAN, 2 хости)

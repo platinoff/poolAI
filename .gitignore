@@ -18,9 +18,24 @@ Cargo.std.toml
 !.cursor/rules/
 !.cursor/rules/*.mdc
 
+# --- Secrets / credentials (never commit/push) ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+!certs/README.md
+secrets/
+**/credentials.json
+**/service-account*.json
+
+# Local TLS material (generate via certs/README.md or README § certificates)
+certs/*.pem
+certs/*.key
+
 # Generated/static audit logs (do not commit/push)
-data/audit/*.log.gz
-data/audit/*.log
+data/audit/*
+!data/audit/.gitkeep
 
 # Local one-off git helper scripts (MSYS2 session artifacts; not product)
 bin/commit-*.sh
@@ -32,7 +47,15 @@ bin/poll-*.sh
 bin/_poll-*.sh
 bin/git-commit-push.sh
 bin/test-vm-create-api.sh
+
+# Corrupted MSYS/Windows path artifacts (literal ":-/" or unicode colon dirs)
 :-/
+*tmp/poolai-e2e*/
+**/poolai-e2e-*/poolai.log
+**/poolai-e2e-*/pid
+poolai.log
+**/poolai.log
+**/pid
 
 # Local multi-node LAN dev stand (bin/run-lan-nodes.*)
 data/lan-stand/

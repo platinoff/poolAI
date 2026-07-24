@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-24 (band 77 **PH-S1409…S1418** ✅ · Audit docs canon · band 78 ready)
+**Оновлено:** 2026-07-24 (security **PH-SVC55…SVC64** ✅ · band 77 ✅ · band 78 ready)
 
 **Наступна сесія:** **`абракадабра`** — drain band 78 (FM **§5.59** Audit vision-sync).
 
@@ -8,22 +8,33 @@
 
 | # | Sprint | Фокус | Статус |
 |---|--------|--------|--------|
-| 1 | **PH-SVC41** | Pa11y: drop invalid `cargo build --debug` | **✅** |
-| 2 | **PH-SVC42** | Playwright: same `--debug` fix | **✅** |
-| 3 | **PH-SVC43** | Docs: TLS reload `block_in_place`+`await` for `cargo doc --features jwt,https` | **✅** |
-| 4 | **PH-SVC45…54** | Cursor 3.13.10 + Auto-review + vision eye/prune ≤2000 | **✅** |
-| 5 | **PH-SVC34** | Re-verify GH Actions after push | **[ ]** |
-| 6 | **PH-SVC35** | Secret scanning #1 Atlassian — **revoke у Atlassian** | **[ ]** OWNER |
-| 7 | **PH-SVC31…33 / 36…40 / 44** | prior service | **✅** |
+| 1 | **PH-SVC55…64** | Security hygiene: untrack PEMs + audit logs; `.gitignore`; permissions; docs | **✅** |
+| 2 | **PH-SVC41** | Pa11y: drop invalid `cargo build --debug` | **✅** |
+| 3 | **PH-SVC42** | Playwright: same `--debug` fix | **✅** |
+| 4 | **PH-SVC43** | Docs: TLS reload `block_in_place`+`await` for `cargo doc --features jwt,https` | **✅** |
+| 5 | **PH-SVC45…54** | Cursor 3.13.10 + Auto-review + vision eye/prune ≤2000 | **✅** |
+| 6 | **PH-SVC34** | Re-verify GH Actions after push | **[ ]** |
+| 7 | **PH-SVC35** | Secret scanning #1 Atlassian — **revoke у Atlassian** | **[ ]** OWNER |
+| 8 | **PH-SVC31…33 / 36…40 / 44** | prior service | **✅** |
 
-Канон secret: [`SECRETS_MANAGEMENT.md`](../security/SECRETS_MANAGEMENT.md) §4. Сталевий стан: [`STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md).
+Канон secret: [`SECRETS_MANAGEMENT.md`](../security/SECRETS_MANAGEMENT.md) §1/§4 · local TLS [`certs/README.md`](../../certs/README.md). Сталевий стан: [`STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md).
 
 **Cursor / toolchain (service):** local desktop **3.13.10** · Auto-review · research [`CURSOR_UPDATE_RESEARCH_2026-07-24.md`](./CURSOR_UPDATE_RESEARCH_2026-07-24.md) · FM **§5.16**.
 
 **Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **860** спринтів → PH-S2278.
 
-## Band 78 — Audit vision-sync (PH-S1419…S1428, **ACTIVE**)
+## Security findings closed (PH-SVC55…64, by severity)
 
+| Severity | Finding | Fix |
+|----------|---------|-----|
+| **Critical** | Private key `certs/key.pem` tracked + pushed | `git rm --cached`; ignore; regenerate `CN=localhost` |
+| **High** | `certs/cert.pem` (PII subject) in git | untracked; generate via `certs/README.md` |
+| **High** | Six `data/audit/*.log.gz` tracked | untracked; `data/audit/` + `.gitkeep` |
+| **Medium** | `.env` / `*.pem` / e2e log+pid gaps | `.gitignore` + permissions block staging |
+| **Low** | Corrupted MSYS path / e2e tmp artifacts | ignore patterns widened |
+| **Open (OWNER)** | PH-SVC35 Atlassian token (historical) | revoke in Atlassian; no history rewrite |
+
+## Band 78 — Audit vision-sync (PH-S1419…S1428, **ACTIVE**)
 | Sprint | Фокус |
 |--------|--------|
 | **PH-S1419** | `audit_vision_sync_depth` ui-core module |

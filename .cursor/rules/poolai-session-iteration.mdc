@@ -51,6 +51,7 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 ## Commit / push
 
 - Staging: `git diff --cached --stat`; не `git add -A`
+- **Ніколи:** `.env*`, `*.pem`/`*.key`, `certs/*.pem`, `data/audit/*` (крім `.gitkeep`), `comitmsg/*.txt` — див. `.gitignore` + PH-SVC55
 - Hook / subject: [`git-commit-msys.mdc`](git-commit-msys.mdc)
 - Push: [`.cursor/commands/git-push.md`](../commands/git-push.md) + самарі в чат
 

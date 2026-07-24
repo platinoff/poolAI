@@ -49,21 +49,26 @@ PoolAI currently stores secrets in:
 
 ### 1. Never Commit Secrets to Git
 
-**Current Status**: ⚠️ `config.toml` may contain secrets
+**Current Status (2026-07-24, PH-SVC55…SVC64):** ✅ `.gitignore` blocks `.env*`, `*.pem`/`*.key`, `certs/*.pem`, `data/audit/`, `secrets/`. Tracked PEMs and audit `.log.gz` removed from the index (files stay local). History rewrite still **OWNER-only** (PH-SVC36).
+
+**Still open:** PH-SVC35 — OWNER must revoke the historical Atlassian API token (Secret scanning alert). Regenerate local TLS material if the old `certs/key.pem` was ever used beyond disposable HTTPS.
 
 **Recommendations**:
 ```bash
-# Add to .gitignore
-config.toml
+# Already in .gitignore (do not re-add)
+.env
+.env.*
 *.pem
 *.key
-.env
+certs/*.pem
+data/audit/
 secrets/
 ```
 
 **Template Files**:
 - Use `config.example.toml` (without secrets)
 - Use `config.https.example.toml` (without actual certificates)
+- Generate PEMs via [`certs/README.md`](../../certs/README.md) (not committed)
 
 ### 2. Use Environment Variables for Production
 

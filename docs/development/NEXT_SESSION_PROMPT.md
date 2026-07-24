@@ -1,18 +1,18 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-07-24 (band 77 **PH-S1409…S1418, 2026-07-24) ·** ✅ · horizon band 78)
+**Оновлено:** 2026-07-24 (security **PH-SVC55…SVC64** ✅ · band 77 ✅ · horizon band 78)
 
-Maintenance mode (FM §5.15) · band 77 drained.
+Maintenance mode (FM §5.15) · band 77 drained · security hygiene closed.
 
 Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.18 @ S2278).
 
 | **← наступний** | **`абракадабра`** (project scan → band 78) |
-| **§5.12 active** | **10** (band 77 ✅) |
+| **§5.12 active** | **10** (band 77 ✅ · band 78 ready) |
 | **P0 open** | **PH-SVC34** re-verify GH · **PH-SVC35** OWNER |
 | **Completion pending** | **860** sprints PH-S1419…S2278 · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) |
 | **Horizon** | band 78 → **PH-S1419…S1428** |
 | **Vision** | rev **385** |
-| **Cursor** | local **3.13.10** · Auto-review · [`CURSOR_UPDATE_RESEARCH_2026-07-24.md`](./CURSOR_UPDATE_RESEARCH_2026-07-24.md) |
+| **Cursor** | local **3.13.10** · Auto-review · security PEMs untracked |
 
 ---
 
@@ -22,7 +22,7 @@ Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.1
 абракадабра
 ```
 
-**Порядок:** drain band 78 (Audit vision-sync). Після push — PH-SVC34 GH re-verify.
+**Порядок:** drain band 78 (Audit vision-sync). Після push — PH-SVC34 GH re-verify. **Не** комітити `certs/*.pem`, `.env`, `data/audit/*`.
 
 ---
 
@@ -47,4 +47,4 @@ Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.1
 
 ## Не повторювати
 
-band 77 ✅ · band 76 ✅ · band 75 ✅ · PH-SVC45…54 ✅ (Cursor 3.13.10 / Auto-review / vision eye+prune) · PH-SVC41…43 ✅ (`cargo build --debug` invalid; TLS reload needs `await`) · band 74 ✅ · FM-003 LAN · FM-041 Cloud SDK · mandatory ZK/TEE · history rewrite без OWNER.
+PH-SVC55…64 ✅ (PEMs/audit untrack + gitignore) · band 77 ✅ · band 76 ✅ · PH-SVC45…54 ✅ · PH-SVC41…43 ✅ · band 74 ✅ · FM-003 LAN · FM-041 Cloud SDK · mandatory ZK/TEE · history rewrite без OWNER · staging `certs/*.pem` / `data/audit/*` / `.env`.

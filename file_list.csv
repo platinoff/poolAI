@@ -167,8 +167,7 @@
 ./Cargo.minimal.toml
 ./Cargo.std.toml
 ./Cargo.toml
-./certs/cert.pem
-./certs/key.pem
+./certs/README.md
 ./comitmsg/.commit-msg-a11y.txt
 ./comitmsg/.commit-msg-docs-s11.txt
 ./comitmsg/.commit-msg-docs-sync.txt

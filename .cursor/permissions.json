@@ -11,6 +11,7 @@
       "Every git push --force, git reset --hard, or history rewrite (filter-repo, rebase that rewrites published main) should go through approval first.",
       "Every command that deletes .git, modifies git config, or skips hooks with --no-verify should go through approval first.",
       "Every command that reads or prints secrets from .env, credentials, API tokens, or private keys should go through approval first.",
+      "Every git add / commit that stages .env, *.pem, *.key, certs/*.pem, data/audit/* (except .gitkeep), or credentials.json should go through approval first.",
       "Every Run Everything style unrestricted shell outside the workspace should go through approval first.",
       "Do not auto-run Python interpreters or create .py product files in this repository."
     ]

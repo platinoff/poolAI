@@ -84,7 +84,7 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 **Product-complete:** PH-S1010 ✅ · FM **§5.15** ✅ · **maintenance mode**.
 
-**Tech (сьогодні):** Service **PH-SVC45…SVC54** — Cursor **3.13.10** + Auto-review (`.cursor/permissions.json`) · vision eye filter + prune closed PH-S ≤2000 · screenshot P0 PH-SVC41…43 already on main · open **PH-SVC34** (GH verify) · **PH-SVC35** OWNER Atlassian revoke ([`SECRETS_MANAGEMENT.md`](docs/security/SECRETS_MANAGEMENT.md) §4).
+**Tech (сьогодні):** Security service **PH-SVC55…SVC64** — untrack `certs/*.pem` + `data/audit/*.log.gz`; `.gitignore` + permissions block secrets · Cursor **3.13.10** Auto-review · open **PH-SVC34** (GH verify) · **PH-SVC35** OWNER Atlassian revoke ([`SECRETS_MANAGEMENT.md`](docs/security/SECRETS_MANAGEMENT.md) §1/§4 · [`certs/README.md`](certs/README.md)).
 
 **Наступна сесія (owner):** **`абракадабра`** — drain band 76 **PH-S1399…S1408** · [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 

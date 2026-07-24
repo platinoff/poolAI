@@ -1,5 +1,13 @@
 # Cursor Agent Configuration Changelog
 
+## 2026-07-24 — Security hygiene service band (PH-SVC55…SVC64)
+
+- **`.gitignore`**: `.env*`, `*.pem`/`*.key`, `certs/*.pem`, full `data/audit/`, e2e `poolai.log`/`pid`, MSYS path artifacts.
+- **Index:** `git rm --cached` for tracked PEMs + historical audit `.log.gz`; local PEMs regenerated `CN=localhost`.
+- **`.cursor/permissions.json`**: block staging secrets/PEMs/audit.
+- **Docs:** `certs/README.md`, `SECRETS_MANAGEMENT` §1, `TLS.md`, FM §5.16 PH-SVC55…64, HANDOFF/NEXT/README/INDEX/`file_list.csv`.
+- **Open OWNER:** PH-SVC35 Atlassian revoke; PH-SVC34 GH re-verify. Next session: **`абракадабра`** → band 78.
+
 ## 2026-07-24 — Cursor 3.13.10 service band (PH-SVC45…SVC54)
 
 - **`cursor-environment-baseline.mdc`**: local `cursor` **3.13.10**; Run Modes / **Auto-review**; pointer to `CURSOR_UPDATE_RESEARCH_2026-07-24.md`.

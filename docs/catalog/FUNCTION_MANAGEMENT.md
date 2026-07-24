@@ -2125,14 +2125,24 @@ FM-xxx (з таблиці нижче)
 | **PH-SVC52** | `file_list.csv` + `.cursor/CHANGELOG` | CURSOR_UPDATE_2026-07-24 | **✅** |
 | **PH-SVC53** | `poolai-vision-sync --check` | drift gate green | **✅** |
 | **PH-SVC54** | git push + самарі | service commit `main` | **✅** |
+| **PH-SVC55** | Security structure scan | tracked PEMs, audit logs, `.env` gaps, push surface | **✅** |
+| **PH-SVC56** | Untrack `certs/*.pem` from index | `git rm --cached`; keep local files; rotate localhost PEMs | **✅** |
+| **PH-SVC57** | Untrack `data/audit/*.log.gz` | index clean; `data/audit/.gitkeep` | **✅** |
+| **PH-SVC58** | Adapt `.gitignore` | `.env*`, `*.pem`/`*.key`, `certs/*`, `data/audit/`, e2e log/pid artifacts | **✅** |
+| **PH-SVC59** | `certs/README.md` + TLS/SECRETS docs | generate-local canon; no history rewrite | **✅** |
+| **PH-SVC60** | `.cursor/permissions.json` | block staging secrets/PEMs/audit | **✅** |
+| **PH-SVC61** | Rules/skills sync | agent-roles + session-iteration + CHANGELOG security hygiene | **✅** |
+| **PH-SVC62** | HANDOFF + NEXT_SESSION | security zriz; next `абракадабра` | **✅** |
+| **PH-SVC63** | `file_list.csv` + INDEX pointer | certs/README; drop tracked pem rows | **✅** |
+| **PH-SVC64** | git push + самарі | severity table in chat | **✅** |
 
-**Наступний service trigger:** **`абракадабра`** → drain band 78 · **PH-SVC34** re-verify GH after push · **PH-SVC35** OWNER. **Відкриті service:** PH-SVC34 · PH-SVC35 (OWNER).
+**Наступний service trigger:** **`абракадабра`** → drain band 78 · **PH-SVC34** re-verify GH after push · **PH-SVC35** OWNER (Atlassian revoke). **Відкриті service:** PH-SVC34 · PH-SVC35 (OWNER). Security band PH-SVC55…SVC64 ✅.
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S262)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-24):** band 78 **PH-S1419…S1428** `[ ]` · §5.12 **10** · band 77 ✅ · service PH-SVC45…SVC54 ✅ · P0 PH-SVC41…43 ✅ · PH-SVC34/35 · наступна **`абракадабра`** → band 78 · completion pending **860** → S2278.
+**Активна смуга (2026-07-24):** band 78 **PH-S1419…S1428** `[ ]` · §5.12 **10** · band 77 ✅ · service PH-SVC55…SVC64 ✅ (security hygiene) · PH-SVC45…SVC54 ✅ · P0 PH-SVC41…43 ✅ · PH-SVC34/35 · наступна **`абракадабра`** → band 78 · completion pending **860** → S2278.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

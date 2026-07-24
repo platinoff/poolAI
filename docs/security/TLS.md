@@ -29,16 +29,21 @@ Enable HTTPS in config (`https.enabled = true`) or set paths via env.
 
 ## Development certificates
 
+PEMs under `certs/` are **local only** (gitignored). See [`certs/README.md`](../../certs/README.md).
+
 ```bash
-# Example (openssl) — see also repo `certs/` for local dev
+mkdir -p certs
 openssl req -x509 -newkey rsa:2048 -keyout certs/key.pem -out certs/cert.pem -days 365 -nodes -subj "/CN=localhost"
 ```
+
+TLS integration tests skip when PEMs are absent (`tests/tls_https_integration.rs`).
 
 ## Related
 
 - Policy module: `src/network/tls_config.rs`
 - Listener: `src/network/mod.rs` (`feature = "https"`)
+- Secrets hygiene: [`SECRETS_MANAGEMENT.md`](./SECRETS_MANAGEMENT.md) §1 (PH-SVC55)
 - Legacy planning: [`../development/TLS_UPGRADE_PLAN.md`](../development/TLS_UPGRADE_PLAN.md)
 - Prometheus scrape (unchanged on HTTP or HTTPS): [`../development/PROMETHEUS_METRICS.md`](../development/PROMETHEUS_METRICS.md)
 
-**Last updated:** 2026-05-23 (PH-S08).
+**Last updated:** 2026-07-24 (PH-SVC55 — untrack PEMs).
