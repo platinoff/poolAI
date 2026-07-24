@@ -1,13 +1,13 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-07-24 (security **PH-SVC55…SVC64** ✅ · band 77 **PH-S1409…S1418** ✅ · horizon band 78)
+**Оновлено:** 2026-07-24 (band 77 **PH-S1409…S1418, 2026-07-24) ·** ✅ · horizon band 78)
 
-Maintenance mode (FM §5.15) · band 77 drained · security hygiene closed.
+Maintenance mode (FM §5.15) · band 77 drained.
 
 Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.18 @ S2278).
 
 | **← наступний** | **`абракадабра`** (project scan → band 78) |
-| **§5.12 active** | **10** (band 77 ✅ · band 78 ready) |
+| **§5.12 active** | **10** (band 77 ✅) |
 | **P0 open** | **PH-SVC34** re-verify GH · **PH-SVC35** OWNER |
 | **Completion pending** | **860** sprints PH-S1419…S2278 · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) |
 | **Horizon** | band 78 → **PH-S1419…S1428** |
