@@ -19,7 +19,7 @@ aligned with the enterprise Audit journal.
 
 **Boundary:** band 78 = vision-sync gate for Audit phase C; prior docs-canon remains
 [`AUDIT_DOCS_CANON.md`](./AUDIT_DOCS_CANON.md) (band 77). Mirror: [`SSO_VISION_SYNC.md`](./SSO_VISION_SYNC.md).
-Next: band 79 Audit ratio-advisory (`PH-S1429…S1438`).
+Next: band 79 Audit ratio-advisory (`PH-S1429…S1438`) — [`AUDIT_RATIO_ADVISORY.md`](./AUDIT_RATIO_ADVISORY.md).
 
 ## Loc-audit / verify
 

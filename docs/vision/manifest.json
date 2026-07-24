@@ -2768,11 +2768,23 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_development_AUDIT_VISION_SYNC_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_audit_ratio_advisory_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUDIT_RATIO_ADVISORY_md"
     }
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S1428",
+  "last_sprint_closed": "PH-S1438",
   "layers": [
     {
       "id": "L0",
@@ -2805,7 +2817,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1429",
+  "next_sprint": "PH-S1439",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -11025,99 +11037,127 @@
       "label": "galaxy_horizon_s1419_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s1419_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_audit_ratio_advisory_depth_rs",
+      "label": "audit_ratio_advisory_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/audit_ratio_advisory_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUDIT_RATIO_ADVISORY_md",
+      "label": "AUDIT_RATIO_ADVISORY.md",
+      "layer": "L1",
+      "path": "docs/development/AUDIT_RATIO_ADVISORY.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_audit_ratio_advisory_integration_rs",
+      "label": "audit_ratio_advisory_integration.rs",
+      "layer": "L3",
+      "path": "tests/audit_ratio_advisory_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1429_integration_rs",
+      "label": "galaxy_horizon_s1429_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1429_integration.rs"
     }
   ],
-  "revision": 387,
+  "revision": 389,
   "sprint_queue": [
     {
       "acceptance": "depth enum + criteria registry",
-      "deps": "audit_ratio_advisory_depth.rs",
-      "id": "PH-S1429",
+      "deps": "ui-core",
+      "id": "PH-S1439",
       "open": true,
-      "row": 1364,
+      "row": 1374,
       "status": "open",
-      "title": "audit_ratio_advisory_depth` ui-core module"
+      "title": "audit_depth` scaffold"
     },
     {
-      "acceptance": "prior `--audit*` + vision-sync; unit test",
-      "deps": "AUDIT_RATIO_ADVISORY_SLICES",
-      "id": "PH-S1430",
+      "acceptance": "durable path or production verify stub + unit",
+      "deps": "store",
+      "id": "PH-S1440",
       "open": true,
-      "row": 1365,
+      "row": 1375,
       "status": "open",
-      "title": "Slice aggregate (prior audit*)"
+      "title": "audit` store/wire slice"
     },
     {
-      "acceptance": "markers + registry",
-      "deps": "audit_ratio_advisory_integration",
-      "id": "PH-S1431",
+      "acceptance": "tests/*_integration.rs` or contract test",
+      "deps": "tests",
+      "id": "PH-S1441",
       "open": true,
-      "row": 1366,
+      "row": 1376,
       "status": "open",
-      "title": "Criteria contracts"
+      "title": "audit` API contracts"
     },
     {
-      "acceptance": "ratio-advisory verify gate",
-      "deps": "verify-dev-stand / run-poolai",
-      "id": "PH-S1432",
+      "acceptance": "verify-dev-stand or admin strip",
+      "deps": "verify/admin",
+      "id": "PH-S1442",
       "open": true,
-      "row": 1367,
+      "row": 1377,
       "status": "open",
-      "title": "VERIFY_AUDIT_RATIO_ADVISORY` + quick"
+      "title": "audit` admin/ops glue"
     },
     {
-      "acceptance": "unit export-shape",
-      "deps": "poolai_http_stand_smoke",
-      "id": "PH-S1433",
+      "acceptance": "export shape unit test",
+      "deps": "stand-smoke",
+      "id": "PH-S1443",
       "open": true,
-      "row": 1368,
+      "row": 1378,
       "status": "open",
-      "title": "Stand smoke export shape"
+      "title": "Stand smoke `audit` export"
     },
     {
-      "acceptance": "rust_ratio.json` fields",
+      "acceptance": "rust_ratio.json` zriz",
       "deps": "loc-audit",
-      "id": "PH-S1434",
+      "id": "PH-S1444",
       "open": true,
-      "row": 1369,
+      "row": 1379,
       "status": "open",
-      "title": "poolai-loc-audit --audit-ratio-advisory"
+      "title": "poolai-loc-audit PH-S1444"
     },
     {
-      "acceptance": "ratio-advisory matrix",
-      "deps": "RUN_LOCAL/INDEX/HANDOFF/NEXT",
-      "id": "PH-S1435",
+      "acceptance": "HANDOFF/NEXT sync",
+      "deps": "RUN_LOCAL/INDEX",
+      "id": "PH-S1445",
       "open": true,
-      "row": 1370,
+      "row": 1380,
       "status": "open",
-      "title": "Docs `AUDIT_RATIO_ADVISORY.md` + canon"
+      "title": "Docs canon sync"
     },
     {
       "acceptance": "drift gate green",
       "deps": "docs/vision",
-      "id": "PH-S1436",
+      "id": "PH-S1446",
       "open": true,
-      "row": 1371,
+      "row": 1381,
       "status": "open",
-      "title": "vision-sync --check"
+      "title": "poolai-vision-sync --check"
     },
     {
       "acceptance": "--min-ratio 0.95 --advisory",
       "deps": "loc-audit",
-      "id": "PH-S1437",
+      "id": "PH-S1447",
       "open": true,
-      "row": 1372,
+      "row": 1382,
       "status": "open",
       "title": "Ratio hold advisory"
     },
     {
-      "acceptance": "galaxy_horizon_s1429_integration`; HANDOFF/NEXT",
+      "acceptance": "band close",
       "deps": "tests/docs",
-      "id": "PH-S1438",
+      "id": "PH-S1448",
       "open": true,
-      "row": 1373,
+      "row": 1383,
       "status": "open",
-      "title": "Audit ratio-advisory band close"
+      "title": "galaxy_horizon_s1439_integration"
     }
   ],
   "sprint_queue_open_count": 10,
