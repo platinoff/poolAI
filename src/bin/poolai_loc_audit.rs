@@ -15,6 +15,9 @@ use poolai_ui_core::audit_api_contracts_depth::{
     audit_api_criteria_total, AUDIT_API_CASES, AUDIT_API_CRITERIA,
 };
 use poolai_ui_core::audit_depth::{audit_criteria_total, AUDIT_CASES, AUDIT_CRITERIA};
+use poolai_ui_core::audit_docs_canon_depth::{
+    audit_docs_canon_criteria_total, AUDIT_DOCS_CANON_CASES, AUDIT_DOCS_CANON_CRITERIA,
+};
 use poolai_ui_core::audit_loc_audit_depth::{
     audit_loc_audit_criteria_total, AUDIT_LOC_AUDIT_CASES, AUDIT_LOC_AUDIT_CRITERIA,
 };
@@ -233,6 +236,8 @@ struct AuditConfig {
     audit_stand_smoke: bool,
     /// Emit band-76 audit loc-audit aggregate fields (PH-S1404).
     audit_loc_audit: bool,
+    /// Emit band-77 audit docs-canon fields (PH-S1414).
+    audit_docs_canon: bool,
 }
 
 impl Default for AuditConfig {
@@ -274,6 +279,7 @@ impl Default for AuditConfig {
             audit_admin_ops: false,
             audit_stand_smoke: false,
             audit_loc_audit: false,
+            audit_docs_canon: false,
         }
     }
 }
@@ -517,6 +523,12 @@ struct RustRatioReport {
     audit_loc_audit_criteria_total: usize,
     /// Audit loc-audit criteria met count (PH-S1404).
     audit_loc_audit_criteria_met_count: usize,
+    /// Band-77 audit docs-canon mode (PH-S1414).
+    audit_docs_canon_mode: bool,
+    /// Audit docs-canon criteria registry size (PH-S1414).
+    audit_docs_canon_criteria_total: usize,
+    /// Audit docs-canon criteria met count (PH-S1414).
+    audit_docs_canon_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -905,6 +917,22 @@ fn audit_audit_loc_audit_criteria_met(root: &Path) -> (usize, usize) {
     (met, total)
 }
 
+fn audit_audit_docs_canon_criteria_met(root: &Path) -> (usize, usize) {
+    let total = audit_docs_canon_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in AUDIT_DOCS_CANON_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
 fn audit_sso_api_criteria_met(root: &Path) -> (usize, usize) {
     let total = sso_api_criteria_total();
     let mut met = 0usize;
@@ -1154,6 +1182,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--audit-admin-ops" => config.audit_admin_ops = true,
             "--audit-stand-smoke" => config.audit_stand_smoke = true,
             "--audit-loc-audit" => config.audit_loc_audit = true,
+            "--audit-docs-canon" => config.audit_docs_canon = true,
             "--audit" => config.audit = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
@@ -1208,6 +1237,7 @@ fn print_help() {
            --audit-admin-ops           band-74 audit admin/ops fields (PH-S1385)\n\
            --audit-stand-smoke         band-75 audit stand-smoke fields (PH-S1394)\n\
            --audit-loc-audit           band-76 audit loc-audit aggregate fields (PH-S1404)\n\
+           --audit-docs-canon          band-77 audit docs-canon fields (PH-S1414)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -1628,6 +1658,17 @@ fn build_report(
         notes.push("PH-S1408: band 76 audit loc-audit — criteria met vs registry");
     }
 
+    let (audit_docs_canon_criteria_met_count, audit_docs_canon_criteria_total_count) =
+        if config.audit_docs_canon {
+            audit_audit_docs_canon_criteria_met(root)
+        } else {
+            (0, audit_docs_canon_criteria_total())
+        };
+    if config.audit_docs_canon {
+        notes.push("PH-S1414: audit_docs_canon_mode — aggregate band 71–76 AUDIT_*.md canon docs");
+        notes.push("PH-S1418: band 77 audit docs-canon — criteria met vs registry");
+    }
+
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
         sprint: SPRINT,
@@ -1751,6 +1792,9 @@ fn build_report(
         audit_loc_audit_mode: config.audit_loc_audit,
         audit_loc_audit_criteria_total: audit_loc_audit_criteria_total_count,
         audit_loc_audit_criteria_met_count,
+        audit_docs_canon_mode: config.audit_docs_canon,
+        audit_docs_canon_criteria_total: audit_docs_canon_criteria_total_count,
+        audit_docs_canon_criteria_met_count,
         by_category,
         notes,
     })
@@ -2112,6 +2156,17 @@ fn print_summary(report: &RustRatioReport) {
         println!(
             "  audit_loc_audit_cases: {}",
             AUDIT_LOC_AUDIT_CASES.join(", ")
+        );
+    }
+    if report.audit_docs_canon_mode {
+        println!("  audit_docs_canon:      true (PH-S1414 band 77)");
+        println!(
+            "  audit_docs_canon_criteria: {}/{} met",
+            report.audit_docs_canon_criteria_met_count, report.audit_docs_canon_criteria_total
+        );
+        println!(
+            "  audit_docs_canon_cases: {}",
+            AUDIT_DOCS_CANON_CASES.join(", ")
         );
     }
     for (name, loc) in &report.by_category {

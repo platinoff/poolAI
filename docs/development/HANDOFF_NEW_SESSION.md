@@ -1,8 +1,8 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-24 (band 76 **PH-S1399…S1408** ✅ · Audit loc-audit aggregate · band 77 ready)
+**Оновлено:** 2026-07-24 (band 77 **PH-S1409…S1418** ✅ · Audit docs canon · band 78 ready)
 
-**Наступна сесія:** **`абракадабра`** — drain band 77 (FM **§5.58** Audit docs canon).
+**Наступна сесія:** **`абракадабра`** — drain band 78 (FM **§5.59** Audit vision-sync).
 
 ## P0 / service (2026-07-24)
 
@@ -20,9 +20,26 @@
 
 **Cursor / toolchain (service):** local desktop **3.13.10** · Auto-review · research [`CURSOR_UPDATE_RESEARCH_2026-07-24.md`](./CURSOR_UPDATE_RESEARCH_2026-07-24.md) · FM **§5.16**.
 
-**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **870** спринтів → PH-S2278.
+**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **860** спринтів → PH-S2278.
 
-## Band 77 — Audit docs canon (PH-S1409…S1418, **ACTIVE**)
+## Band 78 — Audit vision-sync (PH-S1419…S1428, **ACTIVE**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1419** | `audit_vision_sync_depth` ui-core module |
+| **PH-S1420** | Vision slice aggregate stub |
+| **PH-S1421** | Criteria contracts |
+| **PH-S1422** | `VERIFY_AUDIT_VISION_SYNC` + quick |
+| **PH-S1423** | Stand smoke export shape |
+| **PH-S1424** | `poolai-loc-audit --audit-vision-sync` |
+| **PH-S1425** | `AUDIT_VISION_SYNC.md` + canon |
+| **PH-S1426** | vision-sync --check |
+| **PH-S1427** | Ratio hold advisory |
+| **PH-S1428** | Band close |
+
+**§5.12:** **10** відкритих. **Vision:** rev **385**. **Pending completion:** **860** (→ PH-S2278).
+
+## Band 77 — Audit docs canon (PH-S1409…S1418, ✅)
 
 | Sprint | Фокус |
 |--------|--------|
@@ -37,7 +54,7 @@
 | **PH-S1417** | Ratio hold advisory |
 | **PH-S1418** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **383**. **Pending completion:** **870** (→ PH-S2278).
+**PH-S1418 ✅ (2026-07-24):** `audit_docs_canon_depth.rs`; `AUDIT_DOCS_CANON_SLICES`; `--audit-docs-canon`; `VERIFY_AUDIT_DOCS_CANON`; `AUDIT_DOCS_CANON.md`; `galaxy_horizon_s1409_integration`. Phase C Audit docs-canon closed.
 
 ## Band 76 — Audit loc-audit aggregate (PH-S1399…S1408, ✅)
 

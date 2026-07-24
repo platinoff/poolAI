@@ -3,26 +3,26 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S1409",
+      "id": "PH-S1419",
       "link": "docs/vision/index.html#sprint-queue",
       "next": true,
       "published": "2026-05-28",
       "status": "open",
-      "summary": "depth enum + docs-canon criteria registry",
-      "title": "audit_docs_canon_depth` ui-core module"
+      "summary": "depth enum + vision/criteria registry",
+      "title": "audit_vision_sync_depth` ui-core module"
     },
     {
       "category": "open",
-      "id": "PH-S1410",
+      "id": "PH-S1420",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "AUDIT_DEPTH`…`AUDIT_LOC_AUDIT` under one gate",
-      "title": "Slice aggregate (`AUDIT_*.md`)"
+      "summary": "six vision slices; unit test",
+      "title": "Vision slice aggregate stub"
     },
     {
       "category": "open",
-      "id": "PH-S1411",
+      "id": "PH-S1421",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -31,16 +31,16 @@
     },
     {
       "category": "open",
-      "id": "PH-S1412",
+      "id": "PH-S1422",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "docs-canon verify gate",
-      "title": "VERIFY_AUDIT_DOCS_CANON` + quick"
+      "summary": "vision-sync verify gate",
+      "title": "VERIFY_AUDIT_VISION_SYNC` + quick"
     },
     {
       "category": "open",
-      "id": "PH-S1413",
+      "id": "PH-S1423",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -49,25 +49,25 @@
     },
     {
       "category": "open",
-      "id": "PH-S1414",
+      "id": "PH-S1424",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
       "summary": "rust_ratio.json` fields",
-      "title": "poolai-loc-audit --audit-docs-canon"
+      "title": "poolai-loc-audit --audit-vision-sync"
     },
     {
       "category": "open",
-      "id": "PH-S1415",
+      "id": "PH-S1425",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "docs-canon matrix",
-      "title": "Docs `AUDIT_DOCS_CANON.md` + canon"
+      "summary": "vision-sync matrix",
+      "title": "Docs `AUDIT_VISION_SYNC.md` + canon"
     },
     {
       "category": "open",
-      "id": "PH-S1416",
+      "id": "PH-S1426",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -76,7 +76,7 @@
     },
     {
       "category": "open",
-      "id": "PH-S1417",
+      "id": "PH-S1427",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -85,12 +85,102 @@
     },
     {
       "category": "open",
-      "id": "PH-S1418",
+      "id": "PH-S1428",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
+      "summary": "galaxy_horizon_s1419_integration`; HANDOFF/NEXT",
+      "title": "Audit vision-sync band close"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1418",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
       "summary": "galaxy_horizon_s1409_integration`; HANDOFF/NEXT",
       "title": "Audit docs-canon band close"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1417",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--min-ratio 0.95 --advisory",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1416",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "drift gate green",
+      "title": "vision-sync --check"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1415",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "docs-canon matrix",
+      "title": "Docs `AUDIT_DOCS_CANON.md` + canon"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1414",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "rust_ratio.json` fields",
+      "title": "poolai-loc-audit --audit-docs-canon"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1413",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "unit export-shape",
+      "title": "Stand smoke export shape"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1412",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "docs-canon verify gate",
+      "title": "VERIFY_AUDIT_DOCS_CANON` + quick"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1411",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "markers + registry",
+      "title": "Criteria contracts"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1410",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "AUDIT_DEPTH`…`AUDIT_LOC_AUDIT` under one gate",
+      "title": "Slice aggregate (`AUDIT_*.md`)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1409",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "depth enum + docs-canon criteria registry",
+      "title": "audit_docs_canon_depth` ui-core module"
     },
     {
       "category": "closed",
@@ -104,96 +194,6 @@
     {
       "category": "closed",
       "id": "PH-S1407",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--min-ratio 0.95 --advisory",
-      "title": "Ratio hold advisory"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1406",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "drift gate green",
-      "title": "vision-sync --check"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1405",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "aggregate matrix",
-      "title": "Docs `AUDIT_LOC_AUDIT.md` + canon"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1404",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "rust_ratio.json` fields",
-      "title": "poolai-loc-audit --audit-loc-audit"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1403",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "unit export-shape",
-      "title": "Stand smoke export shape"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1402",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "aggregate verify gate",
-      "title": "VERIFY_AUDIT_LOC_AUDIT` + quick"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1401",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "markers + registry",
-      "title": "Criteria contracts"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1400",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--audit`…`--audit-stand-smoke` under one gate",
-      "title": "Slice aggregate (audit→stand-smoke)"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1399",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "depth enum + aggregate criteria registry",
-      "title": "audit_loc_audit_depth` ui-core module"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1398",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_horizon_s1389_integration`; HANDOFF/NEXT",
-      "title": "Audit stand smoke band close"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1397",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",

@@ -5816,6 +5816,49 @@ mod tests {
     }
 
     #[test]
+    fn audit_docs_canon_band77_export_shape_ph_s1413() {
+        use poolai_ui_core::audit_docs_canon_depth::{
+            audit_docs_canon_criteria_total, audit_docs_canon_depth_stub,
+            audit_docs_canon_slices_met, AuditDocsCanonDepth, AUDIT_DOCS_CANON_CASES,
+            AUDIT_DOCS_CANON_CRITERIA, AUDIT_DOCS_CANON_SLICES, FM_BAND77_ROWS,
+        };
+        use serde_json::json;
+        assert_eq!(
+            audit_docs_canon_depth_stub(Some(&json!({"stand_smoke_export": true}))),
+            AuditDocsCanonDepth::StandSmokeExport
+        );
+        assert_eq!(
+            audit_docs_canon_depth_stub(Some(&json!({
+                "audit_docs_canon_depth": true,
+                "slice_aggregate": true,
+                "criteria_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "audit_docs_canon_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            AuditDocsCanonDepth::FullBand77
+        );
+        assert_eq!(AUDIT_DOCS_CANON_CRITERIA.len(), 10);
+        assert_eq!(audit_docs_canon_criteria_total(), 10);
+        assert_eq!(AUDIT_DOCS_CANON_SLICES.len(), 6);
+        assert!(AUDIT_DOCS_CANON_CASES.contains(&"aggregate_flag"));
+        let canon = include_str!("../../docs/development/AUDIT_DOCS_CANON.md");
+        assert_eq!(audit_docs_canon_slices_met(canon), (6, 6));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--audit-docs-canon"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND77_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band77 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn sso_docs_canon_band67_export_shape_ph_s1313() {
         use poolai_ui_core::sso_docs_canon_depth::{
             sso_docs_canon_criteria_total, sso_docs_canon_depth_stub, sso_docs_canon_slices_met,

@@ -2744,11 +2744,23 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_development_AUDIT_LOC_AUDIT_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_audit_docs_canon_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUDIT_DOCS_CANON_md"
     }
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S1408",
+  "last_sprint_closed": "PH-S1418",
   "layers": [
     {
       "id": "L0",
@@ -2781,7 +2793,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1409",
+  "next_sprint": "PH-S1419",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -10945,99 +10957,127 @@
       "label": "galaxy_horizon_s1399_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s1399_integration.rs"
-    }
-  ],
-  "revision": 383,
-  "sprint_queue": [
-    {
-      "acceptance": "depth enum + docs-canon criteria registry",
-      "deps": "audit_docs_canon_depth.rs",
-      "id": "PH-S1409",
-      "open": true,
-      "row": 1344,
-      "status": "open",
-      "title": "audit_docs_canon_depth` ui-core module"
     },
     {
-      "acceptance": "AUDIT_DEPTH`…`AUDIT_LOC_AUDIT` under one gate",
-      "deps": "docs slices",
-      "id": "PH-S1410",
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_audit_docs_canon_depth_rs",
+      "label": "audit_docs_canon_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/audit_docs_canon_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUDIT_DOCS_CANON_md",
+      "label": "AUDIT_DOCS_CANON.md",
+      "layer": "L1",
+      "path": "docs/development/AUDIT_DOCS_CANON.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_audit_docs_canon_integration_rs",
+      "label": "audit_docs_canon_integration.rs",
+      "layer": "L3",
+      "path": "tests/audit_docs_canon_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1409_integration_rs",
+      "label": "galaxy_horizon_s1409_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1409_integration.rs"
+    }
+  ],
+  "revision": 385,
+  "sprint_queue": [
+    {
+      "acceptance": "depth enum + vision/criteria registry",
+      "deps": "audit_vision_sync_depth.rs",
+      "id": "PH-S1419",
       "open": true,
-      "row": 1345,
+      "row": 1354,
       "status": "open",
-      "title": "Slice aggregate (`AUDIT_*.md`)"
+      "title": "audit_vision_sync_depth` ui-core module"
+    },
+    {
+      "acceptance": "six vision slices; unit test",
+      "deps": "AUDIT_VISION_SYNC_SLICES",
+      "id": "PH-S1420",
+      "open": true,
+      "row": 1355,
+      "status": "open",
+      "title": "Vision slice aggregate stub"
     },
     {
       "acceptance": "markers + registry",
-      "deps": "audit_docs_canon_integration",
-      "id": "PH-S1411",
+      "deps": "audit_vision_sync_integration",
+      "id": "PH-S1421",
       "open": true,
-      "row": 1346,
+      "row": 1356,
       "status": "open",
       "title": "Criteria contracts"
     },
     {
-      "acceptance": "docs-canon verify gate",
+      "acceptance": "vision-sync verify gate",
       "deps": "verify-dev-stand / run-poolai",
-      "id": "PH-S1412",
+      "id": "PH-S1422",
       "open": true,
-      "row": 1347,
+      "row": 1357,
       "status": "open",
-      "title": "VERIFY_AUDIT_DOCS_CANON` + quick"
+      "title": "VERIFY_AUDIT_VISION_SYNC` + quick"
     },
     {
       "acceptance": "unit export-shape",
       "deps": "poolai_http_stand_smoke",
-      "id": "PH-S1413",
+      "id": "PH-S1423",
       "open": true,
-      "row": 1348,
+      "row": 1358,
       "status": "open",
       "title": "Stand smoke export shape"
     },
     {
       "acceptance": "rust_ratio.json` fields",
       "deps": "loc-audit",
-      "id": "PH-S1414",
+      "id": "PH-S1424",
       "open": true,
-      "row": 1349,
+      "row": 1359,
       "status": "open",
-      "title": "poolai-loc-audit --audit-docs-canon"
+      "title": "poolai-loc-audit --audit-vision-sync"
     },
     {
-      "acceptance": "docs-canon matrix",
+      "acceptance": "vision-sync matrix",
       "deps": "RUN_LOCAL/INDEX/HANDOFF/NEXT",
-      "id": "PH-S1415",
+      "id": "PH-S1425",
       "open": true,
-      "row": 1350,
+      "row": 1360,
       "status": "open",
-      "title": "Docs `AUDIT_DOCS_CANON.md` + canon"
+      "title": "Docs `AUDIT_VISION_SYNC.md` + canon"
     },
     {
       "acceptance": "drift gate green",
       "deps": "docs/vision",
-      "id": "PH-S1416",
+      "id": "PH-S1426",
       "open": true,
-      "row": 1351,
+      "row": 1361,
       "status": "open",
       "title": "vision-sync --check"
     },
     {
       "acceptance": "--min-ratio 0.95 --advisory",
       "deps": "loc-audit",
-      "id": "PH-S1417",
+      "id": "PH-S1427",
       "open": true,
-      "row": 1352,
+      "row": 1362,
       "status": "open",
       "title": "Ratio hold advisory"
     },
     {
-      "acceptance": "galaxy_horizon_s1409_integration`; HANDOFF/NEXT",
+      "acceptance": "galaxy_horizon_s1419_integration`; HANDOFF/NEXT",
       "deps": "tests/docs",
-      "id": "PH-S1418",
+      "id": "PH-S1428",
       "open": true,
-      "row": 1353,
+      "row": 1363,
       "status": "open",
-      "title": "Audit docs-canon band close"
+      "title": "Audit vision-sync band close"
     }
   ],
   "sprint_queue_open_count": 10,

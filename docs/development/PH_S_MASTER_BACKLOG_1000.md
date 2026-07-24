@@ -36,7 +36,7 @@
 | 74 | PH-S1379…S1388 | C Audit · admin/ops glue |
 | 75 | PH-S1389…S1398 | C Audit · stand smoke |
 | 76 | PH-S1399…S1408 | C Audit · loc-audit |
-| 77 | PH-S1409…S1418 | C Audit · docs canon |
+| 77 | PH-S1409…S1418 | C Audit · docs canon **✅ drained** |
 | 78 | PH-S1419…S1428 | C Audit · vision-sync |
 | 79 | PH-S1429…S1438 | C Audit · ratio advisory |
 | 80 | PH-S1439…S1448 | C Audit · horizon close |
@@ -503,32 +503,32 @@
 | **PH-S1407** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
 | **PH-S1408** | galaxy_horizon_s1399_integration | band close | **✅** |
 
-## Band 77 — PH-S1409…S1418 (C Audit · docs canon)
+## Band 77 — PH-S1409…S1418 (C Audit · docs canon) · **✅ drained**
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1409** | `audit_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1410** | `audit` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1411** | `audit` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1412** | `audit` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1413** | Stand smoke `audit` export | export shape unit test | **[ ]** |
-| **PH-S1414** | poolai-loc-audit PH-S1414 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1415** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1416** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1417** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1418** | galaxy_horizon_s1409_integration | band close | **[ ]** |
+| **PH-S1409** | `audit_docs_canon_depth` ui-core | depth enum + docs-canon criteria registry | **✅** |
+| **PH-S1410** | Docs slice aggregate stub | `AUDIT_DOCS_CANON_SLICES` (six `AUDIT_*.md`) | **✅** |
+| **PH-S1411** | Criteria contracts | `audit_docs_canon_integration` | **✅** |
+| **PH-S1412** | `VERIFY_AUDIT_DOCS_CANON` + quick `--audit-docs-canon` | verify-dev-stand + RUN_LOCAL | **✅** |
+| **PH-S1413** | Stand smoke export shape | `audit_docs_canon_band77_export_shape` | **✅** |
+| **PH-S1414** | `poolai-loc-audit --audit-docs-canon` | `rust_ratio.json` fields | **✅** |
+| **PH-S1415** | Docs `AUDIT_DOCS_CANON.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | **✅** |
+| **PH-S1416** | poolai-vision-sync --check | drift gate green | **✅** |
+| **PH-S1417** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
+| **PH-S1418** | galaxy_horizon_s1409_integration | band close | **✅** |
 
 ## Band 78 — PH-S1419…S1428 (C Audit · vision-sync)
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1419** | `audit_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1420** | `audit` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1421** | `audit` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1422** | `audit` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1423** | Stand smoke `audit` export | export shape unit test | **[ ]** |
-| **PH-S1424** | poolai-loc-audit PH-S1424 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1425** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
+| **PH-S1419** | `audit_vision_sync_depth` ui-core | depth enum + vision/criteria registry | **[ ]** |
+| **PH-S1420** | Vision slice aggregate stub | `AUDIT_VISION_SYNC_SLICES` | **[ ]** |
+| **PH-S1421** | Criteria contracts | `audit_vision_sync_integration` | **[ ]** |
+| **PH-S1422** | `VERIFY_AUDIT_VISION_SYNC` + quick `--audit-vision-sync` | verify-dev-stand + RUN_LOCAL | **[ ]** |
+| **PH-S1423** | Stand smoke export shape | `audit_vision_sync_band78_export_shape` | **[ ]** |
+| **PH-S1424** | `poolai-loc-audit --audit-vision-sync` | `rust_ratio.json` fields | **[ ]** |
+| **PH-S1425** | Docs `AUDIT_VISION_SYNC.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
 | **PH-S1426** | poolai-vision-sync --check | drift gate green | **[ ]** |
 | **PH-S1427** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
 | **PH-S1428** | galaxy_horizon_s1419_integration | band close | **[ ]** |

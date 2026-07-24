@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 172833,
-  "non_rust_product_loc": 9331,
-  "product_loc_total": 182164,
-  "rust_ratio": 0.9487769262862037,
-  "rust_ratio_pct": 94.87769262862037,
+  "rust_loc": 173309,
+  "non_rust_product_loc": 9348,
+  "product_loc_total": 182657,
+  "rust_ratio": 0.9488221091992094,
+  "rust_ratio_pct": 94.88221091992094,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -118,9 +118,12 @@
   "audit_stand_smoke_mode": false,
   "audit_stand_smoke_criteria_total": 10,
   "audit_stand_smoke_criteria_met_count": 0,
-  "audit_loc_audit_mode": true,
+  "audit_loc_audit_mode": false,
   "audit_loc_audit_criteria_total": 10,
-  "audit_loc_audit_criteria_met_count": 10,
+  "audit_loc_audit_criteria_met_count": 0,
+  "audit_docs_canon_mode": true,
+  "audit_docs_canon_criteria_total": 10,
+  "audit_docs_canon_criteria_met_count": 10,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -132,23 +135,23 @@
     },
     "ops_shell": {
       "files": 39,
-      "loc": 3606
+      "loc": 3623
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 94,
-      "loc": 20049
+      "files": 95,
+      "loc": 20275
     },
     "rust_src": {
       "files": 300,
-      "loc": 112386
+      "loc": 112481
     },
     "rust_tests": {
-      "files": 295,
-      "loc": 39790
+      "files": 297,
+      "loc": 39945
     },
     "ui_css": {
       "files": 2,
@@ -179,7 +182,7 @@
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
     "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
-    "PH-S1404: audit_loc_audit_mode — aggregate band 71–75 --audit* loc-audit slices",
-    "PH-S1408: band 76 audit loc-audit — criteria met vs registry"
+    "PH-S1414: audit_docs_canon_mode — aggregate band 71–76 AUDIT_*.md canon docs",
+    "PH-S1418: band 77 audit docs-canon — criteria met vs registry"
   ]
 }
