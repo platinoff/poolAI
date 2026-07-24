@@ -48,7 +48,7 @@
 | **PH-S1437** | Ratio hold advisory |
 | **PH-S1438** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **386**. **Pending completion:** **850** (→ PH-S2278).
+**§5.12:** **10** відкритих. **Vision:** rev **387**. **Pending completion:** **850** (→ PH-S2278).
 
 ## Band 78 — Audit vision-sync (PH-S1419…S1428, ✅)
 

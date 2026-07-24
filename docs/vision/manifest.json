@@ -2756,6 +2756,18 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_development_AUDIT_DOCS_CANON_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_audit_vision_sync_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUDIT_VISION_SYNC_md"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -10985,9 +10997,37 @@
       "label": "galaxy_horizon_s1409_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s1409_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_audit_vision_sync_depth_rs",
+      "label": "audit_vision_sync_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/audit_vision_sync_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUDIT_VISION_SYNC_md",
+      "label": "AUDIT_VISION_SYNC.md",
+      "layer": "L1",
+      "path": "docs/development/AUDIT_VISION_SYNC.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_audit_vision_sync_integration_rs",
+      "label": "audit_vision_sync_integration.rs",
+      "layer": "L3",
+      "path": "tests/audit_vision_sync_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1419_integration_rs",
+      "label": "galaxy_horizon_s1419_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1419_integration.rs"
     }
   ],
-  "revision": 386,
+  "revision": 387,
   "sprint_queue": [
     {
       "acceptance": "depth enum + criteria registry",

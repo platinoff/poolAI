@@ -11,7 +11,7 @@ Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.1
 | **P0 open** | **PH-SVC34** re-verify GH · **PH-SVC35** OWNER |
 | **Completion pending** | **850** sprints PH-S1429…S2278 · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) |
 | **Horizon** | band 79 → **PH-S1429…S1438** |
-| **Vision** | rev **386** |
+| **Vision** | rev **387** |
 | **Cursor** | local **3.13.10** · Auto-review · security PEMs untracked |
 
 ---
