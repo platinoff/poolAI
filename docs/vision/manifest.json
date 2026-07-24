@@ -2726,6 +2726,12 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_development_AUDIT_STAND_SMOKE_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_CURSOR_UPDATE_RESEARCH_2026_07_24_md"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -10892,9 +10898,16 @@
       "label": "galaxy_horizon_s1389_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s1389_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_CURSOR_UPDATE_RESEARCH_2026_07_24_md",
+      "label": "CURSOR_UPDATE_RESEARCH_2026-07-24.md",
+      "layer": "L1",
+      "path": "docs/development/CURSOR_UPDATE_RESEARCH_2026-07-24.md"
     }
   ],
-  "revision": 380,
+  "revision": 381,
   "sprint_queue": [
     {
       "acceptance": "depth enum + aggregate criteria registry",
