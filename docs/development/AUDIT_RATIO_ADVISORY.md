@@ -18,7 +18,7 @@ Prior vision-sync remains [`AUDIT_VISION_SYNC.md`](./AUDIT_VISION_SYNC.md) (band
 
 **Boundary:** band 79 = ratio-advisory ops gate for Audit phase C (no new Audit durable store).
 Prior vision-sync: [`AUDIT_VISION_SYNC.md`](./AUDIT_VISION_SYNC.md) (band 78).
-Mirror: [`SSO_RATIO_ADVISORY.md`](./SSO_RATIO_ADVISORY.md). Next: band 80 Audit horizon close.
+Mirror: [`SSO_RATIO_ADVISORY.md`](./SSO_RATIO_ADVISORY.md). Next: band 80 Audit horizon close — [`AUDIT_HORIZON.md`](./AUDIT_HORIZON.md).
 
 ## Loc-audit / verify
 

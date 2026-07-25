@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-07-24 (project completion path · band 79 ✅ · band 80 horizon · Cursor **3.13.10**)
+**Оновлено:** 2026-07-24 (project completion path · band 80 ✅ · band 81 horizon · Cursor **3.13.10**)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -1221,24 +1221,43 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **10** (band 79 ✅ · band 80 open). **Master horizon:** PH-S1439…S1448 (band 80). **Completion pending:** PH-S1439…S2278 = **840** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **389**. **Наступна сесія:** **`абракадабра`** — drain band 80.
+**Відкритих у §5.12:** **10** (band 80 ✅ · band 81 open). **Master horizon:** PH-S1449…S1458 (band 81). **Completion pending:** PH-S1449…S2278 = **830** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **391**. **Наступна сесія:** **`абракадабра`** — drain band 81.
 
-### 5.61 Audit horizon close queue — band 80 (PH-S1439…S1448, 2026-07-24) · **ACTIVE**
+### 5.62 Policies depth scaffold queue — band 81 (PH-S1449…S1458, 2026-07-24) · **ACTIVE**
 
-**Джерело:** project completion / enterprise phase C — Audit horizon close. Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · master [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md).
+**Джерело:** project completion / enterprise phase D — Policies depth scaffold. Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · master [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
-| 1374 | **PH-S1439** | `audit_depth` scaffold | ui-core | depth enum + criteria registry | **[ ]** |
-| 1375 | **PH-S1440** | `audit` store/wire slice | store | durable path or production verify stub + unit | **[ ]** |
-| 1376 | **PH-S1441** | `audit` API contracts | tests | `tests/*_integration.rs` or contract test | **[ ]** |
-| 1377 | **PH-S1442** | `audit` admin/ops glue | verify/admin | verify-dev-stand or admin strip | **[ ]** |
-| 1378 | **PH-S1443** | Stand smoke `audit` export | stand-smoke | export shape unit test | **[ ]** |
-| 1379 | **PH-S1444** | poolai-loc-audit PH-S1444 | loc-audit | `rust_ratio.json` zriz | **[ ]** |
-| 1380 | **PH-S1445** | Docs canon sync | RUN_LOCAL/INDEX | HANDOFF/NEXT sync | **[ ]** |
-| 1381 | **PH-S1446** | poolai-vision-sync --check | docs/vision | drift gate green | **[ ]** |
-| 1382 | **PH-S1447** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **[ ]** |
-| 1383 | **PH-S1448** | galaxy_horizon_s1439_integration | tests/docs | band close | **[ ]** |
+| 1384 | **PH-S1449** | `policy_depth` scaffold | ui-core | depth enum + criteria registry | **[ ]** |
+| 1385 | **PH-S1450** | `policy` store/wire slice | store | durable path or production verify stub + unit | **[ ]** |
+| 1386 | **PH-S1451** | `policy` API contracts | tests | `tests/*_integration.rs` or contract test | **[ ]** |
+| 1387 | **PH-S1452** | `policy` admin/ops glue | verify/admin | verify-dev-stand or admin strip | **[ ]** |
+| 1388 | **PH-S1453** | Stand smoke `policy` export | stand-smoke | export shape unit test | **[ ]** |
+| 1389 | **PH-S1454** | poolai-loc-audit PH-S1454 | loc-audit | `rust_ratio.json` zriz | **[ ]** |
+| 1390 | **PH-S1455** | Docs canon sync | RUN_LOCAL/INDEX | HANDOFF/NEXT sync | **[ ]** |
+| 1391 | **PH-S1456** | poolai-vision-sync --check | docs/vision | drift gate green | **[ ]** |
+| 1392 | **PH-S1457** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **[ ]** |
+| 1393 | **PH-S1458** | galaxy_horizon_s1449_integration | tests/docs | band close | **[ ]** |
+
+### 5.61 Audit horizon close queue — band 80 (PH-S1439…S1448, 2026-07-24) · **✅**
+
+**Джерело:** project completion / enterprise phase C — Audit horizon close (aggregate bands 71–79). Mirror band 70 [`SSO_HORIZON.md`](../development/SSO_HORIZON.md). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · master [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1374 | **PH-S1439** | `audit_horizon_depth` ui-core module | `audit_horizon_depth.rs` | depth enum + criteria registry | **✅** |
+| 1375 | **PH-S1440** | Slice aggregate (phase-C audit*) | `AUDIT_HORIZON_SLICES` | bands 71–79 `--audit*` + ratio-advisory; unit test | **✅** |
+| 1376 | **PH-S1441** | Criteria contracts | `audit_horizon_integration` | markers + registry | **✅** |
+| 1377 | **PH-S1442** | `VERIFY_AUDIT_HORIZON` + quick | verify-dev-stand / run-poolai | horizon verify gate | **✅** |
+| 1378 | **PH-S1443** | Stand smoke export shape | `poolai_http_stand_smoke` | unit export-shape | **✅** |
+| 1379 | **PH-S1444** | `poolai-loc-audit --audit-horizon` | loc-audit | `rust_ratio.json` fields | **✅** |
+| 1380 | **PH-S1445** | Docs `AUDIT_HORIZON.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | horizon matrix | **✅** |
+| 1381 | **PH-S1446** | vision-sync --check | docs/vision | drift gate green | **✅** |
+| 1382 | **PH-S1447** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **✅** |
+| 1383 | **PH-S1448** | Audit horizon band close | tests/docs | `galaxy_horizon_s1439_integration`; HANDOFF/NEXT | **✅** |
+
+**PH-S1448 ✅ (2026-07-24):** `audit_horizon_depth.rs`; `AUDIT_HORIZON_SLICES`; `--audit-horizon`; `VERIFY_AUDIT_HORIZON`; `AUDIT_HORIZON.md`; `galaxy_horizon_s1439_integration`. Phase C Audit horizon closed.
 
 ### 5.60 Audit ratio advisory queue — band 79 (PH-S1429…S1438, 2026-07-24) · **✅**
 
@@ -2040,7 +2059,7 @@ FM-xxx (з таблиці нижче)
 | **Enterprise subset pending** | **760** (S1389…S2148 → §5.17) |
 | **Extension pending** | **130** (S2149…S2278 → §5.18) |
 | **Drained** | band 51–74 PH-S1149…S1388 ✅ |
-| **Активна §5.12** | band 80 **PH-S1439…S1448** `[ ]` (§5.61) |
+| **Активна §5.12** | band 81 **PH-S1449…S1458** `[ ]` (§5.62) |
 | **План** | [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md) |
 | **Реєстр** | [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md) |
 | **Regen** | `bash scripts/generate-ph-s-master-backlog-1000.sh` · `bash scripts/generate-ph-s-completion-extension.sh` |
@@ -2172,13 +2191,13 @@ FM-xxx (з таблиці нижче)
 | **PH-SVC63** | `file_list.csv` + INDEX pointer | certs/README; drop tracked pem rows | **✅** |
 | **PH-SVC64** | git push + самарі | severity table in chat | **✅** |
 
-**Наступний service trigger:** **`абракадабра`** → drain band 80 · **PH-SVC34** re-verify GH after push · **PH-SVC35** OWNER (Atlassian revoke). **Відкриті service:** PH-SVC34 · PH-SVC35 (OWNER). Security band PH-SVC55…SVC64 ✅.
+**Наступний service trigger:** **`абракадабра`** → drain band 81 · **PH-SVC34** re-verify GH after push · **PH-SVC35** OWNER (Atlassian revoke). **Відкриті service:** PH-SVC34 · PH-SVC35 (OWNER). Security band PH-SVC55…SVC64 ✅.
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S262)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-24):** band 80 **PH-S1439…S1448** `[ ]` · §5.12 **10** · band 79 ✅ · service PH-SVC55…SVC64 ✅ (security hygiene) · PH-SVC45…SVC54 ✅ · P0 PH-SVC41…43 ✅ · PH-SVC34/35 · наступна **`абракадабра`** → band 80 · completion pending **840** → S2278.
+**Активна смуга (2026-07-24):** band 81 **PH-S1449…S1458** `[ ]` · §5.12 **10** · band 80 ✅ · service PH-SVC55…SVC64 ✅ (security hygiene) · PH-SVC45…SVC54 ✅ · P0 PH-SVC41…43 ✅ · PH-SVC34/35 · наступна **`абракадабра`** → band 81 · completion pending **830** → S2278.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

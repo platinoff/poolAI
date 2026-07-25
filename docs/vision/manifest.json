@@ -2780,11 +2780,23 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_development_AUDIT_RATIO_ADVISORY_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_audit_horizon_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUDIT_HORIZON_md"
     }
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S1438",
+  "last_sprint_closed": "PH-S1448",
   "layers": [
     {
       "id": "L0",
@@ -2817,7 +2829,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1439",
+  "next_sprint": "PH-S1449",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -11065,99 +11077,127 @@
       "label": "galaxy_horizon_s1429_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s1429_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_audit_horizon_depth_rs",
+      "label": "audit_horizon_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/audit_horizon_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUDIT_HORIZON_md",
+      "label": "AUDIT_HORIZON.md",
+      "layer": "L1",
+      "path": "docs/development/AUDIT_HORIZON.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_audit_horizon_integration_rs",
+      "label": "audit_horizon_integration.rs",
+      "layer": "L3",
+      "path": "tests/audit_horizon_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1439_integration_rs",
+      "label": "galaxy_horizon_s1439_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1439_integration.rs"
     }
   ],
-  "revision": 389,
+  "revision": 391,
   "sprint_queue": [
     {
       "acceptance": "depth enum + criteria registry",
       "deps": "ui-core",
-      "id": "PH-S1439",
+      "id": "PH-S1449",
       "open": true,
-      "row": 1374,
+      "row": 1384,
       "status": "open",
-      "title": "audit_depth` scaffold"
+      "title": "policy_depth` scaffold"
     },
     {
       "acceptance": "durable path or production verify stub + unit",
       "deps": "store",
-      "id": "PH-S1440",
+      "id": "PH-S1450",
       "open": true,
-      "row": 1375,
+      "row": 1385,
       "status": "open",
-      "title": "audit` store/wire slice"
+      "title": "policy` store/wire slice"
     },
     {
       "acceptance": "tests/*_integration.rs` or contract test",
       "deps": "tests",
-      "id": "PH-S1441",
+      "id": "PH-S1451",
       "open": true,
-      "row": 1376,
+      "row": 1386,
       "status": "open",
-      "title": "audit` API contracts"
+      "title": "policy` API contracts"
     },
     {
       "acceptance": "verify-dev-stand or admin strip",
       "deps": "verify/admin",
-      "id": "PH-S1442",
+      "id": "PH-S1452",
       "open": true,
-      "row": 1377,
+      "row": 1387,
       "status": "open",
-      "title": "audit` admin/ops glue"
+      "title": "policy` admin/ops glue"
     },
     {
       "acceptance": "export shape unit test",
       "deps": "stand-smoke",
-      "id": "PH-S1443",
+      "id": "PH-S1453",
       "open": true,
-      "row": 1378,
+      "row": 1388,
       "status": "open",
-      "title": "Stand smoke `audit` export"
+      "title": "Stand smoke `policy` export"
     },
     {
       "acceptance": "rust_ratio.json` zriz",
       "deps": "loc-audit",
-      "id": "PH-S1444",
+      "id": "PH-S1454",
       "open": true,
-      "row": 1379,
+      "row": 1389,
       "status": "open",
-      "title": "poolai-loc-audit PH-S1444"
+      "title": "poolai-loc-audit PH-S1454"
     },
     {
       "acceptance": "HANDOFF/NEXT sync",
       "deps": "RUN_LOCAL/INDEX",
-      "id": "PH-S1445",
+      "id": "PH-S1455",
       "open": true,
-      "row": 1380,
+      "row": 1390,
       "status": "open",
       "title": "Docs canon sync"
     },
     {
       "acceptance": "drift gate green",
       "deps": "docs/vision",
-      "id": "PH-S1446",
+      "id": "PH-S1456",
       "open": true,
-      "row": 1381,
+      "row": 1391,
       "status": "open",
       "title": "poolai-vision-sync --check"
     },
     {
       "acceptance": "--min-ratio 0.95 --advisory",
       "deps": "loc-audit",
-      "id": "PH-S1447",
+      "id": "PH-S1457",
       "open": true,
-      "row": 1382,
+      "row": 1392,
       "status": "open",
       "title": "Ratio hold advisory"
     },
     {
       "acceptance": "band close",
       "deps": "tests/docs",
-      "id": "PH-S1448",
+      "id": "PH-S1458",
       "open": true,
-      "row": 1383,
+      "row": 1393,
       "status": "open",
-      "title": "galaxy_horizon_s1439_integration"
+      "title": "galaxy_horizon_s1449_integration"
     }
   ],
   "sprint_queue_open_count": 10,

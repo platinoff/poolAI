@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-24",
+  "generated_at": "2026-07-25",
   "sprint": "PH-S1010",
   "formal_band_min": 0.9,
   "formal_band_max": 0.95,
@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 174251,
-  "non_rust_product_loc": 9382,
-  "product_loc_total": 183633,
-  "rust_ratio": 0.9489089651642134,
-  "rust_ratio_pct": 94.89089651642134,
+  "rust_loc": 174735,
+  "non_rust_product_loc": 9399,
+  "product_loc_total": 184134,
+  "rust_ratio": 0.9489556518622307,
+  "rust_ratio_pct": 94.89556518622308,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -127,9 +127,12 @@
   "audit_vision_sync_mode": false,
   "audit_vision_sync_criteria_total": 10,
   "audit_vision_sync_criteria_met_count": 0,
-  "audit_ratio_advisory_mode": true,
+  "audit_ratio_advisory_mode": false,
   "audit_ratio_advisory_criteria_total": 10,
-  "audit_ratio_advisory_criteria_met_count": 10,
+  "audit_ratio_advisory_criteria_met_count": 0,
+  "audit_horizon_mode": true,
+  "audit_horizon_criteria_total": 10,
+  "audit_horizon_criteria_met_count": 10,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -141,23 +144,23 @@
     },
     "ops_shell": {
       "files": 39,
-      "loc": 3657
+      "loc": 3674
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 97,
-      "loc": 20733
+      "files": 98,
+      "loc": 20973
     },
     "rust_src": {
       "files": 300,
-      "loc": 112674
+      "loc": 112768
     },
     "rust_tests": {
-      "files": 301,
-      "loc": 40236
+      "files": 303,
+      "loc": 40386
     },
     "ui_css": {
       "files": 2,
@@ -188,7 +191,7 @@
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
     "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
-    "PH-S1434: audit_ratio_advisory_mode — aggregate prior --audit* + vision-sync slices",
-    "PH-S1438: band 79 audit ratio-advisory — criteria met vs registry"
+    "PH-S1444: audit_horizon_mode — aggregate band 71–79 Audit slices (phase C close)",
+    "PH-S1448: band 80 audit horizon — criteria met vs registry"
   ]
 }

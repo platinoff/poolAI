@@ -5945,6 +5945,49 @@ mod tests {
     }
 
     #[test]
+    fn audit_horizon_band80_export_shape_ph_s1443() {
+        use poolai_ui_core::audit_horizon_depth::{
+            audit_horizon_criteria_total, audit_horizon_depth_stub, audit_horizon_slices_met,
+            AuditHorizonDepth, AUDIT_HORIZON_CASES, AUDIT_HORIZON_CRITERIA, AUDIT_HORIZON_SLICES,
+            FM_BAND80_ROWS,
+        };
+        use serde_json::json;
+        assert_eq!(
+            audit_horizon_depth_stub(Some(&json!({"stand_smoke_export": true}))),
+            AuditHorizonDepth::StandSmokeExport
+        );
+        assert_eq!(
+            audit_horizon_depth_stub(Some(&json!({
+                "audit_horizon_depth": true,
+                "slice_aggregate": true,
+                "criteria_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "audit_horizon_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            AuditHorizonDepth::FullBand80
+        );
+        assert_eq!(AUDIT_HORIZON_CRITERIA.len(), 10);
+        assert_eq!(audit_horizon_criteria_total(), 10);
+        assert_eq!(AUDIT_HORIZON_SLICES.len(), 10);
+        assert!(AUDIT_HORIZON_CASES.contains(&"aggregate_flag"));
+        let canon = include_str!("../../docs/development/AUDIT_HORIZON.md");
+        assert_eq!(audit_horizon_slices_met(canon), (10, 10));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--audit-horizon"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND80_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band80 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn sso_docs_canon_band67_export_shape_ph_s1313() {
         use poolai_ui_core::sso_docs_canon_depth::{
             sso_docs_canon_criteria_total, sso_docs_canon_depth_stub, sso_docs_canon_slices_met,

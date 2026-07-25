@@ -1,8 +1,8 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-24 (security **PH-SVC55…SVC64** ✅ · band 79 ✅ · band 80 ready)
+**Оновлено:** 2026-07-24 (security **PH-SVC55…SVC64** ✅ · band 80 ✅ · band 81 ready)
 
-**Наступна сесія:** **`абракадабра`** — drain band 80 (FM **§5.61** Audit horizon close).
+**Наступна сесія:** **`абракадабра`** — drain band 81 (FM **§5.62** Policies depth scaffold).
 
 ## P0 / service (2026-07-24)
 
@@ -21,7 +21,7 @@
 
 **Cursor / toolchain (service):** local desktop **3.13.10** · Auto-review · research [`CURSOR_UPDATE_RESEARCH_2026-07-24.md`](./CURSOR_UPDATE_RESEARCH_2026-07-24.md) · FM **§5.16**.
 
-**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **840** спринтів → PH-S2278.
+**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **830** спринтів → PH-S2278.
 
 ## Security findings closed (PH-SVC55…64, by severity)
 
@@ -34,21 +34,38 @@
 | **Low** | Corrupted MSYS path / e2e tmp artifacts | ignore patterns widened |
 | **Open (OWNER)** | PH-SVC35 Atlassian token (historical) | revoke in Atlassian; no history rewrite |
 
-## Band 80 — Audit horizon close (PH-S1439…S1448, **ACTIVE**)
+## Band 81 — Policies depth scaffold (PH-S1449…S1458, **ACTIVE**)
 | Sprint | Фокус |
 |--------|--------|
-| **PH-S1439** | `audit_depth` scaffold |
-| **PH-S1440** | `audit` store/wire slice |
-| **PH-S1441** | `audit` API contracts |
-| **PH-S1442** | `audit` admin/ops glue |
-| **PH-S1443** | Stand smoke `audit` export |
-| **PH-S1444** | poolai-loc-audit PH-S1444 |
-| **PH-S1445** | Docs canon sync |
+| **PH-S1449** | `policy_depth` scaffold |
+| **PH-S1450** | `policy` store/wire slice |
+| **PH-S1451** | `policy` API contracts |
+| **PH-S1452** | `policy` admin/ops glue |
+| **PH-S1453** | Stand smoke `policy` export |
+| **PH-S1454** | poolai-loc-audit PH-S1454 |
+| **PH-S1455** | Docs canon sync |
+| **PH-S1456** | vision-sync --check |
+| **PH-S1457** | Ratio hold advisory |
+| **PH-S1458** | Band close |
+
+**§5.12:** **10** відкритих. **Vision:** rev **391**. **Pending completion:** **830** (→ PH-S2278).
+
+## Band 80 — Audit horizon close (PH-S1439…S1448, ✅)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1439** | `audit_horizon_depth` ui-core module |
+| **PH-S1440** | Slice aggregate (phase-C audit*) |
+| **PH-S1441** | Criteria contracts |
+| **PH-S1442** | `VERIFY_AUDIT_HORIZON` + quick |
+| **PH-S1443** | Stand smoke export shape |
+| **PH-S1444** | `poolai-loc-audit --audit-horizon` |
+| **PH-S1445** | `AUDIT_HORIZON.md` + canon |
 | **PH-S1446** | vision-sync --check |
 | **PH-S1447** | Ratio hold advisory |
 | **PH-S1448** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **389**. **Pending completion:** **840** (→ PH-S2278).
+**PH-S1448 ✅ (2026-07-24):** `audit_horizon_depth.rs`; `AUDIT_HORIZON_SLICES`; `--audit-horizon`; `VERIFY_AUDIT_HORIZON`; `AUDIT_HORIZON.md`; `galaxy_horizon_s1439_integration`. Phase C Audit closed.
 
 ## Band 79 — Audit ratio-advisory (PH-S1429…S1438, ✅)
 

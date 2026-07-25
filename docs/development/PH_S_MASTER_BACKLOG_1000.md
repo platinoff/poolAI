@@ -548,20 +548,20 @@
 | **PH-S1437** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
 | **PH-S1438** | galaxy_horizon_s1429_integration | band close | **✅** |
 
-## Band 80 — PH-S1439…S1448 (C Audit · horizon close)
+## Band 80 — PH-S1439…S1448 (C Audit · horizon close) · **✅**
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1439** | `audit_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1440** | `audit` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1441** | `audit` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1442** | `audit` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1443** | Stand smoke `audit` export | export shape unit test | **[ ]** |
-| **PH-S1444** | poolai-loc-audit PH-S1444 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1445** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1446** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1447** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1448** | galaxy_horizon_s1439_integration | band close | **[ ]** |
+| **PH-S1439** | `audit_horizon_depth` scaffold | ui-core depth enum + criteria registry | **✅** |
+| **PH-S1440** | Slice aggregate (phase-C audit*) | `AUDIT_HORIZON_SLICES` | **✅** |
+| **PH-S1441** | Criteria contracts | `audit_horizon_integration` | **✅** |
+| **PH-S1442** | `VERIFY_AUDIT_HORIZON` + quick | verify-dev-stand + RUN_LOCAL | **✅** |
+| **PH-S1443** | Stand smoke export shape | `audit_horizon_band80_export_shape` | **✅** |
+| **PH-S1444** | `poolai-loc-audit --audit-horizon` | `rust_ratio.json` fields | **✅** |
+| **PH-S1445** | Docs `AUDIT_HORIZON.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | **✅** |
+| **PH-S1446** | poolai-vision-sync --check | drift gate green | **✅** |
+| **PH-S1447** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
+| **PH-S1448** | galaxy_horizon_s1439_integration | band close | **✅** |
 
 ## Band 81 — PH-S1449…S1458 (D Policies · depth scaffold)
 
