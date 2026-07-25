@@ -40,6 +40,7 @@ use poolai_ui_core::ci_canon_depth::{ci_canon_criteria_total, CI_CANON_CASES, CI
 use poolai_ui_core::galaxy_edge_verification_depth::{
     edge_verification_criteria_total, EDGE_VERIFICATION_CASES, EDGE_VERIFICATION_CRITERIA,
 };
+use poolai_ui_core::policy_depth::{policy_criteria_total, POLICY_CASES, POLICY_CRITERIA};
 use poolai_ui_core::pre_push_hook_depth::{
     pre_push_hook_criteria_total, PRE_PUSH_HOOK_CASES, PRE_PUSH_HOOK_CRITERIA,
 };
@@ -253,6 +254,8 @@ struct AuditConfig {
     audit_ratio_advisory: bool,
     /// Emit band-80 audit horizon-close fields (PH-S1444).
     audit_horizon: bool,
+    /// Emit band-81 policies depth fields (PH-S1454).
+    policy: bool,
 }
 
 impl Default for AuditConfig {
@@ -298,6 +301,7 @@ impl Default for AuditConfig {
             audit_vision_sync: false,
             audit_ratio_advisory: false,
             audit_horizon: false,
+            policy: false,
         }
     }
 }
@@ -565,6 +569,12 @@ struct RustRatioReport {
     audit_horizon_criteria_total: usize,
     /// Audit horizon criteria met count (PH-S1444).
     audit_horizon_criteria_met_count: usize,
+    /// Band-81 policies depth mode (PH-S1454).
+    policy_mode: bool,
+    /// Policies depth criteria registry size (PH-S1454).
+    policy_criteria_total: usize,
+    /// Policies depth criteria met count (PH-S1454).
+    policy_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -845,6 +855,22 @@ fn audit_depth_criteria_met(root: &Path) -> (usize, usize) {
     let total = audit_criteria_total();
     let mut met = 0usize;
     for (_, marker, rel) in AUDIT_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
+fn policy_depth_criteria_met(root: &Path) -> (usize, usize) {
+    let total = policy_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in POLICY_CRITERIA {
         let path = root.join(rel);
         if path.is_file() {
             if let Ok(content) = fs::read_to_string(&path) {
@@ -1271,6 +1297,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--audit-ratio-advisory" => config.audit_ratio_advisory = true,
             "--audit-horizon" => config.audit_horizon = true,
             "--audit" => config.audit = true,
+            "--policy" => config.policy = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
                 print_help();
@@ -1328,6 +1355,7 @@ fn print_help() {
            --audit-vision-sync         band-78 audit vision-sync fields (PH-S1424)\n\
            --audit-ratio-advisory      band-79 audit ratio-advisory fields (PH-S1434)\n\
            --audit-horizon             band-80 audit horizon-close fields (PH-S1444)\n\
+           --policy                    band-81 policies depth scaffold fields (PH-S1454)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -1795,6 +1823,17 @@ fn build_report(
         );
         notes.push("PH-S1448: band 80 audit horizon — criteria met vs registry");
     }
+    let (policy_criteria_met_count, policy_criteria_total_count) = if config.policy {
+        policy_depth_criteria_met(root)
+    } else {
+        (0, policy_criteria_total())
+    };
+    if config.policy {
+        notes.push(
+            "PH-S1454: policy_mode — policies depth scaffold (POOLAI_POLICY_STORE + field stub)",
+        );
+        notes.push("PH-S1458: band 81 policies depth — criteria met vs registry");
+    }
 
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
@@ -1931,6 +1970,9 @@ fn build_report(
         audit_horizon_mode: config.audit_horizon,
         audit_horizon_criteria_total: audit_horizon_criteria_total_count,
         audit_horizon_criteria_met_count,
+        policy_mode: config.policy,
+        policy_criteria_total: policy_criteria_total_count,
+        policy_criteria_met_count,
         by_category,
         notes,
     })
@@ -2335,6 +2377,14 @@ fn print_summary(report: &RustRatioReport) {
             report.audit_horizon_criteria_met_count, report.audit_horizon_criteria_total
         );
         println!("  audit_horizon_cases: {}", AUDIT_HORIZON_CASES.join(", "));
+    }
+    if report.policy_mode {
+        println!("  policy:                true (PH-S1454 band 81)");
+        println!(
+            "  policy_criteria:       {}/{} met",
+            report.policy_criteria_met_count, report.policy_criteria_total
+        );
+        println!("  policy_cases:          {}", POLICY_CASES.join(", "));
     }
     for (name, loc) in &report.by_category {
         println!("  {name}: {} files, {} loc", loc.files, loc.loc);

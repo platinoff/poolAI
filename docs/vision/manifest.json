@@ -2792,11 +2792,23 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_development_AUDIT_HORIZON_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_policy_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_POLICIES_DEPTH_md"
     }
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S1448",
+  "last_sprint_closed": "PH-S1458",
   "layers": [
     {
       "id": "L0",
@@ -2829,7 +2841,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1449",
+  "next_sprint": "PH-S1459",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -11105,99 +11117,127 @@
       "label": "galaxy_horizon_s1439_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_horizon_s1439_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_policy_depth_rs",
+      "label": "policy_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/policy_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_POLICIES_DEPTH_md",
+      "label": "POLICIES_DEPTH.md",
+      "layer": "L1",
+      "path": "docs/development/POLICIES_DEPTH.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1449_integration_rs",
+      "label": "galaxy_horizon_s1449_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1449_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_policy_depth_audit_rs",
+      "label": "policy_depth_audit.rs",
+      "layer": "L3",
+      "path": "tests/policy_depth_audit.rs"
     }
   ],
-  "revision": 391,
+  "revision": 393,
   "sprint_queue": [
     {
-      "acceptance": "depth enum + criteria registry",
-      "deps": "ui-core",
-      "id": "PH-S1449",
+      "acceptance": "depth enum + store criteria registry",
+      "deps": "policy_store_depth.rs",
+      "id": "PH-S1459",
       "open": true,
-      "row": 1384,
+      "row": 1394,
       "status": "open",
-      "title": "policy_depth` scaffold"
+      "title": "policy_store_depth` ui-core module"
     },
     {
-      "acceptance": "durable path or production verify stub + unit",
-      "deps": "store",
-      "id": "PH-S1450",
+      "acceptance": "POOLAI_POLICY_DATA_DIR` + `policy_store_wire()` + unit",
+      "deps": "security.rs",
+      "id": "PH-S1460",
       "open": true,
-      "row": 1385,
+      "row": 1395,
       "status": "open",
-      "title": "policy` store/wire slice"
+      "title": "Policies store wire durable path"
     },
     {
-      "acceptance": "tests/*_integration.rs` or contract test",
+      "acceptance": "policy_store_wire_integration",
       "deps": "tests",
-      "id": "PH-S1451",
+      "id": "PH-S1461",
       "open": true,
-      "row": 1386,
+      "row": 1396,
       "status": "open",
-      "title": "policy` API contracts"
+      "title": "Policies store wire contracts"
     },
     {
-      "acceptance": "verify-dev-stand or admin strip",
+      "acceptance": "store gate",
       "deps": "verify/admin",
-      "id": "PH-S1452",
+      "id": "PH-S1462",
       "open": true,
-      "row": 1387,
+      "row": 1397,
       "status": "open",
-      "title": "policy` admin/ops glue"
+      "title": "VERIFY_POLICY_STORE` + `--policy-store"
     },
     {
-      "acceptance": "export shape unit test",
+      "acceptance": "policy_store_band82_export_shape",
       "deps": "stand-smoke",
-      "id": "PH-S1453",
+      "id": "PH-S1463",
       "open": true,
-      "row": 1388,
+      "row": 1398,
       "status": "open",
-      "title": "Stand smoke `policy` export"
+      "title": "Stand smoke export shape band 82"
     },
     {
-      "acceptance": "rust_ratio.json` zriz",
+      "acceptance": "rust_ratio.json` fields",
       "deps": "loc-audit",
-      "id": "PH-S1454",
+      "id": "PH-S1464",
       "open": true,
-      "row": 1389,
+      "row": 1399,
       "status": "open",
-      "title": "poolai-loc-audit PH-S1454"
+      "title": "poolai-loc-audit --policy-store"
     },
     {
-      "acceptance": "HANDOFF/NEXT sync",
+      "acceptance": "docs matrix",
       "deps": "RUN_LOCAL/INDEX",
-      "id": "PH-S1455",
+      "id": "PH-S1465",
       "open": true,
-      "row": 1390,
+      "row": 1400,
       "status": "open",
-      "title": "Docs canon sync"
+      "title": "Docs `POLICIES_STORE.md` + canon"
     },
     {
       "acceptance": "drift gate green",
       "deps": "docs/vision",
-      "id": "PH-S1456",
+      "id": "PH-S1466",
       "open": true,
-      "row": 1391,
+      "row": 1401,
       "status": "open",
-      "title": "poolai-vision-sync --check"
+      "title": "vision-sync --check"
     },
     {
       "acceptance": "--min-ratio 0.95 --advisory",
       "deps": "loc-audit",
-      "id": "PH-S1457",
+      "id": "PH-S1467",
       "open": true,
-      "row": 1392,
+      "row": 1402,
       "status": "open",
       "title": "Ratio hold advisory"
     },
     {
       "acceptance": "band close",
       "deps": "tests/docs",
-      "id": "PH-S1458",
+      "id": "PH-S1468",
       "open": true,
-      "row": 1393,
+      "row": 1403,
       "status": "open",
-      "title": "galaxy_horizon_s1449_integration"
+      "title": "galaxy_horizon_s1459_integration"
     }
   ],
   "sprint_queue_open_count": 10,

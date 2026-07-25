@@ -43,6 +43,7 @@ VERIFY_AUDIT_DOCS_CANON="${VERIFY_AUDIT_DOCS_CANON:-0}"
 VERIFY_AUDIT_VISION_SYNC="${VERIFY_AUDIT_VISION_SYNC:-0}"
 VERIFY_AUDIT_RATIO_ADVISORY="${VERIFY_AUDIT_RATIO_ADVISORY:-0}"
 VERIFY_AUDIT_HORIZON="${VERIFY_AUDIT_HORIZON:-0}"
+VERIFY_POLICY="${VERIFY_POLICY:-0}"
 VERIFY_SSO_LOC_AUDIT="${VERIFY_SSO_LOC_AUDIT:-0}"
 VERIFY_SSO_DOCS_CANON="${VERIFY_SSO_DOCS_CANON:-0}"
 VERIFY_SSO_VISION_SYNC="${VERIFY_SSO_VISION_SYNC:-0}"
@@ -593,6 +594,16 @@ if [[ "$VERIFY_AUDIT_HORIZON" == "1" ]]; then
     echo "OK  audit horizon gate"
   else
     echo "FAIL audit horizon gate"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_POLICY" == "1" ]]; then
+  echo "Running poolai-loc-audit --policy (PH-S1452)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --policy); then
+    echo "OK  policies depth gate loc-audit"
+  else
+    echo "FAIL policies depth gate loc-audit"
     fail=1
   fi
 fi

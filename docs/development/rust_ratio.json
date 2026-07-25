@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 174735,
-  "non_rust_product_loc": 9399,
-  "product_loc_total": 184134,
-  "rust_ratio": 0.9489556518622307,
-  "rust_ratio_pct": 94.89556518622308,
+  "rust_loc": 175293,
+  "non_rust_product_loc": 9416,
+  "product_loc_total": 184709,
+  "rust_ratio": 0.9490225164989253,
+  "rust_ratio_pct": 94.90225164989253,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -130,9 +130,12 @@
   "audit_ratio_advisory_mode": false,
   "audit_ratio_advisory_criteria_total": 10,
   "audit_ratio_advisory_criteria_met_count": 0,
-  "audit_horizon_mode": true,
+  "audit_horizon_mode": false,
   "audit_horizon_criteria_total": 10,
-  "audit_horizon_criteria_met_count": 10,
+  "audit_horizon_criteria_met_count": 0,
+  "policy_mode": true,
+  "policy_criteria_total": 8,
+  "policy_criteria_met_count": 8,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -144,23 +147,23 @@
     },
     "ops_shell": {
       "files": 39,
-      "loc": 3674
+      "loc": 3691
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 98,
-      "loc": 20973
+      "files": 99,
+      "loc": 21215
     },
     "rust_src": {
       "files": 300,
-      "loc": 112768
+      "loc": 112937
     },
     "rust_tests": {
-      "files": 303,
-      "loc": 40386
+      "files": 305,
+      "loc": 40533
     },
     "ui_css": {
       "files": 2,
@@ -191,7 +194,7 @@
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
     "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
-    "PH-S1444: audit_horizon_mode — aggregate band 71–79 Audit slices (phase C close)",
-    "PH-S1448: band 80 audit horizon — criteria met vs registry"
+    "PH-S1454: policy_mode — policies depth scaffold (POOLAI_POLICY_STORE + field stub)",
+    "PH-S1458: band 81 policies depth — criteria met vs registry"
   ]
 }

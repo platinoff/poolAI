@@ -1,8 +1,8 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-24 (security **PH-SVC55…SVC64** ✅ · band 80 ✅ · band 81 ready)
+**Оновлено:** 2026-07-24 (security **PH-SVC55…SVC64** ✅ · band 81 ✅ · band 82 ready)
 
-**Наступна сесія:** **`абракадабра`** — drain band 81 (FM **§5.62** Policies depth scaffold).
+**Наступна сесія:** **`абракадабра`** — drain band 82 (FM **§5.63** Policies store wire).
 
 ## P0 / service (2026-07-24)
 
@@ -21,7 +21,7 @@
 
 **Cursor / toolchain (service):** local desktop **3.13.10** · Auto-review · research [`CURSOR_UPDATE_RESEARCH_2026-07-24.md`](./CURSOR_UPDATE_RESEARCH_2026-07-24.md) · FM **§5.16**.
 
-**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **830** спринтів → PH-S2278.
+**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **820** спринтів → PH-S2278.
 
 ## Security findings closed (PH-SVC55…64, by severity)
 
@@ -34,7 +34,24 @@
 | **Low** | Corrupted MSYS path / e2e tmp artifacts | ignore patterns widened |
 | **Open (OWNER)** | PH-SVC35 Atlassian token (historical) | revoke in Atlassian; no history rewrite |
 
-## Band 81 — Policies depth scaffold (PH-S1449…S1458, **ACTIVE**)
+## Band 82 — Policies store wire (PH-S1459…S1468, **ACTIVE**)
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1459** | `policy_store_depth` scaffold |
+| **PH-S1460** | `policy_store_wire` durable path |
+| **PH-S1461** | store wire contracts |
+| **PH-S1462** | `VERIFY_POLICY_STORE` + `--policy-store` |
+| **PH-S1463** | Stand smoke `policy_store` export |
+| **PH-S1464** | poolai-loc-audit `--policy-store` |
+| **PH-S1465** | Docs `POLICIES_STORE.md` + canon |
+| **PH-S1466** | vision-sync --check |
+| **PH-S1467** | Ratio hold advisory |
+| **PH-S1468** | Band close |
+
+**§5.12:** **10** відкритих. **Vision:** rev **393**. **Pending completion:** **820** (→ PH-S2278).
+
+## Band 81 — Policies depth scaffold (PH-S1449…S1458, ✅)
+
 | Sprint | Фокус |
 |--------|--------|
 | **PH-S1449** | `policy_depth` scaffold |
@@ -42,13 +59,13 @@
 | **PH-S1451** | `policy` API contracts |
 | **PH-S1452** | `policy` admin/ops glue |
 | **PH-S1453** | Stand smoke `policy` export |
-| **PH-S1454** | poolai-loc-audit PH-S1454 |
-| **PH-S1455** | Docs canon sync |
+| **PH-S1454** | poolai-loc-audit `--policy` |
+| **PH-S1455** | Docs `POLICIES_DEPTH.md` + canon |
 | **PH-S1456** | vision-sync --check |
 | **PH-S1457** | Ratio hold advisory |
 | **PH-S1458** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **391**. **Pending completion:** **830** (→ PH-S2278).
+**PH-S1458 ✅ (2026-07-24):** `policy_depth.rs`; `POOLAI_POLICY_STORE`; `--policy`; `VERIFY_POLICY`; `POLICIES_DEPTH.md`; `galaxy_horizon_s1449_integration`. Phase D Policies depth closed.
 
 ## Band 80 — Audit horizon close (PH-S1439…S1448, ✅)
 

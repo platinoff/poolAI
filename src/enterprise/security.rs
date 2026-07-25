@@ -16,6 +16,9 @@
 //! optional `POOLAI_SSO_DATA_DIR` as the durable path (restart-safe CRUD later).
 //! See [`docs/development/SSO_STORE.md`] and [`docs/development/SSO_DEPTH.md`].
 //!
+//! Security policies (phase D band 81): `POOLAI_POLICY_STORE` (`memory` default;
+//! `sqlite` horizon band 82+). See [`docs/development/POLICIES_DEPTH.md`].
+//!
 //! # Example
 //!
 //! ```rust,no_run
@@ -440,6 +443,24 @@ pub struct SamlProvider {
     pub enabled: bool,
 }
 
+/// Env key for security policy store backend (`memory` default; `sqlite` horizon band 82+).
+pub const POOLAI_POLICY_STORE: &str = "POOLAI_POLICY_STORE";
+
+/// Canonical policy store modes (band 81 scaffold).
+pub const POLICY_STORE_MODES: &[&str] = &["memory", "sqlite"];
+
+/// Resolve configured policy store mode (PH-S1450 scaffold; durable wire band 82+).
+pub fn policy_store_mode() -> &'static str {
+    match std::env::var(POOLAI_POLICY_STORE)
+        .unwrap_or_else(|_| "memory".into())
+        .to_ascii_lowercase()
+        .as_str()
+    {
+        "sqlite" => "sqlite",
+        _ => "memory",
+    }
+}
+
 /// Security policy
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SecurityPolicy {
@@ -455,6 +476,23 @@ pub struct SecurityPolicy {
     pub session_timeout: u64,
     /// Maximum failed login attempts
     pub max_failed_attempts: usize,
+}
+
+/// Production verify stub for security policy fields (PH-S1450).
+///
+/// Requires non-empty `name` and `session_timeout` in `1..=86400`.
+pub fn validate_security_policy_fields(policy: &SecurityPolicy) -> Result<(), AppError> {
+    if policy.name.trim().is_empty() {
+        return Err(AppError::ValidationError(
+            "policy name must be non-empty".to_string(),
+        ));
+    }
+    if policy.session_timeout == 0 || policy.session_timeout > 86_400 {
+        return Err(AppError::ValidationError(
+            "policy session_timeout must be in 1..=86400 seconds".to_string(),
+        ));
+    }
+    Ok(())
 }
 
 /// Security manager
@@ -1539,6 +1577,57 @@ mod tests {
         assert_eq!(sso_store_mode(), "sqlite");
         std::env::remove_var(POOLAI_SSO_STORE);
         assert!(SSO_STORE_MODES.contains(&"memory"));
+    }
+
+    #[test]
+    fn policy_store_mode_defaults_memory_ph_s1450() {
+        std::env::remove_var(POOLAI_POLICY_STORE);
+        assert_eq!(policy_store_mode(), "memory");
+        std::env::set_var(POOLAI_POLICY_STORE, "sqlite");
+        assert_eq!(policy_store_mode(), "sqlite");
+        std::env::remove_var(POOLAI_POLICY_STORE);
+        assert!(POLICY_STORE_MODES.contains(&"memory"));
+    }
+
+    #[test]
+    fn validate_security_policy_fields_ok_ph_s1450() {
+        let policy = SecurityPolicy {
+            name: "default".into(),
+            description: "ok".into(),
+            allowed_ip_ranges: vec![],
+            require_mfa: false,
+            session_timeout: 3600,
+            max_failed_attempts: 5,
+        };
+        assert!(validate_security_policy_fields(&policy).is_ok());
+    }
+
+    #[test]
+    fn validate_security_policy_fields_rejects_empty_name_ph_s1450() {
+        let policy = SecurityPolicy {
+            name: "  ".into(),
+            description: "bad".into(),
+            allowed_ip_ranges: vec![],
+            require_mfa: false,
+            session_timeout: 3600,
+            max_failed_attempts: 5,
+        };
+        let err = validate_security_policy_fields(&policy).unwrap_err();
+        assert!(err.to_string().contains("name"));
+    }
+
+    #[test]
+    fn validate_security_policy_fields_rejects_timeout_bounds_ph_s1450() {
+        let policy = SecurityPolicy {
+            name: "timeout".into(),
+            description: "bad".into(),
+            allowed_ip_ranges: vec![],
+            require_mfa: false,
+            session_timeout: 0,
+            max_failed_attempts: 5,
+        };
+        let err = validate_security_policy_fields(&policy).unwrap_err();
+        assert!(err.to_string().contains("session_timeout"));
     }
 
     #[test]

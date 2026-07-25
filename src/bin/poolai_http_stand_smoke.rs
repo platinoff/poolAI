@@ -6200,6 +6200,46 @@ mod tests {
     }
 
     #[test]
+    fn policy_band81_export_shape_ph_s1453() {
+        use poolai_ui_core::policy_depth::{
+            policy_criteria_total, policy_depth_stub, PolicyDepth, FM_BAND81_ROWS, POLICY_CASES,
+            POLICY_CRITERIA,
+        };
+        use serde_json::json;
+        assert_eq!(
+            policy_depth_stub(Some(&json!({"api_contracts": true}))),
+            PolicyDepth::ApiContracts
+        );
+        assert_eq!(
+            policy_depth_stub(Some(&json!({
+                "policy_depth": true,
+                "store_wire": true,
+                "api_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "policy_docs": true,
+            }))),
+            PolicyDepth::FullBand81
+        );
+        assert_eq!(POLICY_CRITERIA.len(), 8);
+        assert_eq!(policy_criteria_total(), 8);
+        assert!(POLICY_CASES.contains(&"verify_dev_stand_hook"));
+        let security_mod = include_str!("../../src/enterprise/security.rs");
+        assert!(security_mod.contains("POOLAI_POLICY_STORE"));
+        assert!(security_mod.contains("validate_security_policy_fields"));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--policy"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND81_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band81 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn audit_store_band72_export_shape_ph_s1363() {
         use poolai_ui_core::audit_store_depth::{
             audit_store_criteria_total, audit_store_depth_stub, AuditStoreDepth, AUDIT_STORE_CASES,
