@@ -50,7 +50,7 @@
 | **PH-S1507** | Ratio hold advisory |
 | **PH-S1508** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **401**. **Pending completion:** **780** (→ PH-S2278).
+**§5.12:** **10** відкритих. **Vision:** rev **402**. **Pending completion:** **780** (→ PH-S2278).
 
 ## Band 85 — Policies stand smoke (PH-S1489…S1498, ✅)
 
