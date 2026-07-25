@@ -11,7 +11,7 @@ Today `SecurityManager` keeps **in-memory** `SecurityPolicy` CRUD. Horizon path:
 | Mode | Env | Status |
 |------|-----|--------|
 | `memory` | `POOLAI_POLICY_STORE=memory` (default) | Current — API/admin CRUD |
-| `sqlite` | `POOLAI_POLICY_STORE=sqlite` | Band 82 store wire — durable path |
+| `sqlite` | `POOLAI_POLICY_STORE=sqlite` | Band 82 store wire — see [`POLICIES_STORE.md`](./POLICIES_STORE.md) |
 
 Production verify stub (PH-S1450): `validate_security_policy_fields` requires non-empty **name** and **session_timeout** in `1..=86400` under `cargo test-ci`. Full persisted CRUD / RBAC cross-tenant remains later in phase D.
 
@@ -43,4 +43,5 @@ bash bin/run-poolai.sh quick --policy
 - FM §5.17 enterprise 100% · §5.62 band 81 journal
 - Phase C Audit closed at band 80 — see [`AUDIT_HORIZON.md`](./AUDIT_HORIZON.md)
 - Mirror: [`AUDIT_DEPTH.md`](./AUDIT_DEPTH.md) · [`SSO_DEPTH.md`](./SSO_DEPTH.md)
+- Store wire (band 82): [`POLICIES_STORE.md`](./POLICIES_STORE.md)
 - PH-S1449 · policy_depth · POOLAI_POLICY_STORE · PH-S1452 · VERIFY_POLICY · PH-S1454 · --policy · PH-S1458

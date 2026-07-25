@@ -15,7 +15,9 @@
 - **[`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md)** — роадмеп Galaxy Grid; §5.12 **0** · PH-S524…S533 ✅; **`абракадабра`** = project scan.
 - **[`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md)** — **поточна фаза:** Horizon Layer C → 100% (S35–S40).
 - **[`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md)** — методика доведення проєкту до 100%.
-- **[`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)** — copy-paste для агента; **`абракадабра`** · §5.12 **10** · band 79 ✅ · vision rev **394**; [`OPENAPI_GAP_AUDIT_2026-05-19.md`](./OPENAPI_GAP_AUDIT_2026-05-19.md).
+- **[`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)** — copy-paste для агента; **`абракадабра`** · §5.12 **10** · band 82 ✅ · horizon band 83; [`OPENAPI_GAP_AUDIT_2026-05-19.md`](./OPENAPI_GAP_AUDIT_2026-05-19.md).
+- **[`POLICIES_STORE.md`](./POLICIES_STORE.md)** — band 82 Policies store-wire matrix (`--policy-store`).
+- **[`POLICIES_DEPTH.md`](./POLICIES_DEPTH.md)** — band 81 Policies depth scaffold (`--policy`).
 - **[`AUDIT_VISION_SYNC.md`](./AUDIT_VISION_SYNC.md)** — band 78 Audit vision-sync matrix (`--audit-vision-sync`).
 - **[`SSO_HORIZON.md`](./SSO_HORIZON.md)** — band 70 SSO horizon-close matrix (`--sso-horizon`).
 - **[`AUDIT_HORIZON.md`](./AUDIT_HORIZON.md)** — band 80 Audit horizon-close matrix (`--audit-horizon`).

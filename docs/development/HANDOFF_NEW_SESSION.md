@@ -1,8 +1,8 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-25 (GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 81 ✅ · band 82 ready)
+**Оновлено:** 2026-07-25 (band 82 **PH-S1459…S1468** ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 83 ready)
 
-**Наступна сесія:** **`абракадабра`** — drain band 82 (FM **§5.63** Policies store wire).
+**Наступна сесія:** **`абракадабра`** — drain band 83 (FM **§5.64** Policies API contracts).
 
 ## P0 / service (2026-07-25)
 
@@ -35,7 +35,24 @@
 | **Low** | Corrupted MSYS path / e2e tmp artifacts | ignore patterns widened |
 | **Open (OWNER)** | PH-SVC35 Atlassian token (historical) | revoke in Atlassian; no history rewrite |
 
-## Band 82 — Policies store wire (PH-S1459…S1468, **ACTIVE**)
+## Band 83 — Policies API contracts (PH-S1469…S1478, **ACTIVE**)
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1469** | `policy_api_contracts_depth` scaffold |
+| **PH-S1470** | Policy query HTTP lifecycle |
+| **PH-S1471** | `GET /policy/store` wire status |
+| **PH-S1472** | OpenAPI `PolicyStoreWire` |
+| **PH-S1473** | Policy field validation fixtures |
+| **PH-S1474** | `VERIFY_POLICY_API` + `--policy-api` |
+| **PH-S1475** | Stand smoke + loc-audit `--policy-api` |
+| **PH-S1476** | Docs `POLICIES_API.md` + canon |
+| **PH-S1477** | vision-sync + ratio hold |
+| **PH-S1478** | Band close |
+
+**§5.12:** **10** відкритих. **Vision:** rev **395**. **Pending completion:** **810** (→ PH-S2278).
+
+## Band 82 — Policies store wire (PH-S1459…S1468, ✅)
+
 | Sprint | Фокус |
 |--------|--------|
 | **PH-S1459** | `policy_store_depth` scaffold |
@@ -49,7 +66,7 @@
 | **PH-S1467** | Ratio hold advisory |
 | **PH-S1468** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **394**. **Pending completion:** **820** (→ PH-S2278).
+**PH-S1468 ✅ (2026-07-25):** `policy_store_depth.rs`; `POOLAI_POLICY_DATA_DIR`; `policy_store_wire()`; `--policy-store`; `VERIFY_POLICY_STORE`; `POLICIES_STORE.md`; `galaxy_horizon_s1459_integration`. Phase D Policies store wire closed.
 
 ## Band 81 — Policies depth scaffold (PH-S1449…S1458, ✅)
 

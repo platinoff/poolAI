@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 175293,
-  "non_rust_product_loc": 9416,
-  "product_loc_total": 184709,
-  "rust_ratio": 0.9490225164989253,
-  "rust_ratio_pct": 94.90225164989253,
+  "rust_loc": 175781,
+  "non_rust_product_loc": 9433,
+  "product_loc_total": 185214,
+  "rust_ratio": 0.9490697247508287,
+  "rust_ratio_pct": 94.90697247508287,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -133,9 +133,12 @@
   "audit_horizon_mode": false,
   "audit_horizon_criteria_total": 10,
   "audit_horizon_criteria_met_count": 0,
-  "policy_mode": true,
+  "policy_mode": false,
   "policy_criteria_total": 8,
-  "policy_criteria_met_count": 8,
+  "policy_criteria_met_count": 0,
+  "policy_store_mode": true,
+  "policy_store_criteria_total": 7,
+  "policy_store_criteria_met_count": 7,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -147,23 +150,23 @@
     },
     "ops_shell": {
       "files": 39,
-      "loc": 3691
+      "loc": 3708
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 99,
-      "loc": 21215
+      "files": 100,
+      "loc": 21388
     },
     "rust_src": {
       "files": 300,
-      "loc": 112937
+      "loc": 113125
     },
     "rust_tests": {
-      "files": 305,
-      "loc": 40533
+      "files": 307,
+      "loc": 40660
     },
     "ui_css": {
       "files": 2,
@@ -194,7 +197,7 @@
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
     "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
-    "PH-S1454: policy_mode — policies depth scaffold (POOLAI_POLICY_STORE + field stub)",
-    "PH-S1458: band 81 policies depth — criteria met vs registry"
+    "PH-S1464: policy_store_mode — durable path wire stub (POOLAI_POLICY_DATA_DIR)",
+    "PH-S1468: band 82 policies store wire — criteria met vs registry"
   ]
 }

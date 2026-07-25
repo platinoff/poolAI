@@ -999,7 +999,14 @@ fn parse_fm_closed_range(fm_content: &str, closed_band: u32) -> Option<String> {
         };
         let start = idx + pattern.len() - 4;
         let rest = &fm_content[start..];
-        let close_marker = rest.find("**").or_else(|| rest.find(')'))?;
+        // Prefer the earlier of `)` / `**` so titles like
+        // `(PH-S1459…S1468) · **✅**` yield `PH-S1459…S1468`, not `…S1468) ·`.
+        let close_marker = match (rest.find("**"), rest.find(')')) {
+            (Some(a), Some(b)) => a.min(b),
+            (Some(a), None) => a,
+            (None, Some(b)) => b,
+            (None, None) => continue,
+        };
         let range = rest[..close_marker].trim();
         if range.contains('…') {
             return Some(range.to_string());

@@ -91,6 +91,7 @@ Options (quick):
   --audit-ratio-advisory After health wait, loc-audit --audit-ratio-advisory (PH-S1432)
   --audit-horizon After health wait, loc-audit --audit-horizon (PH-S1442)
   --policy        After health wait, loc-audit --policy (PH-S1452)
+  --policy-store  After health wait, loc-audit --policy-store (PH-S1462)
   --skip-build    Skip cargo build
   --port N        HTTP port (default 8080)
 
@@ -305,6 +306,7 @@ cmd_quick() {
   local audit_ratio_advisory=0
   local audit_horizon=0
   local policy=0
+  local policy_store=0
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --skip-build) SKIP_BUILD=1; shift ;;
@@ -345,6 +347,7 @@ cmd_quick() {
       --audit-horizon) audit_horizon=1; shift ;;
       --audit) audit=1; shift ;;
       --policy) policy=1; shift ;;
+      --policy-store) policy_store=1; shift ;;
       --port) PORT="$2"; shift 2 ;;
       *) echo "Unknown option: $1"; usage; exit 1 ;;
     esac
@@ -511,6 +514,10 @@ cmd_quick() {
   if [[ "$policy" == "1" ]]; then
     echo "Running poolai-loc-audit --policy (PH-S1452)..."
     cargo run --quiet --bin poolai-loc-audit -- --policy
+  fi
+  if [[ "$policy_store" == "1" ]]; then
+    echo "Running poolai-loc-audit --policy-store (PH-S1462)..."
+    cargo run --quiet --bin poolai-loc-audit -- --policy-store
   fi
 }
 

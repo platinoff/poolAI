@@ -578,20 +578,20 @@
 | **PH-S1457** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
 | **PH-S1458** | galaxy_horizon_s1449_integration | band close | **✅** |
 
-## Band 82 — PH-S1459…S1468 (D Policies · store wire)
+## Band 82 — PH-S1459…S1468 (D Policies · store wire) · **✅**
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1459** | `policy_store_depth` | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1460** | `policy_store_wire` | durable path + unit tests | **[ ]** |
-| **PH-S1461** | store wire contracts | `policy_store_wire_integration` | **[ ]** |
-| **PH-S1462** | `VERIFY_POLICY_STORE` + `--policy-store` | verify-dev-stand / run-poolai | **[ ]** |
-| **PH-S1463** | Stand smoke export shape | `policy_store_band82_export_shape` | **[ ]** |
-| **PH-S1464** | poolai-loc-audit `--policy-store` | `rust_ratio.json` fields | **[ ]** |
-| **PH-S1465** | Docs `POLICIES_STORE.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1466** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1467** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1468** | galaxy_horizon_s1459_integration | band close | **[ ]** |
+| **PH-S1459** | `policy_store_depth` | ui-core depth enum + criteria registry | **✅** |
+| **PH-S1460** | `policy_store_wire` | durable path + unit tests | **✅** |
+| **PH-S1461** | store wire contracts | `policy_store_wire_integration` | **✅** |
+| **PH-S1462** | `VERIFY_POLICY_STORE` + `--policy-store` | verify-dev-stand / run-poolai | **✅** |
+| **PH-S1463** | Stand smoke export shape | `policy_store_band82_export_shape` | **✅** |
+| **PH-S1464** | poolai-loc-audit `--policy-store` | `rust_ratio.json` fields | **✅** |
+| **PH-S1465** | Docs `POLICIES_STORE.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | **✅** |
+| **PH-S1466** | poolai-vision-sync --check | drift gate green | **✅** |
+| **PH-S1467** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
+| **PH-S1468** | galaxy_horizon_s1459_integration | band close | **✅** |
 
 ## Band 83 — PH-S1469…S1478 (D Policies · API contracts)
 

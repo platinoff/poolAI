@@ -16,8 +16,9 @@
 //! optional `POOLAI_SSO_DATA_DIR` as the durable path (restart-safe CRUD later).
 //! See [`docs/development/SSO_STORE.md`] and [`docs/development/SSO_DEPTH.md`].
 //!
-//! Security policies (phase D band 81): `POOLAI_POLICY_STORE` (`memory` default;
-//! `sqlite` horizon band 82+). See [`docs/development/POLICIES_DEPTH.md`].
+//! Security policies (phase D band 81–82): `POOLAI_POLICY_STORE` (`memory` default;
+//! `sqlite` + optional `POOLAI_POLICY_DATA_DIR` durable path). See
+//! [`docs/development/POLICIES_DEPTH.md`] and [`docs/development/POLICIES_STORE.md`].
 //!
 //! # Example
 //!
@@ -449,7 +450,7 @@ pub const POOLAI_POLICY_STORE: &str = "POOLAI_POLICY_STORE";
 /// Canonical policy store modes (band 81 scaffold).
 pub const POLICY_STORE_MODES: &[&str] = &["memory", "sqlite"];
 
-/// Resolve configured policy store mode (PH-S1450 scaffold; durable wire band 82+).
+/// Resolve configured policy store mode (PH-S1450 scaffold; durable wire PH-S1460).
 pub fn policy_store_mode() -> &'static str {
     match std::env::var(POOLAI_POLICY_STORE)
         .unwrap_or_else(|_| "memory".into())
@@ -458,6 +459,66 @@ pub fn policy_store_mode() -> &'static str {
     {
         "sqlite" => "sqlite",
         _ => "memory",
+    }
+}
+
+/// Env key for durable policy data directory (band 82 wire).
+pub const POOLAI_POLICY_DATA_DIR: &str = "POOLAI_POLICY_DATA_DIR";
+
+/// Canonical sqlite DB file name under the configured data dir (band 82 wire).
+pub const POLICY_STORE_SQLITE_FILE: &str = "policy.sqlite";
+
+/// Optional durable data directory from env (PH-S1460).
+pub fn policy_store_data_dir_from_env() -> Option<PathBuf> {
+    std::env::var(POOLAI_POLICY_DATA_DIR)
+        .ok()
+        .map(|v| v.trim().to_string())
+        .filter(|v| !v.is_empty())
+        .map(PathBuf::from)
+}
+
+/// Policy store wire snapshot (mode + durable path; CRUD later in phase D).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PolicyStoreWire {
+    /// `memory` or `sqlite`.
+    pub mode: String,
+    /// Resolved sqlite file path when mode is sqlite and data dir is set.
+    pub durable_path: Option<String>,
+    /// True when sqlite mode has a durable path.
+    pub configured: bool,
+}
+
+/// Resolve policy store wire for ops / verify / contracts (PH-S1460).
+pub fn policy_store_wire() -> PolicyStoreWire {
+    let mode = policy_store_mode().to_string();
+    if mode != "sqlite" {
+        return PolicyStoreWire {
+            mode,
+            durable_path: None,
+            configured: false,
+        };
+    }
+    let durable_path = policy_store_data_dir_from_env().map(|dir| {
+        dir.join(POLICY_STORE_SQLITE_FILE)
+            .to_string_lossy()
+            .replace('\\', "/")
+    });
+    let configured = durable_path.is_some();
+    PolicyStoreWire {
+        mode,
+        durable_path,
+        configured,
+    }
+}
+
+/// Wire label for admin / metrics depth fields (PH-S1460).
+pub fn policy_store_wire_label(wire: &PolicyStoreWire) -> &'static str {
+    if wire.mode == "sqlite" && wire.configured {
+        "sqlite"
+    } else if wire.mode == "sqlite" {
+        "sqlite_unconfigured"
+    } else {
+        "memory"
     }
 }
 
@@ -1587,6 +1648,46 @@ mod tests {
         assert_eq!(policy_store_mode(), "sqlite");
         std::env::remove_var(POOLAI_POLICY_STORE);
         assert!(POLICY_STORE_MODES.contains(&"memory"));
+        assert_eq!(POOLAI_POLICY_DATA_DIR, "POOLAI_POLICY_DATA_DIR");
+    }
+
+    #[test]
+    fn policy_store_wire_memory_default_ph_s1460() {
+        std::env::remove_var(POOLAI_POLICY_STORE);
+        std::env::remove_var(POOLAI_POLICY_DATA_DIR);
+        let wire = policy_store_wire();
+        assert_eq!(wire.mode, "memory");
+        assert!(!wire.configured);
+        assert!(wire.durable_path.is_none());
+        assert_eq!(policy_store_wire_label(&wire), "memory");
+        assert_eq!(POOLAI_POLICY_DATA_DIR, "POOLAI_POLICY_DATA_DIR");
+        assert_eq!(POLICY_STORE_SQLITE_FILE, "policy.sqlite");
+    }
+
+    #[test]
+    fn policy_store_wire_sqlite_unconfigured_ph_s1460() {
+        std::env::set_var(POOLAI_POLICY_STORE, "sqlite");
+        std::env::remove_var(POOLAI_POLICY_DATA_DIR);
+        let wire = policy_store_wire();
+        assert_eq!(wire.mode, "sqlite");
+        assert!(!wire.configured);
+        assert_eq!(policy_store_wire_label(&wire), "sqlite_unconfigured");
+        std::env::remove_var(POOLAI_POLICY_STORE);
+    }
+
+    #[test]
+    fn policy_store_wire_sqlite_configured_ph_s1460() {
+        std::env::set_var(POOLAI_POLICY_STORE, "sqlite");
+        std::env::set_var(POOLAI_POLICY_DATA_DIR, "/tmp/poolai-policy-wire");
+        let wire = policy_store_wire();
+        assert!(wire.configured);
+        assert_eq!(policy_store_wire_label(&wire), "sqlite");
+        let path = wire.durable_path.as_deref().expect("path");
+        assert!(
+            path.ends_with(POLICY_STORE_SQLITE_FILE) || path.contains(POLICY_STORE_SQLITE_FILE)
+        );
+        std::env::remove_var(POOLAI_POLICY_STORE);
+        std::env::remove_var(POOLAI_POLICY_DATA_DIR);
     }
 
     #[test]
