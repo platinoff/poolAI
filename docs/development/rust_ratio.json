@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 176964,
-  "non_rust_product_loc": 9467,
-  "product_loc_total": 186431,
-  "rust_ratio": 0.9492198185924015,
-  "rust_ratio_pct": 94.92198185924015,
+  "rust_loc": 177557,
+  "non_rust_product_loc": 9493,
+  "product_loc_total": 187050,
+  "rust_ratio": 0.949248863940123,
+  "rust_ratio_pct": 94.9248863940123,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -142,9 +142,12 @@
   "policy_api_mode": false,
   "policy_api_criteria_total": 9,
   "policy_api_criteria_met_count": 0,
-  "policy_admin_ops_mode": true,
+  "policy_admin_ops_mode": false,
   "policy_admin_ops_criteria_total": 10,
-  "policy_admin_ops_criteria_met_count": 10,
+  "policy_admin_ops_criteria_met_count": 0,
+  "policy_stand_smoke_mode": true,
+  "policy_stand_smoke_criteria_total": 10,
+  "policy_stand_smoke_criteria_met_count": 10,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -156,23 +159,23 @@
     },
     "ops_shell": {
       "files": 39,
-      "loc": 3742
+      "loc": 3768
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 102,
-      "loc": 21820
+      "files": 103,
+      "loc": 22004
     },
     "rust_src": {
       "files": 300,
-      "loc": 113463
+      "loc": 113754
     },
     "rust_tests": {
-      "files": 311,
-      "loc": 41073
+      "files": 313,
+      "loc": 41191
     },
     "ui_css": {
       "files": 2,
@@ -203,7 +206,7 @@
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
     "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
-    "PH-S1485: policy_admin_ops_mode — store strip / policy refresh / verify hooks",
-    "PH-S1488: band 84 policies admin/ops glue — criteria met vs registry"
+    "PH-S1494: policy_stand_smoke_mode — live store / policies query / validate fixtures",
+    "PH-S1498: band 85 policies stand smoke — criteria met vs registry"
   ]
 }

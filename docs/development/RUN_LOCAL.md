@@ -24,7 +24,7 @@ cd S:\rust\poolAI
 .\bin\run-poolai.ps1 stop
 ```
 
-**Last updated:** 2026-07-25 (PH-S1488 band 84 · `--policy-admin-ops` · `VERIFY_POLICY_ADMIN_OPS`)
+**Last updated:** 2026-07-25 (PH-S1498 band 85 · `--policy-stand-smoke` · `VERIFY_POLICY_STAND_SMOKE`)
 
 ### PH-S1011 / PH-S1012: Light compile + quick preset
 
@@ -85,6 +85,7 @@ cd S:\rust\poolAI
 /usr/bin/bash bin/run-poolai.sh quick --policy-store
 /usr/bin/bash bin/run-poolai.sh quick --policy-api
 /usr/bin/bash bin/run-poolai.sh quick --policy-admin-ops
+/usr/bin/bash bin/run-poolai.sh quick --policy-stand-smoke
 # PowerShell:
 .\bin\run-poolai.ps1 quick -StandSmoke
 .\bin\run-poolai.ps1 quick -MigrationAdvisory
@@ -363,6 +364,7 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `VERIFY_POLICY_STORE=1` | `verify-dev-stand.sh` → `poolai-loc-audit --policy-store` (PH-S1462) |
 | `VERIFY_POLICY_API=1` | `verify-dev-stand.sh` → `poolai-loc-audit --policy-api` (PH-S1474) |
 | `VERIFY_POLICY_ADMIN_OPS=1` | `verify-dev-stand.sh` → `poolai-loc-audit --policy-admin-ops` (PH-S1484) |
+| `VERIFY_POLICY_STAND_SMOKE=1` | `verify-dev-stand.sh` → `poolai-http-stand-smoke --policy-stand-smoke` + `poolai-loc-audit --policy-stand-smoke` (PH-S1495) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 ### PH-S1100: Rust migration advisory (band 46)
@@ -1141,6 +1143,26 @@ VERIFY_POLICY_ADMIN_OPS=1 bash bin/verify-dev-stand.sh
 | `policy_admin_ops_criteria_met_count` | Criteria with marker present in canonical doc path |
 
 Module: [`policy_admin_ops_depth.rs`](../../crates/poolai-ui-core/src/policy_admin_ops_depth.rs) · tests: `policy_admin_ops_integration.rs`, `galaxy_horizon_s1479_integration.rs` · docs: [`POLICIES_ADMIN_OPS.md`](./POLICIES_ADMIN_OPS.md).
+
+### PH-S1495: Policies stand smoke (band 85)
+
+```bash
+export POOLAI_BASE_URL=http://127.0.0.1:8080
+cargo run --bin poolai-http-stand-smoke -- --policy-stand-smoke
+cargo run --bin poolai-loc-audit -- --policy-stand-smoke
+cargo run --bin poolai-loc-audit -- --policy-stand-smoke --advisory --min-ratio 0.95
+
+VERIFY_POLICY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
+/usr/bin/bash bin/run-poolai.sh quick --policy-stand-smoke
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `policy_stand_smoke_mode` | `true` when `--policy-stand-smoke` (PH-S1494) |
+| `policy_stand_smoke_criteria_total` | Registry size (10) |
+| `policy_stand_smoke_criteria_met_count` | Criteria with marker present in canonical doc path |
+
+Module: [`policy_stand_smoke_depth.rs`](../../crates/poolai-ui-core/src/policy_stand_smoke_depth.rs) · tests: `policy_stand_smoke_integration.rs`, `galaxy_horizon_s1489_integration.rs` · docs: [`POLICIES_STAND_SMOKE.md`](./POLICIES_STAND_SMOKE.md).
 
 Default stand smoke includes **`vision_revision_parity`** (PH-S208, PH-S235): repo `manifest.revision` vs FM §5.12 `Vision rev`, `extensions.active_sprint` vs `manifest.next_sprint`, then `GET /docs/vision/manifest.json` with `X-PoolAI-Vision-Revision` header vs JSON body.
 

@@ -47,6 +47,9 @@ use poolai_ui_core::policy_api_contracts_depth::{
     policy_api_criteria_total, POLICY_API_CASES, POLICY_API_CRITERIA,
 };
 use poolai_ui_core::policy_depth::{policy_criteria_total, POLICY_CASES, POLICY_CRITERIA};
+use poolai_ui_core::policy_stand_smoke_depth::{
+    policy_stand_smoke_criteria_total, POLICY_STAND_SMOKE_CASES, POLICY_STAND_SMOKE_CRITERIA,
+};
 use poolai_ui_core::policy_store_depth::{
     policy_store_criteria_total, POLICY_STORE_CASES, POLICY_STORE_CRITERIA,
 };
@@ -271,6 +274,8 @@ struct AuditConfig {
     policy_api: bool,
     /// Emit band-84 policies admin/ops fields (PH-S1485).
     policy_admin_ops: bool,
+    /// Emit band-85 policies stand-smoke fields (PH-S1494).
+    policy_stand_smoke: bool,
 }
 
 impl Default for AuditConfig {
@@ -320,6 +325,7 @@ impl Default for AuditConfig {
             policy_store: false,
             policy_api: false,
             policy_admin_ops: false,
+            policy_stand_smoke: false,
         }
     }
 }
@@ -611,6 +617,12 @@ struct RustRatioReport {
     policy_admin_ops_criteria_total: usize,
     /// Policies admin/ops criteria met count (PH-S1485).
     policy_admin_ops_criteria_met_count: usize,
+    /// Band-85 policies stand-smoke mode (PH-S1494).
+    policy_stand_smoke_mode: bool,
+    /// Policies stand-smoke criteria registry size (PH-S1494).
+    policy_stand_smoke_criteria_total: usize,
+    /// Policies stand-smoke criteria met count (PH-S1494).
+    policy_stand_smoke_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -955,6 +967,22 @@ fn policy_policy_admin_ops_criteria_met(root: &Path) -> (usize, usize) {
     let total = policy_admin_ops_criteria_total();
     let mut met = 0usize;
     for (_, marker, rel) in POLICY_ADMIN_OPS_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
+fn policy_policy_stand_smoke_criteria_met(root: &Path) -> (usize, usize) {
+    let total = policy_stand_smoke_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in POLICY_STAND_SMOKE_CRITERIA {
         let path = root.join(rel);
         if path.is_file() {
             if let Ok(content) = fs::read_to_string(&path) {
@@ -1385,6 +1413,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--policy-store" => config.policy_store = true,
             "--policy-api" => config.policy_api = true,
             "--policy-admin-ops" => config.policy_admin_ops = true,
+            "--policy-stand-smoke" => config.policy_stand_smoke = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
                 print_help();
@@ -1446,6 +1475,7 @@ fn print_help() {
            --policy-store              band-82 policies store-wire fields (PH-S1464)\n\
            --policy-api                band-83 policies HTTP API contracts fields (PH-S1475)\n\
            --policy-admin-ops          band-84 policies admin/ops fields (PH-S1485)\n\
+           --policy-stand-smoke        band-85 policies stand-smoke fields (PH-S1494)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -1953,6 +1983,18 @@ fn build_report(
         notes.push("PH-S1485: policy_admin_ops_mode — store strip / policy refresh / verify hooks");
         notes.push("PH-S1488: band 84 policies admin/ops glue — criteria met vs registry");
     }
+    let (policy_stand_smoke_criteria_met_count, policy_stand_smoke_criteria_total_count) =
+        if config.policy_stand_smoke {
+            policy_policy_stand_smoke_criteria_met(root)
+        } else {
+            (0, policy_stand_smoke_criteria_total())
+        };
+    if config.policy_stand_smoke {
+        notes.push(
+            "PH-S1494: policy_stand_smoke_mode — live store / policies query / validate fixtures",
+        );
+        notes.push("PH-S1498: band 85 policies stand smoke — criteria met vs registry");
+    }
 
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
@@ -2101,6 +2143,9 @@ fn build_report(
         policy_admin_ops_mode: config.policy_admin_ops,
         policy_admin_ops_criteria_total: policy_admin_ops_criteria_total_count,
         policy_admin_ops_criteria_met_count,
+        policy_stand_smoke_mode: config.policy_stand_smoke,
+        policy_stand_smoke_criteria_total: policy_stand_smoke_criteria_total_count,
+        policy_stand_smoke_criteria_met_count,
         by_category,
         notes,
     })
@@ -2539,6 +2584,17 @@ fn print_summary(report: &RustRatioReport) {
         println!(
             "  policy_admin_ops_cases: {}",
             POLICY_ADMIN_OPS_CASES.join(", ")
+        );
+    }
+    if report.policy_stand_smoke_mode {
+        println!("  policy_stand_smoke:    true (PH-S1494 band 85)");
+        println!(
+            "  policy_stand_smoke_criteria: {}/{} met",
+            report.policy_stand_smoke_criteria_met_count, report.policy_stand_smoke_criteria_total
+        );
+        println!(
+            "  policy_stand_smoke_cases: {}",
+            POLICY_STAND_SMOKE_CASES.join(", ")
         );
     }
     for (name, loc) in &report.by_category {

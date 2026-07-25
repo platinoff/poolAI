@@ -54,7 +54,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 **Версія в репозиторії:** `0.2.2` (див. `Cargo.toml`). **Робоча гілка:** `main`.
 
-Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S1488 ✅ (phase D Policies admin/ops glue). **Rust ratio:** **94.92%** (hold **95%** advisory). **Vision:** manifest rev **400**. **§5.12:** **10** відкритих (band 84 ✅ · band 85) · tech **PH-SVC31…SVC40** CI macvlan fix ✅ · наступна сесія **`абракадабра`** (P0 → band 85) — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
+Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S1498 ✅ (phase D Policies stand smoke). **Rust ratio:** **94.92%** (hold **95%** advisory). **Vision:** manifest rev **401**. **§5.12:** **10** відкритих (band 85 ✅ · band 86) · tech **PH-SVC31…SVC40** CI macvlan fix ✅ · наступна сесія **`абракадабра`** (P0 → band 86) — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
 **Репозиторій:** [github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)
 
@@ -86,9 +86,9 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 **Tech (сьогодні):** Service **PH-SVC65…SVC74** — GitHub App / Actions tokens opaque (JWT `ghs_` ~520) · rules + [`SECRETS_MANAGEMENT.md`](docs/security/SECRETS_MANAGEMENT.md) §5 · research [`GITHUB_APP_INSTALLATION_TOKENS_2026-07-25.md`](docs/development/GITHUB_APP_INSTALLATION_TOKENS_2026-07-25.md) · Cursor **3.13.10** Auto-review · open **PH-SVC34** (GH verify) · **PH-SVC35** OWNER Atlassian revoke.
 
-**Наступна сесія (owner):** **`абракадабра`** — drain band 85 **PH-S1489…S1498** · [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія (owner):** **`абракадабра`** — drain band 86 **PH-S1499…S1508** · [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
-**§5.12:** **10** відкритих (band 84 ✅ · band 85) · vision **rev 400** · last **PH-S1488** · next **PH-S1489**.
+**§5.12:** **10** відкритих (band 85 ✅ · band 86) · vision **rev 401** · last **PH-S1498** · next **PH-S1499**.
 
 **Ops (поза чергою):** **FM-003** LAN §4 **BLOCKED** (2 хости) · **FM-041** Cloud SDK **Deferred**.
 

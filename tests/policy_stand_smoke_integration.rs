@@ -1,0 +1,190 @@
+//! PH-S1490…S1492: Policies live stand-smoke contracts (band 85).
+//! Marker: policy_stand_smoke_integration
+//!
+//! CI canon uses in-process axum (no live stand). Live HTTP runners live in
+//! `poolai-http-stand-smoke --policy-stand-smoke`.
+
+#![cfg(feature = "enterprise")]
+
+use axum::body::{to_bytes, Body};
+use axum::http::{Request, StatusCode};
+use axum::Router;
+use poolai::core::state::ApiContext;
+use poolai::network::enterprise_api::create_enterprise_api_routes;
+use poolai_ui_core::policy_stand_smoke_depth::{
+    policy_stand_smoke_criteria_total, policy_stand_smoke_depth_stub, PolicyStandSmokeDepth,
+    POLICY_STAND_SMOKE_CASES, POLICY_STAND_SMOKE_CRITERIA,
+};
+use serde_json::{json, Value};
+use tower::ServiceExt;
+
+async fn enterprise_app() -> Router {
+    let ctx = ApiContext::default();
+    ctx.security_manager
+        .initialize()
+        .await
+        .expect("security manager init");
+    Router::new()
+        .nest("/api/enterprise", create_enterprise_api_routes())
+        .with_state(ctx)
+}
+
+async fn request_json(
+    app: &Router,
+    method: &str,
+    uri: &str,
+    body: Option<Value>,
+) -> (StatusCode, Value) {
+    let mut builder = Request::builder().method(method).uri(uri);
+    let req_body = if let Some(v) = body {
+        builder = builder.header("content-type", "application/json");
+        Body::from(serde_json::to_vec(&v).unwrap())
+    } else {
+        Body::empty()
+    };
+    let response = app
+        .clone()
+        .oneshot(builder.body(req_body).unwrap())
+        .await
+        .unwrap();
+    let status = response.status();
+    let bytes = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+    let v: Value = if bytes.is_empty() {
+        Value::Null
+    } else {
+        serde_json::from_slice(&bytes).expect("JSON body")
+    };
+    (status, v)
+}
+
+#[test]
+fn policy_stand_smoke_depth_registry_ph_s1489() {
+    assert_eq!(POLICY_STAND_SMOKE_CRITERIA.len(), 10);
+    assert_eq!(policy_stand_smoke_criteria_total(), 10);
+    assert!(POLICY_STAND_SMOKE_CASES.contains(&"live_store"));
+    assert!(POLICY_STAND_SMOKE_CASES.contains(&"live_policies_query"));
+    assert_eq!(
+        policy_stand_smoke_depth_stub(Some(&json!({"live_store": true}))),
+        PolicyStandSmokeDepth::LiveStore
+    );
+}
+
+#[tokio::test]
+async fn policy_stand_smoke_store_wire_ph_s1490() {
+    std::env::remove_var("POOLAI_POLICY_STORE");
+    std::env::remove_var("POOLAI_POLICY_DATA_DIR");
+
+    let app = enterprise_app().await;
+    let (status, wire) = request_json(&app, "GET", "/api/enterprise/policy/store", None).await;
+    assert_eq!(status, StatusCode::OK, "store wire: {wire}");
+    let obj = wire.as_object().expect("wire object");
+    for key in ["mode", "durable_path", "configured"] {
+        assert!(obj.contains_key(key), "wire missing `{key}`: {obj:?}");
+    }
+    assert_eq!(obj.get("mode").and_then(|m| m.as_str()), Some("memory"));
+    assert_eq!(obj.get("configured").and_then(|c| c.as_bool()), Some(false));
+}
+
+#[tokio::test]
+async fn policy_stand_smoke_policies_query_ph_s1491() {
+    let app = enterprise_app().await;
+
+    let (status, body) = request_json(
+        &app,
+        "GET",
+        "/api/enterprise/security/policies?limit=5",
+        None,
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK, "query: {body}");
+    assert!(body.is_array(), "expected policies array: {body}");
+
+    let (status_filter, filtered) = request_json(
+        &app,
+        "GET",
+        "/api/enterprise/security/policies?name=default&limit=2",
+        None,
+    )
+    .await;
+    assert_eq!(status_filter, StatusCode::OK, "filtered: {filtered}");
+    let arr = filtered.as_array().expect("filtered array");
+    for item in arr {
+        let name = item.get("name").and_then(|n| n.as_str()).unwrap_or("");
+        assert!(name.contains("default"), "name={name}");
+    }
+
+    assert_eq!(
+        policy_stand_smoke_depth_stub(Some(&json!({"live_policies_query": true}))),
+        PolicyStandSmokeDepth::LivePoliciesQuery
+    );
+}
+
+#[tokio::test]
+async fn policy_stand_smoke_field_fixtures_ph_s1492() {
+    let app = enterprise_app().await;
+
+    let (ok_status, ok_body) = request_json(
+        &app,
+        "POST",
+        "/api/enterprise/security/policies/validate",
+        Some(json!({
+            "name": "stand-smoke-ok",
+            "description": "valid",
+            "session_timeout": 3600,
+            "require_mfa": false,
+            "max_failed_attempts": 5
+        })),
+    )
+    .await;
+    assert_eq!(ok_status, StatusCode::OK, "valid: {ok_body}");
+    assert_eq!(ok_body.get("valid").and_then(|v| v.as_bool()), Some(true));
+
+    let (missing_name_status, missing_name) = request_json(
+        &app,
+        "POST",
+        "/api/enterprise/security/policies/validate",
+        Some(json!({
+            "name": "",
+            "description": "x",
+            "session_timeout": 3600
+        })),
+    )
+    .await;
+    assert_eq!(
+        missing_name_status,
+        StatusCode::BAD_REQUEST,
+        "missing name: {missing_name}"
+    );
+    assert!(
+        missing_name.to_string().contains("POLICY_MISSING_NAME")
+            || missing_name.to_string().contains("name must be non-empty"),
+        "unexpected missing-name body: {missing_name}"
+    );
+
+    let (bad_timeout_status, bad_timeout) = request_json(
+        &app,
+        "POST",
+        "/api/enterprise/security/policies/validate",
+        Some(json!({
+            "name": "timeout",
+            "description": "x",
+            "session_timeout": 0
+        })),
+    )
+    .await;
+    assert_eq!(
+        bad_timeout_status,
+        StatusCode::BAD_REQUEST,
+        "bad timeout: {bad_timeout}"
+    );
+    assert!(
+        bad_timeout.to_string().contains("POLICY_INVALID_TIMEOUT")
+            || bad_timeout.to_string().contains("session_timeout"),
+        "unexpected timeout body: {bad_timeout}"
+    );
+
+    assert_eq!(
+        policy_stand_smoke_depth_stub(Some(&json!({"live_policy_field_fixtures": true}))),
+        PolicyStandSmokeDepth::LivePolicyFieldFixtures
+    );
+}

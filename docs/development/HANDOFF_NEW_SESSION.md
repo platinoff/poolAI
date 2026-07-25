@@ -1,8 +1,8 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-25 (band 84 **PH-S1479…S1488** ✅ · band 83 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 85 ready)
+**Оновлено:** 2026-07-25 (band 85 **PH-S1489…S1498** ✅ · band 84 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 86 ready)
 
-**Наступна сесія:** **`абракадабра`** — drain band 85 (FM **§5.66** Policies stand smoke).
+**Наступна сесія:** **`абракадабра`** — drain band 86 (FM **§5.67** Policies loc-audit aggregate).
 
 ## P0 / service (2026-07-25)
 
@@ -35,7 +35,25 @@
 | **Low** | Corrupted MSYS path / e2e tmp artifacts | ignore patterns widened |
 | **Open (OWNER)** | PH-SVC35 Atlassian token (historical) | revoke in Atlassian; no history rewrite |
 
-## Band 85 — Policies stand smoke (PH-S1489…S1498, **ACTIVE**)
+## Band 86 — Policies loc-audit aggregate (PH-S1499…S1508, **ACTIVE**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1499** | `policy_loc_audit_depth` scaffold |
+| **PH-S1500** | Slice aggregate (phase-D `policy*`) |
+| **PH-S1501** | Criteria contracts |
+| **PH-S1502** | `VERIFY_POLICY_LOC_AUDIT` + quick `--policy-loc-audit` |
+| **PH-S1503** | Stand smoke export shape band 86 |
+| **PH-S1504** | `poolai-loc-audit --policy-loc-audit` |
+| **PH-S1505** | Docs `POLICIES_LOC_AUDIT.md` + canon |
+| **PH-S1506** | vision-sync --check |
+| **PH-S1507** | Ratio hold advisory |
+| **PH-S1508** | Band close |
+
+**§5.12:** **10** відкритих. **Vision:** rev **401**. **Pending completion:** **780** (→ PH-S2278).
+
+## Band 85 — Policies stand smoke (PH-S1489…S1498, ✅)
+
 | Sprint | Фокус |
 |--------|--------|
 | **PH-S1489** | `policy_stand_smoke_depth` scaffold |
@@ -49,7 +67,7 @@
 | **PH-S1497** | Ratio hold advisory |
 | **PH-S1498** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **400**. **Pending completion:** **790** (→ PH-S2278).
+**PH-S1498 ✅ (2026-07-25):** `policy_stand_smoke_depth.rs`; `smoke_policy_store_wire` / `smoke_policy_policies_query` / `smoke_policy_field_fixtures`; `--policy-stand-smoke` (stand smoke + loc-audit); `VERIFY_POLICY_STAND_SMOKE`; `POLICIES_STAND_SMOKE.md`; `galaxy_horizon_s1489_integration`. Phase D Policies stand smoke closed.
 
 ## Band 84 — Policies admin/ops glue (PH-S1479…S1488, ✅)
 

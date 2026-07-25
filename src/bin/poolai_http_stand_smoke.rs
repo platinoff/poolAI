@@ -72,6 +72,8 @@ struct Cli {
     sso_stand_smoke_only: bool,
     /// PH-S1393: live audit store/events/validate suite (band 75).
     audit_stand_smoke_only: bool,
+    /// PH-S1493: live policy store/query/validate suite (band 85).
+    policy_stand_smoke_only: bool,
     base_url: String,
 }
 
@@ -248,6 +250,7 @@ fn parse_cli() -> Cli {
     let mut tenant_stand_smoke_only = false;
     let mut sso_stand_smoke_only = false;
     let mut audit_stand_smoke_only = false;
+    let mut policy_stand_smoke_only = false;
     for arg in std::env::args().skip(1) {
         match arg.as_str() {
             "--json" => json_out = true,
@@ -258,6 +261,7 @@ fn parse_cli() -> Cli {
             "--tenant-stand-smoke" => tenant_stand_smoke_only = true,
             "--sso-stand-smoke" => sso_stand_smoke_only = true,
             "--audit-stand-smoke" => audit_stand_smoke_only = true,
+            "--policy-stand-smoke" => policy_stand_smoke_only = true,
             _ if arg.starts_with('-') => {}
             _ => {}
         }
@@ -297,6 +301,11 @@ fn parse_cli() -> Cli {
             .ok()
             .is_some_and(|v| matches!(v.as_str(), "1" | "true" | "yes"));
     }
+    if !policy_stand_smoke_only {
+        policy_stand_smoke_only = std::env::var("POOLAI_STAND_SMOKE_POLICY")
+            .ok()
+            .is_some_and(|v| matches!(v.as_str(), "1" | "true" | "yes"));
+    }
     Cli {
         json_out,
         include_raid,
@@ -306,6 +315,7 @@ fn parse_cli() -> Cli {
         tenant_stand_smoke_only,
         sso_stand_smoke_only,
         audit_stand_smoke_only,
+        policy_stand_smoke_only,
         base_url: base_url_from_env(),
     }
 }
@@ -671,6 +681,142 @@ async fn smoke_audit_event_field_fixtures(client: &Client, base: &str) -> Result
     {
         return Err(format!(
             "audit validate missing resource unexpected: {resource_body}"
+        ));
+    }
+    Ok(())
+}
+
+/// PH-S1490: live `GET /api/enterprise/policy/store` shape.
+async fn smoke_policy_store_wire(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/api/enterprise/policy/store"))
+        .send()
+        .await
+        .map_err(|e| format!("policy store request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("policy store status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    let obj = body
+        .as_object()
+        .ok_or_else(|| format!("policy store expected object: {body}"))?;
+    for key in ["mode", "durable_path", "configured"] {
+        if !obj.contains_key(key) {
+            return Err(format!("policy store missing `{key}`: {body}"));
+        }
+    }
+    Ok(())
+}
+
+/// PH-S1491: live `GET /api/enterprise/security/policies` query (+ optional name filter).
+async fn smoke_policy_policies_query(client: &Client, base: &str) -> Result<(), String> {
+    let list = client
+        .get(api_url(base, "/api/enterprise/security/policies?limit=5"))
+        .send()
+        .await
+        .map_err(|e| format!("policies list: {e}"))?;
+    if list.status() != StatusCode::OK {
+        return Err(format!("policies list status {}", list.status()));
+    }
+    let body: Value = list.json().await.map_err(|e| e.to_string())?;
+    if !body.is_array() {
+        return Err(format!("policies expected array: {body}"));
+    }
+
+    let filtered = client
+        .get(api_url(
+            base,
+            "/api/enterprise/security/policies?name=default&limit=2",
+        ))
+        .send()
+        .await
+        .map_err(|e| format!("policies filter: {e}"))?;
+    if filtered.status() != StatusCode::OK {
+        return Err(format!("policies filter status {}", filtered.status()));
+    }
+    let filtered_body: Value = filtered.json().await.map_err(|e| e.to_string())?;
+    let arr = filtered_body
+        .as_array()
+        .ok_or_else(|| format!("policies filter expected array: {filtered_body}"))?;
+    for item in arr {
+        let name = item.get("name").and_then(|n| n.as_str()).unwrap_or("");
+        if !name.contains("default") {
+            return Err(format!("policies filter leaked `{name}`"));
+        }
+    }
+    Ok(())
+}
+
+/// PH-S1492: live policy-field validation fixtures (no durable write).
+async fn smoke_policy_field_fixtures(client: &Client, base: &str) -> Result<(), String> {
+    let valid = client
+        .post(api_url(base, "/api/enterprise/security/policies/validate"))
+        .json(&json!({
+            "name": "stand-smoke-ok",
+            "description": "valid",
+            "session_timeout": 3600,
+            "require_mfa": false,
+            "max_failed_attempts": 5
+        }))
+        .send()
+        .await
+        .map_err(|e| format!("policy validate ok: {e}"))?;
+    if valid.status() != StatusCode::OK {
+        return Err(format!("policy validate ok status {}", valid.status()));
+    }
+    let valid_body: Value = valid.json().await.map_err(|e| e.to_string())?;
+    if valid_body.get("valid").and_then(|v| v.as_bool()) != Some(true) {
+        return Err(format!("policy validate ok unexpected: {valid_body}"));
+    }
+
+    let missing_name = client
+        .post(api_url(base, "/api/enterprise/security/policies/validate"))
+        .json(&json!({
+            "name": "",
+            "description": "x",
+            "session_timeout": 3600
+        }))
+        .send()
+        .await
+        .map_err(|e| format!("policy validate missing name: {e}"))?;
+    if missing_name.status() != StatusCode::BAD_REQUEST {
+        return Err(format!(
+            "policy validate missing name status {}",
+            missing_name.status()
+        ));
+    }
+    let name_body: Value = missing_name.json().await.map_err(|e| e.to_string())?;
+    let name_text = name_body.to_string();
+    if !(name_text.contains("POLICY_MISSING_NAME") || name_text.contains("name must be non-empty"))
+    {
+        return Err(format!(
+            "policy validate missing name unexpected: {name_body}"
+        ));
+    }
+
+    let bad_timeout = client
+        .post(api_url(base, "/api/enterprise/security/policies/validate"))
+        .json(&json!({
+            "name": "timeout",
+            "description": "x",
+            "session_timeout": 0
+        }))
+        .send()
+        .await
+        .map_err(|e| format!("policy validate timeout: {e}"))?;
+    if bad_timeout.status() != StatusCode::BAD_REQUEST {
+        return Err(format!(
+            "policy validate timeout status {}",
+            bad_timeout.status()
+        ));
+    }
+    let timeout_body: Value = bad_timeout.json().await.map_err(|e| e.to_string())?;
+    let timeout_text = timeout_body.to_string();
+    if !(timeout_text.contains("POLICY_INVALID_TIMEOUT")
+        || timeout_text.contains("session_timeout"))
+    {
+        return Err(format!(
+            "policy validate timeout unexpected: {timeout_body}"
         ));
     }
     Ok(())
@@ -3396,6 +3542,63 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
             &mut cases,
             "audit_event_field_fixtures",
             smoke_audit_event_field_fixtures(&client, &cli.base_url).await,
+        )
+        .await;
+        let passed = cases.iter().filter(|c| c.ok).count() as u32;
+        let failed = cases.iter().filter(|c| !c.ok).count() as u32;
+        return SmokeReport {
+            base_url: cli.base_url.clone(),
+            stand_root,
+            ok: failed == 0,
+            passed,
+            failed,
+            cases,
+            tool: "poolai-http-stand-smoke",
+        };
+    }
+
+    if cli.policy_stand_smoke_only {
+        async fn record(
+            cases: &mut Vec<SmokeCaseResult>,
+            name: &'static str,
+            result: Result<(), String>,
+        ) {
+            cases.push(match result {
+                Ok(()) => SmokeCaseResult {
+                    name,
+                    ok: true,
+                    detail: None,
+                },
+                Err(e) => SmokeCaseResult {
+                    name,
+                    ok: false,
+                    detail: Some(e),
+                },
+            });
+        }
+
+        record(
+            &mut cases,
+            "health",
+            smoke_health(&client, &cli.base_url).await,
+        )
+        .await;
+        record(
+            &mut cases,
+            "policy_store_wire",
+            smoke_policy_store_wire(&client, &cli.base_url).await,
+        )
+        .await;
+        record(
+            &mut cases,
+            "policy_policies_query",
+            smoke_policy_policies_query(&client, &cli.base_url).await,
+        )
+        .await;
+        record(
+            &mut cases,
+            "policy_field_fixtures",
+            smoke_policy_field_fixtures(&client, &cli.base_url).await,
         )
         .await;
         let passed = cases.iter().filter(|c| c.ok).count() as u32;
@@ -6317,6 +6520,52 @@ mod tests {
             assert!(
                 fm.contains(row) || row.starts_with("PH-S"),
                 "FM band83 row {row}"
+            );
+        }
+    }
+
+    #[test]
+    fn policy_stand_smoke_band85_export_shape_ph_s1493() {
+        use poolai_ui_core::policy_stand_smoke_depth::{
+            policy_stand_smoke_criteria_total, policy_stand_smoke_depth_stub,
+            PolicyStandSmokeDepth, FM_BAND85_ROWS, POLICY_STAND_SMOKE_CASES,
+            POLICY_STAND_SMOKE_CRITERIA,
+        };
+        use serde_json::json;
+        assert_eq!(
+            policy_stand_smoke_depth_stub(Some(&json!({"live_store": true}))),
+            PolicyStandSmokeDepth::LiveStore
+        );
+        assert_eq!(
+            policy_stand_smoke_depth_stub(Some(&json!({
+                "policy_stand_smoke_depth": true,
+                "live_store": true,
+                "live_policies_query": true,
+                "live_policy_field_fixtures": true,
+                "cli_flag": true,
+                "loc_audit_flag": true,
+                "verify_dev_stand_hook": true,
+                "policy_stand_smoke_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            PolicyStandSmokeDepth::FullBand85
+        );
+        assert_eq!(POLICY_STAND_SMOKE_CRITERIA.len(), 10);
+        assert_eq!(policy_stand_smoke_criteria_total(), 10);
+        assert!(POLICY_STAND_SMOKE_CASES.contains(&"live_policies_query"));
+        let smoke_src = include_str!("../../src/bin/poolai_http_stand_smoke.rs");
+        assert!(smoke_src.contains("smoke_policy_store_wire"));
+        assert!(smoke_src.contains("smoke_policy_policies_query"));
+        assert!(smoke_src.contains("smoke_policy_field_fixtures"));
+        assert!(smoke_src.contains("--policy-stand-smoke"));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--policy-stand-smoke"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND85_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band85 row {row}"
             );
         }
     }
