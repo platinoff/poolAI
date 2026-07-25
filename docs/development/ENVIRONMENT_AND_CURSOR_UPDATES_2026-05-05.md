@@ -1,6 +1,6 @@
 # Environment and Cursor updates verification (2026-05-05)
 
-> **Актуальний зріз (2026-07-24):** [`CURSOR_UPDATE_RESEARCH_2026-07-24.md`](./CURSOR_UPDATE_RESEARCH_2026-07-24.md) — Cursor **3.13.10**, Auto-review, service band PH-SVC45…SVC54. Попередній: [`CURSOR_UPDATE_RESEARCH_2026-07-22.md`](./CURSOR_UPDATE_RESEARCH_2026-07-22.md) (3.12.30).
+> **Актуальний зріз (2026-07-25):** [`GITHUB_APP_INSTALLATION_TOKENS_2026-07-25.md`](./GITHUB_APP_INSTALLATION_TOKENS_2026-07-25.md) — Actions/`ghs_*` opaque JWT · service PH-SVC65…SVC74. Cursor desktop: [`CURSOR_UPDATE_RESEARCH_2026-07-24.md`](./CURSOR_UPDATE_RESEARCH_2026-07-24.md) (**3.13.10**, Auto-review). Попередній Cursor: [`CURSOR_UPDATE_RESEARCH_2026-07-22.md`](./CURSOR_UPDATE_RESEARCH_2026-07-22.md).
 
 ## Local software baseline on this machine
 
@@ -36,6 +36,8 @@ Purpose:
 - Ensure config/script/CI edits include post-update verification and cleanup discipline.
 
 **Service band 2026-07-24:** baseline → Cursor 3.13.10; Auto-review + permissions; vision eye + prune closed ≤2000; FM §5.16 PH-SVC45…SVC54.
+
+**Service band 2026-07-25:** GitHub App installation / Actions token format (JWT `ghs_` ~520) → rules, SECRETS §5, permissions; FM §5.16 PH-SVC65…SVC74. Product drain unchanged: **`абракадабра`** → band 82.
 
 ## Operational recommendation
 

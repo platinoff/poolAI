@@ -96,6 +96,21 @@ export HTTPS_KEY_PATH="/etc/poolai/certs/key.pem"
 
 After revoke, dismiss or resolve the GitHub Secret scanning alert in repo Security settings.
 
+### 5. GitHub App / Actions tokens (PH-SVC65…74, 2026-07-25)
+
+**Source:** [GitHub Changelog — installation token override header](https://github.blog/changelog/2026-05-15-github-app-installation-tokens-per-request-override-header/) · PoolAI research [`GITHUB_APP_INSTALLATION_TOKENS_2026-07-25.md`](../development/GITHUB_APP_INSTALLATION_TOKENS_2026-07-25.md).
+
+GitHub App installation tokens (incl. Actions **`GITHUB_TOKEN`**) may be **stateless JWT** (`ghs_` + ~520 chars + two dots) or classic opaque (`ghs_` short, no dots).
+
+| Rule | PoolAI |
+|------|--------|
+| Treat `ghs_*` / `GITHUB_TOKEN` as **opaque** | No length assumptions; no “must have zero dots” checks |
+| Regex (if ever needed) | `ghs_[A-Za-z0-9\.\-_]{36,}` |
+| Storage (if ever persisted) | ≥ **520** characters |
+| Override header `X-GitHub-Stateless-S2S-Token` | Only for App mint testing; **not** in PoolAI product (no installation mint today) |
+| Agents / CI logs | Never print or commit `GITHUB_TOKEN` / `ghs_*` |
+| Local `git push` / `абракадабра` | Unaffected (user SSH/PAT); watch **CI** after push (PH-SVC34) |
+
 ### 3. Use Secret Management Services
 
 #### HashiCorp Vault

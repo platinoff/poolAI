@@ -80,11 +80,11 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 - `cargo test --all-features` — на **Windows MSVC** можливі каскадні помилки компіляції тестів і/або `STATUS_STACK_BUFFER_OVERRUN` у `rustc` через обсяг фіч (cloud-sdk тощо); для повного матрицю краще **GNU toolchain** з `rust-toolchain.toml` або **Linux CI**. Інтеграційні тести ML прунінгу та SAML узгоджені з поточною семантикою `PruningResult` / унікальними іменами SAML-провайдерів.
 - **Архітектурні інкременти (`main`, 2026-04–05)**: **`RaidService`** + **`VirtualNode*`** services (**FM-016** ✅); ML pipeline + **TurboQuant**; **P3 / FM-005** — `json_errors.rs`, **`HttpAppError`/`RestError`** по REST, **`raid*`**, **`enterprise_api/`**, auth/WS/rate-limit ✅; **OpenAPI** enterprise sync (S14–S20); бінарі **`poolai-worker`**, **`poolai-telegram-bot`**, **`poolai_health_load`**; dev stand — `bin/verify-dev-stand.*`, `core::dev_stand`; ML-тести — **`[[test]]` + `required-features = ["ml"]`**; P2b wire — `tests/distributed_raid_wire_integration.rs`.
 
-### Next Focus (2026-07-24)
+### Next Focus (2026-07-25)
 
 **Product-complete:** PH-S1010 ✅ · FM **§5.15** ✅ · **maintenance mode**.
 
-**Tech (сьогодні):** Security service **PH-SVC55…SVC64** — untrack `certs/*.pem` + `data/audit/*.log.gz`; `.gitignore` + permissions block secrets · Cursor **3.13.10** Auto-review · open **PH-SVC34** (GH verify) · **PH-SVC35** OWNER Atlassian revoke ([`SECRETS_MANAGEMENT.md`](docs/security/SECRETS_MANAGEMENT.md) §1/§4 · [`certs/README.md`](certs/README.md)).
+**Tech (сьогодні):** Service **PH-SVC65…SVC74** — GitHub App / Actions tokens opaque (JWT `ghs_` ~520) · rules + [`SECRETS_MANAGEMENT.md`](docs/security/SECRETS_MANAGEMENT.md) §5 · research [`GITHUB_APP_INSTALLATION_TOKENS_2026-07-25.md`](docs/development/GITHUB_APP_INSTALLATION_TOKENS_2026-07-25.md) · Cursor **3.13.10** Auto-review · open **PH-SVC34** (GH verify) · **PH-SVC35** OWNER Atlassian revoke.
 
 **Наступна сесія (owner):** **`абракадабра`** — drain band 76 **PH-S1399…S1408** · [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 

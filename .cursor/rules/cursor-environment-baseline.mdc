@@ -36,6 +36,13 @@ alwaysApply: false
 - Cloud Agents do **not** use Run Modes.
 - Chat **Mode** (Agent/Plan via Shift+Tab) is separate from Run Mode.
 
+## GitHub Actions tokens (2026-07-25)
+
+- Installation / Actions `GITHUB_TOKEN` may be **JWT-format** (`ghs_` ~520 chars, two dots) or classic opaque — treat as **opaque**; no hardcoded length/regex that rejects JWT.
+- Override header `X-GitHub-Stateless-S2S-Token` is for App mint testing only — PoolAI does **not** mint installation tokens in product code.
+- Canon: [`SECRETS_MANAGEMENT.md`](../../docs/security/SECRETS_MANAGEMENT.md) §5 · research [`GITHUB_APP_INSTALLATION_TOKENS_2026-07-25.md`](../../docs/development/GITHUB_APP_INSTALLATION_TOKENS_2026-07-25.md).
+- Local `абракадабра` push (user SSH/PAT) unchanged; post-push CI (PH-SVC34) may see the new token format in third-party actions.
+
 ## Ops notes
 
 - Agents Window Changes empty on Windows was a 3.12.x bug (`cwd=`); expect fix on **3.13** line.

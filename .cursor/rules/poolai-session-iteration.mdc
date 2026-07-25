@@ -52,6 +52,7 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 
 - Staging: `git diff --cached --stat`; не `git add -A`
 - **Ніколи:** `.env*`, `*.pem`/`*.key`, `certs/*.pem`, `data/audit/*` (крім `.gitkeep`), `comitmsg/*.txt` — див. `.gitignore` + PH-SVC55
+- **GitHub Actions token:** після push CI може отримати JWT-format `GITHUB_TOKEN` (`ghs_` ~520) — не додавати length-checks у workflows/scripts; opaque only ([`SECRETS_MANAGEMENT.md`](../../docs/security/SECRETS_MANAGEMENT.md) §5 · PH-SVC65)
 - Hook / subject: [`git-commit-msys.mdc`](git-commit-msys.mdc)
 - Push: [`.cursor/commands/git-push.md`](../commands/git-push.md) + самарі в чат
 
@@ -107,6 +108,8 @@ flowchart LR
 | 4 Vision close | FM §5.12 ✅ + HANDOFF + NEXT → **один** `poolai-vision-sync` → rev з `manifest.json` → `--check` |
 | 5 Test | `cargo fmt --all` → **один** `cargo test-ci` (**після** vision close) |
 | 6 Git | **один** commit (`git-commit-tree-msg.sh`: код + `docs/vision/*` + FM/HANDOFF/NEXT) + `git push origin main` + **самарі** |
+
+**CI після push:** Actions `GITHUB_TOKEN` може бути JWT-format (`ghs_` ~520) — workflows уже передають opaque; не додавати length-checks у drain. Див. PH-SVC65 · [`SECRETS_MANAGEMENT.md`](../../docs/security/SECRETS_MANAGEMENT.md) §5.
 
 **Ітерація:** після push §5.12 знову **0** (або <10) → у **наступній** сесії **`абракадабра`** → S0 → **project scan** (якщо <10) → drain → push. Без окремого підтвердження кожного PH-S*.
 

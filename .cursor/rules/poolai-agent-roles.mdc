@@ -56,6 +56,8 @@ alwaysApply: true
 
 **Security hygiene (PH-SVC55…):** ніколи не стаджити `.env`, `*.pem`/`*.key`, `certs/*.pem`, `data/audit/*` (крім `.gitkeep`). Канон — [`SECRETS_MANAGEMENT.md`](../../docs/security/SECRETS_MANAGEMENT.md) §1 · [`certs/README.md`](../../certs/README.md). History rewrite — лише OWNER.
 
+**GitHub tokens (PH-SVC65…):** `GITHUB_TOKEN` / `ghs_*` — **opaque** (JWT ~520 або classic); не логувати, не валідувати довжину в CI/scripts. Research — [`GITHUB_APP_INSTALLATION_TOKENS_2026-07-25.md`](../../docs/development/GITHUB_APP_INSTALLATION_TOKENS_2026-07-25.md). Не змінює drain `абракадабра` (local push = user creds).
+
 ## Поза чергою
 
 - **BLOCKED:** PH-S35 / PH-S16 / PH-S02 (LAN, 2 хости)

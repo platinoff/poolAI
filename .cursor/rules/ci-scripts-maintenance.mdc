@@ -15,6 +15,14 @@ alwaysApply: false
 - Prefer explicit, reproducible commands over implicit environment assumptions.
 - If a script or workflow behavior changes, add/update matching doc under `docs/development/` and link it from `docs/README.md` when broadly useful.
 
+## GitHub Actions `GITHUB_TOKEN` format (PH-SVC65+)
+
+- Pass `${{ secrets.GITHUB_TOKEN }}` / `${{ github.token }}` to actions as **opaque** strings only.
+- Do **not** add shell/regex checks that assume short opaque tokens (no dots) or fixed length &lt; 520.
+- Recommended match-both regex (only if validation is unavoidable): `ghs_[A-Za-z0-9\.\-_]{36,}`.
+- Temporary App mint header `X-GitHub-Stateless-S2S-Token` is **not** used in PoolAI workflows (no installation-token mint).
+- Detail: [`GITHUB_APP_INSTALLATION_TOKENS_2026-07-25.md`](../../docs/development/GITHUB_APP_INSTALLATION_TOKENS_2026-07-25.md).
+
 ## Cleanup policy
 
 - Remove dead scripts and obsolete workflow steps when they no longer provide value.

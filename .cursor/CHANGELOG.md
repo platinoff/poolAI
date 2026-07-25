@@ -1,5 +1,14 @@
 # Cursor Agent Configuration Changelog
 
+## 2026-07-25 — GitHub App installation tokens (PH-SVC65…SVC74)
+
+- **Research:** [`docs/development/GITHUB_APP_INSTALLATION_TOKENS_2026-07-25.md`](../docs/development/GITHUB_APP_INSTALLATION_TOKENS_2026-07-25.md) — JWT-format `ghs_` (~520) + temporary override header; Actions `GITHUB_TOKEN` in scope.
+- **`SECRETS_MANAGEMENT.md` §5:** opaque `ghs_*`; regex `ghs_[A-Za-z0-9\.\-_]{36,}`; storage ≥520; no product mint header.
+- **Rules:** `cursor-environment-baseline`, `poolai-agent-roles`, `poolai-session-iteration` (`абракадабра` CI note), `ci-scripts-maintenance`, `autonomous-orchestrator`.
+- **`.cursor/permissions.json`:** block print of `GITHUB_TOKEN`/`ghs_`; block length-check workflow changes.
+- **Docs:** HANDOFF/NEXT/README/INDEX/ENV/`file_list.csv`; FM §5.16 PH-SVC65…74.
+- **Product queue unchanged:** §5.12 **10** · next session **`абракадабра`** → band 82. Open: PH-SVC34 · PH-SVC35.
+
 ## 2026-07-24 — Security hygiene service band (PH-SVC55…SVC64)
 
 - **`.gitignore`**: `.env*`, `*.pem`/`*.key`, `certs/*.pem`, full `data/audit/`, e2e `poolai.log`/`pid`, MSYS path artifacts.
