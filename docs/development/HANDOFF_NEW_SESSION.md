@@ -49,7 +49,7 @@
 | **PH-S1477** | vision-sync + ratio hold |
 | **PH-S1478** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **395**. **Pending completion:** **810** (→ PH-S2278).
+**§5.12:** **10** відкритих. **Vision:** rev **396**. **Pending completion:** **810** (→ PH-S2278).
 
 ## Band 82 — Policies store wire (PH-S1459…S1468, ✅)
 
