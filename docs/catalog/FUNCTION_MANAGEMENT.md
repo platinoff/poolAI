@@ -1221,7 +1221,7 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **10** (band 84 ✅ · band 85 open). **Master horizon:** PH-S1489…S1498 (band 85). **Completion pending:** PH-S1489…S2278 = **790** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **399**. **Наступна сесія:** **`абракадабра`** — drain band 85.
+**Відкритих у §5.12:** **10** (band 84 ✅ · band 85 open). **Master horizon:** PH-S1489…S1498 (band 85). **Completion pending:** PH-S1489…S2278 = **790** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **400**. **Наступна сесія:** **`абракадабра`** — drain band 85.
 
 ### 5.66 Policies stand smoke queue — band 85 (PH-S1489…S1498) · **ACTIVE**
 

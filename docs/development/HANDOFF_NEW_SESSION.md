@@ -49,7 +49,7 @@
 | **PH-S1497** | Ratio hold advisory |
 | **PH-S1498** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **399**. **Pending completion:** **790** (→ PH-S2278).
+**§5.12:** **10** відкритих. **Vision:** rev **400**. **Pending completion:** **790** (→ PH-S2278).
 
 ## Band 84 — Policies admin/ops glue (PH-S1479…S1488, ✅)
 
