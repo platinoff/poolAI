@@ -1221,24 +1221,43 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **10** (band 83 ✅ · band 84 open). **Master horizon:** PH-S1479…S1488 (band 84). **Completion pending:** PH-S1479…S2278 = **800** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **398**. **Наступна сесія:** **`абракадабра`** — drain band 84.
+**Відкритих у §5.12:** **10** (band 84 ✅ · band 85 open). **Master horizon:** PH-S1489…S1498 (band 85). **Completion pending:** PH-S1489…S2278 = **790** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **399**. **Наступна сесія:** **`абракадабра`** — drain band 85.
 
-### 5.65 Policies admin/ops glue queue — band 84 (PH-S1479…S1488) · **ACTIVE**
+### 5.66 Policies stand smoke queue — band 85 (PH-S1489…S1498) · **ACTIVE**
+
+**Джерело:** project completion / enterprise phase D — Policies live stand smoke (mirror band 75 [`AUDIT_STAND_SMOKE.md`](../development/AUDIT_STAND_SMOKE.md)). Prior admin/ops: [`POLICIES_ADMIN_OPS.md`](../development/POLICIES_ADMIN_OPS.md) (band 84). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · master [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1424 | **PH-S1489** | `policy_stand_smoke_depth` ui-core module | `policy_stand_smoke_depth.rs` | depth enum + stand-smoke criteria registry | **[ ]** |
+| 1425 | **PH-S1490** | Live store wire smoke | `GET /policy/store` | shape + integration | **[ ]** |
+| 1426 | **PH-S1491** | Live security policies query smoke | `GET /security/policies` | list + filters stub | **[ ]** |
+| 1427 | **PH-S1492** | Live policy-field fixture smoke | validate fixture | missing name/timeout → 4xx | **[ ]** |
+| 1428 | **PH-S1493** | CLI `--policy-stand-smoke` | stand smoke bin | live suite + export shape | **[ ]** |
+| 1429 | **PH-S1494** | `poolai-loc-audit --policy-stand-smoke` | loc-audit | `rust_ratio.json` fields | **[ ]** |
+| 1430 | **PH-S1495** | `VERIFY_POLICY_STAND_SMOKE` | verify-dev-stand | live + loc-audit verify | **[ ]** |
+| 1431 | **PH-S1496** | Docs `POLICIES_STAND_SMOKE.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | stand matrix | **[ ]** |
+| 1432 | **PH-S1497** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **[ ]** |
+| 1433 | **PH-S1498** | Policies stand smoke band close | tests/docs | `galaxy_horizon_s1489_integration`; HANDOFF/NEXT | **[ ]** |
+
+### 5.65 Policies admin/ops glue queue — band 84 (PH-S1479…S1488) · **✅**
 
 **Джерело:** project completion / enterprise phase D — Policies admin/ops glue (mirror band 74 [`AUDIT_ADMIN_OPS.md`](../development/AUDIT_ADMIN_OPS.md)). Prior API: [`POLICIES_API.md`](../development/POLICIES_API.md) (band 83). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · master [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
-| 1414 | **PH-S1479** | `policy_admin_ops_depth` ui-core module | `policy_admin_ops_depth.rs` | depth enum + admin/ops criteria registry | **[ ]** |
-| 1415 | **PH-S1480** | Admin policy store-wire status strip | `src/ui/admin` security | badge ← `GET /policy/store` | **[ ]** |
-| 1416 | **PH-S1481** | Admin policy query ops glue | same | refresh policies from HTTP query contracts | **[ ]** |
-| 1417 | **PH-S1482** | Admin policy ops HTML contracts | `policy_admin_ops_integration.rs` | store/query markers | **[ ]** |
-| 1418 | **PH-S1483** | i18n Policies admin ops keys | `i18n.rs` ADMIN_POLICY_* | EN/UK patch keys | **[ ]** |
-| 1419 | **PH-S1484** | `VERIFY_POLICY_ADMIN_OPS` + quick `--policy-admin-ops` | verify-dev-stand | gate + RUN_LOCAL | **[ ]** |
-| 1420 | **PH-S1485** | Stand smoke + `poolai-loc-audit --policy-admin-ops` | stand smoke / loc-audit | export shape + rust_ratio fields | **[ ]** |
-| 1421 | **PH-S1486** | Docs `POLICIES_ADMIN_OPS.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | ops matrix | **[ ]** |
-| 1422 | **PH-S1487** | vision-sync --check + ratio hold | vision / loc-audit | drift + `--min-ratio 0.95 --advisory` | **[ ]** |
-| 1423 | **PH-S1488** | Policies admin/ops band close | tests/docs | `galaxy_horizon_s1479_integration`; HANDOFF/NEXT | **[ ]** |
+| 1414 | **PH-S1479** | `policy_admin_ops_depth` ui-core module | `policy_admin_ops_depth.rs` | depth enum + admin/ops criteria registry | **✅** |
+| 1415 | **PH-S1480** | Admin policy store-wire status strip | `src/ui/admin` security | badge ← `GET /policy/store` | **✅** |
+| 1416 | **PH-S1481** | Admin policy query ops glue | same | refresh policies from HTTP query contracts | **✅** |
+| 1417 | **PH-S1482** | Admin policy ops HTML contracts | `policy_admin_ops_integration.rs` | store/query markers | **✅** |
+| 1418 | **PH-S1483** | i18n Policies admin ops keys | `i18n.rs` ADMIN_POLICY_* | EN/UK patch keys | **✅** |
+| 1419 | **PH-S1484** | `VERIFY_POLICY_ADMIN_OPS` + quick `--policy-admin-ops` | verify-dev-stand | gate + RUN_LOCAL | **✅** |
+| 1420 | **PH-S1485** | Stand smoke + `poolai-loc-audit --policy-admin-ops` | stand smoke / loc-audit | export shape + rust_ratio fields | **✅** |
+| 1421 | **PH-S1486** | Docs `POLICIES_ADMIN_OPS.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | ops matrix | **✅** |
+| 1422 | **PH-S1487** | vision-sync --check + ratio hold | vision / loc-audit | drift + `--min-ratio 0.95 --advisory` | **✅** |
+| 1423 | **PH-S1488** | Policies admin/ops band close | tests/docs | `galaxy_horizon_s1479_integration`; HANDOFF/NEXT | **✅** |
+
+**PH-S1488 ✅ (2026-07-25):** `policy_admin_ops_depth.rs`; `#policy-store-badge` ← `GET /policy/store`; `refreshSecurityPolicies`; `--policy-admin-ops`; `VERIFY_POLICY_ADMIN_OPS`; `POLICIES_ADMIN_OPS.md`; `galaxy_horizon_s1479_integration`. Phase D Policies admin/ops glue closed.
 
 ### 5.64 Policies API contracts queue — band 83 (PH-S1469…S1478) · **✅**
 
@@ -2116,7 +2135,7 @@ FM-xxx (з таблиці нижче)
 | **Enterprise subset pending** | **760** (S1389…S2148 → §5.17) |
 | **Extension pending** | **130** (S2149…S2278 → §5.18) |
 | **Drained** | band 51–74 PH-S1149…S1388 ✅ |
-| **Активна §5.12** | band 84 **PH-S1479…S1488** `[ ]` (§5.65) |
+| **Активна §5.12** | band 85 **PH-S1489…S1498** `[ ]` (§5.66) |
 | **План** | [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md) |
 | **Реєстр** | [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md) |
 | **Regen** | `bash scripts/generate-ph-s-master-backlog-1000.sh` · `bash scripts/generate-ph-s-completion-extension.sh` |
@@ -2264,7 +2283,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-25):** band 84 **PH-S1479…S1488** `[ ]` · §5.12 **10** · band 83 ✅ · service PH-SVC65…SVC74 ✅ (GH App tokens) · PH-SVC55…SVC64 ✅ · PH-SVC45…SVC54 ✅ · P0 PH-SVC41…43 ✅ · PH-SVC34/35 · наступна **`абракадабра`** → band 84 · completion pending **800** → S2278.
+**Активна смуга (2026-07-25):** band 85 **PH-S1489…S1498** `[ ]` · §5.12 **10** · band 84 ✅ · band 83 ✅ · service PH-SVC65…SVC74 ✅ (GH App tokens) · PH-SVC55…SVC64 ✅ · PH-SVC45…SVC54 ✅ · P0 PH-SVC41…43 ✅ · PH-SVC34/35 · наступна **`абракадабра`** → band 85 · completion pending **790** → S2278.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

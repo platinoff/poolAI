@@ -47,6 +47,7 @@ pub mod network_profiles;
 pub mod openapi_wire_depth;
 pub mod owner_ops_depth;
 pub mod payout_batch;
+pub mod policy_admin_ops_depth;
 pub mod policy_api_contracts_depth;
 pub mod policy_depth;
 pub mod policy_store_depth;

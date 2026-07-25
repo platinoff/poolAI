@@ -2,6 +2,7 @@
 //!
 //! Provides OAuth2/SAML providers and security policies management.
 //! PH-S1280/S1281: SSO store-wire status strip + OAuth2/SAML ops glue (band 64).
+//! PH-S1480/S1481: policy store-wire status strip + policy refresh glue (band 84).
 
 use crate::ui::admin::admin_layout_security;
 use axum::response::Html;
@@ -45,6 +46,41 @@ pub async fn admin_security() -> Html<String> {
         if (el) {
           el.innerHTML = '<span class="status-badge inactive">' +
             escapeHtml(T('admin.sso.storeErr', 'SSO store wire unavailable')) + '</span>';
+        }
+      }
+    }
+
+    function renderPolicyStoreBadge(wire) {
+      const el = document.getElementById('policy-store-badge');
+      if (!el) return;
+      const mode = String((wire && wire.mode) || 'memory').toLowerCase();
+      const configured = !!(wire && wire.configured);
+      const path = (wire && wire.durable_path) ? String(wire.durable_path) : '';
+      const storeLabel = T('admin.policy.storeLabel', 'Policy store:');
+      const storeHint = T('admin.policy.storeHint', 'Policy persistence backend (POOLAI_POLICY_STORE / POOLAI_POLICY_DATA_DIR)');
+      const modeLabel = T('admin.policy.store.' + mode, mode);
+      const cfg = configured
+        ? T('admin.policy.store.configured', 'configured')
+        : T('admin.policy.store.unconfigured', 'unconfigured');
+      const pathBit = path ? (' · ' + escapeHtml(path)) : '';
+      el.innerHTML =
+        '<span class="status-badge ' + (configured ? 'active' : 'inactive') + '" title="' + escapeHtml(storeHint) + '">' +
+        escapeHtml(storeLabel) + ' ' + escapeHtml(modeLabel) + ' (' + escapeHtml(cfg) + ')' + pathBit +
+        '</span>';
+    }
+
+    async function loadPolicyStoreWire() {
+      const el = document.getElementById('policy-store-badge');
+      if (el) {
+        el.textContent = T('admin.policy.storeLoading', 'Loading store…');
+      }
+      try {
+        const wire = await fetchJson('/api/enterprise/policy/store');
+        renderPolicyStoreBadge(wire);
+      } catch (e) {
+        if (el) {
+          el.innerHTML = '<span class="status-badge inactive">' +
+            escapeHtml(T('admin.policy.storeErr', 'Policy store wire unavailable')) + '</span>';
         }
       }
     }
@@ -548,6 +584,15 @@ pub async fn admin_security() -> Html<String> {
         adminShowInlineError('security-content', e);
       }
     }
+
+    async function refreshSecurityPolicies() {
+      try {
+        await loadSecurityPolicies();
+        showNotification(T('admin.policy.refreshOk', 'Security policies refreshed'), 'success');
+      } catch (e) {
+        showNotification(T('admin.policy.refreshErr', 'Security policies refresh failed: ') + e.message, 'error');
+      }
+    }
     
     function renderSecurityPolicies(policies) {
       const el = document.getElementById('security-content');
@@ -558,6 +603,7 @@ pub async fn admin_security() -> Html<String> {
       el.innerHTML = `
         <div class="admin-header">
           <h3>${escapeHtml(T('admin.sec.policiesHeading', 'Security Policies'))}</h3>
+          <button type="button" class="btn" onclick="refreshSecurityPolicies()">${escapeHtml(T('admin.policy.btn.refresh', 'Refresh'))}</button>
           <button type="button" class="btn btn-primary" onclick="showCreatePolicyModal()" aria-label="${escapeHtml(T('admin.sec.createPolicyBtn', 'Create Policy'))}">${escapeHtml(T('admin.sec.createPolicyBtn', 'Create Policy'))}</button>
         </div>
         <div id="security-policies-list">
@@ -788,6 +834,7 @@ pub async fn admin_security() -> Html<String> {
     });
 
     loadSsoStoreWire();
+    loadPolicyStoreWire();
     loadTabContent('oauth2');
     "#;
 
@@ -799,6 +846,7 @@ pub async fn admin_security() -> Html<String> {
           <div class="admin-header">
             <h2 data-i18n="admin.page.security">Security Management</h2>
             <span id="sso-store-badge" class="sso-store-badge muted" data-i18n="admin.sso.storeLoading">Loading store…</span>
+            <span id="policy-store-badge" class="policy-store-badge muted" data-i18n="admin.policy.storeLoading">Loading store…</span>
           </div>
           <div class="admin-tabs" role="tablist" aria-label="Security management">
             <button type="button" class="tab active" id="security-tab-oauth2" role="tab" aria-selected="true" aria-controls="security-content" data-tab="oauth2" data-i18n="admin.sec.tab.oauth">OAuth2 Providers</button>
@@ -1105,4 +1153,13 @@ async fn admin_security_sso_admin_ops_glue_ph_s1280() {
     assert!(html.contains("/api/enterprise/security/sso/store"));
     assert!(html.contains("refreshOAuth2Providers"));
     assert!(html.contains("refreshSamlProviders"));
+}
+
+#[tokio::test]
+async fn admin_security_policy_admin_ops_glue_ph_s1480() {
+    let html = admin_security().await.0;
+    assert!(html.contains("id=\"policy-store-badge\""));
+    assert!(html.contains("loadPolicyStoreWire"));
+    assert!(html.contains("/api/enterprise/policy/store"));
+    assert!(html.contains("refreshSecurityPolicies"));
 }

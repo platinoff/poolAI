@@ -895,6 +895,50 @@ pub const ADMIN_SSO_UK: &[I18nRow<'_>] = &[
     ("admin.sso.refreshSamlErr", "Помилка оновлення SAML: "),
 ];
 
+/// English policies admin/ops keys (PH-S1483 band 84).
+pub const ADMIN_POLICY_EN: &[I18nRow<'_>] = &[
+    ("admin.policy.storeLoading", "Loading store…"),
+    ("admin.policy.storeLabel", "Policy store:"),
+    (
+        "admin.policy.storeHint",
+        "Policy persistence backend (POOLAI_POLICY_STORE / POOLAI_POLICY_DATA_DIR)",
+    ),
+    ("admin.policy.store.memory", "memory"),
+    ("admin.policy.store.sqlite", "sqlite"),
+    ("admin.policy.store.file", "file"),
+    ("admin.policy.store.configured", "configured"),
+    ("admin.policy.store.unconfigured", "unconfigured"),
+    ("admin.policy.storeErr", "Policy store wire unavailable"),
+    ("admin.policy.btn.refresh", "Refresh"),
+    ("admin.policy.refreshOk", "Security policies refreshed"),
+    (
+        "admin.policy.refreshErr",
+        "Security policies refresh failed: ",
+    ),
+];
+
+/// Ukrainian policies admin/ops keys (PH-S1483 band 84).
+pub const ADMIN_POLICY_UK: &[I18nRow<'_>] = &[
+    ("admin.policy.storeLoading", "Завантаження сховища…"),
+    ("admin.policy.storeLabel", "Сховище політик:"),
+    (
+        "admin.policy.storeHint",
+        "Бекенд персистентності політик (POOLAI_POLICY_STORE / POOLAI_POLICY_DATA_DIR)",
+    ),
+    ("admin.policy.store.memory", "memory"),
+    ("admin.policy.store.sqlite", "sqlite"),
+    ("admin.policy.store.file", "file"),
+    ("admin.policy.store.configured", "налаштовано"),
+    ("admin.policy.store.unconfigured", "не налаштовано"),
+    ("admin.policy.storeErr", "Policy store wire недоступний"),
+    ("admin.policy.btn.refresh", "Оновити"),
+    ("admin.policy.refreshOk", "Політики безпеки оновлено"),
+    (
+        "admin.policy.refreshErr",
+        "Помилка оновлення політик безпеки: ",
+    ),
+];
+
 /// English security admin keys (PH-S231; moved from `i18n_core.js`).
 pub const ADMIN_SECURITY_EN: &[I18nRow<'_>] = &[
     ("admin.page.security", "Security Management"),
@@ -3015,12 +3059,14 @@ pub fn admin_tenants_patch_script() -> String {
     )
 }
 
-/// Security admin page — slim `admin.sec.*` + `admin.sso.*` patch (PH-S231; SSO ops PH-S1283).
+/// Security admin page — slim security/SSO/policy patch (PH-S231; PH-S1283; PH-S1483).
 pub fn admin_security_patch() -> BTreeMap<String, BTreeMap<String, String>> {
     let mut en = rows_to_map(ADMIN_SECURITY_EN);
     en.extend(rows_to_map(ADMIN_SSO_EN));
+    en.extend(rows_to_map(ADMIN_POLICY_EN));
     let mut uk = rows_to_map(ADMIN_SECURITY_UK);
     uk.extend(rows_to_map(ADMIN_SSO_UK));
+    uk.extend(rows_to_map(ADMIN_POLICY_UK));
     let mut root = BTreeMap::new();
     root.insert("en".into(), en);
     root.insert("uk".into(), uk);
@@ -3521,6 +3567,7 @@ pub fn t_en(key: &str) -> Option<&'static str> {
         ADMIN_TENANTS_EN,
         ADMIN_SECURITY_EN,
         ADMIN_SSO_EN,
+        ADMIN_POLICY_EN,
         ADMIN_TOPOLOGY_EN,
         ADMIN_INSTANCES_EN,
         ADMIN_VM_EN,
@@ -3546,6 +3593,7 @@ pub fn t_uk(key: &str) -> Option<&'static str> {
         ADMIN_TENANTS_UK,
         ADMIN_SECURITY_UK,
         ADMIN_SSO_UK,
+        ADMIN_POLICY_UK,
         ADMIN_TOPOLOGY_UK,
         ADMIN_INSTANCES_UK,
         ADMIN_VM_UK,
@@ -3650,6 +3698,7 @@ mod tests {
     fn security_patch_has_matching_en_uk_key_counts_ph_s231() {
         assert_eq!(ADMIN_SECURITY_EN.len(), ADMIN_SECURITY_UK.len());
         assert_eq!(ADMIN_SSO_EN.len(), ADMIN_SSO_UK.len());
+        assert_eq!(ADMIN_POLICY_EN.len(), ADMIN_POLICY_UK.len());
     }
 
     #[test]

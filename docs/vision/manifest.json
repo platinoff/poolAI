@@ -2838,7 +2838,7 @@
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S1478",
+  "last_sprint_closed": "PH-S1488",
   "layers": [
     {
       "id": "L0",
@@ -2871,7 +2871,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1479",
+  "next_sprint": "PH-S1489",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -11240,97 +11240,97 @@
       "path": "tests/policy_api_contracts_integration.rs"
     }
   ],
-  "revision": 398,
+  "revision": 399,
   "sprint_queue": [
     {
-      "acceptance": "depth enum + admin/ops criteria registry",
-      "deps": "policy_admin_ops_depth.rs",
-      "id": "PH-S1479",
+      "acceptance": "depth enum + stand-smoke criteria registry",
+      "deps": "policy_stand_smoke_depth.rs",
+      "id": "PH-S1489",
       "open": true,
-      "row": 1414,
+      "row": 1424,
       "status": "open",
-      "title": "policy_admin_ops_depth` ui-core module"
+      "title": "policy_stand_smoke_depth` ui-core module"
     },
     {
-      "acceptance": "badge ← `GET /policy/store",
-      "deps": "src/ui/admin` security",
-      "id": "PH-S1480",
+      "acceptance": "shape + integration",
+      "deps": "GET /policy/store",
+      "id": "PH-S1490",
       "open": true,
-      "row": 1415,
+      "row": 1425,
       "status": "open",
-      "title": "Admin policy store-wire status strip"
+      "title": "Live store wire smoke"
     },
     {
-      "acceptance": "refresh policies from HTTP query contracts",
-      "deps": "same",
-      "id": "PH-S1481",
+      "acceptance": "list + filters stub",
+      "deps": "GET /security/policies",
+      "id": "PH-S1491",
       "open": true,
-      "row": 1416,
+      "row": 1426,
       "status": "open",
-      "title": "Admin policy query ops glue"
+      "title": "Live security policies query smoke"
     },
     {
-      "acceptance": "store/query markers",
-      "deps": "policy_admin_ops_integration.rs",
-      "id": "PH-S1482",
+      "acceptance": "missing name/timeout → 4xx",
+      "deps": "validate fixture",
+      "id": "PH-S1492",
       "open": true,
-      "row": 1417,
+      "row": 1427,
       "status": "open",
-      "title": "Admin policy ops HTML contracts"
+      "title": "Live policy-field fixture smoke"
     },
     {
-      "acceptance": "EN/UK patch keys",
-      "deps": "i18n.rs` ADMIN_POLICY_*",
-      "id": "PH-S1483",
+      "acceptance": "live suite + export shape",
+      "deps": "stand smoke bin",
+      "id": "PH-S1493",
       "open": true,
-      "row": 1418,
+      "row": 1428,
       "status": "open",
-      "title": "i18n Policies admin ops keys"
+      "title": "CLI `--policy-stand-smoke"
     },
     {
-      "acceptance": "gate + RUN_LOCAL",
+      "acceptance": "rust_ratio.json` fields",
+      "deps": "loc-audit",
+      "id": "PH-S1494",
+      "open": true,
+      "row": 1429,
+      "status": "open",
+      "title": "poolai-loc-audit --policy-stand-smoke"
+    },
+    {
+      "acceptance": "live + loc-audit verify",
       "deps": "verify-dev-stand",
-      "id": "PH-S1484",
+      "id": "PH-S1495",
       "open": true,
-      "row": 1419,
+      "row": 1430,
       "status": "open",
-      "title": "VERIFY_POLICY_ADMIN_OPS` + quick `--policy-admin-ops"
+      "title": "VERIFY_POLICY_STAND_SMOKE"
     },
     {
-      "acceptance": "export shape + rust_ratio fields",
-      "deps": "stand smoke / loc-audit",
-      "id": "PH-S1485",
-      "open": true,
-      "row": 1420,
-      "status": "open",
-      "title": "Stand smoke + `poolai-loc-audit --policy-admin-ops"
-    },
-    {
-      "acceptance": "ops matrix",
+      "acceptance": "stand matrix",
       "deps": "RUN_LOCAL/INDEX/HANDOFF/NEXT",
-      "id": "PH-S1486",
+      "id": "PH-S1496",
       "open": true,
-      "row": 1421,
+      "row": 1431,
       "status": "open",
-      "title": "Docs `POLICIES_ADMIN_OPS.md` + canon"
+      "title": "Docs `POLICIES_STAND_SMOKE.md` + canon"
     },
     {
-      "acceptance": "drift + `--min-ratio 0.95 --advisory",
-      "deps": "vision / loc-audit",
-      "id": "PH-S1487",
+      "acceptance": "--min-ratio 0.95 --advisory",
+      "deps": "loc-audit",
+      "id": "PH-S1497",
       "open": true,
-      "row": 1422,
+      "row": 1432,
       "status": "open",
-      "title": "vision-sync --check + ratio hold"
+      "title": "Ratio hold advisory"
     },
     {
-      "acceptance": "galaxy_horizon_s1479_integration`; HANDOFF/NEXT",
+      "acceptance": "galaxy_horizon_s1489_integration`; HANDOFF/NEXT",
       "deps": "tests/docs",
-      "id": "PH-S1488",
+      "id": "PH-S1498",
       "open": true,
-      "row": 1423,
+      "row": 1433,
       "status": "open",
-      "title": "Policies admin/ops band close"
+      "title": "Policies stand smoke band close"
     }
   ],
   "sprint_queue_open_count": 10,

@@ -1,8 +1,8 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-25 (band 83 **PH-S1469…S1478** ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 84 ready)
+**Оновлено:** 2026-07-25 (band 84 **PH-S1479…S1488** ✅ · band 83 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 85 ready)
 
-**Наступна сесія:** **`абракадабра`** — drain band 84 (FM **§5.65** Policies admin/ops glue).
+**Наступна сесія:** **`абракадабра`** — drain band 85 (FM **§5.66** Policies stand smoke).
 
 ## P0 / service (2026-07-25)
 
@@ -22,7 +22,7 @@
 
 **Cursor / toolchain (service):** local desktop **3.13.10** · Auto-review · Cursor research [`CURSOR_UPDATE_RESEARCH_2026-07-24.md`](./CURSOR_UPDATE_RESEARCH_2026-07-24.md) · FM **§5.16**.
 
-**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **800** спринтів → PH-S2278.
+**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **790** спринтів → PH-S2278.
 
 ## Security findings closed (PH-SVC55…64, by severity)
 
@@ -35,7 +35,24 @@
 | **Low** | Corrupted MSYS path / e2e tmp artifacts | ignore patterns widened |
 | **Open (OWNER)** | PH-SVC35 Atlassian token (historical) | revoke in Atlassian; no history rewrite |
 
-## Band 84 — Policies admin/ops glue (PH-S1479…S1488, **ACTIVE**)
+## Band 85 — Policies stand smoke (PH-S1489…S1498, **ACTIVE**)
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1489** | `policy_stand_smoke_depth` scaffold |
+| **PH-S1490** | Live store wire smoke `GET /policy/store` |
+| **PH-S1491** | Live security policies query smoke |
+| **PH-S1492** | Live policy-field fixture smoke |
+| **PH-S1493** | CLI `--policy-stand-smoke` |
+| **PH-S1494** | `poolai-loc-audit --policy-stand-smoke` |
+| **PH-S1495** | `VERIFY_POLICY_STAND_SMOKE` |
+| **PH-S1496** | Docs `POLICIES_STAND_SMOKE.md` + canon |
+| **PH-S1497** | Ratio hold advisory |
+| **PH-S1498** | Band close |
+
+**§5.12:** **10** відкритих. **Vision:** rev **399**. **Pending completion:** **790** (→ PH-S2278).
+
+## Band 84 — Policies admin/ops glue (PH-S1479…S1488, ✅)
+
 | Sprint | Фокус |
 |--------|--------|
 | **PH-S1479** | `policy_admin_ops_depth` scaffold |
@@ -49,7 +66,7 @@
 | **PH-S1487** | vision-sync + ratio hold |
 | **PH-S1488** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **398**. **Pending completion:** **800** (→ PH-S2278).
+**PH-S1488 ✅ (2026-07-25):** `policy_admin_ops_depth.rs`; `#policy-store-badge` ← `GET /policy/store`; `refreshSecurityPolicies`; `--policy-admin-ops`; `VERIFY_POLICY_ADMIN_OPS`; `POLICIES_ADMIN_OPS.md`; `galaxy_horizon_s1479_integration`. Phase D Policies admin/ops glue closed.
 
 ## Band 83 — Policies API contracts (PH-S1469…S1478, ✅)
 

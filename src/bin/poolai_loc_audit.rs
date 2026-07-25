@@ -40,6 +40,9 @@ use poolai_ui_core::ci_canon_depth::{ci_canon_criteria_total, CI_CANON_CASES, CI
 use poolai_ui_core::galaxy_edge_verification_depth::{
     edge_verification_criteria_total, EDGE_VERIFICATION_CASES, EDGE_VERIFICATION_CRITERIA,
 };
+use poolai_ui_core::policy_admin_ops_depth::{
+    policy_admin_ops_criteria_total, POLICY_ADMIN_OPS_CASES, POLICY_ADMIN_OPS_CRITERIA,
+};
 use poolai_ui_core::policy_api_contracts_depth::{
     policy_api_criteria_total, POLICY_API_CASES, POLICY_API_CRITERIA,
 };
@@ -266,6 +269,8 @@ struct AuditConfig {
     policy_store: bool,
     /// Emit band-83 policies HTTP API contracts fields (PH-S1475).
     policy_api: bool,
+    /// Emit band-84 policies admin/ops fields (PH-S1485).
+    policy_admin_ops: bool,
 }
 
 impl Default for AuditConfig {
@@ -314,6 +319,7 @@ impl Default for AuditConfig {
             policy: false,
             policy_store: false,
             policy_api: false,
+            policy_admin_ops: false,
         }
     }
 }
@@ -599,6 +605,12 @@ struct RustRatioReport {
     policy_api_criteria_total: usize,
     /// Policies HTTP API criteria met count (PH-S1475).
     policy_api_criteria_met_count: usize,
+    /// Band-84 policies admin/ops mode (PH-S1485).
+    policy_admin_ops_mode: bool,
+    /// Policies admin/ops criteria registry size (PH-S1485).
+    policy_admin_ops_criteria_total: usize,
+    /// Policies admin/ops criteria met count (PH-S1485).
+    policy_admin_ops_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -927,6 +939,22 @@ fn policy_policy_api_criteria_met(root: &Path) -> (usize, usize) {
     let total = policy_api_criteria_total();
     let mut met = 0usize;
     for (_, marker, rel) in POLICY_API_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
+fn policy_policy_admin_ops_criteria_met(root: &Path) -> (usize, usize) {
+    let total = policy_admin_ops_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in POLICY_ADMIN_OPS_CRITERIA {
         let path = root.join(rel);
         if path.is_file() {
             if let Ok(content) = fs::read_to_string(&path) {
@@ -1356,6 +1384,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--policy" => config.policy = true,
             "--policy-store" => config.policy_store = true,
             "--policy-api" => config.policy_api = true,
+            "--policy-admin-ops" => config.policy_admin_ops = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
                 print_help();
@@ -1416,6 +1445,7 @@ fn print_help() {
            --policy                    band-81 policies depth scaffold fields (PH-S1454)\n\
            --policy-store              band-82 policies store-wire fields (PH-S1464)\n\
            --policy-api                band-83 policies HTTP API contracts fields (PH-S1475)\n\
+           --policy-admin-ops          band-84 policies admin/ops fields (PH-S1485)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -1913,6 +1943,16 @@ fn build_report(
         notes.push("PH-S1475: policy_api_mode — query/store HTTP contracts + field fixtures");
         notes.push("PH-S1478: band 83 policies API contracts — criteria met vs registry");
     }
+    let (policy_admin_ops_criteria_met_count, policy_admin_ops_criteria_total_count) =
+        if config.policy_admin_ops {
+            policy_policy_admin_ops_criteria_met(root)
+        } else {
+            (0, policy_admin_ops_criteria_total())
+        };
+    if config.policy_admin_ops {
+        notes.push("PH-S1485: policy_admin_ops_mode — store strip / policy refresh / verify hooks");
+        notes.push("PH-S1488: band 84 policies admin/ops glue — criteria met vs registry");
+    }
 
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
@@ -2058,6 +2098,9 @@ fn build_report(
         policy_api_mode: config.policy_api,
         policy_api_criteria_total: policy_api_criteria_total_count,
         policy_api_criteria_met_count,
+        policy_admin_ops_mode: config.policy_admin_ops,
+        policy_admin_ops_criteria_total: policy_admin_ops_criteria_total_count,
+        policy_admin_ops_criteria_met_count,
         by_category,
         notes,
     })
@@ -2486,6 +2529,17 @@ fn print_summary(report: &RustRatioReport) {
             report.policy_api_criteria_met_count, report.policy_api_criteria_total
         );
         println!("  policy_api_cases:      {}", POLICY_API_CASES.join(", "));
+    }
+    if report.policy_admin_ops_mode {
+        println!("  policy_admin_ops:      true (PH-S1485 band 84)");
+        println!(
+            "  policy_admin_ops_criteria: {}/{} met",
+            report.policy_admin_ops_criteria_met_count, report.policy_admin_ops_criteria_total
+        );
+        println!(
+            "  policy_admin_ops_cases: {}",
+            POLICY_ADMIN_OPS_CASES.join(", ")
+        );
     }
     for (name, loc) in &report.by_category {
         println!("  {name}: {} files, {} loc", loc.files, loc.loc);

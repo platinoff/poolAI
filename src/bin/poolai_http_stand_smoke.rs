@@ -6322,6 +6322,49 @@ mod tests {
     }
 
     #[test]
+    fn policy_admin_ops_band84_export_shape_ph_s1485() {
+        use poolai_ui_core::policy_admin_ops_depth::{
+            policy_admin_ops_criteria_total, policy_admin_ops_depth_stub, PolicyAdminOpsDepth,
+            FM_BAND84_ROWS, POLICY_ADMIN_OPS_CASES, POLICY_ADMIN_OPS_CRITERIA,
+        };
+        use serde_json::json;
+        assert_eq!(
+            policy_admin_ops_depth_stub(Some(&json!({"query_ops_glue": true}))),
+            PolicyAdminOpsDepth::QueryOpsGlue
+        );
+        assert_eq!(
+            policy_admin_ops_depth_stub(Some(&json!({
+                "policy_admin_ops_depth": true,
+                "store_strip": true,
+                "query_ops_glue": true,
+                "html_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "policy_admin_ops_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            PolicyAdminOpsDepth::FullBand84
+        );
+        assert_eq!(POLICY_ADMIN_OPS_CRITERIA.len(), 10);
+        assert_eq!(policy_admin_ops_criteria_total(), 10);
+        assert!(POLICY_ADMIN_OPS_CASES.contains(&"store_strip"));
+        let policy_ui = include_str!("../../src/ui/admin/security.rs");
+        assert!(policy_ui.contains("policy-store-badge"));
+        assert!(policy_ui.contains("refreshSecurityPolicies"));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--policy-admin-ops"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND84_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band84 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn audit_store_band72_export_shape_ph_s1363() {
         use poolai_ui_core::audit_store_depth::{
             audit_store_criteria_total, audit_store_depth_stub, AuditStoreDepth, AUDIT_STORE_CASES,

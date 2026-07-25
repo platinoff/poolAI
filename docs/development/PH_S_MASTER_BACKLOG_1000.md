@@ -608,20 +608,20 @@
 | **PH-S1477** | vision-sync + ratio hold | `--check` + `--min-ratio 0.95 --advisory` | **✅** |
 | **PH-S1478** | galaxy_horizon_s1469_integration | band close | **✅** |
 
-## Band 84 — PH-S1479…S1488 (D Policies · admin/ops glue)
+## Band 84 — PH-S1479…S1488 (D Policies · admin/ops glue) · **✅** (FM §5.65 override)
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1479** | `policy_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1480** | `policy` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1481** | `policy` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1482** | `policy` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1483** | Stand smoke `policy` export | export shape unit test | **[ ]** |
-| **PH-S1484** | poolai-loc-audit PH-S1484 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1485** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1486** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1487** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1488** | galaxy_horizon_s1479_integration | band close | **[ ]** |
+| **PH-S1479** | `policy_admin_ops_depth` | ui-core depth enum + criteria registry | **✅** |
+| **PH-S1480** | Admin policy store strip | `#policy-store-badge` ← `GET /policy/store` | **✅** |
+| **PH-S1481** | Admin policy query ops | `refreshSecurityPolicies` | **✅** |
+| **PH-S1482** | HTML contracts | `policy_admin_ops_integration` | **✅** |
+| **PH-S1483** | i18n ADMIN_POLICY_* | EN/UK patch keys | **✅** |
+| **PH-S1484** | `VERIFY_POLICY_ADMIN_OPS` | verify-dev-stand / run-poolai | **✅** |
+| **PH-S1485** | Stand smoke + loc-audit `--policy-admin-ops` | export shape + rust_ratio | **✅** |
+| **PH-S1486** | Docs `POLICIES_ADMIN_OPS.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | **✅** |
+| **PH-S1487** | vision-sync + ratio hold | `--check` + `--min-ratio 0.95 --advisory` | **✅** |
+| **PH-S1488** | galaxy_horizon_s1479_integration | band close | **✅** |
 
 ## Band 85 — PH-S1489…S1498 (D Policies · stand smoke)
 

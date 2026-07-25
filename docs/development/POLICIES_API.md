@@ -1,6 +1,6 @@
 # Policies HTTP API Contracts — Enterprise Phase D (Band 83)
 
-Canonical doc: [`POLICIES_API.md`](./POLICIES_API.md) (band 83, PH-S1476). Prev: [`POLICIES_STORE.md`](./POLICIES_STORE.md) (band 82 ✅). Next: Policies admin/ops (band 84).
+Canonical doc: [`POLICIES_API.md`](./POLICIES_API.md) (band 83, PH-S1476). Prev: [`POLICIES_STORE.md`](./POLICIES_STORE.md) (band 82 ✅). Next: [`POLICIES_ADMIN_OPS.md`](./POLICIES_ADMIN_OPS.md) (band 84 ✅).
 
 ## Overview
 
