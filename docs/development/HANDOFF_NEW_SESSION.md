@@ -49,7 +49,7 @@
 | **PH-S1487** | vision-sync + ratio hold |
 | **PH-S1488** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **397**. **Pending completion:** **800** (→ PH-S2278).
+**§5.12:** **10** відкритих. **Vision:** rev **398**. **Pending completion:** **800** (→ PH-S2278).
 
 ## Band 83 — Policies API contracts (PH-S1469…S1478, ✅)
 
