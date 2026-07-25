@@ -6280,551 +6280,593 @@
 <a href=#6280 id=6280 data-nosnippet>6280</a>    }
 <a href=#6281 id=6281 data-nosnippet>6281</a>
 <a href=#6282 id=6282 data-nosnippet>6282</a>    <span class="attr">#[test]
-<a href=#6283 id=6283 data-nosnippet>6283</a>    </span><span class="kw">fn </span>audit_store_band72_export_shape_ph_s1363() {
-<a href=#6284 id=6284 data-nosnippet>6284</a>        <span class="kw">use </span>poolai_ui_core::audit_store_depth::{
-<a href=#6285 id=6285 data-nosnippet>6285</a>            audit_store_criteria_total, audit_store_depth_stub, AuditStoreDepth, AUDIT_STORE_CASES,
-<a href=#6286 id=6286 data-nosnippet>6286</a>            AUDIT_STORE_CRITERIA, FM_BAND72_ROWS,
+<a href=#6283 id=6283 data-nosnippet>6283</a>    </span><span class="kw">fn </span>policy_api_band83_export_shape_ph_s1475() {
+<a href=#6284 id=6284 data-nosnippet>6284</a>        <span class="kw">use </span>poolai_ui_core::policy_api_contracts_depth::{
+<a href=#6285 id=6285 data-nosnippet>6285</a>            policy_api_contracts_depth_stub, policy_api_criteria_total, PolicyApiContractsDepth,
+<a href=#6286 id=6286 data-nosnippet>6286</a>            FM_BAND83_ROWS, POLICY_API_CASES, POLICY_API_CRITERIA,
 <a href=#6287 id=6287 data-nosnippet>6287</a>        };
 <a href=#6288 id=6288 data-nosnippet>6288</a>        <span class="kw">use </span>serde_json::json;
 <a href=#6289 id=6289 data-nosnippet>6289</a>        <span class="macro">assert_eq!</span>(
-<a href=#6290 id=6290 data-nosnippet>6290</a>            audit_store_depth_stub(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({<span class="string">"api_contracts"</span>: <span class="bool-val">true</span>}))),
-<a href=#6291 id=6291 data-nosnippet>6291</a>            AuditStoreDepth::ApiContracts
+<a href=#6290 id=6290 data-nosnippet>6290</a>            policy_api_contracts_depth_stub(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({<span class="string">"store_wire_http"</span>: <span class="bool-val">true</span>}))),
+<a href=#6291 id=6291 data-nosnippet>6291</a>            PolicyApiContractsDepth::StoreWireHttp
 <a href=#6292 id=6292 data-nosnippet>6292</a>        );
 <a href=#6293 id=6293 data-nosnippet>6293</a>        <span class="macro">assert_eq!</span>(
-<a href=#6294 id=6294 data-nosnippet>6294</a>            audit_store_depth_stub(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({
-<a href=#6295 id=6295 data-nosnippet>6295</a>                <span class="string">"audit_store_depth"</span>: <span class="bool-val">true</span>,
-<a href=#6296 id=6296 data-nosnippet>6296</a>                <span class="string">"store_wire"</span>: <span class="bool-val">true</span>,
-<a href=#6297 id=6297 data-nosnippet>6297</a>                <span class="string">"api_contracts"</span>: <span class="bool-val">true</span>,
-<a href=#6298 id=6298 data-nosnippet>6298</a>                <span class="string">"verify_dev_stand_hook"</span>: <span class="bool-val">true</span>,
-<a href=#6299 id=6299 data-nosnippet>6299</a>                <span class="string">"stand_smoke_export"</span>: <span class="bool-val">true</span>,
-<a href=#6300 id=6300 data-nosnippet>6300</a>                <span class="string">"loc_audit_flag"</span>: <span class="bool-val">true</span>,
-<a href=#6301 id=6301 data-nosnippet>6301</a>                <span class="string">"audit_store_docs"</span>: <span class="bool-val">true</span>,
-<a href=#6302 id=6302 data-nosnippet>6302</a>            }))),
-<a href=#6303 id=6303 data-nosnippet>6303</a>            AuditStoreDepth::FullBand72
-<a href=#6304 id=6304 data-nosnippet>6304</a>        );
-<a href=#6305 id=6305 data-nosnippet>6305</a>        <span class="macro">assert_eq!</span>(AUDIT_STORE_CRITERIA.len(), <span class="number">7</span>);
-<a href=#6306 id=6306 data-nosnippet>6306</a>        <span class="macro">assert_eq!</span>(audit_store_criteria_total(), <span class="number">7</span>);
-<a href=#6307 id=6307 data-nosnippet>6307</a>        <span class="macro">assert!</span>(AUDIT_STORE_CASES.contains(<span class="kw-2">&amp;</span><span class="string">"store_wire"</span>));
-<a href=#6308 id=6308 data-nosnippet>6308</a>        <span class="kw">let </span>audit_mod = <span class="macro">include_str!</span>(<span class="string">"../../src/enterprise/audit.rs"</span>);
-<a href=#6309 id=6309 data-nosnippet>6309</a>        <span class="macro">assert!</span>(audit_mod.contains(<span class="string">"audit_store_wire"</span>));
-<a href=#6310 id=6310 data-nosnippet>6310</a>        <span class="macro">assert!</span>(audit_mod.contains(<span class="string">"POOLAI_AUDIT_DATA_DIR"</span>));
-<a href=#6311 id=6311 data-nosnippet>6311</a>        <span class="kw">let </span>loc_audit = <span class="macro">include_str!</span>(<span class="string">"../../src/bin/poolai_loc_audit.rs"</span>);
-<a href=#6312 id=6312 data-nosnippet>6312</a>        <span class="macro">assert!</span>(loc_audit.contains(<span class="string">"--audit-store"</span>));
-<a href=#6313 id=6313 data-nosnippet>6313</a>        <span class="kw">let </span>fm = <span class="macro">include_str!</span>(<span class="string">"../../docs/catalog/FUNCTION_MANAGEMENT.md"</span>);
-<a href=#6314 id=6314 data-nosnippet>6314</a>        <span class="kw">for </span>row <span class="kw">in </span>FM_BAND72_ROWS {
-<a href=#6315 id=6315 data-nosnippet>6315</a>            <span class="macro">assert!</span>(
-<a href=#6316 id=6316 data-nosnippet>6316</a>                fm.contains(row) || row.starts_with(<span class="string">"PH-S"</span>),
-<a href=#6317 id=6317 data-nosnippet>6317</a>                <span class="string">"FM band72 row {row}"
-<a href=#6318 id=6318 data-nosnippet>6318</a>            </span>);
-<a href=#6319 id=6319 data-nosnippet>6319</a>        }
-<a href=#6320 id=6320 data-nosnippet>6320</a>    }
-<a href=#6321 id=6321 data-nosnippet>6321</a>
-<a href=#6322 id=6322 data-nosnippet>6322</a>    <span class="attr">#[test]
-<a href=#6323 id=6323 data-nosnippet>6323</a>    </span><span class="kw">fn </span>audit_api_band73_export_shape_ph_s1375() {
-<a href=#6324 id=6324 data-nosnippet>6324</a>        <span class="kw">use </span>poolai_ui_core::audit_api_contracts_depth::{
-<a href=#6325 id=6325 data-nosnippet>6325</a>            audit_api_contracts_depth_stub, audit_api_criteria_total, AuditApiContractsDepth,
-<a href=#6326 id=6326 data-nosnippet>6326</a>            AUDIT_API_CASES, AUDIT_API_CRITERIA, FM_BAND73_ROWS,
-<a href=#6327 id=6327 data-nosnippet>6327</a>        };
-<a href=#6328 id=6328 data-nosnippet>6328</a>        <span class="kw">use </span>serde_json::json;
-<a href=#6329 id=6329 data-nosnippet>6329</a>        <span class="macro">assert_eq!</span>(
-<a href=#6330 id=6330 data-nosnippet>6330</a>            audit_api_contracts_depth_stub(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({<span class="string">"store_wire_http"</span>: <span class="bool-val">true</span>}))),
-<a href=#6331 id=6331 data-nosnippet>6331</a>            AuditApiContractsDepth::StoreWireHttp
-<a href=#6332 id=6332 data-nosnippet>6332</a>        );
-<a href=#6333 id=6333 data-nosnippet>6333</a>        <span class="macro">assert_eq!</span>(
-<a href=#6334 id=6334 data-nosnippet>6334</a>            audit_api_contracts_depth_stub(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({
-<a href=#6335 id=6335 data-nosnippet>6335</a>                <span class="string">"audit_api_depth"</span>: <span class="bool-val">true</span>,
-<a href=#6336 id=6336 data-nosnippet>6336</a>                <span class="string">"query_http_lifecycle"</span>: <span class="bool-val">true</span>,
-<a href=#6337 id=6337 data-nosnippet>6337</a>                <span class="string">"store_wire_http"</span>: <span class="bool-val">true</span>,
-<a href=#6338 id=6338 data-nosnippet>6338</a>                <span class="string">"openapi_schemas"</span>: <span class="bool-val">true</span>,
-<a href=#6339 id=6339 data-nosnippet>6339</a>                <span class="string">"event_field_fixtures"</span>: <span class="bool-val">true</span>,
+<a href=#6294 id=6294 data-nosnippet>6294</a>            policy_api_contracts_depth_stub(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({
+<a href=#6295 id=6295 data-nosnippet>6295</a>                <span class="string">"policy_api_depth"</span>: <span class="bool-val">true</span>,
+<a href=#6296 id=6296 data-nosnippet>6296</a>                <span class="string">"query_http_lifecycle"</span>: <span class="bool-val">true</span>,
+<a href=#6297 id=6297 data-nosnippet>6297</a>                <span class="string">"store_wire_http"</span>: <span class="bool-val">true</span>,
+<a href=#6298 id=6298 data-nosnippet>6298</a>                <span class="string">"openapi_schemas"</span>: <span class="bool-val">true</span>,
+<a href=#6299 id=6299 data-nosnippet>6299</a>                <span class="string">"policy_field_fixtures"</span>: <span class="bool-val">true</span>,
+<a href=#6300 id=6300 data-nosnippet>6300</a>                <span class="string">"verify_dev_stand_hook"</span>: <span class="bool-val">true</span>,
+<a href=#6301 id=6301 data-nosnippet>6301</a>                <span class="string">"stand_smoke_export"</span>: <span class="bool-val">true</span>,
+<a href=#6302 id=6302 data-nosnippet>6302</a>                <span class="string">"loc_audit_flag"</span>: <span class="bool-val">true</span>,
+<a href=#6303 id=6303 data-nosnippet>6303</a>                <span class="string">"policy_api_docs"</span>: <span class="bool-val">true</span>,
+<a href=#6304 id=6304 data-nosnippet>6304</a>            }))),
+<a href=#6305 id=6305 data-nosnippet>6305</a>            PolicyApiContractsDepth::FullBand83
+<a href=#6306 id=6306 data-nosnippet>6306</a>        );
+<a href=#6307 id=6307 data-nosnippet>6307</a>        <span class="macro">assert_eq!</span>(POLICY_API_CRITERIA.len(), <span class="number">9</span>);
+<a href=#6308 id=6308 data-nosnippet>6308</a>        <span class="macro">assert_eq!</span>(policy_api_criteria_total(), <span class="number">9</span>);
+<a href=#6309 id=6309 data-nosnippet>6309</a>        <span class="macro">assert!</span>(POLICY_API_CASES.contains(<span class="kw-2">&amp;</span><span class="string">"store_wire_http"</span>));
+<a href=#6310 id=6310 data-nosnippet>6310</a>        <span class="kw">let </span>security_api = <span class="macro">include_str!</span>(<span class="string">"../../src/network/enterprise_api/security.rs"</span>);
+<a href=#6311 id=6311 data-nosnippet>6311</a>        <span class="macro">assert!</span>(security_api.contains(<span class="string">"GET /policy/store"</span>));
+<a href=#6312 id=6312 data-nosnippet>6312</a>        <span class="macro">assert!</span>(security_api.contains(<span class="string">"policy_store_wire_handler"</span>));
+<a href=#6313 id=6313 data-nosnippet>6313</a>        <span class="kw">let </span>loc_audit = <span class="macro">include_str!</span>(<span class="string">"../../src/bin/poolai_loc_audit.rs"</span>);
+<a href=#6314 id=6314 data-nosnippet>6314</a>        <span class="macro">assert!</span>(loc_audit.contains(<span class="string">"--policy-api"</span>));
+<a href=#6315 id=6315 data-nosnippet>6315</a>        <span class="kw">let </span>fm = <span class="macro">include_str!</span>(<span class="string">"../../docs/catalog/FUNCTION_MANAGEMENT.md"</span>);
+<a href=#6316 id=6316 data-nosnippet>6316</a>        <span class="kw">for </span>row <span class="kw">in </span>FM_BAND83_ROWS {
+<a href=#6317 id=6317 data-nosnippet>6317</a>            <span class="macro">assert!</span>(
+<a href=#6318 id=6318 data-nosnippet>6318</a>                fm.contains(row) || row.starts_with(<span class="string">"PH-S"</span>),
+<a href=#6319 id=6319 data-nosnippet>6319</a>                <span class="string">"FM band83 row {row}"
+<a href=#6320 id=6320 data-nosnippet>6320</a>            </span>);
+<a href=#6321 id=6321 data-nosnippet>6321</a>        }
+<a href=#6322 id=6322 data-nosnippet>6322</a>    }
+<a href=#6323 id=6323 data-nosnippet>6323</a>
+<a href=#6324 id=6324 data-nosnippet>6324</a>    <span class="attr">#[test]
+<a href=#6325 id=6325 data-nosnippet>6325</a>    </span><span class="kw">fn </span>audit_store_band72_export_shape_ph_s1363() {
+<a href=#6326 id=6326 data-nosnippet>6326</a>        <span class="kw">use </span>poolai_ui_core::audit_store_depth::{
+<a href=#6327 id=6327 data-nosnippet>6327</a>            audit_store_criteria_total, audit_store_depth_stub, AuditStoreDepth, AUDIT_STORE_CASES,
+<a href=#6328 id=6328 data-nosnippet>6328</a>            AUDIT_STORE_CRITERIA, FM_BAND72_ROWS,
+<a href=#6329 id=6329 data-nosnippet>6329</a>        };
+<a href=#6330 id=6330 data-nosnippet>6330</a>        <span class="kw">use </span>serde_json::json;
+<a href=#6331 id=6331 data-nosnippet>6331</a>        <span class="macro">assert_eq!</span>(
+<a href=#6332 id=6332 data-nosnippet>6332</a>            audit_store_depth_stub(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({<span class="string">"api_contracts"</span>: <span class="bool-val">true</span>}))),
+<a href=#6333 id=6333 data-nosnippet>6333</a>            AuditStoreDepth::ApiContracts
+<a href=#6334 id=6334 data-nosnippet>6334</a>        );
+<a href=#6335 id=6335 data-nosnippet>6335</a>        <span class="macro">assert_eq!</span>(
+<a href=#6336 id=6336 data-nosnippet>6336</a>            audit_store_depth_stub(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({
+<a href=#6337 id=6337 data-nosnippet>6337</a>                <span class="string">"audit_store_depth"</span>: <span class="bool-val">true</span>,
+<a href=#6338 id=6338 data-nosnippet>6338</a>                <span class="string">"store_wire"</span>: <span class="bool-val">true</span>,
+<a href=#6339 id=6339 data-nosnippet>6339</a>                <span class="string">"api_contracts"</span>: <span class="bool-val">true</span>,
 <a href=#6340 id=6340 data-nosnippet>6340</a>                <span class="string">"verify_dev_stand_hook"</span>: <span class="bool-val">true</span>,
 <a href=#6341 id=6341 data-nosnippet>6341</a>                <span class="string">"stand_smoke_export"</span>: <span class="bool-val">true</span>,
 <a href=#6342 id=6342 data-nosnippet>6342</a>                <span class="string">"loc_audit_flag"</span>: <span class="bool-val">true</span>,
-<a href=#6343 id=6343 data-nosnippet>6343</a>                <span class="string">"audit_api_docs"</span>: <span class="bool-val">true</span>,
+<a href=#6343 id=6343 data-nosnippet>6343</a>                <span class="string">"audit_store_docs"</span>: <span class="bool-val">true</span>,
 <a href=#6344 id=6344 data-nosnippet>6344</a>            }))),
-<a href=#6345 id=6345 data-nosnippet>6345</a>            AuditApiContractsDepth::FullBand73
+<a href=#6345 id=6345 data-nosnippet>6345</a>            AuditStoreDepth::FullBand72
 <a href=#6346 id=6346 data-nosnippet>6346</a>        );
-<a href=#6347 id=6347 data-nosnippet>6347</a>        <span class="macro">assert_eq!</span>(AUDIT_API_CRITERIA.len(), <span class="number">9</span>);
-<a href=#6348 id=6348 data-nosnippet>6348</a>        <span class="macro">assert_eq!</span>(audit_api_criteria_total(), <span class="number">9</span>);
-<a href=#6349 id=6349 data-nosnippet>6349</a>        <span class="macro">assert!</span>(AUDIT_API_CASES.contains(<span class="kw-2">&amp;</span><span class="string">"store_wire_http"</span>));
-<a href=#6350 id=6350 data-nosnippet>6350</a>        <span class="kw">let </span>audit_api = <span class="macro">include_str!</span>(<span class="string">"../../src/network/enterprise_api/audit.rs"</span>);
-<a href=#6351 id=6351 data-nosnippet>6351</a>        <span class="macro">assert!</span>(audit_api.contains(<span class="string">"GET /audit/store"</span>));
-<a href=#6352 id=6352 data-nosnippet>6352</a>        <span class="macro">assert!</span>(audit_api.contains(<span class="string">"audit_store_wire_handler"</span>));
+<a href=#6347 id=6347 data-nosnippet>6347</a>        <span class="macro">assert_eq!</span>(AUDIT_STORE_CRITERIA.len(), <span class="number">7</span>);
+<a href=#6348 id=6348 data-nosnippet>6348</a>        <span class="macro">assert_eq!</span>(audit_store_criteria_total(), <span class="number">7</span>);
+<a href=#6349 id=6349 data-nosnippet>6349</a>        <span class="macro">assert!</span>(AUDIT_STORE_CASES.contains(<span class="kw-2">&amp;</span><span class="string">"store_wire"</span>));
+<a href=#6350 id=6350 data-nosnippet>6350</a>        <span class="kw">let </span>audit_mod = <span class="macro">include_str!</span>(<span class="string">"../../src/enterprise/audit.rs"</span>);
+<a href=#6351 id=6351 data-nosnippet>6351</a>        <span class="macro">assert!</span>(audit_mod.contains(<span class="string">"audit_store_wire"</span>));
+<a href=#6352 id=6352 data-nosnippet>6352</a>        <span class="macro">assert!</span>(audit_mod.contains(<span class="string">"POOLAI_AUDIT_DATA_DIR"</span>));
 <a href=#6353 id=6353 data-nosnippet>6353</a>        <span class="kw">let </span>loc_audit = <span class="macro">include_str!</span>(<span class="string">"../../src/bin/poolai_loc_audit.rs"</span>);
-<a href=#6354 id=6354 data-nosnippet>6354</a>        <span class="macro">assert!</span>(loc_audit.contains(<span class="string">"--audit-api"</span>));
+<a href=#6354 id=6354 data-nosnippet>6354</a>        <span class="macro">assert!</span>(loc_audit.contains(<span class="string">"--audit-store"</span>));
 <a href=#6355 id=6355 data-nosnippet>6355</a>        <span class="kw">let </span>fm = <span class="macro">include_str!</span>(<span class="string">"../../docs/catalog/FUNCTION_MANAGEMENT.md"</span>);
-<a href=#6356 id=6356 data-nosnippet>6356</a>        <span class="kw">for </span>row <span class="kw">in </span>FM_BAND73_ROWS {
+<a href=#6356 id=6356 data-nosnippet>6356</a>        <span class="kw">for </span>row <span class="kw">in </span>FM_BAND72_ROWS {
 <a href=#6357 id=6357 data-nosnippet>6357</a>            <span class="macro">assert!</span>(
 <a href=#6358 id=6358 data-nosnippet>6358</a>                fm.contains(row) || row.starts_with(<span class="string">"PH-S"</span>),
-<a href=#6359 id=6359 data-nosnippet>6359</a>                <span class="string">"FM band73 row {row}"
+<a href=#6359 id=6359 data-nosnippet>6359</a>                <span class="string">"FM band72 row {row}"
 <a href=#6360 id=6360 data-nosnippet>6360</a>            </span>);
 <a href=#6361 id=6361 data-nosnippet>6361</a>        }
 <a href=#6362 id=6362 data-nosnippet>6362</a>    }
 <a href=#6363 id=6363 data-nosnippet>6363</a>
 <a href=#6364 id=6364 data-nosnippet>6364</a>    <span class="attr">#[test]
-<a href=#6365 id=6365 data-nosnippet>6365</a>    </span><span class="kw">fn </span>audit_admin_ops_band74_export_shape_ph_s1385() {
-<a href=#6366 id=6366 data-nosnippet>6366</a>        <span class="kw">use </span>poolai_ui_core::audit_admin_ops_depth::{
-<a href=#6367 id=6367 data-nosnippet>6367</a>            audit_admin_ops_criteria_total, audit_admin_ops_depth_stub, AuditAdminOpsDepth,
-<a href=#6368 id=6368 data-nosnippet>6368</a>            AUDIT_ADMIN_OPS_CASES, AUDIT_ADMIN_OPS_CRITERIA, FM_BAND74_ROWS,
+<a href=#6365 id=6365 data-nosnippet>6365</a>    </span><span class="kw">fn </span>audit_api_band73_export_shape_ph_s1375() {
+<a href=#6366 id=6366 data-nosnippet>6366</a>        <span class="kw">use </span>poolai_ui_core::audit_api_contracts_depth::{
+<a href=#6367 id=6367 data-nosnippet>6367</a>            audit_api_contracts_depth_stub, audit_api_criteria_total, AuditApiContractsDepth,
+<a href=#6368 id=6368 data-nosnippet>6368</a>            AUDIT_API_CASES, AUDIT_API_CRITERIA, FM_BAND73_ROWS,
 <a href=#6369 id=6369 data-nosnippet>6369</a>        };
 <a href=#6370 id=6370 data-nosnippet>6370</a>        <span class="kw">use </span>serde_json::json;
 <a href=#6371 id=6371 data-nosnippet>6371</a>        <span class="macro">assert_eq!</span>(
-<a href=#6372 id=6372 data-nosnippet>6372</a>            audit_admin_ops_depth_stub(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({<span class="string">"query_ops_glue"</span>: <span class="bool-val">true</span>}))),
-<a href=#6373 id=6373 data-nosnippet>6373</a>            AuditAdminOpsDepth::QueryOpsGlue
+<a href=#6372 id=6372 data-nosnippet>6372</a>            audit_api_contracts_depth_stub(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({<span class="string">"store_wire_http"</span>: <span class="bool-val">true</span>}))),
+<a href=#6373 id=6373 data-nosnippet>6373</a>            AuditApiContractsDepth::StoreWireHttp
 <a href=#6374 id=6374 data-nosnippet>6374</a>        );
 <a href=#6375 id=6375 data-nosnippet>6375</a>        <span class="macro">assert_eq!</span>(
-<a href=#6376 id=6376 data-nosnippet>6376</a>            audit_admin_ops_depth_stub(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({
-<a href=#6377 id=6377 data-nosnippet>6377</a>                <span class="string">"audit_admin_ops_depth"</span>: <span class="bool-val">true</span>,
-<a href=#6378 id=6378 data-nosnippet>6378</a>                <span class="string">"store_strip"</span>: <span class="bool-val">true</span>,
-<a href=#6379 id=6379 data-nosnippet>6379</a>                <span class="string">"query_ops_glue"</span>: <span class="bool-val">true</span>,
-<a href=#6380 id=6380 data-nosnippet>6380</a>                <span class="string">"html_contracts"</span>: <span class="bool-val">true</span>,
-<a href=#6381 id=6381 data-nosnippet>6381</a>                <span class="string">"verify_dev_stand_hook"</span>: <span class="bool-val">true</span>,
-<a href=#6382 id=6382 data-nosnippet>6382</a>                <span class="string">"stand_smoke_export"</span>: <span class="bool-val">true</span>,
-<a href=#6383 id=6383 data-nosnippet>6383</a>                <span class="string">"loc_audit_flag"</span>: <span class="bool-val">true</span>,
-<a href=#6384 id=6384 data-nosnippet>6384</a>                <span class="string">"audit_admin_ops_docs"</span>: <span class="bool-val">true</span>,
-<a href=#6385 id=6385 data-nosnippet>6385</a>                <span class="string">"ratio_hold"</span>: <span class="bool-val">true</span>,
-<a href=#6386 id=6386 data-nosnippet>6386</a>                <span class="string">"band_close"</span>: <span class="bool-val">true</span>,
-<a href=#6387 id=6387 data-nosnippet>6387</a>            }))),
-<a href=#6388 id=6388 data-nosnippet>6388</a>            AuditAdminOpsDepth::FullBand74
-<a href=#6389 id=6389 data-nosnippet>6389</a>        );
-<a href=#6390 id=6390 data-nosnippet>6390</a>        <span class="macro">assert_eq!</span>(AUDIT_ADMIN_OPS_CRITERIA.len(), <span class="number">10</span>);
-<a href=#6391 id=6391 data-nosnippet>6391</a>        <span class="macro">assert_eq!</span>(audit_admin_ops_criteria_total(), <span class="number">10</span>);
-<a href=#6392 id=6392 data-nosnippet>6392</a>        <span class="macro">assert!</span>(AUDIT_ADMIN_OPS_CASES.contains(<span class="kw-2">&amp;</span><span class="string">"store_strip"</span>));
-<a href=#6393 id=6393 data-nosnippet>6393</a>        <span class="kw">let </span>audit_ui = <span class="macro">include_str!</span>(<span class="string">"../../src/ui/admin/audit.rs"</span>);
-<a href=#6394 id=6394 data-nosnippet>6394</a>        <span class="macro">assert!</span>(audit_ui.contains(<span class="string">"audit-store-badge"</span>));
-<a href=#6395 id=6395 data-nosnippet>6395</a>        <span class="macro">assert!</span>(audit_ui.contains(<span class="string">"refreshAuditEvents"</span>));
-<a href=#6396 id=6396 data-nosnippet>6396</a>        <span class="kw">let </span>loc_audit = <span class="macro">include_str!</span>(<span class="string">"../../src/bin/poolai_loc_audit.rs"</span>);
-<a href=#6397 id=6397 data-nosnippet>6397</a>        <span class="macro">assert!</span>(loc_audit.contains(<span class="string">"--audit-admin-ops"</span>));
-<a href=#6398 id=6398 data-nosnippet>6398</a>        <span class="kw">let </span>fm = <span class="macro">include_str!</span>(<span class="string">"../../docs/catalog/FUNCTION_MANAGEMENT.md"</span>);
-<a href=#6399 id=6399 data-nosnippet>6399</a>        <span class="kw">for </span>row <span class="kw">in </span>FM_BAND74_ROWS {
-<a href=#6400 id=6400 data-nosnippet>6400</a>            <span class="macro">assert!</span>(
-<a href=#6401 id=6401 data-nosnippet>6401</a>                fm.contains(row) || row.starts_with(<span class="string">"PH-S"</span>),
-<a href=#6402 id=6402 data-nosnippet>6402</a>                <span class="string">"FM band74 row {row}"
-<a href=#6403 id=6403 data-nosnippet>6403</a>            </span>);
-<a href=#6404 id=6404 data-nosnippet>6404</a>        }
-<a href=#6405 id=6405 data-nosnippet>6405</a>    }
-<a href=#6406 id=6406 data-nosnippet>6406</a>
-<a href=#6407 id=6407 data-nosnippet>6407</a>    <span class="attr">#[test]
-<a href=#6408 id=6408 data-nosnippet>6408</a>    </span><span class="kw">fn </span>galaxy_edge_verification_band48_export_shape_ph_s1125() {
-<a href=#6409 id=6409 data-nosnippet>6409</a>        <span class="kw">use </span>poolai_ui_core::galaxy_edge_verification_depth::{
-<a href=#6410 id=6410 data-nosnippet>6410</a>            edge_verification_criteria_total, galaxy_edge_verification_depth_stub,
-<a href=#6411 id=6411 data-nosnippet>6411</a>            GalaxyEdgeVerificationDepth, EDGE_VERIFICATION_CASES, EDGE_VERIFICATION_CRITERIA,
-<a href=#6412 id=6412 data-nosnippet>6412</a>            FM_BAND48_ROWS,
-<a href=#6413 id=6413 data-nosnippet>6413</a>        };
-<a href=#6414 id=6414 data-nosnippet>6414</a>        <span class="kw">use </span>serde_json::json;
-<a href=#6415 id=6415 data-nosnippet>6415</a>        <span class="macro">assert_eq!</span>(
-<a href=#6416 id=6416 data-nosnippet>6416</a>            galaxy_edge_verification_depth_stub(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({<span class="string">"fraud_proof_stub"</span>: <span class="bool-val">true</span>}))),
-<a href=#6417 id=6417 data-nosnippet>6417</a>            GalaxyEdgeVerificationDepth::FraudProofStub
-<a href=#6418 id=6418 data-nosnippet>6418</a>        );
-<a href=#6419 id=6419 data-nosnippet>6419</a>        <span class="macro">assert_eq!</span>(
-<a href=#6420 id=6420 data-nosnippet>6420</a>            galaxy_edge_verification_depth_stub(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({
-<a href=#6421 id=6421 data-nosnippet>6421</a>                <span class="string">"fraud_proof_stub"</span>: <span class="bool-val">true</span>,
-<a href=#6422 id=6422 data-nosnippet>6422</a>                <span class="string">"capability_admission"</span>: <span class="bool-val">true</span>,
-<a href=#6423 id=6423 data-nosnippet>6423</a>                <span class="string">"network_profile_stale"</span>: <span class="bool-val">true</span>,
-<a href=#6424 id=6424 data-nosnippet>6424</a>                <span class="string">"tee_attestation"</span>: <span class="bool-val">true</span>,
-<a href=#6425 id=6425 data-nosnippet>6425</a>                <span class="string">"metrics_http"</span>: <span class="bool-val">true</span>,
-<a href=#6426 id=6426 data-nosnippet>6426</a>                <span class="string">"stand_smoke_parity"</span>: <span class="bool-val">true</span>,
-<a href=#6427 id=6427 data-nosnippet>6427</a>            }))),
-<a href=#6428 id=6428 data-nosnippet>6428</a>            GalaxyEdgeVerificationDepth::FullBand48
-<a href=#6429 id=6429 data-nosnippet>6429</a>        );
-<a href=#6430 id=6430 data-nosnippet>6430</a>        <span class="macro">assert_eq!</span>(EDGE_VERIFICATION_CRITERIA.len(), <span class="number">7</span>);
-<a href=#6431 id=6431 data-nosnippet>6431</a>        <span class="macro">assert_eq!</span>(edge_verification_criteria_total(), <span class="number">7</span>);
-<a href=#6432 id=6432 data-nosnippet>6432</a>        <span class="macro">assert!</span>(EDGE_VERIFICATION_CASES.contains(<span class="kw-2">&amp;</span><span class="string">"openapi_wire"</span>));
-<a href=#6433 id=6433 data-nosnippet>6433</a>        <span class="kw">let </span>fm = <span class="macro">include_str!</span>(<span class="string">"../../docs/catalog/FUNCTION_MANAGEMENT.md"</span>);
-<a href=#6434 id=6434 data-nosnippet>6434</a>        <span class="kw">for </span>row <span class="kw">in </span>FM_BAND48_ROWS {
-<a href=#6435 id=6435 data-nosnippet>6435</a>            <span class="macro">assert!</span>(
-<a href=#6436 id=6436 data-nosnippet>6436</a>                fm.contains(row) || row.starts_with(<span class="string">"PH-S"</span>),
-<a href=#6437 id=6437 data-nosnippet>6437</a>                <span class="string">"FM band48 row {row}"
-<a href=#6438 id=6438 data-nosnippet>6438</a>            </span>);
-<a href=#6439 id=6439 data-nosnippet>6439</a>        }
-<a href=#6440 id=6440 data-nosnippet>6440</a>    }
-<a href=#6441 id=6441 data-nosnippet>6441</a>
-<a href=#6442 id=6442 data-nosnippet>6442</a>    <span class="attr">#[test]
-<a href=#6443 id=6443 data-nosnippet>6443</a>    </span><span class="kw">fn </span>grid_verification_replay_json_export_shape_ph_s710() {
-<a href=#6444 id=6444 data-nosnippet>6444</a>        <span class="kw">use </span>poolai::grid::stand_smoke_metrics_parity::{
-<a href=#6445 id=6445 data-nosnippet>6445</a>            validate_grid_metrics_json_export, REPLAY_JSON_KEYS, VERIFICATION_JSON_KEYS,
-<a href=#6446 id=6446 data-nosnippet>6446</a>        };
-<a href=#6447 id=6447 data-nosnippet>6447</a>        <span class="kw">let </span>verification = <span class="macro">serde_json::json!</span>({
-<a href=#6448 id=6448 data-nosnippet>6448</a>            <span class="string">"ok"</span>: <span class="bool-val">true</span>,
-<a href=#6449 id=6449 data-nosnippet>6449</a>            <span class="string">"metrics"</span>: {
-<a href=#6450 id=6450 data-nosnippet>6450</a>                <span class="string">"sample_total"</span>: <span class="number">0</span>,
-<a href=#6451 id=6451 data-nosnippet>6451</a>                <span class="string">"mismatch_total"</span>: <span class="number">0</span>,
-<a href=#6452 id=6452 data-nosnippet>6452</a>                <span class="string">"match_total"</span>: <span class="number">0</span>,
-<a href=#6453 id=6453 data-nosnippet>6453</a>                <span class="string">"checker_pending_total"</span>: <span class="number">0</span>,
-<a href=#6454 id=6454 data-nosnippet>6454</a>            }
-<a href=#6455 id=6455 data-nosnippet>6455</a>        });
-<a href=#6456 id=6456 data-nosnippet>6456</a>        validate_grid_metrics_json_export(<span class="kw-2">&amp;</span>verification, VERIFICATION_JSON_KEYS)
-<a href=#6457 id=6457 data-nosnippet>6457</a>            .expect(<span class="string">"verification"</span>);
-<a href=#6458 id=6458 data-nosnippet>6458</a>        <span class="kw">let </span>replay = <span class="macro">serde_json::json!</span>({
-<a href=#6459 id=6459 data-nosnippet>6459</a>            <span class="string">"ok"</span>: <span class="bool-val">true</span>,
-<a href=#6460 id=6460 data-nosnippet>6460</a>            <span class="string">"metrics"</span>: {
-<a href=#6461 id=6461 data-nosnippet>6461</a>                <span class="string">"replay_pending"</span>: <span class="number">0</span>,
-<a href=#6462 id=6462 data-nosnippet>6462</a>                <span class="string">"replay_pending_scheduled_total"</span>: <span class="number">0</span>,
-<a href=#6463 id=6463 data-nosnippet>6463</a>                <span class="string">"verification_replay_record_total"</span>: <span class="number">0</span>,
-<a href=#6464 id=6464 data-nosnippet>6464</a>            }
-<a href=#6465 id=6465 data-nosnippet>6465</a>        });
-<a href=#6466 id=6466 data-nosnippet>6466</a>        validate_grid_metrics_json_export(<span class="kw-2">&amp;</span>replay, REPLAY_JSON_KEYS).expect(<span class="string">"replay"</span>);
-<a href=#6467 id=6467 data-nosnippet>6467</a>    }
-<a href=#6468 id=6468 data-nosnippet>6468</a>
-<a href=#6469 id=6469 data-nosnippet>6469</a>    <span class="attr">#[test]
-<a href=#6470 id=6470 data-nosnippet>6470</a>    </span><span class="kw">fn </span>grid_settlement_trust_replication_pricing_json_export_shape_ph_s711() {
-<a href=#6471 id=6471 data-nosnippet>6471</a>        <span class="kw">use </span>poolai::grid::stand_smoke_metrics_parity::{
-<a href=#6472 id=6472 data-nosnippet>6472</a>            validate_grid_metrics_json_export, PRICING_JSON_KEYS, REPLICATION_JSON_KEYS,
-<a href=#6473 id=6473 data-nosnippet>6473</a>            SETTLEMENT_JSON_KEYS, TRUST_JSON_KEYS,
-<a href=#6474 id=6474 data-nosnippet>6474</a>        };
-<a href=#6475 id=6475 data-nosnippet>6475</a>        <span class="kw">let </span>settlement = <span class="macro">serde_json::json!</span>({
-<a href=#6476 id=6476 data-nosnippet>6476</a>            <span class="string">"ok"</span>: <span class="bool-val">true</span>,
-<a href=#6477 id=6477 data-nosnippet>6477</a>            <span class="string">"metrics"</span>: {
-<a href=#6478 id=6478 data-nosnippet>6478</a>                <span class="string">"pending_verification_total"</span>: <span class="number">0</span>,
-<a href=#6479 id=6479 data-nosnippet>6479</a>                <span class="string">"cleared_total"</span>: <span class="number">0</span>,
-<a href=#6480 id=6480 data-nosnippet>6480</a>                <span class="string">"resolved_total"</span>: <span class="number">0</span>,
-<a href=#6481 id=6481 data-nosnippet>6481</a>                <span class="string">"payout_batch_total"</span>: <span class="number">0</span>,
-<a href=#6482 id=6482 data-nosnippet>6482</a>            }
-<a href=#6483 id=6483 data-nosnippet>6483</a>        });
-<a href=#6484 id=6484 data-nosnippet>6484</a>        validate_grid_metrics_json_export(<span class="kw-2">&amp;</span>settlement, SETTLEMENT_JSON_KEYS).expect(<span class="string">"settlement"</span>);
-<a href=#6485 id=6485 data-nosnippet>6485</a>        <span class="kw">let </span>trust = <span class="macro">serde_json::json!</span>({
-<a href=#6486 id=6486 data-nosnippet>6486</a>            <span class="string">"ok"</span>: <span class="bool-val">true</span>,
-<a href=#6487 id=6487 data-nosnippet>6487</a>            <span class="string">"metrics"</span>: {
-<a href=#6488 id=6488 data-nosnippet>6488</a>                <span class="string">"payout_eligible_total"</span>: <span class="number">0</span>,
-<a href=#6489 id=6489 data-nosnippet>6489</a>                <span class="string">"payout_held_total"</span>: <span class="number">0</span>,
-<a href=#6490 id=6490 data-nosnippet>6490</a>                <span class="string">"last_trust_score"</span>: <span class="number">0</span>,
-<a href=#6491 id=6491 data-nosnippet>6491</a>                <span class="string">"gate_min_threshold"</span>: <span class="number">40</span>,
-<a href=#6492 id=6492 data-nosnippet>6492</a>            }
-<a href=#6493 id=6493 data-nosnippet>6493</a>        });
-<a href=#6494 id=6494 data-nosnippet>6494</a>        validate_grid_metrics_json_export(<span class="kw-2">&amp;</span>trust, TRUST_JSON_KEYS).expect(<span class="string">"trust"</span>);
-<a href=#6495 id=6495 data-nosnippet>6495</a>        <span class="kw">let </span>replication = <span class="macro">serde_json::json!</span>({
-<a href=#6496 id=6496 data-nosnippet>6496</a>            <span class="string">"ok"</span>: <span class="bool-val">true</span>,
-<a href=#6497 id=6497 data-nosnippet>6497</a>            <span class="string">"metrics"</span>: {
-<a href=#6498 id=6498 data-nosnippet>6498</a>                <span class="string">"strict_total"</span>: <span class="number">0</span>,
-<a href=#6499 id=6499 data-nosnippet>6499</a>                <span class="string">"enqueue_total"</span>: <span class="number">0</span>,
-<a href=#6500 id=6500 data-nosnippet>6500</a>                <span class="string">"executor_enqueue_total"</span>: <span class="number">0</span>,
-<a href=#6501 id=6501 data-nosnippet>6501</a>                <span class="string">"rate_limited_total"</span>: <span class="number">0</span>,
-<a href=#6502 id=6502 data-nosnippet>6502</a>            }
-<a href=#6503 id=6503 data-nosnippet>6503</a>        });
-<a href=#6504 id=6504 data-nosnippet>6504</a>        validate_grid_metrics_json_export(<span class="kw-2">&amp;</span>replication, REPLICATION_JSON_KEYS)
-<a href=#6505 id=6505 data-nosnippet>6505</a>            .expect(<span class="string">"replication"</span>);
-<a href=#6506 id=6506 data-nosnippet>6506</a>        <span class="kw">let </span>pricing = <span class="macro">serde_json::json!</span>({
-<a href=#6507 id=6507 data-nosnippet>6507</a>            <span class="string">"ok"</span>: <span class="bool-val">true</span>,
-<a href=#6508 id=6508 data-nosnippet>6508</a>            <span class="string">"metrics"</span>: {
-<a href=#6509 id=6509 data-nosnippet>6509</a>                <span class="string">"fresh_served_total"</span>: <span class="number">0</span>,
-<a href=#6510 id=6510 data-nosnippet>6510</a>                <span class="string">"stale_served_total"</span>: <span class="number">0</span>,
-<a href=#6511 id=6511 data-nosnippet>6511</a>                <span class="string">"forced_fallback_total"</span>: <span class="number">0</span>,
-<a href=#6512 id=6512 data-nosnippet>6512</a>                <span class="string">"provider_catalog_lookups_total"</span>: <span class="number">0</span>,
-<a href=#6513 id=6513 data-nosnippet>6513</a>                <span class="string">"provider_catalog_hits_total"</span>: <span class="number">0</span>,
-<a href=#6514 id=6514 data-nosnippet>6514</a>                <span class="string">"provider_errors_total"</span>: <span class="number">0</span>,
-<a href=#6515 id=6515 data-nosnippet>6515</a>                <span class="string">"provider_timeouts_total"</span>: <span class="number">0</span>,
-<a href=#6516 id=6516 data-nosnippet>6516</a>            }
-<a href=#6517 id=6517 data-nosnippet>6517</a>        });
-<a href=#6518 id=6518 data-nosnippet>6518</a>        validate_grid_metrics_json_export(<span class="kw-2">&amp;</span>pricing, PRICING_JSON_KEYS).expect(<span class="string">"pricing"</span>);
-<a href=#6519 id=6519 data-nosnippet>6519</a>    }
-<a href=#6520 id=6520 data-nosnippet>6520</a>
-<a href=#6521 id=6521 data-nosnippet>6521</a>    <span class="attr">#[test]
-<a href=#6522 id=6522 data-nosnippet>6522</a>    </span><span class="kw">fn </span>grid_prefetch_locality_metrics_parity_ph_s831() {
-<a href=#6523 id=6523 data-nosnippet>6523</a>        <span class="kw">use </span>poolai::grid::stand_smoke_metrics_parity::{
-<a href=#6524 id=6524 data-nosnippet>6524</a>            validate_locality_metrics_parity, validate_prefetch_metrics_parity,
-<a href=#6525 id=6525 data-nosnippet>6525</a>        };
-<a href=#6526 id=6526 data-nosnippet>6526</a>
-<a href=#6527 id=6527 data-nosnippet>6527</a>        <span class="kw">let </span>prefetch_prom = <span class="macro">concat!</span>(
-<a href=#6528 id=6528 data-nosnippet>6528</a>            <span class="string">"galaxy_prefetch_pull_bytes_total 1024\n"</span>,
-<a href=#6529 id=6529 data-nosnippet>6529</a>            <span class="string">"galaxy_prefetch_backpressure_total 1\n"</span>,
-<a href=#6530 id=6530 data-nosnippet>6530</a>        );
-<a href=#6531 id=6531 data-nosnippet>6531</a>        <span class="kw">let </span>prefetch = <span class="macro">serde_json::json!</span>({
-<a href=#6532 id=6532 data-nosnippet>6532</a>            <span class="string">"ok"</span>: <span class="bool-val">true</span>,
-<a href=#6533 id=6533 data-nosnippet>6533</a>            <span class="string">"metrics"</span>: {
-<a href=#6534 id=6534 data-nosnippet>6534</a>                <span class="string">"pull_bytes_total"</span>: <span class="number">1024</span>,
-<a href=#6535 id=6535 data-nosnippet>6535</a>                <span class="string">"backpressure_total"</span>: <span class="number">1</span>,
-<a href=#6536 id=6536 data-nosnippet>6536</a>                <span class="string">"plan_total"</span>: <span class="number">0</span>,
-<a href=#6537 id=6537 data-nosnippet>6537</a>                <span class="string">"enqueue_total"</span>: <span class="number">0</span>,
-<a href=#6538 id=6538 data-nosnippet>6538</a>                <span class="string">"peer_fetch_total"</span>: <span class="number">0</span>,
-<a href=#6539 id=6539 data-nosnippet>6539</a>            }
-<a href=#6540 id=6540 data-nosnippet>6540</a>        });
-<a href=#6541 id=6541 data-nosnippet>6541</a>        validate_prefetch_metrics_parity(prefetch_prom, <span class="kw-2">&amp;</span>prefetch).expect(<span class="string">"prefetch parity"</span>);
-<a href=#6542 id=6542 data-nosnippet>6542</a>
-<a href=#6543 id=6543 data-nosnippet>6543</a>        <span class="kw">let </span>locality_prom = <span class="macro">concat!</span>(
-<a href=#6544 id=6544 data-nosnippet>6544</a>            <span class="string">"galaxy_shard_local_hit_ratio 7500\n"</span>,
-<a href=#6545 id=6545 data-nosnippet>6545</a>            <span class="string">"galaxy_hot_tier_hit_ratio 4000\n"</span>,
-<a href=#6546 id=6546 data-nosnippet>6546</a>            <span class="string">"galaxy_cross_region_egress_mb 5\n"</span>,
-<a href=#6547 id=6547 data-nosnippet>6547</a>            <span class="string">"galaxy_hot_promote_total 1\n"</span>,
-<a href=#6548 id=6548 data-nosnippet>6548</a>            <span class="string">"galaxy_hot_evict_total 0\n"</span>,
-<a href=#6549 id=6549 data-nosnippet>6549</a>        );
-<a href=#6550 id=6550 data-nosnippet>6550</a>        <span class="kw">let </span>locality = <span class="macro">serde_json::json!</span>({
-<a href=#6551 id=6551 data-nosnippet>6551</a>            <span class="string">"ok"</span>: <span class="bool-val">true</span>,
-<a href=#6552 id=6552 data-nosnippet>6552</a>            <span class="string">"metrics"</span>: {
-<a href=#6553 id=6553 data-nosnippet>6553</a>                <span class="string">"shard_local_hit_ratio_bps"</span>: <span class="number">7500</span>,
-<a href=#6554 id=6554 data-nosnippet>6554</a>                <span class="string">"hot_tier_hit_ratio_bps"</span>: <span class="number">4000</span>,
-<a href=#6555 id=6555 data-nosnippet>6555</a>                <span class="string">"cross_region_egress_mb"</span>: <span class="number">5</span>,
-<a href=#6556 id=6556 data-nosnippet>6556</a>                <span class="string">"hot_promote_total"</span>: <span class="number">1</span>,
-<a href=#6557 id=6557 data-nosnippet>6557</a>                <span class="string">"hot_evict_total"</span>: <span class="number">0</span>,
+<a href=#6376 id=6376 data-nosnippet>6376</a>            audit_api_contracts_depth_stub(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({
+<a href=#6377 id=6377 data-nosnippet>6377</a>                <span class="string">"audit_api_depth"</span>: <span class="bool-val">true</span>,
+<a href=#6378 id=6378 data-nosnippet>6378</a>                <span class="string">"query_http_lifecycle"</span>: <span class="bool-val">true</span>,
+<a href=#6379 id=6379 data-nosnippet>6379</a>                <span class="string">"store_wire_http"</span>: <span class="bool-val">true</span>,
+<a href=#6380 id=6380 data-nosnippet>6380</a>                <span class="string">"openapi_schemas"</span>: <span class="bool-val">true</span>,
+<a href=#6381 id=6381 data-nosnippet>6381</a>                <span class="string">"event_field_fixtures"</span>: <span class="bool-val">true</span>,
+<a href=#6382 id=6382 data-nosnippet>6382</a>                <span class="string">"verify_dev_stand_hook"</span>: <span class="bool-val">true</span>,
+<a href=#6383 id=6383 data-nosnippet>6383</a>                <span class="string">"stand_smoke_export"</span>: <span class="bool-val">true</span>,
+<a href=#6384 id=6384 data-nosnippet>6384</a>                <span class="string">"loc_audit_flag"</span>: <span class="bool-val">true</span>,
+<a href=#6385 id=6385 data-nosnippet>6385</a>                <span class="string">"audit_api_docs"</span>: <span class="bool-val">true</span>,
+<a href=#6386 id=6386 data-nosnippet>6386</a>            }))),
+<a href=#6387 id=6387 data-nosnippet>6387</a>            AuditApiContractsDepth::FullBand73
+<a href=#6388 id=6388 data-nosnippet>6388</a>        );
+<a href=#6389 id=6389 data-nosnippet>6389</a>        <span class="macro">assert_eq!</span>(AUDIT_API_CRITERIA.len(), <span class="number">9</span>);
+<a href=#6390 id=6390 data-nosnippet>6390</a>        <span class="macro">assert_eq!</span>(audit_api_criteria_total(), <span class="number">9</span>);
+<a href=#6391 id=6391 data-nosnippet>6391</a>        <span class="macro">assert!</span>(AUDIT_API_CASES.contains(<span class="kw-2">&amp;</span><span class="string">"store_wire_http"</span>));
+<a href=#6392 id=6392 data-nosnippet>6392</a>        <span class="kw">let </span>audit_api = <span class="macro">include_str!</span>(<span class="string">"../../src/network/enterprise_api/audit.rs"</span>);
+<a href=#6393 id=6393 data-nosnippet>6393</a>        <span class="macro">assert!</span>(audit_api.contains(<span class="string">"GET /audit/store"</span>));
+<a href=#6394 id=6394 data-nosnippet>6394</a>        <span class="macro">assert!</span>(audit_api.contains(<span class="string">"audit_store_wire_handler"</span>));
+<a href=#6395 id=6395 data-nosnippet>6395</a>        <span class="kw">let </span>loc_audit = <span class="macro">include_str!</span>(<span class="string">"../../src/bin/poolai_loc_audit.rs"</span>);
+<a href=#6396 id=6396 data-nosnippet>6396</a>        <span class="macro">assert!</span>(loc_audit.contains(<span class="string">"--audit-api"</span>));
+<a href=#6397 id=6397 data-nosnippet>6397</a>        <span class="kw">let </span>fm = <span class="macro">include_str!</span>(<span class="string">"../../docs/catalog/FUNCTION_MANAGEMENT.md"</span>);
+<a href=#6398 id=6398 data-nosnippet>6398</a>        <span class="kw">for </span>row <span class="kw">in </span>FM_BAND73_ROWS {
+<a href=#6399 id=6399 data-nosnippet>6399</a>            <span class="macro">assert!</span>(
+<a href=#6400 id=6400 data-nosnippet>6400</a>                fm.contains(row) || row.starts_with(<span class="string">"PH-S"</span>),
+<a href=#6401 id=6401 data-nosnippet>6401</a>                <span class="string">"FM band73 row {row}"
+<a href=#6402 id=6402 data-nosnippet>6402</a>            </span>);
+<a href=#6403 id=6403 data-nosnippet>6403</a>        }
+<a href=#6404 id=6404 data-nosnippet>6404</a>    }
+<a href=#6405 id=6405 data-nosnippet>6405</a>
+<a href=#6406 id=6406 data-nosnippet>6406</a>    <span class="attr">#[test]
+<a href=#6407 id=6407 data-nosnippet>6407</a>    </span><span class="kw">fn </span>audit_admin_ops_band74_export_shape_ph_s1385() {
+<a href=#6408 id=6408 data-nosnippet>6408</a>        <span class="kw">use </span>poolai_ui_core::audit_admin_ops_depth::{
+<a href=#6409 id=6409 data-nosnippet>6409</a>            audit_admin_ops_criteria_total, audit_admin_ops_depth_stub, AuditAdminOpsDepth,
+<a href=#6410 id=6410 data-nosnippet>6410</a>            AUDIT_ADMIN_OPS_CASES, AUDIT_ADMIN_OPS_CRITERIA, FM_BAND74_ROWS,
+<a href=#6411 id=6411 data-nosnippet>6411</a>        };
+<a href=#6412 id=6412 data-nosnippet>6412</a>        <span class="kw">use </span>serde_json::json;
+<a href=#6413 id=6413 data-nosnippet>6413</a>        <span class="macro">assert_eq!</span>(
+<a href=#6414 id=6414 data-nosnippet>6414</a>            audit_admin_ops_depth_stub(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({<span class="string">"query_ops_glue"</span>: <span class="bool-val">true</span>}))),
+<a href=#6415 id=6415 data-nosnippet>6415</a>            AuditAdminOpsDepth::QueryOpsGlue
+<a href=#6416 id=6416 data-nosnippet>6416</a>        );
+<a href=#6417 id=6417 data-nosnippet>6417</a>        <span class="macro">assert_eq!</span>(
+<a href=#6418 id=6418 data-nosnippet>6418</a>            audit_admin_ops_depth_stub(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({
+<a href=#6419 id=6419 data-nosnippet>6419</a>                <span class="string">"audit_admin_ops_depth"</span>: <span class="bool-val">true</span>,
+<a href=#6420 id=6420 data-nosnippet>6420</a>                <span class="string">"store_strip"</span>: <span class="bool-val">true</span>,
+<a href=#6421 id=6421 data-nosnippet>6421</a>                <span class="string">"query_ops_glue"</span>: <span class="bool-val">true</span>,
+<a href=#6422 id=6422 data-nosnippet>6422</a>                <span class="string">"html_contracts"</span>: <span class="bool-val">true</span>,
+<a href=#6423 id=6423 data-nosnippet>6423</a>                <span class="string">"verify_dev_stand_hook"</span>: <span class="bool-val">true</span>,
+<a href=#6424 id=6424 data-nosnippet>6424</a>                <span class="string">"stand_smoke_export"</span>: <span class="bool-val">true</span>,
+<a href=#6425 id=6425 data-nosnippet>6425</a>                <span class="string">"loc_audit_flag"</span>: <span class="bool-val">true</span>,
+<a href=#6426 id=6426 data-nosnippet>6426</a>                <span class="string">"audit_admin_ops_docs"</span>: <span class="bool-val">true</span>,
+<a href=#6427 id=6427 data-nosnippet>6427</a>                <span class="string">"ratio_hold"</span>: <span class="bool-val">true</span>,
+<a href=#6428 id=6428 data-nosnippet>6428</a>                <span class="string">"band_close"</span>: <span class="bool-val">true</span>,
+<a href=#6429 id=6429 data-nosnippet>6429</a>            }))),
+<a href=#6430 id=6430 data-nosnippet>6430</a>            AuditAdminOpsDepth::FullBand74
+<a href=#6431 id=6431 data-nosnippet>6431</a>        );
+<a href=#6432 id=6432 data-nosnippet>6432</a>        <span class="macro">assert_eq!</span>(AUDIT_ADMIN_OPS_CRITERIA.len(), <span class="number">10</span>);
+<a href=#6433 id=6433 data-nosnippet>6433</a>        <span class="macro">assert_eq!</span>(audit_admin_ops_criteria_total(), <span class="number">10</span>);
+<a href=#6434 id=6434 data-nosnippet>6434</a>        <span class="macro">assert!</span>(AUDIT_ADMIN_OPS_CASES.contains(<span class="kw-2">&amp;</span><span class="string">"store_strip"</span>));
+<a href=#6435 id=6435 data-nosnippet>6435</a>        <span class="kw">let </span>audit_ui = <span class="macro">include_str!</span>(<span class="string">"../../src/ui/admin/audit.rs"</span>);
+<a href=#6436 id=6436 data-nosnippet>6436</a>        <span class="macro">assert!</span>(audit_ui.contains(<span class="string">"audit-store-badge"</span>));
+<a href=#6437 id=6437 data-nosnippet>6437</a>        <span class="macro">assert!</span>(audit_ui.contains(<span class="string">"refreshAuditEvents"</span>));
+<a href=#6438 id=6438 data-nosnippet>6438</a>        <span class="kw">let </span>loc_audit = <span class="macro">include_str!</span>(<span class="string">"../../src/bin/poolai_loc_audit.rs"</span>);
+<a href=#6439 id=6439 data-nosnippet>6439</a>        <span class="macro">assert!</span>(loc_audit.contains(<span class="string">"--audit-admin-ops"</span>));
+<a href=#6440 id=6440 data-nosnippet>6440</a>        <span class="kw">let </span>fm = <span class="macro">include_str!</span>(<span class="string">"../../docs/catalog/FUNCTION_MANAGEMENT.md"</span>);
+<a href=#6441 id=6441 data-nosnippet>6441</a>        <span class="kw">for </span>row <span class="kw">in </span>FM_BAND74_ROWS {
+<a href=#6442 id=6442 data-nosnippet>6442</a>            <span class="macro">assert!</span>(
+<a href=#6443 id=6443 data-nosnippet>6443</a>                fm.contains(row) || row.starts_with(<span class="string">"PH-S"</span>),
+<a href=#6444 id=6444 data-nosnippet>6444</a>                <span class="string">"FM band74 row {row}"
+<a href=#6445 id=6445 data-nosnippet>6445</a>            </span>);
+<a href=#6446 id=6446 data-nosnippet>6446</a>        }
+<a href=#6447 id=6447 data-nosnippet>6447</a>    }
+<a href=#6448 id=6448 data-nosnippet>6448</a>
+<a href=#6449 id=6449 data-nosnippet>6449</a>    <span class="attr">#[test]
+<a href=#6450 id=6450 data-nosnippet>6450</a>    </span><span class="kw">fn </span>galaxy_edge_verification_band48_export_shape_ph_s1125() {
+<a href=#6451 id=6451 data-nosnippet>6451</a>        <span class="kw">use </span>poolai_ui_core::galaxy_edge_verification_depth::{
+<a href=#6452 id=6452 data-nosnippet>6452</a>            edge_verification_criteria_total, galaxy_edge_verification_depth_stub,
+<a href=#6453 id=6453 data-nosnippet>6453</a>            GalaxyEdgeVerificationDepth, EDGE_VERIFICATION_CASES, EDGE_VERIFICATION_CRITERIA,
+<a href=#6454 id=6454 data-nosnippet>6454</a>            FM_BAND48_ROWS,
+<a href=#6455 id=6455 data-nosnippet>6455</a>        };
+<a href=#6456 id=6456 data-nosnippet>6456</a>        <span class="kw">use </span>serde_json::json;
+<a href=#6457 id=6457 data-nosnippet>6457</a>        <span class="macro">assert_eq!</span>(
+<a href=#6458 id=6458 data-nosnippet>6458</a>            galaxy_edge_verification_depth_stub(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({<span class="string">"fraud_proof_stub"</span>: <span class="bool-val">true</span>}))),
+<a href=#6459 id=6459 data-nosnippet>6459</a>            GalaxyEdgeVerificationDepth::FraudProofStub
+<a href=#6460 id=6460 data-nosnippet>6460</a>        );
+<a href=#6461 id=6461 data-nosnippet>6461</a>        <span class="macro">assert_eq!</span>(
+<a href=#6462 id=6462 data-nosnippet>6462</a>            galaxy_edge_verification_depth_stub(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({
+<a href=#6463 id=6463 data-nosnippet>6463</a>                <span class="string">"fraud_proof_stub"</span>: <span class="bool-val">true</span>,
+<a href=#6464 id=6464 data-nosnippet>6464</a>                <span class="string">"capability_admission"</span>: <span class="bool-val">true</span>,
+<a href=#6465 id=6465 data-nosnippet>6465</a>                <span class="string">"network_profile_stale"</span>: <span class="bool-val">true</span>,
+<a href=#6466 id=6466 data-nosnippet>6466</a>                <span class="string">"tee_attestation"</span>: <span class="bool-val">true</span>,
+<a href=#6467 id=6467 data-nosnippet>6467</a>                <span class="string">"metrics_http"</span>: <span class="bool-val">true</span>,
+<a href=#6468 id=6468 data-nosnippet>6468</a>                <span class="string">"stand_smoke_parity"</span>: <span class="bool-val">true</span>,
+<a href=#6469 id=6469 data-nosnippet>6469</a>            }))),
+<a href=#6470 id=6470 data-nosnippet>6470</a>            GalaxyEdgeVerificationDepth::FullBand48
+<a href=#6471 id=6471 data-nosnippet>6471</a>        );
+<a href=#6472 id=6472 data-nosnippet>6472</a>        <span class="macro">assert_eq!</span>(EDGE_VERIFICATION_CRITERIA.len(), <span class="number">7</span>);
+<a href=#6473 id=6473 data-nosnippet>6473</a>        <span class="macro">assert_eq!</span>(edge_verification_criteria_total(), <span class="number">7</span>);
+<a href=#6474 id=6474 data-nosnippet>6474</a>        <span class="macro">assert!</span>(EDGE_VERIFICATION_CASES.contains(<span class="kw-2">&amp;</span><span class="string">"openapi_wire"</span>));
+<a href=#6475 id=6475 data-nosnippet>6475</a>        <span class="kw">let </span>fm = <span class="macro">include_str!</span>(<span class="string">"../../docs/catalog/FUNCTION_MANAGEMENT.md"</span>);
+<a href=#6476 id=6476 data-nosnippet>6476</a>        <span class="kw">for </span>row <span class="kw">in </span>FM_BAND48_ROWS {
+<a href=#6477 id=6477 data-nosnippet>6477</a>            <span class="macro">assert!</span>(
+<a href=#6478 id=6478 data-nosnippet>6478</a>                fm.contains(row) || row.starts_with(<span class="string">"PH-S"</span>),
+<a href=#6479 id=6479 data-nosnippet>6479</a>                <span class="string">"FM band48 row {row}"
+<a href=#6480 id=6480 data-nosnippet>6480</a>            </span>);
+<a href=#6481 id=6481 data-nosnippet>6481</a>        }
+<a href=#6482 id=6482 data-nosnippet>6482</a>    }
+<a href=#6483 id=6483 data-nosnippet>6483</a>
+<a href=#6484 id=6484 data-nosnippet>6484</a>    <span class="attr">#[test]
+<a href=#6485 id=6485 data-nosnippet>6485</a>    </span><span class="kw">fn </span>grid_verification_replay_json_export_shape_ph_s710() {
+<a href=#6486 id=6486 data-nosnippet>6486</a>        <span class="kw">use </span>poolai::grid::stand_smoke_metrics_parity::{
+<a href=#6487 id=6487 data-nosnippet>6487</a>            validate_grid_metrics_json_export, REPLAY_JSON_KEYS, VERIFICATION_JSON_KEYS,
+<a href=#6488 id=6488 data-nosnippet>6488</a>        };
+<a href=#6489 id=6489 data-nosnippet>6489</a>        <span class="kw">let </span>verification = <span class="macro">serde_json::json!</span>({
+<a href=#6490 id=6490 data-nosnippet>6490</a>            <span class="string">"ok"</span>: <span class="bool-val">true</span>,
+<a href=#6491 id=6491 data-nosnippet>6491</a>            <span class="string">"metrics"</span>: {
+<a href=#6492 id=6492 data-nosnippet>6492</a>                <span class="string">"sample_total"</span>: <span class="number">0</span>,
+<a href=#6493 id=6493 data-nosnippet>6493</a>                <span class="string">"mismatch_total"</span>: <span class="number">0</span>,
+<a href=#6494 id=6494 data-nosnippet>6494</a>                <span class="string">"match_total"</span>: <span class="number">0</span>,
+<a href=#6495 id=6495 data-nosnippet>6495</a>                <span class="string">"checker_pending_total"</span>: <span class="number">0</span>,
+<a href=#6496 id=6496 data-nosnippet>6496</a>            }
+<a href=#6497 id=6497 data-nosnippet>6497</a>        });
+<a href=#6498 id=6498 data-nosnippet>6498</a>        validate_grid_metrics_json_export(<span class="kw-2">&amp;</span>verification, VERIFICATION_JSON_KEYS)
+<a href=#6499 id=6499 data-nosnippet>6499</a>            .expect(<span class="string">"verification"</span>);
+<a href=#6500 id=6500 data-nosnippet>6500</a>        <span class="kw">let </span>replay = <span class="macro">serde_json::json!</span>({
+<a href=#6501 id=6501 data-nosnippet>6501</a>            <span class="string">"ok"</span>: <span class="bool-val">true</span>,
+<a href=#6502 id=6502 data-nosnippet>6502</a>            <span class="string">"metrics"</span>: {
+<a href=#6503 id=6503 data-nosnippet>6503</a>                <span class="string">"replay_pending"</span>: <span class="number">0</span>,
+<a href=#6504 id=6504 data-nosnippet>6504</a>                <span class="string">"replay_pending_scheduled_total"</span>: <span class="number">0</span>,
+<a href=#6505 id=6505 data-nosnippet>6505</a>                <span class="string">"verification_replay_record_total"</span>: <span class="number">0</span>,
+<a href=#6506 id=6506 data-nosnippet>6506</a>            }
+<a href=#6507 id=6507 data-nosnippet>6507</a>        });
+<a href=#6508 id=6508 data-nosnippet>6508</a>        validate_grid_metrics_json_export(<span class="kw-2">&amp;</span>replay, REPLAY_JSON_KEYS).expect(<span class="string">"replay"</span>);
+<a href=#6509 id=6509 data-nosnippet>6509</a>    }
+<a href=#6510 id=6510 data-nosnippet>6510</a>
+<a href=#6511 id=6511 data-nosnippet>6511</a>    <span class="attr">#[test]
+<a href=#6512 id=6512 data-nosnippet>6512</a>    </span><span class="kw">fn </span>grid_settlement_trust_replication_pricing_json_export_shape_ph_s711() {
+<a href=#6513 id=6513 data-nosnippet>6513</a>        <span class="kw">use </span>poolai::grid::stand_smoke_metrics_parity::{
+<a href=#6514 id=6514 data-nosnippet>6514</a>            validate_grid_metrics_json_export, PRICING_JSON_KEYS, REPLICATION_JSON_KEYS,
+<a href=#6515 id=6515 data-nosnippet>6515</a>            SETTLEMENT_JSON_KEYS, TRUST_JSON_KEYS,
+<a href=#6516 id=6516 data-nosnippet>6516</a>        };
+<a href=#6517 id=6517 data-nosnippet>6517</a>        <span class="kw">let </span>settlement = <span class="macro">serde_json::json!</span>({
+<a href=#6518 id=6518 data-nosnippet>6518</a>            <span class="string">"ok"</span>: <span class="bool-val">true</span>,
+<a href=#6519 id=6519 data-nosnippet>6519</a>            <span class="string">"metrics"</span>: {
+<a href=#6520 id=6520 data-nosnippet>6520</a>                <span class="string">"pending_verification_total"</span>: <span class="number">0</span>,
+<a href=#6521 id=6521 data-nosnippet>6521</a>                <span class="string">"cleared_total"</span>: <span class="number">0</span>,
+<a href=#6522 id=6522 data-nosnippet>6522</a>                <span class="string">"resolved_total"</span>: <span class="number">0</span>,
+<a href=#6523 id=6523 data-nosnippet>6523</a>                <span class="string">"payout_batch_total"</span>: <span class="number">0</span>,
+<a href=#6524 id=6524 data-nosnippet>6524</a>            }
+<a href=#6525 id=6525 data-nosnippet>6525</a>        });
+<a href=#6526 id=6526 data-nosnippet>6526</a>        validate_grid_metrics_json_export(<span class="kw-2">&amp;</span>settlement, SETTLEMENT_JSON_KEYS).expect(<span class="string">"settlement"</span>);
+<a href=#6527 id=6527 data-nosnippet>6527</a>        <span class="kw">let </span>trust = <span class="macro">serde_json::json!</span>({
+<a href=#6528 id=6528 data-nosnippet>6528</a>            <span class="string">"ok"</span>: <span class="bool-val">true</span>,
+<a href=#6529 id=6529 data-nosnippet>6529</a>            <span class="string">"metrics"</span>: {
+<a href=#6530 id=6530 data-nosnippet>6530</a>                <span class="string">"payout_eligible_total"</span>: <span class="number">0</span>,
+<a href=#6531 id=6531 data-nosnippet>6531</a>                <span class="string">"payout_held_total"</span>: <span class="number">0</span>,
+<a href=#6532 id=6532 data-nosnippet>6532</a>                <span class="string">"last_trust_score"</span>: <span class="number">0</span>,
+<a href=#6533 id=6533 data-nosnippet>6533</a>                <span class="string">"gate_min_threshold"</span>: <span class="number">40</span>,
+<a href=#6534 id=6534 data-nosnippet>6534</a>            }
+<a href=#6535 id=6535 data-nosnippet>6535</a>        });
+<a href=#6536 id=6536 data-nosnippet>6536</a>        validate_grid_metrics_json_export(<span class="kw-2">&amp;</span>trust, TRUST_JSON_KEYS).expect(<span class="string">"trust"</span>);
+<a href=#6537 id=6537 data-nosnippet>6537</a>        <span class="kw">let </span>replication = <span class="macro">serde_json::json!</span>({
+<a href=#6538 id=6538 data-nosnippet>6538</a>            <span class="string">"ok"</span>: <span class="bool-val">true</span>,
+<a href=#6539 id=6539 data-nosnippet>6539</a>            <span class="string">"metrics"</span>: {
+<a href=#6540 id=6540 data-nosnippet>6540</a>                <span class="string">"strict_total"</span>: <span class="number">0</span>,
+<a href=#6541 id=6541 data-nosnippet>6541</a>                <span class="string">"enqueue_total"</span>: <span class="number">0</span>,
+<a href=#6542 id=6542 data-nosnippet>6542</a>                <span class="string">"executor_enqueue_total"</span>: <span class="number">0</span>,
+<a href=#6543 id=6543 data-nosnippet>6543</a>                <span class="string">"rate_limited_total"</span>: <span class="number">0</span>,
+<a href=#6544 id=6544 data-nosnippet>6544</a>            }
+<a href=#6545 id=6545 data-nosnippet>6545</a>        });
+<a href=#6546 id=6546 data-nosnippet>6546</a>        validate_grid_metrics_json_export(<span class="kw-2">&amp;</span>replication, REPLICATION_JSON_KEYS)
+<a href=#6547 id=6547 data-nosnippet>6547</a>            .expect(<span class="string">"replication"</span>);
+<a href=#6548 id=6548 data-nosnippet>6548</a>        <span class="kw">let </span>pricing = <span class="macro">serde_json::json!</span>({
+<a href=#6549 id=6549 data-nosnippet>6549</a>            <span class="string">"ok"</span>: <span class="bool-val">true</span>,
+<a href=#6550 id=6550 data-nosnippet>6550</a>            <span class="string">"metrics"</span>: {
+<a href=#6551 id=6551 data-nosnippet>6551</a>                <span class="string">"fresh_served_total"</span>: <span class="number">0</span>,
+<a href=#6552 id=6552 data-nosnippet>6552</a>                <span class="string">"stale_served_total"</span>: <span class="number">0</span>,
+<a href=#6553 id=6553 data-nosnippet>6553</a>                <span class="string">"forced_fallback_total"</span>: <span class="number">0</span>,
+<a href=#6554 id=6554 data-nosnippet>6554</a>                <span class="string">"provider_catalog_lookups_total"</span>: <span class="number">0</span>,
+<a href=#6555 id=6555 data-nosnippet>6555</a>                <span class="string">"provider_catalog_hits_total"</span>: <span class="number">0</span>,
+<a href=#6556 id=6556 data-nosnippet>6556</a>                <span class="string">"provider_errors_total"</span>: <span class="number">0</span>,
+<a href=#6557 id=6557 data-nosnippet>6557</a>                <span class="string">"provider_timeouts_total"</span>: <span class="number">0</span>,
 <a href=#6558 id=6558 data-nosnippet>6558</a>            }
 <a href=#6559 id=6559 data-nosnippet>6559</a>        });
-<a href=#6560 id=6560 data-nosnippet>6560</a>        validate_locality_metrics_parity(locality_prom, <span class="kw-2">&amp;</span>locality).expect(<span class="string">"locality parity"</span>);
+<a href=#6560 id=6560 data-nosnippet>6560</a>        validate_grid_metrics_json_export(<span class="kw-2">&amp;</span>pricing, PRICING_JSON_KEYS).expect(<span class="string">"pricing"</span>);
 <a href=#6561 id=6561 data-nosnippet>6561</a>    }
 <a href=#6562 id=6562 data-nosnippet>6562</a>
 <a href=#6563 id=6563 data-nosnippet>6563</a>    <span class="attr">#[test]
-<a href=#6564 id=6564 data-nosnippet>6564</a>    </span><span class="kw">fn </span>grid_governance_fee_metrics_parity_ph_s832() {
+<a href=#6564 id=6564 data-nosnippet>6564</a>    </span><span class="kw">fn </span>grid_prefetch_locality_metrics_parity_ph_s831() {
 <a href=#6565 id=6565 data-nosnippet>6565</a>        <span class="kw">use </span>poolai::grid::stand_smoke_metrics_parity::{
-<a href=#6566 id=6566 data-nosnippet>6566</a>            validate_fee_split_metrics_parity, validate_governance_metrics_parity,
+<a href=#6566 id=6566 data-nosnippet>6566</a>            validate_locality_metrics_parity, validate_prefetch_metrics_parity,
 <a href=#6567 id=6567 data-nosnippet>6567</a>        };
 <a href=#6568 id=6568 data-nosnippet>6568</a>
-<a href=#6569 id=6569 data-nosnippet>6569</a>        <span class="kw">let </span>fee_prom = <span class="string">"galaxy_fee_split_applied_total 7\n"</span>;
-<a href=#6570 id=6570 data-nosnippet>6570</a>        <span class="kw">let </span>fee_split = <span class="macro">serde_json::json!</span>({
-<a href=#6571 id=6571 data-nosnippet>6571</a>            <span class="string">"ok"</span>: <span class="bool-val">true</span>,
-<a href=#6572 id=6572 data-nosnippet>6572</a>            <span class="string">"metrics"</span>: {
-<a href=#6573 id=6573 data-nosnippet>6573</a>                <span class="string">"fee_split_applied_total"</span>: <span class="number">7</span>,
-<a href=#6574 id=6574 data-nosnippet>6574</a>                <span class="string">"primary_dev_fee_bps"</span>: <span class="number">10</span>,
-<a href=#6575 id=6575 data-nosnippet>6575</a>                <span class="string">"secondary_admin_fee_min_bps"</span>: <span class="number">100</span>,
-<a href=#6576 id=6576 data-nosnippet>6576</a>                <span class="string">"secondary_admin_fee_max_bps"</span>: <span class="number">500</span>,
-<a href=#6577 id=6577 data-nosnippet>6577</a>            }
-<a href=#6578 id=6578 data-nosnippet>6578</a>        });
-<a href=#6579 id=6579 data-nosnippet>6579</a>        validate_fee_split_metrics_parity(fee_prom, <span class="kw-2">&amp;</span>fee_split).expect(<span class="string">"fee parity"</span>);
-<a href=#6580 id=6580 data-nosnippet>6580</a>
-<a href=#6581 id=6581 data-nosnippet>6581</a>        <span class="kw">let </span>gov_prom = <span class="macro">concat!</span>(
-<a href=#6582 id=6582 data-nosnippet>6582</a>            <span class="string">"poolai_release_verify_total 2\n"</span>,
-<a href=#6583 id=6583 data-nosnippet>6583</a>            <span class="string">"poolai_release_verify_fail_total 0\n"</span>,
-<a href=#6584 id=6584 data-nosnippet>6584</a>            <span class="string">"poolai_update_notify_pending 1\n"</span>,
-<a href=#6585 id=6585 data-nosnippet>6585</a>            <span class="string">"poolai_advisory_acknowledged_total 3\n"</span>,
-<a href=#6586 id=6586 data-nosnippet>6586</a>        );
-<a href=#6587 id=6587 data-nosnippet>6587</a>        <span class="kw">let </span>governance = <span class="macro">serde_json::json!</span>({
-<a href=#6588 id=6588 data-nosnippet>6588</a>            <span class="string">"ok"</span>: <span class="bool-val">true</span>,
-<a href=#6589 id=6589 data-nosnippet>6589</a>            <span class="string">"metrics"</span>: {
-<a href=#6590 id=6590 data-nosnippet>6590</a>                <span class="string">"release_verify_total"</span>: <span class="number">2</span>,
-<a href=#6591 id=6591 data-nosnippet>6591</a>                <span class="string">"release_verify_fail_total"</span>: <span class="number">0</span>,
-<a href=#6592 id=6592 data-nosnippet>6592</a>                <span class="string">"update_notify_pending"</span>: <span class="number">1</span>,
-<a href=#6593 id=6593 data-nosnippet>6593</a>                <span class="string">"advisory_acknowledged_total"</span>: <span class="number">3</span>,
-<a href=#6594 id=6594 data-nosnippet>6594</a>            }
-<a href=#6595 id=6595 data-nosnippet>6595</a>        });
-<a href=#6596 id=6596 data-nosnippet>6596</a>        validate_governance_metrics_parity(gov_prom, <span class="kw-2">&amp;</span>governance).expect(<span class="string">"governance parity"</span>);
-<a href=#6597 id=6597 data-nosnippet>6597</a>    }
-<a href=#6598 id=6598 data-nosnippet>6598</a>
-<a href=#6599 id=6599 data-nosnippet>6599</a>    <span class="attr">#[test]
-<a href=#6600 id=6600 data-nosnippet>6600</a>    </span><span class="kw">fn </span>stand_smoke_export_shape_regression_suite_ph_s834() {
-<a href=#6601 id=6601 data-nosnippet>6601</a>        <span class="kw">use </span>poolai::grid::stand_smoke_metrics_parity::validate_band6_metrics_parity_v2;
-<a href=#6602 id=6602 data-nosnippet>6602</a>
-<a href=#6603 id=6603 data-nosnippet>6603</a>        <span class="kw">let </span>prom = <span class="macro">concat!</span>(
-<a href=#6604 id=6604 data-nosnippet>6604</a>            <span class="string">"galaxy_verification_sample_total 1\n"</span>,
-<a href=#6605 id=6605 data-nosnippet>6605</a>            <span class="string">"galaxy_verification_checker_pending_total 0\n"</span>,
-<a href=#6606 id=6606 data-nosnippet>6606</a>            <span class="string">"galaxy_replay_pending 0\n"</span>,
-<a href=#6607 id=6607 data-nosnippet>6607</a>            <span class="string">"galaxy_verification_replay_record_total 0\n"</span>,
-<a href=#6608 id=6608 data-nosnippet>6608</a>            <span class="string">"galaxy_settlement_cleared_total 0\n"</span>,
-<a href=#6609 id=6609 data-nosnippet>6609</a>            <span class="string">"galaxy_settlement_payout_batch_total 0\n"</span>,
-<a href=#6610 id=6610 data-nosnippet>6610</a>            <span class="string">"galaxy_trust_payout_eligible_total 0\n"</span>,
-<a href=#6611 id=6611 data-nosnippet>6611</a>            <span class="string">"galaxy_trust_score 0\n"</span>,
-<a href=#6612 id=6612 data-nosnippet>6612</a>            <span class="string">"galaxy_replication_strict_total 0\n"</span>,
-<a href=#6613 id=6613 data-nosnippet>6613</a>            <span class="string">"galaxy_replication_enqueue_total 0\n"</span>,
-<a href=#6614 id=6614 data-nosnippet>6614</a>            <span class="string">"galaxy_pricing_fresh_served 0\n"</span>,
-<a href=#6615 id=6615 data-nosnippet>6615</a>            <span class="string">"galaxy_pricing_stale_served 0\n"</span>,
-<a href=#6616 id=6616 data-nosnippet>6616</a>            <span class="string">"galaxy_prefetch_pull_bytes_total 0\n"</span>,
-<a href=#6617 id=6617 data-nosnippet>6617</a>            <span class="string">"galaxy_prefetch_backpressure_total 0\n"</span>,
-<a href=#6618 id=6618 data-nosnippet>6618</a>            <span class="string">"galaxy_shard_local_hit_ratio 0\n"</span>,
-<a href=#6619 id=6619 data-nosnippet>6619</a>            <span class="string">"galaxy_hot_tier_hit_ratio 0\n"</span>,
-<a href=#6620 id=6620 data-nosnippet>6620</a>            <span class="string">"galaxy_cross_region_egress_mb 0\n"</span>,
-<a href=#6621 id=6621 data-nosnippet>6621</a>            <span class="string">"galaxy_hot_promote_total 0\n"</span>,
-<a href=#6622 id=6622 data-nosnippet>6622</a>            <span class="string">"galaxy_hot_evict_total 0\n"</span>,
-<a href=#6623 id=6623 data-nosnippet>6623</a>            <span class="string">"galaxy_fee_split_applied_total 0\n"</span>,
-<a href=#6624 id=6624 data-nosnippet>6624</a>            <span class="string">"poolai_release_verify_total 0\n"</span>,
+<a href=#6569 id=6569 data-nosnippet>6569</a>        <span class="kw">let </span>prefetch_prom = <span class="macro">concat!</span>(
+<a href=#6570 id=6570 data-nosnippet>6570</a>            <span class="string">"galaxy_prefetch_pull_bytes_total 1024\n"</span>,
+<a href=#6571 id=6571 data-nosnippet>6571</a>            <span class="string">"galaxy_prefetch_backpressure_total 1\n"</span>,
+<a href=#6572 id=6572 data-nosnippet>6572</a>        );
+<a href=#6573 id=6573 data-nosnippet>6573</a>        <span class="kw">let </span>prefetch = <span class="macro">serde_json::json!</span>({
+<a href=#6574 id=6574 data-nosnippet>6574</a>            <span class="string">"ok"</span>: <span class="bool-val">true</span>,
+<a href=#6575 id=6575 data-nosnippet>6575</a>            <span class="string">"metrics"</span>: {
+<a href=#6576 id=6576 data-nosnippet>6576</a>                <span class="string">"pull_bytes_total"</span>: <span class="number">1024</span>,
+<a href=#6577 id=6577 data-nosnippet>6577</a>                <span class="string">"backpressure_total"</span>: <span class="number">1</span>,
+<a href=#6578 id=6578 data-nosnippet>6578</a>                <span class="string">"plan_total"</span>: <span class="number">0</span>,
+<a href=#6579 id=6579 data-nosnippet>6579</a>                <span class="string">"enqueue_total"</span>: <span class="number">0</span>,
+<a href=#6580 id=6580 data-nosnippet>6580</a>                <span class="string">"peer_fetch_total"</span>: <span class="number">0</span>,
+<a href=#6581 id=6581 data-nosnippet>6581</a>            }
+<a href=#6582 id=6582 data-nosnippet>6582</a>        });
+<a href=#6583 id=6583 data-nosnippet>6583</a>        validate_prefetch_metrics_parity(prefetch_prom, <span class="kw-2">&amp;</span>prefetch).expect(<span class="string">"prefetch parity"</span>);
+<a href=#6584 id=6584 data-nosnippet>6584</a>
+<a href=#6585 id=6585 data-nosnippet>6585</a>        <span class="kw">let </span>locality_prom = <span class="macro">concat!</span>(
+<a href=#6586 id=6586 data-nosnippet>6586</a>            <span class="string">"galaxy_shard_local_hit_ratio 7500\n"</span>,
+<a href=#6587 id=6587 data-nosnippet>6587</a>            <span class="string">"galaxy_hot_tier_hit_ratio 4000\n"</span>,
+<a href=#6588 id=6588 data-nosnippet>6588</a>            <span class="string">"galaxy_cross_region_egress_mb 5\n"</span>,
+<a href=#6589 id=6589 data-nosnippet>6589</a>            <span class="string">"galaxy_hot_promote_total 1\n"</span>,
+<a href=#6590 id=6590 data-nosnippet>6590</a>            <span class="string">"galaxy_hot_evict_total 0\n"</span>,
+<a href=#6591 id=6591 data-nosnippet>6591</a>        );
+<a href=#6592 id=6592 data-nosnippet>6592</a>        <span class="kw">let </span>locality = <span class="macro">serde_json::json!</span>({
+<a href=#6593 id=6593 data-nosnippet>6593</a>            <span class="string">"ok"</span>: <span class="bool-val">true</span>,
+<a href=#6594 id=6594 data-nosnippet>6594</a>            <span class="string">"metrics"</span>: {
+<a href=#6595 id=6595 data-nosnippet>6595</a>                <span class="string">"shard_local_hit_ratio_bps"</span>: <span class="number">7500</span>,
+<a href=#6596 id=6596 data-nosnippet>6596</a>                <span class="string">"hot_tier_hit_ratio_bps"</span>: <span class="number">4000</span>,
+<a href=#6597 id=6597 data-nosnippet>6597</a>                <span class="string">"cross_region_egress_mb"</span>: <span class="number">5</span>,
+<a href=#6598 id=6598 data-nosnippet>6598</a>                <span class="string">"hot_promote_total"</span>: <span class="number">1</span>,
+<a href=#6599 id=6599 data-nosnippet>6599</a>                <span class="string">"hot_evict_total"</span>: <span class="number">0</span>,
+<a href=#6600 id=6600 data-nosnippet>6600</a>            }
+<a href=#6601 id=6601 data-nosnippet>6601</a>        });
+<a href=#6602 id=6602 data-nosnippet>6602</a>        validate_locality_metrics_parity(locality_prom, <span class="kw-2">&amp;</span>locality).expect(<span class="string">"locality parity"</span>);
+<a href=#6603 id=6603 data-nosnippet>6603</a>    }
+<a href=#6604 id=6604 data-nosnippet>6604</a>
+<a href=#6605 id=6605 data-nosnippet>6605</a>    <span class="attr">#[test]
+<a href=#6606 id=6606 data-nosnippet>6606</a>    </span><span class="kw">fn </span>grid_governance_fee_metrics_parity_ph_s832() {
+<a href=#6607 id=6607 data-nosnippet>6607</a>        <span class="kw">use </span>poolai::grid::stand_smoke_metrics_parity::{
+<a href=#6608 id=6608 data-nosnippet>6608</a>            validate_fee_split_metrics_parity, validate_governance_metrics_parity,
+<a href=#6609 id=6609 data-nosnippet>6609</a>        };
+<a href=#6610 id=6610 data-nosnippet>6610</a>
+<a href=#6611 id=6611 data-nosnippet>6611</a>        <span class="kw">let </span>fee_prom = <span class="string">"galaxy_fee_split_applied_total 7\n"</span>;
+<a href=#6612 id=6612 data-nosnippet>6612</a>        <span class="kw">let </span>fee_split = <span class="macro">serde_json::json!</span>({
+<a href=#6613 id=6613 data-nosnippet>6613</a>            <span class="string">"ok"</span>: <span class="bool-val">true</span>,
+<a href=#6614 id=6614 data-nosnippet>6614</a>            <span class="string">"metrics"</span>: {
+<a href=#6615 id=6615 data-nosnippet>6615</a>                <span class="string">"fee_split_applied_total"</span>: <span class="number">7</span>,
+<a href=#6616 id=6616 data-nosnippet>6616</a>                <span class="string">"primary_dev_fee_bps"</span>: <span class="number">10</span>,
+<a href=#6617 id=6617 data-nosnippet>6617</a>                <span class="string">"secondary_admin_fee_min_bps"</span>: <span class="number">100</span>,
+<a href=#6618 id=6618 data-nosnippet>6618</a>                <span class="string">"secondary_admin_fee_max_bps"</span>: <span class="number">500</span>,
+<a href=#6619 id=6619 data-nosnippet>6619</a>            }
+<a href=#6620 id=6620 data-nosnippet>6620</a>        });
+<a href=#6621 id=6621 data-nosnippet>6621</a>        validate_fee_split_metrics_parity(fee_prom, <span class="kw-2">&amp;</span>fee_split).expect(<span class="string">"fee parity"</span>);
+<a href=#6622 id=6622 data-nosnippet>6622</a>
+<a href=#6623 id=6623 data-nosnippet>6623</a>        <span class="kw">let </span>gov_prom = <span class="macro">concat!</span>(
+<a href=#6624 id=6624 data-nosnippet>6624</a>            <span class="string">"poolai_release_verify_total 2\n"</span>,
 <a href=#6625 id=6625 data-nosnippet>6625</a>            <span class="string">"poolai_release_verify_fail_total 0\n"</span>,
-<a href=#6626 id=6626 data-nosnippet>6626</a>            <span class="string">"poolai_update_notify_pending 0\n"</span>,
-<a href=#6627 id=6627 data-nosnippet>6627</a>            <span class="string">"poolai_advisory_acknowledged_total 0\n"</span>,
-<a href=#6628 id=6628 data-nosnippet>6628</a>            <span class="string">"galaxy_settlement_payout_batch_queue_depth 0\n"</span>,
-<a href=#6629 id=6629 data-nosnippet>6629</a>            <span class="string">"galaxy_settlement_onchain_submit_total 0\n"</span>,
-<a href=#6630 id=6630 data-nosnippet>6630</a>        );
-<a href=#6631 id=6631 data-nosnippet>6631</a>        <span class="kw">let </span>verification = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"sample_total"</span>: <span class="number">1</span>, <span class="string">"mismatch_total"</span>: <span class="number">0</span>, <span class="string">"match_total"</span>: <span class="number">0</span>, <span class="string">"checker_pending_total"</span>: <span class="number">0</span>}});
-<a href=#6632 id=6632 data-nosnippet>6632</a>        <span class="kw">let </span>replay = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"replay_pending"</span>: <span class="number">0</span>, <span class="string">"replay_pending_scheduled_total"</span>: <span class="number">0</span>, <span class="string">"verification_replay_record_total"</span>: <span class="number">0</span>}});
-<a href=#6633 id=6633 data-nosnippet>6633</a>        <span class="kw">let </span>settlement = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"pending_verification_total"</span>: <span class="number">0</span>, <span class="string">"cleared_total"</span>: <span class="number">0</span>, <span class="string">"resolved_total"</span>: <span class="number">0</span>, <span class="string">"payout_batch_total"</span>: <span class="number">0</span>}});
-<a href=#6634 id=6634 data-nosnippet>6634</a>        <span class="kw">let </span>trust = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"payout_eligible_total"</span>: <span class="number">0</span>, <span class="string">"payout_held_total"</span>: <span class="number">0</span>, <span class="string">"last_trust_score"</span>: <span class="number">0</span>, <span class="string">"gate_min_threshold"</span>: <span class="number">40</span>}});
-<a href=#6635 id=6635 data-nosnippet>6635</a>        <span class="kw">let </span>replication = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"strict_total"</span>: <span class="number">0</span>, <span class="string">"enqueue_total"</span>: <span class="number">0</span>, <span class="string">"executor_enqueue_total"</span>: <span class="number">0</span>, <span class="string">"rate_limited_total"</span>: <span class="number">0</span>}});
-<a href=#6636 id=6636 data-nosnippet>6636</a>        <span class="kw">let </span>pricing = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"fresh_served_total"</span>: <span class="number">0</span>, <span class="string">"stale_served_total"</span>: <span class="number">0</span>, <span class="string">"forced_fallback_total"</span>: <span class="number">0</span>, <span class="string">"provider_catalog_lookups_total"</span>: <span class="number">0</span>, <span class="string">"provider_catalog_hits_total"</span>: <span class="number">0</span>, <span class="string">"provider_errors_total"</span>: <span class="number">0</span>, <span class="string">"provider_timeouts_total"</span>: <span class="number">0</span>}});
-<a href=#6637 id=6637 data-nosnippet>6637</a>        <span class="kw">let </span>prefetch = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"pull_bytes_total"</span>: <span class="number">0</span>, <span class="string">"backpressure_total"</span>: <span class="number">0</span>, <span class="string">"plan_total"</span>: <span class="number">0</span>, <span class="string">"enqueue_total"</span>: <span class="number">0</span>, <span class="string">"peer_fetch_total"</span>: <span class="number">0</span>}});
-<a href=#6638 id=6638 data-nosnippet>6638</a>        <span class="kw">let </span>locality = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"shard_local_hit_ratio_bps"</span>: <span class="number">0</span>, <span class="string">"hot_tier_hit_ratio_bps"</span>: <span class="number">0</span>, <span class="string">"cross_region_egress_mb"</span>: <span class="number">0</span>, <span class="string">"hot_promote_total"</span>: <span class="number">0</span>, <span class="string">"hot_evict_total"</span>: <span class="number">0</span>}});
-<a href=#6639 id=6639 data-nosnippet>6639</a>        <span class="kw">let </span>fee_split = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"fee_split_applied_total"</span>: <span class="number">0</span>, <span class="string">"primary_dev_fee_bps"</span>: <span class="number">10</span>, <span class="string">"secondary_admin_fee_min_bps"</span>: <span class="number">100</span>, <span class="string">"secondary_admin_fee_max_bps"</span>: <span class="number">500</span>}});
-<a href=#6640 id=6640 data-nosnippet>6640</a>        <span class="kw">let </span>governance = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"release_verify_total"</span>: <span class="number">0</span>, <span class="string">"release_verify_fail_total"</span>: <span class="number">0</span>, <span class="string">"update_notify_pending"</span>: <span class="number">0</span>, <span class="string">"advisory_acknowledged_total"</span>: <span class="number">0</span>}});
-<a href=#6641 id=6641 data-nosnippet>6641</a>        <span class="kw">let </span>payout_batch = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"payout_batch_total"</span>: <span class="number">0</span>, <span class="string">"payout_batch_queue_depth"</span>: <span class="number">0</span>, <span class="string">"onchain_submit_total"</span>: <span class="number">0</span>}});
-<a href=#6642 id=6642 data-nosnippet>6642</a>        validate_band6_metrics_parity_v2(
-<a href=#6643 id=6643 data-nosnippet>6643</a>            prom,
-<a href=#6644 id=6644 data-nosnippet>6644</a>            <span class="kw-2">&amp;</span>verification,
-<a href=#6645 id=6645 data-nosnippet>6645</a>            <span class="kw-2">&amp;</span>replay,
-<a href=#6646 id=6646 data-nosnippet>6646</a>            <span class="kw-2">&amp;</span>settlement,
-<a href=#6647 id=6647 data-nosnippet>6647</a>            <span class="kw-2">&amp;</span>trust,
-<a href=#6648 id=6648 data-nosnippet>6648</a>            <span class="kw-2">&amp;</span>replication,
-<a href=#6649 id=6649 data-nosnippet>6649</a>            <span class="kw-2">&amp;</span>pricing,
-<a href=#6650 id=6650 data-nosnippet>6650</a>            <span class="kw-2">&amp;</span>prefetch,
-<a href=#6651 id=6651 data-nosnippet>6651</a>            <span class="kw-2">&amp;</span>locality,
-<a href=#6652 id=6652 data-nosnippet>6652</a>            <span class="kw-2">&amp;</span>fee_split,
-<a href=#6653 id=6653 data-nosnippet>6653</a>            <span class="kw-2">&amp;</span>governance,
-<a href=#6654 id=6654 data-nosnippet>6654</a>            <span class="kw-2">&amp;</span>payout_batch,
-<a href=#6655 id=6655 data-nosnippet>6655</a>        )
-<a href=#6656 id=6656 data-nosnippet>6656</a>        .expect(<span class="string">"band18 regression suite"</span>);
-<a href=#6657 id=6657 data-nosnippet>6657</a>    }
-<a href=#6658 id=6658 data-nosnippet>6658</a>
-<a href=#6659 id=6659 data-nosnippet>6659</a>    <span class="attr">#[test]
-<a href=#6660 id=6660 data-nosnippet>6660</a>    </span><span class="kw">fn </span>multi_module_stand_smoke_full_suite_ph_s1002() {
-<a href=#6661 id=6661 data-nosnippet>6661</a>        <span class="kw">use </span>poolai_ui_core::multi_module_depth::{
-<a href=#6662 id=6662 data-nosnippet>6662</a>            multi_module_depth_stub, MultiModuleDepth, MULTI_MODULE_BAND35_TOP5_GRID_APIS,
-<a href=#6663 id=6663 data-nosnippet>6663</a>            STAND_SMOKE_FULL_SUITE,
-<a href=#6664 id=6664 data-nosnippet>6664</a>        };
-<a href=#6665 id=6665 data-nosnippet>6665</a>        <span class="kw">use </span>serde_json::json;
-<a href=#6666 id=6666 data-nosnippet>6666</a>
-<a href=#6667 id=6667 data-nosnippet>6667</a>        <span class="macro">assert_eq!</span>(
-<a href=#6668 id=6668 data-nosnippet>6668</a>            multi_module_depth_stub(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({<span class="string">"stand_smoke"</span>: <span class="bool-val">true</span>}))),
-<a href=#6669 id=6669 data-nosnippet>6669</a>            MultiModuleDepth::StandSmoke
-<a href=#6670 id=6670 data-nosnippet>6670</a>        );
-<a href=#6671 id=6671 data-nosnippet>6671</a>        <span class="macro">assert_eq!</span>(MULTI_MODULE_BAND35_TOP5_GRID_APIS.len(), <span class="number">5</span>);
-<a href=#6672 id=6672 data-nosnippet>6672</a>        <span class="macro">assert!</span>(STAND_SMOKE_FULL_SUITE.contains(<span class="string">"--json"</span>));
-<a href=#6673 id=6673 data-nosnippet>6673</a>        stand_smoke_export_shape_regression_suite_ph_s834();
-<a href=#6674 id=6674 data-nosnippet>6674</a>    }
-<a href=#6675 id=6675 data-nosnippet>6675</a>
-<a href=#6676 id=6676 data-nosnippet>6676</a>    <span class="attr">#[test]
-<a href=#6677 id=6677 data-nosnippet>6677</a>    </span><span class="kw">fn </span>grid_metrics_band6_prometheus_parity_export_shape_ph_s713() {
-<a href=#6678 id=6678 data-nosnippet>6678</a>        <span class="kw">use </span>poolai::grid::stand_smoke_metrics_parity::validate_band6_metrics_parity;
-<a href=#6679 id=6679 data-nosnippet>6679</a>        <span class="kw">let </span>prom = <span class="macro">concat!</span>(
-<a href=#6680 id=6680 data-nosnippet>6680</a>            <span class="string">"galaxy_verification_sample_total 0\n"</span>,
-<a href=#6681 id=6681 data-nosnippet>6681</a>            <span class="string">"galaxy_verification_checker_pending_total 0\n"</span>,
-<a href=#6682 id=6682 data-nosnippet>6682</a>            <span class="string">"galaxy_replay_pending 0\n"</span>,
-<a href=#6683 id=6683 data-nosnippet>6683</a>            <span class="string">"galaxy_verification_replay_record_total 0\n"</span>,
-<a href=#6684 id=6684 data-nosnippet>6684</a>            <span class="string">"galaxy_settlement_cleared_total 0\n"</span>,
-<a href=#6685 id=6685 data-nosnippet>6685</a>            <span class="string">"galaxy_settlement_payout_batch_total 0\n"</span>,
-<a href=#6686 id=6686 data-nosnippet>6686</a>            <span class="string">"galaxy_trust_payout_eligible_total 0\n"</span>,
-<a href=#6687 id=6687 data-nosnippet>6687</a>            <span class="string">"galaxy_trust_score 0\n"</span>,
-<a href=#6688 id=6688 data-nosnippet>6688</a>            <span class="string">"galaxy_replication_strict_total 0\n"</span>,
-<a href=#6689 id=6689 data-nosnippet>6689</a>            <span class="string">"galaxy_replication_enqueue_total 0\n"</span>,
-<a href=#6690 id=6690 data-nosnippet>6690</a>            <span class="string">"galaxy_pricing_fresh_served 0\n"</span>,
-<a href=#6691 id=6691 data-nosnippet>6691</a>            <span class="string">"galaxy_pricing_stale_served 0\n"</span>,
-<a href=#6692 id=6692 data-nosnippet>6692</a>        );
-<a href=#6693 id=6693 data-nosnippet>6693</a>        <span class="kw">let </span>verification = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"sample_total"</span>: <span class="number">0</span>, <span class="string">"mismatch_total"</span>: <span class="number">0</span>, <span class="string">"match_total"</span>: <span class="number">0</span>, <span class="string">"checker_pending_total"</span>: <span class="number">0</span>}});
-<a href=#6694 id=6694 data-nosnippet>6694</a>        <span class="kw">let </span>replay = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"replay_pending"</span>: <span class="number">0</span>, <span class="string">"replay_pending_scheduled_total"</span>: <span class="number">0</span>, <span class="string">"verification_replay_record_total"</span>: <span class="number">0</span>}});
-<a href=#6695 id=6695 data-nosnippet>6695</a>        <span class="kw">let </span>settlement = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"pending_verification_total"</span>: <span class="number">0</span>, <span class="string">"cleared_total"</span>: <span class="number">0</span>, <span class="string">"resolved_total"</span>: <span class="number">0</span>, <span class="string">"payout_batch_total"</span>: <span class="number">0</span>}});
-<a href=#6696 id=6696 data-nosnippet>6696</a>        <span class="kw">let </span>trust = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"payout_eligible_total"</span>: <span class="number">0</span>, <span class="string">"payout_held_total"</span>: <span class="number">0</span>, <span class="string">"last_trust_score"</span>: <span class="number">0</span>, <span class="string">"gate_min_threshold"</span>: <span class="number">40</span>}});
-<a href=#6697 id=6697 data-nosnippet>6697</a>        <span class="kw">let </span>replication = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"strict_total"</span>: <span class="number">0</span>, <span class="string">"enqueue_total"</span>: <span class="number">0</span>, <span class="string">"executor_enqueue_total"</span>: <span class="number">0</span>, <span class="string">"rate_limited_total"</span>: <span class="number">0</span>}});
-<a href=#6698 id=6698 data-nosnippet>6698</a>        <span class="kw">let </span>pricing = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"fresh_served_total"</span>: <span class="number">0</span>, <span class="string">"stale_served_total"</span>: <span class="number">0</span>, <span class="string">"forced_fallback_total"</span>: <span class="number">0</span>, <span class="string">"provider_catalog_lookups_total"</span>: <span class="number">0</span>, <span class="string">"provider_catalog_hits_total"</span>: <span class="number">0</span>, <span class="string">"provider_errors_total"</span>: <span class="number">0</span>, <span class="string">"provider_timeouts_total"</span>: <span class="number">0</span>}});
-<a href=#6699 id=6699 data-nosnippet>6699</a>        validate_band6_metrics_parity(
-<a href=#6700 id=6700 data-nosnippet>6700</a>            prom,
-<a href=#6701 id=6701 data-nosnippet>6701</a>            <span class="kw-2">&amp;</span>verification,
-<a href=#6702 id=6702 data-nosnippet>6702</a>            <span class="kw-2">&amp;</span>replay,
-<a href=#6703 id=6703 data-nosnippet>6703</a>            <span class="kw-2">&amp;</span>settlement,
-<a href=#6704 id=6704 data-nosnippet>6704</a>            <span class="kw-2">&amp;</span>trust,
-<a href=#6705 id=6705 data-nosnippet>6705</a>            <span class="kw-2">&amp;</span>replication,
-<a href=#6706 id=6706 data-nosnippet>6706</a>            <span class="kw-2">&amp;</span>pricing,
-<a href=#6707 id=6707 data-nosnippet>6707</a>        )
-<a href=#6708 id=6708 data-nosnippet>6708</a>        .expect(<span class="string">"band6 parity"</span>);
-<a href=#6709 id=6709 data-nosnippet>6709</a>    }
-<a href=#6710 id=6710 data-nosnippet>6710</a>
-<a href=#6711 id=6711 data-nosnippet>6711</a>    <span class="attr">#[test]
-<a href=#6712 id=6712 data-nosnippet>6712</a>    </span><span class="kw">fn </span>grid_settlement_trust_prometheus_parity_export_shape_ph_s723() {
-<a href=#6713 id=6713 data-nosnippet>6713</a>        <span class="kw">use </span>poolai::grid::stand_smoke_metrics_parity::validate_settlement_trust_metrics_parity;
-<a href=#6714 id=6714 data-nosnippet>6714</a>        <span class="kw">let </span>prom = <span class="macro">concat!</span>(
-<a href=#6715 id=6715 data-nosnippet>6715</a>            <span class="string">"galaxy_settlement_cleared_total 2\n"</span>,
-<a href=#6716 id=6716 data-nosnippet>6716</a>            <span class="string">"galaxy_settlement_payout_batch_total 1\n"</span>,
-<a href=#6717 id=6717 data-nosnippet>6717</a>            <span class="string">"galaxy_trust_payout_eligible_total 3\n"</span>,
-<a href=#6718 id=6718 data-nosnippet>6718</a>            <span class="string">"galaxy_trust_score 55\n"</span>,
-<a href=#6719 id=6719 data-nosnippet>6719</a>        );
-<a href=#6720 id=6720 data-nosnippet>6720</a>        <span class="kw">let </span>settlement = <span class="macro">serde_json::json!</span>({
-<a href=#6721 id=6721 data-nosnippet>6721</a>            <span class="string">"ok"</span>: <span class="bool-val">true</span>,
-<a href=#6722 id=6722 data-nosnippet>6722</a>            <span class="string">"metrics"</span>: {
-<a href=#6723 id=6723 data-nosnippet>6723</a>                <span class="string">"pending_verification_total"</span>: <span class="number">0</span>,
-<a href=#6724 id=6724 data-nosnippet>6724</a>                <span class="string">"cleared_total"</span>: <span class="number">2</span>,
-<a href=#6725 id=6725 data-nosnippet>6725</a>                <span class="string">"resolved_total"</span>: <span class="number">0</span>,
-<a href=#6726 id=6726 data-nosnippet>6726</a>                <span class="string">"payout_batch_total"</span>: <span class="number">1</span>,
-<a href=#6727 id=6727 data-nosnippet>6727</a>            }
-<a href=#6728 id=6728 data-nosnippet>6728</a>        });
-<a href=#6729 id=6729 data-nosnippet>6729</a>        <span class="kw">let </span>trust = <span class="macro">serde_json::json!</span>({
-<a href=#6730 id=6730 data-nosnippet>6730</a>            <span class="string">"ok"</span>: <span class="bool-val">true</span>,
-<a href=#6731 id=6731 data-nosnippet>6731</a>            <span class="string">"metrics"</span>: {
-<a href=#6732 id=6732 data-nosnippet>6732</a>                <span class="string">"payout_eligible_total"</span>: <span class="number">3</span>,
-<a href=#6733 id=6733 data-nosnippet>6733</a>                <span class="string">"payout_held_total"</span>: <span class="number">0</span>,
-<a href=#6734 id=6734 data-nosnippet>6734</a>                <span class="string">"last_trust_score"</span>: <span class="number">55</span>,
-<a href=#6735 id=6735 data-nosnippet>6735</a>                <span class="string">"gate_min_threshold"</span>: <span class="number">40</span>,
-<a href=#6736 id=6736 data-nosnippet>6736</a>            }
-<a href=#6737 id=6737 data-nosnippet>6737</a>        });
-<a href=#6738 id=6738 data-nosnippet>6738</a>        validate_settlement_trust_metrics_parity(prom, <span class="kw-2">&amp;</span>settlement, <span class="kw-2">&amp;</span>trust).expect(<span class="string">"parity"</span>);
-<a href=#6739 id=6739 data-nosnippet>6739</a>    }
-<a href=#6740 id=6740 data-nosnippet>6740</a>
-<a href=#6741 id=6741 data-nosnippet>6741</a>    <span class="attr">#[test]
-<a href=#6742 id=6742 data-nosnippet>6742</a>    </span><span class="kw">fn </span>grid_network_profiles_list_put_export_shape_ph_s733() {
-<a href=#6743 id=6743 data-nosnippet>6743</a>        <span class="kw">let </span>list = <span class="macro">serde_json::json!</span>({
-<a href=#6744 id=6744 data-nosnippet>6744</a>            <span class="string">"ok"</span>: <span class="bool-val">true</span>,
-<a href=#6745 id=6745 data-nosnippet>6745</a>            <span class="string">"peer_ids"</span>: [<span class="string">"peer-a"</span>, <span class="string">"peer-b"</span>],
-<a href=#6746 id=6746 data-nosnippet>6746</a>            <span class="string">"count"</span>: <span class="number">2
-<a href=#6747 id=6747 data-nosnippet>6747</a>        </span>});
-<a href=#6748 id=6748 data-nosnippet>6748</a>        <span class="macro">assert_eq!</span>(list[<span class="string">"ok"</span>], <span class="bool-val">true</span>);
-<a href=#6749 id=6749 data-nosnippet>6749</a>        <span class="macro">assert_eq!</span>(list[<span class="string">"count"</span>], <span class="number">2</span>);
-<a href=#6750 id=6750 data-nosnippet>6750</a>        <span class="kw">let </span>ids = list[<span class="string">"peer_ids"</span>].as_array().expect(<span class="string">"peer_ids"</span>);
-<a href=#6751 id=6751 data-nosnippet>6751</a>        <span class="macro">assert_eq!</span>(ids.len(), <span class="number">2</span>);
+<a href=#6626 id=6626 data-nosnippet>6626</a>            <span class="string">"poolai_update_notify_pending 1\n"</span>,
+<a href=#6627 id=6627 data-nosnippet>6627</a>            <span class="string">"poolai_advisory_acknowledged_total 3\n"</span>,
+<a href=#6628 id=6628 data-nosnippet>6628</a>        );
+<a href=#6629 id=6629 data-nosnippet>6629</a>        <span class="kw">let </span>governance = <span class="macro">serde_json::json!</span>({
+<a href=#6630 id=6630 data-nosnippet>6630</a>            <span class="string">"ok"</span>: <span class="bool-val">true</span>,
+<a href=#6631 id=6631 data-nosnippet>6631</a>            <span class="string">"metrics"</span>: {
+<a href=#6632 id=6632 data-nosnippet>6632</a>                <span class="string">"release_verify_total"</span>: <span class="number">2</span>,
+<a href=#6633 id=6633 data-nosnippet>6633</a>                <span class="string">"release_verify_fail_total"</span>: <span class="number">0</span>,
+<a href=#6634 id=6634 data-nosnippet>6634</a>                <span class="string">"update_notify_pending"</span>: <span class="number">1</span>,
+<a href=#6635 id=6635 data-nosnippet>6635</a>                <span class="string">"advisory_acknowledged_total"</span>: <span class="number">3</span>,
+<a href=#6636 id=6636 data-nosnippet>6636</a>            }
+<a href=#6637 id=6637 data-nosnippet>6637</a>        });
+<a href=#6638 id=6638 data-nosnippet>6638</a>        validate_governance_metrics_parity(gov_prom, <span class="kw-2">&amp;</span>governance).expect(<span class="string">"governance parity"</span>);
+<a href=#6639 id=6639 data-nosnippet>6639</a>    }
+<a href=#6640 id=6640 data-nosnippet>6640</a>
+<a href=#6641 id=6641 data-nosnippet>6641</a>    <span class="attr">#[test]
+<a href=#6642 id=6642 data-nosnippet>6642</a>    </span><span class="kw">fn </span>stand_smoke_export_shape_regression_suite_ph_s834() {
+<a href=#6643 id=6643 data-nosnippet>6643</a>        <span class="kw">use </span>poolai::grid::stand_smoke_metrics_parity::validate_band6_metrics_parity_v2;
+<a href=#6644 id=6644 data-nosnippet>6644</a>
+<a href=#6645 id=6645 data-nosnippet>6645</a>        <span class="kw">let </span>prom = <span class="macro">concat!</span>(
+<a href=#6646 id=6646 data-nosnippet>6646</a>            <span class="string">"galaxy_verification_sample_total 1\n"</span>,
+<a href=#6647 id=6647 data-nosnippet>6647</a>            <span class="string">"galaxy_verification_checker_pending_total 0\n"</span>,
+<a href=#6648 id=6648 data-nosnippet>6648</a>            <span class="string">"galaxy_replay_pending 0\n"</span>,
+<a href=#6649 id=6649 data-nosnippet>6649</a>            <span class="string">"galaxy_verification_replay_record_total 0\n"</span>,
+<a href=#6650 id=6650 data-nosnippet>6650</a>            <span class="string">"galaxy_settlement_cleared_total 0\n"</span>,
+<a href=#6651 id=6651 data-nosnippet>6651</a>            <span class="string">"galaxy_settlement_payout_batch_total 0\n"</span>,
+<a href=#6652 id=6652 data-nosnippet>6652</a>            <span class="string">"galaxy_trust_payout_eligible_total 0\n"</span>,
+<a href=#6653 id=6653 data-nosnippet>6653</a>            <span class="string">"galaxy_trust_score 0\n"</span>,
+<a href=#6654 id=6654 data-nosnippet>6654</a>            <span class="string">"galaxy_replication_strict_total 0\n"</span>,
+<a href=#6655 id=6655 data-nosnippet>6655</a>            <span class="string">"galaxy_replication_enqueue_total 0\n"</span>,
+<a href=#6656 id=6656 data-nosnippet>6656</a>            <span class="string">"galaxy_pricing_fresh_served 0\n"</span>,
+<a href=#6657 id=6657 data-nosnippet>6657</a>            <span class="string">"galaxy_pricing_stale_served 0\n"</span>,
+<a href=#6658 id=6658 data-nosnippet>6658</a>            <span class="string">"galaxy_prefetch_pull_bytes_total 0\n"</span>,
+<a href=#6659 id=6659 data-nosnippet>6659</a>            <span class="string">"galaxy_prefetch_backpressure_total 0\n"</span>,
+<a href=#6660 id=6660 data-nosnippet>6660</a>            <span class="string">"galaxy_shard_local_hit_ratio 0\n"</span>,
+<a href=#6661 id=6661 data-nosnippet>6661</a>            <span class="string">"galaxy_hot_tier_hit_ratio 0\n"</span>,
+<a href=#6662 id=6662 data-nosnippet>6662</a>            <span class="string">"galaxy_cross_region_egress_mb 0\n"</span>,
+<a href=#6663 id=6663 data-nosnippet>6663</a>            <span class="string">"galaxy_hot_promote_total 0\n"</span>,
+<a href=#6664 id=6664 data-nosnippet>6664</a>            <span class="string">"galaxy_hot_evict_total 0\n"</span>,
+<a href=#6665 id=6665 data-nosnippet>6665</a>            <span class="string">"galaxy_fee_split_applied_total 0\n"</span>,
+<a href=#6666 id=6666 data-nosnippet>6666</a>            <span class="string">"poolai_release_verify_total 0\n"</span>,
+<a href=#6667 id=6667 data-nosnippet>6667</a>            <span class="string">"poolai_release_verify_fail_total 0\n"</span>,
+<a href=#6668 id=6668 data-nosnippet>6668</a>            <span class="string">"poolai_update_notify_pending 0\n"</span>,
+<a href=#6669 id=6669 data-nosnippet>6669</a>            <span class="string">"poolai_advisory_acknowledged_total 0\n"</span>,
+<a href=#6670 id=6670 data-nosnippet>6670</a>            <span class="string">"galaxy_settlement_payout_batch_queue_depth 0\n"</span>,
+<a href=#6671 id=6671 data-nosnippet>6671</a>            <span class="string">"galaxy_settlement_onchain_submit_total 0\n"</span>,
+<a href=#6672 id=6672 data-nosnippet>6672</a>        );
+<a href=#6673 id=6673 data-nosnippet>6673</a>        <span class="kw">let </span>verification = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"sample_total"</span>: <span class="number">1</span>, <span class="string">"mismatch_total"</span>: <span class="number">0</span>, <span class="string">"match_total"</span>: <span class="number">0</span>, <span class="string">"checker_pending_total"</span>: <span class="number">0</span>}});
+<a href=#6674 id=6674 data-nosnippet>6674</a>        <span class="kw">let </span>replay = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"replay_pending"</span>: <span class="number">0</span>, <span class="string">"replay_pending_scheduled_total"</span>: <span class="number">0</span>, <span class="string">"verification_replay_record_total"</span>: <span class="number">0</span>}});
+<a href=#6675 id=6675 data-nosnippet>6675</a>        <span class="kw">let </span>settlement = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"pending_verification_total"</span>: <span class="number">0</span>, <span class="string">"cleared_total"</span>: <span class="number">0</span>, <span class="string">"resolved_total"</span>: <span class="number">0</span>, <span class="string">"payout_batch_total"</span>: <span class="number">0</span>}});
+<a href=#6676 id=6676 data-nosnippet>6676</a>        <span class="kw">let </span>trust = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"payout_eligible_total"</span>: <span class="number">0</span>, <span class="string">"payout_held_total"</span>: <span class="number">0</span>, <span class="string">"last_trust_score"</span>: <span class="number">0</span>, <span class="string">"gate_min_threshold"</span>: <span class="number">40</span>}});
+<a href=#6677 id=6677 data-nosnippet>6677</a>        <span class="kw">let </span>replication = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"strict_total"</span>: <span class="number">0</span>, <span class="string">"enqueue_total"</span>: <span class="number">0</span>, <span class="string">"executor_enqueue_total"</span>: <span class="number">0</span>, <span class="string">"rate_limited_total"</span>: <span class="number">0</span>}});
+<a href=#6678 id=6678 data-nosnippet>6678</a>        <span class="kw">let </span>pricing = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"fresh_served_total"</span>: <span class="number">0</span>, <span class="string">"stale_served_total"</span>: <span class="number">0</span>, <span class="string">"forced_fallback_total"</span>: <span class="number">0</span>, <span class="string">"provider_catalog_lookups_total"</span>: <span class="number">0</span>, <span class="string">"provider_catalog_hits_total"</span>: <span class="number">0</span>, <span class="string">"provider_errors_total"</span>: <span class="number">0</span>, <span class="string">"provider_timeouts_total"</span>: <span class="number">0</span>}});
+<a href=#6679 id=6679 data-nosnippet>6679</a>        <span class="kw">let </span>prefetch = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"pull_bytes_total"</span>: <span class="number">0</span>, <span class="string">"backpressure_total"</span>: <span class="number">0</span>, <span class="string">"plan_total"</span>: <span class="number">0</span>, <span class="string">"enqueue_total"</span>: <span class="number">0</span>, <span class="string">"peer_fetch_total"</span>: <span class="number">0</span>}});
+<a href=#6680 id=6680 data-nosnippet>6680</a>        <span class="kw">let </span>locality = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"shard_local_hit_ratio_bps"</span>: <span class="number">0</span>, <span class="string">"hot_tier_hit_ratio_bps"</span>: <span class="number">0</span>, <span class="string">"cross_region_egress_mb"</span>: <span class="number">0</span>, <span class="string">"hot_promote_total"</span>: <span class="number">0</span>, <span class="string">"hot_evict_total"</span>: <span class="number">0</span>}});
+<a href=#6681 id=6681 data-nosnippet>6681</a>        <span class="kw">let </span>fee_split = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"fee_split_applied_total"</span>: <span class="number">0</span>, <span class="string">"primary_dev_fee_bps"</span>: <span class="number">10</span>, <span class="string">"secondary_admin_fee_min_bps"</span>: <span class="number">100</span>, <span class="string">"secondary_admin_fee_max_bps"</span>: <span class="number">500</span>}});
+<a href=#6682 id=6682 data-nosnippet>6682</a>        <span class="kw">let </span>governance = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"release_verify_total"</span>: <span class="number">0</span>, <span class="string">"release_verify_fail_total"</span>: <span class="number">0</span>, <span class="string">"update_notify_pending"</span>: <span class="number">0</span>, <span class="string">"advisory_acknowledged_total"</span>: <span class="number">0</span>}});
+<a href=#6683 id=6683 data-nosnippet>6683</a>        <span class="kw">let </span>payout_batch = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"payout_batch_total"</span>: <span class="number">0</span>, <span class="string">"payout_batch_queue_depth"</span>: <span class="number">0</span>, <span class="string">"onchain_submit_total"</span>: <span class="number">0</span>}});
+<a href=#6684 id=6684 data-nosnippet>6684</a>        validate_band6_metrics_parity_v2(
+<a href=#6685 id=6685 data-nosnippet>6685</a>            prom,
+<a href=#6686 id=6686 data-nosnippet>6686</a>            <span class="kw-2">&amp;</span>verification,
+<a href=#6687 id=6687 data-nosnippet>6687</a>            <span class="kw-2">&amp;</span>replay,
+<a href=#6688 id=6688 data-nosnippet>6688</a>            <span class="kw-2">&amp;</span>settlement,
+<a href=#6689 id=6689 data-nosnippet>6689</a>            <span class="kw-2">&amp;</span>trust,
+<a href=#6690 id=6690 data-nosnippet>6690</a>            <span class="kw-2">&amp;</span>replication,
+<a href=#6691 id=6691 data-nosnippet>6691</a>            <span class="kw-2">&amp;</span>pricing,
+<a href=#6692 id=6692 data-nosnippet>6692</a>            <span class="kw-2">&amp;</span>prefetch,
+<a href=#6693 id=6693 data-nosnippet>6693</a>            <span class="kw-2">&amp;</span>locality,
+<a href=#6694 id=6694 data-nosnippet>6694</a>            <span class="kw-2">&amp;</span>fee_split,
+<a href=#6695 id=6695 data-nosnippet>6695</a>            <span class="kw-2">&amp;</span>governance,
+<a href=#6696 id=6696 data-nosnippet>6696</a>            <span class="kw-2">&amp;</span>payout_batch,
+<a href=#6697 id=6697 data-nosnippet>6697</a>        )
+<a href=#6698 id=6698 data-nosnippet>6698</a>        .expect(<span class="string">"band18 regression suite"</span>);
+<a href=#6699 id=6699 data-nosnippet>6699</a>    }
+<a href=#6700 id=6700 data-nosnippet>6700</a>
+<a href=#6701 id=6701 data-nosnippet>6701</a>    <span class="attr">#[test]
+<a href=#6702 id=6702 data-nosnippet>6702</a>    </span><span class="kw">fn </span>multi_module_stand_smoke_full_suite_ph_s1002() {
+<a href=#6703 id=6703 data-nosnippet>6703</a>        <span class="kw">use </span>poolai_ui_core::multi_module_depth::{
+<a href=#6704 id=6704 data-nosnippet>6704</a>            multi_module_depth_stub, MultiModuleDepth, MULTI_MODULE_BAND35_TOP5_GRID_APIS,
+<a href=#6705 id=6705 data-nosnippet>6705</a>            STAND_SMOKE_FULL_SUITE,
+<a href=#6706 id=6706 data-nosnippet>6706</a>        };
+<a href=#6707 id=6707 data-nosnippet>6707</a>        <span class="kw">use </span>serde_json::json;
+<a href=#6708 id=6708 data-nosnippet>6708</a>
+<a href=#6709 id=6709 data-nosnippet>6709</a>        <span class="macro">assert_eq!</span>(
+<a href=#6710 id=6710 data-nosnippet>6710</a>            multi_module_depth_stub(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({<span class="string">"stand_smoke"</span>: <span class="bool-val">true</span>}))),
+<a href=#6711 id=6711 data-nosnippet>6711</a>            MultiModuleDepth::StandSmoke
+<a href=#6712 id=6712 data-nosnippet>6712</a>        );
+<a href=#6713 id=6713 data-nosnippet>6713</a>        <span class="macro">assert_eq!</span>(MULTI_MODULE_BAND35_TOP5_GRID_APIS.len(), <span class="number">5</span>);
+<a href=#6714 id=6714 data-nosnippet>6714</a>        <span class="macro">assert!</span>(STAND_SMOKE_FULL_SUITE.contains(<span class="string">"--json"</span>));
+<a href=#6715 id=6715 data-nosnippet>6715</a>        stand_smoke_export_shape_regression_suite_ph_s834();
+<a href=#6716 id=6716 data-nosnippet>6716</a>    }
+<a href=#6717 id=6717 data-nosnippet>6717</a>
+<a href=#6718 id=6718 data-nosnippet>6718</a>    <span class="attr">#[test]
+<a href=#6719 id=6719 data-nosnippet>6719</a>    </span><span class="kw">fn </span>grid_metrics_band6_prometheus_parity_export_shape_ph_s713() {
+<a href=#6720 id=6720 data-nosnippet>6720</a>        <span class="kw">use </span>poolai::grid::stand_smoke_metrics_parity::validate_band6_metrics_parity;
+<a href=#6721 id=6721 data-nosnippet>6721</a>        <span class="kw">let </span>prom = <span class="macro">concat!</span>(
+<a href=#6722 id=6722 data-nosnippet>6722</a>            <span class="string">"galaxy_verification_sample_total 0\n"</span>,
+<a href=#6723 id=6723 data-nosnippet>6723</a>            <span class="string">"galaxy_verification_checker_pending_total 0\n"</span>,
+<a href=#6724 id=6724 data-nosnippet>6724</a>            <span class="string">"galaxy_replay_pending 0\n"</span>,
+<a href=#6725 id=6725 data-nosnippet>6725</a>            <span class="string">"galaxy_verification_replay_record_total 0\n"</span>,
+<a href=#6726 id=6726 data-nosnippet>6726</a>            <span class="string">"galaxy_settlement_cleared_total 0\n"</span>,
+<a href=#6727 id=6727 data-nosnippet>6727</a>            <span class="string">"galaxy_settlement_payout_batch_total 0\n"</span>,
+<a href=#6728 id=6728 data-nosnippet>6728</a>            <span class="string">"galaxy_trust_payout_eligible_total 0\n"</span>,
+<a href=#6729 id=6729 data-nosnippet>6729</a>            <span class="string">"galaxy_trust_score 0\n"</span>,
+<a href=#6730 id=6730 data-nosnippet>6730</a>            <span class="string">"galaxy_replication_strict_total 0\n"</span>,
+<a href=#6731 id=6731 data-nosnippet>6731</a>            <span class="string">"galaxy_replication_enqueue_total 0\n"</span>,
+<a href=#6732 id=6732 data-nosnippet>6732</a>            <span class="string">"galaxy_pricing_fresh_served 0\n"</span>,
+<a href=#6733 id=6733 data-nosnippet>6733</a>            <span class="string">"galaxy_pricing_stale_served 0\n"</span>,
+<a href=#6734 id=6734 data-nosnippet>6734</a>        );
+<a href=#6735 id=6735 data-nosnippet>6735</a>        <span class="kw">let </span>verification = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"sample_total"</span>: <span class="number">0</span>, <span class="string">"mismatch_total"</span>: <span class="number">0</span>, <span class="string">"match_total"</span>: <span class="number">0</span>, <span class="string">"checker_pending_total"</span>: <span class="number">0</span>}});
+<a href=#6736 id=6736 data-nosnippet>6736</a>        <span class="kw">let </span>replay = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"replay_pending"</span>: <span class="number">0</span>, <span class="string">"replay_pending_scheduled_total"</span>: <span class="number">0</span>, <span class="string">"verification_replay_record_total"</span>: <span class="number">0</span>}});
+<a href=#6737 id=6737 data-nosnippet>6737</a>        <span class="kw">let </span>settlement = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"pending_verification_total"</span>: <span class="number">0</span>, <span class="string">"cleared_total"</span>: <span class="number">0</span>, <span class="string">"resolved_total"</span>: <span class="number">0</span>, <span class="string">"payout_batch_total"</span>: <span class="number">0</span>}});
+<a href=#6738 id=6738 data-nosnippet>6738</a>        <span class="kw">let </span>trust = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"payout_eligible_total"</span>: <span class="number">0</span>, <span class="string">"payout_held_total"</span>: <span class="number">0</span>, <span class="string">"last_trust_score"</span>: <span class="number">0</span>, <span class="string">"gate_min_threshold"</span>: <span class="number">40</span>}});
+<a href=#6739 id=6739 data-nosnippet>6739</a>        <span class="kw">let </span>replication = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"strict_total"</span>: <span class="number">0</span>, <span class="string">"enqueue_total"</span>: <span class="number">0</span>, <span class="string">"executor_enqueue_total"</span>: <span class="number">0</span>, <span class="string">"rate_limited_total"</span>: <span class="number">0</span>}});
+<a href=#6740 id=6740 data-nosnippet>6740</a>        <span class="kw">let </span>pricing = <span class="macro">serde_json::json!</span>({<span class="string">"ok"</span>: <span class="bool-val">true</span>, <span class="string">"metrics"</span>: {<span class="string">"fresh_served_total"</span>: <span class="number">0</span>, <span class="string">"stale_served_total"</span>: <span class="number">0</span>, <span class="string">"forced_fallback_total"</span>: <span class="number">0</span>, <span class="string">"provider_catalog_lookups_total"</span>: <span class="number">0</span>, <span class="string">"provider_catalog_hits_total"</span>: <span class="number">0</span>, <span class="string">"provider_errors_total"</span>: <span class="number">0</span>, <span class="string">"provider_timeouts_total"</span>: <span class="number">0</span>}});
+<a href=#6741 id=6741 data-nosnippet>6741</a>        validate_band6_metrics_parity(
+<a href=#6742 id=6742 data-nosnippet>6742</a>            prom,
+<a href=#6743 id=6743 data-nosnippet>6743</a>            <span class="kw-2">&amp;</span>verification,
+<a href=#6744 id=6744 data-nosnippet>6744</a>            <span class="kw-2">&amp;</span>replay,
+<a href=#6745 id=6745 data-nosnippet>6745</a>            <span class="kw-2">&amp;</span>settlement,
+<a href=#6746 id=6746 data-nosnippet>6746</a>            <span class="kw-2">&amp;</span>trust,
+<a href=#6747 id=6747 data-nosnippet>6747</a>            <span class="kw-2">&amp;</span>replication,
+<a href=#6748 id=6748 data-nosnippet>6748</a>            <span class="kw-2">&amp;</span>pricing,
+<a href=#6749 id=6749 data-nosnippet>6749</a>        )
+<a href=#6750 id=6750 data-nosnippet>6750</a>        .expect(<span class="string">"band6 parity"</span>);
+<a href=#6751 id=6751 data-nosnippet>6751</a>    }
 <a href=#6752 id=6752 data-nosnippet>6752</a>
-<a href=#6753 id=6753 data-nosnippet>6753</a>        <span class="kw">let </span>profile = <span class="macro">serde_json::json!</span>({
-<a href=#6754 id=6754 data-nosnippet>6754</a>            <span class="string">"ok"</span>: <span class="bool-val">true</span>,
-<a href=#6755 id=6755 data-nosnippet>6755</a>            <span class="string">"peer_id"</span>: <span class="string">"peer-a"</span>,
-<a href=#6756 id=6756 data-nosnippet>6756</a>            <span class="string">"network_profile"</span>: {
-<a href=#6757 id=6757 data-nosnippet>6757</a>                <span class="string">"region"</span>: <span class="string">"smoke"</span>,
-<a href=#6758 id=6758 data-nosnippet>6758</a>                <span class="string">"latency_ms_p50"</span>: <span class="number">11
-<a href=#6759 id=6759 data-nosnippet>6759</a>            </span>}
-<a href=#6760 id=6760 data-nosnippet>6760</a>        });
-<a href=#6761 id=6761 data-nosnippet>6761</a>        <span class="macro">assert_eq!</span>(profile[<span class="string">"peer_id"</span>], <span class="string">"peer-a"</span>);
-<a href=#6762 id=6762 data-nosnippet>6762</a>        <span class="macro">assert_eq!</span>(profile[<span class="string">"network_profile"</span>][<span class="string">"region"</span>].as_str(), <span class="prelude-val">Some</span>(<span class="string">"smoke"</span>));
-<a href=#6763 id=6763 data-nosnippet>6763</a>    }
-<a href=#6764 id=6764 data-nosnippet>6764</a>
-<a href=#6765 id=6765 data-nosnippet>6765</a>    <span class="attr">#[test]
-<a href=#6766 id=6766 data-nosnippet>6766</a>    </span><span class="kw">fn </span>openapi_band_export_shape_ph_s843() {
-<a href=#6767 id=6767 data-nosnippet>6767</a>        <span class="kw">let </span>advisories = <span class="macro">serde_json::json!</span>([
-<a href=#6768 id=6768 data-nosnippet>6768</a>            {
-<a href=#6769 id=6769 data-nosnippet>6769</a>                <span class="string">"id"</span>: <span class="string">"CVE-2026-0001"</span>,
-<a href=#6770 id=6770 data-nosnippet>6770</a>                <span class="string">"severity"</span>: <span class="string">"medium"</span>,
-<a href=#6771 id=6771 data-nosnippet>6771</a>                <span class="string">"summary"</span>: <span class="string">"Signed release manifest rotation advisory (Galaxy §9.2)"</span>,
-<a href=#6772 id=6772 data-nosnippet>6772</a>                <span class="string">"acknowledged"</span>: <span class="bool-val">false
-<a href=#6773 id=6773 data-nosnippet>6773</a>            </span>}
-<a href=#6774 id=6774 data-nosnippet>6774</a>        ]);
-<a href=#6775 id=6775 data-nosnippet>6775</a>        <span class="kw">let </span>row = <span class="kw-2">&amp;</span>advisories[<span class="number">0</span>];
-<a href=#6776 id=6776 data-nosnippet>6776</a>        <span class="kw">for </span>key <span class="kw">in </span>[<span class="string">"id"</span>, <span class="string">"severity"</span>, <span class="string">"summary"</span>, <span class="string">"acknowledged"</span>] {
-<a href=#6777 id=6777 data-nosnippet>6777</a>            <span class="macro">assert!</span>(row.get(key).is_some(), <span class="string">"missing {key}"</span>);
-<a href=#6778 id=6778 data-nosnippet>6778</a>        }
-<a href=#6779 id=6779 data-nosnippet>6779</a>        <span class="kw">let </span>rebind_err = <span class="macro">serde_json::json!</span>({
-<a href=#6780 id=6780 data-nosnippet>6780</a>            <span class="string">"error"</span>: <span class="string">"admin_required"</span>,
-<a href=#6781 id=6781 data-nosnippet>6781</a>            <span class="string">"message"</span>: <span class="string">"Bearer admin token required for wallet rebind override"
-<a href=#6782 id=6782 data-nosnippet>6782</a>        </span>});
-<a href=#6783 id=6783 data-nosnippet>6783</a>        <span class="macro">assert_eq!</span>(rebind_err[<span class="string">"error"</span>].as_str(), <span class="prelude-val">Some</span>(<span class="string">"admin_required"</span>));
-<a href=#6784 id=6784 data-nosnippet>6784</a>    }
-<a href=#6785 id=6785 data-nosnippet>6785</a>
-<a href=#6786 id=6786 data-nosnippet>6786</a>    <span class="attr">#[test]
-<a href=#6787 id=6787 data-nosnippet>6787</a>    </span><span class="kw">fn </span>signed_capability_reject_export_shape_ph_s743() {
-<a href=#6788 id=6788 data-nosnippet>6788</a>        <span class="kw">let </span>reject = <span class="macro">serde_json::json!</span>({
-<a href=#6789 id=6789 data-nosnippet>6789</a>            <span class="string">"error"</span>: {
-<a href=#6790 id=6790 data-nosnippet>6790</a>                <span class="string">"code"</span>: <span class="string">"capability_signature_invalid"</span>,
-<a href=#6791 id=6791 data-nosnippet>6791</a>                <span class="string">"message"</span>: <span class="string">"signed capability_document required for telegram_edge origin"
-<a href=#6792 id=6792 data-nosnippet>6792</a>            </span>}
-<a href=#6793 id=6793 data-nosnippet>6793</a>        });
-<a href=#6794 id=6794 data-nosnippet>6794</a>        <span class="macro">assert_eq!</span>(
-<a href=#6795 id=6795 data-nosnippet>6795</a>            reject[<span class="string">"error"</span>][<span class="string">"code"</span>].as_str(),
-<a href=#6796 id=6796 data-nosnippet>6796</a>            <span class="prelude-val">Some</span>(<span class="string">"capability_signature_invalid"</span>)
-<a href=#6797 id=6797 data-nosnippet>6797</a>        );
-<a href=#6798 id=6798 data-nosnippet>6798</a>        <span class="macro">assert!</span>(reject[<span class="string">"error"</span>][<span class="string">"message"</span>]
-<a href=#6799 id=6799 data-nosnippet>6799</a>            .as_str()
-<a href=#6800 id=6800 data-nosnippet>6800</a>            .unwrap_or(<span class="string">""</span>)
-<a href=#6801 id=6801 data-nosnippet>6801</a>            .contains(<span class="string">"telegram_edge"</span>));
-<a href=#6802 id=6802 data-nosnippet>6802</a>
-<a href=#6803 id=6803 data-nosnippet>6803</a>        <span class="kw">let </span>metrics = <span class="macro">concat!</span>(
-<a href=#6804 id=6804 data-nosnippet>6804</a>            <span class="string">"# HELP galaxy_capability_unsigned_rejected_total Unsigned or invalid signed capability rejections on telegram_edge register-remote (PH-S740)\n"</span>,
-<a href=#6805 id=6805 data-nosnippet>6805</a>            <span class="string">"# TYPE galaxy_capability_unsigned_rejected_total gauge\n"</span>,
-<a href=#6806 id=6806 data-nosnippet>6806</a>            <span class="string">"galaxy_capability_unsigned_rejected_total 1\n"</span>,
-<a href=#6807 id=6807 data-nosnippet>6807</a>            <span class="string">"# HELP galaxy_capability_signed_accepted_total Successful signed capability admissions on telegram_edge register-remote (PH-S741)\n"</span>,
-<a href=#6808 id=6808 data-nosnippet>6808</a>            <span class="string">"# TYPE galaxy_capability_signed_accepted_total gauge\n"</span>,
-<a href=#6809 id=6809 data-nosnippet>6809</a>            <span class="string">"galaxy_capability_signed_accepted_total 0\n"</span>,
-<a href=#6810 id=6810 data-nosnippet>6810</a>        );
-<a href=#6811 id=6811 data-nosnippet>6811</a>        <span class="macro">assert!</span>(metrics.contains(<span class="string">"galaxy_capability_unsigned_rejected_total"</span>));
-<a href=#6812 id=6812 data-nosnippet>6812</a>        <span class="macro">assert!</span>(metrics.contains(<span class="string">"galaxy_capability_signed_accepted_total"</span>));
-<a href=#6813 id=6813 data-nosnippet>6813</a>    }
-<a href=#6814 id=6814 data-nosnippet>6814</a>
-<a href=#6815 id=6815 data-nosnippet>6815</a>    <span class="attr">#[test]
-<a href=#6816 id=6816 data-nosnippet>6816</a>    </span><span class="kw">fn </span>vision_revision_fm_parity_ph_s235() {
-<a href=#6817 id=6817 data-nosnippet>6817</a>        <span class="kw">let </span>root = repo_root();
-<a href=#6818 id=6818 data-nosnippet>6818</a>        assert_vision_repo_parity(<span class="kw-2">&amp;</span>root)
-<a href=#6819 id=6819 data-nosnippet>6819</a>            .expect(<span class="string">"run poolai-vision-sync --check before stand smoke"</span>);
-<a href=#6820 id=6820 data-nosnippet>6820</a>        <span class="kw">let </span>manifest_rev = read_manifest_revision(<span class="kw-2">&amp;</span>root).expect(<span class="string">"manifest"</span>);
-<a href=#6821 id=6821 data-nosnippet>6821</a>        <span class="kw">let </span>fm_rev = read_fm_vision_revision(<span class="kw-2">&amp;</span>root).expect(<span class="string">"fm"</span>);
-<a href=#6822 id=6822 data-nosnippet>6822</a>        <span class="macro">assert_eq!</span>(manifest_rev, fm_rev);
-<a href=#6823 id=6823 data-nosnippet>6823</a>        <span class="kw">if let </span><span class="prelude-val">Some</span>(next) = read_manifest_next_sprint(<span class="kw-2">&amp;</span>root) {
-<a href=#6824 id=6824 data-nosnippet>6824</a>            <span class="kw">let </span>active = read_extensions_active_sprint(<span class="kw-2">&amp;</span>root)
-<a href=#6825 id=6825 data-nosnippet>6825</a>                .expect(<span class="string">"extensions"</span>)
-<a href=#6826 id=6826 data-nosnippet>6826</a>                .expect(<span class="string">"active_sprint"</span>);
-<a href=#6827 id=6827 data-nosnippet>6827</a>            <span class="macro">assert_eq!</span>(active, next);
-<a href=#6828 id=6828 data-nosnippet>6828</a>        }
-<a href=#6829 id=6829 data-nosnippet>6829</a>    }
-<a href=#6830 id=6830 data-nosnippet>6830</a>}</code></pre></div></section></main></body></html>
+<a href=#6753 id=6753 data-nosnippet>6753</a>    <span class="attr">#[test]
+<a href=#6754 id=6754 data-nosnippet>6754</a>    </span><span class="kw">fn </span>grid_settlement_trust_prometheus_parity_export_shape_ph_s723() {
+<a href=#6755 id=6755 data-nosnippet>6755</a>        <span class="kw">use </span>poolai::grid::stand_smoke_metrics_parity::validate_settlement_trust_metrics_parity;
+<a href=#6756 id=6756 data-nosnippet>6756</a>        <span class="kw">let </span>prom = <span class="macro">concat!</span>(
+<a href=#6757 id=6757 data-nosnippet>6757</a>            <span class="string">"galaxy_settlement_cleared_total 2\n"</span>,
+<a href=#6758 id=6758 data-nosnippet>6758</a>            <span class="string">"galaxy_settlement_payout_batch_total 1\n"</span>,
+<a href=#6759 id=6759 data-nosnippet>6759</a>            <span class="string">"galaxy_trust_payout_eligible_total 3\n"</span>,
+<a href=#6760 id=6760 data-nosnippet>6760</a>            <span class="string">"galaxy_trust_score 55\n"</span>,
+<a href=#6761 id=6761 data-nosnippet>6761</a>        );
+<a href=#6762 id=6762 data-nosnippet>6762</a>        <span class="kw">let </span>settlement = <span class="macro">serde_json::json!</span>({
+<a href=#6763 id=6763 data-nosnippet>6763</a>            <span class="string">"ok"</span>: <span class="bool-val">true</span>,
+<a href=#6764 id=6764 data-nosnippet>6764</a>            <span class="string">"metrics"</span>: {
+<a href=#6765 id=6765 data-nosnippet>6765</a>                <span class="string">"pending_verification_total"</span>: <span class="number">0</span>,
+<a href=#6766 id=6766 data-nosnippet>6766</a>                <span class="string">"cleared_total"</span>: <span class="number">2</span>,
+<a href=#6767 id=6767 data-nosnippet>6767</a>                <span class="string">"resolved_total"</span>: <span class="number">0</span>,
+<a href=#6768 id=6768 data-nosnippet>6768</a>                <span class="string">"payout_batch_total"</span>: <span class="number">1</span>,
+<a href=#6769 id=6769 data-nosnippet>6769</a>            }
+<a href=#6770 id=6770 data-nosnippet>6770</a>        });
+<a href=#6771 id=6771 data-nosnippet>6771</a>        <span class="kw">let </span>trust = <span class="macro">serde_json::json!</span>({
+<a href=#6772 id=6772 data-nosnippet>6772</a>            <span class="string">"ok"</span>: <span class="bool-val">true</span>,
+<a href=#6773 id=6773 data-nosnippet>6773</a>            <span class="string">"metrics"</span>: {
+<a href=#6774 id=6774 data-nosnippet>6774</a>                <span class="string">"payout_eligible_total"</span>: <span class="number">3</span>,
+<a href=#6775 id=6775 data-nosnippet>6775</a>                <span class="string">"payout_held_total"</span>: <span class="number">0</span>,
+<a href=#6776 id=6776 data-nosnippet>6776</a>                <span class="string">"last_trust_score"</span>: <span class="number">55</span>,
+<a href=#6777 id=6777 data-nosnippet>6777</a>                <span class="string">"gate_min_threshold"</span>: <span class="number">40</span>,
+<a href=#6778 id=6778 data-nosnippet>6778</a>            }
+<a href=#6779 id=6779 data-nosnippet>6779</a>        });
+<a href=#6780 id=6780 data-nosnippet>6780</a>        validate_settlement_trust_metrics_parity(prom, <span class="kw-2">&amp;</span>settlement, <span class="kw-2">&amp;</span>trust).expect(<span class="string">"parity"</span>);
+<a href=#6781 id=6781 data-nosnippet>6781</a>    }
+<a href=#6782 id=6782 data-nosnippet>6782</a>
+<a href=#6783 id=6783 data-nosnippet>6783</a>    <span class="attr">#[test]
+<a href=#6784 id=6784 data-nosnippet>6784</a>    </span><span class="kw">fn </span>grid_network_profiles_list_put_export_shape_ph_s733() {
+<a href=#6785 id=6785 data-nosnippet>6785</a>        <span class="kw">let </span>list = <span class="macro">serde_json::json!</span>({
+<a href=#6786 id=6786 data-nosnippet>6786</a>            <span class="string">"ok"</span>: <span class="bool-val">true</span>,
+<a href=#6787 id=6787 data-nosnippet>6787</a>            <span class="string">"peer_ids"</span>: [<span class="string">"peer-a"</span>, <span class="string">"peer-b"</span>],
+<a href=#6788 id=6788 data-nosnippet>6788</a>            <span class="string">"count"</span>: <span class="number">2
+<a href=#6789 id=6789 data-nosnippet>6789</a>        </span>});
+<a href=#6790 id=6790 data-nosnippet>6790</a>        <span class="macro">assert_eq!</span>(list[<span class="string">"ok"</span>], <span class="bool-val">true</span>);
+<a href=#6791 id=6791 data-nosnippet>6791</a>        <span class="macro">assert_eq!</span>(list[<span class="string">"count"</span>], <span class="number">2</span>);
+<a href=#6792 id=6792 data-nosnippet>6792</a>        <span class="kw">let </span>ids = list[<span class="string">"peer_ids"</span>].as_array().expect(<span class="string">"peer_ids"</span>);
+<a href=#6793 id=6793 data-nosnippet>6793</a>        <span class="macro">assert_eq!</span>(ids.len(), <span class="number">2</span>);
+<a href=#6794 id=6794 data-nosnippet>6794</a>
+<a href=#6795 id=6795 data-nosnippet>6795</a>        <span class="kw">let </span>profile = <span class="macro">serde_json::json!</span>({
+<a href=#6796 id=6796 data-nosnippet>6796</a>            <span class="string">"ok"</span>: <span class="bool-val">true</span>,
+<a href=#6797 id=6797 data-nosnippet>6797</a>            <span class="string">"peer_id"</span>: <span class="string">"peer-a"</span>,
+<a href=#6798 id=6798 data-nosnippet>6798</a>            <span class="string">"network_profile"</span>: {
+<a href=#6799 id=6799 data-nosnippet>6799</a>                <span class="string">"region"</span>: <span class="string">"smoke"</span>,
+<a href=#6800 id=6800 data-nosnippet>6800</a>                <span class="string">"latency_ms_p50"</span>: <span class="number">11
+<a href=#6801 id=6801 data-nosnippet>6801</a>            </span>}
+<a href=#6802 id=6802 data-nosnippet>6802</a>        });
+<a href=#6803 id=6803 data-nosnippet>6803</a>        <span class="macro">assert_eq!</span>(profile[<span class="string">"peer_id"</span>], <span class="string">"peer-a"</span>);
+<a href=#6804 id=6804 data-nosnippet>6804</a>        <span class="macro">assert_eq!</span>(profile[<span class="string">"network_profile"</span>][<span class="string">"region"</span>].as_str(), <span class="prelude-val">Some</span>(<span class="string">"smoke"</span>));
+<a href=#6805 id=6805 data-nosnippet>6805</a>    }
+<a href=#6806 id=6806 data-nosnippet>6806</a>
+<a href=#6807 id=6807 data-nosnippet>6807</a>    <span class="attr">#[test]
+<a href=#6808 id=6808 data-nosnippet>6808</a>    </span><span class="kw">fn </span>openapi_band_export_shape_ph_s843() {
+<a href=#6809 id=6809 data-nosnippet>6809</a>        <span class="kw">let </span>advisories = <span class="macro">serde_json::json!</span>([
+<a href=#6810 id=6810 data-nosnippet>6810</a>            {
+<a href=#6811 id=6811 data-nosnippet>6811</a>                <span class="string">"id"</span>: <span class="string">"CVE-2026-0001"</span>,
+<a href=#6812 id=6812 data-nosnippet>6812</a>                <span class="string">"severity"</span>: <span class="string">"medium"</span>,
+<a href=#6813 id=6813 data-nosnippet>6813</a>                <span class="string">"summary"</span>: <span class="string">"Signed release manifest rotation advisory (Galaxy §9.2)"</span>,
+<a href=#6814 id=6814 data-nosnippet>6814</a>                <span class="string">"acknowledged"</span>: <span class="bool-val">false
+<a href=#6815 id=6815 data-nosnippet>6815</a>            </span>}
+<a href=#6816 id=6816 data-nosnippet>6816</a>        ]);
+<a href=#6817 id=6817 data-nosnippet>6817</a>        <span class="kw">let </span>row = <span class="kw-2">&amp;</span>advisories[<span class="number">0</span>];
+<a href=#6818 id=6818 data-nosnippet>6818</a>        <span class="kw">for </span>key <span class="kw">in </span>[<span class="string">"id"</span>, <span class="string">"severity"</span>, <span class="string">"summary"</span>, <span class="string">"acknowledged"</span>] {
+<a href=#6819 id=6819 data-nosnippet>6819</a>            <span class="macro">assert!</span>(row.get(key).is_some(), <span class="string">"missing {key}"</span>);
+<a href=#6820 id=6820 data-nosnippet>6820</a>        }
+<a href=#6821 id=6821 data-nosnippet>6821</a>        <span class="kw">let </span>rebind_err = <span class="macro">serde_json::json!</span>({
+<a href=#6822 id=6822 data-nosnippet>6822</a>            <span class="string">"error"</span>: <span class="string">"admin_required"</span>,
+<a href=#6823 id=6823 data-nosnippet>6823</a>            <span class="string">"message"</span>: <span class="string">"Bearer admin token required for wallet rebind override"
+<a href=#6824 id=6824 data-nosnippet>6824</a>        </span>});
+<a href=#6825 id=6825 data-nosnippet>6825</a>        <span class="macro">assert_eq!</span>(rebind_err[<span class="string">"error"</span>].as_str(), <span class="prelude-val">Some</span>(<span class="string">"admin_required"</span>));
+<a href=#6826 id=6826 data-nosnippet>6826</a>    }
+<a href=#6827 id=6827 data-nosnippet>6827</a>
+<a href=#6828 id=6828 data-nosnippet>6828</a>    <span class="attr">#[test]
+<a href=#6829 id=6829 data-nosnippet>6829</a>    </span><span class="kw">fn </span>signed_capability_reject_export_shape_ph_s743() {
+<a href=#6830 id=6830 data-nosnippet>6830</a>        <span class="kw">let </span>reject = <span class="macro">serde_json::json!</span>({
+<a href=#6831 id=6831 data-nosnippet>6831</a>            <span class="string">"error"</span>: {
+<a href=#6832 id=6832 data-nosnippet>6832</a>                <span class="string">"code"</span>: <span class="string">"capability_signature_invalid"</span>,
+<a href=#6833 id=6833 data-nosnippet>6833</a>                <span class="string">"message"</span>: <span class="string">"signed capability_document required for telegram_edge origin"
+<a href=#6834 id=6834 data-nosnippet>6834</a>            </span>}
+<a href=#6835 id=6835 data-nosnippet>6835</a>        });
+<a href=#6836 id=6836 data-nosnippet>6836</a>        <span class="macro">assert_eq!</span>(
+<a href=#6837 id=6837 data-nosnippet>6837</a>            reject[<span class="string">"error"</span>][<span class="string">"code"</span>].as_str(),
+<a href=#6838 id=6838 data-nosnippet>6838</a>            <span class="prelude-val">Some</span>(<span class="string">"capability_signature_invalid"</span>)
+<a href=#6839 id=6839 data-nosnippet>6839</a>        );
+<a href=#6840 id=6840 data-nosnippet>6840</a>        <span class="macro">assert!</span>(reject[<span class="string">"error"</span>][<span class="string">"message"</span>]
+<a href=#6841 id=6841 data-nosnippet>6841</a>            .as_str()
+<a href=#6842 id=6842 data-nosnippet>6842</a>            .unwrap_or(<span class="string">""</span>)
+<a href=#6843 id=6843 data-nosnippet>6843</a>            .contains(<span class="string">"telegram_edge"</span>));
+<a href=#6844 id=6844 data-nosnippet>6844</a>
+<a href=#6845 id=6845 data-nosnippet>6845</a>        <span class="kw">let </span>metrics = <span class="macro">concat!</span>(
+<a href=#6846 id=6846 data-nosnippet>6846</a>            <span class="string">"# HELP galaxy_capability_unsigned_rejected_total Unsigned or invalid signed capability rejections on telegram_edge register-remote (PH-S740)\n"</span>,
+<a href=#6847 id=6847 data-nosnippet>6847</a>            <span class="string">"# TYPE galaxy_capability_unsigned_rejected_total gauge\n"</span>,
+<a href=#6848 id=6848 data-nosnippet>6848</a>            <span class="string">"galaxy_capability_unsigned_rejected_total 1\n"</span>,
+<a href=#6849 id=6849 data-nosnippet>6849</a>            <span class="string">"# HELP galaxy_capability_signed_accepted_total Successful signed capability admissions on telegram_edge register-remote (PH-S741)\n"</span>,
+<a href=#6850 id=6850 data-nosnippet>6850</a>            <span class="string">"# TYPE galaxy_capability_signed_accepted_total gauge\n"</span>,
+<a href=#6851 id=6851 data-nosnippet>6851</a>            <span class="string">"galaxy_capability_signed_accepted_total 0\n"</span>,
+<a href=#6852 id=6852 data-nosnippet>6852</a>        );
+<a href=#6853 id=6853 data-nosnippet>6853</a>        <span class="macro">assert!</span>(metrics.contains(<span class="string">"galaxy_capability_unsigned_rejected_total"</span>));
+<a href=#6854 id=6854 data-nosnippet>6854</a>        <span class="macro">assert!</span>(metrics.contains(<span class="string">"galaxy_capability_signed_accepted_total"</span>));
+<a href=#6855 id=6855 data-nosnippet>6855</a>    }
+<a href=#6856 id=6856 data-nosnippet>6856</a>
+<a href=#6857 id=6857 data-nosnippet>6857</a>    <span class="attr">#[test]
+<a href=#6858 id=6858 data-nosnippet>6858</a>    </span><span class="kw">fn </span>vision_revision_fm_parity_ph_s235() {
+<a href=#6859 id=6859 data-nosnippet>6859</a>        <span class="kw">let </span>root = repo_root();
+<a href=#6860 id=6860 data-nosnippet>6860</a>        assert_vision_repo_parity(<span class="kw-2">&amp;</span>root)
+<a href=#6861 id=6861 data-nosnippet>6861</a>            .expect(<span class="string">"run poolai-vision-sync --check before stand smoke"</span>);
+<a href=#6862 id=6862 data-nosnippet>6862</a>        <span class="kw">let </span>manifest_rev = read_manifest_revision(<span class="kw-2">&amp;</span>root).expect(<span class="string">"manifest"</span>);
+<a href=#6863 id=6863 data-nosnippet>6863</a>        <span class="kw">let </span>fm_rev = read_fm_vision_revision(<span class="kw-2">&amp;</span>root).expect(<span class="string">"fm"</span>);
+<a href=#6864 id=6864 data-nosnippet>6864</a>        <span class="macro">assert_eq!</span>(manifest_rev, fm_rev);
+<a href=#6865 id=6865 data-nosnippet>6865</a>        <span class="kw">if let </span><span class="prelude-val">Some</span>(next) = read_manifest_next_sprint(<span class="kw-2">&amp;</span>root) {
+<a href=#6866 id=6866 data-nosnippet>6866</a>            <span class="kw">let </span>active = read_extensions_active_sprint(<span class="kw-2">&amp;</span>root)
+<a href=#6867 id=6867 data-nosnippet>6867</a>                .expect(<span class="string">"extensions"</span>)
+<a href=#6868 id=6868 data-nosnippet>6868</a>                .expect(<span class="string">"active_sprint"</span>);
+<a href=#6869 id=6869 data-nosnippet>6869</a>            <span class="macro">assert_eq!</span>(active, next);
+<a href=#6870 id=6870 data-nosnippet>6870</a>        }
+<a href=#6871 id=6871 data-nosnippet>6871</a>    }
+<a href=#6872 id=6872 data-nosnippet>6872</a>}</code></pre></div></section></main></body></html>
