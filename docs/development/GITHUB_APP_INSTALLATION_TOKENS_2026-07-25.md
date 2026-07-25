@@ -60,7 +60,7 @@ Header **тимчасовий** — після deprecation усі eligible apps 
 | 5 | `ci-scripts-maintenance.mdc` | no hardcoded token length |
 | 6 | `.cursor/permissions.json` | block print/log `GITHUB_TOKEN` / `ghs_` |
 | 7 | HANDOFF / NEXT / README / INDEX / ENV / CHANGELOG / `file_list.csv` | service zriz |
-| 8 | `poolai-vision-sync --check` | drift gate |
+| 8 | `poolai-vision-sync --check` | drift gate (rev **394**) |
 
 **Не робити в product drain:**
 

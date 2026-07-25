@@ -2804,6 +2804,12 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_development_POLICIES_DEPTH_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_GITHUB_APP_INSTALLATION_TOKENS_2026_07_25_md"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -11145,9 +11151,16 @@
       "label": "policy_depth_audit.rs",
       "layer": "L3",
       "path": "tests/policy_depth_audit.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_GITHUB_APP_INSTALLATION_TOKENS_2026_07_25_md",
+      "label": "GITHUB_APP_INSTALLATION_TOKENS_2026-07-25.md",
+      "layer": "L1",
+      "path": "docs/development/GITHUB_APP_INSTALLATION_TOKENS_2026-07-25.md"
     }
   ],
-  "revision": 393,
+  "revision": 394,
   "sprint_queue": [
     {
       "acceptance": "depth enum + store criteria registry",

@@ -49,7 +49,7 @@
 | **PH-S1467** | Ratio hold advisory |
 | **PH-S1468** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **393**. **Pending completion:** **820** (→ PH-S2278).
+**§5.12:** **10** відкритих. **Vision:** rev **394**. **Pending completion:** **820** (→ PH-S2278).
 
 ## Band 81 — Policies depth scaffold (PH-S1449…S1458, ✅)
 
