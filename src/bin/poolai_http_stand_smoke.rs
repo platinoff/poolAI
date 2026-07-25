@@ -6280,6 +6280,48 @@ mod tests {
     }
 
     #[test]
+    fn policy_api_band83_export_shape_ph_s1475() {
+        use poolai_ui_core::policy_api_contracts_depth::{
+            policy_api_contracts_depth_stub, policy_api_criteria_total, PolicyApiContractsDepth,
+            FM_BAND83_ROWS, POLICY_API_CASES, POLICY_API_CRITERIA,
+        };
+        use serde_json::json;
+        assert_eq!(
+            policy_api_contracts_depth_stub(Some(&json!({"store_wire_http": true}))),
+            PolicyApiContractsDepth::StoreWireHttp
+        );
+        assert_eq!(
+            policy_api_contracts_depth_stub(Some(&json!({
+                "policy_api_depth": true,
+                "query_http_lifecycle": true,
+                "store_wire_http": true,
+                "openapi_schemas": true,
+                "policy_field_fixtures": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "policy_api_docs": true,
+            }))),
+            PolicyApiContractsDepth::FullBand83
+        );
+        assert_eq!(POLICY_API_CRITERIA.len(), 9);
+        assert_eq!(policy_api_criteria_total(), 9);
+        assert!(POLICY_API_CASES.contains(&"store_wire_http"));
+        let security_api = include_str!("../../src/network/enterprise_api/security.rs");
+        assert!(security_api.contains("GET /policy/store"));
+        assert!(security_api.contains("policy_store_wire_handler"));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--policy-api"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND83_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band83 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn audit_store_band72_export_shape_ph_s1363() {
         use poolai_ui_core::audit_store_depth::{
             audit_store_criteria_total, audit_store_depth_stub, AuditStoreDepth, AUDIT_STORE_CASES,

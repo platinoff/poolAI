@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-07-25 (project completion path · band 82 ✅ · band 83 horizon · GH tokens PH-SVC65…74 ✅ · Cursor **3.13.10**)
+**Оновлено:** 2026-07-25 (project completion path · band 83 ✅ · band 84 horizon · GH tokens PH-SVC65…74 ✅ · Cursor **3.13.10**)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -1221,24 +1221,43 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **10** (band 82 ✅ · band 83 open). **Master horizon:** PH-S1469…S1478 (band 83). **Completion pending:** PH-S1469…S2278 = **810** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **396**. **Наступна сесія:** **`абракадабра`** — drain band 83.
+**Відкритих у §5.12:** **10** (band 83 ✅ · band 84 open). **Master horizon:** PH-S1479…S1488 (band 84). **Completion pending:** PH-S1479…S2278 = **800** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **397**. **Наступна сесія:** **`абракадабра`** — drain band 84.
 
-### 5.64 Policies API contracts queue — band 83 (PH-S1469…S1478) · **ACTIVE**
+### 5.65 Policies admin/ops glue queue — band 84 (PH-S1479…S1488) · **ACTIVE**
+
+**Джерело:** project completion / enterprise phase D — Policies admin/ops glue (mirror band 74 [`AUDIT_ADMIN_OPS.md`](../development/AUDIT_ADMIN_OPS.md)). Prior API: [`POLICIES_API.md`](../development/POLICIES_API.md) (band 83). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · master [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1414 | **PH-S1479** | `policy_admin_ops_depth` ui-core module | `policy_admin_ops_depth.rs` | depth enum + admin/ops criteria registry | **[ ]** |
+| 1415 | **PH-S1480** | Admin policy store-wire status strip | `src/ui/admin` security | badge ← `GET /policy/store` | **[ ]** |
+| 1416 | **PH-S1481** | Admin policy query ops glue | same | refresh policies from HTTP query contracts | **[ ]** |
+| 1417 | **PH-S1482** | Admin policy ops HTML contracts | `policy_admin_ops_integration.rs` | store/query markers | **[ ]** |
+| 1418 | **PH-S1483** | i18n Policies admin ops keys | `i18n.rs` ADMIN_POLICY_* | EN/UK patch keys | **[ ]** |
+| 1419 | **PH-S1484** | `VERIFY_POLICY_ADMIN_OPS` + quick `--policy-admin-ops` | verify-dev-stand | gate + RUN_LOCAL | **[ ]** |
+| 1420 | **PH-S1485** | Stand smoke + `poolai-loc-audit --policy-admin-ops` | stand smoke / loc-audit | export shape + rust_ratio fields | **[ ]** |
+| 1421 | **PH-S1486** | Docs `POLICIES_ADMIN_OPS.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | ops matrix | **[ ]** |
+| 1422 | **PH-S1487** | vision-sync --check + ratio hold | vision / loc-audit | drift + `--min-ratio 0.95 --advisory` | **[ ]** |
+| 1423 | **PH-S1488** | Policies admin/ops band close | tests/docs | `galaxy_horizon_s1479_integration`; HANDOFF/NEXT | **[ ]** |
+
+### 5.64 Policies API contracts queue — band 83 (PH-S1469…S1478) · **✅**
 
 **Джерело:** project completion / enterprise phase D — Policies API contracts (mirror band 73 [`AUDIT_API.md`](../development/AUDIT_API.md)). Prior store: [`POLICIES_STORE.md`](../development/POLICIES_STORE.md) (band 82). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · master [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
-| 1404 | **PH-S1469** | `policy_api_contracts_depth` ui-core module | `policy_api_contracts_depth.rs` | depth enum + HTTP API criteria registry | **[ ]** |
-| 1405 | **PH-S1470** | Policy query HTTP lifecycle | `policy_api_contracts_integration` | GET/list filters + pagination stub | **[ ]** |
-| 1406 | **PH-S1471** | Store-wire status HTTP read | `GET /policy/store` | `{mode,durable_path,configured}` memory/sqlite | **[ ]** |
-| 1407 | **PH-S1472** | OpenAPI `PolicyStoreWire` + errors | `docs/openapi.yaml` | store schema + path; gap-audit 0 | **[ ]** |
-| 1408 | **PH-S1473** | Policy field validation fixtures | same suite | missing name/timeout → 4xx | **[ ]** |
-| 1409 | **PH-S1474** | `VERIFY_POLICY_API` + quick `--policy-api` | verify-dev-stand | API gate | **[ ]** |
-| 1410 | **PH-S1475** | Stand smoke + `poolai-loc-audit --policy-api` | stand smoke / loc-audit | export shape + rust_ratio fields | **[ ]** |
-| 1411 | **PH-S1476** | Docs `POLICIES_API.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | HTTP contract matrix | **[ ]** |
-| 1412 | **PH-S1477** | vision-sync --check + ratio hold | vision / loc-audit | drift + `--min-ratio 0.95 --advisory` | **[ ]** |
-| 1413 | **PH-S1478** | Policies API band close | tests/docs | `galaxy_horizon_s1469_integration`; HANDOFF/NEXT | **[ ]** |
+| 1404 | **PH-S1469** | `policy_api_contracts_depth` ui-core module | `policy_api_contracts_depth.rs` | depth enum + HTTP API criteria registry | **✅** |
+| 1405 | **PH-S1470** | Policy query HTTP lifecycle | `policy_api_contracts_integration` | GET/list filters + pagination stub | **✅** |
+| 1406 | **PH-S1471** | Store-wire status HTTP read | `GET /policy/store` | `{mode,durable_path,configured}` memory/sqlite | **✅** |
+| 1407 | **PH-S1472** | OpenAPI `PolicyStoreWire` + errors | `docs/openapi.yaml` | store schema + path; gap-audit 0 | **✅** |
+| 1408 | **PH-S1473** | Policy field validation fixtures | same suite | missing name/timeout → 4xx | **✅** |
+| 1409 | **PH-S1474** | `VERIFY_POLICY_API` + quick `--policy-api` | verify-dev-stand | API gate | **✅** |
+| 1410 | **PH-S1475** | Stand smoke + `poolai-loc-audit --policy-api` | stand smoke / loc-audit | export shape + rust_ratio fields | **✅** |
+| 1411 | **PH-S1476** | Docs `POLICIES_API.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | HTTP contract matrix | **✅** |
+| 1412 | **PH-S1477** | vision-sync --check + ratio hold | vision / loc-audit | drift + `--min-ratio 0.95 --advisory` | **✅** |
+| 1413 | **PH-S1478** | Policies API band close | tests/docs | `galaxy_horizon_s1469_integration`; HANDOFF/NEXT | **✅** |
+
+**PH-S1478 ✅ (2026-07-25):** `policy_api_contracts_depth.rs`; `GET /policy/store`; query filters + validate fixtures; `--policy-api`; `VERIFY_POLICY_API`; `POLICIES_API.md`; `galaxy_horizon_s1469_integration`. Phase D Policies API contracts closed.
 
 ### 5.63 Policies store wire queue — band 82 (PH-S1459…S1468) · **✅**
 
@@ -2097,7 +2116,7 @@ FM-xxx (з таблиці нижче)
 | **Enterprise subset pending** | **760** (S1389…S2148 → §5.17) |
 | **Extension pending** | **130** (S2149…S2278 → §5.18) |
 | **Drained** | band 51–74 PH-S1149…S1388 ✅ |
-| **Активна §5.12** | band 83 **PH-S1469…S1478** `[ ]` (§5.64) |
+| **Активна §5.12** | band 84 **PH-S1479…S1488** `[ ]` (§5.65) |
 | **План** | [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md) |
 | **Реєстр** | [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md) |
 | **Regen** | `bash scripts/generate-ph-s-master-backlog-1000.sh` · `bash scripts/generate-ph-s-completion-extension.sh` |
@@ -2239,13 +2258,13 @@ FM-xxx (з таблиці нижче)
 | **PH-SVC73** | `poolai-vision-sync --check` | drift gate green | **✅** |
 | **PH-SVC74** | git push + самарі | service commit `main` | **✅** |
 
-**Наступний service trigger:** **`абракадабра`** → drain band 83 · **PH-SVC34** re-verify GH after push (watch JWT-format `GITHUB_TOKEN`) · **PH-SVC35** OWNER (Atlassian revoke). **Відкриті service:** PH-SVC34 · PH-SVC35 (OWNER). GH tokens band PH-SVC65…SVC74 ✅ · Security PH-SVC55…SVC64 ✅.
+**Наступний service trigger:** **`абракадабра`** → drain band 84 · **PH-SVC34** re-verify GH after push (watch JWT-format `GITHUB_TOKEN`) · **PH-SVC35** OWNER (Atlassian revoke). **Відкриті service:** PH-SVC34 · PH-SVC35 (OWNER). GH tokens band PH-SVC65…SVC74 ✅ · Security PH-SVC55…SVC64 ✅.
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S262)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-25):** band 83 **PH-S1469…S1478** `[ ]` · §5.12 **10** · band 82 ✅ · service PH-SVC65…SVC74 ✅ (GH App tokens) · PH-SVC55…SVC64 ✅ · PH-SVC45…SVC54 ✅ · P0 PH-SVC41…43 ✅ · PH-SVC34/35 · наступна **`абракадабра`** → band 83 · completion pending **810** → S2278.
+**Активна смуга (2026-07-25):** band 84 **PH-S1479…S1488** `[ ]` · §5.12 **10** · band 83 ✅ · service PH-SVC65…SVC74 ✅ (GH App tokens) · PH-SVC55…SVC64 ✅ · PH-SVC45…SVC54 ✅ · P0 PH-SVC41…43 ✅ · PH-SVC34/35 · наступна **`абракадабра`** → band 84 · completion pending **800** → S2278.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

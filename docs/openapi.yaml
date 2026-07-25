@@ -5467,6 +5467,44 @@ paths:
         '404':
           description: Provider not found
 
+  /policy/store:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseSecurity
+      summary: Policy store wire status
+      description: |
+        Returns the band-82 durable-path wire snapshot (`mode`, `durable_path`, `configured`).
+        Unauthenticated read for ops / admin glue (PH-S1471/S1472).
+      operationId: getPolicyStoreWire
+      responses:
+        '200':
+          description: Policy store wire snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyStoreWire'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Subsystem unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /security/policies:
     servers:
       - url: http://localhost:8080/api/enterprise
@@ -5475,7 +5513,29 @@ paths:
       tags:
         - EnterpriseSecurity
       summary: List security policies
+      description: |
+        List policies with optional `name` substring filter, `require_mfa` filter,
+        and `limit` pagination stub (PH-S1470).
       operationId: listSecurityPolicies
+      parameters:
+        - name: name
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Substring match on policy name
+        - name: require_mfa
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+          description: Max policies to return
       responses:
         '200':
           description: Policy list
@@ -5527,6 +5587,43 @@ paths:
           description: Forbidden
         '503':
           description: Security manager unavailable
+
+  /security/policies/validate:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    post:
+      tags:
+        - EnterpriseSecurity
+      summary: Validate security policy fields
+      description: |
+        Field fixtures without durable write (PH-S1473). Missing name →
+        `POLICY_MISSING_NAME`; invalid `session_timeout` → `POLICY_INVALID_TIMEOUT`.
+      operationId: validateSecurityPolicy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SecurityPolicy'
+      responses:
+        '200':
+          description: Fields valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valid:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Missing name or invalid session_timeout
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /security/policies/{name}:
     servers:
@@ -9580,6 +9677,24 @@ components:
           type: object
           description: SAML IdP config (`enterprise::security::SamlConfig`)
           additionalProperties: true
+
+    PolicyStoreWire:
+      type: object
+      description: Band-82/83 policy store wire snapshot exposed over HTTP (PH-S1471/S1472)
+      required:
+        - mode
+        - configured
+      properties:
+        mode:
+          type: string
+          description: "`memory` or `sqlite`"
+        durable_path:
+          type: string
+          nullable: true
+          description: Resolved sqlite file path when configured
+        configured:
+          type: boolean
+          description: True when sqlite mode has a durable path
 
     SecurityPolicy:
       type: object

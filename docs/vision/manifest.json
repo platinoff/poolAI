@@ -2826,7 +2826,7 @@
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S1468",
+  "last_sprint_closed": "PH-S1478",
   "layers": [
     {
       "id": "L0",
@@ -2859,7 +2859,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1469",
+  "next_sprint": "PH-S1479",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -11200,97 +11200,97 @@
       "path": "tests/policy_store_wire_integration.rs"
     }
   ],
-  "revision": 396,
+  "revision": 397,
   "sprint_queue": [
     {
-      "acceptance": "depth enum + HTTP API criteria registry",
-      "deps": "policy_api_contracts_depth.rs",
-      "id": "PH-S1469",
+      "acceptance": "depth enum + admin/ops criteria registry",
+      "deps": "policy_admin_ops_depth.rs",
+      "id": "PH-S1479",
       "open": true,
-      "row": 1404,
+      "row": 1414,
       "status": "open",
-      "title": "policy_api_contracts_depth` ui-core module"
+      "title": "policy_admin_ops_depth` ui-core module"
     },
     {
-      "acceptance": "GET/list filters + pagination stub",
-      "deps": "policy_api_contracts_integration",
-      "id": "PH-S1470",
+      "acceptance": "badge ← `GET /policy/store",
+      "deps": "src/ui/admin` security",
+      "id": "PH-S1480",
       "open": true,
-      "row": 1405,
+      "row": 1415,
       "status": "open",
-      "title": "Policy query HTTP lifecycle"
+      "title": "Admin policy store-wire status strip"
     },
     {
-      "acceptance": "{mode,durable_path,configured}` memory/sqlite",
-      "deps": "GET /policy/store",
-      "id": "PH-S1471",
+      "acceptance": "refresh policies from HTTP query contracts",
+      "deps": "same",
+      "id": "PH-S1481",
       "open": true,
-      "row": 1406,
+      "row": 1416,
       "status": "open",
-      "title": "Store-wire status HTTP read"
+      "title": "Admin policy query ops glue"
     },
     {
-      "acceptance": "store schema + path; gap-audit 0",
-      "deps": "docs/openapi.yaml",
-      "id": "PH-S1472",
+      "acceptance": "store/query markers",
+      "deps": "policy_admin_ops_integration.rs",
+      "id": "PH-S1482",
       "open": true,
-      "row": 1407,
+      "row": 1417,
       "status": "open",
-      "title": "OpenAPI `PolicyStoreWire` + errors"
+      "title": "Admin policy ops HTML contracts"
     },
     {
-      "acceptance": "missing name/timeout → 4xx",
-      "deps": "same suite",
-      "id": "PH-S1473",
+      "acceptance": "EN/UK patch keys",
+      "deps": "i18n.rs` ADMIN_POLICY_*",
+      "id": "PH-S1483",
       "open": true,
-      "row": 1408,
+      "row": 1418,
       "status": "open",
-      "title": "Policy field validation fixtures"
+      "title": "i18n Policies admin ops keys"
     },
     {
-      "acceptance": "API gate",
+      "acceptance": "gate + RUN_LOCAL",
       "deps": "verify-dev-stand",
-      "id": "PH-S1474",
+      "id": "PH-S1484",
       "open": true,
-      "row": 1409,
+      "row": 1419,
       "status": "open",
-      "title": "VERIFY_POLICY_API` + quick `--policy-api"
+      "title": "VERIFY_POLICY_ADMIN_OPS` + quick `--policy-admin-ops"
     },
     {
       "acceptance": "export shape + rust_ratio fields",
       "deps": "stand smoke / loc-audit",
-      "id": "PH-S1475",
+      "id": "PH-S1485",
       "open": true,
-      "row": 1410,
+      "row": 1420,
       "status": "open",
-      "title": "Stand smoke + `poolai-loc-audit --policy-api"
+      "title": "Stand smoke + `poolai-loc-audit --policy-admin-ops"
     },
     {
-      "acceptance": "HTTP contract matrix",
+      "acceptance": "ops matrix",
       "deps": "RUN_LOCAL/INDEX/HANDOFF/NEXT",
-      "id": "PH-S1476",
+      "id": "PH-S1486",
       "open": true,
-      "row": 1411,
+      "row": 1421,
       "status": "open",
-      "title": "Docs `POLICIES_API.md` + canon"
+      "title": "Docs `POLICIES_ADMIN_OPS.md` + canon"
     },
     {
       "acceptance": "drift + `--min-ratio 0.95 --advisory",
       "deps": "vision / loc-audit",
-      "id": "PH-S1477",
+      "id": "PH-S1487",
       "open": true,
-      "row": 1412,
+      "row": 1422,
       "status": "open",
       "title": "vision-sync --check + ratio hold"
     },
     {
-      "acceptance": "galaxy_horizon_s1469_integration`; HANDOFF/NEXT",
+      "acceptance": "galaxy_horizon_s1479_integration`; HANDOFF/NEXT",
       "deps": "tests/docs",
-      "id": "PH-S1478",
+      "id": "PH-S1488",
       "open": true,
-      "row": 1413,
+      "row": 1423,
       "status": "open",
-      "title": "Policies API band close"
+      "title": "Policies admin/ops band close"
     }
   ],
   "sprint_queue_open_count": 10,

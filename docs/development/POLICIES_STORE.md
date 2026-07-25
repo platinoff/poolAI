@@ -16,6 +16,7 @@ remains a later phase-D band (API contracts / persist), mirroring Audit
 | `sqlite` configured | `POOLAI_POLICY_STORE=sqlite` + `POOLAI_POLICY_DATA_DIR=…` | Durable path → `…/policy.sqlite` |
 
 **Boundary:** band 82 resolves the wire (`policy_store_wire()`);
+band 83 exposes it over HTTP — see [`POLICIES_API.md`](./POLICIES_API.md);
 later bands persist policy CRUD / RBAC via sqlite.
 
 ## Loc-audit / verify hooks

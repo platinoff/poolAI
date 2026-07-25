@@ -3,10 +3,11 @@
 use crate::core::error::ErrorContext;
 use crate::core::state::ApiContext;
 use crate::enterprise;
+use crate::enterprise::security::{validate_security_policy_fields, SecurityPolicy};
 use crate::network::api::check_permission;
 use crate::network::auth::Claims;
 use crate::services::enterprise_service::{EnterpriseSecurityError, EnterpriseService};
-use axum::extract::{Extension, Json, Path, State};
+use axum::extract::{Extension, Json, Path, Query, State};
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use serde::Deserialize;
@@ -16,6 +17,36 @@ use super::{enterprise_err, enterprise_json_err};
 /// GET /security/sso/store — band-62 wire snapshot over HTTP (PH-S1272).
 pub(super) async fn sso_store_wire_handler() -> impl IntoResponse {
     Json(enterprise::security::sso_store_wire())
+}
+
+/// GET /policy/store — band-82 wire snapshot over HTTP (PH-S1471).
+pub(super) async fn policy_store_wire_handler() -> impl IntoResponse {
+    Json(enterprise::security::policy_store_wire())
+}
+
+/// Query params for GET /security/policies (PH-S1470).
+#[derive(Deserialize)]
+pub(super) struct PolicyQueryParams {
+    name: Option<String>,
+    require_mfa: Option<bool>,
+    limit: Option<usize>,
+}
+
+/// Body for POST /security/policies/validate — field fixtures without durable write (PH-S1473).
+#[derive(Deserialize)]
+pub(super) struct SecurityPolicyValidateRequest {
+    #[serde(default)]
+    name: Option<String>,
+    #[serde(default)]
+    description: Option<String>,
+    #[serde(default)]
+    allowed_ip_ranges: Option<Vec<String>>,
+    #[serde(default)]
+    require_mfa: Option<bool>,
+    #[serde(default)]
+    session_timeout: Option<u64>,
+    #[serde(default)]
+    max_failed_attempts: Option<usize>,
 }
 
 #[derive(Deserialize)]
@@ -171,9 +202,33 @@ pub(super) struct SecurityPolicyCreateRequest {
     policy: enterprise::security::SecurityPolicy,
 }
 
-pub(super) async fn security_policies_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+pub(super) async fn security_policies_handler(
+    State(ctx): State<ApiContext>,
+    Query(params): Query<PolicyQueryParams>,
+) -> impl IntoResponse {
     match EnterpriseService::list_security_policies(&ctx).await {
-        Ok(policies) => Json(policies).into_response(),
+        Ok(policies) => {
+            let mut filtered: Vec<_> = policies
+                .into_iter()
+                .filter(|p| {
+                    if let Some(ref name) = params.name {
+                        if !p.name.contains(name.as_str()) {
+                            return false;
+                        }
+                    }
+                    if let Some(require_mfa) = params.require_mfa {
+                        if p.require_mfa != require_mfa {
+                            return false;
+                        }
+                    }
+                    true
+                })
+                .collect();
+            if let Some(limit) = params.limit {
+                filtered.truncate(limit);
+            }
+            Json(filtered).into_response()
+        }
         Err(EnterpriseSecurityError::Init(e)) => enterprise_err(
             "SECURITY_MANAGER_UNAVAILABLE",
             format!("Security manager not initialized: {}", e),
@@ -188,6 +243,49 @@ pub(super) async fn security_policies_handler(State(ctx): State<ApiContext>) -> 
             StatusCode::INTERNAL_SERVER_ERROR,
         )
         .into_response(),
+    }
+}
+
+/// POST /security/policies/validate — missing name/timeout → 400 fixtures (PH-S1473).
+pub(super) async fn security_policy_validate_handler(
+    Json(body): Json<SecurityPolicyValidateRequest>,
+) -> impl IntoResponse {
+    let policy = SecurityPolicy {
+        name: body.name.unwrap_or_default(),
+        description: body.description.unwrap_or_default(),
+        allowed_ip_ranges: body.allowed_ip_ranges.unwrap_or_default(),
+        require_mfa: body.require_mfa.unwrap_or(false),
+        session_timeout: body.session_timeout.unwrap_or(0),
+        max_failed_attempts: body.max_failed_attempts.unwrap_or(5),
+    };
+
+    match validate_security_policy_fields(&policy) {
+        Ok(()) => (
+            StatusCode::OK,
+            Json(serde_json::json!({
+                "valid": true,
+                "message": "Security policy fields ok"
+            })),
+        )
+            .into_response(),
+        Err(e) => {
+            let msg = e.to_string();
+            let code = if msg.contains("name must be non-empty") || msg.contains("missing name") {
+                "POLICY_MISSING_NAME"
+            } else if msg.contains("session_timeout") {
+                "POLICY_INVALID_TIMEOUT"
+            } else {
+                "POLICY_VALIDATION_FAILED"
+            };
+            enterprise_json_err(
+                code,
+                msg,
+                ErrorContext::new("security_policy_validate")
+                    .with_hint("Set non-empty name and session_timeout in 1..=86400."),
+                StatusCode::BAD_REQUEST,
+            )
+            .into_response()
+        }
     }
 }
 

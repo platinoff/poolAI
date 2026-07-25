@@ -83,6 +83,7 @@ cd S:\rust\poolAI
 /usr/bin/bash bin/run-poolai.sh quick --audit-horizon
 /usr/bin/bash bin/run-poolai.sh quick --policy
 /usr/bin/bash bin/run-poolai.sh quick --policy-store
+/usr/bin/bash bin/run-poolai.sh quick --policy-api
 # PowerShell:
 .\bin\run-poolai.ps1 quick -StandSmoke
 .\bin\run-poolai.ps1 quick -MigrationAdvisory
@@ -359,6 +360,7 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `VERIFY_AUDIT_HORIZON=1` | `verify-dev-stand.sh` → `poolai-loc-audit --audit-horizon` (PH-S1442) |
 | `VERIFY_POLICY=1` | `verify-dev-stand.sh` → `poolai-loc-audit --policy` (PH-S1452) |
 | `VERIFY_POLICY_STORE=1` | `verify-dev-stand.sh` → `poolai-loc-audit --policy-store` (PH-S1462) |
+| `VERIFY_POLICY_API=1` | `verify-dev-stand.sh` → `poolai-loc-audit --policy-api` (PH-S1474) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 ### PH-S1100: Rust migration advisory (band 46)
@@ -1101,6 +1103,24 @@ VERIFY_POLICY_STORE=1 bash bin/verify-dev-stand.sh
 | `policy_store_criteria_met_count` | Criteria with marker present in canonical doc path |
 
 Module: [`policy_store_depth.rs`](../../crates/poolai-ui-core/src/policy_store_depth.rs) · tests: `policy_store_wire_integration.rs`, `galaxy_horizon_s1459_integration.rs` · docs: [`POLICIES_STORE.md`](./POLICIES_STORE.md).
+
+### PH-S1475: Policies HTTP API contracts (band 83)
+
+```bash
+cargo run --bin poolai-loc-audit -- --policy-api
+cargo run --bin poolai-loc-audit -- --policy-api --advisory --min-ratio 0.95
+
+VERIFY_POLICY_API=1 bash bin/verify-dev-stand.sh
+/usr/bin/bash bin/run-poolai.sh quick --policy-api
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `policy_api_mode` | `true` when `--policy-api` (PH-S1475) |
+| `policy_api_criteria_total` | Registry size (9) |
+| `policy_api_criteria_met_count` | Criteria with marker present in canonical doc path |
+
+Module: [`policy_api_contracts_depth.rs`](../../crates/poolai-ui-core/src/policy_api_contracts_depth.rs) · tests: `policy_api_contracts_integration.rs`, `galaxy_horizon_s1469_integration.rs` · docs: [`POLICIES_API.md`](./POLICIES_API.md).
 
 Default stand smoke includes **`vision_revision_parity`** (PH-S208, PH-S235): repo `manifest.revision` vs FM §5.12 `Vision rev`, `extensions.active_sprint` vs `manifest.next_sprint`, then `GET /docs/vision/manifest.json` with `X-PoolAI-Vision-Revision` header vs JSON body.
 

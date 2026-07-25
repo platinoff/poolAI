@@ -593,20 +593,20 @@
 | **PH-S1467** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
 | **PH-S1468** | galaxy_horizon_s1459_integration | band close | **✅** |
 
-## Band 83 — PH-S1469…S1478 (D Policies · API contracts)
+## Band 83 — PH-S1469…S1478 (D Policies · API contracts) · **✅**
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1469** | `policy_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1470** | `policy` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1471** | `policy` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1472** | `policy` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1473** | Stand smoke `policy` export | export shape unit test | **[ ]** |
-| **PH-S1474** | poolai-loc-audit PH-S1474 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1475** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1476** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1477** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1478** | galaxy_horizon_s1469_integration | band close | **[ ]** |
+| **PH-S1469** | `policy_api_contracts_depth` | ui-core depth enum + criteria registry | **✅** |
+| **PH-S1470** | Policy query HTTP lifecycle | GET/list filters + pagination stub | **✅** |
+| **PH-S1471** | `GET /policy/store` | store wire HTTP `{mode,durable_path,configured}` | **✅** |
+| **PH-S1472** | OpenAPI `PolicyStoreWire` | schema + path; gap-audit 0 | **✅** |
+| **PH-S1473** | Policy field validation fixtures | missing name/timeout → 4xx | **✅** |
+| **PH-S1474** | `VERIFY_POLICY_API` + `--policy-api` | verify-dev-stand / run-poolai | **✅** |
+| **PH-S1475** | Stand smoke + loc-audit `--policy-api` | export shape + rust_ratio | **✅** |
+| **PH-S1476** | Docs `POLICIES_API.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | **✅** |
+| **PH-S1477** | vision-sync + ratio hold | `--check` + `--min-ratio 0.95 --advisory` | **✅** |
+| **PH-S1478** | galaxy_horizon_s1469_integration | band close | **✅** |
 
 ## Band 84 — PH-S1479…S1488 (D Policies · admin/ops glue)
 

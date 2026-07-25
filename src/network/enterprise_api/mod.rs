@@ -148,10 +148,17 @@ pub fn create_enterprise_api_routes() -> Router<ApiContext> {
             delete(security_saml_provider_delete_handler)
                 .layer(middleware::from_fn(auth_middleware)),
         )
+        // Policy store path (PH-S1471) — outside /security/policies/{name} catch-all.
+        .route("/policy/store", get(policy_store_wire_handler))
         .route("/security/policies", get(security_policies_handler))
         .route(
             "/security/policies",
             post(security_policy_create_handler).layer(middleware::from_fn(auth_middleware)),
+        )
+        // Static validate path (PH-S1473) — before policy `{name}` routes.
+        .route(
+            "/security/policies/validate",
+            post(security_policy_validate_handler),
         )
         .route(
             "/security/policies/{name}",

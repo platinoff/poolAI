@@ -40,6 +40,9 @@ use poolai_ui_core::ci_canon_depth::{ci_canon_criteria_total, CI_CANON_CASES, CI
 use poolai_ui_core::galaxy_edge_verification_depth::{
     edge_verification_criteria_total, EDGE_VERIFICATION_CASES, EDGE_VERIFICATION_CRITERIA,
 };
+use poolai_ui_core::policy_api_contracts_depth::{
+    policy_api_criteria_total, POLICY_API_CASES, POLICY_API_CRITERIA,
+};
 use poolai_ui_core::policy_depth::{policy_criteria_total, POLICY_CASES, POLICY_CRITERIA};
 use poolai_ui_core::policy_store_depth::{
     policy_store_criteria_total, POLICY_STORE_CASES, POLICY_STORE_CRITERIA,
@@ -261,6 +264,8 @@ struct AuditConfig {
     policy: bool,
     /// Emit band-82 policies store-wire fields (PH-S1464).
     policy_store: bool,
+    /// Emit band-83 policies HTTP API contracts fields (PH-S1475).
+    policy_api: bool,
 }
 
 impl Default for AuditConfig {
@@ -308,6 +313,7 @@ impl Default for AuditConfig {
             audit_horizon: false,
             policy: false,
             policy_store: false,
+            policy_api: false,
         }
     }
 }
@@ -587,6 +593,12 @@ struct RustRatioReport {
     policy_store_criteria_total: usize,
     /// Policies store-wire criteria met count (PH-S1464).
     policy_store_criteria_met_count: usize,
+    /// Band-83 policies HTTP API contracts mode (PH-S1475).
+    policy_api_mode: bool,
+    /// Policies HTTP API criteria registry size (PH-S1475).
+    policy_api_criteria_total: usize,
+    /// Policies HTTP API criteria met count (PH-S1475).
+    policy_api_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -899,6 +911,22 @@ fn policy_store_wire_criteria_met(root: &Path) -> (usize, usize) {
     let total = policy_store_criteria_total();
     let mut met = 0usize;
     for (_, marker, rel) in POLICY_STORE_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
+fn policy_policy_api_criteria_met(root: &Path) -> (usize, usize) {
+    let total = policy_api_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in POLICY_API_CRITERIA {
         let path = root.join(rel);
         if path.is_file() {
             if let Ok(content) = fs::read_to_string(&path) {
@@ -1327,6 +1355,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--audit" => config.audit = true,
             "--policy" => config.policy = true,
             "--policy-store" => config.policy_store = true,
+            "--policy-api" => config.policy_api = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
                 print_help();
@@ -1386,6 +1415,7 @@ fn print_help() {
            --audit-horizon             band-80 audit horizon-close fields (PH-S1444)\n\
            --policy                    band-81 policies depth scaffold fields (PH-S1454)\n\
            --policy-store              band-82 policies store-wire fields (PH-S1464)\n\
+           --policy-api                band-83 policies HTTP API contracts fields (PH-S1475)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -1874,6 +1904,15 @@ fn build_report(
         notes.push("PH-S1464: policy_store_mode — durable path wire stub (POOLAI_POLICY_DATA_DIR)");
         notes.push("PH-S1468: band 82 policies store wire — criteria met vs registry");
     }
+    let (policy_api_criteria_met_count, policy_api_criteria_total_count) = if config.policy_api {
+        policy_policy_api_criteria_met(root)
+    } else {
+        (0, policy_api_criteria_total())
+    };
+    if config.policy_api {
+        notes.push("PH-S1475: policy_api_mode — query/store HTTP contracts + field fixtures");
+        notes.push("PH-S1478: band 83 policies API contracts — criteria met vs registry");
+    }
 
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
@@ -2016,6 +2055,9 @@ fn build_report(
         policy_store_mode: config.policy_store,
         policy_store_criteria_total: policy_store_criteria_total_count,
         policy_store_criteria_met_count,
+        policy_api_mode: config.policy_api,
+        policy_api_criteria_total: policy_api_criteria_total_count,
+        policy_api_criteria_met_count,
         by_category,
         notes,
     })
@@ -2436,6 +2478,14 @@ fn print_summary(report: &RustRatioReport) {
             report.policy_store_criteria_met_count, report.policy_store_criteria_total
         );
         println!("  policy_store_cases:    {}", POLICY_STORE_CASES.join(", "));
+    }
+    if report.policy_api_mode {
+        println!("  policy_api:            true (PH-S1475 band 83)");
+        println!(
+            "  policy_api_criteria:   {}/{} met",
+            report.policy_api_criteria_met_count, report.policy_api_criteria_total
+        );
+        println!("  policy_api_cases:      {}", POLICY_API_CASES.join(", "));
     }
     for (name, loc) in &report.by_category {
         println!("  {name}: {} files, {} loc", loc.files, loc.loc);

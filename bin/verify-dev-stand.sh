@@ -45,6 +45,7 @@ VERIFY_AUDIT_RATIO_ADVISORY="${VERIFY_AUDIT_RATIO_ADVISORY:-0}"
 VERIFY_AUDIT_HORIZON="${VERIFY_AUDIT_HORIZON:-0}"
 VERIFY_POLICY="${VERIFY_POLICY:-0}"
 VERIFY_POLICY_STORE="${VERIFY_POLICY_STORE:-0}"
+VERIFY_POLICY_API="${VERIFY_POLICY_API:-0}"
 VERIFY_SSO_LOC_AUDIT="${VERIFY_SSO_LOC_AUDIT:-0}"
 VERIFY_SSO_DOCS_CANON="${VERIFY_SSO_DOCS_CANON:-0}"
 VERIFY_SSO_VISION_SYNC="${VERIFY_SSO_VISION_SYNC:-0}"
@@ -615,6 +616,16 @@ if [[ "$VERIFY_POLICY_STORE" == "1" ]]; then
     echo "OK  policies store-wire gate loc-audit"
   else
     echo "FAIL policies store-wire gate loc-audit"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_POLICY_API" == "1" ]]; then
+  echo "Running poolai-loc-audit --policy-api (PH-S1474)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --policy-api); then
+    echo "OK  policies HTTP API contracts gate loc-audit"
+  else
+    echo "FAIL policies HTTP API contracts gate loc-audit"
     fail=1
   fi
 fi

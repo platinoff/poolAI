@@ -3,80 +3,80 @@
   "items": [
     {
       "category": "open",
-      "id": "PH-S1469",
+      "id": "PH-S1479",
       "link": "docs/vision/index.html#sprint-queue",
       "next": true,
       "published": "2026-05-28",
       "status": "open",
-      "summary": "depth enum + HTTP API criteria registry",
-      "title": "policy_api_contracts_depth` ui-core module"
+      "summary": "depth enum + admin/ops criteria registry",
+      "title": "policy_admin_ops_depth` ui-core module"
     },
     {
       "category": "open",
-      "id": "PH-S1470",
+      "id": "PH-S1480",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "GET/list filters + pagination stub",
-      "title": "Policy query HTTP lifecycle"
+      "summary": "badge ← `GET /policy/store",
+      "title": "Admin policy store-wire status strip"
     },
     {
       "category": "open",
-      "id": "PH-S1471",
+      "id": "PH-S1481",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "{mode,durable_path,configured}` memory/sqlite",
-      "title": "Store-wire status HTTP read"
+      "summary": "refresh policies from HTTP query contracts",
+      "title": "Admin policy query ops glue"
     },
     {
       "category": "open",
-      "id": "PH-S1472",
+      "id": "PH-S1482",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "store schema + path; gap-audit 0",
-      "title": "OpenAPI `PolicyStoreWire` + errors"
+      "summary": "store/query markers",
+      "title": "Admin policy ops HTML contracts"
     },
     {
       "category": "open",
-      "id": "PH-S1473",
+      "id": "PH-S1483",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "missing name/timeout → 4xx",
-      "title": "Policy field validation fixtures"
+      "summary": "EN/UK patch keys",
+      "title": "i18n Policies admin ops keys"
     },
     {
       "category": "open",
-      "id": "PH-S1474",
+      "id": "PH-S1484",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "API gate",
-      "title": "VERIFY_POLICY_API` + quick `--policy-api"
+      "summary": "gate + RUN_LOCAL",
+      "title": "VERIFY_POLICY_ADMIN_OPS` + quick `--policy-admin-ops"
     },
     {
       "category": "open",
-      "id": "PH-S1475",
+      "id": "PH-S1485",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
       "summary": "export shape + rust_ratio fields",
-      "title": "Stand smoke + `poolai-loc-audit --policy-api"
+      "title": "Stand smoke + `poolai-loc-audit --policy-admin-ops"
     },
     {
       "category": "open",
-      "id": "PH-S1476",
+      "id": "PH-S1486",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
-      "summary": "HTTP contract matrix",
-      "title": "Docs `POLICIES_API.md` + canon"
+      "summary": "ops matrix",
+      "title": "Docs `POLICIES_ADMIN_OPS.md` + canon"
     },
     {
       "category": "open",
-      "id": "PH-S1477",
+      "id": "PH-S1487",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
@@ -85,12 +85,102 @@
     },
     {
       "category": "open",
-      "id": "PH-S1478",
+      "id": "PH-S1488",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "open",
+      "summary": "galaxy_horizon_s1479_integration`; HANDOFF/NEXT",
+      "title": "Policies admin/ops band close"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1478",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
       "summary": "galaxy_horizon_s1469_integration`; HANDOFF/NEXT",
       "title": "Policies API band close"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1477",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "drift + `--min-ratio 0.95 --advisory",
+      "title": "vision-sync --check + ratio hold"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1476",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "HTTP contract matrix",
+      "title": "Docs `POLICIES_API.md` + canon"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1475",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "export shape + rust_ratio fields",
+      "title": "Stand smoke + `poolai-loc-audit --policy-api"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1474",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "API gate",
+      "title": "VERIFY_POLICY_API` + quick `--policy-api"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1473",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "missing name/timeout → 4xx",
+      "title": "Policy field validation fixtures"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1472",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "store schema + path; gap-audit 0",
+      "title": "OpenAPI `PolicyStoreWire` + errors"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1471",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "{mode,durable_path,configured}` memory/sqlite",
+      "title": "Store-wire status HTTP read"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1470",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "GET/list filters + pagination stub",
+      "title": "Policy query HTTP lifecycle"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1469",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "depth enum + HTTP API criteria registry",
+      "title": "policy_api_contracts_depth` ui-core module"
     },
     {
       "category": "closed",
@@ -104,96 +194,6 @@
     {
       "category": "closed",
       "id": "PH-S1467",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--min-ratio 0.95 --advisory",
-      "title": "Ratio hold advisory"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1466",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "drift gate green",
-      "title": "vision-sync --check"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1465",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "docs matrix",
-      "title": "Docs `POLICIES_STORE.md` + canon"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1464",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "rust_ratio.json` fields",
-      "title": "poolai-loc-audit --policy-store"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1463",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "policy_store_band82_export_shape",
-      "title": "Stand smoke export shape band 82"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1462",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "store gate",
-      "title": "VERIFY_POLICY_STORE` + `--policy-store"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1461",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "policy_store_wire_integration",
-      "title": "Policies store wire contracts"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1460",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "POOLAI_POLICY_DATA_DIR` + `policy_store_wire()` + unit",
-      "title": "Policies store wire durable path"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1459",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "depth enum + store criteria registry",
-      "title": "policy_store_depth` ui-core module"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1458",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "band close",
-      "title": "galaxy_horizon_s1449_integration"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1457",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
