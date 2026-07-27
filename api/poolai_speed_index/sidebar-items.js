@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["DEFAULT_OUTPUT","HISTORY_BENCH_CAP","HISTORY_TEST_CI_CAP","VISION_MIRROR"],"fn":["git_head_short","load_index","main","mirror_to_vision","print_summary","record_bench","record_test_ci","repo_root","usage","write_index"],"struct":["BenchEntry","LatestSpeeds","SpeedIndex","TestCiEntry"]};
