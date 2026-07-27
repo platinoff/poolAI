@@ -1221,7 +1221,7 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **10** (band 86 ✅ · band 87 open). **Master horizon:** PH-S1509…S1518 (band 87). **Completion pending:** PH-S1509…S2278 = **770** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **406**. **Наступна сесія:** **`абракадабра`** — drain band 87.
+**Відкритих у §5.12:** **10** (band 86 ✅ · band 87 open). **Master horizon:** PH-S1509…S1518 (band 87). **Completion pending:** PH-S1509…S2278 = **770** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **407**. **Наступна сесія:** **`абракадабра`** — drain band 87.
 
 ### 5.68 Policies docs canon queue — band 87 (PH-S1509…S1518) · **ACTIVE**
 
@@ -2313,7 +2313,7 @@ FM-xxx (з таблиці нижче)
 | **PH-SVC75** | Cursor 3.13.21 + toolchain research | `CURSOR_UPDATE_RESEARCH_2026-07-27.md` | **✅** |
 | **PH-SVC76** | `cursor-environment-baseline.mdc` | 3.13.21 + Router/sandbox notes | **✅** |
 | **PH-SVC77** | agent-roles + orchestrator + permissions | desktop 3.13.21; vision allow | **✅** |
-| **PH-SVC78** | Vision tools state verify | Speeds/eye/prune; `--check` ok rev 406 | **✅** |
+| **PH-SVC78** | Vision tools state verify | Speeds/eye/prune; `--check` ok rev 407 | **✅** |
 | **PH-SVC79** | HANDOFF + NEXT_SESSION | service zriz; next `абракадабра` | **✅** |
 | **PH-SVC80** | README / INDEX / ENV pointer | Jul 27 research | **✅** |
 | **PH-SVC81** | `file_list.csv` + `.cursor/CHANGELOG` | CURSOR_UPDATE_2026-07-27 | **✅** |

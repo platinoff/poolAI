@@ -2888,6 +2888,12 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_development_POLICIES_LOC_AUDIT_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_CURSOR_UPDATE_RESEARCH_2026_07_27_md"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -11404,9 +11410,16 @@
       "label": "policy_loc_audit_integration.rs",
       "layer": "L3",
       "path": "tests/policy_loc_audit_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_CURSOR_UPDATE_RESEARCH_2026_07_27_md",
+      "label": "CURSOR_UPDATE_RESEARCH_2026-07-27.md",
+      "layer": "L1",
+      "path": "docs/development/CURSOR_UPDATE_RESEARCH_2026-07-27.md"
     }
   ],
-  "revision": 406,
+  "revision": 407,
   "sprint_queue": [
     {
       "acceptance": "depth enum + docs-canon criteria registry",

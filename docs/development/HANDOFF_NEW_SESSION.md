@@ -51,7 +51,7 @@
 | **PH-S1517** | Ratio hold advisory |
 | **PH-S1518** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **406**. **Pending completion:** **770** (→ PH-S2278).
+**§5.12:** **10** відкритих. **Vision:** rev **407**. **Pending completion:** **770** (→ PH-S2278).
 
 ## Band 86 — Policies loc-audit aggregate (PH-S1499…S1508, ✅)
 

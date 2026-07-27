@@ -2,7 +2,7 @@
 
 **Дата:** 2026-07-27 (service band PH-SVC75…SVC84) · **Cursor:** 3.13.21 · **Rust:** 1.92.0 (rustup GNU) · **Git:** 2.50.0 (MSYS2)
 
-**Операційний зріз:** §5.12 **10** (band 87 **PH-S1509…S1518** open) · vision rev **406** (Speeds + eye + prune ≤2000) · наступна product-сесія **`абракадабра`**.
+**Операційний зріз:** §5.12 **10** (band 87 **PH-S1509…S1518** open) · vision rev **407** (Speeds + eye + prune ≤2000) · наступна product-сесія **`абракадабра`**.
 
 **Попередній зріз:** [`CURSOR_UPDATE_RESEARCH_2026-07-24.md`](./CURSOR_UPDATE_RESEARCH_2026-07-24.md) (Cursor 3.13.10) · GH tokens [`GITHUB_APP_INSTALLATION_TOKENS_2026-07-25.md`](./GITHUB_APP_INSTALLATION_TOKENS_2026-07-25.md).
 
@@ -53,7 +53,7 @@
 
 ## 4. Vision tools state (PoolAI `docs/vision/`)
 
-Перевірено 2026-07-27 (`poolai-vision-sync --check` → **ok**, rev **406**):
+Перевірено 2026-07-27 (`poolai-vision-sync --check` → **ok**, rev **407**):
 
 | Компонент | Стан | Канон |
 |-----------|------|--------|
@@ -80,7 +80,7 @@
 | 6 | Vision Speeds + eye + prune | ✅ verified |
 | 7 | FM §5.16 PH-SVC75…SVC84 | ✅ |
 | 8 | HANDOFF / NEXT / README / INDEX zriz | ✅ |
-| 9 | `poolai-vision-sync --check` | ✅ rev 406 |
+| 9 | `poolai-vision-sync --check` | ✅ rev 407 |
 
 ---
 
