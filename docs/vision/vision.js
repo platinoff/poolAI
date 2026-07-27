@@ -139,8 +139,10 @@
   let constellationHubIdSet = new Set();
   let activeTreeFileEl = null;
   let collapsedPanels = new Set();
-  const DIAGRAM_PANELS = ["layers", "queue", "map", "links"];
+  const DIAGRAM_PANELS = ["layers", "queue", "map", "speeds", "links"];
   const ALL_PANELS = [...DIAGRAM_PANELS, "preview"];
+  const SPEED_INDEX_URL = "/docs/vision/speed_index.json";
+  const SPEED_INDEX_FALLBACK = "/docs/development/speed_index.json";
   const panelAnchors = new Map();
   let openFilterDrop = null;
   let mapNodesBound = false;
@@ -3973,6 +3975,127 @@
     bindSprintQueueItems(box);
   }
 
+  function formatWallSecs(secs) {
+    if (secs == null || Number.isNaN(Number(secs))) return "—";
+    const s = Number(secs);
+    if (s < 90) return s.toFixed(1) + "s";
+    const m = Math.floor(s / 60);
+    const r = Math.round(s % 60);
+    return m + "m " + r + "s";
+  }
+
+  function formatNs(ns) {
+    if (ns == null) return "—";
+    const n = Number(ns);
+    if (n >= 1e9) return (n / 1e9).toFixed(2) + " s";
+    if (n >= 1e6) return (n / 1e6).toFixed(2) + " ms";
+    if (n >= 1e3) return (n / 1e3).toFixed(1) + " µs";
+    return n + " ns";
+  }
+
+  async function loadSpeedIndex() {
+    try {
+      const r = await fetch(SPEED_INDEX_URL + "?t=" + Date.now());
+      if (r.ok) return await r.json();
+    } catch (_) {
+      /* try fallback */
+    }
+    try {
+      const r2 = await fetch(SPEED_INDEX_FALLBACK + "?t=" + Date.now());
+      if (r2.ok) return await r2.json();
+    } catch (_) {
+      /* empty */
+    }
+    return null;
+  }
+
+  function renderSpeedIndex(data) {
+    const box = document.getElementById("speed-index");
+    if (!box) return;
+    if (!data) {
+      box.innerHTML =
+        '<p class="speed-index-empty" style="color:var(--muted);margin:0">No <code>speed_index.json</code> yet. Run <code>bash bin/record-test-ci-speed.sh</code> after <code>cargo test-ci</code>.</p>';
+      return;
+    }
+    const latest = data.latest || {};
+    const testHist = Array.isArray(data.test_ci_history)
+      ? data.test_ci_history.slice().reverse().slice(0, 8)
+      : [];
+    const benchHist = Array.isArray(data.bench_history)
+      ? data.bench_history.slice().reverse().slice(0, 8)
+      : [];
+    let html = '<div class="speed-index-meta">';
+    html +=
+      "<span>host <strong>" +
+      escapeHtml(String(data.host_label || "—")) +
+      "</strong></span>";
+    html +=
+      "<span>git <strong>" +
+      escapeHtml(String(data.git_head || "—")) +
+      "</strong></span>";
+    html +=
+      "<span>at <strong>" +
+      escapeHtml(String(data.generated_at || "—")) +
+      "</strong></span>";
+    html += "</div>";
+    html += '<div class="speed-index-latest">';
+    const ok = latest.test_ci_ok;
+    const okCls = ok === true ? "ok" : ok === false ? "fail" : "unknown";
+    html +=
+      '<div class="speed-card ' +
+      okCls +
+      '"><div class="speed-card-label">cargo test-ci</div><div class="speed-card-value">' +
+      escapeHtml(formatWallSecs(latest.test_ci_wall_secs)) +
+      '</div><div class="speed-card-sub">' +
+      escapeHtml(
+        (ok === true ? "ok" : ok === false ? "fail" : "—") +
+          " · " +
+          (latest.test_ci_recorded_at || "not recorded")
+      ) +
+      "</div></div>";
+    html +=
+      '<div class="speed-card bench"><div class="speed-card-label">last Criterion</div><div class="speed-card-value">' +
+      escapeHtml(formatNs(latest.last_bench_median_ns)) +
+      '</div><div class="speed-card-sub">' +
+      escapeHtml(
+        (latest.last_bench_label || "—") +
+          " · " +
+          (latest.last_bench_recorded_at || "not recorded")
+      ) +
+      "</div></div>";
+    html += "</div>";
+    html += '<h3 class="speed-index-h">test-ci history</h3><ul class="speed-index-list">';
+    if (!testHist.length) {
+      html +=
+        '<li class="speed-index-empty-row" style="color:var(--muted)">Empty — record after drain.</li>';
+    }
+    testHist.forEach((e) => {
+      html +=
+        '<li><span class="speed-id">' +
+        escapeHtml(formatWallSecs(e.wall_secs)) +
+        '</span><span class="speed-title">' +
+        escapeHtml(e.ok ? "ok" : "fail") +
+        " · " +
+        escapeHtml(e.recorded_at || "") +
+        '</span></li>';
+    });
+    html += '</ul><h3 class="speed-index-h">Criterion medians</h3><ul class="speed-index-list">';
+    if (!benchHist.length) {
+      html +=
+        '<li class="speed-index-empty-row" style="color:var(--muted)">Empty — optional short benches.</li>';
+    }
+    benchHist.forEach((e) => {
+      html +=
+        '<li><span class="speed-id">' +
+        escapeHtml(formatNs(e.median_ns)) +
+        '</span><span class="speed-title">' +
+        escapeHtml((e.bench || "") + "::" + (e.group || "")) +
+        "</span></li>";
+    });
+    html += "</ul>";
+    box.innerHTML = html;
+  }
+
   function scrollToSprintQueue() {
     ensurePanelExpanded("queue");
     const panel = document.querySelector('.panel[data-panel="queue"]');
@@ -4502,6 +4625,8 @@
     renderRssTicker(feed);
     renderMap();
     renderSprintQueue(manifest);
+    const speed = await loadSpeedIndex();
+    renderSpeedIndex(speed);
 
     const tree = document.getElementById("file-tree");
     tree.innerHTML = "";

@@ -12,6 +12,11 @@
       "title": "Graph (manifest)"
     },
     {
+      "id": "speeds",
+      "source": "speed_index.json",
+      "title": "Test/bench speeds"
+    },
+    {
       "id": "scope",
       "source": "extensions.json",
       "title": "Sprint extensions"

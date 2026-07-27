@@ -8,6 +8,7 @@ This document ties together **reproducible micro-benchmarks** (Criterion, in-tre
 - **Prometheus scrape (`GET /metrics`)**: [`../development/PROMETHEUS_METRICS.md`](../development/PROMETHEUS_METRICS.md) (PH-S07 / FM-043)
 - **Runtime / Tokio tuning**: [`TUNING.md`](./TUNING.md)
 - **Architecture-oriented measurement backlog**: [`../development/PERFORMANCE_OPTIMIZATION_PLAN_2026-03-17.md`](../development/PERFORMANCE_OPTIMIZATION_PLAN_2026-03-17.md)
+- **Speed index (test-ci wall + Criterion → vision Speeds panel)**: [`../development/SPEED_INDEX.md`](../development/SPEED_INDEX.md) · [`../development/speed_index.json`](../development/speed_index.json)
 
 **PoolAI version**: 0.2.x. **Rust**: stable (see workspace MSRV notes in `Cargo.toml` / `README.md`).
 

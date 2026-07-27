@@ -118,7 +118,8 @@ function GetVisionWatchPayload {
         'index.html',
         'vision.css',
         'vision.js',
-        'vision.svg'
+        'vision.svg',
+        'speed_index.json'
     )
     $bundleTicks = [long]0
     $dataTicks = [long]0
@@ -134,6 +135,11 @@ function GetVisionWatchPayload {
         else {
             $dataTicks += $ticks
         }
+    }
+    # Also watch canonical index under docs/development (source of truth).
+    $devSpeed = Join-Path $RepoRootPath 'docs\development\speed_index.json'
+    if (Test-Path -LiteralPath $devSpeed -PathType Leaf) {
+        $dataTicks += (Get-Item -LiteralPath $devSpeed).LastWriteTimeUtc.Ticks
     }
     $revision = 0
     $manifestPath = Join-Path $VisionDirectory 'manifest.json'

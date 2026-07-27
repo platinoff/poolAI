@@ -22,7 +22,7 @@ Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.1
 абракадабра
 ```
 
-**Порядок:** drain band 86 (Policies loc-audit aggregate). Після push — PH-SVC34 GH re-verify (JWT-format `GITHUB_TOKEN` ok). **Не** комітити `certs/*.pem`, `.env`, `data/audit/*`. **Не** валідувати довжину `ghs_*`.
+**Порядок:** drain band 86 (Policies loc-audit aggregate). Після drain — **`bash bin/record-test-ci-speed.sh`** (або timed `cargo test-ci` + `poolai-speed-index --record-test-ci`) → Speeds panel у vision ([`SPEED_INDEX.md`](./SPEED_INDEX.md)). Потім vision-sync / push. Після push — PH-SVC34 GH re-verify (JWT-format `GITHUB_TOKEN` ok). **Не** комітити `certs/*.pem`, `.env`, `data/audit/*`. **Не** валідувати довжину `ghs_*`.
 
 ---
 

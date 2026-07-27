@@ -2,7 +2,7 @@
 
 **Оновлено:** 2026-07-25 (band 85 **PH-S1489…S1498** ✅ · band 84 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 86 ready)
 
-**Наступна сесія:** **`абракадабра`** — drain band 86 (FM **§5.67** Policies loc-audit aggregate).
+**Наступна сесія:** **`абракадабра`** — drain band 86 (FM **§5.67** Policies loc-audit aggregate) · після drain — [`SPEED_INDEX.md`](./SPEED_INDEX.md) (`bash bin/record-test-ci-speed.sh`) + Speeds panel у vision.
 
 ## P0 / service (2026-07-25)
 

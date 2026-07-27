@@ -2267,6 +2267,105 @@ body.vision-reduced-motion #map-svg .edge.constellation-pipe,
   color: #a78bfa;
 }
 
+.speed-index-body {
+  padding: 0.55rem 0.65rem 0.75rem;
+  overflow: auto;
+}
+
+.speed-index-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.85rem;
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin-bottom: 0.55rem;
+}
+
+.speed-index-meta strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.speed-index-latest {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem;
+  margin-bottom: 0.65rem;
+}
+
+.speed-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.45rem 0.55rem;
+  background: rgba(8, 14, 24, 0.55);
+}
+
+.speed-card.ok {
+  border-color: rgba(63, 185, 80, 0.45);
+}
+
+.speed-card.fail {
+  border-color: rgba(248, 81, 73, 0.5);
+}
+
+.speed-card.bench {
+  border-color: rgba(126, 184, 255, 0.35);
+}
+
+.speed-card-label {
+  font-size: 0.68rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.speed-card-value {
+  font-size: 1.15rem;
+  font-weight: 650;
+  color: var(--text);
+  margin: 0.15rem 0;
+}
+
+.speed-card-sub {
+  font-size: 0.68rem;
+  color: var(--muted);
+  word-break: break-word;
+}
+
+.speed-index-h {
+  margin: 0.55rem 0 0.3rem;
+  font-size: 0.75rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.speed-index-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.speed-index-list li {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  padding: 0.22rem 0;
+  border-bottom: 1px solid rgba(120, 160, 220, 0.08);
+}
+
+.speed-id {
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.speed-title {
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .panel-flash {
   outline: 1px solid var(--border-bright);
   box-shadow: 0 0 12px var(--glow);
