@@ -49,6 +49,7 @@ VERIFY_POLICY_API="${VERIFY_POLICY_API:-0}"
 VERIFY_POLICY_ADMIN_OPS="${VERIFY_POLICY_ADMIN_OPS:-0}"
 VERIFY_POLICY_STAND_SMOKE="${VERIFY_POLICY_STAND_SMOKE:-0}"
 VERIFY_POLICY_LOC_AUDIT="${VERIFY_POLICY_LOC_AUDIT:-0}"
+VERIFY_POLICY_DOCS_CANON="${VERIFY_POLICY_DOCS_CANON:-0}"
 VERIFY_SSO_LOC_AUDIT="${VERIFY_SSO_LOC_AUDIT:-0}"
 VERIFY_SSO_DOCS_CANON="${VERIFY_SSO_DOCS_CANON:-0}"
 VERIFY_SSO_VISION_SYNC="${VERIFY_SSO_VISION_SYNC:-0}"
@@ -666,6 +667,16 @@ if [[ "$VERIFY_POLICY_LOC_AUDIT" == "1" ]]; then
     echo "OK  policies loc-audit aggregate gate"
   else
     echo "FAIL policies loc-audit aggregate gate"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_POLICY_DOCS_CANON" == "1" ]]; then
+  echo "Running poolai-loc-audit --policy-docs-canon (PH-S1512)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --policy-docs-canon); then
+    echo "OK  policies docs-canon gate"
+  else
+    echo "FAIL policies docs-canon gate"
     fail=1
   fi
 fi

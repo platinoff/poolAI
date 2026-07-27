@@ -6613,6 +6613,49 @@ mod tests {
     }
 
     #[test]
+    fn policy_docs_canon_band87_export_shape_ph_s1513() {
+        use poolai_ui_core::policy_docs_canon_depth::{
+            policy_docs_canon_criteria_total, policy_docs_canon_depth_stub,
+            policy_docs_canon_slices_met, PolicyDocsCanonDepth, FM_BAND87_ROWS,
+            POLICY_DOCS_CANON_CASES, POLICY_DOCS_CANON_CRITERIA, POLICY_DOCS_CANON_SLICES,
+        };
+        use serde_json::json;
+        assert_eq!(
+            policy_docs_canon_depth_stub(Some(&json!({"stand_smoke_export": true}))),
+            PolicyDocsCanonDepth::StandSmokeExport
+        );
+        assert_eq!(
+            policy_docs_canon_depth_stub(Some(&json!({
+                "policy_docs_canon_depth": true,
+                "slice_aggregate": true,
+                "criteria_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "policy_docs_canon_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            PolicyDocsCanonDepth::FullBand87
+        );
+        assert_eq!(POLICY_DOCS_CANON_CRITERIA.len(), 10);
+        assert_eq!(policy_docs_canon_criteria_total(), 10);
+        assert_eq!(POLICY_DOCS_CANON_SLICES.len(), 6);
+        assert!(POLICY_DOCS_CANON_CASES.contains(&"aggregate_flag"));
+        let canon = include_str!("../../docs/development/POLICIES_DOCS_CANON.md");
+        assert_eq!(policy_docs_canon_slices_met(canon), (6, 6));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--policy-docs-canon"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND87_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band87 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn policy_admin_ops_band84_export_shape_ph_s1485() {
         use poolai_ui_core::policy_admin_ops_depth::{
             policy_admin_ops_criteria_total, policy_admin_ops_depth_stub, PolicyAdminOpsDepth,

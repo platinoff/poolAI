@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 178535,
-  "non_rust_product_loc": 9557,
-  "product_loc_total": 188092,
-  "rust_ratio": 0.9491897582034323,
-  "rust_ratio_pct": 94.91897582034323,
+  "rust_loc": 179015,
+  "non_rust_product_loc": 9574,
+  "product_loc_total": 188589,
+  "rust_ratio": 0.9492335183918468,
+  "rust_ratio_pct": 94.92335183918468,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -148,9 +148,12 @@
   "policy_stand_smoke_mode": false,
   "policy_stand_smoke_criteria_total": 10,
   "policy_stand_smoke_criteria_met_count": 0,
-  "policy_loc_audit_mode": true,
+  "policy_loc_audit_mode": false,
   "policy_loc_audit_criteria_total": 10,
-  "policy_loc_audit_criteria_met_count": 10,
+  "policy_loc_audit_criteria_met_count": 0,
+  "policy_docs_canon_mode": true,
+  "policy_docs_canon_criteria_total": 10,
+  "policy_docs_canon_criteria_met_count": 10,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -162,23 +165,23 @@
     },
     "ops_shell": {
       "files": 40,
-      "loc": 3826
+      "loc": 3843
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 104,
-      "loc": 22219
+      "files": 105,
+      "loc": 22445
     },
     "rust_src": {
       "files": 301,
-      "loc": 114261
+      "loc": 114358
     },
     "rust_tests": {
-      "files": 315,
-      "loc": 41447
+      "files": 317,
+      "loc": 41604
     },
     "ui_css": {
       "files": 2,
@@ -209,7 +212,7 @@
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
     "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
-    "PH-S1504: policy_loc_audit_mode — aggregate band 81–85 --policy* loc-audit slices",
-    "PH-S1508: band 86 policies loc-audit — criteria met vs registry"
+    "PH-S1514: policy_docs_canon_mode — aggregate band 81–86 POLICIES_*.md canon docs",
+    "PH-S1518: band 87 policies docs-canon — criteria met vs registry"
   ]
 }

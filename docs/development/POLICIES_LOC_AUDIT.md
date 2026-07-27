@@ -17,7 +17,7 @@ individually; the aggregate registry proves all five exist plus verify/docs/band
 | Contracts | `policy_loc_audit_integration` | slice presence + criteria totals |
 
 **Boundary:** band 86 = aggregate loc-audit ops gate; prior live smoke remains
-[`POLICIES_STAND_SMOKE.md`](./POLICIES_STAND_SMOKE.md) (band 85). Next: Policies docs-canon (band 87).
+[`POLICIES_STAND_SMOKE.md`](./POLICIES_STAND_SMOKE.md) (band 85). Next: [`POLICIES_DOCS_CANON.md`](./POLICIES_DOCS_CANON.md) (band 87).
 
 ## Loc-audit / verify
 

@@ -47,6 +47,9 @@ use poolai_ui_core::policy_api_contracts_depth::{
     policy_api_criteria_total, POLICY_API_CASES, POLICY_API_CRITERIA,
 };
 use poolai_ui_core::policy_depth::{policy_criteria_total, POLICY_CASES, POLICY_CRITERIA};
+use poolai_ui_core::policy_docs_canon_depth::{
+    policy_docs_canon_criteria_total, POLICY_DOCS_CANON_CASES, POLICY_DOCS_CANON_CRITERIA,
+};
 use poolai_ui_core::policy_loc_audit_depth::{
     policy_loc_audit_criteria_total, POLICY_LOC_AUDIT_CASES, POLICY_LOC_AUDIT_CRITERIA,
 };
@@ -281,6 +284,8 @@ struct AuditConfig {
     policy_stand_smoke: bool,
     /// Emit band-86 policies loc-audit aggregate fields (PH-S1504).
     policy_loc_audit: bool,
+    /// Emit band-87 policies docs-canon fields (PH-S1514).
+    policy_docs_canon: bool,
 }
 
 impl Default for AuditConfig {
@@ -332,6 +337,7 @@ impl Default for AuditConfig {
             policy_admin_ops: false,
             policy_stand_smoke: false,
             policy_loc_audit: false,
+            policy_docs_canon: false,
         }
     }
 }
@@ -635,6 +641,12 @@ struct RustRatioReport {
     policy_loc_audit_criteria_total: usize,
     /// Policies loc-audit criteria met count (PH-S1504).
     policy_loc_audit_criteria_met_count: usize,
+    /// Band-87 policies docs-canon mode (PH-S1514).
+    policy_docs_canon_mode: bool,
+    /// Policies docs-canon criteria registry size (PH-S1514).
+    policy_docs_canon_criteria_total: usize,
+    /// Policies docs-canon criteria met count (PH-S1514).
+    policy_docs_canon_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -1011,6 +1023,22 @@ fn policy_policy_loc_audit_criteria_met(root: &Path) -> (usize, usize) {
     let total = policy_loc_audit_criteria_total();
     let mut met = 0usize;
     for (_, marker, rel) in POLICY_LOC_AUDIT_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
+fn policy_policy_docs_canon_criteria_met(root: &Path) -> (usize, usize) {
+    let total = policy_docs_canon_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in POLICY_DOCS_CANON_CRITERIA {
         let path = root.join(rel);
         if path.is_file() {
             if let Ok(content) = fs::read_to_string(&path) {
@@ -1442,6 +1470,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--policy-admin-ops" => config.policy_admin_ops = true,
             "--policy-stand-smoke" => config.policy_stand_smoke = true,
             "--policy-loc-audit" => config.policy_loc_audit = true,
+            "--policy-docs-canon" => config.policy_docs_canon = true,
             "--policy" => config.policy = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
@@ -1506,6 +1535,7 @@ fn print_help() {
            --policy-admin-ops          band-84 policies admin/ops fields (PH-S1485)\n\
            --policy-stand-smoke        band-85 policies stand-smoke fields (PH-S1494)\n\
            --policy-loc-audit          band-86 policies loc-audit aggregate fields (PH-S1504)\n\
+           --policy-docs-canon         band-87 policies docs-canon fields (PH-S1514)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -2039,6 +2069,19 @@ fn build_report(
         notes.push("PH-S1508: band 86 policies loc-audit — criteria met vs registry");
     }
 
+    let (policy_docs_canon_criteria_met_count, policy_docs_canon_criteria_total_count) =
+        if config.policy_docs_canon {
+            policy_policy_docs_canon_criteria_met(root)
+        } else {
+            (0, policy_docs_canon_criteria_total())
+        };
+    if config.policy_docs_canon {
+        notes.push(
+            "PH-S1514: policy_docs_canon_mode — aggregate band 81–86 POLICIES_*.md canon docs",
+        );
+        notes.push("PH-S1518: band 87 policies docs-canon — criteria met vs registry");
+    }
+
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
         sprint: SPRINT,
@@ -2192,6 +2235,9 @@ fn build_report(
         policy_loc_audit_mode: config.policy_loc_audit,
         policy_loc_audit_criteria_total: policy_loc_audit_criteria_total_count,
         policy_loc_audit_criteria_met_count,
+        policy_docs_canon_mode: config.policy_docs_canon,
+        policy_docs_canon_criteria_total: policy_docs_canon_criteria_total_count,
+        policy_docs_canon_criteria_met_count,
         by_category,
         notes,
     })
@@ -2652,6 +2698,17 @@ fn print_summary(report: &RustRatioReport) {
         println!(
             "  policy_loc_audit_cases: {}",
             POLICY_LOC_AUDIT_CASES.join(", ")
+        );
+    }
+    if report.policy_docs_canon_mode {
+        println!("  policy_docs_canon:     true (PH-S1514 band 87)");
+        println!(
+            "  policy_docs_canon_criteria: {}/{} met",
+            report.policy_docs_canon_criteria_met_count, report.policy_docs_canon_criteria_total
+        );
+        println!(
+            "  policy_docs_canon_cases: {}",
+            POLICY_DOCS_CANON_CASES.join(", ")
         );
     }
     for (name, loc) in &report.by_category {

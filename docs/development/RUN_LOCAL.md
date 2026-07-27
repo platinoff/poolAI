@@ -24,7 +24,7 @@ cd S:\rust\poolAI
 .\bin\run-poolai.ps1 stop
 ```
 
-**Last updated:** 2026-07-27 (PH-S1508 band 86 · `--policy-loc-audit` · `VERIFY_POLICY_LOC_AUDIT`)
+**Last updated:** 2026-07-27 (PH-S1518 band 87 · `--policy-docs-canon` · `VERIFY_POLICY_DOCS_CANON`)
 
 ### PH-S1011 / PH-S1012: Light compile + quick preset
 
@@ -87,6 +87,7 @@ cd S:\rust\poolAI
 /usr/bin/bash bin/run-poolai.sh quick --policy-admin-ops
 /usr/bin/bash bin/run-poolai.sh quick --policy-stand-smoke
 /usr/bin/bash bin/run-poolai.sh quick --policy-loc-audit
+/usr/bin/bash bin/run-poolai.sh quick --policy-docs-canon
 # PowerShell:
 .\bin\run-poolai.ps1 quick -StandSmoke
 .\bin\run-poolai.ps1 quick -MigrationAdvisory
@@ -367,6 +368,7 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `VERIFY_POLICY_ADMIN_OPS=1` | `verify-dev-stand.sh` → `poolai-loc-audit --policy-admin-ops` (PH-S1484) |
 | `VERIFY_POLICY_STAND_SMOKE=1` | `verify-dev-stand.sh` → `poolai-http-stand-smoke --policy-stand-smoke` + `poolai-loc-audit --policy-stand-smoke` (PH-S1495) |
 | `VERIFY_POLICY_LOC_AUDIT=1` | `verify-dev-stand.sh` → `poolai-loc-audit --policy-loc-audit` (PH-S1502) |
+| `VERIFY_POLICY_DOCS_CANON=1` | `verify-dev-stand.sh` → `poolai-loc-audit --policy-docs-canon` (PH-S1512) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 ### PH-S1100: Rust migration advisory (band 46)
@@ -1185,6 +1187,26 @@ VERIFY_POLICY_LOC_AUDIT=1 bash bin/verify-dev-stand.sh
 | `policy_loc_audit_criteria_met_count` | Criteria with marker present in canonical doc path |
 
 Module: [`policy_loc_audit_depth.rs`](../../crates/poolai-ui-core/src/policy_loc_audit_depth.rs) · tests: `policy_loc_audit_integration.rs`, `galaxy_horizon_s1499_integration.rs` · docs: [`POLICIES_LOC_AUDIT.md`](./POLICIES_LOC_AUDIT.md).
+
+### PH-S1514: Policies docs-canon aggregate (band 87)
+
+Aggregate gate for band 81–86 `POLICIES_*.md` canon docs.
+
+```bash
+cargo run --bin poolai-loc-audit -- --policy-docs-canon
+cargo run --bin poolai-loc-audit -- --policy-docs-canon --migration-advisory --advisory --min-ratio 0.95
+
+VERIFY_POLICY_DOCS_CANON=1 bash bin/verify-dev-stand.sh
+/usr/bin/bash bin/run-poolai.sh quick --policy-docs-canon
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `policy_docs_canon_mode` | `true` when `--policy-docs-canon` (PH-S1514) |
+| `policy_docs_canon_criteria_total` | Registry size (10) |
+| `policy_docs_canon_criteria_met_count` | Criteria with marker present in canonical doc path |
+
+Module: [`policy_docs_canon_depth.rs`](../../crates/poolai-ui-core/src/policy_docs_canon_depth.rs) · tests: `policy_docs_canon_integration.rs`, `galaxy_horizon_s1509_integration.rs` · docs: [`POLICIES_DOCS_CANON.md`](./POLICIES_DOCS_CANON.md).
 
 Default stand smoke includes **`vision_revision_parity`** (PH-S208, PH-S235): repo `manifest.revision` vs FM §5.12 `Vision rev`, `extensions.active_sprint` vs `manifest.next_sprint`, then `GET /docs/vision/manifest.json` with `X-PoolAI-Vision-Revision` header vs JSON body.
 
