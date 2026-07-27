@@ -2858,6 +2858,12 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_development_POLICIES_STAND_SMOKE_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_GROK_BUILD_VS_POOLAI_RESEARCH_2026_07_27_md"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -11318,9 +11324,16 @@
       "label": "policy_stand_smoke_integration.rs",
       "layer": "L3",
       "path": "tests/policy_stand_smoke_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_GROK_BUILD_VS_POOLAI_RESEARCH_2026_07_27_md",
+      "label": "GROK_BUILD_VS_POOLAI_RESEARCH_2026-07-27.md",
+      "layer": "L1",
+      "path": "docs/development/GROK_BUILD_VS_POOLAI_RESEARCH_2026-07-27.md"
     }
   ],
-  "revision": 402,
+  "revision": 403,
   "sprint_queue": [
     {
       "acceptance": "depth enum + aggregate criteria registry",
