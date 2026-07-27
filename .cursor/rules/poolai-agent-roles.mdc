@@ -30,16 +30,18 @@ alwaysApply: true
 
 **Не делегувати оркестратору:** фінальний `git push`, закриття спринту в FM §5.12, оновлення `NEXT_SESSION_PROMPT.md`, amend після push.
 
-## Cursor 3.11+ (side chats, transcript search) · local desktop **3.13.10**
+## Cursor 3.11+ (side chats, transcript search) · local desktop **3.13.21**
 
 - **Side chats** (`/side`, `/btw`, plus у Agents): дослідження/уточнення без зупинки main drain thread; **local-only** (не Cloud Agents).
 - **Transcript search** (Cmd/Ctrl+K у Agents Window; Cmd/Ctrl+F in-chat): пошук минулих PH-S* / `абракадабра` сесій.
 - **Modes:** Shift+Tab / mode picker — drain/`абракадабра` = **Agent**; Plan лише для неоднозначного scope.
-- **Run Mode (auto-exec):** Settings → Agents → Approvals & Execution → **Auto-review** (не Run Everything). Steer: [`.cursor/permissions.json`](../permissions.json). Окремо від chat Mode.
+- **Run Mode (auto-exec):** Settings → Agents → Approvals & Execution → **Auto-review** (не Run Everything). Steer: [`.cursor/permissions.json`](../permissions.json). Окремо від chat Mode. Windows VDT: не вимагати project `sandbox.json`.
+- **Cursor Router (Auto):** для довгого drain — **Balance** або **Intelligence** (не Cost).
 - **`/multitask`:** паралельні фонові Task subagents під час довгого drain (не замість канону MSYS2).
 - **Cloud agent hooks** (`beforeSubmitPrompt`, `afterAgentResponse`, `afterAgentThought`, `stop`, `subagentStart`, …): опційно для cloud; локальний VDT канон — MSYS2 + `poolai-session-iteration.mdc`.
-- Baseline / research: [`cursor-environment-baseline.mdc`](cursor-environment-baseline.mdc) · [`CURSOR_UPDATE_RESEARCH_2026-07-24.md`](../../docs/development/CURSOR_UPDATE_RESEARCH_2026-07-24.md) (local **3.13.10**).
-- **Ops:** Agents Window Changes (Win) — fix у 3.13 line; flicker з **Cursor Dark High Contrast** — змінити тему; не блокує drain.
+- Baseline / research: [`cursor-environment-baseline.mdc`](cursor-environment-baseline.mdc) · [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](../../docs/development/CURSOR_UPDATE_RESEARCH_2026-07-27.md) (local **3.13.21**).
+- **Vision tools (PoolAI):** Speeds + eye 👁 + prune ≤2000 — [`docs/vision/README.md`](../../docs/vision/README.md); service/close — `poolai-vision-sync --check`.
+- **Ops:** Agents Window Changes (Win) — fix у 3.13 line (verify **3.13.21**); flicker з **Cursor Dark High Contrast** — змінити тему; не блокує drain.
 
 ## Канон черги (FM)
 

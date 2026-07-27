@@ -42,9 +42,12 @@ alwaysApply: false
 ## Auto-execution (Cursor Run Modes)
 
 - Prefer **Auto-review** (Settings → Agents → Approvals & Execution) for orchestrated runs / `абракадабра`.
-- Project steer: [`.cursor/permissions.json`](../permissions.json) — MSYS2/`cargo`/`git` allow; block force-push, secrets, history rewrite, Python product files.
+- Project steer: [`.cursor/permissions.json`](../permissions.json) — MSYS2/`cargo`/`git`/vision-sync allow; block force-push, secrets, history rewrite, Python product files.
 - Do **not** enable **Run Everything** for PoolAI without explicit owner request.
+- Do **not** add project `sandbox.json` for Windows VDT without OWNER (Seatbelt/Landlock = macOS/Linux).
+- Cursor Router Auto: prefer **Balance** / **Intelligence** for long drain (not Cost).
 - Chat Mode (Agent/Plan) ≠ Run Mode.
+- Desktop baseline: **3.13.21** — [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](../../docs/development/CURSOR_UPDATE_RESEARCH_2026-07-27.md).
 
 ## Поза обсягом (без явного запиту)
 

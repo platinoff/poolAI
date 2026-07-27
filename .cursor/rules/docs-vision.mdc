@@ -53,6 +53,9 @@ alwaysApply: false
 - Запуск: **`.\bin\open-docs-vision.ps1`** → URL **`http://127.0.0.1:8765/docs/vision/index.html`** у Simple Browser (див. `.cursor/commands/open-docs-vision.md`).
 - Кнопка **Reload manifest** — після `git pull` або локального коміту.
 - Чотири панелі: SVG · 3D layer stack · sprint extensions · doc preview.
+- **Speeds panel:** `speed_index.json` + [`SPEED_INDEX.md`](../../docs/development/SPEED_INDEX.md); після `абракадабра` drain — `bash bin/record-test-ci-speed.sh`.
+- **Sprint queue eye 👁:** open / open+queued; closed PH-S ≤2000 prune (`poolai-vision-sync`).
+- **Service verify:** `cargo run --bin poolai-vision-sync -- --check` (Cursor desktop baseline — [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](../../docs/development/CURSOR_UPDATE_RESEARCH_2026-07-27.md)).
 
 ## Зв’язок з іншими правилами
 

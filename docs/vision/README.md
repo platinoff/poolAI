@@ -55,7 +55,7 @@ http://127.0.0.1:8765/docs/vision/index.html
 
 **Auto-reload:** кнопка **Auto** у шапці; сервер `GET /docs/vision/__watch` — зміни `manifest.json` / `extensions.json` / **`speed_index.json`** оновлюють граф без F5; **`git_head`** (короткий hash) оновлює cyan pill у шапці без F5; зміни `index.html` / `vision.css` / `vision.js` — повне перезавантаження сторінки.
 
-**Speeds panel:** latest `cargo test-ci` wall-clock + Criterion medians from [`../development/speed_index.json`](../development/speed_index.json) (mirror `speed_index.json` у цьому каталозі). Canon: [`../development/SPEED_INDEX.md`](../development/SPEED_INDEX.md) · `bash bin/record-test-ci-speed.sh`.
+**Speeds panel:** latest `cargo test-ci` wall-clock + Criterion medians from [`../development/speed_index.json`](../development/speed_index.json) (mirror `speed_index.json` у цьому каталозі). Canon: [`../development/SPEED_INDEX.md`](../development/SPEED_INDEX.md) · `bash bin/record-test-ci-speed.sh`. Verified service **PH-SVC78** (2026-07-27) alongside Cursor desktop **3.13.21** — [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](../development/CURSOR_UPDATE_RESEARCH_2026-07-27.md).
 
 **Auto-sync (інкрементальна карта):** `cargo run --bin poolai-vision-sync` або `GET /docs/vision/__sync` — додає нові/змінені git-tracked файли (`docs/`, `src/`, `e2e/`, …) у `manifest.json` з ребрами до hub-вузлів (`galaxy_grid`, `fm`, `handoff`, …). **Drift gate:** `cargo run --bin poolai-vision-sync -- --check` (FM §5.12 vs manifest + **PH-S227** `.mdc` cross-links; CI job `vision-manifest-drift`). `open-docs-vision.ps1` викликає sync при старті; **Reload manifest** у UI — теж через `__sync`.
 

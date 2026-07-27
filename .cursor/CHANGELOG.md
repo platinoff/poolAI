@@ -1,5 +1,16 @@
 # Cursor Agent Configuration Changelog
 
+## 2026-07-27 — Cursor 3.13.21 + vision tools verify (PH-SVC75…SVC84)
+
+- **Research:** [`docs/development/CURSOR_UPDATE_RESEARCH_2026-07-27.md`](../docs/development/CURSOR_UPDATE_RESEARCH_2026-07-27.md) — local desktop **3.13.21** (was 3.13.10); public changelog still 3.11 + Jul 22 Router; no new numbered IDE features.
+- **`cursor-environment-baseline.mdc`:** 3.13.21; rustup vs MSYS2 pacman note; sandbox.json not required on Windows VDT; Router Balance/Intelligence for long drain.
+- **`poolai-agent-roles.mdc`** + **`autonomous-orchestrator.mdc`:** desktop 3.13.21; vision Speeds/eye pointer; sandbox OWNER gate.
+- **`.cursor/permissions.json`:** vision-sync / Speeds / `docs/vision/` allow; block unsolicited `sandbox.json`; MSYS2 unsandboxed note.
+- **`docs-vision.mdc`:** Speeds + eye + `--check` service verify.
+- **Vision tools:** Speeds/eye/prune verified (`poolai-vision-sync --check` ok, rev 406) — no code change.
+- **Docs:** HANDOFF/NEXT/README/INDEX/ENV/`file_list.csv`; FM §5.16 PH-SVC75…84.
+- **Product queue unchanged:** §5.12 **10** (band 87) · next session **`абракадабра`**. Open: PH-SVC34 · PH-SVC35.
+
 ## 2026-07-25 — GitHub App installation tokens (PH-SVC65…SVC74)
 
 - **Research:** [`docs/development/GITHUB_APP_INSTALLATION_TOKENS_2026-07-25.md`](../docs/development/GITHUB_APP_INSTALLATION_TOKENS_2026-07-25.md) — JWT-format `ghs_` (~520) + temporary override header; Actions `GITHUB_TOKEN` in scope.

@@ -7,9 +7,9 @@ alwaysApply: false
 # Cursor Environment Baseline
 
 - Keep Cursor workflows aligned with the installed local stack before making automation changes.
-- Baseline for this machine (verified 2026-07-24):
-  - `cursor`: **3.13.10** (`C:\Program Files\cursor\resources\app\bin\cursor.cmd` — not in MSYS2 PATH; confirm via `resources/app/package.json` `version`)
-  - `rustc`: 1.92.0
+- Baseline for this machine (verified 2026-07-27):
+  - `cursor`: **3.13.21** (`C:\Program Files\cursor\resources\app\bin\cursor.cmd` — not in MSYS2 PATH; confirm via `resources/app/package.json` `version`)
+  - `rustc`: 1.92.0 (rustup `stable-x86_64-pc-windows-gnu`; ignore MSYS2 pacman 1.87 if present)
   - `cargo`: 1.92.0
   - `git`: 2.50.0 (MSYS2 UCRT64)
 
@@ -18,23 +18,25 @@ alwaysApply: false
 - When updating `.cursor/commands/`, `.cursor/hooks.json`, or `.cursor/rules/`, validate current CLI output first.
 - Re-check tool versions after OS/package updates using:
   - Cursor: `package.json` under `C:\Program Files\cursor\resources\app\` (or `cursor.cmd --version` outside MSYS2)
-  - `rustc --version`
+  - `rustc --version` (with `RUSTUP_TOOLCHAIN=stable-x86_64-pc-windows-gnu`)
   - `cargo --version`
   - `git --version`
 
 ## Cursor release alignment (latest known)
 
-- **Local desktop build:** **3.13.10** (2026-07-24). Patch line after 3.12.30 — includes Windows Agents Window Changes-tab fix (forum); **not** a new numbered public feature write-up (changelog still tops at **3.11** + Jul 22 Router).
+- **Local desktop build:** **3.13.21** (2026-07-27). Patch after **3.13.10** — Windows Agents Changes-tab / switch-agent chat / subagent back-nav fixes expected on 3.13 line; **not** a new numbered public feature write-up (changelog still tops at **3.11** + Jul 22 Router).
 - **Public changelog:** latest **numbered** IDE release is **3.11** (Jul 10, 2026): side chats (`/side`, `/btw`), Agents Window transcript search (Cmd/Ctrl+K), cloud conversation hooks. Jul 17 = Slack-only. Jul 22 = **Cursor Router** (Auto Cost/Balance/Intelligence).
-- Post-update research: [`docs/development/CURSOR_UPDATE_RESEARCH_2026-07-24.md`](../../docs/development/CURSOR_UPDATE_RESEARCH_2026-07-24.md) · previous [`…2026-07-22.md`](../../docs/development/CURSOR_UPDATE_RESEARCH_2026-07-22.md).
+- Post-update research: [`docs/development/CURSOR_UPDATE_RESEARCH_2026-07-27.md`](../../docs/development/CURSOR_UPDATE_RESEARCH_2026-07-27.md) · previous [`…2026-07-24.md`](../../docs/development/CURSOR_UPDATE_RESEARCH_2026-07-24.md).
 
 ## Automatic execution (Run Modes)
 
 - **Settings → Agents → Approvals & Execution.** Prefer **Auto-review** for PoolAI drain / `абракадабра` (not **Run Everything**).
-- Project steer: [`.cursor/permissions.json`](../permissions.json) — allow MSYS2/`cargo`/`git` drain; block force-push, secrets, history rewrite, Python product files.
+- Project steer: [`.cursor/permissions.json`](../permissions.json) — allow MSYS2/`cargo`/`git`/vision-sync drain; block force-push, secrets, history rewrite, Python product files.
+- **sandbox.json:** optional; Seatbelt/Landlock documented for macOS/Linux. Windows VDT (MSYS2) often runs unsandboxed via classifier — do **not** add project `sandbox.json` without OWNER.
 - Legacy YOLO / Auto-Run naming → **Run Modes** (3.6+). Write **Auto-review** in rules, not YOLO.
 - Cloud Agents do **not** use Run Modes.
 - Chat **Mode** (Agent/Plan via Shift+Tab) is separate from Run Mode.
+- **Cursor Router (Auto):** for long `абракадабра` drain prefer **Balance** or **Intelligence** (not Cost).
 
 ## GitHub Actions tokens (2026-07-25)
 
@@ -45,11 +47,13 @@ alwaysApply: false
 
 ## Ops notes
 
-- Agents Window Changes empty on Windows was a 3.12.x bug (`cwd=`); expect fix on **3.13** line.
+- Agents Window Changes empty on Windows was a 3.12.x bug (`cwd=`); expect fix on **3.13** line (verify on **3.13.21**).
 - Agents Window flicker з темою **Cursor Dark High Contrast** — перемкнути тему (forum Jul 21); не змінює VDT drain.
+- Remote SSH `crepectl`/GLIBC 2.39 (Ubuntu 22.04) — **N/A** для local Windows PoolAI.
 - **3.7.x** carry-over: Agents Window, tiled layout, **Task** subagents, **`/multitask`**.
 - **Multitask:** `/multitask` + фонові Task subagents; довгі `cargo test-ci` — через `shell` subagent або background shell; оркестратор не блокується на drain.
 - **Modes (Shift+Tab / mode picker):** Plan — лише для неоднозначного scope; **`абракадабра`** і drain — **Agent** (реалізація + MSYS2). Mode switch = fresh context.
 - Subagent types (лише за явним запитом, не в drain): `bugbot`, `security-review`, `best-of-n-runner`; див. [`poolai-agent-roles.mdc`](poolai-agent-roles.mdc).
+- **PoolAI vision tools:** Speeds panel + eye filter + prune closed ≤2000 — [`docs/vision/README.md`](../../docs/vision/README.md); `poolai-vision-sync --check` before service close.
 - Prefer rules that are resilient to UI updates: focus on repository conventions, not fragile UI click paths.
 - Skills live under user `~/.cursor/skills-cursor/`; repo rules under `.cursor/rules/` — do not duplicate skill content in rules.

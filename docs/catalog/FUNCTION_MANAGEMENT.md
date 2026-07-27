@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-07-27 (project completion path · band 86 ✅ · band 87 horizon · GH tokens PH-SVC65…74 ✅ · Cursor **3.13.10**)
+**Оновлено:** 2026-07-27 (project completion path · band 86 ✅ · band 87 horizon · Cursor **3.13.21** PH-SVC75…84 ✅ · GH tokens PH-SVC65…74 ✅)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -2310,14 +2310,24 @@ FM-xxx (з таблиці нижче)
 | **PH-SVC72** | `file_list.csv` + `.cursor/CHANGELOG` | GITHUB_APP_INSTALLATION_TOKENS row | **✅** |
 | **PH-SVC73** | `poolai-vision-sync --check` | drift gate green | **✅** |
 | **PH-SVC74** | git push + самарі | service commit `main` | **✅** |
+| **PH-SVC75** | Cursor 3.13.21 + toolchain research | `CURSOR_UPDATE_RESEARCH_2026-07-27.md` | **✅** |
+| **PH-SVC76** | `cursor-environment-baseline.mdc` | 3.13.21 + Router/sandbox notes | **✅** |
+| **PH-SVC77** | agent-roles + orchestrator + permissions | desktop 3.13.21; vision allow | **✅** |
+| **PH-SVC78** | Vision tools state verify | Speeds/eye/prune; `--check` ok rev 406 | **✅** |
+| **PH-SVC79** | HANDOFF + NEXT_SESSION | service zriz; next `абракадабра` | **✅** |
+| **PH-SVC80** | README / INDEX / ENV pointer | Jul 27 research | **✅** |
+| **PH-SVC81** | `file_list.csv` + `.cursor/CHANGELOG` | CURSOR_UPDATE_2026-07-27 | **✅** |
+| **PH-SVC82** | docs-vision Speeds cross-link | SPEED_INDEX + 3.13.21 pointer | **✅** |
+| **PH-SVC83** | `poolai-vision-sync --check` | drift gate green | **✅** |
+| **PH-SVC84** | git push + самарі | service commit `main` | **✅** |
 
-**Наступний service trigger:** **`абракадабра`** → drain band 87 · **PH-SVC34** re-verify GH after push (watch JWT-format `GITHUB_TOKEN`) · **PH-SVC35** OWNER (Atlassian revoke). **Відкриті service:** PH-SVC34 · PH-SVC35 (OWNER). GH tokens band PH-SVC65…SVC74 ✅ · Security PH-SVC55…SVC64 ✅.
+**Наступний service trigger:** **`абракадабра`** → drain band 87 · **PH-SVC34** re-verify GH after push (watch JWT-format `GITHUB_TOKEN`) · **PH-SVC35** OWNER (Atlassian revoke). **Відкриті service:** PH-SVC34 · PH-SVC35 (OWNER). Cursor **3.13.21** PH-SVC75…SVC84 ✅ · GH tokens PH-SVC65…SVC74 ✅ · Security PH-SVC55…SVC64 ✅.
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S262)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-27):** band 87 **PH-S1509…S1518** `[ ]` · §5.12 **10** · band 86 ✅ · band 85 ✅ · service PH-SVC65…SVC74 ✅ (GH App tokens) · PH-SVC55…SVC64 ✅ · PH-SVC45…SVC54 ✅ · P0 PH-SVC41…43 ✅ · PH-SVC34/35 · наступна **`абракадабра`** → band 87 · completion pending **770** → S2278.
+**Активна смуга (2026-07-27):** band 87 **PH-S1509…S1518** `[ ]` · §5.12 **10** · band 86 ✅ · band 85 ✅ · service PH-SVC75…SVC84 ✅ (Cursor 3.13.21) · PH-SVC65…SVC74 ✅ · PH-SVC55…SVC64 ✅ · PH-SVC45…SVC54 ✅ · P0 PH-SVC41…43 ✅ · PH-SVC34/35 · наступна **`абракадабра`** → band 87 · completion pending **770** → S2278.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

@@ -1,26 +1,27 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-27 (band 86 **PH-S1499…S1508** ✅ · band 85 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 87 ready)
+**Оновлено:** 2026-07-27 (service **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · band 86 **PH-S1499…S1508** ✅ · band 85 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 87 ready)
 
 **Наступна сесія:** **`абракадабра`** — drain band 87 (FM **§5.68** Policies docs-canon aggregate) · після drain — [`SPEED_INDEX.md`](./SPEED_INDEX.md) (`bash bin/record-test-ci-speed.sh`) + Speeds panel у vision.
 
-## P0 / service (2026-07-25)
+## P0 / service (2026-07-27)
 
 | # | Sprint | Фокус | Статус |
 |---|--------|--------|--------|
-| 1 | **PH-SVC65…74** | GitHub App / Actions installation tokens: opaque JWT ~520; rules + SECRETS §5 | **✅** |
-| 2 | **PH-SVC55…64** | Security hygiene: untrack PEMs + audit logs; `.gitignore`; permissions; docs | **✅** |
-| 3 | **PH-SVC41** | Pa11y: drop invalid `cargo build --debug` | **✅** |
-| 4 | **PH-SVC42** | Playwright: same `--debug` fix | **✅** |
-| 5 | **PH-SVC43** | Docs: TLS reload `block_in_place`+`await` for `cargo doc --features jwt,https` | **✅** |
-| 6 | **PH-SVC45…54** | Cursor 3.13.10 + Auto-review + vision eye/prune ≤2000 | **✅** |
-| 7 | **PH-SVC34** | Re-verify GH Actions after push (JWT-format `GITHUB_TOKEN` ok) | **[ ]** |
-| 8 | **PH-SVC35** | Secret scanning #1 Atlassian — **revoke у Atlassian** | **[ ]** OWNER |
-| 9 | **PH-SVC31…33 / 36…40 / 44** | prior service | **✅** |
+| 1 | **PH-SVC75…84** | Cursor 3.13.21 research + rules/agents + vision tools verify | **✅** |
+| 2 | **PH-SVC65…74** | GitHub App / Actions installation tokens: opaque JWT ~520; rules + SECRETS §5 | **✅** |
+| 3 | **PH-SVC55…64** | Security hygiene: untrack PEMs + audit logs; `.gitignore`; permissions; docs | **✅** |
+| 4 | **PH-SVC41** | Pa11y: drop invalid `cargo build --debug` | **✅** |
+| 5 | **PH-SVC42** | Playwright: same `--debug` fix | **✅** |
+| 6 | **PH-SVC43** | Docs: TLS reload `block_in_place`+`await` for `cargo doc --features jwt,https` | **✅** |
+| 7 | **PH-SVC45…54** | Cursor 3.13.10 + Auto-review + vision eye/prune ≤2000 | **✅** |
+| 8 | **PH-SVC34** | Re-verify GH Actions after push (JWT-format `GITHUB_TOKEN` ok) | **[ ]** |
+| 9 | **PH-SVC35** | Secret scanning #1 Atlassian — **revoke у Atlassian** | **[ ]** OWNER |
+| 10 | **PH-SVC31…33 / 36…40 / 44** | prior service | **✅** |
 
 Канон secret: [`SECRETS_MANAGEMENT.md`](../security/SECRETS_MANAGEMENT.md) §1/§4/§5 · local TLS [`certs/README.md`](../../certs/README.md) · GH tokens [`GITHUB_APP_INSTALLATION_TOKENS_2026-07-25.md`](./GITHUB_APP_INSTALLATION_TOKENS_2026-07-25.md). Сталевий стан: [`STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md).
 
-**Cursor / toolchain (service):** local desktop **3.13.10** · Auto-review · Cursor research [`CURSOR_UPDATE_RESEARCH_2026-07-24.md`](./CURSOR_UPDATE_RESEARCH_2026-07-24.md) · FM **§5.16**.
+**Cursor / toolchain (service):** local desktop **3.13.21** · Auto-review · Router Balance/Intelligence for drain · vision Speeds/eye verified · research [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](./CURSOR_UPDATE_RESEARCH_2026-07-27.md) · FM **§5.16**.
 
 **Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **770** спринтів → PH-S2278.
 
