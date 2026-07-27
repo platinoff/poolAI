@@ -2864,6 +2864,18 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_development_GROK_BUILD_VS_POOLAI_RESEARCH_2026_07_27_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_SPEED_INDEX_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_vision_speed_index_json"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -11331,9 +11343,30 @@
       "label": "GROK_BUILD_VS_POOLAI_RESEARCH_2026-07-27.md",
       "layer": "L1",
       "path": "docs/development/GROK_BUILD_VS_POOLAI_RESEARCH_2026-07-27.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_SPEED_INDEX_md",
+      "label": "SPEED_INDEX.md",
+      "layer": "L1",
+      "path": "docs/development/SPEED_INDEX.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_vision_speed_index_json",
+      "label": "speed_index.json",
+      "layer": "L1",
+      "path": "docs/vision/speed_index.json"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_bin_poolai_speed_index_rs",
+      "label": "poolai_speed_index.rs",
+      "layer": "L3",
+      "path": "src/bin/poolai_speed_index.rs"
     }
   ],
-  "revision": 403,
+  "revision": 404,
   "sprint_queue": [
     {
       "acceptance": "depth enum + aggregate criteria registry",
