@@ -75,6 +75,9 @@ docs/development/.commit-msg-*.txt
 comitmsg/*
 !comitmsg/README.md
 
+# Local marketing assets / social drafts (not product docs)
+docs/marketing/
+
 # OS files
 .DS_Store
 Thumbs.db
