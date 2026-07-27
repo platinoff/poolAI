@@ -47,6 +47,9 @@ use poolai_ui_core::policy_api_contracts_depth::{
     policy_api_criteria_total, POLICY_API_CASES, POLICY_API_CRITERIA,
 };
 use poolai_ui_core::policy_depth::{policy_criteria_total, POLICY_CASES, POLICY_CRITERIA};
+use poolai_ui_core::policy_loc_audit_depth::{
+    policy_loc_audit_criteria_total, POLICY_LOC_AUDIT_CASES, POLICY_LOC_AUDIT_CRITERIA,
+};
 use poolai_ui_core::policy_stand_smoke_depth::{
     policy_stand_smoke_criteria_total, POLICY_STAND_SMOKE_CASES, POLICY_STAND_SMOKE_CRITERIA,
 };
@@ -276,6 +279,8 @@ struct AuditConfig {
     policy_admin_ops: bool,
     /// Emit band-85 policies stand-smoke fields (PH-S1494).
     policy_stand_smoke: bool,
+    /// Emit band-86 policies loc-audit aggregate fields (PH-S1504).
+    policy_loc_audit: bool,
 }
 
 impl Default for AuditConfig {
@@ -326,6 +331,7 @@ impl Default for AuditConfig {
             policy_api: false,
             policy_admin_ops: false,
             policy_stand_smoke: false,
+            policy_loc_audit: false,
         }
     }
 }
@@ -623,6 +629,12 @@ struct RustRatioReport {
     policy_stand_smoke_criteria_total: usize,
     /// Policies stand-smoke criteria met count (PH-S1494).
     policy_stand_smoke_criteria_met_count: usize,
+    /// Band-86 policies loc-audit aggregate mode (PH-S1504).
+    policy_loc_audit_mode: bool,
+    /// Policies loc-audit criteria registry size (PH-S1504).
+    policy_loc_audit_criteria_total: usize,
+    /// Policies loc-audit criteria met count (PH-S1504).
+    policy_loc_audit_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -983,6 +995,22 @@ fn policy_policy_stand_smoke_criteria_met(root: &Path) -> (usize, usize) {
     let total = policy_stand_smoke_criteria_total();
     let mut met = 0usize;
     for (_, marker, rel) in POLICY_STAND_SMOKE_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
+fn policy_policy_loc_audit_criteria_met(root: &Path) -> (usize, usize) {
+    let total = policy_loc_audit_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in POLICY_LOC_AUDIT_CRITERIA {
         let path = root.join(rel);
         if path.is_file() {
             if let Ok(content) = fs::read_to_string(&path) {
@@ -1409,11 +1437,12 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--audit-ratio-advisory" => config.audit_ratio_advisory = true,
             "--audit-horizon" => config.audit_horizon = true,
             "--audit" => config.audit = true,
-            "--policy" => config.policy = true,
             "--policy-store" => config.policy_store = true,
             "--policy-api" => config.policy_api = true,
             "--policy-admin-ops" => config.policy_admin_ops = true,
             "--policy-stand-smoke" => config.policy_stand_smoke = true,
+            "--policy-loc-audit" => config.policy_loc_audit = true,
+            "--policy" => config.policy = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
                 print_help();
@@ -1476,6 +1505,7 @@ fn print_help() {
            --policy-api                band-83 policies HTTP API contracts fields (PH-S1475)\n\
            --policy-admin-ops          band-84 policies admin/ops fields (PH-S1485)\n\
            --policy-stand-smoke        band-85 policies stand-smoke fields (PH-S1494)\n\
+           --policy-loc-audit          band-86 policies loc-audit aggregate fields (PH-S1504)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -1996,6 +2026,19 @@ fn build_report(
         notes.push("PH-S1498: band 85 policies stand smoke — criteria met vs registry");
     }
 
+    let (policy_loc_audit_criteria_met_count, policy_loc_audit_criteria_total_count) =
+        if config.policy_loc_audit {
+            policy_policy_loc_audit_criteria_met(root)
+        } else {
+            (0, policy_loc_audit_criteria_total())
+        };
+    if config.policy_loc_audit {
+        notes.push(
+            "PH-S1504: policy_loc_audit_mode — aggregate band 81–85 --policy* loc-audit slices",
+        );
+        notes.push("PH-S1508: band 86 policies loc-audit — criteria met vs registry");
+    }
+
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
         sprint: SPRINT,
@@ -2146,6 +2189,9 @@ fn build_report(
         policy_stand_smoke_mode: config.policy_stand_smoke,
         policy_stand_smoke_criteria_total: policy_stand_smoke_criteria_total_count,
         policy_stand_smoke_criteria_met_count,
+        policy_loc_audit_mode: config.policy_loc_audit,
+        policy_loc_audit_criteria_total: policy_loc_audit_criteria_total_count,
+        policy_loc_audit_criteria_met_count,
         by_category,
         notes,
     })
@@ -2595,6 +2641,17 @@ fn print_summary(report: &RustRatioReport) {
         println!(
             "  policy_stand_smoke_cases: {}",
             POLICY_STAND_SMOKE_CASES.join(", ")
+        );
+    }
+    if report.policy_loc_audit_mode {
+        println!("  policy_loc_audit:      true (PH-S1504 band 86)");
+        println!(
+            "  policy_loc_audit_criteria: {}/{} met",
+            report.policy_loc_audit_criteria_met_count, report.policy_loc_audit_criteria_total
+        );
+        println!(
+            "  policy_loc_audit_cases: {}",
+            POLICY_LOC_AUDIT_CASES.join(", ")
         );
     }
     for (name, loc) in &report.by_category {

@@ -50,6 +50,7 @@ pub mod payout_batch;
 pub mod policy_admin_ops_depth;
 pub mod policy_api_contracts_depth;
 pub mod policy_depth;
+pub mod policy_loc_audit_depth;
 pub mod policy_stand_smoke_depth;
 pub mod policy_store_depth;
 pub mod pre_push_hook_depth;

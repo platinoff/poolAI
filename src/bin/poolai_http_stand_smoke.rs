@@ -6571,6 +6571,48 @@ mod tests {
     }
 
     #[test]
+    fn policy_loc_audit_band86_export_shape_ph_s1503() {
+        use poolai_ui_core::policy_loc_audit_depth::{
+            policy_loc_audit_criteria_total, policy_loc_audit_depth_stub,
+            policy_loc_audit_slices_met, PolicyLocAuditDepth, FM_BAND86_ROWS,
+            POLICY_LOC_AUDIT_CASES, POLICY_LOC_AUDIT_CRITERIA, POLICY_LOC_AUDIT_SLICES,
+        };
+        use serde_json::json;
+        assert_eq!(
+            policy_loc_audit_depth_stub(Some(&json!({"stand_smoke_export": true}))),
+            PolicyLocAuditDepth::StandSmokeExport
+        );
+        assert_eq!(
+            policy_loc_audit_depth_stub(Some(&json!({
+                "policy_loc_audit_depth": true,
+                "slice_aggregate": true,
+                "criteria_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "policy_loc_audit_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            PolicyLocAuditDepth::FullBand86
+        );
+        assert_eq!(POLICY_LOC_AUDIT_CRITERIA.len(), 10);
+        assert_eq!(policy_loc_audit_criteria_total(), 10);
+        assert_eq!(POLICY_LOC_AUDIT_SLICES.len(), 5);
+        assert!(POLICY_LOC_AUDIT_CASES.contains(&"aggregate_flag"));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert_eq!(policy_loc_audit_slices_met(loc_audit), (5, 5));
+        assert!(loc_audit.contains("--policy-loc-audit"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND86_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band86 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn policy_admin_ops_band84_export_shape_ph_s1485() {
         use poolai_ui_core::policy_admin_ops_depth::{
             policy_admin_ops_criteria_total, policy_admin_ops_depth_stub, PolicyAdminOpsDepth,

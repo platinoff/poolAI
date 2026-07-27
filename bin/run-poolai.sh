@@ -95,6 +95,7 @@ Options (quick):
   --policy-api    After health wait, loc-audit --policy-api (PH-S1474)
   --policy-admin-ops After health wait, loc-audit --policy-admin-ops (PH-S1484)
   --policy-stand-smoke After health wait, stand smoke + loc-audit --policy-stand-smoke (PH-S1495)
+  --policy-loc-audit After health wait, loc-audit --policy-loc-audit aggregate (PH-S1502)
   --skip-build    Skip cargo build
   --port N        HTTP port (default 8080)
 
@@ -313,6 +314,7 @@ cmd_quick() {
   local policy_api=0
   local policy_admin_ops=0
   local policy_stand_smoke=0
+  local policy_loc_audit=0
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --skip-build) SKIP_BUILD=1; shift ;;
@@ -352,11 +354,12 @@ cmd_quick() {
       --audit-ratio-advisory) audit_ratio_advisory=1; shift ;;
       --audit-horizon) audit_horizon=1; shift ;;
       --audit) audit=1; shift ;;
+      --policy-admin-ops) policy_admin_ops=1; shift ;;
+      --policy-stand-smoke) policy_stand_smoke=1; shift ;;
+      --policy-loc-audit) policy_loc_audit=1; shift ;;
       --policy) policy=1; shift ;;
       --policy-store) policy_store=1; shift ;;
       --policy-api) policy_api=1; shift ;;
-      --policy-admin-ops) policy_admin_ops=1; shift ;;
-      --policy-stand-smoke) policy_stand_smoke=1; shift ;;
       --port) PORT="$2"; shift 2 ;;
       *) echo "Unknown option: $1"; usage; exit 1 ;;
     esac
@@ -541,6 +544,10 @@ cmd_quick() {
     cargo run --quiet --bin poolai-http-stand-smoke -- --policy-stand-smoke
     echo "Running poolai-loc-audit --policy-stand-smoke (PH-S1495)..."
     cargo run --quiet --bin poolai-loc-audit -- --policy-stand-smoke
+  fi
+  if [[ "$policy_loc_audit" == "1" ]]; then
+    echo "Running poolai-loc-audit --policy-loc-audit (PH-S1502)..."
+    cargo run --quiet --bin poolai-loc-audit -- --policy-loc-audit
   fi
 }
 

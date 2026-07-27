@@ -1,8 +1,8 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-25 (band 85 **PH-S1489…S1498** ✅ · band 84 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 86 ready)
+**Оновлено:** 2026-07-27 (band 86 **PH-S1499…S1508** ✅ · band 85 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 87 ready)
 
-**Наступна сесія:** **`абракадабра`** — drain band 86 (FM **§5.67** Policies loc-audit aggregate) · після drain — [`SPEED_INDEX.md`](./SPEED_INDEX.md) (`bash bin/record-test-ci-speed.sh`) + Speeds panel у vision.
+**Наступна сесія:** **`абракадабра`** — drain band 87 (FM **§5.68** Policies docs-canon aggregate) · після drain — [`SPEED_INDEX.md`](./SPEED_INDEX.md) (`bash bin/record-test-ci-speed.sh`) + Speeds panel у vision.
 
 ## P0 / service (2026-07-25)
 
@@ -22,7 +22,7 @@
 
 **Cursor / toolchain (service):** local desktop **3.13.10** · Auto-review · Cursor research [`CURSOR_UPDATE_RESEARCH_2026-07-24.md`](./CURSOR_UPDATE_RESEARCH_2026-07-24.md) · FM **§5.16**.
 
-**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **790** спринтів → PH-S2278.
+**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **770** спринтів → PH-S2278.
 
 ## Security findings closed (PH-SVC55…64, by severity)
 
@@ -35,7 +35,24 @@
 | **Low** | Corrupted MSYS path / e2e tmp artifacts | ignore patterns widened |
 | **Open (OWNER)** | PH-SVC35 Atlassian token (historical) | revoke in Atlassian; no history rewrite |
 
-## Band 86 — Policies loc-audit aggregate (PH-S1499…S1508, **ACTIVE**)
+## Band 87 — Policies docs-canon (PH-S1509…S1518, **ACTIVE**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1509** | `policy_docs_canon_depth` scaffold |
+| **PH-S1510** | Slice aggregate (`POLICIES_*.md`) |
+| **PH-S1511** | Criteria contracts |
+| **PH-S1512** | `VERIFY_POLICY_DOCS_CANON` + quick `--policy-docs-canon` |
+| **PH-S1513** | Stand smoke export shape band 87 |
+| **PH-S1514** | `poolai-loc-audit --policy-docs-canon` |
+| **PH-S1515** | Docs `POLICIES_DOCS_CANON.md` + canon |
+| **PH-S1516** | vision-sync --check |
+| **PH-S1517** | Ratio hold advisory |
+| **PH-S1518** | Band close |
+
+**§5.12:** **10** відкритих. **Vision:** rev **406**. **Pending completion:** **770** (→ PH-S2278).
+
+## Band 86 — Policies loc-audit aggregate (PH-S1499…S1508, ✅)
 
 | Sprint | Фокус |
 |--------|--------|
@@ -50,7 +67,7 @@
 | **PH-S1507** | Ratio hold advisory |
 | **PH-S1508** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **404**. **Pending completion:** **780** (→ PH-S2278).
+**PH-S1508 ✅ (2026-07-27):** `policy_loc_audit_depth.rs`; `POLICY_LOC_AUDIT_SLICES`; `--policy-loc-audit`; `VERIFY_POLICY_LOC_AUDIT`; `POLICIES_LOC_AUDIT.md`; `galaxy_horizon_s1499_integration`. Phase D Policies loc-audit aggregate closed.
 
 ## Band 85 — Policies stand smoke (PH-S1489…S1498, ✅)
 
