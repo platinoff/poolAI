@@ -49,6 +49,7 @@ pub struct TopologyGraphLayout {
 #[derive(Debug, Clone)]
 struct SimNode {
     id: String,
+    #[allow(dead_code)] // retained for future topology UI labels
     label: String,
     load: f32,
     x: f64,

@@ -743,20 +743,20 @@
 | **PH-S1567** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
 | **PH-S1568** | galaxy_horizon_s1559_integration | band close | **✅** |
 
-## Band 93 — PH-S1569…S1578 (E Monitoring · API contracts)
+## Band 93 — PH-S1569…S1578 (E Monitoring · API contracts) · **✅**
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1569** | `monitoring_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1570** | `monitoring` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1571** | `monitoring` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1572** | `monitoring` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1573** | Stand smoke `monitoring` export | export shape unit test | **[ ]** |
-| **PH-S1574** | poolai-loc-audit PH-S1574 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1575** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1576** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1577** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1578** | galaxy_horizon_s1569_integration | band close | **[ ]** |
+| **PH-S1569** | `monitoring_api_contracts_depth` + rustc unused | ui-core depth enum + criteria; rust_diagnostics unused batch | **✅** |
+| **PH-S1570** | monitoring query HTTP lifecycle | `monitoring_api_contracts_integration` | **✅** |
+| **PH-S1571** | `GET /monitoring/store` | MonitoringStoreWire HTTP | **✅** |
+| **PH-S1572** | OpenAPI MonitoringStoreWire | openapi schema + path | **✅** |
+| **PH-S1573** | alert-rules/validate fixtures | field fixtures HTTP | **✅** |
+| **PH-S1574** | `VERIFY_MONITORING_API` + `--monitoring-api` | verify-dev-stand / run-poolai | **✅** |
+| **PH-S1575** | Stand smoke + loc-audit `--monitoring-api` | export shape + rust_ratio | **✅** |
+| **PH-S1576** | Docs `MONITORING_API.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | **✅** |
+| **PH-S1577** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
+| **PH-S1578** | galaxy_horizon_s1569_integration | band close | **✅** |
 
 ## Band 94 — PH-S1579…S1588 (E Monitoring · admin/ops glue)
 

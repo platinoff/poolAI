@@ -531,6 +531,7 @@ struct ProviderEndpointWrappedUnits {
     units: HashMap<String, u64>,
 }
 
+#[allow(dead_code)] // reserved for live pricing oracle units map parse
 fn parse_live_units_map(raw: &str) -> Option<HashMap<String, u64>> {
     if let Ok(wrapped) = serde_json::from_str::<ProviderEndpointWrappedUnits>(raw) {
         if !wrapped.units.is_empty() {

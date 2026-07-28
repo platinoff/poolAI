@@ -177,6 +177,7 @@ pub fn apply_lease_failover(record: &mut JobRecord, now: DateTime<Utc>) -> bool 
 }
 
 /// Requeue when lease owner lacks required task capability (PH-S547).
+#[allow(dead_code)] // wired when capacity-preemption scheduler path lands
 pub fn apply_capacity_preemption_failover(
     record: &mut JobRecord,
     owner_has_required_capability: bool,

@@ -191,6 +191,8 @@ impl WindowsJobObjectLimiter {
         }
 
         let handle_id = self.job_handle_for(process_id).await?;
+        #[cfg(not(all(target_os = "windows", feature = "vm-isolation-windows")))]
+        let _ = handle_id;
 
         #[cfg(all(target_os = "windows", feature = "vm-isolation-windows"))]
         {

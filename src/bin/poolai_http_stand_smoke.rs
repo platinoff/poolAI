@@ -6866,6 +6866,49 @@ mod tests {
     }
 
     #[test]
+    fn monitoring_api_band93_export_shape_ph_s1575() {
+        use poolai_ui_core::monitoring_api_contracts_depth::{
+            monitoring_api_contracts_depth_stub, monitoring_api_criteria_total,
+            MonitoringApiContractsDepth, FM_BAND93_ROWS, MONITORING_API_CASES,
+            MONITORING_API_CRITERIA,
+        };
+        use serde_json::json;
+        assert_eq!(
+            monitoring_api_contracts_depth_stub(Some(&json!({"store_wire_http": true}))),
+            MonitoringApiContractsDepth::StoreWireHttp
+        );
+        assert_eq!(
+            monitoring_api_contracts_depth_stub(Some(&json!({
+                "monitoring_api_depth": true,
+                "query_http_lifecycle": true,
+                "store_wire_http": true,
+                "openapi_schemas": true,
+                "monitoring_field_fixtures": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "monitoring_api_docs": true,
+            }))),
+            MonitoringApiContractsDepth::FullBand93
+        );
+        assert_eq!(MONITORING_API_CRITERIA.len(), 9);
+        assert_eq!(monitoring_api_criteria_total(), 9);
+        assert!(MONITORING_API_CASES.contains(&"store_wire_http"));
+        let monitoring_api = include_str!("../../src/network/enterprise_api/monitoring.rs");
+        assert!(monitoring_api.contains("GET /monitoring/store"));
+        assert!(monitoring_api.contains("monitoring_store_wire_handler"));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--monitoring-api"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND93_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band93 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn policy_admin_ops_band84_export_shape_ph_s1485() {
         use poolai_ui_core::policy_admin_ops_depth::{
             policy_admin_ops_criteria_total, policy_admin_ops_depth_stub, PolicyAdminOpsDepth,

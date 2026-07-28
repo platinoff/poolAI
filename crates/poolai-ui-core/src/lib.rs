@@ -42,6 +42,7 @@ pub mod libs;
 pub mod memory;
 pub mod ml;
 pub mod modal;
+pub mod monitoring_api_contracts_depth;
 pub mod monitoring_depth;
 pub mod monitoring_store_depth;
 pub mod multi_module_depth;

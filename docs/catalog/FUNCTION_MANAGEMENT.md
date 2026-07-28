@@ -1221,7 +1221,26 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 92 ✅ · band 93 next). **Master horizon:** PH-S1569…S1578 (band 93). **Completion pending:** PH-S1569…S2278 = **710** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **420**. **Наступна сесія:** **`абракадабра`** — project scan / band 93.
+**Відкритих у §5.12:** **0** (band 93 ✅ · band 94 next). **Master horizon:** PH-S1579…S1588 (band 94). **Completion pending:** PH-S1579…S2278 = **700** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **421**. **Наступна сесія:** **`абракадабра`** — project scan / band 94.
+
+### 5.74 Monitoring API contracts queue — band 93 (PH-S1569…S1578, 2026-07-28) · **✅**
+
+**Джерело:** project completion / enterprise phase E — Monitoring HTTP API contracts (mirror band 83 [`POLICIES_API.md`](../development/POLICIES_API.md) · band 73 [`AUDIT_API.md`](../development/AUDIT_API.md)). Prior store: [`MONITORING_STORE.md`](../development/MONITORING_STORE.md) (band 92). Warnings-first: rustc unused batch from `rust_diagnostics` folded into PH-S1569. Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · master [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1504 | **PH-S1569** | `monitoring_api_contracts_depth` + rustc unused | ui-core + rust_diagnostics | depth enum + criteria; unused_imports/mut/vars/dead_code batch | **✅** |
+| 1505 | **PH-S1570** | monitoring query HTTP lifecycle | tests | `monitoring_query_http_lifecycle_ph_s1570` | **✅** |
+| 1506 | **PH-S1571** | `GET /monitoring/store` | network | `MonitoringStoreWire` over HTTP | **✅** |
+| 1507 | **PH-S1572** | OpenAPI `MonitoringStoreWire` | openapi.yaml | schema + `/monitoring/store` path | **✅** |
+| 1508 | **PH-S1573** | alert-rules/validate fixtures | tests | `monitoring_field_fixtures_http_ph_s1573` | **✅** |
+| 1509 | **PH-S1574** | `VERIFY_MONITORING_API` + `--monitoring-api` | verify/admin | verify-dev-stand / run-poolai | **✅** |
+| 1510 | **PH-S1575** | Stand smoke + loc-audit `--monitoring-api` | stand-smoke | export shape + rust_ratio fields | **✅** |
+| 1511 | **PH-S1576** | Docs `MONITORING_API.md` + canon | RUN_LOCAL/INDEX | HANDOFF/NEXT sync | **✅** |
+| 1512 | **PH-S1577** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **✅** |
+| 1513 | **PH-S1578** | galaxy_horizon_s1569_integration | tests/docs | band close | **✅** |
+
+**PH-S1578 ✅ (2026-07-28):** `monitoring_api_contracts_depth.rs`; `GET /monitoring/store`; `POST /monitoring/alert-rules/validate`; `--monitoring-api`; `VERIFY_MONITORING_API`; `MONITORING_API.md`; `galaxy_horizon_s1569_integration`. Phase E Monitoring API contracts closed.
 
 ### 5.73 Monitoring store wire queue — band 92 (PH-S1559…S1568, 2026-07-28) · **✅**
 
@@ -2264,7 +2283,7 @@ FM-xxx (з таблиці нижче)
 | **Enterprise subset pending** | **760** (S1389…S2148 → §5.17) |
 | **Extension pending** | **130** (S2149…S2278 → §5.18) |
 | **Drained** | band 51–74 PH-S1149…S1388 ✅ |
-| **Активна §5.12** | band 92 **PH-S1559…S1568** `✅` (§5.73) |
+| **Активна §5.12** | band 93 **PH-S1569…S1578** `✅` (§5.74) |
 | **План** | [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md) |
 | **Реєстр** | [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md) |
 | **Regen** | `bash scripts/generate-ph-s-master-backlog-1000.sh` · `bash scripts/generate-ph-s-completion-extension.sh` |
@@ -2423,7 +2442,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-28):** band 92 **PH-S1559…S1568** `✅` · §5.12 **0** · band 91 ✅ · band 90 ✅ · service PH-SVC75…SVC84 ✅ (Cursor 3.13.21) · PH-SVC65…SVC74 ✅ · PH-SVC55…SVC64 ✅ · PH-SVC45…SVC54 ✅ · P0 PH-SVC41…43 ✅ · PH-SVC34/35 · наступна **`абракадабра`** → band 93 · completion pending **710** → S2278.
+**Активна смуга (2026-07-28):** band 93 **PH-S1569…S1578** `✅` · §5.12 **0** · band 92 ✅ · band 91 ✅ · band 90 ✅ · service PH-SVC75…SVC84 ✅ (Cursor 3.13.21) · PH-SVC65…SVC74 ✅ · PH-SVC55…SVC64 ✅ · PH-SVC45…SVC54 ✅ · P0 PH-SVC41…43 ✅ · PH-SVC34/35 · наступна **`абракадабра`** → band 94 · completion pending **700** → S2278.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

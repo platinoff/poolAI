@@ -4929,6 +4929,38 @@ paths:
         '503':
           description: Security manager unavailable
 
+  /monitoring/store:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseMonitoring
+      summary: Monitoring store wire status
+      description: |
+        Returns the band-92 durable-path wire snapshot (`mode`, `durable_path`, `configured`).
+        Unauthenticated read for ops / admin glue (PH-S1571/S1572).
+      operationId: getMonitoringStoreWire
+      responses:
+        '200':
+          description: Monitoring store wire snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MonitoringStoreWire'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Subsystem unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /monitoring/alerts:
     servers:
       - url: http://localhost:8080/api/enterprise
@@ -5167,6 +5199,54 @@ paths:
           description: Forbidden
         '503':
           description: Monitoring manager unavailable
+
+  /monitoring/alert-rules/validate:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    post:
+      tags:
+        - EnterpriseMonitoring
+      summary: Validate alert rule fields (no durable write)
+      description: Field fixtures for missing name / invalid operator (PH-S1573).
+      operationId: validateMonitoringAlertRule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                metric:
+                  type: string
+                threshold:
+                  type: number
+                operator:
+                  type: string
+                severity:
+                  type: string
+                enabled:
+                  type: boolean
+      responses:
+        '200':
+          description: Fields valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valid:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /security/sso/store:
     servers:
@@ -9681,6 +9761,24 @@ components:
     PolicyStoreWire:
       type: object
       description: Band-82/83 policy store wire snapshot exposed over HTTP (PH-S1471/S1472)
+      required:
+        - mode
+        - configured
+      properties:
+        mode:
+          type: string
+          description: "`memory` or `sqlite`"
+        durable_path:
+          type: string
+          nullable: true
+          description: Resolved sqlite file path when configured
+        configured:
+          type: boolean
+          description: True when sqlite mode has a durable path
+
+    MonitoringStoreWire:
+      type: object
+      description: Band-92/93 monitoring store wire snapshot exposed over HTTP (PH-S1571/S1572)
       required:
         - mode
         - configured

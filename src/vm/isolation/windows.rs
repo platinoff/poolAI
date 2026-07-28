@@ -11,7 +11,9 @@ use crate::vm::isolation::{
 };
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-use tracing::{info, warn};
+use tracing::info;
+#[cfg(all(target_os = "windows", feature = "vm-isolation-windows"))]
+use tracing::warn;
 
 #[cfg(all(target_os = "windows", feature = "vm-isolation-windows"))]
 mod windows_native;
@@ -36,6 +38,7 @@ impl WindowsNetworkIsolator {
             .cloned()
     }
 
+    #[allow(dead_code)] // ops introspection helper
     pub fn list_appcontainer_states(&self) -> Vec<(u32, AppContainerState)> {
         self.appcontainer_states
             .lock()
@@ -76,6 +79,10 @@ impl NetworkIsolator for WindowsNetworkIsolator {
             process_id, config.allow_loopback, config.allowed_interfaces, config.allowed_ports
         );
 
+        #[cfg_attr(
+            not(all(target_os = "windows", feature = "vm-isolation-windows")),
+            allow(unused_mut)
+        )]
         let mut state = plan_network_isolation(process_id, config);
 
         #[cfg(all(target_os = "windows", feature = "vm-isolation-windows"))]
@@ -167,6 +174,7 @@ impl WindowsFilesystemIsolator {
             .cloned()
     }
 
+    #[allow(dead_code)] // ops introspection helper
     pub fn list_appcontainer_states(&self) -> Vec<(u32, AppContainerState)> {
         self.appcontainer_states
             .lock()
@@ -215,6 +223,10 @@ impl FilesystemIsolator for WindowsFilesystemIsolator {
             config.read_only_paths.len()
         );
 
+        #[cfg_attr(
+            not(all(target_os = "windows", feature = "vm-isolation-windows")),
+            allow(unused_mut)
+        )]
         let mut state = plan_filesystem_isolation(process_id, config)?;
 
         #[cfg(all(target_os = "windows", feature = "vm-isolation-windows"))]

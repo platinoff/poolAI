@@ -1,6 +1,6 @@
 # Monitoring Store Wire — Enterprise Phase E (Band 92)
 
-Canonical doc: [`MONITORING_STORE.md`](./MONITORING_STORE.md) (band 92, PH-S1565).
+Canonical doc: [`MONITORING_STORE.md`](./MONITORING_STORE.md) (band 92, PH-S1565). Prev: [`MONITORING_DEPTH.md`](./MONITORING_DEPTH.md) (band 91 ✅). Next: [`MONITORING_API.md`](./MONITORING_API.md) (band 93 ✅).
 
 ## Overview
 

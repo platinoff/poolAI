@@ -81,6 +81,8 @@ pub fn create_enterprise_api_routes() -> Router<ApiContext> {
         .route("/audit/events", get(audit_events_query_handler))
         .route("/audit/events/validate", post(audit_event_validate_handler))
         // Monitoring
+        // Static store path (PH-S1571) — before other monitoring routes.
+        .route("/monitoring/store", get(monitoring_store_wire_handler))
         .route("/monitoring/alerts", get(monitoring_alerts_handler))
         .route(
             "/monitoring/alerts/{id}/acknowledge",
@@ -92,6 +94,11 @@ pub fn create_enterprise_api_routes() -> Router<ApiContext> {
             post(monitoring_dashboard_create_handler).layer(middleware::from_fn(auth_middleware)),
         )
         .route("/monitoring/metrics", get(monitoring_metrics_handler))
+        // Static validate path (PH-S1573) — before alert-rules create/list.
+        .route(
+            "/monitoring/alert-rules/validate",
+            post(monitoring_alert_rule_validate_handler),
+        )
         .route(
             "/monitoring/alert-rules",
             post(monitoring_alert_rule_create_handler).layer(middleware::from_fn(auth_middleware)),

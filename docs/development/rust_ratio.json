@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 182057,
-  "non_rust_product_loc": 9711,
-  "product_loc_total": 191768,
-  "rust_ratio": 0.9493606858287097,
-  "rust_ratio_pct": 94.93606858287097,
+  "rust_loc": 182569,
+  "non_rust_product_loc": 9728,
+  "product_loc_total": 192297,
+  "rust_ratio": 0.949411587284253,
+  "rust_ratio_pct": 94.94115872842531,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -166,9 +166,12 @@
   "monitoring_mode": false,
   "monitoring_criteria_total": 8,
   "monitoring_criteria_met_count": 0,
-  "monitoring_store_mode": true,
+  "monitoring_store_mode": false,
   "monitoring_store_criteria_total": 7,
-  "monitoring_store_criteria_met_count": 7,
+  "monitoring_store_criteria_met_count": 0,
+  "monitoring_api_mode": true,
+  "monitoring_api_criteria_total": 9,
+  "monitoring_api_criteria_met_count": 9,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -180,23 +183,23 @@
     },
     "ops_shell": {
       "files": 41,
-      "loc": 3975
+      "loc": 3992
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 110,
-      "loc": 23571
+      "files": 111,
+      "loc": 23754
     },
     "rust_src": {
       "files": 302,
-      "loc": 115560
+      "loc": 115758
     },
     "rust_tests": {
-      "files": 327,
-      "loc": 42318
+      "files": 329,
+      "loc": 42449
     },
     "ui_css": {
       "files": 2,
@@ -225,7 +228,9 @@
     "PH-S1008: multi-module band 35 hold advisory — in_formal_band true; target 95% hold until PH-S1010",
     "PH-S1010: product-complete band 36 — ratio_95_formal_gate_met; stretch 96% advisory if below_stretch_spirit",
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
-    "PH-S1564: monitoring_store_mode — durable path wire stub (POOLAI_MONITORING_STORE + DATA_DIR)",
-    "PH-S1568: band 92 monitoring store wire — criteria met vs registry"
+    "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
+    "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
+    "PH-S1575: monitoring_api_mode — query/store HTTP contracts + field fixtures",
+    "PH-S1578: band 93 monitoring API contracts — criteria met vs registry"
   ]
 }

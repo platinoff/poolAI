@@ -1,8 +1,8 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-28 (band 92 **PH-S1559…S1568** ✅ · band 91 ✅ · service **PH-SVC85** Rust diagnostics panel ✅ · **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · band 88 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 93 next)
+**Оновлено:** 2026-07-28 (band 93 **PH-S1569…S1578** ✅ · band 92 ✅ · band 91 ✅ · service **PH-SVC85** Rust diagnostics panel ✅ · **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · band 88 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 94 next)
 
-**Наступна сесія:** **`абракадабра`** — S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain band 93 · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+**Наступна сесія:** **`абракадабра`** — S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain band 94 · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
 
 ## P0 / service (2026-07-27)
 
@@ -24,7 +24,7 @@
 
 **Cursor / toolchain (service):** local desktop **3.13.21** · Auto-review · Router Balance/Intelligence for drain · vision Speeds/Rust/eye verified · research [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](./CURSOR_UPDATE_RESEARCH_2026-07-27.md) · FM **§5.16**.
 
-**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **710** спринтів → PH-S2278.
+**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **700** спринтів → PH-S2278.
 
 ## Security findings closed (PH-SVC55…64, by severity)
 
@@ -36,6 +36,25 @@
 | **Medium** | `.env` / `*.pem` / e2e log+pid gaps | `.gitignore` + permissions block staging |
 | **Low** | Corrupted MSYS path / e2e tmp artifacts | ignore patterns widened |
 | **Open (OWNER)** | PH-SVC35 Atlassian token (historical) | revoke in Atlassian; no history rewrite |
+
+## Band 93 — Monitoring API contracts (PH-S1569…S1578, **✅**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1569** | `monitoring_api_contracts_depth` + rustc unused batch |
+| **PH-S1570** | Query HTTP lifecycle (alerts/rules/metrics) |
+| **PH-S1571** | `GET /monitoring/store` |
+| **PH-S1572** | OpenAPI `MonitoringStoreWire` |
+| **PH-S1573** | `POST /monitoring/alert-rules/validate` fixtures |
+| **PH-S1574** | `VERIFY_MONITORING_API` + quick `--monitoring-api` |
+| **PH-S1575** | Stand smoke + loc-audit `--monitoring-api` |
+| **PH-S1576** | Docs `MONITORING_API.md` + canon |
+| **PH-S1577** | Ratio hold advisory |
+| **PH-S1578** | Band close |
+
+**PH-S1578 ✅ (2026-07-28):** `monitoring_api_contracts_depth.rs`; `GET /monitoring/store`; validate fixtures; `--monitoring-api`; `VERIFY_MONITORING_API`; `MONITORING_API.md`; `galaxy_horizon_s1569_integration`. Phase E Monitoring API contracts drained.
+
+**§5.12:** **0** відкритих. **Vision:** rev **421**. **Pending completion:** **700** (→ PH-S2278). **Next expected band:** 94 (`PH-S1579…S1588`, Monitoring admin/ops glue).
 
 ## Band 92 — Monitoring store wire (PH-S1559…S1568, **✅**)
 

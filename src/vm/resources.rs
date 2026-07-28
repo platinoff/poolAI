@@ -174,6 +174,7 @@ impl ResourceLimiter for PlatformResourceLimiter {
     }
 
     async fn get_usage(&self, process_id: u32) -> Result<ResourceUsage, AppError> {
+        let _ = process_id;
         #[cfg(target_os = "windows")]
         {
             return Ok(ResourceUsage {
@@ -185,7 +186,6 @@ impl ResourceLimiter for PlatformResourceLimiter {
 
         #[cfg(target_os = "linux")]
         {
-            let _ = process_id;
             return Ok(ResourceUsage {
                 cpu_percent: 0.0,
                 memory_mb: 0,

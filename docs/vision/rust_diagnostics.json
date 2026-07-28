@@ -2,28 +2,28 @@
   "schema_version": 1,
   "generated_at": "2026-07-28",
   "host_label": "PLATINOV",
-  "git_head": "63e7597e4",
+  "git_head": "fb466dd2d",
   "source": "local",
   "notes": [
     "Machine-readable Rust/Clippy warning+error index for vision Rust panel.",
     "Record via poolai-rust-diagnostics or bin/record-rust-diagnostics.sh (abrakadabra drain + CI)."
   ],
   "latest": {
-    "warnings": 173,
-    "errors": 5,
+    "warnings": 139,
+    "errors": 7,
     "ok": false,
-    "recorded_at": "2026-07-28T13:32:00Z",
+    "recorded_at": "2026-07-28T21:44:56Z",
     "command": "cargo clippy --message-format=json --all-targets --features jwt,https",
-    "wall_secs": 240.521277,
+    "wall_secs": 185.6193909,
     "top_codes": [
       "clippy::needless_borrows_for_generic_args×87",
-      "clippy::nonminimal_bool×17",
       "clippy::too_many_arguments×16",
-      "clippy::await_holding_lock×10",
-      "dead_code×7",
-      "unused_mut×5",
-      "clippy::derivable_impls×4",
-      "clippy::manual_clamp×4"
+      "clippy::await_holding_lock×9",
+      "E0432×5",
+      "clippy::manual_clamp×4",
+      "clippy::nonminimal_bool×3",
+      "E0425×2",
+      "clippy::items_after_test_module×2"
     ]
   },
   "history": [
@@ -110,6 +110,28 @@
         "unused_mut×5",
         "clippy::derivable_impls×4",
         "clippy::manual_clamp×4"
+      ]
+    },
+    {
+      "kind": "rust_diagnostics",
+      "command": "cargo clippy --message-format=json --all-targets --features jwt,https",
+      "warnings": 139,
+      "errors": 7,
+      "ok": false,
+      "recorded_at": "2026-07-28T21:44:56Z",
+      "wall_secs": 185.6193909,
+      "host_label": "PLATINOV",
+      "git_head": "fb466dd2d",
+      "source": "local",
+      "top_codes": [
+        "clippy::needless_borrows_for_generic_args×87",
+        "clippy::too_many_arguments×16",
+        "clippy::await_holding_lock×9",
+        "E0432×5",
+        "clippy::manual_clamp×4",
+        "clippy::nonminimal_bool×3",
+        "E0425×2",
+        "clippy::items_after_test_module×2"
       ]
     }
   ]

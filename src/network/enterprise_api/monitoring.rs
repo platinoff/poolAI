@@ -3,6 +3,7 @@
 use crate::core::error::ErrorContext;
 use crate::core::state::ApiContext;
 use crate::enterprise;
+use crate::enterprise::monitoring::{validate_monitoring_alert_fields, AlertRule, AlertSeverity};
 use crate::network::api::check_permission;
 use crate::network::auth::Claims;
 use crate::services::enterprise_service::{
@@ -17,12 +18,35 @@ use uuid::Uuid;
 
 use super::enterprise_json_err;
 
+/// GET /monitoring/store — band-92 wire snapshot over HTTP (PH-S1571).
+pub(super) async fn monitoring_store_wire_handler() -> impl IntoResponse {
+    Json(enterprise::monitoring::monitoring_store_wire())
+}
+
 #[derive(Deserialize)]
-#[allow(dead_code)]
 pub(super) struct MonitoringAlertsQuery {
     severity: Option<String>,
     tenant_id: Option<String>,
     acknowledged: Option<bool>,
+    /// Soft limit for contract pagination stub (PH-S1570).
+    limit: Option<usize>,
+}
+
+/// Body for POST /monitoring/alert-rules/validate — field fixtures without durable write (PH-S1573).
+#[derive(Deserialize)]
+pub(super) struct MonitoringAlertRuleValidateRequest {
+    #[serde(default)]
+    name: Option<String>,
+    #[serde(default)]
+    metric: Option<String>,
+    #[serde(default)]
+    threshold: Option<f64>,
+    #[serde(default)]
+    operator: Option<String>,
+    #[serde(default)]
+    severity: Option<String>,
+    #[serde(default)]
+    enabled: Option<bool>,
 }
 
 pub(super) async fn monitoring_alerts_handler(
@@ -36,7 +60,14 @@ pub(super) async fn monitoring_alerts_handler(
     };
 
     match EnterpriseService::list_monitoring_alerts(&ctx, q).await {
-        Ok(alerts) => Json(alerts).into_response(),
+        Ok(mut alerts) => {
+            if let Some(limit) = params.limit {
+                if alerts.len() > limit {
+                    alerts.truncate(limit);
+                }
+            }
+            Json(alerts).into_response()
+        }
         Err(EnterpriseMonitoringError::Init(e)) => enterprise_json_err(
             "MONITORING_MANAGER_UNAVAILABLE",
             format!("Monitoring manager not initialized: {}", e),
@@ -253,6 +284,58 @@ pub(super) async fn monitoring_alert_rules_handler(
             StatusCode::INTERNAL_SERVER_ERROR,
         )
         .into_response(),
+    }
+}
+
+/// POST /monitoring/alert-rules/validate — empty name/metric/operator → 400 fixtures (PH-S1573).
+pub(super) async fn monitoring_alert_rule_validate_handler(
+    Json(body): Json<MonitoringAlertRuleValidateRequest>,
+) -> impl IntoResponse {
+    let severity = match body.severity.as_deref() {
+        Some("INFO") | Some("info") => AlertSeverity::Info,
+        Some("ERROR") | Some("error") => AlertSeverity::Error,
+        Some("CRITICAL") | Some("critical") => AlertSeverity::Critical,
+        _ => AlertSeverity::Warning,
+    };
+    let rule = AlertRule {
+        name: body.name.unwrap_or_default(),
+        metric: body.metric.unwrap_or_default(),
+        threshold: body.threshold.unwrap_or(0.0),
+        operator: body.operator.unwrap_or_else(|| ">".to_string()),
+        severity,
+        enabled: body.enabled.unwrap_or(true),
+        tenant_id: None,
+    };
+
+    match validate_monitoring_alert_fields(&rule) {
+        Ok(()) => (
+            StatusCode::OK,
+            Json(serde_json::json!({
+                "valid": true,
+                "message": "Monitoring alert rule fields ok"
+            })),
+        )
+            .into_response(),
+        Err(e) => {
+            let msg = e.to_string();
+            let code = if msg.contains("name") {
+                "MONITORING_MISSING_NAME"
+            } else if msg.contains("metric") {
+                "MONITORING_MISSING_METRIC"
+            } else if msg.contains("operator") {
+                "MONITORING_INVALID_OPERATOR"
+            } else {
+                "MONITORING_VALIDATION_FAILED"
+            };
+            enterprise_json_err(
+                code,
+                msg,
+                ErrorContext::new("monitoring_alert_rule_validate")
+                    .with_hint("Set non-empty name/metric and a valid comparison operator."),
+                StatusCode::BAD_REQUEST,
+            )
+            .into_response()
+        }
     }
 }
 

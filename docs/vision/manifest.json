@@ -2982,7 +2982,7 @@
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S1568",
+  "last_sprint_closed": "PH-S1578",
   "layers": [
     {
       "id": "L0",
@@ -3015,7 +3015,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1569",
+  "next_sprint": "PH-S1579",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -11692,7 +11692,7 @@
       "path": "tests/monitoring_store_wire_integration.rs"
     }
   ],
-  "revision": 420,
+  "revision": 421,
   "sprint_queue": [],
   "sprint_queue_open_count": 0,
   "updated_at": "2026-06-20",
