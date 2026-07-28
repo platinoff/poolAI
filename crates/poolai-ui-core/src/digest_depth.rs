@@ -147,7 +147,7 @@ mod tests {
             }))),
             DigestDepth::FullDigest
         );
-        assert_eq!(GRID_MODULE_STEMS.len(), 57);
+        assert_eq!(GRID_MODULE_STEMS.len(), 59);
         assert_eq!(JOB_MODULE_STEMS.len(), 13);
     }
 }

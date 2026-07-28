@@ -1,6 +1,6 @@
 # Rust diagnostics — Clippy warning/error index
 
-**Оновлено:** 2026-07-27  
+**Оновлено:** 2026-07-28  
 **Артефакт:** [`rust_diagnostics.json`](./rust_diagnostics.json) · mirror [`../vision/rust_diagnostics.json`](../vision/rust_diagnostics.json)  
 **Bin:** `poolai-rust-diagnostics` · wrapper: `bin/record-rust-diagnostics.sh`  
 **UI:** Galaxy docs vision → panel **Rust** (`docs/vision/index.html`)  
@@ -13,6 +13,8 @@
 Відслідковувати **кількість warnings / errors** Clippy між сесіями **`абракадабра`** і з GitHub Actions — поруч зі Speeds panel, без ручного «clippy був ок».
 
 Сканування **без** `-D warnings`, щоб warnings лишались видимими (CI lint job з `-D` лишається окремим gate).
+
+**Project scan (`абракадабра`):** перед формуванням топ-10 PH-S* читати `latest` / `top_codes` (або `cargo run --bin poolai-rust-diagnostics -- --print`). Виправні warnings/errors — **пріоритет 0** у смузі (див. [`poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § Project scan). Повний `record-rust-diagnostics.sh` — на кінці drain (крок Test), не замість scan-time читання індексу.
 
 ---
 
@@ -73,4 +75,5 @@ Job **`rust-diagnostics`** (ubuntu):
 
 | Дата | Зміна |
 |------|--------|
+| 2026-07-28 | Project scan: читати індекс **до** топ-10 PH-S*; виправні warnings = пріоритет 0 |
 | 2026-07-27 | Перший index + Rust panel + CI job + `record-rust-diagnostics.sh` |

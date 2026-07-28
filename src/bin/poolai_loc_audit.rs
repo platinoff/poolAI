@@ -50,6 +50,9 @@ use poolai_ui_core::policy_depth::{policy_criteria_total, POLICY_CASES, POLICY_C
 use poolai_ui_core::policy_docs_canon_depth::{
     policy_docs_canon_criteria_total, POLICY_DOCS_CANON_CASES, POLICY_DOCS_CANON_CRITERIA,
 };
+use poolai_ui_core::policy_horizon_depth::{
+    policy_horizon_criteria_total, POLICY_HORIZON_CASES, POLICY_HORIZON_CRITERIA,
+};
 use poolai_ui_core::policy_loc_audit_depth::{
     policy_loc_audit_criteria_total, POLICY_LOC_AUDIT_CASES, POLICY_LOC_AUDIT_CRITERIA,
 };
@@ -297,6 +300,8 @@ struct AuditConfig {
     policy_vision_sync: bool,
     /// Emit band-89 policies ratio-advisory fields (PH-S1534).
     policy_ratio_advisory: bool,
+    /// Emit band-90 policies horizon-close fields (PH-S1544).
+    policy_horizon: bool,
 }
 
 impl Default for AuditConfig {
@@ -351,6 +356,7 @@ impl Default for AuditConfig {
             policy_docs_canon: false,
             policy_vision_sync: false,
             policy_ratio_advisory: false,
+            policy_horizon: false,
         }
     }
 }
@@ -672,6 +678,12 @@ struct RustRatioReport {
     policy_ratio_advisory_criteria_total: usize,
     /// Policies ratio-advisory criteria met count (PH-S1534).
     policy_ratio_advisory_criteria_met_count: usize,
+    /// Band-90 policies horizon-close mode (PH-S1544).
+    policy_horizon_mode: bool,
+    /// Policies horizon-close criteria registry size (PH-S1544).
+    policy_horizon_criteria_total: usize,
+    /// Policies horizon-close criteria met count (PH-S1544).
+    policy_horizon_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -1380,6 +1392,22 @@ fn audit_sso_horizon_criteria_met(root: &Path) -> (usize, usize) {
     (met, total)
 }
 
+fn audit_policy_horizon_criteria_met(root: &Path) -> (usize, usize) {
+    let total = policy_horizon_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in POLICY_HORIZON_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(text) = fs::read_to_string(&path) {
+                if text.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
 fn audit_sso_ratio_advisory_criteria_met(root: &Path) -> (usize, usize) {
     let total = sso_ratio_advisory_criteria_total();
     let mut met = 0usize;
@@ -1530,6 +1558,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--policy-docs-canon" => config.policy_docs_canon = true,
             "--policy-vision-sync" => config.policy_vision_sync = true,
             "--policy-ratio-advisory" => config.policy_ratio_advisory = true,
+            "--policy-horizon" => config.policy_horizon = true,
             "--policy" => config.policy = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
@@ -1597,6 +1626,7 @@ fn print_help() {
            --policy-docs-canon         band-87 policies docs-canon fields (PH-S1514)\n\
            --policy-vision-sync        band-88 policies vision-sync fields (PH-S1524)\n\
            --policy-ratio-advisory     band-89 policies ratio-advisory fields (PH-S1534)\n\
+           --policy-horizon            band-90 policies horizon-close fields (PH-S1544)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -2169,6 +2199,19 @@ fn build_report(
         notes.push("PH-S1538: band 89 policies ratio-advisory — criteria met vs registry");
     }
 
+    let (policy_horizon_criteria_met_count, policy_horizon_criteria_total_count) =
+        if config.policy_horizon {
+            audit_policy_horizon_criteria_met(root)
+        } else {
+            (0, policy_horizon_criteria_total())
+        };
+    if config.policy_horizon {
+        notes.push(
+            "PH-S1544: policy_horizon_mode — aggregate band 81–89 policy slices (phase D close)",
+        );
+        notes.push("PH-S1548: band 90 policies horizon close — criteria met vs registry");
+    }
+
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
         sprint: SPRINT,
@@ -2331,6 +2374,9 @@ fn build_report(
         policy_ratio_advisory_mode: config.policy_ratio_advisory,
         policy_ratio_advisory_criteria_total: policy_ratio_advisory_criteria_total_count,
         policy_ratio_advisory_criteria_met_count,
+        policy_horizon_mode: config.policy_horizon,
+        policy_horizon_criteria_total: policy_horizon_criteria_total_count,
+        policy_horizon_criteria_met_count,
         by_category,
         notes,
     })
@@ -2825,6 +2871,17 @@ fn print_summary(report: &RustRatioReport) {
         println!(
             "  policy_ratio_advisory_cases: {}",
             POLICY_RATIO_ADVISORY_CASES.join(", ")
+        );
+    }
+    if report.policy_horizon_mode {
+        println!("  policy_horizon:        true (PH-S1544 band 90)");
+        println!(
+            "  policy_horizon_criteria: {}/{} met",
+            report.policy_horizon_criteria_met_count, report.policy_horizon_criteria_total
+        );
+        println!(
+            "  policy_horizon_cases: {}",
+            POLICY_HORIZON_CASES.join(", ")
         );
     }
     for (name, loc) in &report.by_category {

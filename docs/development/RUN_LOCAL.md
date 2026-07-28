@@ -373,6 +373,7 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `VERIFY_POLICY_DOCS_CANON=1` | `verify-dev-stand.sh` → `poolai-loc-audit --policy-docs-canon` (PH-S1512) |
 | `VERIFY_POLICY_VISION_SYNC=1` | `verify-dev-stand.sh` → `poolai-loc-audit --policy-vision-sync` (PH-S1522) |
 | `VERIFY_POLICY_RATIO_ADVISORY=1` | `verify-dev-stand.sh` → `poolai-loc-audit --policy-ratio-advisory` (PH-S1532) |
+| `VERIFY_POLICY_HORIZON=1` | `verify-dev-stand.sh` → `poolai-loc-audit --policy-horizon` (PH-S1544) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 ### PH-S1100: Rust migration advisory (band 46)

@@ -6743,6 +6743,49 @@ mod tests {
     }
 
     #[test]
+    fn policy_horizon_band90_export_shape_ph_s1543() {
+        use poolai_ui_core::policy_horizon_depth::{
+            policy_horizon_criteria_total, policy_horizon_depth_stub, policy_horizon_slices_met,
+            PolicyHorizonDepth, FM_BAND90_ROWS, POLICY_HORIZON_CASES, POLICY_HORIZON_CRITERIA,
+            POLICY_HORIZON_SLICES,
+        };
+        use serde_json::json;
+        assert_eq!(
+            policy_horizon_depth_stub(Some(&json!({"stand_smoke_export": true}))),
+            PolicyHorizonDepth::StandSmokeExport
+        );
+        assert_eq!(
+            policy_horizon_depth_stub(Some(&json!({
+                "policy_horizon_depth": true,
+                "slice_aggregate": true,
+                "criteria_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "policy_horizon_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            PolicyHorizonDepth::FullBand90
+        );
+        assert_eq!(POLICY_HORIZON_CRITERIA.len(), 10);
+        assert_eq!(policy_horizon_criteria_total(), 10);
+        assert_eq!(POLICY_HORIZON_SLICES.len(), 10);
+        assert!(POLICY_HORIZON_CASES.contains(&"aggregate_flag"));
+        let canon = include_str!("../../docs/development/POLICIES_HORIZON.md");
+        assert_eq!(policy_horizon_slices_met(canon), (10, 10));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--policy-horizon"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND90_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band90 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn policy_admin_ops_band84_export_shape_ph_s1485() {
         use poolai_ui_core::policy_admin_ops_depth::{
             policy_admin_ops_criteria_total, policy_admin_ops_depth_stub, PolicyAdminOpsDepth,

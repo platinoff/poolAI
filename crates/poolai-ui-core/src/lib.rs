@@ -51,6 +51,7 @@ pub mod policy_admin_ops_depth;
 pub mod policy_api_contracts_depth;
 pub mod policy_depth;
 pub mod policy_docs_canon_depth;
+pub mod policy_horizon_depth;
 pub mod policy_loc_audit_depth;
 pub mod policy_ratio_advisory_depth;
 pub mod policy_stand_smoke_depth;

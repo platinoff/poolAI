@@ -12,7 +12,7 @@ alwaysApply: true
 | Роль | Хто | Відповідальність |
 |------|-----|------------------|
 | **Власник / креативний директор** | Людина | Візія, пріоритети, BLOCKED/Deferred, фінальний push за бажанням |
-| **Оркестратор** | Головний агент Cursor (Composer) | Звичайна сесія: один **PH-S***. **`абракадабра`:** S0 → **project scan всього репо** → 10 PH-S* у §5.12 → drain → push + самарі. **Service band (§5.16):** toolchain/Cursor research → rules → docs sync → vision → push |
+| **Оркестратор** | Головний агент Cursor (Composer) | Звичайна сесія: один **PH-S***. **`абракадабра`:** S0 (**диск/clean першим**) → project scan (**warnings першими**, за можливості) → 10 PH-S* у §5.12 → drain → **`git push` + самарі завжди в кінці**. **Service band (§5.16):** toolchain/Cursor research → rules → docs sync → vision → push |
 | **Субагенти** | Task tool | Вузькі підзадачі; результат повертається оркестратору |
 
 ## Субагенти Cursor (коли делегувати)

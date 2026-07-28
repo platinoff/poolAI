@@ -1,8 +1,8 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-27 (band 89 **PH-S1529…S1538** ✅ · service **PH-SVC85** Rust diagnostics panel ✅ · **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · band 88 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 90 ready)
+**Оновлено:** 2026-07-28 (band 90 **PH-S1539…S1548** ✅ · band 89 ✅ · service **PH-SVC85** Rust diagnostics panel ✅ · **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · band 88 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 91 next)
 
-**Наступна сесія:** **`абракадабра`** — drain band 90 (FM **§5.71** Policies horizon close) · після drain — Speeds (`bash bin/record-test-ci-speed.sh`) + Rust diagnostics (`bash bin/record-rust-diagnostics.sh`) → vision panels.
+**Наступна сесія:** **`абракадабра`** — S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain band 91 · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
 
 ## P0 / service (2026-07-27)
 
@@ -24,7 +24,7 @@
 
 **Cursor / toolchain (service):** local desktop **3.13.21** · Auto-review · Router Balance/Intelligence for drain · vision Speeds/Rust/eye verified · research [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](./CURSOR_UPDATE_RESEARCH_2026-07-27.md) · FM **§5.16**.
 
-**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **750** спринтів → PH-S2278.
+**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **730** спринтів → PH-S2278.
 
 ## Security findings closed (PH-SVC55…64, by severity)
 
@@ -37,7 +37,7 @@
 | **Low** | Corrupted MSYS path / e2e tmp artifacts | ignore patterns widened |
 | **Open (OWNER)** | PH-SVC35 Atlassian token (historical) | revoke in Atlassian; no history rewrite |
 
-## Band 90 — Policies horizon close (PH-S1539…S1548, **ACTIVE**)
+## Band 90 — Policies horizon close (PH-S1539…S1548, **✅**)
 
 | Sprint | Фокус |
 |--------|--------|
@@ -52,7 +52,9 @@
 | **PH-S1547** | Ratio hold advisory |
 | **PH-S1548** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **414**. **Pending completion:** **740** (→ PH-S2278).
+**PH-S1548 ✅ (2026-07-28):** `policy_horizon_depth.rs`; `POLICY_HORIZON_SLICES`; `--policy-horizon`; `VERIFY_POLICY_HORIZON`; `POLICIES_HORIZON.md`; `galaxy_horizon_s1539_integration`. Phase D Policies horizon close drained.
+
+**§5.12:** **10** відкритих. **Vision:** rev **414**. **Pending completion:** **730** (→ PH-S2278). **Next expected band:** 91 (`PH-S1549…S1558`, Monitoring).
 
 ## Band 89 — Policies ratio-advisory (PH-S1529…S1538, ✅)
 

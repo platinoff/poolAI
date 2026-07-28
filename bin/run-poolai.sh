@@ -321,6 +321,7 @@ cmd_quick() {
   local policy_docs_canon=0
   local policy_vision_sync=0
   local policy_ratio_advisory=0
+  local policy_horizon=0
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --skip-build) SKIP_BUILD=1; shift ;;
@@ -366,6 +367,7 @@ cmd_quick() {
       --policy-docs-canon) policy_docs_canon=1; shift ;;
       --policy-vision-sync) policy_vision_sync=1; shift ;;
       --policy-ratio-advisory) policy_ratio_advisory=1; shift ;;
+      --policy-horizon) policy_horizon=1; shift ;;
       --policy) policy=1; shift ;;
       --policy-store) policy_store=1; shift ;;
       --policy-api) policy_api=1; shift ;;
@@ -569,6 +571,10 @@ cmd_quick() {
   if [[ "$policy_ratio_advisory" == "1" ]]; then
     echo "Running poolai-loc-audit --policy-ratio-advisory (PH-S1532)..."
     cargo run --quiet --bin poolai-loc-audit -- --policy-ratio-advisory
+  fi
+  if [[ "$policy_horizon" == "1" ]]; then
+    echo "Running poolai-loc-audit --policy-horizon (PH-S1544)..."
+    cargo run --quiet --bin poolai-loc-audit -- --policy-horizon
   fi
 }
 

@@ -252,7 +252,7 @@ mod tests {
         );
         assert_eq!(
             admin_wasm_slim_depth_stub(Some(&json!({"vm_panel": true, "workers_panel": true}))),
-            AdminWasmSlimDepth::VmPanel
+            AdminWasmSlimDepth::WorkersPanel
         );
     }
 

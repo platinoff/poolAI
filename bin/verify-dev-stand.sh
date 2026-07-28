@@ -52,6 +52,7 @@ VERIFY_POLICY_LOC_AUDIT="${VERIFY_POLICY_LOC_AUDIT:-0}"
 VERIFY_POLICY_DOCS_CANON="${VERIFY_POLICY_DOCS_CANON:-0}"
 VERIFY_POLICY_VISION_SYNC="${VERIFY_POLICY_VISION_SYNC:-0}"
 VERIFY_POLICY_RATIO_ADVISORY="${VERIFY_POLICY_RATIO_ADVISORY:-0}"
+VERIFY_POLICY_HORIZON="${VERIFY_POLICY_HORIZON:-0}"
 VERIFY_SSO_LOC_AUDIT="${VERIFY_SSO_LOC_AUDIT:-0}"
 VERIFY_SSO_DOCS_CANON="${VERIFY_SSO_DOCS_CANON:-0}"
 VERIFY_SSO_VISION_SYNC="${VERIFY_SSO_VISION_SYNC:-0}"
@@ -699,6 +700,16 @@ if [[ "$VERIFY_POLICY_RATIO_ADVISORY" == "1" ]]; then
     echo "OK  policies ratio-advisory gate"
   else
     echo "FAIL policies ratio-advisory gate"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_POLICY_HORIZON" == "1" ]]; then
+  echo "Running poolai-loc-audit --policy-horizon (PH-S1544)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --policy-horizon); then
+    echo "OK  policies horizon gate"
+  else
+    echo "FAIL policies horizon gate"
     fail=1
   fi
 fi

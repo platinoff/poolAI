@@ -19,14 +19,22 @@ alwaysApply: false
 
 ## S0
 
-1. MSYS2: `git fetch`; `git status -sb`; `git log -1 --oneline`
-2. `HANDOFF_NEW_SESSION.md` · FM §5.12 · `NEXT_SESSION_PROMPT.md`
-3. `df -h /s | tail -1` — avail &lt;5G → `cargo clean`
+**Спочатку диск** (до `cargo` / scan / drain), потім git + docs.
+
+1. **Диск S:** `df -h /s | tail -1` + `bash scripts/check_target_disk.sh`
+   - avail **&lt;5G** або `check_target_disk` warn → **`cargo clean`** (за потреби повторно `df` / check)
+   - avail **&lt;12G** або `target/` роздутий → clean / зменшити тиск **перед** важкими збірками
+2. MSYS2: `git fetch`; `git status -sb`; `git log -1 --oneline`
+3. `HANDOFF_NEW_SESSION.md` · FM §5.12 · `NEXT_SESSION_PROMPT.md`
 
 ```bash
 export PATH="$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"
 export K8S_OPENAPI_ENABLED_VERSION=1.28
+export CARGO_TARGET_DIR=/s/rust/poolAI/target
 cd /s/rust/poolAI || cd "S:/rust/poolAI"
+df -h /s | tail -1
+bash scripts/check_target_disk.sh
+# за потреби: cargo clean && df -h /s | tail -1
 ```
 
 ## Тести (Rust-first)
@@ -87,33 +95,34 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 | Scope = лише FM §5.12 / §5.13 | **Project scan** усього репо → 10 gap → запис у §5.12 → drain |
 | §5.12 = джерело пріоритетів | §5.12 = **журнал PH-S*** (≤10 відкритих); пріоритети — concept, FM §5.1, roadmaps, code |
 
-**Сенс:** VDT по **всьому PoolAI** — не ratio-band. Кожна нова сесія **`абракадабра`** = новий project scan + drain + push.
+**Сенс:** VDT по **всьому PoolAI** — не ratio-band. Кожна нова сесія **`абракадабра`** = диск → scan (warnings first) → drain → **один** push + самарі **в кінці**.
 
 ```mermaid
 flowchart LR
-  S0[S0 git+HANDOFF+FM] --> Scan[Project scan цілого репо]
+  Disk[S0 диск + clean] --> GitDocs[git+HANDOFF+FM]
+  GitDocs --> Scan[Project scan + warnings]
   Scan --> Pick[Top 10 → PH-S* у §5.12]
   Pick --> Drain[Drain усі відкриті]
   Drain --> Vision[Vision close band]
   Vision --> Test[cargo fmt + test-ci]
-  Test --> Push[git push + самарі]
+  Test --> Push[git push + самарі — кінець сесії]
   Push --> Next[Нова сесія: знову абракадабра]
 ```
 
 | Крок | Дія |
 |------|-----|
-| 1 S0 | `git fetch`; HANDOFF; FM **§1–§5.1**; [`STABLE_STATE`](../../docs/status/STABLE_STATE_SUMMARY.md); `NEXT_SESSION`; **`poolai-vision-sync --check` ok**; `df -h /s` |
-| 2 Project scan | Якщо §5.12 **< 10** → **scan всього проєкту** (карта нижче) → **10 PH-S*** у §5.12 |
-| 3 Drain | Усі відкриті PH-S* (код → scope-тести → docs **без** vision rev footer) |
+| 1 S0 диск | **`df -h /s`** + `bash scripts/check_target_disk.sh` → за потреби **`cargo clean`** → знову `df`; **лише потім** `git fetch`; HANDOFF; FM **§1–§5.1**; [`STABLE_STATE`](../../docs/status/STABLE_STATE_SUMMARY.md); `NEXT_SESSION`; **`poolai-vision-sync --check` ok** |
+| 2 Project scan | Якщо §5.12 **< 10** → **scan всього проєкту** (карта нижче) → **10 PH-S*** у §5.12; **спочатку** warnings/diagnostics (див. пріоритет **0**) |
+| 3 Drain | Усі відкриті PH-S* (код → scope-тести → docs **без** vision rev footer); **без** mid-drain `git push` |
 | 4 Vision close | FM §5.12 ✅ + HANDOFF + NEXT → **один** `poolai-vision-sync` → rev з `manifest.json` → `--check` |
-| 5 Test | `cargo fmt --all` → **один** `cargo test-ci` (**після** vision close) → **`bash bin/record-test-ci-speed.sh`** (або timed + `poolai-speed-index`) · Speeds panel [`SPEED_INDEX.md`](../../docs/development/SPEED_INDEX.md) · **`bash bin/record-rust-diagnostics.sh`** · Rust panel [`RUST_DIAGNOSTICS.md`](../../docs/development/RUST_DIAGNOSTICS.md) |
-| 6 Git | **один** commit (`git-commit-tree-msg.sh`: код + `docs/vision/*` + `speed_index.json` + FM/HANDOFF/NEXT) + `git push origin main` + **самарі** |
+| 5 Test | `cargo fmt --all` → **один** `cargo test-ci` (**після** vision close) → **`bash bin/record-test-ci-speed.sh`** · Speeds [`SPEED_INDEX.md`](../../docs/development/SPEED_INDEX.md) · **`bash bin/record-rust-diagnostics.sh`** · Rust [`RUST_DIAGNOSTICS.md`](../../docs/development/RUST_DIAGNOSTICS.md) |
+| 6 Git (**кінець сесії**) | **один** commit (`git-commit-tree-msg.sh`: код + `docs/vision/*` + `speed_index.json` + `rust_diagnostics.json` + FM/HANDOFF/NEXT) → **`git push origin main` + самарі в чат** — **завжди останній крок**; після самарі сесія завершена |
 
 **CI після push:** Actions `GITHUB_TOKEN` може бути JWT-format (`ghs_` ~520) — workflows уже передають opaque; не додавати length-checks у drain. Див. PH-SVC65 · [`SECRETS_MANAGEMENT.md`](../../docs/security/SECRETS_MANAGEMENT.md) §5.
 
-**Ітерація:** після push §5.12 знову **0** (або <10) → у **наступній** сесії **`абракадабра`** → S0 → **project scan** (якщо <10) → drain → push. Без окремого підтвердження кожного PH-S*.
+**Ітерація:** після push §5.12 знову **0** (або <10) → у **наступній** сесії **`абракадабра`** → S0 (диск) → **project scan** (якщо <10) → drain → push + самарі. Без окремого підтвердження кожного PH-S*.
 
-**Не** підміняє BLOCKED/Deferred (FM-003 LAN, FM-041 Cloud SDK). **Не** `git add -A`. Канон push — [`.cursor/commands/git-push.md`](../commands/git-push.md).
+**Не** підміняє BLOCKED/Deferred (FM-003 LAN, FM-041 Cloud SDK). **Не** `git add -A`. **Не** push mid-drain / mid-scan. Канон push — [`.cursor/commands/git-push.md`](../commands/git-push.md).
 
 **Не повторювати:** закриті acceptance з FM; блок «Не повторювати» у `NEXT_SESSION_PROMPT`.
 
@@ -123,6 +132,7 @@ flowchart LR
 
 | Шар | Джерела | Що шукати |
 |-----|---------|-----------|
+| **Warnings (first)** | [`rust_diagnostics.json`](../../docs/development/rust_diagnostics.json) · `cargo run --bin poolai-rust-diagnostics -- --print` · clippy / rustc warnings · CI lint noise | виправні warnings/errors → PH-S* **на початок** смуги |
 | **Concept** | `docs/concept/POOLAI_GALAXY_GRID.md`, GRID/Solana/JOB docs | §TBD, horizon wire без PH-S* / FM-* |
 | **FM функції** | FM **§5.1** **FM-*** | Planned / partial / без ✅ — **пріоритет §5.1** |
 | **Architect** | `NEXT_STEPS_ARCHITECT_*.md` | `rg "\- \[ \]"` |
@@ -130,15 +140,16 @@ flowchart LR
 | **Gaps** | `DOCS_LEGACY_AUDIT`, `OPENAPI_GAP_AUDIT`, FM **§5.3** | docs/API/code gaps |
 | **Статус** | `STABLE_STATE_SUMMARY`, `FUNCTIONALITY_DIGEST` | заявлено vs `src/` |
 | **Код** | `rg "TODO|FIXME" src/` tests/ crates/ | Rust-first |
-| **Ratio** | FM **§5.13** | лише якщо п.1–7 < 10 рядків |
+| **Ratio** | FM **§5.13** | лише якщо п.1–8 < 10 рядків |
 | **Fallback** | band 10 (нижче) | останній резорт |
 
-**Після scan:** обрані пункти → **PH-S(N…)** у FM **§5.12** (журнал). Колонка «Джерело»: `FM-042`, `Galaxy §5.5`, `Architect L130`, …
+**Після scan:** обрані пункти → **PH-S(N…)** у FM **§5.12** (журнал). Колонка «Джерело»: `clippy::…`, `rust_diagnostics`, `FM-042`, `Galaxy §5.5`, …
 
 **Порядок (якщо потрібен один список):**
 
 | Пріоритет | Джерело | Що шукати |
 |-----------|---------|-----------|
+| **0** | Warnings / попередження — [`RUST_DIAGNOSTICS.md`](../../docs/development/RUST_DIAGNOSTICS.md), `rust_diagnostics.json` (`latest.warnings` / `errors` / `top_codes`), швидкий clippy scope | **За можливості ставити першими** у смузі: unused imports, dead_code, needless_borrows, trivial clippy batches, compile errors з індексу. Errors > 0 — обов’язково в смугу. Великі архітектурні lints (too_many_arguments тощо) — лише якщо fit у 1–2 PH-S* |
 | 1 | [`POOLAI_GALAXY_GRID.md`](../../docs/concept/POOLAI_GALAXY_GRID.md) §TBD / «майбутній wire» / horizon | stub/metrics/wire ще без PH-S* |
 | 2 | [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../../docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md) §4 horizon | live wire, prefetch pull, governance gaps |
 | 3 | FM **§5.1** (FM-* **Implemented partial** / **Planned**) | найвищий номер без ✅ у §5.1 |
@@ -146,7 +157,13 @@ flowchart LR
 | 5 | [`DOCS_LEGACY_AUDIT_2026-05-19.md`](../../docs/development/DOCS_LEGACY_AUDIT_2026-05-19.md) §5.3 | docs/code gaps |
 | 6 | [`RUST_RATIO_STRATEGY_2026-06-13.md`](../../docs/development/RUST_RATIO_STRATEGY_2026-06-13.md) §5.13 | wasm slim, stand smoke, loc-audit band |
 | 7 | `rg "TODO|FIXME" src/` tests/ crates/ | code-first мікро-PH-S* |
-| 8 | Шаблон смуги 10 (нижче) | лише якщо п.1–7 не дають 10 рядків |
+| 8 | Шаблон смуги 10 (нижче) / master backlog band | лише якщо п.0–7 не дають 10 рядків |
+
+**Warnings → PH-S* (правила):**
+
+- Читати індекс **до** формування топ-10; не чекати кінцевого `record-rust-diagnostics` (той лишається на кроці 5 для panel).
+- Якщо `warnings > 0` або `errors > 0` і є **виправні** пакети (1–N файлів / один lint code) — виділити **1–3 PH-S*** на початок смуги (Джерело: `rust_diagnostics` / lint code).
+- Не витісняти BLOCKED/Deferred; не роздувати один lint на всю смугу з 10, якщо залишок — product horizon.
 
 **Правила рядків §5.12:**
 
@@ -205,14 +222,14 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 4. `cargo run --bin poolai-vision-sync -- --check` → має бути **ok**.
 5. Потім — фінальний `cargo test-ci` (див. Drain § вище).
 
-### Git (один commit на всю смугу)
+### Git (один commit + push — **завжди кінець сесії**)
 
 1. Staging лише файлів смуги (`git diff --cached --stat`); не `comitmsg/`, не `data/audit/`.
-2. У commit: код + `docs/vision/*` + FM/HANDOFF/NEXT (після vision close + test-ci green).
+2. У commit: код + `docs/vision/*` + FM/HANDOFF/NEXT (+ speed/diagnostics JSON) — після vision close + test-ci green.
 3. Текст: `comitmsg/.commit-msg-ph-sNNN-NNN.txt`.
 4. **Канон (новий код + docs):** `bash bin/git-commit-tree-msg.sh comitmsg/.commit-msg-ph-sNNN-NNN.txt <paths…>` — `write-tree` зі staged файлів.
 5. **Лише subject hook-fix** (без нових файлів): `bash bin/amend-head-msg.sh comitmsg/…` — **не** включає unstaged/staged diff у tree.
-6. `git push origin main` + самарі в чат (смуга PH-S*, rust_ratio, vision rev).
+6. **`git push origin main` + самарі в чат** (смуга PH-S*, warnings fixed / leftover, rust_ratio, vision rev, disk) — **обов’язково останній крок сесії**; не push раніше; не завершувати сесію без push+самарі якщо був drain/commit.
 
 Деталі hook — [`git-commit-msys.mdc`](git-commit-msys.mdc).
 
@@ -220,7 +237,8 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 
 | Симптом | Дія |
 |--------|-----|
-| error 112 / диск S: | `cargo clean` |
+| error 112 / диск S: / avail &lt;5G | S0: `df -h /s` → `cargo clean` → `check_target_disk.sh`; не стартувати drain без місця |
+| mid-drain `git push` | заборонено для `абракадабра`; push + самарі лише крок 6 (кінець сесії) |
 | `amend-head-msg` без нових файлів у commit | drain смуги → **`git-commit-tree-msg.sh`** (див. § «Git абракадабра») |
 | subject = `Co-authored-by:` | [`git-commit-msys.mdc`](git-commit-msys.mdc) → `git-commit-tree-msg.sh` або `amend-head-msg.sh` |
 | `bash` → WSL «no distributions» | `C:\msys64\usr\bin\bash.exe -lc` (не bare `bash`) |
@@ -235,3 +253,4 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 | `link.exe` / `link: extra operand` у MSYS2 test | `export RUSTUP_TOOLCHAIN=stable-x86_64-pc-windows-gnu` (не MSVC host у bash) |
 | `Could not determine Node.js install directory` | MSYS2: `pacman -S mingw-w64-ucrt-x86_64-nodejs`; перевір `node.exe` у `/ucrt64/bin/` |
 | API-only спринт — чи потрібен Playwright? | Ні — Rust integration test; Playwright лише UI scope |
+| scan ігнорує clippy warnings | читати `rust_diagnostics.json` / `--print` **до** топ-10; виправні → пріоритет 0 |

@@ -6,18 +6,18 @@
   "warn_below": 0.93,
   "target_ratio": 0.95,
   "stretch_spirit": 0.96,
-  "advisory_mode": true,
-  "min_ratio": 0.95,
-  "rust_loc": 180525,
-  "non_rust_product_loc": 9660,
-  "product_loc_total": 190185,
-  "rust_ratio": 0.9492073507374399,
-  "rust_ratio_pct": 94.92073507374398,
+  "advisory_mode": false,
+  "min_ratio": null,
+  "rust_loc": 181008,
+  "non_rust_product_loc": 9676,
+  "product_loc_total": 190684,
+  "rust_ratio": 0.949256361309811,
+  "rust_ratio_pct": 94.92563613098109,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
   "below_stretch_spirit": true,
-  "meets_min_ratio": false,
+  "meets_min_ratio": null,
   "ui_js_loc": 1922,
   "ui_js_band28_baseline_loc": 2141,
   "ui_js_loc_reduction": 219,
@@ -157,9 +157,12 @@
   "policy_vision_sync_mode": false,
   "policy_vision_sync_criteria_total": 10,
   "policy_vision_sync_criteria_met_count": 0,
-  "policy_ratio_advisory_mode": true,
+  "policy_ratio_advisory_mode": false,
   "policy_ratio_advisory_criteria_total": 10,
-  "policy_ratio_advisory_criteria_met_count": 10,
+  "policy_ratio_advisory_criteria_met_count": 0,
+  "policy_horizon_mode": false,
+  "policy_horizon_criteria_total": 10,
+  "policy_horizon_criteria_met_count": 0,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -171,23 +174,23 @@
     },
     "ops_shell": {
       "files": 41,
-      "loc": 3924
+      "loc": 3940
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 107,
-      "loc": 22910
+      "files": 108,
+      "loc": 23150
     },
     "rust_src": {
       "files": 302,
-      "loc": 115108
+      "loc": 115205
     },
     "rust_tests": {
-      "files": 321,
-      "loc": 41899
+      "files": 323,
+      "loc": 42045
     },
     "ui_css": {
       "files": 2,
@@ -217,8 +220,6 @@
     "PH-S1010: product-complete band 36 — ratio_95_formal_gate_met; stretch 96% advisory if below_stretch_spirit",
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
-    "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
-    "PH-S1534: policy_ratio_advisory_mode — aggregate prior --policy* + vision-sync slices",
-    "PH-S1538: band 89 policies ratio-advisory — criteria met vs registry"
+    "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending"
   ]
 }

@@ -20,14 +20,14 @@ flowchart LR
 
 | Крок | Дія |
 |------|-----|
-| S0 | `git fetch`; HANDOFF; FM **§5.12**; `df -h /s` |
+| S0 | **Спочатку** `df -h /s` (+ `check_target_disk.sh` → `cargo clean` за потреби); потім `git fetch`; HANDOFF; FM **§5.12** |
 | Спринт | Один **PH-S*** з §5.12; scope лише файли спринту |
 | Тести | `cargo fmt --all` → `K8S_OPENAPI_ENABLED_VERSION=1.28 cargo test-ci`; Raft — `cargo test-raft-ci` за scope |
 | OpenAPI | Після API: `cargo run --bin poolai-openapi-gap-audit` (0) |
 | E2E (UI) | Лише scope `src/ui/` / axe / visual: `export PATH="$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"` → `bash bin/e2e-playwright.sh --start` |
 | API wire | **Rust** `tests/*_integration.rs` — канон; Playwright API-smoke — legacy, не дублювати ([`poolai-testing-policy.mdc`](poolai-testing-policy.mdc)) |
 | Доки | PH-S* → ✅ у FM §5.12 + HANDOFF + `NEXT_SESSION_PROMPT` |
-| Git | MSYS2, [`git-push.md`](../commands/git-push.md), [`git-commit-msys.mdc`](git-commit-msys.mdc) |
+| Git | MSYS2, [`git-push.md`](../commands/git-push.md), [`git-commit-msys.mdc`](git-commit-msys.mdc) — **push + самарі в кінці сесії** |
 
 ## Локальний CI vs GitHub
 
@@ -43,19 +43,20 @@ flowchart LR
 
 **Звичайна сесія (один PH-S*):** п.1–3 нижче.
 
-**`абракадабра`:** **project scan всього репо** → top 10 → §5.12 (журнал) → drain — див. [`poolai-session-iteration.mdc`](poolai-session-iteration.mdc) § «Project scan» + § «Тригер абракадабра».
+**`абракадабра`:** **S0 диск/clean** → **project scan** (warnings/diagnostics **першими**, за можливості) → top 10 → §5.12 (журнал) → drain → vision → test-ci → **`git push` + самарі завжди в кінці** — див. [`poolai-session-iteration.mdc`](poolai-session-iteration.mdc) § «Project scan» + § «Тригер абракадабра».
 
-1. `rg "\- \[ \]" docs/development/NEXT_STEPS_ARCHITECT_*.md`
-2. [`DOCS_LEGACY_AUDIT`](../../docs/development/DOCS_LEGACY_AUDIT_2026-05-19.md) · concept · [`GALAXY_GRID_ROADMAP`](../../docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md) · FM **§5.1**
-3. `rg "TODO|FIXME" src/` → нові PH-S* у FM §5.12 (code-first, **Rust integration** для API)
-4. Якщо п.1–3 < 10 рядків — FM **§5.13** / fallback band ([`RUST_RATIO_STRATEGY_2026-06-13.md`](../../docs/development/RUST_RATIO_STRATEGY_2026-06-13.md))
-5. Приклад багатоспринтової смуги — [`poolai-session-iteration.mdc`](poolai-session-iteration.mdc) § «Приклад ітерації (PH-S97…S99)»
+1. `rust_diagnostics.json` / `poolai-rust-diagnostics --print` / clippy warnings → виправні PH-S* на початок смуги
+2. `rg "\- \[ \]" docs/development/NEXT_STEPS_ARCHITECT_*.md`
+3. [`DOCS_LEGACY_AUDIT`](../../docs/development/DOCS_LEGACY_AUDIT_2026-05-19.md) · concept · [`GALAXY_GRID_ROADMAP`](../../docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md) · FM **§5.1**
+4. `rg "TODO|FIXME" src/` → нові PH-S* у FM §5.12 (code-first, **Rust integration** для API)
+5. Якщо п.1–4 < 10 рядків — FM **§5.13** / fallback band ([`RUST_RATIO_STRATEGY_2026-06-13.md`](../../docs/development/RUST_RATIO_STRATEGY_2026-06-13.md))
+6. Приклад багатоспринтової смуги — [`poolai-session-iteration.mdc`](poolai-session-iteration.mdc) § «Приклад ітерації (PH-S97…S99)»
 
 ## Тригер «абракадабра» (drain **всього проєкту**)
 
 Промпт **`абракадабра`** у **новій сесії** = VDT-цикл **без підтвердження** кожного PH-S*:
 
-**S0** → **project scan** → **10 PH-S*** у §5.12 → **drain** (код + scope-тести) → **vision close** (один `poolai-vision-sync` + `--check`) → **один** `cargo test-ci` → **один** commit (код + `docs/vision/*` + FM/HANDOFF/NEXT) → **`git push` + самарі** → наступна сесія знову **`абракадабра`**. Деталі — [`poolai-session-iteration.mdc`](poolai-session-iteration.mdc) § «Vision close band».
+**S0 (диск → clean за потреби → git/docs)** → **project scan** (warnings first) → **10 PH-S*** у §5.12 → **drain** (код + scope-тести; **без** mid-push) → **vision close** → **один** `cargo test-ci` → **один** commit → **`git push` + самарі (кінець сесії)** → наступна сесія знову **`абракадабра`**. Деталі — [`poolai-session-iteration.mdc`](poolai-session-iteration.mdc).
 
 §5.12 — **журнал виконання**, не джерело пріоритетів. Деталі — [`poolai-session-iteration.mdc`](poolai-session-iteration.mdc) § «Тригер абракадабра».
 
