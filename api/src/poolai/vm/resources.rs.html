@@ -174,18 +174,18 @@
 <a href=#174 id=174 data-nosnippet>174</a>    }
 <a href=#175 id=175 data-nosnippet>175</a>
 <a href=#176 id=176 data-nosnippet>176</a>    <span class="kw">async fn </span>get_usage(<span class="kw-2">&amp;</span><span class="self">self</span>, process_id: u32) -&gt; <span class="prelude-ty">Result</span>&lt;ResourceUsage, AppError&gt; {
-<a href=#177 id=177 data-nosnippet>177</a>        <span class="attr">#[cfg(target_os = <span class="string">"windows"</span>)]
-<a href=#178 id=178 data-nosnippet>178</a>        </span>{
-<a href=#179 id=179 data-nosnippet>179</a>            <span class="kw">return </span><span class="prelude-val">Ok</span>(ResourceUsage {
-<a href=#180 id=180 data-nosnippet>180</a>                cpu_percent: <span class="number">0.0</span>,
-<a href=#181 id=181 data-nosnippet>181</a>                memory_mb: <span class="number">0</span>,
-<a href=#182 id=182 data-nosnippet>182</a>                gpu_utilization: <span class="prelude-val">None</span>,
-<a href=#183 id=183 data-nosnippet>183</a>            });
-<a href=#184 id=184 data-nosnippet>184</a>        }
-<a href=#185 id=185 data-nosnippet>185</a>
-<a href=#186 id=186 data-nosnippet>186</a>        <span class="attr">#[cfg(target_os = <span class="string">"linux"</span>)]
-<a href=#187 id=187 data-nosnippet>187</a>        </span>{
-<a href=#188 id=188 data-nosnippet>188</a>            <span class="kw">let _ </span>= process_id;
+<a href=#177 id=177 data-nosnippet>177</a>        <span class="kw">let _ </span>= process_id;
+<a href=#178 id=178 data-nosnippet>178</a>        <span class="attr">#[cfg(target_os = <span class="string">"windows"</span>)]
+<a href=#179 id=179 data-nosnippet>179</a>        </span>{
+<a href=#180 id=180 data-nosnippet>180</a>            <span class="kw">return </span><span class="prelude-val">Ok</span>(ResourceUsage {
+<a href=#181 id=181 data-nosnippet>181</a>                cpu_percent: <span class="number">0.0</span>,
+<a href=#182 id=182 data-nosnippet>182</a>                memory_mb: <span class="number">0</span>,
+<a href=#183 id=183 data-nosnippet>183</a>                gpu_utilization: <span class="prelude-val">None</span>,
+<a href=#184 id=184 data-nosnippet>184</a>            });
+<a href=#185 id=185 data-nosnippet>185</a>        }
+<a href=#186 id=186 data-nosnippet>186</a>
+<a href=#187 id=187 data-nosnippet>187</a>        <span class="attr">#[cfg(target_os = <span class="string">"linux"</span>)]
+<a href=#188 id=188 data-nosnippet>188</a>        </span>{
 <a href=#189 id=189 data-nosnippet>189</a>            <span class="kw">return </span><span class="prelude-val">Ok</span>(ResourceUsage {
 <a href=#190 id=190 data-nosnippet>190</a>                cpu_percent: <span class="number">0.0</span>,
 <a href=#191 id=191 data-nosnippet>191</a>                memory_mb: <span class="number">0</span>,
