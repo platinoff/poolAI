@@ -54,6 +54,7 @@ alwaysApply: false
 - Кнопка **Reload manifest** — після `git pull` або локального коміту.
 - Чотири панелі: SVG · 3D layer stack · sprint extensions · doc preview.
 - **Speeds panel:** `speed_index.json` + [`SPEED_INDEX.md`](../../docs/development/SPEED_INDEX.md); після `абракадабра` drain — `bash bin/record-test-ci-speed.sh`.
+- **Rust panel:** `rust_diagnostics.json` + [`RUST_DIAGNOSTICS.md`](../../docs/development/RUST_DIAGNOSTICS.md); після drain — `bash bin/record-rust-diagnostics.sh`; CI job `rust-diagnostics`.
 - **Sprint queue eye 👁:** open / open+queued; closed PH-S ≤2000 prune (`poolai-vision-sync`).
 - **Service verify:** `cargo run --bin poolai-vision-sync -- --check` (Cursor desktop baseline — [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](../../docs/development/CURSOR_UPDATE_RESEARCH_2026-07-27.md)).
 

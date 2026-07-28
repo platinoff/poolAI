@@ -17,6 +17,11 @@
       "title": "Test/bench speeds"
     },
     {
+      "id": "rust",
+      "source": "rust_diagnostics.json",
+      "title": "Rust warnings/errors"
+    },
+    {
       "id": "scope",
       "source": "extensions.json",
       "title": "Sprint extensions"

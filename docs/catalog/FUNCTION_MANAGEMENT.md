@@ -1221,7 +1221,7 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **10** (band 88 ✅ · band 89 open). **Master horizon:** PH-S1529…S1538 (band 89). **Completion pending:** PH-S1529…S2278 = **750** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **411**. **Наступна сесія:** **`абракадабра`** — drain band 89.
+**Відкритих у §5.12:** **10** (band 88 ✅ · band 89 open). **Master horizon:** PH-S1529…S1538 (band 89). **Completion pending:** PH-S1529…S2278 = **750** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **412**. **Наступна сесія:** **`абракадабра`** — drain band 89.
 
 ### 5.70 Policies ratio advisory queue — band 89 (PH-S1529…S1538) · **ACTIVE**
 
@@ -2358,8 +2358,9 @@ FM-xxx (з таблиці нижче)
 | **PH-SVC82** | docs-vision Speeds cross-link | SPEED_INDEX + 3.13.21 pointer | **✅** |
 | **PH-SVC83** | `poolai-vision-sync --check` | drift gate green | **✅** |
 | **PH-SVC84** | git push + самарі | service commit `main` | **✅** |
+| **PH-SVC85** | Vision Rust diagnostics panel | `poolai-rust-diagnostics` · `rust_diagnostics.json` · CI job · panel **Rust** | **✅** |
 
-**Наступний service trigger:** **`абракадабра`** → drain band 89 · **PH-SVC34** re-verify GH after push (watch JWT-format `GITHUB_TOKEN`) · **PH-SVC35** OWNER (Atlassian revoke). **Відкриті service:** PH-SVC34 · PH-SVC35 (OWNER). Cursor **3.13.21** PH-SVC75…SVC84 ✅ · GH tokens PH-SVC65…SVC74 ✅ · Security PH-SVC55…SVC64 ✅.
+**Наступний service trigger:** **`абракадабра`** → drain band 89 · **PH-SVC34** re-verify GH after push (watch JWT-format `GITHUB_TOKEN`) · **PH-SVC35** OWNER (Atlassian revoke). **Відкриті service:** PH-SVC34 · PH-SVC35 (OWNER). Cursor **3.13.21** PH-SVC75…SVC84 ✅ · Rust panel **PH-SVC85** ✅ · GH tokens PH-SVC65…SVC74 ✅ · Security PH-SVC55…SVC64 ✅.
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S262)
 

@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-28",
+  "host_label": "local-ph-svc85",
+  "git_head": "b46b16c98",
+  "source": "local",
+  "notes": [
+    "Machine-readable Rust/Clippy warning+error index for vision Rust panel.",
+    "Record via poolai-rust-diagnostics or bin/record-rust-diagnostics.sh (abrakadabra drain + CI)."
+  ],
+  "latest": {
+    "warnings": 9,
+    "errors": 0,
+    "ok": true,
+    "recorded_at": "2026-07-28T01:15:23Z",
+    "command": "cargo check --message-format=json --lib",
+    "wall_secs": 80.5131135,
+    "top_codes": [
+      "dead_code×4",
+      "unused_mut×2",
+      "unused_variables×2",
+      "unused_imports×1"
+    ]
+  },
+  "history": [
+    {
+      "kind": "rust_diagnostics",
+      "command": "bootstrap",
+      "warnings": 0,
+      "errors": 0,
+      "ok": true,
+      "recorded_at": "2026-07-28T01:10:23Z",
+      "host_label": "bootstrap-ph-svc85",
+      "git_head": "b46b16c98",
+      "source": "local"
+    },
+    {
+      "kind": "rust_diagnostics",
+      "command": "cargo",
+      "warnings": 0,
+      "errors": 0,
+      "ok": true,
+      "recorded_at": "2026-07-28T01:11:36Z",
+      "wall_secs": 0.0681734,
+      "host_label": "PLATINOV",
+      "git_head": "b46b16c98",
+      "source": "local"
+    },
+    {
+      "kind": "rust_diagnostics",
+      "command": "cargo check --message-format=json --lib",
+      "warnings": 9,
+      "errors": 0,
+      "ok": true,
+      "recorded_at": "2026-07-28T01:15:23Z",
+      "wall_secs": 80.5131135,
+      "host_label": "local-ph-svc85",
+      "git_head": "b46b16c98",
+      "source": "local",
+      "top_codes": [
+        "dead_code×4",
+        "unused_mut×2",
+        "unused_variables×2",
+        "unused_imports×1"
+      ]
+    }
+  ]
+}

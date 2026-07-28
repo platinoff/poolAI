@@ -2918,6 +2918,18 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_development_POLICIES_VISION_SYNC_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_RUST_DIAGNOSTICS_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_vision_rust_diagnostics_json"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -11497,9 +11509,30 @@
       "label": "policy_vision_sync_integration.rs",
       "layer": "L3",
       "path": "tests/policy_vision_sync_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_RUST_DIAGNOSTICS_md",
+      "label": "RUST_DIAGNOSTICS.md",
+      "layer": "L1",
+      "path": "docs/development/RUST_DIAGNOSTICS.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_vision_rust_diagnostics_json",
+      "label": "rust_diagnostics.json",
+      "layer": "L1",
+      "path": "docs/vision/rust_diagnostics.json"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_bin_poolai_rust_diagnostics_rs",
+      "label": "poolai_rust_diagnostics.rs",
+      "layer": "L3",
+      "path": "src/bin/poolai_rust_diagnostics.rs"
     }
   ],
-  "revision": 411,
+  "revision": 412,
   "sprint_queue": [
     {
       "acceptance": "depth enum + ratio/criteria registry",

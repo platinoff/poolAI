@@ -106,7 +106,7 @@ flowchart LR
 | 2 Project scan | Якщо §5.12 **< 10** → **scan всього проєкту** (карта нижче) → **10 PH-S*** у §5.12 |
 | 3 Drain | Усі відкриті PH-S* (код → scope-тести → docs **без** vision rev footer) |
 | 4 Vision close | FM §5.12 ✅ + HANDOFF + NEXT → **один** `poolai-vision-sync` → rev з `manifest.json` → `--check` |
-| 5 Test | `cargo fmt --all` → **один** `cargo test-ci` (**після** vision close) → **`bash bin/record-test-ci-speed.sh`** (або timed + `poolai-speed-index`) · Speeds panel [`SPEED_INDEX.md`](../../docs/development/SPEED_INDEX.md) |
+| 5 Test | `cargo fmt --all` → **один** `cargo test-ci` (**після** vision close) → **`bash bin/record-test-ci-speed.sh`** (або timed + `poolai-speed-index`) · Speeds panel [`SPEED_INDEX.md`](../../docs/development/SPEED_INDEX.md) · **`bash bin/record-rust-diagnostics.sh`** · Rust panel [`RUST_DIAGNOSTICS.md`](../../docs/development/RUST_DIAGNOSTICS.md) |
 | 6 Git | **один** commit (`git-commit-tree-msg.sh`: код + `docs/vision/*` + `speed_index.json` + FM/HANDOFF/NEXT) + `git push origin main` + **самарі** |
 
 **CI після push:** Actions `GITHUB_TOKEN` може бути JWT-format (`ghs_` ~520) — workflows уже передають opaque; не додавати length-checks у drain. Див. PH-SVC65 · [`SECRETS_MANAGEMENT.md`](../../docs/security/SECRETS_MANAGEMENT.md) §5.

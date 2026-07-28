@@ -224,6 +224,53 @@ jobs:
       - name: manifest.json vs FM §5.12
         run: cargo run --bin poolai-vision-sync -- --check
 
+  rust-diagnostics:
+    name: Rust diagnostics (vision panel)
+    runs-on: ubuntu-latest
+    env:
+      CARGO_BUILD_JOBS: "1"
+      CARGO_INCREMENTAL: "0"
+      K8S_OPENAPI_ENABLED_VERSION: "1.28"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        timeout-minutes: 5
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: clippy
+
+      - name: Cache cargo
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-rust-diag-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-rust-diag-
+
+      - name: Clippy JSON scan → rust_diagnostics.json
+        # Without -D warnings so warning counts stay visible for the vision Rust panel.
+        # Fail the job only when compiler/clippy errors > 0 (script exit).
+        run: bash bin/record-rust-diagnostics.sh --ci
+        env:
+          HOST_LABEL: github-actions-ubuntu
+
+      - name: Upload rust_diagnostics.json artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rust-diagnostics-json
+          path: |
+            docs/development/rust_diagnostics.json
+            docs/vision/rust_diagnostics.json
+          if-no-files-found: warn
+
   rust-ratio-audit:
     name: Rust LOC ratio hold gate (PH-S165)
     runs-on: ubuntu-latest

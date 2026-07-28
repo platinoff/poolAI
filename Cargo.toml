@@ -215,6 +215,10 @@ name = "poolai-speed-index"
 path = "src/bin/poolai_speed_index.rs"
 
 [[bin]]
+name = "poolai-rust-diagnostics"
+path = "src/bin/poolai_rust_diagnostics.rs"
+
+[[bin]]
 name = "poolai-verify-release"
 path = "src/bin/poolai_verify_release.rs"
 

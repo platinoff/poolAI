@@ -119,7 +119,8 @@ function GetVisionWatchPayload {
         'vision.css',
         'vision.js',
         'vision.svg',
-        'speed_index.json'
+        'speed_index.json',
+        'rust_diagnostics.json'
     )
     $bundleTicks = [long]0
     $dataTicks = [long]0
@@ -136,10 +137,14 @@ function GetVisionWatchPayload {
             $dataTicks += $ticks
         }
     }
-    # Also watch canonical index under docs/development (source of truth).
+    # Also watch canonical indexes under docs/development (source of truth).
     $devSpeed = Join-Path $RepoRootPath 'docs\development\speed_index.json'
     if (Test-Path -LiteralPath $devSpeed -PathType Leaf) {
         $dataTicks += (Get-Item -LiteralPath $devSpeed).LastWriteTimeUtc.Ticks
+    }
+    $devRust = Join-Path $RepoRootPath 'docs\development\rust_diagnostics.json'
+    if (Test-Path -LiteralPath $devRust -PathType Leaf) {
+        $dataTicks += (Get-Item -LiteralPath $devRust).LastWriteTimeUtc.Ticks
     }
     $revision = 0
     $manifestPath = Join-Path $VisionDirectory 'manifest.json'

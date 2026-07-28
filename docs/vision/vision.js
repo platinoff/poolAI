@@ -139,10 +139,12 @@
   let constellationHubIdSet = new Set();
   let activeTreeFileEl = null;
   let collapsedPanels = new Set();
-  const DIAGRAM_PANELS = ["layers", "queue", "map", "speeds", "links"];
+  const DIAGRAM_PANELS = ["layers", "queue", "map", "speeds", "rust", "links"];
   const ALL_PANELS = [...DIAGRAM_PANELS, "preview"];
   const SPEED_INDEX_URL = "/docs/vision/speed_index.json";
   const SPEED_INDEX_FALLBACK = "/docs/development/speed_index.json";
+  const RUST_DIAG_URL = "/docs/vision/rust_diagnostics.json";
+  const RUST_DIAG_FALLBACK = "/docs/development/rust_diagnostics.json";
   const panelAnchors = new Map();
   let openFilterDrop = null;
   let mapNodesBound = false;
@@ -4009,6 +4011,116 @@
     return null;
   }
 
+  async function loadRustDiagnostics() {
+    try {
+      const r = await fetch(RUST_DIAG_URL + "?t=" + Date.now());
+      if (r.ok) return await r.json();
+    } catch (_) {
+      /* try fallback */
+    }
+    try {
+      const r2 = await fetch(RUST_DIAG_FALLBACK + "?t=" + Date.now());
+      if (r2.ok) return await r2.json();
+    } catch (_) {
+      /* empty */
+    }
+    return null;
+  }
+
+  function renderRustDiagnostics(data) {
+    const box = document.getElementById("rust-diagnostics");
+    if (!box) return;
+    if (!data || data.latest == null || data.latest.warnings == null) {
+      box.innerHTML =
+        '<p class="rust-diagnostics-empty" style="color:var(--muted);margin:0">No <code>rust_diagnostics.json</code> yet. Run <code>bash bin/record-rust-diagnostics.sh</code> (local drain or CI).</p>';
+      return;
+    }
+    const latest = data.latest || {};
+    const hist = Array.isArray(data.history)
+      ? data.history.slice().reverse().slice(0, 10)
+      : [];
+    const w = latest.warnings;
+    const e = latest.errors;
+    const ok = latest.ok;
+    let statusCls = "unknown";
+    if (e > 0 || ok === false) statusCls = "fail";
+    else if (w > 0) statusCls = "warn";
+    else if (ok === true) statusCls = "ok";
+    let html = '<div class="speed-index-meta">';
+    html +=
+      "<span>host <strong>" +
+      escapeHtml(String(data.host_label || "—")) +
+      "</strong></span>";
+    html +=
+      "<span>git <strong>" +
+      escapeHtml(String(data.git_head || "—")) +
+      "</strong></span>";
+    html +=
+      "<span>src <strong>" +
+      escapeHtml(String(data.source || "—")) +
+      "</strong></span>";
+    html +=
+      "<span>at <strong>" +
+      escapeHtml(String(data.generated_at || "—")) +
+      "</strong></span>";
+    html += "</div>";
+    html += '<div class="speed-index-latest rust-diagnostics-latest">';
+    html +=
+      '<div class="speed-card ' +
+      statusCls +
+      '"><div class="speed-card-label">warnings</div><div class="speed-card-value">' +
+      escapeHtml(String(w ?? "—")) +
+      '</div><div class="speed-card-sub">' +
+      escapeHtml(latest.recorded_at || "not recorded") +
+      "</div></div>";
+    html +=
+      '<div class="speed-card ' +
+      (e > 0 ? "fail" : "ok") +
+      '"><div class="speed-card-label">errors</div><div class="speed-card-value">' +
+      escapeHtml(String(e ?? "—")) +
+      '</div><div class="speed-card-sub">' +
+      escapeHtml(
+        (ok === true ? "ok" : ok === false ? "fail" : "—") +
+          (latest.wall_secs != null
+            ? " · " + formatWallSecs(latest.wall_secs)
+            : "")
+      ) +
+      "</div></div>";
+    html += "</div>";
+    const codes = Array.isArray(latest.top_codes) ? latest.top_codes : [];
+    if (codes.length) {
+      html += '<h3 class="speed-index-h">top codes</h3><ul class="speed-index-list">';
+      codes.forEach((c) => {
+        html +=
+          '<li><span class="speed-id">lint</span><span class="speed-title">' +
+          escapeHtml(String(c)) +
+          "</span></li>";
+      });
+      html += "</ul>";
+    }
+    html += '<h3 class="speed-index-h">history</h3><ul class="speed-index-list">';
+    if (!hist.length) {
+      html +=
+        '<li class="speed-index-empty-row" style="color:var(--muted)">Empty — record after drain / CI.</li>';
+    }
+    hist.forEach((entry) => {
+      html +=
+        '<li><span class="speed-id">' +
+        escapeHtml(String(entry.warnings ?? 0) + "/" + String(entry.errors ?? 0)) +
+        '</span><span class="speed-title">' +
+        escapeHtml(
+          (entry.ok ? "ok" : "fail") +
+            " · " +
+            (entry.source || "") +
+            " · " +
+            (entry.recorded_at || "")
+        ) +
+        "</span></li>";
+    });
+    html += "</ul>";
+    box.innerHTML = html;
+  }
+
   function renderSpeedIndex(data) {
     const box = document.getElementById("speed-index");
     if (!box) return;
@@ -4627,6 +4739,8 @@
     renderSprintQueue(manifest);
     const speed = await loadSpeedIndex();
     renderSpeedIndex(speed);
+    const rustDiag = await loadRustDiagnostics();
+    renderRustDiagnostics(rustDiag);
 
     const tree = document.getElementById("file-tree");
     tree.innerHTML = "";
