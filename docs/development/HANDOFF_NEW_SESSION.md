@@ -54,7 +54,7 @@
 
 **PH-S1578 ✅ (2026-07-28):** `monitoring_api_contracts_depth.rs`; `GET /monitoring/store`; validate fixtures; `--monitoring-api`; `VERIFY_MONITORING_API`; `MONITORING_API.md`; `galaxy_horizon_s1569_integration`. Phase E Monitoring API contracts drained.
 
-**§5.12:** **0** відкритих. **Vision:** rev **421**. **Pending completion:** **700** (→ PH-S2278). **Next expected band:** 94 (`PH-S1579…S1588`, Monitoring admin/ops glue).
+**§5.12:** **0** відкритих. **Vision:** rev **422**. **Pending completion:** **700** (→ PH-S2278). **Next expected band:** 94 (`PH-S1579…S1588`, Monitoring admin/ops glue).
 
 ## Band 92 — Monitoring store wire (PH-S1559…S1568, **✅**)
 
