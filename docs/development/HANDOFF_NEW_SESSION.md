@@ -54,7 +54,7 @@
 
 **PH-S1568 ✅ (2026-07-28):** `monitoring_store_depth.rs`; `monitoring_store_wire()`; `--monitoring-store`; `VERIFY_MONITORING_STORE`; `MONITORING_STORE.md`; `galaxy_horizon_s1559_integration`. Phase E Monitoring store wire drained.
 
-**§5.12:** **0** відкритих. **Vision:** rev **419**. **Pending completion:** **710** (→ PH-S2278). **Next expected band:** 93 (`PH-S1569…S1578`, Monitoring API contracts).
+**§5.12:** **0** відкритих. **Vision:** rev **420**. **Pending completion:** **710** (→ PH-S2278). **Next expected band:** 93 (`PH-S1569…S1578`, Monitoring API contracts).
 
 ## Band 91 — Monitoring depth scaffold (PH-S1549…S1558, **✅**)
 
