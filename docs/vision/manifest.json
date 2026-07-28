@@ -2942,11 +2942,23 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_development_POLICIES_RATIO_ADVISORY_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_policy_horizon_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_POLICIES_HORIZON_md"
     }
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S1538",
+  "last_sprint_closed": "PH-S1548",
   "layers": [
     {
       "id": "L0",
@@ -11570,102 +11582,39 @@
       "label": "policy_ratio_advisory_integration.rs",
       "layer": "L3",
       "path": "tests/policy_ratio_advisory_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_policy_horizon_depth_rs",
+      "label": "policy_horizon_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/policy_horizon_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_POLICIES_HORIZON_md",
+      "label": "POLICIES_HORIZON.md",
+      "layer": "L1",
+      "path": "docs/development/POLICIES_HORIZON.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1539_integration_rs",
+      "label": "galaxy_horizon_s1539_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1539_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_policy_horizon_integration_rs",
+      "label": "policy_horizon_integration.rs",
+      "layer": "L3",
+      "path": "tests/policy_horizon_integration.rs"
     }
   ],
-  "revision": 414,
-  "sprint_queue": [
-    {
-      "acceptance": "depth enum + criteria registry",
-      "deps": "policy_horizon_depth.rs",
-      "id": "PH-S1539",
-      "open": true,
-      "row": 1474,
-      "status": "open",
-      "title": "policy_horizon_depth` ui-core module"
-    },
-    {
-      "acceptance": "bands 81–89 `--policy*` + ratio-advisory; unit test",
-      "deps": "POLICY_HORIZON_SLICES",
-      "id": "PH-S1540",
-      "open": true,
-      "row": 1475,
-      "status": "open",
-      "title": "Slice aggregate (phase-D policy*)"
-    },
-    {
-      "acceptance": "markers + registry",
-      "deps": "policy_horizon_integration",
-      "id": "PH-S1541",
-      "open": true,
-      "row": 1476,
-      "status": "open",
-      "title": "Criteria contracts"
-    },
-    {
-      "acceptance": "horizon verify gate",
-      "deps": "verify-dev-stand / run-poolai",
-      "id": "PH-S1542",
-      "open": true,
-      "row": 1477,
-      "status": "open",
-      "title": "VERIFY_POLICY_HORIZON` + quick"
-    },
-    {
-      "acceptance": "unit export-shape",
-      "deps": "poolai_http_stand_smoke",
-      "id": "PH-S1543",
-      "open": true,
-      "row": 1478,
-      "status": "open",
-      "title": "Stand smoke export shape"
-    },
-    {
-      "acceptance": "rust_ratio.json` fields",
-      "deps": "loc-audit",
-      "id": "PH-S1544",
-      "open": true,
-      "row": 1479,
-      "status": "open",
-      "title": "poolai-loc-audit --policy-horizon"
-    },
-    {
-      "acceptance": "horizon matrix",
-      "deps": "RUN_LOCAL/INDEX/HANDOFF/NEXT",
-      "id": "PH-S1545",
-      "open": true,
-      "row": 1480,
-      "status": "open",
-      "title": "Docs `POLICIES_HORIZON.md` + canon"
-    },
-    {
-      "acceptance": "drift gate green",
-      "deps": "docs/vision",
-      "id": "PH-S1546",
-      "open": true,
-      "row": 1481,
-      "status": "open",
-      "title": "vision-sync --check"
-    },
-    {
-      "acceptance": "--min-ratio 0.95 --advisory",
-      "deps": "loc-audit",
-      "id": "PH-S1547",
-      "open": true,
-      "row": 1482,
-      "status": "open",
-      "title": "Ratio hold advisory"
-    },
-    {
-      "acceptance": "galaxy_horizon_s1539_integration`; HANDOFF/NEXT",
-      "deps": "tests/docs",
-      "id": "PH-S1548",
-      "open": true,
-      "row": 1483,
-      "status": "open",
-      "title": "Policies horizon band close"
-    }
-  ],
-  "sprint_queue_open_count": 10,
+  "revision": 415,
+  "sprint_queue": [],
+  "sprint_queue_open_count": 0,
   "updated_at": "2026-06-20",
   "vision_ui_rev": 59
 }

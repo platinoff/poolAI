@@ -1,16 +1,16 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-07-28 (band 90 **PH-S1539…S1548, 2026-07-28** ✅ · horizon band 91 next)
+**Оновлено:** 2026-07-27 (band 90 **PH-S1539…S1548** ✅ · horizon band 90)
 
 Maintenance mode (FM §5.15) · band 90 drained.
 
 Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.18 @ S2278).
 
-| **← наступний** | **`абракадабра`** (project scan → band 91) |
-| **§5.12 active** | **10** (band 90 ✅) |
+| **← наступний** | **`абракадабра`** (project scan → band 90) |
+| **§5.12 active** | **0** (band 90 ✅) |
 | **P0 open** | **PH-SVC34** re-verify GH · **PH-SVC35** OWNER |
 | **Completion pending** | **730** sprints PH-S1549…S2278 · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) |
-| **Horizon** | band 91 → **PH-S1549…S1558** |
+| **Horizon** | band 90 → **PH-S1539…S1548** |
 | **Vision** | rev **414** |
 | **Cursor / GH** | local **3.13.21** · Auto-review · Router Balance/Intelligence · Actions `GITHUB_TOKEN` opaque/JWT · [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](./CURSOR_UPDATE_RESEARCH_2026-07-27.md) |
 
@@ -28,7 +28,7 @@ Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.1
 
 ---
 
-## Band 91 (очікуваний фокус — project scan)
+## Band 90 (очікуваний фокус — project scan)
 
 | Sprint | Фокус |
 |--------|--------|
