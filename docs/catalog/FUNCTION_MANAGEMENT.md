@@ -1221,7 +1221,7 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 91 ✅ · band 92 next). **Master horizon:** PH-S1559…S1568 (band 92). **Completion pending:** PH-S1559…S2278 = **720** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **417**. **Наступна сесія:** **`абракадабра`** — project scan / band 92.
+**Відкритих у §5.12:** **0** (band 91 ✅ · band 92 next). **Master horizon:** PH-S1559…S1568 (band 92). **Completion pending:** PH-S1559…S2278 = **720** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **418**. **Наступна сесія:** **`абракадабра`** — project scan / band 92.
 
 ### 5.72 Monitoring depth scaffold queue — band 91 (PH-S1549…S1558, 2026-07-28) · **✅**
 
