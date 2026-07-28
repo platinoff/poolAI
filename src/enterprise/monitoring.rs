@@ -4,6 +4,8 @@
 //!
 //! Monitoring depth (phase E band 91+): `POOLAI_MONITORING_DATA_DIR` enables SQLite
 //! (`monitoring.db`). See [`docs/development/MONITORING_DEPTH.md`].
+//! Store wire (band 92): `POOLAI_MONITORING_STORE` + `monitoring_store_wire()` —
+//! [`docs/development/MONITORING_STORE.md`].
 //!
 //! # Features
 //!
@@ -44,7 +46,7 @@ use rusqlite::{params, Connection, Result as SqliteResult};
 use serde::{Deserialize, Serialize};
 use serde_json;
 use std::collections::HashMap;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::sync::{Arc, OnceLock};
 use tokio::sync::RwLock;
 use tracing::{info, warn};
@@ -53,8 +55,11 @@ use uuid::Uuid;
 /// SQLite file under `POOLAI_MONITORING_DATA_DIR` (FM-030).
 pub const MONITORING_DB_FILE: &str = "monitoring.db";
 
-/// Env key for durable monitoring SQLite directory (band 91 scaffold).
+/// Env key for durable monitoring SQLite directory (band 91 scaffold / band 92 wire).
 pub const POOLAI_MONITORING_DATA_DIR: &str = "POOLAI_MONITORING_DATA_DIR";
+
+/// Env key for monitoring store backend mode (band 92 wire).
+pub const POOLAI_MONITORING_STORE: &str = "POOLAI_MONITORING_STORE";
 
 /// Canonical monitoring store modes (band 91 scaffold).
 pub const MONITORING_STORE_MODES: &[&str] = &["memory", "sqlite"];
@@ -117,10 +122,73 @@ impl Default for AlertRule {
     }
 }
 
-/// Resolve configured monitoring store mode (PH-S1550; durable when data dir set).
+/// Resolve configured monitoring store mode (PH-S1550; durable wire PH-S1560).
+///
+/// Prefer explicit `POOLAI_MONITORING_STORE`; else a set data dir implies `sqlite`
+/// (band 91+ compatibility).
 pub fn monitoring_store_mode() -> &'static str {
-    if data_dir_from_env().is_some() {
+    match std::env::var(POOLAI_MONITORING_STORE)
+        .unwrap_or_default()
+        .to_ascii_lowercase()
+        .as_str()
+    {
+        "sqlite" => "sqlite",
+        "memory" => "memory",
+        _ => {
+            if data_dir_from_env().is_some() {
+                "sqlite"
+            } else {
+                "memory"
+            }
+        }
+    }
+}
+
+/// Optional durable data directory as [`PathBuf`] (PH-S1560).
+pub fn monitoring_store_data_dir_from_env() -> Option<PathBuf> {
+    data_dir_from_env().map(PathBuf::from)
+}
+
+/// Monitoring store wire snapshot (mode + durable path; CRUD via DATA_DIR already).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct MonitoringStoreWire {
+    /// `memory` or `sqlite`.
+    pub mode: String,
+    /// Resolved sqlite file path when mode is sqlite and data dir is set.
+    pub durable_path: Option<String>,
+    /// True when sqlite mode has a durable path.
+    pub configured: bool,
+}
+
+/// Resolve monitoring store wire for ops / verify / contracts (PH-S1560).
+pub fn monitoring_store_wire() -> MonitoringStoreWire {
+    let mode = monitoring_store_mode().to_string();
+    if mode != "sqlite" {
+        return MonitoringStoreWire {
+            mode,
+            durable_path: None,
+            configured: false,
+        };
+    }
+    let durable_path = monitoring_store_data_dir_from_env().map(|dir| {
+        dir.join(MONITORING_DB_FILE)
+            .to_string_lossy()
+            .replace('\\', "/")
+    });
+    let configured = durable_path.is_some();
+    MonitoringStoreWire {
+        mode,
+        durable_path,
+        configured,
+    }
+}
+
+/// Wire label for admin / metrics depth fields (PH-S1560).
+pub fn monitoring_store_wire_label(wire: &MonitoringStoreWire) -> &'static str {
+    if wire.mode == "sqlite" && wire.configured {
         "sqlite"
+    } else if wire.mode == "sqlite" {
+        "sqlite_unconfigured"
     } else {
         "memory"
     }
@@ -1170,6 +1238,7 @@ mod tests {
 
     #[test]
     fn monitoring_store_mode_defaults_memory_ph_s1550() {
+        std::env::remove_var(POOLAI_MONITORING_STORE);
         std::env::remove_var(POOLAI_MONITORING_DATA_DIR);
         assert_eq!(monitoring_store_mode(), "memory");
         std::env::set_var(POOLAI_MONITORING_DATA_DIR, "/tmp/poolai-monitoring-wire");
@@ -1177,6 +1246,43 @@ mod tests {
         std::env::remove_var(POOLAI_MONITORING_DATA_DIR);
         assert!(MONITORING_STORE_MODES.contains(&"memory"));
         assert_eq!(POOLAI_MONITORING_DATA_DIR, "POOLAI_MONITORING_DATA_DIR");
+        assert_eq!(POOLAI_MONITORING_STORE, "POOLAI_MONITORING_STORE");
+    }
+
+    #[test]
+    fn monitoring_store_wire_memory_default_ph_s1560() {
+        std::env::remove_var(POOLAI_MONITORING_STORE);
+        std::env::remove_var(POOLAI_MONITORING_DATA_DIR);
+        let wire = monitoring_store_wire();
+        assert_eq!(wire.mode, "memory");
+        assert!(!wire.configured);
+        assert!(wire.durable_path.is_none());
+        assert_eq!(monitoring_store_wire_label(&wire), "memory");
+        assert_eq!(MONITORING_DB_FILE, "monitoring.db");
+    }
+
+    #[test]
+    fn monitoring_store_wire_sqlite_unconfigured_ph_s1560() {
+        std::env::set_var(POOLAI_MONITORING_STORE, "sqlite");
+        std::env::remove_var(POOLAI_MONITORING_DATA_DIR);
+        let wire = monitoring_store_wire();
+        assert_eq!(wire.mode, "sqlite");
+        assert!(!wire.configured);
+        assert_eq!(monitoring_store_wire_label(&wire), "sqlite_unconfigured");
+        std::env::remove_var(POOLAI_MONITORING_STORE);
+    }
+
+    #[test]
+    fn monitoring_store_wire_sqlite_configured_ph_s1560() {
+        std::env::set_var(POOLAI_MONITORING_STORE, "sqlite");
+        std::env::set_var(POOLAI_MONITORING_DATA_DIR, "/tmp/poolai-monitoring-wire");
+        let wire = monitoring_store_wire();
+        assert!(wire.configured);
+        assert_eq!(monitoring_store_wire_label(&wire), "sqlite");
+        let path = wire.durable_path.as_deref().expect("path");
+        assert!(path.ends_with(MONITORING_DB_FILE) || path.contains(MONITORING_DB_FILE));
+        std::env::remove_var(POOLAI_MONITORING_STORE);
+        std::env::remove_var(POOLAI_MONITORING_DATA_DIR);
     }
 
     #[test]

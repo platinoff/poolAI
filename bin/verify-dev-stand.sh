@@ -54,6 +54,7 @@ VERIFY_POLICY_VISION_SYNC="${VERIFY_POLICY_VISION_SYNC:-0}"
 VERIFY_POLICY_RATIO_ADVISORY="${VERIFY_POLICY_RATIO_ADVISORY:-0}"
 VERIFY_POLICY_HORIZON="${VERIFY_POLICY_HORIZON:-0}"
 VERIFY_MONITORING="${VERIFY_MONITORING:-0}"
+VERIFY_MONITORING_STORE="${VERIFY_MONITORING_STORE:-0}"
 VERIFY_SSO_LOC_AUDIT="${VERIFY_SSO_LOC_AUDIT:-0}"
 VERIFY_SSO_DOCS_CANON="${VERIFY_SSO_DOCS_CANON:-0}"
 VERIFY_SSO_VISION_SYNC="${VERIFY_SSO_VISION_SYNC:-0}"
@@ -721,6 +722,16 @@ if [[ "$VERIFY_MONITORING" == "1" ]]; then
     echo "OK  monitoring depth gate loc-audit"
   else
     echo "FAIL monitoring depth gate loc-audit"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_MONITORING_STORE" == "1" ]]; then
+  echo "Running poolai-loc-audit --monitoring-store (PH-S1562)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --monitoring-store); then
+    echo "OK  monitoring store-wire gate loc-audit"
+  else
+    echo "FAIL monitoring store-wire gate loc-audit"
     fail=1
   fi
 fi

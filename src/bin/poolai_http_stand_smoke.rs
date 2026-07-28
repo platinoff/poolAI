@@ -6826,6 +6826,46 @@ mod tests {
     }
 
     #[test]
+    fn monitoring_store_band92_export_shape_ph_s1563() {
+        use poolai_ui_core::monitoring_store_depth::{
+            monitoring_store_criteria_total, monitoring_store_depth_stub, MonitoringStoreDepth,
+            FM_BAND92_ROWS, MONITORING_STORE_CASES, MONITORING_STORE_CRITERIA,
+        };
+        use serde_json::json;
+        assert_eq!(
+            monitoring_store_depth_stub(Some(&json!({"api_contracts": true}))),
+            MonitoringStoreDepth::ApiContracts
+        );
+        assert_eq!(
+            monitoring_store_depth_stub(Some(&json!({
+                "monitoring_store_depth": true,
+                "store_wire": true,
+                "api_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "monitoring_store_docs": true,
+            }))),
+            MonitoringStoreDepth::FullBand92
+        );
+        assert_eq!(MONITORING_STORE_CRITERIA.len(), 7);
+        assert_eq!(monitoring_store_criteria_total(), 7);
+        assert!(MONITORING_STORE_CASES.contains(&"store_wire"));
+        let monitoring_mod = include_str!("../../src/enterprise/monitoring.rs");
+        assert!(monitoring_mod.contains("monitoring_store_wire"));
+        assert!(monitoring_mod.contains("POOLAI_MONITORING_STORE"));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--monitoring-store"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND92_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band92 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn policy_admin_ops_band84_export_shape_ph_s1485() {
         use poolai_ui_core::policy_admin_ops_depth::{
             policy_admin_ops_criteria_total, policy_admin_ops_depth_stub, PolicyAdminOpsDepth,

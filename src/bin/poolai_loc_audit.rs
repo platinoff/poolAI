@@ -43,6 +43,9 @@ use poolai_ui_core::galaxy_edge_verification_depth::{
 use poolai_ui_core::monitoring_depth::{
     monitoring_criteria_total, MONITORING_CASES, MONITORING_CRITERIA,
 };
+use poolai_ui_core::monitoring_store_depth::{
+    monitoring_store_criteria_total, MONITORING_STORE_CASES, MONITORING_STORE_CRITERIA,
+};
 use poolai_ui_core::policy_admin_ops_depth::{
     policy_admin_ops_criteria_total, POLICY_ADMIN_OPS_CASES, POLICY_ADMIN_OPS_CRITERIA,
 };
@@ -307,6 +310,8 @@ struct AuditConfig {
     policy_horizon: bool,
     /// Emit band-91 monitoring depth fields (PH-S1554).
     monitoring: bool,
+    /// Emit band-92 monitoring store-wire fields (PH-S1564).
+    monitoring_store: bool,
 }
 
 impl Default for AuditConfig {
@@ -363,6 +368,7 @@ impl Default for AuditConfig {
             policy_ratio_advisory: false,
             policy_horizon: false,
             monitoring: false,
+            monitoring_store: false,
         }
     }
 }
@@ -696,6 +702,12 @@ struct RustRatioReport {
     monitoring_criteria_total: usize,
     /// Monitoring depth criteria met count (PH-S1554).
     monitoring_criteria_met_count: usize,
+    /// Band-92 monitoring store-wire mode (PH-S1564).
+    monitoring_store_mode: bool,
+    /// Monitoring store-wire criteria registry size (PH-S1564).
+    monitoring_store_criteria_total: usize,
+    /// Monitoring store-wire criteria met count (PH-S1564).
+    monitoring_store_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -1008,6 +1020,22 @@ fn monitoring_depth_criteria_met(root: &Path) -> (usize, usize) {
     let total = monitoring_criteria_total();
     let mut met = 0usize;
     for (_, marker, rel) in MONITORING_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
+fn monitoring_store_wire_criteria_met(root: &Path) -> (usize, usize) {
+    let total = monitoring_store_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in MONITORING_STORE_CRITERIA {
         let path = root.join(rel);
         if path.is_file() {
             if let Ok(content) = fs::read_to_string(&path) {
@@ -1589,6 +1617,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--policy-horizon" => config.policy_horizon = true,
             "--policy" => config.policy = true,
             "--monitoring" => config.monitoring = true,
+            "--monitoring-store" => config.monitoring_store = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
                 print_help();
@@ -1657,6 +1686,7 @@ fn print_help() {
            --policy-ratio-advisory     band-89 policies ratio-advisory fields (PH-S1534)\n\
            --policy-horizon            band-90 policies horizon-close fields (PH-S1544)\n\
            --monitoring                band-91 monitoring depth scaffold fields (PH-S1554)\n\
+           --monitoring-store          band-92 monitoring store-wire fields (PH-S1564)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -2252,6 +2282,18 @@ fn build_report(
         );
         notes.push("PH-S1558: band 91 monitoring depth — criteria met vs registry");
     }
+    let (monitoring_store_criteria_met_count, monitoring_store_criteria_total_count) =
+        if config.monitoring_store {
+            monitoring_store_wire_criteria_met(root)
+        } else {
+            (0, monitoring_store_criteria_total())
+        };
+    if config.monitoring_store {
+        notes.push(
+            "PH-S1564: monitoring_store_mode — durable path wire stub (POOLAI_MONITORING_STORE + DATA_DIR)",
+        );
+        notes.push("PH-S1568: band 92 monitoring store wire — criteria met vs registry");
+    }
 
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
@@ -2421,6 +2463,9 @@ fn build_report(
         monitoring_mode: config.monitoring,
         monitoring_criteria_total: monitoring_criteria_total_count,
         monitoring_criteria_met_count,
+        monitoring_store_mode: config.monitoring_store,
+        monitoring_store_criteria_total: monitoring_store_criteria_total_count,
+        monitoring_store_criteria_met_count,
         by_category,
         notes,
     })
@@ -2935,6 +2980,17 @@ fn print_summary(report: &RustRatioReport) {
             report.monitoring_criteria_met_count, report.monitoring_criteria_total
         );
         println!("  monitoring_cases:      {}", MONITORING_CASES.join(", "));
+    }
+    if report.monitoring_store_mode {
+        println!("  monitoring_store:      true (PH-S1564 band 92)");
+        println!(
+            "  monitoring_store_criteria: {}/{} met",
+            report.monitoring_store_criteria_met_count, report.monitoring_store_criteria_total
+        );
+        println!(
+            "  monitoring_store_cases: {}",
+            MONITORING_STORE_CASES.join(", ")
+        );
     }
     for (name, loc) in &report.by_category {
         println!("  {name}: {} files, {} loc", loc.files, loc.loc);

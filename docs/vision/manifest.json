@@ -2970,7 +2970,7 @@
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S1558",
+  "last_sprint_closed": "PH-S1568",
   "layers": [
     {
       "id": "L0",
@@ -3003,7 +3003,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1559",
+  "next_sprint": "PH-S1569",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -11652,7 +11652,7 @@
       "path": "tests/monitoring_depth_audit.rs"
     }
   ],
-  "revision": 418,
+  "revision": 419,
   "sprint_queue": [],
   "sprint_queue_open_count": 0,
   "updated_at": "2026-06-20",

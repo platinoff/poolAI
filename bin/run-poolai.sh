@@ -101,6 +101,7 @@ Options (quick):
   --policy-ratio-advisory After health wait, loc-audit --policy-ratio-advisory (PH-S1532)
   --policy-horizon After health wait, loc-audit --policy-horizon (PH-S1544)
   --monitoring    After health wait, loc-audit --monitoring (PH-S1552)
+  --monitoring-store After health wait, loc-audit --monitoring-store (PH-S1562)
   --skip-build    Skip cargo build
   --port N        HTTP port (default 8080)
 
@@ -325,6 +326,7 @@ cmd_quick() {
   local policy_ratio_advisory=0
   local policy_horizon=0
   local monitoring=0
+  local monitoring_store=0
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --skip-build) SKIP_BUILD=1; shift ;;
@@ -373,6 +375,7 @@ cmd_quick() {
       --policy-horizon) policy_horizon=1; shift ;;
       --policy) policy=1; shift ;;
       --monitoring) monitoring=1; shift ;;
+      --monitoring-store) monitoring_store=1; shift ;;
       --policy-store) policy_store=1; shift ;;
       --policy-api) policy_api=1; shift ;;
       --port) PORT="$2"; shift 2 ;;
@@ -583,6 +586,10 @@ cmd_quick() {
   if [[ "$monitoring" == "1" ]]; then
     echo "Running poolai-loc-audit --monitoring (PH-S1552)..."
     cargo run --quiet --bin poolai-loc-audit -- --monitoring
+  fi
+  if [[ "$monitoring_store" == "1" ]]; then
+    echo "Running poolai-loc-audit --monitoring-store (PH-S1562)..."
+    cargo run --quiet --bin poolai-loc-audit -- --monitoring-store
   fi
 }
 

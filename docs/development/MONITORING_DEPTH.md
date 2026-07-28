@@ -43,5 +43,5 @@ bash bin/run-poolai.sh quick --monitoring
 - FM §5.17 enterprise 100% · §5.72 band 91 journal
 - Phase D Policies closed at band 90 — see [`POLICIES_HORIZON.md`](./POLICIES_HORIZON.md)
 - Mirror: [`POLICIES_DEPTH.md`](./POLICIES_DEPTH.md) · [`AUDIT_DEPTH.md`](./AUDIT_DEPTH.md) · [`SSO_DEPTH.md`](./SSO_DEPTH.md)
-- Store wire (band 92): master backlog Monitoring · store wire
+- Store wire (band 92): [`MONITORING_STORE.md`](./MONITORING_STORE.md) ✅
 - PH-S1549 · monitoring_depth · POOLAI_MONITORING_DATA_DIR · PH-S1552 · VERIFY_MONITORING · PH-S1554 · --monitoring · PH-S1558

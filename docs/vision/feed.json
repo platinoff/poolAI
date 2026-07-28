@@ -3,6 +3,96 @@
   "items": [
     {
       "category": "closed",
+      "id": "PH-S1568",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "band close",
+      "title": "galaxy_horizon_s1559_integration"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1567",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--min-ratio 0.95 --advisory",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1566",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "drift gate green",
+      "title": "poolai-vision-sync --check"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1565",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "HANDOFF/NEXT sync",
+      "title": "Docs `MONITORING_STORE.md` + canon"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1564",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "rust_ratio.json` fields",
+      "title": "poolai-loc-audit `--monitoring-store"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1563",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "export shape unit test",
+      "title": "Stand smoke `monitoring` store export"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1562",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "verify-dev-stand / run-poolai",
+      "title": "VERIFY_MONITORING_STORE` + `--monitoring-store"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1561",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "monitoring_store_wire_integration",
+      "title": "store wire contracts"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1560",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "POOLAI_MONITORING_STORE` + `monitoring_store_wire()` + unit",
+      "title": "Monitoring store wire durable path"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1559",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "depth enum + criteria registry",
+      "title": "monitoring_store_depth` scaffold"
+    },
+    {
+      "category": "closed",
       "id": "PH-S1558",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
@@ -13,96 +103,6 @@
     {
       "category": "closed",
       "id": "PH-S1557",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--min-ratio 0.95 --advisory",
-      "title": "Ratio hold advisory"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1556",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "drift gate green",
-      "title": "poolai-vision-sync --check"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1555",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "HANDOFF/NEXT sync",
-      "title": "Docs canon sync"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1554",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "rust_ratio.json` zriz",
-      "title": "poolai-loc-audit PH-S1554"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1553",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "export shape unit test",
-      "title": "Stand smoke `monitoring` export"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1552",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "verify-dev-stand or admin strip",
-      "title": "monitoring` admin/ops glue"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1551",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "tests/*_integration.rs` or contract test",
-      "title": "monitoring` API contracts"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1550",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "durable path or production verify stub + unit",
-      "title": "monitoring` store/wire slice"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1549",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "depth enum + criteria registry",
-      "title": "monitoring_depth` scaffold"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1548",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_horizon_s1539_integration`; HANDOFF/NEXT",
-      "title": "Policies horizon band close"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1547",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
