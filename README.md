@@ -90,7 +90,7 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 **Наступна сесія (owner):** **`абракадабра`** — drain band 95 **PH-S1589…S1598** · [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
-**§5.12:** **0** відкритих (band 94 ✅ · band 95 next) · vision **rev 423** · last **PH-S1588** · next **PH-S1589**.
+**§5.12:** **0** відкритих (band 94 ✅ · band 95 next) · vision **rev 424** · last **PH-S1588** · next **PH-S1589**.
 
 **Ops (поза чергою):** **FM-003** LAN §4 **BLOCKED** (2 хости) · **FM-041** Cloud SDK **Deferred**.
 

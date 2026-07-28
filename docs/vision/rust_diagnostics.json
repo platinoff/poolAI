@@ -9,20 +9,20 @@
     "Record via poolai-rust-diagnostics or bin/record-rust-diagnostics.sh (abrakadabra drain + CI)."
   ],
   "latest": {
-    "warnings": 157,
-    "errors": 11,
+    "warnings": 138,
+    "errors": 9,
     "ok": false,
-    "recorded_at": "2026-07-28T23:20:45Z",
+    "recorded_at": "2026-07-28T23:21:19Z",
     "command": "cargo clippy --message-format=json --all-targets --features jwt,https",
-    "wall_secs": 108.0036137,
+    "wall_secs": 142.6401195,
     "top_codes": [
       "clippy::needless_borrows_for_generic_args×87",
-      "clippy::nonminimal_bool×17",
       "clippy::too_many_arguments×16",
       "clippy::await_holding_lock×9",
-      "E0432×8",
+      "E0432×6",
       "clippy::manual_clamp×4",
       "E0425×3",
+      "clippy::nonminimal_bool×3",
       "clippy::items_after_test_module×2"
     ]
   },
@@ -137,22 +137,22 @@
     {
       "kind": "rust_diagnostics",
       "command": "cargo clippy --message-format=json --all-targets --features jwt,https",
-      "warnings": 157,
-      "errors": 11,
+      "warnings": 138,
+      "errors": 9,
       "ok": false,
-      "recorded_at": "2026-07-28T23:20:45Z",
-      "wall_secs": 108.0036137,
+      "recorded_at": "2026-07-28T23:21:19Z",
+      "wall_secs": 142.6401195,
       "host_label": "PLATINOV",
       "git_head": "cfd96a9d3",
       "source": "local",
       "top_codes": [
         "clippy::needless_borrows_for_generic_args×87",
-        "clippy::nonminimal_bool×17",
         "clippy::too_many_arguments×16",
         "clippy::await_holding_lock×9",
-        "E0432×8",
+        "E0432×6",
         "clippy::manual_clamp×4",
         "E0425×3",
+        "clippy::nonminimal_bool×3",
         "clippy::items_after_test_module×2"
       ]
     }

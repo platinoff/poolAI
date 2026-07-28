@@ -1221,7 +1221,7 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 94 ✅ · band 95 next). **Master horizon:** PH-S1589…S1598 (band 95). **Completion pending:** PH-S1589…S2278 = **690** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **423**. **Наступна сесія:** **`абракадабра`** — project scan / band 95.
+**Відкритих у §5.12:** **0** (band 94 ✅ · band 95 next). **Master horizon:** PH-S1589…S1598 (band 95). **Completion pending:** PH-S1589…S2278 = **690** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **424**. **Наступна сесія:** **`абракадабра`** — project scan / band 95.
 
 ### 5.75 Monitoring admin/ops glue queue — band 94 (PH-S1579…S1588, 2026-07-28) · **✅**
 
