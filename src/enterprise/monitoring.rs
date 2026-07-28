@@ -2,6 +2,9 @@
 //!
 //! Provides real-time dashboards, alerts, and advanced metrics.
 //!
+//! Monitoring depth (phase E band 91+): `POOLAI_MONITORING_DATA_DIR` enables SQLite
+//! (`monitoring.db`). See [`docs/development/MONITORING_DEPTH.md`].
+//!
 //! # Features
 //!
 //! - Real-time metrics aggregation
@@ -24,8 +27,10 @@
 //!     name: "high-cpu".to_string(),
 //!     metric: "cpu_usage".to_string(),
 //!     threshold: 90.0,
+//!     operator: ">".to_string(),
 //!     severity: AlertSeverity::Warning,
 //!     enabled: true,
+//!     tenant_id: None,
 //! };
 //!
 //! manager.create_alert_rule(rule).await?;
@@ -47,6 +52,12 @@ use uuid::Uuid;
 
 /// SQLite file under `POOLAI_MONITORING_DATA_DIR` (FM-030).
 pub const MONITORING_DB_FILE: &str = "monitoring.db";
+
+/// Env key for durable monitoring SQLite directory (band 91 scaffold).
+pub const POOLAI_MONITORING_DATA_DIR: &str = "POOLAI_MONITORING_DATA_DIR";
+
+/// Canonical monitoring store modes (band 91 scaffold).
+pub const MONITORING_STORE_MODES: &[&str] = &["memory", "sqlite"];
 
 /// Alert severity level
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
@@ -104,6 +115,39 @@ impl Default for AlertRule {
             tenant_id: None,
         }
     }
+}
+
+/// Resolve configured monitoring store mode (PH-S1550; durable when data dir set).
+pub fn monitoring_store_mode() -> &'static str {
+    if data_dir_from_env().is_some() {
+        "sqlite"
+    } else {
+        "memory"
+    }
+}
+
+/// Production verify stub for alert rule fields (PH-S1550).
+pub fn validate_monitoring_alert_fields(rule: &AlertRule) -> Result<(), AppError> {
+    if rule.name.trim().is_empty() {
+        return Err(AppError::ValidationError(
+            "Alert rule name cannot be empty".to_string(),
+        ));
+    }
+    if rule.metric.trim().is_empty() {
+        return Err(AppError::ValidationError(
+            "Alert rule metric cannot be empty".to_string(),
+        ));
+    }
+    let valid_operators = [">", "<", ">=", "<=", "=="];
+    if !valid_operators.contains(&rule.operator.as_str()) {
+        return Err(AppError::ValidationError(format!(
+            "Invalid alert operator: {}. Valid operators are: {:?}. \
+                Context: Alert rule operator must be one of the supported comparison operators. \
+                Suggestion: Use '>' for greater than, '<' for less than, '>=' for greater or equal, '<=' for less or equal, '==' for equal.",
+            rule.operator, valid_operators
+        )));
+    }
+    Ok(())
 }
 
 /// Alert instance
@@ -616,27 +660,7 @@ impl MonitoringManager {
     ///
     /// Returns `AppError` if rule creation fails.
     pub async fn create_alert_rule(&self, rule: AlertRule) -> Result<(), AppError> {
-        if rule.name.is_empty() {
-            return Err(AppError::ValidationError(
-                "Alert rule name cannot be empty".to_string(),
-            ));
-        }
-
-        if rule.metric.is_empty() {
-            return Err(AppError::ValidationError(
-                "Alert rule metric cannot be empty".to_string(),
-            ));
-        }
-
-        let valid_operators = [">", "<", ">=", "<=", "=="];
-        if !valid_operators.contains(&rule.operator.as_str()) {
-            return Err(AppError::ValidationError(format!(
-                "Invalid alert operator: {}. Valid operators are: {:?}. \
-                Context: Alert rule operator must be one of the supported comparison operators. \
-                Suggestion: Use '>' for greater than, '<' for less than, '>=' for greater or equal, '<=' for less or equal, '==' for equal.",
-                rule.operator, valid_operators
-            )));
-        }
+        validate_monitoring_alert_fields(&rule)?;
 
         let mut rules = self.alert_rules.write().await;
         rules.insert(rule.name.clone(), rule.clone());
@@ -1143,6 +1167,61 @@ mod tests {
         assert_eq!(dashboards.len(), 1);
         assert_eq!(dashboards[0].id, dashboard.id);
     }
+
+    #[test]
+    fn monitoring_store_mode_defaults_memory_ph_s1550() {
+        std::env::remove_var(POOLAI_MONITORING_DATA_DIR);
+        assert_eq!(monitoring_store_mode(), "memory");
+        std::env::set_var(POOLAI_MONITORING_DATA_DIR, "/tmp/poolai-monitoring-wire");
+        assert_eq!(monitoring_store_mode(), "sqlite");
+        std::env::remove_var(POOLAI_MONITORING_DATA_DIR);
+        assert!(MONITORING_STORE_MODES.contains(&"memory"));
+        assert_eq!(POOLAI_MONITORING_DATA_DIR, "POOLAI_MONITORING_DATA_DIR");
+    }
+
+    #[test]
+    fn validate_monitoring_alert_fields_ok_ph_s1550() {
+        let rule = AlertRule {
+            name: "high-cpu".into(),
+            metric: "cpu_usage".into(),
+            threshold: 90.0,
+            operator: ">".into(),
+            severity: AlertSeverity::Warning,
+            enabled: true,
+            tenant_id: None,
+        };
+        assert!(validate_monitoring_alert_fields(&rule).is_ok());
+    }
+
+    #[test]
+    fn validate_monitoring_alert_fields_rejects_empty_name_ph_s1550() {
+        let rule = AlertRule {
+            name: "  ".into(),
+            metric: "cpu_usage".into(),
+            threshold: 90.0,
+            operator: ">".into(),
+            severity: AlertSeverity::Warning,
+            enabled: true,
+            tenant_id: None,
+        };
+        let err = validate_monitoring_alert_fields(&rule).unwrap_err();
+        assert!(err.to_string().contains("name"));
+    }
+
+    #[test]
+    fn validate_monitoring_alert_fields_rejects_bad_operator_ph_s1550() {
+        let rule = AlertRule {
+            name: "bad-op".into(),
+            metric: "cpu_usage".into(),
+            threshold: 90.0,
+            operator: "!=".into(),
+            severity: AlertSeverity::Warning,
+            enabled: true,
+            tenant_id: None,
+        };
+        let err = validate_monitoring_alert_fields(&rule).unwrap_err();
+        assert!(err.to_string().contains("operator"));
+    }
 }
 
 /// Global monitoring manager instance
@@ -1184,7 +1263,7 @@ pub fn get_global_monitoring_manager() -> Arc<MonitoringManager> {
 
 /// Directory for SQLite persistence (`POOLAI_MONITORING_DATA_DIR`).
 pub fn data_dir_from_env() -> Option<String> {
-    std::env::var("POOLAI_MONITORING_DATA_DIR")
+    std::env::var(POOLAI_MONITORING_DATA_DIR)
         .ok()
         .filter(|s| !s.trim().is_empty())
         .map(|s| s.trim().to_string())

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
   <title id="title">PoolAI Galaxy Starwalker Vision</title>
-  <desc id="desc">Isometric L0-L3 layers with Galaxy Grid at center. PH-S1548 done, next PH-S1539.</desc>
+  <desc id="desc">Isometric L0-L3 layers with Galaxy Grid at center. PH-S1558 done, next PH-S1559.</desc>
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#06080f"/>
@@ -107,5 +107,5 @@
     <text x="0" y="108" fill="#a78bfa">? implements / session-tracks</text>
   </g>
 
-  <text x="600" y="738" text-anchor="middle" fill="#6a7a9a" font-family="Segoe UI, system-ui, sans-serif" font-size="12">PH-S1548 done policies horizon close - PH-S1539 next - 0 open - rev 415</text>
+  <text x="600" y="738" text-anchor="middle" fill="#6a7a9a" font-family="Segoe UI, system-ui, sans-serif" font-size="12">PH-S1558 done monitoring depth scaffold - PH-S1559 next - 0 open - rev 417</text>
 </svg>

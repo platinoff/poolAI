@@ -75,7 +75,6 @@ pub fn render_grid_replication_pricing_panel_html(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use serde_json::json;
 
     #[test]
     fn render_grid_replication_pricing_panel_ph_s700() {

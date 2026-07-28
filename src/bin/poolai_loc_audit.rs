@@ -40,6 +40,9 @@ use poolai_ui_core::ci_canon_depth::{ci_canon_criteria_total, CI_CANON_CASES, CI
 use poolai_ui_core::galaxy_edge_verification_depth::{
     edge_verification_criteria_total, EDGE_VERIFICATION_CASES, EDGE_VERIFICATION_CRITERIA,
 };
+use poolai_ui_core::monitoring_depth::{
+    monitoring_criteria_total, MONITORING_CASES, MONITORING_CRITERIA,
+};
 use poolai_ui_core::policy_admin_ops_depth::{
     policy_admin_ops_criteria_total, POLICY_ADMIN_OPS_CASES, POLICY_ADMIN_OPS_CRITERIA,
 };
@@ -302,6 +305,8 @@ struct AuditConfig {
     policy_ratio_advisory: bool,
     /// Emit band-90 policies horizon-close fields (PH-S1544).
     policy_horizon: bool,
+    /// Emit band-91 monitoring depth fields (PH-S1554).
+    monitoring: bool,
 }
 
 impl Default for AuditConfig {
@@ -357,6 +362,7 @@ impl Default for AuditConfig {
             policy_vision_sync: false,
             policy_ratio_advisory: false,
             policy_horizon: false,
+            monitoring: false,
         }
     }
 }
@@ -684,6 +690,12 @@ struct RustRatioReport {
     policy_horizon_criteria_total: usize,
     /// Policies horizon-close criteria met count (PH-S1544).
     policy_horizon_criteria_met_count: usize,
+    /// Band-91 monitoring depth mode (PH-S1554).
+    monitoring_mode: bool,
+    /// Monitoring depth criteria registry size (PH-S1554).
+    monitoring_criteria_total: usize,
+    /// Monitoring depth criteria met count (PH-S1554).
+    monitoring_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -980,6 +992,22 @@ fn policy_depth_criteria_met(root: &Path) -> (usize, usize) {
     let total = policy_criteria_total();
     let mut met = 0usize;
     for (_, marker, rel) in POLICY_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
+fn monitoring_depth_criteria_met(root: &Path) -> (usize, usize) {
+    let total = monitoring_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in MONITORING_CRITERIA {
         let path = root.join(rel);
         if path.is_file() {
             if let Ok(content) = fs::read_to_string(&path) {
@@ -1560,6 +1588,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--policy-ratio-advisory" => config.policy_ratio_advisory = true,
             "--policy-horizon" => config.policy_horizon = true,
             "--policy" => config.policy = true,
+            "--monitoring" => config.monitoring = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
                 print_help();
@@ -1627,6 +1656,7 @@ fn print_help() {
            --policy-vision-sync        band-88 policies vision-sync fields (PH-S1524)\n\
            --policy-ratio-advisory     band-89 policies ratio-advisory fields (PH-S1534)\n\
            --policy-horizon            band-90 policies horizon-close fields (PH-S1544)\n\
+           --monitoring                band-91 monitoring depth scaffold fields (PH-S1554)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -2211,6 +2241,17 @@ fn build_report(
         );
         notes.push("PH-S1548: band 90 policies horizon close — criteria met vs registry");
     }
+    let (monitoring_criteria_met_count, monitoring_criteria_total_count) = if config.monitoring {
+        monitoring_depth_criteria_met(root)
+    } else {
+        (0, monitoring_criteria_total())
+    };
+    if config.monitoring {
+        notes.push(
+            "PH-S1554: monitoring_mode — monitoring depth scaffold (POOLAI_MONITORING_DATA_DIR + field stub)",
+        );
+        notes.push("PH-S1558: band 91 monitoring depth — criteria met vs registry");
+    }
 
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
@@ -2377,6 +2418,9 @@ fn build_report(
         policy_horizon_mode: config.policy_horizon,
         policy_horizon_criteria_total: policy_horizon_criteria_total_count,
         policy_horizon_criteria_met_count,
+        monitoring_mode: config.monitoring,
+        monitoring_criteria_total: monitoring_criteria_total_count,
+        monitoring_criteria_met_count,
         by_category,
         notes,
     })
@@ -2883,6 +2927,14 @@ fn print_summary(report: &RustRatioReport) {
             "  policy_horizon_cases: {}",
             POLICY_HORIZON_CASES.join(", ")
         );
+    }
+    if report.monitoring_mode {
+        println!("  monitoring:            true (PH-S1554 band 91)");
+        println!(
+            "  monitoring_criteria:   {}/{} met",
+            report.monitoring_criteria_met_count, report.monitoring_criteria_total
+        );
+        println!("  monitoring_cases:      {}", MONITORING_CASES.join(", "));
     }
     for (name, loc) in &report.by_category {
         println!("  {name}: {} files, {} loc", loc.files, loc.loc);

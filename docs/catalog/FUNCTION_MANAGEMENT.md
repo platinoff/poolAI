@@ -1221,7 +1221,26 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **10** (band 90 ✅ · band 91 next). **Master horizon:** PH-S1539…S1548 (band 90). **Completion pending:** PH-S1549…S2278 = **730** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **415**. **Наступна сесія:** **`абракадабра`** — project scan / band 91.
+**Відкритих у §5.12:** **0** (band 91 ✅ · band 92 next). **Master horizon:** PH-S1559…S1568 (band 92). **Completion pending:** PH-S1559…S2278 = **720** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **417**. **Наступна сесія:** **`абракадабра`** — project scan / band 92.
+
+### 5.72 Monitoring depth scaffold queue — band 91 (PH-S1549…S1558, 2026-07-28) · **✅**
+
+**Джерело:** project completion / enterprise phase E — Monitoring depth scaffold. Mirror band 81 [`POLICIES_DEPTH.md`](../development/POLICIES_DEPTH.md). Prior Policies horizon: [`POLICIES_HORIZON.md`](../development/POLICIES_HORIZON.md) (band 90). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · master [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1484 | **PH-S1549** | `monitoring_depth` scaffold | ui-core | depth enum + criteria registry | **✅** |
+| 1485 | **PH-S1550** | `monitoring` store/wire slice | store | durable path or production verify stub + unit | **✅** |
+| 1486 | **PH-S1551** | `monitoring` API contracts | tests | `tests/*_integration.rs` or contract test | **✅** |
+| 1487 | **PH-S1552** | `monitoring` admin/ops glue | verify/admin | verify-dev-stand or admin strip | **✅** |
+| 1488 | **PH-S1553** | Stand smoke `monitoring` export | stand-smoke | export shape unit test | **✅** |
+| 1489 | **PH-S1554** | poolai-loc-audit PH-S1554 | loc-audit | `rust_ratio.json` zriz | **✅** |
+| 1490 | **PH-S1555** | Docs canon sync | RUN_LOCAL/INDEX | HANDOFF/NEXT sync | **✅** |
+| 1491 | **PH-S1556** | poolai-vision-sync --check | docs/vision | drift gate green | **✅** |
+| 1492 | **PH-S1557** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **✅** |
+| 1493 | **PH-S1558** | galaxy_horizon_s1549_integration | tests/docs | band close | **✅** |
+
+**PH-S1558 ✅ (2026-07-28):** `monitoring_depth.rs`; `POOLAI_MONITORING_DATA_DIR`; `--monitoring`; `VERIFY_MONITORING`; `MONITORING_DEPTH.md`; `galaxy_horizon_s1549_integration`. Phase E Monitoring depth scaffold closed.
 
 ### 5.71 Policies horizon close queue — band 90 (PH-S1539…S1548, 2026-07-28) · **✅**
 
@@ -2226,7 +2245,7 @@ FM-xxx (з таблиці нижче)
 | **Enterprise subset pending** | **760** (S1389…S2148 → §5.17) |
 | **Extension pending** | **130** (S2149…S2278 → §5.18) |
 | **Drained** | band 51–74 PH-S1149…S1388 ✅ |
-| **Активна §5.12** | band 90 **PH-S1539…S1548** `✅` (§5.71) |
+| **Активна §5.12** | band 91 **PH-S1549…S1558** `✅` (§5.72) |
 | **План** | [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md) |
 | **Реєстр** | [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md) |
 | **Regen** | `bash scripts/generate-ph-s-master-backlog-1000.sh` · `bash scripts/generate-ph-s-completion-extension.sh` |
@@ -2385,7 +2404,7 @@ FM-xxx (з таблиці нижче)
 
 Рядки **PH-S150…S262** у таблиці §5.12 вище — **єдина черга** (max 10 відкритих). §5.13 — тематичний індекс ratio/portability/wasm stretch + post-stretch maintain.
 
-**Активна смуга (2026-07-28):** band 90 **PH-S1539…S1548** `✅` · §5.12 **10** · band 89 ✅ · band 88 ✅ · service PH-SVC75…SVC84 ✅ (Cursor 3.13.21) · PH-SVC65…SVC74 ✅ · PH-SVC55…SVC64 ✅ · PH-SVC45…SVC54 ✅ · P0 PH-SVC41…43 ✅ · PH-SVC34/35 · наступна **`абракадабра`** → band 91 · completion pending **730** → S2278.
+**Активна смуга (2026-07-28):** band 91 **PH-S1549…S1558** `✅` · §5.12 **0** · band 90 ✅ · band 89 ✅ · service PH-SVC75…SVC84 ✅ (Cursor 3.13.21) · PH-SVC65…SVC74 ✅ · PH-SVC55…SVC64 ✅ · PH-SVC45…SVC54 ✅ · P0 PH-SVC41…43 ✅ · PH-SVC34/35 · наступна **`абракадабра`** → band 92 · completion pending **720** → S2278.
 
 **Ціль:** формально **90–95%** Rust у product code; **spirit 96%** — орієнтир replenish (більше Rust — краще).
 

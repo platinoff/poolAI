@@ -1,8 +1,8 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-28 (band 90 **PH-S1539…S1548** ✅ · band 89 ✅ · service **PH-SVC85** Rust diagnostics panel ✅ · **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · band 88 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 91 next)
+**Оновлено:** 2026-07-28 (band 91 **PH-S1549…S1558** ✅ · band 90 ✅ · service **PH-SVC85** Rust diagnostics panel ✅ · **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · band 88 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 92 next)
 
-**Наступна сесія:** **`абракадабра`** — S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain band 91 · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+**Наступна сесія:** **`абракадабра`** — S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain band 92 · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
 
 ## P0 / service (2026-07-27)
 
@@ -24,7 +24,7 @@
 
 **Cursor / toolchain (service):** local desktop **3.13.21** · Auto-review · Router Balance/Intelligence for drain · vision Speeds/Rust/eye verified · research [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](./CURSOR_UPDATE_RESEARCH_2026-07-27.md) · FM **§5.16**.
 
-**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **730** спринтів → PH-S2278.
+**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **720** спринтів → PH-S2278.
 
 ## Security findings closed (PH-SVC55…64, by severity)
 
@@ -36,6 +36,25 @@
 | **Medium** | `.env` / `*.pem` / e2e log+pid gaps | `.gitignore` + permissions block staging |
 | **Low** | Corrupted MSYS path / e2e tmp artifacts | ignore patterns widened |
 | **Open (OWNER)** | PH-SVC35 Atlassian token (historical) | revoke in Atlassian; no history rewrite |
+
+## Band 91 — Monitoring depth scaffold (PH-S1549…S1558, **✅**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1549** | `monitoring_depth` scaffold |
+| **PH-S1550** | Store/wire (`POOLAI_MONITORING_DATA_DIR` + `validate_monitoring_alert_fields`) |
+| **PH-S1551** | Criteria contracts (`monitoring_depth_audit`) |
+| **PH-S1552** | `VERIFY_MONITORING` + quick `--monitoring` |
+| **PH-S1553** | Stand smoke export shape band 91 |
+| **PH-S1554** | `poolai-loc-audit --monitoring` |
+| **PH-S1555** | Docs `MONITORING_DEPTH.md` + canon |
+| **PH-S1556** | vision-sync --check |
+| **PH-S1557** | Ratio hold advisory |
+| **PH-S1558** | Band close |
+
+**PH-S1558 ✅ (2026-07-28):** `monitoring_depth.rs`; `MONITORING_CRITERIA`; `--monitoring`; `VERIFY_MONITORING`; `MONITORING_DEPTH.md`; `galaxy_horizon_s1549_integration`. Phase E Monitoring depth scaffold drained.
+
+**§5.12:** **0** відкритих. **Vision:** rev **417**. **Pending completion:** **720** (→ PH-S2278). **Next expected band:** 92 (`PH-S1559…S1568`, Monitoring store wire).
 
 ## Band 90 — Policies horizon close (PH-S1539…S1548, **✅**)
 

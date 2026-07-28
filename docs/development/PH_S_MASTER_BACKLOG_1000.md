@@ -717,16 +717,16 @@
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1549** | `monitoring_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1550** | `monitoring` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1551** | `monitoring` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1552** | `monitoring` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1553** | Stand smoke `monitoring` export | export shape unit test | **[ ]** |
-| **PH-S1554** | poolai-loc-audit PH-S1554 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1555** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1556** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1557** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1558** | galaxy_horizon_s1549_integration | band close | **[ ]** |
+| **PH-S1549** | `monitoring_depth` scaffold | ui-core depth enum + criteria registry | **✅** |
+| **PH-S1550** | `monitoring` store/wire slice | durable path or production verify stub + unit test | **✅** |
+| **PH-S1551** | `monitoring` API contracts | `tests/*_integration.rs` or contract test | **✅** |
+| **PH-S1552** | `monitoring` admin/ops glue | verify-dev-stand or admin strip | **✅** |
+| **PH-S1553** | Stand smoke `monitoring` export | export shape unit test | **✅** |
+| **PH-S1554** | poolai-loc-audit PH-S1554 | `rust_ratio.json` zriz | **✅** |
+| **PH-S1555** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **✅** |
+| **PH-S1556** | poolai-vision-sync --check | drift gate green | **✅** |
+| **PH-S1557** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
+| **PH-S1558** | galaxy_horizon_s1549_integration | band close | **✅** |
 
 ## Band 92 — PH-S1559…S1568 (E Monitoring · store wire)
 

@@ -24,7 +24,7 @@ cd S:\rust\poolAI
 .\bin\run-poolai.ps1 stop
 ```
 
-**Last updated:** 2026-07-27 (PH-S1538 band 89 · `--policy-ratio-advisory` · `VERIFY_POLICY_RATIO_ADVISORY`)
+**Last updated:** 2026-07-28 (PH-S1558 band 91 · `--monitoring` · `VERIFY_MONITORING`)
 
 ### PH-S1011 / PH-S1012: Light compile + quick preset
 
@@ -90,6 +90,8 @@ cd S:\rust\poolAI
 /usr/bin/bash bin/run-poolai.sh quick --policy-docs-canon
 /usr/bin/bash bin/run-poolai.sh quick --policy-vision-sync
 /usr/bin/bash bin/run-poolai.sh quick --policy-ratio-advisory
+/usr/bin/bash bin/run-poolai.sh quick --policy-horizon
+/usr/bin/bash bin/run-poolai.sh quick --monitoring
 # PowerShell:
 .\bin\run-poolai.ps1 quick -StandSmoke
 .\bin\run-poolai.ps1 quick -MigrationAdvisory
@@ -374,6 +376,7 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `VERIFY_POLICY_VISION_SYNC=1` | `verify-dev-stand.sh` → `poolai-loc-audit --policy-vision-sync` (PH-S1522) |
 | `VERIFY_POLICY_RATIO_ADVISORY=1` | `verify-dev-stand.sh` → `poolai-loc-audit --policy-ratio-advisory` (PH-S1532) |
 | `VERIFY_POLICY_HORIZON=1` | `verify-dev-stand.sh` → `poolai-loc-audit --policy-horizon` (PH-S1544) |
+| `VERIFY_MONITORING=1` | `verify-dev-stand.sh` → `poolai-loc-audit --monitoring` (PH-S1552) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 ### PH-S1100: Rust migration advisory (band 46)

@@ -994,6 +994,7 @@ mod tests {
         );
     }
 
+    #[test]
     fn build_metric_history_query_ph_s441() {
         let q = build_metric_history_query(
             "cpu.usage",

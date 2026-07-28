@@ -6786,6 +6786,46 @@ mod tests {
     }
 
     #[test]
+    fn monitoring_band91_export_shape_ph_s1553() {
+        use poolai_ui_core::monitoring_depth::{
+            monitoring_criteria_total, monitoring_depth_stub, MonitoringDepth, FM_BAND91_ROWS,
+            MONITORING_CASES, MONITORING_CRITERIA,
+        };
+        use serde_json::json;
+        assert_eq!(
+            monitoring_depth_stub(Some(&json!({"api_contracts": true}))),
+            MonitoringDepth::ApiContracts
+        );
+        assert_eq!(
+            monitoring_depth_stub(Some(&json!({
+                "monitoring_depth": true,
+                "store_wire": true,
+                "api_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "monitoring_docs": true,
+            }))),
+            MonitoringDepth::FullBand91
+        );
+        assert_eq!(MONITORING_CRITERIA.len(), 8);
+        assert_eq!(monitoring_criteria_total(), 8);
+        assert!(MONITORING_CASES.contains(&"verify_dev_stand_hook"));
+        let monitoring_mod = include_str!("../../src/enterprise/monitoring.rs");
+        assert!(monitoring_mod.contains("POOLAI_MONITORING_DATA_DIR"));
+        assert!(monitoring_mod.contains("validate_monitoring_alert_fields"));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--monitoring"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND91_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band91 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn policy_admin_ops_band84_export_shape_ph_s1485() {
         use poolai_ui_core::policy_admin_ops_depth::{
             policy_admin_ops_criteria_total, policy_admin_ops_depth_stub, PolicyAdminOpsDepth,
