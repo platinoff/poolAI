@@ -24,7 +24,7 @@ cd S:\rust\poolAI
 .\bin\run-poolai.ps1 stop
 ```
 
-**Last updated:** 2026-07-27 (PH-S1528 band 88 · `--policy-vision-sync` · `VERIFY_POLICY_VISION_SYNC`)
+**Last updated:** 2026-07-27 (PH-S1538 band 89 · `--policy-ratio-advisory` · `VERIFY_POLICY_RATIO_ADVISORY`)
 
 ### PH-S1011 / PH-S1012: Light compile + quick preset
 
@@ -89,6 +89,7 @@ cd S:\rust\poolAI
 /usr/bin/bash bin/run-poolai.sh quick --policy-loc-audit
 /usr/bin/bash bin/run-poolai.sh quick --policy-docs-canon
 /usr/bin/bash bin/run-poolai.sh quick --policy-vision-sync
+/usr/bin/bash bin/run-poolai.sh quick --policy-ratio-advisory
 # PowerShell:
 .\bin\run-poolai.ps1 quick -StandSmoke
 .\bin\run-poolai.ps1 quick -MigrationAdvisory
@@ -371,6 +372,7 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `VERIFY_POLICY_LOC_AUDIT=1` | `verify-dev-stand.sh` → `poolai-loc-audit --policy-loc-audit` (PH-S1502) |
 | `VERIFY_POLICY_DOCS_CANON=1` | `verify-dev-stand.sh` → `poolai-loc-audit --policy-docs-canon` (PH-S1512) |
 | `VERIFY_POLICY_VISION_SYNC=1` | `verify-dev-stand.sh` → `poolai-loc-audit --policy-vision-sync` (PH-S1522) |
+| `VERIFY_POLICY_RATIO_ADVISORY=1` | `verify-dev-stand.sh` → `poolai-loc-audit --policy-ratio-advisory` (PH-S1532) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 ### PH-S1100: Rust migration advisory (band 46)
@@ -1229,6 +1231,26 @@ VERIFY_POLICY_VISION_SYNC=1 bash bin/verify-dev-stand.sh
 | `policy_vision_sync_criteria_met_count` | Criteria with marker present in canonical doc path |
 
 Module: [`policy_vision_sync_depth.rs`](../../crates/poolai-ui-core/src/policy_vision_sync_depth.rs) · tests: `policy_vision_sync_integration.rs`, `galaxy_horizon_s1519_integration.rs` · docs: [`POLICIES_VISION_SYNC.md`](./POLICIES_VISION_SYNC.md).
+
+### PH-S1534: Policies ratio-advisory aggregate (band 89)
+
+Aggregate gate for prior `--policy*` slices + [`POLICIES_VISION_SYNC.md`](./POLICIES_VISION_SYNC.md).
+
+```bash
+cargo run --bin poolai-loc-audit -- --policy-ratio-advisory
+cargo run --bin poolai-loc-audit -- --policy-ratio-advisory --migration-advisory --advisory --min-ratio 0.95
+
+VERIFY_POLICY_RATIO_ADVISORY=1 bash bin/verify-dev-stand.sh
+/usr/bin/bash bin/run-poolai.sh quick --policy-ratio-advisory
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `policy_ratio_advisory_mode` | `true` when `--policy-ratio-advisory` (PH-S1534) |
+| `policy_ratio_advisory_criteria_total` | Registry size (10) |
+| `policy_ratio_advisory_criteria_met_count` | Criteria with marker present in canonical doc path |
+
+Module: [`policy_ratio_advisory_depth.rs`](../../crates/poolai-ui-core/src/policy_ratio_advisory_depth.rs) · tests: `policy_ratio_advisory_integration.rs`, `galaxy_horizon_s1529_integration.rs` · docs: [`POLICIES_RATIO_ADVISORY.md`](./POLICIES_RATIO_ADVISORY.md).
 
 Default stand smoke includes **`vision_revision_parity`** (PH-S208, PH-S235): repo `manifest.revision` vs FM §5.12 `Vision rev`, `extensions.active_sprint` vs `manifest.next_sprint`, then `GET /docs/vision/manifest.json` with `X-PoolAI-Vision-Revision` header vs JSON body.
 

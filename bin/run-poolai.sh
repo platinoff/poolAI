@@ -98,6 +98,7 @@ Options (quick):
   --policy-loc-audit After health wait, loc-audit --policy-loc-audit aggregate (PH-S1502)
   --policy-docs-canon After health wait, loc-audit --policy-docs-canon (PH-S1512)
   --policy-vision-sync After health wait, loc-audit --policy-vision-sync (PH-S1522)
+  --policy-ratio-advisory After health wait, loc-audit --policy-ratio-advisory (PH-S1532)
   --skip-build    Skip cargo build
   --port N        HTTP port (default 8080)
 
@@ -319,6 +320,7 @@ cmd_quick() {
   local policy_loc_audit=0
   local policy_docs_canon=0
   local policy_vision_sync=0
+  local policy_ratio_advisory=0
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --skip-build) SKIP_BUILD=1; shift ;;
@@ -363,6 +365,7 @@ cmd_quick() {
       --policy-loc-audit) policy_loc_audit=1; shift ;;
       --policy-docs-canon) policy_docs_canon=1; shift ;;
       --policy-vision-sync) policy_vision_sync=1; shift ;;
+      --policy-ratio-advisory) policy_ratio_advisory=1; shift ;;
       --policy) policy=1; shift ;;
       --policy-store) policy_store=1; shift ;;
       --policy-api) policy_api=1; shift ;;
@@ -562,6 +565,10 @@ cmd_quick() {
   if [[ "$policy_vision_sync" == "1" ]]; then
     echo "Running poolai-loc-audit --policy-vision-sync (PH-S1522)..."
     cargo run --quiet --bin poolai-loc-audit -- --policy-vision-sync
+  fi
+  if [[ "$policy_ratio_advisory" == "1" ]]; then
+    echo "Running poolai-loc-audit --policy-ratio-advisory (PH-S1532)..."
+    cargo run --quiet --bin poolai-loc-audit -- --policy-ratio-advisory
   fi
 }
 

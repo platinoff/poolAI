@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-27",
+  "generated_at": "2026-07-28",
   "sprint": "PH-S1010",
   "formal_band_min": 0.9,
   "formal_band_max": 0.95,
@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 179015,
-  "non_rust_product_loc": 9574,
-  "product_loc_total": 188589,
-  "rust_ratio": 0.9492335183918468,
-  "rust_ratio_pct": 94.92335183918468,
+  "rust_loc": 180525,
+  "non_rust_product_loc": 9660,
+  "product_loc_total": 190185,
+  "rust_ratio": 0.9492073507374399,
+  "rust_ratio_pct": 94.92073507374398,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -151,12 +151,15 @@
   "policy_loc_audit_mode": false,
   "policy_loc_audit_criteria_total": 10,
   "policy_loc_audit_criteria_met_count": 0,
-  "policy_docs_canon_mode": true,
+  "policy_docs_canon_mode": false,
   "policy_docs_canon_criteria_total": 10,
-  "policy_docs_canon_criteria_met_count": 10,
-  "policy_vision_sync_mode": true,
+  "policy_docs_canon_criteria_met_count": 0,
+  "policy_vision_sync_mode": false,
   "policy_vision_sync_criteria_total": 10,
-  "policy_vision_sync_criteria_met_count": 10,
+  "policy_vision_sync_criteria_met_count": 0,
+  "policy_ratio_advisory_mode": true,
+  "policy_ratio_advisory_criteria_total": 10,
+  "policy_ratio_advisory_criteria_met_count": 10,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -164,27 +167,27 @@
     },
     "ops_ps1": {
       "files": 16,
-      "loc": 1527
+      "loc": 1532
     },
     "ops_shell": {
-      "files": 40,
-      "loc": 3843
+      "files": 41,
+      "loc": 3924
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 105,
-      "loc": 22445
+      "files": 107,
+      "loc": 22910
     },
     "rust_src": {
-      "files": 301,
-      "loc": 114358
+      "files": 302,
+      "loc": 115108
     },
     "rust_tests": {
-      "files": 317,
-      "loc": 41604
+      "files": 321,
+      "loc": 41899
     },
     "ui_css": {
       "files": 2,
@@ -215,9 +218,7 @@
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
     "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
-    "PH-S1514: policy_docs_canon_mode — aggregate band 81–86 POLICIES_*.md canon docs",
-    "PH-S1518: band 87 policies docs-canon — criteria met vs registry",
-    "PH-S1524: policy_vision_sync_mode — aggregate docs/vision/* + POLICIES_DOCS_CANON",
-    "PH-S1528: band 88 policies vision-sync — criteria met vs registry"
+    "PH-S1534: policy_ratio_advisory_mode — aggregate prior --policy* + vision-sync slices",
+    "PH-S1538: band 89 policies ratio-advisory — criteria met vs registry"
   ]
 }

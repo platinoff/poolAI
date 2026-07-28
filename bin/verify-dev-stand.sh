@@ -51,6 +51,7 @@ VERIFY_POLICY_STAND_SMOKE="${VERIFY_POLICY_STAND_SMOKE:-0}"
 VERIFY_POLICY_LOC_AUDIT="${VERIFY_POLICY_LOC_AUDIT:-0}"
 VERIFY_POLICY_DOCS_CANON="${VERIFY_POLICY_DOCS_CANON:-0}"
 VERIFY_POLICY_VISION_SYNC="${VERIFY_POLICY_VISION_SYNC:-0}"
+VERIFY_POLICY_RATIO_ADVISORY="${VERIFY_POLICY_RATIO_ADVISORY:-0}"
 VERIFY_SSO_LOC_AUDIT="${VERIFY_SSO_LOC_AUDIT:-0}"
 VERIFY_SSO_DOCS_CANON="${VERIFY_SSO_DOCS_CANON:-0}"
 VERIFY_SSO_VISION_SYNC="${VERIFY_SSO_VISION_SYNC:-0}"
@@ -688,6 +689,16 @@ if [[ "$VERIFY_POLICY_VISION_SYNC" == "1" ]]; then
     echo "OK  policies vision-sync gate"
   else
     echo "FAIL policies vision-sync gate"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_POLICY_RATIO_ADVISORY" == "1" ]]; then
+  echo "Running poolai-loc-audit --policy-ratio-advisory (PH-S1532)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --policy-ratio-advisory); then
+    echo "OK  policies ratio-advisory gate"
+  else
+    echo "FAIL policies ratio-advisory gate"
     fail=1
   fi
 fi

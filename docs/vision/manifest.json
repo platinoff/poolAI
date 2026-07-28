@@ -2930,11 +2930,23 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_vision_rust_diagnostics_json"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_policy_ratio_advisory_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_POLICIES_RATIO_ADVISORY_md"
     }
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S1528",
+  "last_sprint_closed": "PH-S1538",
   "layers": [
     {
       "id": "L0",
@@ -2967,7 +2979,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1529",
+  "next_sprint": "PH-S1539",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -11530,99 +11542,127 @@
       "label": "poolai_rust_diagnostics.rs",
       "layer": "L3",
       "path": "src/bin/poolai_rust_diagnostics.rs"
-    }
-  ],
-  "revision": 412,
-  "sprint_queue": [
-    {
-      "acceptance": "depth enum + ratio/criteria registry",
-      "deps": "policy_ratio_advisory_depth.rs",
-      "id": "PH-S1529",
-      "open": true,
-      "row": 1464,
-      "status": "open",
-      "title": "policy_ratio_advisory_depth` ui-core module"
     },
     {
-      "acceptance": "six prior slices; unit test",
-      "deps": "POLICY_RATIO_ADVISORY_SLICES",
-      "id": "PH-S1530",
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_policy_ratio_advisory_depth_rs",
+      "label": "policy_ratio_advisory_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/policy_ratio_advisory_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_POLICIES_RATIO_ADVISORY_md",
+      "label": "POLICIES_RATIO_ADVISORY.md",
+      "layer": "L1",
+      "path": "docs/development/POLICIES_RATIO_ADVISORY.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1529_integration_rs",
+      "label": "galaxy_horizon_s1529_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1529_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_policy_ratio_advisory_integration_rs",
+      "label": "policy_ratio_advisory_integration.rs",
+      "layer": "L3",
+      "path": "tests/policy_ratio_advisory_integration.rs"
+    }
+  ],
+  "revision": 414,
+  "sprint_queue": [
+    {
+      "acceptance": "depth enum + criteria registry",
+      "deps": "policy_horizon_depth.rs",
+      "id": "PH-S1539",
       "open": true,
-      "row": 1465,
+      "row": 1474,
       "status": "open",
-      "title": "Slice aggregate (prior `--policy*` + vision-sync)"
+      "title": "policy_horizon_depth` ui-core module"
+    },
+    {
+      "acceptance": "bands 81–89 `--policy*` + ratio-advisory; unit test",
+      "deps": "POLICY_HORIZON_SLICES",
+      "id": "PH-S1540",
+      "open": true,
+      "row": 1475,
+      "status": "open",
+      "title": "Slice aggregate (phase-D policy*)"
     },
     {
       "acceptance": "markers + registry",
-      "deps": "policy_ratio_advisory_integration",
-      "id": "PH-S1531",
+      "deps": "policy_horizon_integration",
+      "id": "PH-S1541",
       "open": true,
-      "row": 1466,
+      "row": 1476,
       "status": "open",
       "title": "Criteria contracts"
     },
     {
-      "acceptance": "ratio-advisory verify gate",
+      "acceptance": "horizon verify gate",
       "deps": "verify-dev-stand / run-poolai",
-      "id": "PH-S1532",
+      "id": "PH-S1542",
       "open": true,
-      "row": 1467,
+      "row": 1477,
       "status": "open",
-      "title": "VERIFY_POLICY_RATIO_ADVISORY` + quick"
+      "title": "VERIFY_POLICY_HORIZON` + quick"
     },
     {
       "acceptance": "unit export-shape",
       "deps": "poolai_http_stand_smoke",
-      "id": "PH-S1533",
+      "id": "PH-S1543",
       "open": true,
-      "row": 1468,
+      "row": 1478,
       "status": "open",
       "title": "Stand smoke export shape"
     },
     {
       "acceptance": "rust_ratio.json` fields",
       "deps": "loc-audit",
-      "id": "PH-S1534",
+      "id": "PH-S1544",
       "open": true,
-      "row": 1469,
+      "row": 1479,
       "status": "open",
-      "title": "poolai-loc-audit --policy-ratio-advisory"
+      "title": "poolai-loc-audit --policy-horizon"
     },
     {
-      "acceptance": "ratio-advisory matrix",
+      "acceptance": "horizon matrix",
       "deps": "RUN_LOCAL/INDEX/HANDOFF/NEXT",
-      "id": "PH-S1535",
+      "id": "PH-S1545",
       "open": true,
-      "row": 1470,
+      "row": 1480,
       "status": "open",
-      "title": "Docs `POLICIES_RATIO_ADVISORY.md` + canon"
+      "title": "Docs `POLICIES_HORIZON.md` + canon"
     },
     {
       "acceptance": "drift gate green",
       "deps": "docs/vision",
-      "id": "PH-S1536",
+      "id": "PH-S1546",
       "open": true,
-      "row": 1471,
+      "row": 1481,
       "status": "open",
       "title": "vision-sync --check"
     },
     {
       "acceptance": "--min-ratio 0.95 --advisory",
       "deps": "loc-audit",
-      "id": "PH-S1537",
+      "id": "PH-S1547",
       "open": true,
-      "row": 1472,
+      "row": 1482,
       "status": "open",
       "title": "Ratio hold advisory"
     },
     {
-      "acceptance": "galaxy_horizon_s1529_integration`; HANDOFF/NEXT",
+      "acceptance": "galaxy_horizon_s1539_integration`; HANDOFF/NEXT",
       "deps": "tests/docs",
-      "id": "PH-S1538",
+      "id": "PH-S1548",
       "open": true,
-      "row": 1473,
+      "row": 1483,
       "status": "open",
-      "title": "Policies ratio-advisory band close"
+      "title": "Policies horizon band close"
     }
   ],
   "sprint_queue_open_count": 10,

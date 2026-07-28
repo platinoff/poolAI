@@ -19,7 +19,7 @@ aligned with the enterprise Policies journal.
 
 **Boundary:** band 88 = vision-sync gate for Policies phase D; prior docs-canon remains
 [`POLICIES_DOCS_CANON.md`](./POLICIES_DOCS_CANON.md) (band 87). Mirror: [`AUDIT_VISION_SYNC.md`](./AUDIT_VISION_SYNC.md).
-Next: band 89 Policies ratio-advisory (`PH-S1529…S1538`).
+Next: band 89 Policies ratio-advisory (`PH-S1529…S1538`) — [`POLICIES_RATIO_ADVISORY.md`](./POLICIES_RATIO_ADVISORY.md).
 
 ## Loc-audit / verify
 

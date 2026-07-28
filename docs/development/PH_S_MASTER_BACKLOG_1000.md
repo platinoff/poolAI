@@ -687,28 +687,28 @@
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1529** | `policy_ratio_advisory_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1530** | Slice aggregate (prior `--policy*` + vision-sync) | `POLICY_RATIO_ADVISORY_SLICES` | **[ ]** |
-| **PH-S1531** | Criteria contracts | `policy_ratio_advisory_integration` | **[ ]** |
-| **PH-S1532** | `VERIFY_POLICY_RATIO_ADVISORY` + quick | verify-dev-stand / run-poolai | **[ ]** |
-| **PH-S1533** | Stand smoke export shape | unit export-shape band 89 | **[ ]** |
-| **PH-S1534** | `poolai-loc-audit --policy-ratio-advisory` | `rust_ratio.json` fields | **[ ]** |
-| **PH-S1535** | Docs `POLICIES_RATIO_ADVISORY.md` | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1536** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1537** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1538** | galaxy_horizon_s1529_integration | band close | **[ ]** |
+| **PH-S1529** | `policy_ratio_advisory_depth` scaffold | ui-core depth enum + criteria registry | **✅** |
+| **PH-S1530** | Slice aggregate (prior `--policy*` + vision-sync) | `POLICY_RATIO_ADVISORY_SLICES` | **✅** |
+| **PH-S1531** | Criteria contracts | `policy_ratio_advisory_integration` | **✅** |
+| **PH-S1532** | `VERIFY_POLICY_RATIO_ADVISORY` + quick | verify-dev-stand / run-poolai | **✅** |
+| **PH-S1533** | Stand smoke export shape | unit export-shape band 89 | **✅** |
+| **PH-S1534** | `poolai-loc-audit --policy-ratio-advisory` | `rust_ratio.json` fields | **✅** |
+| **PH-S1535** | Docs `POLICIES_RATIO_ADVISORY.md` | RUN_LOCAL/INDEX/HANDOFF/NEXT | **✅** |
+| **PH-S1536** | poolai-vision-sync --check | drift gate green | **✅** |
+| **PH-S1537** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
+| **PH-S1538** | galaxy_horizon_s1529_integration | band close | **✅** |
 
 ## Band 90 — PH-S1539…S1548 (D Policies · horizon close)
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1539** | `policy_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1540** | `policy` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1541** | `policy` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1542** | `policy` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1543** | Stand smoke `policy` export | export shape unit test | **[ ]** |
-| **PH-S1544** | poolai-loc-audit PH-S1544 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1545** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
+| **PH-S1539** | `policy_horizon_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
+| **PH-S1540** | Slice aggregate (phase-D policy*) | `POLICY_HORIZON_SLICES` | **[ ]** |
+| **PH-S1541** | Criteria contracts | `policy_horizon_integration` | **[ ]** |
+| **PH-S1542** | `VERIFY_POLICY_HORIZON` + quick | verify-dev-stand / run-poolai | **[ ]** |
+| **PH-S1543** | Stand smoke export shape | unit export-shape band 90 | **[ ]** |
+| **PH-S1544** | `poolai-loc-audit --policy-horizon` | `rust_ratio.json` fields | **[ ]** |
+| **PH-S1545** | Docs `POLICIES_HORIZON.md` | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
 | **PH-S1546** | poolai-vision-sync --check | drift gate green | **[ ]** |
 | **PH-S1547** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
 | **PH-S1548** | galaxy_horizon_s1539_integration | band close | **[ ]** |

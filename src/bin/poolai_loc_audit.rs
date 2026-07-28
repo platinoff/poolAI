@@ -53,6 +53,10 @@ use poolai_ui_core::policy_docs_canon_depth::{
 use poolai_ui_core::policy_loc_audit_depth::{
     policy_loc_audit_criteria_total, POLICY_LOC_AUDIT_CASES, POLICY_LOC_AUDIT_CRITERIA,
 };
+use poolai_ui_core::policy_ratio_advisory_depth::{
+    policy_ratio_advisory_criteria_total, POLICY_RATIO_ADVISORY_CASES,
+    POLICY_RATIO_ADVISORY_CRITERIA,
+};
 use poolai_ui_core::policy_stand_smoke_depth::{
     policy_stand_smoke_criteria_total, POLICY_STAND_SMOKE_CASES, POLICY_STAND_SMOKE_CRITERIA,
 };
@@ -291,6 +295,8 @@ struct AuditConfig {
     policy_docs_canon: bool,
     /// Emit band-88 policies vision-sync fields (PH-S1524).
     policy_vision_sync: bool,
+    /// Emit band-89 policies ratio-advisory fields (PH-S1534).
+    policy_ratio_advisory: bool,
 }
 
 impl Default for AuditConfig {
@@ -344,6 +350,7 @@ impl Default for AuditConfig {
             policy_loc_audit: false,
             policy_docs_canon: false,
             policy_vision_sync: false,
+            policy_ratio_advisory: false,
         }
     }
 }
@@ -659,6 +666,12 @@ struct RustRatioReport {
     policy_vision_sync_criteria_total: usize,
     /// Policies vision-sync criteria met count (PH-S1524).
     policy_vision_sync_criteria_met_count: usize,
+    /// Band-89 policies ratio-advisory mode (PH-S1534).
+    policy_ratio_advisory_mode: bool,
+    /// Policies ratio-advisory criteria registry size (PH-S1534).
+    policy_ratio_advisory_criteria_total: usize,
+    /// Policies ratio-advisory criteria met count (PH-S1534).
+    policy_ratio_advisory_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -1067,6 +1080,22 @@ fn policy_policy_vision_sync_criteria_met(root: &Path) -> (usize, usize) {
     let total = policy_vision_sync_criteria_total();
     let mut met = 0usize;
     for (_, marker, rel) in POLICY_VISION_SYNC_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
+fn policy_policy_ratio_advisory_criteria_met(root: &Path) -> (usize, usize) {
+    let total = policy_ratio_advisory_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in POLICY_RATIO_ADVISORY_CRITERIA {
         let path = root.join(rel);
         if path.is_file() {
             if let Ok(content) = fs::read_to_string(&path) {
@@ -1500,6 +1529,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--policy-loc-audit" => config.policy_loc_audit = true,
             "--policy-docs-canon" => config.policy_docs_canon = true,
             "--policy-vision-sync" => config.policy_vision_sync = true,
+            "--policy-ratio-advisory" => config.policy_ratio_advisory = true,
             "--policy" => config.policy = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
@@ -1566,6 +1596,7 @@ fn print_help() {
            --policy-loc-audit          band-86 policies loc-audit aggregate fields (PH-S1504)\n\
            --policy-docs-canon         band-87 policies docs-canon fields (PH-S1514)\n\
            --policy-vision-sync        band-88 policies vision-sync fields (PH-S1524)\n\
+           --policy-ratio-advisory     band-89 policies ratio-advisory fields (PH-S1534)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -2125,6 +2156,19 @@ fn build_report(
         notes.push("PH-S1528: band 88 policies vision-sync — criteria met vs registry");
     }
 
+    let (policy_ratio_advisory_criteria_met_count, policy_ratio_advisory_criteria_total_count) =
+        if config.policy_ratio_advisory {
+            policy_policy_ratio_advisory_criteria_met(root)
+        } else {
+            (0, policy_ratio_advisory_criteria_total())
+        };
+    if config.policy_ratio_advisory {
+        notes.push(
+            "PH-S1534: policy_ratio_advisory_mode — aggregate prior --policy* + vision-sync slices",
+        );
+        notes.push("PH-S1538: band 89 policies ratio-advisory — criteria met vs registry");
+    }
+
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
         sprint: SPRINT,
@@ -2284,6 +2328,9 @@ fn build_report(
         policy_vision_sync_mode: config.policy_vision_sync,
         policy_vision_sync_criteria_total: policy_vision_sync_criteria_total_count,
         policy_vision_sync_criteria_met_count,
+        policy_ratio_advisory_mode: config.policy_ratio_advisory,
+        policy_ratio_advisory_criteria_total: policy_ratio_advisory_criteria_total_count,
+        policy_ratio_advisory_criteria_met_count,
         by_category,
         notes,
     })
@@ -2766,6 +2813,18 @@ fn print_summary(report: &RustRatioReport) {
         println!(
             "  policy_vision_sync_cases: {}",
             POLICY_VISION_SYNC_CASES.join(", ")
+        );
+    }
+    if report.policy_ratio_advisory_mode {
+        println!("  policy_ratio_advisory: true (PH-S1534 band 89)");
+        println!(
+            "  policy_ratio_advisory_criteria: {}/{} met",
+            report.policy_ratio_advisory_criteria_met_count,
+            report.policy_ratio_advisory_criteria_total
+        );
+        println!(
+            "  policy_ratio_advisory_cases: {}",
+            POLICY_RATIO_ADVISORY_CASES.join(", ")
         );
     }
     for (name, loc) in &report.by_category {

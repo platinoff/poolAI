@@ -1,8 +1,8 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-27 (band 88 **PH-S1519…S1528** ✅ · service **PH-SVC85** Rust diagnostics panel ✅ · **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · band 87 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 89 ready)
+**Оновлено:** 2026-07-27 (band 89 **PH-S1529…S1538** ✅ · service **PH-SVC85** Rust diagnostics panel ✅ · **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · band 88 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 90 ready)
 
-**Наступна сесія:** **`абракадабра`** — drain band 89 (FM **§5.70** Policies ratio-advisory aggregate) · після drain — Speeds (`bash bin/record-test-ci-speed.sh`) + Rust diagnostics (`bash bin/record-rust-diagnostics.sh`) → vision panels.
+**Наступна сесія:** **`абракадабра`** — drain band 90 (FM **§5.71** Policies horizon close) · після drain — Speeds (`bash bin/record-test-ci-speed.sh`) + Rust diagnostics (`bash bin/record-rust-diagnostics.sh`) → vision panels.
 
 ## P0 / service (2026-07-27)
 
@@ -37,7 +37,24 @@
 | **Low** | Corrupted MSYS path / e2e tmp artifacts | ignore patterns widened |
 | **Open (OWNER)** | PH-SVC35 Atlassian token (historical) | revoke in Atlassian; no history rewrite |
 
-## Band 89 — Policies ratio-advisory (PH-S1529…S1538, **ACTIVE**)
+## Band 90 — Policies horizon close (PH-S1539…S1548, **ACTIVE**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1539** | `policy_horizon_depth` scaffold |
+| **PH-S1540** | Slice aggregate (phase-D `--policy*` + ratio-advisory) |
+| **PH-S1541** | Criteria contracts |
+| **PH-S1542** | `VERIFY_POLICY_HORIZON` + quick `--policy-horizon` |
+| **PH-S1543** | Stand smoke export shape band 90 |
+| **PH-S1544** | `poolai-loc-audit --policy-horizon` |
+| **PH-S1545** | Docs `POLICIES_HORIZON.md` + canon |
+| **PH-S1546** | vision-sync --check |
+| **PH-S1547** | Ratio hold advisory |
+| **PH-S1548** | Band close |
+
+**§5.12:** **10** відкритих. **Vision:** rev **414**. **Pending completion:** **740** (→ PH-S2278).
+
+## Band 89 — Policies ratio-advisory (PH-S1529…S1538, ✅)
 
 | Sprint | Фокус |
 |--------|--------|
@@ -52,7 +69,7 @@
 | **PH-S1537** | Ratio hold advisory |
 | **PH-S1538** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **411**. **Pending completion:** **750** (→ PH-S2278).
+**PH-S1538 ✅ (2026-07-27):** `policy_ratio_advisory_depth.rs`; `POLICY_RATIO_ADVISORY_SLICES`; `--policy-ratio-advisory`; `VERIFY_POLICY_RATIO_ADVISORY`; `POLICIES_RATIO_ADVISORY.md`; `galaxy_horizon_s1529_integration`. Phase D Policies ratio-advisory closed.
 
 ## Band 88 — Policies vision-sync (PH-S1519…S1528, ✅)
 
