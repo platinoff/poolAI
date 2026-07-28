@@ -1,2 +1,2 @@
-window.ALL_CRATES = ["poolai","poolai_e2e_stand","poolai_health_load","poolai_http_stand_smoke","poolai_loc_audit","poolai_openapi_gap_audit","poolai_speed_index","poolai_verify_release","poolai_vision_sync","poolai_worker"];
-//{"start":21,"fragment_lengths":[8,19,21,26,19,27,21,24,21,16]}
+window.ALL_CRATES = ["poolai","poolai_e2e_stand","poolai_health_load","poolai_http_stand_smoke","poolai_loc_audit","poolai_openapi_gap_audit","poolai_rust_diagnostics","poolai_speed_index","poolai_verify_release","poolai_vision_sync","poolai_worker"];
+//{"start":21,"fragment_lengths":[8,19,21,26,19,27,26,21,24,21,16]}
