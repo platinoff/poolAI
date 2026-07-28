@@ -24,7 +24,7 @@ cd S:\rust\poolAI
 .\bin\run-poolai.ps1 stop
 ```
 
-**Last updated:** 2026-07-28 (PH-S1578 band 93 · `--monitoring-api` · `VERIFY_MONITORING_API`)
+**Last updated:** 2026-07-28 (PH-S1588 band 94 · `--monitoring-admin-ops` · `VERIFY_MONITORING_ADMIN_OPS`)
 
 ### PH-S1011 / PH-S1012: Light compile + quick preset
 
@@ -93,6 +93,7 @@ cd S:\rust\poolAI
 /usr/bin/bash bin/run-poolai.sh quick --policy-horizon
 /usr/bin/bash bin/run-poolai.sh quick --monitoring-store
 /usr/bin/bash bin/run-poolai.sh quick --monitoring-api
+/usr/bin/bash bin/run-poolai.sh quick --monitoring-admin-ops
 # PowerShell:
 .\bin\run-poolai.ps1 quick -StandSmoke
 .\bin\run-poolai.ps1 quick -MigrationAdvisory
@@ -380,6 +381,7 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `VERIFY_MONITORING=1` | `verify-dev-stand.sh` → `poolai-loc-audit --monitoring` (PH-S1552) |
 | `VERIFY_MONITORING_STORE=1` | `verify-dev-stand.sh` → `poolai-loc-audit --monitoring-store` (PH-S1562) |
 | `VERIFY_MONITORING_API=1` | `verify-dev-stand.sh` → `poolai-loc-audit --monitoring-api` (PH-S1574) |
+| `VERIFY_MONITORING_ADMIN_OPS=1` | `verify-dev-stand.sh` → `poolai-loc-audit --monitoring-admin-ops` (PH-S1584) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 ### PH-S1100: Rust migration advisory (band 46)
@@ -1318,6 +1320,26 @@ VERIFY_MONITORING_API=1 bash bin/verify-dev-stand.sh
 | `monitoring_api_criteria_met_count` | Criteria with marker present in canonical doc path |
 
 Module: [`monitoring_api_contracts_depth.rs`](../../crates/poolai-ui-core/src/monitoring_api_contracts_depth.rs) · tests: `monitoring_api_contracts_integration.rs`, `galaxy_horizon_s1569_integration.rs` · docs: [`MONITORING_API.md`](./MONITORING_API.md).
+
+### PH-S1585: Monitoring admin/ops glue (band 94)
+
+Enterprise phase E monitoring admin/ops glue — `#monitoring-store-badge`, `refreshMonitoring`, verify/loc-audit hooks.
+
+```bash
+cargo run --bin poolai-loc-audit -- --monitoring-admin-ops
+cargo run --bin poolai-loc-audit -- --monitoring-admin-ops --advisory --min-ratio 0.95
+
+VERIFY_MONITORING_ADMIN_OPS=1 bash bin/verify-dev-stand.sh
+/usr/bin/bash bin/run-poolai.sh quick --monitoring-admin-ops
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `monitoring_admin_ops_mode` | `true` when `--monitoring-admin-ops` (PH-S1585) |
+| `monitoring_admin_ops_criteria_total` | Registry size (10) |
+| `monitoring_admin_ops_criteria_met_count` | Criteria with marker present in canonical doc path |
+
+Module: [`monitoring_admin_ops_depth.rs`](../../crates/poolai-ui-core/src/monitoring_admin_ops_depth.rs) · tests: `monitoring_admin_ops_integration.rs`, `galaxy_horizon_s1579_integration.rs` · docs: [`MONITORING_ADMIN_OPS.md`](./MONITORING_ADMIN_OPS.md).
 
 Default stand smoke includes **`vision_revision_parity`** (PH-S208, PH-S235): repo `manifest.revision` vs FM §5.12 `Vision rev`, `extensions.active_sprint` vs `manifest.next_sprint`, then `GET /docs/vision/manifest.json` with `X-PoolAI-Vision-Revision` header vs JSON body.
 

@@ -1,6 +1,6 @@
 # Monitoring HTTP API Contracts — Enterprise Phase E (Band 93)
 
-Canonical doc: [`MONITORING_API.md`](./MONITORING_API.md) (band 93, PH-S1576). Prev: [`MONITORING_STORE.md`](./MONITORING_STORE.md) (band 92 ✅). Next: Monitoring admin/ops glue (band 94).
+Canonical doc: [`MONITORING_API.md`](./MONITORING_API.md) (band 93, PH-S1576). Prev: [`MONITORING_STORE.md`](./MONITORING_STORE.md) (band 92 ✅). Next: [`MONITORING_ADMIN_OPS.md`](./MONITORING_ADMIN_OPS.md) (band 94).
 
 ## Overview
 

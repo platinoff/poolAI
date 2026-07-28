@@ -40,6 +40,9 @@ use poolai_ui_core::ci_canon_depth::{ci_canon_criteria_total, CI_CANON_CASES, CI
 use poolai_ui_core::galaxy_edge_verification_depth::{
     edge_verification_criteria_total, EDGE_VERIFICATION_CASES, EDGE_VERIFICATION_CRITERIA,
 };
+use poolai_ui_core::monitoring_admin_ops_depth::{
+    monitoring_admin_ops_criteria_total, MONITORING_ADMIN_OPS_CASES, MONITORING_ADMIN_OPS_CRITERIA,
+};
 use poolai_ui_core::monitoring_api_contracts_depth::{
     monitoring_api_criteria_total, MONITORING_API_CASES, MONITORING_API_CRITERIA,
 };
@@ -317,6 +320,8 @@ struct AuditConfig {
     monitoring_store: bool,
     /// Emit band-93 monitoring HTTP API contracts fields (PH-S1575).
     monitoring_api: bool,
+    /// Emit band-94 monitoring admin/ops fields (PH-S1585).
+    monitoring_admin_ops: bool,
 }
 
 impl Default for AuditConfig {
@@ -375,6 +380,7 @@ impl Default for AuditConfig {
             monitoring: false,
             monitoring_store: false,
             monitoring_api: false,
+            monitoring_admin_ops: false,
         }
     }
 }
@@ -720,6 +726,12 @@ struct RustRatioReport {
     monitoring_api_criteria_total: usize,
     /// Monitoring HTTP API criteria met count (PH-S1575).
     monitoring_api_criteria_met_count: usize,
+    /// Band-94 monitoring admin/ops mode (PH-S1585).
+    monitoring_admin_ops_mode: bool,
+    /// Monitoring admin/ops criteria registry size (PH-S1585).
+    monitoring_admin_ops_criteria_total: usize,
+    /// Monitoring admin/ops criteria met count (PH-S1585).
+    monitoring_admin_ops_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -1064,6 +1076,22 @@ fn monitoring_api_criteria_met(root: &Path) -> (usize, usize) {
     let total = monitoring_api_criteria_total();
     let mut met = 0usize;
     for (_, marker, rel) in MONITORING_API_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
+fn monitoring_admin_ops_criteria_met(root: &Path) -> (usize, usize) {
+    let total = monitoring_admin_ops_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in MONITORING_ADMIN_OPS_CRITERIA {
         let path = root.join(rel);
         if path.is_file() {
             if let Ok(content) = fs::read_to_string(&path) {
@@ -1647,6 +1675,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--monitoring" => config.monitoring = true,
             "--monitoring-store" => config.monitoring_store = true,
             "--monitoring-api" => config.monitoring_api = true,
+            "--monitoring-admin-ops" => config.monitoring_admin_ops = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
                 print_help();
@@ -1717,6 +1746,7 @@ fn print_help() {
            --monitoring                band-91 monitoring depth scaffold fields (PH-S1554)\n\
            --monitoring-store          band-92 monitoring store-wire fields (PH-S1564)\n\
            --monitoring-api            band-93 monitoring HTTP API contracts fields (PH-S1575)\n\
+           --monitoring-admin-ops      band-94 monitoring admin/ops fields (PH-S1585)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -2334,6 +2364,18 @@ fn build_report(
         notes.push("PH-S1575: monitoring_api_mode — query/store HTTP contracts + field fixtures");
         notes.push("PH-S1578: band 93 monitoring API contracts — criteria met vs registry");
     }
+    let (monitoring_admin_ops_criteria_met_count, monitoring_admin_ops_criteria_total_count) =
+        if config.monitoring_admin_ops {
+            monitoring_admin_ops_criteria_met(root)
+        } else {
+            (0, monitoring_admin_ops_criteria_total())
+        };
+    if config.monitoring_admin_ops {
+        notes.push(
+            "PH-S1585: monitoring_admin_ops_mode — store strip / monitoring refresh / verify hooks",
+        );
+        notes.push("PH-S1588: band 94 monitoring admin/ops — criteria met vs registry");
+    }
 
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
@@ -2509,6 +2551,9 @@ fn build_report(
         monitoring_api_mode: config.monitoring_api,
         monitoring_api_criteria_total: monitoring_api_criteria_total_count,
         monitoring_api_criteria_met_count,
+        monitoring_admin_ops_mode: config.monitoring_admin_ops,
+        monitoring_admin_ops_criteria_total: monitoring_admin_ops_criteria_total_count,
+        monitoring_admin_ops_criteria_met_count,
         by_category,
         notes,
     })
@@ -3044,6 +3089,18 @@ fn print_summary(report: &RustRatioReport) {
         println!(
             "  monitoring_api_cases: {}",
             MONITORING_API_CASES.join(", ")
+        );
+    }
+    if report.monitoring_admin_ops_mode {
+        println!("  monitoring_admin_ops:  true (PH-S1585 band 94)");
+        println!(
+            "  monitoring_admin_ops_criteria: {}/{} met",
+            report.monitoring_admin_ops_criteria_met_count,
+            report.monitoring_admin_ops_criteria_total
+        );
+        println!(
+            "  monitoring_admin_ops_cases: {}",
+            MONITORING_ADMIN_OPS_CASES.join(", ")
         );
     }
     for (name, loc) in &report.by_category {

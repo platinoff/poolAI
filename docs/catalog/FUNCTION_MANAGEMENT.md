@@ -1221,7 +1221,26 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 93 ✅ · band 94 next). **Master horizon:** PH-S1579…S1588 (band 94). **Completion pending:** PH-S1579…S2278 = **700** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **422**. **Наступна сесія:** **`абракадабра`** — project scan / band 94.
+**Відкритих у §5.12:** **0** (band 94 ✅ · band 95 next). **Master horizon:** PH-S1589…S1598 (band 95). **Completion pending:** PH-S1589…S2278 = **690** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **423**. **Наступна сесія:** **`абракадабра`** — project scan / band 95.
+
+### 5.75 Monitoring admin/ops glue queue — band 94 (PH-S1579…S1588, 2026-07-28) · **✅**
+
+**Джерело:** project completion / enterprise phase E — Monitoring admin/ops glue (mirror band 84 [`POLICIES_ADMIN_OPS.md`](../development/POLICIES_ADMIN_OPS.md) · band 74 [`AUDIT_ADMIN_OPS.md`](../development/AUDIT_ADMIN_OPS.md)). Prior API: [`MONITORING_API.md`](../development/MONITORING_API.md) (band 93). Warnings-first: clippy `required-features` on mis-gated integration tests folded into PH-S1579. Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · master [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1514 | **PH-S1579** | `monitoring_admin_ops_depth` + clippy gates | ui-core + Cargo.toml | depth enum + criteria; `required-features` for s730/discovery/grid_openapi | **✅** |
+| 1515 | **PH-S1580** | `#monitoring-store-badge` store strip | admin UI | `loadMonitoringStoreWire` ← `GET /monitoring/store` | **✅** |
+| 1516 | **PH-S1581** | `refreshMonitoring` query ops glue | admin UI | Refresh button + notification | **✅** |
+| 1517 | **PH-S1582** | Admin monitoring ops HTML contracts | `monitoring_admin_ops_integration.rs` | store/query markers | **✅** |
+| 1518 | **PH-S1583** | Monitoring admin/ops i18n | i18n.rs | `admin.mon.store*` / `btn.refresh` EN+UK | **✅** |
+| 1519 | **PH-S1584** | `VERIFY_MONITORING_ADMIN_OPS` + `--monitoring-admin-ops` | verify/admin | verify-dev-stand / run-poolai | **✅** |
+| 1520 | **PH-S1585** | Stand smoke + loc-audit `--monitoring-admin-ops` | stand-smoke | export shape + rust_ratio fields | **✅** |
+| 1521 | **PH-S1586** | Docs `MONITORING_ADMIN_OPS.md` + canon | RUN_LOCAL/INDEX | HANDOFF/NEXT sync | **✅** |
+| 1522 | **PH-S1587** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **✅** |
+| 1523 | **PH-S1588** | galaxy_horizon_s1579_integration | tests/docs | band close | **✅** |
+
+**PH-S1588 ✅ (2026-07-28):** `monitoring_admin_ops_depth.rs`; `#monitoring-store-badge` ← `GET /monitoring/store`; `refreshMonitoring`; `--monitoring-admin-ops`; `VERIFY_MONITORING_ADMIN_OPS`; `MONITORING_ADMIN_OPS.md`; `galaxy_horizon_s1579_integration`. Phase E Monitoring admin/ops glue closed.
 
 ### 5.74 Monitoring API contracts queue — band 93 (PH-S1569…S1578, 2026-07-28) · **✅**
 

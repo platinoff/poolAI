@@ -1,8 +1,8 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-28 (band 93 **PH-S1569…S1578** ✅ · band 92 ✅ · band 91 ✅ · service **PH-SVC85** Rust diagnostics panel ✅ · **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · band 88 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 94 next)
+**Оновлено:** 2026-07-28 (band 94 **PH-S1579…S1588** ✅ · band 93 ✅ · band 92 ✅ · band 91 ✅ · service **PH-SVC85** Rust diagnostics panel ✅ · **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · band 88 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 95 next)
 
-**Наступна сесія:** **`абракадабра`** — S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain band 94 · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+**Наступна сесія:** **`абракадабра`** — S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain band 95 · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
 
 ## P0 / service (2026-07-27)
 
@@ -24,7 +24,7 @@
 
 **Cursor / toolchain (service):** local desktop **3.13.21** · Auto-review · Router Balance/Intelligence for drain · vision Speeds/Rust/eye verified · research [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](./CURSOR_UPDATE_RESEARCH_2026-07-27.md) · FM **§5.16**.
 
-**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **700** спринтів → PH-S2278.
+**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **690** спринтів → PH-S2278.
 
 ## Security findings closed (PH-SVC55…64, by severity)
 
@@ -36,6 +36,25 @@
 | **Medium** | `.env` / `*.pem` / e2e log+pid gaps | `.gitignore` + permissions block staging |
 | **Low** | Corrupted MSYS path / e2e tmp artifacts | ignore patterns widened |
 | **Open (OWNER)** | PH-SVC35 Atlassian token (historical) | revoke in Atlassian; no history rewrite |
+
+## Band 94 — Monitoring admin/ops glue (PH-S1579…S1588, **✅**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1579** | `monitoring_admin_ops_depth` + clippy `required-features` |
+| **PH-S1580** | `#monitoring-store-badge` store strip |
+| **PH-S1581** | `refreshMonitoring` query ops glue |
+| **PH-S1582** | HTML contracts (`monitoring_admin_ops_integration`) |
+| **PH-S1583** | i18n `admin.mon.store*` |
+| **PH-S1584** | `VERIFY_MONITORING_ADMIN_OPS` + quick `--monitoring-admin-ops` |
+| **PH-S1585** | Stand smoke + loc-audit `--monitoring-admin-ops` |
+| **PH-S1586** | Docs `MONITORING_ADMIN_OPS.md` + canon |
+| **PH-S1587** | Ratio hold advisory |
+| **PH-S1588** | Band close |
+
+**PH-S1588 ✅ (2026-07-28):** `monitoring_admin_ops_depth.rs`; `#monitoring-store-badge` ← `GET /monitoring/store`; `refreshMonitoring`; `--monitoring-admin-ops`; `VERIFY_MONITORING_ADMIN_OPS`; `MONITORING_ADMIN_OPS.md`; `galaxy_horizon_s1579_integration`. Phase E Monitoring admin/ops glue drained.
+
+**§5.12:** **0** відкритих. **Vision:** rev **423**. **Pending completion:** **690** (→ PH-S2278). **Next expected band:** 95 (`PH-S1589…S1598`, Monitoring stand smoke).
 
 ## Band 93 — Monitoring API contracts (PH-S1569…S1578, **✅**)
 

@@ -11,6 +11,41 @@ pub async fn admin_monitoring() -> Html<String> {
     function T(k, fb) { return typeof poolaiT === 'function' ? poolaiT(k, fb) : fb; }
     function Ep() { return typeof poolaiT === 'function' ? poolaiT('err.errorPrefix', 'Error: ') : 'Error: '; }
 
+    function renderMonitoringStoreBadge(wire) {
+      const el = document.getElementById('monitoring-store-badge');
+      if (!el) return;
+      const mode = String((wire && wire.mode) || 'memory').toLowerCase();
+      const configured = !!(wire && wire.configured);
+      const path = (wire && wire.durable_path) ? String(wire.durable_path) : '';
+      const storeLabel = T('admin.mon.storeLabel', 'Monitoring store:');
+      const storeHint = T('admin.mon.storeHint', 'Monitoring persistence backend (POOLAI_MONITORING_STORE / POOLAI_MONITORING_DATA_DIR)');
+      const modeLabel = T('admin.mon.store.' + mode, mode);
+      const cfg = configured
+        ? T('admin.mon.store.configured', 'configured')
+        : T('admin.mon.store.unconfigured', 'unconfigured');
+      const pathBit = path ? (' · ' + escapeHtml(path)) : '';
+      el.innerHTML =
+        '<span class="status-badge ' + (configured ? 'active' : 'inactive') + '" title="' + escapeHtml(storeHint) + '">' +
+        escapeHtml(storeLabel) + ' ' + escapeHtml(modeLabel) + ' (' + escapeHtml(cfg) + ')' + pathBit +
+        '</span>';
+    }
+
+    async function loadMonitoringStoreWire() {
+      const el = document.getElementById('monitoring-store-badge');
+      if (el) {
+        el.textContent = T('admin.mon.storeLoading', 'Loading store…');
+      }
+      try {
+        const wire = await fetchJson('/api/enterprise/monitoring/store');
+        renderMonitoringStoreBadge(wire);
+      } catch (e) {
+        if (el) {
+          el.innerHTML = '<span class="status-badge inactive">' +
+            escapeHtml(T('admin.mon.storeErr', 'Monitoring store wire unavailable')) + '</span>';
+        }
+      }
+    }
+
     async function loadMonitoring() {
       adminShowLoading('monitoring-content', T('admin.mon.loading', 'Loading monitoring…'));
       try {
@@ -23,6 +58,15 @@ pub async fn admin_monitoring() -> Html<String> {
       } catch (e) {
         adminShowInlineError('monitoring-content', e);
         showNotification(T('admin.mon.errLoad', 'Error loading monitoring: ') + e.message, 'error');
+      }
+    }
+
+    async function refreshMonitoring() {
+      try {
+        await loadMonitoring();
+        showNotification(T('admin.mon.refreshOk', 'Monitoring refreshed'), 'success');
+      } catch (e) {
+        showNotification(T('admin.mon.refreshErr', 'Monitoring refresh failed: ') + e.message, 'error');
       }
     }
     
@@ -289,6 +333,7 @@ pub async fn admin_monitoring() -> Html<String> {
       }
     }
     
+    loadMonitoringStoreWire();
     loadMonitoring();
     poolaiStartMetricsPolling(loadMonitoring, 5000);
     "#;
@@ -300,6 +345,8 @@ pub async fn admin_monitoring() -> Html<String> {
         <div class="admin-section">
           <div class="admin-header">
             <h2 data-i18n="admin.mon.section">Monitoring</h2>
+            <span id="monitoring-store-badge" class="monitoring-store-badge muted" data-i18n="admin.mon.storeLoading">Loading store…</span>
+            <button type="button" class="btn" onclick="refreshMonitoring()" data-i18n="admin.mon.btn.refresh" data-i18n-aria="admin.mon.btn.refresh">Refresh</button>
             <button type="button" class="btn btn-secondary" id="ml-demo-btn" onclick="runMlPipelineDemo()" data-i18n="admin.mon.mlDemoBtn" data-i18n-aria="admin.mon.mlDemoBtn">Run ML Demo</button>
             <button type="button" class="btn btn-primary" onclick="showCreateDashboardModal()" data-i18n="admin.mon.createDashBtn" data-i18n-aria="admin.mon.createDashBtn">Create Dashboard</button>
             <button type="button" class="btn" onclick="showCreateAlertRuleModal()" data-i18n="admin.mon.createRuleBtn" data-i18n-aria="admin.mon.createRuleBtn">Create Alert Rule</button>
@@ -417,4 +464,17 @@ async fn admin_monitoring_page_slim_monitoring_i18n_patch_ph_s220() {
     assert!(html.contains(r#""admin.mon.mlTitle""#));
     assert!(!html.contains(r#""admin.jobs.leaseState.active""#));
     assert!(!html.contains(r#""admin.updatesCompat.section""#));
+}
+
+#[tokio::test]
+async fn admin_monitoring_admin_ops_glue_ph_s1580() {
+    let html = admin_monitoring().await.0;
+    assert!(html.contains("id=\"monitoring-store-badge\""));
+    assert!(html.contains("loadMonitoringStoreWire"));
+    assert!(html.contains("/api/enterprise/monitoring/store"));
+    assert!(html.contains("refreshMonitoring"));
+    assert!(
+        html.contains("admin.mon.storeLabel")
+            || html.contains("data-i18n=\"admin.mon.storeLoading\"")
+    );
 }

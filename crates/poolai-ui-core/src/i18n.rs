@@ -1720,6 +1720,20 @@ pub const ADMIN_MONITORING_EN: &[I18nRow<'_>] = &[
     ("admin.mon.ph.layoutJson", r#"{"widgets": []}"#),
     ("admin.mon.ph.ruleName", "high-cpu-alert"),
     ("admin.mon.ph.metric", "cpu_usage"),
+    ("admin.mon.storeLoading", "Loading store…"),
+    ("admin.mon.storeLabel", "Monitoring store:"),
+    (
+        "admin.mon.storeHint",
+        "Monitoring persistence backend (POOLAI_MONITORING_STORE / POOLAI_MONITORING_DATA_DIR)",
+    ),
+    ("admin.mon.store.memory", "memory"),
+    ("admin.mon.store.sqlite", "sqlite"),
+    ("admin.mon.store.configured", "configured"),
+    ("admin.mon.store.unconfigured", "unconfigured"),
+    ("admin.mon.storeErr", "Monitoring store wire unavailable"),
+    ("admin.mon.btn.refresh", "Refresh"),
+    ("admin.mon.refreshOk", "Monitoring refreshed"),
+    ("admin.mon.refreshErr", "Monitoring refresh failed: "),
 ];
 
 /// Ukrainian monitoring admin keys (PH-S207).
@@ -1815,6 +1829,20 @@ pub const ADMIN_MONITORING_UK: &[I18nRow<'_>] = &[
     ("admin.mon.ph.layoutJson", r#"{"widgets": []}"#),
     ("admin.mon.ph.ruleName", "high-cpu-alert"),
     ("admin.mon.ph.metric", "cpu_usage"),
+    ("admin.mon.storeLoading", "Завантаження сховища…"),
+    ("admin.mon.storeLabel", "Сховище моніторингу:"),
+    (
+        "admin.mon.storeHint",
+        "Бекенд персистентності моніторингу (POOLAI_MONITORING_STORE / POOLAI_MONITORING_DATA_DIR)",
+    ),
+    ("admin.mon.store.memory", "memory"),
+    ("admin.mon.store.sqlite", "sqlite"),
+    ("admin.mon.store.configured", "налаштовано"),
+    ("admin.mon.store.unconfigured", "не налаштовано"),
+    ("admin.mon.storeErr", "Monitoring store wire недоступний"),
+    ("admin.mon.btn.refresh", "Оновити"),
+    ("admin.mon.refreshOk", "Моніторинг оновлено"),
+    ("admin.mon.refreshErr", "Помилка оновлення моніторингу: "),
 ];
 
 /// English workers admin keys (PH-S222; moved from `i18n_core.js`).

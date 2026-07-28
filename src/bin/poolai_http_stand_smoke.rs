@@ -6952,6 +6952,50 @@ mod tests {
     }
 
     #[test]
+    fn monitoring_admin_ops_band94_export_shape_ph_s1585() {
+        use poolai_ui_core::monitoring_admin_ops_depth::{
+            monitoring_admin_ops_criteria_total, monitoring_admin_ops_depth_stub,
+            MonitoringAdminOpsDepth, FM_BAND94_ROWS, MONITORING_ADMIN_OPS_CASES,
+            MONITORING_ADMIN_OPS_CRITERIA,
+        };
+        use serde_json::json;
+        assert_eq!(
+            monitoring_admin_ops_depth_stub(Some(&json!({"query_ops_glue": true}))),
+            MonitoringAdminOpsDepth::QueryOpsGlue
+        );
+        assert_eq!(
+            monitoring_admin_ops_depth_stub(Some(&json!({
+                "monitoring_admin_ops_depth": true,
+                "store_strip": true,
+                "query_ops_glue": true,
+                "html_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "monitoring_admin_ops_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            MonitoringAdminOpsDepth::FullBand94
+        );
+        assert_eq!(MONITORING_ADMIN_OPS_CRITERIA.len(), 10);
+        assert_eq!(monitoring_admin_ops_criteria_total(), 10);
+        assert!(MONITORING_ADMIN_OPS_CASES.contains(&"store_strip"));
+        let mon_ui = include_str!("../../src/ui/admin/monitoring.rs");
+        assert!(mon_ui.contains("monitoring-store-badge"));
+        assert!(mon_ui.contains("refreshMonitoring"));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--monitoring-admin-ops"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND94_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band94 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn audit_store_band72_export_shape_ph_s1363() {
         use poolai_ui_core::audit_store_depth::{
             audit_store_criteria_total, audit_store_depth_stub, AuditStoreDepth, AUDIT_STORE_CASES,

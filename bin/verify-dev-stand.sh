@@ -56,6 +56,7 @@ VERIFY_POLICY_HORIZON="${VERIFY_POLICY_HORIZON:-0}"
 VERIFY_MONITORING="${VERIFY_MONITORING:-0}"
 VERIFY_MONITORING_STORE="${VERIFY_MONITORING_STORE:-0}"
 VERIFY_MONITORING_API="${VERIFY_MONITORING_API:-0}"
+VERIFY_MONITORING_ADMIN_OPS="${VERIFY_MONITORING_ADMIN_OPS:-0}"
 VERIFY_SSO_LOC_AUDIT="${VERIFY_SSO_LOC_AUDIT:-0}"
 VERIFY_SSO_DOCS_CANON="${VERIFY_SSO_DOCS_CANON:-0}"
 VERIFY_SSO_VISION_SYNC="${VERIFY_SSO_VISION_SYNC:-0}"
@@ -743,6 +744,16 @@ if [[ "$VERIFY_MONITORING_API" == "1" ]]; then
     echo "OK  monitoring API contracts gate loc-audit"
   else
     echo "FAIL monitoring API contracts gate loc-audit"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_MONITORING_ADMIN_OPS" == "1" ]]; then
+  echo "Running poolai-loc-audit --monitoring-admin-ops (PH-S1584)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --monitoring-admin-ops); then
+    echo "OK  monitoring admin/ops gate loc-audit"
+  else
+    echo "FAIL monitoring admin/ops gate loc-audit"
     fail=1
   fi
 fi

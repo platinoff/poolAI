@@ -762,16 +762,16 @@
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1579** | `monitoring_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1580** | `monitoring` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1581** | `monitoring` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1582** | `monitoring` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1583** | Stand smoke `monitoring` export | export shape unit test | **[ ]** |
-| **PH-S1584** | poolai-loc-audit PH-S1584 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1585** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1586** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1587** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1588** | galaxy_horizon_s1579_integration | band close | **[ ]** |
+| **PH-S1579** | `monitoring_admin_ops_depth` + clippy gates | ui-core depth enum + Cargo.toml required-features | **✅** |
+| **PH-S1580** | `#monitoring-store-badge` | loadMonitoringStoreWire ← GET /monitoring/store | **✅** |
+| **PH-S1581** | `refreshMonitoring` | Refresh button + notification | **✅** |
+| **PH-S1582** | HTML contracts | `monitoring_admin_ops_integration` | **✅** |
+| **PH-S1583** | i18n | `admin.mon.store*` EN+UK | **✅** |
+| **PH-S1584** | `VERIFY_MONITORING_ADMIN_OPS` | verify-dev-stand / run-poolai | **✅** |
+| **PH-S1585** | Stand smoke + loc-audit `--monitoring-admin-ops` | export shape + rust_ratio | **✅** |
+| **PH-S1586** | Docs `MONITORING_ADMIN_OPS.md` | RUN_LOCAL/INDEX/HANDOFF/NEXT | **✅** |
+| **PH-S1587** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
+| **PH-S1588** | galaxy_horizon_s1579_integration | band close | **✅** |
 
 ## Band 95 — PH-S1589…S1598 (E Monitoring · stand smoke)
 

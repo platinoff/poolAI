@@ -2994,7 +2994,7 @@
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S1578",
+  "last_sprint_closed": "PH-S1588",
   "layers": [
     {
       "id": "L0",
@@ -3027,7 +3027,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1579",
+  "next_sprint": "PH-S1589",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -11732,7 +11732,7 @@
       "path": "tests/monitoring_api_contracts_integration.rs"
     }
   ],
-  "revision": 422,
+  "revision": 423,
   "sprint_queue": [],
   "sprint_queue_open_count": 0,
   "updated_at": "2026-06-20",

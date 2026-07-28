@@ -3,6 +3,96 @@
   "items": [
     {
       "category": "closed",
+      "id": "PH-S1588",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "band close",
+      "title": "galaxy_horizon_s1579_integration"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1587",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--min-ratio 0.95 --advisory",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1586",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "HANDOFF/NEXT sync",
+      "title": "Docs `MONITORING_ADMIN_OPS.md` + canon"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1585",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "export shape + rust_ratio fields",
+      "title": "Stand smoke + loc-audit `--monitoring-admin-ops"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1584",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "verify-dev-stand / run-poolai",
+      "title": "VERIFY_MONITORING_ADMIN_OPS` + `--monitoring-admin-ops"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1583",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "admin.mon.store*` / `btn.refresh` EN+UK",
+      "title": "Monitoring admin/ops i18n"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1582",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "store/query markers",
+      "title": "Admin monitoring ops HTML contracts"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1581",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "Refresh button + notification",
+      "title": "refreshMonitoring` query ops glue"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1580",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "loadMonitoringStoreWire` ← `GET /monitoring/store",
+      "title": "#monitoring-store-badge` store strip"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1579",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "depth enum + criteria; `required-features` for s730/discovery/grid_openapi",
+      "title": "monitoring_admin_ops_depth` + clippy gates"
+    },
+    {
+      "category": "closed",
       "id": "PH-S1578",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
@@ -13,96 +103,6 @@
     {
       "category": "closed",
       "id": "PH-S1577",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--min-ratio 0.95 --advisory",
-      "title": "Ratio hold advisory"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1576",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "HANDOFF/NEXT sync",
-      "title": "Docs `MONITORING_API.md` + canon"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1575",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "export shape + rust_ratio fields",
-      "title": "Stand smoke + loc-audit `--monitoring-api"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1574",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "verify-dev-stand / run-poolai",
-      "title": "VERIFY_MONITORING_API` + `--monitoring-api"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1573",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "monitoring_field_fixtures_http_ph_s1573",
-      "title": "alert-rules/validate fixtures"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1572",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "schema + `/monitoring/store` path",
-      "title": "OpenAPI `MonitoringStoreWire"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1571",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "MonitoringStoreWire` over HTTP",
-      "title": "GET /monitoring/store"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1570",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "monitoring_query_http_lifecycle_ph_s1570",
-      "title": "monitoring query HTTP lifecycle"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1569",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "depth enum + criteria; unused_imports/mut/vars/dead_code batch",
-      "title": "monitoring_api_contracts_depth` + rustc unused"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1568",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "band close",
-      "title": "galaxy_horizon_s1559_integration"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1567",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
