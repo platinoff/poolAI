@@ -154,6 +154,9 @@
   "policy_docs_canon_mode": true,
   "policy_docs_canon_criteria_total": 10,
   "policy_docs_canon_criteria_met_count": 10,
+  "policy_vision_sync_mode": true,
+  "policy_vision_sync_criteria_total": 10,
+  "policy_vision_sync_criteria_met_count": 10,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -213,6 +216,8 @@
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
     "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
     "PH-S1514: policy_docs_canon_mode — aggregate band 81–86 POLICIES_*.md canon docs",
-    "PH-S1518: band 87 policies docs-canon — criteria met vs registry"
+    "PH-S1518: band 87 policies docs-canon — criteria met vs registry",
+    "PH-S1524: policy_vision_sync_mode — aggregate docs/vision/* + POLICIES_DOCS_CANON",
+    "PH-S1528: band 88 policies vision-sync — criteria met vs registry"
   ]
 }

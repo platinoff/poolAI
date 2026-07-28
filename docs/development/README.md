@@ -16,6 +16,7 @@
 - **[`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md)** — **поточна фаза:** Horizon Layer C → 100% (S35–S40).
 - **[`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md)** — методика доведення проєкту до 100%.
 - **[`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)** — copy-paste для агента; **`абракадабра`** · §5.12 **10** · band 85 ✅ · horizon band 86; [`OPENAPI_GAP_AUDIT_2026-05-19.md`](./OPENAPI_GAP_AUDIT_2026-05-19.md).
+- **[`POLICIES_VISION_SYNC.md`](./POLICIES_VISION_SYNC.md)** — band 88 Policies vision-sync matrix (`--policy-vision-sync`).
 - **[`POLICIES_STAND_SMOKE.md`](./POLICIES_STAND_SMOKE.md)** — band 85 Policies live stand smoke (`--policy-stand-smoke`).
 - **[`POLICIES_ADMIN_OPS.md`](./POLICIES_ADMIN_OPS.md)** — band 84 Policies admin/ops glue (`--policy-admin-ops`).
 - **[`POLICIES_API.md`](./POLICIES_API.md)** — band 83 Policies HTTP API contracts (`--policy-api`).

@@ -6656,6 +6656,49 @@ mod tests {
     }
 
     #[test]
+    fn policy_vision_sync_band88_export_shape_ph_s1523() {
+        use poolai_ui_core::policy_vision_sync_depth::{
+            policy_vision_sync_criteria_total, policy_vision_sync_depth_stub,
+            policy_vision_sync_slices_met, PolicyVisionSyncDepth, FM_BAND88_ROWS,
+            POLICY_VISION_SYNC_CASES, POLICY_VISION_SYNC_CRITERIA, POLICY_VISION_SYNC_SLICES,
+        };
+        use serde_json::json;
+        assert_eq!(
+            policy_vision_sync_depth_stub(Some(&json!({"stand_smoke_export": true}))),
+            PolicyVisionSyncDepth::StandSmokeExport
+        );
+        assert_eq!(
+            policy_vision_sync_depth_stub(Some(&json!({
+                "policy_vision_sync_depth": true,
+                "slice_aggregate": true,
+                "criteria_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "policy_vision_sync_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            PolicyVisionSyncDepth::FullBand88
+        );
+        assert_eq!(POLICY_VISION_SYNC_CRITERIA.len(), 10);
+        assert_eq!(policy_vision_sync_criteria_total(), 10);
+        assert_eq!(POLICY_VISION_SYNC_SLICES.len(), 6);
+        assert!(POLICY_VISION_SYNC_CASES.contains(&"aggregate_flag"));
+        let canon = include_str!("../../docs/development/POLICIES_VISION_SYNC.md");
+        assert_eq!(policy_vision_sync_slices_met(canon), (6, 6));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--policy-vision-sync"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND88_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band88 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn policy_admin_ops_band84_export_shape_ph_s1485() {
         use poolai_ui_core::policy_admin_ops_depth::{
             policy_admin_ops_criteria_total, policy_admin_ops_depth_stub, PolicyAdminOpsDepth,

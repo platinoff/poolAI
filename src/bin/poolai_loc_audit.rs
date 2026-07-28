@@ -59,6 +59,9 @@ use poolai_ui_core::policy_stand_smoke_depth::{
 use poolai_ui_core::policy_store_depth::{
     policy_store_criteria_total, POLICY_STORE_CASES, POLICY_STORE_CRITERIA,
 };
+use poolai_ui_core::policy_vision_sync_depth::{
+    policy_vision_sync_criteria_total, POLICY_VISION_SYNC_CASES, POLICY_VISION_SYNC_CRITERIA,
+};
 use poolai_ui_core::pre_push_hook_depth::{
     pre_push_hook_criteria_total, PRE_PUSH_HOOK_CASES, PRE_PUSH_HOOK_CRITERIA,
 };
@@ -286,6 +289,8 @@ struct AuditConfig {
     policy_loc_audit: bool,
     /// Emit band-87 policies docs-canon fields (PH-S1514).
     policy_docs_canon: bool,
+    /// Emit band-88 policies vision-sync fields (PH-S1524).
+    policy_vision_sync: bool,
 }
 
 impl Default for AuditConfig {
@@ -338,6 +343,7 @@ impl Default for AuditConfig {
             policy_stand_smoke: false,
             policy_loc_audit: false,
             policy_docs_canon: false,
+            policy_vision_sync: false,
         }
     }
 }
@@ -647,6 +653,12 @@ struct RustRatioReport {
     policy_docs_canon_criteria_total: usize,
     /// Policies docs-canon criteria met count (PH-S1514).
     policy_docs_canon_criteria_met_count: usize,
+    /// Band-88 policies vision-sync mode (PH-S1524).
+    policy_vision_sync_mode: bool,
+    /// Policies vision-sync criteria registry size (PH-S1524).
+    policy_vision_sync_criteria_total: usize,
+    /// Policies vision-sync criteria met count (PH-S1524).
+    policy_vision_sync_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -1039,6 +1051,22 @@ fn policy_policy_docs_canon_criteria_met(root: &Path) -> (usize, usize) {
     let total = policy_docs_canon_criteria_total();
     let mut met = 0usize;
     for (_, marker, rel) in POLICY_DOCS_CANON_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
+fn policy_policy_vision_sync_criteria_met(root: &Path) -> (usize, usize) {
+    let total = policy_vision_sync_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in POLICY_VISION_SYNC_CRITERIA {
         let path = root.join(rel);
         if path.is_file() {
             if let Ok(content) = fs::read_to_string(&path) {
@@ -1471,6 +1499,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--policy-stand-smoke" => config.policy_stand_smoke = true,
             "--policy-loc-audit" => config.policy_loc_audit = true,
             "--policy-docs-canon" => config.policy_docs_canon = true,
+            "--policy-vision-sync" => config.policy_vision_sync = true,
             "--policy" => config.policy = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
@@ -1536,6 +1565,7 @@ fn print_help() {
            --policy-stand-smoke        band-85 policies stand-smoke fields (PH-S1494)\n\
            --policy-loc-audit          band-86 policies loc-audit aggregate fields (PH-S1504)\n\
            --policy-docs-canon         band-87 policies docs-canon fields (PH-S1514)\n\
+           --policy-vision-sync        band-88 policies vision-sync fields (PH-S1524)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -2082,6 +2112,19 @@ fn build_report(
         notes.push("PH-S1518: band 87 policies docs-canon — criteria met vs registry");
     }
 
+    let (policy_vision_sync_criteria_met_count, policy_vision_sync_criteria_total_count) =
+        if config.policy_vision_sync {
+            policy_policy_vision_sync_criteria_met(root)
+        } else {
+            (0, policy_vision_sync_criteria_total())
+        };
+    if config.policy_vision_sync {
+        notes.push(
+            "PH-S1524: policy_vision_sync_mode — aggregate docs/vision/* + POLICIES_DOCS_CANON",
+        );
+        notes.push("PH-S1528: band 88 policies vision-sync — criteria met vs registry");
+    }
+
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
         sprint: SPRINT,
@@ -2238,6 +2281,9 @@ fn build_report(
         policy_docs_canon_mode: config.policy_docs_canon,
         policy_docs_canon_criteria_total: policy_docs_canon_criteria_total_count,
         policy_docs_canon_criteria_met_count,
+        policy_vision_sync_mode: config.policy_vision_sync,
+        policy_vision_sync_criteria_total: policy_vision_sync_criteria_total_count,
+        policy_vision_sync_criteria_met_count,
         by_category,
         notes,
     })
@@ -2709,6 +2755,17 @@ fn print_summary(report: &RustRatioReport) {
         println!(
             "  policy_docs_canon_cases: {}",
             POLICY_DOCS_CANON_CASES.join(", ")
+        );
+    }
+    if report.policy_vision_sync_mode {
+        println!("  policy_vision_sync:    true (PH-S1524 band 88)");
+        println!(
+            "  policy_vision_sync_criteria: {}/{} met",
+            report.policy_vision_sync_criteria_met_count, report.policy_vision_sync_criteria_total
+        );
+        println!(
+            "  policy_vision_sync_cases: {}",
+            POLICY_VISION_SYNC_CASES.join(", ")
         );
     }
     for (name, loc) in &report.by_category {

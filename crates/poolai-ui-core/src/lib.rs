@@ -54,6 +54,7 @@ pub mod policy_docs_canon_depth;
 pub mod policy_loc_audit_depth;
 pub mod policy_stand_smoke_depth;
 pub mod policy_store_depth;
+pub mod policy_vision_sync_depth;
 pub mod pre_push_hook_depth;
 pub mod pricing;
 pub mod product_complete_depth;

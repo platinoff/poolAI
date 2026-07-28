@@ -1,8 +1,8 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-27 (band 87 **PH-S1509…S1518** ✅ · service **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · band 86 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 88 ready)
+**Оновлено:** 2026-07-27 (band 88 **PH-S1519…S1528** ✅ · service **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · band 87 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 89 ready)
 
-**Наступна сесія:** **`абракадабра`** — drain band 88 (FM **§5.69** Policies vision-sync aggregate) · після drain — [`SPEED_INDEX.md`](./SPEED_INDEX.md) (`bash bin/record-test-ci-speed.sh`) + Speeds panel у vision.
+**Наступна сесія:** **`абракадабра`** — drain band 89 (FM **§5.70** Policies ratio-advisory aggregate) · після drain — [`SPEED_INDEX.md`](./SPEED_INDEX.md) (`bash bin/record-test-ci-speed.sh`) + Speeds panel у vision.
 
 ## P0 / service (2026-07-27)
 
@@ -23,7 +23,7 @@
 
 **Cursor / toolchain (service):** local desktop **3.13.21** · Auto-review · Router Balance/Intelligence for drain · vision Speeds/eye verified · research [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](./CURSOR_UPDATE_RESEARCH_2026-07-27.md) · FM **§5.16**.
 
-**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **760** спринтів → PH-S2278.
+**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **750** спринтів → PH-S2278.
 
 ## Security findings closed (PH-SVC55…64, by severity)
 
@@ -36,7 +36,24 @@
 | **Low** | Corrupted MSYS path / e2e tmp artifacts | ignore patterns widened |
 | **Open (OWNER)** | PH-SVC35 Atlassian token (historical) | revoke in Atlassian; no history rewrite |
 
-## Band 88 — Policies vision-sync (PH-S1519…S1528, **ACTIVE**)
+## Band 89 — Policies ratio-advisory (PH-S1529…S1538, **ACTIVE**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1529** | `policy_ratio_advisory_depth` scaffold |
+| **PH-S1530** | Slice aggregate (prior `--policy*` + vision-sync) |
+| **PH-S1531** | Criteria contracts |
+| **PH-S1532** | `VERIFY_POLICY_RATIO_ADVISORY` + quick `--policy-ratio-advisory` |
+| **PH-S1533** | Stand smoke export shape band 89 |
+| **PH-S1534** | `poolai-loc-audit --policy-ratio-advisory` |
+| **PH-S1535** | Docs `POLICIES_RATIO_ADVISORY.md` + canon |
+| **PH-S1536** | vision-sync --check |
+| **PH-S1537** | Ratio hold advisory |
+| **PH-S1538** | Band close |
+
+**§5.12:** **10** відкритих. **Vision:** rev **411**. **Pending completion:** **750** (→ PH-S2278).
+
+## Band 88 — Policies vision-sync (PH-S1519…S1528, ✅)
 
 | Sprint | Фокус |
 |--------|--------|
@@ -51,7 +68,7 @@
 | **PH-S1527** | Ratio hold advisory |
 | **PH-S1528** | Band close |
 
-**§5.12:** **10** відкритих. **Vision:** rev **409**. **Pending completion:** **760** (→ PH-S2278).
+**PH-S1528 ✅ (2026-07-27):** `policy_vision_sync_depth.rs`; `POLICY_VISION_SYNC_SLICES`; `--policy-vision-sync`; `VERIFY_POLICY_VISION_SYNC`; `POLICIES_VISION_SYNC.md`; `galaxy_horizon_s1519_integration`. Phase D Policies vision-sync closed.
 
 ## Band 87 — Policies docs-canon (PH-S1509…S1518, ✅)
 
