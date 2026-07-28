@@ -54,7 +54,7 @@
 
 **PH-S1548 ✅ (2026-07-28):** `policy_horizon_depth.rs`; `POLICY_HORIZON_SLICES`; `--policy-horizon`; `VERIFY_POLICY_HORIZON`; `POLICIES_HORIZON.md`; `galaxy_horizon_s1539_integration`. Phase D Policies horizon close drained.
 
-**§5.12:** **10** відкритих. **Vision:** rev **414**. **Pending completion:** **730** (→ PH-S2278). **Next expected band:** 91 (`PH-S1549…S1558`, Monitoring).
+**§5.12:** **10** відкритих. **Vision:** rev **415**. **Pending completion:** **730** (→ PH-S2278). **Next expected band:** 91 (`PH-S1549…S1558`, Monitoring).
 
 ## Band 89 — Policies ratio-advisory (PH-S1529…S1538, ✅)
 
