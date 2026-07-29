@@ -54,7 +54,7 @@
 
 **PH-S1608 ✅ (2026-07-28):** `monitoring_loc_audit_depth.rs`; `MONITORING_LOC_AUDIT_SLICES`; `--monitoring-loc-audit`; `VERIFY_MONITORING_LOC_AUDIT`; `MONITORING_LOC_AUDIT.md`; Vision Sprint Queue drained UX; `galaxy_horizon_s1599_integration`. Phase E Monitoring loc-audit aggregate drained.
 
-**§5.12:** **0** відкритих. **Vision:** rev **427**. **Pending completion:** **670** (→ PH-S2278). **Next expected band:** 97 (`PH-S1609…S1618`, Monitoring docs canon).
+**§5.12:** **0** відкритих. **Vision:** rev **428**. **Pending completion:** **670** (→ PH-S2278). **Next expected band:** 97 (`PH-S1609…S1618`, Monitoring docs canon).
 
 ## Band 95 — Monitoring stand smoke (PH-S1589…S1598, **✅**)
 
