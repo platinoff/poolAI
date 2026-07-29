@@ -43,7 +43,7 @@
 
 **PH-S1618 ✅ (2026-07-29):** `monitoring_docs_canon_depth.rs`; `MONITORING_DOCS_CANON_SLICES`; `--monitoring-docs-canon`; `VERIFY_MONITORING_DOCS_CANON`; `MONITORING_DOCS_CANON.md`; `galaxy_horizon_s1609_integration`. Phase E Monitoring docs-canon aggregate drained.
 
-**§5.12:** **0** відкритих. **Vision:** rev **430**. **Pending completion:** **660** (→ PH-S2278). **Next expected band:** 98 (`PH-S1619…S1628`, Monitoring vision-sync).
+**§5.12:** **0** відкритих. **Vision:** rev **431**. **Pending completion:** **660** (→ PH-S2278). **Next expected band:** 98 (`PH-S1619…S1628`, Monitoring vision-sync).
 
 ## Security findings closed (PH-SVC55…64, by severity)
 
