@@ -807,16 +807,16 @@
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1609** | `monitoring_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1610** | `monitoring` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1611** | `monitoring` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1612** | `monitoring` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1613** | Stand smoke `monitoring` export | export shape unit test | **[ ]** |
-| **PH-S1614** | poolai-loc-audit PH-S1614 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1615** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1616** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1617** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1618** | galaxy_horizon_s1609_integration | band close | **[ ]** |
+| **PH-S1609** | `monitoring_docs_canon` depth scaffold | ui-core depth enum + criteria registry | **✅** |
+| **PH-S1610** | Docs-canon slice aggregate | `MONITORING_DOCS_CANON_SLICES` | **✅** |
+| **PH-S1611** | Criteria / export contracts | `monitoring_docs_canon_integration` | **✅** |
+| **PH-S1612** | verify-dev-stand / docs-canon hook | `VERIFY_MONITORING_DOCS_CANON` | **✅** |
+| **PH-S1613** | Stand smoke export shape | `monitoring_docs_canon_band97_export_shape` | **✅** |
+| **PH-S1614** | poolai-loc-audit `--monitoring-docs-canon` | `rust_ratio.json` zriz | **✅** |
+| **PH-S1615** | Docs canon sync | `MONITORING_DOCS_CANON.md` + RUN_LOCAL | **✅** |
+| **PH-S1616** | poolai-vision-sync --check | drift gate green | **✅** |
+| **PH-S1617** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
+| **PH-S1618** | galaxy_horizon_s1609_integration | band close | **✅** |
 
 ## Band 98 — PH-S1619…S1628 (E Monitoring · vision-sync)
 

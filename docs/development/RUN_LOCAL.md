@@ -1386,6 +1386,25 @@ Module: [`monitoring_loc_audit_depth.rs`](../../crates/poolai-ui-core/src/monito
 
 Default stand smoke includes **`vision_revision_parity`** (PH-S208, PH-S235): repo `manifest.revision` vs FM §5.12 `Vision rev`, `extensions.active_sprint` vs `manifest.next_sprint`, then `GET /docs/vision/manifest.json` with `X-PoolAI-Vision-Revision` header vs JSON body.
 
+### Monitoring docs-canon (band 97, PH-S1609…S1618)
+
+Enterprise phase E monitoring docs-canon — consolidates band 91–95 `MONITORING_*.md` slices.
+
+```bash
+cargo run --bin poolai-loc-audit -- --monitoring-docs-canon
+cargo run --bin poolai-loc-audit -- --monitoring-docs-canon --advisory --min-ratio 0.95
+VERIFY_MONITORING_DOCS_CANON=1 bash bin/verify-dev-stand.sh
+/usr/bin/bash bin/run-poolai.sh quick --monitoring-docs-canon
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `monitoring_docs_canon_mode` | `true` when `--monitoring-docs-canon` (PH-S1614) |
+| `monitoring_docs_canon_criteria_total` | Registry size (10) |
+| `monitoring_docs_canon_criteria_met_count` | Criteria with marker present in canonical doc paths |
+
+Module: [`monitoring_docs_canon_depth.rs`](../../crates/poolai-ui-core/src/monitoring_docs_canon_depth.rs) · tests: `monitoring_docs_canon_integration.rs`, `galaxy_horizon_s1609_integration.rs` · docs: [`MONITORING_DOCS_CANON.md`](./MONITORING_DOCS_CANON.md).
+
 ---
 
 ## Admin UI WASM POC (PH-S147)

@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-07-27 (project completion path · band 89 ✅ · band 90 horizon · Cursor **3.13.21** PH-SVC75…84 ✅ · GH tokens PH-SVC65…74 ✅)
+**Оновлено:** 2026-07-29 (project completion path · band 97 ✅ · band 98 horizon · Cursor **3.13.21** PH-SVC75…84 ✅ · GH tokens PH-SVC65…74 ✅)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -1221,7 +1221,24 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 96 ✅ · band 97 next). **Master horizon:** PH-S1609…S1618 (band 97). **Completion pending:** PH-S1609…S2278 = **670** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **428**. **Наступна сесія:** **`абракадабра`** — project scan / band 97.
+**Відкритих у §5.12:** **0** (band 97 ✅ · band 98 next). **Master horizon:** PH-S1619…S1628 (band 98). **Completion pending:** PH-S1619…S2278 = **660** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **430**. **Наступна сесія:** **`абракадабра`** — project scan / band 98.
+
+### 5.78 Monitoring docs canon queue — band 97 (PH-S1609…S1618, 2026-07-29) · **✅**
+
+**Джерело:** project completion / enterprise phase E — Monitoring docs-canon aggregate (mirror band 86 policies docs-canon). Prior: [`MONITORING_LOC_AUDIT.md`](../development/MONITORING_LOC_AUDIT.md) (band 96). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · master [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1544 | **PH-S1609** | `monitoring_docs_canon_depth` ui-core module | `monitoring_docs_canon_depth.rs` | depth enum + criteria registry | **✅** |
+| 1545 | **PH-S1610** | Docs-canon slice aggregate | `MONITORING_DOCS_CANON_SLICES` | 6 slice docs referenced | **✅** |
+| 1546 | **PH-S1611** | Criteria / export contracts | `monitoring_docs_canon_integration` | criteria totals consistent | **✅** |
+| 1547 | **PH-S1612** | verify-dev-stand / docs-canon hook | `VERIFY_MONITORING_DOCS_CANON` | verify-dev-stand gate + quick | **✅** |
+| 1548 | **PH-S1613** | Stand smoke export shape | `poolai_http_stand_smoke` | `monitoring_docs_canon_band97_export_shape` | **✅** |
+| 1549 | **PH-S1614** | `poolai-loc-audit --monitoring-docs-canon` | loc-audit | `rust_ratio.json` fields | **✅** |
+| 1550 | **PH-S1615** | Docs canon sync | docs | `MONITORING_DOCS_CANON.md` + canon | **✅** |
+| 1551 | **PH-S1616** | vision-sync --check | ops | drift gate green | **✅** |
+| 1552 | **PH-S1617** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **✅** |
+| 1553 | **PH-S1618** | Band close | tests/docs | `galaxy_horizon_s1609_integration` | **✅** |
 
 ### 5.77 Monitoring loc-audit queue — band 96 (PH-S1599…S1608, 2026-07-28) · **✅**
 

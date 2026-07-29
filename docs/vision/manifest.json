@@ -3030,7 +3030,7 @@
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S1608",
+  "last_sprint_closed": "PH-S1618",
   "layers": [
     {
       "id": "L0",
@@ -3063,7 +3063,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1609",
+  "next_sprint": "PH-S1619",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -11852,7 +11852,7 @@
       "path": "tests/monitoring_loc_audit_integration.rs"
     }
   ],
-  "revision": 428,
+  "revision": 430,
   "sprint_queue": [],
   "sprint_queue_open_count": 0,
   "updated_at": "2026-06-20",

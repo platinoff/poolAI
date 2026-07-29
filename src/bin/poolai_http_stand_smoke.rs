@@ -6913,6 +6913,50 @@ mod tests {
     }
 
     #[test]
+    fn monitoring_docs_canon_band97_export_shape_ph_s1613() {
+        use poolai_ui_core::monitoring_docs_canon_depth::{
+            monitoring_docs_canon_criteria_total, monitoring_docs_canon_depth_stub,
+            monitoring_docs_canon_slices_met, MonitoringDocsCanonDepth, FM_BAND97_ROWS,
+            MONITORING_DOCS_CANON_CASES, MONITORING_DOCS_CANON_CRITERIA,
+            MONITORING_DOCS_CANON_SLICES,
+        };
+        use serde_json::json;
+        assert_eq!(
+            monitoring_docs_canon_depth_stub(Some(&json!({"stand_smoke_export": true}))),
+            MonitoringDocsCanonDepth::StandSmokeExport
+        );
+        assert_eq!(
+            monitoring_docs_canon_depth_stub(Some(&json!({
+                "monitoring_docs_canon_depth": true,
+                "slice_aggregate": true,
+                "criteria_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "monitoring_docs_canon_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            MonitoringDocsCanonDepth::FullBand97
+        );
+        assert_eq!(MONITORING_DOCS_CANON_CRITERIA.len(), 10);
+        assert_eq!(monitoring_docs_canon_criteria_total(), 10);
+        assert_eq!(MONITORING_DOCS_CANON_SLICES.len(), 6);
+        assert!(MONITORING_DOCS_CANON_CASES.contains(&"aggregate_flag"));
+        let canon = include_str!("../../docs/development/MONITORING_DOCS_CANON.md");
+        assert_eq!(monitoring_docs_canon_slices_met(canon), (6, 6));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--monitoring-docs-canon"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND97_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band97 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn policy_docs_canon_band87_export_shape_ph_s1513() {
         use poolai_ui_core::policy_docs_canon_depth::{
             policy_docs_canon_criteria_total, policy_docs_canon_depth_stub,

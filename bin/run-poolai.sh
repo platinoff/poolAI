@@ -106,6 +106,7 @@ Options (quick):
   --monitoring-admin-ops After health wait, loc-audit --monitoring-admin-ops (PH-S1584)
   --monitoring-stand-smoke After health wait, stand smoke + loc-audit --monitoring-stand-smoke (PH-S1595)
   --monitoring-loc-audit After health wait, loc-audit --monitoring-loc-audit aggregate (PH-S1602)
+  --monitoring-docs-canon After health wait, loc-audit --monitoring-docs-canon (PH-S1614)
   --skip-build    Skip cargo build
   --port N        HTTP port (default 8080)
 
@@ -335,6 +336,7 @@ cmd_quick() {
   local monitoring_admin_ops=0
   local monitoring_stand_smoke=0
   local monitoring_loc_audit=0
+  local monitoring_docs_canon=0
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --skip-build) SKIP_BUILD=1; shift ;;
@@ -388,6 +390,7 @@ cmd_quick() {
       --monitoring-admin-ops) monitoring_admin_ops=1; shift ;;
       --monitoring-stand-smoke) monitoring_stand_smoke=1; shift ;;
       --monitoring-loc-audit) monitoring_loc_audit=1; shift ;;
+      --monitoring-docs-canon) monitoring_docs_canon=1; shift ;;
       --policy-store) policy_store=1; shift ;;
       --policy-api) policy_api=1; shift ;;
       --port) PORT="$2"; shift 2 ;;
@@ -621,6 +624,10 @@ cmd_quick() {
   if [[ "$monitoring_loc_audit" == "1" ]]; then
     echo "Running poolai-loc-audit --monitoring-loc-audit (PH-S1602)..."
     cargo run --quiet --bin poolai-loc-audit -- --monitoring-loc-audit
+  fi
+  if [[ "$monitoring_docs_canon" == "1" ]]; then
+    echo "Running poolai-loc-audit --monitoring-docs-canon (PH-S1614)..."
+    cargo run --quiet --bin poolai-loc-audit -- --monitoring-docs-canon
   fi
 }
 

@@ -1,8 +1,8 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-28 (band 96 **PH-S1599…S1608** ✅ · band 95 ✅ · band 94 ✅ · band 93 ✅ · band 92 ✅ · band 91 ✅ · service **PH-SVC85** Rust diagnostics panel ✅ · **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · band 88 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 97 next)
+**Оновлено:** 2026-07-29 (band 97 **PH-S1609…S1618** ✅ · band 96 ✅ · band 95 ✅ · band 94 ✅ · band 93 ✅ · band 92 ✅ · band 91 ✅ · service **PH-SVC85** Rust diagnostics panel ✅ · **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · band 88 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 98 next)
 
-**Наступна сесія:** **`абракадабра`** — S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain band 97 · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+**Наступна сесія:** **`абракадабра`** — S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain band 98 · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
 
 ## P0 / service (2026-07-27)
 
@@ -24,7 +24,26 @@
 
 **Cursor / toolchain (service):** local desktop **3.13.21** · Auto-review · Router Balance/Intelligence for drain · vision Speeds/Rust/eye verified · research [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](./CURSOR_UPDATE_RESEARCH_2026-07-27.md) · FM **§5.16**.
 
-**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **670** спринтів → PH-S2278.
+**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **660** спринтів → PH-S2278.
+
+## Band 97 — Monitoring docs canon (PH-S1609…S1618, **✅**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1609** | `monitoring_docs_canon_depth` + criteria registry |
+| **PH-S1610** | Slice aggregate (`MONITORING_DOCS_CANON_SLICES`) |
+| **PH-S1611** | Criteria contracts (`monitoring_docs_canon_integration`) |
+| **PH-S1612** | `VERIFY_MONITORING_DOCS_CANON` + quick `--monitoring-docs-canon` |
+| **PH-S1613** | Stand smoke export shape band 97 |
+| **PH-S1614** | `poolai-loc-audit --monitoring-docs-canon` |
+| **PH-S1615** | Docs `MONITORING_DOCS_CANON.md` + canon |
+| **PH-S1616** | vision-sync --check |
+| **PH-S1617** | Ratio hold advisory |
+| **PH-S1618** | Band close |
+
+**PH-S1618 ✅ (2026-07-29):** `monitoring_docs_canon_depth.rs`; `MONITORING_DOCS_CANON_SLICES`; `--monitoring-docs-canon`; `VERIFY_MONITORING_DOCS_CANON`; `MONITORING_DOCS_CANON.md`; `galaxy_horizon_s1609_integration`. Phase E Monitoring docs-canon aggregate drained.
+
+**§5.12:** **0** відкритих. **Vision:** rev **430**. **Pending completion:** **660** (→ PH-S2278). **Next expected band:** 98 (`PH-S1619…S1628`, Monitoring vision-sync).
 
 ## Security findings closed (PH-SVC55…64, by severity)
 
