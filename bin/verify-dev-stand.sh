@@ -57,6 +57,7 @@ VERIFY_MONITORING="${VERIFY_MONITORING:-0}"
 VERIFY_MONITORING_STORE="${VERIFY_MONITORING_STORE:-0}"
 VERIFY_MONITORING_API="${VERIFY_MONITORING_API:-0}"
 VERIFY_MONITORING_ADMIN_OPS="${VERIFY_MONITORING_ADMIN_OPS:-0}"
+VERIFY_MONITORING_STAND_SMOKE="${VERIFY_MONITORING_STAND_SMOKE:-0}"
 VERIFY_SSO_LOC_AUDIT="${VERIFY_SSO_LOC_AUDIT:-0}"
 VERIFY_SSO_DOCS_CANON="${VERIFY_SSO_DOCS_CANON:-0}"
 VERIFY_SSO_VISION_SYNC="${VERIFY_SSO_VISION_SYNC:-0}"
@@ -754,6 +755,23 @@ if [[ "$VERIFY_MONITORING_ADMIN_OPS" == "1" ]]; then
     echo "OK  monitoring admin/ops gate loc-audit"
   else
     echo "FAIL monitoring admin/ops gate loc-audit"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_MONITORING_STAND_SMOKE" == "1" ]]; then
+  echo "Running poolai-http-stand-smoke --monitoring-stand-smoke (PH-S1595)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-http-stand-smoke -- --monitoring-stand-smoke); then
+    echo "OK  monitoring stand-smoke live suite"
+  else
+    echo "FAIL monitoring stand-smoke live suite"
+    fail=1
+  fi
+  echo "Running poolai-loc-audit --monitoring-stand-smoke (PH-S1595)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --monitoring-stand-smoke); then
+    echo "OK  monitoring stand-smoke gate loc-audit"
+  else
+    echo "FAIL monitoring stand-smoke gate loc-audit"
     fail=1
   fi
 fi

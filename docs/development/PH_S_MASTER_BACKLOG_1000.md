@@ -54,7 +54,7 @@
 | 92 | PH-S1559…S1568 | E Monitoring · store wire |
 | 93 | PH-S1569…S1578 | E Monitoring · API contracts |
 | 94 | PH-S1579…S1588 | E Monitoring · admin/ops glue |
-| 95 | PH-S1589…S1598 | E Monitoring · stand smoke |
+| 95 | PH-S1589…S1598 | E Monitoring · stand smoke **✅ drained** |
 | 96 | PH-S1599…S1608 | E Monitoring · loc-audit |
 | 97 | PH-S1609…S1618 | E Monitoring · docs canon |
 | 98 | PH-S1619…S1628 | E Monitoring · vision-sync |
@@ -773,20 +773,20 @@
 | **PH-S1587** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
 | **PH-S1588** | galaxy_horizon_s1579_integration | band close | **✅** |
 
-## Band 95 — PH-S1589…S1598 (E Monitoring · stand smoke)
+## Band 95 — PH-S1589…S1598 (E Monitoring · stand smoke) · **✅ drained** · override
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1589** | `monitoring_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1590** | `monitoring` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1591** | `monitoring` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1592** | `monitoring` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1593** | Stand smoke `monitoring` export | export shape unit test | **[ ]** |
-| **PH-S1594** | poolai-loc-audit PH-S1594 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1595** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1596** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1597** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1598** | galaxy_horizon_s1589_integration | band close | **[ ]** |
+| **PH-S1589** | `monitoring_stand_smoke_depth` | ui-core depth enum + criteria registry | **✅** |
+| **PH-S1590** | Live store wire | `GET /monitoring/store` shape + integration | **✅** |
+| **PH-S1591** | Live alerts query | list + severity filter stub | **✅** |
+| **PH-S1592** | Live field fixtures | validate missing name/operator → 4xx | **✅** |
+| **PH-S1593** | CLI `--monitoring-stand-smoke` | live suite + export shape | **✅** |
+| **PH-S1594** | `poolai-loc-audit --monitoring-stand-smoke` | `rust_ratio.json` fields | **✅** |
+| **PH-S1595** | `VERIFY_MONITORING_STAND_SMOKE` | live + loc-audit verify | **✅** |
+| **PH-S1596** | Docs `MONITORING_STAND_SMOKE.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | **✅** |
+| **PH-S1597** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
+| **PH-S1598** | `galaxy_horizon_s1589_integration` | band close | **✅** |
 
 ## Band 96 — PH-S1599…S1608 (E Monitoring · loc-audit)
 

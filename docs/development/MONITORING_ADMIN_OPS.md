@@ -1,7 +1,7 @@
 # Monitoring Admin/Ops Glue — Enterprise Phase E (Band 94)
 
 Canonical doc: [`MONITORING_ADMIN_OPS.md`](./MONITORING_ADMIN_OPS.md) (band 94, PH-S1586).
-Prev: [`MONITORING_API.md`](./MONITORING_API.md) (band 93 ✅). Next: Monitoring stand smoke (band 95). Mirror: [`POLICIES_ADMIN_OPS.md`](./POLICIES_ADMIN_OPS.md).
+Prev: [`MONITORING_API.md`](./MONITORING_API.md) (band 93 ✅). Next: Monitoring stand smoke (band 95 ✅) — [`MONITORING_STAND_SMOKE.md`](./MONITORING_STAND_SMOKE.md). Mirror: [`POLICIES_ADMIN_OPS.md`](./POLICIES_ADMIN_OPS.md).
 
 ## Overview
 

@@ -1221,7 +1221,26 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 94 ✅ · band 95 next). **Master horizon:** PH-S1589…S1598 (band 95). **Completion pending:** PH-S1589…S2278 = **690** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **424**. **Наступна сесія:** **`абракадабра`** — project scan / band 95.
+**Відкритих у §5.12:** **0** (band 95 ✅ · band 96 next). **Master horizon:** PH-S1599…S1608 (band 96). **Completion pending:** PH-S1599…S2278 = **680** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **426**. **Наступна сесія:** **`абракадабра`** — project scan / band 96.
+
+### 5.76 Monitoring stand smoke queue — band 95 (PH-S1589…S1598, 2026-07-28) · **✅**
+
+**Джерело:** project completion / enterprise phase E — Monitoring live stand smoke (mirror band 85 [`POLICIES_STAND_SMOKE.md`](../development/POLICIES_STAND_SMOKE.md) · band 75 [`AUDIT_STAND_SMOKE.md`](../development/AUDIT_STAND_SMOKE.md)). Prior admin/ops: [`MONITORING_ADMIN_OPS.md`](../development/MONITORING_ADMIN_OPS.md) (band 94). Warnings-first: diagnostics errors already gated in band 94 (`required-features`); no new hygiene PH-S* — product stand-smoke. Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · master [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1524 | **PH-S1589** | `monitoring_stand_smoke_depth` ui-core module | `monitoring_stand_smoke_depth.rs` | depth enum + stand-smoke criteria registry | **✅** |
+| 1525 | **PH-S1590** | Live store wire smoke | `GET /monitoring/store` | shape + integration | **✅** |
+| 1526 | **PH-S1591** | Live alerts query smoke | `GET /monitoring/alerts` | list + severity filter stub | **✅** |
+| 1527 | **PH-S1592** | Live monitoring-field fixture smoke | validate fixture | missing name/operator → 4xx | **✅** |
+| 1528 | **PH-S1593** | CLI `--monitoring-stand-smoke` | stand smoke bin | live suite + export shape | **✅** |
+| 1529 | **PH-S1594** | `poolai-loc-audit --monitoring-stand-smoke` | loc-audit | `rust_ratio.json` fields | **✅** |
+| 1530 | **PH-S1595** | `VERIFY_MONITORING_STAND_SMOKE` | verify-dev-stand | live + loc-audit verify | **✅** |
+| 1531 | **PH-S1596** | Docs `MONITORING_STAND_SMOKE.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | stand matrix | **✅** |
+| 1532 | **PH-S1597** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **✅** |
+| 1533 | **PH-S1598** | Monitoring stand smoke band close | tests/docs | `galaxy_horizon_s1589_integration`; HANDOFF/NEXT | **✅** |
+
+**PH-S1598 ✅ (2026-07-28):** `monitoring_stand_smoke_depth.rs`; `smoke_monitoring_store_wire` / `alerts_query` / `field_fixtures`; `--monitoring-stand-smoke`; `VERIFY_MONITORING_STAND_SMOKE`; `MONITORING_STAND_SMOKE.md`; `galaxy_horizon_s1589_integration`. Phase E Monitoring stand smoke closed.
 
 ### 5.75 Monitoring admin/ops glue queue — band 94 (PH-S1579…S1588, 2026-07-28) · **✅**
 

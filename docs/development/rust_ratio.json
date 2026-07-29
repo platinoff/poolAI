@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-28",
+  "generated_at": "2026-07-29",
   "sprint": "PH-S1010",
   "formal_band_min": 0.9,
   "formal_band_max": 0.95,
@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 183241,
-  "non_rust_product_loc": 9745,
-  "product_loc_total": 192986,
-  "rust_ratio": 0.9495041091063601,
-  "rust_ratio_pct": 94.95041091063601,
+  "rust_loc": 183852,
+  "non_rust_product_loc": 9772,
+  "product_loc_total": 193624,
+  "rust_ratio": 0.9495310498698508,
+  "rust_ratio_pct": 94.95310498698508,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -172,9 +172,12 @@
   "monitoring_api_mode": false,
   "monitoring_api_criteria_total": 9,
   "monitoring_api_criteria_met_count": 0,
-  "monitoring_admin_ops_mode": true,
+  "monitoring_admin_ops_mode": false,
   "monitoring_admin_ops_criteria_total": 10,
-  "monitoring_admin_ops_criteria_met_count": 10,
+  "monitoring_admin_ops_criteria_met_count": 0,
+  "monitoring_stand_smoke_mode": true,
+  "monitoring_stand_smoke_criteria_total": 10,
+  "monitoring_stand_smoke_criteria_met_count": 10,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -186,23 +189,23 @@
     },
     "ops_shell": {
       "files": 41,
-      "loc": 4009
+      "loc": 4036
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 112,
-      "loc": 23993
+      "files": 113,
+      "loc": 24180
     },
     "rust_src": {
       "files": 302,
-      "loc": 115913
+      "loc": 116219
     },
     "rust_tests": {
-      "files": 331,
-      "loc": 42727
+      "files": 333,
+      "loc": 42845
     },
     "ui_css": {
       "files": 2,
@@ -233,7 +236,7 @@
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
     "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
-    "PH-S1585: monitoring_admin_ops_mode — store strip / monitoring refresh / verify hooks",
-    "PH-S1588: band 94 monitoring admin/ops — criteria met vs registry"
+    "PH-S1594: monitoring_stand_smoke_mode — live store / alerts query / validate fixtures",
+    "PH-S1598: band 95 monitoring stand smoke — criteria met vs registry"
   ]
 }

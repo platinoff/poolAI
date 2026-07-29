@@ -74,6 +74,8 @@ struct Cli {
     audit_stand_smoke_only: bool,
     /// PH-S1493: live policy store/query/validate suite (band 85).
     policy_stand_smoke_only: bool,
+    /// PH-S1593: live monitoring store/alerts/validate suite (band 95).
+    monitoring_stand_smoke_only: bool,
     base_url: String,
 }
 
@@ -251,6 +253,7 @@ fn parse_cli() -> Cli {
     let mut sso_stand_smoke_only = false;
     let mut audit_stand_smoke_only = false;
     let mut policy_stand_smoke_only = false;
+    let mut monitoring_stand_smoke_only = false;
     for arg in std::env::args().skip(1) {
         match arg.as_str() {
             "--json" => json_out = true,
@@ -262,6 +265,7 @@ fn parse_cli() -> Cli {
             "--sso-stand-smoke" => sso_stand_smoke_only = true,
             "--audit-stand-smoke" => audit_stand_smoke_only = true,
             "--policy-stand-smoke" => policy_stand_smoke_only = true,
+            "--monitoring-stand-smoke" => monitoring_stand_smoke_only = true,
             _ if arg.starts_with('-') => {}
             _ => {}
         }
@@ -306,6 +310,11 @@ fn parse_cli() -> Cli {
             .ok()
             .is_some_and(|v| matches!(v.as_str(), "1" | "true" | "yes"));
     }
+    if !monitoring_stand_smoke_only {
+        monitoring_stand_smoke_only = std::env::var("POOLAI_STAND_SMOKE_MONITORING")
+            .ok()
+            .is_some_and(|v| matches!(v.as_str(), "1" | "true" | "yes"));
+    }
     Cli {
         json_out,
         include_raid,
@@ -316,6 +325,7 @@ fn parse_cli() -> Cli {
         sso_stand_smoke_only,
         audit_stand_smoke_only,
         policy_stand_smoke_only,
+        monitoring_stand_smoke_only,
         base_url: base_url_from_env(),
     }
 }
@@ -681,6 +691,151 @@ async fn smoke_audit_event_field_fixtures(client: &Client, base: &str) -> Result
     {
         return Err(format!(
             "audit validate missing resource unexpected: {resource_body}"
+        ));
+    }
+    Ok(())
+}
+
+/// PH-S1590: live `GET /api/enterprise/monitoring/store` shape.
+async fn smoke_monitoring_store_wire(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/api/enterprise/monitoring/store"))
+        .send()
+        .await
+        .map_err(|e| format!("monitoring store request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("monitoring store status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    let obj = body
+        .as_object()
+        .ok_or_else(|| format!("monitoring store expected object: {body}"))?;
+    for key in ["mode", "durable_path", "configured"] {
+        if !obj.contains_key(key) {
+            return Err(format!("monitoring store missing `{key}`: {body}"));
+        }
+    }
+    Ok(())
+}
+
+/// PH-S1591: live `GET /api/enterprise/monitoring/alerts` query (+ optional severity filter).
+async fn smoke_monitoring_alerts_query(client: &Client, base: &str) -> Result<(), String> {
+    let list = client
+        .get(api_url(base, "/api/enterprise/monitoring/alerts?limit=5"))
+        .send()
+        .await
+        .map_err(|e| format!("alerts list: {e}"))?;
+    if list.status() != StatusCode::OK {
+        return Err(format!("alerts list status {}", list.status()));
+    }
+    let body: Value = list.json().await.map_err(|e| e.to_string())?;
+    if !body.is_array() {
+        return Err(format!("alerts expected array: {body}"));
+    }
+
+    let filtered = client
+        .get(api_url(
+            base,
+            "/api/enterprise/monitoring/alerts?severity=WARNING&limit=2",
+        ))
+        .send()
+        .await
+        .map_err(|e| format!("alerts filter: {e}"))?;
+    if filtered.status() != StatusCode::OK {
+        return Err(format!("alerts filter status {}", filtered.status()));
+    }
+    let filtered_body: Value = filtered.json().await.map_err(|e| e.to_string())?;
+    let arr = filtered_body
+        .as_array()
+        .ok_or_else(|| format!("alerts filter expected array: {filtered_body}"))?;
+    for item in arr {
+        let sev = item.get("severity").and_then(|s| s.as_str()).unwrap_or("");
+        if !(sev.eq_ignore_ascii_case("WARNING") || sev.eq_ignore_ascii_case("warning")) {
+            return Err(format!("alerts filter leaked `{sev}`"));
+        }
+    }
+    Ok(())
+}
+
+/// PH-S1592: live monitoring alert-rule validation fixtures (no durable write).
+async fn smoke_monitoring_field_fixtures(client: &Client, base: &str) -> Result<(), String> {
+    let valid = client
+        .post(api_url(
+            base,
+            "/api/enterprise/monitoring/alert-rules/validate",
+        ))
+        .json(&json!({
+            "name": "stand-smoke-ok",
+            "metric": "cpu_usage",
+            "threshold": 90.0,
+            "operator": ">",
+            "severity": "WARNING",
+            "enabled": true
+        }))
+        .send()
+        .await
+        .map_err(|e| format!("monitoring validate ok: {e}"))?;
+    if valid.status() != StatusCode::OK {
+        return Err(format!("monitoring validate ok status {}", valid.status()));
+    }
+    let valid_body: Value = valid.json().await.map_err(|e| e.to_string())?;
+    if valid_body.get("valid").and_then(|v| v.as_bool()) != Some(true) {
+        return Err(format!("monitoring validate ok unexpected: {valid_body}"));
+    }
+
+    let missing_name = client
+        .post(api_url(
+            base,
+            "/api/enterprise/monitoring/alert-rules/validate",
+        ))
+        .json(&json!({
+            "name": "",
+            "metric": "cpu_usage",
+            "threshold": 90.0,
+            "operator": ">"
+        }))
+        .send()
+        .await
+        .map_err(|e| format!("monitoring validate missing name: {e}"))?;
+    if missing_name.status() != StatusCode::BAD_REQUEST {
+        return Err(format!(
+            "monitoring validate missing name status {}",
+            missing_name.status()
+        ));
+    }
+    let name_body: Value = missing_name.json().await.map_err(|e| e.to_string())?;
+    let name_text = name_body.to_string();
+    if !(name_text.contains("MONITORING_MISSING_NAME") || name_text.contains("name")) {
+        return Err(format!(
+            "monitoring validate missing name unexpected: {name_body}"
+        ));
+    }
+
+    let bad_op = client
+        .post(api_url(
+            base,
+            "/api/enterprise/monitoring/alert-rules/validate",
+        ))
+        .json(&json!({
+            "name": "bad-op",
+            "metric": "cpu_usage",
+            "threshold": 90.0,
+            "operator": "!="
+        }))
+        .send()
+        .await
+        .map_err(|e| format!("monitoring validate bad operator: {e}"))?;
+    if bad_op.status() != StatusCode::BAD_REQUEST {
+        return Err(format!(
+            "monitoring validate bad operator status {}",
+            bad_op.status()
+        ));
+    }
+    let op_body: Value = bad_op.json().await.map_err(|e| e.to_string())?;
+    let op_text = op_body.to_string();
+    if !(op_text.contains("MONITORING_INVALID_OPERATOR") || op_text.contains("operator")) {
+        return Err(format!(
+            "monitoring validate bad operator unexpected: {op_body}"
         ));
     }
     Ok(())
@@ -3599,6 +3754,63 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
             &mut cases,
             "policy_field_fixtures",
             smoke_policy_field_fixtures(&client, &cli.base_url).await,
+        )
+        .await;
+        let passed = cases.iter().filter(|c| c.ok).count() as u32;
+        let failed = cases.iter().filter(|c| !c.ok).count() as u32;
+        return SmokeReport {
+            base_url: cli.base_url.clone(),
+            stand_root,
+            ok: failed == 0,
+            passed,
+            failed,
+            cases,
+            tool: "poolai-http-stand-smoke",
+        };
+    }
+
+    if cli.monitoring_stand_smoke_only {
+        async fn record(
+            cases: &mut Vec<SmokeCaseResult>,
+            name: &'static str,
+            result: Result<(), String>,
+        ) {
+            cases.push(match result {
+                Ok(()) => SmokeCaseResult {
+                    name,
+                    ok: true,
+                    detail: None,
+                },
+                Err(e) => SmokeCaseResult {
+                    name,
+                    ok: false,
+                    detail: Some(e),
+                },
+            });
+        }
+
+        record(
+            &mut cases,
+            "health",
+            smoke_health(&client, &cli.base_url).await,
+        )
+        .await;
+        record(
+            &mut cases,
+            "monitoring_store_wire",
+            smoke_monitoring_store_wire(&client, &cli.base_url).await,
+        )
+        .await;
+        record(
+            &mut cases,
+            "monitoring_alerts_query",
+            smoke_monitoring_alerts_query(&client, &cli.base_url).await,
+        )
+        .await;
+        record(
+            &mut cases,
+            "monitoring_field_fixtures",
+            smoke_monitoring_field_fixtures(&client, &cli.base_url).await,
         )
         .await;
         let passed = cases.iter().filter(|c| c.ok).count() as u32;
@@ -6566,6 +6778,52 @@ mod tests {
             assert!(
                 fm.contains(row) || row.starts_with("PH-S"),
                 "FM band85 row {row}"
+            );
+        }
+    }
+
+    #[test]
+    fn monitoring_stand_smoke_band95_export_shape_ph_s1593() {
+        use poolai_ui_core::monitoring_stand_smoke_depth::{
+            monitoring_stand_smoke_criteria_total, monitoring_stand_smoke_depth_stub,
+            MonitoringStandSmokeDepth, FM_BAND95_ROWS, MONITORING_STAND_SMOKE_CASES,
+            MONITORING_STAND_SMOKE_CRITERIA,
+        };
+        use serde_json::json;
+        assert_eq!(
+            monitoring_stand_smoke_depth_stub(Some(&json!({"live_store": true}))),
+            MonitoringStandSmokeDepth::LiveStore
+        );
+        assert_eq!(
+            monitoring_stand_smoke_depth_stub(Some(&json!({
+                "monitoring_stand_smoke_depth": true,
+                "live_store": true,
+                "live_alerts_query": true,
+                "live_monitoring_field_fixtures": true,
+                "cli_flag": true,
+                "loc_audit_flag": true,
+                "verify_dev_stand_hook": true,
+                "monitoring_stand_smoke_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            MonitoringStandSmokeDepth::FullBand95
+        );
+        assert_eq!(MONITORING_STAND_SMOKE_CRITERIA.len(), 10);
+        assert_eq!(monitoring_stand_smoke_criteria_total(), 10);
+        assert!(MONITORING_STAND_SMOKE_CASES.contains(&"live_alerts_query"));
+        let smoke_src = include_str!("../../src/bin/poolai_http_stand_smoke.rs");
+        assert!(smoke_src.contains("smoke_monitoring_store_wire"));
+        assert!(smoke_src.contains("smoke_monitoring_alerts_query"));
+        assert!(smoke_src.contains("smoke_monitoring_field_fixtures"));
+        assert!(smoke_src.contains("--monitoring-stand-smoke"));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--monitoring-stand-smoke"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND95_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band95 row {row}"
             );
         }
     }

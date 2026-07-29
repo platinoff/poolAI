@@ -3,6 +3,96 @@
   "items": [
     {
       "category": "closed",
+      "id": "PH-S1598",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_horizon_s1589_integration`; HANDOFF/NEXT",
+      "title": "Monitoring stand smoke band close"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1597",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--min-ratio 0.95 --advisory",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1596",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "stand matrix",
+      "title": "Docs `MONITORING_STAND_SMOKE.md` + canon"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1595",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "live + loc-audit verify",
+      "title": "VERIFY_MONITORING_STAND_SMOKE"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1594",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "rust_ratio.json` fields",
+      "title": "poolai-loc-audit --monitoring-stand-smoke"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1593",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "live suite + export shape",
+      "title": "CLI `--monitoring-stand-smoke"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1592",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "missing name/operator → 4xx",
+      "title": "Live monitoring-field fixture smoke"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1591",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "list + severity filter stub",
+      "title": "Live alerts query smoke"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1590",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "shape + integration",
+      "title": "Live store wire smoke"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1589",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "depth enum + stand-smoke criteria registry",
+      "title": "monitoring_stand_smoke_depth` ui-core module"
+    },
+    {
+      "category": "closed",
       "id": "PH-S1588",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
@@ -13,96 +103,6 @@
     {
       "category": "closed",
       "id": "PH-S1587",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--min-ratio 0.95 --advisory",
-      "title": "Ratio hold advisory"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1586",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "HANDOFF/NEXT sync",
-      "title": "Docs `MONITORING_ADMIN_OPS.md` + canon"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1585",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "export shape + rust_ratio fields",
-      "title": "Stand smoke + loc-audit `--monitoring-admin-ops"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1584",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "verify-dev-stand / run-poolai",
-      "title": "VERIFY_MONITORING_ADMIN_OPS` + `--monitoring-admin-ops"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1583",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "admin.mon.store*` / `btn.refresh` EN+UK",
-      "title": "Monitoring admin/ops i18n"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1582",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "store/query markers",
-      "title": "Admin monitoring ops HTML contracts"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1581",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "Refresh button + notification",
-      "title": "refreshMonitoring` query ops glue"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1580",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "loadMonitoringStoreWire` ← `GET /monitoring/store",
-      "title": "#monitoring-store-badge` store strip"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1579",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "depth enum + criteria; `required-features` for s730/discovery/grid_openapi",
-      "title": "monitoring_admin_ops_depth` + clippy gates"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1578",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "band close",
-      "title": "galaxy_horizon_s1569_integration"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1577",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
