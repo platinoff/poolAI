@@ -3018,7 +3018,7 @@
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S1598",
+  "last_sprint_closed": "PH-S1608",
   "layers": [
     {
       "id": "L0",
@@ -3051,7 +3051,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1599",
+  "next_sprint": "PH-S1609",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -11812,7 +11812,7 @@
       "path": "tests/monitoring_stand_smoke_integration.rs"
     }
   ],
-  "revision": 426,
+  "revision": 427,
   "sprint_queue": [],
   "sprint_queue_open_count": 0,
   "updated_at": "2026-06-20",

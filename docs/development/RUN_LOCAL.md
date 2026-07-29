@@ -24,7 +24,7 @@ cd S:\rust\poolAI
 .\bin\run-poolai.ps1 stop
 ```
 
-**Last updated:** 2026-07-28 (PH-S1598 band 95 · `--monitoring-stand-smoke` · `VERIFY_MONITORING_STAND_SMOKE`)
+**Last updated:** 2026-07-28 (PH-S1608 band 96 · `--monitoring-loc-audit` · `VERIFY_MONITORING_LOC_AUDIT`)
 
 ### PH-S1011 / PH-S1012: Light compile + quick preset
 
@@ -95,6 +95,7 @@ cd S:\rust\poolAI
 /usr/bin/bash bin/run-poolai.sh quick --monitoring-api
 /usr/bin/bash bin/run-poolai.sh quick --monitoring-admin-ops
 /usr/bin/bash bin/run-poolai.sh quick --monitoring-stand-smoke
+/usr/bin/bash bin/run-poolai.sh quick --monitoring-loc-audit
 # PowerShell:
 .\bin\run-poolai.ps1 quick -StandSmoke
 .\bin\run-poolai.ps1 quick -MigrationAdvisory
@@ -384,6 +385,7 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `VERIFY_MONITORING_API=1` | `verify-dev-stand.sh` → `poolai-loc-audit --monitoring-api` (PH-S1574) |
 | `VERIFY_MONITORING_ADMIN_OPS=1` | `verify-dev-stand.sh` → `poolai-loc-audit --monitoring-admin-ops` (PH-S1584) |
 | `VERIFY_MONITORING_STAND_SMOKE=1` | `verify-dev-stand.sh` → `poolai-http-stand-smoke --monitoring-stand-smoke` + `poolai-loc-audit --monitoring-stand-smoke` (PH-S1595) |
+| `VERIFY_MONITORING_LOC_AUDIT=1` | `verify-dev-stand.sh` → `poolai-loc-audit --monitoring-loc-audit` (PH-S1602) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 ### PH-S1100: Rust migration advisory (band 46)
@@ -1362,6 +1364,25 @@ VERIFY_MONITORING_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `monitoring_stand_smoke_criteria_met_count` | Criteria with marker present in canonical doc path |
 
 Module: [`monitoring_stand_smoke_depth.rs`](../../crates/poolai-ui-core/src/monitoring_stand_smoke_depth.rs) · tests: `monitoring_stand_smoke_integration.rs`, `galaxy_horizon_s1589_integration.rs` · docs: [`MONITORING_STAND_SMOKE.md`](./MONITORING_STAND_SMOKE.md).
+
+### Monitoring loc-audit aggregate (band 96, PH-S1599…S1608)
+
+Enterprise phase E monitoring loc-audit aggregate — consolidates band 91–95 `--monitoring*` slices.
+
+```bash
+cargo run --bin poolai-loc-audit -- --monitoring-loc-audit
+cargo run --bin poolai-loc-audit -- --monitoring-loc-audit --advisory --min-ratio 0.95
+VERIFY_MONITORING_LOC_AUDIT=1 bash bin/verify-dev-stand.sh
+/usr/bin/bash bin/run-poolai.sh quick --monitoring-loc-audit
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `monitoring_loc_audit_mode` | `true` when `--monitoring-loc-audit` (PH-S1604) |
+| `monitoring_loc_audit_criteria_total` | Registry size (10) |
+| `monitoring_loc_audit_criteria_met_count` | Criteria with marker present in canonical doc path |
+
+Module: [`monitoring_loc_audit_depth.rs`](../../crates/poolai-ui-core/src/monitoring_loc_audit_depth.rs) · tests: `monitoring_loc_audit_integration.rs`, `galaxy_horizon_s1599_integration.rs` · docs: [`MONITORING_LOC_AUDIT.md`](./MONITORING_LOC_AUDIT.md).
 
 Default stand smoke includes **`vision_revision_parity`** (PH-S208, PH-S235): repo `manifest.revision` vs FM §5.12 `Vision rev`, `extensions.active_sprint` vs `manifest.next_sprint`, then `GET /docs/vision/manifest.json` with `X-PoolAI-Vision-Revision` header vs JSON body.
 

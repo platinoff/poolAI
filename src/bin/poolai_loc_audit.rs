@@ -49,6 +49,9 @@ use poolai_ui_core::monitoring_api_contracts_depth::{
 use poolai_ui_core::monitoring_depth::{
     monitoring_criteria_total, MONITORING_CASES, MONITORING_CRITERIA,
 };
+use poolai_ui_core::monitoring_loc_audit_depth::{
+    monitoring_loc_audit_criteria_total, MONITORING_LOC_AUDIT_CASES, MONITORING_LOC_AUDIT_CRITERIA,
+};
 use poolai_ui_core::monitoring_stand_smoke_depth::{
     monitoring_stand_smoke_criteria_total, MONITORING_STAND_SMOKE_CASES,
     MONITORING_STAND_SMOKE_CRITERIA,
@@ -328,6 +331,8 @@ struct AuditConfig {
     monitoring_admin_ops: bool,
     /// Emit band-95 monitoring stand-smoke fields (PH-S1594).
     monitoring_stand_smoke: bool,
+    /// Emit band-96 monitoring loc-audit aggregate fields (PH-S1604).
+    monitoring_loc_audit: bool,
 }
 
 impl Default for AuditConfig {
@@ -388,6 +393,7 @@ impl Default for AuditConfig {
             monitoring_api: false,
             monitoring_admin_ops: false,
             monitoring_stand_smoke: false,
+            monitoring_loc_audit: false,
         }
     }
 }
@@ -745,6 +751,12 @@ struct RustRatioReport {
     monitoring_stand_smoke_criteria_total: usize,
     /// Monitoring stand-smoke criteria met count (PH-S1594).
     monitoring_stand_smoke_criteria_met_count: usize,
+    /// Band-96 monitoring loc-audit aggregate mode (PH-S1604).
+    monitoring_loc_audit_mode: bool,
+    /// Monitoring loc-audit criteria registry size (PH-S1604).
+    monitoring_loc_audit_criteria_total: usize,
+    /// Monitoring loc-audit criteria met count (PH-S1604).
+    monitoring_loc_audit_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -1121,6 +1133,22 @@ fn monitoring_stand_smoke_criteria_met(root: &Path) -> (usize, usize) {
     let total = monitoring_stand_smoke_criteria_total();
     let mut met = 0usize;
     for (_, marker, rel) in MONITORING_STAND_SMOKE_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
+fn monitoring_loc_audit_criteria_met(root: &Path) -> (usize, usize) {
+    let total = monitoring_loc_audit_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in MONITORING_LOC_AUDIT_CRITERIA {
         let path = root.join(rel);
         if path.is_file() {
             if let Ok(content) = fs::read_to_string(&path) {
@@ -1706,6 +1734,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--monitoring-api" => config.monitoring_api = true,
             "--monitoring-admin-ops" => config.monitoring_admin_ops = true,
             "--monitoring-stand-smoke" => config.monitoring_stand_smoke = true,
+            "--monitoring-loc-audit" => config.monitoring_loc_audit = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
                 print_help();
@@ -1778,6 +1807,7 @@ fn print_help() {
            --monitoring-api            band-93 monitoring HTTP API contracts fields (PH-S1575)\n\
            --monitoring-admin-ops      band-94 monitoring admin/ops fields (PH-S1585)\n\
            --monitoring-stand-smoke    band-95 monitoring stand-smoke fields (PH-S1594)\n\
+           --monitoring-loc-audit      band-96 monitoring loc-audit aggregate fields (PH-S1604)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -2419,6 +2449,18 @@ fn build_report(
         );
         notes.push("PH-S1598: band 95 monitoring stand smoke — criteria met vs registry");
     }
+    let (monitoring_loc_audit_criteria_met_count, monitoring_loc_audit_criteria_total_count) =
+        if config.monitoring_loc_audit {
+            monitoring_loc_audit_criteria_met(root)
+        } else {
+            (0, monitoring_loc_audit_criteria_total())
+        };
+    if config.monitoring_loc_audit {
+        notes.push(
+            "PH-S1604: monitoring_loc_audit_mode — aggregate band 91–95 --monitoring* loc-audit slices",
+        );
+        notes.push("PH-S1608: band 96 monitoring loc-audit — criteria met vs registry");
+    }
 
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
@@ -2600,6 +2642,9 @@ fn build_report(
         monitoring_stand_smoke_mode: config.monitoring_stand_smoke,
         monitoring_stand_smoke_criteria_total: monitoring_stand_smoke_criteria_total_count,
         monitoring_stand_smoke_criteria_met_count,
+        monitoring_loc_audit_mode: config.monitoring_loc_audit,
+        monitoring_loc_audit_criteria_total: monitoring_loc_audit_criteria_total_count,
+        monitoring_loc_audit_criteria_met_count,
         by_category,
         notes,
     })
@@ -3159,6 +3204,18 @@ fn print_summary(report: &RustRatioReport) {
         println!(
             "  monitoring_stand_smoke_cases: {}",
             MONITORING_STAND_SMOKE_CASES.join(", ")
+        );
+    }
+    if report.monitoring_loc_audit_mode {
+        println!("  monitoring_loc_audit:  true (PH-S1604 band 96)");
+        println!(
+            "  monitoring_loc_audit_criteria: {}/{} met",
+            report.monitoring_loc_audit_criteria_met_count,
+            report.monitoring_loc_audit_criteria_total
+        );
+        println!(
+            "  monitoring_loc_audit_cases: {}",
+            MONITORING_LOC_AUDIT_CASES.join(", ")
         );
     }
     for (name, loc) in &report.by_category {

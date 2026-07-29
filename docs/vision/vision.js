@@ -3877,11 +3877,26 @@
     const box = document.getElementById("sprint-queue");
     if (!box) return;
     bindQueueEyeButton();
-    const queue =
-      manifest && Array.isArray(manifest.sprint_queue) ? manifest.sprint_queue : [];
-    if (!queue.length) {
+    const hasQueueField = manifest && Array.isArray(manifest.sprint_queue);
+    const queue = hasQueueField ? manifest.sprint_queue : [];
+    // Missing sprint_queue → sync never ran / stale client. Empty [] after drain is valid.
+    if (!hasQueueField) {
       box.innerHTML =
         '<p class="sprint-queue-empty" style="color:var(--muted);margin:0">Run <code>poolai-vision-sync</code> to load FM §5.12.</p>';
+      return;
+    }
+    if (!queue.length) {
+      const last = manifest.last_sprint_closed || "—";
+      const next = manifest.next_sprint || "—";
+      box.innerHTML =
+        '<div class="sprint-queue-meta"><span><strong>0</strong> open</span>' +
+        '<span>last <strong>' +
+        escapeHtml(String(last)) +
+        "</strong></span>" +
+        "<span>→ <strong>" +
+        escapeHtml(String(next)) +
+        "</strong></span></div>" +
+        '<p class="sprint-queue-empty" style="color:var(--muted);margin:0.5rem 0 0">No open sprints in FM §5.12 (drained). Next session: <code>абракадабра</code>.</p>';
       return;
     }
     const openCount =

@@ -2,28 +2,28 @@
   "schema_version": 1,
   "generated_at": "2026-07-29",
   "host_label": "PLATINOV",
-  "git_head": "09db276b9",
+  "git_head": "e19672ce7",
   "source": "local",
   "notes": [
     "Machine-readable Rust/Clippy warning+error index for vision Rust panel.",
     "Record via poolai-rust-diagnostics or bin/record-rust-diagnostics.sh (abrakadabra drain + CI)."
   ],
   "latest": {
-    "warnings": 156,
-    "errors": 1,
+    "warnings": 153,
+    "errors": 9,
     "ok": false,
-    "recorded_at": "2026-07-29T02:13:28Z",
+    "recorded_at": "2026-07-29T04:17:43Z",
     "command": "cargo clippy --message-format=json --all-targets --features jwt,https",
-    "wall_secs": 237.9043689,
+    "wall_secs": 212.6254466,
     "top_codes": [
       "clippy::needless_borrows_for_generic_args×87",
       "clippy::nonminimal_bool×17",
-      "clippy::too_many_arguments×16",
-      "clippy::await_holding_lock×11",
+      "clippy::too_many_arguments×17",
+      "clippy::await_holding_lock×9",
+      "E0432×6",
       "clippy::manual_clamp×4",
-      "clippy::items_after_test_module×2",
-      "clippy::len_without_is_empty×2",
-      "clippy::new_without_default×2"
+      "E0425×3",
+      "clippy::items_after_test_module×2"
     ]
   },
   "history": [
@@ -176,6 +176,28 @@
         "clippy::items_after_test_module×2",
         "clippy::len_without_is_empty×2",
         "clippy::new_without_default×2"
+      ]
+    },
+    {
+      "kind": "rust_diagnostics",
+      "command": "cargo clippy --message-format=json --all-targets --features jwt,https",
+      "warnings": 153,
+      "errors": 9,
+      "ok": false,
+      "recorded_at": "2026-07-29T04:17:43Z",
+      "wall_secs": 212.6254466,
+      "host_label": "PLATINOV",
+      "git_head": "e19672ce7",
+      "source": "local",
+      "top_codes": [
+        "clippy::needless_borrows_for_generic_args×87",
+        "clippy::nonminimal_bool×17",
+        "clippy::too_many_arguments×17",
+        "clippy::await_holding_lock×9",
+        "E0432×6",
+        "clippy::manual_clamp×4",
+        "E0425×3",
+        "clippy::items_after_test_module×2"
       ]
     }
   ]

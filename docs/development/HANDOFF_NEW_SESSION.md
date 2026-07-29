@@ -1,8 +1,8 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-07-28 (band 95 **PH-S1589…S1598** ✅ · band 94 ✅ · band 93 ✅ · band 92 ✅ · band 91 ✅ · service **PH-SVC85** Rust diagnostics panel ✅ · **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · band 88 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 96 next)
+**Оновлено:** 2026-07-28 (band 96 **PH-S1599…S1608** ✅ · band 95 ✅ · band 94 ✅ · band 93 ✅ · band 92 ✅ · band 91 ✅ · service **PH-SVC85** Rust diagnostics panel ✅ · **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · band 88 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 97 next)
 
-**Наступна сесія:** **`абракадабра`** — S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain band 96 · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+**Наступна сесія:** **`абракадабра`** — S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain band 97 · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
 
 ## P0 / service (2026-07-27)
 
@@ -24,7 +24,7 @@
 
 **Cursor / toolchain (service):** local desktop **3.13.21** · Auto-review · Router Balance/Intelligence for drain · vision Speeds/Rust/eye verified · research [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](./CURSOR_UPDATE_RESEARCH_2026-07-27.md) · FM **§5.16**.
 
-**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **680** спринтів → PH-S2278.
+**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **670** спринтів → PH-S2278.
 
 ## Security findings closed (PH-SVC55…64, by severity)
 
@@ -36,6 +36,25 @@
 | **Medium** | `.env` / `*.pem` / e2e log+pid gaps | `.gitignore` + permissions block staging |
 | **Low** | Corrupted MSYS path / e2e tmp artifacts | ignore patterns widened |
 | **Open (OWNER)** | PH-SVC35 Atlassian token (historical) | revoke in Atlassian; no history rewrite |
+
+## Band 96 — Monitoring loc-audit (PH-S1599…S1608, **✅**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1599** | `monitoring_loc_audit_depth` + criteria registry |
+| **PH-S1600** | Slice aggregate (`MONITORING_LOC_AUDIT_SLICES`) |
+| **PH-S1601** | Criteria contracts (`monitoring_loc_audit_integration`) |
+| **PH-S1602** | `VERIFY_MONITORING_LOC_AUDIT` + quick `--monitoring-loc-audit` |
+| **PH-S1603** | Stand smoke export shape band 96 |
+| **PH-S1604** | `poolai-loc-audit --monitoring-loc-audit` |
+| **PH-S1605** | Docs `MONITORING_LOC_AUDIT.md` + canon |
+| **PH-S1606** | vision-sync --check + Sprint Queue drained-empty UX |
+| **PH-S1607** | Ratio hold advisory |
+| **PH-S1608** | Band close |
+
+**PH-S1608 ✅ (2026-07-28):** `monitoring_loc_audit_depth.rs`; `MONITORING_LOC_AUDIT_SLICES`; `--monitoring-loc-audit`; `VERIFY_MONITORING_LOC_AUDIT`; `MONITORING_LOC_AUDIT.md`; Vision Sprint Queue drained UX; `galaxy_horizon_s1599_integration`. Phase E Monitoring loc-audit aggregate drained.
+
+**§5.12:** **0** відкритих. **Vision:** rev **427**. **Pending completion:** **670** (→ PH-S2278). **Next expected band:** 97 (`PH-S1609…S1618`, Monitoring docs canon).
 
 ## Band 95 — Monitoring stand smoke (PH-S1589…S1598, **✅**)
 
@@ -54,7 +73,7 @@
 
 **PH-S1598 ✅ (2026-07-28):** `monitoring_stand_smoke_depth.rs`; live store/alerts/validate runners; `--monitoring-stand-smoke`; `VERIFY_MONITORING_STAND_SMOKE`; `MONITORING_STAND_SMOKE.md`; `galaxy_horizon_s1589_integration`. Phase E Monitoring stand smoke drained.
 
-**§5.12:** **0** відкритих. **Vision:** rev **426**. **Pending completion:** **680** (→ PH-S2278). **Next expected band:** 96 (`PH-S1599…S1608`, Monitoring loc-audit).
+**§5.12:** **0** відкритих. **Vision:** rev **426** (at close). **Pending completion:** **680** (→ PH-S2278). **Next expected band:** 96 (`PH-S1599…S1608`, Monitoring loc-audit) — **drained**.
 
 ## Band 94 — Monitoring admin/ops glue (PH-S1579…S1588, **✅**)
 

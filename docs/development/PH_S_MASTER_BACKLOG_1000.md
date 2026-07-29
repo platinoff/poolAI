@@ -792,16 +792,16 @@
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1599** | `monitoring_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1600** | `monitoring` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1601** | `monitoring` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1602** | `monitoring` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1603** | Stand smoke `monitoring` export | export shape unit test | **[ ]** |
-| **PH-S1604** | poolai-loc-audit PH-S1604 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1605** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1606** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1607** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1608** | galaxy_horizon_s1599_integration | band close | **[ ]** |
+| **PH-S1599** | `monitoring_loc_audit_depth` scaffold | ui-core depth enum + criteria registry | **✅** |
+| **PH-S1600** | `monitoring` loc-audit slice aggregate | five `--monitoring*` flags + unit test | **✅** |
+| **PH-S1601** | `monitoring` loc-audit contracts | `monitoring_loc_audit_integration` | **✅** |
+| **PH-S1602** | `VERIFY_MONITORING_LOC_AUDIT` | verify-dev-stand / quick flag | **✅** |
+| **PH-S1603** | Stand smoke `monitoring_loc_audit` export | export shape unit test | **✅** |
+| **PH-S1604** | poolai-loc-audit PH-S1604 | `rust_ratio.json` zriz | **✅** |
+| **PH-S1605** | Docs canon sync | MONITORING_LOC_AUDIT + RUN_LOCAL/INDEX | **✅** |
+| **PH-S1606** | poolai-vision-sync --check | drift gate + Sprint Queue drained UX | **✅** |
+| **PH-S1607** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
+| **PH-S1608** | galaxy_horizon_s1599_integration | band close | **✅** |
 
 ## Band 97 — PH-S1609…S1618 (E Monitoring · docs canon)
 

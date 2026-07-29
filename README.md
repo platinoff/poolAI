@@ -54,7 +54,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 **Версія в репозиторії:** `0.2.2` (див. `Cargo.toml`). **Робоча гілка:** `main`.
 
-Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S1598 ✅ (phase D Policies ratio-advisory). **Rust ratio:** **94.95%** (hold **95%** advisory). **Vision:** manifest rev **426**. **§5.12:** **0** відкритих (band 90 ✅ · band 91 next) · tech **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · наступна сесія **`абракадабра`** (band 91) — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
+Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S1608 ✅ (phase D Policies ratio-advisory). **Rust ratio:** **94.96%** (hold **95%** advisory). **Vision:** manifest rev **427**. **§5.12:** **0** відкритих (band 90 ✅ · band 91 next) · tech **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · наступна сесія **`абракадабра`** (band 91) — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
 **Репозиторій:** [github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)
 
@@ -82,15 +82,15 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 ### Next Focus (2026-07-28)
 
-**Product:** наступна сесія **`абракадабра`** → drain band 95 (PH-S1589…S1598 Monitoring stand smoke).
+**Product:** наступна сесія **`абракадабра`** → drain band 97 (PH-S1609…S1618 Monitoring docs canon).
 
 **Tech (сьогодні):** Service **PH-SVC75…SVC84** — Cursor **3.13.21** research + rules/agents + vision Speeds/eye verify · [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](docs/development/CURSOR_UPDATE_RESEARCH_2026-07-27.md) · Auto-review · prior GH tokens **PH-SVC65…74** ✅ · open **PH-SVC34** (GH verify) · **PH-SVC35** OWNER Atlassian revoke.
 
 **Product-complete:** PH-S1010 ✅ · FM **§5.15** ✅ · **maintenance mode**.
 
-**Наступна сесія (owner):** **`абракадабра`** — drain band 95 **PH-S1589…S1598** · [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія (owner):** **`абракадабра`** — drain band 97 **PH-S1609…S1618** · [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
-**§5.12:** **0** відкритих (band 94 ✅ · band 95 next) · vision **rev 426** · last **PH-S1598** · next **PH-S1599**.
+**§5.12:** **0** відкритих (band 96 ✅ · band 97 next) · vision **rev 427** · last **PH-S1608** · next **PH-S1609**.
 
 **Ops (поза чергою):** **FM-003** LAN §4 **BLOCKED** (2 хости) · **FM-041** Cloud SDK **Deferred**.
 

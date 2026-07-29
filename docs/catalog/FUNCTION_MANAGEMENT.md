@@ -1221,7 +1221,26 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 95 ✅ · band 96 next). **Master horizon:** PH-S1599…S1608 (band 96). **Completion pending:** PH-S1599…S2278 = **680** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **426**. **Наступна сесія:** **`абракадабра`** — project scan / band 96.
+**Відкритих у §5.12:** **0** (band 96 ✅ · band 97 next). **Master horizon:** PH-S1609…S1618 (band 97). **Completion pending:** PH-S1609…S2278 = **670** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **427**. **Наступна сесія:** **`абракадабра`** — project scan / band 97.
+
+### 5.77 Monitoring loc-audit queue — band 96 (PH-S1599…S1608, 2026-07-28) · **✅**
+
+**Джерело:** project completion / enterprise phase E — Monitoring loc-audit aggregate (mirror band 86 [`POLICIES_LOC_AUDIT.md`](../development/POLICIES_LOC_AUDIT.md) · band 76 [`AUDIT_LOC_AUDIT.md`](../development/AUDIT_LOC_AUDIT.md)). Prior stand smoke: [`MONITORING_STAND_SMOKE.md`](../development/MONITORING_STAND_SMOKE.md) (band 95). Vision UX: Sprint Queue empty-after-drain no longer asks to re-run sync (PH-S1606). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · master [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1534 | **PH-S1599** | `monitoring_loc_audit_depth` ui-core module | `monitoring_loc_audit_depth.rs` | depth enum + criteria registry | **✅** |
+| 1535 | **PH-S1600** | Loc-audit slice aggregate | `MONITORING_LOC_AUDIT_SLICES` | 5× `--monitoring*` flags present | **✅** |
+| 1536 | **PH-S1601** | Criteria / export contracts | `monitoring_loc_audit_integration` | slice + criteria totals | **✅** |
+| 1537 | **PH-S1602** | `VERIFY_MONITORING_LOC_AUDIT` + quick | verify-dev-stand / run-poolai | loc-audit aggregate gate | **✅** |
+| 1538 | **PH-S1603** | Stand smoke export shape | `poolai_http_stand_smoke` | `monitoring_loc_audit_band96_export_shape` | **✅** |
+| 1539 | **PH-S1604** | `poolai-loc-audit --monitoring-loc-audit` | loc-audit | `rust_ratio.json` fields | **✅** |
+| 1540 | **PH-S1605** | Docs `MONITORING_LOC_AUDIT.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | loc-audit matrix | **✅** |
+| 1541 | **PH-S1606** | vision-sync --check + Sprint Queue UX | `vision.js` / sync | empty drained queue ≠ “run sync”; drift gate green | **✅** |
+| 1542 | **PH-S1607** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **✅** |
+| 1543 | **PH-S1608** | Monitoring loc-audit band close | tests/docs | `galaxy_horizon_s1599_integration`; HANDOFF/NEXT | **✅** |
+
+**PH-S1608 ✅ (2026-07-28):** `monitoring_loc_audit_depth.rs`; `MONITORING_LOC_AUDIT_SLICES`; `--monitoring-loc-audit`; `VERIFY_MONITORING_LOC_AUDIT`; `MONITORING_LOC_AUDIT.md`; Vision Sprint Queue drained-empty UX; `galaxy_horizon_s1599_integration`. Phase E Monitoring loc-audit aggregate closed.
 
 ### 5.76 Monitoring stand smoke queue — band 95 (PH-S1589…S1598, 2026-07-28) · **✅**
 

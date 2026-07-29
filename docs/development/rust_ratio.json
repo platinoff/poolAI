@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 183852,
-  "non_rust_product_loc": 9772,
-  "product_loc_total": 193624,
-  "rust_ratio": 0.9495310498698508,
-  "rust_ratio_pct": 94.95310498698508,
+  "rust_loc": 184423,
+  "non_rust_product_loc": 9789,
+  "product_loc_total": 194212,
+  "rust_ratio": 0.9495963174263177,
+  "rust_ratio_pct": 94.95963174263177,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -175,9 +175,12 @@
   "monitoring_admin_ops_mode": false,
   "monitoring_admin_ops_criteria_total": 10,
   "monitoring_admin_ops_criteria_met_count": 0,
-  "monitoring_stand_smoke_mode": true,
+  "monitoring_stand_smoke_mode": false,
   "monitoring_stand_smoke_criteria_total": 10,
-  "monitoring_stand_smoke_criteria_met_count": 10,
+  "monitoring_stand_smoke_criteria_met_count": 0,
+  "monitoring_loc_audit_mode": true,
+  "monitoring_loc_audit_criteria_total": 10,
+  "monitoring_loc_audit_criteria_met_count": 10,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -189,23 +192,23 @@
     },
     "ops_shell": {
       "files": 41,
-      "loc": 4036
+      "loc": 4053
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 113,
-      "loc": 24180
+      "files": 114,
+      "loc": 24395
     },
     "rust_src": {
       "files": 302,
-      "loc": 116219
+      "loc": 116316
     },
     "rust_tests": {
-      "files": 333,
-      "loc": 42845
+      "files": 335,
+      "loc": 43104
     },
     "ui_css": {
       "files": 2,
@@ -236,7 +239,7 @@
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
     "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
-    "PH-S1594: monitoring_stand_smoke_mode — live store / alerts query / validate fixtures",
-    "PH-S1598: band 95 monitoring stand smoke — criteria met vs registry"
+    "PH-S1604: monitoring_loc_audit_mode — aggregate band 91–95 --monitoring* loc-audit slices",
+    "PH-S1608: band 96 monitoring loc-audit — criteria met vs registry"
   ]
 }

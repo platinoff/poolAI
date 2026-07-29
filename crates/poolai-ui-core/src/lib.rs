@@ -45,6 +45,7 @@ pub mod modal;
 pub mod monitoring_admin_ops_depth;
 pub mod monitoring_api_contracts_depth;
 pub mod monitoring_depth;
+pub mod monitoring_loc_audit_depth;
 pub mod monitoring_stand_smoke_depth;
 pub mod monitoring_store_depth;
 pub mod multi_module_depth;

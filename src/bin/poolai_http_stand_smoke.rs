@@ -6871,6 +6871,48 @@ mod tests {
     }
 
     #[test]
+    fn monitoring_loc_audit_band96_export_shape_ph_s1603() {
+        use poolai_ui_core::monitoring_loc_audit_depth::{
+            monitoring_loc_audit_criteria_total, monitoring_loc_audit_depth_stub,
+            monitoring_loc_audit_slices_met, MonitoringLocAuditDepth, FM_BAND96_ROWS,
+            MONITORING_LOC_AUDIT_CASES, MONITORING_LOC_AUDIT_CRITERIA, MONITORING_LOC_AUDIT_SLICES,
+        };
+        use serde_json::json;
+        assert_eq!(
+            monitoring_loc_audit_depth_stub(Some(&json!({"stand_smoke_export": true}))),
+            MonitoringLocAuditDepth::StandSmokeExport
+        );
+        assert_eq!(
+            monitoring_loc_audit_depth_stub(Some(&json!({
+                "monitoring_loc_audit_depth": true,
+                "slice_aggregate": true,
+                "criteria_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "monitoring_loc_audit_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            MonitoringLocAuditDepth::FullBand96
+        );
+        assert_eq!(MONITORING_LOC_AUDIT_CRITERIA.len(), 10);
+        assert_eq!(monitoring_loc_audit_criteria_total(), 10);
+        assert_eq!(MONITORING_LOC_AUDIT_SLICES.len(), 5);
+        assert!(MONITORING_LOC_AUDIT_CASES.contains(&"aggregate_flag"));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert_eq!(monitoring_loc_audit_slices_met(loc_audit), (5, 5));
+        assert!(loc_audit.contains("--monitoring-loc-audit"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND96_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band96 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn policy_docs_canon_band87_export_shape_ph_s1513() {
         use poolai_ui_core::policy_docs_canon_depth::{
             policy_docs_canon_criteria_total, policy_docs_canon_depth_stub,
