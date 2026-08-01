@@ -96,6 +96,7 @@ cd S:\rust\poolAI
 /usr/bin/bash bin/run-poolai.sh quick --monitoring-admin-ops
 /usr/bin/bash bin/run-poolai.sh quick --monitoring-stand-smoke
 /usr/bin/bash bin/run-poolai.sh quick --monitoring-loc-audit
+/usr/bin/bash bin/run-poolai.sh quick --monitoring-horizon
 # PowerShell:
 .\bin\run-poolai.ps1 quick -StandSmoke
 .\bin\run-poolai.ps1 quick -MigrationAdvisory
@@ -389,6 +390,7 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `VERIFY_MONITORING_DOCS_CANON=1` | `verify-dev-stand.sh` → `poolai-loc-audit --monitoring-docs-canon` (PH-S1612) |
 | `VERIFY_MONITORING_VISION_SYNC=1` | `verify-dev-stand.sh` → `poolai-loc-audit --monitoring-vision-sync` (PH-S1622) |
 | `VERIFY_MONITORING_RATIO_ADVISORY=1` | `verify-dev-stand.sh` → `poolai-loc-audit --monitoring-ratio-advisory` (PH-S1632) |
+| `VERIFY_MONITORING_HORIZON=1` | `verify-dev-stand.sh` → `poolai-loc-audit --monitoring-horizon` (PH-S1644) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 ### PH-S1100: Rust migration advisory (band 46)
@@ -1445,6 +1447,23 @@ VERIFY_MONITORING_RATIO_ADVISORY=1 bash bin/verify-dev-stand.sh
 | `monitoring_ratio_advisory_criteria_met_count` | Criteria with marker present in canonical doc paths |
 
 Module: [`monitoring_ratio_advisory_depth.rs`](../../crates/poolai-ui-core/src/monitoring_ratio_advisory_depth.rs) · tests: `monitoring_ratio_advisory_integration.rs`, `galaxy_horizon_s1629_integration.rs` · docs: [`MONITORING_RATIO_ADVISORY.md`](./MONITORING_RATIO_ADVISORY.md).
+
+---
+
+## Monitoring horizon close (PH-S1642 / band 100)
+
+```bash
+VERIFY_MONITORING_HORIZON=1 bash bin/verify-dev-stand.sh
+/usr/bin/bash bin/run-poolai.sh quick --monitoring-horizon
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `monitoring_horizon_mode` | `true` when `--monitoring-horizon` (PH-S1644) |
+| `monitoring_horizon_criteria_total` | Registry size (10) |
+| `monitoring_horizon_criteria_met_count` | Criteria with marker present in canonical doc paths |
+
+Module: [`monitoring_horizon_depth.rs`](../../crates/poolai-ui-core/src/monitoring_horizon_depth.rs) · tests: `monitoring_horizon_integration.rs`, `galaxy_horizon_s1639_integration.rs` · docs: [`MONITORING_HORIZON.md`](./MONITORING_HORIZON.md).
 
 ---
 

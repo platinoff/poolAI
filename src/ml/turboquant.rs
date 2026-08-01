@@ -303,7 +303,7 @@ fn encode_row_major(flat: &[f32], cols: u32) -> Result<Vec<u8>, TurboQuantError>
         return Err(TurboQuantError::ZeroColumns);
     }
     let c = cols as usize;
-    if flat.len() % c != 0 {
+    if !flat.len().is_multiple_of(c) {
         return Err(TurboQuantError::SizeMismatch);
     }
     let rows = flat.len() / c;

@@ -1,29 +1,29 @@
 {
   "schema_version": 1,
   "generated_at": "2026-08-01",
-  "host_label": "PLATINOV",
-  "git_head": "9a6bd4e51",
+  "host_label": "win10-local",
+  "git_head": "3cb486712",
   "source": "local",
   "notes": [
     "Machine-readable Rust/Clippy warning+error index for vision Rust panel.",
     "Record via poolai-rust-diagnostics or bin/record-rust-diagnostics.sh (abrakadabra drain + CI)."
   ],
   "latest": {
-    "warnings": 139,
-    "errors": 7,
-    "ok": false,
-    "recorded_at": "2026-08-01T19:27:17Z",
-    "command": "cargo clippy --message-format=json --all-targets --features jwt,https",
-    "wall_secs": 160.8701824,
+    "warnings": 274,
+    "errors": 0,
+    "ok": true,
+    "recorded_at": "2026-08-01T21:53:03Z",
+    "command": "cargo clippy --message-format=json --all-targets --features ml,enterprise,cloud,test-utils,job-store-sqlite,prometheus",
+    "wall_secs": 168.4474261,
     "top_codes": [
-      "clippy::needless_borrows_for_generic_args×87",
-      "clippy::too_many_arguments×16",
-      "clippy::await_holding_lock×9",
-      "E0432×4",
-      "clippy::manual_clamp×4",
-      "clippy::nonminimal_bool×3",
-      "E0599×2",
-      "clippy::items_after_test_module×2"
+      "clippy::await_holding_lock×88",
+      "clippy::needless_borrows_for_generic_args×83",
+      "clippy::too_many_arguments×18",
+      "clippy::field_reassign_with_default×14",
+      "dead_code×10",
+      "unused_mut×8",
+      "clippy::needless_update×7",
+      "clippy::items_after_test_module×6"
     ]
   },
   "history": [
@@ -264,6 +264,28 @@
         "clippy::nonminimal_bool×3",
         "E0599×2",
         "clippy::items_after_test_module×2"
+      ]
+    },
+    {
+      "kind": "rust_diagnostics",
+      "command": "cargo clippy --message-format=json --all-targets --features ml,enterprise,cloud,test-utils,job-store-sqlite,prometheus",
+      "warnings": 274,
+      "errors": 0,
+      "ok": true,
+      "recorded_at": "2026-08-01T21:53:03Z",
+      "wall_secs": 168.4474261,
+      "host_label": "win10-local",
+      "git_head": "3cb486712",
+      "source": "local",
+      "top_codes": [
+        "clippy::await_holding_lock×88",
+        "clippy::needless_borrows_for_generic_args×83",
+        "clippy::too_many_arguments×18",
+        "clippy::field_reassign_with_default×14",
+        "dead_code×10",
+        "unused_mut×8",
+        "clippy::needless_update×7",
+        "clippy::items_after_test_module×6"
       ]
     }
   ]

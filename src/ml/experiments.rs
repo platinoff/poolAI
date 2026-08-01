@@ -43,17 +43,12 @@ pub struct ExperimentMetrics {
 }
 
 /// Experiment state
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize, Default)]
 pub enum ExperimentStatus {
+    #[default]
     Running,
     Completed,
     Failed,
-}
-
-impl Default for ExperimentStatus {
-    fn default() -> Self {
-        Self::Running
-    }
 }
 
 /// ML experiment record

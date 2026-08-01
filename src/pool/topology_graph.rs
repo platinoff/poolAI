@@ -344,7 +344,7 @@ fn render_latency_heatmap_html(
     for id in &node_ids {
         html.push_str(&format!(
             "<th scope=\"col\">{}</th>",
-            escape_html(&short_topology_node_id(id))
+            escape_html(short_topology_node_id(id))
         ));
     }
     html.push_str("</tr></thead><tbody>");
@@ -352,7 +352,7 @@ fn render_latency_heatmap_html(
     for row in &node_ids {
         html.push_str(&format!(
             "<tr><th scope=\"row\">{}</th>",
-            escape_html(&short_topology_node_id(row))
+            escape_html(short_topology_node_id(row))
         ));
         for col in &node_ids {
             if row == col {

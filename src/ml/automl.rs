@@ -262,10 +262,7 @@ impl AutoMLPipeline {
             accuracy: best_candidate.score,
             hyperparameters: best_candidate.hyperparameters.clone(),
             training_time_ms: best_candidate.training_time_ms,
-            model_id: format!(
-                "model_{}",
-                uuid::Uuid::new_v4().to_string()[..8].to_string()
-            ),
+            model_id: format!("model_{}", &uuid::Uuid::new_v4().to_string()[..8]),
         };
 
         // Store best model
@@ -443,10 +440,7 @@ impl AutoMLPipeline {
                 accuracy: candidate.score,
                 hyperparameters: candidate.hyperparameters.clone(),
                 training_time_ms: candidate.training_time_ms,
-                model_id: format!(
-                    "ensemble_{}",
-                    uuid::Uuid::new_v4().to_string()[..8].to_string()
-                ),
+                model_id: format!("ensemble_{}", &uuid::Uuid::new_v4().to_string()[..8]),
             })
             .collect();
 

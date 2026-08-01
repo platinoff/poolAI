@@ -1221,7 +1221,24 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 99 ✅ · band 100 next). **Master horizon:** PH-S1639…S1648 (band 100). **Completion pending:** PH-S1639…S2278 = **640** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **434**. **Наступна сесія:** **`абракадабра`** — project scan / band 100.
+**Відкритих у §5.12:** **0** (band 100 ✅ · band 101 next). **Master horizon:** PH-S1649…S1658 (band 101). **Completion pending:** PH-S1649…S2278 = **630** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **435**. **Наступна сесія:** **`абракадабра`** — project scan / band 101.
+
+### 5.81 Monitoring horizon close queue — band 100 (PH-S1639…S1648, 2026-08-01) · **✅**
+
+**Джерело:** project completion / enterprise phase E — Monitoring horizon-close aggregate (mirror band 90 [`POLICIES_HORIZON.md`](../development/POLICIES_HORIZON.md)) + project scan (warnings first: `rust_diagnostics` E0432/E0425 scan artifacts, `clippy::absurd_extreme_comparisons` s610, `clippy::needless_borrows_for_generic_args` batch). Prior: [`MONITORING_RATIO_ADVISORY.md`](../development/MONITORING_RATIO_ADVISORY.md) (band 99). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · master [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1574 | **PH-S1639** | `monitoring_horizon_depth` ui-core module + rust_diagnostics errors fix | `monitoring_horizon_depth.rs` · `record-rust-diagnostics.sh` · `clippy::absurd_extreme_comparisons` | depth enum + criteria registry; scan clippy errors → 0 | **✅** |
+| 1575 | **PH-S1640** | Horizon slice aggregate + `needless_borrows_for_generic_args` batch | `MONITORING_HORIZON_SLICES` · `clippy::needless_borrows_for_generic_args` | 6 horizon slices referenced; borrows batch applied | **✅** |
+| 1576 | **PH-S1641** | Criteria contracts | `monitoring_horizon_integration` | criteria totals consistent | **✅** |
+| 1577 | **PH-S1642** | verify-dev-stand / horizon hook | `VERIFY_MONITORING_HORIZON` | verify-dev-stand gate + quick `--monitoring-horizon` | **✅** |
+| 1578 | **PH-S1643** | Stand smoke export shape | `poolai_http_stand_smoke` | `monitoring_horizon_band100_export_shape` | **✅** |
+| 1579 | **PH-S1644** | `poolai-loc-audit --monitoring-horizon` | loc-audit | `rust_ratio.json` fields | **✅** |
+| 1580 | **PH-S1645** | Docs canon sync | docs | `MONITORING_HORIZON.md` + canon | **✅** |
+| 1581 | **PH-S1646** | vision-sync --check | ops | drift gate green | **✅** |
+| 1582 | **PH-S1647** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **✅** |
+| 1583 | **PH-S1648** | Band close | tests/docs | `galaxy_horizon_s1639_integration` | **✅** |
 
 ### 5.80 Monitoring ratio advisory queue — band 99 (PH-S1629…S1638, 2026-08-01) · **✅**
 

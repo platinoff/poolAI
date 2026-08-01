@@ -23,6 +23,12 @@ pub struct WindowsNetworkIsolator {
     appcontainer_states: Arc<Mutex<HashMap<u32, AppContainerState>>>,
 }
 
+impl Default for WindowsNetworkIsolator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl WindowsNetworkIsolator {
     pub fn new() -> Self {
         Self {

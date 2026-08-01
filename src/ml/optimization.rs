@@ -125,16 +125,12 @@ pub fn apply_quantization(profile: &OptimizationProfile) -> QuantizationResult {
 /// Pruning strategy type
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
 #[non_exhaustive]
+#[derive(Default)]
 pub enum PruningStrategy {
+    #[default]
     MagnitudeBased,
     Structured,
     Unstructured,
-}
-
-impl Default for PruningStrategy {
-    fn default() -> Self {
-        Self::MagnitudeBased
-    }
 }
 
 /// Pruning configuration
@@ -282,7 +278,7 @@ fn structured_pruning(weights: &[f64], target_count: usize) -> Vec<f64> {
     // For structured pruning, we group weights into "channels"
     // In a real implementation, this would work with actual layer structures
     let channel_size = (weights.len() as f32 / 8.0).ceil() as usize; // Assume 8 channels
-    let num_channels = (weights.len() + channel_size - 1) / channel_size;
+    let num_channels = weights.len().div_ceil(channel_size);
 
     // Calculate channel magnitudes
     let mut channel_magnitudes: Vec<(usize, f64)> = (0..num_channels)
@@ -298,7 +294,7 @@ fn structured_pruning(weights: &[f64], target_count: usize) -> Vec<f64> {
     channel_magnitudes.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(std::cmp::Ordering::Equal));
 
     // Calculate how many channels to keep
-    let target_channels = (target_count + channel_size - 1) / channel_size;
+    let target_channels = target_count.div_ceil(channel_size);
     let keep_channels: std::collections::HashSet<usize> = channel_magnitudes
         .iter()
         .rev()
@@ -426,7 +422,7 @@ pub fn evaluate_pruning(weights_before: &[f64], weights_after: &[f64]) -> Prunin
         .filter(|(b, a)| (b.abs() > 1e-10) && (a.abs() < 1e-10))
         .count();
 
-    let compression_ratio = if weights_after.len() > 0 {
+    let compression_ratio = if !weights_after.is_empty() {
         weights_before.len() as f64 / weights_after.len() as f64
     } else {
         1.0

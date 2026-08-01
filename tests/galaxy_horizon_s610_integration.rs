@@ -11,8 +11,8 @@ use poolai::grid::galaxy_locality::{
     LocalitySeedInventory, LocalityTask, LocalityWorker, METRIC_HOT_TIER_GATE_APPLIED_TOTAL,
 };
 use poolai::grid::galaxy_prefetch_metrics::{
-    prefetch_re_migrate_total, reset_prefetch_metrics_for_test, shard_access_total,
-    METRIC_PREFETCH_RE_MIGRATE_TOTAL, METRIC_SHARD_ACCESS_TOTAL,
+    prefetch_re_migrate_total, reset_prefetch_metrics_for_test, METRIC_PREFETCH_RE_MIGRATE_TOTAL,
+    METRIC_SHARD_ACCESS_TOTAL,
 };
 use poolai::grid::galaxy_replication_metrics::{
     replication_rate_limited_total, reset_replication_strict_metrics_for_test,
@@ -396,7 +396,6 @@ async fn horizon_s610_band_trust_hot_tier_prefetch_payout_ph_s619() {
     ] {
         assert!(metrics.contains(name), "missing {name}");
     }
-    assert!(shard_access_total() >= 0);
 
     std::env::remove_var(ENV_HEARTBEAT_UNHEALTHY_THRESHOLD);
     std::env::remove_var(ENV_REPLICATION_MAX_PER_HOUR);

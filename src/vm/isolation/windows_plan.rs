@@ -7,18 +7,13 @@ use crate::vm::isolation::{FilesystemIsolationConfig, NetworkIsolationConfig};
 use std::path::Path;
 
 /// How isolation was applied on the host.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize, Default)]
 pub enum WindowsIsolationMode {
     /// Profile and rules computed; host APIs not invoked (default without `vm-isolation-windows`).
+    #[default]
     PlanOnly,
     /// AppContainer profile creation attempted (`vm-isolation-windows` on Windows).
     AppContainerProfile,
-}
-
-impl Default for WindowsIsolationMode {
-    fn default() -> Self {
-        Self::PlanOnly
-    }
 }
 
 /// Planned Windows Firewall rule (INetFwRule / netsh naming).

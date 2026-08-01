@@ -109,6 +109,7 @@ Options (quick):
   --monitoring-docs-canon After health wait, loc-audit --monitoring-docs-canon (PH-S1614)
   --monitoring-vision-sync After health wait, loc-audit --monitoring-vision-sync (PH-S1622)
   --monitoring-ratio-advisory After health wait, loc-audit --monitoring-ratio-advisory (PH-S1632)
+  --monitoring-horizon After health wait, loc-audit --monitoring-horizon (PH-S1642)
   --skip-build    Skip cargo build
   --port N        HTTP port (default 8080)
 
@@ -396,6 +397,7 @@ cmd_quick() {
       --monitoring-docs-canon) monitoring_docs_canon=1; shift ;;
       --monitoring-vision-sync) monitoring_vision_sync=1; shift ;;
       --monitoring-ratio-advisory) monitoring_ratio_advisory=1; shift ;;
+      --monitoring-horizon) monitoring_horizon=1; shift ;;
       --policy-store) policy_store=1; shift ;;
       --policy-api) policy_api=1; shift ;;
       --port) PORT="$2"; shift 2 ;;
@@ -641,6 +643,10 @@ cmd_quick() {
   if [[ "$monitoring_ratio_advisory" == "1" ]]; then
     echo "Running poolai-loc-audit --monitoring-ratio-advisory (PH-S1632)..."
     cargo run --quiet --bin poolai-loc-audit -- --monitoring-ratio-advisory
+  fi
+  if [[ "$monitoring_horizon" == "1" ]]; then
+    echo "Running poolai-loc-audit --monitoring-horizon (PH-S1642)..."
+    cargo run --quiet --bin poolai-loc-audit -- --monitoring-horizon
   fi
 }
 

@@ -185,7 +185,7 @@ fn openapi_path_for_route(route: &str, nest: &HashMap<&str, &str>) -> String {
 }
 
 fn is_ignored(route: &str) -> bool {
-    IGNORE_ROUTES_EXACT.iter().any(|ig| route == *ig)
+    IGNORE_ROUTES_EXACT.contains(&route)
         || IGNORE_ROUTE_PREFIXES
             .iter()
             .any(|pfx| route.starts_with(pfx))

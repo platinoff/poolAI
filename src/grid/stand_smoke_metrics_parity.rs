@@ -576,7 +576,7 @@ pub fn validate_grid_metrics_json_export(
         .get("metrics")
         .ok_or_else(|| format!("metrics body missing metrics: {body}"))?;
     for key in required_keys {
-        if !metrics.get(key).and_then(|v| v.as_u64()).is_some() {
+        if metrics.get(key).and_then(|v| v.as_u64()).is_none() {
             return Err(format!("metrics missing u64 key {key}: {body}"));
         }
     }

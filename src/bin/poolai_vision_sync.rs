@@ -363,7 +363,7 @@ fn parse_master_horizon_next(section: &str) -> Option<String> {
 }
 
 /// Closed sprints sorted by PH-S serial descending (deduped by id).
-fn closed_entries_by_serial_desc<'a>(entries: &'a [SprintQueueEntry]) -> Vec<&'a SprintQueueEntry> {
+fn closed_entries_by_serial_desc(entries: &[SprintQueueEntry]) -> Vec<&SprintQueueEntry> {
     let mut closed: Vec<&SprintQueueEntry> = entries
         .iter()
         .filter(|e| !e.open && e.status == "closed")

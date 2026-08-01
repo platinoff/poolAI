@@ -1,8 +1,8 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-08-01 (band 99 **PH-S1629…S1638** ✅ · band 98 **PH-S1619…S1628** ✅ · band 97 ✅ · band 96 ✅ · band 95 ✅ · band 94 ✅ · band 93 ✅ · band 92 ✅ · band 91 ✅ · service **PH-SVC85** Rust diagnostics panel ✅ · **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · band 88 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 100 next)
+**Оновлено:** 2026-08-01 (band 100 **PH-S1639…S1648** ✅ · band 99 **PH-S1629…S1638** ✅ · band 98 **PH-S1619…S1628** ✅ · band 97 ✅ · band 96 ✅ · band 95 ✅ · band 94 ✅ · band 93 ✅ · band 92 ✅ · band 91 ✅ · service **PH-SVC85** Rust diagnostics panel ✅ · **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · band 88 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 101 next)
 
-**Наступна сесія:** **`абракадабра`** — S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain band 100 · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+**Наступна сесія:** **`абракадабра`** — S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain band 101 · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
 
 ## P0 / service (2026-07-27)
 
@@ -26,6 +26,23 @@
 
 **Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **650** спринтів → PH-S2278.
 
+## Band 100 — Monitoring horizon-close (PH-S1639…S1648, **✅**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1639** | `monitoring_horizon_depth` + criteria registry + clippy errors fix |
+| **PH-S1640** | Horizon slice aggregate (`MONITORING_HORIZON_SLICES`) + needless-borrows batch |
+| **PH-S1641** | Criteria contracts (`monitoring_horizon_integration`) |
+| **PH-S1642** | `VERIFY_MONITORING_HORIZON` + quick `--monitoring-horizon` |
+| **PH-S1643** | Stand smoke export shape band 100 |
+| **PH-S1644** | `poolai-loc-audit --monitoring-horizon` |
+| **PH-S1645** | Docs `MONITORING_HORIZON.md` + canon |
+| **PH-S1646** | vision-sync --check |
+| **PH-S1647** | Ratio hold advisory |
+| **PH-S1648** | Band close |
+
+**PH-S1648 ✅ (2026-08-01):** `monitoring_horizon_depth.rs`; `MONITORING_HORIZON_SLICES`; `--monitoring-horizon`; `VERIFY_MONITORING_HORIZON`; `MONITORING_HORIZON.md`; `galaxy_horizon_s1639_integration`; clippy errors → 0 (`absurd_extreme_comparisons` removed; diagnostics scan features aligned with CI test set); `needless_borrows_for_generic_args` batch applied. Phase E Monitoring horizon close drained.
+
 ## Band 99 — Monitoring ratio-advisory (PH-S1629…S1638, **✅**)
 
 | Sprint | Фокус |
@@ -42,8 +59,6 @@
 | **PH-S1638** | Band close |
 
 **PH-S1638 ✅ (2026-08-01):** `monitoring_ratio_advisory_depth.rs`; `MONITORING_RATIO_ADVISORY_SLICES`; `--monitoring-ratio-advisory`; `VERIFY_MONITORING_RATIO_ADVISORY`; `MONITORING_RATIO_ADVISORY.md`; `galaxy_horizon_s1629_integration`. Phase E Monitoring ratio-advisory aggregate drained.
-
-**§5.12:** **0** відкритих. **Vision:** rev **433**. **Pending completion:** **640** (→ PH-S2278). **Next expected band:** 100 (`PH-S1639…S1648`, Monitoring horizon-close).
 
 ## Band 98 — Monitoring vision-sync (PH-S1619…S1628, **✅**)
 

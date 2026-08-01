@@ -59,8 +59,9 @@ use tokio::sync::RwLock;
 use uuid::Uuid;
 
 /// Pipeline step type
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize, Default)]
 pub enum StepType {
+    #[default]
     Preprocessing,
     Training,
     /// ML.1 model profiling stub (`profile_model`).
@@ -79,12 +80,6 @@ pub enum StepType {
     Deployment,
 }
 
-impl Default for StepType {
-    fn default() -> Self {
-        Self::Preprocessing
-    }
-}
-
 /// Pipeline step
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct PipelineStep {
@@ -95,18 +90,13 @@ pub struct PipelineStep {
 }
 
 /// Step execution status
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize, Default)]
 pub enum StepStatus {
+    #[default]
     Pending,
     Running,
     Completed,
     Failed,
-}
-
-impl Default for StepStatus {
-    fn default() -> Self {
-        Self::Pending
-    }
 }
 
 /// Step execution result
@@ -121,18 +111,13 @@ pub struct StepResult {
 }
 
 /// Pipeline status
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize, Default)]
 pub enum PipelineStatus {
+    #[default]
     Created,
     Running,
     Completed,
     Failed,
-}
-
-impl Default for PipelineStatus {
-    fn default() -> Self {
-        Self::Created
-    }
 }
 
 /// ML Pipeline

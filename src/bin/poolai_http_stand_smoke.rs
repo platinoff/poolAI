@@ -2059,7 +2059,7 @@ async fn smoke_grid_verification_checker_tasks(client: &Client, base: &str) -> R
     if body.get("ok").and_then(|v| v.as_bool()) != Some(true) {
         return Err(format!("verification-checker/tasks body: {body}"));
     }
-    if !body.get("tasks").and_then(|v| v.as_array()).is_some() {
+    if body.get("tasks").and_then(|v| v.as_array()).is_none() {
         return Err(format!("verification-checker/tasks missing tasks: {body}"));
     }
     Ok(())
@@ -2113,7 +2113,7 @@ async fn smoke_grid_verification_metrics_api(client: &Client, base: &str) -> Res
         "match_total",
         "checker_pending_total",
     ] {
-        if !metrics.get(key).and_then(|v| v.as_u64()).is_some() {
+        if metrics.get(key).and_then(|v| v.as_u64()).is_none() {
             return Err(format!("verification-metrics missing {key}: {body}"));
         }
     }
@@ -2141,7 +2141,7 @@ async fn smoke_grid_replay_metrics_api(client: &Client, base: &str) -> Result<()
         "replay_pending_scheduled_total",
         "verification_replay_record_total",
     ] {
-        if !metrics.get(key).and_then(|v| v.as_u64()).is_some() {
+        if metrics.get(key).and_then(|v| v.as_u64()).is_none() {
             return Err(format!("replay-metrics missing {key}: {body}"));
         }
     }
@@ -2170,7 +2170,7 @@ async fn smoke_grid_settlement_metrics_api(client: &Client, base: &str) -> Resul
         "resolved_total",
         "payout_batch_total",
     ] {
-        if !metrics.get(key).and_then(|v| v.as_u64()).is_some() {
+        if metrics.get(key).and_then(|v| v.as_u64()).is_none() {
             return Err(format!("settlement-metrics missing {key}: {body}"));
         }
     }
@@ -2199,7 +2199,7 @@ async fn smoke_grid_trust_metrics_api(client: &Client, base: &str) -> Result<(),
         "last_trust_score",
         "gate_min_threshold",
     ] {
-        if !metrics.get(key).and_then(|v| v.as_u64()).is_some() {
+        if metrics.get(key).and_then(|v| v.as_u64()).is_none() {
             return Err(format!("trust-metrics missing {key}: {body}"));
         }
     }
@@ -2236,7 +2236,7 @@ async fn smoke_grid_replication_metrics_api(client: &Client, base: &str) -> Resu
         "executor_enqueue_total",
         "rate_limited_total",
     ] {
-        if !metrics.get(key).and_then(|v| v.as_u64()).is_some() {
+        if metrics.get(key).and_then(|v| v.as_u64()).is_none() {
             return Err(format!("replication-metrics missing {key}: {body}"));
         }
     }
@@ -2284,7 +2284,7 @@ async fn smoke_grid_pricing_metrics_api(client: &Client, base: &str) -> Result<(
         "provider_errors_total",
         "provider_timeouts_total",
     ] {
-        if !metrics.get(key).and_then(|v| v.as_u64()).is_some() {
+        if metrics.get(key).and_then(|v| v.as_u64()).is_none() {
             return Err(format!("pricing-metrics missing {key}: {body}"));
         }
     }
@@ -2678,7 +2678,7 @@ async fn smoke_grid_network_profile_read(client: &Client, base: &str) -> Result<
     if body.get("ok").and_then(|v| v.as_bool()) != Some(true) {
         return Err(format!("network-profiles body: {body}"));
     }
-    if !body.get("peer_id").and_then(|v| v.as_str()).is_some() {
+    if body.get("peer_id").and_then(|v| v.as_str()).is_none() {
         return Err(format!("network-profiles missing peer_id: {body}"));
     }
     Ok(())
@@ -2697,7 +2697,7 @@ async fn smoke_grid_network_profiles_list(client: &Client, base: &str) -> Result
     if body.get("ok").and_then(|v| v.as_bool()) != Some(true) {
         return Err(format!("network-profiles list body: {body}"));
     }
-    if !body.get("peer_ids").and_then(|v| v.as_array()).is_some() {
+    if body.get("peer_ids").and_then(|v| v.as_array()).is_none() {
         return Err(format!("network-profiles list missing peer_ids: {body}"));
     }
     Ok(())
@@ -2752,7 +2752,7 @@ async fn smoke_admin_security_advisories_openapi(
     }
     let first = &rows[0];
     for key in ["id", "severity", "summary", "acknowledged"] {
-        if !first.get(key).is_some() {
+        if first.get(key).is_none() {
             return Err(format!("security-advisories missing `{key}`: {first}"));
         }
     }
@@ -2802,7 +2802,7 @@ async fn smoke_grid_telegram_seats(client: &Client, base: &str) -> Result<(), St
     if body.get("ok").and_then(|v| v.as_bool()) != Some(true) {
         return Err(format!("telegram-seats body: {body}"));
     }
-    if !body.get("seat_policy").and_then(|v| v.as_str()).is_some() {
+    if body.get("seat_policy").and_then(|v| v.as_str()).is_none() {
         return Err(format!("telegram-seats missing seat_policy: {body}"));
     }
     Ok(())
@@ -2846,7 +2846,7 @@ async fn smoke_grid_payout_batch_history(client: &Client, base: &str) -> Result<
     if history.get("ok").and_then(|v| v.as_bool()) != Some(true) {
         return Err(format!("payout-batch/history body: {history}"));
     }
-    if !history.get("entries").and_then(|v| v.as_array()).is_some() {
+    if history.get("entries").and_then(|v| v.as_array()).is_none() {
         return Err(format!("payout-batch/history missing entries: {history}"));
     }
 
@@ -2862,10 +2862,10 @@ async fn smoke_grid_payout_batch_history(client: &Client, base: &str) -> Result<
     if latest.get("ok").and_then(|v| v.as_bool()) != Some(true) {
         return Err(format!("payout-batch body: {latest}"));
     }
-    if !latest
+    if latest
         .get("settlement_mode")
         .and_then(|v| v.as_str())
-        .is_some()
+        .is_none()
     {
         return Err(format!("payout-batch missing settlement_mode: {latest}"));
     }
@@ -2917,7 +2917,7 @@ async fn smoke_grid_verification_replay_history(client: &Client, base: &str) -> 
     if body.get("ok").and_then(|v| v.as_bool()) != Some(true) {
         return Err(format!("verification-replay/history body: {body}"));
     }
-    if !body.get("records").and_then(|v| v.as_array()).is_some() {
+    if body.get("records").and_then(|v| v.as_array()).is_none() {
         return Err(format!(
             "verification-replay/history missing records: {body}"
         ));
@@ -7040,6 +7040,49 @@ mod tests {
             assert!(
                 fm.contains(row) || row.starts_with("PH-S"),
                 "FM band99 row {row}"
+            );
+        }
+    }
+
+    #[test]
+    fn monitoring_horizon_band100_export_shape_ph_s1643() {
+        use poolai_ui_core::monitoring_horizon_depth::{
+            monitoring_horizon_criteria_total, monitoring_horizon_depth_stub,
+            monitoring_horizon_slices_met, MonitoringHorizonDepth, FM_BAND100_ROWS,
+            MONITORING_HORIZON_CASES, MONITORING_HORIZON_CRITERIA, MONITORING_HORIZON_SLICES,
+        };
+        use serde_json::json;
+        assert_eq!(
+            monitoring_horizon_depth_stub(Some(&json!({"stand_smoke_export": true}))),
+            MonitoringHorizonDepth::StandSmokeExport
+        );
+        assert_eq!(
+            monitoring_horizon_depth_stub(Some(&json!({
+                "monitoring_horizon_depth": true,
+                "slice_aggregate": true,
+                "criteria_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "monitoring_horizon_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            MonitoringHorizonDepth::FullBand100
+        );
+        assert_eq!(MONITORING_HORIZON_CRITERIA.len(), 10);
+        assert_eq!(monitoring_horizon_criteria_total(), 10);
+        assert_eq!(MONITORING_HORIZON_SLICES.len(), 10);
+        assert!(MONITORING_HORIZON_CASES.contains(&"aggregate_flag"));
+        let canon = include_str!("../../docs/development/MONITORING_HORIZON.md");
+        assert_eq!(monitoring_horizon_slices_met(canon), (10, 10));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--monitoring-horizon"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND100_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band100 row {row}"
             );
         }
     }

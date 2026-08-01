@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 185504,
-  "non_rust_product_loc": 9839,
-  "product_loc_total": 195343,
-  "rust_ratio": 0.949632185437922,
-  "rust_ratio_pct": 94.96321854379221,
+  "rust_loc": 186350,
+  "non_rust_product_loc": 9855,
+  "product_loc_total": 196205,
+  "rust_ratio": 0.9497719222242043,
+  "rust_ratio_pct": 94.97719222242043,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -187,9 +187,12 @@
   "monitoring_vision_sync_mode": false,
   "monitoring_vision_sync_criteria_total": 10,
   "monitoring_vision_sync_criteria_met_count": 0,
-  "monitoring_ratio_advisory_mode": true,
+  "monitoring_ratio_advisory_mode": false,
   "monitoring_ratio_advisory_criteria_total": 10,
-  "monitoring_ratio_advisory_criteria_met_count": 10,
+  "monitoring_ratio_advisory_criteria_met_count": 0,
+  "monitoring_horizon_mode": true,
+  "monitoring_horizon_criteria_total": 10,
+  "monitoring_horizon_criteria_met_count": 10,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -201,23 +204,23 @@
     },
     "ops_shell": {
       "files": 41,
-      "loc": 4103
+      "loc": 4119
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 116,
-      "loc": 24866
+      "files": 118,
+      "loc": 25340
     },
     "rust_src": {
       "files": 302,
-      "loc": 116618
+      "loc": 116688
     },
     "rust_tests": {
-      "files": 339,
-      "loc": 43412
+      "files": 343,
+      "loc": 43714
     },
     "ui_css": {
       "files": 2,
@@ -248,7 +251,7 @@
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
     "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
-    "PH-S1634: monitoring_ratio_advisory_mode — aggregate rust_ratio.json + ratio strategy",
-    "PH-S1638: band 99 monitoring ratio-advisory — criteria met vs registry"
+    "PH-S1644: monitoring_horizon_mode — aggregate band 91–99 monitoring slices (phase E close)",
+    "PH-S1648: band 100 monitoring horizon close — criteria met vs registry"
   ]
 }

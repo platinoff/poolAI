@@ -36,17 +36,13 @@ use std::path::PathBuf;
 /// How allowed parent interfaces are attached inside a Linux network namespace.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
+#[derive(Default)]
 pub enum NetworkInterfaceMode {
     /// Virtual ethernet pair (default).
+    #[default]
     Veth,
     /// Macvlan on the parent interface (Linux `ip link … type macvlan`).
     Macvlan,
-}
-
-impl Default for NetworkInterfaceMode {
-    fn default() -> Self {
-        Self::Veth
-    }
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

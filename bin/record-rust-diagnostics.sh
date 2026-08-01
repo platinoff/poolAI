@@ -36,8 +36,8 @@ if [[ "$SKIP" -eq 1 ]]; then
 fi
 
 HOST_LABEL="${HOST_LABEL:-${COMPUTERNAME:-${HOSTNAME:-local}}}"
-# Default scan matches CI clippy feature set (jwt,https) without -D warnings so counts are visible.
-CMD="${RUST_DIAGNOSTICS_CMD:-cargo clippy --message-format=json --all-targets --features jwt,https}"
+# Default scan matches CI test feature set so all --all-targets files compile (no phantom E0432/E0425).
+CMD="${RUST_DIAGNOSTICS_CMD:-cargo clippy --message-format=json --all-targets --features ml,enterprise,cloud,test-utils,job-store-sqlite,prometheus}"
 
 echo "==> rust diagnostics scan (source=$SOURCE host=$HOST_LABEL)"
 echo "==> $CMD"

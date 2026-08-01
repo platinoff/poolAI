@@ -53,6 +53,9 @@ use poolai_ui_core::monitoring_docs_canon_depth::{
     monitoring_docs_canon_criteria_total, MONITORING_DOCS_CANON_CASES,
     MONITORING_DOCS_CANON_CRITERIA,
 };
+use poolai_ui_core::monitoring_horizon_depth::{
+    monitoring_horizon_criteria_total, MONITORING_HORIZON_CASES, MONITORING_HORIZON_CRITERIA,
+};
 use poolai_ui_core::monitoring_loc_audit_depth::{
     monitoring_loc_audit_criteria_total, MONITORING_LOC_AUDIT_CASES, MONITORING_LOC_AUDIT_CRITERIA,
 };
@@ -351,6 +354,8 @@ struct AuditConfig {
     monitoring_vision_sync: bool,
     /// Emit band-99 monitoring ratio-advisory fields (PH-S1634).
     monitoring_ratio_advisory: bool,
+    /// Emit band-100 monitoring horizon-close fields (PH-S1644).
+    monitoring_horizon: bool,
 }
 
 impl Default for AuditConfig {
@@ -415,6 +420,7 @@ impl Default for AuditConfig {
             monitoring_docs_canon: false,
             monitoring_vision_sync: false,
             monitoring_ratio_advisory: false,
+            monitoring_horizon: false,
         }
     }
 }
@@ -796,6 +802,12 @@ struct RustRatioReport {
     monitoring_ratio_advisory_criteria_total: usize,
     /// Monitoring ratio-advisory criteria met count (PH-S1634).
     monitoring_ratio_advisory_criteria_met_count: usize,
+    /// Band-100 monitoring horizon-close mode (PH-S1644).
+    monitoring_horizon_mode: bool,
+    /// Monitoring horizon-close criteria registry size (PH-S1644).
+    monitoring_horizon_criteria_total: usize,
+    /// Monitoring horizon-close criteria met count (PH-S1644).
+    monitoring_horizon_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -1236,6 +1248,22 @@ fn monitoring_ratio_advisory_criteria_met(root: &Path) -> (usize, usize) {
     let total = monitoring_ratio_advisory_criteria_total();
     let mut met = 0usize;
     for (_, marker, rel) in MONITORING_RATIO_ADVISORY_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
+fn monitoring_horizon_criteria_met(root: &Path) -> (usize, usize) {
+    let total = monitoring_horizon_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in MONITORING_HORIZON_CRITERIA {
         let path = root.join(rel);
         if path.is_file() {
             if let Ok(content) = fs::read_to_string(&path) {
@@ -1825,6 +1853,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--monitoring-docs-canon" => config.monitoring_docs_canon = true,
             "--monitoring-vision-sync" => config.monitoring_vision_sync = true,
             "--monitoring-ratio-advisory" => config.monitoring_ratio_advisory = true,
+            "--monitoring-horizon" => config.monitoring_horizon = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
                 print_help();
@@ -1900,6 +1929,7 @@ fn print_help() {
            --monitoring-docs-canon      band-97 monitoring docs-canon fields (PH-S1614)\n\
            --monitoring-vision-sync    band-98 monitoring vision-sync fields (PH-S1624)\n\
            --monitoring-ratio-advisory  band-99 monitoring ratio-advisory fields (PH-S1634)\n\
+           --monitoring-horizon        band-100 monitoring horizon-close fields (PH-S1644)\n\
            --monitoring-loc-audit      band-96 monitoring loc-audit aggregate fields (PH-S1604)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
@@ -2596,6 +2626,19 @@ fn build_report(
         notes.push("PH-S1638: band 99 monitoring ratio-advisory — criteria met vs registry");
     }
 
+    let (monitoring_horizon_criteria_met_count, monitoring_horizon_criteria_total_count) =
+        if config.monitoring_horizon {
+            monitoring_horizon_criteria_met(root)
+        } else {
+            (0, monitoring_horizon_criteria_total())
+        };
+    if config.monitoring_horizon {
+        notes.push(
+            "PH-S1644: monitoring_horizon_mode — aggregate band 91–99 monitoring slices (phase E close)",
+        );
+        notes.push("PH-S1648: band 100 monitoring horizon close — criteria met vs registry");
+    }
+
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
         sprint: SPRINT,
@@ -2788,6 +2831,9 @@ fn build_report(
         monitoring_ratio_advisory_mode: config.monitoring_ratio_advisory,
         monitoring_ratio_advisory_criteria_total: monitoring_ratio_advisory_criteria_total_count,
         monitoring_ratio_advisory_criteria_met_count,
+        monitoring_horizon_mode: config.monitoring_horizon,
+        monitoring_horizon_criteria_total: monitoring_horizon_criteria_total_count,
+        monitoring_horizon_criteria_met_count,
         by_category,
         notes,
     })
@@ -3395,6 +3441,17 @@ fn print_summary(report: &RustRatioReport) {
         println!(
             "  monitoring_ratio_advisory_cases: {}",
             MONITORING_RATIO_ADVISORY_CASES.join(", ")
+        );
+    }
+    if report.monitoring_horizon_mode {
+        println!("  monitoring_horizon:        true (PH-S1644 band 100)");
+        println!(
+            "  monitoring_horizon_criteria: {}/{} met",
+            report.monitoring_horizon_criteria_met_count, report.monitoring_horizon_criteria_total
+        );
+        println!(
+            "  monitoring_horizon_cases: {}",
+            MONITORING_HORIZON_CASES.join(", ")
         );
     }
     for (name, loc) in &report.by_category {

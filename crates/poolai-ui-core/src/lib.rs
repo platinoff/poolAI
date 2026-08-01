@@ -46,6 +46,7 @@ pub mod monitoring_admin_ops_depth;
 pub mod monitoring_api_contracts_depth;
 pub mod monitoring_depth;
 pub mod monitoring_docs_canon_depth;
+pub mod monitoring_horizon_depth;
 pub mod monitoring_loc_audit_depth;
 pub mod monitoring_ratio_advisory_depth;
 pub mod monitoring_stand_smoke_depth;

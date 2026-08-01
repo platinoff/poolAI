@@ -852,16 +852,16 @@
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1639** | `monitoring_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1640** | `monitoring` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1641** | `monitoring` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1642** | `monitoring` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1643** | Stand smoke `monitoring` export | export shape unit test | **[ ]** |
-| **PH-S1644** | poolai-loc-audit PH-S1644 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1645** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1646** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1647** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1648** | galaxy_horizon_s1639_integration | band close | **[ ]** |
+| **PH-S1639** | `monitoring_horizon_depth` scaffold + rust_diagnostics errors fix | ui-core depth enum + criteria registry; clippy errors → 0 | **✅** |
+| **PH-S1640** | Horizon slice aggregate + needless_borrows batch | `MONITORING_HORIZON_SLICES` + borrows fix | **✅** |
+| **PH-S1641** | `monitoring` API contracts | `tests/*_integration.rs` or contract test | **✅** |
+| **PH-S1642** | `monitoring` admin/ops glue | verify-dev-stand or admin strip | **✅** |
+| **PH-S1643** | Stand smoke `monitoring` export | export shape unit test | **✅** |
+| **PH-S1644** | poolai-loc-audit PH-S1644 | `rust_ratio.json` zriz | **✅** |
+| **PH-S1645** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **✅** |
+| **PH-S1646** | poolai-vision-sync --check | drift gate green | **✅** |
+| **PH-S1647** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
+| **PH-S1648** | galaxy_horizon_s1639_integration | band close | **✅** |
 
 ## Band 101 — PH-S1649…S1658 (F Ratio96 · depth scaffold)
 
