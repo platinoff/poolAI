@@ -3038,6 +3038,30 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_development_MONITORING_DOCS_CANON_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_monitoring_ratio_advisory_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_monitoring_vision_sync_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_MONITORING_RATIO_ADVISORY_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_MONITORING_VISION_SYNC_md"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -11890,9 +11914,65 @@
       "label": "monitoring_docs_canon_integration.rs",
       "layer": "L3",
       "path": "tests/monitoring_docs_canon_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_monitoring_ratio_advisory_depth_rs",
+      "label": "monitoring_ratio_advisory_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/monitoring_ratio_advisory_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_monitoring_vision_sync_depth_rs",
+      "label": "monitoring_vision_sync_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/monitoring_vision_sync_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_MONITORING_RATIO_ADVISORY_md",
+      "label": "MONITORING_RATIO_ADVISORY.md",
+      "layer": "L1",
+      "path": "docs/development/MONITORING_RATIO_ADVISORY.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_MONITORING_VISION_SYNC_md",
+      "label": "MONITORING_VISION_SYNC.md",
+      "layer": "L1",
+      "path": "docs/development/MONITORING_VISION_SYNC.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1619_integration_rs",
+      "label": "galaxy_horizon_s1619_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1619_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1629_integration_rs",
+      "label": "galaxy_horizon_s1629_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1629_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_monitoring_ratio_advisory_integration_rs",
+      "label": "monitoring_ratio_advisory_integration.rs",
+      "layer": "L3",
+      "path": "tests/monitoring_ratio_advisory_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_monitoring_vision_sync_integration_rs",
+      "label": "monitoring_vision_sync_integration.rs",
+      "layer": "L3",
+      "path": "tests/monitoring_vision_sync_integration.rs"
     }
   ],
-  "revision": 433,
+  "revision": 434,
   "sprint_queue": [],
   "sprint_queue_open_count": 0,
   "updated_at": "2026-06-20",
