@@ -60,6 +60,8 @@ VERIFY_MONITORING_ADMIN_OPS="${VERIFY_MONITORING_ADMIN_OPS:-0}"
 VERIFY_MONITORING_STAND_SMOKE="${VERIFY_MONITORING_STAND_SMOKE:-0}"
 VERIFY_MONITORING_LOC_AUDIT="${VERIFY_MONITORING_LOC_AUDIT:-0}"
 VERIFY_MONITORING_DOCS_CANON="${VERIFY_MONITORING_DOCS_CANON:-0}"
+VERIFY_MONITORING_VISION_SYNC="${VERIFY_MONITORING_VISION_SYNC:-0}"
+VERIFY_MONITORING_RATIO_ADVISORY="${VERIFY_MONITORING_RATIO_ADVISORY:-0}"
 VERIFY_SSO_LOC_AUDIT="${VERIFY_SSO_LOC_AUDIT:-0}"
 VERIFY_SSO_DOCS_CANON="${VERIFY_SSO_DOCS_CANON:-0}"
 VERIFY_SSO_VISION_SYNC="${VERIFY_SSO_VISION_SYNC:-0}"
@@ -794,6 +796,26 @@ if [[ "$VERIFY_MONITORING_DOCS_CANON" == "1" ]]; then
     echo "OK  monitoring docs-canon gate"
   else
     echo "FAIL monitoring docs-canon gate"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_MONITORING_VISION_SYNC" == "1" ]]; then
+  echo "Running poolai-loc-audit --monitoring-vision-sync (PH-S1622)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --monitoring-vision-sync); then
+    echo "OK  monitoring vision-sync gate"
+  else
+    echo "FAIL monitoring vision-sync gate"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_MONITORING_RATIO_ADVISORY" == "1" ]]; then
+  echo "Running poolai-loc-audit --monitoring-ratio-advisory (PH-S1632)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --monitoring-ratio-advisory); then
+    echo "OK  monitoring ratio-advisory gate"
+  else
+    echo "FAIL monitoring ratio-advisory gate"
     fail=1
   fi
 fi

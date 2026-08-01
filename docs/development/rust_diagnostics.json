@@ -1,29 +1,29 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-29",
+  "generated_at": "2026-08-01",
   "host_label": "PLATINOV",
-  "git_head": "52ee4c852",
+  "git_head": "9a6bd4e51",
   "source": "local",
   "notes": [
     "Machine-readable Rust/Clippy warning+error index for vision Rust panel.",
     "Record via poolai-rust-diagnostics or bin/record-rust-diagnostics.sh (abrakadabra drain + CI)."
   ],
   "latest": {
-    "warnings": 153,
-    "errors": 10,
+    "warnings": 139,
+    "errors": 7,
     "ok": false,
-    "recorded_at": "2026-07-29T12:04:56Z",
+    "recorded_at": "2026-08-01T19:27:17Z",
     "command": "cargo clippy --message-format=json --all-targets --features jwt,https",
-    "wall_secs": 74.9429907,
+    "wall_secs": 160.8701824,
     "top_codes": [
       "clippy::needless_borrows_for_generic_args×87",
-      "clippy::nonminimal_bool×17",
       "clippy::too_many_arguments×16",
       "clippy::await_holding_lock×9",
-      "E0432×6",
+      "E0432×4",
       "clippy::manual_clamp×4",
-      "E0425×2",
-      "E0599×2"
+      "clippy::nonminimal_bool×3",
+      "E0599×2",
+      "clippy::items_after_test_module×2"
     ]
   },
   "history": [
@@ -220,6 +220,50 @@
         "clippy::manual_clamp×4",
         "E0425×2",
         "E0599×2"
+      ]
+    },
+    {
+      "kind": "rust_diagnostics",
+      "command": "cargo clippy --message-format=json --all-targets --features jwt,https",
+      "warnings": 152,
+      "errors": 4,
+      "ok": false,
+      "recorded_at": "2026-07-29T15:09:57Z",
+      "wall_secs": 167.6261024,
+      "host_label": "PLATINOV",
+      "git_head": "9a6bd4e51",
+      "source": "local",
+      "top_codes": [
+        "clippy::needless_borrows_for_generic_args×87",
+        "clippy::nonminimal_bool×17",
+        "clippy::too_many_arguments×16",
+        "clippy::await_holding_lock×9",
+        "clippy::manual_clamp×4",
+        "E0432×2",
+        "clippy::items_after_test_module×2",
+        "clippy::len_without_is_empty×2"
+      ]
+    },
+    {
+      "kind": "rust_diagnostics",
+      "command": "cargo clippy --message-format=json --all-targets --features jwt,https",
+      "warnings": 139,
+      "errors": 7,
+      "ok": false,
+      "recorded_at": "2026-08-01T19:27:17Z",
+      "wall_secs": 160.8701824,
+      "host_label": "PLATINOV",
+      "git_head": "9a6bd4e51",
+      "source": "local",
+      "top_codes": [
+        "clippy::needless_borrows_for_generic_args×87",
+        "clippy::too_many_arguments×16",
+        "clippy::await_holding_lock×9",
+        "E0432×4",
+        "clippy::manual_clamp×4",
+        "clippy::nonminimal_bool×3",
+        "E0599×2",
+        "clippy::items_after_test_module×2"
       ]
     }
   ]

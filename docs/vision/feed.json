@@ -3,16 +3,16 @@
   "items": [
     {
       "category": "closed",
-      "id": "PH-S1618",
+      "id": "PH-S1638",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "galaxy_horizon_s1609_integration",
+      "summary": "galaxy_horizon_s1629_integration",
       "title": "Band close"
     },
     {
       "category": "closed",
-      "id": "PH-S1617",
+      "id": "PH-S1637",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
@@ -21,7 +21,7 @@
     },
     {
       "category": "closed",
-      "id": "PH-S1616",
+      "id": "PH-S1636",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
@@ -30,43 +30,43 @@
     },
     {
       "category": "closed",
-      "id": "PH-S1615",
+      "id": "PH-S1635",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "MONITORING_DOCS_CANON.md` + canon",
+      "summary": "MONITORING_RATIO_ADVISORY.md` + canon",
       "title": "Docs canon sync"
     },
     {
       "category": "closed",
-      "id": "PH-S1614",
+      "id": "PH-S1634",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
       "summary": "rust_ratio.json` fields",
-      "title": "poolai-loc-audit --monitoring-docs-canon"
+      "title": "poolai-loc-audit --monitoring-ratio-advisory"
     },
     {
       "category": "closed",
-      "id": "PH-S1613",
+      "id": "PH-S1633",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "monitoring_docs_canon_band97_export_shape",
+      "summary": "monitoring_ratio_advisory_band99_export_shape",
       "title": "Stand smoke export shape"
     },
     {
       "category": "closed",
-      "id": "PH-S1612",
+      "id": "PH-S1632",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
       "summary": "verify-dev-stand gate + quick",
-      "title": "verify-dev-stand / docs-canon hook"
+      "title": "verify-dev-stand / ratio-advisory hook"
     },
     {
       "category": "closed",
-      "id": "PH-S1611",
+      "id": "PH-S1631",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
@@ -75,34 +75,34 @@
     },
     {
       "category": "closed",
-      "id": "PH-S1610",
+      "id": "PH-S1630",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "6 slice docs referenced",
-      "title": "Docs-canon slice aggregate"
+      "summary": "6 ratio slices referenced",
+      "title": "Ratio-advisory slice aggregate"
     },
     {
       "category": "closed",
-      "id": "PH-S1609",
+      "id": "PH-S1629",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
       "summary": "depth enum + criteria registry",
-      "title": "monitoring_docs_canon_depth` ui-core module"
+      "title": "monitoring_ratio_advisory_depth` ui-core module"
     },
     {
       "category": "closed",
-      "id": "PH-S1608",
+      "id": "PH-S1628",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "galaxy_horizon_s1599_integration`; HANDOFF/NEXT",
-      "title": "Monitoring loc-audit band close"
+      "summary": "galaxy_horizon_s1619_integration",
+      "title": "Band close"
     },
     {
       "category": "closed",
-      "id": "PH-S1607",
+      "id": "PH-S1627",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",

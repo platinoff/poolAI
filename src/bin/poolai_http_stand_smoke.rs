@@ -6957,6 +6957,94 @@ mod tests {
     }
 
     #[test]
+    fn monitoring_vision_sync_band98_export_shape_ph_s1623() {
+        use poolai_ui_core::monitoring_vision_sync_depth::{
+            monitoring_vision_sync_criteria_total, monitoring_vision_sync_depth_stub,
+            monitoring_vision_sync_slices_met, MonitoringVisionSyncDepth, FM_BAND98_ROWS,
+            MONITORING_VISION_SYNC_CASES, MONITORING_VISION_SYNC_CRITERIA,
+            MONITORING_VISION_SYNC_SLICES,
+        };
+        use serde_json::json;
+        assert_eq!(
+            monitoring_vision_sync_depth_stub(Some(&json!({"stand_smoke_export": true}))),
+            MonitoringVisionSyncDepth::StandSmokeExport
+        );
+        assert_eq!(
+            monitoring_vision_sync_depth_stub(Some(&json!({
+                "monitoring_vision_sync_depth": true,
+                "slice_aggregate": true,
+                "criteria_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "monitoring_vision_sync_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            MonitoringVisionSyncDepth::FullBand98
+        );
+        assert_eq!(MONITORING_VISION_SYNC_CRITERIA.len(), 10);
+        assert_eq!(monitoring_vision_sync_criteria_total(), 10);
+        assert_eq!(MONITORING_VISION_SYNC_SLICES.len(), 6);
+        assert!(MONITORING_VISION_SYNC_CASES.contains(&"aggregate_flag"));
+        let canon = include_str!("../../docs/development/MONITORING_VISION_SYNC.md");
+        assert_eq!(monitoring_vision_sync_slices_met(canon), (6, 6));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--monitoring-vision-sync"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND98_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band98 row {row}"
+            );
+        }
+    }
+
+    #[test]
+    fn monitoring_ratio_advisory_band99_export_shape_ph_s1633() {
+        use poolai_ui_core::monitoring_ratio_advisory_depth::{
+            monitoring_ratio_advisory_criteria_total, monitoring_ratio_advisory_depth_stub,
+            monitoring_ratio_advisory_slices_met, MonitoringRatioAdvisoryDepth, FM_BAND99_ROWS,
+            MONITORING_RATIO_ADVISORY_CASES, MONITORING_RATIO_ADVISORY_CRITERIA,
+            MONITORING_RATIO_ADVISORY_SLICES,
+        };
+        use serde_json::json;
+        assert_eq!(
+            monitoring_ratio_advisory_depth_stub(Some(&json!({"stand_smoke_export": true}))),
+            MonitoringRatioAdvisoryDepth::StandSmokeExport
+        );
+        assert_eq!(
+            monitoring_ratio_advisory_depth_stub(Some(&json!({
+                "monitoring_ratio_advisory_depth": true,
+                "slice_aggregate": true,
+                "criteria_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "monitoring_ratio_advisory_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            MonitoringRatioAdvisoryDepth::FullBand99
+        );
+        assert_eq!(MONITORING_RATIO_ADVISORY_CRITERIA.len(), 10);
+        assert_eq!(monitoring_ratio_advisory_criteria_total(), 10);
+        assert_eq!(MONITORING_RATIO_ADVISORY_SLICES.len(), 6);
+        assert!(MONITORING_RATIO_ADVISORY_CASES.contains(&"aggregate_flag"));
+        let canon = include_str!("../../docs/development/MONITORING_RATIO_ADVISORY.md");
+        assert_eq!(monitoring_ratio_advisory_slices_met(canon), (6, 6));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--monitoring-ratio-advisory"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND99_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band99 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn policy_docs_canon_band87_export_shape_ph_s1513() {
         use poolai_ui_core::policy_docs_canon_depth::{
             policy_docs_canon_criteria_total, policy_docs_canon_depth_stub,

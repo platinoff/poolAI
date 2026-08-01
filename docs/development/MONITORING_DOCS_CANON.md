@@ -19,7 +19,7 @@ verify/loc-audit/band-close.
 
 **Boundary:** band 97 = docs-canon matrix gate for Monitoring. Prior loc-audit remains
 [`MONITORING_LOC_AUDIT.md`](./MONITORING_LOC_AUDIT.md) (band 96).
-Next: band 98 Monitoring vision-sync.
+Next: band 98 Monitoring vision-sync — [`MONITORING_VISION_SYNC.md`](./MONITORING_VISION_SYNC.md). Band 99 ratio-advisory: [`MONITORING_RATIO_ADVISORY.md`](./MONITORING_RATIO_ADVISORY.md).
 
 ## Loc-audit / verify
 

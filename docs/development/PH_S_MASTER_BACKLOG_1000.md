@@ -57,7 +57,7 @@
 | 95 | PH-S1589…S1598 | E Monitoring · stand smoke **✅ drained** |
 | 96 | PH-S1599…S1608 | E Monitoring · loc-audit |
 | 97 | PH-S1609…S1618 | E Monitoring · docs canon |
-| 98 | PH-S1619…S1628 | E Monitoring · vision-sync |
+| 98 | PH-S1619…S1628 | E Monitoring · vision-sync **✅ drained** |
 | 99 | PH-S1629…S1638 | E Monitoring · ratio advisory |
 | 100 | PH-S1639…S1648 | E Monitoring · horizon close |
 | 101 | PH-S1649…S1658 | F Ratio96 · depth scaffold |
@@ -822,31 +822,31 @@
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1619** | `monitoring_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1620** | `monitoring` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1621** | `monitoring` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1622** | `monitoring` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1623** | Stand smoke `monitoring` export | export shape unit test | **[ ]** |
-| **PH-S1624** | poolai-loc-audit PH-S1624 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1625** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1626** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1627** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1628** | galaxy_horizon_s1619_integration | band close | **[ ]** |
+| **PH-S1619** | `monitoring_depth` scaffold | ui-core depth enum + criteria registry | **✅** |
+| **PH-S1620** | `monitoring` store/wire slice | durable path or production verify stub + unit test | **✅** |
+| **PH-S1621** | `monitoring` API contracts | `tests/*_integration.rs` or contract test | **✅** |
+| **PH-S1622** | `monitoring` admin/ops glue | verify-dev-stand or admin strip | **✅** |
+| **PH-S1623** | Stand smoke `monitoring` export | export shape unit test | **✅** |
+| **PH-S1624** | poolai-loc-audit PH-S1624 | `rust_ratio.json` zriz | **✅** |
+| **PH-S1625** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **✅** |
+| **PH-S1626** | poolai-vision-sync --check | drift gate green | **✅** |
+| **PH-S1627** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
+| **PH-S1628** | galaxy_horizon_s1619_integration | band close | **✅** |
 
 ## Band 99 — PH-S1629…S1638 (E Monitoring · ratio advisory)
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1629** | `monitoring_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1630** | `monitoring` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1631** | `monitoring` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1632** | `monitoring` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1633** | Stand smoke `monitoring` export | export shape unit test | **[ ]** |
-| **PH-S1634** | poolai-loc-audit PH-S1634 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1635** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1636** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1637** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1638** | galaxy_horizon_s1629_integration | band close | **[ ]** |
+| **PH-S1629** | `monitoring_depth` scaffold | ui-core depth enum + criteria registry | **✅** |
+| **PH-S1630** | `monitoring` store/wire slice | durable path or production verify stub + unit test | **✅** |
+| **PH-S1631** | `monitoring` API contracts | `tests/*_integration.rs` or contract test | **✅** |
+| **PH-S1632** | `monitoring` admin/ops glue | verify-dev-stand or admin strip | **✅** |
+| **PH-S1633** | Stand smoke `monitoring` export | export shape unit test | **✅** |
+| **PH-S1634** | poolai-loc-audit PH-S1634 | `rust_ratio.json` zriz | **✅** |
+| **PH-S1635** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **✅** |
+| **PH-S1636** | poolai-vision-sync --check | drift gate green | **✅** |
+| **PH-S1637** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **✅** |
+| **PH-S1638** | galaxy_horizon_s1629_integration | band close | **✅** |
 
 ## Band 100 — PH-S1639…S1648 (E Monitoring · horizon close)
 

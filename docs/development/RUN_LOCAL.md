@@ -386,6 +386,9 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `VERIFY_MONITORING_ADMIN_OPS=1` | `verify-dev-stand.sh` → `poolai-loc-audit --monitoring-admin-ops` (PH-S1584) |
 | `VERIFY_MONITORING_STAND_SMOKE=1` | `verify-dev-stand.sh` → `poolai-http-stand-smoke --monitoring-stand-smoke` + `poolai-loc-audit --monitoring-stand-smoke` (PH-S1595) |
 | `VERIFY_MONITORING_LOC_AUDIT=1` | `verify-dev-stand.sh` → `poolai-loc-audit --monitoring-loc-audit` (PH-S1602) |
+| `VERIFY_MONITORING_DOCS_CANON=1` | `verify-dev-stand.sh` → `poolai-loc-audit --monitoring-docs-canon` (PH-S1612) |
+| `VERIFY_MONITORING_VISION_SYNC=1` | `verify-dev-stand.sh` → `poolai-loc-audit --monitoring-vision-sync` (PH-S1622) |
+| `VERIFY_MONITORING_RATIO_ADVISORY=1` | `verify-dev-stand.sh` → `poolai-loc-audit --monitoring-ratio-advisory` (PH-S1632) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 ### PH-S1100: Rust migration advisory (band 46)
@@ -1404,6 +1407,44 @@ VERIFY_MONITORING_DOCS_CANON=1 bash bin/verify-dev-stand.sh
 | `monitoring_docs_canon_criteria_met_count` | Criteria with marker present in canonical doc paths |
 
 Module: [`monitoring_docs_canon_depth.rs`](../../crates/poolai-ui-core/src/monitoring_docs_canon_depth.rs) · tests: `monitoring_docs_canon_integration.rs`, `galaxy_horizon_s1609_integration.rs` · docs: [`MONITORING_DOCS_CANON.md`](./MONITORING_DOCS_CANON.md).
+
+### Monitoring vision-sync (band 98, PH-S1619…S1628)
+
+Enterprise phase E monitoring vision-sync — consolidates `docs/vision/*` + prior [`MONITORING_DOCS_CANON.md`](./MONITORING_DOCS_CANON.md).
+
+```bash
+cargo run --bin poolai-loc-audit -- --monitoring-vision-sync
+cargo run --bin poolai-loc-audit -- --monitoring-vision-sync --migration-advisory --advisory --min-ratio 0.95
+VERIFY_MONITORING_VISION_SYNC=1 bash bin/verify-dev-stand.sh
+/usr/bin/bash bin/run-poolai.sh quick --monitoring-vision-sync
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `monitoring_vision_sync_mode` | `true` when `--monitoring-vision-sync` (PH-S1624) |
+| `monitoring_vision_sync_criteria_total` | Registry size (10) |
+| `monitoring_vision_sync_criteria_met_count` | Criteria with marker present in canonical doc paths |
+
+Module: [`monitoring_vision_sync_depth.rs`](../../crates/poolai-ui-core/src/monitoring_vision_sync_depth.rs) · tests: `monitoring_vision_sync_integration.rs`, `galaxy_horizon_s1619_integration.rs` · docs: [`MONITORING_VISION_SYNC.md`](./MONITORING_VISION_SYNC.md).
+
+### Monitoring ratio-advisory (band 99, PH-S1629…S1638)
+
+Enterprise phase E monitoring ratio-advisory — consolidates the loc-audit ratio hold floor (`rust_ratio.json` + `--min-ratio`) with the ratio strategy and prior [`MONITORING_VISION_SYNC.md`](./MONITORING_VISION_SYNC.md).
+
+```bash
+cargo run --bin poolai-loc-audit -- --monitoring-ratio-advisory
+cargo run --bin poolai-loc-audit -- --monitoring-ratio-advisory --migration-advisory --advisory --min-ratio 0.95
+VERIFY_MONITORING_RATIO_ADVISORY=1 bash bin/verify-dev-stand.sh
+/usr/bin/bash bin/run-poolai.sh quick --monitoring-ratio-advisory
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `monitoring_ratio_advisory_mode` | `true` when `--monitoring-ratio-advisory` (PH-S1634) |
+| `monitoring_ratio_advisory_criteria_total` | Registry size (10) |
+| `monitoring_ratio_advisory_criteria_met_count` | Criteria with marker present in canonical doc paths |
+
+Module: [`monitoring_ratio_advisory_depth.rs`](../../crates/poolai-ui-core/src/monitoring_ratio_advisory_depth.rs) · tests: `monitoring_ratio_advisory_integration.rs`, `galaxy_horizon_s1629_integration.rs` · docs: [`MONITORING_RATIO_ADVISORY.md`](./MONITORING_RATIO_ADVISORY.md).
 
 ---
 

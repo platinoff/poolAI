@@ -7,7 +7,7 @@
 
 **Канон drain:** FM **§5.12** (max **10** відкритих) · реєстр рядків — цей файл + [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md) · enterprise plan — [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](./PH_S_ENTERPRISE_ROADMAP_2026-07-19.md)
 
-**Активна смуга:** band 90 **PH-S1539…S1548** → FM §5.12 `[ ]` · band 89 ✅ (PH-S1529…S1538 Policies ratio advisory)
+**Активна смуга:** band 100 **PH-S1639…S1648** → FM §5.12 `[ ]` · band 99 ✅ (PH-S1629…S1638 Monitoring ratio advisory) · band 98 ✅ (PH-S1619…S1628 Monitoring vision sync) · band 97 ✅ (PH-S1609…S1618 Monitoring docs canon)
 
 **Поза scope:** FM-003 LAN 2-host (**BLOCKED**) · FM-041 Cloud SDK prod (**Deferred**) · mandatory ZK/TEE
 

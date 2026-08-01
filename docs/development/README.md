@@ -18,6 +18,8 @@
 - **[`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)** — copy-paste для агента; **`абракадабра`** · §5.12 **10** · band 85 ✅ · horizon band 86; [`OPENAPI_GAP_AUDIT_2026-05-19.md`](./OPENAPI_GAP_AUDIT_2026-05-19.md).
 - **[`POLICIES_RATIO_ADVISORY.md`](./POLICIES_RATIO_ADVISORY.md)** — band 89 Policies ratio-advisory matrix (`--policy-ratio-advisory`).
 - **[`POLICIES_VISION_SYNC.md`](./POLICIES_VISION_SYNC.md)** — band 88 Policies vision-sync matrix (`--policy-vision-sync`).
+- **[`MONITORING_VISION_SYNC.md`](./MONITORING_VISION_SYNC.md)** — band 98 Monitoring vision-sync matrix (`--monitoring-vision-sync`).
+- **[`MONITORING_RATIO_ADVISORY.md`](./MONITORING_RATIO_ADVISORY.md)** — band 99 Monitoring ratio-advisory matrix (`--monitoring-ratio-advisory`).
 - **[`POLICIES_STAND_SMOKE.md`](./POLICIES_STAND_SMOKE.md)** — band 85 Policies live stand smoke (`--policy-stand-smoke`).
 - **[`POLICIES_ADMIN_OPS.md`](./POLICIES_ADMIN_OPS.md)** — band 84 Policies admin/ops glue (`--policy-admin-ops`).
 - **[`POLICIES_API.md`](./POLICIES_API.md)** — band 83 Policies HTTP API contracts (`--policy-api`).

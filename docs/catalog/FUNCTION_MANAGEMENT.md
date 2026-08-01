@@ -1221,7 +1221,41 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 97 ✅ · band 98 next). **Master horizon:** PH-S1619…S1628 (band 98). **Completion pending:** PH-S1619…S2278 = **660** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **431**. **Наступна сесія:** **`абракадабра`** — project scan / band 98.
+**Відкритих у §5.12:** **0** (band 99 ✅ · band 100 next). **Master horizon:** PH-S1639…S1648 (band 100). **Completion pending:** PH-S1639…S2278 = **640** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **433**. **Наступна сесія:** **`абракадабра`** — project scan / band 100.
+
+### 5.80 Monitoring ratio advisory queue — band 99 (PH-S1629…S1638, 2026-08-01) · **✅**
+
+**Джерело:** project completion / enterprise phase E — Monitoring ratio-advisory aggregate (mirror band 89 [`POLICIES_RATIO_ADVISORY.md`](../development/POLICIES_RATIO_ADVISORY.md)). Prior: [`MONITORING_VISION_SYNC.md`](../development/MONITORING_VISION_SYNC.md) (band 98). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · master [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1564 | **PH-S1629** | `monitoring_ratio_advisory_depth` ui-core module | `monitoring_ratio_advisory_depth.rs` | depth enum + criteria registry | **✅** |
+| 1565 | **PH-S1630** | Ratio-advisory slice aggregate | `MONITORING_RATIO_ADVISORY_SLICES` | 6 ratio slices referenced | **✅** |
+| 1566 | **PH-S1631** | Criteria / export contracts | `monitoring_ratio_advisory_integration` | criteria totals consistent | **✅** |
+| 1567 | **PH-S1632** | verify-dev-stand / ratio-advisory hook | `VERIFY_MONITORING_RATIO_ADVISORY` | verify-dev-stand gate + quick | **✅** |
+| 1568 | **PH-S1633** | Stand smoke export shape | `poolai_http_stand_smoke` | `monitoring_ratio_advisory_band99_export_shape` | **✅** |
+| 1569 | **PH-S1634** | `poolai-loc-audit --monitoring-ratio-advisory` | loc-audit | `rust_ratio.json` fields | **✅** |
+| 1570 | **PH-S1635** | Docs canon sync | docs | `MONITORING_RATIO_ADVISORY.md` + canon | **✅** |
+| 1571 | **PH-S1636** | vision-sync --check | ops | drift gate green | **✅** |
+| 1572 | **PH-S1637** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **✅** |
+| 1573 | **PH-S1638** | Band close | tests/docs | `galaxy_horizon_s1629_integration` | **✅** |
+
+### 5.79 Monitoring vision sync queue — band 98 (PH-S1619…S1628, 2026-07-29) · **✅**
+
+**Джерело:** project completion / enterprise phase E — Monitoring vision-sync aggregate (mirror band 88 [`POLICIES_VISION_SYNC.md`](../development/POLICIES_VISION_SYNC.md)). Prior: [`MONITORING_DOCS_CANON.md`](../development/MONITORING_DOCS_CANON.md) (band 97). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · master [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1554 | **PH-S1619** | `monitoring_vision_sync_depth` ui-core module | `monitoring_vision_sync_depth.rs` | depth enum + criteria registry | **✅** |
+| 1555 | **PH-S1620** | Vision-sync slice aggregate | `MONITORING_VISION_SYNC_SLICES` | 6 vision/docs slices referenced | **✅** |
+| 1556 | **PH-S1621** | Criteria / export contracts | `monitoring_vision_sync_integration` | criteria totals consistent | **✅** |
+| 1557 | **PH-S1622** | verify-dev-stand / vision-sync hook | `VERIFY_MONITORING_VISION_SYNC` | verify-dev-stand gate + quick | **✅** |
+| 1558 | **PH-S1623** | Stand smoke export shape | `poolai_http_stand_smoke` | `monitoring_vision_sync_band98_export_shape` | **✅** |
+| 1559 | **PH-S1624** | `poolai-loc-audit --monitoring-vision-sync` | loc-audit | `rust_ratio.json` fields | **✅** |
+| 1560 | **PH-S1625** | Docs canon sync | docs | `MONITORING_VISION_SYNC.md` + canon | **✅** |
+| 1561 | **PH-S1626** | vision-sync --check | ops | drift gate green | **✅** |
+| 1562 | **PH-S1627** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **✅** |
+| 1563 | **PH-S1628** | Band close | tests/docs | `galaxy_horizon_s1619_integration` | **✅** |
 
 ### 5.78 Monitoring docs canon queue — band 97 (PH-S1609…S1618, 2026-07-29) · **✅**
 

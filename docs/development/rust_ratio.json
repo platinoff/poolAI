@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-29",
+  "generated_at": "2026-08-01",
   "sprint": "PH-S1010",
   "formal_band_min": 0.9,
   "formal_band_max": 0.95,
@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 184908,
-  "non_rust_product_loc": 9806,
-  "product_loc_total": 194714,
-  "rust_ratio": 0.9496389576507083,
-  "rust_ratio_pct": 94.96389576507083,
+  "rust_loc": 185504,
+  "non_rust_product_loc": 9839,
+  "product_loc_total": 195343,
+  "rust_ratio": 0.949632185437922,
+  "rust_ratio_pct": 94.96321854379221,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -181,9 +181,15 @@
   "monitoring_loc_audit_mode": false,
   "monitoring_loc_audit_criteria_total": 10,
   "monitoring_loc_audit_criteria_met_count": 0,
-  "monitoring_docs_canon_mode": true,
+  "monitoring_docs_canon_mode": false,
   "monitoring_docs_canon_criteria_total": 10,
-  "monitoring_docs_canon_criteria_met_count": 10,
+  "monitoring_docs_canon_criteria_met_count": 0,
+  "monitoring_vision_sync_mode": false,
+  "monitoring_vision_sync_criteria_total": 10,
+  "monitoring_vision_sync_criteria_met_count": 0,
+  "monitoring_ratio_advisory_mode": true,
+  "monitoring_ratio_advisory_criteria_total": 10,
+  "monitoring_ratio_advisory_criteria_met_count": 10,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -195,23 +201,23 @@
     },
     "ops_shell": {
       "files": 41,
-      "loc": 4070
+      "loc": 4103
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 115,
-      "loc": 24624
+      "files": 116,
+      "loc": 24866
     },
     "rust_src": {
       "files": 302,
-      "loc": 116416
+      "loc": 116618
     },
     "rust_tests": {
-      "files": 337,
-      "loc": 43260
+      "files": 339,
+      "loc": 43412
     },
     "ui_css": {
       "files": 2,
@@ -242,7 +248,7 @@
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
     "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
     "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
-    "PH-S1614: monitoring_docs_canon_mode — aggregate band 91–95 MONITORING_*.md canon docs",
-    "PH-S1618: band 97 monitoring docs-canon — criteria met vs registry"
+    "PH-S1634: monitoring_ratio_advisory_mode — aggregate rust_ratio.json + ratio strategy",
+    "PH-S1638: band 99 monitoring ratio-advisory — criteria met vs registry"
   ]
 }
