@@ -54,7 +54,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 **Версія в репозиторії:** `0.2.2` (див. `Cargo.toml`). **Робоча гілка:** `main`.
 
-Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S1638 ✅ (phase E Monitoring ratio-advisory). **Rust ratio:** **94.96%** (hold **95%** advisory). **Vision:** manifest rev **433**. **§5.12:** **0** відкритих (band 99 ✅ · band 100 next) · tech **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · наступна сесія **`абракадабра`** (band 100) — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
+Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S1638 ✅ (phase E Monitoring ratio-advisory). **Rust ratio:** **94.96%** (hold **95%** advisory). **Vision:** manifest rev **434**. **§5.12:** **0** відкритих (band 99 ✅ · band 100 next) · tech **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · наступна сесія **`абракадабра`** (band 100) — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
 **Репозиторій:** [github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)
 
