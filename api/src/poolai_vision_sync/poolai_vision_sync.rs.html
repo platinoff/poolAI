@@ -363,7 +363,7 @@
 <a href=#363 id=363 data-nosnippet>363</a></span>}
 <a href=#364 id=364 data-nosnippet>364</a>
 <a href=#365 id=365 data-nosnippet>365</a><span class="doccomment">/// Closed sprints sorted by PH-S serial descending (deduped by id).
-<a href=#366 id=366 data-nosnippet>366</a></span><span class="kw">fn </span>closed_entries_by_serial_desc&lt;<span class="lifetime">'a</span>&gt;(entries: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[SprintQueueEntry]) -&gt; Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>SprintQueueEntry&gt; {
+<a href=#366 id=366 data-nosnippet>366</a></span><span class="kw">fn </span>closed_entries_by_serial_desc(entries: <span class="kw-2">&amp;</span>[SprintQueueEntry]) -&gt; Vec&lt;<span class="kw-2">&amp;</span>SprintQueueEntry&gt; {
 <a href=#367 id=367 data-nosnippet>367</a>    <span class="kw">let </span><span class="kw-2">mut </span>closed: Vec&lt;<span class="kw-2">&amp;</span>SprintQueueEntry&gt; = entries
 <a href=#368 id=368 data-nosnippet>368</a>        .iter()
 <a href=#369 id=369 data-nosnippet>369</a>        .filter(|e| !e.open &amp;&amp; e.status == <span class="string">"closed"</span>)

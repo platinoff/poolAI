@@ -576,7 +576,7 @@
 <a href=#576 id=576 data-nosnippet>576</a>        .get(<span class="string">"metrics"</span>)
 <a href=#577 id=577 data-nosnippet>577</a>        .ok_or_else(|| <span class="macro">format!</span>(<span class="string">"metrics body missing metrics: {body}"</span>))<span class="question-mark">?</span>;
 <a href=#578 id=578 data-nosnippet>578</a>    <span class="kw">for </span>key <span class="kw">in </span>required_keys {
-<a href=#579 id=579 data-nosnippet>579</a>        <span class="kw">if </span>!metrics.get(key).and_then(|v| v.as_u64()).is_some() {
+<a href=#579 id=579 data-nosnippet>579</a>        <span class="kw">if </span>metrics.get(key).and_then(|v| v.as_u64()).is_none() {
 <a href=#580 id=580 data-nosnippet>580</a>            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">"metrics missing u64 key {key}: {body}"</span>));
 <a href=#581 id=581 data-nosnippet>581</a>        }
 <a href=#582 id=582 data-nosnippet>582</a>    }
