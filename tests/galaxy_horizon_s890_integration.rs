@@ -1,5 +1,6 @@
 //! PH-S899: Galaxy horizon close band (PH-S890…S898) — replication quorum production gates.
 
+#![allow(clippy::await_holding_lock)]
 use axum::body::to_bytes;
 use axum::http::{Request, StatusCode};
 use axum::{body::Body, routing::get, Router};

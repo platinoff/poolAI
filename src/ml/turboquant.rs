@@ -455,8 +455,8 @@ mod tests {
         let b = vec![-0.7_f32, 0.5, 1.0, 3.0];
         let d0 = dot_f32(&a, &b);
 
-        let pa = pack_uniform_rows(&[a.clone()]).unwrap();
-        let pb = pack_uniform_rows(&[b.clone()]).unwrap();
+        let pa = pack_uniform_rows(std::slice::from_ref(&a)).unwrap();
+        let pb = pack_uniform_rows(std::slice::from_ref(&b)).unwrap();
         let ra = unpack_to_rows(&pa.bytes).unwrap().pop().unwrap();
         let rb = unpack_to_rows(&pb.bytes).unwrap().pop().unwrap();
         let d1 = dot_f32(&ra, &rb);

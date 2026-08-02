@@ -1,5 +1,6 @@
 //! PH-S65: Galaxy protocol_version negotiation on register-remote.
 
+#![allow(clippy::await_holding_lock)]
 use axum::body::to_bytes;
 use axum::http::{Request, StatusCode};
 use axum::{body::Body, Router};
@@ -63,23 +64,6 @@ async fn register_remote_protocol_1_2_accepted() {
     assert_eq!(v["compat_status"], "accepted");
     assert_eq!(v["registered"], true);
     assert_eq!(v["worker_protocol_version"], "1.2");
-}
-
-async fn register_remote_protocol_1_0_unsupported() {
-    let app = app_with_discovery().await;
-    let register = Request::builder()
-        .method("POST")
-        .uri("/api/v1/discovery/register-remote")
-        .header("content-type", "application/json")
-        .body(Body::from(register_body("1.0")))
-        .unwrap();
-
-    let response = app.oneshot(register).await.unwrap();
-    assert_eq!(response.status(), StatusCode::FORBIDDEN);
-    let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
-    let v: Value = serde_json::from_slice(&body).unwrap();
-    assert_eq!(v["compat_status"], "unsupported");
-    assert_eq!(v["registered"], false);
 }
 
 #[tokio::test]

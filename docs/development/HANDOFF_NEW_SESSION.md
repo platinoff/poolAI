@@ -1,8 +1,25 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-08-02 (band 102 **GSV** PH-S1659…S1668 **✅** · band 101 **PH-S1649…S1658** ✅ · band 100 **PH-S1639…S1648** ✅ · band 99 **PH-S1629…S1638** ✅ · band 98 **PH-S1619…S1628** ✅ · band 97 ✅ · band 96 ✅ · band 95 ✅ · band 94 ✅ · band 93 ✅ · band 92 ✅ · band 91 ✅ · service **PH-SVC85** Rust diagnostics panel ✅ · **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · band 88 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅)
+**Оновлено:** 2026-08-02 (band 103 **lint/diagnostics cleanup** PH-S1669…S1678 **✅** · band 102 **GSV** PH-S1659…S1668 **✅** · band 101 **PH-S1649…S1658** ✅ · band 100 **PH-S1639…S1648** ✅ · band 99 **PH-S1629…S1638** ✅ · band 98 **PH-S1619…S1628** ✅ · band 97 ✅ · band 96 ✅ · band 95 ✅ · band 94 ✅ · band 93 ✅ · band 92 ✅ · band 91 ✅ · service **PH-SVC85** Rust diagnostics panel ✅ · **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · band 88 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅)
 
-**Наступна сесія:** **`абракадабра`** — S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1669+; черга — FM §5.12 / completion roadmap) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+**Наступна сесія:** **`абракадабра`** — S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`; band 103 — 0 warnings / 0 errors) → drain наступного band (PH-S1679+; черга — FM §5.12 / completion roadmap) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+
+## Band 103 — Lint/diagnostics cleanup (PH-S1669…S1678, **✅**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1669** | `await_holding_lock` src test-modules (`grid.rs` + `discovery.rs`) |
+| **PH-S1670** | `await_holding_lock` integration tests ×79 (`#![allow]` banner) |
+| **PH-S1671** | `needless_borrows_for_generic_args` ui-core ×85 (`clippy --fix -p poolai-ui-core`) |
+| **PH-S1672** | `field_reassign_with_default` + `needless_update` + `manual_clamp` ×24 |
+| **PH-S1673** | `dead_code` batch (admin wasm-only fns · `ENV_POOLAI_BIN` · test fn · `pending` · ShardSyncBus `is_empty`) |
+| **PH-S1674** | `too_many_arguments` ×12 + `type_complexity` ×2 (alias `PersistedMonitoringConfig`) |
+| **PH-S1675** | misc diagnostics (redundant guard · from_ref · from_str→parse · large Err · loop index · doc list · identical if) |
+| **PH-S1676** | Verify re-scan — clippy (CI set) **0 warnings / 0 errors** |
+| **PH-S1677** | loc-audit (`--advisory`, ratio 95.00%) + vision-sync + record diagnostics |
+| **PH-S1678** | Band close — `galaxy_horizon_s1669_integration`; FM §5.84 ✅ · HANDOFF · NEXT_SESSION |
+
+**PH-S1669…S1678 ✅ (2026-08-02):** clippy (CI feature set `ml,enterprise,cloud,test-utils,job-store-sqlite,prometheus`) **0 warnings / 0 errors** (baseline 256 warnings). Додано `#[allow(clippy::await_holding_lock)]` у 2 src test-modules + 71 integration tests (файли з тест-сериалізаційними `Mutex`); `--fix` для `needless_borrows` (ui-core ×85) та workspace-misc; решта ручними правками (field_reassign struct literals, `clamp`, `from_ref`, `is_empty`, type alias, `parse` rename, allowed `too_many_arguments`/`result_large_err`/`result_unit_err`/`dead_code`). Видалено dead-code: admin wasm-only assertion helpers (`#[cfg(test)]`), `ENV_POOLAI_BIN`, `register_remote_protocol_1_0_unsupported` (дубль), `PollTasksResponse.pending` (залишено `#[allow]` + `#[serde(default)]`). FM §5.12 §5.84 ✅. Vision rev 441. Band-close test: `tests/galaxy_horizon_s1669_integration.rs`.
 
 ## P0 / service (2026-07-27)
 
@@ -24,7 +41,7 @@
 
 **Cursor / toolchain (service):** local desktop **3.13.21** · Auto-review · Router Balance/Intelligence for drain · vision Speeds/Rust/eye verified · research [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](./CURSOR_UPDATE_RESEARCH_2026-07-27.md) · FM **§5.16**.
 
-**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **610** спринтів → PH-S2278 (після GSV band 102).
+**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **600** спринтів → PH-S2278 (після band 103 lint cleanup).
 
 ## Band 102 — GSV migration · Galaxy StarWalker Vision (PH-S1659…S1668, **✅**)
 

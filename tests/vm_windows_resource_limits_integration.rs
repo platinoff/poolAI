@@ -100,10 +100,12 @@ async fn test_vm_manager_post_spawn_resource_limits() {
     let manager = VmManager::new();
     assert!(manager.is_resource_limits_supported());
 
-    let mut resources = VmResources::default();
-    resources.cpu_cores = 1;
-    resources.memory_mb = 128;
-    resources.gpu_required = false;
+    let resources = VmResources {
+        cpu_cores: 1,
+        memory_mb: 128,
+        gpu_required: false,
+        ..VmResources::default()
+    };
     let instance = manager
         .create_instance(
             "limits-test".to_string(),

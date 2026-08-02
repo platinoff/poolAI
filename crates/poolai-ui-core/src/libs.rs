@@ -20,6 +20,7 @@ fn library_installed(lib: &Value) -> bool {
 }
 
 /// Libraries table HTML for admin panel (PH-S821).
+#[allow(clippy::too_many_arguments)]
 pub fn render_libs_panel_html(
     libs_json: &str,
     col_name: &str,

@@ -1,5 +1,6 @@
 //! FM-016+: Telegram user binding and webhook → virtual-node task enqueue.
 
+#![allow(clippy::await_holding_lock)]
 use axum::body::to_bytes;
 use axum::http::{Request, StatusCode};
 use axum::{body::Body, Router};
@@ -28,7 +29,7 @@ impl WebhookSecretEnvGuard {
         if let Some(value) = secret {
             std::env::set_var("POOLAI_TELEGRAM_WEBHOOK_SECRET", value);
         } else {
-            let _ = std::env::remove_var("POOLAI_TELEGRAM_WEBHOOK_SECRET");
+            std::env::remove_var("POOLAI_TELEGRAM_WEBHOOK_SECRET");
         }
         Self { _lock: lock }
     }
@@ -36,7 +37,7 @@ impl WebhookSecretEnvGuard {
 
 impl Drop for WebhookSecretEnvGuard {
     fn drop(&mut self) {
-        let _ = std::env::remove_var("POOLAI_TELEGRAM_WEBHOOK_SECRET");
+        std::env::remove_var("POOLAI_TELEGRAM_WEBHOOK_SECRET");
     }
 }
 

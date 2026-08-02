@@ -40,16 +40,16 @@ pub fn render_topology_stats_strip_html(summary_json: &str, i18n_json: &str) -> 
 <div class="stat-value" id="topology-last-updated">{last_upd}</div>
 <div class="stat-label">{last_lbl}</div>
 </div>"#,
-        node_count = escape_html(&node_count.to_string()),
-        latency = escape_html(&latency.to_string()),
+        node_count = escape_html(node_count.to_string()),
+        latency = escape_html(latency.to_string()),
         last_upd = escape_html(&ts),
-        nodes_lbl = escape_html(&t(&i18n, "admin.topo.stat.nodes", "Nodes")),
-        latency_lbl = escape_html(&t(
+        nodes_lbl = escape_html(t(&i18n, "admin.topo.stat.nodes", "Nodes")),
+        latency_lbl = escape_html(t(
             &i18n,
             "admin.topo.stat.latencyMs",
             "Latency Measurements"
         )),
-        last_lbl = escape_html(&t(&i18n, "admin.topo.stat.lastUpd", "Last Updated")),
+        last_lbl = escape_html(t(&i18n, "admin.topo.stat.lastUpd", "Last Updated")),
     )
 }
 

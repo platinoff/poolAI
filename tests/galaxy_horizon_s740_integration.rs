@@ -1,5 +1,6 @@
 //! PH-S749: Galaxy horizon close band (PH-S740…S748).
 
+#![allow(clippy::await_holding_lock)]
 use axum::body::to_bytes;
 use axum::http::{Request, StatusCode};
 use axum::{body::Body, routing::get, Router};

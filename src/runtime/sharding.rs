@@ -92,6 +92,10 @@ impl ShardSyncBus {
         self.inbox.read().await.len()
     }
 
+    pub async fn is_empty(&self) -> bool {
+        self.inbox.read().await.is_empty()
+    }
+
     /// Simulate one forward step: all-reduce between every shard pair (both directions).
     pub async fn simulate_all_reduce_step(
         &self,

@@ -134,6 +134,7 @@ pub const DESIGN_TOKENS_AUDIT_NOTE: &str =
     "PH-S1025: structural tokens in poolai-ui-core/design_tokens.rs; admin palette via DARK theme.";
 
 /// Returns true when structural token map and CSS export are in sync.
+#[allow(clippy::const_is_empty)]
 pub fn design_tokens_parity_gate() -> bool {
     !STRUCTURAL.is_empty()
         && STRUCTURAL.iter().all(|(name, value)| {

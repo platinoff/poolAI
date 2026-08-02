@@ -1,5 +1,6 @@
 //! PH-S879: Galaxy horizon close band (PH-S870…S878) — Solana on-chain cleared depth.
 
+#![allow(clippy::await_holding_lock)]
 use axum::body::to_bytes;
 use axum::http::{Request, StatusCode};
 use axum::{body::Body, Router};

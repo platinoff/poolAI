@@ -256,6 +256,9 @@ pub struct MetricDataPoint {
     pub tenant_id: Option<Uuid>,
 }
 
+/// Persisted monitoring config: named alert rules + dashboards.
+type PersistedMonitoringConfig = (HashMap<String, AlertRule>, HashMap<Uuid, Dashboard>);
+
 /// Dashboard configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Dashboard {
@@ -392,9 +395,7 @@ impl MonitoringManager {
         Ok(())
     }
 
-    fn load_persisted_config(
-        conn: &Connection,
-    ) -> Result<(HashMap<String, AlertRule>, HashMap<Uuid, Dashboard>), String> {
+    fn load_persisted_config(conn: &Connection) -> Result<PersistedMonitoringConfig, String> {
         let mut rules = HashMap::new();
         let mut rule_stmt = conn
             .prepare(
@@ -542,20 +543,22 @@ impl MonitoringManager {
             }
 
             let db_path_clone = db_path.clone();
-            let loaded = tokio::task::spawn_blocking(move || -> Result<
-                (HashMap<String, AlertRule>, HashMap<Uuid, Dashboard>),
-                AppError,
-            > {
-                let conn = Connection::open(&db_path_clone).map_err(|e| {
-                    AppError::ConfigError(format!("Failed to open SQLite database: {}", e))
-                })?;
-                Self::init_database_schema(&conn).map_err(|e| {
-                    AppError::ConfigError(format!("Failed to initialize database schema: {}", e))
-                })?;
-                Self::load_persisted_config(&conn).map_err(|e| {
-                    AppError::ConfigError(format!("Failed to load monitoring config: {}", e))
-                })
-            })
+            let loaded = tokio::task::spawn_blocking(
+                move || -> Result<PersistedMonitoringConfig, AppError> {
+                    let conn = Connection::open(&db_path_clone).map_err(|e| {
+                        AppError::ConfigError(format!("Failed to open SQLite database: {}", e))
+                    })?;
+                    Self::init_database_schema(&conn).map_err(|e| {
+                        AppError::ConfigError(format!(
+                            "Failed to initialize database schema: {}",
+                            e
+                        ))
+                    })?;
+                    Self::load_persisted_config(&conn).map_err(|e| {
+                        AppError::ConfigError(format!("Failed to load monitoring config: {}", e))
+                    })
+                },
+            )
             .await
             .map_err(|e| {
                 AppError::ConfigError(format!("Database initialization task failed: {}", e))

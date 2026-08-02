@@ -253,11 +253,7 @@ fn main() -> ExitCode {
     let args: Vec<String> = env::args().skip(1).collect();
     if args.is_empty() || args.iter().any(|a| a == "-h" || a == "--help") {
         usage();
-        return if args.is_empty() {
-            ExitCode::SUCCESS
-        } else {
-            ExitCode::SUCCESS
-        };
+        return ExitCode::SUCCESS;
     }
 
     let root = repo_root();

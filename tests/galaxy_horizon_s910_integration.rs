@@ -1,5 +1,6 @@
 //! PH-S919: Galaxy horizon close band (PH-S910…S918) — Trust score SQLite persist.
 
+#![allow(clippy::await_holding_lock)]
 use axum::body::to_bytes;
 use axum::http::{Request, StatusCode};
 use axum::{body::Body, routing::get, Router};

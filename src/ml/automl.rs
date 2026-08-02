@@ -352,7 +352,7 @@ impl AutoMLPipeline {
         // Add some randomness; fold count slightly stabilizes the stub score spread
         let folds = self.config.cross_validation_folds.max(1) as f64;
         let variation = (data.features.len() as f64 % 10.0) / 100.0 / folds.sqrt();
-        let score = (base_score + variation).min(1.0).max(0.0);
+        let score = (base_score + variation).clamp(0.0, 1.0);
 
         Ok(score)
     }

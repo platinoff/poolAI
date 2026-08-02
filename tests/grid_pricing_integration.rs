@@ -1,5 +1,6 @@
 //! PH-S144: Grid pricing API wire — migrated from `e2e/tests/grid_pricing.spec.ts`.
 
+#![allow(clippy::await_holding_lock)]
 use axum::body::to_bytes;
 use axum::http::{Request, StatusCode};
 use axum::{body::Body, Router};

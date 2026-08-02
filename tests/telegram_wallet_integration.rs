@@ -1,6 +1,7 @@
 //! PH-S990: Telegram wallet HTTP wire — migrated from `e2e/archive/api-smoke/telegram_wallet.spec.ts`.
 //! Canon registry: `tests/integration_gap_audit.rs` · binding extras in `virtual_node_telegram_binding_integration.rs`.
 
+#![allow(clippy::await_holding_lock)]
 use axum::body::to_bytes;
 use axum::http::{Request, StatusCode};
 use axum::{body::Body, Router};

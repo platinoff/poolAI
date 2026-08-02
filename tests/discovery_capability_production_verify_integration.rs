@@ -1,5 +1,6 @@
 //! PH-S561: production capability verify key rejects invalid signatures.
 
+#![allow(clippy::await_holding_lock)]
 use axum::body::to_bytes;
 use axum::http::{Request, StatusCode};
 use axum::{body::Body, Router};

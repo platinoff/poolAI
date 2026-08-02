@@ -3,6 +3,7 @@
 use serde_json::Value;
 
 /// Workers table HTML for admin panel (PH-S480).
+#[allow(clippy::too_many_arguments)]
 pub fn render_workers_panel_html(
     workers_json: &str,
     col_id: &str,

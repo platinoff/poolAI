@@ -20,7 +20,7 @@ pub fn validate_grid_metrics_json_shape(
         .get("metrics")
         .ok_or_else(|| format!("metrics body missing metrics: {body}"))?;
     for key in required_keys {
-        if !metrics.get(key).and_then(|v| v.as_u64()).is_some() {
+        if metrics.get(key).and_then(|v| v.as_u64()).is_none() {
             return Err(format!("metrics missing u64 key {key}: {body}"));
         }
     }
@@ -69,8 +69,8 @@ pub fn render_grid_verification_metrics_strip_html(
 <span>Sample: <strong>{sample}</strong></span>
 <span>Pending: <strong>{pending}</strong></span>
 </div>"#,
-        sample = escape_html(&sample.to_string()),
-        pending = escape_html(&pending.to_string()),
+        sample = escape_html(sample.to_string()),
+        pending = escape_html(pending.to_string()),
     )
 }
 
@@ -104,9 +104,9 @@ pub fn render_grid_settlement_trust_metrics_strip_html(
 <span>Eligible: <strong>{eligible}</strong></span>
 <span>Trust score: <strong>{score}</strong></span>
 </div>"#,
-        cleared = escape_html(&cleared.to_string()),
-        eligible = escape_html(&eligible.to_string()),
-        score = escape_html(&score.to_string()),
+        cleared = escape_html(cleared.to_string()),
+        eligible = escape_html(eligible.to_string()),
+        score = escape_html(score.to_string()),
     )
 }
 
@@ -133,9 +133,9 @@ pub fn render_grid_prefetch_metrics_strip_html(
 <span>Backpressure: <strong>{backpressure}</strong></span>
 <span>Peer fetch: <strong>{peer_fetch}</strong></span>
 </div>"#,
-        pull_bytes = escape_html(&pull_bytes.to_string()),
-        backpressure = escape_html(&backpressure.to_string()),
-        peer_fetch = escape_html(&peer_fetch.to_string()),
+        pull_bytes = escape_html(pull_bytes.to_string()),
+        backpressure = escape_html(backpressure.to_string()),
+        peer_fetch = escape_html(peer_fetch.to_string()),
     )
 }
 
@@ -164,10 +164,10 @@ pub fn render_grid_locality_metrics_strip_html(
 <span>Promote: <strong>{promote}</strong></span>
 <span>Evict: <strong>{evict}</strong></span>
 </div>"#,
-        shard_bps = escape_html(&shard_bps.to_string()),
-        hot_bps = escape_html(&hot_bps.to_string()),
-        promote = escape_html(&promote.to_string()),
-        evict = escape_html(&evict.to_string()),
+        shard_bps = escape_html(shard_bps.to_string()),
+        hot_bps = escape_html(hot_bps.to_string()),
+        promote = escape_html(promote.to_string()),
+        evict = escape_html(evict.to_string()),
     )
 }
 
@@ -197,10 +197,10 @@ pub fn render_grid_fee_split_metrics_strip_html(
 <span>Applied: <strong>{applied}</strong></span>
 <p class="muted admin-hint">{hint}</p>
 </div>"#,
-        primary_bps = escape_html(&primary_bps.to_string()),
-        secondary_min = escape_html(&secondary_min.to_string()),
-        secondary_max = escape_html(&secondary_max.to_string()),
-        applied = escape_html(&applied.to_string()),
+        primary_bps = escape_html(primary_bps.to_string()),
+        secondary_min = escape_html(secondary_min.to_string()),
+        secondary_max = escape_html(secondary_max.to_string()),
+        applied = escape_html(applied.to_string()),
         hint = escape_html(hint),
     )
 }
@@ -239,10 +239,10 @@ pub fn render_grid_governance_metrics_strip_html(
 <span>Advisory ack: <strong>{advisory}</strong></span>
 </div>"#,
         mode = escape_html(mode),
-        verify_ok = escape_html(&verify_ok.to_string()),
-        verify_fail = escape_html(&verify_fail.to_string()),
-        notify_pending = escape_html(&notify_pending.to_string()),
-        advisory = escape_html(&advisory.to_string()),
+        verify_ok = escape_html(verify_ok.to_string()),
+        verify_fail = escape_html(verify_fail.to_string()),
+        notify_pending = escape_html(notify_pending.to_string()),
+        advisory = escape_html(advisory.to_string()),
     )
 }
 
@@ -276,10 +276,10 @@ pub fn render_grid_edge_verification_metrics_strip_html(
 <span>Network profile stale: <strong>{stale}</strong></span>
 <span>TEE required: <strong>{tee}</strong></span>
 </div>"#,
-        fraud = escape_html(&fraud.to_string()),
-        unsigned = escape_html(&unsigned.to_string()),
-        signed = escape_html(&signed.to_string()),
-        stale = escape_html(&stale.to_string()),
+        fraud = escape_html(fraud.to_string()),
+        unsigned = escape_html(unsigned.to_string()),
+        signed = escape_html(signed.to_string()),
+        stale = escape_html(stale.to_string()),
         tee = escape_html(if tee { "yes" } else { "no" }),
     )
 }

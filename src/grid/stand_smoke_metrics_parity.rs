@@ -650,6 +650,7 @@ pub fn validate_band6_metrics_parity(
 }
 
 /// Full grid stand smoke v2 — band-6 core + prefetch/locality/fee/governance/payout-batch (PH-S830).
+#[allow(clippy::too_many_arguments)]
 pub fn validate_band6_metrics_parity_v2(
     prom_text: &str,
     verification: &Value,
@@ -682,6 +683,7 @@ pub fn validate_band6_metrics_parity_v2(
 }
 
 /// Full grid stand smoke v3 — v2 + extended parity pairs across all metric APIs (PH-S1073).
+#[allow(clippy::too_many_arguments)]
 pub fn validate_band6_metrics_parity_v3(
     prom_text: &str,
     verification: &Value,
@@ -743,6 +745,7 @@ pub fn validate_edge_verification_metrics_parity(
 }
 
 /// Full grid stand smoke v4 — v3 + edge-verification-metrics horizon parity (PH-S1123).
+#[allow(clippy::too_many_arguments)]
 pub fn validate_band6_metrics_parity_v4(
     prom_text: &str,
     verification: &Value,

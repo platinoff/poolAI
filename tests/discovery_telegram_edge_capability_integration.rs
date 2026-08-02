@@ -1,5 +1,6 @@
 //! PH-S504: mandatory signed capability for telegram_edge register-remote.
 
+#![allow(clippy::await_holding_lock)]
 use axum::body::to_bytes;
 use axum::http::{Request, StatusCode};
 use axum::{body::Body, Router};

@@ -4,11 +4,7 @@
 //! Phase 2: `GET /health`, `POST /discovery/heartbeat-remote`
 //! Phase 3: poll/complete virtual-node tasks + RAID distributed health wire
 
-use axum::{
-    extract::{Path, State},
-    routing::{get, post},
-    Json, Router,
-};
+use axum::{extract::State, routing::get, Json, Router};
 use poolai::job::JobLeaseConfig;
 use poolai::raid::protocol::ProtocolMessage;
 use poolai::workers::artifact_cache::{count_cached_probes, resolve_cache_dir, store_probe};
@@ -68,6 +64,8 @@ struct WorkerHealthResponse {
 #[derive(Deserialize)]
 struct PollTasksResponse {
     task: Option<VirtualNodeTaskDto>,
+    #[serde(default)]
+    #[allow(dead_code)] // wire contract field; reserved for queue depth reporting
     pending: usize,
 }
 
@@ -734,7 +732,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use axum::extract::Path;
     use axum::http::StatusCode;
+    use axum::routing::post;
     use serde_json::Value;
     use std::sync::Mutex;
     use tokio::time::{sleep, Duration};

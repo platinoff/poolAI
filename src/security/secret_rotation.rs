@@ -26,7 +26,7 @@ impl SecretKind {
         }
     }
 
-    pub fn from_str(s: &str) -> Option<Self> {
+    pub fn parse(s: &str) -> Option<Self> {
         match s {
             "jwt" => Some(SecretKind::Jwt),
             "tls_certificate" | "tls" => Some(SecretKind::TlsCertificate),
@@ -260,9 +260,9 @@ mod tests {
 
     #[test]
     fn secret_kind_parse_roundtrip() {
-        assert_eq!(SecretKind::from_str("jwt"), Some(SecretKind::Jwt));
+        assert_eq!(SecretKind::parse("jwt"), Some(SecretKind::Jwt));
         assert_eq!(
-            SecretKind::from_str("tls_certificate"),
+            SecretKind::parse("tls_certificate"),
             Some(SecretKind::TlsCertificate)
         );
     }

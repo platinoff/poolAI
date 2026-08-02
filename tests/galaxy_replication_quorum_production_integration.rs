@@ -1,5 +1,6 @@
 //! PH-S890: replication quorum gate production — strict tier HTTP wire integration.
 
+#![allow(clippy::await_holding_lock)]
 use axum::body::to_bytes;
 use axum::http::{Request, StatusCode};
 use axum::{body::Body, routing::get, Router};

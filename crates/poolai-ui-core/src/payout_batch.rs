@@ -59,7 +59,7 @@ pub fn render_payout_batch_panel_html(
                         "<tr><td><code>{}</code></td><td>{}</td><td>{}</td><td><code>{}</code></td></tr>",
                         escape_html(row.get("job_id").and_then(|v| v.as_str()).unwrap_or("—")),
                         escape_html(row.get("cleared_at").and_then(|v| v.as_str()).unwrap_or("—")),
-                        escape_html(&format_lamports(row.get("gross_lamports"))),
+                        escape_html(format_lamports(row.get("gross_lamports"))),
                         escape_html(
                             row.get("payout_pubkey")
                                 .and_then(|v| v.as_str())
@@ -89,20 +89,16 @@ pub fn render_payout_batch_panel_html(
 <table class="admin-table"><thead><tr>
 <th>{col_job}</th><th>{col_cleared}</th><th>{col_gross}</th><th>{col_pubkey}</th>
 </tr></thead><tbody>{rows_html}</tbody></table></div>"#,
-        latest_title = escape_html(&t(
-            &i18n,
-            "admin.payoutBatch.latest",
-            "Latest cleared entry"
-        )),
-        mode_label = escape_html(&t(&i18n, "admin.payoutBatch.mode", "Settlement mode")),
-        on_chain_label = escape_html(&t(&i18n, "admin.payoutBatch.onChain", "On-chain pending")),
-        job_label = escape_html(&t(&i18n, "admin.payoutBatch.jobId", "Job ID")),
-        pubkey_label = escape_html(&t(&i18n, "admin.payoutBatch.pubkey", "Payout pubkey")),
-        history_title = escape_html(&t(&i18n, "admin.payoutBatch.history", "Recent history")),
-        col_job = escape_html(&t(&i18n, "admin.payoutBatch.colJob", "Job")),
-        col_cleared = escape_html(&t(&i18n, "admin.payoutBatch.colCleared", "Cleared")),
-        col_gross = escape_html(&t(&i18n, "admin.payoutBatch.colGross", "Gross lamports")),
-        col_pubkey = escape_html(&t(&i18n, "admin.payoutBatch.colPubkey", "Pubkey")),
+        latest_title = escape_html(t(&i18n, "admin.payoutBatch.latest", "Latest cleared entry")),
+        mode_label = escape_html(t(&i18n, "admin.payoutBatch.mode", "Settlement mode")),
+        on_chain_label = escape_html(t(&i18n, "admin.payoutBatch.onChain", "On-chain pending")),
+        job_label = escape_html(t(&i18n, "admin.payoutBatch.jobId", "Job ID")),
+        pubkey_label = escape_html(t(&i18n, "admin.payoutBatch.pubkey", "Payout pubkey")),
+        history_title = escape_html(t(&i18n, "admin.payoutBatch.history", "Recent history")),
+        col_job = escape_html(t(&i18n, "admin.payoutBatch.colJob", "Job")),
+        col_cleared = escape_html(t(&i18n, "admin.payoutBatch.colCleared", "Cleared")),
+        col_gross = escape_html(t(&i18n, "admin.payoutBatch.colGross", "Gross lamports")),
+        col_pubkey = escape_html(t(&i18n, "admin.payoutBatch.colPubkey", "Pubkey")),
         settlement_mode = escape_html(settlement_mode),
         on_chain_val = escape_html(if on_chain_pending { "yes" } else { "no" }),
         job_id = escape_html(
@@ -141,13 +137,13 @@ pub fn render_payout_batch_history_strip_html(history_json: &str, i18n_json: &st
         r#"<div class="admin-card admin-payout-batch-history-strip"><h3>{title}</h3>
 <p><span>{count_label}</span>: <strong>{count}</strong></p>
 <p><span>{latest_label}</span>: <code>{latest_job}</code></p></div>"#,
-        title = escape_html(&t(
+        title = escape_html(t(
             &i18n,
             "admin.payoutBatch.historyStrip",
             "Recent payout batch history"
         )),
-        count_label = escape_html(&t(&i18n, "admin.payoutBatch.historyCount", "Entries")),
-        latest_label = escape_html(&t(&i18n, "admin.payoutBatch.historyLatest", "Latest job")),
+        count_label = escape_html(t(&i18n, "admin.payoutBatch.historyCount", "Entries")),
+        latest_label = escape_html(t(&i18n, "admin.payoutBatch.historyLatest", "Latest job")),
         count = count,
         latest_job = escape_html(latest_job),
     )

@@ -1,5 +1,6 @@
 //! PH-S38: core → sidecar NDJSON domain events (`POOLAI_ONCHAIN_EVENTS_DIR`).
 
+#![allow(clippy::await_holding_lock)]
 use axum::body::{to_bytes, Body};
 use axum::http::{Request, StatusCode};
 use axum::Router;

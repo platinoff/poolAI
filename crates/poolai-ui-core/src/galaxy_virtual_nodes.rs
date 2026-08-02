@@ -3,6 +3,7 @@
 use serde_json::Value;
 
 /// Virtual nodes table with origin badge column (PH-S508).
+#[allow(clippy::too_many_arguments)]
 pub fn render_galaxy_virtual_nodes_panel_html(
     nodes_json: &str,
     col_peer: &str,

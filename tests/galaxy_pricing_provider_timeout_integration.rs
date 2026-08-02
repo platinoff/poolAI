@@ -1,5 +1,6 @@
 //! PH-S900: Galaxy pricing live provider HTTP timeout hardening — metrics + fetch path.
 
+#![allow(clippy::await_holding_lock)]
 use axum::body::to_bytes;
 use axum::http::{Request, StatusCode};
 use axum::{body::Body, routing::get, Router};

@@ -1,5 +1,6 @@
 //! PH-S730: network profile GET survives store reload (restart stub).
 
+#![allow(clippy::await_holding_lock)]
 use axum::body::to_bytes;
 use axum::http::{Request, StatusCode};
 use axum::{body::Body, Router};

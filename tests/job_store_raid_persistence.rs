@@ -1,5 +1,6 @@
 //! PH-S52 / PH-S850: RAID job store restart persistence integration (like PH-S52 stand-restart).
 
+#![allow(clippy::await_holding_lock)]
 #![cfg(feature = "test-utils")]
 
 use axum::body::to_bytes;

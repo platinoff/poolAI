@@ -917,8 +917,8 @@ impl MLPipelineManager {
 
         for i in 0..n {
             let mut weights = vec![0.0; dim];
-            for j in 0..dim {
-                weights[j] = 0.1 * (f64::from(i) + 1.0) + 0.04 * (j as f64);
+            for (j, w) in weights.iter_mut().enumerate() {
+                *w = 0.1 * (f64::from(i) + 1.0) + 0.04 * (j as f64);
             }
             pipeline
                 .add_client_update(ClientUpdate {
@@ -1068,7 +1068,7 @@ impl MLPipelineManager {
     ///
     /// - `feature_rows`: rows separated by `;`, components by `,` (e.g. `"1,2;3,4;5,6"`).
     /// - `labels`: comma-separated floats, same count as rows.
-    /// If omitted, uses a small built-in example (4×2 features).
+    ///   If omitted, uses a small built-in example (4×2 features).
     fn parse_automl_training_data(cfg: &HashMap<String, String>) -> Result<TrainingData, AppError> {
         let default_features = vec![
             vec![1.0, 2.0],

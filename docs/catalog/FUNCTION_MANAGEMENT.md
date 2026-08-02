@@ -1221,7 +1221,24 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 102 ✅ · band 103 next). **Master horizon:** PH-S1669…S1678 (band 103). **Completion pending:** PH-S1669…S2278 = **610** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **440**. **Наступна сесія:** **`абракадабра`** — project scan (наступний PH-S1669+).
+**Відкритих у §5.12:** **0** (band 103 ✅). **Master horizon:** PH-S1679…S1688 (band 104). **Completion pending:** PH-S1679…S2278 = **600** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **442**. **Наступна сесія:** **`абракадабра`** — project scan (наступний PH-S1679+).
+
+### 5.84 Lint/diagnostics cleanup queue — band 103 (PH-S1669…S1678, 2026-08-02) · **✅**
+
+**Джерело:** project scan warnings-first (AGENTS.md «warnings first») — `rust_diagnostics`: **256 warnings / 0 errors**, топ-сімейства `await_holding_lock×88`, `needless_borrows_for_generic_args×82`, `too_many_arguments×18`, `field_reassign_with_default×14`, `dead_code×10`, `needless_update×7`, `manual_clamp×6`, `type_complexity×4`. Запис: `bin/record-rust-diagnostics.sh` (CI feature set). Майстер-беклог band 103 (Ratio96 boilerplate) — вже drained у band 101, тому смуга — lint cleanup. PH-S1669…S1676 ✅: clippy (CI set) **0 warnings / 0 errors** (фінальний re-scan).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1604 | **PH-S1669** | `await_holding_lock` src test-modules | rust_diagnostics | `src/network/api/grid.rs` ×8 + `src/network/discovery.rs` ×1 → per-fn `#[allow]` | **[x]** |
+| 1605 | **PH-S1670** | `await_holding_lock` integration tests | rust_diagnostics | `tests/*.rs` ×79 serialization-lock allows | **[x]** |
+| 1606 | **PH-S1671** | `needless_borrows_for_generic_args` ui-core | rust_diagnostics | `cargo clippy --fix -p poolai-ui-core` ×82 + residual | **[x]** |
+| 1607 | **PH-S1672** | `field_reassign_with_default` + `needless_update` + `manual_clamp` | rust_diagnostics | clippy --fix + residual (×24) | **[x]** |
+| 1608 | **PH-S1673** | `dead_code` batch | rust_diagnostics | admin wasm-only fns; `ENV_POOLAI_BIN`; test fn; `pending`; ShardSyncBus len/is_empty | **[x]** |
+| 1609 | **PH-S1674** | `too_many_arguments` + `type_complexity` | rust_diagnostics | ui-core glue fns; `stand_smoke_metrics_parity`; monitoring type aliases | **[x]** |
+| 1610 | **PH-S1675** | misc diagnostics batch | rust_diagnostics | redundant closure/guard · from_ref · unit-value · unused imports · from_str · large Err · loop index | **[x]** |
+| 1611 | **PH-S1676** | Verify re-scan + residuals | rust_diagnostics | clippy (CI set) target ≤ 20 warnings; residuals fixed | **[x]** |
+| 1612 | **PH-S1677** | loc-audit + vision-sync + record diagnostics | ops | `--ratio96` zriz; vision `--check` green; `record-rust-diagnostics.sh` | **[x]** |
+| 1613 | **PH-S1678** | Band close | tests/docs | `galaxy_horizon_s1669_integration`; FM ✅ · HANDOFF · NEXT_SESSION | **[x]** |
 
 ### 5.83 GSV migration queue — band 102 (PH-S1659…S1668, 2026-08-01) · **✅**
 

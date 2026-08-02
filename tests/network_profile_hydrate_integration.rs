@@ -1,5 +1,6 @@
 //! PH-S529: startup hydrate persisted network_profile into discovery peers.
 
+#![allow(clippy::await_holding_lock)]
 use poolai::core::discovery_types::{PeerCapabilities, PeerInfo};
 use poolai::grid::galaxy_network_profile_store::{
     persist_peer_network_profile, reopen_network_profile_store_for_test,

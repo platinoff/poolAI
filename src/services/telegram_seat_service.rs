@@ -71,6 +71,7 @@ fn effective_seat_limit() -> Option<u32> {
 }
 
 /// Admit one `telegram_edge` peer; returns `Err(())` when seat cap exhausted.
+#[allow(clippy::result_unit_err)]
 pub fn try_admit_telegram_edge(peer_id: &str) -> Result<(), ()> {
     let Some(limit) = effective_seat_limit() else {
         return Ok(());

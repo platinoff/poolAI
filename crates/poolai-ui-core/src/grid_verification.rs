@@ -18,10 +18,11 @@ pub fn render_grid_verification_panel_html(
     let tasks: Vec<Value> = serde_json::from_str(tasks_json).unwrap_or_default();
     let pending_hint = format!("{col_pending}: {pending_total}");
     if tasks.is_empty() {
+        let hint_html = format!(r#"<p class="muted">{}</p>"#, escape_html(&pending_hint));
         return format!(
             "{}{}",
             empty_state_html(empty_message, Some(&pending_hint), "🔍", None),
-            format!(r#"<p class="muted">{}</p>"#, escape_html(&pending_hint))
+            hint_html
         );
     }
     let rows: String = tasks

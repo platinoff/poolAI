@@ -45,10 +45,12 @@ mod tests {
         let tracker = ExperimentTracker::new();
         let exp = tracker.start_experiment("exp1", "NN").await.unwrap();
 
-        let mut metrics = ExperimentMetrics::default();
-        metrics.accuracy = 0.95;
-        metrics.loss = 0.05;
-        metrics.training_time_ms = 1000;
+        let metrics = ExperimentMetrics {
+            accuracy: 0.95,
+            loss: 0.05,
+            training_time_ms: 1000,
+            ..ExperimentMetrics::default()
+        };
 
         tracker.log_metrics(exp.id.as_str(), metrics).await.unwrap();
 
@@ -86,14 +88,18 @@ mod tests {
         let tracker = ExperimentTracker::new();
 
         let e1 = tracker.start_experiment("e1", "NN").await.unwrap();
-        let mut m1 = ExperimentMetrics::default();
-        m1.accuracy = 0.9;
+        let m1 = ExperimentMetrics {
+            accuracy: 0.9,
+            ..ExperimentMetrics::default()
+        };
         tracker.log_metrics(e1.id.as_str(), m1).await.unwrap();
         tracker.end_experiment(e1.id.as_str()).await.unwrap();
 
         let e2 = tracker.start_experiment("e2", "NN").await.unwrap();
-        let mut m2 = ExperimentMetrics::default();
-        m2.accuracy = 0.95;
+        let m2 = ExperimentMetrics {
+            accuracy: 0.95,
+            ..ExperimentMetrics::default()
+        };
         tracker.log_metrics(e2.id.as_str(), m2).await.unwrap();
         tracker.end_experiment(e2.id.as_str()).await.unwrap();
 
@@ -106,14 +112,18 @@ mod tests {
         let tracker = ExperimentTracker::new();
 
         let e1 = tracker.start_experiment("e1", "NN").await.unwrap();
-        let mut m1 = ExperimentMetrics::default();
-        m1.loss = 0.1;
+        let m1 = ExperimentMetrics {
+            loss: 0.1,
+            ..ExperimentMetrics::default()
+        };
         tracker.log_metrics(e1.id.as_str(), m1).await.unwrap();
         tracker.end_experiment(e1.id.as_str()).await.unwrap();
 
         let e2 = tracker.start_experiment("e2", "NN").await.unwrap();
-        let mut m2 = ExperimentMetrics::default();
-        m2.loss = 0.05;
+        let m2 = ExperimentMetrics {
+            loss: 0.05,
+            ..ExperimentMetrics::default()
+        };
         tracker.log_metrics(e2.id.as_str(), m2).await.unwrap();
         tracker.end_experiment(e2.id.as_str()).await.unwrap();
 
@@ -169,14 +179,18 @@ mod tests {
         let tracker = ExperimentTracker::new();
 
         let e1 = tracker.start_experiment("e1", "NN").await.unwrap();
-        let mut m1 = ExperimentMetrics::default();
-        m1.accuracy = 0.9;
+        let m1 = ExperimentMetrics {
+            accuracy: 0.9,
+            ..ExperimentMetrics::default()
+        };
         tracker.log_metrics(e1.id.as_str(), m1).await.unwrap();
         tracker.end_experiment(e1.id.as_str()).await.unwrap();
 
         let e2 = tracker.start_experiment("e2", "NN").await.unwrap();
-        let mut m2 = ExperimentMetrics::default();
-        m2.accuracy = 0.95;
+        let m2 = ExperimentMetrics {
+            accuracy: 0.95,
+            ..ExperimentMetrics::default()
+        };
         tracker.log_metrics(e2.id.as_str(), m2).await.unwrap();
         tracker.end_experiment(e2.id.as_str()).await.unwrap();
 
@@ -192,10 +206,14 @@ mod tests {
         let tracker = ExperimentTracker::new();
         let exp = tracker.start_experiment("exp1", "NN").await.unwrap();
 
-        let mut metrics = ExperimentMetrics::default();
-        metrics.accuracy = 0.95;
-        metrics.custom.insert("f1_score".to_string(), 0.92);
-        metrics.custom.insert("precision".to_string(), 0.94);
+        let metrics = ExperimentMetrics {
+            accuracy: 0.95,
+            custom: HashMap::from([
+                ("f1_score".to_string(), 0.92),
+                ("precision".to_string(), 0.94),
+            ]),
+            ..ExperimentMetrics::default()
+        };
 
         tracker.log_metrics(exp.id.as_str(), metrics).await.unwrap();
 

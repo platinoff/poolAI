@@ -3,6 +3,7 @@
 use serde_json::Value;
 
 /// Instances table HTML for admin panel (PH-S490).
+#[allow(clippy::too_many_arguments)]
 pub fn render_instances_panel_html(
     instances_json: &str,
     col_instance_id: &str,

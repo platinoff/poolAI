@@ -1,5 +1,6 @@
 //! PH-S186: Galaxy verification sample scheduled counter (PH-S164) → Prometheus scrape.
 
+#![allow(clippy::await_holding_lock)]
 use axum::body::to_bytes;
 use axum::http::{Request, StatusCode};
 use axum::{body::Body, routing::get, Router};

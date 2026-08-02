@@ -108,6 +108,7 @@ pub fn trace_renew_success(
 }
 
 /// Emit `job.lease.reject` on acquire/renew/CAS validation failure.
+#[allow(clippy::too_many_arguments)]
 pub fn trace_lease_reject(
     job_id: &str,
     operation: LeaseOperation,

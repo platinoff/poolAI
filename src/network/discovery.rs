@@ -852,6 +852,7 @@ impl crate::core::discovery_handle::DiscoveryHandle for DiscoveryService {
 }
 
 #[cfg(test)]
+#[allow(clippy::await_holding_lock)]
 mod tests {
     use super::*;
     use std::net::{Ipv4Addr, SocketAddrV4};

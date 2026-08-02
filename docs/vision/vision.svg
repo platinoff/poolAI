@@ -107,5 +107,5 @@
     <text x="0" y="108" fill="#a78bfa">? implements / session-tracks</text>
   </g>
 
-  <text x="600" y="738" text-anchor="middle" fill="#6a7a9a" font-family="Segoe UI, system-ui, sans-serif" font-size="12">PH-S1668 done gsv migration - PH-S1669 next - 0 open - rev 440</text>
+  <text x="600" y="738" text-anchor="middle" fill="#6a7a9a" font-family="Segoe UI, system-ui, sans-serif" font-size="12">PH-S1668 done lint/diagnostics cleanup - PH-S1669 next - 10 open - rev 442</text>
 </svg>

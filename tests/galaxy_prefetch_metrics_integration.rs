@@ -1,5 +1,6 @@
 //! PH-S167: Galaxy prefetch metrics — plan_prefetch counters → Prometheus scrape.
 
+#![allow(clippy::await_holding_lock)]
 use axum::body::to_bytes;
 use axum::http::{Request, StatusCode};
 use axum::{body::Body, routing::get, Router};

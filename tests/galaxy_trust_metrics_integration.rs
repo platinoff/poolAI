@@ -1,5 +1,6 @@
 //! PH-S163: Galaxy trust settlement metrics wire — grid HTTP result path → Prometheus scrape.
 
+#![allow(clippy::await_holding_lock)]
 use axum::body::to_bytes;
 use axum::http::{Request, StatusCode};
 use axum::{body::Body, routing::get, Router};

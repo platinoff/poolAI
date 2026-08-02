@@ -314,6 +314,7 @@ pub fn render_line_chart_empty_html(no_data_label: &str) -> String {
 }
 
 /// Mirrors `poolaiRenderLineChart(metricName, data, opts)` (PH-S284).
+#[allow(clippy::too_many_arguments)]
 pub fn render_line_chart_html(
     metric_name: &str,
     values: &[f64],
@@ -548,7 +549,7 @@ pub fn render_ml_pipeline_metrics_panel_html(
                         &r.step_status
                     })
                 ),
-                escape_html(&format_ml_metric_summary(&r.output)),
+                escape_html(format_ml_metric_summary(&r.output)),
             ]
         })
         .collect();
@@ -571,6 +572,7 @@ pub fn render_ml_pipeline_metrics_panel_html(
 }
 
 /// Monitoring active alerts table HTML (PH-S461 wasm glue).
+#[allow(clippy::too_many_arguments)]
 pub fn render_monitoring_alerts_panel_html(
     alerts_json: &str,
     na_label: &str,
@@ -617,7 +619,7 @@ pub fn render_monitoring_alerts_panel_html(
             let triggered = a
                 .get("triggered_at")
                 .and_then(|v| v.as_str())
-                .map(|s| escape_html(s))
+                .map(escape_html)
                 .unwrap_or_else(|| escape_html(na_label));
             let acknowledged = a.get("acknowledged").and_then(|v| v.as_bool()) == Some(true);
             let status_cell = if acknowledged {
@@ -688,6 +690,7 @@ pub fn render_monitoring_alerts_panel_html(
 }
 
 /// Monitoring dashboards table HTML (PH-S470 wasm glue).
+#[allow(clippy::too_many_arguments)]
 pub fn render_monitoring_dashboards_panel_html(
     dashboards_json: &str,
     col_name: &str,
@@ -739,7 +742,7 @@ pub fn render_monitoring_dashboards_panel_html(
             let created = d
                 .get("created_at")
                 .and_then(|v| v.as_str())
-                .map(|s| escape_html(s))
+                .map(escape_html)
                 .unwrap_or_else(|| escape_html(na_label));
             format!(
                 r#"<tr>

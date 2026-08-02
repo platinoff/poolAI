@@ -112,6 +112,7 @@ pub fn create_admin_routes() -> Router<ApiContext> {
 pub use crate::ui::wasm_static::POOLAI_UI_WASM_MODULE;
 
 /// Admin panel layout function - shared across all admin pages
+#[allow(dead_code)] // test-only helper (pages use per-module slim layouts)
 pub fn admin_layout(
     title_i18n_key: &str,
     title_fallback: &str,
@@ -960,6 +961,7 @@ fn admin_charts_sparkline_wasm_first_ph_s275() {
     assert_admin_charts_sparkline_wasm_only();
 }
 
+#[cfg(test)]
 fn assert_admin_charts_sparkline_wasm_only() {
     let js = include_str!("../admin_charts.js");
     assert!(js.contains("wasm.renderSparklineHtml"));
@@ -977,6 +979,7 @@ fn admin_charts_line_chart_wasm_first_ph_s284() {
     assert_admin_charts_line_chart_wasm_only();
 }
 
+#[cfg(test)]
 fn assert_admin_charts_line_chart_wasm_only() {
     let js = include_str!("../admin_charts.js");
     assert!(js.contains("wasm.renderLineChartHtml"));
@@ -1393,6 +1396,7 @@ fn admin_common_ph_s42_table_ux_helpers() {
     assert!(js.contains("poolaiUiWasmCall('emptyStateHtml')"));
 }
 
+#[cfg(test)]
 fn assert_admin_common_table_init_wasm_only() {
     let js = include_str!("../admin_common.js");
     assert!(js.contains("poolaiUiWasmCall('tableExportButtonsHtml')"));
@@ -1402,6 +1406,7 @@ fn assert_admin_common_table_init_wasm_only() {
     assert!(!js.contains("headers.join(',')"));
 }
 
+#[cfg(test)]
 fn assert_admin_common_empty_state_wasm_only() {
     let js = include_str!("../admin_common.js");
     assert!(js.contains("poolaiUiWasmCall('emptyStateHtml')"));

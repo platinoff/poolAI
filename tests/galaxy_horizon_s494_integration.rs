@@ -1,5 +1,6 @@
 //! PH-S500: Galaxy horizon wire integration band (PH-S494…S499 metrics + read APIs).
 
+#![allow(clippy::await_holding_lock)]
 use axum::body::to_bytes;
 use axum::http::{Request, StatusCode};
 use axum::{body::Body, routing::get, Router};

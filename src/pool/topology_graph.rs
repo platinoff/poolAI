@@ -304,7 +304,7 @@ fn layout_graph(
 
 fn latency_color(latency: f64, max_lat: f64) -> String {
     let max = if max_lat > 0.0 { max_lat } else { 1.0 };
-    let t = f64::min(1.0, f64::max(0.0, latency / max));
+    let t = (latency / max).clamp(0.0, 1.0);
     let r = (80.0 + t * 175.0).round() as i32;
     let g = (200.0 - t * 140.0).round() as i32;
     let b = (120.0 - t * 80.0).round() as i32;
@@ -369,7 +369,7 @@ fn render_latency_heatmap_html(
                 continue;
             }
             let lat = *raw.unwrap();
-            let t = f64::min(1.0, f64::max(0.0, lat / max_lat));
+            let t = (lat / max_lat).clamp(0.0, 1.0);
             let bg = latency_color(lat, max_lat);
             let title = escape_html(format!("{} → {}: {:.2} ms", row, col, lat));
             html.push_str(&format!(

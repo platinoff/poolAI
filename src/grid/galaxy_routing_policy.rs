@@ -17,9 +17,6 @@ pub enum RoutingPolicyLocalityVerdict {
 pub fn routing_policy_locality_gate(required_shard_ids: &[String]) -> RoutingPolicyLocalityVerdict {
     match check_strict_locality_gate(required_shard_ids) {
         Ok(()) => RoutingPolicyLocalityVerdict::Allowed,
-        Err(AppError::RestError { code, .. }) if code == "locality_unsatisfied" => {
-            RoutingPolicyLocalityVerdict::StrictLocalityBlock
-        }
         Err(_) => RoutingPolicyLocalityVerdict::StrictLocalityBlock,
     }
 }

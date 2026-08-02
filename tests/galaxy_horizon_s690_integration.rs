@@ -1,5 +1,6 @@
 //! PH-S699: Galaxy horizon close band (PH-S690…S698).
 
+#![allow(clippy::await_holding_lock)]
 use axum::body::to_bytes;
 use axum::http::{Request, StatusCode};
 use axum::{body::Body, routing::get, Router};
@@ -34,7 +35,7 @@ async fn request_json(
     uri: &str,
     body: Option<Value>,
 ) -> (StatusCode, Value) {
-    let mut builder = Request::builder().method(method).uri(uri);
+    let builder = Request::builder().method(method).uri(uri);
     let req = if let Some(json_body) = body {
         builder
             .header("content-type", "application/json")

@@ -2,6 +2,97 @@
   "description": "RSS-style ticker of FM §5.12 sprint queue (open + recent closed)",
   "items": [
     {
+      "category": "open",
+      "id": "PH-S1669",
+      "link": "docs/vision/index.html#sprint-queue",
+      "next": true,
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "src/network/api/grid.rs` ×8 + `src/network/discovery.rs` ×1 → per-fn `#[allow]",
+      "title": "await_holding_lock` src test-modules"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1670",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "tests/*.rs` ×79 serialization-lock allows",
+      "title": "await_holding_lock` integration tests"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1671",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "cargo clippy --fix -p poolai-ui-core` ×82 + residual",
+      "title": "needless_borrows_for_generic_args` ui-core"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1672",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "clippy --fix + residual (×24)",
+      "title": "field_reassign_with_default` + `needless_update` + `manual_clamp"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1673",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "admin wasm-only fns; `ENV_POOLAI_BIN`; test fn; `pending`; ShardSyncBus len/is_empty",
+      "title": "dead_code` batch"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1674",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "ui-core glue fns; `stand_smoke_metrics_parity`; monitoring type aliases",
+      "title": "too_many_arguments` + `type_complexity"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1675",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "redundant closure/guard · from_ref · unit-value · unused imports · from_str · large Err · loop index",
+      "title": "misc diagnostics batch"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1676",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "clippy (CI set) target ≤ 20 warnings; residuals fixed",
+      "title": "Verify re-scan + residuals"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1677",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "--ratio96` zriz; vision `--check` green; `record-rust-diagnostics.sh",
+      "title": "loc-audit + vision-sync + record diagnostics"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1678",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "galaxy_horizon_s1669_integration`; FM ✅ · HANDOFF · NEXT_SESSION",
+      "title": "Band close"
+    },
+    {
       "category": "closed",
       "id": "PH-S1668",
       "link": "docs/vision/index.html#sprint-queue",

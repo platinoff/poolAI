@@ -41,9 +41,9 @@ pub fn render_network_profiles_panel_html(
             format!(
                 "<tr><td><code>{}</code></td><td>{}</td><td>{}</td><td>{}</td></tr>",
                 escape_html(peer_id),
-                escape_html(&profile_field(row, "region")),
-                escape_html(&profile_field(row, "latency_ms_p50")),
-                escape_html(&profile_field(row, "bandwidth_mbps")),
+                escape_html(profile_field(row, "region")),
+                escape_html(profile_field(row, "latency_ms_p50")),
+                escape_html(profile_field(row, "bandwidth_mbps")),
             )
         })
         .collect();

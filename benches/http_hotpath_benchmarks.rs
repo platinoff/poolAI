@@ -10,7 +10,6 @@ use poolai::core::error::AppError;
 use poolai::network::json_errors::{api_error_response, http_status_for_app_error};
 use poolai::observability::make_http_span;
 use std::hint::black_box;
-use tracing_subscriber::util::SubscriberInitExt;
 
 fn bench_json_error_hotpaths(c: &mut Criterion) {
     let _ = tracing_subscriber::fmt()

@@ -21,6 +21,7 @@ fn vm_status_label(status: &Value) -> String {
 }
 
 /// VM instances table HTML for admin panel (PH-S499).
+#[allow(clippy::too_many_arguments)]
 pub fn render_vm_panel_html(
     instances_json: &str,
     col_name: &str,

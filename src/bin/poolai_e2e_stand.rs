@@ -24,7 +24,6 @@ const ENV_PRICING_FB: &str = "POOLAI_GALAXY_PRICING_FALLBACK_JSON";
 const ENV_K8S: &str = "K8S_OPENAPI_ENABLED_VERSION";
 const ENV_RUST_LOG: &str = "RUST_LOG";
 const ENV_STAND_BIN: &str = "POOLAI_E2E_STAND_BIN";
-const ENV_POOLAI_BIN: &str = "POOLAI_BIN";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum CommandKind {

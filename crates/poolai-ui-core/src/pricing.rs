@@ -138,17 +138,17 @@ pub fn render_grid_pricing_freshness_strip_html(
 <span>{fresh_until_lbl}: <strong>{fresh_until}</strong></span>
 <span>{stale_until_lbl}: <strong>{stale_until}</strong></span>
 </div>"#,
-        fresh_lbl = escape_html(&t(&i18n, "admin.gridPricing.col.freshness", "Freshness")),
+        fresh_lbl = escape_html(t(&i18n, "admin.gridPricing.col.freshness", "Freshness")),
         freshness = escape_html(freshness),
-        source_lbl = escape_html(&t(&i18n, "admin.gridPricing.col.source", "Source")),
+        source_lbl = escape_html(t(&i18n, "admin.gridPricing.col.source", "Source")),
         source = escape_html(source),
-        age_lbl = escape_html(&t(&i18n, "admin.gridPricing.col.cacheAge", "Cache age (s)")),
+        age_lbl = escape_html(t(&i18n, "admin.gridPricing.col.cacheAge", "Cache age (s)")),
         cache_age = escape_html(&cache_age),
-        ttl_lbl = escape_html(&t(&i18n, "admin.gridPricing.col.cacheTtl", "Cache TTL (s)")),
+        ttl_lbl = escape_html(t(&i18n, "admin.gridPricing.col.cacheTtl", "Cache TTL (s)")),
         ttl = escape_html(&ttl),
-        fresh_until_lbl = escape_html(&t(&i18n, "admin.gridPricing.col.freshUntil", "Fresh until")),
+        fresh_until_lbl = escape_html(t(&i18n, "admin.gridPricing.col.freshUntil", "Fresh until")),
         fresh_until = escape_html(&fresh_until),
-        stale_until_lbl = escape_html(&t(&i18n, "admin.gridPricing.col.staleUntil", "Stale until")),
+        stale_until_lbl = escape_html(t(&i18n, "admin.gridPricing.col.staleUntil", "Stale until")),
         stale_until = escape_html(&stale_until),
     )
 }

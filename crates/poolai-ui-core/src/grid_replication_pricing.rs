@@ -43,32 +43,32 @@ pub fn render_grid_replication_pricing_panel_html(
 <span>{fresh_lbl}: <strong>{fresh}</strong></span>
 <span>{stale_lbl}: <strong>{stale}</strong></span>
 </div>"#,
-        strict_lbl = escape_html(&t(
+        strict_lbl = escape_html(t(
             &i18n,
             "admin.gridReplicationPricing.strict",
             "Strict tier"
         )),
-        strict = escape_html(&strict.to_string()),
-        enqueue_lbl = escape_html(&t(&i18n, "admin.gridReplicationPricing.enqueue", "Enqueue")),
-        enqueue = escape_html(&metric_u64(&rm, "enqueue_total").to_string()),
-        rate_limited_lbl = escape_html(&t(
+        strict = escape_html(strict.to_string()),
+        enqueue_lbl = escape_html(t(&i18n, "admin.gridReplicationPricing.enqueue", "Enqueue")),
+        enqueue = escape_html(metric_u64(&rm, "enqueue_total").to_string()),
+        rate_limited_lbl = escape_html(t(
             &i18n,
             "admin.gridReplicationPricing.rateLimited",
             "Rate limited"
         )),
-        rate_limited = escape_html(&metric_u64(&rm, "rate_limited_total").to_string()),
-        fresh_lbl = escape_html(&t(
+        rate_limited = escape_html(metric_u64(&rm, "rate_limited_total").to_string()),
+        fresh_lbl = escape_html(t(
             &i18n,
             "admin.gridReplicationPricing.freshServed",
             "Fresh served"
         )),
-        fresh = escape_html(&metric_u64(&pm, "fresh_served_total").to_string()),
-        stale_lbl = escape_html(&t(
+        fresh = escape_html(metric_u64(&pm, "fresh_served_total").to_string()),
+        stale_lbl = escape_html(t(
             &i18n,
             "admin.gridReplicationPricing.staleServed",
             "Stale served"
         )),
-        stale = escape_html(&metric_u64(&pm, "stale_served_total").to_string()),
+        stale = escape_html(metric_u64(&pm, "stale_served_total").to_string()),
     )
 }
 

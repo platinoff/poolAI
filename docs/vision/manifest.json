@@ -12118,11 +12118,109 @@
       "label": "README.md",
       "layer": "L2",
       "path": "docs/gsv/README.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1669_integration_rs",
+      "label": "galaxy_horizon_s1669_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1669_integration.rs"
     }
   ],
-  "revision": 440,
-  "sprint_queue": [],
-  "sprint_queue_open_count": 0,
+  "revision": 442,
+  "sprint_queue": [
+    {
+      "acceptance": "src/network/api/grid.rs` ×8 + `src/network/discovery.rs` ×1 → per-fn `#[allow]",
+      "deps": "rust_diagnostics",
+      "id": "PH-S1669",
+      "open": true,
+      "row": 1604,
+      "status": "open",
+      "title": "await_holding_lock` src test-modules"
+    },
+    {
+      "acceptance": "tests/*.rs` ×79 serialization-lock allows",
+      "deps": "rust_diagnostics",
+      "id": "PH-S1670",
+      "open": true,
+      "row": 1605,
+      "status": "open",
+      "title": "await_holding_lock` integration tests"
+    },
+    {
+      "acceptance": "cargo clippy --fix -p poolai-ui-core` ×82 + residual",
+      "deps": "rust_diagnostics",
+      "id": "PH-S1671",
+      "open": true,
+      "row": 1606,
+      "status": "open",
+      "title": "needless_borrows_for_generic_args` ui-core"
+    },
+    {
+      "acceptance": "clippy --fix + residual (×24)",
+      "deps": "rust_diagnostics",
+      "id": "PH-S1672",
+      "open": true,
+      "row": 1607,
+      "status": "open",
+      "title": "field_reassign_with_default` + `needless_update` + `manual_clamp"
+    },
+    {
+      "acceptance": "admin wasm-only fns; `ENV_POOLAI_BIN`; test fn; `pending`; ShardSyncBus len/is_empty",
+      "deps": "rust_diagnostics",
+      "id": "PH-S1673",
+      "open": true,
+      "row": 1608,
+      "status": "open",
+      "title": "dead_code` batch"
+    },
+    {
+      "acceptance": "ui-core glue fns; `stand_smoke_metrics_parity`; monitoring type aliases",
+      "deps": "rust_diagnostics",
+      "id": "PH-S1674",
+      "open": true,
+      "row": 1609,
+      "status": "open",
+      "title": "too_many_arguments` + `type_complexity"
+    },
+    {
+      "acceptance": "redundant closure/guard · from_ref · unit-value · unused imports · from_str · large Err · loop index",
+      "deps": "rust_diagnostics",
+      "id": "PH-S1675",
+      "open": true,
+      "row": 1610,
+      "status": "open",
+      "title": "misc diagnostics batch"
+    },
+    {
+      "acceptance": "clippy (CI set) target ≤ 20 warnings; residuals fixed",
+      "deps": "rust_diagnostics",
+      "id": "PH-S1676",
+      "open": true,
+      "row": 1611,
+      "status": "open",
+      "title": "Verify re-scan + residuals"
+    },
+    {
+      "acceptance": "--ratio96` zriz; vision `--check` green; `record-rust-diagnostics.sh",
+      "deps": "ops",
+      "id": "PH-S1677",
+      "open": true,
+      "row": 1612,
+      "status": "open",
+      "title": "loc-audit + vision-sync + record diagnostics"
+    },
+    {
+      "acceptance": "galaxy_horizon_s1669_integration`; FM ✅ · HANDOFF · NEXT_SESSION",
+      "deps": "tests/docs",
+      "id": "PH-S1678",
+      "open": true,
+      "row": 1613,
+      "status": "open",
+      "title": "Band close"
+    }
+  ],
+  "sprint_queue_open_count": 10,
   "updated_at": "2026-06-20",
   "vision_ui_rev": 59
 }

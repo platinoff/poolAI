@@ -1,5 +1,6 @@
 //! PH-S741: dev fixture signed capability pass path on register-remote.
 
+#![allow(clippy::await_holding_lock)]
 use axum::body::to_bytes;
 use axum::http::{Request, StatusCode};
 use axum::{body::Body, Router};

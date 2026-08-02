@@ -43,7 +43,7 @@ async fn admin_secrets_rotate_handler(
     if let Err(err) = check_permission(&claims, "admin:all") {
         return err.into_response();
     }
-    let Some(kind) = SecretKind::from_str(req.kind.trim()) else {
+    let Some(kind) = SecretKind::parse(req.kind.trim()) else {
         return HttpAppError::new(AppError::ValidationError(format!(
             "unknown secret kind: {}",
             req.kind

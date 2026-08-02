@@ -52,7 +52,7 @@ pub fn render_secret_rotation_panel_html(rows_json: &str, i18n_json: &str) -> St
                     let status_badge = if configured {
                         format!(
                             r#"<span class="status-badge active">{}</span>"#,
-                            escape_html(&t(
+                            escape_html(t(
                                 &i18n,
                                 "admin.sec.rot.configured",
                                 "Configured"
@@ -61,7 +61,7 @@ pub fn render_secret_rotation_panel_html(rows_json: &str, i18n_json: &str) -> St
                     } else {
                         format!(
                             r#"<span class="status-badge inactive">{}</span>"#,
-                            escape_html(&t(
+                            escape_html(t(
                                 &i18n,
                                 "admin.sec.rot.notConfigured",
                                 "Not configured"
@@ -71,7 +71,7 @@ pub fn render_secret_rotation_panel_html(rows_json: &str, i18n_json: &str) -> St
                     let action_btn = if kind == "jwt" {
                         format!(
                             r#"<button type="button" class="btn btn-primary" onclick='rotateSecret({kind_json})'>{}</button>"#,
-                            escape_html(&t(
+                            escape_html(t(
                                 &i18n,
                                 "admin.sec.rot.reloadJwt",
                                 "Reload JWT from env"
@@ -80,12 +80,12 @@ pub fn render_secret_rotation_panel_html(rows_json: &str, i18n_json: &str) -> St
                     } else if configured && hook_count > 0 {
                         format!(
                             r#"<button type="button" class="btn" onclick='rotateSecret({kind_json})'>{}</button>"#,
-                            escape_html(&t(&i18n, "admin.sec.rot.run", "Run rotation"))
+                            escape_html(t(&i18n, "admin.sec.rot.run", "Run rotation"))
                         )
                     } else {
                         format!(
                             r#"<span class="muted">{}</span>"#,
-                            escape_html(&t(&i18n, "admin.na", "N/A"))
+                            escape_html(t(&i18n, "admin.na", "N/A"))
                         )
                     };
                     let grace_label = if grace_active {
@@ -103,15 +103,15 @@ pub fn render_secret_rotation_panel_html(rows_json: &str, i18n_json: &str) -> St
 <td>{grace}</td>
 <td>{action}</td>
 </tr>"#,
-                        kind_label = escape_html(&rotation_kind_label(&i18n, kind)),
+                        kind_label = escape_html(rotation_kind_label(&i18n, kind)),
                         kind_code = kind_escaped,
                         status = status_badge,
-                        hook_count = escape_html(&hook_count.to_string()),
-                        last_rotated = escape_html(&format_unix_timestamp_display(
+                        hook_count = escape_html(hook_count.to_string()),
+                        last_rotated = escape_html(format_unix_timestamp_display(
                             last_unix,
                             &never
                         )),
-                        rotation_count = escape_html(&rotation_count.to_string()),
+                        rotation_count = escape_html(rotation_count.to_string()),
                         grace = escape_html(&grace_label),
                         action = action_btn,
                     )
@@ -139,16 +139,16 @@ pub fn render_secret_rotation_panel_html(rows_json: &str, i18n_json: &str) -> St
 <tbody>{rows_html}</tbody>
 </table>
 <p class="muted">{hint}</p>"#,
-        heading = escape_html(&t(&i18n, "admin.sec.rot.heading", "Secret rotation")),
-        refresh = escape_html(&t(&i18n, "admin.topo.refresh", "Refresh")),
-        col_kind = escape_html(&t(&i18n, "admin.sec.rot.col.kind", "Secret")),
-        col_status = escape_html(&t(&i18n, "admin.mon.col.statusCol", "Status")),
-        col_hooks = escape_html(&t(&i18n, "admin.sec.rot.col.hooks", "Hooks")),
-        col_last = escape_html(&t(&i18n, "admin.sec.rot.col.last", "Last rotated")),
-        col_count = escape_html(&t(&i18n, "admin.sec.rot.col.count", "Count")),
-        col_grace = escape_html(&t(&i18n, "admin.sec.rot.col.grace", "JWT grace")),
-        col_actions = escape_html(&t(&i18n, "admin.mon.col.actions", "Actions")),
-        hint = escape_html(&t(
+        heading = escape_html(t(&i18n, "admin.sec.rot.heading", "Secret rotation")),
+        refresh = escape_html(t(&i18n, "admin.topo.refresh", "Refresh")),
+        col_kind = escape_html(t(&i18n, "admin.sec.rot.col.kind", "Secret")),
+        col_status = escape_html(t(&i18n, "admin.mon.col.statusCol", "Status")),
+        col_hooks = escape_html(t(&i18n, "admin.sec.rot.col.hooks", "Hooks")),
+        col_last = escape_html(t(&i18n, "admin.sec.rot.col.last", "Last rotated")),
+        col_count = escape_html(t(&i18n, "admin.sec.rot.col.count", "Count")),
+        col_grace = escape_html(t(&i18n, "admin.sec.rot.col.grace", "JWT grace")),
+        col_actions = escape_html(t(&i18n, "admin.mon.col.actions", "Actions")),
+        hint = escape_html(t(
             &i18n,
             "admin.sec.rot.hint",
             "Rotation runs registered hooks only; env vars must be set on the coordinator host."

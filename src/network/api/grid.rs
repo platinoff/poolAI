@@ -772,6 +772,7 @@ fn pricing_oracle() -> &'static Mutex<GalaxyPricingOracle> {
     })
 }
 
+#[allow(clippy::result_large_err)]
 fn now_secs() -> Result<u64, HttpAppError> {
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -948,6 +949,7 @@ pub fn reset_pricing_oracle_for_tests(force_fallback: bool, fallback_quote_micro
 }
 
 #[cfg(test)]
+#[allow(clippy::await_holding_lock)]
 mod tests {
     use super::*;
     use crate::grid::galaxy_pricing_oracle::{

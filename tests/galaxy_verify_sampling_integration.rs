@@ -1,5 +1,6 @@
 //! PH-S164: Galaxy verification sampling — HTTP grid middleware + result ingest wire.
 
+#![allow(clippy::await_holding_lock)]
 use axum::body::to_bytes;
 use axum::http::{Request, StatusCode};
 use axum::{body::Body, Router};

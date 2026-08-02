@@ -187,6 +187,7 @@ fn top_codes(counts: &MessageCounts, lim: usize) -> Vec<String> {
         .collect()
 }
 
+#[allow(clippy::too_many_arguments)]
 fn record_snapshot(
     index: &mut RustDiagnostics,
     warnings: u32,

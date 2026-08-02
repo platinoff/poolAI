@@ -1,5 +1,6 @@
 //! PH-S889: Galaxy horizon close band (PH-S880…S888) — verification checker lifecycle.
 
+#![allow(clippy::await_holding_lock)]
 use axum::body::to_bytes;
 use axum::http::{Request, StatusCode};
 use axum::{body::Body, routing::get, Router};

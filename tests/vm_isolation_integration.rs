@@ -111,7 +111,6 @@ async fn test_filesystem_isolation_config_custom() {
         read_only_paths: vec![PathBuf::from("/tmp/readonly")],
         use_chroot: true,
         strict: false,
-        ..Default::default()
     };
 
     assert!(config.enabled);
@@ -289,7 +288,6 @@ async fn test_filesystem_isolation_apply_invalid_process_id() {
         read_only_paths: vec![],
         use_chroot: true,
         strict: false,
-        ..Default::default()
     };
 
     // Should fail with invalid process ID
@@ -310,7 +308,6 @@ async fn test_filesystem_isolation_apply_chroot_without_root_dir() {
         read_only_paths: vec![],
         use_chroot: true, // Requires root_dir
         strict: false,
-        ..Default::default()
     };
 
     // Should fail validation
@@ -353,7 +350,6 @@ async fn test_filesystem_isolation_graceful_degradation() {
         read_only_paths: vec![PathBuf::from("/tmp/readonly")],
         use_chroot: true,
         strict: false, // Graceful degradation enabled
-        ..Default::default()
     };
 
     // Should succeed even if system calls fail (graceful degradation)
@@ -418,7 +414,6 @@ async fn test_filesystem_isolation_bind_mounts() {
         read_only_paths: vec![PathBuf::from("/tmp/test-readonly")],
         use_chroot: false,
         strict: false,
-        ..Default::default()
     };
 
     // Should succeed (either actually set up bind mounts or gracefully degrade)
@@ -445,7 +440,6 @@ async fn test_filesystem_isolation_read_only_mounts() {
         ],
         use_chroot: false,
         strict: false,
-        ..Default::default()
     };
 
     // Should succeed with read-only mounts
@@ -468,7 +462,6 @@ async fn test_filesystem_isolation_apply_enabled() {
         read_only_paths: vec![PathBuf::from("/tmp/readonly")],
         use_chroot: true,
         strict: false,
-        ..Default::default()
     };
 
     // Should succeed (even if not fully implemented, placeholders return Ok)
