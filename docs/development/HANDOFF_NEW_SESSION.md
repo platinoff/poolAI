@@ -1,8 +1,8 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-08-01 (band 100 **PH-S1639…S1648** ✅ · band 99 **PH-S1629…S1638** ✅ · band 98 **PH-S1619…S1628** ✅ · band 97 ✅ · band 96 ✅ · band 95 ✅ · band 94 ✅ · band 93 ✅ · band 92 ✅ · band 91 ✅ · service **PH-SVC85** Rust diagnostics panel ✅ · **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · band 88 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 101 next)
+**Оновлено:** 2026-08-01 (band 101 **PH-S1649…S1658** ✅ · band 100 **PH-S1639…S1648** ✅ · band 99 **PH-S1629…S1638** ✅ · band 98 **PH-S1619…S1628** ✅ · band 97 ✅ · band 96 ✅ · band 95 ✅ · band 94 ✅ · band 93 ✅ · band 92 ✅ · band 91 ✅ · service **PH-SVC85** Rust diagnostics panel ✅ · **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · band 88 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 102 next)
 
-**Наступна сесія:** **`абракадабра`** — S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain band 101 · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+**Наступна сесія:** **`абракадабра`** — S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain band 102 · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
 
 ## P0 / service (2026-07-27)
 
@@ -24,7 +24,24 @@
 
 **Cursor / toolchain (service):** local desktop **3.13.21** · Auto-review · Router Balance/Intelligence for drain · vision Speeds/Rust/eye verified · research [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](./CURSOR_UPDATE_RESEARCH_2026-07-27.md) · FM **§5.16**.
 
-**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **650** спринтів → PH-S2278.
+**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **620** спринтів → PH-S2278.
+
+## Band 101 — Ratio96 depth scaffold (PH-S1649…S1658, **✅**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1649** | `ratio96_depth` + criteria registry |
+| **PH-S1650** | `ratio96_store_depth` store/wire slice |
+| **PH-S1651** | Criteria contracts (`ratio96_depth_contracts`) |
+| **PH-S1652** | `VERIFY_RATIO96` + quick `--ratio96` |
+| **PH-S1653** | Stand smoke export shape band 101 |
+| **PH-S1654** | `poolai-loc-audit --ratio96` |
+| **PH-S1655** | Docs `RATIO96_DEPTH.md` + canon |
+| **PH-S1656** | vision-sync --check |
+| **PH-S1657** | Ratio hold advisory |
+| **PH-S1658** | Band close |
+
+**PH-S1658 ✅ (2026-08-01):** `ratio96_depth.rs`; `RATIO96_PHASE_F_SLICES`; `ratio96_store_depth.rs`; `ratio96_depth_contracts.rs`; `VERIFY_RATIO96`; `ratio96_band101_export_shape`; `--ratio96`; `RATIO96_DEPTH.md` + `RATIO96_RATIO_ADVISORY.md`; `galaxy_horizon_s1649_integration`. Phase F Ratio96 depth scaffold drained.
 
 ## Band 100 — Monitoring horizon-close (PH-S1639…S1648, **✅**)
 

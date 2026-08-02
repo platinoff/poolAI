@@ -1493,7 +1493,7 @@ mod tests {
 
         let retrieved = manager.get_security_policy("test-policy").await.unwrap();
         assert!(retrieved.is_some());
-        assert_eq!(retrieved.unwrap().require_mfa, true);
+        assert!(retrieved.unwrap().require_mfa);
     }
 
     #[test]

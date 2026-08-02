@@ -1103,6 +1103,71 @@ impl Default for MonitoringManager {
     }
 }
 
+/// Global monitoring manager instance
+static MONITORING_MANAGER: OnceLock<Arc<MonitoringManager>> = OnceLock::new();
+
+/// Align `get_global_monitoring_manager` with [`crate::core::state::AppState::enterprise_monitoring_manager`].
+pub fn try_install_global_monitoring_manager(mgr: Arc<MonitoringManager>) {
+    let _ = MONITORING_MANAGER.set(mgr);
+}
+
+/// Get global monitoring manager instance.
+///
+/// This function returns a singleton instance of `MonitoringManager` that can be used
+/// throughout the application. The instance is created on first access and
+/// reused for subsequent calls.
+///
+/// # Examples
+///
+/// ```no_run
+/// use poolai::enterprise::monitoring::get_global_monitoring_manager;
+///
+/// # async fn example() -> Result<(), poolai::core::error::AppError> {
+/// let manager = get_global_monitoring_manager();
+/// manager.initialize().await?;
+///
+/// // Get active alerts
+/// let alerts = manager.get_active_alerts(None, None, None).await?;
+/// for alert in alerts {
+///     println!("Alert: {} - {}", alert.metric, alert.current_value);
+/// }
+/// # Ok(())
+/// # }
+/// ```
+pub fn get_global_monitoring_manager() -> Arc<MonitoringManager> {
+    MONITORING_MANAGER
+        .get_or_init(|| Arc::new(MonitoringManager::new_from_env()))
+        .clone()
+}
+
+/// Directory for SQLite persistence (`POOLAI_MONITORING_DATA_DIR`).
+pub fn data_dir_from_env() -> Option<String> {
+    std::env::var(POOLAI_MONITORING_DATA_DIR)
+        .ok()
+        .filter(|s| !s.trim().is_empty())
+        .map(|s| s.trim().to_string())
+}
+
+/// Full path to `monitoring.db` when env is set.
+pub fn db_path_from_env() -> Option<String> {
+    data_dir_from_env().map(|dir| {
+        Path::new(&dir)
+            .join(MONITORING_DB_FILE)
+            .to_string_lossy()
+            .into_owned()
+    })
+}
+
+fn severity_from_str(s: &str) -> AlertSeverity {
+    match s {
+        "INFO" => AlertSeverity::Info,
+        "WARNING" => AlertSeverity::Warning,
+        "ERROR" => AlertSeverity::Error,
+        "CRITICAL" => AlertSeverity::Critical,
+        _ => AlertSeverity::Warning,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1327,70 +1392,5 @@ mod tests {
         };
         let err = validate_monitoring_alert_fields(&rule).unwrap_err();
         assert!(err.to_string().contains("operator"));
-    }
-}
-
-/// Global monitoring manager instance
-static MONITORING_MANAGER: OnceLock<Arc<MonitoringManager>> = OnceLock::new();
-
-/// Align `get_global_monitoring_manager` with [`crate::core::state::AppState::enterprise_monitoring_manager`].
-pub fn try_install_global_monitoring_manager(mgr: Arc<MonitoringManager>) {
-    let _ = MONITORING_MANAGER.set(mgr);
-}
-
-/// Get global monitoring manager instance.
-///
-/// This function returns a singleton instance of `MonitoringManager` that can be used
-/// throughout the application. The instance is created on first access and
-/// reused for subsequent calls.
-///
-/// # Examples
-///
-/// ```no_run
-/// use poolai::enterprise::monitoring::get_global_monitoring_manager;
-///
-/// # async fn example() -> Result<(), poolai::core::error::AppError> {
-/// let manager = get_global_monitoring_manager();
-/// manager.initialize().await?;
-///
-/// // Get active alerts
-/// let alerts = manager.get_active_alerts(None, None, None).await?;
-/// for alert in alerts {
-///     println!("Alert: {} - {}", alert.metric, alert.current_value);
-/// }
-/// # Ok(())
-/// # }
-/// ```
-pub fn get_global_monitoring_manager() -> Arc<MonitoringManager> {
-    MONITORING_MANAGER
-        .get_or_init(|| Arc::new(MonitoringManager::new_from_env()))
-        .clone()
-}
-
-/// Directory for SQLite persistence (`POOLAI_MONITORING_DATA_DIR`).
-pub fn data_dir_from_env() -> Option<String> {
-    std::env::var(POOLAI_MONITORING_DATA_DIR)
-        .ok()
-        .filter(|s| !s.trim().is_empty())
-        .map(|s| s.trim().to_string())
-}
-
-/// Full path to `monitoring.db` when env is set.
-pub fn db_path_from_env() -> Option<String> {
-    data_dir_from_env().map(|dir| {
-        Path::new(&dir)
-            .join(MONITORING_DB_FILE)
-            .to_string_lossy()
-            .into_owned()
-    })
-}
-
-fn severity_from_str(s: &str) -> AlertSeverity {
-    match s {
-        "INFO" => AlertSeverity::Info,
-        "WARNING" => AlertSeverity::Warning,
-        "ERROR" => AlertSeverity::Error,
-        "CRITICAL" => AlertSeverity::Critical,
-        _ => AlertSeverity::Warning,
     }
 }

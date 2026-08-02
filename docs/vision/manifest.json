@@ -3078,7 +3078,7 @@
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S1648",
+  "last_sprint_closed": "PH-S1658",
   "layers": [
     {
       "id": "L0",
@@ -3111,7 +3111,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1649",
+  "next_sprint": "PH-S1659",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -12012,7 +12012,7 @@
       "path": "tests/monitoring_horizon_integration.rs"
     }
   ],
-  "revision": 436,
+  "revision": 437,
   "sprint_queue": [],
   "sprint_queue_open_count": 0,
   "updated_at": "2026-06-20",

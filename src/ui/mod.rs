@@ -5321,6 +5321,14 @@ fn dashboard_shared_js_modal_a11y_helpers() {
     assert!(src.contains("function handleDashModalEscape"));
 }
 
+pub async fn initialize() -> Result<(), AppError> {
+    UiManager::new().initialize().await
+}
+
+pub async fn shutdown() -> Result<(), AppError> {
+    UiManager::new().shutdown().await
+}
+
 #[cfg(test)]
 mod dashboard_a11y_tests {
     use super::{libs_page, raid_page, vm_page, workers_page};
@@ -5389,12 +5397,4 @@ mod dashboard_a11y_tests {
         assert!(html.contains("danger: '#c62828'"));
         assert!(!html.contains("danger: '#ff5555'"));
     }
-}
-
-pub async fn initialize() -> Result<(), AppError> {
-    UiManager::new().initialize().await
-}
-
-pub async fn shutdown() -> Result<(), AppError> {
-    UiManager::new().shutdown().await
 }

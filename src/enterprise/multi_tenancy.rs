@@ -833,6 +833,44 @@ impl Default for TenantManager {
     }
 }
 
+/// Global tenant manager instance
+static TENANT_MANAGER: OnceLock<Arc<TenantManager>> = OnceLock::new();
+
+/// If the `OnceLock` is still empty, store `mgr` so `get_global_tenant_manager` returns the same
+/// instance as [`crate::core::state::AppState::tenant_manager`]. No-op if already initialized.
+pub fn try_install_global_tenant_manager(mgr: Arc<TenantManager>) {
+    let _ = TENANT_MANAGER.set(mgr);
+}
+
+/// Get global tenant manager instance.
+///
+/// This function returns a singleton instance of `TenantManager` that can be used
+/// throughout the application. The instance is created on first access and
+/// reused for subsequent calls.
+///
+/// # Examples
+///
+/// ```no_run
+/// use poolai::enterprise::multi_tenancy::get_global_tenant_manager;
+/// use uuid::Uuid;
+///
+/// # async fn example() -> Result<(), poolai::core::error::AppError> {
+/// let manager = get_global_tenant_manager();
+///
+/// // List all tenants
+/// let tenants = manager.list_tenants().await;
+/// for tenant in tenants {
+///     println!("Tenant: {} ({:?})", tenant.name, tenant.id);
+/// }
+/// # Ok(())
+/// # }
+/// ```
+pub fn get_global_tenant_manager() -> Arc<TenantManager> {
+    TENANT_MANAGER
+        .get_or_init(|| Arc::new(TenantManager::new_from_env()))
+        .clone()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1012,42 +1050,4 @@ mod tests {
         assert_eq!(found.unwrap().name, "durable-tenant");
         let _ = std::fs::remove_dir_all(&dir);
     }
-}
-
-/// Global tenant manager instance
-static TENANT_MANAGER: OnceLock<Arc<TenantManager>> = OnceLock::new();
-
-/// If the `OnceLock` is still empty, store `mgr` so `get_global_tenant_manager` returns the same
-/// instance as [`crate::core::state::AppState::tenant_manager`]. No-op if already initialized.
-pub fn try_install_global_tenant_manager(mgr: Arc<TenantManager>) {
-    let _ = TENANT_MANAGER.set(mgr);
-}
-
-/// Get global tenant manager instance.
-///
-/// This function returns a singleton instance of `TenantManager` that can be used
-/// throughout the application. The instance is created on first access and
-/// reused for subsequent calls.
-///
-/// # Examples
-///
-/// ```no_run
-/// use poolai::enterprise::multi_tenancy::get_global_tenant_manager;
-/// use uuid::Uuid;
-///
-/// # async fn example() -> Result<(), poolai::core::error::AppError> {
-/// let manager = get_global_tenant_manager();
-///
-/// // List all tenants
-/// let tenants = manager.list_tenants().await;
-/// for tenant in tenants {
-///     println!("Tenant: {} ({:?})", tenant.name, tenant.id);
-/// }
-/// # Ok(())
-/// # }
-/// ```
-pub fn get_global_tenant_manager() -> Arc<TenantManager> {
-    TENANT_MANAGER
-        .get_or_init(|| Arc::new(TenantManager::new_from_env()))
-        .clone()
 }

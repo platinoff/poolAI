@@ -3,7 +3,6 @@
 use criterion::{criterion_group, criterion_main, Criterion};
 use poolai::runtime::instance::{InstancePlacement, PlacementStrategy};
 use poolai::runtime::sharding::{build_tensor_shard_plan, ShardSyncBus};
-use std::collections::HashMap;
 use std::hint::black_box;
 use tokio::runtime::Runtime;
 

@@ -110,6 +110,7 @@ Options (quick):
   --monitoring-vision-sync After health wait, loc-audit --monitoring-vision-sync (PH-S1622)
   --monitoring-ratio-advisory After health wait, loc-audit --monitoring-ratio-advisory (PH-S1632)
   --monitoring-horizon After health wait, loc-audit --monitoring-horizon (PH-S1642)
+  --ratio96        After health wait, loc-audit --ratio96 (PH-S1652)
   --skip-build    Skip cargo build
   --port N        HTTP port (default 8080)
 
@@ -341,6 +342,7 @@ cmd_quick() {
   local monitoring_loc_audit=0
   local monitoring_docs_canon=0
   local monitoring_vision_sync=0
+  local ratio96=0
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --skip-build) SKIP_BUILD=1; shift ;;
@@ -398,6 +400,7 @@ cmd_quick() {
       --monitoring-vision-sync) monitoring_vision_sync=1; shift ;;
       --monitoring-ratio-advisory) monitoring_ratio_advisory=1; shift ;;
       --monitoring-horizon) monitoring_horizon=1; shift ;;
+      --ratio96) ratio96=1; shift ;;
       --policy-store) policy_store=1; shift ;;
       --policy-api) policy_api=1; shift ;;
       --port) PORT="$2"; shift 2 ;;
@@ -647,6 +650,10 @@ cmd_quick() {
   if [[ "$monitoring_horizon" == "1" ]]; then
     echo "Running poolai-loc-audit --monitoring-horizon (PH-S1642)..."
     cargo run --quiet --bin poolai-loc-audit -- --monitoring-horizon
+  fi
+  if [[ "$ratio96" == "1" ]]; then
+    echo "Running poolai-loc-audit --ratio96 (PH-S1652)..."
+    cargo run --quiet --bin poolai-loc-audit -- --ratio96
   fi
 }
 

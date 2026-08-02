@@ -702,7 +702,7 @@ mod tests {
         std::env::set_var(ENV_JOB_MAX_MIGRATIONS_PER_JOB, "1");
 
         let store = JobStore::open_for_test(None);
-        let mut record = JobRecord {
+        let record = JobRecord {
             spec: JobSpec {
                 id: JobId::new("job-budget"),
                 kind: JobKind::Inference,

@@ -63,6 +63,7 @@ VERIFY_MONITORING_DOCS_CANON="${VERIFY_MONITORING_DOCS_CANON:-0}"
 VERIFY_MONITORING_VISION_SYNC="${VERIFY_MONITORING_VISION_SYNC:-0}"
 VERIFY_MONITORING_RATIO_ADVISORY="${VERIFY_MONITORING_RATIO_ADVISORY:-0}"
 VERIFY_MONITORING_HORIZON="${VERIFY_MONITORING_HORIZON:-0}"
+VERIFY_RATIO96="${VERIFY_RATIO96:-0}"
 VERIFY_SSO_LOC_AUDIT="${VERIFY_SSO_LOC_AUDIT:-0}"
 VERIFY_SSO_DOCS_CANON="${VERIFY_SSO_DOCS_CANON:-0}"
 VERIFY_SSO_VISION_SYNC="${VERIFY_SSO_VISION_SYNC:-0}"
@@ -827,6 +828,16 @@ if [[ "$VERIFY_MONITORING_HORIZON" == "1" ]]; then
     echo "OK  monitoring horizon-close gate"
   else
     echo "FAIL monitoring horizon-close gate"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_RATIO96" == "1" ]]; then
+  echo "Running poolai-loc-audit --ratio96 (PH-S1652)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --ratio96); then
+    echo "OK  ratio96 depth scaffold gate"
+  else
+    echo "FAIL ratio96 depth scaffold gate"
     fail=1
   fi
 fi

@@ -106,6 +106,7 @@ use poolai_ui_core::policy_vision_sync_depth::{
 use poolai_ui_core::pre_push_hook_depth::{
     pre_push_hook_criteria_total, PRE_PUSH_HOOK_CASES, PRE_PUSH_HOOK_CRITERIA,
 };
+use poolai_ui_core::ratio96_depth::{ratio96_criteria_total, RATIO96_CASES, RATIO96_CRITERIA};
 use poolai_ui_core::rust_migration_advisory_depth::{
     migration_registry_total, ADMIN_JS_MIGRATION_CANDIDATES, ARCHIVED_E2E_MIGRATION_CANON,
     MIGRATION_ADVISORY_CASES,
@@ -356,6 +357,8 @@ struct AuditConfig {
     monitoring_ratio_advisory: bool,
     /// Emit band-100 monitoring horizon-close fields (PH-S1644).
     monitoring_horizon: bool,
+    /// Emit band-101 ratio96 depth scaffold fields (PH-S1654).
+    ratio96: bool,
 }
 
 impl Default for AuditConfig {
@@ -421,6 +424,7 @@ impl Default for AuditConfig {
             monitoring_vision_sync: false,
             monitoring_ratio_advisory: false,
             monitoring_horizon: false,
+            ratio96: false,
         }
     }
 }
@@ -808,6 +812,12 @@ struct RustRatioReport {
     monitoring_horizon_criteria_total: usize,
     /// Monitoring horizon-close criteria met count (PH-S1644).
     monitoring_horizon_criteria_met_count: usize,
+    /// Band-101 ratio96 depth scaffold mode (PH-S1654).
+    ratio96_mode: bool,
+    /// Ratio96 criteria registry size (PH-S1654).
+    ratio96_criteria_total: usize,
+    /// Ratio96 criteria met count (PH-S1654).
+    ratio96_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -1264,6 +1274,22 @@ fn monitoring_horizon_criteria_met(root: &Path) -> (usize, usize) {
     let total = monitoring_horizon_criteria_total();
     let mut met = 0usize;
     for (_, marker, rel) in MONITORING_HORIZON_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
+fn ratio96_criteria_met(root: &Path) -> (usize, usize) {
+    let total = ratio96_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in RATIO96_CRITERIA {
         let path = root.join(rel);
         if path.is_file() {
             if let Ok(content) = fs::read_to_string(&path) {
@@ -1854,6 +1880,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--monitoring-vision-sync" => config.monitoring_vision_sync = true,
             "--monitoring-ratio-advisory" => config.monitoring_ratio_advisory = true,
             "--monitoring-horizon" => config.monitoring_horizon = true,
+            "--ratio96" => config.ratio96 = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
                 print_help();
@@ -1929,8 +1956,9 @@ fn print_help() {
            --monitoring-docs-canon      band-97 monitoring docs-canon fields (PH-S1614)\n\
            --monitoring-vision-sync    band-98 monitoring vision-sync fields (PH-S1624)\n\
            --monitoring-ratio-advisory  band-99 monitoring ratio-advisory fields (PH-S1634)\n\
-           --monitoring-horizon        band-100 monitoring horizon-close fields (PH-S1644)\n\
-           --monitoring-loc-audit      band-96 monitoring loc-audit aggregate fields (PH-S1604)\n\
+            --monitoring-horizon        band-100 monitoring horizon-close fields (PH-S1644)\n\
+            --ratio96                   band-101 ratio96 depth scaffold fields (PH-S1654)\n\
+            --monitoring-loc-audit      band-96 monitoring loc-audit aggregate fields (PH-S1604)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -2639,6 +2667,18 @@ fn build_report(
         notes.push("PH-S1648: band 100 monitoring horizon close — criteria met vs registry");
     }
 
+    let (ratio96_criteria_met_count, ratio96_criteria_total_count) = if config.ratio96 {
+        ratio96_criteria_met(root)
+    } else {
+        (0, ratio96_criteria_total())
+    };
+    if config.ratio96 {
+        notes.push(
+            "PH-S1654: ratio96_mode — aggregate phase-F Ratio96 slices (stretch 96% depth scaffold)",
+        );
+        notes.push("PH-S1658: band 101 ratio96 depth scaffold — criteria met vs registry");
+    }
+
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
         sprint: SPRINT,
@@ -2834,6 +2874,9 @@ fn build_report(
         monitoring_horizon_mode: config.monitoring_horizon,
         monitoring_horizon_criteria_total: monitoring_horizon_criteria_total_count,
         monitoring_horizon_criteria_met_count,
+        ratio96_mode: config.ratio96,
+        ratio96_criteria_total: ratio96_criteria_total_count,
+        ratio96_criteria_met_count,
         by_category,
         notes,
     })
@@ -3453,6 +3496,14 @@ fn print_summary(report: &RustRatioReport) {
             "  monitoring_horizon_cases: {}",
             MONITORING_HORIZON_CASES.join(", ")
         );
+    }
+    if report.ratio96_mode {
+        println!("  ratio96:                   true (PH-S1654 band 101)");
+        println!(
+            "  ratio96_criteria:          {}/{} met",
+            report.ratio96_criteria_met_count, report.ratio96_criteria_total
+        );
+        println!("  ratio96_cases:             {}", RATIO96_CASES.join(", "));
     }
     for (name, loc) in &report.by_category {
         println!("  {name}: {} files, {} loc", loc.files, loc.loc);

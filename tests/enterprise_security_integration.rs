@@ -345,7 +345,7 @@ async fn test_security_policy_crud() {
     assert!(retrieved.is_some());
     let retrieved = retrieved.unwrap();
     assert_eq!(retrieved.name, "test-policy");
-    assert_eq!(retrieved.require_mfa, true);
+    assert!(retrieved.require_mfa);
     assert_eq!(retrieved.session_timeout, 1800);
     assert_eq!(retrieved.max_failed_attempts, 3);
     assert_eq!(retrieved.allowed_ip_ranges.len(), 2);
@@ -368,7 +368,7 @@ async fn test_security_policy_crud() {
         .unwrap()
         .unwrap();
     assert_eq!(retrieved.description, "Updated test security policy");
-    assert_eq!(retrieved.require_mfa, false);
+    assert!(!retrieved.require_mfa);
     assert_eq!(retrieved.session_timeout, 3600);
     assert_eq!(retrieved.max_failed_attempts, 5);
     assert_eq!(retrieved.allowed_ip_ranges.len(), 1);

@@ -8004,6 +8004,49 @@ mod tests {
     }
 
     #[test]
+    fn ratio96_band101_export_shape_ph_s1653() {
+        use poolai_ui_core::ratio96_depth::{
+            ratio96_criteria_total, ratio96_depth_stub, ratio96_phase_f_slices_met, Ratio96Depth,
+            FM_BAND101_ROWS, RATIO96_CASES, RATIO96_CRITERIA, RATIO96_PHASE_F_SLICES,
+        };
+        use serde_json::json;
+        assert_eq!(
+            ratio96_depth_stub(Some(&json!({"stand_smoke_export": true}))),
+            Ratio96Depth::StandSmokeExport
+        );
+        assert_eq!(
+            ratio96_depth_stub(Some(&json!({
+                "ratio96_depth": true,
+                "slice_aggregate": true,
+                "store_wire": true,
+                "criteria_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "ratio96_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            Ratio96Depth::FullBand101
+        );
+        assert_eq!(RATIO96_CRITERIA.len(), 10);
+        assert_eq!(ratio96_criteria_total(), 10);
+        assert_eq!(RATIO96_PHASE_F_SLICES.len(), 10);
+        assert!(RATIO96_CASES.contains(&"loc_audit_flag"));
+        let canon = include_str!("../../docs/development/RATIO96_DEPTH.md");
+        assert_eq!(ratio96_phase_f_slices_met(canon), (10, 10));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--ratio96"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND101_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band101 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn vision_revision_fm_parity_ph_s235() {
         let root = repo_root();
         assert_vision_repo_parity(&root)

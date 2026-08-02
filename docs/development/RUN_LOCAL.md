@@ -97,6 +97,7 @@ cd S:\rust\poolAI
 /usr/bin/bash bin/run-poolai.sh quick --monitoring-stand-smoke
 /usr/bin/bash bin/run-poolai.sh quick --monitoring-loc-audit
 /usr/bin/bash bin/run-poolai.sh quick --monitoring-horizon
+/usr/bin/bash bin/run-poolai.sh quick --ratio96
 # PowerShell:
 .\bin\run-poolai.ps1 quick -StandSmoke
 .\bin\run-poolai.ps1 quick -MigrationAdvisory
@@ -391,6 +392,7 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `VERIFY_MONITORING_VISION_SYNC=1` | `verify-dev-stand.sh` → `poolai-loc-audit --monitoring-vision-sync` (PH-S1622) |
 | `VERIFY_MONITORING_RATIO_ADVISORY=1` | `verify-dev-stand.sh` → `poolai-loc-audit --monitoring-ratio-advisory` (PH-S1632) |
 | `VERIFY_MONITORING_HORIZON=1` | `verify-dev-stand.sh` → `poolai-loc-audit --monitoring-horizon` (PH-S1644) |
+| `VERIFY_RATIO96=1` | `verify-dev-stand.sh` → `poolai-loc-audit --ratio96` (PH-S1652) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 ### PH-S1100: Rust migration advisory (band 46)
@@ -1464,6 +1466,23 @@ VERIFY_MONITORING_HORIZON=1 bash bin/verify-dev-stand.sh
 | `monitoring_horizon_criteria_met_count` | Criteria with marker present in canonical doc paths |
 
 Module: [`monitoring_horizon_depth.rs`](../../crates/poolai-ui-core/src/monitoring_horizon_depth.rs) · tests: `monitoring_horizon_integration.rs`, `galaxy_horizon_s1639_integration.rs` · docs: [`MONITORING_HORIZON.md`](./MONITORING_HORIZON.md).
+
+---
+
+## Ratio96 depth scaffold (PH-S1652 / band 101)
+
+```bash
+VERIFY_RATIO96=1 bash bin/verify-dev-stand.sh
+/usr/bin/bash bin/run-poolai.sh quick --ratio96
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `ratio96_mode` | `true` when `--ratio96` (PH-S1654) |
+| `ratio96_criteria_total` | Registry size (10) |
+| `ratio96_criteria_met_count` | Criteria with marker present in canonical doc paths |
+
+Module: [`ratio96_depth.rs`](../../crates/poolai-ui-core/src/ratio96_depth.rs) · [`ratio96_store_depth.rs`](../../crates/poolai-ui-core/src/ratio96_store_depth.rs) · tests: `ratio96_depth_contracts.rs`, `galaxy_horizon_s1649_integration.rs` · docs: [`RATIO96_DEPTH.md`](./RATIO96_DEPTH.md).
 
 ---
 

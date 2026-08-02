@@ -884,6 +884,45 @@ impl Default for AuditQueryFilters {
     }
 }
 
+/// Global audit logger instance
+static AUDIT_LOGGER: OnceLock<Arc<AuditLogger>> = OnceLock::new();
+
+/// Align `get_global_audit_logger` with [`crate::core::state::AppState::audit_logger`] when possible.
+pub fn try_install_global_audit_logger(logger: Arc<AuditLogger>) {
+    let _ = AUDIT_LOGGER.set(logger);
+}
+
+/// Get global audit logger instance.
+///
+/// This function returns a singleton instance of `AuditLogger` that can be used
+/// throughout the application. The instance is created on first access and
+/// reused for subsequent calls.
+///
+/// # Examples
+///
+/// ```no_run
+/// use poolai::enterprise::audit::get_global_audit_logger;
+///
+/// # async fn example() -> Result<(), poolai::core::error::AppError> {
+/// let logger = get_global_audit_logger();
+/// logger.initialize().await?;
+///
+/// // Log an event
+/// logger.log_event(poolai::enterprise::audit::AuditEvent::new(
+///     poolai::enterprise::audit::AuditLevel::Info,
+///     "test_action".to_string(),
+///     "test_resource".to_string(),
+///     "success".to_string(),
+/// )).await?;
+/// # Ok(())
+/// # }
+/// ```
+pub fn get_global_audit_logger() -> Arc<AuditLogger> {
+    AUDIT_LOGGER
+        .get_or_init(|| Arc::new(AuditLogger::new()))
+        .clone()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1110,43 +1149,4 @@ mod tests {
         let msg = format!("{err}");
         assert!(msg.contains("missing resource_type"), "{msg}");
     }
-}
-
-/// Global audit logger instance
-static AUDIT_LOGGER: OnceLock<Arc<AuditLogger>> = OnceLock::new();
-
-/// Align `get_global_audit_logger` with [`crate::core::state::AppState::audit_logger`] when possible.
-pub fn try_install_global_audit_logger(logger: Arc<AuditLogger>) {
-    let _ = AUDIT_LOGGER.set(logger);
-}
-
-/// Get global audit logger instance.
-///
-/// This function returns a singleton instance of `AuditLogger` that can be used
-/// throughout the application. The instance is created on first access and
-/// reused for subsequent calls.
-///
-/// # Examples
-///
-/// ```no_run
-/// use poolai::enterprise::audit::get_global_audit_logger;
-///
-/// # async fn example() -> Result<(), poolai::core::error::AppError> {
-/// let logger = get_global_audit_logger();
-/// logger.initialize().await?;
-///
-/// // Log an event
-/// logger.log_event(poolai::enterprise::audit::AuditEvent::new(
-///     poolai::enterprise::audit::AuditLevel::Info,
-///     "test_action".to_string(),
-///     "test_resource".to_string(),
-///     "success".to_string(),
-/// )).await?;
-/// # Ok(())
-/// # }
-/// ```
-pub fn get_global_audit_logger() -> Arc<AuditLogger> {
-    AUDIT_LOGGER
-        .get_or_init(|| Arc::new(AuditLogger::new()))
-        .clone()
 }

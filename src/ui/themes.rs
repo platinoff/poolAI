@@ -245,6 +245,20 @@ impl Theme {
     }
 }
 
+/// Get theme by name
+pub fn get_theme(name: &str) -> &'static Theme {
+    match name {
+        "light" => &LIGHT_THEME,
+        "high-contrast" => &HIGH_CONTRAST_THEME,
+        _ => &DARK_THEME, // default
+    }
+}
+
+/// Get all available themes
+pub fn get_all_themes() -> Vec<&'static Theme> {
+    vec![&DARK_THEME, &LIGHT_THEME, &HIGH_CONTRAST_THEME]
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -262,18 +276,4 @@ mod tests {
         assert!(css.contains("--spacing-4: 16px"));
         assert!(css.contains("--bg: #0f1216"));
     }
-}
-
-/// Get theme by name
-pub fn get_theme(name: &str) -> &'static Theme {
-    match name {
-        "light" => &LIGHT_THEME,
-        "high-contrast" => &HIGH_CONTRAST_THEME,
-        _ => &DARK_THEME, // default
-    }
-}
-
-/// Get all available themes
-pub fn get_all_themes() -> Vec<&'static Theme> {
-    vec![&DARK_THEME, &LIGHT_THEME, &HIGH_CONTRAST_THEME]
 }

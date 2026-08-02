@@ -39,7 +39,7 @@ async fn request_json(
     uri: &str,
     body: Option<Value>,
 ) -> (StatusCode, Value) {
-    let mut builder = Request::builder().method(method).uri(uri);
+    let builder = Request::builder().method(method).uri(uri);
     let req = if let Some(json_body) = body {
         builder
             .header("content-type", "application/json")

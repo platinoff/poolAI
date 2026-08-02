@@ -153,7 +153,7 @@ async fn horizon_s880_band_verification_checker_lifecycle_ph_s889() {
         json!({ "verification_verdict": "match", "trust_score": 75 }),
     )
     .await;
-    assert!(drain_verification_checker_task("job-drain-s880") == false);
+    assert!(!drain_verification_checker_task("job-drain-s880"));
     assert_eq!(verification_checker_tasks().len(), 0);
     assert_eq!(verification_checker_pending_total(), 0);
 

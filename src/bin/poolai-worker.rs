@@ -578,139 +578,6 @@ async fn execute_task(
     resolve_task_outcome(task_type, &task.payload, &runtime)
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use axum::http::StatusCode;
-    use serde_json::Value;
-    use std::sync::Mutex;
-    use tokio::time::{sleep, Duration};
-
-    fn test_args(url: String) -> Args {
-        Args {
-            worker_id: "worker-test".into(),
-            coordinator_url: url,
-            advertise_address: "127.0.0.1".into(),
-            advertise_port: 9090,
-            max_memory_mb: 512,
-            register_interval_secs: 120,
-            heartbeat_interval_secs: 10,
-            channel: "telegram".into(),
-            telegram_id: None,
-            cache_dir: None,
-        }
-    }
-
-    #[test]
-    fn lease_renew_error_stops_on_epoch_conflict() {
-        assert!(lease_renew_error_stops_loop(
-            "lease renew HTTP 409 Conflict: lease_epoch_rejected"
-        ));
-        assert!(!lease_renew_error_stops_loop(
-            "lease renew failed: connection refused"
-        ));
-    }
-
-    #[test]
-    fn lease_renew_target_parses_root_and_nested_epoch() {
-        let root = serde_json::json!({ "job_id": "job-1", "lease_epoch": 3 });
-        assert_eq!(lease_renew_target(&root), Some(("job-1".into(), 3)));
-
-        let nested = serde_json::json!({ "job_id": "job-2", "lease": { "epoch": 9 } });
-        assert_eq!(lease_renew_target(&nested), Some(("job-2".into(), 9)));
-
-        let missing = serde_json::json!({ "job_id": "job-3" });
-        assert_eq!(lease_renew_target(&missing), None);
-    }
-
-    #[tokio::test]
-    async fn renew_job_lease_posts_epoch_payload() {
-        let captured: Arc<Mutex<Option<(String, Value)>>> = Arc::new(Mutex::new(None));
-        let captured_route = captured.clone();
-        let app = Router::new().route(
-            "/api/v1/jobs/{id}/lease/renew",
-            post(move |Path(id): Path<String>, Json(body): Json<Value>| {
-                let captured_route = captured_route.clone();
-                async move {
-                    *captured_route.lock().expect("lock") = Some((id, body));
-                    (StatusCode::OK, Json(serde_json::json!({ "ok": true })))
-                }
-            }),
-        );
-        let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
-            .await
-            .expect("bind");
-        let addr = listener.local_addr().expect("local addr");
-        let server = tokio::spawn(async move {
-            let _ = axum::serve(listener, app).await;
-        });
-
-        let client = http_client().expect("client");
-        let args = test_args(format!("http://{}", addr));
-        renew_job_lease(&client, &args, "job-lease-1", 11)
-            .await
-            .expect("renew ok");
-
-        for _ in 0..20 {
-            if captured.lock().expect("lock").is_some() {
-                break;
-            }
-            sleep(Duration::from_millis(20)).await;
-        }
-        let got = captured
-            .lock()
-            .expect("lock")
-            .clone()
-            .expect("captured request");
-        assert_eq!(got.0, "job-lease-1");
-        assert_eq!(got.1.get("lease_epoch").and_then(|v| v.as_u64()), Some(11));
-
-        server.abort();
-    }
-
-    #[tokio::test]
-    async fn lease_renew_ticker_fires_while_active() {
-        let hits: Arc<AtomicU64> = Arc::new(AtomicU64::new(0));
-        let hits_route = hits.clone();
-        let app = Router::new().route(
-            "/api/v1/jobs/{id}/lease/renew",
-            post(move |Path(_id): Path<String>, Json(_body): Json<Value>| {
-                let hits_route = hits_route.clone();
-                async move {
-                    hits_route.fetch_add(1, Ordering::Relaxed);
-                    (StatusCode::OK, Json(serde_json::json!({ "ok": true })))
-                }
-            }),
-        );
-        let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
-            .await
-            .expect("bind");
-        let addr = listener.local_addr().expect("local addr");
-        let server = tokio::spawn(async move {
-            let _ = axum::serve(listener, app).await;
-        });
-
-        let client = http_client().expect("client");
-        let args = test_args(format!("http://{}", addr));
-        let handle = tokio::spawn(run_lease_renew_ticker(
-            client,
-            args,
-            "job-ticker".into(),
-            5,
-            1,
-        ));
-        sleep(Duration::from_millis(2_350)).await;
-        handle.abort();
-        let _ = handle.await;
-
-        assert!(
-            hits.load(Ordering::Relaxed) >= 2,
-            "expected periodic renews while task active"
-        );
-        server.abort();
-    }
-}
-
 async fn poll_and_run_tasks(client: &reqwest::Client, rt: &WorkerRuntime) {
     let url = format!(
         "{}/api/v1/virtual-nodes/{}/tasks/poll",
@@ -861,5 +728,138 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
 
         tokio::time::sleep(Duration::from_secs(args.heartbeat_interval_secs)).await;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use axum::http::StatusCode;
+    use serde_json::Value;
+    use std::sync::Mutex;
+    use tokio::time::{sleep, Duration};
+
+    fn test_args(url: String) -> Args {
+        Args {
+            worker_id: "worker-test".into(),
+            coordinator_url: url,
+            advertise_address: "127.0.0.1".into(),
+            advertise_port: 9090,
+            max_memory_mb: 512,
+            register_interval_secs: 120,
+            heartbeat_interval_secs: 10,
+            channel: "telegram".into(),
+            telegram_id: None,
+            cache_dir: None,
+        }
+    }
+
+    #[test]
+    fn lease_renew_error_stops_on_epoch_conflict() {
+        assert!(lease_renew_error_stops_loop(
+            "lease renew HTTP 409 Conflict: lease_epoch_rejected"
+        ));
+        assert!(!lease_renew_error_stops_loop(
+            "lease renew failed: connection refused"
+        ));
+    }
+
+    #[test]
+    fn lease_renew_target_parses_root_and_nested_epoch() {
+        let root = serde_json::json!({ "job_id": "job-1", "lease_epoch": 3 });
+        assert_eq!(lease_renew_target(&root), Some(("job-1".into(), 3)));
+
+        let nested = serde_json::json!({ "job_id": "job-2", "lease": { "epoch": 9 } });
+        assert_eq!(lease_renew_target(&nested), Some(("job-2".into(), 9)));
+
+        let missing = serde_json::json!({ "job_id": "job-3" });
+        assert_eq!(lease_renew_target(&missing), None);
+    }
+
+    #[tokio::test]
+    async fn renew_job_lease_posts_epoch_payload() {
+        let captured: Arc<Mutex<Option<(String, Value)>>> = Arc::new(Mutex::new(None));
+        let captured_route = captured.clone();
+        let app = Router::new().route(
+            "/api/v1/jobs/{id}/lease/renew",
+            post(move |Path(id): Path<String>, Json(body): Json<Value>| {
+                let captured_route = captured_route.clone();
+                async move {
+                    *captured_route.lock().expect("lock") = Some((id, body));
+                    (StatusCode::OK, Json(serde_json::json!({ "ok": true })))
+                }
+            }),
+        );
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+            .await
+            .expect("bind");
+        let addr = listener.local_addr().expect("local addr");
+        let server = tokio::spawn(async move {
+            let _ = axum::serve(listener, app).await;
+        });
+
+        let client = http_client().expect("client");
+        let args = test_args(format!("http://{}", addr));
+        renew_job_lease(&client, &args, "job-lease-1", 11)
+            .await
+            .expect("renew ok");
+
+        for _ in 0..20 {
+            if captured.lock().expect("lock").is_some() {
+                break;
+            }
+            sleep(Duration::from_millis(20)).await;
+        }
+        let got = captured
+            .lock()
+            .expect("lock")
+            .clone()
+            .expect("captured request");
+        assert_eq!(got.0, "job-lease-1");
+        assert_eq!(got.1.get("lease_epoch").and_then(|v| v.as_u64()), Some(11));
+
+        server.abort();
+    }
+
+    #[tokio::test]
+    async fn lease_renew_ticker_fires_while_active() {
+        let hits: Arc<AtomicU64> = Arc::new(AtomicU64::new(0));
+        let hits_route = hits.clone();
+        let app = Router::new().route(
+            "/api/v1/jobs/{id}/lease/renew",
+            post(move |Path(_id): Path<String>, Json(_body): Json<Value>| {
+                let hits_route = hits_route.clone();
+                async move {
+                    hits_route.fetch_add(1, Ordering::Relaxed);
+                    (StatusCode::OK, Json(serde_json::json!({ "ok": true })))
+                }
+            }),
+        );
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+            .await
+            .expect("bind");
+        let addr = listener.local_addr().expect("local addr");
+        let server = tokio::spawn(async move {
+            let _ = axum::serve(listener, app).await;
+        });
+
+        let client = http_client().expect("client");
+        let args = test_args(format!("http://{}", addr));
+        let handle = tokio::spawn(run_lease_renew_ticker(
+            client,
+            args,
+            "job-ticker".into(),
+            5,
+            1,
+        ));
+        sleep(Duration::from_millis(2_350)).await;
+        handle.abort();
+        let _ = handle.await;
+
+        assert!(
+            hits.load(Ordering::Relaxed) >= 2,
+            "expected periodic renews while task active"
+        );
+        server.abort();
     }
 }

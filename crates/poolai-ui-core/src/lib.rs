@@ -71,6 +71,8 @@ pub mod pre_push_hook_depth;
 pub mod pricing;
 pub mod product_complete_depth;
 pub mod prometheus;
+pub mod ratio96_depth;
+pub mod ratio96_store_depth;
 pub mod rust_migration_advisory_depth;
 pub mod security;
 pub mod sso_admin_ops_depth;

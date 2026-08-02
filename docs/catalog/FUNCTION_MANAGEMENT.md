@@ -1221,7 +1221,26 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 100 ✅ · band 101 next). **Master horizon:** PH-S1649…S1658 (band 101). **Completion pending:** PH-S1649…S2278 = **630** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **436**. **Наступна сесія:** **`абракадабра`** — project scan / band 101.
+**Відкритих у §5.12:** **0** (band 101 ✅ · band 102 next). **Master horizon:** PH-S1659…S1668 (band 102). **Completion pending:** PH-S1659…S2278 = **620** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **437**. **Наступна сесія:** **`абракадабра`** — project scan / band 102.
+
+### 5.82 Ratio96 depth scaffold queue — band 101 (PH-S1649…S1658, 2026-08-01) · **✅**
+
+**Джерело:** project completion / phase F — Ratio96 depth scaffold (first of the phase-F stretch-96% bands, mirror band 100 horizon aggregate). Project scan: `record-rust-diagnostics.sh` (274 warnings / 0 errors) — auto-fixable families (`needless_borrows_for_generic_args` batch) folded into band. Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · master [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md). Canon: [`RATIO96_DEPTH.md`](../development/RATIO96_DEPTH.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1584 | **PH-S1649** | `ratio96_depth` ui-core module | `ratio96_depth.rs` | depth enum + criteria registry | **✅** |
+| 1585 | **PH-S1650** | `ratio96` store/wire slice | `ratio96_store_depth.rs` | durable `rust_ratio.json` read + unit test | **✅** |
+| 1586 | **PH-S1651** | `ratio96` API contracts | `ratio96_depth_contracts.rs` | criteria totals + store wire | **✅** |
+| 1587 | **PH-S1652** | `ratio96` admin/ops glue | `VERIFY_RATIO96` / `--ratio96` | verify-dev-stand + run-poolai | **✅** |
+| 1588 | **PH-S1653** | Stand smoke export shape | `poolai_http_stand_smoke` | `ratio96_band101_export_shape` | **✅** |
+| 1589 | **PH-S1654** | `poolai-loc-audit --ratio96` | loc-audit | `rust_ratio.json` fields | **✅** |
+| 1590 | **PH-S1655** | Docs canon sync | `RATIO96_DEPTH.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | **✅** |
+| 1591 | **PH-S1656** | vision-sync --check | ops | drift gate green | **✅** |
+| 1592 | **PH-S1657** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **✅** |
+| 1593 | **PH-S1658** | Band close | tests/docs | `galaxy_horizon_s1649_integration` | **✅** |
+
+**PH-S1658 ✅ (2026-08-01):** `ratio96_depth.rs`; `RATIO96_PHASE_F_SLICES`; `ratio96_store_depth.rs`; `ratio96_depth_contracts.rs`; `VERIFY_RATIO96`; `ratio96_band101_export_shape`; `--ratio96`; `RATIO96_DEPTH.md` + `RATIO96_RATIO_ADVISORY.md`; `galaxy_horizon_s1649_integration`. Phase F Ratio96 depth scaffold closed.
 
 ### 5.81 Monitoring horizon close queue — band 100 (PH-S1639…S1648, 2026-08-01) · **✅**
 
