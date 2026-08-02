@@ -273,18 +273,18 @@ FM-xxx (з таблиці нижче)
 
 | # | Sprint | Фокус | Джерело | Acceptance (скорочено) | Стан |
 |---|--------|--------|---------|-------------------------|------|
-| 1 | **PH-S1749** | Ratio96 horizon v5 start | Ratio96 F band 111 | galaxy_horizon_s1749_integration + stand smoke | **[ ]** |
-| 2 | **PH-S1750** | poolai-loc-audit --ratio96-horizon-v5 | Ratio96 F band 111 | CLI + advisory | **[ ]** |
-| 3 | **PH-S1751** | Docs canon (RATIO96_HORIZON_V5.md) | Ratio96 F band 111 | New doc | **[ ]** |
-| 4 | **PH-S1752** | KIVI debug v5 | Ratio96 F band 111 | manifest.kivi update | **[ ]** |
-| 5 | **PH-S1753** | Multi-provider KIVI v5 | Ratio96 F band 111 | IDE+provider+model+time | **[ ]** |
-| 6 | **PH-S1754** | Band close (s1750_integration) | Ratio96 F band 111 | Integration + FM | **[ ]** |
-| 7 | **PH-S1755** | Rust diagnostics | Ratio96 F band 111 | record-rust-diagnostics.sh | **[ ]** |
-| 8 | **PH-S1756** | Test-ci speed | Ratio96 F band 111 | record-test-ci-speed.sh | **[ ]** |
-| 9 | **PH-S1757** | Project scan replenish | Ratio96 F band 111 | Replenish §5.12 | **[ ]** |
-| 10 | **PH-S1758** | Vision close + push | Ratio96 F band 111 | poolai-vision-sync + git | **[ ]** |
+| 1 | **PH-S1749** | Ratio96 horizon v5 start | Ratio96 F band 111 | galaxy_horizon_s1749_integration + stand smoke | **✅** |
+| 2 | **PH-S1750** | poolai-loc-audit --ratio96-horizon-v5 | Ratio96 F band 111 | CLI + advisory | **✅** |
+| 3 | **PH-S1751** | Docs canon (RATIO96_HORIZON_V5.md) | Ratio96 F band 111 | New doc | **✅** |
+| 4 | **PH-S1752** | KIVI debug v5 | Ratio96 F band 111 | manifest.kivi update | **✅** |
+| 5 | **PH-S1753** | Multi-provider KIVI v5 | Ratio96 F band 111 | IDE+provider+model+time | **✅** |
+| 6 | **PH-S1754** | Band close (s1750_integration) | Ratio96 F band 111 | Integration + FM | **✅** |
+| 7 | **PH-S1755** | Rust diagnostics | Ratio96 F band 111 | record-rust-diagnostics.sh | **✅** |
+| 8 | **PH-S1756** | Test-ci speed | Ratio96 F band 111 | record-test-ci-speed.sh | **✅** |
+| 9 | **PH-S1757** | Project scan replenish | Ratio96 F band 111 | Replenish §5.12 | **✅** |
+| 10 | **PH-S1758** | Vision close + push | Ratio96 F band 111 | poolai-vision-sync + git | **✅** |
 
-**Відкритих у §5.12:** **10** (band 111 PH-S1749…S1758). **Master horizon:** PH-S1759…S1768 (band 112). Vision rev **453**.
+**Відкритих у §5.12:** **0** (band 110 PH-S1739…S1748 ✅). **Master horizon:** PH-S1759…S1768 (band 112). Vision rev **454**.
 
 **Відкритих у §5.12:** **0** (band 106 PH-S1699…S1708 ✅). **Master horizon:** PH-S1709…S1718 (band 107).
 

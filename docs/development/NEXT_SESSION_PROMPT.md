@@ -1,13 +1,13 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-08-02 (band 110 **PH-S1739…S1748** ✅ · band 111 open PH-S1749…S1758)
+**Оновлено:** 2026-08-02 (band 110 **PH-S1739…S1748** ✅ · band 111 closed PH-S1749…S1758 ✅)
 
 Maintenance mode (FM §5.15) · band 105 drained.
 
 Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.18 @ S2278).
 
 | **← наступний** | **`абракадабра`** (project scan → band 106) |
-| **§5.12 active** | **10** (band 111 open) |
+| **§5.12 active** | **0** (band 111 ✅) |
 | **P0 open** | **PH-SVC34** re-verify GH · **PH-SVC35** OWNER |
 | **Completion pending** | **580** sprints PH-S1709…S2278 · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) |
 | **Horizon** | band 110 → **PH-S1739…S1748** |
