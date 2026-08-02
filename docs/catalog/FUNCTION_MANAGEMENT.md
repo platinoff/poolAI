@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-07-29 (project completion path · band 97 ✅ · band 98 horizon · Cursor **3.13.21** PH-SVC75…84 ✅ · GH tokens PH-SVC65…74 ✅)
+**Оновлено:** 2026-08-02 (band 106 **Ratio96 loc-audit** PH-S1699…S1708 ✅)
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -264,6 +264,25 @@ FM-xxx (з таблиці нижче)
 ### 5.12 Research backlog PH-S65+ (Galaxy wire / ops, 2026-05-27)
 
 **VDT:** §5.12 = **журнал PH-S*** (≤10 відкритих). Якщо **< 10** — **`абракадабра`** / project scan **всього проєкту**: concept → FM **§5.1** → roadmaps → architect → DOCS_LEGACY → code → §5.13 fallback. Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Project scan». **Rust-first:** API → `tests/`; Playwright лише browser scope.
+
+**Активна §5.12 (band 106):**
+
+| # | Sprint | Фокус | Джерело | Acceptance (скорочено) | Стан |
+|---|--------|--------|---------|-------------------------|------|
+| 1 | **PH-S1699** | `ratio96_loc_audit_depth` scaffold + criteria registry (10) | Ratio96 F band 106 | `ratio96_loc_audit_depth.rs` + `RATIO96_LOC_AUDIT_CRITERIA` enum | **✅** |
+| 2 | **PH-S1700** | Live `ratio96` loc-audit smoke | Ratio96 F band 106 | `smoke_ratio96_loc_audit` + `smoke_ratio96_migration_advisory` | **✅** |
+| 3 | **PH-S1701** | `ratio96` loc-audit export shape | Ratio96 F band 106 | `ratio96_loc_audit_band106_export_shape` + stand smoke | **✅** |
+| 4 | **PH-S1702** | poolai-loc-audit `--ratio96-loc-audit` | Ratio96 F band 106 | CLI flag + loc-audit integration | **✅** |
+| 5 | **PH-S1703** | Docs canon sync (`RATIO96_LOC_AUDIT.md`) | Ratio96 F band 106 | `RATIO96_LOC_AUDIT.md` + RUN_LOCAL/README + `VERIFY_RATIO96_LOC_AUDIT` | **✅** |
+| 6 | **PH-S1704** | poolai-vision-sync --check | Ratio96 F band 106 | vision-sync manifest rev++ | **✅** |
+| 7 | **PH-S1705** | Ratio hold advisory | Ratio96 F band 106 | `poolai-loc-audit --min-ratio 0.95 --advisory` | **✅** |
+| 8 | **PH-S1706** | Band close (`galaxy_horizon_s1699_integration`) | Ratio96 F band 106 | `galaxy_horizon_s1699_integration.rs` + FM/HANDOFF/NEXT | **✅** |
+| 9 | **PH-S1707** | Project scan replenish (10 PH-S* from §5.1 / architect / roadmap) | Ratio96 F band 106 | Replenish FM §5.12 with next 10 from master backlog | **✅** |
+| 10 | **PH-S1708** | Vision sync + diagnostics | Ratio96 F band 106 | `poolai-vision-sync` + `record-rust-diagnostics.sh` + `record-test-ci-speed.sh` | **✅** |
+
+**Відкритих у §5.12:** **0** (band 106 PH-S1699…S1708 ✅). **Master horizon:** PH-S1709…S1718 (band 107).
+
+**Историчний research backlog (PH-S65+):**
 
 | # | Sprint | Фокус | Джерело | Acceptance (скорочено) | Стан |
 |---|--------|--------|---------|-------------------------|------|
@@ -1221,7 +1240,7 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 105 PH-S1689…S1698 ✅). **Master horizon:** PH-S1699…S1708 (band 106). **Completion pending:** PH-S1679…S2278 = **590** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **446**. **Наступна сесія:** **`абракадабра`** — project scan → band 106 (PH-S1699…S1708).
+**Відкритих у §5.12:** **0** (band 106 PH-S1699…S1708 ✅). **Master horizon:** PH-S1709…S1718 (band 107). **Completion pending:** PH-S1679…S2278 = **580** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **449**. **Наступна сесія:** **`абракадабра`** — project scan → band 107 (PH-S1709…S1718).
 
 ### 5.85 Ratio96 admin/ops glue queue — band 104 (PH-S1679…S1688, 2026-08-02) · **✅**
 
@@ -2458,8 +2477,8 @@ FM-xxx (з таблиці нижче)
 |------|----------|
 | **Pending** | **0** |
 | **Drained bands 1–36** | PH-S660…S1010 ✅ |
-| **Активна §5.12** | — (maintenance mode) |
-| **Наступна promote** | — (owner scan only) |
+| **Активна §5.12** | band 106 **PH-S1699…S1708** (Ratio96 loc-audit) |
+| **Наступна promote** | band 107 **PH-S1709…S1718** (Ratio96 docs canon) |
 | **Сесій `абракадабра`** | band 44 drained (PH-S1079…S1088) |
 | **План фаз** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md) |
 | **Реєстр sprint×acceptance** | [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) |

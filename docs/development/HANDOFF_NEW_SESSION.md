@@ -1,8 +1,46 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-08-02 (band 105 **Ratio96 stand smoke** PH-S1689…S1698 **in_progress** · band 104 **Ratio96 admin/ops glue** PH-S1679…S1688 **✅** · band 103 **lint/diagnostics cleanup** PH-S1669…S1678 **✅** · band 102 **GSV** PH-S1659…S1668 **✅** · band 101 **PH-S1649…S1658** ✅ · band 100 **PH-S1639…S1648** ✅ · band 99 **PH-S1629…S1638** ✅ · band 98 **PH-S1619…S1628** ✅ · band 97 ✅ · band 96 ✅ · band 95 ✅ · band 94 ✅ · band 93 ✅ · band 92 ✅ · band 91 ✅ · service **PH-SVC85** Rust diagnostics panel ✅ · **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · band 88 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅)
+**Оновлено:** 2026-08-02 (band 106 **Ratio96 loc-audit** PH-S1699…S1708 **✅** · band 105 **Ratio96 stand smoke** PH-S1689…S1698 **✅**)
 
-**Наступна сесія:** **`абракадабра`** — S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`; band 105 ✅ — 0 warnings / 0 errors) → drain наступного band (PH-S1699…S1708; черга — FM §5.12 §5.87) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+**Наступна сесія:** **`абракадабра`** — див. **канон воркфлоу в [AGENTS.md](../../AGENTS.md §100–113)**.
+**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`; band 105 ✅ — 0 warnings / 0 errors) → drain наступного band (PH-S1699…S1708; черга — FM §5.12 §5.87) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+
+--- 
+
+### 🔹 Канон воркфлоу для `абракадабра` (VDT-цикл)
+**Джерело:** [AGENTS.md](../../AGENTS.md §100–113)
+
+1. **S0:**
+   - `df -h /s | tail -1` + `bash scripts/check_target_disk.sh` → `cargo clean` за потреби.
+   - `git fetch` → `git status -sb` → `git log -1 --oneline`.
+   - Прочитати: `HANDOFF_NEW_SESSION.md` (кроки 1–12), **FM §5.1–§5.12**, `NEXT_SESSION_PROMPT.md`.
+   - `cargo run --bin poolai-vision-sync -- --check`.
+
+2. **Project scan (якщо §5.12 < 10 відкритих):**
+   - **Warnings/diagnostics першими:** `rust_diagnostics.json` (`cargo run --bin poolai-rust-diagnostics -- --print`), clippy warnings, compile errors.
+   - **Concept/roadmap/architect rows:** `rg "\- \[ \]" docs/development/NEXT_STEPS_ARCHITECT_*.md`, `docs/concept/POOLAI_GALAXY_GRID.md`, FM §5.1.
+   - **Gaps:** `DOCS_LEGACY_AUDIT`, `OPENAPI_GAP_AUDIT`, `rg "TODO|FIXME" src/`.
+   - **Результат:** Додати **10 PH-S*** у **FM §5.12** (нумерація N+1 від останнього; колонка «Джерело»).
+
+3. **Drain:** усі відкриті PH-S* (код → scope-тести; **без** mid-drain push).
+
+4. **Vision close:**
+   - FM §5.12 ✅ → HANDOFF + NEXT → `poolai-vision-sync` (manifest `revision++`).
+   - FM/NEXT/INDEX rev = `manifest.revision` → `--check`.
+
+5. **Test:**
+   - `cargo fmt --all` → `cargo test-ci` → `bash bin/record-test-ci-speed.sh` + `bash bin/record-rust-diagnostics.sh`.
+
+6. **Git (кінець сесії):**
+   - Один commit (код + `docs/vision/*` + speed/diagnostics JSON + FM/HANDOFF/NEXT).
+   - **`git push origin main` + самарі** (обов'язково останній крок).
+
+**⚠️ Правила:**
+- Не `git add -A` (тільки файли спринту).
+- Не `git commit --amend` після push без явного запиту.
+- Не паралелити `cargo test-ci`.
+- Warnings > 0 або errors > 0 → 1–3 PH-S* **на початок смуги** (Джерело: `rust_diagnostics` / lint code).
+- Fallback-смуга: galaxy metrics stubs, wasm glue, stand smoke, concept wire, loc-audit, docs canon, vision sync, INDEX.
 
 ## Band 104 — Ratio96 admin/ops glue (PH-S1679…S1688, **✅**)
 
@@ -50,6 +88,8 @@
 | **PH-S1706** | Ratio hold advisory |
 | **PH-S1707** | Band close (`galaxy_horizon_s1699_integration`) |
 | **PH-S1708** | Project scan replenish (10 PH-S* from §5.1 / architect / roadmap) |
+
+**PH-S1699…S1708 in_progress (2026-08-02):** FM §5.12 replenished with 10 items (band 106). Next: implement all 10 items → vision close → push + samaire.
 
 **PH-S1689…S1698 ✅ (2026-08-02):** `ratio96_stand_smoke_depth.rs` (enum + `RATIO96_STAND_SMOKE_CRITERIA` 10); `smoke_ratio96_store_wire` + `smoke_ratio96_query` + `smoke_ratio96_field_fixtures` + `ratio96_stand_smoke_band105_export_shape`; `--ratio96-stand-smoke` loc-audit; `RATIO96_STAND_SMOKE.md`; `VERIFY_RATIO96_STAND_SMOKE`; `galaxy_horizon_s1689_integration`. FM §5.12 §5.86 ✅. Vision rev **445**.
 

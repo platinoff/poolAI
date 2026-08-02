@@ -7,9 +7,9 @@ Maintenance mode (FM §5.15) · band 105 drained.
 Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.18 @ S2278).
 
 | **← наступний** | **`абракадабра`** (project scan → band 106) |
-| **§5.12 active** | **0** (band 105 ✅) |
+| **§5.12 active** | **10** (band 105 ✅) |
 | **P0 open** | **PH-SVC34** re-verify GH · **PH-SVC35** OWNER |
-| **Completion pending** | **590** sprints PH-S1699…S2278 · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) |
+| **Completion pending** | **580** sprints PH-S1709…S2278 · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) |
 | **Horizon** | band 106 → **PH-S1699…S1708** |
 | **Vision** | rev **446** |
 | **GSV** | окремий проєкт Rust-first · [`GSV/README.md`](../../GSV/README.md) · [`docs/gsv/`](../../gsv/README.md) · **TechPreroadMap** [`GSV_TECH_ROADMAP.md`](../../gsv/GSV_TECH_ROADMAP.md) |
