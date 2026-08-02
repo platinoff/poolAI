@@ -3138,7 +3138,31 @@
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S1708",
+  "kivi": [
+    {
+      "count": 10,
+      "items": [
+        "PH-S1699…S1708 band 106 Ratio96 loc-audit ✅"
+      ],
+      "kind": "done",
+      "signature": "opencode:xai.grok-4.3 @ 2026-08-02 20:15"
+    },
+    {
+      "count": 0,
+      "items": [],
+      "kind": "open",
+      "signature": "workflow: AGENTS.md §100-113 drain"
+    },
+    {
+      "count": 10,
+      "items": [
+        "PH-S1709…S1718 (Ratio96 horizon start)"
+      ],
+      "kind": "pending",
+      "signature": "queue: FM §5.12 next band 107"
+    }
+  ],
+  "last_sprint_closed": "PH-S1698",
   "layers": [
     {
       "id": "L0",
@@ -3171,7 +3195,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1699",
+  "next_sprint": "PH-S1709",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -12233,9 +12257,100 @@
       "path": "tests/galaxy_horizon_s1699_integration.rs"
     }
   ],
-  "revision": 448,
-  "sprint_queue": [],
-  "sprint_queue_open_count": 0,
+  "revision": 449,
+  "sprint_queue": [
+    {
+      "acceptance": "galaxy_horizon_s1709_integration.rs` + stand smoke",
+      "deps": "Ratio96 F band 107",
+      "id": "PH-S1709",
+      "open": true,
+      "row": 1,
+      "status": "open",
+      "title": "Ratio96 horizon start (galaxy_horizon_s1709_integration)"
+    },
+    {
+      "acceptance": "CLI horizon flag + advisory",
+      "deps": "Ratio96 F band 107",
+      "id": "PH-S1710",
+      "open": true,
+      "row": 2,
+      "status": "open",
+      "title": "poolai-loc-audit --ratio96-horizon"
+    },
+    {
+      "acceptance": "New doc + RUN_LOCAL update",
+      "deps": "Ratio96 F band 107",
+      "id": "PH-S1711",
+      "open": true,
+      "row": 3,
+      "status": "open",
+      "title": "Docs canon sync (RATIO96_HORIZON.md)"
+    },
+    {
+      "acceptance": "manifest.kivi + debug widget",
+      "deps": "Ratio96 F band 107",
+      "id": "PH-S1712",
+      "open": true,
+      "row": 4,
+      "status": "open",
+      "title": "Vision sync + KIVI debug"
+    },
+    {
+      "acceptance": "IDE+provider+model+time in done",
+      "deps": "Ratio96 F band 107",
+      "id": "PH-S1713",
+      "open": true,
+      "row": 5,
+      "status": "open",
+      "title": "Multi-provider KIVI signature"
+    },
+    {
+      "acceptance": "Integration test + FM update",
+      "deps": "Ratio96 F band 107",
+      "id": "PH-S1714",
+      "open": true,
+      "row": 6,
+      "status": "open",
+      "title": "Band close (galaxy_horizon_s1710_integration)"
+    },
+    {
+      "acceptance": "record-rust-diagnostics.sh",
+      "deps": "Ratio96 F band 107",
+      "id": "PH-S1715",
+      "open": true,
+      "row": 7,
+      "status": "open",
+      "title": "Rust diagnostics record"
+    },
+    {
+      "acceptance": "record-test-ci-speed.sh",
+      "deps": "Ratio96 F band 107",
+      "id": "PH-S1716",
+      "open": true,
+      "row": 8,
+      "status": "open",
+      "title": "Test-ci speed record"
+    },
+    {
+      "acceptance": "Replenish §5.12 from master",
+      "deps": "Ratio96 F band 107",
+      "id": "PH-S1717",
+      "open": true,
+      "row": 9,
+      "status": "open",
+      "title": "Project scan replenish (next 10)"
+    },
+    {
+      "acceptance": "poolai-vision-sync + git push",
+      "deps": "Ratio96 F band 107",
+      "id": "PH-S1718",
+      "open": true,
+      "row": 10,
+      "status": "open",
+      "title": "Vision close + push"
+    }
+  ],
+  "sprint_queue_open_count": 10,
   "updated_at": "2026-06-20",
   "vision_ui_rev": 59
 }
