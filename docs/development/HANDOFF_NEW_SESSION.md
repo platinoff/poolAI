@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-08-02 (band 112 **Ratio96 horizon v6** PH-S1759…S1768 **✅** · band 113 open PH-S1769…S1778 · Vision rev 454)
+**Оновлено:** 2026-08-02 (band 124 **Ratio96 horizon v18** PH-S1879…S1888 **✅** · band 125 open PH-S1889…S1898 · Vision rev 455)
 
 **Наступна сесія:** **`абракадабра`** — див. **канон воркфлоу в [AGENTS.md](../../AGENTS.md §100–113)**.
 **Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`; band 105 ✅ — 0 warnings / 0 errors) → drain наступного band (PH-S1699…S1708; черга — FM §5.12 §5.87) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.

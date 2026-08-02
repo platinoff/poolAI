@@ -269,24 +269,24 @@ FM-xxx (з таблиці нижче)
 
 ### 5.12 Research backlog (PH-S1739…S1748, band 110, Ratio96 horizon v4) ✅
 
-### 5.12 Research backlog (PH-S1759…S1768, band 112, Ratio96 horizon v6) ✅
+### 5.12 Research backlog (PH-S1879…S1888, band 124, Ratio96 horizon v18) ✅ Vision rev **455**
 
-**Активна §5.12 (band 113):**
+**Активна §5.12 (band 125) Vision rev **455**:**
 
 | # | Sprint | Фокус | Джерело | Acceptance (скорочено) | Стан |
 |---|--------|--------|---------|-------------------------|------|
-| 1 | **PH-S1769** | Ratio96 horizon v7 start (galaxy_horizon_s1769_integration) | Ratio96 F band 113 | `galaxy_horizon_s1769_integration.rs` + stand smoke | **[ ]** |
-| 2 | **PH-S1770** | poolai-loc-audit --ratio96-horizon-v7 | Ratio96 F band 113 | CLI horizon flag + advisory | **[ ]** |
-| 3 | **PH-S1771** | Docs canon sync (RATIO96_HORIZON_V7.md) | Ratio96 F band 113 | New doc + RUN_LOCAL update | **[ ]** |
-| 4 | **PH-S1772** | Vision sync + KIVI debug v7 | Ratio96 F band 113 | manifest.kivi + debug widget | **[ ]** |
-| 5 | **PH-S1773** | Multi-provider KIVI signature v7 | Ratio96 F band 113 | IDE+provider+model+time in done | **[ ]** |
-| 6 | **PH-S1774** | Band close (galaxy_horizon_s1770_integration) | Ratio96 F band 113 | Integration test + FM update | **[ ]** |
-| 7 | **PH-S1775** | Rust diagnostics record | Ratio96 F band 113 | record-rust-diagnostics.sh | **[ ]** |
-| 8 | **PH-S1776** | Test-ci speed record | Ratio96 F band 113 | record-test-ci-speed.sh | **[ ]** |
-| 9 | **PH-S1777** | Project scan replenish (next 10) | Ratio96 F band 113 | Replenish §5.12 from master | **[ ]** |
-| 10 | **PH-S1778** | Vision close + push | Ratio96 F band 113 | poolai-vision-sync + git push | **[ ]** |
+| 1 | **PH-S1779** | Ratio96 horizon v8 start (galaxy_horizon_s1779_integration) | Ratio96 F band 114 | `galaxy_horizon_s1779_integration.rs` + stand smoke | **[ ]** |
+| 2 | **PH-S1780** | poolai-loc-audit --ratio96-horizon-v8 | Ratio96 F band 114 | CLI horizon flag + advisory | **[ ]** |
+| 3 | **PH-S1781** | Docs canon sync (RATIO96_HORIZON_V8.md) | Ratio96 F band 114 | New doc + RUN_LOCAL update | **[ ]** |
+| 4 | **PH-S1782** | Vision sync + KIVI debug v8 | Ratio96 F band 114 | manifest.kivi + debug widget | **[ ]** |
+| 5 | **PH-S1783** | Multi-provider KIVI signature v8 | Ratio96 F band 114 | IDE+provider+model+time in done | **[ ]** |
+| 6 | **PH-S1784** | Band close (galaxy_horizon_s1780_integration) | Ratio96 F band 114 | Integration test + FM update | **[ ]** |
+| 7 | **PH-S1785** | Rust diagnostics record | Ratio96 F band 114 | record-rust-diagnostics.sh | **[ ]** |
+| 8 | **PH-S1786** | Test-ci speed record | Ratio96 F band 114 | record-test-ci-speed.sh | **[ ]** |
+| 9 | **PH-S1787** | Project scan replenish (next 10) | Ratio96 F band 114 | Replenish §5.12 from master | **[ ]** |
+| 10 | **PH-S1788** | Vision close + push | Ratio96 F band 114 | poolai-vision-sync + git push | **[ ]** |
 
-**Відкритих у §5.12:** **10** (band 113 PH-S1769…S1778). **Master horizon:** PH-S1779…S1788 (band 114). Vision rev **454**.
+**Відкритих у §5.12:** **10** (band 114 PH-S1779…S1788). **Master horizon:** PH-S1789…S1798 (band 115). Vision rev **454**.
 
 **Відкритих у §5.12:** **0** (band 106 PH-S1699…S1708 ✅). **Master horizon:** PH-S1709…S1718 (band 107).
 
