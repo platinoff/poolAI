@@ -1,8 +1,8 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-08-01 (band 101 **PH-S1649…S1658** ✅ · band 100 **PH-S1639…S1648** ✅ · band 99 **PH-S1629…S1638** ✅ · band 98 **PH-S1619…S1628** ✅ · band 97 ✅ · band 96 ✅ · band 95 ✅ · band 94 ✅ · band 93 ✅ · band 92 ✅ · band 91 ✅ · service **PH-SVC85** Rust diagnostics panel ✅ · **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · band 88 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅ · band 102 next)
+**Оновлено:** 2026-08-01 (band 102 **GSV** PH-S1659…S1668 **◎ open** · band 101 **PH-S1649…S1658** ✅ · band 100 **PH-S1639…S1648** ✅ · band 99 **PH-S1629…S1638** ✅ · band 98 **PH-S1619…S1628** ✅ · band 97 ✅ · band 96 ✅ · band 95 ✅ · band 94 ✅ · band 93 ✅ · band 92 ✅ · band 91 ✅ · service **PH-SVC85** Rust diagnostics panel ✅ · **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · band 88 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅)
 
-**Наступна сесія:** **`абракадабра`** — S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain band 102 · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+**Наступна сесія:** **`абракадабра`** — S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain band 102 **GSV** · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
 
 ## P0 / service (2026-07-27)
 
@@ -24,7 +24,26 @@
 
 **Cursor / toolchain (service):** local desktop **3.13.21** · Auto-review · Router Balance/Intelligence for drain · vision Speeds/Rust/eye verified · research [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](./CURSOR_UPDATE_RESEARCH_2026-07-27.md) · FM **§5.16**.
 
-**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **620** спринтів → PH-S2278.
+**Completion path:** [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · **610** спринтів → PH-S2278 (після GSV band 102).
+
+## Band 102 — GSV migration · Galaxy StarWalker Vision (PH-S1659…S1668, **◎ open**)
+
+Окремий проєкт **GSV** — vision migration у Rust-first bin-сервер з боксами (95–100% Rust / 0–5% wasm). Архітектура + docs: [`GSV/README.md`](../../GSV/README.md) · [`docs/gsv/`](../../gsv/README.md) · **TechPreroadMap** [`GSV_TECH_ROADMAP.md`](../../gsv/GSV_TECH_ROADMAP.md). Priority: owner (перед master-backlog Ratio96 phase F).
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1659** | GSV docs/architecture + Cargo scaffold |
+| **PH-S1660** | gsv-server bin scaffold (`GET /`, `/api/health`) |
+| **PH-S1661** | Tracker box (`/api/tracker`) |
+| **PH-S1662** | SLI console box (`/api/sli`) |
+| **PH-S1663** | Toolchain box (`/api/toolchain`) |
+| **PH-S1664** | IDE box (opencode + cursor чати) |
+| **PH-S1665** | Update box (SSE `update_available`; «Update» замість reload) |
+| **PH-S1666** | Box preview (Rust-кольори) + SLI terminal |
+| **PH-S1667** | Tests/bench hooks (без перекомпіляції) |
+| **PH-S1668** | Band close (offline-стійкість + metrics resync; tests; docs canon) |
+
+**PH-S1659…S1668 ◎ (2026-08-01):** архітектура + docs створено; спринти зареєстровані в FM §5.12 §5.83; реалізація — наступна сесія (`абракадабра` → drain band 102).
 
 ## Band 101 — Ratio96 depth scaffold (PH-S1649…S1658, **✅**)
 

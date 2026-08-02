@@ -8,11 +8,12 @@ cd "$(dirname "$0")/.."
 
 echo "📋 Updating file_list.csv..."
 
-# Find all files, exclude target, .git, node_modules
+# Find all files, exclude target, .git, node_modules, .tmp
 find . -type f \
   -not -path './target/*' \
   -not -path './.git/*' \
   -not -path './node_modules/*' \
+  -not -path './.tmp/*' \
   -not -path './.cursor/cache/*' \
   | sort > file_list_new.csv
 

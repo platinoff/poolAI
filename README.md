@@ -82,11 +82,13 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 ### Next Focus (2026-08-01)
 
-**Product:** наступна сесія **`абракадабра`** → drain band 101 (PH-S1649…S1658 Monitoring horizon next).
+**Product:** наступна сесія **`абракадабра`** → drain band 102 **GSV migration** (PH-S1659…S1668).
 
-**Наступна сесія (owner):** **`абракадабра`** — drain band 101 **PH-S1649…S1658** · [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
+**GSV (новий):** окремий проєкт **Galaxy StarWalker Vision** — vision migration у Rust-first bin-сервер з боксами (95–100% Rust / 0–5% wasm) · [`GSV/README.md`](GSV/README.md) · **TechPreroadMap** [`docs/gsv/GSV_TECH_ROADMAP.md`](docs/gsv/GSV_TECH_ROADMAP.md).
 
-**§5.12:** **0** відкритих (band 100 ✅ · band 101 next) · vision **rev 438** · last **PH-S1658** · next **PH-S1659**.
+**Наступна сесія (owner):** **`абракадабра`** — drain band 102 **GSV** PH-S1659…S1668 · [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
+
+**§5.12:** **10** відкритих (band 102 GSV ◎) · vision **rev 438** · last **PH-S1658** · next **PH-S1659**.
 
 **Tech (сьогодні):** Service **PH-SVC75…SVC84** — Cursor **3.13.21** research + rules/agents + vision Speeds/eye verify · [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](docs/development/CURSOR_UPDATE_RESEARCH_2026-07-27.md) · Auto-review · prior GH tokens **PH-SVC65…74** ✅ · open **PH-SVC34** (GH verify) · **PH-SVC35** OWNER Atlassian revoke.
 

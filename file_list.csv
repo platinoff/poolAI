@@ -167,6 +167,7 @@
 ./Cargo.minimal.toml
 ./Cargo.std.toml
 ./Cargo.toml
+./GSV/README.md
 ./certs/README.md
 ./comitmsg/.commit-msg-a11y.txt
 ./comitmsg/.commit-msg-docs-s11.txt
@@ -657,6 +658,12 @@
 ./docs/GIT_PUSH_NOW_2026-01-22.md
 ./docs/GIT_WORKFLOW_2026-01-22.md
 ./docs/HOW_TO_RUN.md
+./docs/gsv/GSV_ARCHITECTURE.md
+./docs/gsv/GSV_BOXES.md
+./docs/gsv/GSV_MIGRATION.md
+./docs/gsv/GSV_SERVER.md
+./docs/gsv/GSV_TECH_ROADMAP.md
+./docs/gsv/README.md
 ./docs/INDEX_2026-03-17.md
 ./docs/migration/MIGRATION.md
 ./docs/ml/AUTOML.md

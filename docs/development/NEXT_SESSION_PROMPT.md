@@ -1,17 +1,18 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-07-29 (band 101 **PH-S1649…S1658, 2026-08-01** ✅ · horizon band 102)
+**Оновлено:** 2026-08-01 (band 102 **GSV** PH-S1659…S1668 **◎ open** · band 101 **PH-S1649…S1658, 2026-08-01** ✅)
 
-Maintenance mode (FM §5.15) · band 101 drained.
+Maintenance mode (FM §5.15) · band 102 GSV open.
 
 Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.18 @ S2278).
 
-| **← наступний** | **`абракадабра`** (project scan → band 102) |
-| **§5.12 active** | **0** (band 101 ✅) |
+| **← наступний** | **`абракадабра`** (project scan → drain band 102 **GSV**) |
+| **§5.12 active** | **10** (band 102 GSV ◎) |
 | **P0 open** | **PH-SVC34** re-verify GH · **PH-SVC35** OWNER |
-| **Completion pending** | **620** sprints PH-S1659…S2278 · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) |
-| **Horizon** | band 102 → **PH-S1659…S1668** |
+| **Completion pending** | **610** sprints PH-S1669…S2278 · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) |
+| **Horizon** | band 102 → **PH-S1659…S1668 (GSV)** |
 | **Vision** | rev **438** |
+| **GSV** | окремий проєкт Rust-first · [`GSV/README.md`](../../GSV/README.md) · [`docs/gsv/`](../../gsv/README.md) · **TechPreroadMap** [`GSV_TECH_ROADMAP.md`](../../gsv/GSV_TECH_ROADMAP.md) |
 | **Cursor / GH** | local **3.13.21** · Auto-review · Router Balance/Intelligence · Actions `GITHUB_TOKEN` opaque/JWT · [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](./CURSOR_UPDATE_RESEARCH_2026-07-27.md) |
 
 ---
@@ -22,28 +23,30 @@ Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.1
 абракадабра
 ```
 
-**Порядок:** **S0 диск** (`df -h /s` + `check_target_disk.sh` → `cargo clean` за потреби) → project scan (**спочатку** `rust_diagnostics` / clippy warnings → виправлення в топ смуги) → drain band 102 (Ratio96 store wire; **без** mid-push) → Speeds (`bash bin/record-test-ci-speed.sh`) · Rust panel (`bash bin/record-rust-diagnostics.sh`) → vision-sync → **один** commit → **`git push` + самарі (завжди кінець сесії)**. Після push — PH-SVC34 GH re-verify (JWT-format `GITHUB_TOKEN` ok). **Не** комітити `certs/*.pem`, `.env`, `data/audit/*`. **Не** валідувати довжину `ghs_*`.
+**Порядок:** **S0 диск** (`df -h /s` + `check_target_disk.sh` → `cargo clean` за потреби) → project scan (**спочатку** `rust_diagnostics` / clippy warnings → виправлення в топ смуги) → drain band 102 **GSV migration** (PH-S1659…S1668; **без** mid-push) → Speeds (`bash bin/record-test-ci-speed.sh`) · Rust panel (`bash bin/record-rust-diagnostics.sh`) → vision-sync → **один** commit → **`git push` + самарі (завжди кінець сесії)**. Після push — PH-SVC34 GH re-verify (JWT-format `GITHUB_TOKEN` ok). **Не** комітити `certs/*.pem`, `.env`, `data/audit/*`. **Не** валідувати довжину `ghs_*`.
 
 **Cursor:** desktop **3.13.21** · Run Mode **Auto-review** · drain = Agent mode · Router Auto → Balance/Intelligence · research [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](./CURSOR_UPDATE_RESEARCH_2026-07-27.md).
 
 ---
 
-## Band 102 (очікуваний фокус — project scan)
+## Band 102 — GSV migration (PH-S1659…S1668)
+
+Окремий проєкт **Galaxy StarWalker Vision**: vision migration у Rust-first bin-сервер `gsv-server` з боксами (Tracker · SLI console · Toolchain · IDE · Update/offline · Box preview · SLI terminal · Tests/bench hooks). Канон: **TechPreroadMap** [`GSV_TECH_ROADMAP.md`](../../gsv/GSV_TECH_ROADMAP.md).
 
 | Sprint | Фокус |
 |--------|--------|
-| **PH-S1659** | next project-scan band scaffold (band 101 ratio96-depth ✓ → master backlog next rows) |
-| **PH-S1660** | slice aggregate |
-| **PH-S1661** | criteria contracts |
-| **PH-S1662** | verify-dev-stand hook |
-| **PH-S1663** | stand smoke export |
-| **PH-S1664** | `poolai-loc-audit` flag |
-| **PH-S1665** | docs canon sync |
-| **PH-S1666** | vision-sync --check |
-| **PH-S1667** | ratio hold advisory |
-| **PH-S1668** | band close |
+| **PH-S1659** | GSV docs/architecture + Cargo scaffold |
+| **PH-S1660** | gsv-server bin scaffold (`GET /`, `/api/health`) |
+| **PH-S1661** | Tracker box (`/api/tracker`) |
+| **PH-S1662** | SLI console box (`/api/sli`) |
+| **PH-S1663** | Toolchain box (`/api/toolchain`) |
+| **PH-S1664** | IDE box (opencode + cursor чати) |
+| **PH-S1665** | Update box (SSE `update_available`; «Update» замість reload) |
+| **PH-S1666** | Box preview (Rust-кольори) + SLI terminal |
+| **PH-S1667** | Tests/bench hooks (без перекомпіляції) |
+| **PH-S1668** | Band close (offline-стійкість + metrics resync; tests; docs canon) |
 
-Канон: next project-scan band from [`PH_S_MASTER_BACKLOG_1000.md`](./PH_S_MASTER_BACKLOG_1000.md) (band 102 `PH-S1659…S1668`)
+Канон: [`GSV/README.md`](../../GSV/README.md) · [`docs/gsv/GSV_BOXES.md`](../../gsv/GSV_BOXES.md) · [`docs/gsv/GSV_SERVER.md`](../../gsv/GSV_SERVER.md) · FM §5.12 §5.83
 
 ---
 

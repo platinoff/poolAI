@@ -2,6 +2,8 @@
 
 Ізометрична карта зв’язків **доків ↔ код ↔ спринти** для ітераційної розробки (VDT). Оновлюється разом із закриттям PH-S* / змінами FM §5.11.
 
+> **GSV (2026-08-01):** vision мігрує в окремий Rust-first проєкт **Galaxy StarWalker Vision** (`GSV/` + [`docs/gsv/`](../gsv/README.md)). Цей каталог — канон-джерело до завершення GSV; архітектура міграції: [`GSV_MIGRATION.md`](../gsv/GSV_MIGRATION.md) · TechPreroadMap: [`GSV_TECH_ROADMAP.md`](../gsv/GSV_TECH_ROADMAP.md).
+
 ## Файли
 
 | Файл | Призначення |
