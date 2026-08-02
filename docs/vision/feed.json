@@ -2,95 +2,94 @@
   "description": "RSS-style ticker of FM §5.12 sprint queue (open + recent closed)",
   "items": [
     {
-      "category": "open",
-      "id": "PH-S1719",
+      "category": "closed",
+      "id": "PH-S1738",
       "link": "docs/vision/index.html#sprint-queue",
-      "next": true,
       "published": "2026-05-28",
-      "status": "open",
-      "summary": "galaxy_horizon_s1719_integration.rs` + stand smoke",
-      "title": "Ratio96 horizon continuation (galaxy_horizon_s1719_integration)"
+      "status": "closed",
+      "summary": "poolai-vision-sync + git push",
+      "title": "Vision close + push"
     },
     {
-      "category": "open",
-      "id": "PH-S1720",
+      "category": "closed",
+      "id": "PH-S1737",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
-      "status": "open",
-      "summary": "CLI horizon flag + advisory",
-      "title": "poolai-loc-audit --ratio96-horizon-2"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1721",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "New doc + RUN_LOCAL update",
-      "title": "Docs canon sync (RATIO96_HORIZON_2.md)"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1722",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "manifest.kivi + debug widget update",
-      "title": "Vision sync + KIVI debug v2"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1723",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "IDE+provider+model+time in done",
-      "title": "Multi-provider KIVI signature v2"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1724",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "Integration test + FM update",
-      "title": "Band close (galaxy_horizon_s1720_integration)"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1725",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "record-rust-diagnostics.sh",
-      "title": "Rust diagnostics record"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1726",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "record-test-ci-speed.sh",
-      "title": "Test-ci speed record"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1727",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
+      "status": "closed",
       "summary": "Replenish §5.12 from master",
       "title": "Project scan replenish (next 10)"
     },
     {
-      "category": "open",
-      "id": "PH-S1728",
+      "category": "closed",
+      "id": "PH-S1736",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
-      "status": "open",
-      "summary": "poolai-vision-sync + git push",
-      "title": "Vision close + push"
+      "status": "closed",
+      "summary": "record-test-ci-speed.sh",
+      "title": "Test-ci speed record"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1735",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "record-rust-diagnostics.sh",
+      "title": "Rust diagnostics record"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1734",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "Integration test + FM update",
+      "title": "Band close (galaxy_horizon_s1730_integration)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1733",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "IDE+provider+model+time in done",
+      "title": "Multi-provider KIVI signature v3"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1732",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "manifest.kivi + debug widget update",
+      "title": "Vision sync + KIVI debug v3"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1731",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "New doc + RUN_LOCAL update",
+      "title": "Docs canon sync (RATIO96_HORIZON_V3.md)"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1730",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "CLI horizon flag + advisory",
+      "title": "poolai-loc-audit --ratio96-horizon-v3"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1729",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_horizon_s1729_integration.rs` + stand smoke",
+      "title": "Ratio96 horizon v3 (galaxy_horizon_s1729_integration)"
     },
     {
       "category": "closed",
@@ -108,96 +107,6 @@
       "published": "2026-05-28",
       "status": "closed",
       "summary": "--ratio96-stand-smoke --advisory --min-ratio 0.95",
-      "title": "Ratio hold advisory"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1696",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "drift gate green",
-      "title": "poolai-vision-sync --check"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1695",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "RATIO96_STAND_SMOKE.md`; RUN_LOCAL/README; verify-dev-stand + run-poolai hooks",
-      "title": "Docs canon sync"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1694",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--ratio96-stand-smoke` zriz (mode/total/met)",
-      "title": "poolai-loc-audit PH-S1694"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1693",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "ratio96_stand_smoke_band105_export_shape` unit test",
-      "title": "Stand smoke `ratio96` export"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1692",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "smoke_ratio96_field_fixtures` → 400 codes",
-      "title": "Live `ratio96` field fixture smoke"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1691",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "smoke_ratio96_query",
-      "title": "Live `ratio96` query smoke"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1690",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "smoke_ratio96_store_wire` ← `GET /api/v1/ops/ratio96",
-      "title": "Live `ratio96` store wire smoke"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1689",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "depth enum + criteria registry (10)",
-      "title": "ratio96_stand_smoke_depth` ui-core module"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1688",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_horizon_s1679_integration`; FM ✅ · HANDOFF · NEXT_SESSION",
-      "title": "galaxy_horizon_s1679_integration"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1687",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--ratio96-admin-ops --advisory --min-ratio 0.95",
       "title": "Ratio hold advisory"
     }
   ],

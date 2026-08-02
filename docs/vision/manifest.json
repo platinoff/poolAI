@@ -3162,7 +3162,7 @@
       "signature": "queue: FM §5.12 next band 107"
     }
   ],
-  "last_sprint_closed": "PH-S1698",
+  "last_sprint_closed": "PH-S1738",
   "layers": [
     {
       "id": "L0",
@@ -3195,7 +3195,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1719",
+  "next_sprint": "PH-S1729",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -12257,100 +12257,9 @@
       "path": "tests/galaxy_horizon_s1699_integration.rs"
     }
   ],
-  "revision": 452,
-  "sprint_queue": [
-    {
-      "acceptance": "galaxy_horizon_s1719_integration.rs` + stand smoke",
-      "deps": "Ratio96 F band 108",
-      "id": "PH-S1719",
-      "open": true,
-      "row": 1,
-      "status": "open",
-      "title": "Ratio96 horizon continuation (galaxy_horizon_s1719_integration)"
-    },
-    {
-      "acceptance": "CLI horizon flag + advisory",
-      "deps": "Ratio96 F band 108",
-      "id": "PH-S1720",
-      "open": true,
-      "row": 2,
-      "status": "open",
-      "title": "poolai-loc-audit --ratio96-horizon-2"
-    },
-    {
-      "acceptance": "New doc + RUN_LOCAL update",
-      "deps": "Ratio96 F band 108",
-      "id": "PH-S1721",
-      "open": true,
-      "row": 3,
-      "status": "open",
-      "title": "Docs canon sync (RATIO96_HORIZON_2.md)"
-    },
-    {
-      "acceptance": "manifest.kivi + debug widget update",
-      "deps": "Ratio96 F band 108",
-      "id": "PH-S1722",
-      "open": true,
-      "row": 4,
-      "status": "open",
-      "title": "Vision sync + KIVI debug v2"
-    },
-    {
-      "acceptance": "IDE+provider+model+time in done",
-      "deps": "Ratio96 F band 108",
-      "id": "PH-S1723",
-      "open": true,
-      "row": 5,
-      "status": "open",
-      "title": "Multi-provider KIVI signature v2"
-    },
-    {
-      "acceptance": "Integration test + FM update",
-      "deps": "Ratio96 F band 108",
-      "id": "PH-S1724",
-      "open": true,
-      "row": 6,
-      "status": "open",
-      "title": "Band close (galaxy_horizon_s1720_integration)"
-    },
-    {
-      "acceptance": "record-rust-diagnostics.sh",
-      "deps": "Ratio96 F band 108",
-      "id": "PH-S1725",
-      "open": true,
-      "row": 7,
-      "status": "open",
-      "title": "Rust diagnostics record"
-    },
-    {
-      "acceptance": "record-test-ci-speed.sh",
-      "deps": "Ratio96 F band 108",
-      "id": "PH-S1726",
-      "open": true,
-      "row": 8,
-      "status": "open",
-      "title": "Test-ci speed record"
-    },
-    {
-      "acceptance": "Replenish §5.12 from master",
-      "deps": "Ratio96 F band 108",
-      "id": "PH-S1727",
-      "open": true,
-      "row": 9,
-      "status": "open",
-      "title": "Project scan replenish (next 10)"
-    },
-    {
-      "acceptance": "poolai-vision-sync + git push",
-      "deps": "Ratio96 F band 108",
-      "id": "PH-S1728",
-      "open": true,
-      "row": 10,
-      "status": "open",
-      "title": "Vision close + push"
-    }
-  ],
-  "sprint_queue_open_count": 10,
+  "revision": 453,
+  "sprint_queue": [],
+  "sprint_queue_open_count": 0,
   "updated_at": "2026-06-20",
   "vision_ui_rev": 59
 }
