@@ -1,16 +1,16 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-08-02 (band 110 **PH-S1739…S1748** ✅ · band 111 closed PH-S1749…S1758 ✅)
+**Оновлено:** 2026-08-02 (band 112 **PH-S1759…S1768** ✅ · band 113 open PH-S1769…S1778)
 
 Maintenance mode (FM §5.15) · band 105 drained.
 
 Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.18 @ S2278).
 
 | **← наступний** | **`абракадабра`** (project scan → band 106) |
-| **§5.12 active** | **0** (band 111 ✅) |
+| **§5.12 active** | **10** (band 113 open) |
 | **P0 open** | **PH-SVC34** re-verify GH · **PH-SVC35** OWNER |
 | **Completion pending** | **580** sprints PH-S1709…S2278 · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) |
-| **Horizon** | band 110 → **PH-S1739…S1748** |
+| **Horizon** | band 113 → **PH-S1769…S1778** |
 | **Vision** | rev **453** |
 | **GSV** | окремий проєкт Rust-first · [`GSV/README.md`](../../GSV/README.md) · [`docs/gsv/`](../../gsv/README.md) · **TechPreroadMap** [`GSV_TECH_ROADMAP.md`](../../gsv/GSV_TECH_ROADMAP.md) |
 | **Cursor / GH** | local **3.13.21** · Auto-review · Router Balance/Intelligence · Actions `GITHUB_TOKEN` opaque/JWT · [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](./CURSOR_UPDATE_RESEARCH_2026-07-27.md) |
