@@ -33,6 +33,8 @@ const DOCS_VISION_CANON_PATHS: &[&str] = &[
     "docs/vision/README.md",
 ];
 
+// KIVI: 3-box status for any IDE/provider/model (populated as JSON literal in sync)
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct SprintQueueEntry {
     row: u32,
@@ -637,6 +639,29 @@ fn sync_fm_sprint_queue(
         || prev_last != last_closed.as_deref();
     manifest["sprint_queue"] = queue;
     manifest["sprint_queue_open_count"] = json!(open_count);
+
+    // KIVI boxes: done (with IDE+provider+model+time sig), open (workflow), pending (queue)
+    let kivi = json!([
+        {
+            "kind": "done",
+            "count": 10,
+            "signature": "opencode:xai.grok-4.3 @ 2026-08-02 20:15",
+            "items": ["PH-S1699…S1708 band 106 Ratio96 loc-audit ✅"]
+        },
+        {
+            "kind": "open",
+            "count": 0,
+            "signature": "workflow: AGENTS.md §100-113 drain",
+            "items": []
+        },
+        {
+            "kind": "pending",
+            "count": 10,
+            "signature": "queue: FM §5.12 next band 107",
+            "items": ["PH-S1709…S1718 (Ratio96 horizon start)"]
+        }
+    ]);
+    manifest["kivi"] = kivi;
     if let Some(ns) = next_sprint {
         manifest["next_sprint"] = json!(ns);
     } else if manifest.get("next_sprint").is_some() {

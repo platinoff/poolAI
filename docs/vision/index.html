@@ -54,6 +54,12 @@
     </aside>
     <div class="main-col" role="main" id="vision-main">
       <div class="panel-dock" id="panel-dock" hidden aria-label="Collapsed panels — click to restore"></div>
+<div id="kivi-boxes" class="kivi-boxes" aria-label="KIVI status: done / open / pending">
+  <div class="kivi done"><h3>✅ Done</h3><div class="kivi-sig"></div><ul class="kivi-list"></ul></div>
+  <div class="kivi open"><h3>🔄 Open (workflow)</h3><div class="kivi-sig"></div><ul class="kivi-list"></ul></div>
+  <div class="kivi pending"><h3>⏳ Pending (queue)</h3><div class="kivi-sig"></div><ul class="kivi-list"></ul></div>
+  <details open class="kivi-debug"><summary>🐛 Debug KIVI (manifest.kivi + vision-sync)</summary><pre id="kivi-debug-json"></pre></details>
+</div>
       <div class="diagram-row">
         <section class="panel" data-panel="layers" aria-label="Layer stack">
           <h2><span data-short="Ly">Layers</span><span class="panel-head-actions"><button type="button" class="btn-panel-collapse" title="Collapse to title bar">−</button><button type="button" class="btn-panel-fs" title="Fullscreen (Esc)">⛶</button></span></h2>
