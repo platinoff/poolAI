@@ -5321,80 +5321,80 @@
 <a href=#5321 id=5321 data-nosnippet>5321</a>    <span class="macro">assert!</span>(src.contains(<span class="string">"function handleDashModalEscape"</span>));
 <a href=#5322 id=5322 data-nosnippet>5322</a>}
 <a href=#5323 id=5323 data-nosnippet>5323</a>
-<a href=#5324 id=5324 data-nosnippet>5324</a><span class="attr">#[cfg(test)]
-<a href=#5325 id=5325 data-nosnippet>5325</a></span><span class="kw">mod </span>dashboard_a11y_tests {
-<a href=#5326 id=5326 data-nosnippet>5326</a>    <span class="kw">use super</span>::{libs_page, raid_page, vm_page, workers_page};
+<a href=#5324 id=5324 data-nosnippet>5324</a><span class="kw">pub async fn </span>initialize() -&gt; <span class="prelude-ty">Result</span>&lt;(), AppError&gt; {
+<a href=#5325 id=5325 data-nosnippet>5325</a>    UiManager::new().initialize().<span class="kw">await
+<a href=#5326 id=5326 data-nosnippet>5326</a></span>}
 <a href=#5327 id=5327 data-nosnippet>5327</a>
-<a href=#5328 id=5328 data-nosnippet>5328</a>    <span class="attr">#[tokio::test]
-<a href=#5329 id=5329 data-nosnippet>5329</a>    </span><span class="kw">async fn </span>dashboard_workers_modal_closed_aria_state() {
-<a href=#5330 id=5330 data-nosnippet>5330</a>        <span class="kw">let </span>html = workers_page().<span class="kw">await</span>.<span class="number">0</span>;
-<a href=#5331 id=5331 data-nosnippet>5331</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"id=\"createWorkerModal\""</span>));
-<a href=#5332 id=5332 data-nosnippet>5332</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"aria-modal=\"false\" aria-hidden=\"true\""</span>));
-<a href=#5333 id=5333 data-nosnippet>5333</a>        <span class="macro">assert!</span>(!html.contains(<span class="string">"aria-modal=\"true\" aria-hidden=\"true\""</span>));
-<a href=#5334 id=5334 data-nosnippet>5334</a>    }
+<a href=#5328 id=5328 data-nosnippet>5328</a><span class="kw">pub async fn </span>shutdown() -&gt; <span class="prelude-ty">Result</span>&lt;(), AppError&gt; {
+<a href=#5329 id=5329 data-nosnippet>5329</a>    UiManager::new().shutdown().<span class="kw">await
+<a href=#5330 id=5330 data-nosnippet>5330</a></span>}
+<a href=#5331 id=5331 data-nosnippet>5331</a>
+<a href=#5332 id=5332 data-nosnippet>5332</a><span class="attr">#[cfg(test)]
+<a href=#5333 id=5333 data-nosnippet>5333</a></span><span class="kw">mod </span>dashboard_a11y_tests {
+<a href=#5334 id=5334 data-nosnippet>5334</a>    <span class="kw">use super</span>::{libs_page, raid_page, vm_page, workers_page};
 <a href=#5335 id=5335 data-nosnippet>5335</a>
 <a href=#5336 id=5336 data-nosnippet>5336</a>    <span class="attr">#[tokio::test]
-<a href=#5337 id=5337 data-nosnippet>5337</a>    </span><span class="kw">async fn </span>dashboard_shell_auth_ids_unique_per_viewport() {
+<a href=#5337 id=5337 data-nosnippet>5337</a>    </span><span class="kw">async fn </span>dashboard_workers_modal_closed_aria_state() {
 <a href=#5338 id=5338 data-nosnippet>5338</a>        <span class="kw">let </span>html = workers_page().<span class="kw">await</span>.<span class="number">0</span>;
-<a href=#5339 id=5339 data-nosnippet>5339</a>        <span class="macro">assert_eq!</span>(html.matches(<span class="string">"id=\"userInfo\""</span>).count(), <span class="number">1</span>);
-<a href=#5340 id=5340 data-nosnippet>5340</a>        <span class="macro">assert_eq!</span>(html.matches(<span class="string">"id=\"mobileUserInfo\""</span>).count(), <span class="number">1</span>);
-<a href=#5341 id=5341 data-nosnippet>5341</a>        <span class="macro">assert_eq!</span>(html.matches(<span class="string">"id=\"authLoginBtn\""</span>).count(), <span class="number">1</span>);
-<a href=#5342 id=5342 data-nosnippet>5342</a>        <span class="macro">assert_eq!</span>(html.matches(<span class="string">"id=\"mobileAuthLoginBtn\""</span>).count(), <span class="number">1</span>);
-<a href=#5343 id=5343 data-nosnippet>5343</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"aria-label=\"Select theme\""</span>));
-<a href=#5344 id=5344 data-nosnippet>5344</a>    }
-<a href=#5345 id=5345 data-nosnippet>5345</a>
-<a href=#5346 id=5346 data-nosnippet>5346</a>    <span class="attr">#[tokio::test]
-<a href=#5347 id=5347 data-nosnippet>5347</a>    </span><span class="kw">async fn </span>dashboard_libs_modal_closed_aria_state() {
-<a href=#5348 id=5348 data-nosnippet>5348</a>        <span class="kw">let </span>html = libs_page().<span class="kw">await</span>.<span class="number">0</span>;
-<a href=#5349 id=5349 data-nosnippet>5349</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"id=\"installLibraryModal\""</span>));
-<a href=#5350 id=5350 data-nosnippet>5350</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"role=\"dialog\""</span>));
-<a href=#5351 id=5351 data-nosnippet>5351</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"id=\"installLibraryModalTitle\""</span>));
-<a href=#5352 id=5352 data-nosnippet>5352</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"aria-modal=\"false\" aria-hidden=\"true\""</span>));
-<a href=#5353 id=5353 data-nosnippet>5353</a>    }
-<a href=#5354 id=5354 data-nosnippet>5354</a>
-<a href=#5355 id=5355 data-nosnippet>5355</a>    <span class="attr">#[tokio::test]
-<a href=#5356 id=5356 data-nosnippet>5356</a>    </span><span class="kw">async fn </span>dashboard_vm_modal_closed_aria_state() {
-<a href=#5357 id=5357 data-nosnippet>5357</a>        <span class="kw">let </span>html = vm_page().<span class="kw">await</span>.<span class="number">0</span>;
-<a href=#5358 id=5358 data-nosnippet>5358</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"id=\"createVmModal\""</span>));
-<a href=#5359 id=5359 data-nosnippet>5359</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"aria-modal=\"false\" aria-hidden=\"true\""</span>));
-<a href=#5360 id=5360 data-nosnippet>5360</a>    }
-<a href=#5361 id=5361 data-nosnippet>5361</a>
-<a href=#5362 id=5362 data-nosnippet>5362</a>    <span class="attr">#[tokio::test]
-<a href=#5363 id=5363 data-nosnippet>5363</a>    </span><span class="kw">async fn </span>dashboard_raid_modal_closed_aria_state() {
-<a href=#5364 id=5364 data-nosnippet>5364</a>        <span class="kw">let </span>html = raid_page().<span class="kw">await</span>.<span class="number">0</span>;
-<a href=#5365 id=5365 data-nosnippet>5365</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"id=\"createArtifactModal\""</span>));
-<a href=#5366 id=5366 data-nosnippet>5366</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"aria-modal=\"false\" aria-hidden=\"true\""</span>));
-<a href=#5367 id=5367 data-nosnippet>5367</a>    }
-<a href=#5368 id=5368 data-nosnippet>5368</a>
-<a href=#5369 id=5369 data-nosnippet>5369</a>    <span class="attr">#[tokio::test]
-<a href=#5370 id=5370 data-nosnippet>5370</a>    </span><span class="kw">async fn </span>dashboard_shell_includes_ui_wasm_module() {
-<a href=#5371 id=5371 data-nosnippet>5371</a>        <span class="kw">let </span>html = workers_page().<span class="kw">await</span>.<span class="number">0</span>;
-<a href=#5372 id=5372 data-nosnippet>5372</a>        <span class="macro">assert!</span>(html.contains(<span class="string">r#"type="module""#</span>));
-<a href=#5373 id=5373 data-nosnippet>5373</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"poolai-ui-wasm-ready"</span>));
-<a href=#5374 id=5374 data-nosnippet>5374</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"formatLocaleTimeHms"</span>));
-<a href=#5375 id=5375 data-nosnippet>5375</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"poolaiUiWasmCall"</span>));
-<a href=#5376 id=5376 data-nosnippet>5376</a>    }
-<a href=#5377 id=5377 data-nosnippet>5377</a>
-<a href=#5378 id=5378 data-nosnippet>5378</a>    <span class="attr">#[tokio::test]
-<a href=#5379 id=5379 data-nosnippet>5379</a>    </span><span class="kw">async fn </span>login_page_includes_ui_wasm_module() {
-<a href=#5380 id=5380 data-nosnippet>5380</a>        <span class="kw">let </span>html = <span class="kw">super</span>::login_page().<span class="kw">await</span>.<span class="number">0</span>;
-<a href=#5381 id=5381 data-nosnippet>5381</a>        <span class="macro">assert!</span>(html.contains(<span class="string">r#"type="module""#</span>));
-<a href=#5382 id=5382 data-nosnippet>5382</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"formatIsoDatetime"</span>));
-<a href=#5383 id=5383 data-nosnippet>5383</a>        <span class="macro">assert!</span>(!html.contains(<span class="string">"function apiErrMsg"</span>));
+<a href=#5339 id=5339 data-nosnippet>5339</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"id=\"createWorkerModal\""</span>));
+<a href=#5340 id=5340 data-nosnippet>5340</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"aria-modal=\"false\" aria-hidden=\"true\""</span>));
+<a href=#5341 id=5341 data-nosnippet>5341</a>        <span class="macro">assert!</span>(!html.contains(<span class="string">"aria-modal=\"true\" aria-hidden=\"true\""</span>));
+<a href=#5342 id=5342 data-nosnippet>5342</a>    }
+<a href=#5343 id=5343 data-nosnippet>5343</a>
+<a href=#5344 id=5344 data-nosnippet>5344</a>    <span class="attr">#[tokio::test]
+<a href=#5345 id=5345 data-nosnippet>5345</a>    </span><span class="kw">async fn </span>dashboard_shell_auth_ids_unique_per_viewport() {
+<a href=#5346 id=5346 data-nosnippet>5346</a>        <span class="kw">let </span>html = workers_page().<span class="kw">await</span>.<span class="number">0</span>;
+<a href=#5347 id=5347 data-nosnippet>5347</a>        <span class="macro">assert_eq!</span>(html.matches(<span class="string">"id=\"userInfo\""</span>).count(), <span class="number">1</span>);
+<a href=#5348 id=5348 data-nosnippet>5348</a>        <span class="macro">assert_eq!</span>(html.matches(<span class="string">"id=\"mobileUserInfo\""</span>).count(), <span class="number">1</span>);
+<a href=#5349 id=5349 data-nosnippet>5349</a>        <span class="macro">assert_eq!</span>(html.matches(<span class="string">"id=\"authLoginBtn\""</span>).count(), <span class="number">1</span>);
+<a href=#5350 id=5350 data-nosnippet>5350</a>        <span class="macro">assert_eq!</span>(html.matches(<span class="string">"id=\"mobileAuthLoginBtn\""</span>).count(), <span class="number">1</span>);
+<a href=#5351 id=5351 data-nosnippet>5351</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"aria-label=\"Select theme\""</span>));
+<a href=#5352 id=5352 data-nosnippet>5352</a>    }
+<a href=#5353 id=5353 data-nosnippet>5353</a>
+<a href=#5354 id=5354 data-nosnippet>5354</a>    <span class="attr">#[tokio::test]
+<a href=#5355 id=5355 data-nosnippet>5355</a>    </span><span class="kw">async fn </span>dashboard_libs_modal_closed_aria_state() {
+<a href=#5356 id=5356 data-nosnippet>5356</a>        <span class="kw">let </span>html = libs_page().<span class="kw">await</span>.<span class="number">0</span>;
+<a href=#5357 id=5357 data-nosnippet>5357</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"id=\"installLibraryModal\""</span>));
+<a href=#5358 id=5358 data-nosnippet>5358</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"role=\"dialog\""</span>));
+<a href=#5359 id=5359 data-nosnippet>5359</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"id=\"installLibraryModalTitle\""</span>));
+<a href=#5360 id=5360 data-nosnippet>5360</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"aria-modal=\"false\" aria-hidden=\"true\""</span>));
+<a href=#5361 id=5361 data-nosnippet>5361</a>    }
+<a href=#5362 id=5362 data-nosnippet>5362</a>
+<a href=#5363 id=5363 data-nosnippet>5363</a>    <span class="attr">#[tokio::test]
+<a href=#5364 id=5364 data-nosnippet>5364</a>    </span><span class="kw">async fn </span>dashboard_vm_modal_closed_aria_state() {
+<a href=#5365 id=5365 data-nosnippet>5365</a>        <span class="kw">let </span>html = vm_page().<span class="kw">await</span>.<span class="number">0</span>;
+<a href=#5366 id=5366 data-nosnippet>5366</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"id=\"createVmModal\""</span>));
+<a href=#5367 id=5367 data-nosnippet>5367</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"aria-modal=\"false\" aria-hidden=\"true\""</span>));
+<a href=#5368 id=5368 data-nosnippet>5368</a>    }
+<a href=#5369 id=5369 data-nosnippet>5369</a>
+<a href=#5370 id=5370 data-nosnippet>5370</a>    <span class="attr">#[tokio::test]
+<a href=#5371 id=5371 data-nosnippet>5371</a>    </span><span class="kw">async fn </span>dashboard_raid_modal_closed_aria_state() {
+<a href=#5372 id=5372 data-nosnippet>5372</a>        <span class="kw">let </span>html = raid_page().<span class="kw">await</span>.<span class="number">0</span>;
+<a href=#5373 id=5373 data-nosnippet>5373</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"id=\"createArtifactModal\""</span>));
+<a href=#5374 id=5374 data-nosnippet>5374</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"aria-modal=\"false\" aria-hidden=\"true\""</span>));
+<a href=#5375 id=5375 data-nosnippet>5375</a>    }
+<a href=#5376 id=5376 data-nosnippet>5376</a>
+<a href=#5377 id=5377 data-nosnippet>5377</a>    <span class="attr">#[tokio::test]
+<a href=#5378 id=5378 data-nosnippet>5378</a>    </span><span class="kw">async fn </span>dashboard_shell_includes_ui_wasm_module() {
+<a href=#5379 id=5379 data-nosnippet>5379</a>        <span class="kw">let </span>html = workers_page().<span class="kw">await</span>.<span class="number">0</span>;
+<a href=#5380 id=5380 data-nosnippet>5380</a>        <span class="macro">assert!</span>(html.contains(<span class="string">r#"type="module""#</span>));
+<a href=#5381 id=5381 data-nosnippet>5381</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"poolai-ui-wasm-ready"</span>));
+<a href=#5382 id=5382 data-nosnippet>5382</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"formatLocaleTimeHms"</span>));
+<a href=#5383 id=5383 data-nosnippet>5383</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"poolaiUiWasmCall"</span>));
 <a href=#5384 id=5384 data-nosnippet>5384</a>    }
 <a href=#5385 id=5385 data-nosnippet>5385</a>
 <a href=#5386 id=5386 data-nosnippet>5386</a>    <span class="attr">#[tokio::test]
-<a href=#5387 id=5387 data-nosnippet>5387</a>    </span><span class="kw">async fn </span>dashboard_dark_theme_danger_matches_rust_canon() {
-<a href=#5388 id=5388 data-nosnippet>5388</a>        <span class="kw">let </span>html = workers_page().<span class="kw">await</span>.<span class="number">0</span>;
-<a href=#5389 id=5389 data-nosnippet>5389</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"danger: '#c62828'"</span>));
-<a href=#5390 id=5390 data-nosnippet>5390</a>        <span class="macro">assert!</span>(!html.contains(<span class="string">"danger: '#ff5555'"</span>));
-<a href=#5391 id=5391 data-nosnippet>5391</a>    }
-<a href=#5392 id=5392 data-nosnippet>5392</a>}
+<a href=#5387 id=5387 data-nosnippet>5387</a>    </span><span class="kw">async fn </span>login_page_includes_ui_wasm_module() {
+<a href=#5388 id=5388 data-nosnippet>5388</a>        <span class="kw">let </span>html = <span class="kw">super</span>::login_page().<span class="kw">await</span>.<span class="number">0</span>;
+<a href=#5389 id=5389 data-nosnippet>5389</a>        <span class="macro">assert!</span>(html.contains(<span class="string">r#"type="module""#</span>));
+<a href=#5390 id=5390 data-nosnippet>5390</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"formatIsoDatetime"</span>));
+<a href=#5391 id=5391 data-nosnippet>5391</a>        <span class="macro">assert!</span>(!html.contains(<span class="string">"function apiErrMsg"</span>));
+<a href=#5392 id=5392 data-nosnippet>5392</a>    }
 <a href=#5393 id=5393 data-nosnippet>5393</a>
-<a href=#5394 id=5394 data-nosnippet>5394</a><span class="kw">pub async fn </span>initialize() -&gt; <span class="prelude-ty">Result</span>&lt;(), AppError&gt; {
-<a href=#5395 id=5395 data-nosnippet>5395</a>    UiManager::new().initialize().<span class="kw">await
-<a href=#5396 id=5396 data-nosnippet>5396</a></span>}
-<a href=#5397 id=5397 data-nosnippet>5397</a>
-<a href=#5398 id=5398 data-nosnippet>5398</a><span class="kw">pub async fn </span>shutdown() -&gt; <span class="prelude-ty">Result</span>&lt;(), AppError&gt; {
-<a href=#5399 id=5399 data-nosnippet>5399</a>    UiManager::new().shutdown().<span class="kw">await
-<a href=#5400 id=5400 data-nosnippet>5400</a></span>}</code></pre></div></section></main></body></html>
+<a href=#5394 id=5394 data-nosnippet>5394</a>    <span class="attr">#[tokio::test]
+<a href=#5395 id=5395 data-nosnippet>5395</a>    </span><span class="kw">async fn </span>dashboard_dark_theme_danger_matches_rust_canon() {
+<a href=#5396 id=5396 data-nosnippet>5396</a>        <span class="kw">let </span>html = workers_page().<span class="kw">await</span>.<span class="number">0</span>;
+<a href=#5397 id=5397 data-nosnippet>5397</a>        <span class="macro">assert!</span>(html.contains(<span class="string">"danger: '#c62828'"</span>));
+<a href=#5398 id=5398 data-nosnippet>5398</a>        <span class="macro">assert!</span>(!html.contains(<span class="string">"danger: '#ff5555'"</span>));
+<a href=#5399 id=5399 data-nosnippet>5399</a>    }
+<a href=#5400 id=5400 data-nosnippet>5400</a>}</code></pre></div></section></main></body></html>

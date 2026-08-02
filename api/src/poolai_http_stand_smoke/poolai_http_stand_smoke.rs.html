@@ -8004,18 +8004,61 @@
 <a href=#8004 id=8004 data-nosnippet>8004</a>    }
 <a href=#8005 id=8005 data-nosnippet>8005</a>
 <a href=#8006 id=8006 data-nosnippet>8006</a>    <span class="attr">#[test]
-<a href=#8007 id=8007 data-nosnippet>8007</a>    </span><span class="kw">fn </span>vision_revision_fm_parity_ph_s235() {
-<a href=#8008 id=8008 data-nosnippet>8008</a>        <span class="kw">let </span>root = repo_root();
-<a href=#8009 id=8009 data-nosnippet>8009</a>        assert_vision_repo_parity(<span class="kw-2">&amp;</span>root)
-<a href=#8010 id=8010 data-nosnippet>8010</a>            .expect(<span class="string">"run poolai-vision-sync --check before stand smoke"</span>);
-<a href=#8011 id=8011 data-nosnippet>8011</a>        <span class="kw">let </span>manifest_rev = read_manifest_revision(<span class="kw-2">&amp;</span>root).expect(<span class="string">"manifest"</span>);
-<a href=#8012 id=8012 data-nosnippet>8012</a>        <span class="kw">let </span>fm_rev = read_fm_vision_revision(<span class="kw-2">&amp;</span>root).expect(<span class="string">"fm"</span>);
-<a href=#8013 id=8013 data-nosnippet>8013</a>        <span class="macro">assert_eq!</span>(manifest_rev, fm_rev);
-<a href=#8014 id=8014 data-nosnippet>8014</a>        <span class="kw">if let </span><span class="prelude-val">Some</span>(next) = read_manifest_next_sprint(<span class="kw-2">&amp;</span>root) {
-<a href=#8015 id=8015 data-nosnippet>8015</a>            <span class="kw">let </span>active = read_extensions_active_sprint(<span class="kw-2">&amp;</span>root)
-<a href=#8016 id=8016 data-nosnippet>8016</a>                .expect(<span class="string">"extensions"</span>)
-<a href=#8017 id=8017 data-nosnippet>8017</a>                .expect(<span class="string">"active_sprint"</span>);
-<a href=#8018 id=8018 data-nosnippet>8018</a>            <span class="macro">assert_eq!</span>(active, next);
-<a href=#8019 id=8019 data-nosnippet>8019</a>        }
-<a href=#8020 id=8020 data-nosnippet>8020</a>    }
-<a href=#8021 id=8021 data-nosnippet>8021</a>}</code></pre></div></section></main></body></html>
+<a href=#8007 id=8007 data-nosnippet>8007</a>    </span><span class="kw">fn </span>ratio96_band101_export_shape_ph_s1653() {
+<a href=#8008 id=8008 data-nosnippet>8008</a>        <span class="kw">use </span>poolai_ui_core::ratio96_depth::{
+<a href=#8009 id=8009 data-nosnippet>8009</a>            ratio96_criteria_total, ratio96_depth_stub, ratio96_phase_f_slices_met, Ratio96Depth,
+<a href=#8010 id=8010 data-nosnippet>8010</a>            FM_BAND101_ROWS, RATIO96_CASES, RATIO96_CRITERIA, RATIO96_PHASE_F_SLICES,
+<a href=#8011 id=8011 data-nosnippet>8011</a>        };
+<a href=#8012 id=8012 data-nosnippet>8012</a>        <span class="kw">use </span>serde_json::json;
+<a href=#8013 id=8013 data-nosnippet>8013</a>        <span class="macro">assert_eq!</span>(
+<a href=#8014 id=8014 data-nosnippet>8014</a>            ratio96_depth_stub(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({<span class="string">"stand_smoke_export"</span>: <span class="bool-val">true</span>}))),
+<a href=#8015 id=8015 data-nosnippet>8015</a>            Ratio96Depth::StandSmokeExport
+<a href=#8016 id=8016 data-nosnippet>8016</a>        );
+<a href=#8017 id=8017 data-nosnippet>8017</a>        <span class="macro">assert_eq!</span>(
+<a href=#8018 id=8018 data-nosnippet>8018</a>            ratio96_depth_stub(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({
+<a href=#8019 id=8019 data-nosnippet>8019</a>                <span class="string">"ratio96_depth"</span>: <span class="bool-val">true</span>,
+<a href=#8020 id=8020 data-nosnippet>8020</a>                <span class="string">"slice_aggregate"</span>: <span class="bool-val">true</span>,
+<a href=#8021 id=8021 data-nosnippet>8021</a>                <span class="string">"store_wire"</span>: <span class="bool-val">true</span>,
+<a href=#8022 id=8022 data-nosnippet>8022</a>                <span class="string">"criteria_contracts"</span>: <span class="bool-val">true</span>,
+<a href=#8023 id=8023 data-nosnippet>8023</a>                <span class="string">"verify_dev_stand_hook"</span>: <span class="bool-val">true</span>,
+<a href=#8024 id=8024 data-nosnippet>8024</a>                <span class="string">"stand_smoke_export"</span>: <span class="bool-val">true</span>,
+<a href=#8025 id=8025 data-nosnippet>8025</a>                <span class="string">"loc_audit_flag"</span>: <span class="bool-val">true</span>,
+<a href=#8026 id=8026 data-nosnippet>8026</a>                <span class="string">"ratio96_docs"</span>: <span class="bool-val">true</span>,
+<a href=#8027 id=8027 data-nosnippet>8027</a>                <span class="string">"ratio_hold"</span>: <span class="bool-val">true</span>,
+<a href=#8028 id=8028 data-nosnippet>8028</a>                <span class="string">"band_close"</span>: <span class="bool-val">true</span>,
+<a href=#8029 id=8029 data-nosnippet>8029</a>            }))),
+<a href=#8030 id=8030 data-nosnippet>8030</a>            Ratio96Depth::FullBand101
+<a href=#8031 id=8031 data-nosnippet>8031</a>        );
+<a href=#8032 id=8032 data-nosnippet>8032</a>        <span class="macro">assert_eq!</span>(RATIO96_CRITERIA.len(), <span class="number">10</span>);
+<a href=#8033 id=8033 data-nosnippet>8033</a>        <span class="macro">assert_eq!</span>(ratio96_criteria_total(), <span class="number">10</span>);
+<a href=#8034 id=8034 data-nosnippet>8034</a>        <span class="macro">assert_eq!</span>(RATIO96_PHASE_F_SLICES.len(), <span class="number">10</span>);
+<a href=#8035 id=8035 data-nosnippet>8035</a>        <span class="macro">assert!</span>(RATIO96_CASES.contains(<span class="kw-2">&amp;</span><span class="string">"loc_audit_flag"</span>));
+<a href=#8036 id=8036 data-nosnippet>8036</a>        <span class="kw">let </span>canon = <span class="macro">include_str!</span>(<span class="string">"../../docs/development/RATIO96_DEPTH.md"</span>);
+<a href=#8037 id=8037 data-nosnippet>8037</a>        <span class="macro">assert_eq!</span>(ratio96_phase_f_slices_met(canon), (<span class="number">10</span>, <span class="number">10</span>));
+<a href=#8038 id=8038 data-nosnippet>8038</a>        <span class="kw">let </span>loc_audit = <span class="macro">include_str!</span>(<span class="string">"../../src/bin/poolai_loc_audit.rs"</span>);
+<a href=#8039 id=8039 data-nosnippet>8039</a>        <span class="macro">assert!</span>(loc_audit.contains(<span class="string">"--ratio96"</span>));
+<a href=#8040 id=8040 data-nosnippet>8040</a>        <span class="kw">let </span>fm = <span class="macro">include_str!</span>(<span class="string">"../../docs/catalog/FUNCTION_MANAGEMENT.md"</span>);
+<a href=#8041 id=8041 data-nosnippet>8041</a>        <span class="kw">for </span>row <span class="kw">in </span>FM_BAND101_ROWS {
+<a href=#8042 id=8042 data-nosnippet>8042</a>            <span class="macro">assert!</span>(
+<a href=#8043 id=8043 data-nosnippet>8043</a>                fm.contains(row) || row.starts_with(<span class="string">"PH-S"</span>),
+<a href=#8044 id=8044 data-nosnippet>8044</a>                <span class="string">"FM band101 row {row}"
+<a href=#8045 id=8045 data-nosnippet>8045</a>            </span>);
+<a href=#8046 id=8046 data-nosnippet>8046</a>        }
+<a href=#8047 id=8047 data-nosnippet>8047</a>    }
+<a href=#8048 id=8048 data-nosnippet>8048</a>
+<a href=#8049 id=8049 data-nosnippet>8049</a>    <span class="attr">#[test]
+<a href=#8050 id=8050 data-nosnippet>8050</a>    </span><span class="kw">fn </span>vision_revision_fm_parity_ph_s235() {
+<a href=#8051 id=8051 data-nosnippet>8051</a>        <span class="kw">let </span>root = repo_root();
+<a href=#8052 id=8052 data-nosnippet>8052</a>        assert_vision_repo_parity(<span class="kw-2">&amp;</span>root)
+<a href=#8053 id=8053 data-nosnippet>8053</a>            .expect(<span class="string">"run poolai-vision-sync --check before stand smoke"</span>);
+<a href=#8054 id=8054 data-nosnippet>8054</a>        <span class="kw">let </span>manifest_rev = read_manifest_revision(<span class="kw-2">&amp;</span>root).expect(<span class="string">"manifest"</span>);
+<a href=#8055 id=8055 data-nosnippet>8055</a>        <span class="kw">let </span>fm_rev = read_fm_vision_revision(<span class="kw-2">&amp;</span>root).expect(<span class="string">"fm"</span>);
+<a href=#8056 id=8056 data-nosnippet>8056</a>        <span class="macro">assert_eq!</span>(manifest_rev, fm_rev);
+<a href=#8057 id=8057 data-nosnippet>8057</a>        <span class="kw">if let </span><span class="prelude-val">Some</span>(next) = read_manifest_next_sprint(<span class="kw-2">&amp;</span>root) {
+<a href=#8058 id=8058 data-nosnippet>8058</a>            <span class="kw">let </span>active = read_extensions_active_sprint(<span class="kw-2">&amp;</span>root)
+<a href=#8059 id=8059 data-nosnippet>8059</a>                .expect(<span class="string">"extensions"</span>)
+<a href=#8060 id=8060 data-nosnippet>8060</a>                .expect(<span class="string">"active_sprint"</span>);
+<a href=#8061 id=8061 data-nosnippet>8061</a>            <span class="macro">assert_eq!</span>(active, next);
+<a href=#8062 id=8062 data-nosnippet>8062</a>        }
+<a href=#8063 id=8063 data-nosnippet>8063</a>    }
+<a href=#8064 id=8064 data-nosnippet>8064</a>}</code></pre></div></section></main></body></html>
