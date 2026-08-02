@@ -1,8 +1,57 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-08-02 (band 103 **lint/diagnostics cleanup** PH-S1669…S1678 **✅** · band 102 **GSV** PH-S1659…S1668 **✅** · band 101 **PH-S1649…S1658** ✅ · band 100 **PH-S1639…S1648** ✅ · band 99 **PH-S1629…S1638** ✅ · band 98 **PH-S1619…S1628** ✅ · band 97 ✅ · band 96 ✅ · band 95 ✅ · band 94 ✅ · band 93 ✅ · band 92 ✅ · band 91 ✅ · service **PH-SVC85** Rust diagnostics panel ✅ · **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · band 88 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅)
+**Оновлено:** 2026-08-02 (band 105 **Ratio96 stand smoke** PH-S1689…S1698 **in_progress** · band 104 **Ratio96 admin/ops glue** PH-S1679…S1688 **✅** · band 103 **lint/diagnostics cleanup** PH-S1669…S1678 **✅** · band 102 **GSV** PH-S1659…S1668 **✅** · band 101 **PH-S1649…S1658** ✅ · band 100 **PH-S1639…S1648** ✅ · band 99 **PH-S1629…S1638** ✅ · band 98 **PH-S1619…S1628** ✅ · band 97 ✅ · band 96 ✅ · band 95 ✅ · band 94 ✅ · band 93 ✅ · band 92 ✅ · band 91 ✅ · service **PH-SVC85** Rust diagnostics panel ✅ · **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · band 88 ✅ · GH tokens **PH-SVC65…SVC74** ✅ · security **PH-SVC55…SVC64** ✅)
 
-**Наступна сесія:** **`абракадабра`** — S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`; band 103 — 0 warnings / 0 errors) → drain наступного band (PH-S1679+; черга — FM §5.12 / completion roadmap) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+**Наступна сесія:** **`абракадабра`** — S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`; band 105 ✅ — 0 warnings / 0 errors) → drain наступного band (PH-S1699…S1708; черга — FM §5.12 §5.87) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+
+## Band 104 — Ratio96 admin/ops glue (PH-S1679…S1688, **✅**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1679** | `ratio96_admin_ops_depth` scaffold + criteria registry (10) |
+| **PH-S1680** | `ratio96` store/wire slice + `GET /ops/ratio96` |
+| **PH-S1681** | `ratio96` API contracts (`ratio96_admin_ops_integration`) |
+| **PH-S1682** | `ratio96` admin/ops glue (`#ratio96-store-badge` + `refreshRatio96` + i18n) |
+| **PH-S1683** | Stand smoke `ratio96` export (`ratio96_admin_ops_band104_export_shape`) |
+| **PH-S1684** | poolai-loc-audit `--ratio96-admin-ops` |
+| **PH-S1685** | Docs canon sync (`RATIO96_ADMIN_OPS.md`; RUN_LOCAL/README; `VERIFY_RATIO96_ADMIN_OPS`) |
+| **PH-S1686** | poolai-vision-sync --check |
+| **PH-S1687** | Ratio hold advisory |
+| **PH-S1688** | Band close (`galaxy_horizon_s1679_integration`) |
+
+**PH-S1679…S1688 ✅ (2026-08-02):** `ratio96_admin_ops_depth.rs` (enum + `RATIO96_ADMIN_OPS_CRITERIA` 10); `ratio96_store_wire_json` + `GET /api/v1/ops/ratio96`; `tests/ratio96_admin_ops_integration.rs`; dashboard `#ratio96-store-badge` + `refreshRatio96` + `admin.ratio96.*` i18n; `ratio96_admin_ops_band104_export_shape`; `--ratio96-admin-ops` loc-audit zriz; `RATIO96_ADMIN_OPS.md`; `VERIFY_RATIO96_ADMIN_OPS`. FM §5.12 §5.85 ✅. Vision rev **444**. Band-close test: `tests/galaxy_horizon_s1679_integration.rs`.
+
+## Band 105 — Ratio96 stand smoke (PH-S1689…S1698, **✅**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1689** | `ratio96_stand_smoke_depth` scaffold + criteria registry (10) |
+| **PH-S1690** | Live `ratio96` store wire smoke (`smoke_ratio96_store_wire`) |
+| **PH-S1691** | Live `ratio96` query smoke (`smoke_ratio96_query`) |
+| **PH-S1692** | `ratio96` field fixtures (`smoke_ratio96_field_fixtures`) |
+| **PH-S1693** | Stand smoke `ratio96` export (`ratio96_stand_smoke_band105_export_shape`) |
+| **PH-S1694** | poolai-loc-audit `--ratio96-stand-smoke` |
+| **PH-S1695** | Docs canon sync (`RATIO96_STAND_SMOKE.md`; RUN_LOCAL/README; `VERIFY_RATIO96_STAND_SMOKE`) |
+| **PH-S1696** | poolai-vision-sync --check |
+| **PH-S1697** | Ratio hold advisory |
+| **PH-S1698** | Band close (`galaxy_horizon_s1689_integration`) |
+
+## Band 106 — Ratio96 loc-audit (PH-S1699…S1708, **in_progress**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1699** | `ratio96_loc_audit_depth` scaffold + criteria registry (10) |
+| **PH-S1700** | Live `ratio96` loc-audit smoke (`smoke_ratio96_loc_audit`) |
+| **PH-S1701** | Live `ratio96` migration advisory (`smoke_ratio96_migration_advisory`) |
+| **PH-S1702** | `ratio96` loc-audit export (`ratio96_loc_audit_band106_export_shape`) |
+| **PH-S1703** | poolai-loc-audit `--ratio96-loc-audit` |
+| **PH-S1704** | Docs canon sync (`RATIO96_LOC_AUDIT.md`; RUN_LOCAL/README; `VERIFY_RATIO96_LOC_AUDIT`) |
+| **PH-S1705** | poolai-vision-sync --check |
+| **PH-S1706** | Ratio hold advisory |
+| **PH-S1707** | Band close (`galaxy_horizon_s1699_integration`) |
+| **PH-S1708** | Project scan replenish (10 PH-S* from §5.1 / architect / roadmap) |
+
+**PH-S1689…S1698 ✅ (2026-08-02):** `ratio96_stand_smoke_depth.rs` (enum + `RATIO96_STAND_SMOKE_CRITERIA` 10); `smoke_ratio96_store_wire` + `smoke_ratio96_query` + `smoke_ratio96_field_fixtures` + `ratio96_stand_smoke_band105_export_shape`; `--ratio96-stand-smoke` loc-audit; `RATIO96_STAND_SMOKE.md`; `VERIFY_RATIO96_STAND_SMOKE`; `galaxy_horizon_s1689_integration`. FM §5.12 §5.86 ✅. Vision rev **445**.
 
 ## Band 103 — Lint/diagnostics cleanup (PH-S1669…S1678, **✅**)
 

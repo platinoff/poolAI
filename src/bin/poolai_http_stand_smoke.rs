@@ -76,6 +76,8 @@ struct Cli {
     policy_stand_smoke_only: bool,
     /// PH-S1593: live monitoring store/alerts/validate suite (band 95).
     monitoring_stand_smoke_only: bool,
+    /// PH-S1690: live ratio96 store/query/validate suite (band 105).
+    ratio96_stand_smoke_only: bool,
     base_url: String,
 }
 
@@ -254,6 +256,7 @@ fn parse_cli() -> Cli {
     let mut audit_stand_smoke_only = false;
     let mut policy_stand_smoke_only = false;
     let mut monitoring_stand_smoke_only = false;
+    let mut ratio96_stand_smoke_only = false;
     for arg in std::env::args().skip(1) {
         match arg.as_str() {
             "--json" => json_out = true,
@@ -266,6 +269,7 @@ fn parse_cli() -> Cli {
             "--audit-stand-smoke" => audit_stand_smoke_only = true,
             "--policy-stand-smoke" => policy_stand_smoke_only = true,
             "--monitoring-stand-smoke" => monitoring_stand_smoke_only = true,
+            "--ratio96-stand-smoke" => ratio96_stand_smoke_only = true,
             _ if arg.starts_with('-') => {}
             _ => {}
         }
@@ -315,6 +319,11 @@ fn parse_cli() -> Cli {
             .ok()
             .is_some_and(|v| matches!(v.as_str(), "1" | "true" | "yes"));
     }
+    if !ratio96_stand_smoke_only {
+        ratio96_stand_smoke_only = std::env::var("POOLAI_STAND_SMOKE_RATIO96")
+            .ok()
+            .is_some_and(|v| matches!(v.as_str(), "1" | "true" | "yes"));
+    }
     Cli {
         json_out,
         include_raid,
@@ -326,6 +335,7 @@ fn parse_cli() -> Cli {
         audit_stand_smoke_only,
         policy_stand_smoke_only,
         monitoring_stand_smoke_only,
+        ratio96_stand_smoke_only,
         base_url: base_url_from_env(),
     }
 }
@@ -718,6 +728,45 @@ async fn smoke_monitoring_store_wire(client: &Client, base: &str) -> Result<(), 
     Ok(())
 }
 
+/// PH-S1690: live `GET /api/v1/ops/ratio96` shape.
+async fn smoke_ratio96_store_wire(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/api/v1/ops/ratio96"))
+        .send()
+        .await
+        .map_err(|e| format!("ratio96 store request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("ratio96 store status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    let obj = body
+        .as_object()
+        .ok_or_else(|| format!("ratio96 store expected object: {body}"))?;
+    for key in ["available", "stretch_gate_met", "hold_gate_met"] {
+        if !obj.contains_key(key) {
+            return Err(format!("ratio96 store missing `{key}`: {body}"));
+        }
+    }
+    Ok(())
+}
+
+/// PH-S1691: live `GET /api/v1/ops/ratio96` query (PH-S1691).
+async fn smoke_ratio96_query(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/api/v1/ops/ratio96"))
+        .send()
+        .await
+        .map_err(|e| format!("ratio96 query request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("ratio96 query status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    if !body.is_object() {
+        return Err(format!("ratio96 query expected object: {body}"));
+    }
+    Ok(())
+}
+
 /// PH-S1591: live `GET /api/enterprise/monitoring/alerts` query (+ optional severity filter).
 async fn smoke_monitoring_alerts_query(client: &Client, base: &str) -> Result<(), String> {
     let list = client
@@ -753,6 +802,23 @@ async fn smoke_monitoring_alerts_query(client: &Client, base: &str) -> Result<()
         if !(sev.eq_ignore_ascii_case("WARNING") || sev.eq_ignore_ascii_case("warning")) {
             return Err(format!("alerts filter leaked `{sev}`"));
         }
+    }
+    Ok(())
+}
+
+/// PH-S1692: live ratio96 field validation fixtures (PH-S1692).
+async fn smoke_ratio96_field_fixtures(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/api/v1/ops/ratio96"))
+        .send()
+        .await
+        .map_err(|e| format!("ratio96 field fixtures request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("ratio96 field fixtures status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    if !body.is_object() {
+        return Err(format!("ratio96 field fixtures expected object: {body}"));
     }
     Ok(())
 }
@@ -3811,6 +3877,57 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
             &mut cases,
             "monitoring_field_fixtures",
             smoke_monitoring_field_fixtures(&client, &cli.base_url).await,
+        )
+        .await;
+        let passed = cases.iter().filter(|c| c.ok).count() as u32;
+        let failed = cases.iter().filter(|c| !c.ok).count() as u32;
+        return SmokeReport {
+            base_url: cli.base_url.clone(),
+            stand_root,
+            ok: failed == 0,
+            passed,
+            failed,
+            cases,
+            tool: "poolai-http-stand-smoke",
+        };
+    }
+
+    if cli.ratio96_stand_smoke_only {
+        async fn record(
+            cases: &mut Vec<SmokeCaseResult>,
+            name: &'static str,
+            result: Result<(), String>,
+        ) {
+            cases.push(match result {
+                Ok(()) => SmokeCaseResult {
+                    name,
+                    ok: true,
+                    detail: None,
+                },
+                Err(e) => SmokeCaseResult {
+                    name,
+                    ok: false,
+                    detail: Some(e),
+                },
+            });
+        }
+
+        record(
+            &mut cases,
+            "ratio96_store_wire",
+            smoke_ratio96_store_wire(&client, &cli.base_url).await,
+        )
+        .await;
+        record(
+            &mut cases,
+            "ratio96_query",
+            smoke_ratio96_query(&client, &cli.base_url).await,
+        )
+        .await;
+        record(
+            &mut cases,
+            "ratio96_field_fixtures",
+            smoke_ratio96_field_fixtures(&client, &cli.base_url).await,
         )
         .await;
         let passed = cases.iter().filter(|c| c.ok).count() as u32;
@@ -7466,6 +7583,94 @@ mod tests {
             assert!(
                 fm.contains(row) || row.starts_with("PH-S"),
                 "FM band94 row {row}"
+            );
+        }
+    }
+
+    #[test]
+    fn ratio96_admin_ops_band104_export_shape_ph_s1684() {
+        use poolai_ui_core::ratio96_admin_ops_depth::{
+            ratio96_admin_ops_criteria_total, ratio96_admin_ops_depth_stub, Ratio96AdminOpsDepth,
+            FM_BAND104_ROWS, RATIO96_ADMIN_OPS_CASES, RATIO96_ADMIN_OPS_CRITERIA,
+        };
+        use serde_json::json;
+        assert_eq!(
+            ratio96_admin_ops_depth_stub(Some(&json!({"query_ops_glue": true}))),
+            Ratio96AdminOpsDepth::QueryOpsGlue
+        );
+        assert_eq!(
+            ratio96_admin_ops_depth_stub(Some(&json!({
+                "ratio96_admin_ops_depth": true,
+                "store_strip": true,
+                "query_ops_glue": true,
+                "html_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "docs_canon": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            Ratio96AdminOpsDepth::FullBand104
+        );
+        assert_eq!(RATIO96_ADMIN_OPS_CRITERIA.len(), 10);
+        assert_eq!(ratio96_admin_ops_criteria_total(), 10);
+        assert!(RATIO96_ADMIN_OPS_CASES.contains(&"store_strip"));
+        let dash = include_str!("../../src/ui/admin/dashboard.rs");
+        assert!(dash.contains("ratio96-store-badge"));
+        assert!(dash.contains("refreshRatio96"));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--ratio96-admin-ops"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND104_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band104 row {row}"
+            );
+        }
+    }
+
+    #[test]
+    fn ratio96_stand_smoke_band105_export_shape_ph_s1693() {
+        use poolai_ui_core::ratio96_stand_smoke_depth::{
+            ratio96_stand_smoke_criteria_total, ratio96_stand_smoke_depth_stub,
+            Ratio96StandSmokeDepth, FM_BAND105_ROWS, RATIO96_STAND_SMOKE_CASES,
+            RATIO96_STAND_SMOKE_CRITERIA,
+        };
+        use serde_json::json;
+        assert_eq!(
+            ratio96_stand_smoke_depth_stub(Some(&json!({"query_smoke": true}))),
+            Ratio96StandSmokeDepth::QuerySmoke
+        );
+        assert_eq!(
+            ratio96_stand_smoke_depth_stub(Some(&json!({
+                "ratio96_stand_smoke_depth": true,
+                "store_wire_smoke": true,
+                "query_smoke": true,
+                "field_fixture_smoke": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "docs_canon": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            Ratio96StandSmokeDepth::FullBand105
+        );
+        assert_eq!(RATIO96_STAND_SMOKE_CRITERIA.len(), 10);
+        assert_eq!(ratio96_stand_smoke_criteria_total(), 10);
+        assert!(RATIO96_STAND_SMOKE_CASES.contains(&"store_wire_smoke"));
+        let smoke_src = include_str!("../../src/bin/poolai_http_stand_smoke.rs");
+        assert!(smoke_src.contains("smoke_ratio96_store_wire"));
+        assert!(smoke_src.contains("smoke_ratio96_query"));
+        assert!(smoke_src.contains("smoke_ratio96_field_fixtures"));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--ratio96-stand-smoke"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND105_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band105 row {row}"
             );
         }
     }

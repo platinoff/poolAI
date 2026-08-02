@@ -413,6 +413,9 @@ fn sprint_status_from_cell(cell: &str) -> (String, bool) {
     if plain.contains('✅') || plain.contains("closed") {
         return ("closed".to_string(), false);
     }
+    if plain.contains("[x]") || plain.contains("[✓]") {
+        return ("closed".to_string(), false);
+    }
     if plain.contains("blocked") {
         return ("blocked".to_string(), false);
     }

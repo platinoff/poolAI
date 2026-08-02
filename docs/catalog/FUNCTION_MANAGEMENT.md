@@ -1221,7 +1221,41 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 103 ✅). **Master horizon:** PH-S1679…S1688 (band 104). **Completion pending:** PH-S1679…S2278 = **600** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **442**. **Наступна сесія:** **`абракадабра`** — project scan (наступний PH-S1679+).
+**Відкритих у §5.12:** **0** (band 105 PH-S1689…S1698 ✅). **Master horizon:** PH-S1699…S1708 (band 106). **Completion pending:** PH-S1679…S2278 = **590** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **446**. **Наступна сесія:** **`абракадабра`** — project scan → band 106 (PH-S1699…S1708).
+
+### 5.85 Ratio96 admin/ops glue queue — band 104 (PH-S1679…S1688, 2026-08-02) · **✅**
+
+**Джерело:** master backlog band 104 (F Ratio96 · admin/ops glue) — mirror band 94 monitoring admin/ops glue поверх ratio96 depth scaffold (band 101). Warnings-first: band 103 ✅ (0/0), тому смуга — admin/ops glue.
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1614 | **PH-S1679** | `ratio96_admin_ops_depth` scaffold | master backlog | ui-core depth enum + criteria registry (10) | **[x]** |
+| 1615 | **PH-S1680** | `ratio96` store/wire slice | master backlog | `ratio96_store_wire_json` + `GET /api/v1/ops/ratio96` | **[x]** |
+| 1616 | **PH-S1681** | `ratio96` API contracts | master backlog | `tests/ratio96_admin_ops_integration.rs` (marker `ratio96_admin_ops_contracts`; registry + HTML + i18n) | **[x]** |
+| 1617 | **PH-S1682** | `ratio96` admin/ops glue | master backlog | dashboard `#ratio96-store-badge` + `refreshRatio96` | **[x]** |
+| 1618 | **PH-S1683** | Stand smoke `ratio96` export | master backlog | `ratio96_admin_ops_band104_export_shape` unit test | **[x]** |
+| 1619 | **PH-S1684** | poolai-loc-audit PH-S1684 | master backlog | `--ratio96-admin-ops` zriz (mode/total/met) | **[x]** |
+| 1620 | **PH-S1685** | Docs canon sync | master backlog | `RATIO96_ADMIN_OPS.md`; RUN_LOCAL/README; verify-dev-stand + run-poolai hooks | **[x]** |
+| 1621 | **PH-S1686** | poolai-vision-sync --check | master backlog | drift gate green | **[x]** |
+| 1622 | **PH-S1687** | Ratio hold advisory | master backlog | `--ratio96-admin-ops --advisory --min-ratio 0.95` | **[x]** |
+| 1623 | **PH-S1688** | galaxy_horizon_s1679_integration | band close | `galaxy_horizon_s1679_integration`; FM ✅ · HANDOFF · NEXT_SESSION | **[x]** |
+
+### 5.86 Ratio96 stand smoke queue — band 105 (PH-S1689…S1698, 2026-08-02) · **✅**
+
+**Джерело:** master backlog band 105 (F Ratio96 · stand smoke) — mirror band 95 monitoring stand smoke поверх ratio96 admin/ops glue (band 104). Warnings-first: band 103 ✅ (0/0), тому смуга — stand smoke.
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1624 | **PH-S1689** | `ratio96_stand_smoke_depth` ui-core module | master backlog | depth enum + criteria registry (10) | **[x]** |
+| 1625 | **PH-S1690** | Live `ratio96` store wire smoke | master backlog | `smoke_ratio96_store_wire` ← `GET /api/v1/ops/ratio96` | **[x]** |
+| 1626 | **PH-S1691** | Live `ratio96` query smoke | master backlog | `smoke_ratio96_query` | **[x]** |
+| 1627 | **PH-S1692** | Live `ratio96` field fixture smoke | master backlog | `smoke_ratio96_field_fixtures` → 400 codes | **[x]** |
+| 1628 | **PH-S1693** | Stand smoke `ratio96` export | master backlog | `ratio96_stand_smoke_band105_export_shape` unit test | **[x]** |
+| 1629 | **PH-S1694** | poolai-loc-audit PH-S1694 | master backlog | `--ratio96-stand-smoke` zriz (mode/total/met) | **[x]** |
+| 1630 | **PH-S1695** | Docs canon sync | master backlog | `RATIO96_STAND_SMOKE.md`; RUN_LOCAL/README; verify-dev-stand + run-poolai hooks | **[x]** |
+| 1631 | **PH-S1696** | poolai-vision-sync --check | master backlog | drift gate green | **[x]** |
+| 1632 | **PH-S1697** | Ratio hold advisory | master backlog | `--ratio96-stand-smoke --advisory --min-ratio 0.95` | **[x]** |
+| 1633 | **PH-S1698** | galaxy_horizon_s1689_integration | band close | `galaxy_horizon_s1689_integration`; FM ✅ · HANDOFF · NEXT_SESSION | **[x]** |
 
 ### 5.84 Lint/diagnostics cleanup queue — band 103 (PH-S1669…S1678, 2026-08-02) · **✅**
 

@@ -2,202 +2,111 @@
   "description": "RSS-style ticker of FM §5.12 sprint queue (open + recent closed)",
   "items": [
     {
-      "category": "open",
-      "id": "PH-S1669",
-      "link": "docs/vision/index.html#sprint-queue",
-      "next": true,
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "src/network/api/grid.rs` ×8 + `src/network/discovery.rs` ×1 → per-fn `#[allow]",
-      "title": "await_holding_lock` src test-modules"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1670",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "tests/*.rs` ×79 serialization-lock allows",
-      "title": "await_holding_lock` integration tests"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1671",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "cargo clippy --fix -p poolai-ui-core` ×82 + residual",
-      "title": "needless_borrows_for_generic_args` ui-core"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1672",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "clippy --fix + residual (×24)",
-      "title": "field_reassign_with_default` + `needless_update` + `manual_clamp"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1673",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "admin wasm-only fns; `ENV_POOLAI_BIN`; test fn; `pending`; ShardSyncBus len/is_empty",
-      "title": "dead_code` batch"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1674",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "ui-core glue fns; `stand_smoke_metrics_parity`; monitoring type aliases",
-      "title": "too_many_arguments` + `type_complexity"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1675",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "redundant closure/guard · from_ref · unit-value · unused imports · from_str · large Err · loop index",
-      "title": "misc diagnostics batch"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1676",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "clippy (CI set) target ≤ 20 warnings; residuals fixed",
-      "title": "Verify re-scan + residuals"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1677",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "--ratio96` zriz; vision `--check` green; `record-rust-diagnostics.sh",
-      "title": "loc-audit + vision-sync + record diagnostics"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1678",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "galaxy_horizon_s1669_integration`; FM ✅ · HANDOFF · NEXT_SESSION",
-      "title": "Band close"
-    },
-    {
       "category": "closed",
-      "id": "PH-S1668",
+      "id": "PH-S1698",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "offline-стійкість + metrics resync; Rust tests; docs canon; ratio hold",
-      "title": "Band close"
+      "summary": "galaxy_horizon_s1689_integration`; FM ✅ · HANDOFF · NEXT_SESSION",
+      "title": "galaxy_horizon_s1689_integration"
     },
     {
       "category": "closed",
-      "id": "PH-S1667",
+      "id": "PH-S1697",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "hooks/`; `/api/hooks/tests`; `/api/hooks/bench`; read `target/",
-      "title": "Tests/bench hooks (без перекомпіляції)"
+      "summary": "--ratio96-stand-smoke --advisory --min-ratio 0.95",
+      "title": "Ratio hold advisory"
     },
     {
       "category": "closed",
-      "id": "PH-S1666",
+      "id": "PH-S1696",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "preview/` Rust-кольори; `POST /api/terminal",
-      "title": "Box preview + SLI terminal"
+      "summary": "drift gate green",
+      "title": "poolai-vision-sync --check"
     },
     {
       "category": "closed",
-      "id": "PH-S1665",
+      "id": "PH-S1695",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "/api/update`; SSE `update_available`; «Update» замість reload",
-      "title": "Update box"
+      "summary": "RATIO96_STAND_SMOKE.md`; RUN_LOCAL/README; verify-dev-stand + run-poolai hooks",
+      "title": "Docs canon sync"
     },
     {
       "category": "closed",
-      "id": "PH-S1664",
+      "id": "PH-S1694",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "ide/`; opencode + cursor чати; select сесії",
-      "title": "IDE box"
+      "summary": "--ratio96-stand-smoke` zriz (mode/total/met)",
+      "title": "poolai-loc-audit PH-S1694"
     },
     {
       "category": "closed",
-      "id": "PH-S1663",
+      "id": "PH-S1693",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "toolchain/`; `GET /api/toolchain`; інвентар (rustc 1.92, clippy, MSYS2)",
-      "title": "Toolchain box"
+      "summary": "ratio96_stand_smoke_band105_export_shape` unit test",
+      "title": "Stand smoke `ratio96` export"
     },
     {
       "category": "closed",
-      "id": "PH-S1662",
+      "id": "PH-S1692",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "sli/`; `GET /api/sli`; каталог з `bin/`+`scripts/`+`src/bin/",
-      "title": "SLI console box"
+      "summary": "smoke_ratio96_field_fixtures` → 400 codes",
+      "title": "Live `ratio96` field fixture smoke"
     },
     {
       "category": "closed",
-      "id": "PH-S1661",
+      "id": "PH-S1691",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "tracker/`; `GET /api/tracker`; `gsv_tracker.json`; workflow params",
-      "title": "Tracker box"
+      "summary": "smoke_ratio96_query",
+      "title": "Live `ratio96` query smoke"
     },
     {
       "category": "closed",
-      "id": "PH-S1660",
+      "id": "PH-S1690",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "gsv_server.rs`; `GET /` → UI; `GET /api/health",
-      "title": "gsv-server bin scaffold"
+      "summary": "smoke_ratio96_store_wire` ← `GET /api/v1/ops/ratio96",
+      "title": "Live `ratio96` store wire smoke"
     },
     {
       "category": "closed",
-      "id": "PH-S1659",
+      "id": "PH-S1689",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "docs/gsv/` canon; `GSV/Cargo.toml`; empty server builds",
-      "title": "GSV docs/architecture + Cargo scaffold"
+      "summary": "depth enum + criteria registry (10)",
+      "title": "ratio96_stand_smoke_depth` ui-core module"
     },
     {
       "category": "closed",
-      "id": "PH-S1658",
+      "id": "PH-S1688",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "galaxy_horizon_s1649_integration",
-      "title": "Band close"
+      "summary": "galaxy_horizon_s1679_integration`; FM ✅ · HANDOFF · NEXT_SESSION",
+      "title": "galaxy_horizon_s1679_integration"
     },
     {
       "category": "closed",
-      "id": "PH-S1657",
+      "id": "PH-S1687",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "--min-ratio 0.95 --advisory",
+      "summary": "--ratio96-admin-ops --advisory --min-ratio 0.95",
       "title": "Ratio hold advisory"
     }
   ],

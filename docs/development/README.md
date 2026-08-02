@@ -24,7 +24,9 @@
 - **[`POLICIES_ADMIN_OPS.md`](./POLICIES_ADMIN_OPS.md)** — band 84 Policies admin/ops glue (`--policy-admin-ops`).
 - **[`POLICIES_API.md`](./POLICIES_API.md)** — band 83 Policies HTTP API contracts (`--policy-api`).
 - **[`MONITORING_ADMIN_OPS.md`](./MONITORING_ADMIN_OPS.md)** — band 94 Monitoring admin/ops glue (`--monitoring-admin-ops`).
-- **[`MONITORING_STAND_SMOKE.md`](./MONITORING_STAND_SMOKE.md)** — band 95 Monitoring live stand smoke (`--monitoring-stand-smoke`).
+ - **[`RATIO96_ADMIN_OPS.md`](./RATIO96_ADMIN_OPS.md)** — band 104 Ratio96 admin/ops glue (`--ratio96-admin-ops`).
+ - **[`RATIO96_STAND_SMOKE.md`](./RATIO96_STAND_SMOKE.md)** — band 105 Ratio96 stand smoke (`--ratio96-stand-smoke`).
+ - **[`MONITORING_STAND_SMOKE.md`](./MONITORING_STAND_SMOKE.md)** — band 95 Monitoring live stand smoke (`--monitoring-stand-smoke`).
 - **[`MONITORING_API.md`](./MONITORING_API.md)** — band 93 Monitoring HTTP API contracts (`--monitoring-api`).
 - **[`POLICIES_STORE.md`](./POLICIES_STORE.md)** — band 82 Policies store-wire matrix (`--policy-store`).
 - **[`POLICIES_DEPTH.md`](./POLICIES_DEPTH.md)** — band 81 Policies depth scaffold (`--policy`).

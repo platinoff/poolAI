@@ -98,6 +98,8 @@ cd S:\rust\poolAI
 /usr/bin/bash bin/run-poolai.sh quick --monitoring-loc-audit
 /usr/bin/bash bin/run-poolai.sh quick --monitoring-horizon
 /usr/bin/bash bin/run-poolai.sh quick --ratio96
+/usr/bin/bash bin/run-poolai.sh quick --ratio96-admin-ops
+/usr/bin/bash bin/run-poolai.sh quick --ratio96-stand-smoke
 # PowerShell:
 .\bin\run-poolai.ps1 quick -StandSmoke
 .\bin\run-poolai.ps1 quick -MigrationAdvisory
@@ -393,6 +395,8 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `VERIFY_MONITORING_RATIO_ADVISORY=1` | `verify-dev-stand.sh` → `poolai-loc-audit --monitoring-ratio-advisory` (PH-S1632) |
 | `VERIFY_MONITORING_HORIZON=1` | `verify-dev-stand.sh` → `poolai-loc-audit --monitoring-horizon` (PH-S1644) |
 | `VERIFY_RATIO96=1` | `verify-dev-stand.sh` → `poolai-loc-audit --ratio96` (PH-S1652) |
+| `VERIFY_RATIO96_ADMIN_OPS=1` | `verify-dev-stand.sh` → `poolai-loc-audit --ratio96-admin-ops` (PH-S1684) |
+| `VERIFY_RATIO96_STAND_SMOKE=1` | `verify-dev-stand.sh` → `poolai-loc-audit --ratio96-stand-smoke` (PH-S1694) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 ### PH-S1100: Rust migration advisory (band 46)
@@ -1483,6 +1487,42 @@ VERIFY_RATIO96=1 bash bin/verify-dev-stand.sh
 | `ratio96_criteria_met_count` | Criteria with marker present in canonical doc paths |
 
 Module: [`ratio96_depth.rs`](../../crates/poolai-ui-core/src/ratio96_depth.rs) · [`ratio96_store_depth.rs`](../../crates/poolai-ui-core/src/ratio96_store_depth.rs) · tests: `ratio96_depth_contracts.rs`, `galaxy_horizon_s1649_integration.rs` · docs: [`RATIO96_DEPTH.md`](./RATIO96_DEPTH.md).
+
+---
+
+## Ratio96 admin/ops glue (PH-S1684 / band 104)
+
+```bash
+VERIFY_RATIO96_ADMIN_OPS=1 bash bin/verify-dev-stand.sh
+/usr/bin/bash bin/run-poolai.sh quick --ratio96-admin-ops
+cargo run --bin poolai-loc-audit -- --ratio96-admin-ops --advisory --min-ratio 0.95
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `ratio96_admin_ops_mode` | `true` when `--ratio96-admin-ops` (PH-S1684) |
+| `ratio96_admin_ops_criteria_total` | Registry size (10) |
+| `ratio96_admin_ops_criteria_met_count` | Criteria with marker present in canonical doc paths |
+
+Module: [`ratio96_admin_ops_depth.rs`](../../crates/poolai-ui-core/src/ratio96_admin_ops_depth.rs) · tests: `ratio96_admin_ops_integration.rs`, `galaxy_horizon_s1679_integration.rs` · docs: [`RATIO96_ADMIN_OPS.md`](./RATIO96_ADMIN_OPS.md).
+
+---
+
+## Ratio96 stand smoke (PH-S1694 / band 105)
+
+```bash
+VERIFY_RATIO96_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
+/usr/bin/bash bin/run-poolai.sh quick --ratio96-stand-smoke
+cargo run --bin poolai-loc-audit -- --ratio96-stand-smoke --advisory --min-ratio 0.95
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `ratio96_stand_smoke_mode` | `true` when `--ratio96-stand-smoke` (PH-S1694) |
+| `ratio96_stand_smoke_criteria_total` | Registry size (10) |
+| `ratio96_stand_smoke_criteria_met_count` | Criteria with marker present in canonical doc paths |
+
+Module: [`ratio96_stand_smoke_depth.rs`](../../crates/poolai-ui-core/src/ratio96_stand_smoke_depth.rs) · tests: `galaxy_horizon_s1689_integration.rs` · docs: [`RATIO96_STAND_SMOKE.md`](./RATIO96_STAND_SMOKE.md).
 
 ---
 

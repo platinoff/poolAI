@@ -198,8 +198,52 @@ pub async fn admin_dashboard() -> Html<String> {
       el.textContent = p + formatted;
     }
     
+    function renderRatio96StoreBadge(wire) {
+      const el = document.getElementById('ratio96-store-badge');
+      if (!el) return;
+      const avail = !!(wire && wire.available);
+      const stretch = !!(wire && wire.stretch_gate_met);
+      const hold = !!(wire && wire.hold_gate_met);
+      const hint = T('admin.ratio96.storeHint', 'Phase-F stretch gate read from rust_ratio.json');
+      const state = avail
+        ? (stretch ? T('admin.ratio96.stretchMet', 'stretch met') : T('admin.ratio96.stretchPending', 'below stretch')) + ' · ' +
+          (hold ? T('admin.ratio96.holdMet', 'hold met') : T('admin.ratio96.holdPending', 'below hold'))
+        : T('admin.ratio96.storeMissing', 'store unavailable');
+      const badge = avail ? (stretch ? 'active' : 'inactive') : 'error';
+      el.innerHTML =
+        '<span class="status-badge ' + badge + '" title="' + escapeHtml(hint) + '">' +
+        escapeHtml(T('admin.ratio96.storeLabel', 'Rust ratio (96% stretch):')) + ' ' +
+        escapeHtml(state) + '</span>';
+    }
+
+    async function loadRatio96StoreWire() {
+      const el = document.getElementById('ratio96-store-badge');
+      if (el) {
+        el.textContent = T('admin.ratio96.storeLoading', 'Loading ratio store…');
+      }
+      try {
+        const wire = await fetchJson('/api/v1/ops/ratio96');
+        renderRatio96StoreBadge(wire);
+      } catch (e) {
+        if (el) {
+          el.innerHTML = '<span class="status-badge error">' +
+            escapeHtml(T('admin.ratio96.storeErr', 'Ratio store wire unavailable')) + '</span>';
+        }
+      }
+    }
+
+    async function refreshRatio96() {
+      try {
+        await loadRatio96StoreWire();
+        showNotification(T('admin.ratio96.refreshOk', 'Ratio store refreshed'), 'success');
+      } catch (e) {
+        showNotification(T('admin.ratio96.refreshErr', 'Ratio store refresh failed: ') + e.message, 'error');
+      }
+    }
+    
     loadSystemOverview();
     renderMetricsChart();
+    loadRatio96StoreWire();
     poolaiStartMetricsPolling(loadSystemOverview, 10000);
     poolaiStartMetricsPolling(renderMetricsChart, 30000);
     "#;
@@ -230,6 +274,11 @@ pub async fn admin_dashboard() -> Html<String> {
             <h3 data-i18n="admin.dash.card.metrics">Metrics Overview (Last Hour)</h3>
             <div id="metrics-chart"></div>
           </div>
+          <div class="admin-card">
+            <h3 data-i18n="admin.ratio96.cardTitle">Rust Ratio (Phase F)</h3>
+            <span id="ratio96-store-badge" class="muted" data-i18n="admin.ratio96.storeLoading">Loading ratio store…</span>
+            <button type="button" class="btn" onclick="refreshRatio96()" data-i18n="admin.ratio96.btn.refresh" data-i18n-aria="admin.ratio96.btn.refresh">Refresh</button>
+          </div>
         </div>
         "#,
         script,
@@ -244,4 +293,15 @@ async fn admin_dashboard_page_slim_dashboard_i18n_patch_ph_s228() {
     assert!(html.contains(r#""admin.dash.card.overview""#));
     assert!(!html.contains(r#""admin.jobs.leaseState.active""#));
     assert!(!html.contains(r#""admin.mon.mlTitle""#));
+}
+
+#[tokio::test]
+async fn admin_dashboard_ratio96_store_strip_ph_s1682() {
+    let html = admin_dashboard().await.0;
+    assert!(html.contains("ratio96-store-badge"));
+    assert!(html.contains("loadRatio96StoreWire"));
+    assert!(html.contains("/api/v1/ops/ratio96"));
+    assert!(html.contains("refreshRatio96"));
+    assert!(html.contains("admin.ratio96.storeLabel"));
+    assert!(html.contains("admin.ratio96.btn.refresh"));
 }

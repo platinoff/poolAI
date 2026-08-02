@@ -64,6 +64,8 @@ VERIFY_MONITORING_VISION_SYNC="${VERIFY_MONITORING_VISION_SYNC:-0}"
 VERIFY_MONITORING_RATIO_ADVISORY="${VERIFY_MONITORING_RATIO_ADVISORY:-0}"
 VERIFY_MONITORING_HORIZON="${VERIFY_MONITORING_HORIZON:-0}"
 VERIFY_RATIO96="${VERIFY_RATIO96:-0}"
+VERIFY_RATIO96_ADMIN_OPS="${VERIFY_RATIO96_ADMIN_OPS:-0}"
+VERIFY_RATIO96_STAND_SMOKE="${VERIFY_RATIO96_STAND_SMOKE:-0}"
 VERIFY_SSO_LOC_AUDIT="${VERIFY_SSO_LOC_AUDIT:-0}"
 VERIFY_SSO_DOCS_CANON="${VERIFY_SSO_DOCS_CANON:-0}"
 VERIFY_SSO_VISION_SYNC="${VERIFY_SSO_VISION_SYNC:-0}"
@@ -838,6 +840,26 @@ if [[ "$VERIFY_RATIO96" == "1" ]]; then
     echo "OK  ratio96 depth scaffold gate"
   else
     echo "FAIL ratio96 depth scaffold gate"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_RATIO96_ADMIN_OPS" == "1" ]]; then
+  echo "Running poolai-loc-audit --ratio96-admin-ops (PH-S1684)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --migration-advisory --ratio96-admin-ops); then
+    echo "OK  ratio96 admin/ops glue gate"
+  else
+    echo "FAIL ratio96 admin/ops glue gate"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_RATIO96_STAND_SMOKE" == "1" ]]; then
+  echo "Running poolai-loc-audit --ratio96-stand-smoke (PH-S1694)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --ratio96-stand-smoke); then
+    echo "OK  ratio96 stand smoke gate"
+  else
+    echo "FAIL ratio96 stand smoke gate"
     fail=1
   fi
 fi
