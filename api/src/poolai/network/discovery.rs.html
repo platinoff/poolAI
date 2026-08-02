@@ -852,146 +852,147 @@
 <a href=#852 id=852 data-nosnippet>852</a>}
 <a href=#853 id=853 data-nosnippet>853</a>
 <a href=#854 id=854 data-nosnippet>854</a><span class="attr">#[cfg(test)]
-<a href=#855 id=855 data-nosnippet>855</a></span><span class="kw">mod </span>tests {
-<a href=#856 id=856 data-nosnippet>856</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
-<a href=#857 id=857 data-nosnippet>857</a>    <span class="kw">use </span>std::net::{Ipv4Addr, SocketAddrV4};
-<a href=#858 id=858 data-nosnippet>858</a>
-<a href=#859 id=859 data-nosnippet>859</a>    <span class="attr">#[tokio::test]
-<a href=#860 id=860 data-nosnippet>860</a>    </span><span class="kw">async fn </span>test_discovery_service_creation() {
-<a href=#861 id=861 data-nosnippet>861</a>        <span class="kw">let </span>addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::LOCALHOST, <span class="number">8080</span>));
-<a href=#862 id=862 data-nosnippet>862</a>        <span class="kw">let </span>config = DiscoveryConfig::default();
-<a href=#863 id=863 data-nosnippet>863</a>        <span class="kw">let </span>service = DiscoveryService::new(config, addr, <span class="prelude-val">None</span>);
-<a href=#864 id=864 data-nosnippet>864</a>
-<a href=#865 id=865 data-nosnippet>865</a>        <span class="macro">assert!</span>(!service.local_peer_id().is_empty());
-<a href=#866 id=866 data-nosnippet>866</a>        <span class="macro">assert!</span>(service.local_peer_id().starts_with(<span class="string">"poolai-"</span>));
-<a href=#867 id=867 data-nosnippet>867</a>    }
-<a href=#868 id=868 data-nosnippet>868</a>
-<a href=#869 id=869 data-nosnippet>869</a>    <span class="attr">#[tokio::test]
-<a href=#870 id=870 data-nosnippet>870</a>    </span><span class="kw">async fn </span>test_heartbeat_remote_peer_updates_last_seen() {
-<a href=#871 id=871 data-nosnippet>871</a>        <span class="kw">let </span>addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::LOCALHOST, <span class="number">8080</span>));
-<a href=#872 id=872 data-nosnippet>872</a>        <span class="kw">let </span>service = DiscoveryService::new(DiscoveryConfig::default(), addr, <span class="prelude-val">None</span>);
-<a href=#873 id=873 data-nosnippet>873</a>        <span class="kw">let </span>peer = PeerInfo {
-<a href=#874 id=874 data-nosnippet>874</a>            peer_id: <span class="string">"tg-worker-hb"</span>.to_string(),
-<a href=#875 id=875 data-nosnippet>875</a>            address: <span class="string">"10.0.0.6"</span>.to_string(),
-<a href=#876 id=876 data-nosnippet>876</a>            port: <span class="number">9091</span>,
-<a href=#877 id=877 data-nosnippet>877</a>            last_seen: Utc::now() - chrono::Duration::seconds(<span class="number">120</span>),
-<a href=#878 id=878 data-nosnippet>878</a>            capabilities: PeerCapabilities::default(),
-<a href=#879 id=879 data-nosnippet>879</a>            metadata: HashMap::from([(<span class="string">"role"</span>.to_string(), <span class="string">"virtual_node"</span>.to_string())]),
-<a href=#880 id=880 data-nosnippet>880</a>        };
-<a href=#881 id=881 data-nosnippet>881</a>        service.register_remote_peer(peer).<span class="kw">await</span>.unwrap();
-<a href=#882 id=882 data-nosnippet>882</a>        tokio::time::sleep(std::time::Duration::from_millis(<span class="number">20</span>)).<span class="kw">await</span>;
-<a href=#883 id=883 data-nosnippet>883</a>        service
-<a href=#884 id=884 data-nosnippet>884</a>            .heartbeat_remote_peer(<span class="string">"tg-worker-hb"</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
-<a href=#885 id=885 data-nosnippet>885</a>            .<span class="kw">await
-<a href=#886 id=886 data-nosnippet>886</a>            </span>.unwrap();
-<a href=#887 id=887 data-nosnippet>887</a>        <span class="kw">let </span>updated = service.get_peer(<span class="string">"tg-worker-hb"</span>).<span class="kw">await</span>.expect(<span class="string">"peer"</span>);
-<a href=#888 id=888 data-nosnippet>888</a>        <span class="macro">assert!</span>(updated.last_seen &gt; Utc::now() - chrono::Duration::seconds(<span class="number">5</span>));
-<a href=#889 id=889 data-nosnippet>889</a>    }
-<a href=#890 id=890 data-nosnippet>890</a>
-<a href=#891 id=891 data-nosnippet>891</a>    <span class="attr">#[tokio::test]
-<a href=#892 id=892 data-nosnippet>892</a>    </span><span class="kw">async fn </span>heartbeat_network_profile_persist_stub_ph_s664() {
-<a href=#893 id=893 data-nosnippet>893</a>        <span class="kw">use </span><span class="kw">crate</span>::grid::galaxy_network_profile_store::{
-<a href=#894 id=894 data-nosnippet>894</a>            load_peer_network_profile, reset_network_profile_store_for_test,
-<a href=#895 id=895 data-nosnippet>895</a>            ENV_NETWORK_PROFILE_DATA_DIR,
-<a href=#896 id=896 data-nosnippet>896</a>        };
-<a href=#897 id=897 data-nosnippet>897</a>        <span class="kw">static </span>ENV_LOCK: std::sync::Mutex&lt;()&gt; = std::sync::Mutex::new(());
-<a href=#898 id=898 data-nosnippet>898</a>        <span class="kw">let </span>_guard = ENV_LOCK.lock().unwrap_or_else(|e| e.into_inner());
-<a href=#899 id=899 data-nosnippet>899</a>        <span class="kw">let </span>stamp = std::time::SystemTime::now()
-<a href=#900 id=900 data-nosnippet>900</a>            .duration_since(std::time::UNIX_EPOCH)
-<a href=#901 id=901 data-nosnippet>901</a>            .unwrap()
-<a href=#902 id=902 data-nosnippet>902</a>            .as_nanos();
-<a href=#903 id=903 data-nosnippet>903</a>        <span class="kw">let </span>dir = std::env::temp_dir().join(<span class="macro">format!</span>(<span class="string">"poolai-np-hb-{stamp}"</span>));
-<a href=#904 id=904 data-nosnippet>904</a>        std::env::set_var(ENV_NETWORK_PROFILE_DATA_DIR, dir.to_string_lossy().as_ref());
-<a href=#905 id=905 data-nosnippet>905</a>        reset_network_profile_store_for_test();
-<a href=#906 id=906 data-nosnippet>906</a>
-<a href=#907 id=907 data-nosnippet>907</a>        <span class="kw">let </span>addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::LOCALHOST, <span class="number">8080</span>));
-<a href=#908 id=908 data-nosnippet>908</a>        <span class="kw">let </span>service = DiscoveryService::new(DiscoveryConfig::default(), addr, <span class="prelude-val">None</span>);
-<a href=#909 id=909 data-nosnippet>909</a>        <span class="kw">let </span>peer = PeerInfo {
-<a href=#910 id=910 data-nosnippet>910</a>            peer_id: <span class="string">"np-hb-s664"</span>.to_string(),
-<a href=#911 id=911 data-nosnippet>911</a>            address: <span class="string">"10.0.0.7"</span>.to_string(),
-<a href=#912 id=912 data-nosnippet>912</a>            port: <span class="number">9092</span>,
-<a href=#913 id=913 data-nosnippet>913</a>            last_seen: Utc::now(),
-<a href=#914 id=914 data-nosnippet>914</a>            capabilities: PeerCapabilities::default(),
-<a href=#915 id=915 data-nosnippet>915</a>            metadata: HashMap::from([(<span class="string">"role"</span>.to_string(), <span class="string">"virtual_node"</span>.to_string())]),
-<a href=#916 id=916 data-nosnippet>916</a>        };
-<a href=#917 id=917 data-nosnippet>917</a>        service.register_remote_peer(peer).<span class="kw">await</span>.unwrap();
-<a href=#918 id=918 data-nosnippet>918</a>        <span class="kw">let </span>profile = <span class="string">r#"{"region":"eu-central","latency_ms_p50":35,"egress_policy":"vpn_proxy"}"#</span>;
-<a href=#919 id=919 data-nosnippet>919</a>        service
-<a href=#920 id=920 data-nosnippet>920</a>            .heartbeat_remote_peer(
-<a href=#921 id=921 data-nosnippet>921</a>                <span class="string">"np-hb-s664"</span>,
-<a href=#922 id=922 data-nosnippet>922</a>                <span class="prelude-val">None</span>,
-<a href=#923 id=923 data-nosnippet>923</a>                <span class="prelude-val">Some</span>(HashMap::from([(
-<a href=#924 id=924 data-nosnippet>924</a>                    <span class="string">"network_profile"</span>.to_string(),
-<a href=#925 id=925 data-nosnippet>925</a>                    profile.to_string(),
-<a href=#926 id=926 data-nosnippet>926</a>                )])),
-<a href=#927 id=927 data-nosnippet>927</a>            )
-<a href=#928 id=928 data-nosnippet>928</a>            .<span class="kw">await
-<a href=#929 id=929 data-nosnippet>929</a>            </span>.unwrap();
-<a href=#930 id=930 data-nosnippet>930</a>        <span class="kw">let </span>updated = service.get_peer(<span class="string">"np-hb-s664"</span>).<span class="kw">await</span>.expect(<span class="string">"peer"</span>);
-<a href=#931 id=931 data-nosnippet>931</a>        <span class="kw">let </span>stored = updated
-<a href=#932 id=932 data-nosnippet>932</a>            .metadata
-<a href=#933 id=933 data-nosnippet>933</a>            .get(<span class="string">"network_profile"</span>)
-<a href=#934 id=934 data-nosnippet>934</a>            .expect(<span class="string">"network_profile metadata"</span>);
-<a href=#935 id=935 data-nosnippet>935</a>        <span class="kw">let </span>parsed: serde_json::Value = serde_json::from_str(stored).expect(<span class="string">"profile json"</span>);
-<a href=#936 id=936 data-nosnippet>936</a>        <span class="macro">assert_eq!</span>(parsed[<span class="string">"region"</span>], <span class="string">"eu-central"</span>);
-<a href=#937 id=937 data-nosnippet>937</a>        <span class="macro">assert_eq!</span>(parsed[<span class="string">"latency_ms_p50"</span>], <span class="number">35</span>);
-<a href=#938 id=938 data-nosnippet>938</a>        <span class="macro">assert_eq!</span>(parsed[<span class="string">"egress_policy"</span>], <span class="string">"vpn_proxy"</span>);
-<a href=#939 id=939 data-nosnippet>939</a>        <span class="kw">let </span>loaded = load_peer_network_profile(<span class="string">"np-hb-s664"</span>).expect(<span class="string">"persisted profile"</span>);
-<a href=#940 id=940 data-nosnippet>940</a>        <span class="kw">let </span>loaded_parsed: serde_json::Value =
-<a href=#941 id=941 data-nosnippet>941</a>            serde_json::from_str(<span class="kw-2">&amp;</span>loaded).expect(<span class="string">"loaded profile json"</span>);
-<a href=#942 id=942 data-nosnippet>942</a>        <span class="macro">assert_eq!</span>(loaded_parsed[<span class="string">"region"</span>], <span class="string">"eu-central"</span>);
-<a href=#943 id=943 data-nosnippet>943</a>        <span class="kw">let _ </span>= std::fs::remove_dir_all(<span class="kw-2">&amp;</span>dir);
-<a href=#944 id=944 data-nosnippet>944</a>        std::env::remove_var(ENV_NETWORK_PROFILE_DATA_DIR);
-<a href=#945 id=945 data-nosnippet>945</a>        reset_network_profile_store_for_test();
-<a href=#946 id=946 data-nosnippet>946</a>    }
-<a href=#947 id=947 data-nosnippet>947</a>
-<a href=#948 id=948 data-nosnippet>948</a>    <span class="attr">#[tokio::test]
-<a href=#949 id=949 data-nosnippet>949</a>    </span><span class="kw">async fn </span>test_register_remote_peer() {
-<a href=#950 id=950 data-nosnippet>950</a>        <span class="kw">let </span>addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::LOCALHOST, <span class="number">8080</span>));
-<a href=#951 id=951 data-nosnippet>951</a>        <span class="kw">let </span>service = DiscoveryService::new(DiscoveryConfig::default(), addr, <span class="prelude-val">None</span>);
-<a href=#952 id=952 data-nosnippet>952</a>        <span class="kw">let </span>peer = PeerInfo {
-<a href=#953 id=953 data-nosnippet>953</a>            peer_id: <span class="string">"tg-worker-1"</span>.to_string(),
-<a href=#954 id=954 data-nosnippet>954</a>            address: <span class="string">"10.0.0.5"</span>.to_string(),
-<a href=#955 id=955 data-nosnippet>955</a>            port: <span class="number">9090</span>,
-<a href=#956 id=956 data-nosnippet>956</a>            last_seen: Utc::now(),
-<a href=#957 id=957 data-nosnippet>957</a>            capabilities: PeerCapabilities::default(),
-<a href=#958 id=958 data-nosnippet>958</a>            metadata: HashMap::from([(<span class="string">"channel"</span>.to_string(), <span class="string">"telegram"</span>.to_string())]),
-<a href=#959 id=959 data-nosnippet>959</a>        };
-<a href=#960 id=960 data-nosnippet>960</a>        service.register_remote_peer(peer).<span class="kw">await</span>.unwrap();
-<a href=#961 id=961 data-nosnippet>961</a>        <span class="kw">let </span>peers = service.get_peers().<span class="kw">await</span>;
-<a href=#962 id=962 data-nosnippet>962</a>        <span class="macro">assert_eq!</span>(peers.len(), <span class="number">1</span>);
-<a href=#963 id=963 data-nosnippet>963</a>        <span class="macro">assert_eq!</span>(peers[<span class="number">0</span>].peer_id, <span class="string">"tg-worker-1"</span>);
-<a href=#964 id=964 data-nosnippet>964</a>        <span class="macro">assert_eq!</span>(
-<a href=#965 id=965 data-nosnippet>965</a>            peers[<span class="number">0</span>].metadata.get(<span class="string">"channel"</span>).map(String::as_str),
-<a href=#966 id=966 data-nosnippet>966</a>            <span class="prelude-val">Some</span>(<span class="string">"telegram"</span>)
-<a href=#967 id=967 data-nosnippet>967</a>        );
-<a href=#968 id=968 data-nosnippet>968</a>    }
-<a href=#969 id=969 data-nosnippet>969</a>
-<a href=#970 id=970 data-nosnippet>970</a>    <span class="attr">#[tokio::test]
-<a href=#971 id=971 data-nosnippet>971</a>    </span><span class="kw">async fn </span>test_discovery_message_serialization() {
-<a href=#972 id=972 data-nosnippet>972</a>        <span class="kw">let </span>message = DiscoveryMessage::Announce {
-<a href=#973 id=973 data-nosnippet>973</a>            peer_id: <span class="string">"test-peer"</span>.to_string(),
-<a href=#974 id=974 data-nosnippet>974</a>            address: <span class="string">"127.0.0.1"</span>.to_string(),
-<a href=#975 id=975 data-nosnippet>975</a>            port: <span class="number">8080</span>,
-<a href=#976 id=976 data-nosnippet>976</a>            capabilities: PeerCapabilities::default(),
-<a href=#977 id=977 data-nosnippet>977</a>            metadata: HashMap::new(),
-<a href=#978 id=978 data-nosnippet>978</a>        };
-<a href=#979 id=979 data-nosnippet>979</a>
-<a href=#980 id=980 data-nosnippet>980</a>        <span class="kw">let </span>serialized = serde_json::to_string(<span class="kw-2">&amp;</span>message).unwrap();
-<a href=#981 id=981 data-nosnippet>981</a>        <span class="kw">let </span>deserialized: DiscoveryMessage = serde_json::from_str(<span class="kw-2">&amp;</span>serialized).unwrap();
-<a href=#982 id=982 data-nosnippet>982</a>
-<a href=#983 id=983 data-nosnippet>983</a>        <span class="kw">match </span>deserialized {
-<a href=#984 id=984 data-nosnippet>984</a>            DiscoveryMessage::Announce {
-<a href=#985 id=985 data-nosnippet>985</a>                peer_id,
-<a href=#986 id=986 data-nosnippet>986</a>                address,
-<a href=#987 id=987 data-nosnippet>987</a>                port,
-<a href=#988 id=988 data-nosnippet>988</a>                ..
-<a href=#989 id=989 data-nosnippet>989</a>            } =&gt; {
-<a href=#990 id=990 data-nosnippet>990</a>                <span class="macro">assert_eq!</span>(peer_id, <span class="string">"test-peer"</span>);
-<a href=#991 id=991 data-nosnippet>991</a>                <span class="macro">assert_eq!</span>(address, <span class="string">"127.0.0.1"</span>);
-<a href=#992 id=992 data-nosnippet>992</a>                <span class="macro">assert_eq!</span>(port, <span class="number">8080</span>);
-<a href=#993 id=993 data-nosnippet>993</a>            }
-<a href=#994 id=994 data-nosnippet>994</a>            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"Unexpected message type"</span>),
-<a href=#995 id=995 data-nosnippet>995</a>        }
-<a href=#996 id=996 data-nosnippet>996</a>    }
-<a href=#997 id=997 data-nosnippet>997</a>}</code></pre></div></section></main></body></html>
+<a href=#855 id=855 data-nosnippet>855</a>#[allow(clippy::await_holding_lock)]
+<a href=#856 id=856 data-nosnippet>856</a></span><span class="kw">mod </span>tests {
+<a href=#857 id=857 data-nosnippet>857</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+<a href=#858 id=858 data-nosnippet>858</a>    <span class="kw">use </span>std::net::{Ipv4Addr, SocketAddrV4};
+<a href=#859 id=859 data-nosnippet>859</a>
+<a href=#860 id=860 data-nosnippet>860</a>    <span class="attr">#[tokio::test]
+<a href=#861 id=861 data-nosnippet>861</a>    </span><span class="kw">async fn </span>test_discovery_service_creation() {
+<a href=#862 id=862 data-nosnippet>862</a>        <span class="kw">let </span>addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::LOCALHOST, <span class="number">8080</span>));
+<a href=#863 id=863 data-nosnippet>863</a>        <span class="kw">let </span>config = DiscoveryConfig::default();
+<a href=#864 id=864 data-nosnippet>864</a>        <span class="kw">let </span>service = DiscoveryService::new(config, addr, <span class="prelude-val">None</span>);
+<a href=#865 id=865 data-nosnippet>865</a>
+<a href=#866 id=866 data-nosnippet>866</a>        <span class="macro">assert!</span>(!service.local_peer_id().is_empty());
+<a href=#867 id=867 data-nosnippet>867</a>        <span class="macro">assert!</span>(service.local_peer_id().starts_with(<span class="string">"poolai-"</span>));
+<a href=#868 id=868 data-nosnippet>868</a>    }
+<a href=#869 id=869 data-nosnippet>869</a>
+<a href=#870 id=870 data-nosnippet>870</a>    <span class="attr">#[tokio::test]
+<a href=#871 id=871 data-nosnippet>871</a>    </span><span class="kw">async fn </span>test_heartbeat_remote_peer_updates_last_seen() {
+<a href=#872 id=872 data-nosnippet>872</a>        <span class="kw">let </span>addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::LOCALHOST, <span class="number">8080</span>));
+<a href=#873 id=873 data-nosnippet>873</a>        <span class="kw">let </span>service = DiscoveryService::new(DiscoveryConfig::default(), addr, <span class="prelude-val">None</span>);
+<a href=#874 id=874 data-nosnippet>874</a>        <span class="kw">let </span>peer = PeerInfo {
+<a href=#875 id=875 data-nosnippet>875</a>            peer_id: <span class="string">"tg-worker-hb"</span>.to_string(),
+<a href=#876 id=876 data-nosnippet>876</a>            address: <span class="string">"10.0.0.6"</span>.to_string(),
+<a href=#877 id=877 data-nosnippet>877</a>            port: <span class="number">9091</span>,
+<a href=#878 id=878 data-nosnippet>878</a>            last_seen: Utc::now() - chrono::Duration::seconds(<span class="number">120</span>),
+<a href=#879 id=879 data-nosnippet>879</a>            capabilities: PeerCapabilities::default(),
+<a href=#880 id=880 data-nosnippet>880</a>            metadata: HashMap::from([(<span class="string">"role"</span>.to_string(), <span class="string">"virtual_node"</span>.to_string())]),
+<a href=#881 id=881 data-nosnippet>881</a>        };
+<a href=#882 id=882 data-nosnippet>882</a>        service.register_remote_peer(peer).<span class="kw">await</span>.unwrap();
+<a href=#883 id=883 data-nosnippet>883</a>        tokio::time::sleep(std::time::Duration::from_millis(<span class="number">20</span>)).<span class="kw">await</span>;
+<a href=#884 id=884 data-nosnippet>884</a>        service
+<a href=#885 id=885 data-nosnippet>885</a>            .heartbeat_remote_peer(<span class="string">"tg-worker-hb"</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
+<a href=#886 id=886 data-nosnippet>886</a>            .<span class="kw">await
+<a href=#887 id=887 data-nosnippet>887</a>            </span>.unwrap();
+<a href=#888 id=888 data-nosnippet>888</a>        <span class="kw">let </span>updated = service.get_peer(<span class="string">"tg-worker-hb"</span>).<span class="kw">await</span>.expect(<span class="string">"peer"</span>);
+<a href=#889 id=889 data-nosnippet>889</a>        <span class="macro">assert!</span>(updated.last_seen &gt; Utc::now() - chrono::Duration::seconds(<span class="number">5</span>));
+<a href=#890 id=890 data-nosnippet>890</a>    }
+<a href=#891 id=891 data-nosnippet>891</a>
+<a href=#892 id=892 data-nosnippet>892</a>    <span class="attr">#[tokio::test]
+<a href=#893 id=893 data-nosnippet>893</a>    </span><span class="kw">async fn </span>heartbeat_network_profile_persist_stub_ph_s664() {
+<a href=#894 id=894 data-nosnippet>894</a>        <span class="kw">use </span><span class="kw">crate</span>::grid::galaxy_network_profile_store::{
+<a href=#895 id=895 data-nosnippet>895</a>            load_peer_network_profile, reset_network_profile_store_for_test,
+<a href=#896 id=896 data-nosnippet>896</a>            ENV_NETWORK_PROFILE_DATA_DIR,
+<a href=#897 id=897 data-nosnippet>897</a>        };
+<a href=#898 id=898 data-nosnippet>898</a>        <span class="kw">static </span>ENV_LOCK: std::sync::Mutex&lt;()&gt; = std::sync::Mutex::new(());
+<a href=#899 id=899 data-nosnippet>899</a>        <span class="kw">let </span>_guard = ENV_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+<a href=#900 id=900 data-nosnippet>900</a>        <span class="kw">let </span>stamp = std::time::SystemTime::now()
+<a href=#901 id=901 data-nosnippet>901</a>            .duration_since(std::time::UNIX_EPOCH)
+<a href=#902 id=902 data-nosnippet>902</a>            .unwrap()
+<a href=#903 id=903 data-nosnippet>903</a>            .as_nanos();
+<a href=#904 id=904 data-nosnippet>904</a>        <span class="kw">let </span>dir = std::env::temp_dir().join(<span class="macro">format!</span>(<span class="string">"poolai-np-hb-{stamp}"</span>));
+<a href=#905 id=905 data-nosnippet>905</a>        std::env::set_var(ENV_NETWORK_PROFILE_DATA_DIR, dir.to_string_lossy().as_ref());
+<a href=#906 id=906 data-nosnippet>906</a>        reset_network_profile_store_for_test();
+<a href=#907 id=907 data-nosnippet>907</a>
+<a href=#908 id=908 data-nosnippet>908</a>        <span class="kw">let </span>addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::LOCALHOST, <span class="number">8080</span>));
+<a href=#909 id=909 data-nosnippet>909</a>        <span class="kw">let </span>service = DiscoveryService::new(DiscoveryConfig::default(), addr, <span class="prelude-val">None</span>);
+<a href=#910 id=910 data-nosnippet>910</a>        <span class="kw">let </span>peer = PeerInfo {
+<a href=#911 id=911 data-nosnippet>911</a>            peer_id: <span class="string">"np-hb-s664"</span>.to_string(),
+<a href=#912 id=912 data-nosnippet>912</a>            address: <span class="string">"10.0.0.7"</span>.to_string(),
+<a href=#913 id=913 data-nosnippet>913</a>            port: <span class="number">9092</span>,
+<a href=#914 id=914 data-nosnippet>914</a>            last_seen: Utc::now(),
+<a href=#915 id=915 data-nosnippet>915</a>            capabilities: PeerCapabilities::default(),
+<a href=#916 id=916 data-nosnippet>916</a>            metadata: HashMap::from([(<span class="string">"role"</span>.to_string(), <span class="string">"virtual_node"</span>.to_string())]),
+<a href=#917 id=917 data-nosnippet>917</a>        };
+<a href=#918 id=918 data-nosnippet>918</a>        service.register_remote_peer(peer).<span class="kw">await</span>.unwrap();
+<a href=#919 id=919 data-nosnippet>919</a>        <span class="kw">let </span>profile = <span class="string">r#"{"region":"eu-central","latency_ms_p50":35,"egress_policy":"vpn_proxy"}"#</span>;
+<a href=#920 id=920 data-nosnippet>920</a>        service
+<a href=#921 id=921 data-nosnippet>921</a>            .heartbeat_remote_peer(
+<a href=#922 id=922 data-nosnippet>922</a>                <span class="string">"np-hb-s664"</span>,
+<a href=#923 id=923 data-nosnippet>923</a>                <span class="prelude-val">None</span>,
+<a href=#924 id=924 data-nosnippet>924</a>                <span class="prelude-val">Some</span>(HashMap::from([(
+<a href=#925 id=925 data-nosnippet>925</a>                    <span class="string">"network_profile"</span>.to_string(),
+<a href=#926 id=926 data-nosnippet>926</a>                    profile.to_string(),
+<a href=#927 id=927 data-nosnippet>927</a>                )])),
+<a href=#928 id=928 data-nosnippet>928</a>            )
+<a href=#929 id=929 data-nosnippet>929</a>            .<span class="kw">await
+<a href=#930 id=930 data-nosnippet>930</a>            </span>.unwrap();
+<a href=#931 id=931 data-nosnippet>931</a>        <span class="kw">let </span>updated = service.get_peer(<span class="string">"np-hb-s664"</span>).<span class="kw">await</span>.expect(<span class="string">"peer"</span>);
+<a href=#932 id=932 data-nosnippet>932</a>        <span class="kw">let </span>stored = updated
+<a href=#933 id=933 data-nosnippet>933</a>            .metadata
+<a href=#934 id=934 data-nosnippet>934</a>            .get(<span class="string">"network_profile"</span>)
+<a href=#935 id=935 data-nosnippet>935</a>            .expect(<span class="string">"network_profile metadata"</span>);
+<a href=#936 id=936 data-nosnippet>936</a>        <span class="kw">let </span>parsed: serde_json::Value = serde_json::from_str(stored).expect(<span class="string">"profile json"</span>);
+<a href=#937 id=937 data-nosnippet>937</a>        <span class="macro">assert_eq!</span>(parsed[<span class="string">"region"</span>], <span class="string">"eu-central"</span>);
+<a href=#938 id=938 data-nosnippet>938</a>        <span class="macro">assert_eq!</span>(parsed[<span class="string">"latency_ms_p50"</span>], <span class="number">35</span>);
+<a href=#939 id=939 data-nosnippet>939</a>        <span class="macro">assert_eq!</span>(parsed[<span class="string">"egress_policy"</span>], <span class="string">"vpn_proxy"</span>);
+<a href=#940 id=940 data-nosnippet>940</a>        <span class="kw">let </span>loaded = load_peer_network_profile(<span class="string">"np-hb-s664"</span>).expect(<span class="string">"persisted profile"</span>);
+<a href=#941 id=941 data-nosnippet>941</a>        <span class="kw">let </span>loaded_parsed: serde_json::Value =
+<a href=#942 id=942 data-nosnippet>942</a>            serde_json::from_str(<span class="kw-2">&amp;</span>loaded).expect(<span class="string">"loaded profile json"</span>);
+<a href=#943 id=943 data-nosnippet>943</a>        <span class="macro">assert_eq!</span>(loaded_parsed[<span class="string">"region"</span>], <span class="string">"eu-central"</span>);
+<a href=#944 id=944 data-nosnippet>944</a>        <span class="kw">let _ </span>= std::fs::remove_dir_all(<span class="kw-2">&amp;</span>dir);
+<a href=#945 id=945 data-nosnippet>945</a>        std::env::remove_var(ENV_NETWORK_PROFILE_DATA_DIR);
+<a href=#946 id=946 data-nosnippet>946</a>        reset_network_profile_store_for_test();
+<a href=#947 id=947 data-nosnippet>947</a>    }
+<a href=#948 id=948 data-nosnippet>948</a>
+<a href=#949 id=949 data-nosnippet>949</a>    <span class="attr">#[tokio::test]
+<a href=#950 id=950 data-nosnippet>950</a>    </span><span class="kw">async fn </span>test_register_remote_peer() {
+<a href=#951 id=951 data-nosnippet>951</a>        <span class="kw">let </span>addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::LOCALHOST, <span class="number">8080</span>));
+<a href=#952 id=952 data-nosnippet>952</a>        <span class="kw">let </span>service = DiscoveryService::new(DiscoveryConfig::default(), addr, <span class="prelude-val">None</span>);
+<a href=#953 id=953 data-nosnippet>953</a>        <span class="kw">let </span>peer = PeerInfo {
+<a href=#954 id=954 data-nosnippet>954</a>            peer_id: <span class="string">"tg-worker-1"</span>.to_string(),
+<a href=#955 id=955 data-nosnippet>955</a>            address: <span class="string">"10.0.0.5"</span>.to_string(),
+<a href=#956 id=956 data-nosnippet>956</a>            port: <span class="number">9090</span>,
+<a href=#957 id=957 data-nosnippet>957</a>            last_seen: Utc::now(),
+<a href=#958 id=958 data-nosnippet>958</a>            capabilities: PeerCapabilities::default(),
+<a href=#959 id=959 data-nosnippet>959</a>            metadata: HashMap::from([(<span class="string">"channel"</span>.to_string(), <span class="string">"telegram"</span>.to_string())]),
+<a href=#960 id=960 data-nosnippet>960</a>        };
+<a href=#961 id=961 data-nosnippet>961</a>        service.register_remote_peer(peer).<span class="kw">await</span>.unwrap();
+<a href=#962 id=962 data-nosnippet>962</a>        <span class="kw">let </span>peers = service.get_peers().<span class="kw">await</span>;
+<a href=#963 id=963 data-nosnippet>963</a>        <span class="macro">assert_eq!</span>(peers.len(), <span class="number">1</span>);
+<a href=#964 id=964 data-nosnippet>964</a>        <span class="macro">assert_eq!</span>(peers[<span class="number">0</span>].peer_id, <span class="string">"tg-worker-1"</span>);
+<a href=#965 id=965 data-nosnippet>965</a>        <span class="macro">assert_eq!</span>(
+<a href=#966 id=966 data-nosnippet>966</a>            peers[<span class="number">0</span>].metadata.get(<span class="string">"channel"</span>).map(String::as_str),
+<a href=#967 id=967 data-nosnippet>967</a>            <span class="prelude-val">Some</span>(<span class="string">"telegram"</span>)
+<a href=#968 id=968 data-nosnippet>968</a>        );
+<a href=#969 id=969 data-nosnippet>969</a>    }
+<a href=#970 id=970 data-nosnippet>970</a>
+<a href=#971 id=971 data-nosnippet>971</a>    <span class="attr">#[tokio::test]
+<a href=#972 id=972 data-nosnippet>972</a>    </span><span class="kw">async fn </span>test_discovery_message_serialization() {
+<a href=#973 id=973 data-nosnippet>973</a>        <span class="kw">let </span>message = DiscoveryMessage::Announce {
+<a href=#974 id=974 data-nosnippet>974</a>            peer_id: <span class="string">"test-peer"</span>.to_string(),
+<a href=#975 id=975 data-nosnippet>975</a>            address: <span class="string">"127.0.0.1"</span>.to_string(),
+<a href=#976 id=976 data-nosnippet>976</a>            port: <span class="number">8080</span>,
+<a href=#977 id=977 data-nosnippet>977</a>            capabilities: PeerCapabilities::default(),
+<a href=#978 id=978 data-nosnippet>978</a>            metadata: HashMap::new(),
+<a href=#979 id=979 data-nosnippet>979</a>        };
+<a href=#980 id=980 data-nosnippet>980</a>
+<a href=#981 id=981 data-nosnippet>981</a>        <span class="kw">let </span>serialized = serde_json::to_string(<span class="kw-2">&amp;</span>message).unwrap();
+<a href=#982 id=982 data-nosnippet>982</a>        <span class="kw">let </span>deserialized: DiscoveryMessage = serde_json::from_str(<span class="kw-2">&amp;</span>serialized).unwrap();
+<a href=#983 id=983 data-nosnippet>983</a>
+<a href=#984 id=984 data-nosnippet>984</a>        <span class="kw">match </span>deserialized {
+<a href=#985 id=985 data-nosnippet>985</a>            DiscoveryMessage::Announce {
+<a href=#986 id=986 data-nosnippet>986</a>                peer_id,
+<a href=#987 id=987 data-nosnippet>987</a>                address,
+<a href=#988 id=988 data-nosnippet>988</a>                port,
+<a href=#989 id=989 data-nosnippet>989</a>                ..
+<a href=#990 id=990 data-nosnippet>990</a>            } =&gt; {
+<a href=#991 id=991 data-nosnippet>991</a>                <span class="macro">assert_eq!</span>(peer_id, <span class="string">"test-peer"</span>);
+<a href=#992 id=992 data-nosnippet>992</a>                <span class="macro">assert_eq!</span>(address, <span class="string">"127.0.0.1"</span>);
+<a href=#993 id=993 data-nosnippet>993</a>                <span class="macro">assert_eq!</span>(port, <span class="number">8080</span>);
+<a href=#994 id=994 data-nosnippet>994</a>            }
+<a href=#995 id=995 data-nosnippet>995</a>            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"Unexpected message type"</span>),
+<a href=#996 id=996 data-nosnippet>996</a>        }
+<a href=#997 id=997 data-nosnippet>997</a>    }
+<a href=#998 id=998 data-nosnippet>998</a>}</code></pre></div></section></main></body></html>

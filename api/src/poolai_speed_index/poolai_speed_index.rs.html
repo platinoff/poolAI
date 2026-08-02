@@ -253,180 +253,176 @@
 <a href=#253 id=253 data-nosnippet>253</a>    <span class="kw">let </span>args: Vec&lt;String&gt; = env::args().skip(<span class="number">1</span>).collect();
 <a href=#254 id=254 data-nosnippet>254</a>    <span class="kw">if </span>args.is_empty() || args.iter().any(|a| a == <span class="string">"-h" </span>|| a == <span class="string">"--help"</span>) {
 <a href=#255 id=255 data-nosnippet>255</a>        usage();
-<a href=#256 id=256 data-nosnippet>256</a>        <span class="kw">return if </span>args.is_empty() {
-<a href=#257 id=257 data-nosnippet>257</a>            ExitCode::SUCCESS
-<a href=#258 id=258 data-nosnippet>258</a>        } <span class="kw">else </span>{
-<a href=#259 id=259 data-nosnippet>259</a>            ExitCode::SUCCESS
-<a href=#260 id=260 data-nosnippet>260</a>        };
-<a href=#261 id=261 data-nosnippet>261</a>    }
-<a href=#262 id=262 data-nosnippet>262</a>
-<a href=#263 id=263 data-nosnippet>263</a>    <span class="kw">let </span>root = repo_root();
-<a href=#264 id=264 data-nosnippet>264</a>    <span class="kw">let </span><span class="kw-2">mut </span>output = root.join(DEFAULT_OUTPUT);
-<a href=#265 id=265 data-nosnippet>265</a>    <span class="kw">let </span><span class="kw-2">mut </span>wall_secs: <span class="prelude-ty">Option</span>&lt;f64&gt; = <span class="prelude-val">None</span>;
-<a href=#266 id=266 data-nosnippet>266</a>    <span class="kw">let </span><span class="kw-2">mut </span>ok = <span class="bool-val">true</span>;
-<a href=#267 id=267 data-nosnippet>267</a>    <span class="kw">let </span><span class="kw-2">mut </span>command = <span class="string">"cargo test-ci"</span>.to_string();
-<a href=#268 id=268 data-nosnippet>268</a>    <span class="kw">let </span><span class="kw-2">mut </span>host = env::var(<span class="string">"COMPUTERNAME"</span>)
-<a href=#269 id=269 data-nosnippet>269</a>        .or_else(|<span class="kw">_</span>| env::var(<span class="string">"HOSTNAME"</span>))
-<a href=#270 id=270 data-nosnippet>270</a>        .unwrap_or_else(|<span class="kw">_</span>| <span class="string">"local"</span>.into());
-<a href=#271 id=271 data-nosnippet>271</a>    <span class="kw">let </span><span class="kw-2">mut </span>mode_print = <span class="bool-val">false</span>;
-<a href=#272 id=272 data-nosnippet>272</a>    <span class="kw">let </span><span class="kw-2">mut </span>mode_test = <span class="bool-val">false</span>;
-<a href=#273 id=273 data-nosnippet>273</a>    <span class="kw">let </span><span class="kw-2">mut </span>mode_bench = <span class="bool-val">false</span>;
-<a href=#274 id=274 data-nosnippet>274</a>    <span class="kw">let </span><span class="kw-2">mut </span>bench_name: <span class="prelude-ty">Option</span>&lt;String&gt; = <span class="prelude-val">None</span>;
-<a href=#275 id=275 data-nosnippet>275</a>    <span class="kw">let </span><span class="kw-2">mut </span>group: <span class="prelude-ty">Option</span>&lt;String&gt; = <span class="prelude-val">None</span>;
-<a href=#276 id=276 data-nosnippet>276</a>    <span class="kw">let </span><span class="kw-2">mut </span>median_ns: <span class="prelude-ty">Option</span>&lt;u64&gt; = <span class="prelude-val">None</span>;
-<a href=#277 id=277 data-nosnippet>277</a>    <span class="kw">let </span><span class="kw-2">mut </span>profile = <span class="string">"short"</span>.to_string();
-<a href=#278 id=278 data-nosnippet>278</a>
-<a href=#279 id=279 data-nosnippet>279</a>    <span class="kw">let </span><span class="kw-2">mut </span>i = <span class="number">0</span>;
-<a href=#280 id=280 data-nosnippet>280</a>    <span class="kw">while </span>i &lt; args.len() {
-<a href=#281 id=281 data-nosnippet>281</a>        <span class="kw">match </span>args[i].as_str() {
-<a href=#282 id=282 data-nosnippet>282</a>            <span class="string">"--print" </span>=&gt; mode_print = <span class="bool-val">true</span>,
-<a href=#283 id=283 data-nosnippet>283</a>            <span class="string">"--record-test-ci" </span>=&gt; mode_test = <span class="bool-val">true</span>,
-<a href=#284 id=284 data-nosnippet>284</a>            <span class="string">"--record-bench" </span>=&gt; mode_bench = <span class="bool-val">true</span>,
-<a href=#285 id=285 data-nosnippet>285</a>            <span class="string">"--ok" </span>=&gt; ok = <span class="bool-val">true</span>,
-<a href=#286 id=286 data-nosnippet>286</a>            <span class="string">"--fail" </span>=&gt; ok = <span class="bool-val">false</span>,
-<a href=#287 id=287 data-nosnippet>287</a>            <span class="string">"--wall-secs" </span>=&gt; {
+<a href=#256 id=256 data-nosnippet>256</a>        <span class="kw">return </span>ExitCode::SUCCESS;
+<a href=#257 id=257 data-nosnippet>257</a>    }
+<a href=#258 id=258 data-nosnippet>258</a>
+<a href=#259 id=259 data-nosnippet>259</a>    <span class="kw">let </span>root = repo_root();
+<a href=#260 id=260 data-nosnippet>260</a>    <span class="kw">let </span><span class="kw-2">mut </span>output = root.join(DEFAULT_OUTPUT);
+<a href=#261 id=261 data-nosnippet>261</a>    <span class="kw">let </span><span class="kw-2">mut </span>wall_secs: <span class="prelude-ty">Option</span>&lt;f64&gt; = <span class="prelude-val">None</span>;
+<a href=#262 id=262 data-nosnippet>262</a>    <span class="kw">let </span><span class="kw-2">mut </span>ok = <span class="bool-val">true</span>;
+<a href=#263 id=263 data-nosnippet>263</a>    <span class="kw">let </span><span class="kw-2">mut </span>command = <span class="string">"cargo test-ci"</span>.to_string();
+<a href=#264 id=264 data-nosnippet>264</a>    <span class="kw">let </span><span class="kw-2">mut </span>host = env::var(<span class="string">"COMPUTERNAME"</span>)
+<a href=#265 id=265 data-nosnippet>265</a>        .or_else(|<span class="kw">_</span>| env::var(<span class="string">"HOSTNAME"</span>))
+<a href=#266 id=266 data-nosnippet>266</a>        .unwrap_or_else(|<span class="kw">_</span>| <span class="string">"local"</span>.into());
+<a href=#267 id=267 data-nosnippet>267</a>    <span class="kw">let </span><span class="kw-2">mut </span>mode_print = <span class="bool-val">false</span>;
+<a href=#268 id=268 data-nosnippet>268</a>    <span class="kw">let </span><span class="kw-2">mut </span>mode_test = <span class="bool-val">false</span>;
+<a href=#269 id=269 data-nosnippet>269</a>    <span class="kw">let </span><span class="kw-2">mut </span>mode_bench = <span class="bool-val">false</span>;
+<a href=#270 id=270 data-nosnippet>270</a>    <span class="kw">let </span><span class="kw-2">mut </span>bench_name: <span class="prelude-ty">Option</span>&lt;String&gt; = <span class="prelude-val">None</span>;
+<a href=#271 id=271 data-nosnippet>271</a>    <span class="kw">let </span><span class="kw-2">mut </span>group: <span class="prelude-ty">Option</span>&lt;String&gt; = <span class="prelude-val">None</span>;
+<a href=#272 id=272 data-nosnippet>272</a>    <span class="kw">let </span><span class="kw-2">mut </span>median_ns: <span class="prelude-ty">Option</span>&lt;u64&gt; = <span class="prelude-val">None</span>;
+<a href=#273 id=273 data-nosnippet>273</a>    <span class="kw">let </span><span class="kw-2">mut </span>profile = <span class="string">"short"</span>.to_string();
+<a href=#274 id=274 data-nosnippet>274</a>
+<a href=#275 id=275 data-nosnippet>275</a>    <span class="kw">let </span><span class="kw-2">mut </span>i = <span class="number">0</span>;
+<a href=#276 id=276 data-nosnippet>276</a>    <span class="kw">while </span>i &lt; args.len() {
+<a href=#277 id=277 data-nosnippet>277</a>        <span class="kw">match </span>args[i].as_str() {
+<a href=#278 id=278 data-nosnippet>278</a>            <span class="string">"--print" </span>=&gt; mode_print = <span class="bool-val">true</span>,
+<a href=#279 id=279 data-nosnippet>279</a>            <span class="string">"--record-test-ci" </span>=&gt; mode_test = <span class="bool-val">true</span>,
+<a href=#280 id=280 data-nosnippet>280</a>            <span class="string">"--record-bench" </span>=&gt; mode_bench = <span class="bool-val">true</span>,
+<a href=#281 id=281 data-nosnippet>281</a>            <span class="string">"--ok" </span>=&gt; ok = <span class="bool-val">true</span>,
+<a href=#282 id=282 data-nosnippet>282</a>            <span class="string">"--fail" </span>=&gt; ok = <span class="bool-val">false</span>,
+<a href=#283 id=283 data-nosnippet>283</a>            <span class="string">"--wall-secs" </span>=&gt; {
+<a href=#284 id=284 data-nosnippet>284</a>                i += <span class="number">1</span>;
+<a href=#285 id=285 data-nosnippet>285</a>                wall_secs = args.get(i).and_then(|s| s.parse().ok());
+<a href=#286 id=286 data-nosnippet>286</a>            }
+<a href=#287 id=287 data-nosnippet>287</a>            <span class="string">"--command" </span>=&gt; {
 <a href=#288 id=288 data-nosnippet>288</a>                i += <span class="number">1</span>;
-<a href=#289 id=289 data-nosnippet>289</a>                wall_secs = args.get(i).and_then(|s| s.parse().ok());
-<a href=#290 id=290 data-nosnippet>290</a>            }
-<a href=#291 id=291 data-nosnippet>291</a>            <span class="string">"--command" </span>=&gt; {
-<a href=#292 id=292 data-nosnippet>292</a>                i += <span class="number">1</span>;
-<a href=#293 id=293 data-nosnippet>293</a>                <span class="kw">if let </span><span class="prelude-val">Some</span>(v) = args.get(i) {
-<a href=#294 id=294 data-nosnippet>294</a>                    command = v.clone();
-<a href=#295 id=295 data-nosnippet>295</a>                }
-<a href=#296 id=296 data-nosnippet>296</a>            }
-<a href=#297 id=297 data-nosnippet>297</a>            <span class="string">"--host" </span>=&gt; {
-<a href=#298 id=298 data-nosnippet>298</a>                i += <span class="number">1</span>;
-<a href=#299 id=299 data-nosnippet>299</a>                <span class="kw">if let </span><span class="prelude-val">Some</span>(v) = args.get(i) {
-<a href=#300 id=300 data-nosnippet>300</a>                    host = v.clone();
-<a href=#301 id=301 data-nosnippet>301</a>                }
-<a href=#302 id=302 data-nosnippet>302</a>            }
-<a href=#303 id=303 data-nosnippet>303</a>            <span class="string">"--output" </span>=&gt; {
-<a href=#304 id=304 data-nosnippet>304</a>                i += <span class="number">1</span>;
-<a href=#305 id=305 data-nosnippet>305</a>                <span class="kw">if let </span><span class="prelude-val">Some</span>(v) = args.get(i) {
-<a href=#306 id=306 data-nosnippet>306</a>                    output = root.join(v);
-<a href=#307 id=307 data-nosnippet>307</a>                }
+<a href=#289 id=289 data-nosnippet>289</a>                <span class="kw">if let </span><span class="prelude-val">Some</span>(v) = args.get(i) {
+<a href=#290 id=290 data-nosnippet>290</a>                    command = v.clone();
+<a href=#291 id=291 data-nosnippet>291</a>                }
+<a href=#292 id=292 data-nosnippet>292</a>            }
+<a href=#293 id=293 data-nosnippet>293</a>            <span class="string">"--host" </span>=&gt; {
+<a href=#294 id=294 data-nosnippet>294</a>                i += <span class="number">1</span>;
+<a href=#295 id=295 data-nosnippet>295</a>                <span class="kw">if let </span><span class="prelude-val">Some</span>(v) = args.get(i) {
+<a href=#296 id=296 data-nosnippet>296</a>                    host = v.clone();
+<a href=#297 id=297 data-nosnippet>297</a>                }
+<a href=#298 id=298 data-nosnippet>298</a>            }
+<a href=#299 id=299 data-nosnippet>299</a>            <span class="string">"--output" </span>=&gt; {
+<a href=#300 id=300 data-nosnippet>300</a>                i += <span class="number">1</span>;
+<a href=#301 id=301 data-nosnippet>301</a>                <span class="kw">if let </span><span class="prelude-val">Some</span>(v) = args.get(i) {
+<a href=#302 id=302 data-nosnippet>302</a>                    output = root.join(v);
+<a href=#303 id=303 data-nosnippet>303</a>                }
+<a href=#304 id=304 data-nosnippet>304</a>            }
+<a href=#305 id=305 data-nosnippet>305</a>            <span class="string">"--bench" </span>=&gt; {
+<a href=#306 id=306 data-nosnippet>306</a>                i += <span class="number">1</span>;
+<a href=#307 id=307 data-nosnippet>307</a>                bench_name = args.get(i).cloned();
 <a href=#308 id=308 data-nosnippet>308</a>            }
-<a href=#309 id=309 data-nosnippet>309</a>            <span class="string">"--bench" </span>=&gt; {
+<a href=#309 id=309 data-nosnippet>309</a>            <span class="string">"--group" </span>=&gt; {
 <a href=#310 id=310 data-nosnippet>310</a>                i += <span class="number">1</span>;
-<a href=#311 id=311 data-nosnippet>311</a>                bench_name = args.get(i).cloned();
+<a href=#311 id=311 data-nosnippet>311</a>                group = args.get(i).cloned();
 <a href=#312 id=312 data-nosnippet>312</a>            }
-<a href=#313 id=313 data-nosnippet>313</a>            <span class="string">"--group" </span>=&gt; {
+<a href=#313 id=313 data-nosnippet>313</a>            <span class="string">"--median-ns" </span>=&gt; {
 <a href=#314 id=314 data-nosnippet>314</a>                i += <span class="number">1</span>;
-<a href=#315 id=315 data-nosnippet>315</a>                group = args.get(i).cloned();
+<a href=#315 id=315 data-nosnippet>315</a>                median_ns = args.get(i).and_then(|s| s.parse().ok());
 <a href=#316 id=316 data-nosnippet>316</a>            }
-<a href=#317 id=317 data-nosnippet>317</a>            <span class="string">"--median-ns" </span>=&gt; {
+<a href=#317 id=317 data-nosnippet>317</a>            <span class="string">"--profile" </span>=&gt; {
 <a href=#318 id=318 data-nosnippet>318</a>                i += <span class="number">1</span>;
-<a href=#319 id=319 data-nosnippet>319</a>                median_ns = args.get(i).and_then(|s| s.parse().ok());
-<a href=#320 id=320 data-nosnippet>320</a>            }
-<a href=#321 id=321 data-nosnippet>321</a>            <span class="string">"--profile" </span>=&gt; {
-<a href=#322 id=322 data-nosnippet>322</a>                i += <span class="number">1</span>;
-<a href=#323 id=323 data-nosnippet>323</a>                <span class="kw">if let </span><span class="prelude-val">Some</span>(v) = args.get(i) {
-<a href=#324 id=324 data-nosnippet>324</a>                    profile = v.clone();
-<a href=#325 id=325 data-nosnippet>325</a>                }
-<a href=#326 id=326 data-nosnippet>326</a>            }
-<a href=#327 id=327 data-nosnippet>327</a>            other =&gt; {
-<a href=#328 id=328 data-nosnippet>328</a>                <span class="macro">eprintln!</span>(<span class="string">"unknown arg: {other}"</span>);
-<a href=#329 id=329 data-nosnippet>329</a>                usage();
-<a href=#330 id=330 data-nosnippet>330</a>                <span class="kw">return </span>ExitCode::FAILURE;
-<a href=#331 id=331 data-nosnippet>331</a>            }
-<a href=#332 id=332 data-nosnippet>332</a>        }
-<a href=#333 id=333 data-nosnippet>333</a>        i += <span class="number">1</span>;
-<a href=#334 id=334 data-nosnippet>334</a>    }
-<a href=#335 id=335 data-nosnippet>335</a>
-<a href=#336 id=336 data-nosnippet>336</a>    <span class="kw">let </span>head = git_head_short(<span class="kw-2">&amp;</span>root);
-<a href=#337 id=337 data-nosnippet>337</a>    <span class="kw">let </span><span class="kw-2">mut </span>index = load_index(<span class="kw-2">&amp;</span>output);
-<a href=#338 id=338 data-nosnippet>338</a>
-<a href=#339 id=339 data-nosnippet>339</a>    <span class="kw">if </span>mode_test {
-<a href=#340 id=340 data-nosnippet>340</a>        <span class="kw">let </span><span class="prelude-val">Some</span>(secs) = wall_secs <span class="kw">else </span>{
-<a href=#341 id=341 data-nosnippet>341</a>            <span class="macro">eprintln!</span>(<span class="string">"--record-test-ci requires --wall-secs"</span>);
-<a href=#342 id=342 data-nosnippet>342</a>            <span class="kw">return </span>ExitCode::FAILURE;
-<a href=#343 id=343 data-nosnippet>343</a>        };
-<a href=#344 id=344 data-nosnippet>344</a>        record_test_ci(<span class="kw-2">&amp;mut </span>index, secs, ok, command, host, head);
-<a href=#345 id=345 data-nosnippet>345</a>        <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = write_index(<span class="kw-2">&amp;</span>output, <span class="kw-2">&amp;</span>index) {
-<a href=#346 id=346 data-nosnippet>346</a>            <span class="macro">eprintln!</span>(<span class="string">"write failed: {e}"</span>);
+<a href=#319 id=319 data-nosnippet>319</a>                <span class="kw">if let </span><span class="prelude-val">Some</span>(v) = args.get(i) {
+<a href=#320 id=320 data-nosnippet>320</a>                    profile = v.clone();
+<a href=#321 id=321 data-nosnippet>321</a>                }
+<a href=#322 id=322 data-nosnippet>322</a>            }
+<a href=#323 id=323 data-nosnippet>323</a>            other =&gt; {
+<a href=#324 id=324 data-nosnippet>324</a>                <span class="macro">eprintln!</span>(<span class="string">"unknown arg: {other}"</span>);
+<a href=#325 id=325 data-nosnippet>325</a>                usage();
+<a href=#326 id=326 data-nosnippet>326</a>                <span class="kw">return </span>ExitCode::FAILURE;
+<a href=#327 id=327 data-nosnippet>327</a>            }
+<a href=#328 id=328 data-nosnippet>328</a>        }
+<a href=#329 id=329 data-nosnippet>329</a>        i += <span class="number">1</span>;
+<a href=#330 id=330 data-nosnippet>330</a>    }
+<a href=#331 id=331 data-nosnippet>331</a>
+<a href=#332 id=332 data-nosnippet>332</a>    <span class="kw">let </span>head = git_head_short(<span class="kw-2">&amp;</span>root);
+<a href=#333 id=333 data-nosnippet>333</a>    <span class="kw">let </span><span class="kw-2">mut </span>index = load_index(<span class="kw-2">&amp;</span>output);
+<a href=#334 id=334 data-nosnippet>334</a>
+<a href=#335 id=335 data-nosnippet>335</a>    <span class="kw">if </span>mode_test {
+<a href=#336 id=336 data-nosnippet>336</a>        <span class="kw">let </span><span class="prelude-val">Some</span>(secs) = wall_secs <span class="kw">else </span>{
+<a href=#337 id=337 data-nosnippet>337</a>            <span class="macro">eprintln!</span>(<span class="string">"--record-test-ci requires --wall-secs"</span>);
+<a href=#338 id=338 data-nosnippet>338</a>            <span class="kw">return </span>ExitCode::FAILURE;
+<a href=#339 id=339 data-nosnippet>339</a>        };
+<a href=#340 id=340 data-nosnippet>340</a>        record_test_ci(<span class="kw-2">&amp;mut </span>index, secs, ok, command, host, head);
+<a href=#341 id=341 data-nosnippet>341</a>        <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = write_index(<span class="kw-2">&amp;</span>output, <span class="kw-2">&amp;</span>index) {
+<a href=#342 id=342 data-nosnippet>342</a>            <span class="macro">eprintln!</span>(<span class="string">"write failed: {e}"</span>);
+<a href=#343 id=343 data-nosnippet>343</a>            <span class="kw">return </span>ExitCode::FAILURE;
+<a href=#344 id=344 data-nosnippet>344</a>        }
+<a href=#345 id=345 data-nosnippet>345</a>        <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = mirror_to_vision(<span class="kw-2">&amp;</span>root, <span class="kw-2">&amp;</span>index) {
+<a href=#346 id=346 data-nosnippet>346</a>            <span class="macro">eprintln!</span>(<span class="string">"vision mirror failed: {e}"</span>);
 <a href=#347 id=347 data-nosnippet>347</a>            <span class="kw">return </span>ExitCode::FAILURE;
 <a href=#348 id=348 data-nosnippet>348</a>        }
-<a href=#349 id=349 data-nosnippet>349</a>        <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = mirror_to_vision(<span class="kw-2">&amp;</span>root, <span class="kw-2">&amp;</span>index) {
-<a href=#350 id=350 data-nosnippet>350</a>            <span class="macro">eprintln!</span>(<span class="string">"vision mirror failed: {e}"</span>);
-<a href=#351 id=351 data-nosnippet>351</a>            <span class="kw">return </span>ExitCode::FAILURE;
-<a href=#352 id=352 data-nosnippet>352</a>        }
-<a href=#353 id=353 data-nosnippet>353</a>        print_summary(<span class="kw-2">&amp;</span>index);
-<a href=#354 id=354 data-nosnippet>354</a>        <span class="kw">return </span>ExitCode::SUCCESS;
-<a href=#355 id=355 data-nosnippet>355</a>    }
-<a href=#356 id=356 data-nosnippet>356</a>
-<a href=#357 id=357 data-nosnippet>357</a>    <span class="kw">if </span>mode_bench {
-<a href=#358 id=358 data-nosnippet>358</a>        <span class="kw">let </span>(<span class="prelude-val">Some</span>(b), <span class="prelude-val">Some</span>(g), <span class="prelude-val">Some</span>(ns)) = (bench_name, group, median_ns) <span class="kw">else </span>{
-<a href=#359 id=359 data-nosnippet>359</a>            <span class="macro">eprintln!</span>(<span class="string">"--record-bench requires --bench --group --median-ns"</span>);
-<a href=#360 id=360 data-nosnippet>360</a>            <span class="kw">return </span>ExitCode::FAILURE;
-<a href=#361 id=361 data-nosnippet>361</a>        };
-<a href=#362 id=362 data-nosnippet>362</a>        record_bench(<span class="kw-2">&amp;mut </span>index, b, g, ns, profile, host, head);
-<a href=#363 id=363 data-nosnippet>363</a>        <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = write_index(<span class="kw-2">&amp;</span>output, <span class="kw-2">&amp;</span>index) {
-<a href=#364 id=364 data-nosnippet>364</a>            <span class="macro">eprintln!</span>(<span class="string">"write failed: {e}"</span>);
+<a href=#349 id=349 data-nosnippet>349</a>        print_summary(<span class="kw-2">&amp;</span>index);
+<a href=#350 id=350 data-nosnippet>350</a>        <span class="kw">return </span>ExitCode::SUCCESS;
+<a href=#351 id=351 data-nosnippet>351</a>    }
+<a href=#352 id=352 data-nosnippet>352</a>
+<a href=#353 id=353 data-nosnippet>353</a>    <span class="kw">if </span>mode_bench {
+<a href=#354 id=354 data-nosnippet>354</a>        <span class="kw">let </span>(<span class="prelude-val">Some</span>(b), <span class="prelude-val">Some</span>(g), <span class="prelude-val">Some</span>(ns)) = (bench_name, group, median_ns) <span class="kw">else </span>{
+<a href=#355 id=355 data-nosnippet>355</a>            <span class="macro">eprintln!</span>(<span class="string">"--record-bench requires --bench --group --median-ns"</span>);
+<a href=#356 id=356 data-nosnippet>356</a>            <span class="kw">return </span>ExitCode::FAILURE;
+<a href=#357 id=357 data-nosnippet>357</a>        };
+<a href=#358 id=358 data-nosnippet>358</a>        record_bench(<span class="kw-2">&amp;mut </span>index, b, g, ns, profile, host, head);
+<a href=#359 id=359 data-nosnippet>359</a>        <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = write_index(<span class="kw-2">&amp;</span>output, <span class="kw-2">&amp;</span>index) {
+<a href=#360 id=360 data-nosnippet>360</a>            <span class="macro">eprintln!</span>(<span class="string">"write failed: {e}"</span>);
+<a href=#361 id=361 data-nosnippet>361</a>            <span class="kw">return </span>ExitCode::FAILURE;
+<a href=#362 id=362 data-nosnippet>362</a>        }
+<a href=#363 id=363 data-nosnippet>363</a>        <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = mirror_to_vision(<span class="kw-2">&amp;</span>root, <span class="kw-2">&amp;</span>index) {
+<a href=#364 id=364 data-nosnippet>364</a>            <span class="macro">eprintln!</span>(<span class="string">"vision mirror failed: {e}"</span>);
 <a href=#365 id=365 data-nosnippet>365</a>            <span class="kw">return </span>ExitCode::FAILURE;
 <a href=#366 id=366 data-nosnippet>366</a>        }
-<a href=#367 id=367 data-nosnippet>367</a>        <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = mirror_to_vision(<span class="kw-2">&amp;</span>root, <span class="kw-2">&amp;</span>index) {
-<a href=#368 id=368 data-nosnippet>368</a>            <span class="macro">eprintln!</span>(<span class="string">"vision mirror failed: {e}"</span>);
-<a href=#369 id=369 data-nosnippet>369</a>            <span class="kw">return </span>ExitCode::FAILURE;
-<a href=#370 id=370 data-nosnippet>370</a>        }
-<a href=#371 id=371 data-nosnippet>371</a>        print_summary(<span class="kw-2">&amp;</span>index);
-<a href=#372 id=372 data-nosnippet>372</a>        <span class="kw">return </span>ExitCode::SUCCESS;
-<a href=#373 id=373 data-nosnippet>373</a>    }
-<a href=#374 id=374 data-nosnippet>374</a>
-<a href=#375 id=375 data-nosnippet>375</a>    <span class="comment">// default / --print
-<a href=#376 id=376 data-nosnippet>376</a>    </span><span class="kw">if </span>!output.exists() &amp;&amp; !mode_print {
-<a href=#377 id=377 data-nosnippet>377</a>        <span class="comment">// bootstrap empty index on first print
-<a href=#378 id=378 data-nosnippet>378</a>        </span>index.schema_version = <span class="number">1</span>;
-<a href=#379 id=379 data-nosnippet>379</a>        index.generated_at = Utc::now().format(<span class="string">"%Y-%m-%d"</span>).to_string();
-<a href=#380 id=380 data-nosnippet>380</a>        index.host_label = host;
-<a href=#381 id=381 data-nosnippet>381</a>        index.git_head = head;
-<a href=#382 id=382 data-nosnippet>382</a>        <span class="kw">let _ </span>= write_index(<span class="kw-2">&amp;</span>output, <span class="kw-2">&amp;</span>index);
-<a href=#383 id=383 data-nosnippet>383</a>        <span class="kw">let _ </span>= mirror_to_vision(<span class="kw-2">&amp;</span>root, <span class="kw-2">&amp;</span>index);
-<a href=#384 id=384 data-nosnippet>384</a>    }
-<a href=#385 id=385 data-nosnippet>385</a>    print_summary(<span class="kw-2">&amp;</span>index);
-<a href=#386 id=386 data-nosnippet>386</a>    ExitCode::SUCCESS
-<a href=#387 id=387 data-nosnippet>387</a>}
+<a href=#367 id=367 data-nosnippet>367</a>        print_summary(<span class="kw-2">&amp;</span>index);
+<a href=#368 id=368 data-nosnippet>368</a>        <span class="kw">return </span>ExitCode::SUCCESS;
+<a href=#369 id=369 data-nosnippet>369</a>    }
+<a href=#370 id=370 data-nosnippet>370</a>
+<a href=#371 id=371 data-nosnippet>371</a>    <span class="comment">// default / --print
+<a href=#372 id=372 data-nosnippet>372</a>    </span><span class="kw">if </span>!output.exists() &amp;&amp; !mode_print {
+<a href=#373 id=373 data-nosnippet>373</a>        <span class="comment">// bootstrap empty index on first print
+<a href=#374 id=374 data-nosnippet>374</a>        </span>index.schema_version = <span class="number">1</span>;
+<a href=#375 id=375 data-nosnippet>375</a>        index.generated_at = Utc::now().format(<span class="string">"%Y-%m-%d"</span>).to_string();
+<a href=#376 id=376 data-nosnippet>376</a>        index.host_label = host;
+<a href=#377 id=377 data-nosnippet>377</a>        index.git_head = head;
+<a href=#378 id=378 data-nosnippet>378</a>        <span class="kw">let _ </span>= write_index(<span class="kw-2">&amp;</span>output, <span class="kw-2">&amp;</span>index);
+<a href=#379 id=379 data-nosnippet>379</a>        <span class="kw">let _ </span>= mirror_to_vision(<span class="kw-2">&amp;</span>root, <span class="kw-2">&amp;</span>index);
+<a href=#380 id=380 data-nosnippet>380</a>    }
+<a href=#381 id=381 data-nosnippet>381</a>    print_summary(<span class="kw-2">&amp;</span>index);
+<a href=#382 id=382 data-nosnippet>382</a>    ExitCode::SUCCESS
+<a href=#383 id=383 data-nosnippet>383</a>}
+<a href=#384 id=384 data-nosnippet>384</a>
+<a href=#385 id=385 data-nosnippet>385</a><span class="attr">#[cfg(test)]
+<a href=#386 id=386 data-nosnippet>386</a></span><span class="kw">mod </span>tests {
+<a href=#387 id=387 data-nosnippet>387</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <a href=#388 id=388 data-nosnippet>388</a>
-<a href=#389 id=389 data-nosnippet>389</a><span class="attr">#[cfg(test)]
-<a href=#390 id=390 data-nosnippet>390</a></span><span class="kw">mod </span>tests {
-<a href=#391 id=391 data-nosnippet>391</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
-<a href=#392 id=392 data-nosnippet>392</a>
-<a href=#393 id=393 data-nosnippet>393</a>    <span class="attr">#[test]
-<a href=#394 id=394 data-nosnippet>394</a>    </span><span class="kw">fn </span>record_test_ci_updates_latest_and_caps_history() {
-<a href=#395 id=395 data-nosnippet>395</a>        <span class="kw">let </span><span class="kw-2">mut </span>idx = SpeedIndex::default();
-<a href=#396 id=396 data-nosnippet>396</a>        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">30 </span>{
-<a href=#397 id=397 data-nosnippet>397</a>            record_test_ci(
-<a href=#398 id=398 data-nosnippet>398</a>                <span class="kw-2">&amp;mut </span>idx,
-<a href=#399 id=399 data-nosnippet>399</a>                <span class="number">100.0 </span>+ i <span class="kw">as </span>f64,
-<a href=#400 id=400 data-nosnippet>400</a>                <span class="bool-val">true</span>,
-<a href=#401 id=401 data-nosnippet>401</a>                <span class="string">"cargo test-ci"</span>.into(),
-<a href=#402 id=402 data-nosnippet>402</a>                <span class="string">"host"</span>.into(),
-<a href=#403 id=403 data-nosnippet>403</a>                <span class="string">"abc"</span>.into(),
-<a href=#404 id=404 data-nosnippet>404</a>            );
-<a href=#405 id=405 data-nosnippet>405</a>        }
-<a href=#406 id=406 data-nosnippet>406</a>        <span class="macro">assert_eq!</span>(idx.test_ci_history.len(), HISTORY_TEST_CI_CAP);
-<a href=#407 id=407 data-nosnippet>407</a>        <span class="macro">assert_eq!</span>(idx.latest.test_ci_wall_secs, <span class="prelude-val">Some</span>(<span class="number">129.0</span>));
-<a href=#408 id=408 data-nosnippet>408</a>        <span class="macro">assert_eq!</span>(idx.latest.test_ci_ok, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>));
-<a href=#409 id=409 data-nosnippet>409</a>    }
-<a href=#410 id=410 data-nosnippet>410</a>
-<a href=#411 id=411 data-nosnippet>411</a>    <span class="attr">#[test]
-<a href=#412 id=412 data-nosnippet>412</a>    </span><span class="kw">fn </span>record_bench_updates_latest() {
-<a href=#413 id=413 data-nosnippet>413</a>        <span class="kw">let </span><span class="kw-2">mut </span>idx = SpeedIndex::default();
-<a href=#414 id=414 data-nosnippet>414</a>        record_bench(
-<a href=#415 id=415 data-nosnippet>415</a>            <span class="kw-2">&amp;mut </span>idx,
-<a href=#416 id=416 data-nosnippet>416</a>            <span class="string">"runtime_benchmarks"</span>.into(),
-<a href=#417 id=417 data-nosnippet>417</a>            <span class="string">"memory_pool/x"</span>.into(),
-<a href=#418 id=418 data-nosnippet>418</a>            <span class="number">42</span>,
-<a href=#419 id=419 data-nosnippet>419</a>            <span class="string">"short"</span>.into(),
-<a href=#420 id=420 data-nosnippet>420</a>            <span class="string">"host"</span>.into(),
-<a href=#421 id=421 data-nosnippet>421</a>            <span class="string">"def"</span>.into(),
-<a href=#422 id=422 data-nosnippet>422</a>        );
-<a href=#423 id=423 data-nosnippet>423</a>        <span class="macro">assert_eq!</span>(idx.bench_history.len(), <span class="number">1</span>);
-<a href=#424 id=424 data-nosnippet>424</a>        <span class="macro">assert_eq!</span>(idx.latest.last_bench_median_ns, <span class="prelude-val">Some</span>(<span class="number">42</span>));
-<a href=#425 id=425 data-nosnippet>425</a>        <span class="macro">assert!</span>(idx
-<a href=#426 id=426 data-nosnippet>426</a>            .latest
-<a href=#427 id=427 data-nosnippet>427</a>            .last_bench_label
-<a href=#428 id=428 data-nosnippet>428</a>            .as_deref()
-<a href=#429 id=429 data-nosnippet>429</a>            .unwrap()
-<a href=#430 id=430 data-nosnippet>430</a>            .contains(<span class="string">"runtime_benchmarks"</span>));
-<a href=#431 id=431 data-nosnippet>431</a>    }
-<a href=#432 id=432 data-nosnippet>432</a>}</code></pre></div></section></main></body></html>
+<a href=#389 id=389 data-nosnippet>389</a>    <span class="attr">#[test]
+<a href=#390 id=390 data-nosnippet>390</a>    </span><span class="kw">fn </span>record_test_ci_updates_latest_and_caps_history() {
+<a href=#391 id=391 data-nosnippet>391</a>        <span class="kw">let </span><span class="kw-2">mut </span>idx = SpeedIndex::default();
+<a href=#392 id=392 data-nosnippet>392</a>        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">30 </span>{
+<a href=#393 id=393 data-nosnippet>393</a>            record_test_ci(
+<a href=#394 id=394 data-nosnippet>394</a>                <span class="kw-2">&amp;mut </span>idx,
+<a href=#395 id=395 data-nosnippet>395</a>                <span class="number">100.0 </span>+ i <span class="kw">as </span>f64,
+<a href=#396 id=396 data-nosnippet>396</a>                <span class="bool-val">true</span>,
+<a href=#397 id=397 data-nosnippet>397</a>                <span class="string">"cargo test-ci"</span>.into(),
+<a href=#398 id=398 data-nosnippet>398</a>                <span class="string">"host"</span>.into(),
+<a href=#399 id=399 data-nosnippet>399</a>                <span class="string">"abc"</span>.into(),
+<a href=#400 id=400 data-nosnippet>400</a>            );
+<a href=#401 id=401 data-nosnippet>401</a>        }
+<a href=#402 id=402 data-nosnippet>402</a>        <span class="macro">assert_eq!</span>(idx.test_ci_history.len(), HISTORY_TEST_CI_CAP);
+<a href=#403 id=403 data-nosnippet>403</a>        <span class="macro">assert_eq!</span>(idx.latest.test_ci_wall_secs, <span class="prelude-val">Some</span>(<span class="number">129.0</span>));
+<a href=#404 id=404 data-nosnippet>404</a>        <span class="macro">assert_eq!</span>(idx.latest.test_ci_ok, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>));
+<a href=#405 id=405 data-nosnippet>405</a>    }
+<a href=#406 id=406 data-nosnippet>406</a>
+<a href=#407 id=407 data-nosnippet>407</a>    <span class="attr">#[test]
+<a href=#408 id=408 data-nosnippet>408</a>    </span><span class="kw">fn </span>record_bench_updates_latest() {
+<a href=#409 id=409 data-nosnippet>409</a>        <span class="kw">let </span><span class="kw-2">mut </span>idx = SpeedIndex::default();
+<a href=#410 id=410 data-nosnippet>410</a>        record_bench(
+<a href=#411 id=411 data-nosnippet>411</a>            <span class="kw-2">&amp;mut </span>idx,
+<a href=#412 id=412 data-nosnippet>412</a>            <span class="string">"runtime_benchmarks"</span>.into(),
+<a href=#413 id=413 data-nosnippet>413</a>            <span class="string">"memory_pool/x"</span>.into(),
+<a href=#414 id=414 data-nosnippet>414</a>            <span class="number">42</span>,
+<a href=#415 id=415 data-nosnippet>415</a>            <span class="string">"short"</span>.into(),
+<a href=#416 id=416 data-nosnippet>416</a>            <span class="string">"host"</span>.into(),
+<a href=#417 id=417 data-nosnippet>417</a>            <span class="string">"def"</span>.into(),
+<a href=#418 id=418 data-nosnippet>418</a>        );
+<a href=#419 id=419 data-nosnippet>419</a>        <span class="macro">assert_eq!</span>(idx.bench_history.len(), <span class="number">1</span>);
+<a href=#420 id=420 data-nosnippet>420</a>        <span class="macro">assert_eq!</span>(idx.latest.last_bench_median_ns, <span class="prelude-val">Some</span>(<span class="number">42</span>));
+<a href=#421 id=421 data-nosnippet>421</a>        <span class="macro">assert!</span>(idx
+<a href=#422 id=422 data-nosnippet>422</a>            .latest
+<a href=#423 id=423 data-nosnippet>423</a>            .last_bench_label
+<a href=#424 id=424 data-nosnippet>424</a>            .as_deref()
+<a href=#425 id=425 data-nosnippet>425</a>            .unwrap()
+<a href=#426 id=426 data-nosnippet>426</a>            .contains(<span class="string">"runtime_benchmarks"</span>));
+<a href=#427 id=427 data-nosnippet>427</a>    }
+<a href=#428 id=428 data-nosnippet>428</a>}</code></pre></div></section></main></body></html>

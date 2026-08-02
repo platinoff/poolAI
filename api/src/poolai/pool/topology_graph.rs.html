@@ -304,7 +304,7 @@
 <a href=#304 id=304 data-nosnippet>304</a>
 <a href=#305 id=305 data-nosnippet>305</a><span class="kw">fn </span>latency_color(latency: f64, max_lat: f64) -&gt; String {
 <a href=#306 id=306 data-nosnippet>306</a>    <span class="kw">let </span>max = <span class="kw">if </span>max_lat &gt; <span class="number">0.0 </span>{ max_lat } <span class="kw">else </span>{ <span class="number">1.0 </span>};
-<a href=#307 id=307 data-nosnippet>307</a>    <span class="kw">let </span>t = f64::min(<span class="number">1.0</span>, f64::max(<span class="number">0.0</span>, latency / max));
+<a href=#307 id=307 data-nosnippet>307</a>    <span class="kw">let </span>t = (latency / max).clamp(<span class="number">0.0</span>, <span class="number">1.0</span>);
 <a href=#308 id=308 data-nosnippet>308</a>    <span class="kw">let </span>r = (<span class="number">80.0 </span>+ t * <span class="number">175.0</span>).round() <span class="kw">as </span>i32;
 <a href=#309 id=309 data-nosnippet>309</a>    <span class="kw">let </span>g = (<span class="number">200.0 </span>- t * <span class="number">140.0</span>).round() <span class="kw">as </span>i32;
 <a href=#310 id=310 data-nosnippet>310</a>    <span class="kw">let </span>b = (<span class="number">120.0 </span>- t * <span class="number">80.0</span>).round() <span class="kw">as </span>i32;
@@ -369,7 +369,7 @@
 <a href=#369 id=369 data-nosnippet>369</a>                <span class="kw">continue</span>;
 <a href=#370 id=370 data-nosnippet>370</a>            }
 <a href=#371 id=371 data-nosnippet>371</a>            <span class="kw">let </span>lat = <span class="kw-2">*</span>raw.unwrap();
-<a href=#372 id=372 data-nosnippet>372</a>            <span class="kw">let </span>t = f64::min(<span class="number">1.0</span>, f64::max(<span class="number">0.0</span>, lat / max_lat));
+<a href=#372 id=372 data-nosnippet>372</a>            <span class="kw">let </span>t = (lat / max_lat).clamp(<span class="number">0.0</span>, <span class="number">1.0</span>);
 <a href=#373 id=373 data-nosnippet>373</a>            <span class="kw">let </span>bg = latency_color(lat, max_lat);
 <a href=#374 id=374 data-nosnippet>374</a>            <span class="kw">let </span>title = escape_html(<span class="macro">format!</span>(<span class="string">"{} → {}: {:.2} ms"</span>, row, col, lat));
 <a href=#375 id=375 data-nosnippet>375</a>            html.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
