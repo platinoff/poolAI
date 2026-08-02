@@ -58,9 +58,43 @@ fn repo_root() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
 }
 
-fn git_tracked_files(root: &Path) -> Result<Vec<String>, String> {
+/// List working-tree files: git-tracked + untracked non-ignored.
+///
+/// Vision-close sync runs before `git add`, so drain-created files are still
+/// untracked; indexing only tracked files defers the manifest bump to the
+/// pre-push hook (blocking push + FM drift). Including untracked non-ignored
+/// files makes the sync see them at vision-close time instead.
+fn git_worktree_files(root: &Path) -> Result<Vec<String>, String> {
     let output = Command::new("git")
-        .args(["ls-files", "-z"])
+        .args([
+            "ls-files",
+            "-z",
+            "--cached",
+            "--others",
+            "--exclude-standard",
+        ])
+        .current_dir(root)
+        .output()
+        .map_err(|e| format!("git ls-files: {e}"))?;
+    if !output.status.success() {
+        return Err(format!(
+            "git ls-files failed: {}",
+            String::from_utf8_lossy(&output.stderr)
+        ));
+    }
+    Ok(output
+        .stdout
+        .split(|&b| b == 0)
+        .filter(|chunk| !chunk.is_empty())
+        .filter_map(|chunk| std::str::from_utf8(chunk).ok().map(str::to_string))
+        .collect())
+}
+
+/// Git-tracked files only (used for VDT `.mdc` rule drift, which must index
+/// committed rules exclusively).
+fn git_ls_files_tracked_only(root: &Path) -> Result<Vec<String>, String> {
+    let output = Command::new("git")
+        .args(["ls-files", "-z", "--cached"])
         .current_dir(root)
         .output()
         .map_err(|e| format!("git ls-files: {e}"))?;
@@ -761,7 +795,7 @@ fn manifest_indexed_paths(manifest: &Value) -> BTreeSet<String> {
 }
 
 fn tracked_vdt_mdc_files(root: &Path) -> Result<Vec<String>, String> {
-    Ok(git_tracked_files(root)?
+    Ok(git_ls_files_tracked_only(root)?
         .into_iter()
         .map(|p| normalize_path(&p))
         .filter(|p| p.starts_with(".cursor/rules/") && p.ends_with(".mdc"))
@@ -1489,7 +1523,7 @@ fn main() -> ExitCode {
 
     let manifest_path = root.join(MANIFEST_REL);
 
-    let paths = match git_tracked_files(&root) {
+    let paths = match git_worktree_files(&root) {
         Ok(p) => p,
         Err(e) => {
             eprintln!("error: {e}");
@@ -1788,6 +1822,55 @@ mod tests {
         assert!(e >= 1);
         let nodes = manifest["nodes"].as_array().unwrap();
         assert!(nodes.iter().any(|n| n["path"] == "docs/openapi.yaml"));
+    }
+
+    /// Regression: vision-close sync runs before `git add`, so drain-created
+    /// files are untracked. `git_worktree_files` must include them, or the
+    /// manifest bump is deferred to the pre-push hook (push blocked + FM drift).
+    #[test]
+    fn git_worktree_files_includes_untracked_non_ignored() {
+        let dir = std::env::temp_dir().join(format!("poolai-vision-sync-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        let git = |args: &[&str]| {
+            let out = Command::new("git")
+                .args(args)
+                .current_dir(&dir)
+                .output()
+                .expect("git run");
+            assert!(
+                out.status.success(),
+                "git {args:?}: {}",
+                String::from_utf8_lossy(&out.stderr)
+            );
+        };
+        git(&["init", "-q"]);
+        git(&["config", "user.email", "test@example.com"]);
+        git(&["config", "user.name", "test"]);
+        std::fs::write(dir.join("tracked.rs"), "fn a() {}").unwrap();
+        git(&["add", "tracked.rs"]);
+        git(&["commit", "-qm", "init"]);
+        std::fs::write(dir.join("untracked.rs"), "fn b() {}").unwrap();
+        std::fs::write(dir.join("ignored.log"), "x").unwrap();
+        std::fs::write(dir.join(".gitignore"), "*.log").unwrap();
+
+        let files = git_worktree_files(&dir).expect("worktree files");
+        assert!(
+            files.contains(&"tracked.rs".to_string()),
+            "tracked missing: {files:?}"
+        );
+        assert!(
+            files.contains(&"untracked.rs".to_string()),
+            "untracked missing: {files:?}"
+        );
+        assert!(
+            !files.iter().any(|f| f.ends_with("ignored.log")),
+            "gitignored file leaked into scan: {files:?}"
+        );
+        let tracked_only = git_ls_files_tracked_only(&dir).expect("tracked only");
+        assert!(tracked_only.contains(&"tracked.rs".to_string()));
+        assert!(!tracked_only.contains(&"untracked.rs".to_string()));
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     #[test]
