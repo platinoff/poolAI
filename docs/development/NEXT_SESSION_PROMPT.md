@@ -11,7 +11,7 @@ Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.1
 | **P0 open** | **PH-SVC34** re-verify GH · **PH-SVC35** OWNER |
 | **Completion pending** | **620** sprints PH-S1659…S2278 · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) |
 | **Horizon** | band 102 → **PH-S1659…S1668** |
-| **Vision** | rev **437** |
+| **Vision** | rev **438** |
 | **Cursor / GH** | local **3.13.21** · Auto-review · Router Balance/Intelligence · Actions `GITHUB_TOKEN` opaque/JWT · [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](./CURSOR_UPDATE_RESEARCH_2026-07-27.md) |
 
 ---
