@@ -265,20 +265,20 @@ FM-xxx (з таблиці нижче)
 
 **VDT:** §5.12 = **журнал PH-S*** (≤10 відкритих). Якщо **< 10** — **`абракадабра`** / project scan **всього проєкту**: concept → FM **§5.1** → roadmaps → architect → DOCS_LEGACY → code → §5.13 fallback. Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Project scan». **Rust-first:** API → `tests/`; Playwright лише browser scope.
 
-**Активна §5.12 (band 106):**
+**Активна §5.12 (band 107):**
 
 | # | Sprint | Фокус | Джерело | Acceptance (скорочено) | Стан |
 |---|--------|--------|---------|-------------------------|------|
-| 1 | **PH-S1699** | `ratio96_loc_audit_depth` scaffold + criteria registry (10) | Ratio96 F band 106 | `ratio96_loc_audit_depth.rs` + `RATIO96_LOC_AUDIT_CRITERIA` enum | **✅** |
-| 2 | **PH-S1700** | Live `ratio96` loc-audit smoke | Ratio96 F band 106 | `smoke_ratio96_loc_audit` + `smoke_ratio96_migration_advisory` | **✅** |
-| 3 | **PH-S1701** | `ratio96` loc-audit export shape | Ratio96 F band 106 | `ratio96_loc_audit_band106_export_shape` + stand smoke | **✅** |
-| 4 | **PH-S1702** | poolai-loc-audit `--ratio96-loc-audit` | Ratio96 F band 106 | CLI flag + loc-audit integration | **✅** |
-| 5 | **PH-S1703** | Docs canon sync (`RATIO96_LOC_AUDIT.md`) | Ratio96 F band 106 | `RATIO96_LOC_AUDIT.md` + RUN_LOCAL/README + `VERIFY_RATIO96_LOC_AUDIT` | **✅** |
-| 6 | **PH-S1704** | poolai-vision-sync --check | Ratio96 F band 106 | vision-sync manifest rev++ | **✅** |
-| 7 | **PH-S1705** | Ratio hold advisory | Ratio96 F band 106 | `poolai-loc-audit --min-ratio 0.95 --advisory` | **✅** |
-| 8 | **PH-S1706** | Band close (`galaxy_horizon_s1699_integration`) | Ratio96 F band 106 | `galaxy_horizon_s1699_integration.rs` + FM/HANDOFF/NEXT | **✅** |
-| 9 | **PH-S1707** | Project scan replenish (10 PH-S* from §5.1 / architect / roadmap) | Ratio96 F band 106 | Replenish FM §5.12 with next 10 from master backlog | **✅** |
-| 10 | **PH-S1708** | Vision sync + diagnostics | Ratio96 F band 106 | `poolai-vision-sync` + `record-rust-diagnostics.sh` + `record-test-ci-speed.sh` | **✅** |
+| 1 | **PH-S1709** | Ratio96 horizon start (galaxy_horizon_s1709_integration) | Ratio96 F band 107 | `galaxy_horizon_s1709_integration.rs` + stand smoke | **[ ]** |
+| 2 | **PH-S1710** | poolai-loc-audit --ratio96-horizon | Ratio96 F band 107 | CLI horizon flag + advisory | **[ ]** |
+| 3 | **PH-S1711** | Docs canon sync (RATIO96_HORIZON.md) | Ratio96 F band 107 | New doc + RUN_LOCAL update | **[ ]** |
+| 4 | **PH-S1712** | Vision sync + KIVI debug | Ratio96 F band 107 | manifest.kivi + debug widget | **[ ]** |
+| 5 | **PH-S1713** | Multi-provider KIVI signature | Ratio96 F band 107 | IDE+provider+model+time in done | **[ ]** |
+| 6 | **PH-S1714** | Band close (galaxy_horizon_s1710_integration) | Ratio96 F band 107 | Integration test + FM update | **[ ]** |
+| 7 | **PH-S1715** | Rust diagnostics record | Ratio96 F band 107 | record-rust-diagnostics.sh | **[ ]** |
+| 8 | **PH-S1716** | Test-ci speed record | Ratio96 F band 107 | record-test-ci-speed.sh | **[ ]** |
+| 9 | **PH-S1717** | Project scan replenish (next 10) | Ratio96 F band 107 | Replenish §5.12 from master | **[ ]** |
+| 10 | **PH-S1718** | Vision close + push | Ratio96 F band 107 | poolai-vision-sync + git push | **[ ]** |
 
 **Відкритих у §5.12:** **0** (band 106 PH-S1699…S1708 ✅). **Master horizon:** PH-S1709…S1718 (band 107).
 
