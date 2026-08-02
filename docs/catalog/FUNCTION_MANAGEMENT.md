@@ -265,8 +265,6 @@ FM-xxx (з таблиці нижче)
 
 **VDT:** §5.12 = **журнал PH-S*** (≤10 відкритих). Якщо **< 10** — **`абракадабра`** / project scan **всього проєкту**: concept → FM **§5.1** → roadmaps → architect → DOCS_LEGACY → code → §5.13 fallback. Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Project scan». **Rust-first:** API → `tests/`; Playwright лише browser scope.
 
-### 5.12 Research backlog (PH-S1709…S1718, band 107, Ratio96 horizon) ✅
-
 **Активна §5.12 (band 108):**
 
 | # | Sprint | Фокус | Джерело | Acceptance (скорочено) | Стан |
@@ -282,7 +280,7 @@ FM-xxx (з таблиці нижче)
 | 9 | **PH-S1727** | Project scan replenish (next 10) | Ratio96 F band 108 | Replenish §5.12 from master | **[ ]** |
 | 10 | **PH-S1728** | Vision close + push | Ratio96 F band 108 | poolai-vision-sync + git push | **[ ]** |
 
-**Відкритих у §5.12:** **10** (band 108 PH-S1719…S1728). **Master horizon:** PH-S1729…S1738 (band 109).
+**Відкритих у §5.12:** **10** (band 108 PH-S1719…S1728). **Master horizon:** PH-S1729…S1738 (band 109). Vision rev **451**.
 
 **Відкритих у §5.12:** **0** (band 106 PH-S1699…S1708 ✅). **Master horizon:** PH-S1709…S1718 (band 107).
 

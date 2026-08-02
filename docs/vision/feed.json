@@ -2,6 +2,97 @@
   "description": "RSS-style ticker of FM §5.12 sprint queue (open + recent closed)",
   "items": [
     {
+      "category": "open",
+      "id": "PH-S1719",
+      "link": "docs/vision/index.html#sprint-queue",
+      "next": true,
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "galaxy_horizon_s1719_integration.rs` + stand smoke",
+      "title": "Ratio96 horizon continuation (galaxy_horizon_s1719_integration)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1720",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "CLI horizon flag + advisory",
+      "title": "poolai-loc-audit --ratio96-horizon-2"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1721",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "New doc + RUN_LOCAL update",
+      "title": "Docs canon sync (RATIO96_HORIZON_2.md)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1722",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "manifest.kivi + debug widget update",
+      "title": "Vision sync + KIVI debug v2"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1723",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "IDE+provider+model+time in done",
+      "title": "Multi-provider KIVI signature v2"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1724",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "Integration test + FM update",
+      "title": "Band close (galaxy_horizon_s1720_integration)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1725",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "record-rust-diagnostics.sh",
+      "title": "Rust diagnostics record"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1726",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "record-test-ci-speed.sh",
+      "title": "Test-ci speed record"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1727",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "Replenish §5.12 from master",
+      "title": "Project scan replenish (next 10)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1728",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "poolai-vision-sync + git push",
+      "title": "Vision close + push"
+    },
+    {
       "category": "closed",
       "id": "PH-S1698",
       "link": "docs/vision/index.html#sprint-queue",
