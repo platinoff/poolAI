@@ -37,6 +37,10 @@ certs/*.key
 data/audit/*
 !data/audit/.gitkeep
 
+# GSV durable store (runtime state; do not commit/push)
+GSV/data/*
+!GSV/data/.gitkeep
+
 # Local one-off git helper scripts (MSYS2 session artifacts; not product)
 bin/commit-*.sh
 bin/fix-commit-*.sh

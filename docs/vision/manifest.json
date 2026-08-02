@@ -3102,7 +3102,7 @@
   ],
   "galaxy_background": "vision2.webp",
   "git_head": "50ce232f",
-  "last_sprint_closed": "PH-S1658",
+  "last_sprint_closed": "PH-S1668",
   "layers": [
     {
       "id": "L0",
@@ -3135,7 +3135,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1659",
+  "next_sprint": "PH-S1669",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -12120,100 +12120,9 @@
       "path": "docs/gsv/README.md"
     }
   ],
-  "revision": 439,
-  "sprint_queue": [
-    {
-      "acceptance": "docs/gsv/` canon; `GSV/Cargo.toml`; empty server builds",
-      "deps": "GSV_TECH_ROADMAP",
-      "id": "PH-S1659",
-      "open": true,
-      "row": 1594,
-      "status": "open",
-      "title": "GSV docs/architecture + Cargo scaffold"
-    },
-    {
-      "acceptance": "gsv_server.rs`; `GET /` → UI; `GET /api/health",
-      "deps": "GSV_TECH_ROADMAP",
-      "id": "PH-S1660",
-      "open": true,
-      "row": 1595,
-      "status": "open",
-      "title": "gsv-server bin scaffold"
-    },
-    {
-      "acceptance": "tracker/`; `GET /api/tracker`; `gsv_tracker.json`; workflow params",
-      "deps": "GSV_BOXES §1",
-      "id": "PH-S1661",
-      "open": true,
-      "row": 1596,
-      "status": "open",
-      "title": "Tracker box"
-    },
-    {
-      "acceptance": "sli/`; `GET /api/sli`; каталог з `bin/`+`scripts/`+`src/bin/",
-      "deps": "GSV_BOXES §2",
-      "id": "PH-S1662",
-      "open": true,
-      "row": 1597,
-      "status": "open",
-      "title": "SLI console box"
-    },
-    {
-      "acceptance": "toolchain/`; `GET /api/toolchain`; інвентар (rustc 1.92, clippy, MSYS2)",
-      "deps": "GSV_BOXES §3",
-      "id": "PH-S1663",
-      "open": true,
-      "row": 1598,
-      "status": "open",
-      "title": "Toolchain box"
-    },
-    {
-      "acceptance": "ide/`; opencode + cursor чати; select сесії",
-      "deps": "GSV_BOXES §4",
-      "id": "PH-S1664",
-      "open": true,
-      "row": 1599,
-      "status": "open",
-      "title": "IDE box"
-    },
-    {
-      "acceptance": "/api/update`; SSE `update_available`; «Update» замість reload",
-      "deps": "GSV_BOXES §5 · GSV_SERVER",
-      "id": "PH-S1665",
-      "open": true,
-      "row": 1600,
-      "status": "open",
-      "title": "Update box"
-    },
-    {
-      "acceptance": "preview/` Rust-кольори; `POST /api/terminal",
-      "deps": "GSV_BOXES §6·§7",
-      "id": "PH-S1666",
-      "open": true,
-      "row": 1601,
-      "status": "open",
-      "title": "Box preview + SLI terminal"
-    },
-    {
-      "acceptance": "hooks/`; `/api/hooks/tests`; `/api/hooks/bench`; read `target/",
-      "deps": "GSV_BOXES §8",
-      "id": "PH-S1667",
-      "open": true,
-      "row": 1602,
-      "status": "open",
-      "title": "Tests/bench hooks (без перекомпіляції)"
-    },
-    {
-      "acceptance": "offline-стійкість + metrics resync; Rust tests; docs canon; ratio hold",
-      "deps": "GSV_TECH_ROADMAP",
-      "id": "PH-S1668",
-      "open": true,
-      "row": 1603,
-      "status": "open",
-      "title": "Band close"
-    }
-  ],
-  "sprint_queue_open_count": 10,
+  "revision": 440,
+  "sprint_queue": [],
+  "sprint_queue_open_count": 0,
   "updated_at": "2026-06-20",
   "vision_ui_rev": 59
 }

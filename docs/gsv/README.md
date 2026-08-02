@@ -17,7 +17,7 @@
 ## Зв’язок з PoolAI docs
 
 - Vision-UI-спадкоємець: [`docs/vision/index.html`](../vision/index.html) — статичний Galaxy UI; GSV переносить логіку в Rust-сервер з боксами.
-- Черга sprints: [`docs/catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (band 102).
+- Черга sprints: [`docs/catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (band 102 ✅).
 - Концепт: [`docs/concept/poolAI_concept_root.txt`](../concept/poolAI_concept_root.txt) · [`docs/concept/POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md).
 - Воркфлоу: [`docs/development/HANDOFF_NEW_SESSION.md`](../development/HANDOFF_NEW_SESSION.md) · [`docs/development/NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
@@ -31,4 +31,5 @@
 
 ## Статус
 
+- **2026-08-02:** band 102 **реалізовано** (`PH-S1659…S1668` ✅ у FM §5.12 §5.83): `GSV/` окремий Rust-проєкт (gsv-server + бокси + single-page UI), **52 tests green**, clippy 0, live-smoke ок, timestamps RFC3339. Міграція docs/vision → GSV — ⏳ future.
 - **2026-08-01:** архітектура + docs створено; GSV зареєстровано як band 102 (`PH-S1659…S1668`) у FM §5.12. Реалізація — future.

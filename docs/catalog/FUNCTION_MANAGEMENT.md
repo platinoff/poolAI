@@ -1221,26 +1221,26 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **10** (band 101 ✅ · band 102 GSV open). **Master horizon:** PH-S1659…S1668 (band 102). **Completion pending:** PH-S1669…S2278 = **610** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **439**. **Наступна сесія:** **`абракадабра`** — project scan / drain band 102 (GSV).
+**Відкритих у §5.12:** **0** (band 102 ✅ · band 103 next). **Master horizon:** PH-S1669…S1678 (band 103). **Completion pending:** PH-S1669…S2278 = **610** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **440**. **Наступна сесія:** **`абракадабра`** — project scan (наступний PH-S1669+).
 
-### 5.83 GSV migration queue — Galaxy StarWalker Vision — band 102 (PH-S1659…S1668, 2026-08-01) · **◎ open**
+### 5.83 GSV migration queue — band 102 (PH-S1659…S1668, 2026-08-01) · **✅**
 
 **Джерело:** окремий проєкт GSV (vision migration, Rust 95–100% / wasm 0–5%) — канон міграції vision у самостійний bin-сервер з боксами. Архітектура + docs: [`GSV/README.md`](../../GSV/README.md) · [`GSV_ARCHITECTURE.md`](../../gsv/GSV_ARCHITECTURE.md) · [`GSV_SERVER.md`](../../gsv/GSV_SERVER.md) · [`GSV_BOXES.md`](../../gsv/GSV_BOXES.md) · [`GSV_MIGRATION.md`](../../gsv/GSV_MIGRATION.md) · **TechPreroadMap** [`GSV_TECH_ROADMAP.md`](../../gsv/GSV_TECH_ROADMAP.md). Priority: owner (GSV перед master-backlog Ratio96 phase F).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
-| 1594 | **PH-S1659** | GSV docs/architecture + Cargo scaffold | GSV_TECH_ROADMAP | `docs/gsv/` canon; `GSV/Cargo.toml`; empty server builds | **[ ]** |
-| 1595 | **PH-S1660** | gsv-server bin scaffold | GSV_TECH_ROADMAP | `gsv_server.rs`; `GET /` → UI; `GET /api/health` | **[ ]** |
-| 1596 | **PH-S1661** | Tracker box | GSV_BOXES §1 | `tracker/`; `GET /api/tracker`; `gsv_tracker.json`; workflow params | **[ ]** |
-| 1597 | **PH-S1662** | SLI console box | GSV_BOXES §2 | `sli/`; `GET /api/sli`; каталог з `bin/`+`scripts/`+`src/bin/` | **[ ]** |
-| 1598 | **PH-S1663** | Toolchain box | GSV_BOXES §3 | `toolchain/`; `GET /api/toolchain`; інвентар (rustc 1.92, clippy, MSYS2) | **[ ]** |
-| 1599 | **PH-S1664** | IDE box | GSV_BOXES §4 | `ide/`; opencode + cursor чати; select сесії | **[ ]** |
-| 1600 | **PH-S1665** | Update box | GSV_BOXES §5 · GSV_SERVER | `/api/update`; SSE `update_available`; «Update» замість reload | **[ ]** |
-| 1601 | **PH-S1666** | Box preview + SLI terminal | GSV_BOXES §6·§7 | `preview/` Rust-кольори; `POST /api/terminal` | **[ ]** |
-| 1602 | **PH-S1667** | Tests/bench hooks (без перекомпіляції) | GSV_BOXES §8 | `hooks/`; `/api/hooks/tests`; `/api/hooks/bench`; read `target/` | **[ ]** |
-| 1603 | **PH-S1668** | Band close | GSV_TECH_ROADMAP | offline-стійкість + metrics resync; Rust tests; docs canon; ratio hold | **[ ]** |
+| 1594 | **PH-S1659** | GSV docs/architecture + Cargo scaffold | GSV_TECH_ROADMAP | `docs/gsv/` canon; `GSV/Cargo.toml`; empty server builds | **✅** |
+| 1595 | **PH-S1660** | gsv-server bin scaffold | GSV_TECH_ROADMAP | `gsv_server.rs`; `GET /` → UI; `GET /api/health` | **✅** |
+| 1596 | **PH-S1661** | Tracker box | GSV_BOXES §1 | `tracker/`; `GET /api/tracker`; `gsv_tracker.json`; workflow params | **✅** |
+| 1597 | **PH-S1662** | SLI console box | GSV_BOXES §2 | `sli/`; `GET /api/sli`; каталог з `bin/`+`scripts/`+`src/bin/` | **✅** |
+| 1598 | **PH-S1663** | Toolchain box | GSV_BOXES §3 | `toolchain/`; `GET /api/toolchain`; інвентар (rustc 1.92, clippy, MSYS2) | **✅** |
+| 1599 | **PH-S1664** | IDE box | GSV_BOXES §4 | `ide/`; opencode + cursor чати; select сесії | **✅** |
+| 1600 | **PH-S1665** | Update box | GSV_BOXES §5 · GSV_SERVER | `/api/update`; SSE `update_available`; «Update» замість reload | **✅** |
+| 1601 | **PH-S1666** | Box preview + SLI terminal | GSV_BOXES §6·§7 | `preview/` Rust-кольори; `POST /api/terminal` | **✅** |
+| 1602 | **PH-S1667** | Tests/bench hooks (без перекомпіляції) | GSV_BOXES §8 | `hooks/`; `/api/hooks/tests`; `/api/hooks/bench`; read `target/` | **✅** |
+| 1603 | **PH-S1668** | Band close | GSV_TECH_ROADMAP | offline-стійкість + metrics resync; Rust tests; docs canon; ratio hold | **✅** |
 
-**PH-S1659…S1668 ◎ (2026-08-01):** архітектура + docs створено; спринти зареєстровані; реалізація — наступна сесія (`абракадабра` → drain band 102).
+**PH-S1659…S1668 ✅ (2026-08-02):** GSV реалізовано як окремий Rust-проєкт (`GSV/`, 52 tests green, clippy 0, live-smoke ок). Бокси: Tracker · SLI console · Toolchain · IDE · Update/offline · Box preview · SLI terminal · Tests/bench hooks. Timestamps RFC3339 (chrono).
 
 ### 5.82 Ratio96 depth scaffold queue — band 101 (PH-S1649…S1658, 2026-08-01) · **✅**
 

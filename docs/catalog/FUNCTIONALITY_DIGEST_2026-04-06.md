@@ -1,6 +1,6 @@
 # PoolAI — витяг функціоналу (зведення за доками та кодом)
 
-**Оновлено:** 2026-08-01 (GSV проєкт створено — band 102 `PH-S1659…S1668`).
+**Оновлено:** 2026-08-02 (GSV реалізовано — band 102 `PH-S1659…S1668` ✅).
 
 Цей документ — **не автогенерація з коду**, а структурований **витяг можливостей** системи, узгоджений з кореневим [`README.md`](../../README.md), [`docs/status/STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md), [`docs/development/HANDOFF_NEW_SESSION.md`](../development/HANDOFF_NEW_SESSION.md), модулями `src/` та (частково) [`docs/openapi.yaml`](../openapi.yaml). Для повного переліку HTTP-шляхів див. роутери в `src/network/` — OpenAPI може відставати від фактичного API.
 
@@ -49,7 +49,7 @@
 | **`poolai-telegram-bot`** (`src/bin/poolai-telegram-bot.rs`) | Telegram bot sidecar (`--features tgbot`); coordinator bridge (FM-016++). |
 | **`poolai-solana-adapter`** (`crates/poolai-solana-adapter/src/bin/`) | NDJSON domain events → mock/devnet RPC ack (FM-024/033). |
 
-**GSV (Galaxy StarWalker Vision)** — окремий Rust-first проєкт у `GSV/` (vision migration): bin-сервер `gsv-server` з боксами **Tracker · SLI console · Toolchain · IDE · Update/offline · Box preview · SLI terminal · Tests/bench hooks**. Rust 95–100% / wasm 0–5%. Канон: [`GSV/README.md`](../../GSV/README.md) · docs [`docs/gsv/`](../gsv/README.md) · **TechPreroadMap** [`docs/gsv/GSV_TECH_ROADMAP.md`](../gsv/GSV_TECH_ROADMAP.md) · band 102 `PH-S1659…S1668` (FM §5.12 §5.83).
+**GSV (Galaxy StarWalker Vision)** — окремий Rust-first проєкт у `GSV/` (vision migration): bin-сервер `gsv-server` (axum 0.8, SSE `/events`, single-page UI) з боксами **Tracker · SLI console · Toolchain · IDE · Update/offline · Box preview · SLI terminal · Tests/bench hooks**. Rust 95–100% / wasm 0–5%. **52 tests green, clippy 0.** Канон: [`GSV/README.md`](../../GSV/README.md) · docs [`docs/gsv/`](../gsv/README.md) · **TechPreroadMap** [`docs/gsv/GSV_TECH_ROADMAP.md`](../gsv/GSV_TECH_ROADMAP.md) · band 102 `PH-S1659…S1668` **✅** (FM §5.12 §5.83).
 
 ---
 

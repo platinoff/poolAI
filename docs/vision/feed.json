@@ -2,95 +2,94 @@
   "description": "RSS-style ticker of FM §5.12 sprint queue (open + recent closed)",
   "items": [
     {
-      "category": "open",
-      "id": "PH-S1659",
-      "link": "docs/vision/index.html#sprint-queue",
-      "next": true,
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "docs/gsv/` canon; `GSV/Cargo.toml`; empty server builds",
-      "title": "GSV docs/architecture + Cargo scaffold"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1660",
+      "category": "closed",
+      "id": "PH-S1668",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
-      "status": "open",
-      "summary": "gsv_server.rs`; `GET /` → UI; `GET /api/health",
-      "title": "gsv-server bin scaffold"
+      "status": "closed",
+      "summary": "offline-стійкість + metrics resync; Rust tests; docs canon; ratio hold",
+      "title": "Band close"
     },
     {
-      "category": "open",
-      "id": "PH-S1661",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "tracker/`; `GET /api/tracker`; `gsv_tracker.json`; workflow params",
-      "title": "Tracker box"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1662",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "sli/`; `GET /api/sli`; каталог з `bin/`+`scripts/`+`src/bin/",
-      "title": "SLI console box"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1663",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "toolchain/`; `GET /api/toolchain`; інвентар (rustc 1.92, clippy, MSYS2)",
-      "title": "Toolchain box"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1664",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "ide/`; opencode + cursor чати; select сесії",
-      "title": "IDE box"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1665",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "/api/update`; SSE `update_available`; «Update» замість reload",
-      "title": "Update box"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1666",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "preview/` Rust-кольори; `POST /api/terminal",
-      "title": "Box preview + SLI terminal"
-    },
-    {
-      "category": "open",
+      "category": "closed",
       "id": "PH-S1667",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
-      "status": "open",
+      "status": "closed",
       "summary": "hooks/`; `/api/hooks/tests`; `/api/hooks/bench`; read `target/",
       "title": "Tests/bench hooks (без перекомпіляції)"
     },
     {
-      "category": "open",
-      "id": "PH-S1668",
+      "category": "closed",
+      "id": "PH-S1666",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
-      "status": "open",
-      "summary": "offline-стійкість + metrics resync; Rust tests; docs canon; ratio hold",
-      "title": "Band close"
+      "status": "closed",
+      "summary": "preview/` Rust-кольори; `POST /api/terminal",
+      "title": "Box preview + SLI terminal"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1665",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "/api/update`; SSE `update_available`; «Update» замість reload",
+      "title": "Update box"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1664",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "ide/`; opencode + cursor чати; select сесії",
+      "title": "IDE box"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1663",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "toolchain/`; `GET /api/toolchain`; інвентар (rustc 1.92, clippy, MSYS2)",
+      "title": "Toolchain box"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1662",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "sli/`; `GET /api/sli`; каталог з `bin/`+`scripts/`+`src/bin/",
+      "title": "SLI console box"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1661",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "tracker/`; `GET /api/tracker`; `gsv_tracker.json`; workflow params",
+      "title": "Tracker box"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1660",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "gsv_server.rs`; `GET /` → UI; `GET /api/health",
+      "title": "gsv-server bin scaffold"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1659",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "docs/gsv/` canon; `GSV/Cargo.toml`; empty server builds",
+      "title": "GSV docs/architecture + Cargo scaffold"
     },
     {
       "category": "closed",
@@ -104,96 +103,6 @@
     {
       "category": "closed",
       "id": "PH-S1657",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--min-ratio 0.95 --advisory",
-      "title": "Ratio hold advisory"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1656",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "drift gate green",
-      "title": "vision-sync --check"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1655",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "RUN_LOCAL/INDEX/HANDOFF/NEXT",
-      "title": "Docs canon sync"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1654",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "rust_ratio.json` fields",
-      "title": "poolai-loc-audit --ratio96"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1653",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "ratio96_band101_export_shape",
-      "title": "Stand smoke export shape"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1652",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "verify-dev-stand + run-poolai",
-      "title": "ratio96` admin/ops glue"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1651",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "criteria totals + store wire",
-      "title": "ratio96` API contracts"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1650",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "durable `rust_ratio.json` read + unit test",
-      "title": "ratio96` store/wire slice"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1649",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "depth enum + criteria registry",
-      "title": "ratio96_depth` ui-core module"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1648",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_horizon_s1639_integration",
-      "title": "Band close"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1647",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
       "status": "closed",

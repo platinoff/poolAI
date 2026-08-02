@@ -1,0 +1,8 @@
+# GSV standalone workspace build target (independent from the PoolAI root workspace
+# CARGO_TARGET_DIR=/s/rust/poolAI/target). Keeps gsv artifacts out of the shared
+# target dir so root cargo test-ci / clippy scans are unaffected.
+#
+# Note: an explicit CARGO_TARGET_DIR env var (exported by bin/*.sh) overrides this;
+# when building GSV use: CARGO_TARGET_DIR=/s/rust/poolAI/GSV/target cargo build ...
+[build]
+target-dir = "target"

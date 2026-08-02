@@ -1,0 +1,48 @@
+[workspace]
+resolver = "2"
+members = ["."]
+
+[package]
+name = "gsv"
+version = "0.1.0"
+edition = "2021"
+authors = ["PoolAI Team"]
+description = "GSV (Galaxy StarWalker Vision) - Rust-first vision server with boxes (Tracker, SLI, Toolchain, IDE, Update, Preview, Terminal, Hooks)"
+license = "MIT"
+repository = "https://github.com/poolai/poolai"
+keywords = ["vision", "monitoring", "dashboard", "rust", "sli"]
+categories = ["command-line-utilities", "web-programming"]
+default-run = "gsv-server"
+publish = false
+
+[[bin]]
+name = "gsv-server"
+path = "src/bin/gsv_server.rs"
+
+[dependencies]
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.9"
+
+# Timestamps (RFC3339)
+chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+
+# Async runtime
+tokio = { version = "1.49", features = ["full"] }
+
+# Web framework
+axum = { version = "0.8", features = ["ws"] }
+
+# SSE streams
+futures-util = "0.3"
+tokio-stream = { version = "0.1", features = ["sync"] }
+
+# Logging and tracing
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[dev-dependencies]
+# Integration tests only (contracts + update flow)
+tokio = { version = "1.49", features = ["full"] }
+tower = { version = "0.5", features = ["util"] }

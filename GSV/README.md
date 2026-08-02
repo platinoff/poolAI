@@ -2,7 +2,7 @@
 
 **Канон міграції vision у окремий проєкт.** GSV — самостійний Rust-first проєкт у фолдері `GSV/` репо PoolAI. Працює **95–100% на Rust**, **0–5% WebAssembly** (завжди), UI — тонкий JS/DOM glue у `src/ui/` (без Python).
 
-**Версія:** v0.1.0 (planning) · **Стан:** архітектура + docs (`docs/gsv/`) · **Реалізація:** future sprints band 102 (FM §5.12 `PH-S1659…S1668`).
+**Версія:** v0.1.0 · **Стан:** band 102 реалізовано (FM §5.12 §5.83 **✅** `PH-S1659…S1668`).
 
 ## Суть
 
@@ -20,17 +20,36 @@
    - **Rust tests / benchmarks hook** — запуск без перекомпіляції.
 3. Дотримується правила: **Rust-only** для runtime/API/ML/tools; bins — лише Rust (`src/bin/`), жодного Python/Java.
 
-## Структура (план)
+## Структура
 
 ```
 GSV/
 ├── README.md            ← цей файл (архітектура / entry)
-├── Cargo.toml           ← gsv workspace / package (future)
+├── Cargo.toml           ← gsv package (workspace members=["."]; bin `gsv-server`)
+├── .cargo/config.toml   ← [build] target-dir="target"
 ├── src/
 │   ├── bin/
-│   │   └── gsv_server.rs    ← exe/bin «Galaxy StarWalker Vision» (future)
-│   └── (boxes, sli, toolchain, tracker, ide, update — future PH-S*)
-└── docs/                ← внутрішні docs проєкту (future)
+│   │   └── gsv_server.rs    ← exe/bin «Galaxy StarWalker Vision» (CLI --host/--port/--repo-root/--data-dir)
+│   ├── lib.rs           ← модулі (app_error, boxes, server, state, tracker, vision)
+│   ├── app_error.rs     ← AppError (Display + From + IntoResponse JSON)
+│   ├── state.rs         ← AppState (tracker, ide_selection, update_flag, events broadcast)
+│   ├── tracker.rs       ← TrackerStore + FM §5.12 sprint snapshot parse
+│   ├── vision.rs        ← RFC3339 timestamps, git_head, vision JSON read
+│   ├── server/mod.rs    ← router (/, /api/*, /events SSE)
+│   └── boxes/
+│       ├── mod.rs
+│       ├── sli.rs       ← SLI каталог з bin/ + scripts/ + src/bin/
+│       ├── toolchain.rs ← інвентар тулсів
+│       ├── ide.rs       ← opencode + cursor сесії
+│       ├── update.rs    ← pending rebuild detection
+│       ├── preview.rs   ← Rust syntax highlight + traversal guard
+│       ├── terminal.rs  ← whitelist + injection guard
+│       └── hooks.rs     ← tests/bench (read-only target/ + rust_diagnostics)
+├── ui/index.html        ← single-page UI (SSE, offline/update/resync)
+├── tests/
+│   ├── gsv_server_contracts.rs  ← 18 integration tests
+│   └── gsv_update_flow.rs       ← 8 update/SSE tests
+└── data/                ← gsv_tracker.json (durable store, gitignored)
 ```
 
 Канонічна документація проєкту — `docs/gsv/` (див. нижче).
@@ -43,6 +62,27 @@ GSV/
 - Термінал — MSYS2 bash (не PowerShell) для `cargo`/`git`.
 - Rust стиль: `AppError`, `?`, без `unwrap()`/`expect()` у продукті, `Arc<RwLock<T>>`, `tokio`, `tracing`, модулі через `mod.rs`.
 
+## Збірка / тести
+
+```
+# з кореня репо (unset CARGO_TARGET_DIR — GSV має свій target/):
+export PATH="/c/Users/${USER}/.cargo/bin:$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"
+export RUSTUP_TOOLCHAIN="stable-x86_64-pc-windows-gnu"
+cd GSV
+cargo build --all-targets
+cargo test          # 52 tests (26 unit + 18 contracts + 8 update-flow)
+cargo clippy --all-targets   # 0 warnings/errors
+cargo run --bin gsv-server -- --port 8890   # live smoke
+```
+
+## Запуск
+
+```
+cargo run --bin gsv-server -- --host 127.0.0.1 --port 8765 --repo-root S:/rust/poolAI --data-dir GSV/data
+```
+
+Endpoints: `GET /` (UI), `/api/health`, `/api/tracker`, `/api/sli`, `/api/toolchain`, `/api/ide/sessions`, `POST /api/ide/select`, `/api/update`, `POST /api/update/notify`, `/api/preview?file=…`, `POST /api/terminal`, `/api/hooks/tests`, `/api/hooks/bench`, `GET /events` (SSE).
+
 ## Docs (канон)
 
 | Файл | Призначення |
@@ -52,14 +92,15 @@ GSV/
 | [`docs/gsv/GSV_SERVER.md`](../docs/gsv/GSV_SERVER.md) | exe/bin сервер «Galaxy StarWalker Vision» (endpoints, update, offline) |
 | [`docs/gsv/GSV_BOXES.md`](../docs/gsv/GSV_BOXES.md) | Специфікація боксів (Tracker, SLI console, Toolchain, IDE, Update, Preview, SLI terminal, Tests/bench hooks) |
 | [`docs/gsv/GSV_MIGRATION.md`](../docs/gsv/GSV_MIGRATION.md) | Що мігруємо з `docs/vision/` / `src/` у GSV і як |
-| [`docs/gsv/GSV_TECH_ROADMAP.md`](../docs/gsv/GSV_TECH_ROADMAP.md) | **TechPreroadMap** — логічний порядок → future sprints (band 102) |
+| [`docs/gsv/GSV_TECH_ROADMAP.md`](../docs/gsv/GSV_TECH_ROADMAP.md) | **TechPreroadMap** — логічний порядок → future sprints |
 
 ## Статус
 
 | Етап | Статус |
 |------|--------|
-| Архітектура (цей README + `docs/gsv/`) | **✅ (ця сесія)** |
-| Реєстрація sprints (FM §5.12 band 102 `PH-S1659…S1668`) | **✅ (ця сесія)** |
-| gsv-server bin (Cargo/`gsv_server.rs`) | ⏳ future |
-| Бокси (Tracker, SLI console, Toolchain, IDE, Update, Preview, SLI terminal, Tests/bench) | ⏳ future |
-| Vision docs sync / migration | ⏳ future |
+| Архітектура (цей README + `docs/gsv/`) | **✅** |
+| Реєстрація sprints (FM §5.12 band 102 `PH-S1659…S1668`) | **✅** |
+| gsv-server bin (Cargo/`gsv_server.rs`) | **✅** |
+| Бокси (Tracker, SLI console, Toolchain, IDE, Update, Preview, SLI terminal, Tests/bench) | **✅** |
+| Тести (52: unit + contracts + update-flow) | **✅** |
+| Vision docs sync / migration | **⏳ future** |

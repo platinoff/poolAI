@@ -6,12 +6,12 @@
 
 | Джерело | У GSV | Статус |
 |---------|-------|--------|
-| `index.html` (Galaxy UI) | `GSV/ui/index.html` (UI glue поверх Rust) | ⏳ future |
+| `index.html` (Galaxy UI) | `GSV/ui/index.html` (UI glue поверх Rust) | **✅ (single-page UI: health/tracker/sli/toolchain/ide/update/preview/terminal/hooks, SSE)** |
 | `manifest.json` (граф) | `GSV/data/gsv_manifest.json` (генерується Rust) | ⏳ future |
 | `vision.js` / `vision.css` | `GSV/ui/` | ⏳ future |
 | `feed.json` (RSS ticker) | `GSV/data/gsv_feed.json` | ⏳ future |
 | `vision.svg` | `GSV/ui/vision.svg` | ⏳ future |
-| README (відкриття) | → `docs/gsv/` | **✅ (ця сесія, адаптовано)** |
+| README (відкриття) | → `docs/gsv/` | **✅ (адаптовано)** |
 
 ## Що переносимо (з `src/`)
 
