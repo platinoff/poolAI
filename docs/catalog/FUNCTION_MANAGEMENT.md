@@ -1221,7 +1221,7 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **10** (band 102 GSV open). **Master horizon:** PH-S1659…S1668 (band 102). **Completion pending:** PH-S1669…S2278 = **610** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **438**. **Наступна сесія:** **`абракадабра`** — project scan / drain band 102 (GSV).
+**Відкритих у §5.12:** **10** (band 101 ✅ · band 102 GSV open). **Master horizon:** PH-S1659…S1668 (band 102). **Completion pending:** PH-S1669…S2278 = **610** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **439**. **Наступна сесія:** **`абракадабра`** — project scan / drain band 102 (GSV).
 
 ### 5.83 GSV migration queue — Galaxy StarWalker Vision — band 102 (PH-S1659…S1668, 2026-08-01) · **◎ open**
 

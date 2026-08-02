@@ -1,17 +1,17 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-08-01 (band 102 **GSV** PH-S1659…S1668 **◎ open** · band 101 **PH-S1649…S1658, 2026-08-01** ✅)
+**Оновлено:** 2026-07-29 (band 101 **PH-S1649…S1658, 2026-08-01** ✅ · horizon band 102)
 
-Maintenance mode (FM §5.15) · band 102 GSV open.
+Maintenance mode (FM §5.15) · band 101 drained.
 
 Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.18 @ S2278).
 
-| **← наступний** | **`абракадабра`** (project scan → drain band 102 **GSV**) |
-| **§5.12 active** | **10** (band 102 GSV ◎) |
+| **← наступний** | **`абракадабра`** (project scan → band 102) |
+| **§5.12 active** | **10** (band 101 ✅) |
 | **P0 open** | **PH-SVC34** re-verify GH · **PH-SVC35** OWNER |
 | **Completion pending** | **610** sprints PH-S1669…S2278 · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) |
-| **Horizon** | band 102 → **PH-S1659…S1668 (GSV)** |
-| **Vision** | rev **438** |
+| **Horizon** | band 102 → **PH-S1659…S1668** |
+| **Vision** | rev **439** |
 | **GSV** | окремий проєкт Rust-first · [`GSV/README.md`](../../GSV/README.md) · [`docs/gsv/`](../../gsv/README.md) · **TechPreroadMap** [`GSV_TECH_ROADMAP.md`](../../gsv/GSV_TECH_ROADMAP.md) |
 | **Cursor / GH** | local **3.13.21** · Auto-review · Router Balance/Intelligence · Actions `GITHUB_TOKEN` opaque/JWT · [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](./CURSOR_UPDATE_RESEARCH_2026-07-27.md) |
 
@@ -29,7 +29,7 @@ Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.1
 
 ---
 
-## Band 102 — GSV migration (PH-S1659…S1668)
+## Band 102 (очікуваний фокус — project scan)
 
 Окремий проєкт **Galaxy StarWalker Vision**: vision migration у Rust-first bin-сервер `gsv-server` з боксами (Tracker · SLI console · Toolchain · IDE · Update/offline · Box preview · SLI terminal · Tests/bench hooks). Канон: **TechPreroadMap** [`GSV_TECH_ROADMAP.md`](../../gsv/GSV_TECH_ROADMAP.md).
 
