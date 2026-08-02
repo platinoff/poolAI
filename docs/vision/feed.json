@@ -2,6 +2,97 @@
   "description": "RSS-style ticker of FM §5.12 sprint queue (open + recent closed)",
   "items": [
     {
+      "category": "open",
+      "id": "PH-S1659",
+      "link": "docs/vision/index.html#sprint-queue",
+      "next": true,
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "docs/gsv/` canon; `GSV/Cargo.toml`; empty server builds",
+      "title": "GSV docs/architecture + Cargo scaffold"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1660",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "gsv_server.rs`; `GET /` → UI; `GET /api/health",
+      "title": "gsv-server bin scaffold"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1661",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "tracker/`; `GET /api/tracker`; `gsv_tracker.json`; workflow params",
+      "title": "Tracker box"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1662",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "sli/`; `GET /api/sli`; каталог з `bin/`+`scripts/`+`src/bin/",
+      "title": "SLI console box"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1663",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "toolchain/`; `GET /api/toolchain`; інвентар (rustc 1.92, clippy, MSYS2)",
+      "title": "Toolchain box"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1664",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "ide/`; opencode + cursor чати; select сесії",
+      "title": "IDE box"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1665",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "/api/update`; SSE `update_available`; «Update» замість reload",
+      "title": "Update box"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1666",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "preview/` Rust-кольори; `POST /api/terminal",
+      "title": "Box preview + SLI terminal"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1667",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "hooks/`; `/api/hooks/tests`; `/api/hooks/bench`; read `target/",
+      "title": "Tests/bench hooks (без перекомпіляції)"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1668",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "offline-стійкість + metrics resync; Rust tests; docs canon; ratio hold",
+      "title": "Band close"
+    },
+    {
       "category": "closed",
       "id": "PH-S1658",
       "link": "docs/vision/index.html#sprint-queue",
