@@ -175,6 +175,38 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /ops/ratio96:
+    get:
+      tags:
+        - Ops
+      summary: Ratio96 store wire snapshot
+      description: |
+        Returns Ratio96 store wire snapshot status for admin UI / ops glue (PH-S1680).
+      operationId: getOpsRatio96
+      responses:
+        '200':
+          description: Ratio96 store wire status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mode:
+                    type: string
+                    example: "ratio96_admin_ops"
+                  available:
+                    type: boolean
+                    example: true
+                  stretch_spirit:
+                    type: string
+                    example: "0.96"
+                  stretch_gate_met:
+                    type: boolean
+                    example: false
+                  hold_gate_met:
+                    type: boolean
+                    example: true
+
   /login:
     post:
       tags:

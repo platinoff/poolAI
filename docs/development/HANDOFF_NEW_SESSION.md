@@ -1,9 +1,9 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-08-02 (band 124 **Ratio96 horizon v18** PH-S1879…S1888 **✅** · band 125 open PH-S1889…S1898 · Vision rev 455)
+**Оновлено:** 2026-08-02 (band 106 **Ratio96 loc-audit** PH-S1699…S1708 **✅** · band 107 open PH-S1709…S1718 · Vision rev 456)
 
 **Наступна сесія:** **`абракадабра`** — див. **канон воркфлоу в [AGENTS.md](../../AGENTS.md §100–113)**.
-**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`; band 105 ✅ — 0 warnings / 0 errors) → drain наступного band (PH-S1699…S1708; черга — FM §5.12 §5.87) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`; band 106 ✅ — 0 warnings / 0 errors) → drain наступного band (PH-S1709…S1718; черга — FM §5.12 §5.88) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
 
 --- 
 
@@ -74,7 +74,7 @@
 | **PH-S1697** | Ratio hold advisory |
 | **PH-S1698** | Band close (`galaxy_horizon_s1689_integration`) |
 
-## Band 106 — Ratio96 loc-audit (PH-S1699…S1708, **in_progress**)
+## Band 106 — Ratio96 loc-audit (PH-S1699…S1708, **✅**)
 
 | Sprint | Фокус |
 |--------|--------|
@@ -89,7 +89,7 @@
 | **PH-S1707** | Band close (`galaxy_horizon_s1699_integration`) |
 | **PH-S1708** | Project scan replenish (10 PH-S* from §5.1 / architect / roadmap) |
 
-**PH-S1699…S1708 in_progress (2026-08-02):** FM §5.12 replenished with 10 items (band 106). Next: implement all 10 items → vision close → push + samaire.
+**PH-S1699…S1708 ✅ (2026-08-02):** `ratio96_loc_audit_depth.rs` (enum + `RATIO96_LOC_AUDIT_CRITERIA` 10); `smoke_ratio96_loc_audit` + `smoke_ratio96_migration_advisory` + `ratio96_loc_audit_band106_export_shape`; `--ratio96-loc-audit` loc-audit zriz; `RATIO96_LOC_AUDIT.md`; `VERIFY_RATIO96_LOC_AUDIT`; `galaxy_horizon_s1699_integration`. FM §5.12 §5.87 ✅. Vision rev **456**.
 
 **PH-S1689…S1698 ✅ (2026-08-02):** `ratio96_stand_smoke_depth.rs` (enum + `RATIO96_STAND_SMOKE_CRITERIA` 10); `smoke_ratio96_store_wire` + `smoke_ratio96_query` + `smoke_ratio96_field_fixtures` + `ratio96_stand_smoke_band105_export_shape`; `--ratio96-stand-smoke` loc-audit; `RATIO96_STAND_SMOKE.md`; `VERIFY_RATIO96_STAND_SMOKE`; `galaxy_horizon_s1689_integration`. FM §5.12 §5.86 ✅. Vision rev **445**.
 

@@ -62,6 +62,30 @@ pub fn ratio96_store_wire() -> Result<Ratio96StoreState, String> {
     ratio96_store_state(&doc).ok_or_else(|| "ratio96 store missing stretch fields".to_string())
 }
 
+/// Admin/ops store wire for `GET /api/v1/ops/ratio96` (PH-S1680): a lossless JSON snapshot of
+/// the durable ratio store. `available: false` when the store file is missing or unparseable.
+pub fn ratio96_store_wire_json() -> Value {
+    match ratio96_store_wire() {
+        Ok(s) => serde_json::json!({
+            "mode": "repo_file",
+            "available": true,
+            "stretch_spirit": s.stretch_spirit,
+            "below_stretch_spirit": s.below_stretch_spirit,
+            "stretch_spirit_gate_met": s.stretch_spirit_gate_met,
+            "min_ratio": s.min_ratio,
+            "meets_min_ratio": s.meets_min_ratio,
+            "stretch_gate_met": s.stretch_gate_met(),
+            "hold_gate_met": s.hold_gate_met(),
+        }),
+        Err(_) => serde_json::json!({
+            "mode": "missing",
+            "available": false,
+            "stretch_gate_met": false,
+            "hold_gate_met": false,
+        }),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -106,6 +130,21 @@ mod tests {
         assert!(
             ratio96_store_state(&json!({})).is_none(),
             "empty document should return None"
+        );
+    }
+
+    #[test]
+    fn ratio96_store_wire_json_shape_ph_s1680() {
+        let wire = ratio96_store_wire_json();
+        assert!(wire.get("mode").is_some(), "wire exposes mode");
+        assert!(wire.get("available").is_some(), "wire exposes available");
+        assert!(
+            wire.get("stretch_gate_met").is_some(),
+            "wire exposes stretch_gate_met"
+        );
+        assert!(
+            wire.get("hold_gate_met").is_some(),
+            "wire exposes hold_gate_met"
         );
     }
 }

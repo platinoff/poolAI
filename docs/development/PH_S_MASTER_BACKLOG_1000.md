@@ -912,16 +912,16 @@
 
 | Sprint | Focus | Acceptance | Status |
 |--------|-------|------------|--------|
-| **PH-S1679** | `ratio96_depth` scaffold | ui-core depth enum + criteria registry | **[ ]** |
-| **PH-S1680** | `ratio96` store/wire slice | durable path or production verify stub + unit test | **[ ]** |
-| **PH-S1681** | `ratio96` API contracts | `tests/*_integration.rs` or contract test | **[ ]** |
-| **PH-S1682** | `ratio96` admin/ops glue | verify-dev-stand or admin strip | **[ ]** |
-| **PH-S1683** | Stand smoke `ratio96` export | export shape unit test | **[ ]** |
-| **PH-S1684** | poolai-loc-audit PH-S1684 | `rust_ratio.json` zriz | **[ ]** |
-| **PH-S1685** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[ ]** |
-| **PH-S1686** | poolai-vision-sync --check | drift gate green | **[ ]** |
-| **PH-S1687** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[ ]** |
-| **PH-S1688** | galaxy_horizon_s1679_integration | band close | **[ ]** |
+| **PH-S1679** | `ratio96_depth` scaffold | ui-core depth enum + criteria registry | **[x]** |
+| **PH-S1680** | `ratio96` store/wire slice | durable path or production verify stub + unit test | **[x]** |
+| **PH-S1681** | `ratio96` API contracts | `tests/*_integration.rs` or contract test | **[x]** |
+| **PH-S1682** | `ratio96` admin/ops glue | verify-dev-stand or admin strip | **[x]** |
+| **PH-S1683** | Stand smoke `ratio96` export | export shape unit test | **[x]** |
+| **PH-S1684** | poolai-loc-audit PH-S1684 | `rust_ratio.json` zriz | **[x]** |
+| **PH-S1685** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | **[x]** |
+| **PH-S1686** | poolai-vision-sync --check | drift gate green | **[x]** |
+| **PH-S1687** | Ratio hold advisory | `--min-ratio 0.95 --advisory` | **[x]** |
+| **PH-S1688** | galaxy_horizon_s1679_integration | band close | **[x]** |
 
 ## Band 105 — PH-S1689…S1698 (F Ratio96 · stand smoke)
 

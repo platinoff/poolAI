@@ -110,6 +110,9 @@ use poolai_ui_core::ratio96_admin_ops_depth::{
     ratio96_admin_ops_criteria_total, RATIO96_ADMIN_OPS_CASES, RATIO96_ADMIN_OPS_CRITERIA,
 };
 use poolai_ui_core::ratio96_depth::{ratio96_criteria_total, RATIO96_CASES, RATIO96_CRITERIA};
+use poolai_ui_core::ratio96_loc_audit_depth::{
+    ratio96_loc_audit_criteria_total, RATIO96_LOC_AUDIT_CRITERIA,
+};
 use poolai_ui_core::ratio96_stand_smoke_depth::{
     ratio96_stand_smoke_criteria_total, RATIO96_STAND_SMOKE_CASES, RATIO96_STAND_SMOKE_CRITERIA,
 };
@@ -369,6 +372,8 @@ struct AuditConfig {
     ratio96_admin_ops: bool,
     /// Emit band-105 ratio96 stand smoke fields (PH-S1694).
     ratio96_stand_smoke: bool,
+    /// Emit band-106 ratio96 loc-audit fields (PH-S1703).
+    ratio96_loc_audit: bool,
 }
 
 impl Default for AuditConfig {
@@ -437,6 +442,7 @@ impl Default for AuditConfig {
             ratio96: false,
             ratio96_admin_ops: false,
             ratio96_stand_smoke: false,
+            ratio96_loc_audit: false,
         }
     }
 }
@@ -842,6 +848,12 @@ struct RustRatioReport {
     ratio96_stand_smoke_criteria_total: usize,
     /// Ratio96 stand smoke criteria met count (PH-S1694).
     ratio96_stand_smoke_criteria_met_count: usize,
+    /// Band-106 ratio96 loc-audit mode (PH-S1703).
+    ratio96_loc_audit_mode: bool,
+    /// Ratio96 loc-audit criteria registry size (PH-S1703).
+    ratio96_loc_audit_criteria_total: usize,
+    /// Ratio96 loc-audit criteria met count (PH-S1703).
+    ratio96_loc_audit_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -1346,6 +1358,22 @@ fn ratio96_stand_smoke_criteria_met(root: &Path) -> (usize, usize) {
     let total = ratio96_stand_smoke_criteria_total();
     let mut met = 0usize;
     for (_, marker, rel) in RATIO96_STAND_SMOKE_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
+fn ratio96_loc_audit_criteria_met(root: &Path) -> (usize, usize) {
+    let total = ratio96_loc_audit_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in RATIO96_LOC_AUDIT_CRITERIA {
         let path = root.join(rel);
         if path.is_file() {
             if let Ok(content) = fs::read_to_string(&path) {
@@ -1939,6 +1967,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--ratio96" => config.ratio96 = true,
             "--ratio96-admin-ops" => config.ratio96_admin_ops = true,
             "--ratio96-stand-smoke" => config.ratio96_stand_smoke = true,
+            "--ratio96-loc-audit" => config.ratio96_loc_audit = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
                 print_help();
@@ -2017,7 +2046,8 @@ fn print_help() {
             --monitoring-horizon        band-100 monitoring horizon-close fields (PH-S1644)\n\
             --ratio96                   band-101 ratio96 depth scaffold fields (PH-S1654)\n\
             --ratio96-admin-ops         band-104 ratio96 admin/ops glue fields (PH-S1684)\n\
-            --ratio96-stand-smoke        band-105 ratio96 stand smoke fields (PH-S1694)\n\n            --monitoring-loc-audit      band-96 monitoring loc-audit aggregate fields (PH-S1604)\n\
+            --ratio96-stand-smoke        band-105 ratio96 stand smoke fields (PH-S1694)\n\
+            --ratio96-loc-audit          band-106 ratio96 loc-audit fields (PH-S1703)\n\n            --monitoring-loc-audit      band-96 monitoring loc-audit aggregate fields (PH-S1604)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -2764,6 +2794,19 @@ fn build_report(
         notes.push("PH-S1698: band 105 ratio96 stand smoke — criteria met vs registry");
     }
 
+    let (ratio96_loc_audit_criteria_met_count, ratio96_loc_audit_criteria_total_count) =
+        if config.ratio96_loc_audit {
+            ratio96_loc_audit_criteria_met(root)
+        } else {
+            (0, ratio96_loc_audit_criteria_total())
+        };
+    if config.ratio96_loc_audit {
+        notes.push(
+            "PH-S1703: ratio96_loc_audit_mode — loc-audit + migration advisory / verify hooks",
+        );
+        notes.push("PH-S1708: band 106 ratio96 loc-audit — criteria met vs registry");
+    }
+
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
         sprint: SPRINT,
@@ -2968,6 +3011,9 @@ fn build_report(
         ratio96_stand_smoke_mode: config.ratio96_stand_smoke,
         ratio96_stand_smoke_criteria_total: ratio96_stand_smoke_criteria_total_count,
         ratio96_stand_smoke_criteria_met_count,
+        ratio96_loc_audit_mode: config.ratio96_loc_audit,
+        ratio96_loc_audit_criteria_total: ratio96_loc_audit_criteria_total_count,
+        ratio96_loc_audit_criteria_met_count,
         by_category,
         notes,
     })

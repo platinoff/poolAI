@@ -3,6 +3,96 @@
   "items": [
     {
       "category": "closed",
+      "id": "PH-S1708",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "Replenish §5.12 from master horizon",
+      "title": "Project scan replenish"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1707",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_horizon_s1699_integration`; FM ✅ · HANDOFF · NEXT_SESSION",
+      "title": "galaxy_horizon_s1699_integration"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1706",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--ratio96-loc-audit --advisory --min-ratio 0.95",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1705",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "drift gate green",
+      "title": "poolai-vision-sync --check"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1704",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "RATIO96_LOC_AUDIT.md`; RUN_LOCAL/README; verify-dev-stand + run-poolai hooks",
+      "title": "Docs canon sync"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1703",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--ratio96-loc-audit` zriz (mode/total/met)",
+      "title": "poolai-loc-audit PH-S1703"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1702",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "ratio96_loc_audit_band106_export_shape` unit test",
+      "title": "Loc-audit `ratio96` export"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1701",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "smoke_ratio96_migration_advisory",
+      "title": "Live `ratio96` migration advisory"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1700",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "smoke_ratio96_loc_audit` ← `GET /api/v1/ops/ratio96",
+      "title": "Live `ratio96` loc-audit smoke"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1699",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "depth enum + criteria registry (10)",
+      "title": "ratio96_loc_audit_depth` ui-core module"
+    },
+    {
+      "category": "closed",
       "id": "PH-S1698",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
@@ -17,96 +107,6 @@
       "published": "2026-05-28",
       "status": "closed",
       "summary": "--ratio96-stand-smoke --advisory --min-ratio 0.95",
-      "title": "Ratio hold advisory"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1696",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "drift gate green",
-      "title": "poolai-vision-sync --check"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1695",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "RATIO96_STAND_SMOKE.md`; RUN_LOCAL/README; verify-dev-stand + run-poolai hooks",
-      "title": "Docs canon sync"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1694",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--ratio96-stand-smoke` zriz (mode/total/met)",
-      "title": "poolai-loc-audit PH-S1694"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1693",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "ratio96_stand_smoke_band105_export_shape` unit test",
-      "title": "Stand smoke `ratio96` export"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1692",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "smoke_ratio96_field_fixtures` → 400 codes",
-      "title": "Live `ratio96` field fixture smoke"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1691",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "smoke_ratio96_query",
-      "title": "Live `ratio96` query smoke"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1690",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "smoke_ratio96_store_wire` ← `GET /api/v1/ops/ratio96",
-      "title": "Live `ratio96` store wire smoke"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1689",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "depth enum + criteria registry (10)",
-      "title": "ratio96_stand_smoke_depth` ui-core module"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1688",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "galaxy_horizon_s1679_integration`; FM ✅ · HANDOFF · NEXT_SESSION",
-      "title": "galaxy_horizon_s1679_integration"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1687",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--ratio96-admin-ops --advisory --min-ratio 0.95",
       "title": "Ratio hold advisory"
     }
   ],

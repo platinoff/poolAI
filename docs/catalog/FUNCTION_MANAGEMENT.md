@@ -265,30 +265,7 @@ FM-xxx (з таблиці нижче)
 
 **VDT:** §5.12 = **журнал PH-S*** (≤10 відкритих). Якщо **< 10** — **`абракадабра`** / project scan **всього проєкту**: concept → FM **§5.1** → roadmaps → architect → DOCS_LEGACY → code → §5.13 fallback. Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Project scan». **Rust-first:** API → `tests/`; Playwright лише browser scope.
 
-### 5.12 Research backlog (PH-S1729…S1738, band 109, Ratio96 horizon v3) ✅
-
-### 5.12 Research backlog (PH-S1739…S1748, band 110, Ratio96 horizon v4) ✅
-
-### 5.12 Research backlog (PH-S1879…S1888, band 124, Ratio96 horizon v18) ✅ Vision rev **455**
-
-**Активна §5.12 (band 125) Vision rev **455**:**
-
-| # | Sprint | Фокус | Джерело | Acceptance (скорочено) | Стан |
-|---|--------|--------|---------|-------------------------|------|
-| 1 | **PH-S1779** | Ratio96 horizon v8 start (galaxy_horizon_s1779_integration) | Ratio96 F band 114 | `galaxy_horizon_s1779_integration.rs` + stand smoke | **[ ]** |
-| 2 | **PH-S1780** | poolai-loc-audit --ratio96-horizon-v8 | Ratio96 F band 114 | CLI horizon flag + advisory | **[ ]** |
-| 3 | **PH-S1781** | Docs canon sync (RATIO96_HORIZON_V8.md) | Ratio96 F band 114 | New doc + RUN_LOCAL update | **[ ]** |
-| 4 | **PH-S1782** | Vision sync + KIVI debug v8 | Ratio96 F band 114 | manifest.kivi + debug widget | **[ ]** |
-| 5 | **PH-S1783** | Multi-provider KIVI signature v8 | Ratio96 F band 114 | IDE+provider+model+time in done | **[ ]** |
-| 6 | **PH-S1784** | Band close (galaxy_horizon_s1780_integration) | Ratio96 F band 114 | Integration test + FM update | **[ ]** |
-| 7 | **PH-S1785** | Rust diagnostics record | Ratio96 F band 114 | record-rust-diagnostics.sh | **[ ]** |
-| 8 | **PH-S1786** | Test-ci speed record | Ratio96 F band 114 | record-test-ci-speed.sh | **[ ]** |
-| 9 | **PH-S1787** | Project scan replenish (next 10) | Ratio96 F band 114 | Replenish §5.12 from master | **[ ]** |
-| 10 | **PH-S1788** | Vision close + push | Ratio96 F band 114 | poolai-vision-sync + git push | **[ ]** |
-
-**Відкритих у §5.12:** **10** (band 114 PH-S1779…S1788). **Master horizon:** PH-S1789…S1798 (band 115). Vision rev **454**.
-
-**Відкритих у §5.12:** **0** (band 106 PH-S1699…S1708 ✅). **Master horizon:** PH-S1709…S1718 (band 107).
+**Відкритих у §5.12:** **0** (band 106 ✅). **Master horizon:** PH-S1709…S1718 (band 107). Vision rev **456**.
 
 **Историчний research backlog (PH-S65+):**
 
@@ -1248,7 +1225,7 @@ FM-xxx (з таблиці нижче)
 | 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 106 PH-S1699…S1708 ✅). **Master horizon:** PH-S1709…S1718 (band 107). **Completion pending:** PH-S1679…S2278 = **580** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **449**. **Наступна сесія:** **`абракадабра`** — project scan → band 107 (PH-S1709…S1718).
+**Відкритих у §5.12:** **0** (band 106 PH-S1699…S1708 ✅). **Master horizon:** PH-S1709…S1718 (band 107). **Completion pending:** PH-S1679…S2278 = **580** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **456**. **Наступна сесія:** **`абракадабра`** — project scan → band 107 (PH-S1709…S1718).
 
 ### 5.85 Ratio96 admin/ops glue queue — band 104 (PH-S1679…S1688, 2026-08-02) · **✅**
 
@@ -1283,6 +1260,23 @@ FM-xxx (з таблиці нижче)
 | 1631 | **PH-S1696** | poolai-vision-sync --check | master backlog | drift gate green | **[x]** |
 | 1632 | **PH-S1697** | Ratio hold advisory | master backlog | `--ratio96-stand-smoke --advisory --min-ratio 0.95` | **[x]** |
 | 1633 | **PH-S1698** | galaxy_horizon_s1689_integration | band close | `galaxy_horizon_s1689_integration`; FM ✅ · HANDOFF · NEXT_SESSION | **[x]** |
+
+### 5.87 Ratio96 loc-audit queue — band 106 (PH-S1699…S1708, 2026-08-02) · **✅**
+
+**Джерело:** master backlog band 106 (F Ratio96 · loc-audit) — mirror band 96 monitoring loc-audit поверх ratio96 stand smoke (band 105). Warnings-first: band 103 ✅ (0/0), тому смуга — loc-audit.
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1634 | **PH-S1699** | `ratio96_loc_audit_depth` ui-core module | master backlog | depth enum + criteria registry (10) | **[x]** |
+| 1635 | **PH-S1700** | Live `ratio96` loc-audit smoke | master backlog | `smoke_ratio96_loc_audit` ← `GET /api/v1/ops/ratio96` | **[x]** |
+| 1636 | **PH-S1701** | Live `ratio96` migration advisory | master backlog | `smoke_ratio96_migration_advisory` | **[x]** |
+| 1637 | **PH-S1702** | Loc-audit `ratio96` export | master backlog | `ratio96_loc_audit_band106_export_shape` unit test | **[x]** |
+| 1638 | **PH-S1703** | poolai-loc-audit PH-S1703 | master backlog | `--ratio96-loc-audit` zriz (mode/total/met) | **[x]** |
+| 1639 | **PH-S1704** | Docs canon sync | master backlog | `RATIO96_LOC_AUDIT.md`; RUN_LOCAL/README; verify-dev-stand + run-poolai hooks | **[x]** |
+| 1640 | **PH-S1705** | poolai-vision-sync --check | master backlog | drift gate green | **[x]** |
+| 1641 | **PH-S1706** | Ratio hold advisory | master backlog | `--ratio96-loc-audit --advisory --min-ratio 0.95` | **[x]** |
+| 1642 | **PH-S1707** | galaxy_horizon_s1699_integration | band close | `galaxy_horizon_s1699_integration`; FM ✅ · HANDOFF · NEXT_SESSION | **[x]** |
+| 1643 | **PH-S1708** | Project scan replenish | band close | Replenish §5.12 from master horizon | **[x]** |
 
 ### 5.84 Lint/diagnostics cleanup queue — band 103 (PH-S1669…S1678, 2026-08-02) · **✅**
 

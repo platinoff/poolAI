@@ -66,6 +66,7 @@ VERIFY_MONITORING_HORIZON="${VERIFY_MONITORING_HORIZON:-0}"
 VERIFY_RATIO96="${VERIFY_RATIO96:-0}"
 VERIFY_RATIO96_ADMIN_OPS="${VERIFY_RATIO96_ADMIN_OPS:-0}"
 VERIFY_RATIO96_STAND_SMOKE="${VERIFY_RATIO96_STAND_SMOKE:-0}"
+VERIFY_RATIO96_LOC_AUDIT="${VERIFY_RATIO96_LOC_AUDIT:-0}"
 VERIFY_SSO_LOC_AUDIT="${VERIFY_SSO_LOC_AUDIT:-0}"
 VERIFY_SSO_DOCS_CANON="${VERIFY_SSO_DOCS_CANON:-0}"
 VERIFY_SSO_VISION_SYNC="${VERIFY_SSO_VISION_SYNC:-0}"
@@ -860,6 +861,16 @@ if [[ "$VERIFY_RATIO96_STAND_SMOKE" == "1" ]]; then
     echo "OK  ratio96 stand smoke gate"
   else
     echo "FAIL ratio96 stand smoke gate"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_RATIO96_LOC_AUDIT" == "1" ]]; then
+  echo "Running poolai-loc-audit --ratio96-loc-audit (PH-S1703)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --ratio96-loc-audit); then
+    echo "OK  ratio96 loc-audit gate"
+  else
+    echo "FAIL ratio96 loc-audit gate"
     fail=1
   fi
 fi

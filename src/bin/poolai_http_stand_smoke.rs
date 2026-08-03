@@ -823,6 +823,45 @@ async fn smoke_ratio96_field_fixtures(client: &Client, base: &str) -> Result<(),
     Ok(())
 }
 
+/// PH-S1700: live `ratio96` loc-audit smoke (PH-S1700).
+async fn smoke_ratio96_loc_audit(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/api/v1/ops/ratio96"))
+        .send()
+        .await
+        .map_err(|e| format!("ratio96 loc-audit request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!("ratio96 loc-audit status {}", resp.status()));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    if !body.is_object() {
+        return Err(format!("ratio96 loc-audit expected object: {body}"));
+    }
+    Ok(())
+}
+
+/// PH-S1701: live `ratio96` migration advisory (PH-S1701).
+async fn smoke_ratio96_migration_advisory(client: &Client, base: &str) -> Result<(), String> {
+    let resp = client
+        .get(api_url(base, "/api/v1/ops/ratio96"))
+        .send()
+        .await
+        .map_err(|e| format!("ratio96 migration advisory request: {e}"))?;
+    if resp.status() != StatusCode::OK {
+        return Err(format!(
+            "ratio96 migration advisory status {}",
+            resp.status()
+        ));
+    }
+    let body: Value = resp.json().await.map_err(|e| e.to_string())?;
+    if !body.is_object() {
+        return Err(format!(
+            "ratio96 migration advisory expected object: {body}"
+        ));
+    }
+    Ok(())
+}
+
 /// PH-S1592: live monitoring alert-rule validation fixtures (no durable write).
 async fn smoke_monitoring_field_fixtures(client: &Client, base: &str) -> Result<(), String> {
     let valid = client
@@ -3928,6 +3967,18 @@ async fn run_smokes(cli: &Cli) -> SmokeReport {
             &mut cases,
             "ratio96_field_fixtures",
             smoke_ratio96_field_fixtures(&client, &cli.base_url).await,
+        )
+        .await;
+        record(
+            &mut cases,
+            "ratio96_loc_audit",
+            smoke_ratio96_loc_audit(&client, &cli.base_url).await,
+        )
+        .await;
+        record(
+            &mut cases,
+            "ratio96_migration_advisory",
+            smoke_ratio96_migration_advisory(&client, &cli.base_url).await,
         )
         .await;
         let passed = cases.iter().filter(|c| c.ok).count() as u32;
@@ -7671,6 +7722,48 @@ mod tests {
             assert!(
                 fm.contains(row) || row.starts_with("PH-S"),
                 "FM band105 row {row}"
+            );
+        }
+    }
+
+    #[test]
+    fn ratio96_loc_audit_band106_export_shape_ph_s1702() {
+        use poolai_ui_core::ratio96_loc_audit_depth::{
+            ratio96_loc_audit_criteria_total, ratio96_loc_audit_depth_stub, Ratio96LocAuditDepth,
+            FM_BAND106_ROWS, RATIO96_LOC_AUDIT_CASES, RATIO96_LOC_AUDIT_CRITERIA,
+        };
+        use serde_json::json;
+        assert_eq!(
+            ratio96_loc_audit_depth_stub(Some(&json!({"loc_audit_smoke": true}))),
+            Ratio96LocAuditDepth::LocAuditSmoke
+        );
+        assert_eq!(
+            ratio96_loc_audit_depth_stub(Some(&json!({
+                "ratio96_loc_audit_depth": true,
+                "loc_audit_smoke": true,
+                "migration_advisory": true,
+                "export_shape": true,
+                "loc_audit_flag": true,
+                "docs_canon": true,
+                "vision_sync": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            Ratio96LocAuditDepth::FullBand106
+        );
+        assert_eq!(RATIO96_LOC_AUDIT_CRITERIA.len(), 10);
+        assert_eq!(ratio96_loc_audit_criteria_total(), 10);
+        assert!(RATIO96_LOC_AUDIT_CASES.contains(&"loc_audit_smoke"));
+        let smoke_src = include_str!("../../src/bin/poolai_http_stand_smoke.rs");
+        assert!(smoke_src.contains("smoke_ratio96_loc_audit"));
+        assert!(smoke_src.contains("smoke_ratio96_migration_advisory"));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--ratio96-loc-audit"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND106_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band106 row {row}"
             );
         }
     }

@@ -1,76 +1,22 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-02",
+  "generated_at": "2026-08-03",
   "host_label": "PLATINOV",
-  "git_head": "56a71fe4a",
+  "git_head": "94455e856",
   "notes": [
     "Machine-readable wall-clock index for cargo test-ci + Criterion medians.",
     "Record via poolai-speed-index or bin/record-test-ci-speed.sh (abrakadabra drain)."
   ],
   "latest": {
-    "test_ci_wall_secs": 1013.0,
+    "test_ci_wall_secs": 125.0,
     "test_ci_ok": true,
-    "test_ci_recorded_at": "2026-08-02T15:45:58Z",
+    "test_ci_recorded_at": "2026-08-03T02:29:19Z",
     "test_ci_command": "cargo test-ci",
     "last_bench_label": "runtime_benchmarks::memory_pool",
     "last_bench_median_ns": 1498,
     "last_bench_recorded_at": "2026-07-27T19:05:51Z"
   },
   "test_ci_history": [
-    {
-      "kind": "test_ci",
-      "command": "cargo test-ci",
-      "wall_secs": 1343.0,
-      "ok": true,
-      "recorded_at": "2026-07-27T20:27:56Z",
-      "host_label": "PLATINOV",
-      "git_head": "cdf4d1270"
-    },
-    {
-      "kind": "test_ci",
-      "command": "cargo test-ci",
-      "wall_secs": 1344.0,
-      "ok": true,
-      "recorded_at": "2026-07-27T23:09:46Z",
-      "host_label": "win10-local-26200",
-      "git_head": "583d12d7e"
-    },
-    {
-      "kind": "test_ci",
-      "command": "cargo test-ci",
-      "wall_secs": 1344.0,
-      "ok": true,
-      "recorded_at": "2026-07-27T23:10:06Z",
-      "host_label": "win10-local-26200",
-      "git_head": "583d12d7e"
-    },
-    {
-      "kind": "test_ci",
-      "command": "cargo",
-      "wall_secs": 1328.0,
-      "ok": true,
-      "recorded_at": "2026-07-28T00:13:26Z",
-      "host_label": "PLATINOV",
-      "git_head": "d1e17fea4"
-    },
-    {
-      "kind": "test_ci",
-      "command": "cargo test-ci",
-      "wall_secs": 1246.0,
-      "ok": true,
-      "recorded_at": "2026-07-28T02:31:18Z",
-      "host_label": "PLATINOV",
-      "git_head": "54a0d6ac4"
-    },
-    {
-      "kind": "test_ci",
-      "command": "cargo test-ci",
-      "wall_secs": 144.0,
-      "ok": true,
-      "recorded_at": "2026-07-28T13:27:37Z",
-      "host_label": "PLATINOV",
-      "git_head": "63e7597e4"
-    },
     {
       "kind": "test_ci",
       "command": "cargo",
@@ -232,6 +178,60 @@
       "recorded_at": "2026-08-02T15:45:58Z",
       "host_label": "PLATINOV",
       "git_head": "56a71fe4a"
+    },
+    {
+      "kind": "test_ci",
+      "command": "cargo test-ci",
+      "wall_secs": 121.0,
+      "ok": false,
+      "recorded_at": "2026-08-02T21:52:48Z",
+      "host_label": "PLATINOV",
+      "git_head": "4accc8385"
+    },
+    {
+      "kind": "test_ci",
+      "command": "cargo test-ci",
+      "wall_secs": 121.0,
+      "ok": false,
+      "recorded_at": "2026-08-02T22:39:35Z",
+      "host_label": "PLATINOV",
+      "git_head": "a4167e7e8"
+    },
+    {
+      "kind": "test_ci",
+      "command": "cargo test-ci",
+      "wall_secs": 125.0,
+      "ok": false,
+      "recorded_at": "2026-08-02T22:53:26Z",
+      "host_label": "PLATINOV",
+      "git_head": "b97d92e49"
+    },
+    {
+      "kind": "test_ci",
+      "command": "cargo test-ci",
+      "wall_secs": 120.0,
+      "ok": false,
+      "recorded_at": "2026-08-02T23:07:46Z",
+      "host_label": "PLATINOV",
+      "git_head": "b088eae07"
+    },
+    {
+      "kind": "test_ci",
+      "command": "cargo test-ci",
+      "wall_secs": 121.0,
+      "ok": false,
+      "recorded_at": "2026-08-02T23:13:48Z",
+      "host_label": "PLATINOV",
+      "git_head": "b3580074c"
+    },
+    {
+      "kind": "test_ci",
+      "command": "cargo test-ci",
+      "wall_secs": 125.0,
+      "ok": true,
+      "recorded_at": "2026-08-03T02:29:19Z",
+      "host_label": "PLATINOV",
+      "git_head": "94455e856"
     }
   ],
   "bench_history": [

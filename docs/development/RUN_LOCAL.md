@@ -100,6 +100,7 @@ cd S:\rust\poolAI
 /usr/bin/bash bin/run-poolai.sh quick --ratio96
 /usr/bin/bash bin/run-poolai.sh quick --ratio96-admin-ops
 /usr/bin/bash bin/run-poolai.sh quick --ratio96-stand-smoke
+/usr/bin/bash bin/run-poolai.sh quick --ratio96-loc-audit
 # PowerShell:
 .\bin\run-poolai.ps1 quick -StandSmoke
 .\bin\run-poolai.ps1 quick -MigrationAdvisory
@@ -397,6 +398,7 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `VERIFY_RATIO96=1` | `verify-dev-stand.sh` → `poolai-loc-audit --ratio96` (PH-S1652) |
 | `VERIFY_RATIO96_ADMIN_OPS=1` | `verify-dev-stand.sh` → `poolai-loc-audit --ratio96-admin-ops` (PH-S1684) |
 | `VERIFY_RATIO96_STAND_SMOKE=1` | `verify-dev-stand.sh` → `poolai-loc-audit --ratio96-stand-smoke` (PH-S1694) |
+| `VERIFY_RATIO96_LOC_AUDIT=1` | `verify-dev-stand.sh` → `poolai-loc-audit --ratio96-loc-audit` (PH-S1704) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 ### PH-S1100: Rust migration advisory (band 46)
@@ -1523,6 +1525,24 @@ cargo run --bin poolai-loc-audit -- --ratio96-stand-smoke --advisory --min-ratio
 | `ratio96_stand_smoke_criteria_met_count` | Criteria with marker present in canonical doc paths |
 
 Module: [`ratio96_stand_smoke_depth.rs`](../../crates/poolai-ui-core/src/ratio96_stand_smoke_depth.rs) · tests: `galaxy_horizon_s1689_integration.rs` · docs: [`RATIO96_STAND_SMOKE.md`](./RATIO96_STAND_SMOKE.md).
+
+---
+
+## Ratio96 loc-audit (PH-S1703 / band 106)
+
+```bash
+VERIFY_RATIO96_LOC_AUDIT=1 bash bin/verify-dev-stand.sh
+/usr/bin/bash bin/run-poolai.sh quick --ratio96-loc-audit
+cargo run --bin poolai-loc-audit -- --ratio96-loc-audit --advisory --min-ratio 0.95
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `ratio96_loc_audit_mode` | `true` when `--ratio96-loc-audit` (PH-S1703) |
+| `ratio96_loc_audit_criteria_total` | Registry size (10) |
+| `ratio96_loc_audit_criteria_met_count` | Criteria with marker present in canonical doc paths |
+
+Module: [`ratio96_loc_audit_depth.rs`](../../crates/poolai-ui-core/src/ratio96_loc_audit_depth.rs) · tests: `galaxy_horizon_s1699_integration.rs` · docs: [`RATIO96_LOC_AUDIT.md`](./RATIO96_LOC_AUDIT.md).
 
 ---
 

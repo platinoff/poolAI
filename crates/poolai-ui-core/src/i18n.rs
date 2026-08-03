@@ -635,6 +635,22 @@ pub const ADMIN_DASHBOARD_EN: &[I18nRow<'_>] = &[
     ("admin.dash.noAlerts", "No active alerts"),
     ("admin.dash.noActivity", "No recent activity"),
     ("admin.dash.errLoad", "Error loading dashboard: "),
+    ("admin.ratio96.cardTitle", "Rust Ratio (Phase F)"),
+    ("admin.ratio96.storeLoading", "Loading ratio store…"),
+    ("admin.ratio96.storeLabel", "Rust ratio (96% stretch):"),
+    (
+        "admin.ratio96.storeHint",
+        "Phase-F stretch gate read from rust_ratio.json",
+    ),
+    ("admin.ratio96.stretchMet", "stretch met"),
+    ("admin.ratio96.stretchPending", "below stretch"),
+    ("admin.ratio96.holdMet", "hold met"),
+    ("admin.ratio96.holdPending", "below hold"),
+    ("admin.ratio96.storeMissing", "store unavailable"),
+    ("admin.ratio96.storeErr", "Ratio store wire unavailable"),
+    ("admin.ratio96.btn.refresh", "Refresh"),
+    ("admin.ratio96.refreshOk", "Ratio store refreshed"),
+    ("admin.ratio96.refreshErr", "Ratio store refresh failed: "),
 ];
 
 /// Ukrainian admin dashboard keys (PH-S228).
@@ -657,6 +673,25 @@ pub const ADMIN_DASHBOARD_UK: &[I18nRow<'_>] = &[
     ("admin.dash.noAlerts", "Немає активних сповіщень"),
     ("admin.dash.noActivity", "Немає недавньої активності"),
     ("admin.dash.errLoad", "Помилка завантаження панелі: "),
+    ("admin.ratio96.cardTitle", "Rust співвідношення (Phase F)"),
+    ("admin.ratio96.storeLoading", "Завантаження сховища ratio…"),
+    ("admin.ratio96.storeLabel", "Rust ratio (96% stretch):"),
+    (
+        "admin.ratio96.storeHint",
+        "Фазовий stretch-гейт з rust_ratio.json",
+    ),
+    ("admin.ratio96.stretchMet", "stretch досягнуто"),
+    ("admin.ratio96.stretchPending", "нижче stretch"),
+    ("admin.ratio96.holdMet", "hold досягнуто"),
+    ("admin.ratio96.holdPending", "нижче hold"),
+    ("admin.ratio96.storeMissing", "сховище недоступне"),
+    ("admin.ratio96.storeErr", "Ratio store wire недоступний"),
+    ("admin.ratio96.btn.refresh", "Оновити"),
+    ("admin.ratio96.refreshOk", "Сховище ratio оновлено"),
+    (
+        "admin.ratio96.refreshErr",
+        "Помилка оновлення сховища ratio: ",
+    ),
 ];
 
 /// English audit admin keys (PH-S229; moved from `i18n_core.js`).
