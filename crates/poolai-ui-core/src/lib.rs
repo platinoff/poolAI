@@ -73,6 +73,7 @@ pub mod product_complete_depth;
 pub mod prometheus;
 pub mod ratio96_admin_ops_depth;
 pub mod ratio96_depth;
+pub mod ratio96_docs_canon_depth;
 pub mod ratio96_loc_audit_depth;
 pub mod ratio96_stand_smoke_depth;
 pub mod ratio96_store_depth;

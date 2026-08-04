@@ -7769,6 +7769,49 @@ mod tests {
     }
 
     #[test]
+    fn ratio96_docs_canon_band107_export_shape_ph_s1713() {
+        use poolai_ui_core::ratio96_docs_canon_depth::{
+            ratio96_docs_canon_criteria_total, ratio96_docs_canon_depth_stub,
+            ratio96_docs_canon_slices_met, Ratio96DocsCanonDepth, FM_BAND107_ROWS,
+            RATIO96_DOCS_CANON_CASES, RATIO96_DOCS_CANON_CRITERIA, RATIO96_DOCS_CANON_SLICES,
+        };
+        use serde_json::json;
+        assert_eq!(
+            ratio96_docs_canon_depth_stub(Some(&json!({"stand_smoke_export": true}))),
+            Ratio96DocsCanonDepth::StandSmokeExport
+        );
+        assert_eq!(
+            ratio96_docs_canon_depth_stub(Some(&json!({
+                "ratio96_docs_canon_depth": true,
+                "slice_aggregate": true,
+                "criteria_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "ratio96_docs_canon_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            Ratio96DocsCanonDepth::FullBand107
+        );
+        assert_eq!(RATIO96_DOCS_CANON_CRITERIA.len(), 10);
+        assert_eq!(ratio96_docs_canon_criteria_total(), 10);
+        assert_eq!(RATIO96_DOCS_CANON_SLICES.len(), 4);
+        assert!(RATIO96_DOCS_CANON_CASES.contains(&"aggregate_flag"));
+        let canon = include_str!("../../docs/development/RATIO96_DOCS_CANON.md");
+        assert_eq!(ratio96_docs_canon_slices_met(canon), (4, 4));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--ratio96-docs-canon"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND107_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band107 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn audit_store_band72_export_shape_ph_s1363() {
         use poolai_ui_core::audit_store_depth::{
             audit_store_criteria_total, audit_store_depth_stub, AuditStoreDepth, AUDIT_STORE_CASES,

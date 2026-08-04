@@ -101,6 +101,7 @@ cd S:\rust\poolAI
 /usr/bin/bash bin/run-poolai.sh quick --ratio96-admin-ops
 /usr/bin/bash bin/run-poolai.sh quick --ratio96-stand-smoke
 /usr/bin/bash bin/run-poolai.sh quick --ratio96-loc-audit
+/usr/bin/bash bin/run-poolai.sh quick --ratio96-docs-canon
 # PowerShell:
 .\bin\run-poolai.ps1 quick -StandSmoke
 .\bin\run-poolai.ps1 quick -MigrationAdvisory
@@ -399,6 +400,7 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `VERIFY_RATIO96_ADMIN_OPS=1` | `verify-dev-stand.sh` → `poolai-loc-audit --ratio96-admin-ops` (PH-S1684) |
 | `VERIFY_RATIO96_STAND_SMOKE=1` | `verify-dev-stand.sh` → `poolai-loc-audit --ratio96-stand-smoke` (PH-S1694) |
 | `VERIFY_RATIO96_LOC_AUDIT=1` | `verify-dev-stand.sh` → `poolai-loc-audit --ratio96-loc-audit` (PH-S1704) |
+| `VERIFY_RATIO96_DOCS_CANON=1` | `verify-dev-stand.sh` → `poolai-loc-audit --ratio96-docs-canon` (PH-S1712) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 ### PH-S1100: Rust migration advisory (band 46)
@@ -1543,6 +1545,22 @@ cargo run --bin poolai-loc-audit -- --ratio96-loc-audit --advisory --min-ratio 0
 | `ratio96_loc_audit_criteria_met_count` | Criteria with marker present in canonical doc paths |
 
 Module: [`ratio96_loc_audit_depth.rs`](../../crates/poolai-ui-core/src/ratio96_loc_audit_depth.rs) · tests: `galaxy_horizon_s1699_integration.rs` · docs: [`RATIO96_LOC_AUDIT.md`](./RATIO96_LOC_AUDIT.md).
+
+### Ratio96 docs canon (band 107, PH-S1714)
+
+```bash
+VERIFY_RATIO96_DOCS_CANON=1 bash bin/verify-dev-stand.sh
+/usr/bin/bash bin/run-poolai.sh quick --ratio96-docs-canon
+cargo run --bin poolai-loc-audit -- --ratio96-docs-canon --advisory --min-ratio 0.95
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `ratio96_docs_canon_mode` | `true` when `--ratio96-docs-canon` (PH-S1714) |
+| `ratio96_docs_canon_criteria_total` | Registry size (10) |
+| `ratio96_docs_canon_criteria_met_count` | Criteria with marker present in canonical doc paths |
+
+Module: [`ratio96_docs_canon_depth.rs`](../../crates/poolai-ui-core/src/ratio96_docs_canon_depth.rs) · tests: `galaxy_horizon_s1709_integration.rs` · docs: [`RATIO96_DOCS_CANON.md`](./RATIO96_DOCS_CANON.md).
 
 ---
 

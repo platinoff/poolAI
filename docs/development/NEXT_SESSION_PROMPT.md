@@ -1,17 +1,17 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-08-02 (band 106 **PH-S1699…S1708** ✅ · horizon band 107)
+**Оновлено:** 2026-08-02 (band 107 **PH-S1709…S1718** ✅ · horizon band 108)
 
-Maintenance mode (FM §5.15) · band 106 drained.
+Maintenance mode (FM §5.15) · band 107 drained.
 
 Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.18 @ S2278).
 
-| **← наступний** | **`абракадабра`** (project scan → band 107) |
-| **§5.12 active** | **0** (band 106 ✅) |
+| **← наступний** | **`абракадабра`** (project scan → band 108) |
+| **§5.12 active** | **0** (band 107 ✅) |
 | **P0 open** | **PH-SVC34** re-verify GH · **PH-SVC35** OWNER |
-| **Completion pending** | **580** sprints PH-S1709…S2278 · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) |
-| **Horizon** | band 107 → **PH-S1709…S1718** |
-| **Vision** | rev **456** |
+| **Completion pending** | **570** sprints PH-S1719…S2278 · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) |
+| **Horizon** | band 108 → **PH-S1719…S1728** |
+| **Vision** | rev **457** |
 | **GSV** | окремий проєкт Rust-first · [`GSV/README.md`](../../GSV/README.md) · [`docs/gsv/`](../../gsv/README.md) · **TechPreroadMap** [`GSV_TECH_ROADMAP.md`](../../gsv/GSV_TECH_ROADMAP.md) |
 | **Cursor / GH** | local **3.13.21** · Auto-review · Router Balance/Intelligence · Actions `GITHUB_TOKEN` opaque/JWT · [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](./CURSOR_UPDATE_RESEARCH_2026-07-27.md) |
 
@@ -23,13 +23,13 @@ Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.1
 абракадабра
 ```
 
-**Порядок:** **S0 диск** (`df -h /s` + `check_target_disk.sh` → `cargo clean` за потреби) → project scan (**спочатку** `rust_diagnostics` / clippy warnings → виправлення в топ смуги) → drain наступного band (черга — FM §5.12 / completion roadmap; наступний за каноном — band 107 **PH-S1709…S1718**; **без** mid-push) → Speeds (`bash bin/record-test-ci-speed.sh`) · Rust panel (`bash bin/record-rust-diagnostics.sh`) → vision-sync → **один** commit → **`git push` + самарі (завжди кінець сесії)**. Після push — PH-SVC34 GH re-verify (JWT-format `GITHUB_TOKEN` ok). **Не** комітити `certs/*.pem`, `.env`, `data/audit/*`. **Не** валідувати довжину `ghs_*`.
+**Порядок:** **S0 диск** (`df -h /s` + `check_target_disk.sh` → `cargo clean` за потреби) → project scan (**спочатку** `rust_diagnostics` / clippy warnings → виправлення в топ смуги) → drain наступного band (черга — FM §5.12 / completion roadmap; наступний за каноном — band 108 **PH-S1719…S1728**; **без** mid-push) → Speeds (`bash bin/record-test-ci-speed.sh`) · Rust panel (`bash bin/record-rust-diagnostics.sh`) → vision-sync → **один** commit → **`git push` + самарі (завжди кінець сесії)**. Після push — PH-SVC34 GH re-verify (JWT-format `GITHUB_TOKEN` ok). **Не** комітити `certs/*.pem`, `.env`, `data/audit/*`. **Не** валідувати довжину `ghs_*`.
 
 **Cursor:** desktop **3.13.21** · Run Mode **Auto-review** · drain = Agent mode · Router Auto → Balance/Intelligence · research [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](./CURSOR_UPDATE_RESEARCH_2026-07-27.md).
 
 ---
 
-## Band 107 (очікуваний фокус — project scan)
+## Band 108 (очікуваний фокус — project scan)
 
 Окремий проєкт **Galaxy StarWalker Vision** **завершено** (band 102 ✅): Rust-first bin-сервер `gsv-server` з боксами (Tracker · SLI console · Toolchain · IDE · Update/offline · Box preview · SLI terminal · Tests/bench hooks), 52 tests green, clippy 0. Канон: **TechPreroadMap** [`GSV_TECH_ROADMAP.md`](../../gsv/GSV_TECH_ROADMAP.md).
 

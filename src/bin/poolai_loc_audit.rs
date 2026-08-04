@@ -110,6 +110,9 @@ use poolai_ui_core::ratio96_admin_ops_depth::{
     ratio96_admin_ops_criteria_total, RATIO96_ADMIN_OPS_CASES, RATIO96_ADMIN_OPS_CRITERIA,
 };
 use poolai_ui_core::ratio96_depth::{ratio96_criteria_total, RATIO96_CASES, RATIO96_CRITERIA};
+use poolai_ui_core::ratio96_docs_canon_depth::{
+    ratio96_docs_canon_criteria_total, RATIO96_DOCS_CANON_CASES, RATIO96_DOCS_CANON_CRITERIA,
+};
 use poolai_ui_core::ratio96_loc_audit_depth::{
     ratio96_loc_audit_criteria_total, RATIO96_LOC_AUDIT_CRITERIA,
 };
@@ -374,6 +377,8 @@ struct AuditConfig {
     ratio96_stand_smoke: bool,
     /// Emit band-106 ratio96 loc-audit fields (PH-S1703).
     ratio96_loc_audit: bool,
+    /// Emit band-107 ratio96 docs-canon fields (PH-S1714).
+    ratio96_docs_canon: bool,
 }
 
 impl Default for AuditConfig {
@@ -443,6 +448,7 @@ impl Default for AuditConfig {
             ratio96_admin_ops: false,
             ratio96_stand_smoke: false,
             ratio96_loc_audit: false,
+            ratio96_docs_canon: false,
         }
     }
 }
@@ -854,6 +860,12 @@ struct RustRatioReport {
     ratio96_loc_audit_criteria_total: usize,
     /// Ratio96 loc-audit criteria met count (PH-S1703).
     ratio96_loc_audit_criteria_met_count: usize,
+    /// Band-107 ratio96 docs-canon mode (PH-S1714).
+    ratio96_docs_canon_mode: bool,
+    /// Ratio96 docs-canon criteria registry size (PH-S1714).
+    ratio96_docs_canon_criteria_total: usize,
+    /// Ratio96 docs-canon criteria met count (PH-S1714).
+    ratio96_docs_canon_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -1374,6 +1386,22 @@ fn ratio96_loc_audit_criteria_met(root: &Path) -> (usize, usize) {
     let total = ratio96_loc_audit_criteria_total();
     let mut met = 0usize;
     for (_, marker, rel) in RATIO96_LOC_AUDIT_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
+fn ratio96_docs_canon_criteria_met(root: &Path) -> (usize, usize) {
+    let total = ratio96_docs_canon_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in RATIO96_DOCS_CANON_CRITERIA {
         let path = root.join(rel);
         if path.is_file() {
             if let Ok(content) = fs::read_to_string(&path) {
@@ -1968,6 +1996,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--ratio96-admin-ops" => config.ratio96_admin_ops = true,
             "--ratio96-stand-smoke" => config.ratio96_stand_smoke = true,
             "--ratio96-loc-audit" => config.ratio96_loc_audit = true,
+            "--ratio96-docs-canon" => config.ratio96_docs_canon = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
                 print_help();
@@ -2047,7 +2076,8 @@ fn print_help() {
             --ratio96                   band-101 ratio96 depth scaffold fields (PH-S1654)\n\
             --ratio96-admin-ops         band-104 ratio96 admin/ops glue fields (PH-S1684)\n\
             --ratio96-stand-smoke        band-105 ratio96 stand smoke fields (PH-S1694)\n\
-            --ratio96-loc-audit          band-106 ratio96 loc-audit fields (PH-S1703)\n\n            --monitoring-loc-audit      band-96 monitoring loc-audit aggregate fields (PH-S1604)\n\
+            --ratio96-loc-audit          band-106 ratio96 loc-audit fields (PH-S1703)\n\
+            --ratio96-docs-canon         band-107 ratio96 docs-canon fields (PH-S1714)\n\n            --monitoring-loc-audit      band-96 monitoring loc-audit aggregate fields (PH-S1604)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -2807,6 +2837,19 @@ fn build_report(
         notes.push("PH-S1708: band 106 ratio96 loc-audit — criteria met vs registry");
     }
 
+    let (ratio96_docs_canon_criteria_met_count, ratio96_docs_canon_criteria_total_count) =
+        if config.ratio96_docs_canon {
+            ratio96_docs_canon_criteria_met(root)
+        } else {
+            (0, ratio96_docs_canon_criteria_total())
+        };
+    if config.ratio96_docs_canon {
+        notes.push(
+            "PH-S1714: ratio96_docs_canon_mode — aggregate band 101–106 RATIO96_*.md canon docs",
+        );
+        notes.push("PH-S1718: band 107 ratio96 docs canon — criteria met vs registry");
+    }
+
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
         sprint: SPRINT,
@@ -3014,6 +3057,9 @@ fn build_report(
         ratio96_loc_audit_mode: config.ratio96_loc_audit,
         ratio96_loc_audit_criteria_total: ratio96_loc_audit_criteria_total_count,
         ratio96_loc_audit_criteria_met_count,
+        ratio96_docs_canon_mode: config.ratio96_docs_canon,
+        ratio96_docs_canon_criteria_total: ratio96_docs_canon_criteria_total_count,
+        ratio96_docs_canon_criteria_met_count,
         by_category,
         notes,
     })
@@ -3663,6 +3709,17 @@ fn print_summary(report: &RustRatioReport) {
         println!(
             "  ratio96_stand_smoke_cases: {}",
             RATIO96_STAND_SMOKE_CASES.join(", ")
+        );
+    }
+    if report.ratio96_docs_canon_mode {
+        println!("  ratio96_docs_canon:         true (PH-S1714 band 107)");
+        println!(
+            "  ratio96_docs_canon_criteria: {}/{} met",
+            report.ratio96_docs_canon_criteria_met_count, report.ratio96_docs_canon_criteria_total
+        );
+        println!(
+            "  ratio96_docs_canon_cases:   {}",
+            RATIO96_DOCS_CANON_CASES.join(", ")
         );
     }
     for (name, loc) in &report.by_category {

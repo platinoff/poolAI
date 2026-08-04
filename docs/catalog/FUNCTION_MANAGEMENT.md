@@ -265,7 +265,7 @@ FM-xxx (з таблиці нижче)
 
 **VDT:** §5.12 = **журнал PH-S*** (≤10 відкритих). Якщо **< 10** — **`абракадабра`** / project scan **всього проєкту**: concept → FM **§5.1** → roadmaps → architect → DOCS_LEGACY → code → §5.13 fallback. Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Project scan». **Rust-first:** API → `tests/`; Playwright лише browser scope.
 
-**Відкритих у §5.12:** **0** (band 106 ✅). **Master horizon:** PH-S1709…S1718 (band 107). Vision rev **456**.
+**Відкритих у §5.12:** **0** (band 107 ✅). **Master horizon:** PH-S1719…S1728 (band 108). Vision rev **457**.
 
 **Историчний research backlog (PH-S65+):**
 
@@ -1277,6 +1277,23 @@ FM-xxx (з таблиці нижче)
 | 1641 | **PH-S1706** | Ratio hold advisory | master backlog | `--ratio96-loc-audit --advisory --min-ratio 0.95` | **[x]** |
 | 1642 | **PH-S1707** | galaxy_horizon_s1699_integration | band close | `galaxy_horizon_s1699_integration`; FM ✅ · HANDOFF · NEXT_SESSION | **[x]** |
 | 1643 | **PH-S1708** | Project scan replenish | band close | Replenish §5.12 from master horizon | **[x]** |
+
+### 5.88 Ratio96 docs canon queue — band 107 (PH-S1709…S1718, 2026-08-02) · **✅**
+
+**Джерело:** master backlog band 107 (F Ratio96 · docs canon) — mirror band 67 SSO docs canon поверх ratio96 slices (bands 101, 104–106 `RATIO96_*.md`). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · master [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md). Mirror: [`RATIO96_DOCS_CANON.md`](../development/RATIO96_DOCS_CANON.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1644 | **PH-S1709** | `ratio96_docs_canon_depth` ui-core module | `ratio96_docs_canon_depth.rs` | depth enum + docs-canon criteria registry (10) | **[x]** |
+| 1645 | **PH-S1710** | Docs slice aggregate | `RATIO96_DOCS_CANON_SLICES` | four `RATIO96_*.md` present | **[x]** |
+| 1646 | **PH-S1711** | Criteria contracts | `ratio96_docs_canon_integration` | markers + registry | **[x]** |
+| 1647 | **PH-S1712** | `VERIFY_RATIO96_DOCS_CANON` + quick `--ratio96-docs-canon` | verify-dev-stand | docs-canon gate | **[x]** |
+| 1648 | **PH-S1713** | Stand smoke export shape band 107 | stand smoke | unit export shape | **[x]** |
+| 1649 | **PH-S1714** | `poolai-loc-audit --ratio96-docs-canon` | loc-audit | `rust_ratio.json` fields | **[x]** |
+| 1650 | **PH-S1715** | Docs `RATIO96_DOCS_CANON.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | docs matrix | **[x]** |
+| 1651 | **PH-S1716** | vision-sync --check | vision | drift gate green | **[x]** |
+| 1652 | **PH-S1717** | Ratio hold advisory | loc-audit | `--ratio96-docs-canon --advisory --min-ratio 0.95` | **[x]** |
+| 1653 | **PH-S1718** | Ratio96 docs-canon band close | tests/docs | `galaxy_horizon_s1709_integration`; FM ✅ · HANDOFF · NEXT_SESSION | **[x]** |
 
 ### 5.84 Lint/diagnostics cleanup queue — band 103 (PH-S1669…S1678, 2026-08-02) · **✅**
 

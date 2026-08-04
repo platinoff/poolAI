@@ -54,7 +54,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 **Версія в репозиторії:** `0.2.2` (див. `Cargo.toml`). **Робоча гілка:** `main`.
 
-Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S1708 ✅ (phase F Ratio96 stand smoke). **Rust ratio:** **95.00%** (hold **95%** advisory). **Vision:** manifest rev **456**. **§5.12:** **0** відкритих (band 104 ✅ · band 105 next) · tech **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · наступна сесія **`абракадабра`** (band 105) — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
+Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S1718 ✅ (phase F Ratio96 stand smoke). **Rust ratio:** **95.01%** (hold **95%** advisory). **Vision:** manifest rev **457**. **§5.12:** **0** відкритих (band 104 ✅ · band 105 next) · tech **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · наступна сесія **`абракадабра`** (band 105) — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
 **Репозиторій:** [github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)
 
@@ -88,7 +88,7 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 **Наступна сесія (owner):** **`абракадабра`** — drain band 105 **PH-S1689…S1698** · [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
-**§5.12:** **0** відкритих (band 104 ✅ · band 105 next) · vision **rev 456** · last **PH-S1708** · next **PH-S1709**.
+**§5.12:** **0** відкритих (band 104 ✅ · band 105 next) · vision **rev 457** · last **PH-S1718** · next **PH-S1719**.
 
 **Tech (сьогодні):** Service **PH-SVC75…SVC84** — Cursor **3.13.21** research + rules/agents + vision Speeds/eye verify · [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](docs/development/CURSOR_UPDATE_RESEARCH_2026-07-27.md) · Auto-review · prior GH tokens **PH-SVC65…74** ✅ · open **PH-SVC34** (GH verify) · **PH-SVC35** OWNER Atlassian revoke.
 
