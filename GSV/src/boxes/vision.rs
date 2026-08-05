@@ -135,6 +135,36 @@ pub struct SyncReport {
     pub synced_at: String,
 }
 
+/// Per-layer map stats (`/api/vision/map`).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct LayerStats {
+    pub id: String,
+    pub name: String,
+    pub z: i64,
+    pub node_count: u64,
+    pub edges_from: u64,
+}
+
+/// Edge-kind tally (`/api/vision/map`).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct EdgeKindStats {
+    pub kind: String,
+    pub count: u64,
+}
+
+/// Lightweight galaxy-map report for the UI.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct MapReport {
+    pub revision: u64,
+    pub git_head: String,
+    pub next_sprint: String,
+    pub last_sprint_closed: String,
+    pub nodes_count: u64,
+    pub edges_count: u64,
+    pub layers: Vec<LayerStats>,
+    pub edge_kinds: Vec<EdgeKindStats>,
+}
+
 const MANIFEST_SOURCE: &str = "docs/vision/manifest.json";
 const FEED_SOURCE: &str = "docs/vision/feed.json";
 const MANIFEST_TARGET: &str = "gsv_manifest.json";
@@ -291,6 +321,92 @@ pub fn wire_summary(repo_root: &Path, data_dir: &Path) -> Value {
         "feed_items": feed_items,
         "error": manifest.err().or_else(|| feed.err()),
     })
+}
+
+/// Build the lightweight galaxy-map report from the live manifest source.
+pub fn map_report(repo_root: &Path, data_dir: &Path) -> Result<MapReport, String> {
+    let m = source_manifest(repo_root, data_dir)?;
+    let mut node_counts: std::collections::BTreeMap<String, u64> =
+        std::collections::BTreeMap::new();
+    for node in &m.nodes {
+        *node_counts.entry(node.layer.clone()).or_insert(0) += 1;
+    }
+    let layer_by_id: std::collections::HashMap<String, (String, i64)> = m
+        .layers
+        .iter()
+        .map(|l| (l.id.clone(), (l.name.clone(), l.z)))
+        .collect();
+    let node_layer: std::collections::HashMap<&str, &str> = m
+        .nodes
+        .iter()
+        .map(|n| (n.id.as_str(), n.layer.as_str()))
+        .collect();
+    let mut layers: Vec<LayerStats> = node_counts
+        .into_iter()
+        .map(|(id, node_count)| {
+            let (name, z) = layer_by_id.get(&id).cloned().unwrap_or((id.clone(), 0));
+            let edges_from = m
+                .edges
+                .iter()
+                .filter(|e| node_layer.get(e.from.as_str()).copied() == Some(id.as_str()))
+                .count() as u64;
+            LayerStats {
+                id,
+                name,
+                z,
+                node_count,
+                edges_from,
+            }
+        })
+        .collect();
+    layers.sort_by_key(|l| l.z);
+
+    let mut edge_kinds: std::collections::BTreeMap<String, u64> = std::collections::BTreeMap::new();
+    for e in &m.edges {
+        *edge_kinds.entry(e.kind.clone()).or_insert(0) += 1;
+    }
+    let edge_kinds = edge_kinds
+        .into_iter()
+        .map(|(kind, count)| EdgeKindStats { kind, count })
+        .collect();
+
+    Ok(MapReport {
+        revision: m.revision,
+        git_head: m.git_head,
+        next_sprint: m.next_sprint,
+        last_sprint_closed: m.last_sprint_closed,
+        nodes_count: m.nodes.len() as u64,
+        edges_count: m.edges.len() as u64,
+        layers,
+        edge_kinds,
+    })
+}
+
+/// `GET /api/vision/map` — lightweight galaxy-map report for the UI.
+pub fn wire_map(repo_root: &Path, data_dir: &Path) -> Value {
+    match map_report(repo_root, data_dir) {
+        Ok(r) => {
+            let mut v = serde_json::to_value(&r).unwrap_or_default();
+            if let serde_json::Value::Object(map) = &mut v {
+                map.insert("ok".to_string(), serde_json::Value::Bool(true));
+            }
+            v
+        }
+        Err(e) => json!({ "ok": false, "error": e }),
+    }
+}
+
+/// `GET /api/vision/feed` — optional `status` filter (`closed`/`open`/all).
+pub fn wire_feed_filter(repo_root: &Path, data_dir: &Path, status: Option<&str>) -> Value {
+    match source_feed(repo_root, data_dir) {
+        Ok(mut f) => {
+            if let Some(s) = status.filter(|s| !s.is_empty() && *s != "all") {
+                f.items.retain(|i| i.status == s);
+            }
+            json!({ "ok": true, "feed": f })
+        }
+        Err(e) => json!({ "ok": false, "error": e }),
+    }
 }
 
 /// Write-run: read the live sources and persist both snapshots.
@@ -536,6 +652,106 @@ mod tests {
         assert_eq!(v["nodes_count"], 1);
         assert_eq!(v["edges_count"], 1);
         assert_eq!(v["feed_items"].as_array().unwrap().len(), 1);
+        let _ = std::fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn map_report_layers_sorted_and_counted() {
+        let tmp = std::env::temp_dir().join("gsv_vision_test_map");
+        let _ = std::fs::remove_dir_all(&tmp);
+        let src = tmp.join("src");
+        let data = tmp.join("data");
+        let vis = src.join("docs").join("vision");
+        std::fs::create_dir_all(&vis).unwrap();
+
+        let mut m = sample_manifest();
+        m.layers = vec![
+            Layer {
+                id: "L1".to_string(),
+                name: "Ops".to_string(),
+                z: 1,
+            },
+            Layer {
+                id: "L0".to_string(),
+                name: "Concept".to_string(),
+                z: 0,
+            },
+        ];
+        m.nodes.push(ManifestNode {
+            id: "handoff".to_string(),
+            label: "HANDOFF".to_string(),
+            layer: "L1".to_string(),
+            path: "docs/development/HANDOFF.md".to_string(),
+            sections: vec![],
+            sprints: vec![],
+        });
+        m.edges.push(ManifestEdge {
+            from: "handoff".to_string(),
+            kind: "session-track".to_string(),
+            to: "galaxy_grid".to_string(),
+        });
+        std::fs::write(
+            vis.join("manifest.json"),
+            serde_json::to_string(&m).unwrap(),
+        )
+        .unwrap();
+        std::fs::write(
+            vis.join("feed.json"),
+            serde_json::to_string(&sample_feed()).unwrap(),
+        )
+        .unwrap();
+
+        let r = map_report(&src, &data).unwrap();
+        assert_eq!(r.nodes_count, 2);
+        assert_eq!(r.edges_count, 2);
+        assert_eq!(r.layers.len(), 2);
+        assert_eq!(r.layers[0].id, "L0");
+        assert_eq!(r.layers[0].z, 0);
+        assert_eq!(r.layers[0].node_count, 1);
+        assert_eq!(r.layers[1].id, "L1");
+        assert_eq!(r.layers[1].node_count, 1);
+        assert_eq!(r.layers[1].edges_from, 1);
+        assert_eq!(r.edge_kinds.len(), 2);
+        assert!(r.edge_kinds.iter().any(|e| e.kind == "concept-ref"));
+        let _ = std::fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn wire_feed_filter_filters_by_status() {
+        let tmp = std::env::temp_dir().join("gsv_vision_test_feed_filter");
+        let _ = std::fs::remove_dir_all(&tmp);
+        let src = tmp.join("src");
+        let data = tmp.join("data");
+        let vis = src.join("docs").join("vision");
+        std::fs::create_dir_all(&vis).unwrap();
+        std::fs::write(
+            vis.join("manifest.json"),
+            serde_json::to_string(&sample_manifest()).unwrap(),
+        )
+        .unwrap();
+        let mut f = sample_feed();
+        f.items.push(FeedItem {
+            id: "PH-S1729".to_string(),
+            title: "Next".to_string(),
+            category: "open".to_string(),
+            summary: "open".to_string(),
+            status: "open".to_string(),
+            published: "2026-05-29".to_string(),
+            link: "docs/vision/index.html#sprint-queue".to_string(),
+        });
+        std::fs::write(vis.join("feed.json"), serde_json::to_string(&f).unwrap()).unwrap();
+
+        let all = wire_feed_filter(&src, &data, None);
+        assert_eq!(all["ok"], true);
+        assert_eq!(all["feed"]["items"].as_array().unwrap().len(), 2);
+
+        let closed = wire_feed_filter(&src, &data, Some("closed"));
+        assert_eq!(closed["feed"]["items"].as_array().unwrap().len(), 1);
+        assert_eq!(closed["feed"]["items"][0]["status"], "closed");
+
+        let open = wire_feed_filter(&src, &data, Some("open"));
+        assert_eq!(open["feed"]["items"].as_array().unwrap().len(), 1);
+        assert_eq!(open["feed"]["items"][0]["status"], "open");
         let _ = std::fs::remove_dir_all(&tmp);
     }
 }

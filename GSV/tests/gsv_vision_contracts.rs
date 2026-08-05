@@ -82,8 +82,8 @@ fn vision_feed_reads_real_workspace() {
         f.items.len()
     );
     assert!(
-        f.items.iter().any(|i| i.id == "PH-S1728"),
-        "feed must include the band-108 close entry"
+        f.items.iter().any(|i| i.id == "PH-S1748"),
+        "feed must include the band-110 close entry"
     );
     for item in &f.items {
         assert!(!item.id.is_empty());
@@ -155,4 +155,67 @@ async fn vision_api_feed_endpoint() {
     assert_eq!(body["ok"], true);
     let items = body["feed"]["items"].as_array().expect("feed items");
     assert!(items.len() >= 12);
+}
+
+#[tokio::test]
+async fn vision_api_map_endpoint() {
+    let dir = temp_data_dir("api-map");
+    let (status, body) = get(&app(dir), "/api/vision/map").await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body["ok"], true);
+    assert!(body["nodes_count"].as_u64().unwrap_or(0) >= 1000);
+    assert!(body["edges_count"].as_u64().unwrap_or(0) >= 500);
+    let layers = body["layers"].as_array().expect("layers array");
+    assert_eq!(layers.len(), 6, "L0..L5 map layers");
+    assert_eq!(layers[0]["id"], "L0");
+    assert_eq!(layers[5]["id"], "L5");
+    let zs: Vec<i64> = layers.iter().filter_map(|l| l["z"].as_i64()).collect();
+    let mut sorted = zs.clone();
+    sorted.sort();
+    assert_eq!(zs, sorted, "layers must be z-sorted");
+    let layer_sum: u64 = layers.iter().filter_map(|l| l["node_count"].as_u64()).sum();
+    assert_eq!(layer_sum, body["nodes_count"].as_u64().unwrap_or(0));
+    assert!(body["edge_kinds"]
+        .as_array()
+        .map(|a| !a.is_empty())
+        .unwrap_or(false));
+}
+
+#[tokio::test]
+async fn vision_api_feed_filter_closed() {
+    let dir = temp_data_dir("api-feed-filter");
+    let (status, body) = get(&app(dir), "/api/vision/feed?status=closed").await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body["ok"], true);
+    let items = body["feed"]["items"].as_array().expect("feed items");
+    assert!(items.len() >= 12);
+    for item in items {
+        assert_eq!(item["status"], "closed");
+    }
+}
+
+#[tokio::test]
+async fn vision_assets_svg_served() {
+    let dir = temp_data_dir("api-svg");
+    let res = app(dir)
+        .oneshot(
+            Request::get("/assets/vision.svg")
+                .body(Body::empty())
+                .expect("req"),
+        )
+        .await
+        .expect("resp");
+    assert_eq!(res.status(), StatusCode::OK);
+    assert_eq!(
+        res.headers()
+            .get("content-type")
+            .and_then(|v| v.to_str().ok()),
+        Some("image/svg+xml")
+    );
+    let bytes = axum::body::to_bytes(res.into_body(), usize::MAX)
+        .await
+        .expect("body");
+    let body = String::from_utf8(bytes.to_vec()).expect("utf8");
+    assert!(body.contains("<svg"), "must be an SVG document");
+    assert!(body.contains("PoolAI Galaxy Starwalker Vision"));
 }

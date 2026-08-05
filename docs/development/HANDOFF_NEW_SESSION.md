@@ -1,9 +1,9 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-08-05 (band 109 **GSV vision sync/migration** PH-S1729…S1738 **✅** · band 110 open PH-S1739…S1748 · Vision rev 459)
+**Оновлено:** 2026-08-05 (band 110 **GSV vision map UI** PH-S1739…S1748 **✅** · band 111 open PH-S1749…S1758 · Vision rev 461)
 
 **Наступна сесія:** **`абракадабра`** — див. **канон воркфлоу в [AGENTS.md](../../AGENTS.md §100–113)**.
-**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1739…S1748; черга — FM §5.12) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1749…S1758; черга — FM §5.12) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
 
 --- 
 
@@ -41,6 +41,29 @@
 - Не паралелити `cargo test-ci`.
 - Warnings > 0 або errors > 0 → 1–3 PH-S* **на початок смуги** (Джерело: `rust_diagnostics` / lint code).
 - Fallback-смуга: galaxy metrics stubs, wasm glue, stand smoke, concept wire, loc-audit, docs canon, vision sync, INDEX.
+
+## Band 110 — GSV vision map UI (PH-S1739…S1748, **✅**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1739** | Vision map wire (`map_report`/`wire_map`; `GET /api/vision/map` — layers L0..L5 z-sorted + `node_count`/`edges_from` + `edge_kinds` tally) |
+| **PH-S1740** | vision.svg port (`GSV/ui/vision.svg` + `GET /assets/vision.svg` `image/svg+xml`; audit Ignored, ratio-neutral) |
+| **PH-S1741** | Vision Map UI card (`ui/index.html`: layer chips + edge kinds + svg link) |
+| **PH-S1742** | Vision map contracts (`tests/gsv_vision_contracts.rs`, **10**) |
+| **PH-S1743** | Feed status filter (`GET /api/vision/feed?status=closed\|open\|all`) |
+| **PH-S1744** | GSV vision docs canon (`VISION.md`; `GSV_MIGRATION.md` rows ✅; MEMORY band 110) |
+| **PH-S1745** | poolAI vision parity (`docs/vision/README.md` band 110; `GSV_TECH_ROADMAP.md` band 110) |
+| **PH-S1746** | Ratio hold advisory (`gsv-loc-audit --min-ratio 0.95 --advisory` **96.01%** ✅ + poolAI ratio96 advisory hold 95.02%) |
+| **PH-S1747** | vision-sync close (`gsv-vision-sync` refresh + `poolai-vision-sync` rev **461**) |
+| **PH-S1748** | Band close (ratio hold ≥95%; fmt/clippy/test; docs canon; push) |
+
+**PH-S1739…S1748 ✅ (2026-08-05):** Vision map UI: `boxes/vision.rs` `map_report`/`wire_map` →
+`GET /api/vision/map` (rev 461, 1218 nodes, 535 edges, layers L0..L5 z-sorted: L0:4 L1:253 L2:156
+L3:679 L4:124 L5:2; edge kinds: catalog/concept-ref/crate/implements/mirror/queue/session-tracks/
+sprint-scope/wire/workspace); `GSV/ui/vision.svg` порт + `GET /assets/vision.svg`; Vision Map card;
+`GET /api/vision/feed?status=`; contracts **106** (55 unit + 18 omni + 8 server + 8 update + 7 ratio +
+10 vision), clippy **0**, fmt clean. Ratio: GSV **96.01%** (rust 5411 / product 5636, gate ≥95% ✅) +
+poolAI **95.02%** advisory hold. Vision rev **461**.
 
 ## Band 109 — GSV vision sync/migration (PH-S1729…S1738, **✅**)
 

@@ -30,6 +30,9 @@ pre.out{background:var(--panel2);border:1px solid var(--line);border-radius:6px;
 .g-k{color:var(--rust)}.g-s{color:var(--ok)}.g-n{color:var(--blue)}.g-c{color:var(--dim);font-style:italic}
 .g-ln{color:#3a4a63;user-select:none}.g-pre{margin:0}
 #toast{position:fixed;right:16px;bottom:16px;background:#1a2233;border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:12px;display:none}
+.vmap{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.vmap-col{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 10px;min-width:120px}
+.vmap-l{color:var(--blue);font-weight:600;font-size:12px}
 </style>
 </head>
 <body>
@@ -55,6 +58,7 @@ pre.out{background:var(--panel2);border:1px solid var(--line);border-radius:6px;
   <section class="card"><h2>Bench hooks <span class="hint">/api/hooks/bench</span></h2><div class="body" id="b-hooks-b">…</div></section>
   <section class="card"><h2>Ratio <span class="hint">/api/ratio</span></h2><div class="body" id="b-ratio">…</div></section>
   <section class="card"><h2>Vision <span class="hint">/api/vision</span></h2><div class="body" id="b-vision">…</div></section>
+  <section class="card"><h2>Vision Map <span class="hint">/api/vision/map · /assets/vision.svg</span></h2><div class="body" id="b-vision-map">…</div></section>
   <section class="card"><h2>OmniRouter <span class="hint">/api/omni</span></h2><div class="body">
     <div class="dim" id="b-omni-summary">…</div>
     <div style="margin-top:6px">recommended: <span id="b-omni-rec">…</span></div>
@@ -141,6 +145,18 @@ function renderVision(d) {
     tab(["id", "status", "title"], (d.feed_items || []).map(i =>
       ["<kbd>" + esc(i.id) + "</kbd>", "<span class='" + (i.status === "closed" ? "ok" : "warn") + "'>" + esc(i.status) + "</span>", esc(i.title)]));
 }
+function renderVisionMap(d) {
+  if (!d.ok) { $("b-vision-map").innerHTML = "<span class='err'>" + esc(d.error || "vision map unavailable") + "</span>"; return; }
+  const svg = "<a href='assets/vision.svg' target='_blank' style='font-size:12px'>open vision.svg ↗</a>";
+  const cols = (d.layers || []).map(l =>
+    "<div class='vmap-col'><div class='vmap-l'>" + esc(l.id) + " · " + esc(l.name) + "</div>" +
+    "<div class='dim' style='font-size:11px'>nodes " + l.node_count + " · edges " + l.edges_from + "</div></div>").join("");
+  $("b-vision-map").innerHTML = "<div class='dim'>rev <kbd>" + d.revision + "</kbd> · nodes " + d.nodes_count +
+    " · edges " + d.edges_count + " · " + svg + "</div>" +
+    "<div class='vmap'>" + cols + "</div>" +
+    "<div class='dim' style='margin-top:6px'>edge kinds: " +
+    (d.edge_kinds || []).map(e => "<kbd>" + esc(e.kind) + "</kbd>×" + e.count).join(" ") + "</div>";
+}
 function renderOmni(d) {
   $("b-omni-summary").innerHTML = "providers " + (d.providers || []).length + " · models " + (d.models || []).length +
     " · default <kbd>" + esc(d.routing.default_provider) + "</kbd>";
@@ -165,7 +181,7 @@ async function resync() {
     ["api/health", renderHealth], ["api/tracker", renderTracker], ["api/sli", renderSli],
     ["api/toolchain", renderToolchain], ["api/ide/sessions", renderIde], ["api/update", renderUpdate],
     ["api/hooks/tests", renderHooksTests], ["api/hooks/bench", renderHooksBench], ["api/ratio", renderRatio],
-    ["api/vision", renderVision],
+    ["api/vision", renderVision], ["api/vision/map", renderVisionMap],
     ["api/omni", renderOmni],
   ];
   const results = await Promise.allSettled(urls.map(([u, f]) => get(u).then(f)));

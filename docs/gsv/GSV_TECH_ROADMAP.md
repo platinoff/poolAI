@@ -2,8 +2,10 @@
 
 **TechPreroadMap**: логічний порядок реалізації проєкту GSV → future sprints.
 
-Дата: 2026-08-05 · **Стан:** band 102 **реалізовано** + band 108 (roles/ratio canon) **✅** ·
-**Спринти:** `PH-S1659…S1668` (FM §5.12 §5.83 ✅) · `PH-S1719…S1728` (FM §5.12 §5.89 ✅).
+Дата: 2026-08-05 · **Стан:** band 102 **реалізовано** + band 108 (roles/ratio canon) **✅** +
+band 109 (Vision sync/migration) **✅** + band 110 (Vision map UI) **✅** ·
+**Спринти:** `PH-S1659…S1668` (FM §5.12 §5.83 ✅) · `PH-S1719…S1728` (FM §5.12 §5.89 ✅) ·
+`PH-S1729…S1738` (FM §5.12 §5.90 ✅) · `PH-S1739…S1748` (FM §5.12 §5.91 ✅).
 
 ## Логічний порядок (залежності)
 
@@ -53,6 +55,36 @@ docs/architecture (✅ ця сесія)
 | **PH-S1726** | poolAI docs parity | GSV rows у poolAI docs |
 | **PH-S1727** | poolAI HANDOFF + NEXT | band 108 ✅ · horizon band 109 |
 | **PH-S1728** | Band close | ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync rev 458 |
+
+## Спринти (band 109) — Vision box (poolAI vision canon mirror)
+
+| Sprint | Фокус | Acceptance (ключ) |
+|--------|-------|-------------------|
+| **PH-S1729** | Vision box scaffold | `GSV/src/boxes/vision.rs` (manifest/feed serde) + `Cargo.toml` bin |
+| **PH-S1730** | Manifest wire | `gsv_manifest.json`; `GET /api/vision/manifest` |
+| **PH-S1731** | Feed wire | `gsv_feed.json`; `GET /api/vision/feed` |
+| **PH-S1732** | `gsv-vision-sync` bin | mirror + `--check` drift gate |
+| **PH-S1733** | Vision UI card | summary + sprint ticker |
+| **PH-S1734** | Vision contracts | `tests/gsv_vision_contracts.rs` (7) |
+| **PH-S1735** | GSV vision docs | `VISION.md` + `GSV_MIGRATION.md` rows ✅ + MEMORY mark |
+| **PH-S1736** | poolAI vision parity | `docs/vision/README.md` + cross-check |
+| **PH-S1737** | Ratio hold advisory | `gsv-loc-audit --min-ratio 0.95 --advisory` |
+| **PH-S1738** | Band close | ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync rev 459 |
+
+## Спринти (band 110) — Vision map UI
+
+| Sprint | Фокус | Acceptance (ключ) |
+|--------|-------|-------------------|
+| **PH-S1739** | Vision map wire | `map_report`/`wire_map`; `GET /api/vision/map` (layers L0..L5 z-sorted + edge kinds) |
+| **PH-S1740** | vision.svg port | `GSV/ui/vision.svg` + `GET /assets/vision.svg` (audit Ignored, ratio-neutral) |
+| **PH-S1741** | Vision Map UI card | layer chips + edge kinds + svg link у `ui/index.html` |
+| **PH-S1742** | Vision map contracts | `tests/gsv_vision_contracts.rs` (10) |
+| **PH-S1743** | Feed status filter | `GET /api/vision/feed?status=closed\|open\|all` |
+| **PH-S1744** | GSV vision docs | `VISION.md` map/feed-filter/svg; `GSV_MIGRATION.md` rows ✅; MEMORY band 110 |
+| **PH-S1745** | poolAI vision parity | `docs/vision/README.md` band 110; roadmap band 110 |
+| **PH-S1746** | Ratio hold advisory | `gsv-loc-audit --min-ratio 0.95 --advisory` |
+| **PH-S1747** | vision-sync close | `gsv-vision-sync` refresh + poolAI vision rev **461** |
+| **PH-S1748** | Band close | ratio hold (≥95%); fmt/clippy/test; docs canon; push |
 
 ## Ключові UX-вимоги (узагальнення ТЗ)
 

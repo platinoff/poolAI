@@ -265,7 +265,7 @@ FM-xxx (з таблиці нижче)
 
 **VDT:** §5.12 = **журнал PH-S*** (≤10 відкритих). Якщо **< 10** — **`абракадабра`** / project scan **всього проєкту**: concept → FM **§5.1** → roadmaps → architect → DOCS_LEGACY → code → §5.13 fallback. Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Project scan». **Rust-first:** API → `tests/`; Playwright лише browser scope.
 
-**Відкритих у §5.12:** **0** (band 109 ✅). **Master horizon:** PH-S1739…S1748 (band 110). Vision rev **459**.
+**Відкритих у §5.12:** **0** (band 110 ✅). **Master horizon:** PH-S1749…S1758 (band 111). Vision rev **461**.
 
 **Историчний research backlog (PH-S65+):**
 
@@ -1337,6 +1337,25 @@ parity; ratio holds: GSV **95.45%** (rust 4387 / product 4596, gate ≥95% ✅) 
 advisory (`--ratio96-docs-canon --advisory --min-ratio 0.95`); GSV tests **101**
 (53 unit + 18 omni + 8 server + 8 update + 7 ratio + 7 vision), clippy **0**, fmt clean;
 vision-sync rev **459**.
+
+### 5.91 GSV vision map UI queue — band 110 (PH-S1739…S1748, 2026-08-05) · **✅**
+
+**Джерело:** власник (GSV перед master-backlog) — GSV_MIGRATION.md future rows: `vision.svg` port +
+«Vision UI-логіка (map)» — compact ratio-safe map панель + map wire. Canon:
+[`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../gsv/GSV_MIGRATION.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1674 | **PH-S1739** | Vision map wire | GSV_MIGRATION | `boxes/vision.rs` `wire_map`; `GET /api/vision/map` (layers + per-layer counts + edges by kind) | **✅** |
+| 1675 | **PH-S1740** | vision.svg port | GSV_MIGRATION | `GSV/ui/vision.svg` + `/assets/vision.svg` (ratio-safe `.svg` = Ignored in audit) | **✅** |
+| 1676 | **PH-S1741** | Vision map UI panel | GSV_BOXES | `ui/index.html` Vision Map (layer chips + edges summary + svg link) | **✅** |
+| 1677 | **PH-S1742** | Vision map contracts | Rust-first (API → tests) | `tests/gsv_vision_contracts.rs` map/svg/feed-filter | **✅** |
+| 1678 | **PH-S1743** | Feed status filter | GSV_BOXES | `GET /api/vision/feed?status=closed` | **✅** |
+| 1679 | **PH-S1744** | GSV vision docs canon | session canon | `VISION.md` map; `GSV_MIGRATION.md` rows ✅; MEMORY band 110 | **✅** |
+| 1680 | **PH-S1745** | poolAI vision parity | docs canon | `docs/vision/README.md` band 110; `GSV_TECH_ROADMAP.md` band 110 | **✅** |
+| 1681 | **PH-S1746** | Ratio hold advisory | GSV_ROLES | `gsv-loc-audit --min-ratio 0.95 --advisory` + poolAI ratio96 advisory | **✅** |
+| 1682 | **PH-S1747** | vision-sync close | ops | `gsv-vision-sync` refresh + `poolai-vision-sync` rev **461** | **✅** |
+| 1683 | **PH-S1748** | Band close | GSV_ROLES | ratio hold (≥95%); fmt/clippy/test; docs canon; push | **✅** |
 
 ### 5.88 Ratio96 docs canon queue — band 107 (PH-S1709…S1718, 2026-08-02) · **✅**
 

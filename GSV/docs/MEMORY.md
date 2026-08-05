@@ -4,16 +4,16 @@
 Оновлюється в кінці кожного band. Лічильники — вимірювані (`wc -l`, `cargo test`,
 `cargo run --bin gsv-loc-audit`), не з пам'яті.
 
-## Стан (2026-08-05 · band 109 ✅)
+## Стан (2026-08-05 · band 110 ✅)
 
 - **Канон:** Rust **95–100%** / wasm **0–5%** (завжди), без Python/Java; bins — лише `src/bin/`.
-- **Ratio (виміряно):** `cargo run --bin gsv-loc-audit` → **95.52%** (rust 4223 / product 4421) — gate ≥95% ✅.
-  Звіт: `GSV/data/rust_ratio.json` (gitignored). 292-рядковий `ui/index.html` стиснуто до **198** LOC
-  (95.48% → 95.52%) — при цьому збережено всі бокси + додано **Ratio card**.
-- **Тести (виміряно):** `cargo test` → **87** (46 unit + 18 `gsv_server_contracts` + 8 `gsv_omni_contracts`
-  + 7 `gsv_ratio_contracts` + 8 `gsv_update_flow`). `cargo clippy --all-targets` → **0** warnings. `cargo fmt` clean.
+- **Ratio (виміряно):** `cargo run --bin gsv-loc-audit` → **96.01%** (rust 5411 / product 5636) — gate ≥95% ✅.
+  Звіт: `GSV/data/rust_ratio.json` (gitignored).
+- **Тести (виміряно):** `cargo test` → **106** (55 unit + 18 `gsv_server_contracts` + 8 `gsv_omni_contracts`
+  + 8 `gsv_update_flow` + 7 `gsv_ratio_contracts` + 10 `gsv_vision_contracts`).
+  `cargo clippy --all-targets` → **0** warnings. `cargo fmt` clean.
 - **Бокси:** Tracker · SLI console · Toolchain · IDE · Update/offline · Box preview · SLI terminal ·
-  Tests/bench hooks · **Ratio** · **Vision** · **OmniRouter** (Rust AI-проксі/роутер, catalog/config/proxy).
+  Tests/bench hooks · **Ratio** · **Vision** · **Vision Map** · **OmniRouter** (Rust AI-проксі/роутер).
 
 ## Що зроблено
 
@@ -53,6 +53,21 @@
 - **PH-S1736** poolAI vision parity (`docs/vision/README.md` + cross-check).
 - **PH-S1737** Ratio hold advisory (`gsv-loc-audit --min-ratio 0.95 --advisory`).
 - **PH-S1738** Band close: ratio hold, fmt, clippy, cargo test, docs canon, vision-sync, push.
+
+### Band 110 (PH-S1739…S1748, ✅ 2026-08-05) — Vision map UI (svg + map wire)
+- **PH-S1739** `boxes/vision.rs` `map_report`/`wire_map` — легкий map-звіт (layers L0..L5 z-sorted,
+  `node_count`/`edges_from`, `edge_kinds` tally, totals); `GET /api/vision/map`.
+- **PH-S1740** `GSV/ui/vision.svg` (порт `docs/vision/vision.svg`, include_str!) + `GET /assets/vision.svg`
+  (`image/svg+xml`). `.svg` = audit Ignored → ratio-neutral.
+- **PH-S1741** Vision Map card у `ui/index.html`: per-layer chips + edge kinds + посилання на svg.
+- **PH-S1742** `tests/gsv_vision_contracts.rs` +3 → **10** (map endpoint: 6 layers z-sorted, layer_sum;
+  feed `?status=closed`; `/assets/vision.svg` 200 + content-type).
+- **PH-S1743** `GET /api/vision/feed?status=closed|open|all` — серверний фільтр.
+- **PH-S1744** `GSV/docs/VISION.md` (map/feed-filter/svg) + `GSV_MIGRATION.md` rows ✅ (svg, map, feed filter).
+- **PH-S1745** poolAI vision parity + `GSV_TECH_ROADMAP.md` band 110 row.
+- **PH-S1746** Ratio hold advisory (`gsv-loc-audit --min-ratio 0.95 --advisory`).
+- **PH-S1747** vision-sync close: `gsv-vision-sync` refresh + poolAI vision rev **461**.
+- **PH-S1748** Band close: ratio hold, fmt, clippy, cargo test, docs canon, vision-sync, push.
 
 ## Важливі факти (не забувати)
 

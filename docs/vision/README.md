@@ -2,7 +2,7 @@
 
 Ізометрична карта зв’язків **доків ↔ код ↔ спринти** для ітераційної розробки (VDT). Оновлюється разом із закриттям PH-S* / змінами FM §5.11.
 
-> **GSV (2026-08-05):** vision мігрує в окремий Rust-first проєкт **Galaxy StarWalker Vision** (`GSV/` + [`docs/gsv/`](../gsv/README.md)). Цей каталог — канон-джерело до завершення GSV; архітектура міграції: [`GSV_MIGRATION.md`](../gsv/GSV_MIGRATION.md) · TechPreroadMap: [`GSV_TECH_ROADMAP.md`](../gsv/GSV_TECH_ROADMAP.md) · ролі/пам'ять: [`GSV/docs/GSV_ROLES.md`](../../GSV/docs/GSV_ROLES.md) · [`GSV/docs/MEMORY.md`](../../GSV/docs/MEMORY.md) · Vision box: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md). Bands 102 + 108 + 109 ✅ (FM §5.12 §5.83 · §5.89 · §5.90). Band 109: `gsv-vision-sync` mirror manifest/feed → `GSV/data/gsv_*.json` + `GET /api/vision*`.
+> **GSV (2026-08-05):** vision мігрує в окремий Rust-first проєкт **Galaxy StarWalker Vision** (`GSV/` + [`docs/gsv/`](../gsv/README.md)). Цей каталог — канон-джерело до завершення GSV; архітектура міграції: [`GSV_MIGRATION.md`](../gsv/GSV_MIGRATION.md) · TechPreroadMap: [`GSV_TECH_ROADMAP.md`](../gsv/GSV_TECH_ROADMAP.md) · ролі/пам'ять: [`GSV/docs/GSV_ROLES.md`](../../GSV/docs/GSV_ROLES.md) · [`GSV/docs/MEMORY.md`](../../GSV/docs/MEMORY.md) · Vision box: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md). Bands 102 + 108 + 109 + 110 ✅ (FM §5.12 §5.83 · §5.89 · §5.90 · §5.91). Band 109: `gsv-vision-sync` mirror manifest/feed → `GSV/data/gsv_*.json` + `GET /api/vision*`. Band 110: Vision map UI — `GET /api/vision/map` (layers L0..L5 + edge kinds), `GET /assets/vision.svg` (порт `vision.svg`), `GET /api/vision/feed?status=`.
 
 ## Файли
 

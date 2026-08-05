@@ -26,6 +26,9 @@ use crate::vision;
 /// Embedded single-page UI (canon file: `GSV/ui/index.html`).
 pub const INDEX_HTML: &str = include_str!("../../ui/index.html");
 
+/// Ported vision diagram (`GSV/ui/vision.svg`), ratio-safe: `.svg` is audit-ignored.
+pub const VISION_SVG: &str = include_str!("../../ui/vision.svg");
+
 /// `/api/health` payload.
 fn health(state: &AppState) -> Value {
     json!({
@@ -67,6 +70,7 @@ pub fn router(state: AppState) -> Router {
         .route("/api/ratio", get(api_ratio))
         .route("/api/vision", get(api_vision))
         .route("/api/vision/manifest", get(api_vision_manifest))
+        .route("/api/vision/map", get(api_vision_map))
         .route("/api/vision/feed", get(api_vision_feed))
         .route("/api/omni", get(api_omni))
         .route(
@@ -77,11 +81,24 @@ pub fn router(state: AppState) -> Router {
         .route("/api/omni/v1/chat/completions", post(api_omni_chat))
         .route("/api/omni/test", post(api_omni_test))
         .route("/events", get(events))
+        .route("/assets/vision.svg", get(api_vision_svg))
         .with_state(state)
 }
 
 async fn index() -> Html<&'static str> {
     Html(INDEX_HTML)
+}
+
+async fn api_vision_svg() -> Response {
+    (
+        StatusCode::OK,
+        [
+            ("Content-Type", "image/svg+xml"),
+            ("Cache-Control", "no-cache"),
+        ],
+        VISION_SVG,
+    )
+        .into_response()
 }
 
 async fn api_health(State(state): State<AppState>) -> Json<Value> {
@@ -212,10 +229,26 @@ async fn api_vision_manifest(State(state): State<AppState>) -> Json<Value> {
     ))
 }
 
-async fn api_vision_feed(State(state): State<AppState>) -> Json<Value> {
-    Json(crate::boxes::vision::wire_feed(
+async fn api_vision_map(State(state): State<AppState>) -> Json<Value> {
+    Json(crate::boxes::vision::wire_map(
         &state.repo_root,
         &state.data_dir,
+    ))
+}
+
+#[derive(serde::Deserialize)]
+struct VisionFeedParams {
+    status: Option<String>,
+}
+
+async fn api_vision_feed(
+    State(state): State<AppState>,
+    Query(params): Query<VisionFeedParams>,
+) -> Json<Value> {
+    Json(crate::boxes::vision::wire_feed_filter(
+        &state.repo_root,
+        &state.data_dir,
+        params.status.as_deref(),
     ))
 }
 
