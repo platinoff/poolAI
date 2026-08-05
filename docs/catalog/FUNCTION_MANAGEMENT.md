@@ -265,7 +265,7 @@ FM-xxx (з таблиці нижче)
 
 **VDT:** §5.12 = **журнал PH-S*** (≤10 відкритих). Якщо **< 10** — **`абракадабра`** / project scan **всього проєкту**: concept → FM **§5.1** → roadmaps → architect → DOCS_LEGACY → code → §5.13 fallback. Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Project scan». **Rust-first:** API → `tests/`; Playwright лише browser scope.
 
-**Відкритих у §5.12:** **0** (band 107 ✅). **Master horizon:** PH-S1719…S1728 (band 108). Vision rev **457**.
+**Відкритих у §5.12:** **0** (band 108 ✅). **Master horizon:** PH-S1729…S1738 (band 109). Vision rev **458**.
 
 **Историчний research backlog (PH-S65+):**
 
@@ -1277,6 +1277,35 @@ FM-xxx (з таблиці нижче)
 | 1641 | **PH-S1706** | Ratio hold advisory | master backlog | `--ratio96-loc-audit --advisory --min-ratio 0.95` | **[x]** |
 | 1642 | **PH-S1707** | galaxy_horizon_s1699_integration | band close | `galaxy_horizon_s1699_integration`; FM ✅ · HANDOFF · NEXT_SESSION | **[x]** |
 | 1643 | **PH-S1708** | Project scan replenish | band close | Replenish §5.12 from master horizon | **[x]** |
+
+### 5.89 GSV roles/ratio canon queue — band 108 (PH-S1719…S1728, 2026-08-05) · **✅**
+
+**Джерело:** власник (GSV перед master-backlog) — застосувати до GSV poolAI дисципліну ratio/roles:
+roles canon (дзеркало `.cursor/rules/poolai-agent-roles.mdc` + `poolai-session-iteration.mdc`),
+LOC-ratio audit bin (дзеркало `poolai_loc_audit.rs`), Ratio box + UI badge, GSV memory mark +
+HANDOFF/NEXT, FM band реєстрація, poolAI docs parity. Canon: [`GSV_ROLES.md`](../../GSV/docs/GSV_ROLES.md) ·
+[`MEMORY.md`](../../GSV/docs/MEMORY.md) · [`GSV/README.md`](../../GSV/README.md). Аудит: `cargo run --bin gsv-loc-audit`.
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1654 | **PH-S1719** | GSV roles canon | poolai-agent-roles.mdc | `GSV/docs/GSV_ROLES.md` + README pointer | **[x]** |
+| 1655 | **PH-S1720** | `gsv-loc-audit` bin | `poolai_loc_audit.rs` | `GSV/src/bin/gsv_loc_audit.rs`; `--min-ratio/--advisory`; `GSV/data/rust_ratio.json` | **[x]** |
+| 1656 | **PH-S1721** | Ratio contracts | Rust-first (API → tests) | `tests/gsv_ratio_contracts.rs` (7) | **[x]** |
+| 1657 | **PH-S1722** | Ratio box + wire | GSV_BOXES | `boxes/ratio.rs`; `GET /api/ratio`; UI Ratio card | **[x]** |
+| 1658 | **PH-S1723** | GSV memory mark | session canon | `GSV/docs/MEMORY.md` + `GSV/docs/README.md` | **[x]** |
+| 1659 | **PH-S1724** | GSV HANDOFF/NEXT | HANDOFF/NEXT canon | `GSV/docs/HANDOFF_NEW_SESSION.md` + `NEXT_SESSION_PROMPT.md` | **[x]** |
+| 1660 | **PH-S1725** | FM band 108 + roadmap | FM §5.12 | §5.89 (ця); `GSV_TECH_ROADMAP.md` band 108 | **[x]** |
+| 1661 | **PH-S1726** | poolAI docs parity | docs canon | GSV rows у poolAI docs (digest/vision README) | **[x]** |
+| 1662 | **PH-S1727** | poolAI HANDOFF + NEXT | HANDOFF/NEXT | band 108 ✅ · horizon band 109 | **[x]** |
+| 1663 | **PH-S1728** | Band close | GSV_ROLES | ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync rev 458 | **[x]** |
+
+**PH-S1719…S1728 ✅ (2026-08-05):** `GSV/docs/GSV_ROLES.md` (roles + session canon + ratio gate);
+`GSV/src/bin/gsv_loc_audit.rs` + `GSV/src/boxes/ratio.rs` (git-tracked audit, `normalize_git_root`
+для MSYS `/s/...` → `S:/...`); ratio **95.52%** (rust 4223 / product 4421, gate ≥95% ✅);
+`tests/gsv_ratio_contracts.rs` (7); Ratio box + `GET /api/ratio` + UI Ratio card; `ui/index.html`
+компакт (198 LOC); `GSV/docs/{README,MEMORY,HANDOFF_NEW_SESSION,NEXT_SESSION_PROMPT}`;
+`GSV_TECH_ROADMAP.md` band 108; poolAI docs parity + HANDOFF/NEXT; vision-sync rev **458**.
+Тести GSV **87** (46 unit + 18 + 8 omni + 7 ratio + 8 update), clippy **0**, fmt clean.
 
 ### 5.88 Ratio96 docs canon queue — band 107 (PH-S1709…S1718, 2026-08-02) · **✅**
 
@@ -2496,8 +2525,8 @@ FM-xxx (з таблиці нижче)
 |------|----------|
 | **Pending** | **0** |
 | **Drained bands 1–36** | PH-S660…S1010 ✅ |
-| **Активна §5.12** | band 106 **PH-S1699…S1708** (Ratio96 loc-audit) |
-| **Наступна promote** | band 107 **PH-S1709…S1718** (Ratio96 docs canon) |
+| **Активна §5.12** | band 107 **PH-S1709…S1718** (Ratio96 docs canon) |
+| **Наступна promote** | band 108 **PH-S1719…S1728** (GSV roles/ratio canon) |
 | **Сесій `абракадабра`** | band 44 drained (PH-S1079…S1088) |
 | **План фаз** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md) |
 | **Реєстр sprint×acceptance** | [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) |

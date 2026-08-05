@@ -2,7 +2,8 @@
 
 **TechPreroadMap**: логічний порядок реалізації проєкту GSV → future sprints.
 
-Дата: 2026-08-02 · **Стан:** band 102 **реалізовано** · **Спринти:** `PH-S1659…S1668` (FM §5.12 §5.83 ✅).
+Дата: 2026-08-05 · **Стан:** band 102 **реалізовано** + band 108 (roles/ratio canon) **✅** ·
+**Спринти:** `PH-S1659…S1668` (FM §5.12 §5.83 ✅) · `PH-S1719…S1728` (FM §5.12 §5.89 ✅).
 
 ## Логічний порядок (залежності)
 
@@ -18,6 +19,9 @@ docs/architecture (✅ ця сесія)
       → SLI terminal (AI → команди)
       → Tests/bench hooks (без перекомпіляції)
   → band close (docs canon, parity, vision-sync, ratio hold)
+  → [band 108] roles/ratio canon (GSV як poolAI-grade проєкт):
+      GSV_ROLES → gsv-loc-audit → ratio contracts → Ratio box/UI
+      → memory mark → HANDOFF/NEXT → FM §5.89 → poolAI parity → band close
 ```
 
 ## Спринти (band 102)
@@ -34,6 +38,21 @@ docs/architecture (✅ ця сесія)
 | **PH-S1666** | Box preview + SLI terminal | `preview/` Rust-кольори; `POST /api/terminal` (whitelist SLI) |
 | **PH-S1667** | Tests/bench hooks (без перекомпіляції) | `hooks/`; `/api/hooks/tests`; `/api/hooks/bench`; read `target/` без build |
 | **PH-S1668** | Band close | offline-стійкість + metrics resync; Rust tests; docs canon; vision parity; ratio hold |
+
+## Спринти (band 108) — roles/ratio canon (poolAI дисципліна)
+
+| Sprint | Фокус | Acceptance (ключ) |
+|--------|-------|-------------------|
+| **PH-S1719** | GSV roles canon | `GSV/docs/GSV_ROLES.md`; README pointer |
+| **PH-S1720** | `gsv-loc-audit` bin | `GSV/src/bin/gsv_loc_audit.rs`; `--min-ratio/--advisory`; `GSV/data/rust_ratio.json` |
+| **PH-S1721** | Ratio contracts | `tests/gsv_ratio_contracts.rs` (7) |
+| **PH-S1722** | Ratio box + wire | `boxes/ratio.rs`; `GET /api/ratio`; UI Ratio card |
+| **PH-S1723** | GSV memory mark | `GSV/docs/MEMORY.md` + `GSV/docs/README.md` |
+| **PH-S1724** | GSV HANDOFF/NEXT | `GSV/docs/HANDOFF_NEW_SESSION.md` + `NEXT_SESSION_PROMPT.md` |
+| **PH-S1725** | FM band 108 + roadmap | FM §5.12 §5.89; цей файл |
+| **PH-S1726** | poolAI docs parity | GSV rows у poolAI docs |
+| **PH-S1727** | poolAI HANDOFF + NEXT | band 108 ✅ · horizon band 109 |
+| **PH-S1728** | Band close | ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync rev 458 |
 
 ## Ключові UX-вимоги (узагальнення ТЗ)
 

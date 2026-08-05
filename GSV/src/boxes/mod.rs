@@ -11,11 +11,13 @@
 //! | SLI terminal | `terminal` | `/api/terminal` | SLI catalog |
 //! | Tests/bench hooks | `hooks` | `/api/hooks/…` | `target/` artifacts |
 //! | OmniRouter | `omni` | `/api/omni/…` | provider/model catalog + config + proxy |
+//! | Ratio | `ratio` | `/api/ratio` | `GSV/data/rust_ratio.json` (Rust 95–100%) |
 
 pub mod hooks;
 pub mod ide;
 pub mod omni;
 pub mod preview;
+pub mod ratio;
 pub mod sli;
 pub mod terminal;
 pub mod toolchain;
@@ -24,6 +26,7 @@ pub mod update;
 pub use ide::{IdeSelection, IdeSession, IdeWire};
 pub use omni::{OmniConfig, OmniRouter, OmniWire, ProviderConfig, ProviderWire, RoutingConfig};
 pub use preview::PreviewWire;
+pub use ratio::{AuditConfig, CategoryLoc, ProductCategory, RustRatioReport};
 pub use sli::{SliCatalog, SliEntry, SliWire};
 pub use terminal::{TerminalRequest, TerminalResponse};
 pub use toolchain::{ToolchainEntry, ToolchainWire};

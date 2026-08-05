@@ -5,37 +5,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Galaxy StarWalker Vision (GSV)</title>
 <style>
-:root {
-  --bg:#0b0e14; --panel:#121826; --panel2:#0f1420; --line:#1e2a3d;
-  --fg:#dbe4f0; --dim:#7c8ba3; --accent:#4fd1c5; --rust:#e8843c; --ok:#3fb96e;
-  --warn:#e0a83c; --err:#e05b5b; --blue:#5b8de0;
-}
-* { box-sizing:border-box; }
-body { margin:0; background:var(--bg); color:var(--fg); font:14px/1.5 "Cascadia Code","Consolas",monospace; }
-header { display:flex; align-items:center; gap:12px; padding:10px 18px; background:var(--panel); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:5; flex-wrap:wrap; }
-header h1 { font-size:15px; margin:0; color:var(--accent); }
-header .meta { color:var(--dim); font-size:12px; }
-.badge { padding:2px 9px; border-radius:10px; font-size:11px; font-weight:600; }
-.badge.online { background:#12301f; color:var(--ok); }
-.badge.offline { background:#331818; color:var(--err); }
-.badge.update { background:#332b10; color:var(--warn); cursor:pointer; }
-button { background:var(--panel2); color:var(--fg); border:1px solid var(--line); border-radius:6px; padding:4px 10px; cursor:pointer; font:inherit; font-size:12px; }
-button:hover { border-color:var(--accent); }
-main { display:grid; grid-template-columns:repeat(auto-fill,minmax(420px,1fr)); gap:14px; padding:16px 18px; }
-.card { background:var(--panel); border:1px solid var(--line); border-radius:10px; overflow:hidden; }
-.card h2 { margin:0; padding:8px 14px; font-size:13px; color:var(--rust); background:var(--panel2); border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; }
-.card h2 .hint { color:var(--dim); font-weight:400; font-size:11px; }
-.card .body { padding:10px 14px; max-height:340px; overflow:auto; font-size:12px; }
-table { border-collapse:collapse; width:100%; }
-th, td { text-align:left; padding:3px 8px; border-bottom:1px solid var(--line); }
-th { color:var(--dim); font-weight:500; }
-kbd { color:var(--accent); }
-.ok { color:var(--ok); } .err { color:var(--err); } .warn { color:var(--warn); } .dim { color:var(--dim); }
-textarea, input[type=text] { width:100%; background:var(--panel2); color:var(--fg); border:1px solid var(--line); border-radius:6px; padding:6px 8px; font:inherit; resize:vertical; }
-pre.out { background:var(--panel2); border:1px solid var(--line); border-radius:6px; padding:8px; white-space:pre-wrap; font-size:11px; max-height:200px; overflow:auto; }
-.g-k { color:var(--rust); } .g-s { color:var(--ok); } .g-n { color:var(--blue); } .g-c { color:var(--dim); font-style:italic; }
-.g-ln { color:#3a4a63; user-select:none; } .g-pre { margin:0; }
-#toast { position:fixed; right:16px; bottom:16px; background:#1a2233; border:1px solid var(--line); border-radius:8px; padding:10px 14px; font-size:12px; display:none; }
+:root{--bg:#0b0e14;--panel:#121826;--panel2:#0f1420;--line:#1e2a3d;--fg:#dbe4f0;--dim:#7c8ba3;--accent:#4fd1c5;--rust:#e8843c;--ok:#3fb96e;--warn:#e0a83c;--err:#e05b5b;--blue:#5b8de0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 "Cascadia Code","Consolas",monospace}
+header{display:flex;align-items:center;gap:12px;padding:10px 18px;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5;flex-wrap:wrap}
+header h1{font-size:15px;margin:0;color:var(--accent)}
+header .meta{color:var(--dim);font-size:12px}
+.badge{padding:2px 9px;border-radius:10px;font-size:11px;font-weight:600}
+.badge.online{background:#12301f;color:var(--ok)}.badge.offline{background:#331818;color:var(--err)}.badge.update{background:#332b10;color:var(--warn);cursor:pointer}
+button{background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:4px 10px;cursor:pointer;font:inherit;font-size:12px}
+button:hover{border-color:var(--accent)}
+main{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:14px;padding:16px 18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.card h2{margin:0;padding:8px 14px;font-size:13px;color:var(--rust);background:var(--panel2);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.card h2 .hint{color:var(--dim);font-weight:400;font-size:11px}
+.card .body{padding:10px 14px;max-height:340px;overflow:auto;font-size:12px}
+table{border-collapse:collapse;width:100%}
+th,td{text-align:left;padding:3px 8px;border-bottom:1px solid var(--line)}
+th{color:var(--dim);font-weight:500}
+kbd{color:var(--accent)}
+.ok{color:var(--ok)}.err{color:var(--err)}.warn{color:var(--warn)}.dim{color:var(--dim)}
+textarea,input[type=text]{width:100%;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:inherit;resize:vertical}
+pre.out{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:8px;white-space:pre-wrap;font-size:11px;max-height:200px;overflow:auto}
+.g-k{color:var(--rust)}.g-s{color:var(--ok)}.g-n{color:var(--blue)}.g-c{color:var(--dim);font-style:italic}
+.g-ln{color:#3a4a63;user-select:none}.g-pre{margin:0}
+#toast{position:fixed;right:16px;bottom:16px;background:#1a2233;border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:12px;display:none}
 </style>
 </head>
 <body>
@@ -55,191 +49,112 @@ pre.out { background:var(--panel2); border:1px solid var(--line); border-radius:
   <section class="card"><h2>Toolchain <span class="hint">/api/toolchain</span></h2><div class="body" id="b-toolchain">…</div></section>
   <section class="card"><h2>IDE <span class="hint">/api/ide/sessions</span></h2><div class="body" id="b-ide">…</div></section>
   <section class="card"><h2>Update <span class="hint">/api/update</span></h2><div class="body" id="b-update">…</div></section>
-  <section class="card"><h2>Box preview <span class="hint">/api/preview</span></h2>
-    <div class="body">
-      <input id="pvFile" type="text" value="GSV/src/bin/gsv_server.rs" placeholder="repo-relative file">
-      <br><br><button onclick="loadPreview()">Render</button>
-      <div id="b-preview" style="margin-top:8px"></div>
-    </div>
-  </section>
-  <section class="card"><h2>SLI terminal <span class="hint">POST /api/terminal</span></h2>
-    <div class="body">
-      <input id="termCmd" type="text" value="echo gsv" placeholder="whitelisted SLI command">
-      <br><br><button onclick="runTerminal()">Run</button>
-      <pre class="out" id="b-terminal">…</pre>
-    </div>
-  </section>
+  <section class="card"><h2>Box preview <span class="hint">/api/preview</span></h2><div class="body"><input id="pvFile" type="text" value="GSV/src/bin/gsv_server.rs" placeholder="repo-relative file"><br><br><button onclick="loadPreview()">Render</button><div id="b-preview" style="margin-top:8px"></div></div></section>
+  <section class="card"><h2>SLI terminal <span class="hint">POST /api/terminal</span></h2><div class="body"><input id="termCmd" type="text" value="echo gsv" placeholder="whitelisted SLI command"><br><br><button onclick="runTerminal()">Run</button><pre class="out" id="b-terminal">…</pre></div></section>
   <section class="card"><h2>Tests hooks <span class="hint">/api/hooks/tests</span></h2><div class="body" id="b-hooks-t">…</div></section>
   <section class="card"><h2>Bench hooks <span class="hint">/api/hooks/bench</span></h2><div class="body" id="b-hooks-b">…</div></section>
-  <section class="card"><h2>OmniRouter <span class="hint">/api/omni</span></h2>
-    <div class="body">
-      <div class="dim" id="b-omni-summary">…</div>
-      <div style="margin-top:6px">recommended: <span id="b-omni-rec">…</span></div>
-      <details style="margin-top:6px"><summary>Providers</summary><div id="b-omni-prov"></div></details>
-      <details style="margin-top:6px"><summary>Models</summary><div id="b-omni-models"></div></details>
-      <div style="margin-top:8px">
-        <input id="omniTestProvider" type="text" value="openai" placeholder="provider id" style="width:140px">
-        <button onclick="testOmniProvider()">Test</button>
-        <span id="b-omni-test" class="dim"></span>
-      </div>
-    </div>
-  </section>
+  <section class="card"><h2>Ratio <span class="hint">/api/ratio</span></h2><div class="body" id="b-ratio">…</div></section>
+  <section class="card"><h2>OmniRouter <span class="hint">/api/omni</span></h2><div class="body">
+    <div class="dim" id="b-omni-summary">…</div>
+    <div style="margin-top:6px">recommended: <span id="b-omni-rec">…</span></div>
+    <details style="margin-top:6px"><summary>Providers</summary><div id="b-omni-prov"></div></details>
+    <details style="margin-top:6px"><summary>Models</summary><div id="b-omni-models"></div></details>
+    <div style="margin-top:8px"><input id="omniTestProvider" type="text" value="openai" placeholder="provider id" style="width:140px"><button onclick="testOmniProvider()">Test</button><span id="b-omni-test" class="dim"></span></div>
+  </div></section>
 </main>
 <div id="toast"></div>
 
 <script>
 "use strict";
-const $ = (id) => document.getElementById(id);
-function esc(s) { return String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
-
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const tab = (h, rows) => {
+  if (!rows.length) rows = [h.map(() => "<span class='dim'>—</span>")];
+  return "<table><tr>" + h.map(x => "<th>" + x + "</th>").join("") + "</tr>" +
+    rows.map(r => "<tr>" + r.map(c => "<td>" + c + "</td>").join("") + "</tr>").join("") + "</table>";
+};
 let offline = false;
-
-function toast(msg) {
-  const t = $("toast");
-  t.textContent = msg; t.style.display = "block";
-  setTimeout(() => { t.style.display = "none"; }, 4000);
-}
-
-function setOffline(v) {
-  offline = v;
-  const el = $("status");
-  el.textContent = v ? "offline" : "online";
-  el.className = "badge " + (v ? "offline" : "online");
-}
-
-async function get(path) {
-  const res = await fetch(path);
-  if (!res.ok) throw new Error(path + " → " + res.status);
-  return res.json();
-}
+const toast = msg => { const t = $("toast"); t.textContent = msg; t.style.display = "block"; setTimeout(() => { t.style.display = "none"; }, 4000); };
+const setOffline = v => { offline = v; const el = $("status"); el.textContent = v ? "offline" : "online"; el.className = "badge " + (v ? "offline" : "online"); };
+async function get(path) { const res = await fetch(path); if (!res.ok) throw new Error(path + " → " + res.status); return res.json(); }
 
 function renderHealth(d) {
   $("meta").textContent = d.name + " · v" + d.version + " · uptime " + d.uptime_secs + "s";
-  $("b-health").innerHTML =
-    "<table><tr><th>field</th><th>value</th></tr>" +
-    "<tr><td>name</td><td>" + esc(d.name) + "</td></tr>" +
-    "<tr><td>version</td><td>" + esc(d.version) + "</td></tr>" +
-    "<tr><td>uptime_secs</td><td>" + d.uptime_secs + "</td></tr>" +
-    "<tr><td>ok</td><td class='ok'>" + d.ok + "</td></tr>" +
-    "<tr><td>update_available</td><td>" + d.update_available + "</td></tr></table>";
+  $("b-health").innerHTML = tab(["field", "value"], [
+    ["name", esc(d.name)], ["version", esc(d.version)], ["uptime_secs", d.uptime_secs],
+    ["ok", "<span class='ok'>" + d.ok + "</span>"], ["update_available", d.update_available],
+  ]);
 }
-
 function renderTracker(d) {
   const sp = d.sprints || {};
-  const rows = (d.records || []).map(r =>
-    "<tr><td>" + esc(r.kind) + "</td><td>" + esc(r.label) + "</td><td>" + esc(r.status) + "</td><td class='dim'>" + esc(r.at) + "</td></tr>"
-  ).join("") || "<tr><td colspan='4' class='dim'>no records</td></tr>";
-  $("b-tracker").innerHTML =
-    "<div class='dim'>open " + (sp.open || []).length + " · closed " + (sp.closed || []).length +
+  $("b-tracker").innerHTML = "<div class='dim'>open " + (sp.open || []).length + " · closed " + (sp.closed || []).length +
     " · total " + (sp.total ?? 0) + " · next <kbd>" + esc(sp.next || "—") + "</kbd></div>" +
-    "<table><tr><th>kind</th><th>label</th><th>status</th><th>at</th></tr>" + rows + "</table>";
+    tab(["kind", "label", "status", "at"], (d.records || []).map(r => [esc(r.kind), esc(r.label), esc(r.status), "<span class='dim'>" + esc(r.at) + "</span>"]));
 }
-
 function renderSli(d) {
-  const cat = d.catalog || {};
-  const rows = (cat.entries || []).map(e =>
-    "<tr><td>" + (e.used ? "<span class='ok'>●</span>" : "<span class='dim'>○</span>") + "</td>" +
-    "<td><kbd>" + esc(e.name) + "</kbd></td><td>" + esc(e.kind) + "</td><td class='dim'>" + esc(e.description) + "</td></tr>"
-  ).join("") || "<tr><td colspan='4' class='dim'>no entries</td></tr>";
-  $("b-sli").innerHTML =
-    "<div class='dim'>used " + (cat.used_count ?? 0) + " · unused (new SLI candidates) " + (cat.unused_count ?? 0) + "</div>" +
-    "<table><tr><th></th><th>cmd</th><th>kind</th><th>desc</th></tr>" + rows + "</table>";
+  const c = d.catalog || {};
+  $("b-sli").innerHTML = "<div class='dim'>used " + (c.used_count ?? 0) + " · unused (new SLI candidates) " + (c.unused_count ?? 0) + "</div>" +
+    tab(["", "cmd", "kind", "desc"], (c.entries || []).map(e => [e.used ? "<span class='ok'>●</span>" : "<span class='dim'>○</span>", "<kbd>" + esc(e.name) + "</kbd>", esc(e.kind), "<span class='dim'>" + esc(e.description) + "</span>"]));
 }
-
 function renderToolchain(d) {
-  const rows = (d.entries || []).map(e =>
-    "<tr><td><kbd>" + esc(e.tool) + "</kbd></td><td>" + esc(e.version) + "</td><td class='dim'>" + esc(e.source) + "</td></tr>"
-  ).join("") || "<tr><td colspan='3' class='dim'>empty</td></tr>";
-  $("b-toolchain").innerHTML =
-    "<table><tr><th>tool</th><th>version</th><th>source</th></tr>" + rows + "</table>";
+  $("b-toolchain").innerHTML = tab(["tool", "version", "source"], (d.entries || []).map(e => ["<kbd>" + esc(e.tool) + "</kbd>", esc(e.version), "<span class='dim'>" + esc(e.source) + "</span>"]));
 }
-
 function renderIde(d) {
   const sel = d.selection;
-  const rows = (d.sessions || []).slice(0, 40).map(s =>
-    "<tr><td>" + esc(s.tool) + "</td><td>" + esc(s.label) + "</td><td class='dim'>" + esc(s.modified) + "</td>" +
-    "<td><button onclick=\"selectIde('" + esc(s.tool) + "','" + esc(s.id) + "')\">select</button></td></tr>"
-  ).join("") || "<tr><td colspan='4' class='dim'>no sessions found (read-only)</td></tr>";
-  $("b-ide").innerHTML =
-    (sel ? "<div class='dim'>selected: <kbd>" + esc(sel.tool) + " / " + esc(sel.session) + "</kbd></div>" : "") +
-    "<table><tr><th>tool</th><th>session</th><th>modified</th><th></th></tr>" + rows + "</table>";
+  $("b-ide").innerHTML = (sel ? "<div class='dim'>selected: <kbd>" + esc(sel.tool) + " / " + esc(sel.session) + "</kbd></div>" : "") +
+    tab(["tool", "session", "modified", ""], (d.sessions || []).slice(0, 40).map(s => [esc(s.tool), esc(s.label), "<span class='dim'>" + esc(s.modified) + "</span>", "<button onclick=\"selectIde('" + esc(s.tool) + "','" + esc(s.id) + "')\">select</button>"]));
 }
-
 function renderUpdate(d) {
   const avail = !!d.update_available;
   $("updateBadge").style.display = avail ? "inline-block" : "none";
-  $("b-update").innerHTML =
-    "<table><tr><th>field</th><th>value</th></tr>" +
-    "<tr><td>version</td><td>" + esc(d.version) + "</td></tr>" +
-    "<tr><td>git_head</td><td>" + esc(d.git_head || "—") + "</td></tr>" +
-    "<tr><td>update_available</td><td class='" + (avail ? "warn" : "ok") + "'>" + avail + "</td></tr>" +
-    "<tr><td>binary_mtime</td><td>" + d.binary_mtime + "</td></tr>" +
-    "<tr><td>newest_src_mtime</td><td>" + d.newest_src_mtime + "</td></tr></table>";
+  $("b-update").innerHTML = tab(["field", "value"], [
+    ["version", esc(d.version)], ["git_head", esc(d.git_head || "—")],
+    ["update_available", "<span class='" + (avail ? "warn" : "ok") + "'>" + avail + "</span>"],
+    ["binary_mtime", d.binary_mtime], ["newest_src_mtime", d.newest_src_mtime],
+  ]);
 }
-
 function renderHooksTests(d) {
   const diag = d.diagnostics;
-  $("b-hooks-t").innerHTML =
-    "<div class='dim'>status: <kbd>" + esc(d.status) + "</kbd> · test bins: " + (d.test_bins || []).length + "</div>" +
+  $("b-hooks-t").innerHTML = "<div class='dim'>status: <kbd>" + esc(d.status) + "</kbd> · test bins: " + (d.test_bins || []).length + "</div>" +
     (diag ? "<div>diagnostics: <span class='" + (diag.errors > 0 ? "err" : "ok") + "'>warnings " + diag.warnings + " · errors " + diag.errors + "</span></div>" : "") +
     "<div style='margin-top:6px' class='dim'>" + (d.test_bins || []).slice(0, 30).join(" · ") + "</div>";
 }
-
 function renderHooksBench(d) {
   const sp = d.speed_index;
-  $("b-hooks-b").innerHTML =
-    "<div class='dim'>status: <kbd>" + esc(d.status) + "</kbd> · criterion dirs: " + (d.criterion_dirs || []).length + "</div>" +
+  $("b-hooks-b").innerHTML = "<div class='dim'>status: <kbd>" + esc(d.status) + "</kbd> · criterion dirs: " + (d.criterion_dirs || []).length + "</div>" +
     (sp ? "<div>test-ci wall: <span class='" + (sp.test_ci_ok ? "ok" : "err") + "'>" + sp.test_ci_wall_secs + "s</span></div>" : "") +
     "<div style='margin-top:6px' class='dim'>" + (d.criterion_dirs || []).join(" · ") + "</div>";
 }
-
+function renderRatio(d) {
+  if (!d.ok) { $("b-ratio").innerHTML = "<span class='err'>" + esc(d.error || "missing rust_ratio.json") + "</span>"; return; }
+  $("b-ratio").innerHTML = "<div>Rust ratio <span class='" + (d.meets_min_ratio ? "ok" : "err") + "'>" + d.rust_ratio_pct.toFixed(2) + "%</span> · band min " + (d.formal_band_min * 100).toFixed(0) + "%</div>" +
+    "<div class='dim'>rust " + d.rust_loc + " / non-rust " + d.non_rust_product_loc + " · product " + d.product_loc_total + "</div>" +
+    tab(["category", "files", "loc"], Object.entries(d.by_category || {}).map(([k, v]) => [k, v.files, v.loc]));
+}
 function renderOmni(d) {
-  const rec = (d.recommended || []).map(m => "<kbd>" + esc(m.id) + "</kbd>").join(" ") || "—";
-  $("b-omni-summary").innerHTML =
-    "providers " + (d.providers || []).length + " · models " + (d.models || []).length +
+  $("b-omni-summary").innerHTML = "providers " + (d.providers || []).length + " · models " + (d.models || []).length +
     " · default <kbd>" + esc(d.routing.default_provider) + "</kbd>";
-  $("b-omni-rec").innerHTML = rec;
-  const provRows = (d.providers || []).map(p =>
-    "<tr><td><kbd>" + esc(p.id) + "</kbd></td><td>" + esc(p.name) + "</td><td>" +
-    (p.enabled ? "<span class='ok'>on</span>" : "<span class='err'>off</span>") + "</td><td>" +
-    (p.key_set ? "<span class='ok'>key</span>" : "<span class='dim'>no key</span>") + "</td><td class='dim'>" + esc(p.base_url) + "</td></tr>"
-  ).join("") || "<tr><td colspan='5' class='dim'>empty</td></tr>";
-  $("b-omni-prov").innerHTML =
-    "<table><tr><th>id</th><th>name</th><th>state</th><th>key</th><th>base_url</th></tr>" + provRows + "</table>";
-  const modelRows = (d.models || []).map(m =>
-    "<tr><td><kbd>" + esc(m.id) + "</kbd></td><td>" + esc(m.provider) + "</td><td>" +
-    (m.context_window ? m.context_window.toLocaleString() : "varies") + "</td><td>" +
-    (m.max_output ? m.max_output.toLocaleString() : "varies") + "</td><td>" +
-    (m.free ? "free" : "") + "</td><td>" + (m.recommended ? "<span class='ok'>★</span>" : "") + "</td></tr>"
-  ).join("") || "<tr><td colspan='6' class='dim'>empty</td></tr>";
-  $("b-omni-models").innerHTML =
-    "<table><tr><th>id</th><th>provider</th><th>ctx</th><th>out</th><th></th><th></th></tr>" + modelRows + "</table>";
+  $("b-omni-rec").innerHTML = (d.recommended || []).map(m => "<kbd>" + esc(m.id) + "</kbd>").join(" ") || "—";
+  $("b-omni-prov").innerHTML = tab(["id", "name", "state", "key", "base_url"], (d.providers || []).map(p =>
+    ["<kbd>" + esc(p.id) + "</kbd>", esc(p.name), p.enabled ? "<span class='ok'>on</span>" : "<span class='err'>off</span>",
+     p.key_set ? "<span class='ok'>key</span>" : "<span class='dim'>no key</span>", "<span class='dim'>" + esc(p.base_url) + "</span>"]));
+  $("b-omni-models").innerHTML = tab(["id", "provider", "ctx", "out", "", ""], (d.models || []).map(m =>
+    ["<kbd>" + esc(m.id) + "</kbd>", esc(m.provider), m.context_window ? m.context_window.toLocaleString() : "varies",
+     m.max_output ? m.max_output.toLocaleString() : "varies", m.free ? "free" : "", m.recommended ? "<span class='ok'>★</span>" : ""]));
 }
 
 async function testOmniProvider() {
   try {
-    const res = await fetch("api/omni/test", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ provider: $("omniTestProvider").value }),
-    });
+    const res = await fetch("api/omni/test", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ provider: $("omniTestProvider").value }) });
     const d = await res.json();
     $("b-omni-test").textContent = d.ok ? JSON.stringify(d.result) : "error: " + d.error;
-  } catch (e) {
-    $("b-omni-test").textContent = String(e);
-  }
+  } catch (e) { $("b-omni-test").textContent = String(e); }
 }
-
 async function resync() {
   const urls = [
-    ["api/health", renderHealth],
-    ["api/tracker", renderTracker],
-    ["api/sli", renderSli],
-    ["api/toolchain", renderToolchain],
-    ["api/ide/sessions", renderIde],
-    ["api/update", renderUpdate],
-    ["api/hooks/tests", renderHooksTests],
-    ["api/hooks/bench", renderHooksBench],
+    ["api/health", renderHealth], ["api/tracker", renderTracker], ["api/sli", renderSli],
+    ["api/toolchain", renderToolchain], ["api/ide/sessions", renderIde], ["api/update", renderUpdate],
+    ["api/hooks/tests", renderHooksTests], ["api/hooks/bench", renderHooksBench], ["api/ratio", renderRatio],
     ["api/omni", renderOmni],
   ];
   const results = await Promise.allSettled(urls.map(([u, f]) => get(u).then(f)));
@@ -248,58 +163,30 @@ async function resync() {
   if (failed > 0) toast(failed + " box(es) failed — offline mode");
   else toast("resync ok");
 }
-
 async function loadPreview() {
-  try {
-    const d = await get("api/preview?file=" + encodeURIComponent($("pvFile").value));
-    $("b-preview").innerHTML = d.html;
-  } catch (e) {
-    $("b-preview").innerHTML = "<span class='err'>" + esc(e.message) + "</span>";
-  }
+  try { $("b-preview").innerHTML = (await get("api/preview?file=" + encodeURIComponent($("pvFile").value))).html; }
+  catch (e) { $("b-preview").innerHTML = "<span class='err'>" + esc(e.message) + "</span>"; }
 }
-
 async function runTerminal() {
   try {
-    const res = await fetch("api/terminal", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ command: $("termCmd").value }),
-    });
+    const res = await fetch("api/terminal", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ command: $("termCmd").value }) });
     const d = await res.json();
-    $("b-terminal").textContent =
-      "allowed=" + d.allowed + " exit=" + d.exit_code + " ms=" + d.duration_ms + "\n" +
-      (d.stdout ? "stdout:\n" + d.stdout : "") +
-      (d.stderr ? "stderr:\n" + d.stderr : "");
-  } catch (e) {
-    $("b-terminal").textContent = String(e);
-  }
+    $("b-terminal").textContent = "allowed=" + d.allowed + " exit=" + d.exit_code + " ms=" + d.duration_ms + "\n" +
+      (d.stdout ? "stdout:\n" + d.stdout : "") + (d.stderr ? "stderr:\n" + d.stderr : "");
+  } catch (e) { $("b-terminal").textContent = String(e); }
 }
-
 async function selectIde(tool, session) {
-  try {
-    await fetch("api/ide/select", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ tool, session }),
-    });
-    await resync();
-  } catch (e) { toast(String(e)); }
+  try { await fetch("api/ide/select", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tool, session }) }); await resync(); }
+  catch (e) { toast(String(e)); }
 }
-
 async function notifyUpdate() {
-  try {
-    const d = await (await fetch("api/update/notify", { method: "POST" })).json();
-    toast("update_available=" + d.update_available);
-    await resync();
-  } catch (e) { toast(String(e)); }
+  try { const d = await (await fetch("api/update/notify", { method: "POST" })).json(); toast("update_available=" + d.update_available); await resync(); }
+  catch (e) { toast(String(e)); }
 }
-
 function doUpdate() {
   toast("GSV binary rebuilt on disk — restart gsv-server to apply (Update)");
-  // Update instead of reload: keep page state, trigger full resync after restart.
   setOffline(true);
 }
-
 function connectSse() {
   const es = new EventSource("events");
   es.onopen = () => { setOffline(false); resync(); };
@@ -307,7 +194,6 @@ function connectSse() {
   es.addEventListener("update_available", () => { $("updateBadge").style.display = "inline-block"; });
   es.addEventListener("ready", () => resync());
 }
-
 resync();
 connectSse();
 setInterval(() => get("api/health").then(renderHealth).catch(() => setOffline(true)), 30000);

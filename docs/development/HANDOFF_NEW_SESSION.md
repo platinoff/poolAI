@@ -1,9 +1,9 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-08-02 (band 107 **Ratio96 docs canon** PH-S1709…S1718 **✅** · band 108 open PH-S1719…S1728 · Vision rev 457)
+**Оновлено:** 2026-08-05 (band 108 **GSV roles/ratio canon** PH-S1719…S1728 **✅** · band 109 open PH-S1729…S1738 · Vision rev 458)
 
 **Наступна сесія:** **`абракадабра`** — див. **канон воркфлоу в [AGENTS.md](../../AGENTS.md §100–113)**.
-**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`; band 107 ✅ — 0 warnings / 0 errors) → drain наступного band (PH-S1719…S1728; черга — FM §5.12 §5.89) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1729…S1738; черга — FM §5.12) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
 
 --- 
 
@@ -41,6 +41,28 @@
 - Не паралелити `cargo test-ci`.
 - Warnings > 0 або errors > 0 → 1–3 PH-S* **на початок смуги** (Джерело: `rust_diagnostics` / lint code).
 - Fallback-смуга: galaxy metrics stubs, wasm glue, stand smoke, concept wire, loc-audit, docs canon, vision sync, INDEX.
+
+## Band 108 — GSV roles/ratio canon (PH-S1719…S1728, **✅**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1719** | GSV roles canon (`GSV/docs/GSV_ROLES.md` + README pointer) |
+| **PH-S1720** | `gsv-loc-audit` bin (LOC ratio audit → `GSV/data/rust_ratio.json`, `--min-ratio/--advisory`) |
+| **PH-S1721** | Ratio contracts (`tests/gsv_ratio_contracts.rs`, 7) |
+| **PH-S1722** | Ratio box + wire (`boxes/ratio.rs`; `GET /api/ratio`; UI Ratio card) |
+| **PH-S1723** | GSV memory mark (`GSV/docs/MEMORY.md` + docs index) |
+| **PH-S1724** | GSV HANDOFF/NEXT (`GSV/docs/HANDOFF_NEW_SESSION.md` + `NEXT_SESSION_PROMPT.md`) |
+| **PH-S1725** | FM band 108 + roadmap (FM §5.12 §5.89; `GSV_TECH_ROADMAP.md`) |
+| **PH-S1726** | poolAI docs parity (digest · docs/gsv README · vision) |
+| **PH-S1727** | poolAI HANDOFF + NEXT (band 108 ✅ · horizon band 109) |
+| **PH-S1728** | Band close (ratio hold ≥95%; fmt/clippy/test; docs canon; vision-sync rev 458) |
+
+**PH-S1719…S1728 ✅ (2026-08-05):** GSV як poolAI-grade проєкт: ролі/сесія/ratio-канон
+`GSV/docs/GSV_ROLES.md`; `gsv-loc-audit` + `boxes/ratio.rs` (git-tracked audit,
+`normalize_git_root` MSYS `/s/...` → `S:/...`); ratio **95.52%** (gate ≥95% ✅);
+Ratio box + `GET /api/ratio` + UI card; `ui/index.html` компакт (198 LOC);
+`GSV/docs/{README,MEMORY,HANDOFF_NEW_SESSION,NEXT_SESSION_PROMPT}`; FM §5.12 §5.89 ✅;
+poolAI docs parity; vision rev **458**. GSV tests **87** (46 unit + 18 + 8 omni + 7 ratio + 8 update), clippy **0**.
 
 ## Band 104 — Ratio96 admin/ops glue (PH-S1679…S1688, **✅**)
 

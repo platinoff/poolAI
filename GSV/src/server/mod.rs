@@ -64,6 +64,7 @@ pub fn router(state: AppState) -> Router {
         .route("/api/terminal", post(api_terminal))
         .route("/api/hooks/tests", get(api_hooks_tests))
         .route("/api/hooks/bench", get(api_hooks_bench))
+        .route("/api/ratio", get(api_ratio))
         .route("/api/omni", get(api_omni))
         .route(
             "/api/omni/config",
@@ -188,6 +189,10 @@ async fn api_hooks_tests(State(state): State<AppState>) -> Json<Value> {
 
 async fn api_hooks_bench(State(state): State<AppState>) -> Json<Value> {
     Json(json!(hooks::bench_wire(&state.repo_root)))
+}
+
+async fn api_ratio(State(state): State<AppState>) -> Json<Value> {
+    Json(crate::boxes::ratio::wire(&state.data_dir))
 }
 
 // ── OmniRouter box ─────────────────────────────────────────────────────────────

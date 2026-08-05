@@ -2,7 +2,7 @@
 
 **Канон міграції vision у окремий проєкт.** GSV — самостійний Rust-first проєкт у фолдері `GSV/` репо PoolAI. Працює **95–100% на Rust**, **0–5% WebAssembly** (завжди), UI — тонкий JS/DOM glue у `src/ui/` (без Python).
 
-**Версія:** v0.1.0 · **Стан:** band 102 реалізовано (FM §5.12 §5.83 **✅** `PH-S1659…S1668`).
+**Версія:** v0.1.0 · **Стан:** band 102 реалізовано (FM §5.12 §5.83 **✅** `PH-S1659…S1668`) · band 108 (**✅** `PH-S1719…S1728`: roles/ratio/roles canon, `gsv-loc-audit`, Ratio box).
 
 ## Суть
 
@@ -18,6 +18,7 @@
    - **Box preview** — Rust-кольори відповідно до синтаксису.
    - **SLI terminal** — щоб AI міг посилати команди.
    - **Rust tests / benchmarks hook** — запуск без перекомпіляції.
+   - **Ratio** — Rust/LOC ratio аудит (Rust 95–100%), `gsv-loc-audit` → `GSV/data/rust_ratio.json`, live `GET /api/ratio`.
    - **OmniRouter** — Rust AI-проксі/роутер за каталогом «AI providers» (Aug 2026): рекомендований список GPT 5.2 · GPT 5.2 Codex · Claude Opus 4.5 · Claude Sonnet 4.5 · Gemini 3 Pro · MiniMax M2.1 + китайські (DeepSeek V4, Kimi K3, GLM-4.6, Qwen3 Coder) та free-хости (OpenRouter, Groq, Cerebras, NVIDIA, Hugging Face). OpenAI-сумісний proxy (`/api/omni/v1/chat/completions`), каталог моделей з токен-вікнами зі шіта, конфіг `GSV/data/omni.toml` (redacted у UI).
 3. Дотримується правила: **Rust-only** для runtime/API/ML/tools; bins — лише Rust (`src/bin/`), жодного Python/Java.
 
@@ -30,7 +31,8 @@ GSV/
 ├── .cargo/config.toml   ← [build] target-dir="target"
 ├── src/
 │   ├── bin/
-│   │   └── gsv_server.rs    ← exe/bin «Galaxy StarWalker Vision» (CLI --host/--port/--repo-root/--data-dir)
+│   │   ├── gsv_server.rs    ← exe/bin «Galaxy StarWalker Vision» (CLI --host/--port/--repo-root/--data-dir)
+│   │   └── gsv_loc_audit.rs ← Rust/LOC ratio audit bin (→ GSV/data/rust_ratio.json, --min-ratio/--advisory)
 │   ├── lib.rs           ← модулі (app_error, boxes, server, state, tracker, vision)
 │   ├── app_error.rs     ← AppError (Display + From + IntoResponse JSON)
 │   ├── state.rs         ← AppState (tracker, ide_selection, update_flag, events broadcast)
@@ -46,6 +48,7 @@ GSV/
 │       ├── preview.rs   ← Rust syntax highlight + traversal guard
 │       ├── terminal.rs  ← whitelist + injection guard
 │       ├── hooks.rs     ← tests/bench (read-only target/ + rust_diagnostics)
+│       ├── ratio.rs     ← LOC ratio audit + wire (Rust 95–100% band)
 │       └── omni/        ← OmniRouter: catalog.rs (providers/models зі шіта),
 │                          config.rs (omni.toml + env overrides),
 │                          proxy.rs (OpenAI-сумісний chat completions / models)
@@ -53,8 +56,9 @@ GSV/
 ├── tests/
 │   ├── gsv_server_contracts.rs  ← 18 integration tests
 │   ├── gsv_omni_contracts.rs    ← 8 OmniRouter integration tests
+│   ├── gsv_ratio_contracts.rs   ← 7 ratio box integration tests
 │   └── gsv_update_flow.rs       ← 8 update/SSE tests
-└── data/                ← gsv_tracker.json, omni.toml (durable stores, gitignored)
+└── data/                ← gsv_tracker.json, omni.toml, rust_ratio.json (durable stores, gitignored)
 ```
 
 Канонічна документація проєкту — `docs/gsv/` (див. нижче).
@@ -75,8 +79,9 @@ export PATH="/c/Users/${USER}/.cargo/bin:$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$
 export RUSTUP_TOOLCHAIN="stable-x86_64-pc-windows-gnu"
 cd GSV
 cargo build --all-targets
-cargo test          # 76 tests (42 unit + 18 contracts + 8 omni + 8 update-flow)
+cargo test          # 87 tests (46 unit + 18 contracts + 8 omni + 7 ratio + 8 update-flow)
 cargo clippy --all-targets   # 0 warnings/errors
+cargo run --bin gsv-loc-audit   # Rust/LOC ratio → GSV/data/rust_ratio.json (≥95%)
 cargo run --bin gsv-server -- --port 8890   # live smoke
 ```
 
@@ -86,7 +91,7 @@ cargo run --bin gsv-server -- --port 8890   # live smoke
 cargo run --bin gsv-server -- --host 127.0.0.1 --port 8765 --repo-root S:/rust/poolAI --data-dir GSV/data
 ```
 
-Endpoints: `GET /` (UI), `/api/health`, `/api/tracker`, `/api/sli`, `/api/toolchain`, `/api/ide/sessions`, `POST /api/ide/select`, `/api/update`, `POST /api/update/notify`, `/api/preview?file=…`, `POST /api/terminal`, `/api/hooks/tests`, `/api/hooks/bench`, `/api/omni`, `/api/omni/config` (GET/POST), `/api/omni/v1/models`, `POST /api/omni/v1/chat/completions`, `POST /api/omni/test`, `GET /events` (SSE).
+Endpoints: `GET /` (UI), `/api/health`, `/api/tracker`, `/api/sli`, `/api/toolchain`, `/api/ide/sessions`, `POST /api/ide/select`, `/api/update`, `POST /api/update/notify`, `/api/preview?file=…`, `POST /api/terminal`, `/api/hooks/tests`, `/api/hooks/bench`, `/api/ratio`, `/api/omni`, `/api/omni/config` (GET/POST), `/api/omni/v1/models`, `POST /api/omni/v1/chat/completions`, `POST /api/omni/test`, `GET /events` (SSE).
 
 ## Docs (канон)
 
@@ -98,6 +103,7 @@ Endpoints: `GET /` (UI), `/api/health`, `/api/tracker`, `/api/sli`, `/api/toolch
 | [`docs/gsv/GSV_BOXES.md`](../docs/gsv/GSV_BOXES.md) | Специфікація боксів (Tracker, SLI console, Toolchain, IDE, Update, Preview, SLI terminal, Tests/bench hooks) |
 | [`docs/gsv/GSV_MIGRATION.md`](../docs/gsv/GSV_MIGRATION.md) | Що мігруємо з `docs/vision/` / `src/` у GSV і як |
 | [`docs/gsv/GSV_TECH_ROADMAP.md`](../docs/gsv/GSV_TECH_ROADMAP.md) | **TechPreroadMap** — логічний порядок → future sprints |
+| [`docs/GSV_ROLES.md`](docs/GSV_ROLES.md) | Ролі GSV VDT (Власник/Оркестратор/Субагенти), канон сесії, ratio gate |
 
 ## Статус
 
@@ -107,5 +113,8 @@ Endpoints: `GET /` (UI), `/api/health`, `/api/tracker`, `/api/sli`, `/api/toolch
 | Реєстрація sprints (FM §5.12 band 102 `PH-S1659…S1668`) | **✅** |
 | gsv-server bin (Cargo/`gsv_server.rs`) | **✅** |
 | Бокси (Tracker, SLI console, Toolchain, IDE, Update, Preview, SLI terminal, Tests/bench) | **✅** |
-| Тести (52: unit + contracts + update-flow) | **✅** |
+| OmniRouter (Rust AI-проксі/роутер, catalog/config/proxy) | **✅** |
+| Roles + ratio canon (`docs/GSV_ROLES.md`, band 108) | **✅** |
+| `gsv-loc-audit` + Ratio box + `GET /api/ratio` (Rust ≥95%) | **✅** |
+| Тести (87: 46 unit + contracts + omni + ratio + update-flow) | **✅** |
 | Vision docs sync / migration | **⏳ future** |
