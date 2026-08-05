@@ -38,6 +38,9 @@ axum = { version = "0.8", features = ["ws"] }
 futures-util = "0.3"
 tokio-stream = { version = "0.1", features = ["sync"] }
 
+# HTTP client for the OmniRouter proxy (default-tls = native-tls → schannel on Windows)
+reqwest = { version = "0.12", features = ["json", "stream"] }
+
 # Logging and tracing
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }

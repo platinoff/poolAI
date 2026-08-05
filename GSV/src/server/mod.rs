@@ -3,10 +3,11 @@
 use std::convert::Infallible;
 use std::time::Duration;
 
+use axum::body::Bytes;
 use axum::extract::{Query, State};
-use axum::http::StatusCode;
+use axum::http::{HeaderMap, StatusCode};
 use axum::response::sse::{Event, KeepAlive, Sse};
-use axum::response::Html;
+use axum::response::{Html, IntoResponse, Response};
 use axum::routing::{get, post};
 use axum::{Json, Router};
 use futures_util::StreamExt;
@@ -63,6 +64,14 @@ pub fn router(state: AppState) -> Router {
         .route("/api/terminal", post(api_terminal))
         .route("/api/hooks/tests", get(api_hooks_tests))
         .route("/api/hooks/bench", get(api_hooks_bench))
+        .route("/api/omni", get(api_omni))
+        .route(
+            "/api/omni/config",
+            get(api_omni_config).post(api_omni_config_post),
+        )
+        .route("/api/omni/v1/models", get(api_omni_v1_models))
+        .route("/api/omni/v1/chat/completions", post(api_omni_chat))
+        .route("/api/omni/test", post(api_omni_test))
         .route("/events", get(events))
         .with_state(state)
 }
@@ -179,6 +188,75 @@ async fn api_hooks_tests(State(state): State<AppState>) -> Json<Value> {
 
 async fn api_hooks_bench(State(state): State<AppState>) -> Json<Value> {
     Json(json!(hooks::bench_wire(&state.repo_root)))
+}
+
+// ── OmniRouter box ─────────────────────────────────────────────────────────────
+
+async fn api_omni(State(state): State<AppState>) -> Json<Value> {
+    Json(json!(crate::boxes::omni::wire(&state.omni).await))
+}
+
+async fn api_omni_config(State(state): State<AppState>) -> Json<Value> {
+    Json(state.omni.config.read().await.redacted())
+}
+
+async fn api_omni_config_post(
+    State(state): State<AppState>,
+    Json(patch): Json<Value>,
+) -> Json<Value> {
+    let applied = {
+        let mut cfg = state.omni.config.write().await;
+        cfg.apply(&patch)
+    };
+    match applied {
+        Ok(()) => {
+            state.omni.persist();
+            state.emit("event: omni_config\ndata: changed".to_string());
+            Json(json!({
+                "ok": true,
+                "config": state.omni.config.read().await.redacted(),
+            }))
+        }
+        Err(msg) => Json(json!({
+            "ok": false,
+            "error": msg,
+        })),
+    }
+}
+
+async fn api_omni_v1_models(State(state): State<AppState>) -> Response {
+    crate::boxes::omni::proxy::v1_models(&state.omni)
+        .await
+        .unwrap_or_else(api_error_response)
+}
+
+async fn api_omni_chat(State(state): State<AppState>, headers: HeaderMap, body: Bytes) -> Response {
+    crate::boxes::omni::proxy::chat_completions(&state.omni, &headers, &body)
+        .await
+        .unwrap_or_else(api_error_response)
+}
+
+async fn api_omni_test(State(state): State<AppState>, Json(body): Json<Value>) -> Json<Value> {
+    let provider = body
+        .get("provider")
+        .and_then(Value::as_str)
+        .unwrap_or_default();
+    if provider.is_empty() {
+        return Json(json!({ "ok": false, "error": "provider required" }));
+    }
+    match crate::boxes::omni::proxy::test_provider(&state.omni, provider).await {
+        Ok(res) => Json(json!({ "ok": true, "result": res })),
+        Err(e) => Json(json!({ "ok": false, "error": e.message() })),
+    }
+}
+
+/// Convert an `AppError` into a 400 JSON response (route/config errors).
+fn api_error_response(err: crate::AppError) -> Response {
+    (
+        StatusCode::BAD_REQUEST,
+        Json(json!({ "error": { "code": "OMNI_ERROR", "message": err.message() } })),
+    )
+        .into_response()
 }
 
 /// Server-Sent Events stream: broadcasts state events + periodic keepalive.

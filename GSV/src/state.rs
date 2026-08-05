@@ -14,6 +14,7 @@ use std::time::SystemTime;
 
 use tokio::sync::{broadcast, RwLock};
 
+use crate::boxes::omni::OmniRouter;
 use crate::tracker::TrackerStore;
 
 /// Shared application state for the GSV server.
@@ -29,6 +30,8 @@ pub struct AppState {
     pub started_at: SystemTime,
     /// Tracker box durable store.
     pub tracker: Arc<RwLock<TrackerStore>>,
+    /// OmniRouter box (provider/model catalog, config, OpenAI-compatible proxy).
+    pub omni: Arc<OmniRouter>,
     /// Currently selected IDE session (in-memory selection).
     pub ide_selection: Arc<RwLock<Option<crate::boxes::ide::IdeSelection>>>,
     /// `true` once an update notification has been received.
@@ -56,12 +59,14 @@ impl AppState {
         });
         let data = data_dir.unwrap_or_else(|| root.join("GSV").join("data"));
         let tracker = TrackerStore::load(&root, &data).unwrap_or_default();
+        let omni = OmniRouter::new(&data);
         Self {
             repo_root: Arc::new(root),
             data_dir: Arc::new(data),
             version: Arc::from(crate::gsv_version()),
             started_at: SystemTime::now(),
             tracker: Arc::new(RwLock::new(tracker)),
+            omni: Arc::new(omni),
             ide_selection: Arc::new(RwLock::new(None)),
             update_flag: Arc::new(AtomicBool::new(false)),
             events,

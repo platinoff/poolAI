@@ -88,6 +88,32 @@ Rust модуль: `ide/` (read-only).
 - `GET /api/hooks/bench` → Criterion medians (read `target/criterion/`).
 - Дані не перебудовують проєкт — лише зчитують наявні артефакти.
 
+## 9. OmniRouter (Rust AI-проксі/роутер)
+
+**Роль:** Rust-роутер по AI-провайдерах із шіта «AI providers by opencode» (Aug 2026) — рекомендований список (GPT 5.2, GPT 5.1 Codex, Claude Opus 4.5, Claude Sonnet 4.5, MiniMax M2.1, Gemini 3 Pro) + китайські (DeepSeek V4-Pro/Flash, Kimi K3/K2.7 Code, GLM-4.6, Qwen3 Coder 480B) + free/швидкі хости (OpenRouter `:free`, Groq, Cerebras, NVIDIA, Hugging Face, GitHub Copilot Free).
+
+**Дані:**
+
+| Поле | Джерело |
+|------|---------|
+| Каталог провайдерів | `catalog.rs` (17 providers) |
+| Каталог моделей (ctx / max output) | шіт «AI providers», `catalog.rs` (25 models) |
+| Конфіг / тюнінг | `GSV/data/omni.toml` + env `OMNI_<PROVIDER>_API_KEY` / `_BASE_URL` |
+| Рекомендований список | шіт (6 моделей) |
+
+**Endpoints:**
+
+- `GET /api/omni` — overview wire (providers, models, recommended, routing).
+- `GET /api/omni/config` — конфіг **redacted** (лише `key_set`, без ключів).
+- `POST /api/omni/config` — тюнінг (base_url / api_key / enabled / priority / routing).
+- `GET /api/omni/v1/models` — OpenAI-сумісний список моделей.
+- `POST /api/omni/v1/chat/completions` — OpenAI-сумісний proxy (SSE passthrough для `stream:true`; dry-run через `X-Omni-Dry-Run: 1`).
+- `POST /api/omni/test {provider}` — connectivity check (`GET {base}/models`).
+
+**Роутинг** (`proxy.rs::select_provider`): `X-Omni-Provider` header / `provider` у тілі → власник моделі з каталогу → `routing.default_provider` → `routing.fallback_order` → найвищий пріоритет серед enabled провайдерів з base_url. `base_url` може вказувати на OmniRoute (`http://127.0.0.1:20128/v1`) — тоді Rust-роутер проксірує запити через OmniRoute.
+
+Rust модуль: `omni/` (catalog.rs, config.rs, proxy.rs) → `GSV/data/omni.toml`.
+
 ## Зведена таблиця
 
 | Box | Rust module | Endpoint | Джерело даних |
@@ -100,3 +126,4 @@ Rust модуль: `ide/` (read-only).
 | Box preview | `preview/` | `/api/preview` | файли |
 | SLI terminal | `terminal/` | `/api/terminal` | SLI-каталог |
 | Tests/bench hooks | `hooks/` | `/api/hooks/…` | `target/` артефакти |
+| OmniRouter | `omni/` | `/api/omni/…` | шіт «AI providers», `omni.toml`, proxy |

@@ -22,6 +22,14 @@
 | GET | `/api/update` | статус оновлення (Update box) |
 | GET | `/api/preview` | превʼю з Rust-синтаксис-кольорами |
 | POST | `/api/terminal` | SLI terminal — виконати команду (AI) |
+| GET | `/api/hooks/tests` | результати тестів (read-only, без build) |
+| GET | `/api/hooks/bench` | Criterion medians (read-only) |
+| GET | `/api/omni` | OmniRouter overview (providers, models, recommended, routing) |
+| GET | `/api/omni/config` | OmniRouter конфіг (redacted: лише `key_set`) |
+| POST | `/api/omni/config` | тюнінг провайдерів (base_url/api_key/enabled/priority/routing) |
+| GET | `/api/omni/v1/models` | OpenAI-сумісний список моделей |
+| POST | `/api/omni/v1/chat/completions` | OpenAI-сумісний proxy (dry-run через `X-Omni-Dry-Run: 1`) |
+| POST | `/api/omni/test` | connectivity check провайдера (`GET {base}/models`) |
 | GET | `/api/health` | health-чек |
 | GET | `/events` | SSE: update · offline/online · metrics resync |
 
@@ -54,6 +62,7 @@
 ## Тести (Rust)
 
 - `tests/gsv_server_contracts.rs` — API-контракти (HTTP/4xx/JSON), Rust-інтеграційні тести.
+- `tests/gsv_omni_contracts.rs` — контракти OmniRouter (catalog, redacted config, dry-run proxy, v1/models).
 - `tests/gsv_update_flow.rs` — сценарій update/offline/resync (state machine + SSE).
 - Playwright — лише для браузерного UI (DOM), не для API-дублювання.
 

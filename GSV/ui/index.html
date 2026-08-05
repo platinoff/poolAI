@@ -71,6 +71,19 @@ pre.out { background:var(--panel2); border:1px solid var(--line); border-radius:
   </section>
   <section class="card"><h2>Tests hooks <span class="hint">/api/hooks/tests</span></h2><div class="body" id="b-hooks-t">…</div></section>
   <section class="card"><h2>Bench hooks <span class="hint">/api/hooks/bench</span></h2><div class="body" id="b-hooks-b">…</div></section>
+  <section class="card"><h2>OmniRouter <span class="hint">/api/omni</span></h2>
+    <div class="body">
+      <div class="dim" id="b-omni-summary">…</div>
+      <div style="margin-top:6px">recommended: <span id="b-omni-rec">…</span></div>
+      <details style="margin-top:6px"><summary>Providers</summary><div id="b-omni-prov"></div></details>
+      <details style="margin-top:6px"><summary>Models</summary><div id="b-omni-models"></div></details>
+      <div style="margin-top:8px">
+        <input id="omniTestProvider" type="text" value="openai" placeholder="provider id" style="width:140px">
+        <button onclick="testOmniProvider()">Test</button>
+        <span id="b-omni-test" class="dim"></span>
+      </div>
+    </div>
+  </section>
 </main>
 <div id="toast"></div>
 
@@ -180,6 +193,43 @@ function renderHooksBench(d) {
     "<div style='margin-top:6px' class='dim'>" + (d.criterion_dirs || []).join(" · ") + "</div>";
 }
 
+function renderOmni(d) {
+  const rec = (d.recommended || []).map(m => "<kbd>" + esc(m.id) + "</kbd>").join(" ") || "—";
+  $("b-omni-summary").innerHTML =
+    "providers " + (d.providers || []).length + " · models " + (d.models || []).length +
+    " · default <kbd>" + esc(d.routing.default_provider) + "</kbd>";
+  $("b-omni-rec").innerHTML = rec;
+  const provRows = (d.providers || []).map(p =>
+    "<tr><td><kbd>" + esc(p.id) + "</kbd></td><td>" + esc(p.name) + "</td><td>" +
+    (p.enabled ? "<span class='ok'>on</span>" : "<span class='err'>off</span>") + "</td><td>" +
+    (p.key_set ? "<span class='ok'>key</span>" : "<span class='dim'>no key</span>") + "</td><td class='dim'>" + esc(p.base_url) + "</td></tr>"
+  ).join("") || "<tr><td colspan='5' class='dim'>empty</td></tr>";
+  $("b-omni-prov").innerHTML =
+    "<table><tr><th>id</th><th>name</th><th>state</th><th>key</th><th>base_url</th></tr>" + provRows + "</table>";
+  const modelRows = (d.models || []).map(m =>
+    "<tr><td><kbd>" + esc(m.id) + "</kbd></td><td>" + esc(m.provider) + "</td><td>" +
+    (m.context_window ? m.context_window.toLocaleString() : "varies") + "</td><td>" +
+    (m.max_output ? m.max_output.toLocaleString() : "varies") + "</td><td>" +
+    (m.free ? "free" : "") + "</td><td>" + (m.recommended ? "<span class='ok'>★</span>" : "") + "</td></tr>"
+  ).join("") || "<tr><td colspan='6' class='dim'>empty</td></tr>";
+  $("b-omni-models").innerHTML =
+    "<table><tr><th>id</th><th>provider</th><th>ctx</th><th>out</th><th></th><th></th></tr>" + modelRows + "</table>";
+}
+
+async function testOmniProvider() {
+  try {
+    const res = await fetch("api/omni/test", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ provider: $("omniTestProvider").value }),
+    });
+    const d = await res.json();
+    $("b-omni-test").textContent = d.ok ? JSON.stringify(d.result) : "error: " + d.error;
+  } catch (e) {
+    $("b-omni-test").textContent = String(e);
+  }
+}
+
 async function resync() {
   const urls = [
     ["api/health", renderHealth],
@@ -190,6 +240,7 @@ async function resync() {
     ["api/update", renderUpdate],
     ["api/hooks/tests", renderHooksTests],
     ["api/hooks/bench", renderHooksBench],
+    ["api/omni", renderOmni],
   ];
   const results = await Promise.allSettled(urls.map(([u, f]) => get(u).then(f)));
   const failed = results.filter(r => r.status === "rejected").length;

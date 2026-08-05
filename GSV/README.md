@@ -18,6 +18,7 @@
    - **Box preview** — Rust-кольори відповідно до синтаксису.
    - **SLI terminal** — щоб AI міг посилати команди.
    - **Rust tests / benchmarks hook** — запуск без перекомпіляції.
+   - **OmniRouter** — Rust AI-проксі/роутер за каталогом «AI providers» (Aug 2026): рекомендований список GPT 5.2 · GPT 5.2 Codex · Claude Opus 4.5 · Claude Sonnet 4.5 · Gemini 3 Pro · MiniMax M2.1 + китайські (DeepSeek V4, Kimi K3, GLM-4.6, Qwen3 Coder) та free-хости (OpenRouter, Groq, Cerebras, NVIDIA, Hugging Face). OpenAI-сумісний proxy (`/api/omni/v1/chat/completions`), каталог моделей з токен-вікнами зі шіта, конфіг `GSV/data/omni.toml` (redacted у UI).
 3. Дотримується правила: **Rust-only** для runtime/API/ML/tools; bins — лише Rust (`src/bin/`), жодного Python/Java.
 
 ## Структура
@@ -44,12 +45,16 @@ GSV/
 │       ├── update.rs    ← pending rebuild detection
 │       ├── preview.rs   ← Rust syntax highlight + traversal guard
 │       ├── terminal.rs  ← whitelist + injection guard
-│       └── hooks.rs     ← tests/bench (read-only target/ + rust_diagnostics)
+│       ├── hooks.rs     ← tests/bench (read-only target/ + rust_diagnostics)
+│       └── omni/        ← OmniRouter: catalog.rs (providers/models зі шіта),
+│                          config.rs (omni.toml + env overrides),
+│                          proxy.rs (OpenAI-сумісний chat completions / models)
 ├── ui/index.html        ← single-page UI (SSE, offline/update/resync)
 ├── tests/
 │   ├── gsv_server_contracts.rs  ← 18 integration tests
+│   ├── gsv_omni_contracts.rs    ← 8 OmniRouter integration tests
 │   └── gsv_update_flow.rs       ← 8 update/SSE tests
-└── data/                ← gsv_tracker.json (durable store, gitignored)
+└── data/                ← gsv_tracker.json, omni.toml (durable stores, gitignored)
 ```
 
 Канонічна документація проєкту — `docs/gsv/` (див. нижче).
@@ -70,7 +75,7 @@ export PATH="/c/Users/${USER}/.cargo/bin:$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$
 export RUSTUP_TOOLCHAIN="stable-x86_64-pc-windows-gnu"
 cd GSV
 cargo build --all-targets
-cargo test          # 52 tests (26 unit + 18 contracts + 8 update-flow)
+cargo test          # 76 tests (42 unit + 18 contracts + 8 omni + 8 update-flow)
 cargo clippy --all-targets   # 0 warnings/errors
 cargo run --bin gsv-server -- --port 8890   # live smoke
 ```
@@ -81,7 +86,7 @@ cargo run --bin gsv-server -- --port 8890   # live smoke
 cargo run --bin gsv-server -- --host 127.0.0.1 --port 8765 --repo-root S:/rust/poolAI --data-dir GSV/data
 ```
 
-Endpoints: `GET /` (UI), `/api/health`, `/api/tracker`, `/api/sli`, `/api/toolchain`, `/api/ide/sessions`, `POST /api/ide/select`, `/api/update`, `POST /api/update/notify`, `/api/preview?file=…`, `POST /api/terminal`, `/api/hooks/tests`, `/api/hooks/bench`, `GET /events` (SSE).
+Endpoints: `GET /` (UI), `/api/health`, `/api/tracker`, `/api/sli`, `/api/toolchain`, `/api/ide/sessions`, `POST /api/ide/select`, `/api/update`, `POST /api/update/notify`, `/api/preview?file=…`, `POST /api/terminal`, `/api/hooks/tests`, `/api/hooks/bench`, `/api/omni`, `/api/omni/config` (GET/POST), `/api/omni/v1/models`, `POST /api/omni/v1/chat/completions`, `POST /api/omni/test`, `GET /events` (SSE).
 
 ## Docs (канон)
 

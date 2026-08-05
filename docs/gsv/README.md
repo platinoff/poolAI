@@ -31,5 +31,6 @@
 
 ## Статус
 
+- **2026-08-05:** **OmniRouter box** (`GSV/src/boxes/omni/`) — Rust AI-проксі/роутер за шітом «AI providers by opencode» (Aug 2026): 17 провайдерів + 25 моделей (рекомендований список GPT 5.2 · GPT 5.2 Codex · Claude Opus 4.5 · Claude Sonnet 4.5 · Gemini 3 Pro · MiniMax M2.1), OpenAI-сумісний proxy + redacted конфіг `omni.toml`; 76 tests green (42 unit + 18 contracts + 8 omni + 8 update-flow), clippy 0.
 - **2026-08-02:** band 102 **реалізовано** (`PH-S1659…S1668` ✅ у FM §5.12 §5.83): `GSV/` окремий Rust-проєкт (gsv-server + бокси + single-page UI), **52 tests green**, clippy 0, live-smoke ок, timestamps RFC3339. Міграція docs/vision → GSV — ⏳ future.
 - **2026-08-01:** архітектура + docs створено; GSV зареєстровано як band 102 (`PH-S1659…S1668`) у FM §5.12. Реалізація — future.
