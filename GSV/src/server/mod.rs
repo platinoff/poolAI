@@ -72,6 +72,8 @@ pub fn router(state: AppState) -> Router {
         .route("/api/vision/manifest", get(api_vision_manifest))
         .route("/api/vision/map", get(api_vision_map))
         .route("/api/vision/feed", get(api_vision_feed))
+        .route("/api/vision/sprint-map", get(api_vision_sprint_map))
+        .route("/api/vision/doc-preview", get(api_vision_doc_preview))
         .route("/api/omni", get(api_omni))
         .route(
             "/api/omni/config",
@@ -249,6 +251,30 @@ async fn api_vision_feed(
         &state.repo_root,
         &state.data_dir,
         params.status.as_deref(),
+    ))
+}
+
+async fn api_vision_sprint_map(State(state): State<AppState>) -> Json<Value> {
+    Json(crate::boxes::vision::wire_sprint_map(
+        &state.repo_root,
+        &state.data_dir,
+    ))
+}
+
+#[derive(serde::Deserialize)]
+struct VisionDocPreviewParams {
+    id: Option<String>,
+}
+
+async fn api_vision_doc_preview(
+    State(state): State<AppState>,
+    Query(params): Query<VisionDocPreviewParams>,
+) -> Json<Value> {
+    let id = params.id.unwrap_or_default();
+    Json(crate::boxes::vision::wire_doc_preview(
+        &state.repo_root,
+        &state.data_dir,
+        &id,
     ))
 }
 

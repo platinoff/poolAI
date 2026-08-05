@@ -59,6 +59,8 @@ pre.out{background:var(--panel2);border:1px solid var(--line);border-radius:6px;
   <section class="card"><h2>Ratio <span class="hint">/api/ratio</span></h2><div class="body" id="b-ratio">…</div></section>
   <section class="card"><h2>Vision <span class="hint">/api/vision</span></h2><div class="body" id="b-vision">…</div></section>
   <section class="card"><h2>Vision Map <span class="hint">/api/vision/map · /assets/vision.svg</span></h2><div class="body" id="b-vision-map">…</div></section>
+  <section class="card"><h2>Sprint Map <span class="hint">/api/vision/sprint-map</span></h2><div class="body" id="b-sprint-map">…</div></section>
+  <section class="card"><h2>Doc Preview <span class="hint">/api/vision/doc-preview?id=</span></h2><div class="body"><input id="dpId" type="text" value="galaxy_grid" placeholder="node id"><br><br><button onclick="loadDocPreview()">Show</button><div id="b-doc-preview" style="margin-top:8px">…</div></div></section>
   <section class="card"><h2>OmniRouter <span class="hint">/api/omni</span></h2><div class="body">
     <div class="dim" id="b-omni-summary">…</div>
     <div style="margin-top:6px">recommended: <span id="b-omni-rec">…</span></div>
@@ -145,6 +147,31 @@ function renderVision(d) {
     tab(["id", "status", "title"], (d.feed_items || []).map(i =>
       ["<kbd>" + esc(i.id) + "</kbd>", "<span class='" + (i.status === "closed" ? "ok" : "warn") + "'>" + esc(i.status) + "</span>", esc(i.title)]));
 }
+function renderSprintMap(d) {
+  if (!d.ok) { $("b-sprint-map").innerHTML = "<span class='err'>" + esc(d.error || "sprint map unavailable") + "</span>"; return; }
+  $("b-sprint-map").innerHTML = "<div class='dim'>rev <kbd>" + d.revision + "</kbd> · nodes " + d.nodes_count +
+    " · next <kbd>" + esc(d.next_sprint) + "</kbd> · last closed <kbd>" + esc(d.last_sprint_closed) + "</kbd></div>" +
+    tab(["module", "layer", "targets"], (d.modules || []).map(m =>
+      ["<kbd>" + esc(m.id) + "</kbd>", esc(m.layer), "<span class='ok'>" + m.targets + "</span>"])) +
+    "<div class='dim' style='margin-top:6px'>kinds: " +
+    (d.kinds || []).map(e => "<kbd>" + esc(e.kind) + "</kbd>×" + e.count).join(" ") + "</div>" +
+    "<details style='margin-top:6px'><summary>links (" + (d.links || []).length + ")</summary>" +
+    tab(["kind", "from", "→", "to"], (d.links || []).map(l =>
+      ["<kbd>" + esc(l.kind) + "</kbd>", esc(l.from.id), "→", esc(l.to.id)])) + "</details>";
+}
+function renderDocPreview(d) {
+  if (!d.ok) { $("b-doc-preview").innerHTML = "<span class='err'>" + esc(d.error || "doc preview unavailable") + "</span>"; return; }
+  const n = d.node || {};
+  $("b-doc-preview").innerHTML = "<div><kbd>" + esc(n.id) + "</kbd> · <span class='dim'>" + esc(n.layer) +
+    "</span></div><div class='dim'>" + esc(n.label) + "</div><div class='dim'>" + esc(n.path) + "</div>" +
+    (n.sections && n.sections.length ? "<div style='margin-top:4px'>sections: " + n.sections.map(s => "<kbd>" + esc(s) + "</kbd>").join(" ") + "</div>" : "") +
+    "<div style='margin-top:6px' class='dim'>links out " + d.links_out.length + " · links in " + d.links_in.length + "</div>" +
+    "<details style='margin-top:6px'><summary>out</summary>" +
+    tab(["kind", "target"], (d.links_out || []).map(l => ["<kbd>" + esc(l.kind) + "</kbd>", "<kbd>" + esc(l.node.id) + "</kbd>" + " <span class='dim'>" + esc(l.node.label) + "</span>"])) +
+    "</details><details style='margin-top:6px'><summary>in</summary>" +
+    tab(["kind", "target"], (d.links_in || []).map(l => ["<kbd>" + esc(l.kind) + "</kbd>", "<kbd>" + esc(l.node.id) + "</kbd>" + " <span class='dim'>" + esc(l.node.label) + "</span>"])) +
+    "</details>";
+}
 function renderVisionMap(d) {
   if (!d.ok) { $("b-vision-map").innerHTML = "<span class='err'>" + esc(d.error || "vision map unavailable") + "</span>"; return; }
   const svg = "<a href='assets/vision.svg' target='_blank' style='font-size:12px'>open vision.svg ↗</a>";
@@ -176,12 +203,19 @@ async function testOmniProvider() {
     $("b-omni-test").textContent = d.ok ? JSON.stringify(d.result) : "error: " + d.error;
   } catch (e) { $("b-omni-test").textContent = String(e); }
 }
+async function loadDocPreview() {
+  try {
+    const d = await get("api/vision/doc-preview?id=" + encodeURIComponent($("dpId").value));
+    renderDocPreview(d);
+  } catch (e) { $("b-doc-preview").innerHTML = "<span class='err'>" + esc(e.message) + "</span>"; }
+}
 async function resync() {
   const urls = [
     ["api/health", renderHealth], ["api/tracker", renderTracker], ["api/sli", renderSli],
     ["api/toolchain", renderToolchain], ["api/ide/sessions", renderIde], ["api/update", renderUpdate],
     ["api/hooks/tests", renderHooksTests], ["api/hooks/bench", renderHooksBench], ["api/ratio", renderRatio],
     ["api/vision", renderVision], ["api/vision/map", renderVisionMap],
+    ["api/vision/sprint-map", renderSprintMap],
     ["api/omni", renderOmni],
   ];
   const results = await Promise.allSettled(urls.map(([u, f]) => get(u).then(f)));

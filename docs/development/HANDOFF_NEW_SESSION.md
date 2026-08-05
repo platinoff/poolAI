@@ -1,9 +1,9 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-08-05 (band 110 **GSV vision map UI** PH-S1739…S1748 **✅** · band 111 open PH-S1749…S1758 · Vision rev 461)
+**Оновлено:** 2026-08-05 (band 111 **GSV sprint-map + doc-preview** PH-S1749…S1758 **✅** · band 112 open PH-S1759…S1768 · Vision rev 461)
 
 **Наступна сесія:** **`абракадабра`** — див. **канон воркфлоу в [AGENTS.md](../../AGENTS.md §100–113)**.
-**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1749…S1758; черга — FM §5.12) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1759…S1768; черга — FM §5.12) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
 
 --- 
 
@@ -64,6 +64,28 @@ sprint-scope/wire/workspace); `GSV/ui/vision.svg` порт + `GET /assets/vision
 `GET /api/vision/feed?status=`; contracts **106** (55 unit + 18 omni + 8 server + 8 update + 7 ratio +
 10 vision), clippy **0**, fmt clean. Ratio: GSV **96.01%** (rust 5411 / product 5636, gate ≥95% ✅) +
 poolAI **95.02%** advisory hold. Vision rev **461**.
+
+## Band 111 — GSV sprint-map + doc-preview (PH-S1749…S1758, **✅**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1749** | Sprint-map wire (`sprint_map_report`/`wire_sprint_map`; `GET /api/vision/sprint-map` — sprint-scope/queue/session-tracks links + modules + kinds) |
+| **PH-S1750** | Doc-preview wire (`doc_preview`/`wire_doc_preview`; `GET /api/vision/doc-preview?id=` — node + 1-hop neighbors) |
+| **PH-S1751** | Sprint-map contracts (`tests/gsv_vision_contracts.rs`, **12**) |
+| **PH-S1752** | Doc-preview contracts (`tests/gsv_vision_contracts.rs`, **14**) |
+| **PH-S1753** | Sprint Map UI card (`ui/index.html`: modules/kinds/links) |
+| **PH-S1754** | Doc Preview UI card (`ui/index.html`: node id input + out/in links + sections) |
+| **PH-S1755** | GSV vision docs canon (`VISION.md`; MEMORY band 111; HANDOFF/NEXT band 111) |
+| **PH-S1756** | poolAI vision parity (`GSV_MIGRATION.md` row 21 ✅; `docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 111) |
+| **PH-S1757** | Ratio hold advisory (`gsv-loc-audit --min-ratio 0.95 --advisory` **95.77%** ✅ + poolAI ratio96 advisory hold 95.02%) |
+| **PH-S1758** | Band close (ratio hold ≥95%; fmt/clippy/test; docs canon; vision-sync; push) |
+
+**PH-S1749…S1758 ✅ (2026-08-05):** Sprint map + doc-preview: `GET /api/vision/sprint-map`
+(sprint-map live: rev 462, 266 links = 251 session-tracks + 13 sprint-scope + 2 queue, 8 modules,
+3 kinds) та `GET /api/vision/doc-preview?id=` (galaxy_grid: 101 out / 3 in; missing node →
+`ok:false` + error); Sprint Map + Doc Preview UI cards; contracts **113** (58 unit + 18 omni +
+8 server + 8 update + 7 ratio + 14 vision), clippy **0**, fmt clean. Ratio: GSV **95.77%**
+(rust 5862 / product 6121, gate ≥95% ✅) + poolAI **95.02%** advisory hold. Vision rev **462**.
 
 ## Band 109 — GSV vision sync/migration (PH-S1729…S1738, **✅**)
 

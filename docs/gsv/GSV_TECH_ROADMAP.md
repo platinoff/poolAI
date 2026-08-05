@@ -3,9 +3,10 @@
 **TechPreroadMap**: логічний порядок реалізації проєкту GSV → future sprints.
 
 Дата: 2026-08-05 · **Стан:** band 102 **реалізовано** + band 108 (roles/ratio canon) **✅** +
-band 109 (Vision sync/migration) **✅** + band 110 (Vision map UI) **✅** ·
+band 109 (Vision sync/migration) **✅** + band 110 (Vision map UI) **✅** + band 111 (Sprint map + doc-preview) **✅** ·
 **Спринти:** `PH-S1659…S1668` (FM §5.12 §5.83 ✅) · `PH-S1719…S1728` (FM §5.12 §5.89 ✅) ·
-`PH-S1729…S1738` (FM §5.12 §5.90 ✅) · `PH-S1739…S1748` (FM §5.12 §5.91 ✅).
+`PH-S1729…S1738` (FM §5.12 §5.90 ✅) · `PH-S1739…S1748` (FM §5.12 §5.91 ✅) ·
+`PH-S1749…S1758` (FM §5.12 §5.92 ✅).
 
 ## Логічний порядок (залежності)
 
@@ -85,6 +86,21 @@ docs/architecture (✅ ця сесія)
 | **PH-S1746** | Ratio hold advisory | `gsv-loc-audit --min-ratio 0.95 --advisory` |
 | **PH-S1747** | vision-sync close | `gsv-vision-sync` refresh + poolAI vision rev **461** |
 | **PH-S1748** | Band close | ratio hold (≥95%); fmt/clippy/test; docs canon; push |
+
+## Спринти (band 111) — Sprint map + doc-preview (Vision UI логіка)
+
+| Sprint | Фокус | Acceptance (ключ) |
+|--------|-------|-------------------|
+| **PH-S1749** | Sprint-map wire | `sprint_map_report`/`wire_sprint_map`; `GET /api/vision/sprint-map` (sprint-scope/queue/session-tracks links + modules + kinds) |
+| **PH-S1750** | Doc-preview wire | `doc_preview`/`wire_doc_preview`; `GET /api/vision/doc-preview?id=` (node + 1-hop neighbors) |
+| **PH-S1751** | Sprint-map contracts | `tests/gsv_vision_contracts.rs` (12) |
+| **PH-S1752** | Doc-preview contracts | `tests/gsv_vision_contracts.rs` (**14**) |
+| **PH-S1753** | Sprint Map UI card | modules/kinds/links у `ui/index.html` |
+| **PH-S1754** | Doc Preview UI card | node id input + out/in links + sections у `ui/index.html` |
+| **PH-S1755** | GSV vision docs | `VISION.md` sprint-map/doc-preview; MEMORY band 111; HANDOFF/NEXT band 111 |
+| **PH-S1756** | poolAI vision parity | `GSV_MIGRATION.md` row 21 ✅; `docs/vision/README.md`; roadmap band 111 |
+| **PH-S1757** | Ratio hold advisory | `gsv-loc-audit --min-ratio 0.95 --advisory`; poolAI parity hold |
+| **PH-S1758** | Band close | ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync; push |
 
 ## Ключові UX-вимоги (узагальнення ТЗ)
 

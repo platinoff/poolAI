@@ -265,7 +265,7 @@ FM-xxx (з таблиці нижче)
 
 **VDT:** §5.12 = **журнал PH-S*** (≤10 відкритих). Якщо **< 10** — **`абракадабра`** / project scan **всього проєкту**: concept → FM **§5.1** → roadmaps → architect → DOCS_LEGACY → code → §5.13 fallback. Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Project scan». **Rust-first:** API → `tests/`; Playwright лише browser scope.
 
-**Відкритих у §5.12:** **0** (band 110 ✅). **Master horizon:** PH-S1749…S1758 (band 111). Vision rev **461**.
+**Відкритих у §5.12:** **0** (band 111 ✅). **Master horizon:** PH-S1759…S1768 (band 112). Vision rev **462**.
 
 **Историчний research backlog (PH-S65+):**
 
@@ -1356,6 +1356,25 @@ vision-sync rev **459**.
 | 1681 | **PH-S1746** | Ratio hold advisory | GSV_ROLES | `gsv-loc-audit --min-ratio 0.95 --advisory` + poolAI ratio96 advisory | **✅** |
 | 1682 | **PH-S1747** | vision-sync close | ops | `gsv-vision-sync` refresh + `poolai-vision-sync` rev **461** | **✅** |
 | 1683 | **PH-S1748** | Band close | GSV_ROLES | ratio hold (≥95%); fmt/clippy/test; docs canon; push | **✅** |
+
+### 5.92 GSV sprint-map + doc-preview queue — band 111 (PH-S1749…S1758, 2026-08-05) · **✅**
+
+**Джерело:** власник (GSV перед master-backlog) — GSV_MIGRATION.md «Vision UI-логіка
+(sprint-queue, doc-preview)» — sprint-queue map + docs ↔ code preview wire та UI cards.
+Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../gsv/GSV_MIGRATION.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1684 | **PH-S1749** | Sprint-map wire | GSV_MIGRATION | `boxes/vision.rs` `sprint_map_report`/`wire_sprint_map`; `GET /api/vision/sprint-map` (sprint-scope/queue/session-tracks links + modules + kinds) | **✅** |
+| 1685 | **PH-S1750** | Doc-preview wire | GSV_MIGRATION | `doc_preview`/`wire_doc_preview`; `GET /api/vision/doc-preview?id=` (node + 1-hop neighbors) | **✅** |
+| 1686 | **PH-S1751** | Sprint-map contracts | Rust-first (API → tests) | `tests/gsv_vision_contracts.rs` sprint-map (endpoint kinds + real-workspace report) | **✅** |
+| 1687 | **PH-S1752** | Doc-preview contracts | Rust-first (API → tests) | doc-preview (endpoint + missing/empty params + real-workspace 1-hop) | **✅** |
+| 1688 | **PH-S1753** | Sprint Map UI card | GSV_BOXES | `ui/index.html` Sprint Map (modules/kinds/links) | **✅** |
+| 1689 | **PH-S1754** | Doc Preview UI card | GSV_BOXES | `ui/index.html` Doc Preview (node id input + out/in links + sections) | **✅** |
+| 1690 | **PH-S1755** | GSV vision docs canon | session canon | `VISION.md` sprint-map/doc-preview; MEMORY band 111; HANDOFF/NEXT band 111 | **✅** |
+| 1691 | **PH-S1756** | poolAI vision parity | docs canon | `GSV_MIGRATION.md` row 21 ✅; `docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 111 | **✅** |
+| 1692 | **PH-S1757** | Ratio hold advisory | GSV_ROLES | `gsv-loc-audit --min-ratio 0.95 --advisory` + poolAI ratio96 advisory | **✅** |
+| 1693 | **PH-S1758** | Band close | GSV_ROLES | ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync; push | **✅** |
 
 ### 5.88 Ratio96 docs canon queue — band 107 (PH-S1709…S1718, 2026-08-02) · **✅**
 

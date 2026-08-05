@@ -4,16 +4,16 @@
 Оновлюється в кінці кожного band. Лічильники — вимірювані (`wc -l`, `cargo test`,
 `cargo run --bin gsv-loc-audit`), не з пам'яті.
 
-## Стан (2026-08-05 · band 110 ✅)
+## Стан (2026-08-05 · band 111 ✅)
 
 - **Канон:** Rust **95–100%** / wasm **0–5%** (завжди), без Python/Java; bins — лише `src/bin/`.
-- **Ratio (виміряно):** `cargo run --bin gsv-loc-audit` → **96.01%** (rust 5411 / product 5636) — gate ≥95% ✅.
+- **Ratio (виміряно):** `cargo run --bin gsv-loc-audit` → **95.77%** (rust 5862 / product 6121) — gate ≥95% ✅.
   Звіт: `GSV/data/rust_ratio.json` (gitignored).
-- **Тести (виміряно):** `cargo test` → **106** (55 unit + 18 `gsv_server_contracts` + 8 `gsv_omni_contracts`
-  + 8 `gsv_update_flow` + 7 `gsv_ratio_contracts` + 10 `gsv_vision_contracts`).
+- **Тести (виміряно):** `cargo test` → **113** (58 unit + 18 `gsv_server_contracts` + 8 `gsv_omni_contracts`
+  + 8 `gsv_update_flow` + 7 `gsv_ratio_contracts` + 14 `gsv_vision_contracts`).
   `cargo clippy --all-targets` → **0** warnings. `cargo fmt` clean.
 - **Бокси:** Tracker · SLI console · Toolchain · IDE · Update/offline · Box preview · SLI terminal ·
-  Tests/bench hooks · **Ratio** · **Vision** · **Vision Map** · **OmniRouter** (Rust AI-проксі/роутер).
+  Tests/bench hooks · **Ratio** · **Vision** · **Vision Map** · **Sprint Map** · **Doc Preview** · **OmniRouter** (Rust AI-проксі/роутер).
 
 ## Що зроблено
 
@@ -68,6 +68,24 @@
 - **PH-S1746** Ratio hold advisory (`gsv-loc-audit --min-ratio 0.95 --advisory`).
 - **PH-S1747** vision-sync close: `gsv-vision-sync` refresh + poolAI vision rev **461**.
 - **PH-S1748** Band close: ratio hold, fmt, clippy, cargo test, docs canon, vision-sync, push.
+
+### Band 111 (PH-S1749…S1758, ✅ 2026-08-05) — sprint-map + doc-preview (Vision UI логіка)
+- **PH-S1749** `boxes/vision.rs` `SprintMapReport`/`SprintNode` structs + `sprint_map_report`/`wire_sprint_map` —
+  sprint-queue map (scoping/tracking edges: `sprint-scope`+`queue`+`session-tracks` → links з `NodeRef`,
+  per-node targets tally → `modules`, kinds/layers stats); `GET /api/vision/sprint-map`.
+- **PH-S1750** `DocPreviewReport`/`LinkTarget` structs + `doc_preview`/`wire_doc_preview` — node + 1-hop
+  neighbors (`links_out`/`links_in`); `GET /api/vision/doc-preview?id=<node>` (missing → `ok:false` + error).
+- **PH-S1751** `tests/gsv_vision_contracts.rs` sprint-map contracts (endpoint kinds ⊆
+  {sprint-scope,queue,session-tracks}, real-workspace report + module ids) → 12.
+- **PH-S1752** doc-preview contracts (endpoint node/link_count, missing+empty params, real-workspace
+  1-hop read) → **14**.
+- **PH-S1753** Sprint Map card у `ui/index.html`: modules/kinds/links (details), rev/next/last header.
+- **PH-S1754** Doc Preview card: node id input (`galaxy_grid` default) + out/in links + sections/path.
+- **PH-S1755** `GSV/docs/VISION.md` (sprint-map/doc-preview API) + `MEMORY.md` band 111 + HANDOFF/NEXT_SESSION.
+- **PH-S1756** poolAI parity: `docs/gsv/GSV_MIGRATION.md` row 21 ✅, `docs/vision/README.md`,
+  `GSV_TECH_ROADMAP.md` band 111.
+- **PH-S1757** Ratio hold advisory (`gsv-loc-audit --min-ratio 0.95 --advisory`) + poolAI parity hold.
+- **PH-S1758** Band close: ratio hold, fmt, clippy, cargo test, docs canon, vision-sync, push.
 
 ## Важливі факти (не забувати)
 

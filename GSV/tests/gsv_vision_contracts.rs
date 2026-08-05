@@ -195,6 +195,100 @@ async fn vision_api_feed_filter_closed() {
 }
 
 #[tokio::test]
+async fn vision_api_sprint_map_endpoint() {
+    let dir = temp_data_dir("api-sprint-map");
+    let (status, body) = get(&app(dir), "/api/vision/sprint-map").await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body["ok"], true);
+    assert!(body["revision"].as_u64().unwrap_or(0) > 0);
+    assert!(!body["next_sprint"].as_str().unwrap_or("").is_empty());
+    let kinds = body["kinds"].as_array().expect("kinds array");
+    assert!(
+        kinds.iter().all(|k| matches!(
+            k["kind"].as_str(),
+            Some("sprint-scope") | Some("queue") | Some("session-tracks")
+        )),
+        "sprint-map kinds must be scoping/tracking edges: {kinds:?}"
+    );
+    let layers = body["layers"].as_array().expect("layers array");
+    let zs: Vec<i64> = layers.iter().filter_map(|l| l["z"].as_i64()).collect();
+    let mut sorted = zs.clone();
+    sorted.sort();
+    assert_eq!(zs, sorted, "layers must be z-sorted");
+}
+
+#[test]
+fn vision_sprint_map_reads_real_workspace() {
+    let r = vision::sprint_map_report(&repo_root(), &temp_data_dir("sprint-map")).expect("report");
+    assert!(r.revision > 0);
+    assert!(!r.next_sprint.is_empty());
+    assert!(
+        r.kinds
+            .iter()
+            .all(|k| matches!(k.kind.as_str(), "sprint-scope" | "queue" | "session-tracks")),
+        "unexpected sprint-map kind: {r:?}"
+    );
+    let module_ids: Vec<&str> = r.modules.iter().map(|m| m.id.as_str()).collect();
+    assert!(
+        module_ids
+            .iter()
+            .any(|id| id.starts_with("PH-S") || id.contains("handoff")),
+        "expected sprint modules, got: {module_ids:?}"
+    );
+    for m in &r.modules {
+        assert!(m.targets >= 1);
+    }
+}
+
+#[tokio::test]
+async fn vision_api_doc_preview_endpoint() {
+    let dir = temp_data_dir("api-doc-preview");
+    let m = vision::read_manifest(&repo_root()).expect("manifest");
+    let probe = m.edges.first().map(|e| e.from.as_str()).expect("edge from");
+    let (status, body) = get(
+        &app(dir.clone()),
+        &format!("/api/vision/doc-preview?id={probe}"),
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body["ok"], true);
+    assert_eq!(body["node"]["id"], probe);
+    assert_eq!(
+        body["link_count"].as_u64().unwrap_or(0),
+        (body["links_out"].as_array().unwrap().len() + body["links_in"].as_array().unwrap().len())
+            as u64
+    );
+
+    let (missing_status, missing) =
+        get(&app(dir.clone()), "/api/vision/doc-preview?id=no-such-node").await;
+    assert_eq!(missing_status, StatusCode::OK);
+    assert_eq!(missing["ok"], false);
+    assert!(missing["error"]
+        .as_str()
+        .unwrap_or("")
+        .contains("not found"));
+
+    let (empty_status, empty) = get(&app(dir), "/api/vision/doc-preview").await;
+    assert_eq!(empty_status, StatusCode::OK);
+    assert_eq!(empty["ok"], false);
+}
+
+#[test]
+fn vision_doc_preview_reads_real_workspace() {
+    let dir = temp_data_dir("doc-preview");
+    let m = vision::read_manifest(&repo_root()).expect("manifest");
+    let probe = m.edges.first().expect("edge").from.clone();
+    let r = vision::doc_preview(&repo_root(), &dir, &probe).expect("report");
+    assert_eq!(r.node.id, probe);
+    assert!(r.link_count >= 1);
+    assert_eq!(r.link_count as usize, r.links_out.len() + r.links_in.len());
+    assert!(
+        r.links_out.iter().all(|l| !l.node.id.is_empty())
+            && r.links_in.iter().all(|l| !l.node.id.is_empty())
+    );
+}
+
+#[tokio::test]
 async fn vision_assets_svg_served() {
     let dir = temp_data_dir("api-svg");
     let res = app(dir)

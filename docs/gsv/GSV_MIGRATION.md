@@ -18,7 +18,7 @@
 | Джерело | У GSV | Статус |
 |---------|-------|--------|
 | `poolai-vision-sync` (граф/drift gate) | `gsv-vision-sync` bin (`GSV/src/bin/gsv_vision_sync.rs`) | **✅ (band 109: `--check` drift gate, mirror manifest/feed у `GSV/data/`)** |
-| Vision UI-логіка (map, sprint-queue, doc-preview) | `gsv_server` + `GSV/ui/` | ⏳ future (band 109: Vision card = summary + feed ticker; band 110: Vision Map card = layer chips + edge kinds + svg link; sprint-queue/doc-preview лишаються future) |
+| Vision UI-логіка (map, sprint-queue, doc-preview) | `gsv_server` + `GSV/ui/` | **✅ (band 109: Vision card = summary + feed ticker; band 110: Vision Map card = layer chips + edge kinds + svg link + `GET /api/vision/map`; band 111: Sprint Map card + Doc Preview card → `GET /api/vision/sprint-map` + `GET /api/vision/doc-preview?id=`)** |
 | `crates/poolai-ui-core` / `poolai-ui-wasm` | за потреби (Rust-first; wasm 0–5%) | ⏳ future |
 
 ## Що лишається в PoolAI

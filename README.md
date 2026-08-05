@@ -54,7 +54,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 **Версія в репозиторії:** `0.2.2` (див. `Cargo.toml`). **Робоча гілка:** `main`.
 
-Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S1748 ✅ (phase F Ratio96 stand smoke). **Rust ratio:** **95.02%** (hold **95%** advisory). **Vision:** manifest rev **461**. **§5.12:** **0** відкритих (band 104 ✅ · band 105 next) · tech **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · наступна сесія **`абракадабра`** (band 105) — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
+Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S1758 ✅ (phase F Ratio96 stand smoke). **Rust ratio:** **95.02%** (hold **95%** advisory). **Vision:** manifest rev **462**. **§5.12:** **0** відкритих (band 111 ✅ · band 112 next) · tech **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · наступна сесія **`абракадабра`** (band 112) — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
 **Репозиторій:** [github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)
 
@@ -82,13 +82,13 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 ### Next Focus (2026-08-01)
 
-**Product:** наступна сесія **`абракадабра`** → drain band 105 **PH-S1689…S1698** (project scan наступний).
+**Product:** наступна сесія **`абракадабра`** → drain band 112 **PH-S1759…S1768** (project scan наступний).
 
-**GSV (новий):** окремий проєкт **Galaxy StarWalker Vision** — vision migration у Rust-first bin-сервер з боксами (95–100% Rust / 0–5% wasm) · [`GSV/README.md`](GSV/README.md) · **TechPreroadMap** [`docs/gsv/GSV_TECH_ROADMAP.md`](docs/gsv/GSV_TECH_ROADMAP.md).
+**GSV (новий):** окремий проєкт **Galaxy StarWalker Vision** — vision migration у Rust-first bin-сервер з боксами (95–100% Rust / 0–5% wasm) · [`GSV/README.md`](GSV/README.md) · **TechPreroadMap** [`docs/gsv/GSV_TECH_ROADMAP.md`](docs/gsv/GSV_TECH_ROADMAP.md). Bands 102+108+109+110+111 ✅ · tests **113** · ratio **95.77%**.
 
-**Наступна сесія (owner):** **`абракадабра`** — drain band 105 **PH-S1689…S1698** · [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія (owner):** **`абракадабра`** — drain band 112 **PH-S1759…S1768** · [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
-**§5.12:** **0** відкритих (band 104 ✅ · band 105 next) · vision **rev 461** · last **PH-S1748** · next **PH-S1749**.
+**§5.12:** **0** відкритих (band 111 ✅ · band 112 next) · vision **rev 462** · last **PH-S1758** · next **PH-S1759**.
 
 **Tech (сьогодні):** Service **PH-SVC75…SVC84** — Cursor **3.13.21** research + rules/agents + vision Speeds/eye verify · [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](docs/development/CURSOR_UPDATE_RESEARCH_2026-07-27.md) · Auto-review · prior GH tokens **PH-SVC65…74** ✅ · open **PH-SVC34** (GH verify) · **PH-SVC35** OWNER Atlassian revoke.
 

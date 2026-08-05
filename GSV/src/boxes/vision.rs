@@ -396,6 +396,264 @@ pub fn wire_map(repo_root: &Path, data_dir: &Path) -> Value {
     }
 }
 
+/// Sprint-queue edge kinds (`/api/vision/sprint-map`).
+pub const SPRINT_KINDS: [&str; 3] = ["sprint-scope", "queue", "session-tracks"];
+
+/// Compact node reference used in map reports.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct NodeRef {
+    pub id: String,
+    pub label: String,
+    pub layer: String,
+    pub path: String,
+}
+
+/// Sprint-queue link: a scoping/tracking edge with resolved endpoints.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct SprintLink {
+    pub kind: String,
+    pub from: NodeRef,
+    pub to: NodeRef,
+}
+
+/// Per-module target tally (`/api/vision/sprint-map`).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct SprintModule {
+    pub id: String,
+    pub label: String,
+    pub layer: String,
+    pub path: String,
+    pub targets: u64,
+}
+
+/// Sprint-queue map report (`/api/vision/sprint-map`).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct SprintMapReport {
+    pub revision: u64,
+    pub git_head: String,
+    pub next_sprint: String,
+    pub last_sprint_closed: String,
+    pub nodes_count: u64,
+    pub links: Vec<SprintLink>,
+    pub modules: Vec<SprintModule>,
+    pub kinds: Vec<EdgeKindStats>,
+    pub layers: Vec<LayerStats>,
+}
+
+/// Directed doc-preview link: edge kind + resolved target node.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct LinkTarget {
+    pub kind: String,
+    pub node: NodeRef,
+}
+
+/// Doc-preview report (`/api/vision/doc-preview`).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct DocPreviewReport {
+    pub revision: u64,
+    pub git_head: String,
+    pub node: ManifestNode,
+    pub links_out: Vec<LinkTarget>,
+    pub links_in: Vec<LinkTarget>,
+    pub link_count: u64,
+}
+
+fn node_ref(n: &ManifestNode) -> NodeRef {
+    NodeRef {
+        id: n.id.clone(),
+        label: n.label.clone(),
+        layer: n.layer.clone(),
+        path: n.path.clone(),
+    }
+}
+
+/// Build the sprint-queue map: scoping/tracking edges across the galaxy graph.
+pub fn sprint_map_report(repo_root: &Path, data_dir: &Path) -> Result<SprintMapReport, String> {
+    let m = source_manifest(repo_root, data_dir)?;
+    let by_id: std::collections::HashMap<&str, &ManifestNode> =
+        m.nodes.iter().map(|n| (n.id.as_str(), n)).collect();
+
+    let mut links: Vec<SprintLink> = m
+        .edges
+        .iter()
+        .filter(|e| SPRINT_KINDS.contains(&e.kind.as_str()))
+        .filter_map(|e| {
+            let from = by_id.get(e.from.as_str())?;
+            let to = by_id.get(e.to.as_str())?;
+            Some(SprintLink {
+                kind: e.kind.clone(),
+                from: node_ref(from),
+                to: node_ref(to),
+            })
+        })
+        .collect();
+    links.sort_by(|a, b| {
+        a.kind
+            .cmp(&b.kind)
+            .then_with(|| a.from.id.cmp(&b.from.id))
+            .then_with(|| a.to.id.cmp(&b.to.id))
+    });
+
+    let mut target_counts: std::collections::BTreeMap<&str, u64> =
+        std::collections::BTreeMap::new();
+    for link in &links {
+        *target_counts.entry(link.from.id.as_str()).or_insert(0) += 1;
+    }
+    let mut modules: Vec<SprintModule> = target_counts
+        .into_iter()
+        .filter_map(|(id, targets)| {
+            let n = by_id.get(id)?;
+            Some(SprintModule {
+                id: n.id.clone(),
+                label: n.label.clone(),
+                layer: n.layer.clone(),
+                path: n.path.clone(),
+                targets,
+            })
+        })
+        .collect();
+    modules.sort_by(|a, b| b.targets.cmp(&a.targets).then_with(|| a.id.cmp(&b.id)));
+
+    let mut kinds: std::collections::BTreeMap<String, u64> = std::collections::BTreeMap::new();
+    for link in &links {
+        *kinds.entry(link.kind.clone()).or_insert(0) += 1;
+    }
+    let kinds = kinds
+        .into_iter()
+        .map(|(kind, count)| EdgeKindStats { kind, count })
+        .collect();
+
+    let mut involved: std::collections::BTreeMap<String, u64> = std::collections::BTreeMap::new();
+    let mut layer_edges: std::collections::BTreeMap<String, u64> =
+        std::collections::BTreeMap::new();
+    for link in &links {
+        for id in [&link.from.id, &link.to.id] {
+            *involved.entry(id.clone()).or_insert(0) += 1;
+        }
+        *layer_edges.entry(link.from.layer.clone()).or_insert(0) += 1;
+    }
+    let layer_by_id: std::collections::HashMap<String, (String, i64)> = m
+        .layers
+        .iter()
+        .map(|l| (l.id.clone(), (l.name.clone(), l.z)))
+        .collect();
+    let mut layers: Vec<LayerStats> = involved
+        .iter()
+        .map(|(id, node_count)| {
+            let layer_id = by_id
+                .get(id.as_str())
+                .map(|n| n.layer.as_str())
+                .unwrap_or("L0");
+            let (name, z) = layer_by_id
+                .get(layer_id)
+                .cloned()
+                .unwrap_or_else(|| (layer_id.to_string(), 0));
+            LayerStats {
+                id: layer_id.to_string(),
+                name,
+                z,
+                node_count: *node_count,
+                edges_from: layer_edges.get(layer_id).copied().unwrap_or(0),
+            }
+        })
+        .collect();
+    layers.sort_by_key(|l| l.z);
+
+    Ok(SprintMapReport {
+        revision: m.revision,
+        git_head: m.git_head,
+        next_sprint: m.next_sprint,
+        last_sprint_closed: m.last_sprint_closed,
+        nodes_count: involved.len() as u64,
+        links,
+        modules,
+        kinds,
+        layers,
+    })
+}
+
+/// `GET /api/vision/sprint-map` — sprint-queue scoping/tracking map.
+pub fn wire_sprint_map(repo_root: &Path, data_dir: &Path) -> Value {
+    match sprint_map_report(repo_root, data_dir) {
+        Ok(r) => {
+            let mut v = serde_json::to_value(&r).unwrap_or_default();
+            if let serde_json::Value::Object(map) = &mut v {
+                map.insert("ok".to_string(), serde_json::Value::Bool(true));
+            }
+            v
+        }
+        Err(e) => json!({ "ok": false, "error": e }),
+    }
+}
+
+/// Build the doc-preview report for one graph node (1-hop neighbors).
+pub fn doc_preview(
+    repo_root: &Path,
+    data_dir: &Path,
+    id: &str,
+) -> Result<DocPreviewReport, String> {
+    let m = source_manifest(repo_root, data_dir)?;
+    let by_id: std::collections::HashMap<&str, &ManifestNode> =
+        m.nodes.iter().map(|n| (n.id.as_str(), n)).collect();
+    let node = by_id
+        .get(id)
+        .copied()
+        .ok_or_else(|| format!("node not found: {id}"))?
+        .clone();
+
+    let mut links_out: Vec<LinkTarget> = m
+        .edges
+        .iter()
+        .filter(|e| e.from == id)
+        .filter_map(|e| {
+            by_id.get(e.to.as_str()).map(|n| LinkTarget {
+                kind: e.kind.clone(),
+                node: node_ref(n),
+            })
+        })
+        .collect();
+    let mut links_in: Vec<LinkTarget> = m
+        .edges
+        .iter()
+        .filter(|e| e.to == id)
+        .filter_map(|e| {
+            by_id.get(e.from.as_str()).map(|n| LinkTarget {
+                kind: e.kind.clone(),
+                node: node_ref(n),
+            })
+        })
+        .collect();
+    links_out.sort_by(|a, b| a.kind.cmp(&b.kind).then_with(|| a.node.id.cmp(&b.node.id)));
+    links_in.sort_by(|a, b| a.kind.cmp(&b.kind).then_with(|| a.node.id.cmp(&b.node.id)));
+
+    let link_count = (links_out.len() + links_in.len()) as u64;
+    Ok(DocPreviewReport {
+        revision: m.revision,
+        git_head: m.git_head,
+        node,
+        links_out,
+        links_in,
+        link_count,
+    })
+}
+
+/// `GET /api/vision/doc-preview` — docs ↔ code preview for one node.
+pub fn wire_doc_preview(repo_root: &Path, data_dir: &Path, id: &str) -> Value {
+    if id.is_empty() {
+        return json!({ "ok": false, "error": "id required" });
+    }
+    match doc_preview(repo_root, data_dir, id) {
+        Ok(r) => {
+            let mut v = serde_json::to_value(&r).unwrap_or_default();
+            if let serde_json::Value::Object(map) = &mut v {
+                map.insert("ok".to_string(), serde_json::Value::Bool(true));
+            }
+            v
+        }
+        Err(e) => json!({ "ok": false, "error": e }),
+    }
+}
+
 /// `GET /api/vision/feed` — optional `status` filter (`closed`/`open`/all).
 pub fn wire_feed_filter(repo_root: &Path, data_dir: &Path, status: Option<&str>) -> Value {
     match source_feed(repo_root, data_dir) {
@@ -752,6 +1010,115 @@ mod tests {
         let open = wire_feed_filter(&src, &data, Some("open"));
         assert_eq!(open["feed"]["items"].as_array().unwrap().len(), 1);
         assert_eq!(open["feed"]["items"][0]["status"], "open");
+        let _ = std::fs::remove_dir_all(&tmp);
+    }
+
+    fn sample_manifest_with_sprint_links() -> Manifest {
+        let mut m = sample_manifest();
+        m.nodes.push(ManifestNode {
+            id: "handoff".to_string(),
+            label: "HANDOFF".to_string(),
+            layer: "L0".to_string(),
+            path: "docs/development/HANDOFF.md".to_string(),
+            sections: vec![],
+            sprints: vec![],
+        });
+        m.nodes.push(ManifestNode {
+            id: "grid_dispatch".to_string(),
+            label: "grid/dispatch.rs".to_string(),
+            layer: "L3".to_string(),
+            path: "src/grid/grid_dispatch.rs".to_string(),
+            sections: vec![],
+            sprints: vec![],
+        });
+        m.nodes.push(ManifestNode {
+            id: "e2e_grid_job_lease".to_string(),
+            label: "grid_job_lease.e2e".to_string(),
+            layer: "L3".to_string(),
+            path: "e2e/grid_job_lease.spec.ts".to_string(),
+            sections: vec![],
+            sprints: vec![],
+        });
+        m.edges.push(ManifestEdge {
+            from: "grid_dispatch".to_string(),
+            kind: "sprint-scope".to_string(),
+            to: "e2e_grid_job_lease".to_string(),
+        });
+        m.edges.push(ManifestEdge {
+            from: "handoff".to_string(),
+            kind: "session-tracks".to_string(),
+            to: "grid_dispatch".to_string(),
+        });
+        m
+    }
+
+    fn write_sample(root: &Path, manifest: &Manifest, feed: &Feed) {
+        let vis = root.join("docs").join("vision");
+        std::fs::create_dir_all(&vis).unwrap();
+        std::fs::write(
+            vis.join("manifest.json"),
+            serde_json::to_string(manifest).unwrap(),
+        )
+        .unwrap();
+        std::fs::write(vis.join("feed.json"), serde_json::to_string(feed).unwrap()).unwrap();
+    }
+
+    #[test]
+    fn sprint_map_report_lists_scoping_and_tracking_edges() {
+        let tmp = std::env::temp_dir().join("gsv_vision_test_sprint_map");
+        let _ = std::fs::remove_dir_all(&tmp);
+        let src = tmp.join("src");
+        let data = tmp.join("data");
+        write_sample(&src, &sample_manifest_with_sprint_links(), &sample_feed());
+
+        let r = sprint_map_report(&src, &data).unwrap();
+        assert_eq!(r.links.len(), 2);
+        assert_eq!(r.links[0].kind, "session-tracks");
+        assert_eq!(r.links[0].to.id, "grid_dispatch");
+        assert_eq!(r.links[1].kind, "sprint-scope");
+        assert_eq!(r.links[1].from.id, "grid_dispatch");
+        assert!(r
+            .modules
+            .iter()
+            .any(|m| m.id == "grid_dispatch" && m.targets == 1));
+        assert!(r
+            .modules
+            .iter()
+            .any(|m| m.id == "handoff" && m.targets == 1));
+        assert!(r.kinds.iter().any(|k| k.kind == "sprint-scope"));
+        assert_eq!(r.nodes_count, 3);
+        let _ = std::fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn doc_preview_returns_one_hop_links() {
+        let tmp = std::env::temp_dir().join("gsv_vision_test_doc_preview");
+        let _ = std::fs::remove_dir_all(&tmp);
+        let src = tmp.join("src");
+        let data = tmp.join("data");
+        write_sample(&src, &sample_manifest_with_sprint_links(), &sample_feed());
+
+        let r = doc_preview(&src, &data, "grid_dispatch").unwrap();
+        assert_eq!(r.node.id, "grid_dispatch");
+        assert_eq!(r.link_count, 2);
+        assert!(r.links_in.iter().any(|l| l.node.id == "handoff"));
+        assert!(r
+            .links_out
+            .iter()
+            .any(|l| l.node.id == "e2e_grid_job_lease"));
+        let _ = std::fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn doc_preview_missing_node_is_error() {
+        let tmp = std::env::temp_dir().join("gsv_vision_test_doc_preview_missing");
+        let _ = std::fs::remove_dir_all(&tmp);
+        let src = tmp.join("src");
+        let data = tmp.join("data");
+        write_sample(&src, &sample_manifest_with_sprint_links(), &sample_feed());
+
+        assert!(doc_preview(&src, &data, "nope").is_err());
+        assert_eq!(wire_doc_preview(&src, &data, "")["ok"], false);
         let _ = std::fs::remove_dir_all(&tmp);
     }
 }
