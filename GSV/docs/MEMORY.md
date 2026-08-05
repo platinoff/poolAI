@@ -4,7 +4,7 @@
 Оновлюється в кінці кожного band. Лічильники — вимірювані (`wc -l`, `cargo test`,
 `cargo run --bin gsv-loc-audit`), не з пам'яті.
 
-## Стан (2026-08-05 · band 108 ✅)
+## Стан (2026-08-05 · band 109 ✅)
 
 - **Канон:** Rust **95–100%** / wasm **0–5%** (завжди), без Python/Java; bins — лише `src/bin/`.
 - **Ratio (виміряно):** `cargo run --bin gsv-loc-audit` → **95.52%** (rust 4223 / product 4421) — gate ≥95% ✅.
@@ -13,7 +13,7 @@
 - **Тести (виміряно):** `cargo test` → **87** (46 unit + 18 `gsv_server_contracts` + 8 `gsv_omni_contracts`
   + 7 `gsv_ratio_contracts` + 8 `gsv_update_flow`). `cargo clippy --all-targets` → **0** warnings. `cargo fmt` clean.
 - **Бокси:** Tracker · SLI console · Toolchain · IDE · Update/offline · Box preview · SLI terminal ·
-  Tests/bench hooks · **Ratio** · **OmniRouter** (Rust AI-проксі/роутер, catalog/config/proxy).
+  Tests/bench hooks · **Ratio** · **Vision** · **OmniRouter** (Rust AI-проксі/роутер, catalog/config/proxy).
 
 ## Що зроблено
 
@@ -38,6 +38,21 @@
 - **PH-S1726** poolAI docs parity (FUNCTIONALITY_DIGEST / vision README / GSV rows).
 - **PH-S1727** poolAI `docs/development/HANDOFF_NEW_SESSION.md` + `NEXT_SESSION_PROMPT.md`.
 - **PH-S1728** Band close: ratio hold, fmt, clippy, cargo test, docs canon, vision-sync, push.
+
+### Band 109 (PH-S1729…S1738, ✅ 2026-08-05) — Vision box (poolAI vision canon mirror)
+- **PH-S1729** `GSV/src/boxes/vision.rs` + `boxes/mod.rs` + Cargo `[[bin]]` — serde-структури
+  (manifest nodes/edges/layers + feed) та реєстрація боксу.
+- **PH-S1730** manifest wire: read `docs/vision/manifest.json` → `GSV/data/gsv_manifest.json`;
+  `GET /api/vision/manifest` (nodes/edges/layers).
+- **PH-S1731** feed wire: `docs/vision/feed.json` → `GSV/data/gsv_feed.json`; `GET /api/vision/feed`.
+- **PH-S1732** `GSV/src/bin/gsv_vision_sync.rs` — mirror + `--check` drift gate (source parse +
+  revision parity). Live: rev 458, 1218 nodes, 535 edges, 12 feed items.
+- **PH-S1733** Vision UI card (`ui/index.html`): summary + sprint feed ticker; ratio-safe (без 161 KB legacy JS).
+- **PH-S1734** `tests/gsv_vision_contracts.rs` — 7 integration contracts.
+- **PH-S1735** `GSV/docs/VISION.md` + `GSV_MIGRATION.md` rows ✅ + MEMORY mark.
+- **PH-S1736** poolAI vision parity (`docs/vision/README.md` + cross-check).
+- **PH-S1737** Ratio hold advisory (`gsv-loc-audit --min-ratio 0.95 --advisory`).
+- **PH-S1738** Band close: ratio hold, fmt, clippy, cargo test, docs canon, vision-sync, push.
 
 ## Важливі факти (не забувати)
 

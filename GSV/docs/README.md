@@ -7,7 +7,8 @@
 | Файл | Призначення |
 |------|-------------|
 | [`GSV_ROLES.md`](GSV_ROLES.md) | Ролі GSV VDT (Власник/Оркестратор/Субагенти), канон сесії, Rust ratio gate |
-| [`MEMORY.md`](MEMORY.md) | **Memory mark** — стан проєкту (bands 102 · 108), ключові факти, what/why |
+| [`MEMORY.md`](MEMORY.md) | **Memory mark** — стан проєкту (bands 102 · 108 · 109), ключові факти, what/why |
+| [`VISION.md`](VISION.md) | **Vision box** — дзеркало poolAI vision canon (manifest/feed/sync) |
 | [`HANDOFF_NEW_SESSION.md`](HANDOFF_NEW_SESSION.md) | Операційний зріз для наступної сесії (S0, щоденники, тести) |
 | [`NEXT_SESSION_PROMPT.md`](NEXT_SESSION_PROMPT.md) | Copy-paste промпт наступної сесії GSV |
 

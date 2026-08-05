@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-04",
+  "generated_at": "2026-08-05",
   "sprint": "PH-S1010",
   "formal_band_min": 0.9,
   "formal_band_max": 0.95,
@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 189156,
+  "rust_loc": 189531,
   "non_rust_product_loc": 9940,
-  "product_loc_total": 199096,
-  "rust_ratio": 0.9500743359987142,
-  "rust_ratio_pct": 95.00743359987142,
+  "product_loc_total": 199471,
+  "rust_ratio": 0.9501681948754456,
+  "rust_ratio_pct": 95.01681948754455,
   "in_formal_band": false,
   "below_warn_threshold": false,
   "below_target": false,
@@ -27,7 +27,7 @@
   "e2e_ts_band29_baseline_loc": 1155,
   "e2e_ts_loc_reduction": -75,
   "ops_shell_canon_met": true,
-  "migration_advisory_mode": true,
+  "migration_advisory_mode": false,
   "migration_candidate_total": 14,
   "migration_ui_js_candidate_count": 6,
   "migration_e2e_archived_count": 8,
@@ -226,16 +226,16 @@
       "loc": 606
     },
     "rust_crates": {
-      "files": 124,
-      "loc": 26588
+      "files": 125,
+      "loc": 26824
     },
     "rust_src": {
       "files": 302,
       "loc": 117538
     },
     "rust_tests": {
-      "files": 352,
-      "loc": 44424
+      "files": 354,
+      "loc": 44563
     },
     "ui_css": {
       "files": 2,
@@ -264,8 +264,6 @@
     "PH-S1008: multi-module band 35 hold advisory — in_formal_band true; target 95% hold until PH-S1010",
     "PH-S1010: product-complete band 36 — ratio_95_formal_gate_met; stretch 96% advisory if below_stretch_spirit",
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
-    "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
-    "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
     "PH-S1714: ratio96_docs_canon_mode — aggregate band 101–106 RATIO96_*.md canon docs",
     "PH-S1718: band 107 ratio96 docs canon — criteria met vs registry"
   ]

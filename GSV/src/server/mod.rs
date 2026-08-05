@@ -65,6 +65,9 @@ pub fn router(state: AppState) -> Router {
         .route("/api/hooks/tests", get(api_hooks_tests))
         .route("/api/hooks/bench", get(api_hooks_bench))
         .route("/api/ratio", get(api_ratio))
+        .route("/api/vision", get(api_vision))
+        .route("/api/vision/manifest", get(api_vision_manifest))
+        .route("/api/vision/feed", get(api_vision_feed))
         .route("/api/omni", get(api_omni))
         .route(
             "/api/omni/config",
@@ -193,6 +196,27 @@ async fn api_hooks_bench(State(state): State<AppState>) -> Json<Value> {
 
 async fn api_ratio(State(state): State<AppState>) -> Json<Value> {
     Json(crate::boxes::ratio::wire(&state.data_dir))
+}
+
+async fn api_vision(State(state): State<AppState>) -> Json<Value> {
+    Json(crate::boxes::vision::wire_summary(
+        &state.repo_root,
+        &state.data_dir,
+    ))
+}
+
+async fn api_vision_manifest(State(state): State<AppState>) -> Json<Value> {
+    Json(crate::boxes::vision::wire_manifest(
+        &state.repo_root,
+        &state.data_dir,
+    ))
+}
+
+async fn api_vision_feed(State(state): State<AppState>) -> Json<Value> {
+    Json(crate::boxes::vision::wire_feed(
+        &state.repo_root,
+        &state.data_dir,
+    ))
 }
 
 // ── OmniRouter box ─────────────────────────────────────────────────────────────

@@ -12,6 +12,7 @@
 //! | Tests/bench hooks | `hooks` | `/api/hooks/…` | `target/` artifacts |
 //! | OmniRouter | `omni` | `/api/omni/…` | provider/model catalog + config + proxy |
 //! | Ratio | `ratio` | `/api/ratio` | `GSV/data/rust_ratio.json` (Rust 95–100%) |
+//! | Vision | `vision` | `/api/vision*` | `docs/vision/` manifest + feed mirror |
 
 pub mod hooks;
 pub mod ide;
@@ -22,6 +23,7 @@ pub mod sli;
 pub mod terminal;
 pub mod toolchain;
 pub mod update;
+pub mod vision;
 
 pub use ide::{IdeSelection, IdeSession, IdeWire};
 pub use omni::{OmniConfig, OmniRouter, OmniWire, ProviderConfig, ProviderWire, RoutingConfig};

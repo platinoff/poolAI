@@ -7,18 +7,18 @@
 | Джерело | У GSV | Статус |
 |---------|-------|--------|
 | `index.html` (Galaxy UI) | `GSV/ui/index.html` (UI glue поверх Rust) | **✅ (single-page UI: health/tracker/sli/toolchain/ide/update/preview/terminal/hooks, SSE)** |
-| `manifest.json` (граф) | `GSV/data/gsv_manifest.json` (генерується Rust) | ⏳ future |
-| `vision.js` / `vision.css` | `GSV/ui/` | ⏳ future |
-| `feed.json` (RSS ticker) | `GSV/data/gsv_feed.json` | ⏳ future |
-| `vision.svg` | `GSV/ui/vision.svg` | ⏳ future |
+| `manifest.json` (граф) | `GSV/data/gsv_manifest.json` (генерується Rust) | **✅ (band 109: `boxes/vision`, `gsv-vision-sync`, `GET /api/vision/manifest`)** |
+| `feed.json` (RSS ticker) | `GSV/data/gsv_feed.json` | **✅ (band 109: `GET /api/vision/feed`, Vision UI card)** |
+| `vision.js` / `vision.css` | `GSV/ui/` (тонкий UI glue) | ⏳ future (ratio-safe: не переносимо 161 KB legacy JS; canon Rust 95–100%) |
+| `vision.svg` | `GSV/ui/vision.svg` | ⏳ future (можливо окремим спринтом) |
 | README (відкриття) | → `docs/gsv/` | **✅ (адаптовано)** |
 
 ## Що переносимо (з `src/`)
 
 | Джерело | У GSV | Статус |
 |---------|-------|--------|
-| `poolai-vision-sync` (граф/drift gate) | `gsv_server` (модуль `sync/`) або окремий bin | ⏳ future |
-| Vision UI-логіка (map, sprint-queue, doc-preview) | `gsv_server` + `GSV/ui/` | ⏳ future |
+| `poolai-vision-sync` (граф/drift gate) | `gsv-vision-sync` bin (`GSV/src/bin/gsv_vision_sync.rs`) | **✅ (band 109: `--check` drift gate, mirror manifest/feed у `GSV/data/`)** |
+| Vision UI-логіка (map, sprint-queue, doc-preview) | `gsv_server` + `GSV/ui/` | ⏳ future (band 109: Vision card = summary + feed ticker) |
 | `crates/poolai-ui-core` / `poolai-ui-wasm` | за потреби (Rust-first; wasm 0–5%) | ⏳ future |
 
 ## Що лишається в PoolAI

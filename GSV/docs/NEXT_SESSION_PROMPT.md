@@ -1,6 +1,6 @@
 # Промпт наступної сесії (GSV)
 
-**Оновлено:** 2026-08-05 (band 108 **PH-S1719…S1728** ✅ · ratio **95.52%** · tests **87**)
+**Оновлено:** 2026-08-05 (band 109 **PH-S1729…S1738** ✅ · ratio **95.45%** · tests **101**)
 
 ```
 абракадабра
@@ -20,6 +20,12 @@ Speeds · Rust panel → vision-sync (`poolai-vision-sync`) → **один** com
 - **band 108** (PH-S1719…S1728) ✅ — roles/ratio canon: `GSV/docs/GSV_ROLES.md`; `gsv-loc-audit`
   (95.52% gate ✅); `tests/gsv_ratio_contracts.rs` (7); Ratio box + `GET /api/ratio` + UI card;
   `GSV/docs/{MEMORY,HANDOFF,NEXT,README}`; FM §5.12 §5.89; poolAI docs parity + HANDOFF/NEXT; vision-sync rev 458.
+- **band 109** (PH-S1729…S1738) ✅ — Vision box: `GSV/src/boxes/vision.rs` (manifest/feed serde +
+  read/save/load/wire/sync/drift); `gsv-vision-sync` bin (`--check`); `GET /api/vision*`; Vision UI card;
+  `tests/gsv_vision_contracts.rs` (7); `GSV/docs/VISION.md` + `GSV_MIGRATION.md` rows ✅; poolAI vision
+  README parity; FM §5.12 §5.90; GSV tests **101** (95.45% gate ✅); vision-sync rev 459.
+  **Наступний band 110** (PH-S1739…S1748): master backlog (Ratio96 phase F) або GSV `vision.svg` /
+  legacy-JS policy — за пріоритетом власника.
 
 ## Канон GSV
 
@@ -31,5 +37,7 @@ Speeds · Rust panel → vision-sync (`poolai-vision-sync`) → **один** com
 ## Не повторювати
 
 Band 107 ✅ (poolAI Ratio96 docs canon) · band 106 ✅ (Ratio96 loc-audit) · band 105 ✅ (Ratio96 stand smoke) ·
-band 104 ✅ (Ratio96 admin/ops) · band 103 ✅ · band 102 ✅ (GSV migration) · staging `GSV/data/*` / `certs/*.pem` /
-`.env` · mid-push · build/test при запущеному `gsv-server` · обхід ratio-смуги Rust-кодом замість compact UI.
+band 104 ✅ (Ratio96 admin/ops) · band 103 ✅ · band 102 ✅ (GSV migration) · band 109 ✅ (GSV vision sync) ·
+staging `GSV/data/*` / `certs/*.pem` /
+`.env` · mid-push · build/test при запущеному `gsv-server` · обхід ratio-смуги Rust-кодом замість compact UI ·
+перенесення legacy `vision.js`/`vision.css` у `GSV/ui/` (знищило б ratio canon).

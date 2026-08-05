@@ -1,9 +1,9 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-08-05 (band 108 **GSV roles/ratio canon** PH-S1719…S1728 **✅** · band 109 open PH-S1729…S1738 · Vision rev 458)
+**Оновлено:** 2026-08-05 (band 109 **GSV vision sync/migration** PH-S1729…S1738 **✅** · band 110 open PH-S1739…S1748 · Vision rev 459)
 
 **Наступна сесія:** **`абракадабра`** — див. **канон воркфлоу в [AGENTS.md](../../AGENTS.md §100–113)**.
-**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1729…S1738; черга — FM §5.12) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1739…S1748; черга — FM §5.12) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
 
 --- 
 
@@ -41,6 +41,30 @@
 - Не паралелити `cargo test-ci`.
 - Warnings > 0 або errors > 0 → 1–3 PH-S* **на початок смуги** (Джерело: `rust_diagnostics` / lint code).
 - Fallback-смуга: galaxy metrics stubs, wasm glue, stand smoke, concept wire, loc-audit, docs canon, vision sync, INDEX.
+
+## Band 109 — GSV vision sync/migration (PH-S1729…S1738, **✅**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1729** | Vision box scaffold (`GSV/src/boxes/vision.rs` serde manifest/feed + sync; `boxes/mod.rs`; Cargo `[[bin]]`) |
+| **PH-S1730** | Vision manifest wire (`docs/vision/manifest.json` → `GSV/data/gsv_manifest.json`; `GET /api/vision/manifest`) |
+| **PH-S1731** | Vision feed wire (`docs/vision/feed.json` → `GSV/data/gsv_feed.json`; `GET /api/vision/feed`) |
+| **PH-S1732** | `gsv-vision-sync` bin (`--check` drift gate; revision/git_head summary) |
+| **PH-S1733** | Vision UI panels (Vision card: summary + feed ticker; ratio ≥95%) |
+| **PH-S1734** | Vision contracts (`tests/gsv_vision_contracts.rs`, 7) |
+| **PH-S1735** | GSV vision docs canon (`GSV/docs/VISION.md`; `GSV_MIGRATION.md` ✅ rows; MEMORY mark) |
+| **PH-S1736** | poolAI vision parity (`docs/vision/README.md` GSV note; cross-check `poolai-vision-sync --check`) |
+| **PH-S1737** | Ratio hold advisory (`gsv-loc-audit --min-ratio 0.95 --advisory` 95.45% ✅ + poolAI ratio96 advisory hold 95.02%) |
+| **PH-S1738** | Band close (ratio hold ≥95%; fmt/clippy/test; docs canon; vision-sync rev 459) |
+
+**PH-S1729…S1738 ✅ (2026-08-05):** Vision box — GSV mirror poolAI vision canon: `boxes/vision.rs`
+(manifest nodes/edges/layers + feed serde, read/save/load/wire/sync/drift) + `gsv-vision-sync` bin
+(`--check` gate); `GET /api/vision` + `/api/vision/manifest` + `/api/vision/feed`; Vision UI card;
+`tests/gsv_vision_contracts.rs` (7); snapshot `GSV/data/gsv_manifest.json` + `gsv_feed.json`
+(rev 458 → 459, 1218 nodes, 535 edges, 12 feed items); `GSV/docs/VISION.md` + `GSV_MIGRATION.md`
+rows ✅ + MEMORY; poolAI vision README parity. Ratio: GSV **95.45%** (rust 4387 / product 4596,
+gate ≥95% ✅) + poolAI **95.02%** advisory hold. GSV tests **101** (53 unit + 18 omni + 8 server +
+8 update + 7 ratio + 7 vision), clippy **0**, fmt clean.
 
 ## Band 108 — GSV roles/ratio canon (PH-S1719…S1728, **✅**)
 
