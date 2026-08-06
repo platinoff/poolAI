@@ -2,95 +2,94 @@
   "description": "RSS-style ticker of FM §5.12 sprint queue (open + recent closed)",
   "items": [
     {
-      "category": "open",
-      "id": "PH-S1769",
-      "link": "docs/vision/index.html#sprint-queue",
-      "next": true,
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "NodeSearchReport`/`node_search_report`/`wire_node_search` → `GET /api/vision/node-search?q=&layer=` (case-insensitive id/label/path/sections, top-N 25, layer z-sorted)",
-      "title": "Node search wire"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1770",
+      "category": "closed",
+      "id": "PH-S1778",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
-      "status": "open",
-      "summary": "tests/gsv_vision_contracts.rs` node-search (real-workspace + layer filter + no-match empty)",
-      "title": "Node search contracts"
+      "status": "closed",
+      "summary": "ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync; push",
+      "title": "Band close"
     },
     {
-      "category": "open",
-      "id": "PH-S1771",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "tests/gsv_server_contracts.rs` `GET /api/vision/node-search?q=` ok + results array (empty q → ok true)",
-      "title": "Node-search endpoint contract"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1772",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "Vision Map card embeds `assets/vision.svg` inline + chips/kinds",
-      "title": "Inline SVG map card"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1773",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "clickable layer chips (active filter) + node-search input + results → doc-preview deep-link",
-      "title": "Layer filter + search UX"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1774",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "VISION.md` node-search/map UX; MEMORY band 113; HANDOFF/NEXT band 113",
-      "title": "GSV vision docs canon"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1775",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "GSV_MIGRATION.md` rows ✅; `docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 113",
-      "title": "poolAI vision parity"
-    },
-    {
-      "category": "open",
-      "id": "PH-S1776",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "open",
-      "summary": "gsv-loc-audit --min-ratio 0.95 --advisory` (≥95%) + poolAI ratio96 advisory hold",
-      "title": "Ratio hold advisory"
-    },
-    {
-      "category": "open",
+      "category": "closed",
       "id": "PH-S1777",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
-      "status": "open",
+      "status": "closed",
       "summary": "gsv-vision-sync` refresh + poolAI vision rev++",
       "title": "vision-sync close"
     },
     {
-      "category": "open",
-      "id": "PH-S1778",
+      "category": "closed",
+      "id": "PH-S1776",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
-      "status": "open",
-      "summary": "ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync; push",
-      "title": "Band close"
+      "status": "closed",
+      "summary": "gsv-loc-audit --min-ratio 0.95 --advisory` (≥95%) + poolAI ratio96 advisory hold",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1775",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "GSV_MIGRATION.md` rows ✅; `docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 113",
+      "title": "poolAI vision parity"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1774",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "VISION.md` node-search/map UX; MEMORY band 113; HANDOFF/NEXT band 113",
+      "title": "GSV vision docs canon"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1773",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "clickable layer chips (active filter) + node-search input + results → doc-preview deep-link",
+      "title": "Layer filter + search UX"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1772",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "Vision Map card embeds `assets/vision.svg` inline + chips/kinds",
+      "title": "Inline SVG map card"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1771",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "tests/gsv_server_contracts.rs` `GET /api/vision/node-search?q=` ok + results array (empty q → ok true)",
+      "title": "Node-search endpoint contract"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1770",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "tests/gsv_vision_contracts.rs` node-search (real-workspace + layer filter + no-match empty)",
+      "title": "Node search contracts"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1769",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "NodeSearchReport`/`node_search_report`/`wire_node_search` → `GET /api/vision/node-search?q=&layer=` (case-insensitive id/label/path/sections, top-N 25, layer z-sorted)",
+      "title": "Node search wire"
     },
     {
       "category": "closed",
@@ -108,96 +107,6 @@
       "published": "2026-05-28",
       "status": "closed",
       "summary": "gsv-loc-audit --min-ratio 0.95 --advisory` (95.56%) + poolAI ratio96 advisory",
-      "title": "Ratio hold advisory"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1766",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "GSV_MIGRATION.md` rows ✅; `docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 112",
-      "title": "poolAI vision parity"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1765",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "VISION.md` sync/extensions/sprint-queue; MEMORY band 112; HANDOFF/NEXT band 112",
-      "title": "GSV vision docs canon"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1764",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "ui/index.html` Resync button + drift status; next/active/open + planned details",
-      "title": "Vision Sync + Sprint Queue UI cards"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1763",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "sync endpoint (ok + empty drift) + sprint-queue endpoint (active == next + planned includes active) + real-workspace report",
-      "title": "Sprint-queue contracts"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1762",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "tests/gsv_vision_contracts.rs` extensions (real-workspace read + sync snapshot + revision parity)",
-      "title": "Extensions contracts"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1761",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "SprintQueueReport`/`sprint_queue_report`/`wire_sprint_queue` → `GET /api/vision/sprint-queue` (entries ∪ active)",
-      "title": "Sprint-queue planning wire"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1760",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "wire_sync` → `GET /api/vision/sync` (re-mirror + drift gate у відповіді)",
-      "title": "Vision auto-sync wire"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1759",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "boxes/vision.rs` `Extensions` struct + read/save/load/source + `gsv_extensions.json` snapshot + `wire_extensions` → `GET /api/vision/extensions`; `sync()`/`collect_drift`/bin include extensions",
-      "title": "Extensions mirror"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1758",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync; push",
-      "title": "Band close"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1757",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "gsv-loc-audit --min-ratio 0.95 --advisory` + poolAI ratio96 advisory",
       "title": "Ratio hold advisory"
     }
   ],

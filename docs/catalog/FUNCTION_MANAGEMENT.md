@@ -265,7 +265,7 @@ FM-xxx (з таблиці нижче)
 
 **VDT:** §5.12 = **журнал PH-S*** (≤10 відкритих). Якщо **< 10** — **`абракадабра`** / project scan **всього проєкту**: concept → FM **§5.1** → roadmaps → architect → DOCS_LEGACY → code → §5.13 fallback. Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Project scan». **Rust-first:** API → `tests/`; Playwright лише browser scope.
 
-**Відкритих у §5.12:** **10** (band 114 PH-S1779…S1788). **Master horizon:** PH-S1789…S1798 (band 115). Vision rev **464**.
+**Відкритих у §5.12:** **0** (band 113 ✅). **Master horizon:** PH-S1779…S1788 (band 114). Vision rev **465**.
 
 **Историчний research backlog (PH-S65+):**
 
@@ -1400,7 +1400,7 @@ Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](
 **Джерело:** власник (GSV future — `GSV_MIGRATION.md` «Galaxy UI», key UX-вимоги) — node-search wire
 + inline interactive vision map + layer filter та search-to-preview UX.
 Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../gsv/GSV_MIGRATION.md).
-Виконано: node-search wire + contracts (122) · inline SVG map + layer filter + search UX · docs canon · vision rev 464.
+Виконано: node-search wire + contracts (122) · inline SVG map + layer filter + search UX · docs canon · vision rev 465.
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|

@@ -131,7 +131,7 @@ docs/architecture (✅ ця сесія)
 | **PH-S1774** | GSV vision docs | `VISION.md` node-search/map UX; MEMORY band 113; HANDOFF/NEXT band 113 |
 | **PH-S1775** | poolAI vision parity | `GSV_MIGRATION.md` rows ✅; `docs/vision/README.md`; цей файл band 113 |
 | **PH-S1776** | Ratio hold advisory | `gsv-loc-audit --min-ratio 0.95 --advisory` (≥95%) |
-| **PH-S1777** | vision-sync close | `gsv-vision-sync` refresh + poolAI vision rev **464** |
+| **PH-S1777** | vision-sync close | `gsv-vision-sync` refresh + poolAI vision rev **465** |
 | **PH-S1778** | Band close | ratio hold (≥95%); fmt/clippy/test (122); docs canon; vision-sync; push |
 
 ## Ключові UX-вимоги (узагальнення ТЗ)

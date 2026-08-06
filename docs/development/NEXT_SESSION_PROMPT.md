@@ -7,11 +7,11 @@ Maintenance mode (FM §5.15) · band 113 drained.
 Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.18 @ S2278).
 
 | **← наступний** | **`абракадабра`** (project scan → band 114) |
-| **§5.12 active** | **10** (band 113 ✅) |
+| **§5.12 active** | **0** (band 113 ✅) |
 | **P0 open** | **PH-SVC34** re-verify GH · **PH-SVC35** OWNER |
 | **Completion pending** | **560** sprints PH-S1739…S2278 · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) |
 | **Horizon** | band 114 → **PH-S1779…S1788** |
-| **Vision** | rev **464** |
+| **Vision** | rev **465** |
 | **GSV** | окремий проєкт Rust-first (bands 102+108+109+110+111+112+113 ✅, ratio 95.15%, tests 122) · [`GSV/README.md`](../../GSV/README.md) · [`docs/gsv/`](../../gsv/README.md) · ролі [`GSV/docs/GSV_ROLES.md`](../../GSV/docs/GSV_ROLES.md) · Vision box [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) |
 | **Cursor / GH** | local **3.13.21** · Auto-review · Router Balance/Intelligence · Actions `GITHUB_TOKEN` opaque/JWT · [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](./CURSOR_UPDATE_RESEARCH_2026-07-27.md) |
 
@@ -42,7 +42,7 @@ id/label/path/sections, top-N 25, layer-z-sorted, links_out/in tallies); `tests/
 **22** + `gsv_server_contracts.rs` **19** (загалом **122**); Vision Map card inline `assets/vision.svg` +
 layer filter chips + search → doc-preview deep-link у `GSV/ui/index.html`; `GSV/docs/VISION.md` +
 MEMORY/HANDOFF/NEXT band 113; poolAI vision README/GSV_MIGRATION/TECH_ROADMAP parity; ratio holds GSV
-**95.15%** (rust 6360 / product 6684) + poolAI **95.02%** advisory; FM §5.12 §5.94 ✅; vision rev **464**.
+**95.15%** (rust 6360 / product 6684) + poolAI **95.02%** advisory; FM §5.12 §5.94 ✅; vision rev **465**.
 Далі band 114 (`PH-S1779…S1788`) — за пріоритетом власника: master backlog Ratio96 phase F або GSV
 future (`GSV_MIGRATION.md` ⏳ rows: `vision.js`/`vision.css` ratio-safe defer, `poolai-ui-wasm` defer).
 Оновлювати FM §5.12 (черга, ≥10 відкритих), HANDOFF, NEXT_SESSION.

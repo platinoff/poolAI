@@ -43,7 +43,7 @@ Speeds · Rust panel → vision-sync (`poolai-vision-sync`) → **один** com
   `node_search`/`wire_node_search` → `GET /api/vision/node-search?q=&layer=` (case-insensitive
   id/label/path/sections, top-N 25 layer-z-sorted, links_out/in tallies); Vision Map card inline
   `assets/vision.svg` + layer filter chips + search → doc-preview deep-link; contracts **122**
-  (22 vision + 19 server); poolAI vision rev **464**; FM §5.12 §5.94.
+  (22 vision + 19 server); poolAI vision rev **465**; FM §5.12 §5.94.
   **Наступний band 114**: master backlog (Ratio96 phase F) або GSV future — за пріоритетом власника
   (перші кандидати: `GSV_MIGRATION.md` ⏳ rows — `vision.js`/`vision.css` ratio-safe defer,
   `poolai-ui-wasm` defer).

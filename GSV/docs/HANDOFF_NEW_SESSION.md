@@ -13,8 +13,8 @@
 - **Тести:** `cargo test` → **122** green · **clippy 0** · **fmt clean**.
 - **Сервер:** порт 8870 (8891 транзитивно зарезервований Windows dynamic exclusion; canon порт **8891**).
 - **FM:** band 113 = §5.94 (PH-S1769…S1778 ✅). Master horizon poolAI: band 114.
-- **Vision rev:** 464 (band 113 vision-sync). Vision box: `boxes/vision.rs` + `gsv-vision-sync` bin +
-  `GET /api/vision*`; snapshot `GSV/data/gsv_manifest.json` + `gsv_feed.json` + `gsv_extensions.json` (rev 464).
+- **Vision rev:** 465 (band 113 vision-sync). Vision box: `boxes/vision.rs` + `gsv-vision-sync` bin +
+  `GET /api/vision*`; snapshot `GSV/data/gsv_manifest.json` + `gsv_feed.json` + `gsv_extensions.json` (rev 465).
   Band 110: `GET /api/vision/map`, `GET /assets/vision.svg`, `GET /api/vision/feed?status=`, Vision Map card.
   Band 111: `GET /api/vision/sprint-map` (sprint-scope/queue/session-tracks links + modules + kinds) та
   `GET /api/vision/doc-preview?id=` (node + 1-hop neighbors) — Sprint Map + Doc Preview UI cards.
