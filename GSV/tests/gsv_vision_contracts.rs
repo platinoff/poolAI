@@ -82,8 +82,8 @@ fn vision_feed_reads_real_workspace() {
         f.items.len()
     );
     assert!(
-        f.items.iter().any(|i| i.id == "PH-S1748"),
-        "feed must include the band-110 close entry"
+        f.items.iter().any(|i| i.id == "PH-S1768"),
+        "feed must include the band-112 close entry"
     );
     for item in &f.items {
         assert!(!item.id.is_empty());
@@ -101,6 +101,7 @@ fn vision_sync_writes_snapshots_to_data_dir() {
     );
     assert!(dir.join("gsv_manifest.json").exists());
     assert!(dir.join("gsv_feed.json").exists());
+    assert!(dir.join("gsv_extensions.json").exists());
     assert_eq!(
         vision::load_manifest(&dir).expect("load manifest").revision,
         report.revision
@@ -108,6 +109,27 @@ fn vision_sync_writes_snapshots_to_data_dir() {
     assert_eq!(
         vision::load_feed(&dir).expect("load feed").items.len(),
         report.feed_items as usize
+    );
+    assert_eq!(
+        vision::load_extensions(&dir)
+            .expect("load extensions")
+            .revision,
+        vision::read_extensions(&repo_root())
+            .expect("extensions")
+            .revision
+    );
+}
+
+#[test]
+fn vision_extensions_reads_real_workspace() {
+    let e = vision::read_extensions(&repo_root()).expect("extensions");
+    assert!(e.revision > 0, "extensions revision must be set");
+    assert!(!e.active_sprint.is_empty());
+    assert!(!e.scope_ids().is_empty(), "planning scopes must be present");
+    assert_eq!(
+        e.active_sprint,
+        vision::read_manifest(&repo_root()).unwrap().next_sprint,
+        "extensions active sprint must match the manifest next sprint"
     );
 }
 
@@ -312,4 +334,81 @@ async fn vision_assets_svg_served() {
     let body = String::from_utf8(bytes.to_vec()).expect("utf8");
     assert!(body.contains("<svg"), "must be an SVG document");
     assert!(body.contains("PoolAI Galaxy Starwalker Vision"));
+}
+
+#[tokio::test]
+async fn vision_api_sync_endpoint() {
+    let dir = temp_data_dir("api-sync");
+    let (status, body) = get(&app(dir.clone()), "/api/vision/sync").await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body["ok"], true);
+    assert!(body["revision"].as_u64().unwrap_or(0) > 0);
+    assert_eq!(
+        body["drift"],
+        serde_json::json!([]),
+        "auto-sync must report an empty drift gate"
+    );
+    assert!(dir.join("gsv_extensions.json").exists());
+    assert!(!body["synced_at"].as_str().unwrap_or("").is_empty());
+}
+
+#[tokio::test]
+async fn vision_api_extensions_endpoint() {
+    let dir = temp_data_dir("api-extensions");
+    let (status, body) = get(&app(dir), "/api/vision/extensions").await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body["ok"], true);
+    assert!(body["revision"].as_u64().unwrap_or(0) > 0);
+    assert!(!body["active_sprint"].as_str().unwrap_or("").is_empty());
+    assert!(body["scope_count"].as_u64().unwrap_or(0) > 0);
+    let scopes = body["scopes"].as_array().expect("scopes array");
+    assert!(!scopes.is_empty());
+}
+
+#[tokio::test]
+async fn vision_api_sprint_queue_endpoint() {
+    let dir = temp_data_dir("api-sprint-queue");
+    let (status, body) = get(&app(dir), "/api/vision/sprint-queue").await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body["ok"], true);
+    assert!(body["revision"].as_u64().unwrap_or(0) > 0);
+    assert!(!body["next_sprint"].as_str().unwrap_or("").is_empty());
+    let active = body["active_sprint"].as_str().unwrap_or("").to_string();
+    assert_eq!(active, body["next_sprint"], "active == next sprint");
+    let planned = body["planned"].as_array().expect("planned array");
+    assert!(
+        planned.iter().any(|p| p["id"] == serde_json::json!(active)),
+        "planned queue must include the active sprint"
+    );
+    assert!(body["open_count"].is_u64());
+    let entries = body["entries"].as_array().expect("entries array");
+    for entry in entries {
+        assert!(
+            planned.iter().any(|p| p == entry),
+            "every manifest queue entry must appear in planned"
+        );
+    }
+    assert_eq!(
+        body["open_count"].as_u64().unwrap_or(0) as usize,
+        entries.len(),
+        "open_count must equal manifest queue entries"
+    );
+}
+
+#[test]
+fn vision_sprint_queue_reads_real_workspace() {
+    let dir = temp_data_dir("sprint-queue");
+    let r = vision::sprint_queue_report(&repo_root(), &dir).expect("report");
+    assert!(r.revision > 0);
+    assert!(!r.next_sprint.is_empty());
+    assert_eq!(r.active_sprint, r.next_sprint);
+    assert_eq!(
+        r.open_count as usize,
+        r.entries.len(),
+        "open_count must equal manifest queue entries"
+    );
+    assert!(
+        r.planned.iter().any(|p| p.id == r.active_sprint),
+        "planned must include the active sprint"
+    );
 }

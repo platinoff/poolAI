@@ -1,6 +1,6 @@
 # Промпт наступної сесії (GSV)
 
-**Оновлено:** 2026-08-05 (band 111 **PH-S1749…S1758** ✅ · ratio **95.77%** · tests **113**)
+**Оновлено:** 2026-08-05 (band 112 **PH-S1759…S1768** ✅ · ratio **95.56%** · tests **118**)
 
 ```
 абракадабра
@@ -8,7 +8,7 @@
 
 **Порядок:** **S0 диск** (`df -h /s` + `check_target_disk.sh` → `cargo clean` за потреби) →
 project scan (**warnings first** — `cargo clippy --all-targets` у GSV, `poolai-rust-diagnostics` у poolAI) →
-drain наступного band (черга — FM §5.12 §5.91 / GSV_TECH_ROADMAP; **без** mid-push) →
+drain наступного band (черга — FM §5.12 §5.93 / GSV_TECH_ROADMAP; **без** mid-push) →
 Speeds · Rust panel → vision-sync (`poolai-vision-sync`) → **один** commit → **`git push` + самарі**.
 
 **⚠️ Зупинити `gsv-server` перед `cargo test`/`build`** (блокує `target/debug/gsv-server.exe`);
@@ -33,8 +33,15 @@ Speeds · Rust panel → vision-sync (`poolai-vision-sync`) → **один** com
   `doc_preview`/`wire_doc_preview` → `GET /api/vision/doc-preview?id=` (node + 1-hop neighbors);
   Sprint Map + Doc Preview UI cards; contracts **113** (14 vision); GSV ratio **95.77%** gate ✅;
   poolAI vision rev **462**; FM §5.12 §5.92.
-  **Наступний band 112**: master backlog (Ratio96 phase F) або GSV future — за пріоритетом власника
-  (перші кандидати: `GSV_MIGRATION.md` ⏳ rows — vision auto-sync, sprint-queue manifest планування).
+- **band 112** (PH-S1759…S1768) ✅ — Vision auto-sync + sprint-queue planning:
+  `Extensions` mirror (read/save/load + `gsv_extensions.json` snapshot + `wire_extensions`
+  → `GET /api/vision/extensions`); `wire_sync` → `GET /api/vision/sync` (re-mirror + drift gate);
+  `sprint_queue_report`/`wire_sprint_queue` → `GET /api/vision/sprint-queue` (entries ∪ active plan);
+  Vision Sync + Sprint Queue UI cards; contracts **118** (19 vision); GSV ratio **95.56%** gate ✅;
+  poolAI vision rev **463**; FM §5.12 §5.93.
+  **Наступний band 113**: master backlog (Ratio96 phase F) або GSV future — за пріоритетом власника
+  (перші кандидати: `GSV_MIGRATION.md` ⏳ rows — `vision.js`/`vision.css` ratio-safe defer,
+  `poolai-ui-wasm` defer).
 
 ## Канон GSV
 
@@ -47,7 +54,7 @@ Speeds · Rust panel → vision-sync (`poolai-vision-sync`) → **один** com
 
 Band 107 ✅ (poolAI Ratio96 docs canon) · band 106 ✅ (Ratio96 loc-audit) · band 105 ✅ (Ratio96 stand smoke) ·
 band 104 ✅ (Ratio96 admin/ops) · band 103 ✅ · band 102 ✅ (GSV migration) · band 109 ✅ (GSV vision sync) ·
-band 110 ✅ (GSV vision map UI) · band 111 ✅ (GSV sprint-map + doc-preview) ·
+band 110 ✅ (GSV vision map UI) · band 111 ✅ (GSV sprint-map + doc-preview) · band 112 ✅ (GSV vision auto-sync + sprint-queue) ·
 staging `GSV/data/*` / `certs/*.pem` /
 `.env` · mid-push · build/test при запущеному `gsv-server` · обхід ratio-смуги Rust-кодом замість compact UI ·
 перенесення legacy `vision.js`/`vision.css` у `GSV/ui/` (знищило б ratio canon).

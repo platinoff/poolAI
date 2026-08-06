@@ -3,10 +3,11 @@
 **TechPreroadMap**: логічний порядок реалізації проєкту GSV → future sprints.
 
 Дата: 2026-08-05 · **Стан:** band 102 **реалізовано** + band 108 (roles/ratio canon) **✅** +
-band 109 (Vision sync/migration) **✅** + band 110 (Vision map UI) **✅** + band 111 (Sprint map + doc-preview) **✅** ·
+band 109 (Vision sync/migration) **✅** + band 110 (Vision map UI) **✅** + band 111 (Sprint map + doc-preview) **✅** +
+band 112 (Vision auto-sync + sprint-queue planning) **✅** ·
 **Спринти:** `PH-S1659…S1668` (FM §5.12 §5.83 ✅) · `PH-S1719…S1728` (FM §5.12 §5.89 ✅) ·
 `PH-S1729…S1738` (FM §5.12 §5.90 ✅) · `PH-S1739…S1748` (FM §5.12 §5.91 ✅) ·
-`PH-S1749…S1758` (FM §5.12 §5.92 ✅).
+`PH-S1749…S1758` (FM §5.12 §5.92 ✅) · `PH-S1759…S1768` (FM §5.12 §5.93 ✅).
 
 ## Логічний порядок (залежності)
 
@@ -101,6 +102,21 @@ docs/architecture (✅ ця сесія)
 | **PH-S1756** | poolAI vision parity | `GSV_MIGRATION.md` row 21 ✅; `docs/vision/README.md`; roadmap band 111 |
 | **PH-S1757** | Ratio hold advisory | `gsv-loc-audit --min-ratio 0.95 --advisory`; poolAI parity hold |
 | **PH-S1758** | Band close | ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync; push |
+
+## Спринти (band 112) — Vision auto-sync + sprint-queue planning
+
+| Sprint | Фокус | Acceptance (ключ) |
+|--------|-------|-------------------|
+| **PH-S1759** | Extensions mirror | `Extensions` struct + read/save/load/source; `gsv_extensions.json` snapshot; `wire_extensions` → `GET /api/vision/extensions`; `sync()`/`collect_drift`/bin include extensions |
+| **PH-S1760** | Vision auto-sync wire | `wire_sync` → `GET /api/vision/sync` (re-mirror + drift gate) |
+| **PH-S1761** | Sprint-queue planning wire | `SprintQueueReport`/`wire_sprint_queue` → `GET /api/vision/sprint-queue` (entries ∪ active) |
+| **PH-S1762** | Extensions contracts | `tests/gsv_vision_contracts.rs` extensions (17) |
+| **PH-S1763** | Sprint-queue contracts | sync + sprint-queue endpoints + real-workspace report (**19**) |
+| **PH-S1764** | Vision Sync + Sprint Queue UI cards | Resync button + drift status; next/active/open + planned у `ui/index.html` |
+| **PH-S1765** | GSV vision docs | `VISION.md` sync/extensions/sprint-queue; MEMORY band 112; HANDOFF/NEXT band 112 |
+| **PH-S1766** | poolAI vision parity | `GSV_MIGRATION.md` rows ✅; `docs/vision/README.md`; roadmap band 112 |
+| **PH-S1767** | Ratio hold advisory | `gsv-loc-audit --min-ratio 0.95 --advisory` (95.56%) |
+| **PH-S1768** | Band close | ratio hold (≥95%); fmt/clippy/test (118); docs canon; vision-sync rev 463; push |
 
 ## Ключові UX-вимоги (узагальнення ТЗ)
 

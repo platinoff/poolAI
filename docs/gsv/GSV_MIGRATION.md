@@ -9,6 +9,7 @@
 | `index.html` (Galaxy UI) | `GSV/ui/index.html` (UI glue поверх Rust) | **✅ (single-page UI: health/tracker/sli/toolchain/ide/update/preview/terminal/hooks, SSE)** |
 | `manifest.json` (граф) | `GSV/data/gsv_manifest.json` (генерується Rust) | **✅ (band 109: `boxes/vision`, `gsv-vision-sync`, `GET /api/vision/manifest`; band 110: `GET /api/vision/map`)** |
 | `feed.json` (RSS ticker) | `GSV/data/gsv_feed.json` | **✅ (band 109: `GET /api/vision/feed`, Vision UI card; band 110: `?status=` filter)** |
+| `extensions.json` (active_sprint + planning scopes) | `GSV/data/gsv_extensions.json` | **✅ (band 112: `Extensions` mirror — read/save/load, `GET /api/vision/extensions`, `wire_sync` auto-sync; `sprint-queue` planning `GET /api/vision/sprint-queue`)** |
 | `vision.js` / `vision.css` | `GSV/ui/` (тонкий UI glue) | ⏳ future (ratio-safe: не переносимо 161 KB legacy JS; canon Rust 95–100%) |
 | `vision.svg` | `GSV/ui/vision.svg` + `GET /assets/vision.svg` | **✅ (band 110: порт isometric diagram; `.svg` = audit Ignored, ratio-neutral)** |
 | README (відкриття) | → `docs/gsv/` | **✅ (адаптовано)** |
@@ -17,8 +18,8 @@
 
 | Джерело | У GSV | Статус |
 |---------|-------|--------|
-| `poolai-vision-sync` (граф/drift gate) | `gsv-vision-sync` bin (`GSV/src/bin/gsv_vision_sync.rs`) | **✅ (band 109: `--check` drift gate, mirror manifest/feed у `GSV/data/`)** |
-| Vision UI-логіка (map, sprint-queue, doc-preview) | `gsv_server` + `GSV/ui/` | **✅ (band 109: Vision card = summary + feed ticker; band 110: Vision Map card = layer chips + edge kinds + svg link + `GET /api/vision/map`; band 111: Sprint Map card + Doc Preview card → `GET /api/vision/sprint-map` + `GET /api/vision/doc-preview?id=`)** |
+| `poolai-vision-sync` (граф/drift gate) | `gsv-vision-sync` bin (`GSV/src/bin/gsv_vision_sync.rs`) | **✅ (band 109: `--check` drift gate, mirror manifest/feed у `GSV/data/`; band 112: mirror + `extensions.json` → `gsv_extensions.json`)** |
+| Vision UI-логіка (map, sprint-queue, doc-preview) | `gsv_server` + `GSV/ui/` | **✅ (band 109: Vision card = summary + feed ticker; band 110: Vision Map card = layer chips + edge kinds + svg link + `GET /api/vision/map`; band 111: Sprint Map card + Doc Preview card → `GET /api/vision/sprint-map` + `GET /api/vision/doc-preview?id=`; band 112: Vision Sync card + Sprint Queue card → `GET /api/vision/sync` + `GET /api/vision/sprint-queue`)** |
 | `crates/poolai-ui-core` / `poolai-ui-wasm` | за потреби (Rust-first; wasm 0–5%) | ⏳ future |
 
 ## Що лишається в PoolAI

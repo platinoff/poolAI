@@ -1,9 +1,9 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-08-05 (band 111 **GSV sprint-map + doc-preview** PH-S1749…S1758 **✅** · band 112 open PH-S1759…S1768 · Vision rev 461)
+**Оновлено:** 2026-08-05 (band 112 **GSV vision auto-sync + sprint-queue** PH-S1759…S1768 **✅** · band 113 open PH-S1769…S1778 · Vision rev 463)
 
 **Наступна сесія:** **`абракадабра`** — див. **канон воркфлоу в [AGENTS.md](../../AGENTS.md §100–113)**.
-**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1759…S1768; черга — FM §5.12) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1769…S1778; черга — FM §5.12) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
 
 --- 
 
@@ -86,6 +86,29 @@ poolAI **95.02%** advisory hold. Vision rev **461**.
 `ok:false` + error); Sprint Map + Doc Preview UI cards; contracts **113** (58 unit + 18 omni +
 8 server + 8 update + 7 ratio + 14 vision), clippy **0**, fmt clean. Ratio: GSV **95.77%**
 (rust 5862 / product 6121, gate ≥95% ✅) + poolAI **95.02%** advisory hold. Vision rev **462**.
+
+## Band 112 — GSV vision auto-sync + sprint-queue planning (PH-S1759…S1768, **✅**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1759** | Extensions mirror (`Extensions` struct + read/save/load/source; `gsv_extensions.json` snapshot; `wire_extensions` → `GET /api/vision/extensions`; `sync()`/`collect_drift`/bin include extensions) |
+| **PH-S1760** | Vision auto-sync wire (`wire_sync` → `GET /api/vision/sync` — re-mirror + drift gate) |
+| **PH-S1761** | Sprint-queue planning wire (`SprintQueueReport`/`wire_sprint_queue` → `GET /api/vision/sprint-queue` — entries ∪ active) |
+| **PH-S1762** | Extensions contracts (`tests/gsv_vision_contracts.rs`, **17**) |
+| **PH-S1763** | Sprint-queue contracts (sync endpoint + sprint-queue endpoint + real-workspace report, **19**) |
+| **PH-S1764** | Vision Sync + Sprint Queue UI cards (`ui/index.html`: Resync button + drift status; next/active/open + planned) |
+| **PH-S1765** | GSV vision docs canon (`VISION.md`; MEMORY band 112; HANDOFF/NEXT band 112) |
+| **PH-S1766** | poolAI vision parity (`GSV_MIGRATION.md` rows ✅; `docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 112) |
+| **PH-S1767** | Ratio hold advisory (`gsv-loc-audit --min-ratio 0.95 --advisory` **95.56%** ✅ + poolAI ratio96 advisory hold 95.02%) |
+| **PH-S1768** | Band close (ratio hold ≥95%; fmt/clippy/test; docs canon; vision-sync; push) |
+
+**PH-S1759…S1768 ✅ (2026-08-05):** Vision auto-sync + sprint-queue planning:
+`GET /api/vision/extensions` (extension mirror: active_sprint PH-S1759, revision 310, ui_version 4,
+37 planning scopes) + `gsv_extensions.json` snapshot; `GET /api/vision/sync` (re-mirror + `drift: []`);
+`GET /api/vision/sprint-queue` (next PH-S1759 == active, open_count 0, planned = entries ∪ active);
+Vision Sync (Resync button) + Sprint Queue UI cards; contracts **118** (58 unit + 8 omni + 7 ratio +
+18 server + 8 update + 19 vision), clippy **0**, fmt clean. Ratio: GSV **95.56%**
+(rust 6162 / product 6448, gate ≥95% ✅) + poolAI **95.02%** advisory hold. Vision rev **463**.
 
 ## Band 109 — GSV vision sync/migration (PH-S1729…S1738, **✅**)
 

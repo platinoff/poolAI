@@ -74,6 +74,9 @@ pub fn router(state: AppState) -> Router {
         .route("/api/vision/feed", get(api_vision_feed))
         .route("/api/vision/sprint-map", get(api_vision_sprint_map))
         .route("/api/vision/doc-preview", get(api_vision_doc_preview))
+        .route("/api/vision/sync", get(api_vision_sync))
+        .route("/api/vision/extensions", get(api_vision_extensions))
+        .route("/api/vision/sprint-queue", get(api_vision_sprint_queue))
         .route("/api/omni", get(api_omni))
         .route(
             "/api/omni/config",
@@ -275,6 +278,27 @@ async fn api_vision_doc_preview(
         &state.repo_root,
         &state.data_dir,
         &id,
+    ))
+}
+
+async fn api_vision_sync(State(state): State<AppState>) -> Json<Value> {
+    Json(crate::boxes::vision::wire_sync(
+        &state.repo_root,
+        &state.data_dir,
+    ))
+}
+
+async fn api_vision_extensions(State(state): State<AppState>) -> Json<Value> {
+    Json(crate::boxes::vision::wire_extensions(
+        &state.repo_root,
+        &state.data_dir,
+    ))
+}
+
+async fn api_vision_sprint_queue(State(state): State<AppState>) -> Json<Value> {
+    Json(crate::boxes::vision::wire_sprint_queue(
+        &state.repo_root,
+        &state.data_dir,
     ))
 }
 

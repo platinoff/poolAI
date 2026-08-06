@@ -75,6 +75,7 @@ fn main() -> ExitCode {
                 );
                 println!("  -> {}", report.manifest_target);
                 println!("  -> {}", report.feed_target);
+                println!("  -> {}", report.extensions_target);
                 ExitCode::SUCCESS
             }
             Err(e) => {

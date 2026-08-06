@@ -265,7 +265,7 @@ FM-xxx (з таблиці нижче)
 
 **VDT:** §5.12 = **журнал PH-S*** (≤10 відкритих). Якщо **< 10** — **`абракадабра`** / project scan **всього проєкту**: concept → FM **§5.1** → roadmaps → architect → DOCS_LEGACY → code → §5.13 fallback. Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Project scan». **Rust-first:** API → `tests/`; Playwright лише browser scope.
 
-**Відкритих у §5.12:** **0** (band 111 ✅). **Master horizon:** PH-S1759…S1768 (band 112). Vision rev **462**.
+**Відкритих у §5.12:** **0** (band 112 ✅). **Master horizon:** PH-S1769…S1778 (band 113). Vision rev **463**.
 
 **Историчний research backlog (PH-S65+):**
 
@@ -1375,6 +1375,25 @@ Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](
 | 1691 | **PH-S1756** | poolAI vision parity | docs canon | `GSV_MIGRATION.md` row 21 ✅; `docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 111 | **✅** |
 | 1692 | **PH-S1757** | Ratio hold advisory | GSV_ROLES | `gsv-loc-audit --min-ratio 0.95 --advisory` + poolAI ratio96 advisory | **✅** |
 | 1693 | **PH-S1758** | Band close | GSV_ROLES | ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync; push | **✅** |
+
+### 5.93 GSV vision auto-sync + sprint-queue planning queue — band 112 (PH-S1759…S1768, 2026-08-05) · **✅**
+
+**Джерело:** власник (GSV future — `GSV_MIGRATION.md` «vision auto-sync, sprint-queue manifest
+планування») — extension manifest mirror + auto-sync wire + sprint-queue planning report та UI cards.
+Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../gsv/GSV_MIGRATION.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1694 | **PH-S1759** | Extensions mirror | GSV_MIGRATION | `boxes/vision.rs` `Extensions` struct + read/save/load/source + `gsv_extensions.json` snapshot + `wire_extensions` → `GET /api/vision/extensions`; `sync()`/`collect_drift`/bin include extensions | **✅** |
+| 1695 | **PH-S1760** | Vision auto-sync wire | GSV_MIGRATION | `wire_sync` → `GET /api/vision/sync` (re-mirror + drift gate у відповіді) | **✅** |
+| 1696 | **PH-S1761** | Sprint-queue planning wire | GSV_MIGRATION | `SprintQueueReport`/`sprint_queue_report`/`wire_sprint_queue` → `GET /api/vision/sprint-queue` (entries ∪ active) | **✅** |
+| 1697 | **PH-S1762** | Extensions contracts | Rust-first (API → tests) | `tests/gsv_vision_contracts.rs` extensions (real-workspace read + sync snapshot + revision parity) | **✅** |
+| 1698 | **PH-S1763** | Sprint-queue contracts | Rust-first (API → tests) | sync endpoint (ok + empty drift) + sprint-queue endpoint (active == next + planned includes active) + real-workspace report | **✅** |
+| 1699 | **PH-S1764** | Vision Sync + Sprint Queue UI cards | GSV_BOXES | `ui/index.html` Resync button + drift status; next/active/open + planned details | **✅** |
+| 1700 | **PH-S1765** | GSV vision docs canon | session canon | `VISION.md` sync/extensions/sprint-queue; MEMORY band 112; HANDOFF/NEXT band 112 | **✅** |
+| 1701 | **PH-S1766** | poolAI vision parity | docs canon | `GSV_MIGRATION.md` rows ✅; `docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 112 | **✅** |
+| 1702 | **PH-S1767** | Ratio hold advisory | GSV_ROLES | `gsv-loc-audit --min-ratio 0.95 --advisory` (95.56%) + poolAI ratio96 advisory | **✅** |
+| 1703 | **PH-S1768** | Band close | GSV_ROLES | ratio hold (≥95%); fmt/clippy/test (118); docs canon; vision-sync; push | **✅** |
 
 ### 5.88 Ratio96 docs canon queue — band 107 (PH-S1709…S1718, 2026-08-02) · **✅**
 

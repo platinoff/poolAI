@@ -54,7 +54,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 **Версія в репозиторії:** `0.2.2` (див. `Cargo.toml`). **Робоча гілка:** `main`.
 
-Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S1758 ✅ (phase F Ratio96 stand smoke). **Rust ratio:** **95.02%** (hold **95%** advisory). **Vision:** manifest rev **462**. **§5.12:** **0** відкритих (band 111 ✅ · band 112 next) · tech **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · наступна сесія **`абракадабра`** (band 112) — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
+Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S1768 ✅ (phase F Ratio96 stand smoke). **Rust ratio:** **95.02%** (hold **95%** advisory). **Vision:** manifest rev **463**. **§5.12:** **0** відкритих (band 112 ✅ · band 113 next) · tech **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · наступна сесія **`абракадабра`** (band 113) — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
 **Репозиторій:** [github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)
 
@@ -80,15 +80,15 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 - `cargo test --all-features` — на **Windows MSVC** можливі каскадні помилки компіляції тестів і/або `STATUS_STACK_BUFFER_OVERRUN` у `rustc` через обсяг фіч (cloud-sdk тощо); для повного матрицю краще **GNU toolchain** з `rust-toolchain.toml` або **Linux CI**. Інтеграційні тести ML прунінгу та SAML узгоджені з поточною семантикою `PruningResult` / унікальними іменами SAML-провайдерів.
 - **Архітектурні інкременти (`main`, 2026-04–05)**: **`RaidService`** + **`VirtualNode*`** services (**FM-016** ✅); ML pipeline + **TurboQuant**; **P3 / FM-005** — `json_errors.rs`, **`HttpAppError`/`RestError`** по REST, **`raid*`**, **`enterprise_api/`**, auth/WS/rate-limit ✅; **OpenAPI** enterprise sync (S14–S20); бінарі **`poolai-worker`**, **`poolai-telegram-bot`**, **`poolai_health_load`**; dev stand — `bin/verify-dev-stand.*`, `core::dev_stand`; ML-тести — **`[[test]]` + `required-features = ["ml"]`**; P2b wire — `tests/distributed_raid_wire_integration.rs`.
 
-### Next Focus (2026-08-01)
+### Next Focus (2026-08-05)
 
-**Product:** наступна сесія **`абракадабра`** → drain band 112 **PH-S1759…S1768** (project scan наступний).
+**Product:** наступна сесія **`абракадабра`** → drain band 113 **PH-S1769…S1778** (project scan наступний).
 
-**GSV (новий):** окремий проєкт **Galaxy StarWalker Vision** — vision migration у Rust-first bin-сервер з боксами (95–100% Rust / 0–5% wasm) · [`GSV/README.md`](GSV/README.md) · **TechPreroadMap** [`docs/gsv/GSV_TECH_ROADMAP.md`](docs/gsv/GSV_TECH_ROADMAP.md). Bands 102+108+109+110+111 ✅ · tests **113** · ratio **95.77%**.
+**GSV (новий):** окремий проєкт **Galaxy StarWalker Vision** — vision migration у Rust-first bin-сервер з боксами (95–100% Rust / 0–5% wasm) · [`GSV/README.md`](GSV/README.md) · **TechPreroadMap** [`docs/gsv/GSV_TECH_ROADMAP.md`](docs/gsv/GSV_TECH_ROADMAP.md). Bands 102+108+109+110+111+112 ✅ · tests **118** · ratio **95.56%**.
 
-**Наступна сесія (owner):** **`абракадабра`** — drain band 112 **PH-S1759…S1768** · [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія (owner):** **`абракадабра`** — drain band 113 **PH-S1769…S1778** · [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
-**§5.12:** **0** відкритих (band 111 ✅ · band 112 next) · vision **rev 462** · last **PH-S1758** · next **PH-S1759**.
+**§5.12:** **0** відкритих (band 112 ✅ · band 113 next) · vision **rev 463** · last **PH-S1768** · next **PH-S1769**.
 
 **Tech (сьогодні):** Service **PH-SVC75…SVC84** — Cursor **3.13.21** research + rules/agents + vision Speeds/eye verify · [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](docs/development/CURSOR_UPDATE_RESEARCH_2026-07-27.md) · Auto-review · prior GH tokens **PH-SVC65…74** ✅ · open **PH-SVC34** (GH verify) · **PH-SVC35** OWNER Atlassian revoke.
 

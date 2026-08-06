@@ -61,6 +61,8 @@ pre.out{background:var(--panel2);border:1px solid var(--line);border-radius:6px;
   <section class="card"><h2>Vision Map <span class="hint">/api/vision/map · /assets/vision.svg</span></h2><div class="body" id="b-vision-map">…</div></section>
   <section class="card"><h2>Sprint Map <span class="hint">/api/vision/sprint-map</span></h2><div class="body" id="b-sprint-map">…</div></section>
   <section class="card"><h2>Doc Preview <span class="hint">/api/vision/doc-preview?id=</span></h2><div class="body"><input id="dpId" type="text" value="galaxy_grid" placeholder="node id"><br><br><button onclick="loadDocPreview()">Show</button><div id="b-doc-preview" style="margin-top:8px">…</div></div></section>
+  <section class="card"><h2>Vision Sync <span class="hint">/api/vision/sync</span></h2><div class="body"><button onclick="resyncVision()">Resync snapshot</button> <span id="b-vision-sync-status" class="dim">…</span><div id="b-vision-sync" style="margin-top:8px">…</div></div></section>
+  <section class="card"><h2>Sprint Queue <span class="hint">/api/vision/sprint-queue</span></h2><div class="body" id="b-sprint-queue">…</div></section>
   <section class="card"><h2>OmniRouter <span class="hint">/api/omni</span></h2><div class="body">
     <div class="dim" id="b-omni-summary">…</div>
     <div style="margin-top:6px">recommended: <span id="b-omni-rec">…</span></div>
@@ -172,6 +174,25 @@ function renderDocPreview(d) {
     tab(["kind", "target"], (d.links_in || []).map(l => ["<kbd>" + esc(l.kind) + "</kbd>", "<kbd>" + esc(l.node.id) + "</kbd>" + " <span class='dim'>" + esc(l.node.label) + "</span>"])) +
     "</details>";
 }
+function renderSprintQueue(d) {
+  if (!d.ok) { $("b-sprint-queue").innerHTML = "<span class='err'>" + esc(d.error || "sprint queue unavailable") + "</span>"; return; }
+  $("b-sprint-queue").innerHTML = "<div class='dim'>rev <kbd>" + d.revision + "</kbd> · next <kbd>" + esc(d.next_sprint) +
+    "</kbd> · last closed <kbd>" + esc(d.last_sprint_closed) + "</kbd></div>" +
+    "<div>active <kbd>" + esc(d.active_sprint) + "</kbd> · open <span class='ok'>" + d.open_count + "</span></div>" +
+    "<details style='margin-top:6px'><summary>planned (" + (d.planned || []).length + ")</summary>" +
+    tab(["id", "status", "category", "title"], (d.planned || []).map(p =>
+      ["<kbd>" + esc(p.id) + "</kbd>", "<span class='" + (p.status === "closed" ? "ok" : "warn") + "'>" + esc(p.status) + "</span>", esc(p.category), esc(p.title)])) +
+    "</details>";
+}
+function renderVisionSync(d) {
+  const s = $("b-vision-sync-status");
+  if (!d.ok) { s.textContent = "error"; $("b-vision-sync").innerHTML = "<span class='err'>" + esc(d.error || "sync failed") + "</span>"; return; }
+  s.textContent = d.drift && d.drift.length ? "drift: " + d.drift.length : "drift ok";
+  $("b-vision-sync").innerHTML = "<div>rev <kbd>" + d.revision + "</kbd> · git <span class='dim'>" + esc(d.git_head || "—") +
+    "</span> · " + (d.drift && d.drift.length ? "<span class='err'>drift " + d.drift.length + "</span>" : "<span class='ok'>drift ok</span>") + "</div>" +
+    "<div class='dim'>nodes " + d.nodes_count + " · edges " + d.edges_count + " · feed " + d.feed_items + "</div>" +
+    "<div class='dim' style='font-size:11px'>" + esc(d.synced_at || "") + "</div>";
+}
 function renderVisionMap(d) {
   if (!d.ok) { $("b-vision-map").innerHTML = "<span class='err'>" + esc(d.error || "vision map unavailable") + "</span>"; return; }
   const svg = "<a href='assets/vision.svg' target='_blank' style='font-size:12px'>open vision.svg ↗</a>";
@@ -209,6 +230,11 @@ async function loadDocPreview() {
     renderDocPreview(d);
   } catch (e) { $("b-doc-preview").innerHTML = "<span class='err'>" + esc(e.message) + "</span>"; }
 }
+async function resyncVision() {
+  $("b-vision-sync-status").textContent = "syncing…";
+  try { renderVisionSync(await get("api/vision/sync")); await resync(); }
+  catch (e) { $("b-vision-sync-status").textContent = "error"; $("b-vision-sync").innerHTML = "<span class='err'>" + esc(e.message) + "</span>"; }
+}
 async function resync() {
   const urls = [
     ["api/health", renderHealth], ["api/tracker", renderTracker], ["api/sli", renderSli],
@@ -216,6 +242,7 @@ async function resync() {
     ["api/hooks/tests", renderHooksTests], ["api/hooks/bench", renderHooksBench], ["api/ratio", renderRatio],
     ["api/vision", renderVision], ["api/vision/map", renderVisionMap],
     ["api/vision/sprint-map", renderSprintMap],
+    ["api/vision/sprint-queue", renderSprintQueue],
     ["api/omni", renderOmni],
   ];
   const results = await Promise.allSettled(urls.map(([u, f]) => get(u).then(f)));

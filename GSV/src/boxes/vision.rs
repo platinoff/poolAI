@@ -118,6 +118,31 @@ pub struct Feed {
     pub items: Vec<FeedItem>,
 }
 
+/// Extension manifest mirror (`docs/vision/extensions.json` → `extensions[]`).
+///
+/// Only the planning-relevant fields are typed; `scopes` (scope-id → meta) is
+/// kept opaque so new extension metadata does not break the snapshot.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Extensions {
+    #[serde(default)]
+    pub active_sprint: String,
+    #[serde(default)]
+    pub revision: u64,
+    #[serde(default)]
+    pub ui_version: u64,
+    #[serde(default)]
+    pub updated_at: String,
+    #[serde(default)]
+    pub scopes: std::collections::BTreeMap<String, Value>,
+}
+
+impl Extensions {
+    /// Sorted scope ids for stable wire output.
+    pub fn scope_ids(&self) -> Vec<String> {
+        self.scopes.keys().cloned().collect()
+    }
+}
+
 /// Result of a `gsv-vision-sync` write run.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SyncReport {
@@ -132,6 +157,8 @@ pub struct SyncReport {
     pub feed_source: String,
     pub manifest_target: String,
     pub feed_target: String,
+    pub extensions_source: String,
+    pub extensions_target: String,
     pub synced_at: String,
 }
 
@@ -167,8 +194,10 @@ pub struct MapReport {
 
 const MANIFEST_SOURCE: &str = "docs/vision/manifest.json";
 const FEED_SOURCE: &str = "docs/vision/feed.json";
+const EXTENSIONS_SOURCE: &str = "docs/vision/extensions.json";
 const MANIFEST_TARGET: &str = "gsv_manifest.json";
 const FEED_TARGET: &str = "gsv_feed.json";
+const EXTENSIONS_TARGET: &str = "gsv_extensions.json";
 
 /// Source manifest path under `repo_root`.
 pub fn manifest_source(repo_root: &Path) -> PathBuf {
@@ -188,6 +217,16 @@ pub fn manifest_target(data_dir: &Path) -> PathBuf {
 /// Persisted feed path under `data_dir`.
 pub fn feed_target(data_dir: &Path) -> PathBuf {
     data_dir.join(FEED_TARGET)
+}
+
+/// Source extensions path under `repo_root`.
+pub fn extensions_source(repo_root: &Path) -> PathBuf {
+    repo_root.join(EXTENSIONS_SOURCE)
+}
+
+/// Persisted extensions path under `data_dir`.
+pub fn extensions_target(data_dir: &Path) -> PathBuf {
+    data_dir.join(EXTENSIONS_TARGET)
 }
 
 /// Read + parse the vision manifest from `repo_root`.
@@ -234,6 +273,53 @@ pub fn load_feed(data_dir: &Path) -> Result<Feed, String> {
     let raw =
         std::fs::read_to_string(&path).map_err(|e| format!("read {}: {e}", path.display()))?;
     serde_json::from_str(&raw).map_err(|e| format!("parse {}: {e}", path.display()))
+}
+
+/// Read + parse the extension manifest from `repo_root`.
+pub fn read_extensions(repo_root: &Path) -> Result<Extensions, String> {
+    let path = extensions_source(repo_root);
+    let raw =
+        std::fs::read_to_string(&path).map_err(|e| format!("read {}: {e}", path.display()))?;
+    serde_json::from_str(&raw).map_err(|e| format!("parse extensions.json: {e}"))
+}
+
+/// Persist the extensions snapshot to `data_dir`.
+pub fn save_extensions(extensions: &Extensions, data_dir: &Path) -> Result<(), String> {
+    std::fs::create_dir_all(data_dir).map_err(|e| format!("create data dir: {e}"))?;
+    let raw = serde_json::to_string_pretty(extensions).map_err(|e| format!("serialize: {e}"))?;
+    std::fs::write(extensions_target(data_dir), raw).map_err(|e| format!("write: {e}"))
+}
+
+/// Load the persisted extensions snapshot from `data_dir`.
+pub fn load_extensions(data_dir: &Path) -> Result<Extensions, String> {
+    let path = extensions_target(data_dir);
+    let raw =
+        std::fs::read_to_string(&path).map_err(|e| format!("read {}: {e}", path.display()))?;
+    serde_json::from_str(&raw).map_err(|e| format!("parse {}: {e}", path.display()))
+}
+
+/// Preferred source for the wire: live `repo_root` source, else persisted snapshot.
+fn source_extensions(repo_root: &Path, data_dir: &Path) -> Result<Extensions, String> {
+    read_extensions(repo_root).or_else(|_| load_extensions(data_dir))
+}
+
+/// `GET /api/vision/extensions` — extension manifest mirror (planning scopes).
+pub fn wire_extensions(repo_root: &Path, data_dir: &Path) -> Value {
+    match source_extensions(repo_root, data_dir) {
+        Ok(e) => {
+            let scope_ids = e.scope_ids();
+            json!({
+                "ok": true,
+                "active_sprint": e.active_sprint,
+                "revision": e.revision,
+                "ui_version": e.ui_version,
+                "updated_at": e.updated_at,
+                "scope_count": scope_ids.len(),
+                "scopes": scope_ids,
+            })
+        }
+        Err(e) => json!({ "ok": false, "error": e }),
+    }
 }
 
 /// Preferred source for the wire: live `repo_root` source, else persisted snapshot.
@@ -671,8 +757,10 @@ pub fn wire_feed_filter(repo_root: &Path, data_dir: &Path, status: Option<&str>)
 pub fn sync(repo_root: &Path, data_dir: &Path) -> Result<SyncReport, String> {
     let manifest = read_manifest(repo_root)?;
     let feed = read_feed(repo_root)?;
+    let extensions = read_extensions(repo_root)?;
     save_manifest(&manifest, data_dir)?;
     save_feed(&feed, data_dir)?;
+    save_extensions(&extensions, data_dir)?;
     Ok(SyncReport {
         revision: manifest.revision,
         git_head: manifest.git_head.clone(),
@@ -685,6 +773,8 @@ pub fn sync(repo_root: &Path, data_dir: &Path) -> Result<SyncReport, String> {
         feed_source: feed_source(repo_root).to_string_lossy().to_string(),
         manifest_target: manifest_target(data_dir).to_string_lossy().to_string(),
         feed_target: feed_target(data_dir).to_string_lossy().to_string(),
+        extensions_source: extensions_source(repo_root).to_string_lossy().to_string(),
+        extensions_target: extensions_target(data_dir).to_string_lossy().to_string(),
         synced_at: crate::vision::rfc3339_now(),
     })
 }
@@ -703,6 +793,10 @@ pub fn collect_drift(repo_root: &Path, data_dir: &Path) -> Vec<String> {
         issues.push(e);
         return issues;
     }
+    if let Err(e) = read_extensions(repo_root) {
+        issues.push(e);
+        return issues;
+    }
     if let Ok(persisted) = load_manifest(data_dir) {
         if persisted.revision != manifest.revision {
             issues.push(format!(
@@ -715,6 +809,84 @@ pub fn collect_drift(repo_root: &Path, data_dir: &Path) -> Vec<String> {
         issues.push("manifest revision is 0".to_string());
     }
     issues
+}
+
+/// `GET /api/vision/sync` — auto-sync: re-mirror the vision canon into the
+/// snapshot and report drift. Never fails the request; `ok` reflects the write.
+pub fn wire_sync(repo_root: &Path, data_dir: &Path) -> Value {
+    let drift = collect_drift(repo_root, data_dir);
+    match sync(repo_root, data_dir) {
+        Ok(r) => json!({
+            "ok": true,
+            "drift": drift,
+            "revision": r.revision,
+            "git_head": r.git_head,
+            "nodes_count": r.nodes_count,
+            "edges_count": r.edges_count,
+            "feed_items": r.feed_items,
+            "next_sprint": r.next_sprint,
+            "last_sprint_closed": r.last_sprint_closed,
+            "manifest_target": r.manifest_target,
+            "feed_target": r.feed_target,
+            "extensions_target": r.extensions_target,
+            "synced_at": r.synced_at,
+        }),
+        Err(e) => json!({ "ok": false, "drift": drift, "error": e }),
+    }
+}
+
+/// Sprint-queue planning report (`/api/vision/sprint-queue`).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct SprintQueueReport {
+    pub revision: u64,
+    pub git_head: String,
+    pub next_sprint: String,
+    pub last_sprint_closed: String,
+    pub open_count: u64,
+    pub active_sprint: String,
+    pub entries: Vec<SprintQueueEntry>,
+    pub planned: Vec<SprintQueueEntry>,
+}
+
+/// Build the sprint-queue plan: manifest queue ∪ active sprint from extensions.
+pub fn sprint_queue_report(repo_root: &Path, data_dir: &Path) -> Result<SprintQueueReport, String> {
+    let m = source_manifest(repo_root, data_dir)?;
+    let e = source_extensions(repo_root, data_dir)?;
+    let mut planned = m.sprint_queue.clone();
+    let has_active = planned.iter().any(|q| q.id == e.active_sprint);
+    if !has_active && !e.active_sprint.is_empty() {
+        planned.push(SprintQueueEntry {
+            id: e.active_sprint.clone(),
+            title: e.active_sprint.clone(),
+            summary: "active sprint (extensions)".to_string(),
+            status: "open".to_string(),
+            category: "sprint".to_string(),
+        });
+    }
+    Ok(SprintQueueReport {
+        revision: m.revision,
+        git_head: m.git_head,
+        next_sprint: m.next_sprint,
+        last_sprint_closed: m.last_sprint_closed,
+        open_count: m.sprint_queue_open_count,
+        active_sprint: e.active_sprint,
+        entries: m.sprint_queue,
+        planned,
+    })
+}
+
+/// `GET /api/vision/sprint-queue` — sprint-queue planning report.
+pub fn wire_sprint_queue(repo_root: &Path, data_dir: &Path) -> Value {
+    match sprint_queue_report(repo_root, data_dir) {
+        Ok(r) => {
+            let mut v = serde_json::to_value(&r).unwrap_or_default();
+            if let serde_json::Value::Object(map) = &mut v {
+                map.insert("ok".to_string(), serde_json::Value::Bool(true));
+            }
+            v
+        }
+        Err(e) => json!({ "ok": false, "error": e }),
+    }
 }
 
 #[cfg(test)]
@@ -767,6 +939,33 @@ mod tests {
                 link: "docs/vision/index.html#sprint-queue".to_string(),
             }],
         }
+    }
+
+    fn sample_extensions() -> Extensions {
+        let mut scopes = std::collections::BTreeMap::new();
+        scopes.insert(
+            "fm_replenish_post_galaxy_mvp".to_string(),
+            json!({ "title": "FM replenish" }),
+        );
+        scopes.insert(
+            "docs_vision_meta".to_string(),
+            json!({ "title": "Vision meta" }),
+        );
+        Extensions {
+            active_sprint: "PH-S1729".to_string(),
+            revision: 310,
+            ui_version: 4,
+            updated_at: "2026-05-28".to_string(),
+            scopes,
+        }
+    }
+
+    fn write_extensions(vis: &Path) {
+        std::fs::write(
+            vis.join("extensions.json"),
+            serde_json::to_string(&sample_extensions()).unwrap(),
+        )
+        .unwrap();
     }
 
     #[test]
@@ -822,6 +1021,7 @@ mod tests {
             serde_json::to_string(&sample_feed()).unwrap(),
         )
         .unwrap();
+        write_extensions(&vis);
 
         let report = sync(&src, &data).unwrap();
         assert_eq!(report.revision, 458);
@@ -830,6 +1030,7 @@ mod tests {
         assert_eq!(report.feed_items, 1);
         assert!(manifest_target(&data).exists());
         assert!(feed_target(&data).exists());
+        assert!(extensions_target(&data).exists());
         let _ = std::fs::remove_dir_all(&tmp);
     }
 
@@ -851,6 +1052,7 @@ mod tests {
             serde_json::to_string(&sample_feed()).unwrap(),
         )
         .unwrap();
+        write_extensions(&vis);
         save_manifest(&sample_manifest(), &data).unwrap();
 
         assert!(collect_drift(&src, &data).is_empty());
@@ -877,6 +1079,7 @@ mod tests {
             serde_json::to_string(&sample_feed()).unwrap(),
         )
         .unwrap();
+        write_extensions(&vis);
         save_manifest(&sample_manifest(), &data).unwrap();
 
         let issues = collect_drift(&src, &data);
@@ -1061,6 +1264,7 @@ mod tests {
         )
         .unwrap();
         std::fs::write(vis.join("feed.json"), serde_json::to_string(feed).unwrap()).unwrap();
+        write_extensions(&vis);
     }
 
     #[test]
