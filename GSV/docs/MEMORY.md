@@ -4,13 +4,13 @@
 Оновлюється в кінці кожного band. Лічильники — вимірювані (`wc -l`, `cargo test`,
 `cargo run --bin gsv-loc-audit`), не з пам'яті.
 
-## Стан (2026-08-05 · band 112 ✅)
+## Стан (2026-08-05 · band 113 ✅)
 
 - **Канон:** Rust **95–100%** / wasm **0–5%** (завжди), без Python/Java; bins — лише `src/bin/`.
-- **Ratio (виміряно):** `cargo run --bin gsv-loc-audit` → **95.56%** (rust 6162 / product 6448) — gate ≥95% ✅.
+- **Ratio (виміряно):** `cargo run --bin gsv-loc-audit` → **95.15%** (rust 6360 / product 6684) — gate ≥95% ✅.
   Звіт: `GSV/data/rust_ratio.json` (gitignored).
-- **Тести (виміряно):** `cargo test` → **118** (58 unit + 8 `gsv_omni_contracts` + 7 `gsv_ratio_contracts`
-  + 18 `gsv_server_contracts` + 8 `gsv_update_flow` + 19 `gsv_vision_contracts`).
+- **Тести (виміряно):** `cargo test` → **122** (58 unit + 8 `gsv_omni_contracts` + 7 `gsv_ratio_contracts`
+  + 19 `gsv_server_contracts` + 8 `gsv_update_flow` + 22 `gsv_vision_contracts`).
   `cargo clippy --all-targets` → **0** warnings. `cargo fmt` clean.
 - **Бокси:** Tracker · SLI console · Toolchain · IDE · Update/offline · Box preview · SLI terminal ·
   Tests/bench hooks · **Ratio** · **Vision** · **Vision Map** · **Sprint Map** · **Doc Preview** ·
@@ -115,6 +115,28 @@
 - **PH-S1767** Ratio hold advisory (`gsv-loc-audit --min-ratio 0.95 --advisory` → 95.56%) +
   poolAI parity hold.
 - **PH-S1768** Band close: ratio hold, fmt, clippy, cargo test (118), docs canon, vision-sync, push.
+
+### Band 113 (PH-S1769…S1778, ✅ 2026-08-05) — Galaxy UI: node search + interactive map
+- **PH-S1769** `boxes/vision.rs` `NodeSearchReport`/`NodeSearchResult` structs + `node_search`/
+  `wire_node_search` — case-insensitive match по id/label/path/sections, `top-N 25`
+  (`NODE_SEARCH_LIMIT`) layer-z-sorted, `links_out`/`links_in` tallies;
+  `GET /api/vision/node-search?q=&layer=` route + handler у `server/mod.rs`.
+- **PH-S1770** `tests/gsv_vision_contracts.rs` node-search contracts (real-workspace
+  id/label/path/links + layer-z sort, layer filter, no-match empty + cap) → 22.
+- **PH-S1771** `tests/gsv_server_contracts.rs` node-search endpoint contract
+  (ok + revision + results + links_out/in u64; empty `q` → ok true) → 19.
+- **PH-S1772** Vision Map card рендерить **inline** `assets/vision.svg` (`<img>` через
+  `GET /assets/vision.svg`) + chips/kinds.
+- **PH-S1773** Layer filter + search UX у `ui/index.html`: клікабельні layer chips
+  (active filter → `toggleMapLayer`), node-search input + results table
+  (`searchVisionNodes`) → deep-link у Doc Preview (`openSearchNode`).
+- **PH-S1774** `GSV/docs/VISION.md` (node-search API + інтерактивна мапа) + `MEMORY.md` band 113 +
+  HANDOFF/NEXT_SESSION.
+- **PH-S1775** poolAI parity: `docs/gsv/GSV_MIGRATION.md` row ✅, `docs/vision/README.md`,
+  `GSV_TECH_ROADMAP.md` band 113, FM §5.94.
+- **PH-S1776** Ratio hold advisory (`gsv-loc-audit --min-ratio 0.95 --advisory`) + poolAI parity hold.
+- **PH-S1777** vision-sync close: `gsv-vision-sync` refresh + poolAI vision rev++.
+- **PH-S1778** Band close: ratio hold, fmt, clippy, cargo test, docs canon, vision-sync, push.
 
 ## Важливі факти (не забувати)
 

@@ -255,3 +255,24 @@ async fn health_has_json_content_type() {
         .and_then(|v| v.to_str().ok());
     assert!(ct.is_some_and(|v| v.contains("application/json")));
 }
+
+#[tokio::test]
+async fn vision_node_search_endpoint() {
+    let (app, _state) = app();
+    let (status, json) = get(&app, "/api/vision/node-search?q=galaxy").await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(json["ok"], true);
+    assert!(json["revision"].as_u64().unwrap_or(0) > 0);
+    assert_eq!(json["query"], "galaxy");
+    let results = json["results"].as_array().expect("results array");
+    assert!(!results.is_empty());
+    for res in results {
+        assert!(res["id"].as_str().is_some_and(|s| !s.is_empty()));
+        assert!(res["links_out"].is_u64());
+        assert!(res["links_in"].is_u64());
+    }
+    let (status, empty) = get(&app, "/api/vision/node-search").await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(empty["ok"], true);
+    assert!(empty["results"].is_array());
+}

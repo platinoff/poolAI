@@ -412,3 +412,59 @@ fn vision_sprint_queue_reads_real_workspace() {
         "planned must include the active sprint"
     );
 }
+
+#[test]
+fn vision_node_search_finds_galaxy_nodes() {
+    let dir = temp_data_dir("node-search");
+    let r = vision::node_search(&repo_root(), &dir, "galaxy", None).expect("search");
+    assert!(r.revision > 0);
+    assert_eq!(r.query, "galaxy");
+    assert!(r.layer.is_empty());
+    assert!(r.total_matches > 0);
+    assert!(!r.results.is_empty());
+    let layers = r
+        .results
+        .iter()
+        .map(|res| res.layer.clone())
+        .collect::<Vec<_>>();
+    let sorted = {
+        let mut v = layers.clone();
+        v.sort();
+        v
+    };
+    assert_eq!(layers, sorted, "results must be layer-z sorted then by id");
+    for res in &r.results {
+        assert!(!res.id.is_empty());
+        assert!(!res.label.is_empty());
+        assert!(!res.layer.is_empty());
+        assert!(
+            res.links_out > 0 || res.links_in > 0,
+            "galaxy nodes are connected to at least one edge"
+        );
+    }
+}
+
+#[test]
+fn vision_node_search_filters_by_layer() {
+    let dir = temp_data_dir("node-search-layer");
+    let m = vision::read_manifest(&repo_root()).expect("manifest");
+    let layer_id = m.layers.first().map(|l| l.id.clone()).expect("layer");
+    let r = vision::node_search(&repo_root(), &dir, "", Some(&layer_id)).expect("search");
+    assert_eq!(r.layer, layer_id);
+    assert!(r.total_matches > 0);
+    assert!(r.results.iter().all(|res| res.layer == layer_id));
+}
+
+#[test]
+fn vision_node_search_no_match_empty() {
+    let dir = temp_data_dir("node-search-empty");
+    let r = vision::node_search(&repo_root(), &dir, "zzz-no-such-node-42", None).expect("search");
+    assert_eq!(r.total_matches, 0);
+    assert!(r.results.is_empty());
+    let all = vision::node_search(&repo_root(), &dir, "", None).expect("search all");
+    assert!(
+        all.total_matches as usize > vision::NODE_SEARCH_LIMIT,
+        "galaxy has more nodes than the search cap"
+    );
+    assert_eq!(all.results.len(), vision::NODE_SEARCH_LIMIT);
+}

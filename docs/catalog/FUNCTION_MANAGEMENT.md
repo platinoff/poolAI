@@ -265,7 +265,7 @@ FM-xxx (з таблиці нижче)
 
 **VDT:** §5.12 = **журнал PH-S*** (≤10 відкритих). Якщо **< 10** — **`абракадабра`** / project scan **всього проєкту**: concept → FM **§5.1** → roadmaps → architect → DOCS_LEGACY → code → §5.13 fallback. Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Project scan». **Rust-first:** API → `tests/`; Playwright лише browser scope.
 
-**Відкритих у §5.12:** **0** (band 112 ✅). **Master horizon:** PH-S1769…S1778 (band 113). Vision rev **463**.
+**Відкритих у §5.12:** **10** (band 114 PH-S1779…S1788). **Master horizon:** PH-S1789…S1798 (band 115). Vision rev **464**.
 
 **Историчний research backlog (PH-S65+):**
 
@@ -1394,6 +1394,26 @@ Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](
 | 1701 | **PH-S1766** | poolAI vision parity | docs canon | `GSV_MIGRATION.md` rows ✅; `docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 112 | **✅** |
 | 1702 | **PH-S1767** | Ratio hold advisory | GSV_ROLES | `gsv-loc-audit --min-ratio 0.95 --advisory` (95.56%) + poolAI ratio96 advisory | **✅** |
 | 1703 | **PH-S1768** | Band close | GSV_ROLES | ratio hold (≥95%); fmt/clippy/test (118); docs canon; vision-sync; push | **✅** |
+
+### 5.94 GSV Galaxy UI: node search + interactive map queue — band 113 (PH-S1769…S1778, 2026-08-05) · **✅**
+
+**Джерело:** власник (GSV future — `GSV_MIGRATION.md` «Galaxy UI», key UX-вимоги) — node-search wire
++ inline interactive vision map + layer filter та search-to-preview UX.
+Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../gsv/GSV_MIGRATION.md).
+Виконано: node-search wire + contracts (122) · inline SVG map + layer filter + search UX · docs canon · vision rev 464.
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1704 | **PH-S1769** | Node search wire | GSV_MIGRATION | `NodeSearchReport`/`node_search_report`/`wire_node_search` → `GET /api/vision/node-search?q=&layer=` (case-insensitive id/label/path/sections, top-N 25, layer z-sorted) | `[x]` |
+| 1705 | **PH-S1770** | Node search contracts | Rust-first (API → tests) | `tests/gsv_vision_contracts.rs` node-search (real-workspace + layer filter + no-match empty) | `[x]` |
+| 1706 | **PH-S1771** | Node-search endpoint contract | Rust-first (API → tests) | `tests/gsv_server_contracts.rs` `GET /api/vision/node-search?q=` ok + results array (empty q → ok true) | `[x]` |
+| 1707 | **PH-S1772** | Inline SVG map card | GSV_BOXES | Vision Map card embeds `assets/vision.svg` inline + chips/kinds | `[x]` |
+| 1708 | **PH-S1773** | Layer filter + search UX | GSV_BOXES | clickable layer chips (active filter) + node-search input + results → doc-preview deep-link | `[x]` |
+| 1709 | **PH-S1774** | GSV vision docs canon | session canon | `VISION.md` node-search/map UX; MEMORY band 113; HANDOFF/NEXT band 113 | `[x]` |
+| 1710 | **PH-S1775** | poolAI vision parity | docs canon | `GSV_MIGRATION.md` rows ✅; `docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 113 | `[x]` |
+| 1711 | **PH-S1776** | Ratio hold advisory | GSV_ROLES | `gsv-loc-audit --min-ratio 0.95 --advisory` (≥95%) + poolAI ratio96 advisory hold | `[x]` |
+| 1712 | **PH-S1777** | vision-sync close | vision | `gsv-vision-sync` refresh + poolAI vision rev++ | `[x]` |
+| 1713 | **PH-S1778** | Band close | GSV_ROLES | ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync; push | `[x]` |
 
 ### 5.88 Ratio96 docs canon queue — band 107 (PH-S1709…S1718, 2026-08-02) · **✅**
 

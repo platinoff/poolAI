@@ -74,6 +74,7 @@ pub fn router(state: AppState) -> Router {
         .route("/api/vision/feed", get(api_vision_feed))
         .route("/api/vision/sprint-map", get(api_vision_sprint_map))
         .route("/api/vision/doc-preview", get(api_vision_doc_preview))
+        .route("/api/vision/node-search", get(api_vision_node_search))
         .route("/api/vision/sync", get(api_vision_sync))
         .route("/api/vision/extensions", get(api_vision_extensions))
         .route("/api/vision/sprint-queue", get(api_vision_sprint_queue))
@@ -285,6 +286,24 @@ async fn api_vision_sync(State(state): State<AppState>) -> Json<Value> {
     Json(crate::boxes::vision::wire_sync(
         &state.repo_root,
         &state.data_dir,
+    ))
+}
+
+#[derive(serde::Deserialize)]
+struct VisionNodeSearchParams {
+    q: Option<String>,
+    layer: Option<String>,
+}
+
+async fn api_vision_node_search(
+    State(state): State<AppState>,
+    Query(params): Query<VisionNodeSearchParams>,
+) -> Json<Value> {
+    Json(crate::boxes::vision::wire_node_search(
+        &state.repo_root,
+        &state.data_dir,
+        params.q.as_deref().unwrap_or_default(),
+        params.layer.as_deref(),
     ))
 }
 

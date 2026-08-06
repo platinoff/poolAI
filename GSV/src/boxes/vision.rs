@@ -740,6 +740,118 @@ pub fn wire_doc_preview(repo_root: &Path, data_dir: &Path, id: &str) -> Value {
     }
 }
 
+/// Node-search result: matched galaxy node + link tallies.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct NodeSearchResult {
+    pub id: String,
+    pub label: String,
+    pub layer: String,
+    pub path: String,
+    #[serde(default)]
+    pub sections: Vec<String>,
+    pub links_out: u64,
+    pub links_in: u64,
+}
+
+/// Node-search report (`/api/vision/node-search`).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct NodeSearchReport {
+    pub revision: u64,
+    pub git_head: String,
+    pub query: String,
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub layer: String,
+    pub total_matches: u64,
+    pub results: Vec<NodeSearchResult>,
+}
+
+/// Default result cap for node search.
+pub const NODE_SEARCH_LIMIT: usize = 25;
+
+/// Case-insensitive match over id / label / path / sections.
+fn node_matches_query(n: &ManifestNode, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    n.id.to_lowercase().contains(needle)
+        || n.label.to_lowercase().contains(needle)
+        || n.path.to_lowercase().contains(needle)
+        || n.sections.iter().any(|s| s.to_lowercase().contains(needle))
+}
+
+/// Build the node-search report (live source, else persisted snapshot).
+pub fn node_search(
+    repo_root: &Path,
+    data_dir: &Path,
+    query: &str,
+    layer: Option<&str>,
+) -> Result<NodeSearchReport, String> {
+    let m = source_manifest(repo_root, data_dir)?;
+    let needle = query.trim().to_lowercase();
+    let layer_filter = layer.unwrap_or("").trim().to_string();
+
+    let mut links_out: std::collections::HashMap<&str, u64> = std::collections::HashMap::new();
+    let mut links_in: std::collections::HashMap<&str, u64> = std::collections::HashMap::new();
+    for e in &m.edges {
+        *links_out.entry(e.from.as_str()).or_insert(0) += 1;
+        *links_in.entry(e.to.as_str()).or_insert(0) += 1;
+    }
+    let layer_z: std::collections::HashMap<&str, i64> =
+        m.layers.iter().map(|l| (l.id.as_str(), l.z)).collect();
+
+    let mut results: Vec<NodeSearchResult> = m
+        .nodes
+        .iter()
+        .filter(|n| node_matches_query(n, &needle))
+        .filter(|n| layer_filter.is_empty() || n.layer == layer_filter)
+        .map(|n| NodeSearchResult {
+            id: n.id.clone(),
+            label: n.label.clone(),
+            layer: n.layer.clone(),
+            path: n.path.clone(),
+            sections: n.sections.clone(),
+            links_out: links_out.get(n.id.as_str()).copied().unwrap_or(0),
+            links_in: links_in.get(n.id.as_str()).copied().unwrap_or(0),
+        })
+        .collect();
+    results.sort_by(|a, b| {
+        layer_z
+            .get(a.layer.as_str())
+            .cmp(&layer_z.get(b.layer.as_str()))
+            .then_with(|| a.id.cmp(&b.id))
+    });
+    let total_matches = results.len() as u64;
+    results.truncate(NODE_SEARCH_LIMIT);
+
+    Ok(NodeSearchReport {
+        revision: m.revision,
+        git_head: m.git_head,
+        query: query.trim().to_string(),
+        layer: layer_filter,
+        total_matches,
+        results,
+    })
+}
+
+/// `GET /api/vision/node-search?q=&layer=` — galaxy node search.
+pub fn wire_node_search(
+    repo_root: &Path,
+    data_dir: &Path,
+    query: &str,
+    layer: Option<&str>,
+) -> Value {
+    match node_search(repo_root, data_dir, query, layer) {
+        Ok(r) => {
+            let mut v = serde_json::to_value(&r).unwrap_or_default();
+            if let serde_json::Value::Object(map) = &mut v {
+                map.insert("ok".to_string(), serde_json::Value::Bool(true));
+            }
+            v
+        }
+        Err(e) => json!({ "ok": false, "error": e }),
+    }
+}
+
 /// `GET /api/vision/feed` — optional `status` filter (`closed`/`open`/all).
 pub fn wire_feed_filter(repo_root: &Path, data_dir: &Path, status: Option<&str>) -> Value {
     match source_feed(repo_root, data_dir) {

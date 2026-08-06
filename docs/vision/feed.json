@@ -2,6 +2,97 @@
   "description": "RSS-style ticker of FM §5.12 sprint queue (open + recent closed)",
   "items": [
     {
+      "category": "open",
+      "id": "PH-S1769",
+      "link": "docs/vision/index.html#sprint-queue",
+      "next": true,
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "NodeSearchReport`/`node_search_report`/`wire_node_search` → `GET /api/vision/node-search?q=&layer=` (case-insensitive id/label/path/sections, top-N 25, layer z-sorted)",
+      "title": "Node search wire"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1770",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "tests/gsv_vision_contracts.rs` node-search (real-workspace + layer filter + no-match empty)",
+      "title": "Node search contracts"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1771",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "tests/gsv_server_contracts.rs` `GET /api/vision/node-search?q=` ok + results array (empty q → ok true)",
+      "title": "Node-search endpoint contract"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1772",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "Vision Map card embeds `assets/vision.svg` inline + chips/kinds",
+      "title": "Inline SVG map card"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1773",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "clickable layer chips (active filter) + node-search input + results → doc-preview deep-link",
+      "title": "Layer filter + search UX"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1774",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "VISION.md` node-search/map UX; MEMORY band 113; HANDOFF/NEXT band 113",
+      "title": "GSV vision docs canon"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1775",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "GSV_MIGRATION.md` rows ✅; `docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 113",
+      "title": "poolAI vision parity"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1776",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "gsv-loc-audit --min-ratio 0.95 --advisory` (≥95%) + poolAI ratio96 advisory hold",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1777",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "gsv-vision-sync` refresh + poolAI vision rev++",
+      "title": "vision-sync close"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1778",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync; push",
+      "title": "Band close"
+    },
+    {
       "category": "closed",
       "id": "PH-S1768",
       "link": "docs/vision/index.html#sprint-queue",

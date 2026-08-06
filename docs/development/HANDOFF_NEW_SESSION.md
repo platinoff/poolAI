@@ -1,9 +1,9 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-08-05 (band 112 **GSV vision auto-sync + sprint-queue** PH-S1759…S1768 **✅** · band 113 open PH-S1769…S1778 · Vision rev 463)
+**Оновлено:** 2026-08-05 (band 113 **GSV Galaxy UI: node search + interactive map** PH-S1769…S1778 **✅** · band 114 open PH-S1779…S1788 · Vision rev 464)
 
 **Наступна сесія:** **`абракадабра`** — див. **канон воркфлоу в [AGENTS.md](../../AGENTS.md §100–113)**.
-**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1769…S1778; черга — FM §5.12) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1779…S1788; черга — FM §5.12) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
 
 --- 
 
@@ -109,6 +109,29 @@ poolAI **95.02%** advisory hold. Vision rev **461**.
 Vision Sync (Resync button) + Sprint Queue UI cards; contracts **118** (58 unit + 8 omni + 7 ratio +
 18 server + 8 update + 19 vision), clippy **0**, fmt clean. Ratio: GSV **95.56%**
 (rust 6162 / product 6448, gate ≥95% ✅) + poolAI **95.02%** advisory hold. Vision rev **463**.
+
+## Band 113 — GSV Galaxy UI: node search + interactive map (PH-S1769…S1778, **✅**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1769** | Node search wire (`NodeSearchReport`/`node_search_report`/`wire_node_search` → `GET /api/vision/node-search?q=&layer=` — case-insensitive id/label/path/sections, top-N 25, layer-z-sorted, links_out/in tallies) |
+| **PH-S1770** | Node search contracts (`tests/gsv_vision_contracts.rs`, **22**) |
+| **PH-S1771** | Node-search endpoint contract (`tests/gsv_server_contracts.rs`, **19**) |
+| **PH-S1772** | Inline SVG map card (Vision Map card embeds `assets/vision.svg` inline + chips/kinds) |
+| **PH-S1773** | Layer filter + search UX (`ui/index.html`: clickable layer chips + node-search input + results → doc-preview deep-link) |
+| **PH-S1774** | GSV vision docs canon (`VISION.md`; MEMORY band 113; HANDOFF/NEXT band 113) |
+| **PH-S1775** | poolAI vision parity (`GSV_MIGRATION.md` rows ✅; `docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 113) |
+| **PH-S1776** | Ratio hold advisory (`gsv-loc-audit --min-ratio 0.95 --advisory` **95.15%** ✅ + poolAI ratio96 advisory hold 95.02%) |
+| **PH-S1777** | vision-sync close (`gsv-vision-sync` refresh + poolAI vision rev 464) |
+| **PH-S1778** | Band close (ratio hold ≥95%; fmt/clippy/test; docs canon; vision-sync; push) |
+
+**PH-S1769…S1778 ✅ (2026-08-05):** Galaxy UI node search + interactive map:
+`GET /api/vision/node-search?q=&layer=` (case-insensitive id/label/path/sections, top-N 25,
+layer-z-sorted, links_out/in tallies from edges); Vision Map card inline `assets/vision.svg` +
+layer filter chips + search → doc-preview deep-link у `GSV/ui/index.html`; contracts **122**
+(58 unit + 8 omni + 7 ratio + 19 server + 8 update + 22 vision), clippy **0**, fmt clean.
+Ratio: GSV **95.15%** (rust 6360 / product 6684, gate ≥95% ✅) + poolAI **95.02%** advisory hold.
+Vision rev **464**.
 
 ## Band 109 — GSV vision sync/migration (PH-S1729…S1738, **✅**)
 

@@ -1,7 +1,7 @@
 # GSV — Vision box (poolAI vision canon mirror)
 
 Дзеркало poolAI vision canon (`docs/vision/manifest.json` + `docs/vision/feed.json` +
-`docs/vision/extensions.json`) у Rust-бокс GSV. Band 112 (PH-S1759…S1768, ✅).
+`docs/vision/extensions.json`) у Rust-бокс GSV. Band 113 (PH-S1769…S1778, ✅).
 
 ## Що це
 
@@ -31,6 +31,9 @@
   - `GET /api/vision/sprint-queue` — **band 112**: sprint-queue planning report
     (`next_sprint`/`last_sprint_closed`, `open_count`, `entries` з manifest.sprint_queue,
     `active_sprint` з extensions, `planned` = entries ∪ active) → `SprintQueueReport`.
+  - `GET /api/vision/node-search?q=&layer=` — **band 113**: galaxy node search
+    (case-insensitive match по id/label/path/sections, `top-N 25` layer-z-sorted,
+    `links_out`/`links_in` tallies) → `NodeSearchReport`/`NodeSearchResult`.
   - `GET /assets/vision.svg` — **band 110**: порт `docs/vision/vision.svg` (isometric diagram,
     `image/svg+xml`, include_str! з `GSV/ui/vision.svg`).
 
@@ -53,11 +56,24 @@ persisted `gsv_manifest.json` revision збігається з source.
 - `extensions.active_sprint` → `active_sprint`; `planned` = entries ∪ активний спринт
   (статус `open`, category `sprint`), коли він ще не в черзі.
 
+## Node search + інтерактивна мапа (band 113)
+
+`NodeSearchReport` (band 113):
+
+- `query`/`layer` — відбиток запиту; `total_matches` — повна кількість збігів.
+- `results` — `NodeSearchResult` (id/label/layer/path/sections + `links_out`/`links_in`),
+  топ-25 (`NODE_SEARCH_LIMIT`), відсортовані за z шару, потім за id.
+- Порожній `q` = браузинг шару (усі nodes шару).
+
+UI (`ui/index.html`): Vision Map card тепер рендерить **inline** `assets/vision.svg` +
+клікабельні layer chips (фільтр мапи/пошуку, active chip), node-search input + results table
+→ deep-link у Doc Preview card (`openSearchNode`).
+
 ## Ratio-safe політика
 
 `vision.js` (161 KB) / `vision.css` (50 KB) legacy не переносяться у `GSV/ui/` — це знищило б
 canon Rust 95–100%. UI — тонкий glue: Vision card (summary + ticker), **Vision Map card**
-(per-layer chips + edge kinds + посилання на `vision.svg`), **Sprint Map card**
+(inline SVG + per-layer chips + edge kinds + node search), **Sprint Map card**
 (sprint-queue modules/kinds/links), **Doc Preview card** (node + 1-hop neighbors,
 input `galaxy_grid`), **Vision Sync card** (Resync snapshot button + drift status) та
 **Sprint Queue card** (next/active/open + planned details) у `ui/index.html`.

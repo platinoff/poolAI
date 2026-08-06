@@ -197,13 +197,51 @@ function renderVisionMap(d) {
   if (!d.ok) { $("b-vision-map").innerHTML = "<span class='err'>" + esc(d.error || "vision map unavailable") + "</span>"; return; }
   const svg = "<a href='assets/vision.svg' target='_blank' style='font-size:12px'>open vision.svg ↗</a>";
   const cols = (d.layers || []).map(l =>
-    "<div class='vmap-col'><div class='vmap-l'>" + esc(l.id) + " · " + esc(l.name) + "</div>" +
-    "<div class='dim' style='font-size:11px'>nodes " + l.node_count + " · edges " + l.edges_from + "</div></div>").join("");
+    "<div class='vmap-col' style='cursor:pointer;" + (mapLayerFilter === l.id ? "outline:1px solid var(--accent);" : "") +
+    "' title='filter map by " + esc(l.id) + "' onclick=\"toggleMapLayer('" + esc(l.id) + "')\">" +
+    "<div class='vmap-l'>" + esc(l.id) + " · " + esc(l.name) + "</div>" +
+    "<div class='dim' style='font-size:11px'>nodes " + l.node_count + " · edges " + l.edges_from +
+    (mapLayerFilter === l.id ? " · <span class='ok'>filtered</span>" : "") + "</div></div>").join("");
   $("b-vision-map").innerHTML = "<div class='dim'>rev <kbd>" + d.revision + "</kbd> · nodes " + d.nodes_count +
     " · edges " + d.edges_count + " · " + svg + "</div>" +
+    "<img src='assets/vision.svg' alt='galaxy vision map' style='width:100%;margin:8px 0;border:1px solid var(--line);border-radius:8px;background:var(--panel2)'>" +
     "<div class='vmap'>" + cols + "</div>" +
     "<div class='dim' style='margin-top:6px'>edge kinds: " +
-    (d.edge_kinds || []).map(e => "<kbd>" + esc(e.kind) + "</kbd>×" + e.count).join(" ") + "</div>";
+    (d.edge_kinds || []).map(e => "<kbd>" + esc(e.kind) + "</kbd>×" + e.count).join(" ") + "</div>" +
+    "<div style='margin-top:8px'><input id='nodeSearchQ' type='text' value='" + esc(nodeSearchQuery) +
+    "' placeholder='search nodes (id / label / path)'><button onclick='searchVisionNodes()' style='margin-top:6px'>Search</button></div>" +
+    "<div id='b-node-search' style='margin-top:8px'></div>";
+}
+let mapLayerFilter = "";
+let nodeSearchQuery = "";
+function toggleMapLayer(layer) {
+  mapLayerFilter = mapLayerFilter === layer ? "" : layer;
+  resyncMapAndSearch();
+}
+async function resyncMapAndSearch() {
+  try { renderVisionMap(await get("api/vision/map")); } catch (e) { $("b-vision-map").innerHTML = "<span class='err'>" + esc(e.message) + "</span>"; }
+  searchVisionNodes();
+}
+async function searchVisionNodes() {
+  nodeSearchQuery = ($("nodeSearchQ") || {}).value || "";
+  const params = new URLSearchParams();
+  if (nodeSearchQuery) params.set("q", nodeSearchQuery);
+  if (mapLayerFilter) params.set("layer", mapLayerFilter);
+  const qs = params.toString();
+  const url = "api/vision/node-search" + (qs ? "?" + qs : "");
+  try {
+    const d = await get(url);
+    if (!d.ok) { $("b-node-search").innerHTML = "<span class='err'>" + esc(d.error || "search failed") + "</span>"; return; }
+    $("b-node-search").innerHTML = "<div class='dim'>matches <kbd>" + d.total_matches + "</kbd> · shown " +
+      (d.results || []).length + (d.layer ? " · layer <kbd>" + esc(d.layer) + "</kbd>" : "") + "</div>" +
+      tab(["id", "layer", "out", "in", "label", ""], (d.results || []).map(r =>
+        ["<kbd>" + esc(r.id) + "</kbd>", esc(r.layer), r.links_out, r.links_in,
+         "<span class='dim'>" + esc(r.label) + "</span>", "<button onclick=\"openSearchNode('" + esc(r.id) + "')\">open</button>"]));
+  } catch (e) { $("b-node-search").innerHTML = "<span class='err'>" + esc(e.message) + "</span>"; }
+}
+function openSearchNode(id) {
+  $("dpId").value = id;
+  loadDocPreview();
 }
 function renderOmni(d) {
   $("b-omni-summary").innerHTML = "providers " + (d.providers || []).length + " · models " + (d.models || []).length +

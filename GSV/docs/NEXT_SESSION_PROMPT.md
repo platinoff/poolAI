@@ -1,6 +1,6 @@
 # Промпт наступної сесії (GSV)
 
-**Оновлено:** 2026-08-05 (band 112 **PH-S1759…S1768** ✅ · ratio **95.56%** · tests **118**)
+**Оновлено:** 2026-08-05 (band 113 **PH-S1769…S1778** ✅ · ratio **95.15%** · tests **122**)
 
 ```
 абракадабра
@@ -8,7 +8,7 @@
 
 **Порядок:** **S0 диск** (`df -h /s` + `check_target_disk.sh` → `cargo clean` за потреби) →
 project scan (**warnings first** — `cargo clippy --all-targets` у GSV, `poolai-rust-diagnostics` у poolAI) →
-drain наступного band (черга — FM §5.12 §5.93 / GSV_TECH_ROADMAP; **без** mid-push) →
+drain наступного band (черга — FM §5.12 §5.94 / GSV_TECH_ROADMAP; **без** mid-push) →
 Speeds · Rust panel → vision-sync (`poolai-vision-sync`) → **один** commit → **`git push` + самарі**.
 
 **⚠️ Зупинити `gsv-server` перед `cargo test`/`build`** (блокує `target/debug/gsv-server.exe`);
@@ -39,7 +39,12 @@ Speeds · Rust panel → vision-sync (`poolai-vision-sync`) → **один** com
   `sprint_queue_report`/`wire_sprint_queue` → `GET /api/vision/sprint-queue` (entries ∪ active plan);
   Vision Sync + Sprint Queue UI cards; contracts **118** (19 vision); GSV ratio **95.56%** gate ✅;
   poolAI vision rev **463**; FM §5.12 §5.93.
-  **Наступний band 113**: master backlog (Ratio96 phase F) або GSV future — за пріоритетом власника
+- **band 113** (PH-S1769…S1778) ✅ — Galaxy UI: node search + interactive map:
+  `node_search`/`wire_node_search` → `GET /api/vision/node-search?q=&layer=` (case-insensitive
+  id/label/path/sections, top-N 25 layer-z-sorted, links_out/in tallies); Vision Map card inline
+  `assets/vision.svg` + layer filter chips + search → doc-preview deep-link; contracts **122**
+  (22 vision + 19 server); poolAI vision rev **464**; FM §5.12 §5.94.
+  **Наступний band 114**: master backlog (Ratio96 phase F) або GSV future — за пріоритетом власника
   (перші кандидати: `GSV_MIGRATION.md` ⏳ rows — `vision.js`/`vision.css` ratio-safe defer,
   `poolai-ui-wasm` defer).
 
@@ -55,6 +60,7 @@ Speeds · Rust panel → vision-sync (`poolai-vision-sync`) → **один** com
 Band 107 ✅ (poolAI Ratio96 docs canon) · band 106 ✅ (Ratio96 loc-audit) · band 105 ✅ (Ratio96 stand smoke) ·
 band 104 ✅ (Ratio96 admin/ops) · band 103 ✅ · band 102 ✅ (GSV migration) · band 109 ✅ (GSV vision sync) ·
 band 110 ✅ (GSV vision map UI) · band 111 ✅ (GSV sprint-map + doc-preview) · band 112 ✅ (GSV vision auto-sync + sprint-queue) ·
+band 113 ✅ (GSV node search + interactive map) ·
 staging `GSV/data/*` / `certs/*.pem` /
 `.env` · mid-push · build/test при запущеному `gsv-server` · обхід ratio-смуги Rust-кодом замість compact UI ·
 перенесення legacy `vision.js`/`vision.css` у `GSV/ui/` (знищило б ratio canon).

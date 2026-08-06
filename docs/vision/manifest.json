@@ -12297,9 +12297,100 @@
       "path": "tests/ratio96_docs_canon_integration.rs"
     }
   ],
-  "revision": 463,
-  "sprint_queue": [],
-  "sprint_queue_open_count": 0,
+  "revision": 464,
+  "sprint_queue": [
+    {
+      "acceptance": "NodeSearchReport`/`node_search_report`/`wire_node_search` → `GET /api/vision/node-search?q=&layer=` (case-insensitive id/label/path/sections, top-N 25, layer z-sorted)",
+      "deps": "GSV_MIGRATION",
+      "id": "PH-S1769",
+      "open": true,
+      "row": 1704,
+      "status": "open",
+      "title": "Node search wire"
+    },
+    {
+      "acceptance": "tests/gsv_vision_contracts.rs` node-search (real-workspace + layer filter + no-match empty)",
+      "deps": "Rust-first (API → tests)",
+      "id": "PH-S1770",
+      "open": true,
+      "row": 1705,
+      "status": "open",
+      "title": "Node search contracts"
+    },
+    {
+      "acceptance": "tests/gsv_server_contracts.rs` `GET /api/vision/node-search?q=` ok + results array (empty q → ok true)",
+      "deps": "Rust-first (API → tests)",
+      "id": "PH-S1771",
+      "open": true,
+      "row": 1706,
+      "status": "open",
+      "title": "Node-search endpoint contract"
+    },
+    {
+      "acceptance": "Vision Map card embeds `assets/vision.svg` inline + chips/kinds",
+      "deps": "GSV_BOXES",
+      "id": "PH-S1772",
+      "open": true,
+      "row": 1707,
+      "status": "open",
+      "title": "Inline SVG map card"
+    },
+    {
+      "acceptance": "clickable layer chips (active filter) + node-search input + results → doc-preview deep-link",
+      "deps": "GSV_BOXES",
+      "id": "PH-S1773",
+      "open": true,
+      "row": 1708,
+      "status": "open",
+      "title": "Layer filter + search UX"
+    },
+    {
+      "acceptance": "VISION.md` node-search/map UX; MEMORY band 113; HANDOFF/NEXT band 113",
+      "deps": "session canon",
+      "id": "PH-S1774",
+      "open": true,
+      "row": 1709,
+      "status": "open",
+      "title": "GSV vision docs canon"
+    },
+    {
+      "acceptance": "GSV_MIGRATION.md` rows ✅; `docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 113",
+      "deps": "docs canon",
+      "id": "PH-S1775",
+      "open": true,
+      "row": 1710,
+      "status": "open",
+      "title": "poolAI vision parity"
+    },
+    {
+      "acceptance": "gsv-loc-audit --min-ratio 0.95 --advisory` (≥95%) + poolAI ratio96 advisory hold",
+      "deps": "GSV_ROLES",
+      "id": "PH-S1776",
+      "open": true,
+      "row": 1711,
+      "status": "open",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "acceptance": "gsv-vision-sync` refresh + poolAI vision rev++",
+      "deps": "vision",
+      "id": "PH-S1777",
+      "open": true,
+      "row": 1712,
+      "status": "open",
+      "title": "vision-sync close"
+    },
+    {
+      "acceptance": "ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync; push",
+      "deps": "GSV_ROLES",
+      "id": "PH-S1778",
+      "open": true,
+      "row": 1713,
+      "status": "open",
+      "title": "Band close"
+    }
+  ],
+  "sprint_queue_open_count": 10,
   "updated_at": "2026-06-20",
   "vision_ui_rev": 59
 }

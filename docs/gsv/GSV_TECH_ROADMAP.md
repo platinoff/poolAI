@@ -4,10 +4,11 @@
 
 Дата: 2026-08-05 · **Стан:** band 102 **реалізовано** + band 108 (roles/ratio canon) **✅** +
 band 109 (Vision sync/migration) **✅** + band 110 (Vision map UI) **✅** + band 111 (Sprint map + doc-preview) **✅** +
-band 112 (Vision auto-sync + sprint-queue planning) **✅** ·
+band 112 (Vision auto-sync + sprint-queue planning) **✅** + band 113 (Node search + interactive map) **✅** ·
 **Спринти:** `PH-S1659…S1668` (FM §5.12 §5.83 ✅) · `PH-S1719…S1728` (FM §5.12 §5.89 ✅) ·
 `PH-S1729…S1738` (FM §5.12 §5.90 ✅) · `PH-S1739…S1748` (FM §5.12 §5.91 ✅) ·
-`PH-S1749…S1758` (FM §5.12 §5.92 ✅) · `PH-S1759…S1768` (FM §5.12 §5.93 ✅).
+`PH-S1749…S1758` (FM §5.12 §5.92 ✅) · `PH-S1759…S1768` (FM §5.12 §5.93 ✅) ·
+`PH-S1769…S1778` (FM §5.12 §5.94 ✅).
 
 ## Логічний порядок (залежності)
 
@@ -117,6 +118,21 @@ docs/architecture (✅ ця сесія)
 | **PH-S1766** | poolAI vision parity | `GSV_MIGRATION.md` rows ✅; `docs/vision/README.md`; roadmap band 112 |
 | **PH-S1767** | Ratio hold advisory | `gsv-loc-audit --min-ratio 0.95 --advisory` (95.56%) |
 | **PH-S1768** | Band close | ratio hold (≥95%); fmt/clippy/test (118); docs canon; vision-sync rev 463; push |
+
+## Спринти (band 113) — Galaxy UI: node search + interactive map
+
+| Sprint | Фокус | Acceptance (ключ) |
+|--------|-------|-------------------|
+| **PH-S1769** | Node search wire | `NodeSearchReport`/`node_search_report`/`wire_node_search` → `GET /api/vision/node-search?q=&layer=` (case-insensitive id/label/path/sections, top-N 25, layer-z-sorted, links_out/in tallies) |
+| **PH-S1770** | Node search contracts | `tests/gsv_vision_contracts.rs` (real-workspace + layer filter + no-match empty/cap, **22**) |
+| **PH-S1771** | Node-search endpoint contract | `tests/gsv_server_contracts.rs` (`/api/vision/node-search?q=` ok + results; empty q → ok true, **19**) |
+| **PH-S1772** | Inline SVG map card | Vision Map card рендерить `assets/vision.svg` inline (`<img>`) + chips/kinds |
+| **PH-S1773** | Layer filter + search UX | клікабельні layer chips (active filter) + node-search input + results → doc-preview deep-link у `ui/index.html` |
+| **PH-S1774** | GSV vision docs | `VISION.md` node-search/map UX; MEMORY band 113; HANDOFF/NEXT band 113 |
+| **PH-S1775** | poolAI vision parity | `GSV_MIGRATION.md` rows ✅; `docs/vision/README.md`; цей файл band 113 |
+| **PH-S1776** | Ratio hold advisory | `gsv-loc-audit --min-ratio 0.95 --advisory` (≥95%) |
+| **PH-S1777** | vision-sync close | `gsv-vision-sync` refresh + poolAI vision rev **464** |
+| **PH-S1778** | Band close | ratio hold (≥95%); fmt/clippy/test (122); docs canon; vision-sync; push |
 
 ## Ключові UX-вимоги (узагальнення ТЗ)
 
