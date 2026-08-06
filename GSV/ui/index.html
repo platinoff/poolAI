@@ -63,6 +63,8 @@ pre.out{background:var(--panel2);border:1px solid var(--line);border-radius:6px;
   <section class="card"><h2>Doc Preview <span class="hint">/api/vision/doc-preview?id=</span></h2><div class="body"><input id="dpId" type="text" value="galaxy_grid" placeholder="node id"><br><br><button onclick="loadDocPreview()">Show</button><div id="b-doc-preview" style="margin-top:8px">…</div></div></section>
   <section class="card"><h2>Vision Sync <span class="hint">/api/vision/sync</span></h2><div class="body"><button onclick="resyncVision()">Resync snapshot</button> <span id="b-vision-sync-status" class="dim">…</span><div id="b-vision-sync" style="margin-top:8px">…</div></div></section>
   <section class="card"><h2>Sprint Queue <span class="hint">/api/vision/sprint-queue</span></h2><div class="body" id="b-sprint-queue">…</div></section>
+  <section class="card"><h2>Sprint Board <span class="hint">/api/vision/sprint-board</span></h2><div class="body" id="b-sprint-board">…</div></section>
+  <section class="card"><h2>Sprint Progress <span class="hint">/api/vision/sprint-progress</span></h2><div class="body" id="b-sprint-progress">…</div></section>
   <section class="card"><h2>OmniRouter <span class="hint">/api/omni</span></h2><div class="body">
     <div class="dim" id="b-omni-summary">…</div>
     <div style="margin-top:6px">recommended: <span id="b-omni-rec">…</span></div>
@@ -184,6 +186,36 @@ function renderSprintQueue(d) {
       ["<kbd>" + esc(p.id) + "</kbd>", "<span class='" + (p.status === "closed" ? "ok" : "warn") + "'>" + esc(p.status) + "</span>", esc(p.category), esc(p.title)])) +
     "</details>";
 }
+function bar(pct) {
+  const w = Math.max(0, Math.min(100, pct));
+  return "<div style='background:var(--line);border-radius:6px;height:10px;margin:6px 0;overflow:hidden'>" +
+    "<div style='width:" + w + "%;height:100%;background:var(--accent)'></div></div>" +
+    "<div class='dim'>" + w + "% closed</div>";
+}
+function renderSprintBoard(d) {
+  if (!d.ok) { $("b-sprint-board").innerHTML = "<span class='err'>" + esc(d.error || "sprint board unavailable") + "</span>"; return; }
+  let out = "<div class='dim'>rev <kbd>" + d.revision + "</kbd> · next <kbd>" + esc(d.next_sprint) +
+    "</kbd> · active <kbd>" + esc(d.active_sprint) + "</kbd></div>" +
+    "<div>open <span class='warn'>" + d.open_count + "</span> · closed <span class='ok'>" + d.closed_count +
+    "</span> · total <span class='dim'>" + d.total + "</span></div>" + bar(d.progress_pct);
+  for (const c of (d.columns || [])) {
+    out += "<details style='margin-top:6px'><summary>" + esc(c.name) + " (" + c.count + ")</summary>" +
+      tab(["id", "status", "title"], (c.entries || []).map(e =>
+        ["<kbd>" + esc(e.id) + "</kbd>", "<span class='" + (e.status === "closed" ? "ok" : "warn") + "'>" + esc(e.status) + "</span>", esc(e.title)])) +
+      "</details>";
+  }
+  $("b-sprint-board").innerHTML = out;
+}
+function renderSprintProgress(d) {
+  if (!d.ok) { $("b-sprint-progress").innerHTML = "<span class='err'>" + esc(d.error || "sprint progress unavailable") + "</span>"; return; }
+  let out = "<div class='dim'>rev <kbd>" + d.revision + "</kbd></div>" +
+    "<div>open <span class='warn'>" + d.open_count + "</span> · closed <span class='ok'>" + d.closed_count +
+    "</span> · planned <span class='dim'>" + d.planned_count + "</span> · total <span class='dim'>" + d.total + "</span></div>" +
+    bar(d.progress_pct) +
+    tab(["layer", "z", "nodes", "linked"], (d.layers || []).map(l =>
+      ["<kbd>" + esc(l.id) + "</kbd>", l.z, "<span class='dim'>" + l.node_count + "</span>", "<span class='ok'>" + l.linked_count + "</span>"]));
+  $("b-sprint-progress").innerHTML = out;
+}
 function renderVisionSync(d) {
   const s = $("b-vision-sync-status");
   if (!d.ok) { s.textContent = "error"; $("b-vision-sync").innerHTML = "<span class='err'>" + esc(d.error || "sync failed") + "</span>"; return; }
@@ -281,6 +313,8 @@ async function resync() {
     ["api/vision", renderVision], ["api/vision/map", renderVisionMap],
     ["api/vision/sprint-map", renderSprintMap],
     ["api/vision/sprint-queue", renderSprintQueue],
+    ["api/vision/sprint-board", renderSprintBoard],
+    ["api/vision/sprint-progress", renderSprintProgress],
     ["api/omni", renderOmni],
   ];
   const results = await Promise.allSettled(urls.map(([u, f]) => get(u).then(f)));

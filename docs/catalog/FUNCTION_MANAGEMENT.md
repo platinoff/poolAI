@@ -265,7 +265,7 @@ FM-xxx (з таблиці нижче)
 
 **VDT:** §5.12 = **журнал PH-S*** (≤10 відкритих). Якщо **< 10** — **`абракадабра`** / project scan **всього проєкту**: concept → FM **§5.1** → roadmaps → architect → DOCS_LEGACY → code → §5.13 fallback. Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Project scan». **Rust-first:** API → `tests/`; Playwright лише browser scope.
 
-**Відкритих у §5.12:** **0** (band 113 ✅). **Master horizon:** PH-S1779…S1788 (band 114). Vision rev **465**.
+**Відкритих у §5.12:** **0** (band 114 ✅). **Master horizon:** PH-S1789…S1798 (band 115). Vision rev **467**.
 
 **Историчний research backlog (PH-S65+):**
 
@@ -1414,6 +1414,31 @@ Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](
 | 1711 | **PH-S1776** | Ratio hold advisory | GSV_ROLES | `gsv-loc-audit --min-ratio 0.95 --advisory` (≥95%) + poolAI ratio96 advisory hold | `[x]` |
 | 1712 | **PH-S1777** | vision-sync close | vision | `gsv-vision-sync` refresh + poolAI vision rev++ | `[x]` |
 | 1713 | **PH-S1778** | Band close | GSV_ROLES | ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync; push | `[x]` |
+
+### 5.95 GSV Sprint-board + progress UI queue — band 114 (PH-S1779…S1788, 2026-08-05) · **✅**
+
+**Джерело:** власник (GSV future — sprint-queue planning data → board + progress UX; base:
+`GET /api/vision/sprint-queue` band 112 + `GET /api/vision/sprint-map` band 111 + manifest layers).
+Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../gsv/GSV_MIGRATION.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1714 | **PH-S1779** | Sprint-board wire | GSV_BOXES | `SprintBoardReport`/`sprint_board_report`/`wire_sprint_board` → `GET /api/vision/sprint-board` (group entries open/closed/planned + counts + progress pct + next/active) | `[x]` |
+| 1715 | **PH-S1780** | Progress wire | GSV_BOXES | `SprintProgressReport`/`sprint_progress_report` (closed/total pct, per-status counts, per-layer distribution via manifest nodes/layers) | `[x]` |
+| 1716 | **PH-S1781** | Sprint-board contracts | Rust-first (API → tests) | `tests/gsv_vision_contracts.rs` real-workspace board (open+closed groups, pct ∈ [0,100], next == active) | `[x]` |
+| 1717 | **PH-S1782** | Progress contracts | Rust-first (API → tests) | `tests/gsv_vision_contracts.rs` per-layer distribution matches manifest layers; statuses sum == total | `[x]` |
+| 1718 | **PH-S1783** | Sprint-board endpoint contract | Rust-first (API → tests) | `tests/gsv_server_contracts.rs` `GET /api/vision/sprint-board` ok + groups + progress | `[x]` |
+| 1719 | **PH-S1784** | Sprint Board UI card | GSV_BOXES | board columns open/closed/planned + progress bar + counts у `ui/index.html` | `[x]` |
+| 1720 | **PH-S1785** | Progress UI | GSV_BOXES | per-layer chips + pct + next/active focus card у `ui/index.html` | `[x]` |
+| 1721 | **PH-S1786** | GSV vision docs canon | session canon | `VISION.md` sprint-board/progress; MEMORY band 114; HANDOFF/NEXT band 114 | `[x]` |
+| 1722 | **PH-S1787** | poolAI vision parity | docs canon | `GSV_MIGRATION.md` rows ✅; `docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 114 | `[x]` |
+| 1723 | **PH-S1788** | Band close | GSV_ROLES | ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync rev 467; push | `[x]` |
+
+**PH-S1788 ✅ (2026-08-05):** `SprintBoardReport`/`sprint_board_report`/`wire_sprint_board`
+→ `GET /api/vision/sprint-board` (open/closed/planned columns + `progress_pct`); `SprintProgressReport`/
+`sprint_progress_report`/`wire_sprint_progress` → `GET /api/vision/sprint-progress` (status counts +
+per-layer `node_count`/`linked_count`); Sprint Board + Sprint Progress UI cards; vision contracts **38** +
+server contracts **21** (загалом **140**); GSV ratio **95.02%** gate ✅; vision rev **467**; FM §5.12 §5.95 ✅.
 
 ### 5.88 Ratio96 docs canon queue — band 107 (PH-S1709…S1718, 2026-08-02) · **✅**
 

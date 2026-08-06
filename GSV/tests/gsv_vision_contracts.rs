@@ -82,8 +82,8 @@ fn vision_feed_reads_real_workspace() {
         f.items.len()
     );
     assert!(
-        f.items.iter().any(|i| i.id == "PH-S1768"),
-        "feed must include the band-112 close entry"
+        f.items.iter().any(|i| i.id == "PH-S1788"),
+        "feed must include the band-114 close entry"
     );
     for item in &f.items {
         assert!(!item.id.is_empty());
@@ -467,4 +467,249 @@ fn vision_node_search_no_match_empty() {
         "galaxy has more nodes than the search cap"
     );
     assert_eq!(all.results.len(), vision::NODE_SEARCH_LIMIT);
+}
+
+#[test]
+fn vision_sprint_board_groups_queue() {
+    let dir = temp_data_dir("sprint-board");
+    let r = vision::sprint_board_report(&repo_root(), &dir).expect("board");
+    assert!(r.revision > 0);
+    assert_eq!(r.next_sprint, r.active_sprint);
+    assert_eq!(
+        r.open_count + r.closed_count,
+        r.total,
+        "open + closed must equal the working queue total"
+    );
+    let names: Vec<&str> = r.columns.iter().map(|c| c.name.as_str()).collect();
+    assert!(names.contains(&"open"));
+    assert!(names.contains(&"closed"));
+    assert!(names.contains(&"planned"));
+    let summed: u64 = r.columns.iter().map(|c| c.count).sum();
+    assert_eq!(summed, r.total, "column counts must sum to the total");
+    for column in &r.columns {
+        assert_eq!(column.entries.len() as u64, column.count);
+    }
+}
+
+#[test]
+fn vision_sprint_board_progress_pct_range() {
+    let dir = temp_data_dir("sprint-board-pct");
+    let r = vision::sprint_board_report(&repo_root(), &dir).expect("board");
+    assert!(r.progress_pct <= 100, "progress pct must be in [0,100]");
+    if r.total > 0 {
+        assert_eq!(
+            r.progress_pct,
+            (r.closed_count * 100) / r.total,
+            "progress pct must be closed/total"
+        );
+    } else {
+        assert_eq!(r.progress_pct, 0);
+    }
+}
+
+#[test]
+fn vision_sprint_progress_layers_match_manifest() {
+    let dir = temp_data_dir("sprint-progress-layers");
+    let m = vision::read_manifest(&repo_root()).expect("manifest");
+    let r = vision::sprint_progress_report(&repo_root(), &dir).expect("progress");
+    assert_eq!(r.revision, m.revision);
+    assert_eq!(
+        r.layers.len(),
+        m.layers.len(),
+        "per-layer distribution must match manifest layers"
+    );
+    let total_nodes: u64 = r.layers.iter().map(|l| l.node_count).sum();
+    assert_eq!(total_nodes, m.nodes.len() as u64);
+    for (report_layer, manifest_layer) in r.layers.iter().zip(m.layers.iter()) {
+        assert_eq!(report_layer.id, manifest_layer.id);
+        assert!(report_layer.linked_count <= report_layer.node_count);
+    }
+}
+
+#[test]
+fn vision_sprint_progress_statuses_sum() {
+    let dir = temp_data_dir("sprint-progress-statuses");
+    let r = vision::sprint_progress_report(&repo_root(), &dir).expect("progress");
+    assert_eq!(
+        r.open_count + r.closed_count + r.planned_count,
+        r.total,
+        "status counts must sum to the total"
+    );
+    assert!(r.progress_pct <= 100);
+}
+
+#[test]
+fn vision_sprint_board_column_order_contract() {
+    let dir = temp_data_dir("sprint-board-order");
+    let r = vision::sprint_board_report(&repo_root(), &dir).expect("board");
+    let names: Vec<&str> = r.columns.iter().map(|c| c.name.as_str()).collect();
+    assert_eq!(
+        names,
+        vec!["open", "closed", "planned"],
+        "column order is fixed"
+    );
+}
+
+#[test]
+fn vision_sprint_board_active_sprint_in_open_column() {
+    let dir = temp_data_dir("sprint-board-active");
+    let r = vision::sprint_board_report(&repo_root(), &dir).expect("board");
+    let open = r
+        .columns
+        .iter()
+        .find(|c| c.name == "open")
+        .expect("open column");
+    assert!(
+        open.entries.iter().any(|e| e.id == r.active_sprint),
+        "the active sprint must sit in the open column"
+    );
+}
+
+#[test]
+fn vision_sprint_board_entries_unique_across_columns() {
+    let dir = temp_data_dir("sprint-board-unique");
+    let r = vision::sprint_board_report(&repo_root(), &dir).expect("board");
+    let mut seen: Vec<String> = Vec::new();
+    for column in &r.columns {
+        for entry in &column.entries {
+            assert!(
+                !seen.contains(&entry.id),
+                "id {} must appear in exactly one column",
+                entry.id
+            );
+            seen.push(entry.id.clone());
+        }
+    }
+    assert_eq!(
+        seen.len() as u64,
+        r.total,
+        "columns must cover the whole working queue"
+    );
+}
+
+#[test]
+fn vision_sprint_board_closed_column_only_done() {
+    let dir = temp_data_dir("sprint-board-closed");
+    let r = vision::sprint_board_report(&repo_root(), &dir).expect("board");
+    let closed = r
+        .columns
+        .iter()
+        .find(|c| c.name == "closed")
+        .expect("closed column");
+    for entry in &closed.entries {
+        assert!(
+            entry.status == "closed" || entry.status == "done",
+            "closed column must only hold finished sprints, got {}",
+            entry.status
+        );
+    }
+}
+
+#[test]
+fn vision_sprint_board_revision_matches_manifest() {
+    let dir = temp_data_dir("sprint-board-revision");
+    let m = vision::read_manifest(&repo_root()).expect("manifest");
+    let r = vision::sprint_board_report(&repo_root(), &dir).expect("board");
+    assert_eq!(r.revision, m.revision);
+    assert_eq!(r.next_sprint, m.next_sprint);
+    assert!(!r.last_sprint_closed.is_empty());
+}
+
+#[test]
+fn vision_sprint_progress_layers_z_ordered() {
+    let dir = temp_data_dir("sprint-progress-z");
+    let r = vision::sprint_progress_report(&repo_root(), &dir).expect("progress");
+    let zs: Vec<i64> = r.layers.iter().map(|l| l.z).collect();
+    let mut sorted = zs.clone();
+    sorted.sort();
+    assert_eq!(zs, sorted, "layers must be z-ascending");
+}
+
+#[test]
+fn vision_sprint_progress_linked_counts_reflect_queue_sprints() {
+    let dir = temp_data_dir("sprint-progress-linked");
+    let m = vision::read_manifest(&repo_root()).expect("manifest");
+    let q = vision::sprint_queue_report(&repo_root(), &dir).expect("queue");
+    let ids: std::collections::BTreeSet<&str> = q.planned.iter().map(|e| e.id.as_str()).collect();
+    let r = vision::sprint_progress_report(&repo_root(), &dir).expect("progress");
+    for layer in &r.layers {
+        let expected = m
+            .nodes
+            .iter()
+            .filter(|n| n.layer == layer.id)
+            .filter(|n| n.sprints.iter().any(|s| ids.contains(s.as_str())))
+            .count() as u64;
+        assert_eq!(
+            layer.linked_count, expected,
+            "linked_count for {} must match nodes referencing queue sprints",
+            layer.id
+        );
+    }
+}
+
+#[test]
+fn vision_sprint_progress_planned_count_formula() {
+    let dir = temp_data_dir("sprint-progress-planned");
+    let r = vision::sprint_progress_report(&repo_root(), &dir).expect("progress");
+    assert_eq!(
+        r.planned_count,
+        r.total.saturating_sub(r.open_count + r.closed_count),
+        "planned must be the residual status bucket"
+    );
+}
+
+#[test]
+fn vision_wire_sprint_board_ok_true() {
+    let dir = temp_data_dir("wire-sprint-board");
+    let wire = vision::wire_sprint_board(&repo_root(), &dir);
+    assert_eq!(wire["ok"], true);
+    assert!(wire["columns"].is_array());
+    assert!(wire["progress_pct"].is_u64());
+}
+
+#[test]
+fn vision_wire_sprint_progress_ok_true() {
+    let dir = temp_data_dir("wire-sprint-progress");
+    let wire = vision::wire_sprint_progress(&repo_root(), &dir);
+    assert_eq!(wire["ok"], true);
+    assert!(wire["layers"].is_array());
+    assert!(wire["progress_pct"].is_u64());
+}
+
+#[test]
+fn vision_sprint_progress_links_capped_by_node_count() {
+    let dir = temp_data_dir("sprint-progress-cap");
+    let r = vision::sprint_progress_report(&repo_root(), &dir).expect("progress");
+    for layer in &r.layers {
+        assert!(
+            layer.linked_count <= layer.node_count,
+            "layer {} linked ({}) cannot exceed nodes ({})",
+            layer.id,
+            layer.linked_count,
+            layer.node_count
+        );
+    }
+    let linked_total: u64 = r.layers.iter().map(|l| l.linked_count).sum();
+    let node_total: u64 = r.layers.iter().map(|l| l.node_count).sum();
+    assert!(
+        linked_total <= node_total,
+        "aggregate linked cannot exceed nodes"
+    );
+    assert_eq!(
+        r.progress_pct,
+        (r.closed_count * 100) / r.total,
+        "progress pct must equal closed/total"
+    );
+}
+
+#[test]
+fn vision_sprint_board_wire_matches_report_function() {
+    let dir = temp_data_dir("sprint-board-wire");
+    let report = vision::sprint_board_report(&repo_root(), &dir).expect("board");
+    let wire = vision::wire_sprint_board(&repo_root(), &dir);
+    assert_eq!(wire["total"], report.total);
+    assert_eq!(wire["open_count"], report.open_count);
+    assert_eq!(wire["closed_count"], report.closed_count);
+    assert_eq!(wire["active_sprint"], report.active_sprint);
+    assert_eq!(wire["columns"].as_array().map(|a| a.len()).unwrap_or(0), 3);
 }

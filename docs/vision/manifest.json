@@ -3174,7 +3174,7 @@
       "signature": "queue: FM §5.12 next band 107"
     }
   ],
-  "last_sprint_closed": "PH-S1778",
+  "last_sprint_closed": "PH-S1788",
   "layers": [
     {
       "id": "L0",
@@ -3207,7 +3207,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1779",
+  "next_sprint": "PH-S1789",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -12297,7 +12297,7 @@
       "path": "tests/ratio96_docs_canon_integration.rs"
     }
   ],
-  "revision": 465,
+  "revision": 467,
   "sprint_queue": [],
   "sprint_queue_open_count": 0,
   "updated_at": "2026-06-20",

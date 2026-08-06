@@ -276,3 +276,62 @@ async fn vision_node_search_endpoint() {
     assert_eq!(empty["ok"], true);
     assert!(empty["results"].is_array());
 }
+
+#[tokio::test]
+async fn vision_sprint_board_endpoint() {
+    let (app, _state) = app();
+    let (status, json) = get(&app, "/api/vision/sprint-board").await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(json["ok"], true);
+    assert!(json["revision"].as_u64().unwrap_or(0) > 0);
+    assert!(json["total"].is_u64());
+    assert_eq!(
+        json["open_count"].as_u64().unwrap_or(0) + json["closed_count"].as_u64().unwrap_or(0),
+        json["total"].as_u64().unwrap_or(0),
+        "open + closed must equal the total"
+    );
+    assert!(json["progress_pct"].as_u64().is_some_and(|p| p <= 100));
+    assert_eq!(json["next_sprint"], json["active_sprint"]);
+    let columns = json["columns"].as_array().expect("columns array");
+    assert_eq!(
+        columns.len(),
+        3,
+        "board must expose open/closed/planned columns"
+    );
+    for column in columns {
+        assert!(column["count"].is_u64());
+        assert!(column["entries"].is_array());
+        assert_eq!(
+            column["entries"].as_array().unwrap().len() as u64,
+            column["count"].as_u64().unwrap_or(0)
+        );
+    }
+}
+
+#[tokio::test]
+async fn vision_sprint_progress_endpoint() {
+    let (app, _state) = app();
+    let (status, json) = get(&app, "/api/vision/sprint-progress").await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(json["ok"], true);
+    assert!(json["revision"].as_u64().unwrap_or(0) > 0);
+    assert!(json["total"].is_u64());
+    assert_eq!(
+        json["open_count"].as_u64().unwrap_or(0)
+            + json["closed_count"].as_u64().unwrap_or(0)
+            + json["planned_count"].as_u64().unwrap_or(0),
+        json["total"].as_u64().unwrap_or(0)
+    );
+    let layers = json["layers"].as_array().expect("layers array");
+    assert!(!layers.is_empty());
+    for layer in layers {
+        assert!(layer["id"].as_str().is_some_and(|s| !s.is_empty()));
+        assert!(layer["z"].is_i64());
+        assert!(layer["node_count"].is_u64());
+        assert!(layer["linked_count"].is_u64());
+        assert!(
+            layer["linked_count"].as_u64().unwrap_or(0)
+                <= layer["node_count"].as_u64().unwrap_or(0)
+        );
+    }
+}

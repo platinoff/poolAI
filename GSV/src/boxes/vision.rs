@@ -1001,6 +1001,198 @@ pub fn wire_sprint_queue(repo_root: &Path, data_dir: &Path) -> Value {
     }
 }
 
+/// Sprint-board column (open / closed / planned).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct SprintBoardColumn {
+    pub name: String,
+    pub count: u64,
+    pub entries: Vec<SprintQueueEntry>,
+}
+
+/// Sprint-board report (`/api/vision/sprint-board`).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct SprintBoardReport {
+    pub revision: u64,
+    pub git_head: String,
+    pub next_sprint: String,
+    pub last_sprint_closed: String,
+    pub active_sprint: String,
+    pub total: u64,
+    pub open_count: u64,
+    pub closed_count: u64,
+    pub progress_pct: u64,
+    pub columns: Vec<SprintBoardColumn>,
+}
+
+fn sprint_status_group(status: &str, is_active: bool) -> &'static str {
+    if is_active || status == "open" {
+        "open"
+    } else if status == "closed" || status == "done" {
+        "closed"
+    } else {
+        "planned"
+    }
+}
+
+/// Build the sprint-board from the sprint-queue plan: group the working queue
+/// (manifest ∪ active) into open / closed / planned columns + progress pct.
+pub fn sprint_board_report(repo_root: &Path, data_dir: &Path) -> Result<SprintBoardReport, String> {
+    let q = sprint_queue_report(repo_root, data_dir)?;
+    let mut columns = vec![
+        SprintBoardColumn {
+            name: "open".to_string(),
+            count: 0,
+            entries: Vec::new(),
+        },
+        SprintBoardColumn {
+            name: "closed".to_string(),
+            count: 0,
+            entries: Vec::new(),
+        },
+        SprintBoardColumn {
+            name: "planned".to_string(),
+            count: 0,
+            entries: Vec::new(),
+        },
+    ];
+    for entry in &q.planned {
+        let group = sprint_status_group(&entry.status, entry.id == q.active_sprint);
+        let column = columns
+            .iter_mut()
+            .find(|c| c.name == group)
+            .expect("known column");
+        column.entries.push(entry.clone());
+        column.count += 1;
+    }
+    let open_count = columns[0].count;
+    let closed_count = columns[1].count;
+    let total = q.planned.len() as u64;
+    let progress_pct = if total > 0 {
+        (closed_count * 100) / total
+    } else {
+        0
+    };
+    Ok(SprintBoardReport {
+        revision: q.revision,
+        git_head: q.git_head,
+        next_sprint: q.next_sprint,
+        last_sprint_closed: q.last_sprint_closed,
+        active_sprint: q.active_sprint,
+        total,
+        open_count,
+        closed_count,
+        progress_pct,
+        columns,
+    })
+}
+
+/// `GET /api/vision/sprint-board` — sprint-board report.
+pub fn wire_sprint_board(repo_root: &Path, data_dir: &Path) -> Value {
+    match sprint_board_report(repo_root, data_dir) {
+        Ok(r) => {
+            let mut v = serde_json::to_value(&r).unwrap_or_default();
+            if let serde_json::Value::Object(map) = &mut v {
+                map.insert("ok".to_string(), serde_json::Value::Bool(true));
+            }
+            v
+        }
+        Err(e) => json!({ "ok": false, "error": e }),
+    }
+}
+
+/// Per-layer sprint progress (`/api/vision/sprint-board` → `layers[]`).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct SprintLayerProgress {
+    pub id: String,
+    pub name: String,
+    pub z: i64,
+    pub node_count: u64,
+    pub linked_count: u64,
+}
+
+/// Sprint progress report (statuses + per-layer distribution).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct SprintProgressReport {
+    pub revision: u64,
+    pub total: u64,
+    pub open_count: u64,
+    pub closed_count: u64,
+    pub planned_count: u64,
+    pub progress_pct: u64,
+    pub layers: Vec<SprintLayerProgress>,
+}
+
+/// Build sprint progress: status counts over the working queue + per-layer
+/// distribution of nodes linked to the current queue's sprints.
+pub fn sprint_progress_report(
+    repo_root: &Path,
+    data_dir: &Path,
+) -> Result<SprintProgressReport, String> {
+    let m = source_manifest(repo_root, data_dir)?;
+    let q = sprint_queue_report(repo_root, data_dir)?;
+    let ids: std::collections::BTreeSet<String> = q.planned.iter().map(|e| e.id.clone()).collect();
+    let mut layers: Vec<SprintLayerProgress> = m
+        .layers
+        .iter()
+        .map(|l| SprintLayerProgress {
+            id: l.id.clone(),
+            name: l.name.clone(),
+            z: l.z,
+            node_count: 0,
+            linked_count: 0,
+        })
+        .collect();
+    for node in &m.nodes {
+        if let Some(layer) = layers.iter_mut().find(|l| l.id == node.layer) {
+            layer.node_count += 1;
+            if node.sprints.iter().any(|s| ids.contains(s)) {
+                layer.linked_count += 1;
+            }
+        }
+    }
+    layers.sort_by_key(|l| l.z);
+    let total = q.planned.len() as u64;
+    let closed_count = q
+        .planned
+        .iter()
+        .filter(|e| e.status == "closed" || e.status == "done")
+        .count() as u64;
+    let open_count = q
+        .planned
+        .iter()
+        .filter(|e| e.status == "open" || e.id == q.active_sprint)
+        .count() as u64;
+    let planned_count = total.saturating_sub(closed_count + open_count);
+    let progress_pct = if total > 0 {
+        (closed_count * 100) / total
+    } else {
+        0
+    };
+    Ok(SprintProgressReport {
+        revision: m.revision,
+        total,
+        open_count,
+        closed_count,
+        planned_count,
+        progress_pct,
+        layers,
+    })
+}
+
+/// `GET /api/vision/sprint-progress` — sprint progress report.
+pub fn wire_sprint_progress(repo_root: &Path, data_dir: &Path) -> Value {
+    match sprint_progress_report(repo_root, data_dir) {
+        Ok(r) => {
+            let mut v = serde_json::to_value(&r).unwrap_or_default();
+            if let serde_json::Value::Object(map) = &mut v {
+                map.insert("ok".to_string(), serde_json::Value::Bool(true));
+            }
+            v
+        }
+        Err(e) => json!({ "ok": false, "error": e }),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

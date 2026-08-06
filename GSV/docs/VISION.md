@@ -1,7 +1,7 @@
 # GSV — Vision box (poolAI vision canon mirror)
 
 Дзеркало poolAI vision canon (`docs/vision/manifest.json` + `docs/vision/feed.json` +
-`docs/vision/extensions.json`) у Rust-бокс GSV. Band 113 (PH-S1769…S1778, ✅).
+`docs/vision/extensions.json`) у Rust-бокс GSV. Band 114 (PH-S1779…S1788, ✅).
 
 ## Що це
 
@@ -34,6 +34,14 @@
   - `GET /api/vision/node-search?q=&layer=` — **band 113**: galaxy node search
     (case-insensitive match по id/label/path/sections, `top-N 25` layer-z-sorted,
     `links_out`/`links_in` tallies) → `NodeSearchReport`/`NodeSearchResult`.
+  - `GET /api/vision/sprint-board` — **band 114**: sprint-board report
+    (`total`/`open_count`/`closed_count`/`progress_pct`, `next_sprint`/`last_sprint_closed`/
+    `active_sprint`, `columns` open/closed/planned з `SprintQueueEntry`) →
+    `SprintBoardReport`/`SprintBoardColumn`.
+  - `GET /api/vision/sprint-progress` — **band 114**: sprint progress report
+    (status counts `open`/`closed`/`planned` + `progress_pct` + per-layer розподіл
+    `layers[]` з `node_count`/`linked_count` проти чергових спринтів, z-ascending) →
+    `SprintProgressReport`/`SprintLayerProgress`.
   - `GET /assets/vision.svg` — **band 110**: порт `docs/vision/vision.svg` (isometric diagram,
     `image/svg+xml`, include_str! з `GSV/ui/vision.svg`).
 
@@ -69,13 +77,32 @@ UI (`ui/index.html`): Vision Map card тепер рендерить **inline** `
 клікабельні layer chips (фільтр мапи/пошуку, active chip), node-search input + results table
 → deep-link у Doc Preview card (`openSearchNode`).
 
+## Sprint-board + progress UI (band 114)
+
+`SprintBoardReport` (band 114) будує доску зі спільного `planned` queue (band 112):
+
+- `columns` — три фіксовані групи: `open` (активний спринт або `status == "open"`),
+  `closed` (`closed`/`done`), `planned` (решту статусів).
+- `progress_pct` = `closed_count * 100 / total`; `total` = розмір working queue.
+
+`SprintProgressReport` (band 114) — додає per-layer розподіл:
+
+- `layers[]` — з `manifest.layers`, z-ascending, з `node_count` (nodes шару) та
+  `linked_count` (nodes, що посилаються на спринт з черги).
+- Status counts (`open`/`closed`/`planned`) — над `planned` queue, сума = `total`.
+
+UI: **Sprint Board card** (progress bar + open/closed/planned колонки-details) та
+**Sprint Progress card** (progress bar + per-layer таблиця nodes/linked) у `ui/index.html`.
+
 ## Ratio-safe політика
 
 `vision.js` (161 KB) / `vision.css` (50 KB) legacy не переносяться у `GSV/ui/` — це знищило б
 canon Rust 95–100%. UI — тонкий glue: Vision card (summary + ticker), **Vision Map card**
 (inline SVG + per-layer chips + edge kinds + node search), **Sprint Map card**
 (sprint-queue modules/kinds/links), **Doc Preview card** (node + 1-hop neighbors,
-input `galaxy_grid`), **Vision Sync card** (Resync snapshot button + drift status) та
-**Sprint Queue card** (next/active/open + planned details) у `ui/index.html`.
+input `galaxy_grid`), **Vision Sync card** (Resync snapshot button + drift status),
+**Sprint Queue card** (next/active/open + planned details), **Sprint Board card**
+(progress bar + open/closed/planned колонки) та **Sprint Progress card** (progress bar +
+per-layer nodes/linked таблиця) у `ui/index.html`.
 `.svg` у ratio-аудиті Ignored — порт діаграми ratio-neutral.
 Див. [`GSV_MIGRATION.md`](../../docs/gsv/GSV_MIGRATION.md).

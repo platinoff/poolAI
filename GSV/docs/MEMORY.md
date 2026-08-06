@@ -4,17 +4,18 @@
 Оновлюється в кінці кожного band. Лічильники — вимірювані (`wc -l`, `cargo test`,
 `cargo run --bin gsv-loc-audit`), не з пам'яті.
 
-## Стан (2026-08-05 · band 113 ✅)
+## Стан (2026-08-05 · band 114 ✅)
 
 - **Канон:** Rust **95–100%** / wasm **0–5%** (завжди), без Python/Java; bins — лише `src/bin/`.
-- **Ratio (виміряно):** `cargo run --bin gsv-loc-audit` → **95.15%** (rust 6360 / product 6684) — gate ≥95% ✅.
+- **Ratio (виміряно):** `cargo run --bin gsv-loc-audit` → **95.02%** (rust 6832 / product 7190) — gate ≥95% ✅.
   Звіт: `GSV/data/rust_ratio.json` (gitignored).
-- **Тести (виміряно):** `cargo test` → **122** (58 unit + 8 `gsv_omni_contracts` + 7 `gsv_ratio_contracts`
-  + 19 `gsv_server_contracts` + 8 `gsv_update_flow` + 22 `gsv_vision_contracts`).
+- **Тести (виміряно):** `cargo test` → **140** (58 unit + 8 `gsv_omni_contracts` + 7 `gsv_ratio_contracts`
+  + 21 `gsv_server_contracts` + 8 `gsv_update_flow` + 38 `gsv_vision_contracts`).
   `cargo clippy --all-targets` → **0** warnings. `cargo fmt` clean.
 - **Бокси:** Tracker · SLI console · Toolchain · IDE · Update/offline · Box preview · SLI terminal ·
   Tests/bench hooks · **Ratio** · **Vision** · **Vision Map** · **Sprint Map** · **Doc Preview** ·
-  **Vision Sync** · **Sprint Queue** · **OmniRouter** (Rust AI-проксі/роутер).
+  **Vision Sync** · **Sprint Queue** · **Sprint Board** · **Sprint Progress** · **OmniRouter**
+  (Rust AI-проксі/роутер).
 
 ## Що зроблено
 
@@ -137,6 +138,33 @@
 - **PH-S1776** Ratio hold advisory (`gsv-loc-audit --min-ratio 0.95 --advisory`) + poolAI parity hold.
 - **PH-S1777** vision-sync close: `gsv-vision-sync` refresh + poolAI vision rev++.
 - **PH-S1778** Band close: ratio hold, fmt, clippy, cargo test, docs canon, vision-sync, push.
+
+### Band 114 (PH-S1779…S1788, ✅ 2026-08-05) — GSV Sprint-board + progress UI
+- **PH-S1779** `boxes/vision.rs` `SprintBoardReport`/`SprintBoardColumn` structs +
+  `sprint_board_report`/`wire_sprint_board` — доска зі спільного `planned` queue:
+  columns open/closed/planned (active або `open` → open; `closed`/`done` → closed; решта → planned),
+  counts + `progress_pct` = closed/total; `GET /api/vision/sprint-board` route + handler
+  у `server/mod.rs`.
+- **PH-S1780** `SprintProgressReport`/`SprintLayerProgress` structs +
+  `sprint_progress_report`/`wire_sprint_progress` — status counts + per-layer розподіл
+  (`node_count`/`linked_count` проти чергових спринтів, z-ascending);
+  `GET /api/vision/sprint-progress` route + handler.
+- **PH-S1781** `tests/gsv_vision_contracts.rs` sprint-board contracts (grouping, progress pct
+  formula, column order, active in open, unique across columns, closed-only-done, revision parity,
+  wire ok) → 30.
+- **PH-S1782** sprint-progress contracts (layers match manifest + node sums, statuses sum,
+  z-ordered, linked reflects queue sprints, planned formula, wire ok) → **38**.
+- **PH-S1783** `tests/gsv_server_contracts.rs` sprint-board + sprint-progress endpoint contracts
+  (ok + status sums + columns/layers shape) → 21.
+- **PH-S1784** Sprint Board card у `ui/index.html`: progress bar + open/closed/planned
+  колонки-details (`bar()` helper).
+- **PH-S1785** Sprint Progress card: progress bar + per-layer таблиця nodes/linked.
+- **PH-S1786** `GSV/docs/VISION.md` (sprint-board/sprint-progress API + band 114 section) +
+  `MEMORY.md` band 114 + HANDOFF/NEXT_SESSION.
+- **PH-S1787** poolAI parity: `docs/gsv/GSV_MIGRATION.md` rows ✅, `docs/vision/README.md`,
+  `GSV_TECH_ROADMAP.md` band 114, FM §5.95.
+- **PH-S1788** Band close: ratio hold (**95.02%**), fmt, clippy 0, cargo test (140), docs canon,
+  vision-sync rev 467, push.
 
 ## Важливі факти (не забувати)
 

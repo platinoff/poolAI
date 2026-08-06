@@ -1,9 +1,9 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-08-05 (band 113 **GSV Galaxy UI: node search + interactive map** PH-S1769…S1778 **✅** · band 114 open PH-S1779…S1788 · Vision rev 465)
+**Оновлено:** 2026-08-05 (band 114 **GSV Sprint-board + progress UI** PH-S1779…S1788 **✅** · band 115 open PH-S1789…S1798 · Vision rev 467)
 
 **Наступна сесія:** **`абракадабра`** — див. **канон воркфлоу в [AGENTS.md](../../AGENTS.md §100–113)**.
-**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1779…S1788; черга — FM §5.12) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1789…S1798; черга — FM §5.12) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
 
 --- 
 
@@ -133,6 +133,30 @@ layer filter chips + search → doc-preview deep-link у `GSV/ui/index.html`; co
 Ratio: GSV **95.15%** (rust 6360 / product 6684, gate ≥95% ✅) + poolAI **95.02%** advisory hold.
 Vision rev **465**.
 
+## Band 114 — GSV Sprint-board + progress UI (PH-S1779…S1788, **✅**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1779** | Sprint-board wire (`SprintBoardReport`/`SprintBoardColumn`/`sprint_board_report`/`wire_sprint_board` → `GET /api/vision/sprint-board` — open/closed/planned columns + counts + `progress_pct` = closed/total) |
+| **PH-S1780** | Progress wire (`SprintProgressReport`/`SprintLayerProgress`/`sprint_progress_report`/`wire_sprint_progress` → `GET /api/vision/sprint-progress` — status counts + per-layer `node_count`/`linked_count`, z-ascending) |
+| **PH-S1781** | Sprint-board contracts (`tests/gsv_vision_contracts.rs`, **30**) |
+| **PH-S1782** | Progress contracts (`tests/gsv_vision_contracts.rs` — layers match manifest, statuses sum, z-ordered, linked reflect queue, **38**) |
+| **PH-S1783** | Endpoint contracts (`tests/gsv_server_contracts.rs` — sprint-board + sprint-progress ok + shape, **21**) |
+| **PH-S1784** | Sprint Board card (`ui/index.html`: progress bar + open/closed/planned колонки-details, `bar()` helper) |
+| **PH-S1785** | Sprint Progress card (`ui/index.html`: progress bar + per-layer таблиця nodes/linked) |
+| **PH-S1786** | GSV vision docs canon (`VISION.md`; MEMORY band 114; HANDOFF/NEXT band 114) |
+| **PH-S1787** | poolAI vision parity (`GSV_MIGRATION.md` rows ✅; `docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 114; FM §5.95) |
+| **PH-S1788** | Band close (ratio hold ≥95%; fmt/clippy/test; docs canon; vision-sync; push) |
+
+**PH-S1779…S1788 ✅ (2026-08-05):** GSV Sprint-board + progress UI:
+`GET /api/vision/sprint-board` (open/closed/planned columns + `progress_pct` = closed/total)
+та `GET /api/vision/sprint-progress` (status counts + per-layer `node_count`/`linked_count`
+distribution, z-ascending); Sprint Board + Sprint Progress UI cards у `GSV/ui/index.html`
+(progress bar + columns-details / per-layer таблиця); contracts **140**
+(58 unit + 8 omni + 7 ratio + 21 server + 8 update + 38 vision), clippy **0**, fmt clean.
+Ratio: GSV **95.02%** (rust 6832 / product 7190, gate ≥95% ✅) + poolAI **95.02%** advisory hold.
+Vision rev **467**.
+
 ## Band 109 — GSV vision sync/migration (PH-S1729…S1738, **✅**)
 
 | Sprint | Фокус |
@@ -178,6 +202,23 @@ gate ≥95% ✅) + poolAI **95.02%** advisory hold. GSV tests **101** (53 unit +
 Ratio box + `GET /api/ratio` + UI card; `ui/index.html` компакт (198 LOC);
 `GSV/docs/{README,MEMORY,HANDOFF_NEW_SESSION,NEXT_SESSION_PROMPT}`; FM §5.12 §5.89 ✅;
 poolAI docs parity; vision rev **458**. GSV tests **87** (46 unit + 18 + 8 omni + 7 ratio + 8 update), clippy **0**.
+
+## Band 107 — Ratio96 docs canon (PH-S1709…S1718, **✅**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1709** | `ratio96_docs_canon_depth` ui-core module (`ratio96_docs_canon_depth.rs`; depth enum + criteria registry, 10) |
+| **PH-S1710** | Docs slice aggregate (`RATIO96_DOCS_CANON_SLICES`; four `RATIO96_*.md` present) |
+| **PH-S1711** | Criteria contracts (`ratio96_docs_canon_integration`; markers + registry) |
+| **PH-S1712** | `VERIFY_RATIO96_DOCS_CANON` + quick `--ratio96-docs-canon` (`verify-dev-stand` gate; `bin/run-poolai.sh`) |
+| **PH-S1713** | Stand smoke export shape band 107 (`ratio96_docs_canon_band107_export_shape`) |
+| **PH-S1714** | `poolai-loc-audit --ratio96-docs-canon` (`rust_ratio.json` fields) |
+| **PH-S1715** | Docs `RATIO96_DOCS_CANON.md` + canon (RUN_LOCAL/INDEX/HANDOFF/NEXT) |
+| **PH-S1716** | vision-sync --check (drift gate green) |
+| **PH-S1717** | Ratio hold advisory (`--ratio96-docs-canon --advisory --min-ratio 0.95`) |
+| **PH-S1718** | Ratio96 docs-canon band close (`galaxy_horizon_s1709_integration`; FM §5.88; HANDOFF/NEXT band 108) |
+
+**PH-S1709…S1718 ✅ (2026-08-02):** `ratio96_docs_canon_depth.rs` (enum `None..FullBand107`, slices `RATIO96_DEPTH/ADMIN_OPS/STAND_SMOKE/LOC_AUDIT`, 10 criteria, 10 cases, `FM_BAND107_ROWS`, `depth_stub`); `tests/ratio96_docs_canon_integration.rs`; `bin/verify-dev-stand.sh` `VERIFY_RATIO96_DOCS_CANON` + `bin/run-poolai.sh --ratio96-docs-canon`; `ratio96_docs_canon_band107_export_shape` stand smoke; `poolai-loc-audit --ratio96-docs-canon`; `RATIO96_DOCS_CANON.md` + RUN_LOCAL; rust_ratio.json advisory hold (95.01%); `docs/vision/index.html` legacy kivi-boxes removed. FM §5.88 ✅. Vision rev **457**. Band-close test: `tests/galaxy_horizon_s1709_integration.rs`.
 
 ## Band 104 — Ratio96 admin/ops glue (PH-S1679…S1688, **✅**)
 

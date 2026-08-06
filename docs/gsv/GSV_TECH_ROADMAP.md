@@ -4,7 +4,8 @@
 
 Дата: 2026-08-05 · **Стан:** band 102 **реалізовано** + band 108 (roles/ratio canon) **✅** +
 band 109 (Vision sync/migration) **✅** + band 110 (Vision map UI) **✅** + band 111 (Sprint map + doc-preview) **✅** +
-band 112 (Vision auto-sync + sprint-queue planning) **✅** + band 113 (Node search + interactive map) **✅** ·
+band 112 (Vision auto-sync + sprint-queue planning) **✅** + band 113 (Node search + interactive map) **✅** +
+band 114 (GSV Sprint-board + progress UI) **✅** ·
 **Спринти:** `PH-S1659…S1668` (FM §5.12 §5.83 ✅) · `PH-S1719…S1728` (FM §5.12 §5.89 ✅) ·
 `PH-S1729…S1738` (FM §5.12 §5.90 ✅) · `PH-S1739…S1748` (FM §5.12 §5.91 ✅) ·
 `PH-S1749…S1758` (FM §5.12 §5.92 ✅) · `PH-S1759…S1768` (FM §5.12 §5.93 ✅) ·
@@ -133,6 +134,21 @@ docs/architecture (✅ ця сесія)
 | **PH-S1776** | Ratio hold advisory | `gsv-loc-audit --min-ratio 0.95 --advisory` (≥95%) |
 | **PH-S1777** | vision-sync close | `gsv-vision-sync` refresh + poolAI vision rev **465** |
 | **PH-S1778** | Band close | ratio hold (≥95%); fmt/clippy/test (122); docs canon; vision-sync; push |
+
+## Спринти (band 114) — GSV Sprint-board + progress UI
+
+| Sprint | Фокус | Acceptance (ключ) |
+|--------|-------|-------------------|
+| **PH-S1779** | Sprint-board wire | `SprintBoardReport`/`SprintBoardColumn`/`sprint_board_report`/`wire_sprint_board` → `GET /api/vision/sprint-board` (open/closed/planned columns + counts + `progress_pct` = closed/total) |
+| **PH-S1780** | Progress wire | `SprintProgressReport`/`SprintLayerProgress`/`sprint_progress_report`/`wire_sprint_progress` → `GET /api/vision/sprint-progress` (status counts + per-layer `node_count`/`linked_count`, z-ascending) |
+| **PH-S1781** | Sprint-board contracts | `tests/gsv_vision_contracts.rs` (grouping, pct formula, column order, active-in-open, uniqueness, **30**) |
+| **PH-S1782** | Progress contracts | sprint-progress contracts (layers match manifest, statuses sum, z-ordered, linked reflect queue, **38**) |
+| **PH-S1783** | Endpoint contracts | `tests/gsv_server_contracts.rs` sprint-board + sprint-progress (ok + status sums + columns/layers shape, **21**) |
+| **PH-S1784** | Sprint Board card | Sprint Board UI card у `ui/index.html`: progress bar + open/closed/planned колонки-details (`bar()` helper) |
+| **PH-S1785** | Sprint Progress card | Sprint Progress UI card: progress bar + per-layer таблиця nodes/linked |
+| **PH-S1786** | GSV vision docs | `VISION.md` sprint-board/sprint-progress API + band 114 section; MEMORY band 114; HANDOFF/NEXT band 114 |
+| **PH-S1787** | poolAI vision parity | `GSV_MIGRATION.md` rows ✅; `docs/vision/README.md`; цей файл band 114; FM §5.95 |
+| **PH-S1788** | Band close | ratio hold (**95.02%**); fmt/clippy/test (140); docs canon; vision-sync rev 467; push |
 
 ## Ключові UX-вимоги (узагальнення ТЗ)
 
