@@ -265,7 +265,7 @@ FM-xxx (з таблиці нижче)
 
 **VDT:** §5.12 = **журнал PH-S*** (≤10 відкритих). Якщо **< 10** — **`абракадабра`** / project scan **всього проєкту**: concept → FM **§5.1** → roadmaps → architect → DOCS_LEGACY → code → §5.13 fallback. Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Project scan». **Rust-first:** API → `tests/`; Playwright лише browser scope.
 
-**Відкритих у §5.12:** **0** (band 115 ✅). **Master horizon:** PH-S1799…S1808 (band 116). Vision rev **468**.
+**Відкритих у §5.12:** **0** (band 116 ✅). **Master horizon:** PH-S1809…S1818 (band 117). Vision rev **469**.
 
 **Историчний research backlog (PH-S65+):**
 
@@ -1459,6 +1459,23 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1731 | **PH-S1796** | poolAI vision parity | docs canon | `docs/vision/README.md`; FM §5.12 §5.96; `GSV_TECH_ROADMAP.md` band 115; poolAI HANDOFF/NEXT band 115 | **[x]** |
 | 1732 | **PH-S1797** | Ratio hold advisory | gsv-loc-audit | `gsv-loc-audit --min-ratio 0.95 --advisory` (≥95%) | **[x]** |
 | 1733 | **PH-S1798** | Band close | GSV_ROLES | ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync rev 468; push | **[x]** |
+
+### 5.97 GSV history charts queue — band 116 (PH-S1799…S1808, 2026-08-07) · **✅**
+
+**Джерело:** master backlog band 116 (GSV history charts — speed-index history UI + rust-diagnostics history chart) — GSV Speeds/Rust supersession (bands 109–115) + live artifacts `docs/vision/{speed_index,rust_diagnostics}.json` (history arrays). Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../gsv/GSV_MIGRATION.md). Rust-first: charts = Rust-rendered SVG (ratio-safe 95–100%, no UI JS).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1734 | **PH-S1799** | Scope + queue | docs canon | Define band 116 (speeds history UI + rust-diagnostics history chart) у FM §5.97 + §5.12 header (master horizon) | **[x]** |
+| 1735 | **PH-S1800** | Speeds history wire | GSV_BOXES | Typed `SpeedTestCiRecord`/`SpeedBenchRecord` + `test_ci_history`/`bench_history` у `SpeedIndexReport`; `read_speed_index` carries history arrays (source fallback unchanged) | **[x]** |
+| 1736 | **PH-S1801** | Rust diagnostics history wire | GSV_BOXES | Typed `RustDiagRecord` + `history` у `RustDiagnosticsReport`; `read_rust_diagnostics` carries history (source fallback unchanged) | **[x]** |
+| 1737 | **PH-S1802** | Contracts | Rust-first (API → tests) | History arrays round-trip + SVG chart unit tests (vision tests 23: typed parse, empty state, bars) | **[x]** |
+| 1738 | **PH-S1803** | Speed history chart UI | GSV_BOXES | `/api/vision/speeds.svg` (Rust-rendered SVG: test-ci wall-clock bars, green ok / red fail, footer latest bench) + card `<img>` у `ui/index.html` | **[x]** |
+| 1739 | **PH-S1804** | Rust history chart UI | GSV_BOXES | `/api/vision/rust-diagnostics.svg` (Rust-rendered SVG: warnings orange + errors red grouped bars, command footer) + card `<img>` | **[x]** |
+| 1740 | **PH-S1805** | Stand smoke + wasm defer | GSV_ROLES | Stand smoke notes; `poolai-ui-wasm` defer row у `GSV_MIGRATION.md` + roadmap | **[x]** |
+| 1741 | **PH-S1806** | GSV vision docs canon | session canon | `VISION.md` speeds.svg/rust-diagnostics.svg + history API + band 116 section; MEMORY band 116; HANDOFF/NEXT band 116 | **[x]** |
+| 1742 | **PH-S1807** | poolAI vision parity | docs canon | `docs/vision/README.md`; FM §5.12 §5.97; `GSV_TECH_ROADMAP.md` band 116; poolAI HANDOFF/NEXT band 116 | **[x]** |
+| 1743 | **PH-S1808** | Band close | GSV_ROLES | ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync rev 469; push | **[x]** |
 
 ### 5.88 Ratio96 docs canon queue — band 107 (PH-S1709…S1718, 2026-08-02) · **✅**
 

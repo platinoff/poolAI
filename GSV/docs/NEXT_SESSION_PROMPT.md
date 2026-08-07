@@ -1,6 +1,6 @@
 # Промпт наступної сесії (GSV)
 
-**Оновлено:** 2026-08-07 (band 115 **PH-S1789…S1798** ✅ · ratio **95.04%** · tests **150**)
+**Оновлено:** 2026-08-07 (band 116 **PH-S1799…S1808** ✅ · ratio **95.26%** · tests **153**)
 
 ```
 абракадабра
@@ -8,7 +8,7 @@
 
 **Порядок:** **S0 диск** (`df -h /s` + `check_target_disk.sh` → `cargo clean` за потреби) →
 project scan (**warnings first** — `cargo clippy --all-targets` у GSV, `poolai-rust-diagnostics` у poolAI) →
-drain наступного band (черга — FM §5.12 §5.96 / GSV_TECH_ROADMAP; **без** mid-push) →
+drain наступного band (черга — FM §5.12 §5.97 / GSV_TECH_ROADMAP; **без** mid-push) →
 Speeds · Rust panel → vision-sync (`poolai-vision-sync`) → **один** commit → **`git push` + самарі**.
 
 **⚠️ Зупинити `gsv-server` перед `cargo test`/`build`** (блокує `target/debug/gsv-server.exe`);
@@ -58,9 +58,19 @@ Speeds · Rust panel → vision-sync (`poolai-vision-sync`) → **один** com
   `GSV/docs/LEGACY_PARITY.md` audit (Speeds + Rust — єдині прогалини, закрито;
   `vision.js`/`vision.css` superseded); contracts **150** (40 vision + 23 server);
   GSV ratio **95.04%** gate ✅; poolAI vision rev **468**; FM §5.12 §5.96.
-  **Наступний band 116**: master backlog (Ratio96 phase F) або GSV future — за пріоритетом власника
+- **band 116** (PH-S1799…S1808) ✅ — GSV history charts (speed/rust analytics):
+  typed `SpeedTestCiRecord`/`SpeedBenchRecord`/`RustDiagRecord` + `test_ci_history`/
+  `bench_history`/`history` через wire (`read_speed_index`/`read_rust_diagnostics`,
+  source fallback unchanged); `speed_index_chart_svg` → `GET /api/vision/speeds.svg`
+  (Rust-rendered SVG: test-CI wall bars green ok / red fail, ≤24 runs, footer latest bench) та
+  `rust_diagnostics_chart_svg` → `GET /api/vision/rust-diagnostics.svg` (warnings orange +
+  errors red grouped bars, command footer); `<img>` charts у Speed Index + Rust Diagnostics
+  cards; vision tests **153** (67 unit + 40 vision + 23 server); GSV ratio **95.26%** gate ✅;
+  stand smoke: обидва SVG → 200 `image/svg+xml`; `poolai-ui-wasm` defer; poolAI vision rev
+  **469**; FM §5.12 §5.97.
+  **Наступний band 117**: master backlog (Ratio96 phase F) або GSV future — за пріоритетом власника
   (перші кандидати: legacy `vision.js`/`vision.css` **superseded** — дезактивація після stand smoke,
-  `poolai-ui-wasm` defer, speed-index history UI, rust-diagnostics history chart).
+  GSV updates/cleanup, ratio96 phase F aggregate).
 
 ## Канон GSV
 
@@ -75,7 +85,7 @@ Band 107 ✅ (poolAI Ratio96 docs canon) · band 106 ✅ (Ratio96 loc-audit) · 
 band 104 ✅ (Ratio96 admin/ops) · band 103 ✅ · band 102 ✅ (GSV migration) · band 109 ✅ (GSV vision sync) ·
 band 110 ✅ (GSV vision map UI) · band 111 ✅ (GSV sprint-map + doc-preview) · band 112 ✅ (GSV vision auto-sync + sprint-queue) ·
 band 113 ✅ (GSV node search + interactive map) · band 114 ✅ (GSV sprint-board + progress UI) ·
-band 115 ✅ (GSV migration completion — legacy vision supersession) ·
+band 115 ✅ (GSV migration completion — legacy vision supersession) · band 116 ✅ (GSV history charts — speed/rust analytics) ·
 staging `GSV/data/*` / `certs/*.pem` /
 `.env` · mid-push · build/test при запущеному `gsv-server` · обхід ratio-смуги Rust-кодом замість compact UI ·
 перенесення legacy `vision.js`/`vision.css` у `GSV/ui/` (знищило б ratio canon).

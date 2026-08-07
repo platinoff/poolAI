@@ -88,6 +88,11 @@ pub fn router(state: AppState) -> Router {
             "/api/vision/rust-diagnostics",
             get(api_vision_rust_diagnostics),
         )
+        .route("/api/vision/speeds.svg", get(api_vision_speeds_svg))
+        .route(
+            "/api/vision/rust-diagnostics.svg",
+            get(api_vision_rust_diagnostics_svg),
+        )
         .route("/api/omni", get(api_omni))
         .route(
             "/api/omni/config",
@@ -357,6 +362,30 @@ async fn api_vision_rust_diagnostics(State(state): State<AppState>) -> Json<Valu
         &state.repo_root,
         &state.data_dir,
     ))
+}
+
+async fn api_vision_speeds_svg(State(state): State<AppState>) -> Response {
+    (
+        StatusCode::OK,
+        [
+            ("Content-Type", "image/svg+xml"),
+            ("Cache-Control", "no-cache"),
+        ],
+        crate::boxes::vision::speed_index_chart_svg(&state.repo_root, &state.data_dir),
+    )
+        .into_response()
+}
+
+async fn api_vision_rust_diagnostics_svg(State(state): State<AppState>) -> Response {
+    (
+        StatusCode::OK,
+        [
+            ("Content-Type", "image/svg+xml"),
+            ("Cache-Control", "no-cache"),
+        ],
+        crate::boxes::vision::rust_diagnostics_chart_svg(&state.repo_root, &state.data_dir),
+    )
+        .into_response()
 }
 
 // ── OmniRouter box ─────────────────────────────────────────────────────────────

@@ -6,10 +6,12 @@
 band 109 (Vision sync/migration) **✅** + band 110 (Vision map UI) **✅** + band 111 (Sprint map + doc-preview) **✅** +
 band 112 (Vision auto-sync + sprint-queue planning) **✅** + band 113 (Node search + interactive map) **✅** +
 band 114 (GSV Sprint-board + progress UI) **✅** · band 115 (GSV migration completion) **✅** ·
+band 116 (GSV history charts — speed/rust analytics) **✅** ·
 **Спринти:** `PH-S1659…S1668` (FM §5.12 §5.83 ✅) · `PH-S1719…S1728` (FM §5.12 §5.89 ✅) ·
 `PH-S1729…S1738` (FM §5.12 §5.90 ✅) · `PH-S1739…S1748` (FM §5.12 §5.91 ✅) ·
 `PH-S1749…S1758` (FM §5.12 §5.92 ✅) · `PH-S1759…S1768` (FM §5.12 §5.93 ✅) ·
-`PH-S1769…S1778` (FM §5.12 §5.94 ✅) · `PH-S1789…S1798` (FM §5.12 §5.96 ✅).
+`PH-S1769…S1778` (FM §5.12 §5.94 ✅) · `PH-S1789…S1798` (FM §5.12 §5.96 ✅) ·
+`PH-S1799…S1808` (FM §5.12 §5.97 ✅).
 
 ## Логічний порядок (залежності)
 
@@ -164,6 +166,21 @@ docs/architecture (✅ ця сесія)
 | **PH-S1796** | poolAI vision parity | FM §5.12 §5.96; HANDOFF/NEXT band 115; `docs/vision/` canon |
 | **PH-S1797** | Ratio hold advisory | `gsv-loc-audit` ≥95% (**95.04%**); legacy JS не переносимо (superseded) |
 | **PH-S1798** | Band close | ratio hold; fmt/clippy/test (150); docs canon; vision-sync rev 468; push |
+
+## Спринти (band 116) — GSV history charts (speed/rust analytics)
+
+| Sprint | Фокус | Acceptance (ключ) |
+|--------|-------|-------------------|
+| **PH-S1799** | Scope + queue | FM §5.97 band 116 (PH-S1799…S1808) + manifest sync |
+| **PH-S1800** | Speeds history wire | `SpeedTestCiRecord`/`SpeedBenchRecord` + `test_ci_history`/`bench_history` у `SpeedIndexReport`; `read_speed_index` carry arrays (source fallback unchanged) |
+| **PH-S1801** | Rust diagnostics history wire | `RustDiagRecord` + `history` у `RustDiagnosticsReport`; `read_rust_diagnostics` carry history |
+| **PH-S1802** | Contracts | vision tests 20 → **23**: typed parse, SVG bars + empty state (`data_dir_of` helper) |
+| **PH-S1803** | Speed history chart UI | `speed_index_chart_svg` → `GET /api/vision/speeds.svg` (Rust-rendered SVG: test-CI wall bars green ok / red fail, ≤24 runs, footer latest bench) + `<img id="i-speed-chart">` |
+| **PH-S1804** | Rust history chart UI | `rust_diagnostics_chart_svg` → `GET /api/vision/rust-diagnostics.svg` (warnings orange + errors red grouped bars, command footer) + `<img id="i-rust-chart">` |
+| **PH-S1805** | Stand smoke + wasm defer | stand smoke: обидва SVG 200 `image/svg+xml`; `poolai-ui-wasm` defer row у `GSV_MIGRATION.md` + roadmap |
+| **PH-S1806** | GSV vision docs canon | `VISION.md` +band 116 section/endpoints; MEMORY band 116; HANDOFF/NEXT band 116 |
+| **PH-S1807** | poolAI vision parity | `docs/vision/README.md`; FM §5.12 §5.97; цей файл band 116; poolAI HANDOFF/NEXT band 116 |
+| **PH-S1808** | Band close | ratio hold (**95.26%**); fmt/clippy/test (153); docs canon; vision-sync rev 469; push |
 
 ## Ключові UX-вимоги (узагальнення ТЗ)
 

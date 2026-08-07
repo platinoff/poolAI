@@ -1,7 +1,7 @@
 # GSV — Vision box (poolAI vision canon mirror)
 
 Дзеркало poolAI vision canon (`docs/vision/manifest.json` + `docs/vision/feed.json` +
-`docs/vision/extensions.json`) у Rust-бокс GSV. Band 114 (PH-S1779…S1788, ✅).
+`docs/vision/extensions.json`) у Rust-бокс GSV. Bands 109–116 (PH-S1729…S1808, ✅).
 
 ## Що це
 
@@ -48,6 +48,12 @@
   - `GET /api/vision/rust-diagnostics` — **band 115**: rust clippy diagnostics report
     (`rust_diagnostics.json` → latest warnings/errors/top_codes + history count) →
     `RustDiagnosticsReport`/`RustDiagLatest`; empty-tolerant.
+  - `GET /api/vision/speeds.svg` — **band 116**: Rust-rendered SVG chart (test-CI wall-clock
+    bars, green = ok / red = fail, ≤24 runs, footer latest bench) з `test_ci_history`;
+    empty-state svg (`ok:true`, `present:false`) коли масив порожній.
+  - `GET /api/vision/rust-diagnostics.svg` — **band 116**: Rust-rendered SVG chart
+    (warnings orange + errors red grouped bars, ≤24 runs, command footer) з `history`;
+    empty-state svg коли масив порожній.
   - `GET /assets/vision.svg` — **band 110**: порт `docs/vision/vision.svg` (isometric diagram,
     `image/svg+xml`, include_str! з `GSV/ui/vision.svg`).
 
@@ -120,6 +126,29 @@ UI: **Sprint Board card** (progress bar + open/closed/planned колонки-det
 UI: **Speed Index card** (test-ci wall time + bench median + rows) та
 **Rust Diagnostics card** (warnings/errors/clean + top clippy codes) у `ui/index.html`.
 
+## Speeds + Rust history charts (band 116)
+
+`speed_index_chart_svg` (band 116) — Rust-rendered SVG з `docs/vision/speed_index.json`
+`test_ci_history[]`:
+
+- Вертикальні bars тест-CI wall-clock (останні ≤24 записи), **green** = ok / **red** = fail,
+  день-мітки MM-DD (`svg_day_label`), footer = latest bench label + median ns.
+- Порожній масив → `svg_empty` (title + hint) — картка не падає.
+- `#[serde]` типи `SpeedTestCiRecord`/`SpeedBenchRecord`; `read_speed_index` проносить
+  `test_ci_history`/`bench_history` через wire (source fallback unchanged).
+
+`rust_diagnostics_chart_svg` (band 116) — Rust-rendered SVG з `docs/vision/rust_diagnostics.json`
+`history[]`:
+
+- Групові bars **warnings** (orange) + **errors** (red) на останніх ≤24 записах,
+  день-мітки, footer = command (≤48 chars).
+- Порожній масив → `svg_empty`. Тип `RustDiagRecord`; `read_rust_diagnostics` проносить
+  `history` через wire.
+
+UI: `<img>` per card у `ui/index.html` — `i-speed-chart` → `/api/vision/speeds.svg` та
+`i-rust-chart` → `/api/vision/rust-diagnostics.svg` (`image/svg+xml`,
+`Cache-Control: no-cache`). Charts — Rust-рендерені (ratio-safe, zero UI JS).
+
 ## Ratio-safe політика
 
 `vision.js` (161 KB) / `vision.css` (50 KB) legacy не переносяться у `GSV/ui/` — це знищило б
@@ -129,6 +158,8 @@ canon Rust 95–100%. UI — тонкий glue: Vision card (summary + ticker), 
 input `galaxy_grid`), **Vision Sync card** (Resync snapshot button + drift status),
 **Sprint Queue card** (next/active/open + planned details), **Sprint Board card**
 (progress bar + open/closed/planned колонки) та **Sprint Progress card** (progress bar +
-per-layer nodes/linked таблиця) у `ui/index.html`.
+per-layer nodes/linked таблиця) у `ui/index.html`. Band 116 додає `<img>` charts:
+**Speed Index card** — `speeds.svg` (test-ci wall bars) та **Rust Diagnostics card** —
+`rust-diagnostics.svg` (warnings/errors bars); SVG рендерить Rust (`vision.rs`), не JS.
 `.svg` у ratio-аудиті Ignored — порт діаграми ratio-neutral.
 Див. [`GSV_MIGRATION.md`](../../docs/gsv/GSV_MIGRATION.md) і [`LEGACY_PARITY.md`](./LEGACY_PARITY.md).

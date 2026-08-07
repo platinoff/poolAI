@@ -1,8 +1,8 @@
 # GSV — Legacy vision app parity (docs/vision)
 
 Inventory of the legacy Galaxy vision app (`docs/vision/index.html` + `docs/vision/vision.js` +
-`docs/vision/vision.css`, 12.2 + 157.3 + 49.7 KB) against the GSV Rust-first UI. Band 115
-(PH-S1789…S1798, ⏳).
+`docs/vision/vision.css`, 12.2 + 157.3 + 49.7 KB) against the GSV Rust-first UI. Bands 115–116
+(PH-S1789…S1808, ✅).
 
 ## Принцип (ratio-safe)
 
@@ -21,8 +21,8 @@ UI-картками `GSV/ui/index.html`. Документ — джерело і�
 | Layers panel (3D layer-stack) | manifest.layers | `GET /api/vision/map` + Vision Map card (L0..L5 z-sorted SVG) | ✅ covered |
 | Sprint queue panel (FM §5.12, eye filter) | manifest.sprint_queue | `GET /api/vision/sprint-queue` + Sprint Queue card; `GET /api/vision/sprint-board` + Sprint Board card | ✅ superseded |
 | Galaxy map (interactive SVG) | manifest nodes/edges | `GET /api/vision/map` + inline `assets/vision.svg` + layer chips; `GET /api/vision/node-search` | ✅ covered |
-| Speeds panel (`speed_index.json`) | speed_index.json | `GET /api/vision/speeds` + Speed Index card (band 115) | ➡️ migrated (PH-S1790) |
-| Rust panel (`rust_diagnostics.json`) | rust_diagnostics.json | `GET /api/vision/rust-diagnostics` + Rust Diagnostics card (band 115) | ➡️ migrated (PH-S1791) |
+| Speeds panel (`speed_index.json`) | speed_index.json | `GET /api/vision/speeds` + Speed Index card (band 115); `GET /api/vision/speeds.svg` + Speed history chart (band 116) | ✅ migrated (PH-S1790) |
+| Rust panel (`rust_diagnostics.json`) | rust_diagnostics.json | `GET /api/vision/rust-diagnostics` + Rust Diagnostics card (band 115); `GET /api/vision/rust-diagnostics.svg` + Rust history chart (band 116) | ✅ migrated (PH-S1791) |
 | Links panel (related edges = node 1-hop neighbors) | manifest edges | `GET /api/vision/doc-preview?id=` + Doc Preview card | ✅ superseded |
 | Preview panel (doc preview) | manifest nodes/edges | `GET /api/vision/doc-preview?id=` + Doc Preview card | ✅ covered |
 | Explorer sidebar file-tree | manifest paths | `GET /api/vision/node-search?q=` (case-insensitive id/label/path) | ✅ superseded |
@@ -32,10 +32,11 @@ UI-картками `GSV/ui/index.html`. Документ — джерело і�
 
 ## Підсумок
 
-- **Мігровано в Rust (band 115):** Speeds + Rust diagnostics — єдині функціональні прогалини.
+- **Мігровано в Rust (bands 115–116):** Speeds + Rust diagnostics — єдині функціональні прогалини;
+  band 116 додає Rust-rendered SVG history charts (`speeds.svg`/`rust-diagnostics.svg`).
 - **Superseded:** auto-reload/queue/links/file-tree покриваються наявними `GET /api/vision/*` +
   компактними картками (bands 109–114).
 - **Out-of-scope:** GPU FX / power menu / layout chrome — не vision-канон.
 
-Після закриття band 115 legacy `docs/vision/vision.js`/`vision.css` можуть бути позначені як
+Після закриття band 116 legacy `docs/vision/vision.js`/`vision.css` можуть бути позначені як
 superseded (не видаляємо — `docs/vision/` лишається канон-джерелом до завершення GSV).

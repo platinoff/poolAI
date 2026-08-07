@@ -4,13 +4,13 @@
 Оновлюється в кінці кожного band. Лічильники — вимірювані (`wc -l`, `cargo test`,
 `cargo run --bin gsv-loc-audit`), не з пам'яті.
 
-## Стан (2026-08-07 · band 115 ✅)
+## Стан (2026-08-07 · band 116 ✅)
 
 - **Канон:** Rust **95–100%** / wasm **0–5%** (завжди), без Python/Java; bins — лише `src/bin/`.
-- **Ratio (виміряно):** `cargo run --bin gsv-loc-audit` → **95.02%** (rust 6832 / product 7190) — gate ≥95% ✅.
+- **Ratio (виміряно):** `cargo run --bin gsv-loc-audit` → **95.26%** (rust 7663 / product 8044) — gate ≥95% ✅.
   Звіт: `GSV/data/rust_ratio.json` (gitignored).
-- **Тести (виміряно):** `cargo test` → **140** (58 unit + 8 `gsv_omni_contracts` + 7 `gsv_ratio_contracts`
-  + 21 `gsv_server_contracts` + 8 `gsv_update_flow` + 38 `gsv_vision_contracts`).
+- **Тести (виміряно):** `cargo test` → **153** (67 unit + 8 `gsv_omni_contracts` + 7 `gsv_ratio_contracts`
+  + 23 `gsv_server_contracts` + 8 `gsv_update_flow` + 40 `gsv_vision_contracts`).
   `cargo clippy --all-targets` → **0** warnings. `cargo fmt` clean.
 - **Бокси:** Tracker · SLI console · Toolchain · IDE · Update/offline · Box preview · SLI terminal ·
   Tests/bench hooks · **Ratio** · **Vision** · **Vision Map** · **Sprint Map** · **Doc Preview** ·
@@ -189,6 +189,27 @@
 - **PH-S1797** ratio hold advisory: `gsv-loc-audit` **95.04%**; legacy JS не переносимо.
 - **PH-S1798** Band close: ratio hold (**95.04%**), fmt, clippy 0, cargo test (150), docs canon,
   vision-sync rev 468, push.
+
+### Band 116 (PH-S1799…S1808, ✅ 2026-08-07) — GSV history charts (speed/rust analytics)
+- **PH-S1799** FM §5.97 queue (band 116) + manifest sync (10 open).
+- **PH-S1800** typed `SpeedTestCiRecord`/`SpeedBenchRecord` + `test_ci_history`/`bench_history`
+  у `SpeedIndexReport`; `read_speed_index`/`SpeedIndexFile` carry history (source fallback unchanged).
+- **PH-S1801** typed `RustDiagRecord` + `history` у `RustDiagnosticsReport`; `read_rust_diagnostics`
+  carry history (source fallback unchanged).
+- **PH-S1802** vision tests 20 → **23**: `history_records_parse_typed_fields`,
+  `speed_chart_svg_renders_bars_and_empty_state`, `rust_chart_svg_renders_bars_and_empty_state`
+  (+ `data_dir_of` helper).
+- **PH-S1803** `speed_index_chart_svg` + `/api/vision/speeds.svg` (Rust-rendered SVG: test-ci
+  wall bars green ok / red fail, ≤24 runs, footer latest bench) + `<img id="i-speed-chart">`.
+- **PH-S1804** `rust_diagnostics_chart_svg` + `/api/vision/rust-diagnostics.svg` (warnings
+  orange + errors red grouped bars, command footer) + `<img id="i-rust-chart">`.
+- **PH-S1805** stand smoke: `/api/vision/speeds.svg` + `/api/vision/rust-diagnostics.svg` →
+  200 `image/svg+xml`; `poolai-ui-wasm` defer row у `GSV_MIGRATION.md` + roadmap.
+- **PH-S1806** `GSV/docs/VISION.md` +band 116 section/endpoints; MEMORY band 116; HANDOFF/NEXT band 116.
+- **PH-S1807** poolAI parity: `docs/vision/README.md`; FM §5.12 §5.97; `GSV_TECH_ROADMAP.md` band 116;
+  poolAI HANDOFF/NEXT band 116.
+- **PH-S1808** Band close: ratio hold (**95.26%**), fmt, clippy 0, cargo test (153), docs canon,
+  vision-sync rev 469, push.
 
 ## Важливі факти (не забувати)
 

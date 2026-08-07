@@ -1,9 +1,9 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-08-07 (band 115 **GSV migration completion** PH-S1789…S1798 **✅** · band 116 open PH-S1799…S1808 · Vision rev 468)
+**Оновлено:** 2026-08-07 (band 116 **GSV history charts** PH-S1799…S1808 **✅** · band 117 open PH-S1809…S1818 · Vision rev 469)
 
 **Наступна сесія:** **`абракадабра`** — див. **канон воркфлоу в [AGENTS.md](../../AGENTS.md §100–113)**.
-**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1799…S1808; черга — FM §5.12) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1809…S1818; черга — FM §5.12) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
 
 --- 
 
@@ -181,6 +181,31 @@ Speed Index + Rust Diagnostics UI cards у `GSV/ui/index.html`; parity audit
 superseded); contracts **150** (64 unit + 8 omni + 7 ratio + 23 server + 8 update + 40 vision),
 clippy **0**, fmt clean. Ratio: GSV **95.04%** (rust 7303 / product 7684, gate ≥95% ✅) +
 poolAI **95.04%** advisory hold. Vision rev **468**.
+
+## Band 116 — GSV history charts / speed + rust analytics (PH-S1799…S1808, **✅**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1799** | Scope + queue (`docs/catalog/FUNCTION_MANAGEMENT.md` §5.97 band 116 PH-S1799…S1808; `poolai-vision-sync` manifest 10 open) |
+| **PH-S1800** | Speeds history wire (`SpeedTestCiRecord`/`SpeedBenchRecord` + `test_ci_history`/`bench_history` у `SpeedIndexReport`; `read_speed_index` carry arrays) |
+| **PH-S1801** | Rust diagnostics history wire (`RustDiagRecord` + `history` у `RustDiagnosticsReport`) |
+| **PH-S1802** | Contracts (`gsv_vision_contracts.rs` 20 → **23**: typed parse + SVG bars + empty state, `data_dir_of`) |
+| **PH-S1803** | Speed history chart (`speed_index_chart_svg` → `GET /api/vision/speeds.svg` Rust SVG: test-CI wall bars green ok/red fail ≤24 + bench footer; `<img id="i-speed-chart">`) |
+| **PH-S1804** | Rust history chart (`rust_diagnostics_chart_svg` → `GET /api/vision/rust-diagnostics.svg` warnings orange + errors red grouped bars + command footer; `<img id="i-rust-chart">`) |
+| **PH-S1805** | Stand smoke + wasm defer (обидва SVG 200 `image/svg+xml`; `poolai-ui-wasm` defer row у `GSV_MIGRATION.md`) |
+| **PH-S1806** | GSV vision docs canon (`GSV/docs/VISION.md` + band 116 section/endpoints; MEMORY band 116; HANDOFF/NEXT band 116) |
+| **PH-S1807** | poolAI vision parity (`docs/vision/README.md` band 116; FM §5.12 §5.97; `GSV_TECH_ROADMAP.md` band 116; poolAI HANDOFF/NEXT band 116) |
+| **PH-S1808** | Band close (ratio hold ≥95%; fmt/clippy/test; docs canon; vision-sync rev 469; push) |
+
+**PH-S1799…S1808 ✅ (2026-08-07):** GSV history charts — speed + rust analytics:
+`GET /api/vision/speeds.svg` (Rust-rendered SVG: test-CI wall bars green ok / red fail, ≤24 runs,
+footer latest bench) та `GET /api/vision/rust-diagnostics.svg` (warnings orange + errors red
+grouped bars, command footer); typed history (`SpeedTestCiRecord`/`SpeedBenchRecord`/
+`RustDiagRecord` + `test_ci_history`/`bench_history`/`history`); `<img>` charts у Speed Index/
+Rust Diagnostics cards у `GSV/ui/index.html`; `poolai-ui-wasm` defer (`GSV_MIGRATION.md`);
+contracts **153** (67 unit + 8 omni + 7 ratio + 23 server + 8 update + 40 vision), clippy **0**,
+fmt clean. Ratio: GSV **95.26%** (rust 7663 / product 8044, gate ≥95% ✅) + poolAI **95.04%**
+advisory hold. Vision rev **469**.
 
 ## Band 109 — GSV vision sync/migration (PH-S1729…S1738, **✅**)
 

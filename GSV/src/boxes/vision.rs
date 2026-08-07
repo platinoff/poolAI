@@ -277,6 +277,46 @@ pub struct SpeedIndexLatest {
     pub last_bench_recorded_at: String,
 }
 
+/// One test-CI history record (`speed_index.json` → `test_ci_history[]`).
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+pub struct SpeedTestCiRecord {
+    #[serde(default)]
+    pub kind: String,
+    #[serde(default)]
+    pub command: String,
+    #[serde(default)]
+    pub wall_secs: f64,
+    #[serde(default)]
+    pub ok: bool,
+    #[serde(default)]
+    pub recorded_at: String,
+    #[serde(default)]
+    pub host_label: String,
+    #[serde(default)]
+    pub git_head: String,
+}
+
+/// One Criterion bench history record (`speed_index.json` → `bench_history[]`).
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+pub struct SpeedBenchRecord {
+    #[serde(default)]
+    pub kind: String,
+    #[serde(default)]
+    pub bench: String,
+    #[serde(default)]
+    pub group: String,
+    #[serde(default)]
+    pub median_ns: u64,
+    #[serde(default)]
+    pub profile: String,
+    #[serde(default)]
+    pub recorded_at: String,
+    #[serde(default)]
+    pub host_label: String,
+    #[serde(default)]
+    pub git_head: String,
+}
+
 /// Speed-index report (`/api/vision/speeds`).
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 pub struct SpeedIndexReport {
@@ -286,6 +326,8 @@ pub struct SpeedIndexReport {
     pub latest: SpeedIndexLatest,
     pub test_ci_count: u64,
     pub bench_count: u64,
+    pub test_ci_history: Vec<SpeedTestCiRecord>,
+    pub bench_history: Vec<SpeedBenchRecord>,
 }
 
 /// Full speed-index artifact (`speed_index.json`, tolerant of unknown fields).
@@ -300,9 +342,9 @@ struct SpeedIndexFile {
     #[serde(default)]
     latest: SpeedIndexLatest,
     #[serde(default)]
-    test_ci_history: Vec<Value>,
+    test_ci_history: Vec<SpeedTestCiRecord>,
     #[serde(default)]
-    bench_history: Vec<Value>,
+    bench_history: Vec<SpeedBenchRecord>,
 }
 
 /// Latest Rust clippy diagnostic counts (`rust_diagnostics.json` → `latest`).
@@ -322,6 +364,33 @@ pub struct RustDiagLatest {
     pub top_codes: Vec<String>,
 }
 
+/// One Rust diagnostics history record (`rust_diagnostics.json` → `history[]`).
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+pub struct RustDiagRecord {
+    #[serde(default)]
+    pub kind: String,
+    #[serde(default)]
+    pub command: String,
+    #[serde(default)]
+    pub warnings: u64,
+    #[serde(default)]
+    pub errors: u64,
+    #[serde(default)]
+    pub ok: bool,
+    #[serde(default)]
+    pub recorded_at: String,
+    #[serde(default)]
+    pub wall_secs: f64,
+    #[serde(default)]
+    pub host_label: String,
+    #[serde(default)]
+    pub git_head: String,
+    #[serde(default)]
+    pub source: String,
+    #[serde(default)]
+    pub top_codes: Vec<String>,
+}
+
 /// Rust-diagnostics report (`/api/vision/rust-diagnostics`).
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 pub struct RustDiagnosticsReport {
@@ -330,6 +399,7 @@ pub struct RustDiagnosticsReport {
     pub host_label: String,
     pub latest: RustDiagLatest,
     pub history_count: u64,
+    pub history: Vec<RustDiagRecord>,
 }
 
 /// Full rust-diagnostics artifact (`rust_diagnostics.json`).
@@ -344,7 +414,7 @@ struct RustDiagnosticsFile {
     #[serde(default)]
     latest: RustDiagLatest,
     #[serde(default)]
-    history: Vec<Value>,
+    history: Vec<RustDiagRecord>,
 }
 
 /// Read + parse the speed index from `repo_root` (empty-tolerant).
@@ -361,6 +431,8 @@ pub fn read_speed_index(repo_root: &Path) -> Result<SpeedIndexReport, String> {
         latest: file.latest,
         test_ci_count: file.test_ci_history.len() as u64,
         bench_count: file.bench_history.len() as u64,
+        test_ci_history: file.test_ci_history,
+        bench_history: file.bench_history,
     })
 }
 
@@ -394,6 +466,7 @@ pub fn read_rust_diagnostics(repo_root: &Path) -> Result<RustDiagnosticsReport, 
         host_label: file.host_label,
         latest: file.latest,
         history_count: file.history.len() as u64,
+        history: file.history,
     })
 }
 
@@ -1177,6 +1250,142 @@ pub fn wire_speed_index(repo_root: &Path, data_dir: &Path) -> Value {
 pub fn wire_rust_diagnostics(repo_root: &Path, data_dir: &Path) -> Value {
     let r = source_rust_diagnostics(repo_root, data_dir);
     json!({ "ok": true, "present": read_rust_diagnostics(repo_root).is_ok(), "rust_diagnostics": r })
+}
+
+/// Short `MM-DD` from an ISO `recorded_at` (fallback: truncated raw string).
+fn svg_day_label(recorded_at: &str) -> String {
+    if recorded_at.len() >= 10 {
+        recorded_at[5..10].to_string()
+    } else {
+        recorded_at.chars().take(10).collect()
+    }
+}
+
+/// Empty-state SVG (no data artifact yet).
+fn svg_empty(title: &str, hint: &str) -> String {
+    format!(
+        r##"<svg xmlns="http://www.w3.org/2000/svg" width="560" height="132" viewBox="0 0 560 132">
+<rect width="560" height="132" rx="8" fill="#121826"/>
+<text x="12" y="22" font-family="monospace" font-size="12" fill="#e8843c">{title}</text>
+<text x="12" y="70" font-family="monospace" font-size="12" fill="#7c8ba3">{hint}</text>
+</svg>"##
+    )
+}
+
+/// `GET /api/vision/speeds.svg` — test-CI wall-clock history bar chart (SVG).
+///
+/// Bars are green when the run `ok`, red otherwise; the latest bench median is
+/// noted in the footer. Rendered server-side in Rust so the UI stays ratio-safe
+/// (no client chart code).
+pub fn speed_index_chart_svg(repo_root: &Path, data_dir: &Path) -> String {
+    let r = source_speed_index(repo_root, data_dir);
+    if r.test_ci_history.is_empty() {
+        return svg_empty(
+            "Speed index history",
+            "no speed_index.json history - run bin/record-test-ci-speed.sh",
+        );
+    }
+    let n = r.test_ci_history.len().min(24);
+    let recs: Vec<&SpeedTestCiRecord> = r.test_ci_history[r.test_ci_history.len() - n..]
+        .iter()
+        .collect();
+    let max_wall = recs
+        .iter()
+        .map(|x| x.wall_secs)
+        .fold(0.0_f64, f64::max)
+        .max(1.0);
+    let plot_h = 92.0_f64;
+    let base_y = 118.0_f64;
+    let slot = 560.0_f64 / n as f64;
+    let mut bars = String::new();
+    for (i, rec) in recs.iter().enumerate() {
+        let h = (rec.wall_secs / max_wall) * plot_h;
+        let x = i as f64 * slot + slot * 0.25;
+        let w = slot * 0.5;
+        let color = if rec.ok { "#3fb96e" } else { "#e05b5b" };
+        bars.push_str(&format!(
+            r##"<rect x="{x:.1}" y="{y:.1}" width="{w:.1}" height="{h:.1}" fill="{color}" opacity="0.9"><title>{rec:.0}s {ok} {day}</title></rect>"##,
+            y = base_y - h,
+            rec = rec.wall_secs,
+            ok = if rec.ok { "ok" } else { "fail" },
+            day = svg_day_label(&rec.recorded_at),
+        ));
+    }
+    let bench = r
+        .bench_history
+        .last()
+        .map(|b| format!("latest bench {} {} ns", b.bench, b.median_ns))
+        .unwrap_or_else(|| "no bench history".to_string());
+    format!(
+        r##"<svg xmlns="http://www.w3.org/2000/svg" width="560" height="132" viewBox="0 0 560 132">
+<rect width="560" height="132" rx="8" fill="#121826"/>
+<text x="12" y="20" font-family="monospace" font-size="12" fill="#e8843c">test-ci wall-clock ({n} runs, max {max_wall:.0}s)</text>
+{bars}
+<line x1="6" y1="{base_y:.0}" x2="554" y2="{base_y:.0}" stroke="#1e2a3d" stroke-width="1"/>
+<text x="12" y="128" font-family="monospace" font-size="10" fill="#7c8ba3">{bench}</text>
+</svg>"##
+    )
+}
+
+/// `GET /api/vision/rust-diagnostics.svg` — warnings/errors history chart (SVG).
+///
+/// Grouped bars per run: warnings in rust orange, errors in red. Rendered
+/// server-side in Rust (ratio-safe).
+pub fn rust_diagnostics_chart_svg(repo_root: &Path, data_dir: &Path) -> String {
+    let r = source_rust_diagnostics(repo_root, data_dir);
+    if r.history.is_empty() {
+        return svg_empty(
+            "Rust diagnostics history",
+            "no rust_diagnostics.json history - run bin/record-rust-clippy.sh",
+        );
+    }
+    let n = r.history.len().min(24);
+    let recs: Vec<&RustDiagRecord> = r.history[r.history.len() - n..].iter().collect();
+    let max_total = recs
+        .iter()
+        .map(|x| x.warnings + x.errors)
+        .max()
+        .unwrap_or(0)
+        .max(1);
+    let plot_h = 92.0_f64;
+    let base_y = 118.0_f64;
+    let slot = 560.0_f64 / n as f64;
+    let mut bars = String::new();
+    for (i, rec) in recs.iter().enumerate() {
+        let hw = (rec.warnings as f64 / max_total as f64) * plot_h;
+        let he = (rec.errors as f64 / max_total as f64) * plot_h;
+        let x = i as f64 * slot + slot * 0.1;
+        let w = slot * 0.4;
+        bars.push_str(&format!(
+            r##"<rect x="{x:.1}" y="{y:.1}" width="{w:.1}" height="{hw:.1}" fill="#e8843c" opacity="0.9"><title>w {warn} e {err} {day}</title></rect>"##,
+            y = base_y - hw,
+            warn = rec.warnings,
+            err = rec.errors,
+            day = svg_day_label(&rec.recorded_at),
+        ));
+        bars.push_str(&format!(
+            r##"<rect x="{x2:.1}" y="{y2:.1}" width="{w:.1}" height="{he:.1}" fill="#e05b5b" opacity="0.9"><title>errors {err} {day}</title></rect>"##,
+            x2 = x + w,
+            y2 = base_y - he,
+            err = rec.errors,
+            day = svg_day_label(&rec.recorded_at),
+        ));
+    }
+    let latest = r.latest.command.clone();
+    let latest = if latest.len() > 48 {
+        format!("{}...", &latest[..48])
+    } else {
+        latest
+    };
+    format!(
+        r##"<svg xmlns="http://www.w3.org/2000/svg" width="560" height="132" viewBox="0 0 560 132">
+<rect width="560" height="132" rx="8" fill="#121826"/>
+<text x="12" y="20" font-family="monospace" font-size="12" fill="#e8843c">clippy warnings/errors ({n} runs, max {max_total})</text>
+{bars}
+<line x1="6" y1="{base_y:.0}" x2="554" y2="{base_y:.0}" stroke="#1e2a3d" stroke-width="1"/>
+<text x="12" y="128" font-family="monospace" font-size="10" fill="#7c8ba3">{latest}</text>
+</svg>"##
+    )
 }
 
 /// Sprint-queue planning report (`/api/vision/sprint-queue`).
@@ -2046,6 +2255,146 @@ mod tests {
         assert_eq!(wire["ok"], true);
         assert_eq!(wire["present"], false);
         assert_eq!(wire["rust_diagnostics"]["latest"]["warnings"], 3);
+        let _ = std::fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn history_records_parse_typed_fields() {
+        let tmp = std::env::temp_dir().join("gsv_vision_test_history_typed");
+        let _ = std::fs::remove_dir_all(&tmp);
+        let src = tmp.join("src");
+        let vis = src.join("docs").join("vision");
+        std::fs::create_dir_all(&vis).unwrap();
+        std::fs::write(
+            vis.join("speed_index.json"),
+            r#"{
+              "schema_version": 1,
+              "generated_at": "2026-08-04",
+              "host_label": "PLATINOV",
+              "git_head": "50ce232f",
+              "latest": {},
+              "test_ci_history": [
+                { "kind": "test_ci", "command": "cargo test-ci", "wall_secs": 600.0, "ok": false,
+                  "recorded_at": "2026-08-02T03:22:20Z", "host_label": "PLATINOV", "git_head": "1e16ef501" },
+                { "kind": "test_ci", "command": "cargo test-ci", "wall_secs": 1076.0, "ok": true,
+                  "recorded_at": "2026-08-04T11:54:58Z", "host_label": "PLATINOV", "git_head": "cd5ae5b97" }
+              ],
+              "bench_history": [
+                { "kind": "criterion", "bench": "runtime_benchmarks", "group": "memory_pool",
+                  "median_ns": 1498, "profile": "short", "recorded_at": "2026-07-27T19:05:51Z",
+                  "host_label": "win10-local-26200", "git_head": "1795243f7" }
+              ]
+            }"#,
+        )
+        .unwrap();
+        std::fs::write(
+            vis.join("rust_diagnostics.json"),
+            r#"{
+              "schema_version": 1,
+              "generated_at": "2026-08-04",
+              "host_label": "PLATINOV",
+              "git_head": "cd5ae5b97",
+              "latest": {},
+              "history": [
+                { "kind": "rust_diagnostics", "command": "cargo check", "warnings": 9, "errors": 0,
+                  "ok": true, "recorded_at": "2026-07-28T01:15:23Z", "wall_secs": 80.5,
+                  "host_label": "local-ph-svc85", "git_head": "b46b16c98", "source": "local",
+                  "top_codes": ["dead_code×4", "unused_mut×2"] }
+              ]
+            }"#,
+        )
+        .unwrap();
+
+        let s = read_speed_index(&src).unwrap();
+        assert_eq!(s.test_ci_history.len(), 2);
+        assert_eq!(s.test_ci_history[0].command, "cargo test-ci");
+        assert_eq!(s.test_ci_history[0].wall_secs, 600.0);
+        assert!(!s.test_ci_history[0].ok);
+        assert_eq!(s.test_ci_history[1].git_head, "cd5ae5b97");
+        assert_eq!(s.bench_history.len(), 1);
+        assert_eq!(s.bench_history[0].median_ns, 1498);
+        assert_eq!(s.bench_history[0].group, "memory_pool");
+        let wire = wire_speed_index(&src, &data_dir_of(&tmp));
+        assert_eq!(
+            wire["speed_index"]["test_ci_history"][1]["wall_secs"],
+            1076.0
+        );
+
+        let r = read_rust_diagnostics(&src).unwrap();
+        assert_eq!(r.history.len(), 1);
+        assert_eq!(r.history[0].warnings, 9);
+        assert_eq!(r.history[0].errors, 0);
+        assert_eq!(r.history[0].top_codes.len(), 2);
+        assert_eq!(r.history[0].source, "local");
+        let wire = wire_rust_diagnostics(&src, &data_dir_of(&tmp));
+        assert_eq!(wire["rust_diagnostics"]["history"][0]["warnings"], 9);
+        let _ = std::fs::remove_dir_all(&tmp);
+    }
+
+    fn data_dir_of(tmp: &Path) -> std::path::PathBuf {
+        tmp.join("data")
+    }
+
+    #[test]
+    fn speed_chart_svg_renders_bars_and_empty_state() {
+        let tmp = std::env::temp_dir().join("gsv_vision_test_speed_chart");
+        let _ = std::fs::remove_dir_all(&tmp);
+        let src = tmp.join("src");
+        let data = tmp.join("data");
+        std::fs::create_dir_all(&src).unwrap();
+        let empty = speed_index_chart_svg(&src, &data);
+        assert!(empty.contains("no speed_index.json history"));
+
+        let vis = src.join("docs").join("vision");
+        std::fs::create_dir_all(&vis).unwrap();
+        std::fs::write(
+            vis.join("speed_index.json"),
+            r#"{
+              "schema_version": 1,
+              "generated_at": "2026-08-04",
+              "host_label": "PLATINOV",
+              "git_head": "50ce232f",
+              "latest": { "test_ci_wall_secs": 1076.5, "test_ci_ok": true },
+              "test_ci_history": [
+                { "kind": "test_ci", "command": "cargo test-ci", "wall_secs": 600.0, "ok": false,
+                  "recorded_at": "2026-08-02T03:22:20Z", "host_label": "PLATINOV", "git_head": "1e16ef501" },
+                { "kind": "test_ci", "command": "cargo test-ci", "wall_secs": 1076.5, "ok": true,
+                  "recorded_at": "2026-08-04T11:54:58Z", "host_label": "PLATINOV", "git_head": "cd5ae5b97" }
+              ],
+              "bench_history": [
+                { "kind": "criterion", "bench": "runtime_benchmarks", "group": "memory_pool",
+                  "median_ns": 4210, "profile": "short", "recorded_at": "2026-07-27T19:05:51Z",
+                  "host_label": "PLATINOV", "git_head": "1795243f7" }
+              ]
+            }"#,
+        )
+        .unwrap();
+
+        let svg = speed_index_chart_svg(&src, &data);
+        assert!(svg.starts_with("<svg"));
+        assert!(svg.contains("test-ci wall-clock (2 runs"));
+        assert!(svg.contains("fill=\"#3fb96e\""));
+        assert!(svg.contains("fill=\"#e05b5b\""));
+        assert!(svg.contains("latest bench runtime_benchmarks 4210 ns"));
+        let _ = std::fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn rust_chart_svg_renders_bars_and_empty_state() {
+        let tmp = std::env::temp_dir().join("gsv_vision_test_rust_chart");
+        let _ = std::fs::remove_dir_all(&tmp);
+        let src = tmp.join("src");
+        let data = tmp.join("data");
+        std::fs::create_dir_all(&src).unwrap();
+        let empty = rust_diagnostics_chart_svg(&src, &data);
+        assert!(empty.contains("no rust_diagnostics.json history"));
+
+        write_rust_diagnostics(&src);
+        let svg = rust_diagnostics_chart_svg(&src, &data);
+        assert!(svg.starts_with("<svg"));
+        assert!(svg.contains("clippy warnings/errors (1 runs"));
+        assert!(svg.contains("fill=\"#e8843c\""));
+        assert!(svg.contains("fill=\"#e05b5b\""));
         let _ = std::fs::remove_dir_all(&tmp);
     }
 }

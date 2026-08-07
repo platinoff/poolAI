@@ -8,13 +8,13 @@
 
 ## Стан зараз
 
-- **GSV** — окремий Rust-first проєкт (`GSV/`), bands 102 · 108 · 109 · 110 · 111 · 112 · 113 · 114 · 115 **✅**.
-- **Ratio:** `cargo run --bin gsv-loc-audit` → **95.04%** (rust 7303 / product 7684, gate ≥95% ✅) → `GSV/data/rust_ratio.json`.
-- **Тести:** `cargo test` → **150** green · **clippy 0** · **fmt clean**.
+- **GSV** — окремий Rust-first проєкт (`GSV/`), bands 102 · 108 · 109 · 110 · 111 · 112 · 113 · 114 · 115 · 116 **✅**.
+- **Ratio:** `cargo run --bin gsv-loc-audit` → **95.26%** (rust 7663 / product 8044, gate ≥95% ✅) → `GSV/data/rust_ratio.json`.
+- **Тести:** `cargo test` → **153** green · **clippy 0** · **fmt clean**.
 - **Сервер:** порт 8870 (8891 транзитивно зарезервований Windows dynamic exclusion; canon порт **8891**).
-- **FM:** band 115 = §5.96 (PH-S1789…S1798 ✅). Master horizon poolAI: band 116.
-- **Vision rev:** 468 (band 115 vision-sync close). Vision box: `boxes/vision.rs` + `gsv-vision-sync` bin +
-  `GET /api/vision*`; snapshot `GSV/data/gsv_manifest.json` + `gsv_feed.json` + `gsv_extensions.json` (rev 468).
+- **FM:** band 116 = §5.97 (PH-S1799…S1808 ✅). Master horizon poolAI: band 117.
+- **Vision rev:** 469 (band 116 vision-sync close). Vision box: `boxes/vision.rs` + `gsv-vision-sync` bin +
+  `GET /api/vision*`; snapshot `GSV/data/gsv_manifest.json` + `gsv_feed.json` + `gsv_extensions.json` (rev 469).
   Band 110: `GET /api/vision/map`, `GET /assets/vision.svg`, `GET /api/vision/feed?status=`, Vision Map card.
   Band 111: `GET /api/vision/sprint-map` (sprint-scope/queue/session-tracks links + modules + kinds) та
   `GET /api/vision/doc-preview?id=` (node + 1-hop neighbors) — Sprint Map + Doc Preview UI cards.
@@ -29,6 +29,10 @@
   mirror `gsv_speed_index.json`, empty-tolerant) та `GET /api/vision/rust-diagnostics`
   (RustDiagnosticsReport: latest warnings/errors/top_codes + history count, mirror
   `gsv_rust_diagnostics.json`, empty-tolerant) — Speed Index + Rust Diagnostics UI cards.
+  Band 116: `GET /api/vision/speeds.svg` (Speed history chart — Rust-rendered SVG: test-CI
+  wall bars green ok / red fail, ≤24 runs, footer latest bench) та
+  `GET /api/vision/rust-diagnostics.svg` (Rust history chart — warnings orange + errors red
+  grouped bars, command footer); `<img>` charts у Speed Index + Rust Diagnostics cards.
   Legacy parity: [`LEGACY_PARITY.md`](LEGACY_PARITY.md) — єдині прогалини закрито (Speeds + Rust);
   `vision.js`/`vision.css` superseded (band 115).
 - **poolAI ratio:** **95.04%** (advisory hold, `--ratio96-docs-canon --advisory --min-ratio 0.95`).
@@ -37,7 +41,7 @@
 
 1. `df -h /s | tail -1` → `bash scripts/check_target_disk.sh` → `cargo clean` якщо <5G (12G дешево).
 2. `git fetch` → `git status -sb` → `git log -1 --oneline`.
-3. Прочитати цей HANDOFF + `NEXT_SESSION_PROMPT.md` + FM §5.12 §5.96.
+3. Прочитати цей HANDOFF + `NEXT_SESSION_PROMPT.md` + FM §5.12 §5.97.
 
 ## Project scan (якщо §5.12 < 10 відкритих)
 
