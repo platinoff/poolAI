@@ -3,6 +3,96 @@
   "items": [
     {
       "category": "closed",
+      "id": "PH-S1798",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync rev 468; push",
+      "title": "Band close"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1797",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "gsv-loc-audit --min-ratio 0.95 --advisory` (≥95%)",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1796",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "docs/vision/README.md`; FM §5.12 §5.96; `GSV_TECH_ROADMAP.md` band 115; poolAI HANDOFF/NEXT band 115",
+      "title": "poolAI vision parity"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1795",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "VISION.md` speeds/rust-diagnostics API + LEGACY_PARITY + band 115 section; MEMORY band 115; HANDOFF/NEXT band 115",
+      "title": "GSV vision docs canon"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1794",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "GSV_MIGRATION.md` vision.js/css row → ✅ superseded (ratio-safe canon Rust, legacy JS не переносимо); `poolai-ui-wasm` row defer; roadmap band 115",
+      "title": "GSV_MIGRATION rows"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1793",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "compact Speed Index + Rust Diagnostics cards у `ui/index.html` (mirror legacy panels; empty-state hints)",
+      "title": "Speeds + Rust cards"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1792",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "tests/gsv_vision_contracts.rs` + `gsv_server_contracts.rs` (speeds + rust-diagnostics ok/shape/empty-tolerant, mirror round-trip)",
+      "title": "Contracts"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1791",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "RustDiagnosticsReport`/`rust_diagnostics_report`/`wire_rust_diagnostics` → `GET /api/vision/rust-diagnostics` (latest warnings/errors/ok + top_codes; mirror `gsv_rust_diagnostics.json`)",
+      "title": "Rust diagnostics wire"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1790",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "SpeedIndexReport`/`speed_index_report`/`wire_speed_index` → `GET /api/vision/speeds` (latest test_ci wall/ok + bench median + history counts; mirror `gsv_speed_index.json`)",
+      "title": "Speeds wire"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1789",
+      "link": "docs/vision/index.html#sprint-queue",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "Inventory legacy `docs/vision/{index.html,vision.js,vision.css}` panels (Layers/Queue/Map/Speeds/Rust/Links/Preview + header/Explorer/Power chrome) → map each → GSV endpoint+card / superseded / out-of-scope; `GSV/docs/LEGACY_PARITY.md",
+      "title": "Legacy parity audit"
+    },
+    {
+      "category": "closed",
       "id": "PH-S1788",
       "link": "docs/vision/index.html#sprint-queue",
       "published": "2026-05-28",
@@ -18,96 +108,6 @@
       "status": "closed",
       "summary": "GSV_MIGRATION.md` rows ✅; `docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 114",
       "title": "poolAI vision parity"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1786",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "VISION.md` sprint-board/progress; MEMORY band 114; HANDOFF/NEXT band 114",
-      "title": "GSV vision docs canon"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1785",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "per-layer chips + pct + next/active focus card у `ui/index.html",
-      "title": "Progress UI"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1784",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "board columns open/closed/planned + progress bar + counts у `ui/index.html",
-      "title": "Sprint Board UI card"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1783",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "tests/gsv_server_contracts.rs` `GET /api/vision/sprint-board` ok + groups + progress",
-      "title": "Sprint-board endpoint contract"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1782",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "tests/gsv_vision_contracts.rs` per-layer distribution matches manifest layers; statuses sum == total",
-      "title": "Progress contracts"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1781",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "tests/gsv_vision_contracts.rs` real-workspace board (open+closed groups, pct ∈ [0,100], next == active)",
-      "title": "Sprint-board contracts"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1780",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "SprintProgressReport`/`sprint_progress_report` (closed/total pct, per-status counts, per-layer distribution via manifest nodes/layers)",
-      "title": "Progress wire"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1779",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "SprintBoardReport`/`sprint_board_report`/`wire_sprint_board` → `GET /api/vision/sprint-board` (group entries open/closed/planned + counts + progress pct + next/active)",
-      "title": "Sprint-board wire"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1778",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync; push",
-      "title": "Band close"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1777",
-      "link": "docs/vision/index.html#sprint-queue",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "gsv-vision-sync` refresh + poolAI vision rev++",
-      "title": "vision-sync close"
     }
   ],
   "link": "docs/vision/index.html",

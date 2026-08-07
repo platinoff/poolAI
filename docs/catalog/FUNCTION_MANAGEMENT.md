@@ -265,7 +265,7 @@ FM-xxx (з таблиці нижче)
 
 **VDT:** §5.12 = **журнал PH-S*** (≤10 відкритих). Якщо **< 10** — **`абракадабра`** / project scan **всього проєкту**: concept → FM **§5.1** → roadmaps → architect → DOCS_LEGACY → code → §5.13 fallback. Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Project scan». **Rust-first:** API → `tests/`; Playwright лише browser scope.
 
-**Відкритих у §5.12:** **0** (band 114 ✅). **Master horizon:** PH-S1789…S1798 (band 115). Vision rev **467**.
+**Відкритих у §5.12:** **0** (band 115 ✅). **Master horizon:** PH-S1799…S1808 (band 116). Vision rev **468**.
 
 **Историчний research backlog (PH-S65+):**
 
@@ -1439,6 +1439,26 @@ Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](
 `sprint_progress_report`/`wire_sprint_progress` → `GET /api/vision/sprint-progress` (status counts +
 per-layer `node_count`/`linked_count`); Sprint Board + Sprint Progress UI cards; vision contracts **38** +
 server contracts **21** (загалом **140**); GSV ratio **95.02%** gate ✅; vision rev **467**; FM §5.12 §5.95 ✅.
+
+### 5.96 GSV migration completion — legacy vision supersession queue — band 115 (PH-S1789…S1798, 2026-08-05) · **✅**
+
+**Джерело:** власник (GSV migration completion — ratio-safe: supersede legacy `docs/vision/{index.html,vision.js,vision.css}`
+Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Base: `GET /api/vision/*` bands 109–114 +
+`docs/vision/speed_index.json`/`rust_diagnostics.json`. Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) ·
+[`GSV_MIGRATION.md`](../gsv/GSV_MIGRATION.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1724 | **PH-S1789** | Legacy parity audit | docs canon | Inventory legacy `docs/vision/{index.html,vision.js,vision.css}` panels (Layers/Queue/Map/Speeds/Rust/Links/Preview + header/Explorer/Power chrome) → map each → GSV endpoint+card / superseded / out-of-scope; `GSV/docs/LEGACY_PARITY.md` | **[x]** |
+| 1725 | **PH-S1790** | Speeds wire | GSV_BOXES | `SpeedIndexReport`/`speed_index_report`/`wire_speed_index` → `GET /api/vision/speeds` (latest test_ci wall/ok + bench median + history counts; mirror `gsv_speed_index.json`) | **[x]** |
+| 1726 | **PH-S1791** | Rust diagnostics wire | GSV_BOXES | `RustDiagnosticsReport`/`rust_diagnostics_report`/`wire_rust_diagnostics` → `GET /api/vision/rust-diagnostics` (latest warnings/errors/ok + top_codes; mirror `gsv_rust_diagnostics.json`) | **[x]** |
+| 1727 | **PH-S1792** | Contracts | Rust-first (API → tests) | `tests/gsv_vision_contracts.rs` + `gsv_server_contracts.rs` (speeds + rust-diagnostics ok/shape/empty-tolerant, mirror round-trip) | **[x]** |
+| 1728 | **PH-S1793** | Speeds + Rust cards | GSV_BOXES | compact Speed Index + Rust Diagnostics cards у `ui/index.html` (mirror legacy panels; empty-state hints) | **[x]** |
+| 1729 | **PH-S1794** | GSV_MIGRATION rows | docs canon | `GSV_MIGRATION.md` vision.js/css row → ✅ superseded (ratio-safe canon Rust, legacy JS не переносимо); `poolai-ui-wasm` row defer; roadmap band 115 | **[x]** |
+| 1730 | **PH-S1795** | GSV vision docs canon | session canon | `VISION.md` speeds/rust-diagnostics API + LEGACY_PARITY + band 115 section; MEMORY band 115; HANDOFF/NEXT band 115 | **[x]** |
+| 1731 | **PH-S1796** | poolAI vision parity | docs canon | `docs/vision/README.md`; FM §5.12 §5.96; `GSV_TECH_ROADMAP.md` band 115; poolAI HANDOFF/NEXT band 115 | **[x]** |
+| 1732 | **PH-S1797** | Ratio hold advisory | gsv-loc-audit | `gsv-loc-audit --min-ratio 0.95 --advisory` (≥95%) | **[x]** |
+| 1733 | **PH-S1798** | Band close | GSV_ROLES | ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync rev 468; push | **[x]** |
 
 ### 5.88 Ratio96 docs canon queue — band 107 (PH-S1709…S1718, 2026-08-02) · **✅**
 

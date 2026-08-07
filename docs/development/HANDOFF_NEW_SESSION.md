@@ -1,9 +1,9 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-08-05 (band 114 **GSV Sprint-board + progress UI** PH-S1779…S1788 **✅** · band 115 open PH-S1789…S1798 · Vision rev 467)
+**Оновлено:** 2026-08-07 (band 115 **GSV migration completion** PH-S1789…S1798 **✅** · band 116 open PH-S1799…S1808 · Vision rev 468)
 
 **Наступна сесія:** **`абракадабра`** — див. **канон воркфлоу в [AGENTS.md](../../AGENTS.md §100–113)**.
-**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1789…S1798; черга — FM §5.12) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1799…S1808; черга — FM §5.12) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
 
 --- 
 
@@ -156,6 +156,31 @@ distribution, z-ascending); Sprint Board + Sprint Progress UI cards у `GSV/ui/i
 (58 unit + 8 omni + 7 ratio + 21 server + 8 update + 38 vision), clippy **0**, fmt clean.
 Ratio: GSV **95.02%** (rust 6832 / product 7190, gate ≥95% ✅) + poolAI **95.02%** advisory hold.
 Vision rev **467**.
+
+## Band 115 — GSV migration completion / legacy vision supersession (PH-S1789…S1798, **✅**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1789** | Legacy parity audit (`GSV/docs/LEGACY_PARITY.md` — кожна legacy-панель → GSV endpoint+card / superseded / out-of-scope) |
+| **PH-S1790** | Speeds wire (`SpeedIndexReport`/`SpeedIndexLatest`/`read_speed_index`/`save`/`load`/`wire_speed_index` → `GET /api/vision/speeds`, empty-tolerant, mirror `gsv_speed_index.json`) |
+| **PH-S1791** | Rust diagnostics wire (`RustDiagnosticsReport`/`RustDiagLatest`/`read_rust_diagnostics`/`wire_rust_diagnostics` → `GET /api/vision/rust-diagnostics`, mirror `gsv_rust_diagnostics.json`) |
+| **PH-S1792** | Contracts (`gsv_vision_contracts.rs` + `gsv_server_contracts.rs` — speeds/rust-diagnostics ok/shape/empty-tolerant) |
+| **PH-S1793** | Speed Index + Rust Diagnostics UI cards (`ui/index.html`: present/empty states, latest metrics, top clippy codes) |
+| **PH-S1794** | GSV_MIGRATION rows + roadmap (`GSV_MIGRATION.md` vision.js/css superseded; `GSV_TECH_ROADMAP.md` band 115) |
+| **PH-S1795** | GSV vision docs canon (`VISION.md` speeds/rust-diagnostics API; MEMORY band 115; HANDOFF/NEXT band 115) |
+| **PH-S1796** | poolAI vision parity (`docs/vision/README.md`; FM §5.12 §5.96; `GSV_TECH_ROADMAP.md` band 115; poolAI HANDOFF/NEXT band 115) |
+| **PH-S1797** | Ratio hold advisory (`gsv-loc-audit --min-ratio 0.95 --advisory`) |
+| **PH-S1798** | Band close (ratio hold ≥95%; fmt/clippy/test; docs canon; vision-sync rev 468; push) |
+
+**PH-S1789…S1798 ✅ (2026-08-07):** GSV migration completion — legacy vision supersession:
+`GET /api/vision/speeds` (speed index: latest test-CI wall/ok + bench median + history counts,
+mirror `gsv_speed_index.json`, empty-tolerant) та `GET /api/vision/rust-diagnostics` (clippy
+warnings/errors + top_codes + history count, mirror `gsv_rust_diagnostics.json`, empty-tolerant);
+Speed Index + Rust Diagnostics UI cards у `GSV/ui/index.html`; parity audit
+`GSV/docs/LEGACY_PARITY.md` (Speeds + Rust — єдині прогалини, закрито; `vision.js`/`vision.css`
+superseded); contracts **150** (64 unit + 8 omni + 7 ratio + 23 server + 8 update + 40 vision),
+clippy **0**, fmt clean. Ratio: GSV **95.04%** (rust 7303 / product 7684, gate ≥95% ✅) +
+poolAI **95.04%** advisory hold. Vision rev **468**.
 
 ## Band 109 — GSV vision sync/migration (PH-S1729…S1738, **✅**)
 

@@ -76,6 +76,12 @@ fn main() -> ExitCode {
                 println!("  -> {}", report.manifest_target);
                 println!("  -> {}", report.feed_target);
                 println!("  -> {}", report.extensions_target);
+                if !report.speed_index_target.is_empty() {
+                    println!("  -> {}", report.speed_index_target);
+                }
+                if !report.rust_diagnostics_target.is_empty() {
+                    println!("  -> {}", report.rust_diagnostics_target);
+                }
                 ExitCode::SUCCESS
             }
             Err(e) => {

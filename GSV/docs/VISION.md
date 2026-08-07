@@ -42,6 +42,12 @@
     (status counts `open`/`closed`/`planned` + `progress_pct` + per-layer розподіл
     `layers[]` з `node_count`/`linked_count` проти чергових спринтів, z-ascending) →
     `SprintProgressReport`/`SprintLayerProgress`.
+  - `GET /api/vision/speeds` — **band 115**: speed-index report
+    (`speed_index.json` → latest test-CI + bench + history counts) →
+    `SpeedIndexReport`/`SpeedIndexLatest`; empty-tolerant (`ok:true`, `present:false`).
+  - `GET /api/vision/rust-diagnostics` — **band 115**: rust clippy diagnostics report
+    (`rust_diagnostics.json` → latest warnings/errors/top_codes + history count) →
+    `RustDiagnosticsReport`/`RustDiagLatest`; empty-tolerant.
   - `GET /assets/vision.svg` — **band 110**: порт `docs/vision/vision.svg` (isometric diagram,
     `image/svg+xml`, include_str! з `GSV/ui/vision.svg`).
 
@@ -94,6 +100,26 @@ UI (`ui/index.html`): Vision Map card тепер рендерить **inline** `
 UI: **Sprint Board card** (progress bar + open/closed/planned колонки-details) та
 **Sprint Progress card** (progress bar + per-layer таблиця nodes/linked) у `ui/index.html`.
 
+## Speeds + Rust diagnostics wire (band 115)
+
+`SpeedIndexReport` (band 115) — mirror `docs/vision/speed_index.json`:
+
+- `latest` (`SpeedIndexLatest`): `test_ci_wall_secs`/`test_ci_ok`/`test_ci_recorded_at`/
+  `test_ci_command` + `last_bench_label`/`last_bench_median_ns`/`last_bench_recorded_at`.
+- `test_ci_count`/`bench_count` — довжини історичних масивів.
+- Mirror у `GSV/data/gsv_speed_index.json` (sync best-effort); `source_speed_index` =
+  live → snapshot → empty default. `wire_speed_index` → `{ok, present, speed_index}`.
+
+`RustDiagnosticsReport` (band 115) — mirror `docs/vision/rust_diagnostics.json`:
+
+- `latest` (`RustDiagLatest`): `warnings`/`errors`/`ok`/`recorded_at`/`command`/`top_codes`.
+- `history_count` — довжина історичного масиву.
+- Mirror у `GSV/data/gsv_rust_diagnostics.json`; `source_rust_diagnostics` = live →
+  snapshot → empty default. `wire_rust_diagnostics` → `{ok, present, rust_diagnostics}`.
+
+UI: **Speed Index card** (test-ci wall time + bench median + rows) та
+**Rust Diagnostics card** (warnings/errors/clean + top clippy codes) у `ui/index.html`.
+
 ## Ratio-safe політика
 
 `vision.js` (161 KB) / `vision.css` (50 KB) legacy не переносяться у `GSV/ui/` — це знищило б
@@ -105,4 +131,4 @@ input `galaxy_grid`), **Vision Sync card** (Resync snapshot button + drift statu
 (progress bar + open/closed/planned колонки) та **Sprint Progress card** (progress bar +
 per-layer nodes/linked таблиця) у `ui/index.html`.
 `.svg` у ratio-аудиті Ignored — порт діаграми ratio-neutral.
-Див. [`GSV_MIGRATION.md`](../../docs/gsv/GSV_MIGRATION.md).
+Див. [`GSV_MIGRATION.md`](../../docs/gsv/GSV_MIGRATION.md) і [`LEGACY_PARITY.md`](./LEGACY_PARITY.md).

@@ -4,7 +4,7 @@
 Оновлюється в кінці кожного band. Лічильники — вимірювані (`wc -l`, `cargo test`,
 `cargo run --bin gsv-loc-audit`), не з пам'яті.
 
-## Стан (2026-08-05 · band 114 ✅)
+## Стан (2026-08-07 · band 115 ✅)
 
 - **Канон:** Rust **95–100%** / wasm **0–5%** (завжди), без Python/Java; bins — лише `src/bin/`.
 - **Ratio (виміряно):** `cargo run --bin gsv-loc-audit` → **95.02%** (rust 6832 / product 7190) — gate ≥95% ✅.
@@ -165,6 +165,30 @@
   `GSV_TECH_ROADMAP.md` band 114, FM §5.95.
 - **PH-S1788** Band close: ratio hold (**95.02%**), fmt, clippy 0, cargo test (140), docs canon,
   vision-sync rev 467, push.
+
+### Band 115 (PH-S1789…S1798, ✅ 2026-08-07) — GSV migration completion (legacy vision supersession)
+- **PH-S1789** `GSV/docs/LEGACY_PARITY.md` — parity audit: кожна legacy-панель
+  (`docs/vision/index.html`: layers/queue/map/speeds/rust/links/preview + chrome) → GSV
+  endpoint+card / superseded / out-of-scope. Єдині прогалини: Speeds + Rust diagnostics.
+- **PH-S1790** `SpeedIndexReport`/`SpeedIndexLatest` structs + `read_speed_index`/
+  `save_speed_index`/`load_speed_index`/`source_speed_index` (live → snapshot → empty default) +
+  `wire_speed_index` → `GET /api/vision/speeds` (route + handler у `server/mod.rs`).
+- **PH-S1791** `RustDiagnosticsReport`/`RustDiagLatest` + `read_rust_diagnostics`/
+  `save_rust_diagnostics`/`load_rust_diagnostics`/`source_rust_diagnostics` +
+  `wire_rust_diagnostics` → `GET /api/vision/rust-diagnostics`.
+- **PH-S1792** contracts: `tests/gsv_vision_contracts.rs` (real-workspace speed_index/
+  rust_diagnostics reads + wire shapes) + `tests/gsv_server_contracts.rs`
+  (`/api/vision/speeds` + `/api/vision/rust-diagnostics` 200/ok/present/shape).
+- **PH-S1793** Speed Index card + Rust Diagnostics card у `ui/index.html` (present/empty
+  states, latest metrics, top clippy codes).
+- **PH-S1794** `docs/gsv/GSV_MIGRATION.md` rows ✅ (speed_index/rust_diagnostics moved;
+  `vision.js`/`vision.css` superseded) + `docs/gsv/GSV_TECH_ROADMAP.md` band 115.
+- **PH-S1795** `GSV/docs/VISION.md` +band 115 endpoints/section; `MEMORY.md` band 115;
+  HANDOFF/NEXT band 115.
+- **PH-S1796** poolAI parity: FM §5.12 §5.96, HANDOFF/NEXT band 115, `docs/vision/` canon.
+- **PH-S1797** ratio hold advisory: `gsv-loc-audit` **95.04%**; legacy JS не переносимо.
+- **PH-S1798** Band close: ratio hold (**95.04%**), fmt, clippy 0, cargo test (150), docs canon,
+  vision-sync rev 468, push.
 
 ## Важливі факти (не забувати)
 

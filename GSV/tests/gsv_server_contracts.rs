@@ -335,3 +335,31 @@ async fn vision_sprint_progress_endpoint() {
         );
     }
 }
+
+#[tokio::test]
+async fn vision_speeds_endpoint() {
+    let (app, _state) = app();
+    let (status, json) = get(&app, "/api/vision/speeds").await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(json["ok"], true);
+    assert!(json["present"].is_boolean());
+    assert!(json["speed_index"]["test_ci_count"].is_u64());
+    assert!(json["speed_index"]["bench_count"].is_u64());
+    assert!(json["speed_index"]["latest"]["test_ci_wall_secs"].is_f64());
+    assert!(json["speed_index"]["latest"]["last_bench_median_ns"].is_u64());
+    assert!(json["speed_index"]["host_label"].as_str().is_some());
+}
+
+#[tokio::test]
+async fn vision_rust_diagnostics_endpoint() {
+    let (app, _state) = app();
+    let (status, json) = get(&app, "/api/vision/rust-diagnostics").await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(json["ok"], true);
+    assert!(json["present"].is_boolean());
+    assert!(json["rust_diagnostics"]["latest"]["warnings"].is_u64());
+    assert!(json["rust_diagnostics"]["latest"]["errors"].is_u64());
+    assert!(json["rust_diagnostics"]["latest"]["ok"].is_boolean());
+    assert!(json["rust_diagnostics"]["history_count"].is_u64());
+    assert!(json["rust_diagnostics"]["latest"]["top_codes"].is_array());
+}

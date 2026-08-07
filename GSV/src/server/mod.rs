@@ -83,6 +83,11 @@ pub fn router(state: AppState) -> Router {
             "/api/vision/sprint-progress",
             get(api_vision_sprint_progress),
         )
+        .route("/api/vision/speeds", get(api_vision_speeds))
+        .route(
+            "/api/vision/rust-diagnostics",
+            get(api_vision_rust_diagnostics),
+        )
         .route("/api/omni", get(api_omni))
         .route(
             "/api/omni/config",
@@ -335,6 +340,20 @@ async fn api_vision_sprint_board(State(state): State<AppState>) -> Json<Value> {
 
 async fn api_vision_sprint_progress(State(state): State<AppState>) -> Json<Value> {
     Json(crate::boxes::vision::wire_sprint_progress(
+        &state.repo_root,
+        &state.data_dir,
+    ))
+}
+
+async fn api_vision_speeds(State(state): State<AppState>) -> Json<Value> {
+    Json(crate::boxes::vision::wire_speed_index(
+        &state.repo_root,
+        &state.data_dir,
+    ))
+}
+
+async fn api_vision_rust_diagnostics(State(state): State<AppState>) -> Json<Value> {
+    Json(crate::boxes::vision::wire_rust_diagnostics(
         &state.repo_root,
         &state.data_dir,
     ))

@@ -713,3 +713,34 @@ fn vision_sprint_board_wire_matches_report_function() {
     assert_eq!(wire["active_sprint"], report.active_sprint);
     assert_eq!(wire["columns"].as_array().map(|a| a.len()).unwrap_or(0), 3);
 }
+
+#[test]
+fn vision_speed_index_reads_real_workspace() {
+    let r = vision::read_speed_index(&repo_root()).expect("speed_index.json");
+    assert!(r.test_ci_count > 0, "expected test_ci_history rows");
+    assert!(r.latest.test_ci_wall_secs > 0.0);
+    assert!(!r.host_label.is_empty());
+    let wire = vision::wire_speed_index(&repo_root(), &temp_data_dir("speed-wire"));
+    assert_eq!(wire["ok"], true);
+    assert_eq!(wire["present"], true);
+    assert_eq!(wire["speed_index"]["test_ci_count"], r.test_ci_count);
+    assert_eq!(
+        wire["speed_index"]["latest"]["test_ci_wall_secs"],
+        r.latest.test_ci_wall_secs
+    );
+}
+
+#[test]
+fn vision_rust_diagnostics_reads_real_workspace() {
+    let r = vision::read_rust_diagnostics(&repo_root()).expect("rust_diagnostics.json");
+    assert!(r.history_count > 0, "expected history rows");
+    assert!(!r.host_label.is_empty());
+    let wire = vision::wire_rust_diagnostics(&repo_root(), &temp_data_dir("rustdiag-wire"));
+    assert_eq!(wire["ok"], true);
+    assert_eq!(wire["present"], true);
+    assert_eq!(
+        wire["rust_diagnostics"]["latest"]["warnings"],
+        r.latest.warnings
+    );
+    assert_eq!(wire["rust_diagnostics"]["history_count"], r.history_count);
+}

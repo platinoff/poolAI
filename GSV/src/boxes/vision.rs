@@ -159,6 +159,10 @@ pub struct SyncReport {
     pub feed_target: String,
     pub extensions_source: String,
     pub extensions_target: String,
+    #[serde(default)]
+    pub speed_index_target: String,
+    #[serde(default)]
+    pub rust_diagnostics_target: String,
     pub synced_at: String,
 }
 
@@ -227,6 +231,190 @@ pub fn extensions_source(repo_root: &Path) -> PathBuf {
 /// Persisted extensions path under `data_dir`.
 pub fn extensions_target(data_dir: &Path) -> PathBuf {
     data_dir.join(EXTENSIONS_TARGET)
+}
+
+const SPEED_INDEX_SOURCE: &str = "docs/vision/speed_index.json";
+const RUST_DIAGNOSTICS_SOURCE: &str = "docs/vision/rust_diagnostics.json";
+const SPEED_INDEX_TARGET: &str = "gsv_speed_index.json";
+const RUST_DIAGNOSTICS_TARGET: &str = "gsv_rust_diagnostics.json";
+
+/// Source `speed_index.json` path under `repo_root`.
+pub fn speed_index_source(repo_root: &Path) -> PathBuf {
+    repo_root.join(SPEED_INDEX_SOURCE)
+}
+
+/// Persisted speed-index snapshot path under `data_dir`.
+pub fn speed_index_target(data_dir: &Path) -> PathBuf {
+    data_dir.join(SPEED_INDEX_TARGET)
+}
+
+/// Source `rust_diagnostics.json` path under `repo_root`.
+pub fn rust_diagnostics_source(repo_root: &Path) -> PathBuf {
+    repo_root.join(RUST_DIAGNOSTICS_SOURCE)
+}
+
+/// Persisted rust-diagnostics snapshot path under `data_dir`.
+pub fn rust_diagnostics_target(data_dir: &Path) -> PathBuf {
+    data_dir.join(RUST_DIAGNOSTICS_TARGET)
+}
+
+/// Latest test-CI + benchmark speed metrics (`speed_index.json` → `latest`).
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+pub struct SpeedIndexLatest {
+    #[serde(default)]
+    pub test_ci_wall_secs: f64,
+    #[serde(default)]
+    pub test_ci_ok: bool,
+    #[serde(default)]
+    pub test_ci_recorded_at: String,
+    #[serde(default)]
+    pub test_ci_command: String,
+    #[serde(default)]
+    pub last_bench_label: String,
+    #[serde(default)]
+    pub last_bench_median_ns: u64,
+    #[serde(default)]
+    pub last_bench_recorded_at: String,
+}
+
+/// Speed-index report (`/api/vision/speeds`).
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+pub struct SpeedIndexReport {
+    pub generated_at: String,
+    pub git_head: String,
+    pub host_label: String,
+    pub latest: SpeedIndexLatest,
+    pub test_ci_count: u64,
+    pub bench_count: u64,
+}
+
+/// Full speed-index artifact (`speed_index.json`, tolerant of unknown fields).
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+struct SpeedIndexFile {
+    #[serde(default)]
+    generated_at: String,
+    #[serde(default)]
+    git_head: String,
+    #[serde(default)]
+    host_label: String,
+    #[serde(default)]
+    latest: SpeedIndexLatest,
+    #[serde(default)]
+    test_ci_history: Vec<Value>,
+    #[serde(default)]
+    bench_history: Vec<Value>,
+}
+
+/// Latest Rust clippy diagnostic counts (`rust_diagnostics.json` → `latest`).
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+pub struct RustDiagLatest {
+    #[serde(default)]
+    pub warnings: u64,
+    #[serde(default)]
+    pub errors: u64,
+    #[serde(default)]
+    pub ok: bool,
+    #[serde(default)]
+    pub recorded_at: String,
+    #[serde(default)]
+    pub command: String,
+    #[serde(default)]
+    pub top_codes: Vec<String>,
+}
+
+/// Rust-diagnostics report (`/api/vision/rust-diagnostics`).
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+pub struct RustDiagnosticsReport {
+    pub generated_at: String,
+    pub git_head: String,
+    pub host_label: String,
+    pub latest: RustDiagLatest,
+    pub history_count: u64,
+}
+
+/// Full rust-diagnostics artifact (`rust_diagnostics.json`).
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+struct RustDiagnosticsFile {
+    #[serde(default)]
+    generated_at: String,
+    #[serde(default)]
+    git_head: String,
+    #[serde(default)]
+    host_label: String,
+    #[serde(default)]
+    latest: RustDiagLatest,
+    #[serde(default)]
+    history: Vec<Value>,
+}
+
+/// Read + parse the speed index from `repo_root` (empty-tolerant).
+pub fn read_speed_index(repo_root: &Path) -> Result<SpeedIndexReport, String> {
+    let path = speed_index_source(repo_root);
+    let raw =
+        std::fs::read_to_string(&path).map_err(|e| format!("read {}: {e}", path.display()))?;
+    let file: SpeedIndexFile =
+        serde_json::from_str(&raw).map_err(|e| format!("parse speed_index.json: {e}"))?;
+    Ok(SpeedIndexReport {
+        generated_at: file.generated_at,
+        git_head: file.git_head,
+        host_label: file.host_label,
+        latest: file.latest,
+        test_ci_count: file.test_ci_history.len() as u64,
+        bench_count: file.bench_history.len() as u64,
+    })
+}
+
+/// Persist the speed-index report under `data_dir`.
+pub fn save_speed_index(report: &SpeedIndexReport, data_dir: &Path) -> Result<(), String> {
+    let path = speed_index_target(data_dir);
+    std::fs::create_dir_all(data_dir).map_err(|e| format!("create data dir: {e}"))?;
+    let raw =
+        serde_json::to_string_pretty(report).map_err(|e| format!("encode speed index: {e}"))?;
+    std::fs::write(&path, raw).map_err(|e| format!("write {}: {e}", path.display()))
+}
+
+/// Read the persisted speed-index snapshot from `data_dir`.
+pub fn load_speed_index(data_dir: &Path) -> Result<SpeedIndexReport, String> {
+    let path = speed_index_target(data_dir);
+    let raw =
+        std::fs::read_to_string(&path).map_err(|e| format!("read {}: {e}", path.display()))?;
+    serde_json::from_str(&raw).map_err(|e| format!("parse gsv_speed_index.json: {e}"))
+}
+
+/// Read + parse rust diagnostics from `repo_root` (empty-tolerant).
+pub fn read_rust_diagnostics(repo_root: &Path) -> Result<RustDiagnosticsReport, String> {
+    let path = rust_diagnostics_source(repo_root);
+    let raw =
+        std::fs::read_to_string(&path).map_err(|e| format!("read {}: {e}", path.display()))?;
+    let file: RustDiagnosticsFile =
+        serde_json::from_str(&raw).map_err(|e| format!("parse rust_diagnostics.json: {e}"))?;
+    Ok(RustDiagnosticsReport {
+        generated_at: file.generated_at,
+        git_head: file.git_head,
+        host_label: file.host_label,
+        latest: file.latest,
+        history_count: file.history.len() as u64,
+    })
+}
+
+/// Persist the rust-diagnostics report under `data_dir`.
+pub fn save_rust_diagnostics(
+    report: &RustDiagnosticsReport,
+    data_dir: &Path,
+) -> Result<(), String> {
+    let path = rust_diagnostics_target(data_dir);
+    std::fs::create_dir_all(data_dir).map_err(|e| format!("create data dir: {e}"))?;
+    let raw = serde_json::to_string_pretty(report)
+        .map_err(|e| format!("encode rust diagnostics: {e}"))?;
+    std::fs::write(&path, raw).map_err(|e| format!("write {}: {e}", path.display()))
+}
+
+/// Read the persisted rust-diagnostics snapshot from `data_dir`.
+pub fn load_rust_diagnostics(data_dir: &Path) -> Result<RustDiagnosticsReport, String> {
+    let path = rust_diagnostics_target(data_dir);
+    let raw =
+        std::fs::read_to_string(&path).map_err(|e| format!("read {}: {e}", path.display()))?;
+    serde_json::from_str(&raw).map_err(|e| format!("parse gsv_rust_diagnostics.json: {e}"))
 }
 
 /// Read + parse the vision manifest from `repo_root`.
@@ -330,6 +518,22 @@ fn source_manifest(repo_root: &Path, data_dir: &Path) -> Result<Manifest, String
 /// Preferred source for the wire: live `repo_root` source, else persisted snapshot.
 fn source_feed(repo_root: &Path, data_dir: &Path) -> Result<Feed, String> {
     read_feed(repo_root).or_else(|_| load_feed(data_dir))
+}
+
+/// Preferred source for the wire: live `repo_root` source, else persisted snapshot,
+/// else an empty report (empty-tolerant — artifact may not exist yet).
+fn source_speed_index(repo_root: &Path, data_dir: &Path) -> SpeedIndexReport {
+    read_speed_index(repo_root)
+        .or_else(|_| load_speed_index(data_dir))
+        .unwrap_or_default()
+}
+
+/// Preferred source for the wire: live `repo_root` source, else persisted snapshot,
+/// else an empty report (empty-tolerant — artifact may not exist yet).
+fn source_rust_diagnostics(repo_root: &Path, data_dir: &Path) -> RustDiagnosticsReport {
+    read_rust_diagnostics(repo_root)
+        .or_else(|_| load_rust_diagnostics(data_dir))
+        .unwrap_or_default()
 }
 
 /// `GET /api/vision/manifest` — full galaxy graph mirror.
@@ -865,7 +1069,7 @@ pub fn wire_feed_filter(repo_root: &Path, data_dir: &Path, status: Option<&str>)
     }
 }
 
-/// Write-run: read the live sources and persist both snapshots.
+/// Write-run: read the live sources and persist snapshots.
 pub fn sync(repo_root: &Path, data_dir: &Path) -> Result<SyncReport, String> {
     let manifest = read_manifest(repo_root)?;
     let feed = read_feed(repo_root)?;
@@ -873,6 +1077,20 @@ pub fn sync(repo_root: &Path, data_dir: &Path) -> Result<SyncReport, String> {
     save_manifest(&manifest, data_dir)?;
     save_feed(&feed, data_dir)?;
     save_extensions(&extensions, data_dir)?;
+    let speed_target = if let Ok(s) = read_speed_index(repo_root) {
+        let _ = save_speed_index(&s, data_dir);
+        speed_index_target(data_dir).to_string_lossy().to_string()
+    } else {
+        String::new()
+    };
+    let rust_diag_target = if let Ok(r) = read_rust_diagnostics(repo_root) {
+        let _ = save_rust_diagnostics(&r, data_dir);
+        rust_diagnostics_target(data_dir)
+            .to_string_lossy()
+            .to_string()
+    } else {
+        String::new()
+    };
     Ok(SyncReport {
         revision: manifest.revision,
         git_head: manifest.git_head.clone(),
@@ -887,6 +1105,8 @@ pub fn sync(repo_root: &Path, data_dir: &Path) -> Result<SyncReport, String> {
         feed_target: feed_target(data_dir).to_string_lossy().to_string(),
         extensions_source: extensions_source(repo_root).to_string_lossy().to_string(),
         extensions_target: extensions_target(data_dir).to_string_lossy().to_string(),
+        speed_index_target: speed_target,
+        rust_diagnostics_target: rust_diag_target,
         synced_at: crate::vision::rfc3339_now(),
     })
 }
@@ -945,6 +1165,18 @@ pub fn wire_sync(repo_root: &Path, data_dir: &Path) -> Value {
         }),
         Err(e) => json!({ "ok": false, "drift": drift, "error": e }),
     }
+}
+
+/// `GET /api/vision/speeds` — speed-index report (latest test-CI + benchmark + history counts).
+pub fn wire_speed_index(repo_root: &Path, data_dir: &Path) -> Value {
+    let r = source_speed_index(repo_root, data_dir);
+    json!({ "ok": true, "present": read_speed_index(repo_root).is_ok(), "speed_index": r })
+}
+
+/// `GET /api/vision/rust-diagnostics` — rust clippy diagnostics report.
+pub fn wire_rust_diagnostics(repo_root: &Path, data_dir: &Path) -> Value {
+    let r = source_rust_diagnostics(repo_root, data_dir);
+    json!({ "ok": true, "present": read_rust_diagnostics(repo_root).is_ok(), "rust_diagnostics": r })
 }
 
 /// Sprint-queue planning report (`/api/vision/sprint-queue`).
@@ -1627,6 +1859,193 @@ mod tests {
 
         assert!(doc_preview(&src, &data, "nope").is_err());
         assert_eq!(wire_doc_preview(&src, &data, "")["ok"], false);
+        let _ = std::fs::remove_dir_all(&tmp);
+    }
+
+    fn write_speed_index(repo_root: &Path) {
+        let vis = repo_root.join("docs").join("vision");
+        std::fs::create_dir_all(&vis).unwrap();
+        std::fs::write(
+            vis.join("speed_index.json"),
+            r#"{
+              "schema_version": 1,
+              "generated_at": "2026-08-04T00:00:00Z",
+              "host_label": "PLATINOV",
+              "git_head": "50ce232f",
+              "latest": {
+                "test_ci_wall_secs": 1076.5,
+                "test_ci_ok": true,
+                "test_ci_recorded_at": "2026-08-04T00:00:00Z",
+                "test_ci_command": "bin/record-test-ci-speed.sh",
+                "last_bench_label": "dispatch_pipeline",
+                "last_bench_median_ns": 4210,
+                "last_bench_recorded_at": "2026-08-04T00:00:00Z"
+              },
+              "test_ci_history": [{ "kind": "test-ci", "wall_secs": 1076.5, "ok": true }],
+              "bench_history": [{ "kind": "bench", "median_ns": 4210 }]
+            }"#,
+        )
+        .unwrap();
+    }
+
+    fn write_rust_diagnostics(repo_root: &Path) {
+        let vis = repo_root.join("docs").join("vision");
+        std::fs::create_dir_all(&vis).unwrap();
+        std::fs::write(
+            vis.join("rust_diagnostics.json"),
+            r#"{
+              "schema_version": 1,
+              "generated_at": "2026-08-04T00:00:00Z",
+              "host_label": "PLATINOV",
+              "git_head": "50ce232f",
+              "source": "local",
+              "latest": {
+                "warnings": 3,
+                "errors": 0,
+                "ok": true,
+                "recorded_at": "2026-08-04T00:00:00Z",
+                "command": "cargo clippy --all-targets",
+                "top_codes": ["clippy::needless_borrow", "clippy::too_many_arguments"]
+              },
+              "history": [{ "kind": "clippy", "warnings": 3, "errors": 0, "ok": true }]
+            }"#,
+        )
+        .unwrap();
+    }
+
+    #[test]
+    fn speed_index_round_trip_and_wire() {
+        let tmp = std::env::temp_dir().join("gsv_vision_test_speed_index");
+        let _ = std::fs::remove_dir_all(&tmp);
+        let src = tmp.join("src");
+        let data = tmp.join("data");
+        write_speed_index(&src);
+
+        let r = read_speed_index(&src).unwrap();
+        assert_eq!(r.generated_at, "2026-08-04T00:00:00Z");
+        assert_eq!(r.host_label, "PLATINOV");
+        assert_eq!(r.latest.test_ci_wall_secs, 1076.5);
+        assert!(r.latest.test_ci_ok);
+        assert_eq!(r.latest.last_bench_median_ns, 4210);
+        assert_eq!(r.test_ci_count, 1);
+        assert_eq!(r.bench_count, 1);
+
+        save_speed_index(&r, &data).unwrap();
+        let loaded = load_speed_index(&data).unwrap();
+        assert_eq!(loaded, r);
+
+        let wire = wire_speed_index(&src, &data);
+        assert_eq!(wire["ok"], true);
+        assert_eq!(wire["present"], true);
+        assert_eq!(wire["speed_index"]["latest"]["test_ci_wall_secs"], 1076.5);
+        assert_eq!(wire["speed_index"]["test_ci_count"], 1);
+        let _ = std::fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn rust_diagnostics_round_trip_and_wire() {
+        let tmp = std::env::temp_dir().join("gsv_vision_test_rust_diag");
+        let _ = std::fs::remove_dir_all(&tmp);
+        let src = tmp.join("src");
+        let data = tmp.join("data");
+        write_rust_diagnostics(&src);
+
+        let r = read_rust_diagnostics(&src).unwrap();
+        assert_eq!(r.latest.warnings, 3);
+        assert_eq!(r.latest.errors, 0);
+        assert!(r.latest.ok);
+        assert_eq!(r.latest.top_codes.len(), 2);
+        assert_eq!(r.history_count, 1);
+
+        save_rust_diagnostics(&r, &data).unwrap();
+        assert_eq!(load_rust_diagnostics(&data).unwrap(), r);
+
+        let wire = wire_rust_diagnostics(&src, &data);
+        assert_eq!(wire["ok"], true);
+        assert_eq!(wire["present"], true);
+        assert_eq!(wire["rust_diagnostics"]["latest"]["warnings"], 3);
+        assert_eq!(wire["rust_diagnostics"]["history_count"], 1);
+        let _ = std::fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn speed_index_and_rust_diag_wire_empty_tolerant() {
+        let tmp = std::env::temp_dir().join("gsv_vision_test_missing_diag");
+        let _ = std::fs::remove_dir_all(&tmp);
+        let src = tmp.join("src");
+        let data = tmp.join("data");
+        std::fs::create_dir_all(&src).unwrap();
+
+        let s = wire_speed_index(&src, &data);
+        assert_eq!(s["ok"], true);
+        assert_eq!(s["present"], false);
+        assert_eq!(s["speed_index"]["test_ci_count"], 0);
+
+        let r = wire_rust_diagnostics(&src, &data);
+        assert_eq!(r["ok"], true);
+        assert_eq!(r["present"], false);
+        assert_eq!(r["rust_diagnostics"]["latest"]["warnings"], 0);
+        let _ = std::fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn sync_mirrors_speed_index_and_rust_diagnostics() {
+        let tmp = std::env::temp_dir().join("gsv_vision_test_sync_extra");
+        let _ = std::fs::remove_dir_all(&tmp);
+        let src = tmp.join("src");
+        let data = tmp.join("data");
+        write_sample(&src, &sample_manifest(), &sample_feed());
+        write_speed_index(&src);
+        write_rust_diagnostics(&src);
+
+        let report = sync(&src, &data).unwrap();
+        assert!(report.speed_index_target.ends_with("gsv_speed_index.json"));
+        assert!(report
+            .rust_diagnostics_target
+            .ends_with("gsv_rust_diagnostics.json"));
+        assert!(speed_index_target(&data).exists());
+        assert!(rust_diagnostics_target(&data).exists());
+        assert_eq!(load_speed_index(&data).unwrap().host_label, "PLATINOV");
+        assert_eq!(load_rust_diagnostics(&data).unwrap().latest.warnings, 3);
+        let _ = std::fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn wire_speed_index_falls_back_to_snapshot_when_source_missing() {
+        let tmp = std::env::temp_dir().join("gsv_vision_test_speed_fallback");
+        let _ = std::fs::remove_dir_all(&tmp);
+        let src = tmp.join("src");
+        let data = tmp.join("data");
+        write_speed_index(&src);
+        let r = read_speed_index(&src).unwrap();
+        save_speed_index(&r, &data).unwrap();
+        std::fs::remove_dir_all(src.join("docs")).unwrap();
+
+        assert!(read_speed_index(&src).is_err());
+        let wire = wire_speed_index(&src, &data);
+        assert_eq!(wire["ok"], true);
+        assert_eq!(wire["present"], false);
+        assert_eq!(wire["speed_index"]["host_label"], "PLATINOV");
+        assert_eq!(wire["speed_index"]["test_ci_count"], 1);
+        let _ = std::fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn wire_rust_diagnostics_falls_back_to_snapshot_when_source_missing() {
+        let tmp = std::env::temp_dir().join("gsv_vision_test_rustdiag_fallback");
+        let _ = std::fs::remove_dir_all(&tmp);
+        let src = tmp.join("src");
+        let data = tmp.join("data");
+        write_rust_diagnostics(&src);
+        let r = read_rust_diagnostics(&src).unwrap();
+        save_rust_diagnostics(&r, &data).unwrap();
+        std::fs::remove_dir_all(src.join("docs")).unwrap();
+
+        assert!(read_rust_diagnostics(&src).is_err());
+        let wire = wire_rust_diagnostics(&src, &data);
+        assert_eq!(wire["ok"], true);
+        assert_eq!(wire["present"], false);
+        assert_eq!(wire["rust_diagnostics"]["latest"]["warnings"], 3);
         let _ = std::fs::remove_dir_all(&tmp);
     }
 }
