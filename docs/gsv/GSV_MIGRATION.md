@@ -4,8 +4,8 @@
 
 ## Що переносимо (з `docs/vision/`)
 
-| Джерело | У GSV | Статус |
-|---------|-------|--------|
+| Джерело (`docs/vision/`) | У GSV | Статус |
+|-------------------------|-------|--------|
 | `index.html` (Galaxy UI) | `GSV/ui/index.html` (UI glue поверх Rust) | **✅ (single-page UI: health/tracker/sli/toolchain/ide/update/preview/terminal/hooks, SSE); band 117: legacy `docs/vision/index.html` → GSV pointer page (deactivated)** |
 | `manifest.json` (граф) | `GSV/data/gsv_manifest.json` (генерується Rust) | **✅ (band 109: `boxes/vision`, `gsv-vision-sync`, `GET /api/vision/manifest`; band 110: `GET /api/vision/map`)** |
 | `feed.json` (RSS ticker) | `GSV/data/gsv_feed.json` | **✅ (band 109: `GET /api/vision/feed`, Vision UI card; band 110: `?status=` filter)** |
@@ -14,7 +14,7 @@
 | `rust_diagnostics.json` (clippy warnings/errors) | `GSV/data/gsv_rust_diagnostics.json` + `GET /api/vision/rust-diagnostics` + Rust Diagnostics card | **✅ (band 115: `RustDiagnosticsReport` wire, mirror у sync, empty-tolerant; band 116: `GET /api/vision/rust-diagnostics.svg` + Rust history chart — Rust-rendered SVG)** |
 | `vision.js` / `vision.css` | `GSV/ui/` (тонкий UI glue) | **✅ (band 115: superseded — див. [`LEGACY_PARITY.md`](../../../GSV/docs/LEGACY_PARITY.md); legacy JS/CSS не переносимо, canon Rust 95–100%; band 117: DEACTIVATED banner, файли лишаються архівом)** |
 | `vision.svg` | `GSV/ui/vision.svg` + `GET /assets/vision.svg` | **✅ (band 110: порт isometric diagram; `.svg` = audit Ignored, ratio-neutral)** |
-| README (відкриття) | → `docs/gsv/` | **✅ (адаптовано)** |
+| `README.md` (документація vision) | `docs/gsv/` та `GSV/docs/` | **✅ (адаптовано, деактиваційні нотатки band 117)** |
 
 ## Що переносимо (з `src/`)
 
