@@ -14,8 +14,8 @@ export PATH="/c/msys64/ucrt64/bin:/c/msys64/usr/bin:$PATH"
 cd /s/rust/poolAI
 /c/msys64/usr/bin/rm -f .git/index.lock
 cargo fmt --all
-git add .cursor/rules/rust-architect.md docs/status/RUST_ARCHITECT_UPDATE_2026-01-22.md docs/troubleshooting/GIT_INDEX_LOCK_FIX.md
-git add .cursor/rules/ai-assistant.md .cursor/rules/git-workflow.md .cursor/rules/msys2-windows.md .cursor/rules/scripts.md
+git add .cursor/rules/rust-architect.mdc docs/status/RUST_ARCHITECT_UPDATE_2026-01-22.md docs/troubleshooting/GIT_INDEX_LOCK_FIX.md
+git add .cursor/rules/ai-assistant.mdc .cursor/rules/git-workflow.mdc .cursor/rules/msys2-windows.mdc .cursor/rules/scripts.mdc
 git add .cursor/commands/git-push.md
 git add Cargo.toml docs/CHANGELOG.md docs/cloud/CLOUD_SDK_STATUS.md docs/concept/poolAI_concept_root.txt
 git add docs/development/NEXT_STEPS_2026-01-19.md docs/status/STABLE_STATE_SUMMARY.md scripts/README.md
@@ -23,9 +23,9 @@ git add src/cloud/providers/aws.rs src/lib.rs src/network/api/mod.rs src/network
 git add tests/cloud_mock_integration.rs tests/integration/cloud/aws_tests.rs tests/integration/cloud/edge_cases_tests.rs tests/integration/mod.rs
 git add src/ml/ src/network/api/ai_ml.rs
 git status -sb
-git commit -m "docs(architect): update rust-architect.md with current state (v0.2.2)
+git commit -m "docs(architect): update rust-architect.mdc with current state (v0.2.2)
 
-- Update rust-architect.md with current project state (v0.2.2)
+- Update rust-architect.mdc with current project state (v0.2.2)
 - Add RUST_ARCHITECT_UPDATE_2026-01-22.md status document
 - Fix git-push.md with full path to rm command
 - Add GIT_INDEX_LOCK_FIX.md troubleshooting guide

@@ -14,8 +14,17 @@
 | [`functionality-management.mdc`](rules/functionality-management.mdc) | on-demand | FM-менеджер |
 | [`autonomous-orchestrator.mdc`](rules/autonomous-orchestrator.mdc) | on-demand | AUTO_RUN |
 | [`docs-vision.mdc`](rules/docs-vision.mdc) | globs | `docs/vision/` sync |
+| [`chat-context.mdc`](rules/chat-context.mdc) | globs | Стартовий контекст чату; ключові документи |
+| [`ai-assistant.mdc`](rules/ai-assistant.mdc) | globs | AI-асистент: ключові документи, sync концепт→статус |
+| [`documentation.mdc`](rules/documentation.mdc) | globs | Куди писати доки (кроки 11–12), структура `docs/` |
+| [`git-workflow.mdc`](rules/git-workflow.mdc) | globs | Git workflow: CL, Summary, MSYS2 push |
+| [`msys2-windows.mdc`](rules/msys2-windows.mdc) | globs | MSYS2/Windows dev env (bash only, GNU) |
+| [`project-structure.mdc`](rules/project-structure.mdc) | globs | Організація репозиторію (src/, bin/, scripts/) |
+| [`rust-architect.mdc`](rules/rust-architect.mdc) | globs | Rust Architect workflow, `target/` disk, pre-push |
+| [`rust.mdc`](rules/rust.mdc) | globs | Rust стиль і патерни |
+| [`scripts.mdc`](rules/scripts.mdc) | globs | Скрипти: bash only, `scripts/` структура |
 
-Повний список legacy `.md` — [`rules/.cursorrules`](rules/.cursorrules).
+Повний індекс правил — [`rules/.cursorrules`](rules/.cursorrules).
 
 ## Commands (`commands/`)
 

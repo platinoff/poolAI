@@ -1,3 +1,9 @@
+---
+description: PoolAI — Git workflow (Conventional Commits, Summary у тілі, MSYS2 bash push)
+globs: "{**/*.rs,**/*.toml,**/*.sh,**/*.md}"
+alwaysApply: false
+---
+
 # Git Workflow — Conventional Commits (CL) & Push
 
 ## ⚠️ CRITICAL: MSYS2 bash only

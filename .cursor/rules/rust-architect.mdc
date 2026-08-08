@@ -1,3 +1,9 @@
+---
+description: PoolAI — Rust Architect workflow: runtime stack, MSYS2, target/ disk, pre-push checks, docs sync
+globs: "{src/**,tests/**,crates/**,docs/**}"
+alwaysApply: false
+---
+
 # Rust Architect Rules - PoolAI Development
 
 ## ⛔ Runtime stack (non-negotiable)
@@ -25,7 +31,7 @@
 
 - **Політика (м’які пороги за замовчуванням):** тримати **≥ 12 GiB** вільних на томі, де лежить репозиторій (або `CARGO_TARGET_DIR`); каталог **`target/`** доречно тримати **≤ ~48 GiB** для цього монорепо — інакше `cargo clean` або окремий том під `CARGO_TARGET_DIR`.
 - **Перевірка перед важкими прогонами:** `bash scripts/check_target_disk.sh` (лише попередження) або з жорстким фейлом: `bash scripts/check_target_disk.sh --enforce` / `POOLAI_ENFORCE_DISK_LIMIT=1`. Пороги: `POOLAI_MIN_FREE_DISK_GB`, `POOLAI_MAX_TARGET_DIR_GB` (див. шапку скрипта).
-- **Зменшення тиску на диск:** `CARGO_INCREMENTAL=0` для разових повних матриць; `-j 1` для лінкера на Windows (уже в доках); не тримати одночасно кілька величезних `target/` на одному тому.
+- **Зменшення тиску на диск:** `CARGO_INCREMENTAL=0` для разових повних матриць; `-j 1` для лінкера на Windows (уже в доках); не тримати одночасно кілька величезних `target/` на одному томі.
 
 **Не використовувати для push**: вбудований термінал Cursor без потреби (див. troubleshooting у `git-push.md`).
 
@@ -95,7 +101,7 @@
    - IMPORTANT: не стаджити `data/audit/*.log.gz`.
    - Додатково (таргетовано): `cloud_mock_integration` з `--features cloud,cloud-sdk`, `rustc >= 1.88` для AWS SDK.
 
-   See `git-workflow.md`, `git-push.md`.
+   See `git-workflow.mdc`, `git-push.md`.
 
 5. **File Organization**:
    - ✅ All documentation in `docs/` directory

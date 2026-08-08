@@ -126,7 +126,7 @@ cargo fmt --all
 git add <paths> && git commit -m "type(scope): subject" && git push origin main
 ```
 
-CL (Conventional Commits): `feat(scope): subject`. Див. `.cursor/rules/git-workflow.md`. Push: copy-paste блок з `.cursor/commands/git-push.md` (без .sh).
+CL (Conventional Commits): `feat(scope): subject`. Див. `.cursor/rules/git-workflow.mdc`. Push: copy-paste блок з `.cursor/commands/git-push.md` (без .sh).
 
 ---
 

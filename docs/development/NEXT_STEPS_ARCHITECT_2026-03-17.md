@@ -267,7 +267,7 @@ Grid / Job / Memory / Tokenization (Priority 6)
 
 **2026-04-03**: `UserManager` у `AppState`. **2026-04-04–05**: discovery + OAuth2 pending у `AppState`; інтеграційні тести `tests/network_api_integration.rs` для VM/RAID list — **не 404** (типово **503** без менеджерів на `ApiContext::default()`).
 
-**Cursor / правила**: каталог `.cursor/rules/` (`rust-architect.md`, `ai-assistant.md`, `chat-context.md`, `.cursorrules`, …). Оновлено `rust-architect.md`: канонічний push через зовнішній MSYS2; агент/CI можуть використовувати PowerShell; опис Dependabot; узгодження з `cargo test` як у CI; примітка про MSVC vs `rust-toolchain.toml` (GNU).
+**Cursor / правила**: каталог `.cursor/rules/` (`rust-architect.mdc`, `ai-assistant.mdc`, `chat-context.mdc`, `.cursorrules`, …). Оновлено `rust-architect.mdc`: канонічний push через зовнішній MSYS2; агент/CI можуть використовувати PowerShell; опис Dependabot; узгодження з `cargo test` як у CI; примітка про MSVC vs `rust-toolchain.toml` (GNU).
 
 **Toolchain (локально, Windows)**: `rustc`/`cargo` **1.92.0**; `rust-toolchain.toml` — GNU target + clippy/rustfmt. Перевірка: `rustup show` (за потреби `rustup override set 1.92.0-x86_64-pc-windows-gnu`).
 
@@ -422,7 +422,7 @@ Grid / Job / Memory / Tokenization (Priority 6)
 ## Верифікація 2026-04-06 (документація — таксономія та ML-тести)
 
 - **Таксономія `docs/`**: оновлено [`docs/STRUCTURE.md`](../STRUCTURE.md) (канонічні точки входу, каталоги, політика щодо плоских `docs/*.md`, Cursor rules, інвентар, примітка про doctests на Windows).
-- **Індекси**: [`docs/README.md`](../README.md), [`docs/INDEX_2026-03-17.md`](../INDEX_2026-03-17.md), [`docs/development/HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md), кореневий [`README.md`](../../README.md) — посилання на `STRUCTURE.md` та `.cursor/rules/documentation.md`.
+- **Індекси**: [`docs/README.md`](../README.md), [`docs/INDEX_2026-03-17.md`](../INDEX_2026-03-17.md), [`docs/development/HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md), кореневий [`README.md`](../../README.md) — посилання на `STRUCTURE.md` та `.cursor/rules/documentation.mdc`.
 - **Тести**: у `Cargo.toml` додано `[[test]]` з `required-features = ["ml"]` для інтеграцій **`ml_*`** (`automl`, `experiments`, `federated`, `pipeline`, `pruning`, `versioning`), щоб **`cargo test`** без `--features ml` не компілював optional `poolai::ml`.
 
 ## Верифікація 2026-04-07 (P4 — `runtime_benchmarks` baseline, MSVC `bench`)

@@ -1,3 +1,9 @@
+---
+description: PoolAI — організація репозиторію: src/, bin/, scripts/, tests/, crates/, naming
+globs: "{src/**,tests/**,crates/**,scripts/**,bin/**,docs/**}"
+alwaysApply: false
+---
+
 # Project Structure Rules
 
 ## Runtime stack (канон)
@@ -84,4 +90,4 @@
 
 - Use Conventional Commits format
 - One logical change per commit
-- See `git-workflow.md` for detailed commit format and workflow rules
+- See `git-workflow.mdc` for detailed commit format and workflow rules

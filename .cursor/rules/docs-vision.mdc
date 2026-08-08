@@ -62,7 +62,7 @@ alwaysApply: false
 
 - [`.cursor/rules/virtual-development-team.mdc`](virtual-development-team.mdc) — один PH-S*; vision — **після** FM/HANDOFF.
 - [`.cursor/skills/poolai-documentation/SKILL.md`](../skills/poolai-documentation/SKILL.md) — кроки 1–12; vision — додаткова карта, не заміна INDEX.
-- [`.cursor/rules/documentation.md`](documentation.md) — нові docs лише під `docs/`.
+- [`.cursor/rules/documentation.mdc`](documentation.mdc) — нові docs лише під `docs/`.
 
 ## Не робити
 

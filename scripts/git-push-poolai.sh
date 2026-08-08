@@ -2,11 +2,11 @@
 # Git add, commit, push for poolAI.
 # Run in MSYS2 UCRT64 bash (NOT PowerShell). Close Cursor Source Control first.
 # Usage: bash scripts/git-push-poolai.sh
-# See: .cursor/rules/msys2-windows.md, docs/troubleshooting/GIT_PUSH_FAILED.md
+# See: .cursor/rules/msys2-windows.mdc, docs/troubleshooting/GIT_PUSH_FAILED.md
 
 set -e
 
-# MSYS2 UCRT64 PATH (per .cursor/rules/msys2-windows.md)
+# MSYS2 UCRT64 PATH (per .cursor/rules/msys2-windows.mdc)
 export PATH="/c/msys64/ucrt64/bin:/c/msys64/usr/bin:$PATH"
 
 # Repo root (script lives in scripts/)

@@ -69,4 +69,4 @@ cargo run --bin poolai-vision-sync -- --check
 
 - `docs/development/HANDOFF_NEW_SESSION.md` — vision close band
 - `.cursor/rules/docs-vision.mdc` — vision map rules
-- `.cursor/rules/git-workflow.md` — push workflow
+- `.cursor/rules/git-workflow.mdc` — push workflow

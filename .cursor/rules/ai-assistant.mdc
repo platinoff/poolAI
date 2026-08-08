@@ -1,8 +1,14 @@
+---
+description: PoolAI AI-асистент: ключові документи, sync концепт→статус→NEXT_STEPS, MSYS2 bash
+globs: "{**/*.md,**/*.txt,**/*.rs}"
+alwaysApply: false
+---
+
 # AI Assistant Rules
 
 ## 🧭 Подальша робота з чатом
 
-При **«налаштуйся для роботи з чатом»** або старті нової сесії — **спочатку читай `chat-context.md`**. Там зведено: проект, ключові документи, термінал (MSYS2 only), git (без .sh), патчі, поточний стан і наступні кроки.
+При **«налаштуйся для роботи з чатом»** або старті нової сесії — **спочатку читай `chat-context.mdc`**. Там зведено: проект, ключові документи, термінал (MSYS2 only), git (без .sh), патчі, поточний стан і наступні кроки.
 
 ---
 
@@ -16,7 +22,7 @@
 ### ⚠️ CRITICAL: Always check these documents first when answering questions
 
 **Main active documents** (ALWAYS reference these):
-- **Chat context** (session start / «налаштуйся»): `.cursor/rules/chat-context.md`
+- **Chat context** (session start / «налаштуйся»): `.cursor/rules/chat-context.mdc`
 - **Session handoff (кроки 1–12)**: `docs/development/HANDOFF_NEW_SESSION.md`
 - **Autonomous run (orchestrator)**: newest `docs/development/AUTO_RUN_SESSION_*.md` (Post-Horizon: `AUTO_RUN_SESSION_2026_POST_HORIZON.md`)
 - **Dev patterns registry**: `docs/development/AUTO_DEV_PATTERNS.md`
@@ -78,4 +84,4 @@
 
 ---
 
-**Session start**: See `chat-context.md` for compact context (project, docs, terminal, git, next steps).
+**Session start**: See `chat-context.mdc` for compact context (project, docs, terminal, git, next steps).

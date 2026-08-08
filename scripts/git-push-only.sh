@@ -1,6 +1,6 @@
 #!/bin/bash
 # Push only (no add/commit). Use after git-push-poolai.sh commit or manual commit.
-# Run in MSYS2 UCRT64 bash. See .cursor/rules/msys2-windows.md
+# Run in MSYS2 UCRT64 bash. See .cursor/rules/msys2-windows.mdc
 
 set -e
 export PATH="/c/msys64/ucrt64/bin:/c/msys64/usr/bin:$PATH"

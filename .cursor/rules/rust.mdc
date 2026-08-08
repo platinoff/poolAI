@@ -1,3 +1,9 @@
+---
+description: PoolAI — Rust стиль і патерни (edition 2021, error handling, tokio, testing, feature flags)
+globs: "{src/**,tests/**,crates/**}"
+alwaysApply: false
+---
+
 # Rust Project Rules
 
 **Stack policy:** PoolAI product code is **Rust-only** (plus `src/ui/` JS). Do not add Python runtime, `requirements.txt`, or Python sidecars. See `.cursor/rules/runtime-stack-policy.mdc`.
@@ -54,7 +60,7 @@
 
 ## Testing
 
-- Before heavy runs (`cargo test --all-features`, full clippy matrices): optional `bash scripts/check_target_disk.sh` — warns if free space on the repo volume is below **POOLAI_MIN_FREE_DISK_GB** (default 12) or `target/` exceeds **POOLAI_MAX_TARGET_DIR_GB** (default 48). Use `--enforce` or `POOLAI_ENFORCE_DISK_LIMIT=1` to fail fast. See `rust-architect.md` (target disk policy).
+- Before heavy runs (`cargo test --all-features`, full clippy matrices): optional `bash scripts/check_target_disk.sh` — warns if free space on the repo volume is below **POOLAI_MIN_FREE_DISK_GB** (default 12) or `target/` exceeds **POOLAI_MAX_TARGET_DIR_GB** (default 48). Use `--enforce` or `POOLAI_ENFORCE_DISK_LIMIT=1` to fail fast. See `rust-architect.mdc` (target disk policy).
 - Unit tests in `tests/` directory
 - Use `#[tokio::test]` for async tests
 - Use `tempfile` crate for temporary directories in tests
@@ -74,7 +80,7 @@
 - Always run `cargo fmt` after making code changes
 - Always run `cargo clippy` before committing
 - Always run `cargo test` before committing
-- Use Conventional Commits format (see `.cursorrules`)
+- Use Conventional Commits format (see `git-workflow.mdc`)
 - Update documentation when adding new features
 - Check `docs/status/CURRENT_STATUS.md` for project status
 
@@ -91,4 +97,4 @@
 - One logical change per commit
 - Include tests for new features
 - Update documentation for new features
-- See `.cursorrules` for detailed commit format
+- See `git-workflow.mdc` for detailed commit format

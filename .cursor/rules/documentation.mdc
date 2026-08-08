@@ -1,3 +1,9 @@
+---
+description: PoolAI — куди писати доки: кроки 1–12, каталог, правила структури docs/, без .md у корені
+globs: "docs/**"
+alwaysApply: false
+---
+
 # Documentation Structure Rules
 
 ## Canonical documentation order (PoolAI)

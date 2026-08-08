@@ -1,6 +1,6 @@
 # Repository layout (code & ops)
 
-**Оновлено:** 2026-05-24 · Для людей і онбордингу. Канон стеку — [`STRUCTURE.md`](../STRUCTURE.md) §7, [`.cursor/rules/project-structure.md`](../../.cursor/rules/project-structure.md).
+**Оновлено:** 2026-05-24 · Для людей і онбордингу. Канон стеку — [`STRUCTURE.md`](../STRUCTURE.md) §7, [`.cursor/rules/project-structure.mdc`](../../.cursor/rules/project-structure.mdc).
 
 ---
 

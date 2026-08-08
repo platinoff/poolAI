@@ -11,9 +11,9 @@
 
 | Джерело | Шлях | Призначення |
 |--------|------|-------------|
-| **Стартовий контекст** | `.cursor/rules/chat-context.md` | При «налаштуйся для роботи з чатом» / старті сесії — читати першим |
+| **Стартовий контекст** | `.cursor/rules/chat-context.mdc` | При «налаштуйся для роботи з чатом» / старті сесії — читати першим |
 | **Головні правила** | `.cursor/rules/.cursorrules` | Посилання на усі правила в `.cursor/rules/` |
-| **AI-помічник** | `.cursor/rules/ai-assistant.md` | Ключові документи, sync концепт→статус→NEXT_STEPS |
+| **AI-помічник** | `.cursor/rules/ai-assistant.mdc` | Ключові документи, sync концепт→статус→NEXT_STEPS |
 
 **Термінал**: тільки **MSYS2 bash** — `C:\msys64\usr\bin\bash.exe` (UCRT64). Не PowerShell, не cmd.  
 **Патчі**: `rust-toolchain.toml`, `.cursor`, `.vscode`, `scripts/`.
@@ -98,7 +98,7 @@
 
 ## 3. Наступні кроки розробки
 
-Джерела: `docs/status/STABLE_STATE_SUMMARY.md`, `docs/development/NEXT_STEPS_2026-01-19.md`, `DEVELOPMENT_ROADMAP.md`, `chat-context.md`.
+Джерела: `docs/status/STABLE_STATE_SUMMARY.md`, `docs/development/NEXT_STEPS_2026-01-19.md`, `DEVELOPMENT_ROADMAP.md`, `chat-context.mdc`.
 
 ### 3.1 Поточний стан
 
@@ -142,7 +142,7 @@ Git push — copy-paste блок з `.cursor/commands/git-push.md` у **зовн
 
 ## 4. Швидка перевірка перед роботою
 
-- [ ] Відкрити `chat-context.md` при старті сесії або запиті «налаштуйся для роботи з чатом».
+- [ ] Відкрити `chat-context.mdc` при старті сесії або запиті «налаштуйся для роботи з чатом».
 - [ ] Термінал: тільки MSYS2 bash; cargo/git — у зовнішньому bash для push.
 - [ ] Якщо Cursor дає порожні/обрізані відповіді — Reload Window, новий чат, менше контексту.
 - [ ] Концепт/статус/план: узгоджувати з `poolAI_concept_root.txt`, `STABLE_STATE_SUMMARY.md`, `NEXT_STEPS_2026-01-19.md`.

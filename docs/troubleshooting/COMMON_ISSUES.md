@@ -35,7 +35,7 @@ This is a known issue with Rust binaries triggering false positives in antivirus
 2. Run `bash scripts/check_target_disk.sh` (warns by default). To fail before tests: `bash scripts/check_target_disk.sh --enforce` or set `POOLAI_ENFORCE_DISK_LIMIT=1`. Tune thresholds with `POOLAI_MIN_FREE_DISK_GB` / `POOLAI_MAX_TARGET_DIR_GB` (see script header).
 3. `cargo clean` or point `CARGO_TARGET_DIR` at a larger disk. For one-off full feature matrices, `CARGO_INCREMENTAL=0` reduces growth.
 
-Policy for agents: `.cursor/rules/rust-architect.md` → **target/ і ліміт дискового простору**.
+Policy for agents: `.cursor/rules/rust-architect.mdc` → **target/ і ліміт дискового простору**.
 
 ## Startup Issues
 

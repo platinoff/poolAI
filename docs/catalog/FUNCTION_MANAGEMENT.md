@@ -265,7 +265,7 @@ FM-xxx (з таблиці нижче)
 
 **VDT:** §5.12 = **журнал PH-S*** (≤10 відкритих). Якщо **< 10** — **`абракадабра`** / project scan **всього проєкту**: concept → FM **§5.1** → roadmaps → architect → DOCS_LEGACY → code → §5.13 fallback. Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Project scan». **Rust-first:** API → `tests/`; Playwright лише browser scope.
 
-**Відкритих у §5.12:** **0** (band 118 ✅). **Master horizon:** PH-S1829…S1838 (band 119). Vision rev **471**.
+**Відкритих у §5.12:** **0** (band 118 ✅). **Master horizon:** PH-S1829…S1838 (band 119). Vision rev **472**.
 
 **Историчний research backlog (PH-S65+):**
 

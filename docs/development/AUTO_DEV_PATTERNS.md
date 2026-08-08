@@ -768,4 +768,4 @@
 
 - `git add -A` без відбору; не комітити `data/audit/*.log.gz`
 - Повний `cargo test` з doctests на Windows — ризик os error 1455; канон — `cargo test-ci`
-- PowerShell/cmd для `cargo`/`git` у цьому репо — лише MSYS2 bash (див. `chat-context.md`)
+- PowerShell/cmd для `cargo`/`git` у цьому репо — лише MSYS2 bash (див. `chat-context.mdc`)

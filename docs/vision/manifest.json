@@ -3146,6 +3146,60 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_development_RATIO96_DOCS_CANON_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "_cursor_rules_ai_assistant_mdc"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "_cursor_rules_chat_context_mdc"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "_cursor_rules_documentation_mdc"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "_cursor_rules_git_workflow_mdc"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "_cursor_rules_msys2_windows_mdc"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "_cursor_rules_project_structure_mdc"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "_cursor_rules_rust_architect_mdc"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "_cursor_rules_rust_mdc"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "_cursor_rules_scripts_mdc"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -12295,9 +12349,72 @@
       "label": "ratio96_docs_canon_integration.rs",
       "layer": "L3",
       "path": "tests/ratio96_docs_canon_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_ai_assistant_mdc",
+      "label": "ai-assistant.mdc",
+      "layer": "L1",
+      "path": ".cursor/rules/ai-assistant.mdc"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_chat_context_mdc",
+      "label": "chat-context.mdc",
+      "layer": "L1",
+      "path": ".cursor/rules/chat-context.mdc"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_documentation_mdc",
+      "label": "documentation.mdc",
+      "layer": "L1",
+      "path": ".cursor/rules/documentation.mdc"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_git_workflow_mdc",
+      "label": "git-workflow.mdc",
+      "layer": "L1",
+      "path": ".cursor/rules/git-workflow.mdc"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_msys2_windows_mdc",
+      "label": "msys2-windows.mdc",
+      "layer": "L1",
+      "path": ".cursor/rules/msys2-windows.mdc"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_project_structure_mdc",
+      "label": "project-structure.mdc",
+      "layer": "L1",
+      "path": ".cursor/rules/project-structure.mdc"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_rust_architect_mdc",
+      "label": "rust-architect.mdc",
+      "layer": "L1",
+      "path": ".cursor/rules/rust-architect.mdc"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_rust_mdc",
+      "label": "rust.mdc",
+      "layer": "L1",
+      "path": ".cursor/rules/rust.mdc"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_scripts_mdc",
+      "label": "scripts.mdc",
+      "layer": "L1",
+      "path": ".cursor/rules/scripts.mdc"
     }
   ],
-  "revision": 471,
+  "revision": 472,
   "sprint_queue": [],
   "sprint_queue_open_count": 0,
   "updated_at": "2026-06-20",

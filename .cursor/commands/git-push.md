@@ -162,4 +162,4 @@ git push origin main
 Детальніше: 
 - `docs/troubleshooting/GIT_PUSH_FAILED.md` - загальні проблеми
 - `docs/troubleshooting/GIT_INDEX_LOCK_FIX.md` - виправлення index.lock та rm
-- `git-workflow.md` - git workflow правила
+- `git-workflow.mdc` - git workflow правила

@@ -3,7 +3,7 @@
 **Версія**: v0.2.2 → v0.3.0+  
 **Останнє оновлення**: 2026-06-19
 
-**Структура доків і правила агента:** [`../STRUCTURE.md`](../STRUCTURE.md) · [`.cursor/rules/documentation.md`](../../.cursor/rules/documentation.md)
+**Структура доків і правила агента:** [`../STRUCTURE.md`](../STRUCTURE.md) · [`.cursor/rules/documentation.mdc`](../../.cursor/rules/documentation.mdc)
 
 ---
 

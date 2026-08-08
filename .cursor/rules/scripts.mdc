@@ -1,3 +1,9 @@
+---
+description: PoolAI — скрипти: bash only (MSYS2), scripts/ структура, описи без .ps1 у списках
+globs: "scripts/**"
+alwaysApply: false
+---
+
 # Scripts Structure Rules
 
 ## 🔧 Scripts Structure - STRICT RULES

@@ -61,7 +61,7 @@ description: >-
 
 ## Правила для агента
 
-- Нові **плани / статус / концепт** — лише під `docs/` у відповідній підпапці (див. `.cursor/rules/documentation.md`).
+- Нові **плани / статус / концепт** — лише під `docs/` у відповідній підпапці (див. `.cursor/rules/documentation.mdc`).
 - Не дублюй довгі чеклисти в кореневий `README` — посилайся на `docs/development/` та витяг (крок 11).
 - Після додавання головного документа: онови `docs/README.md` або `INDEX`, за потреби `file_list.csv`.
 - Запити на **беклог, прогалини, індекс функцій, охоплення docs** — `.cursor/rules/functionality-management.mdc`.

@@ -48,6 +48,6 @@ alwaysApply: true
 
 - [`poolai-testing-policy.mdc`](poolai-testing-policy.mdc) — Rust-first pyramid, Playwright vs integration, MSYS2 PATH
 
-- `.cursor/rules/project-structure.md` — каталоги
-- `.cursor/rules/rust.md` — стиль Rust
+- `.cursor/rules/project-structure.mdc` — каталоги
+- `.cursor/rules/rust.mdc` — стиль Rust
 - `docs/ARCHITECTURE_BEST_PRACTICES.md` — § Technology stack

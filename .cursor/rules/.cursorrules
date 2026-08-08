@@ -1,15 +1,15 @@
 # Cursor Rules for PoolAI Project
 
 ⚠️ **IMPORTANT**: This file is maintained for backward compatibility.  
-**All rules are now in `.cursor/rules/` directory.**
+**All rules are now in `.cursor/rules/` directory as `.mdc` files.**
 
 ## Chat / подальша робота з чатом
 
-При старті сесії або запиті «налаштуйся для роботи з чатом» — **читай `chat-context.md`** першим. Там: проект, ключові документи, термінал (MSYS2 only), git (без .sh), патчі, поточний стан і далі.
+При старті сесії або запиті «налаштуйся для роботи з чатом» — **читай `chat-context.mdc`** першим. Там: проект, ключові документи, термінал (MSYS2 only), git (без .sh), патчі, поточний стан і далі.
 
 ## Terminal & patches
 
-- **Terminal**: `C:\msys64\usr\bin\bash.exe` (MSYS2 UCRT64) for all local `cargo`/`git`/scripts — no PowerShell, no cmd (see `rust-architect.md`, `msys2-windows.md`).
+- **Terminal**: `C:\msys64\usr\bin\bash.exe` (MSYS2 UCRT64) for all local `cargo`/`git`/scripts — no PowerShell, no cmd (see `rust-architect.mdc`, `msys2-windows.mdc`).
 - **Patches**: `rust-toolchain.toml`, `.cursor`, `.vscode`, `scripts/`
 
 ## Runtime stack
@@ -22,15 +22,15 @@ All project rules are organized in `.cursor/rules/`:
 
 - **`poolai-agent-roles.mdc`** - 👥 VDT ролі + субагенти + §5.1/§5.12 (always on)
 - **`runtime-stack-policy.mdc`** - ⛔ Rust-only runtime; block Python proposals (always on)
-- **`chat-context.md`** - 🧭 Стартовий контекст чату (при «налаштуйся» / подальша робота)
-- **`rust-architect.md`** - ⭐ Rust Architect workflow and concept file usage (READ FIRST)
-- **`documentation.md`** - Documentation structure and file organization rules
-- **`git-workflow.md`** - Git workflow, commit format, and push order rules
-- **`msys2-windows.md`** - MSYS2 and Windows development environment rules (bash, NOT PowerShell)
-- **`scripts.md`** - Scripts structure and file listing rules
-- **`project-structure.md`** - Project organization and file naming rules
-- **`rust.md`** - Rust coding standards and patterns
-- **`ai-assistant.md`** - AI assistant rules and key document references
+- **`chat-context.mdc`** - 🧭 Стартовий контекст чату (при «налаштуйся» / подальша робота)
+- **`rust-architect.mdc`** - ⭐ Rust Architect workflow and concept file usage (READ FIRST)
+- **`documentation.mdc`** - Documentation structure and file organization rules
+- **`git-workflow.mdc`** - Git workflow, commit format, and push order rules
+- **`msys2-windows.mdc`** - MSYS2 and Windows development environment rules (bash, NOT PowerShell)
+- **`scripts.mdc`** - Scripts structure and file listing rules
+- **`project-structure.mdc`** - Project organization and file naming rules
+- **`rust.mdc`** - Rust coding standards and patterns
+- **`ai-assistant.mdc`** - AI assistant rules and key document references
 - **`autonomous-orchestrator.mdc`** - Автономна розробка: оркестратор, субагенти, AUTO_RUN
 - **`functionality-management.mdc`** - Менеджер функціоналу: FM-*, охоплення docs, §5.1
 
@@ -38,14 +38,14 @@ All project rules are organized in `.cursor/rules/`:
 
 For detailed rules, see the corresponding file in `.cursor/rules/`:
 
-- Documentation: `.cursor/rules/documentation.md`
-- Git workflow: `.cursor/rules/git-workflow.md`
-- MSYS2/Windows: `.cursor/rules/msys2-windows.md`
-- Scripts: `.cursor/rules/scripts.md`
-- Project structure: `.cursor/rules/project-structure.md`
-- Rust patterns: `.cursor/rules/rust.md`
-- AI assistant: `.cursor/rules/ai-assistant.md`
-- Chat context: `.cursor/rules/chat-context.md`
+- Documentation: `.cursor/rules/documentation.mdc`
+- Git workflow: `.cursor/rules/git-workflow.mdc`
+- MSYS2/Windows: `.cursor/rules/msys2-windows.mdc`
+- Scripts: `.cursor/rules/scripts.mdc`
+- Project structure: `.cursor/rules/project-structure.mdc`
+- Rust patterns: `.cursor/rules/rust.mdc`
+- AI assistant: `.cursor/rules/ai-assistant.mdc`
+- Chat context: `.cursor/rules/chat-context.mdc`
 
 ---
 

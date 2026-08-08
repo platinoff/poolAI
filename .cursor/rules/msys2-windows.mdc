@@ -1,9 +1,15 @@
+---
+description: PoolAI — MSYS2 Windows dev env (bash only, GNU toolchain, target/ disk, cl tooling)
+globs: "{**/*.rs,**/*.toml,**/*.sh}"
+alwaysApply: false
+---
+
 # MSYS2 & Windows Development Environment
 
 ## ⚠️ CRITICAL: MSYS2 bash only — no PowerShell, no cmd
 
 **Terminal**: `C:\msys64\usr\bin\bash.exe` (MSYS2 UCRT64) for **all** dev work: `cargo`, `git`, scripts, and any verification you run locally.  
-CI on GitHub uses its own runner environment; locally, stay in MSYS2 bash (see `rust-architect.md`, `git-push.md`).
+CI on GitHub uses its own runner environment; locally, stay in MSYS2 bash (see `rust-architect.mdc`, `git-push.md`).
 
 ### Windows 11 (24H2+ / builds 26100+; e.g. 26200)
 
