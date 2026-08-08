@@ -3,7 +3,7 @@
 **Оновлено:** 2026-07-27  
 **Артефакт:** [`speed_index.json`](./speed_index.json) · mirror [`../vision/speed_index.json`](../vision/speed_index.json)  
 **Bin:** `poolai-speed-index` · wrapper: `bin/record-test-ci-speed.sh`  
-**UI:** Galaxy docs vision → panel **Speeds** (`docs/vision/index.html`)
+**UI:** GSV → panel **Speeds** (`http://127.0.0.1:8891/`) · legacy `docs/vision/index.html` deactivated (band 117)
 
 ---
 

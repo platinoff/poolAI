@@ -5,7 +5,7 @@
 ## Призначення
 
 - **Bin/exe** «Galaxy StarWalker Vision» — `cargo run --bin gsv-server` (або зібраний `.exe` на Windows).
-- Віддає static UI (наслідник `docs/vision/index.html`) + REST API боксів + події (SSE).
+- Віддає static UI (спадкоємець деактивованого legacy `docs/vision/index.html` — band 117) + REST API боксів + події (SSE).
 - Працює як **self-contained server**: доки + метрики + бокs — все в одному Rust бінарнику.
 
 ## Endpoints (план)

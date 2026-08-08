@@ -37,9 +37,9 @@ fn horizon_s1039_band_vision_map_close_ph_s1048() {
     assert!(next.contains("абракадабра"));
 
     let index = include_str!("../docs/vision/index.html");
-    assert!(index.contains("vision-skip-link"));
-    assert!(index.contains("role=\"main\""));
-    assert!(index.contains("role=\"tree\""));
+    assert!(index.contains("superseded by GSV"));
+    assert!(!index.contains("vision-skip-link"));
+    assert!(!index.contains("role=\"tree\""));
 
     let vision_js = include_str!("../docs/vision/vision.js");
     assert!(vision_js.contains("updateMapSprintDim"));

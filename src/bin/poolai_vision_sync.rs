@@ -685,7 +685,7 @@ fn feed_item_json(entry: &SprintQueueEntry, next_sprint: Option<&str>) -> Value 
         "status": entry.status,
         "published": today_iso(),
         "summary": entry.acceptance,
-        "link": "docs/vision/index.html#sprint-queue"
+        "link": "http://127.0.0.1:8891/#b-sprint-board"
     });
     if entry.open && next_sprint == Some(entry.id.as_str()) {
         item["next"] = json!(true);
@@ -711,7 +711,7 @@ fn build_sprint_feed(entries: &[SprintQueueEntry], fm_section: Option<&str>) -> 
     json!({
         "updated_at": today_iso(),
         "title": "PoolAI Vision Sprint Feed",
-        "link": "docs/vision/index.html",
+        "link": "http://127.0.0.1:8891/",
         "description": "RSS-style ticker of FM §5.12 sprint queue (open + recent closed)",
         "items": items
     })
@@ -2032,6 +2032,10 @@ mod tests {
             js.contains("renderSprintChips") && js.contains("bindMapLinkedSprintChip(span, s)"),
             "renderSprintChips should bind map-linked chips"
         );
+        assert!(
+            js.contains("DEACTIVATED — band 117"),
+            "vision.js should carry the band-117 deactivation banner"
+        );
     }
 
     #[test]
@@ -2051,8 +2055,8 @@ mod tests {
         );
         let html = std::fs::read_to_string("docs/vision/index.html").expect("index.html");
         assert!(
-            html.contains("map-scene-3d") && html.contains("map-orbit-pad"),
-            "index.html missing 3D scene / orbit pad"
+            html.contains("superseded by GSV") && !html.contains("map-scene-3d"),
+            "index.html should be a GSV pointer page (legacy 3D scene removed)"
         );
     }
 
@@ -2071,6 +2075,10 @@ mod tests {
         assert!(
             css.contains(".map-orbit-pad") && css.contains("bottom:"),
             "orbit pad should anchor above bottom bar"
+        );
+        assert!(
+            css.contains("DEACTIVATED — band 117"),
+            "vision.css should carry the band-117 deactivation banner"
         );
     }
 

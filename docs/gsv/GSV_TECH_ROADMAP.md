@@ -6,12 +6,12 @@
 band 109 (Vision sync/migration) **✅** + band 110 (Vision map UI) **✅** + band 111 (Sprint map + doc-preview) **✅** +
 band 112 (Vision auto-sync + sprint-queue planning) **✅** + band 113 (Node search + interactive map) **✅** +
 band 114 (GSV Sprint-board + progress UI) **✅** · band 115 (GSV migration completion) **✅** ·
-band 116 (GSV history charts — speed/rust analytics) **✅** ·
+band 116 (GSV history charts — speed/rust analytics) **✅** · band 117 (GSV legacy vision deactivation) **✅** ·
 **Спринти:** `PH-S1659…S1668` (FM §5.12 §5.83 ✅) · `PH-S1719…S1728` (FM §5.12 §5.89 ✅) ·
 `PH-S1729…S1738` (FM §5.12 §5.90 ✅) · `PH-S1739…S1748` (FM §5.12 §5.91 ✅) ·
 `PH-S1749…S1758` (FM §5.12 §5.92 ✅) · `PH-S1759…S1768` (FM §5.12 §5.93 ✅) ·
 `PH-S1769…S1778` (FM §5.12 §5.94 ✅) · `PH-S1789…S1798` (FM §5.12 §5.96 ✅) ·
-`PH-S1799…S1808` (FM §5.12 §5.97 ✅).
+`PH-S1799…S1808` (FM §5.12 §5.97 ✅) · `PH-S1809…S1818` (FM §5.12 §5.98 ✅).
 
 ## Логічний порядок (залежності)
 
@@ -181,6 +181,21 @@ docs/architecture (✅ ця сесія)
 | **PH-S1806** | GSV vision docs canon | `VISION.md` +band 116 section/endpoints; MEMORY band 116; HANDOFF/NEXT band 116 |
 | **PH-S1807** | poolAI vision parity | `docs/vision/README.md`; FM §5.12 §5.97; цей файл band 116; poolAI HANDOFF/NEXT band 116 |
 | **PH-S1808** | Band close | ratio hold (**95.26%**); fmt/clippy/test (153); docs canon; vision-sync rev 469; push |
+
+## Спринти (band 117) — GSV legacy vision deactivation
+
+| Sprint | Фокус | Acceptance (ключ) |
+|--------|-------|-------------------|
+| **PH-S1809** | Scope + queue | FM §5.98 band 117 (PH-S1809…S1818) + manifest sync |
+| **PH-S1810** | Legacy index deactivation | `docs/vision/index.html` → minimal GSV pointer page (no `vision.js`/`vision.css` refs) |
+| **PH-S1811** | Legacy JS/CSS deactivation | DEACTIVATED banner у `vision.js`/`vision.css`; deactivation note у `docs/vision/README.md` |
+| **PH-S1812** | Live link retarget | `poolai-vision-sync` feed links → `http://127.0.0.1:8891/#b-sprint-board`; GSV `vision.rs` sample links; RUN_LOCAL/GSV_SERVER/gsv README/SPEED_INDEX/RUST_DIAGNOSTICS → GSV |
+| **PH-S1813** | Legacy test retirement | `poolai_vision_sync.rs` unit ×4 + `galaxy_horizon_s1011/s1019/s1039` → deactivated pointer state; e2e pointer assertions |
+| **PH-S1814** | GSV parity docs | `LEGACY_PARITY.md` + `GSV_MIGRATION.md` band 117 |
+| **PH-S1815** | GSV vision docs canon | `VISION.md`/`MEMORY.md`/HANDOFF/NEXT band 117 |
+| **PH-S1816** | poolAI vision parity | `docs/vision/README.md`; FM §5.12 §5.98; цей файл band 117; poolAI HANDOFF/NEXT band 117 |
+| **PH-S1817** | Ratio + rev prep | ratio hold advisory (**95.26%**); vision-sync rev 470 (poolai + gsv + --check) |
+| **PH-S1818** | Band close | ratio hold; fmt/clippy/test (poolAI test-ci + GSV 153); docs canon; vision-sync rev 470; push |
 
 ## Ключові UX-вимоги (узагальнення ТЗ)
 

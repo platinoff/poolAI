@@ -1,9 +1,9 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-08-07 (band 116 **GSV history charts** PH-S1799…S1808 **✅** · band 117 open PH-S1809…S1818 · Vision rev 469)
+**Оновлено:** 2026-08-07 (band 117 **GSV legacy vision deactivation** PH-S1809…S1818 **✅** · band 118 open PH-S1819…S1828 · Vision rev 470)
 
 **Наступна сесія:** **`абракадабра`** — див. **канон воркфлоу в [AGENTS.md](../../AGENTS.md §100–113)**.
-**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1809…S1818; черга — FM §5.12) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1819…S1828; черга — FM §5.12 → band 118) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
 
 --- 
 
@@ -206,6 +206,33 @@ Rust Diagnostics cards у `GSV/ui/index.html`; `poolai-ui-wasm` defer (`GSV_MIGR
 contracts **153** (67 unit + 8 omni + 7 ratio + 23 server + 8 update + 40 vision), clippy **0**,
 fmt clean. Ratio: GSV **95.26%** (rust 7663 / product 8044, gate ≥95% ✅) + poolAI **95.04%**
 advisory hold. Vision rev **469**.
+
+## Band 117 — GSV legacy vision deactivation (PH-S1809…S1818, **✅**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1809** | Scope + queue (`docs/catalog/FUNCTION_MANAGEMENT.md` §5.98 band 117 PH-S1809…S1818; `poolai-vision-sync` manifest 10 open, rev 469) |
+| **PH-S1810** | Legacy index deactivation (`docs/vision/index.html` → minimal GSV pointer page, no `vision.js`/`vision.css` refs) |
+| **PH-S1811** | Legacy JS/CSS deactivation (DEACTIVATED banner у `vision.js`/`vision.css`; deactivation note у `docs/vision/README.md`) |
+| **PH-S1812** | Live link retarget (`poolai-vision-sync` feed links + GSV `vision.rs` sample links → `http://127.0.0.1:8891/#b-sprint-board`; RUN_LOCAL/GSV_SERVER/gsv README/SPEED_INDEX/RUST_DIAGNOSTICS → GSV) |
+| **PH-S1813** | Legacy test retirement (`poolai_vision_sync.rs` unit ×4 + `galaxy_horizon_s1011/s1019/s1039` → deactivated pointer state; e2e `vision.spec.ts`/`a11y.spec.ts`; `VISION_MAP_BAND40_ROWS` markers) |
+| **PH-S1814** | GSV parity docs (`LEGACY_PARITY.md` + `GSV_MIGRATION.md` band 117) |
+| **PH-S1815** | GSV vision docs canon (`VISION.md`/`MEMORY.md`/HANDOFF/NEXT band 117) |
+| **PH-S1816** | poolAI vision parity (`docs/vision/README.md`; FM §5.12 §5.98; `GSV_TECH_ROADMAP.md` band 117; poolAI HANDOFF/NEXT band 117) |
+| **PH-S1817** | Ratio + rev prep (ratio hold advisory; vision-sync rev 470 poolai + gsv + --check) |
+| **PH-S1818** | Band close (ratio hold; fmt/clippy/test poolAI test-ci + GSV 153; docs canon; vision-sync rev 470; push) |
+
+**PH-S1809…S1818 ✅ (2026-08-07):** GSV legacy vision deactivation:
+`docs/vision/index.html` → minimal GSV pointer page (legacy Galaxy UI no longer referenced);
+`vision.js`/`vision.css` — DEACTIVATED banner (band 117; файли лишаються архівом — не видаляємо,
+`docs/vision/` канон-джерело даних); `docs/vision/README.md` deactivation note;
+live link retarget: `poolai-vision-sync` feed + GSV `vision.rs` sample feed links →
+`http://127.0.0.1:8891/#b-sprint-board`; RUN_LOCAL/GSV_SERVER/docs-gsv README/SPEED_INDEX/
+RUST_DIAGNOSTICS → GSV; legacy test retirement: `poolai_vision_sync.rs` unit ×4 +
+`galaxy_horizon_s1011/s1019/s1039` → deactivated pointer state, e2e `vision.spec.ts`/`a11y.spec.ts`
+pointer assertions, `VISION_MAP_BAND40_ROWS` markers; `LEGACY_PARITY.md`/`GSV_MIGRATION.md`/
+`VISION.md`/`GSV_TECH_ROADMAP.md` band 117; GSV MEMORY/HANDOFF/NEXT band 117; GSV ratio **95.26%**
+gate ✅ + poolAI advisory hold; vision rev **470**.
 
 ## Band 109 — GSV vision sync/migration (PH-S1729…S1738, **✅**)
 

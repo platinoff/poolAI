@@ -120,7 +120,7 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 - Після зміни продукту (модулі, маршрути, features): оновити `FUNCTIONALITY_DIGEST` + `file_list.csv` (при нових шляхах) + README Next Focus.
 - Скрипти: dev/ops launchers → `bin/` (.sh/.ps1), toolchain/deploy → `scripts/` (**.sh лише, без нових .ps1**), Rust CLIs → `src/bin/`.
 - Переліки файлів: тільки описові назви, **не** `.ps1`/`.ps` розширеннями.
-- Vision map (`docs/vision/`): після FM/HANDOFF — `poolai-vision-sync` + `--check`; перегляд через `bin/open-docs-vision.ps1` → `http://127.0.0.1:8765/docs/vision/index.html`.
+- Vision map (`docs/vision/`): після FM/HANDOFF — `poolai-vision-sync` + `--check`; **live UI (band 117):** `gsv-server` → `http://127.0.0.1:8891/` · [`GSV_SERVER.md`](docs/gsv/GSV_SERVER.md); legacy `bin/open-docs-vision.ps1` → `http://127.0.0.1:8765/docs/vision/index.html` — архів (deactivated, band 117).
 
 ## Безпека та токени
 

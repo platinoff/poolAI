@@ -135,10 +135,7 @@ test.describe("axe vision map (PH-S1051)", () => {
     } catch {
       test.skip(true, "vision server unavailable");
     }
-    await page.locator("#map-scene-3d, #map-scene, .map-scene, #vision-map").first().waitFor({
-      state: "visible",
-      timeout: 20_000,
-    });
+    await expect(page.locator("h1")).toBeVisible({ timeout: 20_000 });
     const results = await new AxeBuilder({ page })
       .withTags(AXE_TAGS)
       .exclude("#map-starfield, .map-orbit-layer")

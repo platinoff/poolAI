@@ -118,7 +118,7 @@ cd S:\rust\poolAI
 | PowerShell | `.\bin\open-docs-vision.ps1` |
 | MSYS2 | `/usr/bin/bash bin/open-docs-vision.sh` |
 
-URL: `http://127.0.0.1:8765/docs/vision/index.html` — see README § Galaxy docs vision.
+URL (GSV, canon): `http://127.0.0.1:8891/` — див. [`GSV_SERVER.md`](../gsv/GSV_SERVER.md) · `GSV/docs/GSV_ROLES.md`. Legacy static server (`open-docs-vision.ps1`, `http://127.0.0.1:8765/docs/vision/index.html`) — деактивований (band 117), лишається архівом.
 
 ### PH-S1015 / PH-S1016: Admin power UI + API
 

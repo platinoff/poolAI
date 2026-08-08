@@ -211,6 +211,22 @@
 - **PH-S1808** Band close: ratio hold (**95.26%**), fmt, clippy 0, cargo test (153), docs canon,
   vision-sync rev 469, push.
 
+### Band 117 (PH-S1809…S1818, ✅ 2026-08-07) — GSV legacy vision deactivation
+- **PH-S1809** FM §5.98 queue (band 117) + manifest sync (10 open, rev 469).
+- **PH-S1810** `docs/vision/index.html` → minimal GSV pointer page (no `vision.js`/`vision.css` refs).
+- **PH-S1811** `vision.js`/`vision.css` DEACTIVATED banner (band 117); `docs/vision/README.md` deactivation note.
+- **PH-S1812** live link retarget: poolai-vision-sync feed links → `http://127.0.0.1:8891/#b-sprint-board`;
+  GSV `vision.rs` sample feed links; RUN_LOCAL/GSV_SERVER/docs-gsv README/SPEED_INDEX/RUST_DIAGNOSTICS → GSV.
+- **PH-S1813** legacy test retirement: `poolai_vision_sync.rs` unit ×4 + `galaxy_horizon_s1011/s1019/s1039`
+  → deactivated pointer state; e2e `vision.spec.ts`/`a11y.spec.ts` pointer assertions; `VISION_MAP_BAND40_ROWS` markers.
+- **PH-S1814** `LEGACY_PARITY.md` + `GSV_MIGRATION.md` band 117 (index/JS/CSS deactivated).
+- **PH-S1815** `VISION.md`/`MEMORY.md`/HANDOFF/NEXT band 117.
+- **PH-S1816** poolAI parity: `docs/vision/README.md`; FM §5.12 §5.98; `GSV_TECH_ROADMAP.md` band 117;
+  poolAI HANDOFF/NEXT band 117.
+- **PH-S1817** ratio hold advisory (**95.26%**) + vision-sync rev 470 (poolai + gsv + --check).
+- **PH-S1818** Band close: ratio hold, fmt, clippy 0, cargo test (poolAI test-ci + GSV 153), docs canon,
+  vision-sync rev 470, push.
+
 ## Важливі факти (не забувати)
 
 1. **GSV — окремий Rust-проєкт** у `S:\rust\poolAI\GSV` (own workspace, own `target/`).

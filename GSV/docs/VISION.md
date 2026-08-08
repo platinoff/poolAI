@@ -1,7 +1,10 @@
 # GSV — Vision box (poolAI vision canon mirror)
 
 Дзеркало poolAI vision canon (`docs/vision/manifest.json` + `docs/vision/feed.json` +
-`docs/vision/extensions.json`) у Rust-бокс GSV. Bands 109–116 (PH-S1729…S1808, ✅).
+`docs/vision/extensions.json`) у Rust-бокс GSV. Bands 109–116 (PH-S1729…S1808, ✅);
+**band 117 (PH-S1809…S1818, ✅)** — legacy vision deactivation: `docs/vision/index.html` →
+GSV pointer page; `vision.js`/`vision.css` → DEACTIVATED banner (архів, не видаляємо);
+живий UI — `gsv-server` → `http://127.0.0.1:8891/`.
 
 ## Що це
 

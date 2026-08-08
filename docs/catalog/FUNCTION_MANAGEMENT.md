@@ -265,7 +265,7 @@ FM-xxx (з таблиці нижче)
 
 **VDT:** §5.12 = **журнал PH-S*** (≤10 відкритих). Якщо **< 10** — **`абракадабра`** / project scan **всього проєкту**: concept → FM **§5.1** → roadmaps → architect → DOCS_LEGACY → code → §5.13 fallback. Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Project scan». **Rust-first:** API → `tests/`; Playwright лише browser scope.
 
-**Відкритих у §5.12:** **0** (band 116 ✅). **Master horizon:** PH-S1809…S1818 (band 117). Vision rev **469**.
+**Відкритих у §5.12:** **0** (band 117 ✅). **Master horizon:** PH-S1819…S1828 (band 118). Vision rev **470**.
 
 **Историчний research backlog (PH-S65+):**
 
@@ -1476,6 +1476,23 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1741 | **PH-S1806** | GSV vision docs canon | session canon | `VISION.md` speeds.svg/rust-diagnostics.svg + history API + band 116 section; MEMORY band 116; HANDOFF/NEXT band 116 | **[x]** |
 | 1742 | **PH-S1807** | poolAI vision parity | docs canon | `docs/vision/README.md`; FM §5.12 §5.97; `GSV_TECH_ROADMAP.md` band 116; poolAI HANDOFF/NEXT band 116 | **[x]** |
 | 1743 | **PH-S1808** | Band close | GSV_ROLES | ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync rev 469; push | **[x]** |
+
+### 5.98 GSV legacy vision deactivation queue — band 117 (PH-S1809…S1818, 2026-08-07) · **✅**
+
+**Джерело:** GSV supersession close (bands 115–116) — legacy `docs/vision/index.html` + `vision.js`/`vision.css` superseded; stand smoke passed (band 116); legacy assets деактивуються (**не видаляємо** — `docs/vision/` лишається канон-джерелом до завершення GSV). Canon: [`GSV/docs/LEGACY_PARITY.md`](../../GSV/docs/LEGACY_PARITY.md) · [`GSV_MIGRATION.md`](../gsv/GSV_MIGRATION.md). Rust-first: UI переходить на GSV (`gsv-server` + `GET /api/vision*`); перенесення legacy JS/CSS у `GSV/ui/` знищило б ratio canon.
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1744 | **PH-S1809** | Scope + queue | docs canon | Define band 117 (legacy vision deactivation) у FM §5.98 + §5.12 header (master horizon) | **[x]** |
+| 1745 | **PH-S1810** | Legacy index deactivation | docs canon | Rewrite `docs/vision/index.html` → minimal GSV pointer page (no `vision.js`/`vision.css` refs; canonical GSV links) | **[x]** |
+| 1746 | **PH-S1811** | Legacy JS/CSS deactivation | docs canon | DEACTIVATED banner у `docs/vision/vision.js` + `vision.css`; deactivation note у `docs/vision/README.md` (files лишаються — canon) | **[x]** |
+| 1747 | **PH-S1812** | Live link retarget | docs canon | `poolai-vision-sync` feed links (`docs/vision/index.html#sprint-queue`) → GSV; GSV `vision.rs` sample links; RUN_LOCAL/GSV_SERVER/gsv README/SPEED_INDEX/RUST_DIAGNOSTICS links → GSV | **[x]** |
+| 1748 | **PH-S1813** | Legacy test retirement | Rust-first (API → tests) | Update legacy-content tests: `poolai_vision_sync.rs` unit ×4 + `galaxy_horizon_s1011/s1019/s1039` → assert deactivated pointer state | **[x]** |
+| 1749 | **PH-S1814** | GSV parity docs | session canon | `LEGACY_PARITY.md` band 117 (index/JS/CSS deactivated); `GSV_MIGRATION.md` vision.js/css row +band 117 | **[x]** |
+| 1750 | **PH-S1815** | GSV vision docs canon | session canon | `VISION.md` +band 117; MEMORY band 117; GSV HANDOFF/NEXT band 117 | **[x]** |
+| 1751 | **PH-S1816** | poolAI vision parity | docs canon | `docs/vision/README.md`; FM §5.12 §5.98; `GSV_TECH_ROADMAP.md` band 117; poolAI HANDOFF/NEXT band 117 | **[x]** |
+| 1752 | **PH-S1817** | Ratio hold advisory | GSV_ROLES | `gsv-loc-audit --min-ratio 0.95 --advisory` ≥95% + poolAI ratio96 advisory hold; vision-sync rev 470 (poolai + gsv + --check) | **[x]** |
+| 1753 | **PH-S1818** | Band close | GSV_ROLES | ratio hold; fmt/clippy/test (poolAI test-ci + GSV 153+); docs canon; vision-sync rev 470; push | **[x]** |
 
 ### 5.88 Ratio96 docs canon queue — band 107 (PH-S1709…S1718, 2026-08-02) · **✅**
 

@@ -1,6 +1,6 @@
 # Промпт наступної сесії (GSV)
 
-**Оновлено:** 2026-08-07 (band 116 **PH-S1799…S1808** ✅ · ratio **95.26%** · tests **153**)
+**Оновлено:** 2026-08-07 (band 117 **PH-S1809…S1818** ✅ · ratio **95.26%** · tests **153**)
 
 ```
 абракадабра
@@ -8,7 +8,7 @@
 
 **Порядок:** **S0 диск** (`df -h /s` + `check_target_disk.sh` → `cargo clean` за потреби) →
 project scan (**warnings first** — `cargo clippy --all-targets` у GSV, `poolai-rust-diagnostics` у poolAI) →
-drain наступного band (черга — FM §5.12 §5.97 / GSV_TECH_ROADMAP; **без** mid-push) →
+drain наступного band (черга — FM §5.12 §5.98 / GSV_TECH_ROADMAP; **без** mid-push) →
 Speeds · Rust panel → vision-sync (`poolai-vision-sync`) → **один** commit → **`git push` + самарі**.
 
 **⚠️ Зупинити `gsv-server` перед `cargo test`/`build`** (блокує `target/debug/gsv-server.exe`);
@@ -68,9 +68,17 @@ Speeds · Rust panel → vision-sync (`poolai-vision-sync`) → **один** com
   cards; vision tests **153** (67 unit + 40 vision + 23 server); GSV ratio **95.26%** gate ✅;
   stand smoke: обидва SVG → 200 `image/svg+xml`; `poolai-ui-wasm` defer; poolAI vision rev
   **469**; FM §5.12 §5.97.
-  **Наступний band 117**: master backlog (Ratio96 phase F) або GSV future — за пріоритетом власника
-  (перші кандидати: legacy `vision.js`/`vision.css` **superseded** — дезактивація після stand smoke,
-  GSV updates/cleanup, ratio96 phase F aggregate).
+- **band 117** (PH-S1809…S1818) ✅ — GSV legacy vision deactivation:
+  `docs/vision/index.html` → GSV pointer page (no `vision.js`/`vision.css` refs);
+  `vision.js`/`vision.css` DEACTIVATED banner (band 117, архів — не видаляємо);
+  `docs/vision/README.md` deactivation note; live link retarget: poolai-vision-sync feed +
+  GSV `vision.rs` sample links → `http://127.0.0.1:8891/#b-sprint-board`;
+  RUN_LOCAL/GSV_SERVER/docs-gsv README/SPEED_INDEX/RUST_DIAGNOSTICS → GSV;
+  legacy test retirement (`poolai_vision_sync.rs` unit ×4, `galaxy_horizon_s1011/s1019/s1039`,
+  e2e `vision.spec.ts`/`a11y.spec.ts` → deactivated pointer state; `VISION_MAP_BAND40_ROWS`);
+  `LEGACY_PARITY.md`/`GSV_MIGRATION.md` band 117; GSV ratio **95.26%** gate ✅;
+  poolAI vision rev **470**; FM §5.12 §5.98.
+  **Наступний band 118**: master backlog (Ratio96 phase F) або GSV future — за пріоритетом власника.
 
 ## Канон GSV
 
@@ -86,6 +94,7 @@ band 104 ✅ (Ratio96 admin/ops) · band 103 ✅ · band 102 ✅ (GSV migration)
 band 110 ✅ (GSV vision map UI) · band 111 ✅ (GSV sprint-map + doc-preview) · band 112 ✅ (GSV vision auto-sync + sprint-queue) ·
 band 113 ✅ (GSV node search + interactive map) · band 114 ✅ (GSV sprint-board + progress UI) ·
 band 115 ✅ (GSV migration completion — legacy vision supersession) · band 116 ✅ (GSV history charts — speed/rust analytics) ·
+band 117 ✅ (GSV legacy vision deactivation) ·
 staging `GSV/data/*` / `certs/*.pem` /
 `.env` · mid-push · build/test при запущеному `gsv-server` · обхід ratio-смуги Rust-кодом замість compact UI ·
 перенесення legacy `vision.js`/`vision.css` у `GSV/ui/` (знищило б ratio canon).

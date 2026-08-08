@@ -1,3 +1,10 @@
+/* =====================================================================
+ * DEACTIVATED — band 117 (2026-08-07).
+ * Legacy vision UI superseded by Galaxy StarWalker Vision (GSV).
+ * docs/vision/index.html is now a pointer page and no longer loads this
+ * file. Assets kept as canon archive — do not remove.
+ * See GSV/docs/LEGACY_PARITY.md and docs/gsv/GSV_MIGRATION.md.
+ * ===================================================================== */
 /* PoolAI docs vision — interactive manifest graph */
 (function () {
   "use strict";

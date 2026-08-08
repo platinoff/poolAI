@@ -19,11 +19,11 @@ pub enum VisionMapDepth {
 /// FM §5.21 band-40 marker rows.
 pub const FM_BAND40_ROWS: &[&str] = &["5.21", "Vision map/a11y/perf", "PH-S1039…S1048", "vision"];
 
-/// Vision UI adoption markers for band 40.
+/// Vision UI adoption markers for band 40 (legacy UI deactivated band 117).
 pub const VISION_MAP_BAND40_ROWS: &[&str] = &[
     "PH-S1039",
-    "vision-skip-link",
-    "role=\"tree\"",
+    "DEACTIVATED",
+    "superseded by GSV",
     "link-neighbor",
     "updateMapSprintDim",
     "PH-S1048",

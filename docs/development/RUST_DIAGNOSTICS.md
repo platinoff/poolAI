@@ -3,7 +3,7 @@
 **Оновлено:** 2026-07-28  
 **Артефакт:** [`rust_diagnostics.json`](./rust_diagnostics.json) · mirror [`../vision/rust_diagnostics.json`](../vision/rust_diagnostics.json)  
 **Bin:** `poolai-rust-diagnostics` · wrapper: `bin/record-rust-diagnostics.sh`  
-**UI:** Galaxy docs vision → panel **Rust** (`docs/vision/index.html`)  
+**UI:** GSV → panel **Rust** (`http://127.0.0.1:8891/`) · legacy `docs/vision/index.html` deactivated (band 117)  
 **CI:** job `rust-diagnostics` in [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) (artifact upload)
 
 ---

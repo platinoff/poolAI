@@ -1681,7 +1681,7 @@ mod tests {
                 summary: "ratio hold".to_string(),
                 status: "closed".to_string(),
                 published: "2026-05-28".to_string(),
-                link: "docs/vision/index.html#sprint-queue".to_string(),
+                link: "http://127.0.0.1:8891/#b-sprint-board".to_string(),
             }],
         }
     }
@@ -1943,7 +1943,7 @@ mod tests {
             summary: "open".to_string(),
             status: "open".to_string(),
             published: "2026-05-29".to_string(),
-            link: "docs/vision/index.html#sprint-queue".to_string(),
+            link: "http://127.0.0.1:8891/#b-sprint-board".to_string(),
         });
         std::fs::write(vis.join("feed.json"), serde_json::to_string(&f).unwrap()).unwrap();
 
