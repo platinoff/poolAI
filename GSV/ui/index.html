@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Galaxy StarWalker Vision (GSV)</title>
 <style>
-:root{--bg:#0b0e14;--panel:#121826;--panel2:#0f1420;--line:#1e2a3d;--fg:#dbe4f0;--dim:#7c8ba3;--accent:#4fd1c5;--rust:#e8843c;--ok:#3fb96e;--warn:#e0a83c;--err:#e05b5b;--blue:#5b8de0}
+:root{--bg:#0b0e14;--panel:#121826;--panel2:#0f1420;--line:#1e2a3d;--fg:#dbe4f0;--dim:#7c8ba3;--accent:#4fd1c5;--rust:#e8843c;--ok:#3fb96e;--warn:#e0a83c;--err:#e05b5b;--blue:#5b8de0;--sprint:#a78bfa;--sprint-next:#c4b5fd;--sprint-pill-bg:rgba(167,139,250,0.2);--sprint-pill-border:rgba(167,139,250,0.4);--sprint-pill-color:#d4c4ff;--sprint-chip-bg:rgba(167,139,250,0.15);--sprint-chip-border:rgba(167,139,250,0.3);--sprint-open-border:rgba(167,139,250,0.35);--sprint-open-bg:rgba(167,139,250,0.08);--sprint-next-border:rgba(126,184,255,0.55);--sprint-next-glow:rgba(126,184,255,0.15);--sprint-closed-op:0.55}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 "Cascadia Code","Consolas",monospace}
 header{display:flex;align-items:center;gap:12px;padding:10px 18px;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5;flex-wrap:wrap}
@@ -33,6 +33,13 @@ pre.out{background:var(--panel2);border:1px solid var(--line);border-radius:6px;
 .vmap{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .vmap-col{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 10px;min-width:120px}
 .vmap-l{color:var(--blue);font-weight:600;font-size:12px}
+.sprint-pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:0.65rem;font-weight:600;background:var(--sprint-pill-bg);border:1px solid var(--sprint-pill-border);color:var(--sprint-pill-color)}
+.sprint-chip{font-size:0.6rem;padding:2px 6px;border-radius:4px;background:var(--sprint-chip-bg);border:1px solid var(--sprint-chip-border);color:var(--sprint-next)}
+.squeue{display:inline-block;padding:1px 7px;border-radius:6px;font-size:0.68rem;border:1px solid var(--line)}
+.squeue.open{border-color:var(--sprint-open-border);background:var(--sprint-open-bg)}
+.squeue.open .squeue-st{color:var(--sprint)}
+.squeue.next{border-color:var(--sprint-next-border);box-shadow:0 0 0 1px var(--sprint-next-glow)}
+.squeue.closed{opacity:var(--sprint-closed-op)}
 </style>
 </head>
 <body>
@@ -60,6 +67,7 @@ pre.out{background:var(--panel2);border:1px solid var(--line);border-radius:6px;
   <section class="card"><h2>Vision <span class="hint">/api/vision</span></h2><div class="body" id="b-vision">…</div></section>
   <section class="card"><h2>Vision Map <span class="hint">/api/vision/map · /assets/vision.svg</span></h2><div class="body" id="b-vision-map">…</div></section>
   <section class="card"><h2>Sprint Map <span class="hint">/api/vision/sprint-map</span></h2><div class="body" id="b-sprint-map">…</div></section>
+  <section class="card"><h2>Sprint Focus <span class="hint">/api/vision/sprint-focus.svg</span></h2><div class="body"><input id="focusSprint" type="text" value="" placeholder="sprint id (default: active)"><br><br><button onclick="loadSprintFocus()">Show focus</button><img id="i-sprint-focus" src="/api/vision/sprint-focus.svg" alt="sprint focus map" style="display:block;width:100%;margin-top:6px;border:1px solid var(--line);border-radius:8px;background:var(--panel2)"></div></section>
   <section class="card"><h2>Doc Preview <span class="hint">/api/vision/doc-preview?id=</span></h2><div class="body"><input id="dpId" type="text" value="galaxy_grid" placeholder="node id"><br><br><button onclick="loadDocPreview()">Show</button><div id="b-doc-preview" style="margin-top:8px">…</div></div></section>
   <section class="card"><h2>Vision Sync <span class="hint">/api/vision/sync</span></h2><div class="body"><button onclick="resyncVision()">Resync snapshot</button> <span id="b-vision-sync-status" class="dim">…</span><div id="b-vision-sync" style="margin-top:8px">…</div></div></section>
   <section class="card"><h2>Sprint Queue <span class="hint">/api/vision/sprint-queue</span></h2><div class="body" id="b-sprint-queue">…</div></section>
@@ -180,12 +188,13 @@ function renderDocPreview(d) {
 }
 function renderSprintQueue(d) {
   if (!d.ok) { $("b-sprint-queue").innerHTML = "<span class='err'>" + esc(d.error || "sprint queue unavailable") + "</span>"; return; }
-  $("b-sprint-queue").innerHTML = "<div class='dim'>rev <kbd>" + d.revision + "</kbd> · next <kbd>" + esc(d.next_sprint) +
-    "</kbd> · last closed <kbd>" + esc(d.last_sprint_closed) + "</kbd></div>" +
-    "<div>active <kbd>" + esc(d.active_sprint) + "</kbd> · open <span class='ok'>" + d.open_count + "</span></div>" +
+  $("b-sprint-queue").innerHTML = "<div class='dim'>rev <kbd>" + d.revision + "</kbd> · next <span class='sprint-pill'>" + esc(d.next_sprint) +
+    "</span> · last closed <kbd>" + esc(d.last_sprint_closed) + "</kbd></div>" +
+    "<div>active <span class='sprint-pill'>" + esc(d.active_sprint) + "</span> · open <span class='ok'>" + d.open_count + "</span></div>" +
     "<details style='margin-top:6px'><summary>planned (" + (d.planned || []).length + ")</summary>" +
     tab(["id", "status", "category", "title"], (d.planned || []).map(p =>
-      ["<kbd>" + esc(p.id) + "</kbd>", "<span class='" + (p.status === "closed" ? "ok" : "warn") + "'>" + esc(p.status) + "</span>", esc(p.category), esc(p.title)])) +
+      ["<span class='squeue " + (p.id === d.active_sprint ? "open" : (p.id === d.next_sprint ? "next" : "closed")) + "'>" + esc(p.id) + "</span>",
+       "<span class='squeue-st'>" + esc(p.status) + "</span>", esc(p.category), esc(p.title)])) +
     "</details>";
 }
 function bar(pct) {
@@ -196,14 +205,14 @@ function bar(pct) {
 }
 function renderSprintBoard(d) {
   if (!d.ok) { $("b-sprint-board").innerHTML = "<span class='err'>" + esc(d.error || "sprint board unavailable") + "</span>"; return; }
-  let out = "<div class='dim'>rev <kbd>" + d.revision + "</kbd> · next <kbd>" + esc(d.next_sprint) +
-    "</kbd> · active <kbd>" + esc(d.active_sprint) + "</kbd></div>" +
+  let out = "<div class='dim'>rev <kbd>" + d.revision + "</kbd> · next <span class='sprint-pill'>" + esc(d.next_sprint) +
+    "</span> · active <span class='sprint-pill'>" + esc(d.active_sprint) + "</span></div>" +
     "<div>open <span class='warn'>" + d.open_count + "</span> · closed <span class='ok'>" + d.closed_count +
     "</span> · total <span class='dim'>" + d.total + "</span></div>" + bar(d.progress_pct);
   for (const c of (d.columns || [])) {
     out += "<details style='margin-top:6px'><summary>" + esc(c.name) + " (" + c.count + ")</summary>" +
       tab(["id", "status", "title"], (c.entries || []).map(e =>
-        ["<kbd>" + esc(e.id) + "</kbd>", "<span class='" + (e.status === "closed" ? "ok" : "warn") + "'>" + esc(e.status) + "</span>", esc(e.title)])) +
+        ["<span class='squeue " + (e.id === d.active_sprint ? "open" : (e.status === "closed" ? "closed" : "")) + "'>" + esc(e.id) + "</span>", "<span class='squeue-st'>" + esc(e.status) + "</span>", esc(e.title)])) +
       "</details>";
   }
   $("b-sprint-board").innerHTML = out;
@@ -321,6 +330,21 @@ async function loadDocPreview() {
     renderDocPreview(d);
   } catch (e) { $("b-doc-preview").innerHTML = "<span class='err'>" + esc(e.message) + "</span>"; }
 }
+async function loadSprintTheme() {
+  try {
+    const d = await get("api/vision/sprint-theme");
+    if (!d.ok) return;
+    const set = (k, v) => { if (v) document.documentElement.style.setProperty(k, v); };
+    set("--sprint", d.sprint); set("--sprint-next", d.sprint_next);
+    set("--sprint-pill-bg", d.pill && d.pill.bg); set("--sprint-pill-border", d.pill && d.pill.border); set("--sprint-pill-color", d.pill && d.pill.color);
+    set("--sprint-chip-bg", d.chip && d.chip.bg); set("--sprint-chip-border", d.chip && d.chip.border);
+    if (d.queue) { set("--sprint-open-border", d.queue.open_border); set("--sprint-open-bg", d.queue.open_bg); set("--sprint-next-border", d.queue.next_border); set("--sprint-next-glow", d.queue.next_glow); set("--sprint-closed-op", d.queue.closed_opacity); }
+  } catch (e) { /* theme is optional */ }
+}
+function loadSprintFocus() {
+  const q = ($("focusSprint") || {}).value || "";
+  $("i-sprint-focus").src = "api/vision/sprint-focus.svg" + (q ? "?sprint=" + encodeURIComponent(q) : "");
+}
 async function resyncVision() {
   $("b-vision-sync-status").textContent = "syncing…";
   try { renderVisionSync(await get("api/vision/sync")); await resync(); }
@@ -378,6 +402,7 @@ function connectSse() {
   es.addEventListener("ready", () => resync());
 }
 resync();
+loadSprintTheme();
 connectSse();
 setInterval(() => get("api/health").then(renderHealth).catch(() => setOffline(true)), 30000);
 </script>

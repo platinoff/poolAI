@@ -265,7 +265,7 @@ FM-xxx (з таблиці нижче)
 
 **VDT:** §5.12 = **журнал PH-S*** (≤10 відкритих). Якщо **< 10** — **`абракадабра`** / project scan **всього проєкту**: concept → FM **§5.1** → roadmaps → architect → DOCS_LEGACY → code → §5.13 fallback. Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Project scan». **Rust-first:** API → `tests/`; Playwright лише browser scope.
 
-**Відкритих у §5.12:** **0** (band 117 ✅). **Master horizon:** PH-S1819…S1828 (band 118). Vision rev **470**.
+**Відкритих у §5.12:** **0** (band 118 ✅). **Master horizon:** PH-S1829…S1838 (band 119). Vision rev **471**.
 
 **Историчний research backlog (PH-S65+):**
 
@@ -1493,6 +1493,23 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1751 | **PH-S1816** | poolAI vision parity | docs canon | `docs/vision/README.md`; FM §5.12 §5.98; `GSV_TECH_ROADMAP.md` band 117; poolAI HANDOFF/NEXT band 117 | **[x]** |
 | 1752 | **PH-S1817** | Ratio hold advisory | GSV_ROLES | `gsv-loc-audit --min-ratio 0.95 --advisory` ≥95% + poolAI ratio96 advisory hold; vision-sync rev 470 (poolai + gsv + --check) | **[x]** |
 | 1753 | **PH-S1818** | Band close | GSV_ROLES | ratio hold; fmt/clippy/test (poolAI test-ci + GSV 153+); docs canon; vision-sync rev 470; push | **[x]** |
+
+### 5.99 GSV sprint UI migration queue — band 118 (PH-S1819…S1828, 2026-08-08) · **✅**
+
+**Джерело:** owner priority (master horizon band 118): migrate legacy Galaxy sprint UI colors + behavior into GSV, recreated in Rust — sprint theme wire (colors), Rust-rendered sprint focus SVG, sprint-pill/queue-state colors. Legacy sprint UI: [`docs/vision/vision.css`](../vision/vision.css) (lines 40, 430–450, 2088–2275) · [`docs/vision/vision.js`](../vision/vision.js) (lines ~84, 659–676, 2131–2170). GSV: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV/docs/LEGACY_PARITY.md`](../../GSV/docs/LEGACY_PARITY.md). Cursor rules migration (legacy `.md` → `.mdc`) **deferred** to a later band.
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1754 | **PH-S1819** | Scope + queue | owner priority | Define band 118 (GSV sprint UI migration) у FM §5.99 + §5.12 header (master horizon) | **[x]** |
+| 1755 | **PH-S1820** | Sprint theme wire | GSV canon | `SprintThemeReport` + `sprint_theme_report()` + `wire_sprint_theme` → `GET /api/vision/sprint-theme`: sprint `#a78bfa`, next `#c4b5fd`, open/next/closed queue colors, layer L0–L5, edge-kind colors | **[x]** |
+| 1756 | **PH-S1821** | Sprint focus SVG | GSV canon | Rust `sprint_focus_svg()` → `GET /api/vision/sprint-focus.svg?sprint=` — sprint-dim style (sprint nodes highlighted, others opacity 0.22); default active sprint; empty-state svg | **[x]** |
+| 1757 | **PH-S1822** | Contracts | GSV tests | `gsv_vision_contracts` (theme colors + focus svg real-workspace) + `gsv_server_contracts` (theme + focus endpoints) | **[x]** |
+| 1758 | **PH-S1823** | UI sprint colors | GSV canon | `GSV/ui/index.html`: sprint-pill + queue open/next/closed colors (theme wire) + focus `<img>` in Sprint cards | **[x]** |
+| 1759 | **PH-S1824** | GSV docs canon | GSV canon | `VISION.md` +band 118 (theme + focus endpoints); MEMORY band 118; GSV HANDOFF/NEXT band 118 | **[x]** |
+| 1760 | **PH-S1825** | poolAI vision parity | docs canon | `docs/vision/README.md`; FM §5.12 §5.99; `GSV_TECH_ROADMAP.md` band 118 | **[x]** |
+| 1761 | **PH-S1826** | Ratio hold advisory | GSV_ROLES | `gsv-loc-audit --min-ratio 0.95 --advisory` ≥95% + poolAI ratio96 advisory hold | **[x]** |
+| 1762 | **PH-S1827** | poolai-vision-sync close | docs canon | `poolai-vision-sync` rev **471** (band 118); `--check` ok; sprint-queue/feed updated | **[x]** |
+| 1763 | **PH-S1828** | Band close | GSV_ROLES | ratio hold; fmt/clippy/test (poolAI test-ci + GSV 153); docs canon; vision-sync rev 471; push | **[x]** |
 
 ### 5.88 Ratio96 docs canon queue — band 107 (PH-S1709…S1718, 2026-08-02) · **✅**
 

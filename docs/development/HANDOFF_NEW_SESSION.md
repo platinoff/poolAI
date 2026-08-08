@@ -1,9 +1,9 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-08-07 (band 117 **GSV legacy vision deactivation** PH-S1809…S1818 **✅** · band 118 open PH-S1819…S1828 · Vision rev 470)
+**Оновлено:** 2026-08-08 (band 118 **GSV sprint UI migration** PH-S1819…S1828 **✅** · band 119 open PH-S1829…S1838 · Vision rev 471)
 
 **Наступна сесія:** **`абракадабра`** — див. **канон воркфлоу в [AGENTS.md](../../AGENTS.md §100–113)**.
-**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1819…S1828; черга — FM §5.12 → band 118) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1829…S1838; черга — FM §5.12 → band 119) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
 
 --- 
 
@@ -233,6 +233,34 @@ RUST_DIAGNOSTICS → GSV; legacy test retirement: `poolai_vision_sync.rs` unit �
 pointer assertions, `VISION_MAP_BAND40_ROWS` markers; `LEGACY_PARITY.md`/`GSV_MIGRATION.md`/
 `VISION.md`/`GSV_TECH_ROADMAP.md` band 117; GSV MEMORY/HANDOFF/NEXT band 117; GSV ratio **95.26%**
 gate ✅ + poolAI advisory hold; vision rev **470**.
+
+## Band 118 — GSV sprint UI migration (PH-S1819…S1828, **✅**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1819** | Scope + queue (`docs/catalog/FUNCTION_MANAGEMENT.md` §5.99 band 118 PH-S1819…S1828; §5.12 header master horizon) |
+| **PH-S1820** | Sprint theme wire (`SprintThemeReport` + `sprint_theme_report`/`wire_sprint_theme` → `GET /api/vision/sprint-theme`: sprint `#a78bfa`/next `#c4b5fd`, pill/chip/queue colors, layers L0–L5, edge-kind palettes) |
+| **PH-S1821** | Sprint focus SVG (`sprint_token_matches`/`path_matches_glob`/`nodes_for_sprint` + `sprint_focus_svg` → `GET /api/vision/sprint-focus.svg?sprint=`: sprint-dim in-scope accent / out-of-scope opacity 0.22/text 0.28; default active sprint; empty-state) |
+| **PH-S1822** | Contracts (`gsv_vision_contracts` theme real-workspace + wire + focus svg; `gsv_server_contracts` theme + focus endpoints) |
+| **PH-S1823** | UI sprint colors (`--sprint*` CSS-змінні + sprint-pill/queue chips у Sprint Queue/Board cards; Sprint Focus card + `loadSprintTheme`/`loadSprintFocus`) |
+| **PH-S1824** | GSV vision docs canon (`VISION.md` +band 118; MEMORY band 118; GSV HANDOFF/NEXT band 118) |
+| **PH-S1825** | poolAI vision parity (`docs/vision/README.md`; FM §5.12 §5.99; `GSV_TECH_ROADMAP.md` band 118; poolAI HANDOFF/NEXT band 118) |
+| **PH-S1826** | Ratio hold advisory (`gsv-loc-audit --min-ratio 0.95 --advisory` **95.35%** + poolAI ratio96 advisory hold) |
+| **PH-S1827** | poolai-vision-sync close (rev **471**; `--check` ok; sprint-queue/feed updated) |
+| **PH-S1828** | Band close (ratio hold; fmt/clippy/test GSV **163**; docs canon; vision-sync rev 471; push) |
+
+**PH-S1819…S1828 ✅ (2026-08-08):** GSV sprint UI migration:
+`SprintThemeReport`/`SprintPillTheme`/`SprintChipTheme`/`SprintQueueStateTheme` +
+`sprint_theme_report`/`wire_sprint_theme` → `GET /api/vision/sprint-theme` (sprint `#a78bfa`/
+next `#c4b5fd`, pill/chip/queue colors, layer L0–L5 + edge-kind palettes, revision/git_head/
+active/next); `sprint_token_matches`/`path_matches_glob`/`nodes_for_sprint`/`sprint_focus_svg`
+→ `GET /api/vision/sprint-focus.svg?sprint=` (sprint-dim: in-scope accent, out-of-scope
+opacity 0.22/text 0.28, edges tinted; default active sprint; empty-state); contracts **163**
+(71 unit + 8 omni + 7 ratio + 25 server + 8 update + 44 vision), clippy **0**, fmt clean;
+`--sprint*` CSS-змінні + sprint-pill/queue chips у Sprint Queue/Board cards + Sprint Focus
+card (`<img id="i-sprint-focus">`); `VISION.md`/`MEMORY.md`/GSV HANDOFF/NEXT/`GSV_MIGRATION.md`/
+`GSV_TECH_ROADMAP.md` band 118; poolAI vision README parity; GSV ratio **95.35%**
+(rust 8328 / product 8734, gate ≥95% ✅) + poolAI **95.04%** advisory hold; vision rev **471**.
 
 ## Band 109 — GSV vision sync/migration (PH-S1729…S1738, **✅**)
 

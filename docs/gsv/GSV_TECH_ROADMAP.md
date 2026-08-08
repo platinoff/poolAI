@@ -197,6 +197,21 @@ docs/architecture (✅ ця сесія)
 | **PH-S1817** | Ratio + rev prep | ratio hold advisory (**95.26%**); vision-sync rev 470 (poolai + gsv + --check) |
 | **PH-S1818** | Band close | ratio hold; fmt/clippy/test (poolAI test-ci + GSV 153); docs canon; vision-sync rev 470; push |
 
+## Спринти (band 118) — GSV sprint UI migration (theme + focus map)
+
+| Sprint | Фокус | Acceptance (ключ) |
+|--------|-------|-------------------|
+| **PH-S1819** | Scope + queue | FM §5.99 band 118 (PH-S1819…S1828) + §5.12 header (master horizon) |
+| **PH-S1820** | Sprint theme wire | `SprintThemeReport`/`SprintPillTheme`/`SprintChipTheme`/`SprintQueueStateTheme`/`SprintLayerColor`/`SprintEdgeKindColor` + `sprint_theme_report`/`wire_sprint_theme` → `GET /api/vision/sprint-theme` (sprint `#a78bfa`/next `#c4b5fd`, pill/chip/queue colors, layers L0–L5, edge kinds) |
+| **PH-S1821** | Sprint focus SVG | `sprint_token_matches`/`path_matches_glob`/`nodes_for_sprint` + `sprint_focus_svg` → `GET /api/vision/sprint-focus.svg?sprint=` (sprint-dim: in-scope accent, out-of-scope opacity 0.22/text 0.28, edges tinted; default active sprint; empty-state) |
+| **PH-S1822** | Contracts | `gsv_vision_contracts` (theme real-workspace + wire shapes + focus svg highlight/dim/empty) + `gsv_server_contracts` (theme + focus endpoints) |
+| **PH-S1823** | UI sprint colors | `GSV/ui/index.html`: `--sprint*` CSS-змінні + sprint-pill/queue chips у Sprint Queue/Board cards; Sprint Focus card (`<img id="i-sprint-focus">`) + `loadSprintTheme`/`loadSprintFocus` |
+| **PH-S1824** | GSV vision docs canon | `VISION.md` +band 118 (theme + focus endpoints/section); MEMORY band 118; GSV HANDOFF/NEXT band 118 |
+| **PH-S1825** | poolAI vision parity | `docs/vision/README.md`; FM §5.12 §5.99; цей файл band 118 |
+| **PH-S1826** | Ratio hold advisory | `gsv-loc-audit --min-ratio 0.95 --advisory` ≥95% (**95.35%**) + poolAI ratio96 advisory hold |
+| **PH-S1827** | poolai-vision-sync close | `poolai-vision-sync` rev **471** (band 118); `--check` ok; sprint-queue/feed updated |
+| **PH-S1828** | Band close | ratio hold; fmt/clippy/test (**163**); docs canon; vision-sync rev 471; push |
+
 ## Ключові UX-вимоги (узагальнення ТЗ)
 
 1. Оновлюємо/дебажимо vision Rust-кодбазу, запущена **bin-версія** → сервер приймає **повідомлення про апдейт**.

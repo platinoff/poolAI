@@ -66,6 +66,25 @@ async fn post(app: &axum::Router, path: &str, body: Value) -> (StatusCode, Value
     (status, json)
 }
 
+async fn get_text(app: &axum::Router, path: &str) -> (StatusCode, String) {
+    let res = app
+        .clone()
+        .oneshot(
+            Request::builder()
+                .uri(path)
+                .method(Method::GET)
+                .body(Body::empty())
+                .expect("request"),
+        )
+        .await
+        .expect("response");
+    let status = res.status();
+    let bytes = axum::body::to_bytes(res.into_body(), usize::MAX)
+        .await
+        .expect("body");
+    (status, String::from_utf8_lossy(&bytes).into_owned())
+}
+
 #[tokio::test]
 async fn index_serves_gsv_ui() {
     let (app, _state) = app();
@@ -362,4 +381,52 @@ async fn vision_rust_diagnostics_endpoint() {
     assert!(json["rust_diagnostics"]["latest"]["ok"].is_boolean());
     assert!(json["rust_diagnostics"]["history_count"].is_u64());
     assert!(json["rust_diagnostics"]["latest"]["top_codes"].is_array());
+}
+
+#[tokio::test]
+async fn vision_sprint_theme_endpoint() {
+    let (app, _state) = app();
+    let (status, json) = get(&app, "/api/vision/sprint-theme").await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(json["ok"], true);
+    assert!(json["revision"].as_u64().unwrap_or(0) > 0);
+    assert!(!json["active_sprint"].as_str().unwrap_or("").is_empty());
+    assert_eq!(json["next_sprint"], json["active_sprint"]);
+    assert_eq!(json["sprint"], "#a78bfa");
+    assert_eq!(json["sprint_next"], "#c4b5fd");
+    assert_eq!(json["pill"]["bg"], "rgba(167, 139, 250, 0.2)");
+    assert_eq!(json["pill"]["border"], "rgba(167, 139, 250, 0.4)");
+    assert_eq!(json["pill"]["color"], "#d4c4ff");
+    assert_eq!(json["chip"]["bg"], "rgba(167, 139, 250, 0.15)");
+    assert_eq!(json["queue"]["open_border"], "rgba(167, 139, 250, 0.35)");
+    assert_eq!(json["queue"]["open_status"], "#a78bfa");
+    assert_eq!(json["queue"]["next_border"], "rgba(126, 184, 255, 0.55)");
+    assert_eq!(json["queue"]["closed_opacity"], "0.55");
+    let layers = json["layers"].as_array().expect("layers array");
+    assert!(!layers.is_empty());
+    for layer in layers {
+        assert!(layer["id"].as_str().unwrap_or("").starts_with('L'));
+        assert!(layer["color"].as_str().unwrap_or("").starts_with('#'));
+    }
+    let kinds = json["edge_kinds"].as_array().expect("edge kinds array");
+    assert!(!kinds.is_empty());
+    for kind in kinds {
+        assert!(!kind["kind"].as_str().unwrap_or("").is_empty());
+        assert!(kind["color"].as_str().unwrap_or("").starts_with('#'));
+    }
+}
+
+#[tokio::test]
+async fn vision_sprint_focus_svg_endpoint() {
+    let (app, _state) = app();
+    let (status, svg) = get_text(&app, "/api/vision/sprint-focus.svg").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(svg.starts_with("<svg"));
+    assert!(svg.contains("sprint focus:"));
+
+    let (status, svg) = get_text(&app, "/api/vision/sprint-focus.svg?sprint=PH-S146").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(svg.starts_with("<svg"));
+    assert!(svg.contains("sprint focus: PH-S146"));
+    assert!(svg.contains("#a78bfa"));
 }

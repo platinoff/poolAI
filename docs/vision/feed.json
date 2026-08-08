@@ -3,6 +3,96 @@
   "items": [
     {
       "category": "closed",
+      "id": "PH-S1828",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "ratio hold; fmt/clippy/test (poolAI test-ci + GSV 153); docs canon; vision-sync rev 471; push",
+      "title": "Band close"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1827",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "poolai-vision-sync` rev 471 (band 118); `--check` ok; sprint-queue/feed updated",
+      "title": "poolai-vision-sync close"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1826",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "gsv-loc-audit --min-ratio 0.95 --advisory` ≥95% + poolAI ratio96 advisory hold",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1825",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "docs/vision/README.md`; FM §5.12 §5.99; `GSV_TECH_ROADMAP.md` band 118",
+      "title": "poolAI vision parity"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1824",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "VISION.md` +band 118 (theme + focus endpoints); MEMORY band 118; GSV HANDOFF/NEXT band 118",
+      "title": "GSV docs canon"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1823",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "GSV/ui/index.html`: sprint-pill + queue open/next/closed colors (theme wire) + focus `<img>` in Sprint cards",
+      "title": "UI sprint colors"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1822",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "gsv_vision_contracts` (theme colors + focus svg real-workspace) + `gsv_server_contracts` (theme + focus endpoints)",
+      "title": "Contracts"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1821",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "Rust `sprint_focus_svg()` → `GET /api/vision/sprint-focus.svg?sprint=` — sprint-dim style (sprint nodes highlighted, others opacity 0.22); default active sprint; empty-state svg",
+      "title": "Sprint focus SVG"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1820",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "SprintThemeReport` + `sprint_theme_report()` + `wire_sprint_theme` → `GET /api/vision/sprint-theme`: sprint `#a78bfa`, next `#c4b5fd`, open/next/closed queue colors, layer L0–L5, edge-kind colors",
+      "title": "Sprint theme wire"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1819",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "Define band 118 (GSV sprint UI migration) у FM §5.99 + §5.12 header (master horizon)",
+      "title": "Scope + queue"
+    },
+    {
+      "category": "closed",
       "id": "PH-S1818",
       "link": "http://127.0.0.1:8891/#b-sprint-board",
       "published": "2026-05-28",
@@ -18,96 +108,6 @@
       "status": "closed",
       "summary": "gsv-loc-audit --min-ratio 0.95 --advisory` ≥95% + poolAI ratio96 advisory hold; vision-sync rev 470 (poolai + gsv + --check)",
       "title": "Ratio hold advisory"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1816",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "docs/vision/README.md`; FM §5.12 §5.98; `GSV_TECH_ROADMAP.md` band 117; poolAI HANDOFF/NEXT band 117",
-      "title": "poolAI vision parity"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1815",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "VISION.md` +band 117; MEMORY band 117; GSV HANDOFF/NEXT band 117",
-      "title": "GSV vision docs canon"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1814",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "LEGACY_PARITY.md` band 117 (index/JS/CSS deactivated); `GSV_MIGRATION.md` vision.js/css row +band 117",
-      "title": "GSV parity docs"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1813",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "Update legacy-content tests: `poolai_vision_sync.rs` unit ×4 + `galaxy_horizon_s1011/s1019/s1039` → assert deactivated pointer state",
-      "title": "Legacy test retirement"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1812",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "poolai-vision-sync` feed links (`docs/vision/index.html#sprint-queue`) → GSV; GSV `vision.rs` sample links; RUN_LOCAL/GSV_SERVER/gsv README/SPEED_INDEX/RUST_DIAGNOSTICS links → GSV",
-      "title": "Live link retarget"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1811",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "DEACTIVATED banner у `docs/vision/vision.js` + `vision.css`; deactivation note у `docs/vision/README.md` (files лишаються — canon)",
-      "title": "Legacy JS/CSS deactivation"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1810",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "Rewrite `docs/vision/index.html` → minimal GSV pointer page (no `vision.js`/`vision.css` refs; canonical GSV links)",
-      "title": "Legacy index deactivation"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1809",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "Define band 117 (legacy vision deactivation) у FM §5.98 + §5.12 header (master horizon)",
-      "title": "Scope + queue"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1808",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync rev 469; push",
-      "title": "Band close"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1807",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "docs/vision/README.md`; FM §5.12 §5.97; `GSV_TECH_ROADMAP.md` band 116; poolAI HANDOFF/NEXT band 116",
-      "title": "poolAI vision parity"
     }
   ],
   "link": "http://127.0.0.1:8891/",

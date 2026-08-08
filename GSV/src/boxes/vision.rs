@@ -122,7 +122,7 @@ pub struct Feed {
 ///
 /// Only the planning-relevant fields are typed; `scopes` (scope-id → meta) is
 /// kept opaque so new extension metadata does not break the snapshot.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]
 pub struct Extensions {
     #[serde(default)]
     pub active_sprint: String,
@@ -1634,6 +1634,377 @@ pub fn wire_sprint_progress(repo_root: &Path, data_dir: &Path) -> Value {
     }
 }
 
+// ---------------------------------------------------------------------------
+// Sprint UI theme (band 118): colors ported from the legacy vision.css
+// (`--sprint: #a78bfa`, sprint-pill/chip/queue-state rules) so GSV renders the
+// galaxy sprint UI with the same look as the deactivated docs/vision/index.html.
+// ---------------------------------------------------------------------------
+
+/// Sprint-pill theme (legacy `.sprint-pill`).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct SprintPillTheme {
+    pub bg: String,
+    pub border: String,
+    pub color: String,
+}
+
+/// Sprint-chip theme (legacy `.sprint-chip`).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct SprintChipTheme {
+    pub bg: String,
+    pub border: String,
+    pub color: String,
+}
+
+/// Sprint-queue state colors (legacy `.sprint-queue-item.open/.next/.closed`).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct SprintQueueStateTheme {
+    pub open_border: String,
+    pub open_bg: String,
+    pub open_status: String,
+    pub next_border: String,
+    pub next_glow: String,
+    pub closed_opacity: String,
+}
+
+/// Per-layer fill color (legacy `--L0…--L5`).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct SprintLayerColor {
+    pub id: String,
+    pub color: String,
+}
+
+/// Per-edge-kind color (legacy `--edge-docs/--edge-code/--edge-toml`).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct SprintEdgeKindColor {
+    pub kind: String,
+    pub color: String,
+}
+
+/// Sprint UI theme report (`/api/vision/sprint-theme`).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct SprintThemeReport {
+    pub revision: u64,
+    pub git_head: String,
+    pub active_sprint: String,
+    pub next_sprint: String,
+    pub sprint: String,
+    pub sprint_next: String,
+    pub pill: SprintPillTheme,
+    pub chip: SprintChipTheme,
+    pub queue: SprintQueueStateTheme,
+    pub layers: Vec<SprintLayerColor>,
+    pub edge_kinds: Vec<SprintEdgeKindColor>,
+}
+
+const SPRINT_ACCENT: &str = "#a78bfa";
+const SPRINT_NEXT_COLOR: &str = "#c4b5fd";
+const QUEUE_NEXT_BORDER: &str = "rgba(126, 184, 255, 0.55)";
+const QUEUE_NEXT_GLOW: &str = "rgba(126, 184, 255, 0.15)";
+
+/// Layer palette keyed by manifest layer id (legacy `--L0…--L5`).
+fn sprint_layer_color(layer_id: &str) -> String {
+    match layer_id {
+        "L0" => "#3d6a9e".to_string(),
+        "L1" => "#3d6a4a".to_string(),
+        "L2" => "#8a7040".to_string(),
+        "L3" => "#8a4068".to_string(),
+        "L4" => "#6a5088".to_string(),
+        "L5" => "#4a6880".to_string(),
+        _ => "#7eb8ff".to_string(),
+    }
+}
+
+/// Edge-kind palette (legacy `--edge-docs/--edge-code/--edge-toml`); unknown
+/// kinds fall back to the accent blue.
+fn sprint_edge_kind_color(kind: &str) -> String {
+    match kind {
+        "docs" => "#90c490".to_string(),
+        "code" => "#c49ab0".to_string(),
+        "toml" => "#7eb8c4".to_string(),
+        _ => "#7eb8ff".to_string(),
+    }
+}
+
+/// Build the sprint UI theme from the live manifest + extensions.
+pub fn sprint_theme_report(repo_root: &Path, data_dir: &Path) -> Result<SprintThemeReport, String> {
+    let m = source_manifest(repo_root, data_dir)?;
+    let e = source_extensions(repo_root, data_dir)?;
+    let mut layers: Vec<SprintLayerColor> = m
+        .layers
+        .iter()
+        .map(|l| SprintLayerColor {
+            id: l.id.clone(),
+            color: sprint_layer_color(&l.id),
+        })
+        .collect();
+    layers.sort_by(|a, b| a.id.cmp(&b.id));
+    let mut kinds: std::collections::BTreeMap<String, String> = std::collections::BTreeMap::new();
+    for edge in &m.edges {
+        kinds
+            .entry(edge.kind.clone())
+            .or_insert_with(|| sprint_edge_kind_color(&edge.kind));
+    }
+    let edge_kinds: Vec<SprintEdgeKindColor> = kinds
+        .into_iter()
+        .map(|(kind, color)| SprintEdgeKindColor { kind, color })
+        .collect();
+    Ok(SprintThemeReport {
+        revision: m.revision,
+        git_head: m.git_head,
+        active_sprint: e.active_sprint,
+        next_sprint: m.next_sprint,
+        sprint: SPRINT_ACCENT.to_string(),
+        sprint_next: SPRINT_NEXT_COLOR.to_string(),
+        pill: SprintPillTheme {
+            bg: "rgba(167, 139, 250, 0.2)".to_string(),
+            border: "rgba(167, 139, 250, 0.4)".to_string(),
+            color: "#d4c4ff".to_string(),
+        },
+        chip: SprintChipTheme {
+            bg: "rgba(167, 139, 250, 0.15)".to_string(),
+            border: "rgba(167, 139, 250, 0.3)".to_string(),
+            color: SPRINT_NEXT_COLOR.to_string(),
+        },
+        queue: SprintQueueStateTheme {
+            open_border: "rgba(167, 139, 250, 0.35)".to_string(),
+            open_bg: "rgba(167, 139, 250, 0.08)".to_string(),
+            open_status: SPRINT_ACCENT.to_string(),
+            next_border: QUEUE_NEXT_BORDER.to_string(),
+            next_glow: QUEUE_NEXT_GLOW.to_string(),
+            closed_opacity: "0.55".to_string(),
+        },
+        layers,
+        edge_kinds,
+    })
+}
+
+/// `GET /api/vision/sprint-theme` — sprint UI theme colors.
+pub fn wire_sprint_theme(repo_root: &Path, data_dir: &Path) -> Value {
+    match sprint_theme_report(repo_root, data_dir) {
+        Ok(r) => {
+            let mut v = serde_json::to_value(&r).unwrap_or_default();
+            if let serde_json::Value::Object(map) = &mut v {
+                map.insert("ok".to_string(), serde_json::Value::Bool(true));
+            }
+            v
+        }
+        Err(e) => json!({ "ok": false, "error": e }),
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Sprint focus SVG (band 118): Rust-rendered galaxy map with the target sprint
+// highlighted and out-of-scope nodes/edges dimmed (legacy `sprint-dim`:
+// circle opacity 0.22 / text 0.28). Rendered server-side so the UI stays
+// ratio-safe (no client chart/map code).
+// ---------------------------------------------------------------------------
+
+/// Sprint token match (legacy `sprintTokenMatches`): exact id or `PH-S*` glob.
+pub fn sprint_token_matches(token: &str, sprint: &str) -> bool {
+    if token.is_empty() || sprint.is_empty() {
+        return false;
+    }
+    if token == sprint {
+        return true;
+    }
+    if let Some(prefix) = token.strip_suffix('*') {
+        return sprint.starts_with(prefix);
+    }
+    false
+}
+
+/// Glob match for node paths (legacy `pathMatchesGlob`): `**` crosses `/`,
+/// `*` matches a non-`/` run, everything else is a literal.
+fn path_matches_glob(path: &str, glob: &str) -> bool {
+    if let Some(prefix) = glob.strip_suffix("/**") {
+        return path.starts_with(prefix);
+    }
+    let path: Vec<char> = path.chars().collect();
+    let glob: Vec<char> = glob.chars().collect();
+    fn match_at(path: &[char], glob: &[char]) -> bool {
+        match glob.first() {
+            None => path.is_empty(),
+            Some('*') => {
+                let double = glob.get(1) == Some(&'*');
+                let rest = if double { &glob[2..] } else { &glob[1..] };
+                if match_at(path, rest) {
+                    return true;
+                }
+                if let Some((&first, tail)) = path.split_first() {
+                    if !double && first == '/' {
+                        return false;
+                    }
+                    match_at(tail, glob)
+                } else {
+                    false
+                }
+            }
+            Some(&want) => match path.split_first() {
+                Some((&got, tail)) if got == want => match_at(tail, &glob[1..]),
+                _ => false,
+            },
+        }
+    }
+    match_at(&path, &glob)
+}
+
+/// Node ids in scope for a sprint: nodes whose `sprints[]` token-matches the
+/// sprint, plus nodes whose path lands in a matching extension scope's docs or
+/// code globs (legacy `buildSprintPathSet` + `nodesForSprint`).
+fn nodes_for_sprint(
+    m: &Manifest,
+    e: &Extensions,
+    sprint: &str,
+) -> std::collections::BTreeSet<String> {
+    let mut ids = std::collections::BTreeSet::new();
+    if sprint.is_empty() {
+        return ids;
+    }
+    let mut scope_globs: Vec<String> = Vec::new();
+    let mut scope_docs: Vec<String> = Vec::new();
+    for scope in e.scopes.values() {
+        let sprints: Vec<String> = scope
+            .get("sprints")
+            .and_then(Value::as_array)
+            .map(|a| {
+                a.iter()
+                    .filter_map(Value::as_str)
+                    .map(str::to_string)
+                    .collect()
+            })
+            .unwrap_or_default();
+        if !sprints.iter().any(|t| sprint_token_matches(t, sprint)) {
+            continue;
+        }
+        if let Some(docs) = scope.get("docs").and_then(Value::as_array) {
+            scope_docs.extend(
+                docs.iter()
+                    .filter_map(Value::as_str)
+                    .map(|p| p.trim_start_matches('/').to_string()),
+            );
+        }
+        for key in ["code_globs", "also_update"] {
+            if let Some(globs) = scope.get(key).and_then(Value::as_array) {
+                scope_globs.extend(globs.iter().filter_map(Value::as_str).map(str::to_string));
+            }
+        }
+    }
+    for n in &m.nodes {
+        let token_match = n.sprints.iter().any(|t| sprint_token_matches(t, sprint));
+        let scope_match = scope_docs.contains(&n.path)
+            || scope_globs.iter().any(|g| path_matches_glob(&n.path, g));
+        if token_match || scope_match {
+            ids.insert(n.id.clone());
+        }
+    }
+    ids
+}
+
+/// `GET /api/vision/sprint-focus.svg?sprint=` — sprint focus map (SVG).
+///
+/// Layout: one row per layer (L0…L5), nodes spread left-to-right. In-scope
+/// nodes render at full opacity with the sprint accent; out-of-scope nodes use
+/// `sprint-dim` (circle 0.22 / text 0.28). Edges touching in-scope nodes are
+/// tinted, others dimmed. Empty state when the sprint has no nodes.
+pub fn sprint_focus_svg(repo_root: &Path, data_dir: &Path, sprint: &str) -> String {
+    let Ok(m) = source_manifest(repo_root, data_dir) else {
+        return svg_empty("Sprint focus", "no manifest snapshot available");
+    };
+    let e = source_extensions(repo_root, data_dir).unwrap_or_default();
+    let focus = if sprint.is_empty() {
+        if e.active_sprint.is_empty() {
+            m.next_sprint.clone()
+        } else {
+            e.active_sprint.clone()
+        }
+    } else {
+        sprint.to_string()
+    };
+    let in_scope = nodes_for_sprint(&m, &e, &focus);
+    if in_scope.is_empty() {
+        return svg_empty(
+            &format!("Sprint focus: {focus}"),
+            "no galaxy nodes reference this sprint yet",
+        );
+    }
+    let mut layers_sorted: Vec<&Layer> = m.layers.iter().collect();
+    layers_sorted.sort_by_key(|l| l.z);
+    let width = 900.0_f64;
+    let row_h = 34.0_f64;
+    let header_h = 26.0_f64;
+    let height = header_h + layers_sorted.len() as f64 * row_h + 20.0_f64;
+    let mut positions: std::collections::HashMap<String, (f64, f64)> =
+        std::collections::HashMap::new();
+    let mut body = String::new();
+    let mut in_scope_count = 0u64;
+    for (li, layer) in layers_sorted.iter().enumerate() {
+        let mut nodes: Vec<&ManifestNode> =
+            m.nodes.iter().filter(|n| n.layer == layer.id).collect();
+        nodes.sort_by(|a, b| a.id.cmp(&b.id));
+        if nodes.is_empty() {
+            continue;
+        }
+        let cy = header_h + li as f64 * row_h + row_h / 2.0;
+        let step = (width - 40.0) / nodes.len() as f64;
+        for (i, n) in nodes.iter().enumerate() {
+            let cx = 20.0 + i as f64 * step + step / 2.0;
+            positions.insert(n.id.clone(), (cx, cy));
+            let scope = in_scope.contains(&n.id);
+            if scope {
+                in_scope_count += 1;
+                body.push_str(&format!(
+                    r##"<circle cx="{cx:.1}" cy="{cy:.1}" r="4" fill="{SPRINT_ACCENT}"><title>{id}</title></circle>"##,
+                    id = n.id
+                ));
+                body.push_str(&format!(
+                    r##"<text x="{cx:.1}" y="{ty:.1}" font-family="monospace" font-size="9" fill="#d4c4ff">{label}</text>"##,
+                    ty = cy + 13.0,
+                    label = n.label
+                ));
+            } else {
+                body.push_str(&format!(
+                    r##"<circle cx="{cx:.1}" cy="{cy:.1}" r="3" fill="{color}" opacity="0.22"><title>{id}</title></circle>"##,
+                    color = sprint_layer_color(&n.layer),
+                    id = n.id
+                ));
+            }
+        }
+    }
+    let mut edges_svg = String::new();
+    for edge in &m.edges {
+        let Some(&(fx, fy)) = positions.get(&edge.from) else {
+            continue;
+        };
+        let Some(&(tx, ty)) = positions.get(&edge.to) else {
+            continue;
+        };
+        let from_scope = in_scope.contains(&edge.from);
+        let to_scope = in_scope.contains(&edge.to);
+        if from_scope || to_scope {
+            edges_svg.push_str(&format!(
+                r##"<line x1="{fx:.1}" y1="{fy:.1}" x2="{tx:.1}" y2="{ty:.1}" stroke="#a78bfa" stroke-width="1" opacity="0.55"><title>{kind}</title></line>"##,
+                kind = edge.kind
+            ));
+        } else {
+            edges_svg.push_str(&format!(
+                r##"<line x1="{fx:.1}" y1="{fy:.1}" x2="{tx:.1}" y2="{ty:.1}" stroke="#33405a" stroke-width="0.7" opacity="0.14"><title>{kind}</title></line>"##,
+                kind = edge.kind
+            ));
+        }
+    }
+    format!(
+        r##"<svg xmlns="http://www.w3.org/2000/svg" width="{width:.0}" height="{height:.0}" viewBox="0 0 {width:.0} {height:.0}">
+<rect width="{width:.0}" height="{height:.0}" rx="8" fill="#121826"/>
+<text x="12" y="16" font-family="monospace" font-size="12" fill="{SPRINT_ACCENT}">sprint focus: {focus}</text>
+<text x="{right:.0}" y="16" font-family="monospace" font-size="11" fill="#7c8ba3" text-anchor="end">{in_scope_count} / {total} nodes</text>
+{edges_svg}{body}
+</svg>"##,
+        right = width - 12.0,
+        total = m.nodes.len()
+    )
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -2395,6 +2766,162 @@ mod tests {
         assert!(svg.contains("clippy warnings/errors (1 runs"));
         assert!(svg.contains("fill=\"#e8843c\""));
         assert!(svg.contains("fill=\"#e05b5b\""));
+        let _ = std::fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn sprint_token_matches_exact_and_glob() {
+        assert!(sprint_token_matches("PH-S1819", "PH-S1819"));
+        assert!(sprint_token_matches("PH-S*", "PH-S1819"));
+        assert!(!sprint_token_matches("PH-S181", "PH-S1819"));
+        assert!(!sprint_token_matches("PH-S1820", "PH-S1819"));
+        assert!(!sprint_token_matches("", "PH-S1819"));
+        assert!(!sprint_token_matches("PH-S1819", ""));
+        assert!(!sprint_token_matches("PH-S*", ""));
+    }
+
+    #[test]
+    fn path_matches_glob_double_star_and_wildcard() {
+        assert!(path_matches_glob(
+            "docs/vision/manifest.json",
+            "docs/vision/**"
+        ));
+        assert!(path_matches_glob("docs/vision/feed.json", "docs/vision/**"));
+        assert!(!path_matches_glob("docs/other/feed.json", "docs/vision/**"));
+        assert!(path_matches_glob("src/lib/db/mod.rs", "src/**/*.rs"));
+        assert!(path_matches_glob("src/lib/db/migrate.rs", "src/**/*.rs"));
+        assert!(path_matches_glob(
+            "docs/vision/feed.json",
+            "docs/vision/feed.json"
+        ));
+        assert!(!path_matches_glob(
+            "docs/vision/feed.json",
+            "docs/vision/feed.xml"
+        ));
+        assert!(!path_matches_glob("src/lib/db/mod.rs", "src/*.rs"));
+    }
+
+    #[test]
+    fn sprint_theme_report_matches_legacy_palette() {
+        let tmp = std::env::temp_dir().join("gsv_vision_test_theme");
+        let _ = std::fs::remove_dir_all(&tmp);
+        let src = tmp.join("src");
+        let data = tmp.join("data");
+        std::fs::create_dir_all(&src).unwrap();
+        let vis = src.join("docs/vision");
+        std::fs::create_dir_all(&vis).unwrap();
+        let mut m = sample_manifest();
+        m.next_sprint = "PH-S1819".to_string();
+        m.layers = vec![
+            Layer {
+                id: "L0".to_string(),
+                name: "Concept".to_string(),
+                z: 0,
+            },
+            Layer {
+                id: "L1".to_string(),
+                name: "Operations".to_string(),
+                z: 1,
+            },
+        ];
+        m.edges.push(ManifestEdge {
+            from: "galaxy_grid".to_string(),
+            kind: "docs".to_string(),
+            to: "handoff".to_string(),
+        });
+        std::fs::write(
+            vis.join("manifest.json"),
+            serde_json::to_string(&m).unwrap(),
+        )
+        .unwrap();
+        std::fs::write(
+            src.join("docs/vision/extensions.json"),
+            serde_json::to_string(&Extensions {
+                active_sprint: "PH-S1819".to_string(),
+                scopes: Default::default(),
+                ..Extensions::default()
+            })
+            .unwrap(),
+        )
+        .unwrap();
+
+        let r = sprint_theme_report(&src, &data).expect("theme");
+        assert_eq!(r.sprint, "#a78bfa");
+        assert_eq!(r.sprint_next, "#c4b5fd");
+        assert_eq!(r.pill.bg, "rgba(167, 139, 250, 0.2)");
+        assert_eq!(r.pill.border, "rgba(167, 139, 250, 0.4)");
+        assert_eq!(r.pill.color, "#d4c4ff");
+        assert_eq!(r.chip.bg, "rgba(167, 139, 250, 0.15)");
+        assert_eq!(r.queue.open_border, "rgba(167, 139, 250, 0.35)");
+        assert_eq!(r.queue.open_status, "#a78bfa");
+        assert_eq!(r.queue.next_border, "rgba(126, 184, 255, 0.55)");
+        assert_eq!(r.queue.closed_opacity, "0.55");
+        assert_eq!(r.active_sprint, "PH-S1819");
+        assert_eq!(r.next_sprint, "PH-S1819");
+        assert_eq!(
+            r.layers
+                .iter()
+                .find(|l| l.id == "L0")
+                .map(|l| l.color.as_str()),
+            Some("#3d6a9e")
+        );
+        assert_eq!(
+            r.edge_kinds
+                .iter()
+                .find(|k| k.kind == "docs")
+                .map(|k| k.color.as_str()),
+            Some("#90c490")
+        );
+        let _ = std::fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn sprint_focus_svg_highlights_scope_and_dims_others() {
+        let tmp = std::env::temp_dir().join("gsv_vision_test_focus");
+        let _ = std::fs::remove_dir_all(&tmp);
+        let src = tmp.join("src");
+        let data = tmp.join("data");
+        std::fs::create_dir_all(&src).unwrap();
+        let vis = src.join("docs/vision");
+        std::fs::create_dir_all(&vis).unwrap();
+        let mut m = sample_manifest();
+        m.nodes.push(ManifestNode {
+            id: "sprint_in_scope".to_string(),
+            label: "in-scope".to_string(),
+            layer: "L0".to_string(),
+            path: "src/lib/sprint_scope.rs".to_string(),
+            sections: vec![],
+            sprints: vec!["PH-S1819".to_string()],
+        });
+        m.nodes.push(ManifestNode {
+            id: "sprint_out_of_scope".to_string(),
+            label: "out".to_string(),
+            layer: "L0".to_string(),
+            path: "src/lib/other.rs".to_string(),
+            sections: vec![],
+            sprints: vec!["PH-S1800".to_string()],
+        });
+        m.edges.push(ManifestEdge {
+            from: "sprint_in_scope".to_string(),
+            kind: "wire".to_string(),
+            to: "sprint_out_of_scope".to_string(),
+        });
+        std::fs::write(
+            vis.join("manifest.json"),
+            serde_json::to_string(&m).unwrap(),
+        )
+        .unwrap();
+
+        let svg = sprint_focus_svg(&src, &data, "PH-S1819");
+        assert!(svg.starts_with("<svg"));
+        assert!(svg.contains("sprint focus: PH-S1819"));
+        assert!(svg.contains("fill=\"#a78bfa\""));
+        assert!(svg.contains("sprint_in_scope"));
+        assert!(svg.contains("opacity=\"0.22\""));
+        assert!(svg.contains("1 / 3 nodes"));
+
+        let no_scope = sprint_focus_svg(&src, &data, "PH-S9999");
+        assert!(no_scope.contains("no galaxy nodes reference this sprint"));
         let _ = std::fs::remove_dir_all(&tmp);
     }
 }

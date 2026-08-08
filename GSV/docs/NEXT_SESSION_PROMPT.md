@@ -1,6 +1,6 @@
 # Промпт наступної сесії (GSV)
 
-**Оновлено:** 2026-08-07 (band 117 **PH-S1809…S1818** ✅ · ratio **95.26%** · tests **153**)
+**Оновлено:** 2026-08-08 (band 118 **PH-S1819…S1828** ✅ · ratio **95.35%** · tests **163**)
 
 ```
 абракадабра
@@ -78,7 +78,16 @@ Speeds · Rust panel → vision-sync (`poolai-vision-sync`) → **один** com
   e2e `vision.spec.ts`/`a11y.spec.ts` → deactivated pointer state; `VISION_MAP_BAND40_ROWS`);
   `LEGACY_PARITY.md`/`GSV_MIGRATION.md` band 117; GSV ratio **95.26%** gate ✅;
   poolAI vision rev **470**; FM §5.12 §5.98.
-  **Наступний band 118**: master backlog (Ratio96 phase F) або GSV future — за пріоритетом власника.
+- **band 118** (PH-S1819…S1828) ✅ — GSV sprint UI migration (theme + focus map):
+  `SprintThemeReport`/`sprint_theme_report`/`wire_sprint_theme` → `GET /api/vision/sprint-theme`
+  (sprint `#a78bfa`/next `#c4b5fd`, pill/chip/queue colors, layer L0–L5 + edge-kind palettes);
+  `sprint_token_matches`/`path_matches_glob`/`nodes_for_sprint`/`sprint_focus_svg`
+  → `GET /api/vision/sprint-focus.svg?sprint=` (sprint-dim: in-scope accent, out-of-scope
+  opacity 0.22/text 0.28, edges tinted; default active sprint; empty-state);
+  Sprint Focus card + `--sprint*` CSS-змінні + sprint-pill/queue chips у Sprint Queue/Board
+  cards; contracts **163** (44 vision + 25 server); GSV ratio **95.35%** gate ✅;
+  poolAI vision rev **471**; FM §5.12 §5.99.
+  **Наступний band 119**: master backlog (Ratio96 phase F) або GSV future — за пріоритетом власника.
 
 ## Канон GSV
 
@@ -94,7 +103,7 @@ band 104 ✅ (Ratio96 admin/ops) · band 103 ✅ · band 102 ✅ (GSV migration)
 band 110 ✅ (GSV vision map UI) · band 111 ✅ (GSV sprint-map + doc-preview) · band 112 ✅ (GSV vision auto-sync + sprint-queue) ·
 band 113 ✅ (GSV node search + interactive map) · band 114 ✅ (GSV sprint-board + progress UI) ·
 band 115 ✅ (GSV migration completion — legacy vision supersession) · band 116 ✅ (GSV history charts — speed/rust analytics) ·
-band 117 ✅ (GSV legacy vision deactivation) ·
+band 117 ✅ (GSV legacy vision deactivation) · band 118 ✅ (GSV sprint UI migration — theme + focus map) ·
 staging `GSV/data/*` / `certs/*.pem` /
 `.env` · mid-push · build/test при запущеному `gsv-server` · обхід ratio-смуги Rust-кодом замість compact UI ·
 перенесення legacy `vision.js`/`vision.css` у `GSV/ui/` (знищило б ratio canon).

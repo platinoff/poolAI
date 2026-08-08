@@ -4,18 +4,18 @@
 Оновлюється в кінці кожного band. Лічильники — вимірювані (`wc -l`, `cargo test`,
 `cargo run --bin gsv-loc-audit`), не з пам'яті.
 
-## Стан (2026-08-07 · band 116 ✅)
+## Стан (2026-08-08 · band 118 ✅)
 
 - **Канон:** Rust **95–100%** / wasm **0–5%** (завжди), без Python/Java; bins — лише `src/bin/`.
-- **Ratio (виміряно):** `cargo run --bin gsv-loc-audit` → **95.26%** (rust 7663 / product 8044) — gate ≥95% ✅.
+- **Ratio (виміряно):** `cargo run --bin gsv-loc-audit` → **95.35%** (rust 8328 / product 8734) — gate ≥95% ✅.
   Звіт: `GSV/data/rust_ratio.json` (gitignored).
-- **Тести (виміряно):** `cargo test` → **153** (67 unit + 8 `gsv_omni_contracts` + 7 `gsv_ratio_contracts`
-  + 23 `gsv_server_contracts` + 8 `gsv_update_flow` + 40 `gsv_vision_contracts`).
+- **Тести (виміряно):** `cargo test` → **163** (71 unit + 8 `gsv_omni_contracts` + 7 `gsv_ratio_contracts`
+  + 25 `gsv_server_contracts` + 8 `gsv_update_flow` + 44 `gsv_vision_contracts`).
   `cargo clippy --all-targets` → **0** warnings. `cargo fmt` clean.
 - **Бокси:** Tracker · SLI console · Toolchain · IDE · Update/offline · Box preview · SLI terminal ·
   Tests/bench hooks · **Ratio** · **Vision** · **Vision Map** · **Sprint Map** · **Doc Preview** ·
-  **Vision Sync** · **Sprint Queue** · **Sprint Board** · **Sprint Progress** · **OmniRouter**
-  (Rust AI-проксі/роутер).
+  **Vision Sync** · **Sprint Queue** · **Sprint Board** · **Sprint Progress** · **Sprint Focus** ·
+  **OmniRouter** (Rust AI-проксі/роутер).
 
 ## Що зроблено
 
@@ -226,6 +226,29 @@
 - **PH-S1817** ratio hold advisory (**95.26%**) + vision-sync rev 470 (poolai + gsv + --check).
 - **PH-S1818** Band close: ratio hold, fmt, clippy 0, cargo test (poolAI test-ci + GSV 153), docs canon,
   vision-sync rev 470, push.
+
+### Band 118 (PH-S1819…S1828, ✅ 2026-08-08) — GSV sprint UI migration (theme + focus map)
+- **PH-S1819** FM §5.99 queue (band 118 sprint UI migration) + §5.12 header (master horizon).
+- **PH-S1820** `SprintThemeReport`/`SprintPillTheme`/`SprintChipTheme`/`SprintQueueStateTheme`/
+  `SprintLayerColor`/`SprintEdgeKindColor` structs + `sprint_theme_report`/`wire_sprint_theme` →
+  `GET /api/vision/sprint-theme` (sprint `#a78bfa`/next `#c4b5fd`, pill/chip/queue colors,
+  layer L0–L5 + edge-kind palettes, revision/git_head/active/next).
+- **PH-S1821** `sprint_token_matches`/`path_matches_glob`/`nodes_for_sprint` +
+  `sprint_focus_svg` → `GET /api/vision/sprint-focus.svg?sprint=` (sprint-dim: in-scope accent,
+  out-of-scope opacity 0.22/text 0.28, edges tinted; default active sprint; empty-state).
+- **PH-S1822** contracts: `gsv_vision_contracts` (theme real-workspace + wire shapes + focus svg
+  highlight/dim/empty) → 44; `gsv_server_contracts` (theme + focus endpoints, `get_text` helper) → 25.
+- **PH-S1823** `GSV/ui/index.html`: `--sprint*` CSS-змінні + sprint-pill/queue-state chips у
+  Sprint Queue/Board cards; Sprint Focus card (input + button + `<img id="i-sprint-focus">`);
+  `loadSprintTheme` apply + `loadSprintFocus` ре-запит svg.
+- **PH-S1824** `GSV/docs/VISION.md` +band 118 (theme/focus endpoints + section); `MEMORY.md` band 118;
+  GSV HANDOFF/NEXT band 118.
+- **PH-S1825** poolAI parity: `docs/vision/README.md`; FM §5.12 §5.99; `GSV_TECH_ROADMAP.md` band 118.
+- **PH-S1826** Ratio hold advisory: `gsv-loc-audit --min-ratio 0.95 --advisory` → **95.35%** +
+  poolAI ratio96 advisory hold.
+- **PH-S1827** vision-sync close: `poolai-vision-sync` rev **471**; `--check` ok; feed/manifest updated.
+- **PH-S1828** Band close: ratio hold (95.35%), fmt, clippy 0, cargo test (163), docs canon,
+  vision-sync rev 471, push.
 
 ## Важливі факти (не забувати)
 

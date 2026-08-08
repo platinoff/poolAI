@@ -82,8 +82,8 @@ fn vision_feed_reads_real_workspace() {
         f.items.len()
     );
     assert!(
-        f.items.iter().any(|i| i.id == "PH-S1808"),
-        "feed must include the band-116 close entry"
+        f.items.iter().any(|i| i.id == "PH-S1828"),
+        "feed must include the band-118 close entry"
     );
     for item in &f.items {
         assert!(!item.id.is_empty());
@@ -743,4 +743,78 @@ fn vision_rust_diagnostics_reads_real_workspace() {
         r.latest.warnings
     );
     assert_eq!(wire["rust_diagnostics"]["history_count"], r.history_count);
+}
+
+#[test]
+fn vision_sprint_theme_reads_real_workspace() {
+    let dir = temp_data_dir("sprint-theme");
+    let r = vision::sprint_theme_report(&repo_root(), &dir).expect("theme");
+    assert!(r.revision > 0);
+    assert!(!r.git_head.is_empty());
+    assert!(!r.active_sprint.is_empty());
+    assert!(!r.next_sprint.is_empty());
+    assert_eq!(r.active_sprint, r.next_sprint);
+    assert_eq!(r.sprint, "#a78bfa");
+    assert_eq!(r.sprint_next, "#c4b5fd");
+    assert_eq!(r.pill.color, "#d4c4ff");
+    assert_eq!(r.queue.closed_opacity, "0.55");
+    assert_eq!(r.layers.len(), 6, "six manifest layers L0..L5");
+    assert!(r
+        .layers
+        .iter()
+        .any(|l| l.id == "L0" && l.color == "#3d6a9e"));
+    assert!(r
+        .layers
+        .iter()
+        .any(|l| l.id == "L5" && l.color == "#4a6880"));
+    assert!(
+        r.edge_kinds
+            .iter()
+            .any(|k| k.kind == "catalog" && k.color == "#7eb8ff"),
+        "unknown edge kinds must fall back to the accent blue"
+    );
+    assert!(r.edge_kinds.iter().all(|k| k.color.starts_with('#')));
+}
+
+#[test]
+fn vision_sprint_theme_wire_shapes() {
+    let dir = temp_data_dir("sprint-theme-wire");
+    let wire = vision::wire_sprint_theme(&repo_root(), &dir);
+    assert_eq!(wire["ok"], true);
+    assert!(wire["revision"].as_u64().unwrap_or(0) > 0);
+    assert_eq!(wire["active_sprint"], wire["next_sprint"]);
+    assert_eq!(wire["sprint"], "#a78bfa");
+    assert_eq!(wire["pill"]["border"], "rgba(167, 139, 250, 0.4)");
+    assert!(wire["layers"].as_array().map(|a| a.len()).unwrap_or(0) >= 6);
+    assert!(wire["edge_kinds"].as_array().map(|a| a.len()).unwrap_or(0) > 0);
+}
+
+#[test]
+fn vision_sprint_focus_svg_renders_active_sprint() {
+    let dir = temp_data_dir("sprint-focus");
+    let svg = vision::sprint_focus_svg(&repo_root(), &dir, "PH-S146");
+    assert!(svg.starts_with("<svg"), "must render a real SVG map");
+    assert!(svg.contains("sprint focus: PH-S146"));
+    assert!(
+        svg.contains("#a78bfa"),
+        "in-scope nodes must be sprint accent"
+    );
+    assert!(
+        svg.contains("opacity=\"0.22\""),
+        "out-of-scope nodes must dim"
+    );
+
+    let default = vision::sprint_focus_svg(&repo_root(), &dir, "");
+    assert!(
+        default.starts_with("<svg"),
+        "default must fall back to a sprint"
+    );
+    assert!(default.contains("sprint focus:"));
+}
+
+#[test]
+fn vision_sprint_focus_svg_empty_state_for_unknown_sprint() {
+    let dir = temp_data_dir("sprint-focus-empty");
+    let svg = vision::sprint_focus_svg(&repo_root(), &dir, "NO-SUCH-SPRINT");
+    assert!(svg.contains("no galaxy nodes reference this sprint"));
 }

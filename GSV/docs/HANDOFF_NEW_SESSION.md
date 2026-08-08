@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (GSV)
 
-**Оновлено:** 2026-08-07 (band 117 **PH-S1809…S1818** ✅ · ratio **95.26%** · tests **153** · clippy **0**)
+**Оновлено:** 2026-08-08 (band 118 **PH-S1819…S1828** ✅ · ratio **95.35%** · tests **163** · clippy **0**)
 
 **Наступна сесія:** **`абракадабра`** → S0 диск/git → project scan (warnings first) → drain ≤10 PH-S*
 → Speeds + Rust panel → vision-sync → **один commit** → **`git push` + самарі**. Канон:
@@ -8,13 +8,13 @@
 
 ## Стан зараз
 
-- **GSV** — окремий Rust-first проєкт (`GSV/`), bands 102 · 108 · 109 · 110 · 111 · 112 · 113 · 114 · 115 · 116 · 117 **✅**.
-- **Ratio:** `cargo run --bin gsv-loc-audit` → **95.26%** (rust 7663 / product 8044, gate ≥95% ✅) → `GSV/data/rust_ratio.json`.
-- **Тести:** `cargo test` → **153** green · **clippy 0** · **fmt clean**.
+- **GSV** — окремий Rust-first проєкт (`GSV/`), bands 102 · 108 · 109 · 110 · 111 · 112 · 113 · 114 · 115 · 116 · 117 · 118 **✅**.
+- **Ratio:** `cargo run --bin gsv-loc-audit` → **95.35%** (rust 8328 / product 8734, gate ≥95% ✅) → `GSV/data/rust_ratio.json`.
+- **Тести:** `cargo test` → **163** green · **clippy 0** · **fmt clean**.
 - **Сервер:** порт 8870 (8891 транзитивно зарезервований Windows dynamic exclusion; canon порт **8891**).
-- **FM:** band 117 = §5.98 (PH-S1809…S1818 ✅). Master horizon poolAI: band 118.
-- **Vision rev:** 470 (band 117 vision-sync close). Vision box: `boxes/vision.rs` + `gsv-vision-sync` bin +
-  `GET /api/vision*`; snapshot `GSV/data/gsv_manifest.json` + `gsv_feed.json` + `gsv_extensions.json` (rev 470).
+- **FM:** band 118 = §5.99 (PH-S1819…S1828 ✅). Master horizon poolAI: band 119.
+- **Vision rev:** 471 (band 118 vision-sync close). Vision box: `boxes/vision.rs` + `gsv-vision-sync` bin +
+  `GET /api/vision*`; snapshot `GSV/data/gsv_manifest.json` + `gsv_feed.json` + `gsv_extensions.json` (rev 471).
   Band 110: `GET /api/vision/map`, `GET /assets/vision.svg`, `GET /api/vision/feed?status=`, Vision Map card.
   Band 111: `GET /api/vision/sprint-map` (sprint-scope/queue/session-tracks links + modules + kinds) та
   `GET /api/vision/doc-preview?id=` (node + 1-hop neighbors) — Sprint Map + Doc Preview UI cards.
@@ -33,10 +33,17 @@
   wall bars green ok / red fail, ≤24 runs, footer latest bench) та
   `GET /api/vision/rust-diagnostics.svg` (Rust history chart — warnings orange + errors red
   grouped bars, command footer); `<img>` charts у Speed Index + Rust Diagnostics cards.
+  Band 118: `GET /api/vision/sprint-theme` (sprint UI theme wire: `#a78bfa`/`#c4b5fd`,
+  pill/chip/queue colors, layer L0–L5 + edge-kind palettes) та
+  `GET /api/vision/sprint-focus.svg?sprint=` (Rust-rendered sprint focus map: in-scope accent,
+  out-of-scope dim 0.22/0.28, default active sprint) — Sprint Focus card + sprint-pill/queue
+  chips у Sprint Queue/Board cards.
   Legacy parity: [`LEGACY_PARITY.md`](LEGACY_PARITY.md) — єдині прогалини закрито (Speeds + Rust);
   `vision.js`/`vision.css` superseded (band 115); **band 117: legacy deactivated** —
   `docs/vision/index.html` = GSV pointer page, `vision.js`/`vision.css` = DEACTIVATED banner
   (архів, не завантажуються); живий UI — `gsv-server` → `http://127.0.0.1:8891/`.
+  **band 118: sprint UI (theme + focus) migrated** — legacy sprint colors/`sprint-dim`
+  recreated в Rust (`vision.rs`), не legacy JS.
 - **poolAI ratio:** **95.04%** (advisory hold, `--ratio96-docs-canon --advisory --min-ratio 0.95`).
 
 ## S0 (кожна сесія, disk/git first)

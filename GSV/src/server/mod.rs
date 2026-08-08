@@ -79,6 +79,7 @@ pub fn router(state: AppState) -> Router {
         .route("/api/vision/extensions", get(api_vision_extensions))
         .route("/api/vision/sprint-queue", get(api_vision_sprint_queue))
         .route("/api/vision/sprint-board", get(api_vision_sprint_board))
+        .route("/api/vision/sprint-theme", get(api_vision_sprint_theme))
         .route(
             "/api/vision/sprint-progress",
             get(api_vision_sprint_progress),
@@ -92,6 +93,10 @@ pub fn router(state: AppState) -> Router {
         .route(
             "/api/vision/rust-diagnostics.svg",
             get(api_vision_rust_diagnostics_svg),
+        )
+        .route(
+            "/api/vision/sprint-focus.svg",
+            get(api_vision_sprint_focus_svg),
         )
         .route("/api/omni", get(api_omni))
         .route(
@@ -336,6 +341,13 @@ async fn api_vision_sprint_queue(State(state): State<AppState>) -> Json<Value> {
     ))
 }
 
+async fn api_vision_sprint_theme(State(state): State<AppState>) -> Json<Value> {
+    Json(crate::boxes::vision::wire_sprint_theme(
+        &state.repo_root,
+        &state.data_dir,
+    ))
+}
+
 async fn api_vision_sprint_board(State(state): State<AppState>) -> Json<Value> {
     Json(crate::boxes::vision::wire_sprint_board(
         &state.repo_root,
@@ -384,6 +396,27 @@ async fn api_vision_rust_diagnostics_svg(State(state): State<AppState>) -> Respo
             ("Cache-Control", "no-cache"),
         ],
         crate::boxes::vision::rust_diagnostics_chart_svg(&state.repo_root, &state.data_dir),
+    )
+        .into_response()
+}
+
+#[derive(serde::Deserialize)]
+struct VisionSprintFocusParams {
+    sprint: Option<String>,
+}
+
+async fn api_vision_sprint_focus_svg(
+    State(state): State<AppState>,
+    Query(params): Query<VisionSprintFocusParams>,
+) -> Response {
+    let sprint = params.sprint.as_deref().unwrap_or_default();
+    (
+        StatusCode::OK,
+        [
+            ("Content-Type", "image/svg+xml"),
+            ("Cache-Control", "no-cache"),
+        ],
+        crate::boxes::vision::sprint_focus_svg(&state.repo_root, &state.data_dir, sprint),
     )
         .into_response()
 }

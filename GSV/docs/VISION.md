@@ -4,7 +4,9 @@
 `docs/vision/extensions.json`) у Rust-бокс GSV. Bands 109–116 (PH-S1729…S1808, ✅);
 **band 117 (PH-S1809…S1818, ✅)** — legacy vision deactivation: `docs/vision/index.html` →
 GSV pointer page; `vision.js`/`vision.css` → DEACTIVATED banner (архів, не видаляємо);
-живий UI — `gsv-server` → `http://127.0.0.1:8891/`.
+живий UI — `gsv-server` → `http://127.0.0.1:8891/`. **band 118 (PH-S1819…S1828, ✅)** —
+sprint UI migration: sprint theme wire (legacy `--sprint` palette) + Rust-rendered
+sprint focus SVG.
 
 ## Що це
 
@@ -57,6 +59,13 @@ GSV pointer page; `vision.js`/`vision.css` → DEACTIVATED banner (архів, �
   - `GET /api/vision/rust-diagnostics.svg` — **band 116**: Rust-rendered SVG chart
     (warnings orange + errors red grouped bars, ≤24 runs, command footer) з `history`;
     empty-state svg коли масив порожній.
+  - `GET /api/vision/sprint-theme` — **band 118**: sprint UI theme wire
+    (`revision`/`git_head`/`active_sprint`/`next_sprint`, `sprint` `#a78bfa`/`sprint_next`
+    `#c4b5fd`, `pill`/`chip`/`queue` colors, `layers` L0–L5, `edge_kinds`) →
+    `SprintThemeReport`/`SprintPillTheme`/`SprintChipTheme`/`SprintQueueStateTheme`.
+  - `GET /api/vision/sprint-focus.svg?sprint=` — **band 118**: Rust-rendered sprint focus
+    map (sprint nodes highlighted, out-of-scope `opacity 0.22`/text `0.28`, edges tinted);
+    default = active sprint, empty-state svg коли жоден node не посилається на спринт.
   - `GET /assets/vision.svg` — **band 110**: порт `docs/vision/vision.svg` (isometric diagram,
     `image/svg+xml`, include_str! з `GSV/ui/vision.svg`).
 
@@ -152,6 +161,33 @@ UI: `<img>` per card у `ui/index.html` — `i-speed-chart` → `/api/vision/spe
 `i-rust-chart` → `/api/vision/rust-diagnostics.svg` (`image/svg+xml`,
 `Cache-Control: no-cache`). Charts — Rust-рендерені (ratio-safe, zero UI JS).
 
+## Sprint UI theme + focus map (band 118)
+
+`sprint_theme_report` (band 118) — sprint UI theme wire з живого manifest + extensions:
+
+- `sprint` `#a78bfa` / `sprint_next` `#c4b5fd` (legacy `--sprint`/`--sprint-next`), `pill`
+  (bg/border/color), `chip`, `queue` (`open_border`/`open_bg`/`open_status`/`next_border`/
+  `next_glow`/`closed_opacity`) — кольори sprint-pill/queue-state з deactivated `vision.css`.
+- `layers[]` L0–L5 per-layer fill (legacy `--L0…--L5`), `edge_kinds[]` per-kind
+  (docs/code/toml; невідомі → accent blue `#7eb8ff`).
+- `wire_sprint_theme` → `{ok, revision, git_head, active_sprint, next_sprint, sprint,
+  sprint_next, pill, chip, queue, layers, edge_kinds}`. Missing source → `{ok:false, error}`.
+
+`sprint_focus_svg` (band 118) — Rust-rendered sprint focus map (legacy `sprint-dim`):
+
+- Scope: nodes чиї `sprints[]` token-matches спринт (`sprint_token_matches` — exact id або
+  `PH-S*` glob) або path у matching extension scope (`path_matches_glob` — `**` crossing,
+  `*` non-`/`; scope `docs`/`code_globs`/`also_update`).
+- Layout: один рядок на layer (L0..L5 z-sorted), in-scope nodes на повній opacity з sprint
+  accent, out-of-scope — `circle 0.22` / `text 0.28`; edges touching in-scope tinted.
+- `?sprint=` default = active sprint (extensions) → next sprint (manifest).
+- Empty state: title `Sprint focus: <id>` + hint «no galaxy nodes reference this sprint yet».
+- `GET /api/vision/sprint-focus.svg` повертає `image/svg+xml`, `Cache-Control: no-cache`.
+
+UI: **Sprint Focus card** у `ui/index.html` (input sprint id + «Show focus» button +
+`<img id="i-sprint-focus">`); theme wire (`loadSprintTheme`) застосовує CSS-змінні
+`--sprint*` на `documentElement`; sprint-pill/queue chips у Sprint Queue + Sprint Board cards.
+
 ## Ratio-safe політика
 
 `vision.js` (161 KB) / `vision.css` (50 KB) legacy не переносяться у `GSV/ui/` — це знищило б
@@ -164,5 +200,7 @@ input `galaxy_grid`), **Vision Sync card** (Resync snapshot button + drift statu
 per-layer nodes/linked таблиця) у `ui/index.html`. Band 116 додає `<img>` charts:
 **Speed Index card** — `speeds.svg` (test-ci wall bars) та **Rust Diagnostics card** —
 `rust-diagnostics.svg` (warnings/errors bars); SVG рендерить Rust (`vision.rs`), не JS.
+Band 118 додає **Sprint Focus card** (`sprint-focus.svg` + sprint id input) та sprint
+theme wire (CSS-змінні `--sprint*` + sprint-pill/queue chips у Sprint Queue/Board cards).
 `.svg` у ratio-аудиті Ignored — порт діаграми ratio-neutral.
 Див. [`GSV_MIGRATION.md`](../../docs/gsv/GSV_MIGRATION.md) і [`LEGACY_PARITY.md`](./LEGACY_PARITY.md).
