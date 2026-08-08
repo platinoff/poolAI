@@ -2924,4 +2924,25 @@ mod tests {
         assert!(no_scope.contains("no galaxy nodes reference this sprint"));
         let _ = std::fs::remove_dir_all(&tmp);
     }
+
+    #[test]
+    fn sprint_theme_extended_properties_validation() {
+        let theme = SprintThemeReport {
+            revision: 472,
+            git_head: "abcdef0".to_string(),
+            active_sprint: "PH-S1829".to_string(),
+            next_sprint: "PH-S1830".to_string(),
+            sprint: "#a78bfa".to_string(),
+            sprint_next: "#c4b5fd".to_string(),
+            pill: SprintPillTheme { bg: "rgba(167, 139, 250, 0.2)".to_string(), border: "rgba(167, 139, 250, 0.4)".to_string(), color: "#d4c4ff".to_string() },
+            chip: SprintChipTheme { bg: "rgba(167, 139, 250, 0.15)".to_string(), border: "rgba(167, 139, 250, 0.3)".to_string(), color: "#c4b5fd".to_string() },
+            queue: SprintQueueStateTheme { open_border: "rgba(167, 139, 250, 0.35)".to_string(), open_bg: "rgba(167, 139, 250, 0.08)".to_string(), open_status: "#a78bfa".to_string(), next_border: "rgba(126, 184, 255, 0.55)".to_string(), next_glow: "rgba(126, 184, 255, 0.15)".to_string(), closed_opacity: "0.55".to_string() },
+            layers: vec![SprintLayerColor { id: "L0".to_string(), color: "#3d6a9e".to_string() }],
+            edge_kinds: vec![SprintEdgeKindColor { kind: "docs".to_string(), color: "#90c490".to_string() }],
+        };
+        assert_eq!(theme.revision, 472);
+        assert_eq!(theme.active_sprint, "PH-S1829");
+        assert_eq!(theme.layers.len(), 1);
+        assert_eq!(theme.edge_kinds.len(), 1);
+    }
 }

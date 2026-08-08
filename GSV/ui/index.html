@@ -40,6 +40,12 @@ pre.out{background:var(--panel2);border:1px solid var(--line);border-radius:6px;
 .squeue.open .squeue-st{color:var(--sprint)}
 .squeue.next{border-color:var(--sprint-next-border);box-shadow:0 0 0 1px var(--sprint-next-glow)}
 .squeue.closed{opacity:var(--sprint-closed-op)}
+.card.collapsed .body{display:none!important}
+.card.fullscreen{position:fixed!important;inset:16px!important;z-index:1000!important;max-height:none!important;display:flex;flex-direction:column;box-shadow:0 10px 40px rgba(0,0,0,0.8)}
+.card.fullscreen .body{max-height:calc(100vh - 80px)!important;flex:1}
+.card h2 .actions{display:flex;gap:4px;align-items:center}
+.card h2 .actions button{background:transparent;border:1px solid var(--line);color:var(--dim);cursor:pointer;padding:1px 6px;font-size:10px;border-radius:4px;font-family:inherit}
+.card h2 .actions button:hover{color:var(--accent);border-color:var(--accent);background:var(--panel)}
 </style>
 </head>
 <body>
@@ -97,6 +103,36 @@ const tab = (h, rows) => {
 let offline = false;
 const toast = msg => { const t = $("toast"); t.textContent = msg; t.style.display = "block"; setTimeout(() => { t.style.display = "none"; }, 4000); };
 const setOffline = v => { offline = v; const el = $("status"); el.textContent = v ? "offline" : "online"; el.className = "badge " + (v ? "offline" : "online"); };
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".card").forEach(card => {
+    const h2 = card.querySelector("h2");
+    if (!h2) return;
+    const actions = document.createElement("span");
+    actions.className = "actions";
+    
+    const minBtn = document.createElement("button");
+    minBtn.textContent = "_";
+    minBtn.title = "Minimize / Restore";
+    minBtn.onclick = (e) => {
+      e.stopPropagation();
+      card.classList.toggle("collapsed");
+      minBtn.textContent = card.classList.contains("collapsed") ? "+" : "_";
+    };
+    
+    const maxBtn = document.createElement("button");
+    maxBtn.textContent = "□";
+    maxBtn.title = "Fullscreen Toggle";
+    maxBtn.onclick = (e) => {
+      e.stopPropagation();
+      card.classList.toggle("fullscreen");
+      maxBtn.textContent = card.classList.contains("fullscreen") ? "×" : "□";
+    };
+    
+    actions.appendChild(minBtn);
+    actions.appendChild(maxBtn);
+    h2.appendChild(actions);
+  });
+});
 async function get(path) { const res = await fetch(path); if (!res.ok) throw new Error(path + " → " + res.status); return res.json(); }
 
 function renderHealth(d) {
