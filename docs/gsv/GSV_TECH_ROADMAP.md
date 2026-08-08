@@ -212,6 +212,21 @@ docs/architecture (✅ ця сесія)
 | **PH-S1827** | poolai-vision-sync close | `poolai-vision-sync` rev **471** (band 118); `--check` ok; sprint-queue/feed updated |
 | **PH-S1828** | Band close | ratio hold; fmt/clippy/test (**163**); docs canon; vision-sync rev 471; push |
 
+## Спринти (band 119) — GSV Telemetry Mesh & Ratio 96% stretch horizon
+
+| Sprint | Фокус | Acceptance (ключ) |
+|--------|-------|-------------------|
+| **PH-S1829** | Telemetry Mesh spec | `GSV/docs/TELEMETRY_MESH.md` — multi-node state sync & cluster metrics schema |
+| **PH-S1830** | Mesh state aggregation wire | `GET /api/vision/mesh` — aggregated node/edge cluster telemetry in Rust |
+| **PH-S1831** | Ratio 96% stretch audit | `gsv-loc-audit --stretch-96` — advisory threshold check for 96% rust ratio target |
+| **PH-S1832** | SSE streaming telemetry | Enhanced `/events` broadcast for real-time cluster telemetry updates |
+| **PH-S1833** | Mesh contracts | `gsv_mesh_contracts.rs` — integration tests for cluster telemetry aggregation |
+| **PH-S1834** | UI mesh status card | `GSV/ui/index.html` — live cluster mesh status widget |
+| **PH-S1835** | GSV docs canon sync | `GSV_TECH_ROADMAP.md` + `MEMORY.md` band 119 rows |
+| **PH-S1836** | poolAI vision parity | `docs/vision/README.md` & FM §5.12 sync for band 119 |
+| **PH-S1837** | Ratio hold verification | `rust_ratio.json` update and hold check (≥95%) |
+| **PH-S1838** | Band 119 close | fmt/clippy/test green; vision-sync rev bump; push |
+
 ## Ключові UX-вимоги (узагальнення ТЗ)
 
 1. Оновлюємо/дебажимо vision Rust-кодбазу, запущена **bin-версія** → сервер приймає **повідомлення про апдейт**.
