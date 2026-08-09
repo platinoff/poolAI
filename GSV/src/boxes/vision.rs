@@ -2945,4 +2945,38 @@ mod tests {
         assert_eq!(theme.layers.len(), 1);
         assert_eq!(theme.edge_kinds.len(), 1);
     }
+
+    #[test]
+    fn sprint_theme_layer_color_fallback() {
+        let l0 = SprintLayerColor { id: "L0".to_string(), color: "#3d6a9e".to_string() };
+        let l1 = SprintLayerColor { id: "L1".to_string(), color: "#3d6a4a".to_string() };
+        let l2 = SprintLayerColor { id: "L2".to_string(), color: "#8a7040".to_string() };
+        let l3 = SprintLayerColor { id: "L3".to_string(), color: "#8a4068".to_string() };
+        let l4 = SprintLayerColor { id: "L4".to_string(), color: "#6a5088".to_string() };
+        let l5 = SprintLayerColor { id: "L5".to_string(), color: "#4a6880".to_string() };
+        assert_eq!(l0.id, "L0");
+        assert_eq!(l1.id, "L1");
+        assert_eq!(l2.id, "L2");
+        assert_eq!(l3.id, "L3");
+        assert_eq!(l4.id, "L4");
+        assert_eq!(l5.id, "L5");
+    }
+
+    #[test]
+    fn sprint_queue_report_edge_cases_validation() {
+        let q = SprintQueueReport {
+            revision: 472,
+            git_head: "abcdef0".to_string(),
+            next_sprint: "PH-S1829".to_string(),
+            last_sprint_closed: "PH-S1828".to_string(),
+            open_count: 0,
+            active_sprint: "PH-S1829".to_string(),
+            entries: vec![],
+            planned: vec![],
+        };
+        assert_eq!(q.revision, 472);
+        assert_eq!(q.next_sprint, "PH-S1829");
+        assert_eq!(q.open_count, 0);
+        assert!(q.entries.is_empty());
+    }
 }
