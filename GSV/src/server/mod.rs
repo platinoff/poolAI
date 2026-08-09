@@ -80,6 +80,7 @@ pub fn router(state: AppState) -> Router {
         .route("/api/vision/sprint-queue", get(api_vision_sprint_queue))
         .route("/api/vision/sprint-board", get(api_vision_sprint_board))
         .route("/api/vision/sprint-theme", get(api_vision_sprint_theme))
+        .route("/api/vision/palette", get(api_vision_palette))
         .route(
             "/api/vision/sprint-progress",
             get(api_vision_sprint_progress),
@@ -98,6 +99,8 @@ pub fn router(state: AppState) -> Router {
             "/api/vision/sprint-focus.svg",
             get(api_vision_sprint_focus_svg),
         )
+        .route("/api/vision/starfield.svg", get(api_vision_starfield_svg))
+        .route("/api/vision/galaxy.svg", get(api_vision_galaxy_svg))
         .route("/api/omni", get(api_omni))
         .route(
             "/api/omni/config",
@@ -348,6 +351,13 @@ async fn api_vision_sprint_theme(State(state): State<AppState>) -> Json<Value> {
     ))
 }
 
+async fn api_vision_palette(State(state): State<AppState>) -> Json<Value> {
+    Json(crate::boxes::vision::wire_palette(
+        &state.repo_root,
+        &state.data_dir,
+    ))
+}
+
 async fn api_vision_sprint_board(State(state): State<AppState>) -> Json<Value> {
     Json(crate::boxes::vision::wire_sprint_board(
         &state.repo_root,
@@ -417,6 +427,42 @@ async fn api_vision_sprint_focus_svg(
             ("Cache-Control", "no-cache"),
         ],
         crate::boxes::vision::sprint_focus_svg(&state.repo_root, &state.data_dir, sprint),
+    )
+        .into_response()
+}
+
+#[derive(serde::Deserialize)]
+struct VisionStarfieldParams {
+    mode: Option<String>,
+}
+
+async fn api_vision_starfield_svg(
+    State(state): State<AppState>,
+    Query(params): Query<VisionStarfieldParams>,
+) -> Response {
+    (
+        StatusCode::OK,
+        [
+            ("Content-Type", "image/svg+xml"),
+            ("Cache-Control", "no-cache"),
+        ],
+        crate::boxes::vision::starfield_svg_wire(
+            &state.repo_root,
+            &state.data_dir,
+            params.mode.as_deref(),
+        ),
+    )
+        .into_response()
+}
+
+async fn api_vision_galaxy_svg() -> Response {
+    (
+        StatusCode::OK,
+        [
+            ("Content-Type", "image/svg+xml"),
+            ("Cache-Control", "no-cache"),
+        ],
+        crate::boxes::vision::galaxy_svg(),
     )
         .into_response()
 }

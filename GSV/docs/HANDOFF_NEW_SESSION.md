@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (GSV)
 
-**Оновлено:** 2026-08-08 (band 118 **PH-S1819…S1828** ✅ · ratio **95.35%** · tests **163** · clippy **0**)
+**Оновлено:** 2026-08-08 (band 119 **PH-S1829…S1838** ✅ · ratio **95.18%** · tests **183** · clippy **0**)
 
 **Наступна сесія:** **`абракадабра`** → S0 диск/git → project scan (warnings first) → drain ≤10 PH-S*
 → Speeds + Rust panel → vision-sync → **один commit** → **`git push` + самарі**. Канон:
@@ -8,13 +8,13 @@
 
 ## Стан зараз
 
-- **GSV** — окремий Rust-first проєкт (`GSV/`), bands 102 · 108 · 109 · 110 · 111 · 112 · 113 · 114 · 115 · 116 · 117 · 118 **✅**.
-- **Ratio:** `cargo run --bin gsv-loc-audit` → **95.35%** (rust 8328 / product 8734, gate ≥95% ✅) → `GSV/data/rust_ratio.json`.
-- **Тести:** `cargo test` → **163** green · **clippy 0** · **fmt clean**.
+- **GSV** — окремий Rust-first проєкт (`GSV/`), bands 102 · 108 · 109 · 110 · 111 · 112 · 113 · 114 · 115 · 116 · 117 · 118 · 119 **✅**.
+- **Ratio:** `cargo run --bin gsv-loc-audit` → **95.18%** (rust 9148 / product 9611, gate ≥95% ✅) → `GSV/data/rust_ratio.json`.
+- **Тести:** `cargo test` → **183** green · **clippy 0** · **fmt clean**.
 - **Сервер:** порт 8870 (8891 транзитивно зарезервований Windows dynamic exclusion; canon порт **8891**).
-- **FM:** band 118 = §5.99 (PH-S1819…S1828 ✅). Master horizon poolAI: band 119.
-- **Vision rev:** 471 (band 118 vision-sync close). Vision box: `boxes/vision.rs` + `gsv-vision-sync` bin +
-  `GET /api/vision*`; snapshot `GSV/data/gsv_manifest.json` + `gsv_feed.json` + `gsv_extensions.json` (rev 471).
+- **FM:** band 119 = §5.100 (PH-S1829…S1838 ✅). Master horizon poolAI: band 120.
+- **Vision rev:** 472 (band 119 vision-sync close). Vision box: `boxes/vision.rs` + `gsv-vision-sync` bin +
+  `GET /api/vision*`; snapshot `GSV/data/gsv_manifest.json` + `gsv_feed.json` + `gsv_extensions.json` (rev 472).
   Band 110: `GET /api/vision/map`, `GET /assets/vision.svg`, `GET /api/vision/feed?status=`, Vision Map card.
   Band 111: `GET /api/vision/sprint-map` (sprint-scope/queue/session-tracks links + modules + kinds) та
   `GET /api/vision/doc-preview?id=` (node + 1-hop neighbors) — Sprint Map + Doc Preview UI cards.
@@ -38,19 +38,30 @@
   `GET /api/vision/sprint-focus.svg?sprint=` (Rust-rendered sprint focus map: in-scope accent,
   out-of-scope dim 0.22/0.28, default active sprint) — Sprint Focus card + sprint-pill/queue
   chips у Sprint Queue/Board cards.
-  Legacy parity: [`LEGACY_PARITY.md`](LEGACY_PARITY.md) — єдині прогалини закрито (Speeds + Rust);
-  `vision.js`/`vision.css` superseded (band 115); **band 117: legacy deactivated** —
-  `docs/vision/index.html` = GSV pointer page, `vision.js`/`vision.css` = DEACTIVATED banner
-  (архів, не завантажуються); живий UI — `gsv-server` → `http://127.0.0.1:8891/`.
+  Band 119: `GET /api/vision/palette` (повний legacy `:root` palette wire: bg-deep/bg/panel/
+  panel-solid/border/border-bright/text/muted/accent/accent-2/glow/sidebar-w, layers+layers_dim
+  L0–L5, edge-docs/code/toml, ext-md/rs/json/toml, sprint, bg-tone, galaxy-bg-opacity) +
+  `GET /api/vision/starfield.svg?mode=eco|fx|ms` (Rust-rendered starfield: deterministic LCG,
+  eco sparse/fx glow/ms medium) + `GET /api/vision/galaxy.svg` (Rust-rendered nebula backdrop) —
+  Galaxy UI full parity: `loadGalaxyPalette` CSS-змінні, RSS ticker, GPU mode button
+  (Eco/FX/Ms cycle), power menu (soft sync / reload / force offline), panel dock +
+  Esc-fullscreen.
+  Legacy parity: [`LEGACY_PARITY.md`](LEGACY_PARITY.md) — всі legacy-панелі закриті
+  (bands 115–119); `vision.js`/`vision.css` superseded (band 115); **band 117: legacy
+  deactivated** — `docs/vision/index.html` = GSV pointer page, `vision.js`/`vision.css` =
+  DEACTIVATED banner (архів, не завантажуються); живий UI — `gsv-server` →
+  `http://127.0.0.1:8891/`.
   **band 118: sprint UI (theme + focus) migrated** — legacy sprint colors/`sprint-dim`
-  recreated в Rust (`vision.rs`), не legacy JS.
+  recreated в Rust (`vision.rs`), не legacy JS. **band 119: Galaxy UI full parity
+  (colors + box behaviors) migrated** — legacy `:root` palette = Rust wire, starfield/galaxy
+  backdrop = Rust SVG, header chrome/dock/fullscreen = compact UI glue (не legacy JS/CSS).
 - **poolAI ratio:** **95.04%** (advisory hold, `--ratio96-docs-canon --advisory --min-ratio 0.95`).
 
 ## S0 (кожна сесія, disk/git first)
 
 1. `df -h /s | tail -1` → `bash scripts/check_target_disk.sh` → `cargo clean` якщо <5G (12G дешево).
 2. `git fetch` → `git status -sb` → `git log -1 --oneline`.
-3. Прочитати цей HANDOFF + `NEXT_SESSION_PROMPT.md` + FM §5.12 §5.97.
+3. Прочитати цей HANDOFF + `NEXT_SESSION_PROMPT.md` + FM §5.12 §5.100.
 
 ## Project scan (якщо §5.12 < 10 відкритих)
 

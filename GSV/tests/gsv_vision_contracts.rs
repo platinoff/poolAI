@@ -818,3 +818,147 @@ fn vision_sprint_focus_svg_empty_state_for_unknown_sprint() {
     let svg = vision::sprint_focus_svg(&repo_root(), &dir, "NO-SUCH-SPRINT");
     assert!(svg.contains("no galaxy nodes reference this sprint"));
 }
+
+#[test]
+fn vision_palette_legacy_root_values() {
+    let p = vision::GalaxyPalette::legacy();
+    assert_eq!(p.bg_deep, "#06080f");
+    assert_eq!(p.bg, "#0a0e18");
+    assert_eq!(p.panel, "rgba(18, 26, 42, 0.72)");
+    assert_eq!(p.panel_solid, "#141c2e");
+    assert_eq!(p.border, "rgba(120, 160, 220, 0.18)");
+    assert_eq!(p.border_bright, "rgba(138, 180, 248, 0.45)");
+    assert_eq!(p.text, "#eef2ff");
+    assert_eq!(p.muted, "#8b9cb8");
+    assert_eq!(p.accent, "#7eb8ff");
+    assert_eq!(p.accent_2, "#c4a5ff");
+    assert_eq!(p.glow, "rgba(126, 184, 255, 0.35)");
+    assert_eq!(p.sidebar_w, "272px");
+    assert_eq!(p.edge_docs, "#90c490");
+    assert_eq!(p.edge_code, "#c49ab0");
+    assert_eq!(p.edge_toml, "#7eb8c4");
+    assert_eq!(p.ext_md, "#58a6ff");
+    assert_eq!(p.ext_rs, "#f0883e");
+    assert_eq!(p.ext_json, "#3fb950");
+    assert_eq!(p.ext_toml, "#7eb8c4");
+    assert_eq!(p.sprint, "#a78bfa");
+    assert_eq!(p.bg_tone, "0.8");
+    assert_eq!(p.galaxy_bg_opacity, "0.15");
+}
+
+#[test]
+fn vision_palette_wire_ok_with_real_workspace() {
+    let dir = temp_data_dir("palette-wire");
+    let wire = vision::wire_palette(&repo_root(), &dir);
+    assert_eq!(wire["ok"], true);
+    assert!(wire["revision"].as_u64().unwrap_or(0) > 0);
+    assert_eq!(wire["bg_deep"], "#06080f");
+    assert_eq!(wire["accent"], "#7eb8ff");
+    assert_eq!(wire["sprint"], "#a78bfa");
+    assert!(wire["layers"].as_array().map(|a| a.len()).unwrap_or(0) >= 6);
+    assert!(wire["layers_dim"].as_array().map(|a| a.len()).unwrap_or(0) >= 6);
+}
+
+#[test]
+fn vision_palette_css_root_contains_all_legacy_vars() {
+    let css = vision::GalaxyPalette::legacy().as_css_root();
+    for name in [
+        "--bg-deep",
+        "--bg",
+        "--panel",
+        "--panel-solid",
+        "--border",
+        "--border-bright",
+        "--text",
+        "--muted",
+        "--accent",
+        "--accent-2",
+        "--glow",
+        "--sidebar-w",
+        "--L0",
+        "--L1",
+        "--L2",
+        "--L3",
+        "--L4",
+        "--L5",
+        "--L0-dim",
+        "--L1-dim",
+        "--L2-dim",
+        "--L3-dim",
+        "--L4-dim",
+        "--L5-dim",
+        "--edge-docs",
+        "--edge-code",
+        "--edge-toml",
+        "--ext-md",
+        "--ext-rs",
+        "--ext-json",
+        "--ext-toml",
+        "--sprint",
+        "--bg-tone",
+        "--galaxy-bg-opacity",
+    ] {
+        assert!(css.contains(name), "missing legacy var {name}");
+    }
+}
+
+#[test]
+fn vision_starfield_svg_modes_shape_and_empty_state() {
+    let dir = temp_data_dir("starfield-svg");
+    let eco = vision::starfield_svg_wire(&repo_root(), &dir, Some("eco"));
+    let fx = vision::starfield_svg_wire(&repo_root(), &dir, Some("fx"));
+    let ms = vision::starfield_svg_wire(&repo_root(), &dir, Some("ms"));
+    assert!(eco.starts_with("<svg"));
+    assert!(fx.starts_with("<svg"));
+    assert!(ms.starts_with("<svg"));
+    assert!(eco.contains("starfield · Eco · 48 stars"));
+    assert!(fx.contains("starfield · FX · 160 stars"));
+    assert!(ms.contains("starfield · Ms · 96 stars"));
+    assert!(
+        fx.contains("rgba(126, 184, 255, 0.14)"),
+        "FX adds glow halo"
+    );
+    assert!(
+        !eco.contains("rgba(126, 184, 255, 0.14)"),
+        "Eco has no glow"
+    );
+    let no_mode = vision::starfield_svg_wire(&repo_root(), &dir, None);
+    assert!(
+        no_mode.contains("starfield · FX · 160 stars"),
+        "default → FX"
+    );
+}
+
+#[test]
+fn vision_galaxy_svg_nebula_parity() {
+    let svg = vision::galaxy_svg();
+    assert!(svg.starts_with("<svg"));
+    assert!(svg.contains("<defs>"));
+    assert!(svg.contains("radialGradient"));
+    assert!(svg.contains("url(#g1)"));
+    assert!(svg.contains("url(#g2)"));
+    assert!(svg.contains("galaxy backdrop"));
+    assert!(svg.contains("#7eb8ff"));
+    assert!(svg.contains("#c4a5ff"));
+    assert!(svg.contains("#06080f"));
+}
+
+#[test]
+fn vision_starfield_galaxy_svg_wires_render() {
+    let eco = vision::starfield_svg(vision::StarfieldMode::Eco);
+    let fx = vision::starfield_svg(vision::StarfieldMode::Fx);
+    let ms = vision::starfield_svg(vision::StarfieldMode::Ms);
+    assert!(eco.starts_with("<svg"));
+    assert!(fx.starts_with("<svg"));
+    assert!(ms.starts_with("<svg"));
+    assert_eq!(
+        eco,
+        vision::starfield_svg(vision::StarfieldMode::Eco),
+        "deterministic"
+    );
+    let galaxy = vision::galaxy_svg();
+    assert!(galaxy.starts_with("<svg"));
+    assert!(galaxy.contains("radialGradient"));
+    assert!(galaxy.contains("url(#g1)"));
+    assert!(galaxy.contains("url(#g2)"));
+}

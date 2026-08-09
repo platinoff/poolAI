@@ -4,18 +4,18 @@
 Оновлюється в кінці кожного band. Лічильники — вимірювані (`wc -l`, `cargo test`,
 `cargo run --bin gsv-loc-audit`), не з пам'яті.
 
-## Стан (2026-08-08 · band 118 ✅)
+## Стан (2026-08-08 · band 119 ✅)
 
 - **Канон:** Rust **95–100%** / wasm **0–5%** (завжди), без Python/Java; bins — лише `src/bin/`.
-- **Ratio (виміряно):** `cargo run --bin gsv-loc-audit` → **95.35%** (rust 8328 / product 8734) — gate ≥95% ✅.
+- **Ratio (виміряно):** `cargo run --bin gsv-loc-audit` → **95.18%** (rust 9148 / product 9611) — gate ≥95% ✅.
   Звіт: `GSV/data/rust_ratio.json` (gitignored).
-- **Тести (виміряно):** `cargo test` → **163** (71 unit + 8 `gsv_omni_contracts` + 7 `gsv_ratio_contracts`
-  + 25 `gsv_server_contracts` + 8 `gsv_update_flow` + 44 `gsv_vision_contracts`).
+- **Тести (виміряно):** `cargo test` → **183** (81 unit + 8 `gsv_omni_contracts` + 7 `gsv_ratio_contracts`
+  + 29 `gsv_server_contracts` + 8 `gsv_update_flow` + 50 `gsv_vision_contracts`).
   `cargo clippy --all-targets` → **0** warnings. `cargo fmt` clean.
 - **Бокси:** Tracker · SLI console · Toolchain · IDE · Update/offline · Box preview · SLI terminal ·
   Tests/bench hooks · **Ratio** · **Vision** · **Vision Map** · **Sprint Map** · **Doc Preview** ·
   **Vision Sync** · **Sprint Queue** · **Sprint Board** · **Sprint Progress** · **Sprint Focus** ·
-  **OmniRouter** (Rust AI-проксі/роутер).
+  **Galaxy UI parity** (band 119) · **OmniRouter** (Rust AI-проксі/роутер).
 
 ## Що зроблено
 
@@ -249,6 +249,36 @@
 - **PH-S1827** vision-sync close: `poolai-vision-sync` rev **471**; `--check` ok; feed/manifest updated.
 - **PH-S1828** Band close: ratio hold (95.35%), fmt, clippy 0, cargo test (163), docs canon,
   vision-sync rev 471, push.
+
+### Band 119 (PH-S1829…S1838, ✅ 2026-08-08) — GSV Galaxy UI full parity (colors + box behaviors)
+- **PH-S1829** `docs/gsv/GSV_TECH_ROADMAP.md` band 119 (PH-S1829…S1838): full `vision.css`
+  `:root` palette + header chrome (ticker, GPU modes, power menu) + panel dock/collapse/
+  fullscreen + starfield/galaxy backdrop scope.
+- **PH-S1830** `GalaxyPalette` struct (bg-deep/bg/panel/panel-solid/border/border-bright/
+  text/muted/accent/accent-2/glow/sidebar-w, `layers`+`layers_dim` L0–L5, `edge_docs`/
+  `edge_code`/`edge_toml`, `ext_md`/`ext_rs`/`ext_json`/`ext_toml`, `sprint`, `bg_tone`,
+  `galaxy_bg_opacity`) + `wire_palette` → `GET /api/vision/palette` (exact legacy `:root`
+  values + `ok`/`revision`).
+- **PH-S1831** `StarfieldMode`/`starfield_svg` (deterministic LCG per mode; eco sparse/static,
+  fx dense+glow, ms medium) → `GET /api/vision/starfield.svg?mode=eco|fx|ms` (`image/svg+xml`).
+- **PH-S1832** `galaxy_svg` (radial nebula gradients + spiral-arm ellipses) →
+  `GET /api/vision/galaxy.svg` (`image/svg+xml`).
+- **PH-S1833** header chrome: RSS ticker (`loadRssTicker` → `/api/vision/feed?status=all`,
+  duplicated track), GPU mode button (`btnGpu` Eco/FX/Ms cycle → `body.vision-(eco|fx|ms)` +
+  starfield re-request), power menu (`powerSoft` → `/api/vision/sync`, `powerReload` → resync,
+  `powerOffline` → forced offline), meta-rev/meta-trail.
+- **PH-S1834** panel dock + Esc-fullscreen: card `–` collapse → `syncDock()` chips (restore);
+  `□` fullscreen + `Esc` exits; `.galaxy-backdrop` `<img>` + `#starfield` fixed backdrops
+  (ratio-safe `.svg`).
+- **PH-S1835** contracts: `gsv_vision_contracts` (palette == legacy `:root`, starfield/galaxy
+  svg shape + mode variance, empty-state) → **50**; `gsv_server_contracts` (palette +
+  starfield + galaxy 200 + `image/svg+xml`) → **29**.
+- **PH-S1836** `GSV/docs/VISION.md` +band 119 (palette/starfield/galaxy/header UI) +
+  `LEGACY_PARITY.md` rows migrated; MEMORY band 119; HANDOFF/NEXT band 119.
+- **PH-S1837** Ratio hold advisory: `gsv-loc-audit` **95.18%** (UI delta компенсовано Rust
+  tests; JS compact); vision-sync rev **472** (poolai + gsv + `--check`).
+- **PH-S1838** Band close: ratio hold (95.18%), fmt, clippy 0, cargo test (**183**), docs canon,
+  vision-sync rev 472, push.
 
 ## Важливі факти (не забувати)
 

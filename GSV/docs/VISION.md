@@ -6,7 +6,9 @@
 GSV pointer page; `vision.js`/`vision.css` → DEACTIVATED banner (архів, не видаляємо);
 живий UI — `gsv-server` → `http://127.0.0.1:8891/`. **band 118 (PH-S1819…S1828, ✅)** —
 sprint UI migration: sprint theme wire (legacy `--sprint` palette) + Rust-rendered
-sprint focus SVG.
+sprint focus SVG. **band 119 (PH-S1829…S1838, ✅)** — Galaxy UI full parity: full legacy
+`:root` palette wire (`GET /api/vision/palette`), Rust-rendered starfield/galaxy backdrop
+SVG, header chrome (RSS ticker, GPU mode cycle, power menu), panel dock + Esc-fullscreen.
 
 ## Що це
 
@@ -66,6 +68,17 @@ sprint focus SVG.
   - `GET /api/vision/sprint-focus.svg?sprint=` — **band 118**: Rust-rendered sprint focus
     map (sprint nodes highlighted, out-of-scope `opacity 0.22`/text `0.28`, edges tinted);
     default = active sprint, empty-state svg коли жоден node не посилається на спринт.
+  - `GET /api/vision/palette` — **band 119**: повний legacy Galaxy palette wire
+    (`GalaxyPalette`: bg-deep/bg/panel/panel-solid/border/border-bright/text/muted/accent/
+    accent-2/glow/sidebar-w, `layers`+`layers_dim` L0–L5, `edge_docs`/`edge_code`/`edge_toml`,
+    `ext_md`/`ext_rs`/`ext_json`/`ext_toml`, `sprint`, `bg_tone`, `galaxy_bg_opacity`;
+    exact legacy `:root` values) + `ok`/`revision` context.
+  - `GET /api/vision/starfield.svg?mode=eco|fx|ms` — **band 119**: Rust-rendered starfield
+    backdrop (deterministic LCG seeded by mode; eco sparse/static, fx dense+glow, ms medium;
+    `image/svg+xml`, `Cache-Control: no-cache`).
+  - `GET /api/vision/galaxy.svg` — **band 119**: Rust-rendered galaxy backdrop
+    (radial nebula gradients + spiral-arm hints from the legacy `:root` palette;
+    `image/svg+xml`, `Cache-Control: no-cache`).
   - `GET /assets/vision.svg` — **band 110**: порт `docs/vision/vision.svg` (isometric diagram,
     `image/svg+xml`, include_str! з `GSV/ui/vision.svg`).
 
@@ -188,6 +201,47 @@ UI: **Sprint Focus card** у `ui/index.html` (input sprint id + «Show focus» b
 `<img id="i-sprint-focus">`); theme wire (`loadSprintTheme`) застосовує CSS-змінні
 `--sprint*` на `documentElement`; sprint-pill/queue chips у Sprint Queue + Sprint Board cards.
 
+## Galaxy UI full parity: palette + backdrop + header chrome (band 119)
+
+`GalaxyPalette` (band 119) — повний legacy `:root` palette (`vision.css`), wired verbatim:
+
+- Кольори фону/панелей/тексту (`bg_deep` `#06080f`, `bg` `#0a0e18`, `panel`, `panel_solid`,
+  `border`, `border_bright`, `text` `#eef2ff`, `muted` `#8b9cb8`), акценти (`accent` `#7eb8ff`,
+  `accent_2` `#c4a5ff`, `glow`), `sidebar_w` `272px`.
+- `layers` + `layers_dim` — L0–L5 base/dim per-layer colors; `edge_docs`/`edge_code`/
+  `edge_toml`; `ext_md`/`ext_rs`/`ext_json`/`ext_toml`; `sprint` (`#a78bfa`); `bg_tone` `0.8`;
+  `galaxy_bg_opacity` `0.15`.
+- `wire_palette` → `{ok, revision, ...palette}`; missing source manifest → `revision: 0`.
+- UI `loadGalaxyPalette()` застосовує `--*` CSS-змінні на `documentElement` (exact legacy
+  look; **без** переносу `vision.css` — ratio-safe).
+
+`starfield_svg(mode)` (band 119) — Rust-rendered backdrop:
+
+- Deterministic LCG (seed per mode) → `star_count` stars (`eco` sparse/static, `fx`
+  dense + glow halos, `ms` medium), fill `rgba(200, 220, 255, …)`.
+- `GET /api/vision/starfield.svg?mode=` — `image/svg+xml`, `Cache-Control: no-cache`.
+- UI `<img id="starfield">` + GPU button (Eco/FX/Ms cycle → `body.vision-(eco|fx|ms)`).
+- Empty manifest → `svg_empty` (card не падає).
+
+`galaxy_svg()` (band 119) — Rust-rendered nebula backdrop:
+
+- Radial gradients `g1`/`g2` (accent/`accent_2`/bg-tone stops) + spiral-arm ellipses;
+  `GET /api/vision/galaxy.svg` — `image/svg+xml`, `Cache-Control: no-cache`.
+- UI `.galaxy-backdrop` `<img>` (fixed, `pointer-events:none`, opacity
+  `var(--galaxy-bg-opacity)`).
+
+Header chrome (band 119):
+
+- **RSS ticker** (`#rssTicker`): label + viewport + duplicated track from
+  `/api/vision/feed?status=all` (≤30 items, open/closed class).
+- **GPU mode button** (`#btnGpu`): Eco → FX → Ms cycle → re-requests
+  `/api/vision/starfield.svg?mode=` + `body` class.
+- **Power menu** (`#btnPower`): Soft sync Vision → `GET /api/vision/sync` + resync,
+  Reload UI → resync, Force offline → `setOffline(true)`.
+- **Panel dock + Esc-fullscreen**: card `–` collapse → dock chips (restore on click);
+  `□` fullscreen toggle + `Esc` exits (clears `.card.fullscreen`,
+  `body.panel-fs-active`). All JS = thin glue (ratio-safe).
+
 ## Ratio-safe політика
 
 `vision.js` (161 KB) / `vision.css` (50 KB) legacy не переносяться у `GSV/ui/` — це знищило б
@@ -203,4 +257,9 @@ per-layer nodes/linked таблиця) у `ui/index.html`. Band 116 додає `
 Band 118 додає **Sprint Focus card** (`sprint-focus.svg` + sprint id input) та sprint
 theme wire (CSS-змінні `--sprint*` + sprint-pill/queue chips у Sprint Queue/Board cards).
 `.svg` у ratio-аудиті Ignored — порт діаграми ratio-neutral.
+Band 119 додає **Galaxy UI full parity**: `GET /api/vision/palette` (повний legacy `:root`
+wire + `loadGalaxyPalette` CSS-змінні), Rust-rendered starfield + galaxy backdrop
+(`/api/vision/starfield.svg?mode=` + `/api/vision/galaxy.svg`), header chrome (RSS ticker,
+GPU mode cycle, power menu) та panel dock + Esc-fullscreen у `ui/index.html` — всі фічі
+реалізовані Rust wire + компактним UI glue, без переносу legacy `vision.js`/`vision.css`.
 Див. [`GSV_MIGRATION.md`](../../docs/gsv/GSV_MIGRATION.md) і [`LEGACY_PARITY.md`](./LEGACY_PARITY.md).

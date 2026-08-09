@@ -46,17 +46,36 @@ pre.out{background:var(--panel2);border:1px solid var(--line);border-radius:6px;
 .card h2 .actions{display:flex;gap:4px;align-items:center}
 .card h2 .actions button{background:transparent;border:1px solid var(--line);color:var(--dim);cursor:pointer;padding:1px 6px;font-size:10px;border-radius:4px;font-family:inherit}
 .card h2 .actions button:hover{color:var(--accent);border-color:var(--accent);background:var(--panel)}
+.galaxy-backdrop{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}.galaxy-backdrop img{position:absolute;inset:-8%;width:116%;height:116%;object-fit:cover;opacity:var(--galaxy-bg-opacity,0.15);pointer-events:none}#starfield{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;opacity:calc(0.45*var(--bg-tone,0.8))}body>header,main{position:relative;z-index:2}
+.rss-ticker{display:none;align-items:center;gap:10px;padding:4px 14px 3px;border-bottom:1px solid var(--border,var(--line));background:rgba(12,18,30,0.88);min-height:30px;overflow:hidden;position:relative;z-index:3}.rss-ticker-label{flex:0 0 auto;font-size:0.62rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--sprint,#a78bfa);padding:2px 6px;border:1px solid rgba(167,139,250,0.35);border-radius:4px;background:rgba(167,139,250,0.08)}
+.rss-ticker-viewport{flex:1;min-width:0;overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 28px,#000 calc(100% - 28px),transparent)}.rss-ticker-track{display:inline-flex;gap:26px;margin:0;padding:0;list-style:none;white-space:nowrap;animation:rss-scroll 70s linear infinite}@keyframes rss-scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.rss-ticker-item{display:inline-flex;gap:6px;font-size:0.7rem;color:var(--dim,#8b9cb8);cursor:pointer}.rss-ticker-item strong{color:var(--sprint,#a78bfa)}
+.header-actions{display:flex;gap:6px;align-items:center;margin-left:auto}
+.power-menu{position:absolute;top:46px;right:14px;background:var(--panel-solid,#141c2e);border:1px solid var(--border-bright,rgba(138,180,248,0.45));border-radius:8px;padding:8px;display:none;flex-direction:column;gap:6px;z-index:40;box-shadow:0 10px 30px rgba(0,0,0,0.6)}.power-menu.open{display:flex}.power-menu button{white-space:nowrap}
+.panel-dock{position:sticky;top:0;z-index:3;display:none;flex-wrap:wrap;gap:6px;padding:6px 18px;background:var(--panel,#121a2a);border-bottom:1px solid var(--line);align-items:center}.panel-dock.visible{display:flex}.panel-dock .dock-title{font-size:11px;color:var(--dim,#8b9cb8);text-transform:uppercase;letter-spacing:0.06em;margin-right:4px}.dock-chip{padding:2px 8px;border:1px solid var(--line);border-radius:6px;font-size:11px;cursor:pointer;color:var(--accent,#7eb8ff);background:var(--panel2,#141c2e)}.dock-chip:hover{border-color:var(--accent)}
+body.panel-fs-active .card{display:none!important}body.panel-fs-active .card.fullscreen{display:flex!important}
 </style>
 </head>
 <body>
+<div class="galaxy-backdrop" aria-hidden="true"><img id="galaxyBackdrop" src="/api/vision/galaxy.svg" alt=""></div>
+<img id="starfield" src="/api/vision/starfield.svg?mode=fx" alt="" aria-hidden="true">
+<div id="rssTicker" class="rss-ticker" aria-label="Sprint feed ticker"><span class="rss-ticker-label" title="FM §5.12 feed from feed.json">Feed</span><div class="rss-ticker-viewport" aria-live="polite"><ul class="rss-ticker-track" id="rssTickerTrack"></ul></div></div>
 <header>
   <h1>Galaxy StarWalker Vision</h1>
   <span class="meta" id="meta">…</span>
+  <span class="meta" id="metaTrail">…</span>
   <span id="status" class="badge online">online</span>
   <span id="updateBadge" class="badge update" style="display:none" onclick="doUpdate()">Update</span>
-  <button onclick="resync()">Resync</button>
-  <button onclick="notifyUpdate()">notify update</button>
+  <div class="header-actions" aria-label="Vision controls">
+    <button id="btnGpu" class="badge gpu" title="GPU mode — Eco low GPU, FX full glow, Ms medium. Click → cycle" onclick="cycleGpuMode()">FX</button>
+    <button id="btnAuto" class="badge" title="Auto-reload when vision files change" onclick="toggleAuto()">Auto</button>
+    <button onclick="resync()">Resync</button>
+    <button onclick="notifyUpdate()">notify update</button>
+    <button id="btnPower" class="badge" title="Vision power — soft sync / reload" aria-haspopup="true" aria-expanded="false" onclick="togglePowerMenu()">⏻ Power</button>
+    <div id="powerMenu" class="power-menu" role="menu" aria-label="Vision power"><button onclick="powerSoft()">Soft sync Vision</button><button onclick="powerReload()">Reload UI</button><button class="err" onclick="powerOffline()">Force offline</button></div>
+  </div>
 </header>
+<div id="panelDock" class="panel-dock" aria-label="Collapsed panels — click to restore"></div>
 
 <main id="grid">
   <section class="card"><h2>Health <span class="hint">/api/health</span></h2><div class="body" id="b-health">…</div></section>
@@ -109,28 +128,20 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!h2) return;
     const actions = document.createElement("span");
     actions.className = "actions";
-    
     const minBtn = document.createElement("button");
-    minBtn.textContent = "_";
-    minBtn.title = "Minimize / Restore";
-    minBtn.onclick = (e) => {
-      e.stopPropagation();
-      card.classList.toggle("collapsed");
-      minBtn.textContent = card.classList.contains("collapsed") ? "+" : "_";
-    };
-    
+    minBtn.textContent = "_"; minBtn.title = "Minimize / Restore";
+    minBtn.onclick = (e) => { e.stopPropagation(); card.classList.toggle("collapsed"); minBtn.textContent = card.classList.contains("collapsed") ? "+" : "_"; syncDock(); };
     const maxBtn = document.createElement("button");
-    maxBtn.textContent = "□";
-    maxBtn.title = "Fullscreen Toggle";
-    maxBtn.onclick = (e) => {
-      e.stopPropagation();
-      card.classList.toggle("fullscreen");
-      maxBtn.textContent = card.classList.contains("fullscreen") ? "×" : "□";
-    };
-    
-    actions.appendChild(minBtn);
-    actions.appendChild(maxBtn);
+    maxBtn.textContent = "□"; maxBtn.title = "Fullscreen Toggle (Esc)";
+    maxBtn.onclick = (e) => { e.stopPropagation(); const on = card.classList.toggle("fullscreen"); maxBtn.textContent = on ? "×" : "□"; document.body.classList.toggle("panel-fs-active", on); };
+    actions.appendChild(minBtn); actions.appendChild(maxBtn);
     h2.appendChild(actions);
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    document.querySelectorAll(".card.fullscreen").forEach(c => { c.classList.remove("fullscreen"); const b = c.querySelector(".actions button:last-child"); if (b) b.textContent = "□"; });
+    document.body.classList.remove("panel-fs-active");
+    const pm = $("powerMenu"); if (pm) pm.classList.remove("open");
   });
 });
 async function get(path) { const res = await fetch(path); if (!res.ok) throw new Error(path + " → " + res.status); return res.json(); }
@@ -190,6 +201,7 @@ function renderRatio(d) {
 }
 function renderVision(d) {
   if (!d.ok) { $("b-vision").innerHTML = "<span class='err'>" + esc(d.error || "vision unavailable") + "</span>"; return; }
+  $("metaTrail").textContent = "rev " + d.revision + " · next " + (d.next_sprint || "—") + " · " + (d.git_head || "");
   $("b-vision").innerHTML = "<div>Vision rev <kbd>" + d.revision + "</kbd> · git <span class='dim'>" + esc(d.git_head || "—") +
     "</span> · updated <span class='dim'>" + esc(d.updated_at || "—") + "</span></div>" +
     "<div class='dim'>nodes " + d.nodes_count + " · edges " + d.edges_count + " · next <kbd>" + esc(d.next_sprint) +
@@ -341,6 +353,16 @@ function openSearchNode(id) {
   $("dpId").value = id;
   loadDocPreview();
 }
+let gpuMode="fx",autoReload=true;const GPU_MODES=["eco","fx","ms"],GPU_LABELS={eco:"Eco",fx:"FX",ms:"Ms"};
+function cycleGpuMode(){gpuMode=GPU_MODES[(GPU_MODES.indexOf(gpuMode)+1)%3];$("btnGpu").textContent=GPU_LABELS[gpuMode];$("starfield").src="api/vision/starfield.svg?mode="+gpuMode;document.body.className=document.body.className.replace(/\bvision-(eco|fx|ms)\b/g,"")+" vision-"+gpuMode}
+function toggleAuto(){autoReload=!autoReload;$("btnAuto").textContent=autoReload?"Auto":"Manual";$("btnAuto").classList.toggle("off",!autoReload)}
+function togglePowerMenu(){const pm=$("powerMenu");pm.classList.toggle("open");$("btnPower").setAttribute("aria-expanded",pm.classList.contains("open")?"true":"false")}
+async function powerSoft(){$("powerMenu").classList.remove("open");$("b-vision-sync-status").textContent="syncing…";try{renderVisionSync(await get("api/vision/sync"));await resync();toast("vision synced")}catch(e){$("b-vision-sync-status").textContent="error";toast(String(e))}}
+function powerReload(){$("powerMenu").classList.remove("open");resync();toast("resync ok")}
+function powerOffline(){$("powerMenu").classList.remove("open");setOffline(true);toast("forced offline")}
+function syncDock(){const dock=$("panelDock");dock.innerHTML="<span class='dock-title'>docked</span>";let n=0;document.querySelectorAll(".card.collapsed").forEach(card=>{const id=card.getAttribute("data-id")||card.querySelector("h2").childNodes[0].textContent.trim();const chip=document.createElement("span");chip.className="dock-chip";chip.textContent=id;chip.title="restore "+id;chip.onclick=()=>{card.classList.remove("collapsed");const b=card.querySelector(".actions button");if(b)b.textContent="_";syncDock()};dock.appendChild(chip);n++});dock.classList.toggle("visible",n>0)}
+async function loadGalaxyPalette(){try{const d=await get("api/vision/palette");if(!d.ok)return;const set=(k,v)=>{if(v)document.documentElement.style.setProperty(k,v)};set("--bg-deep",d.bg_deep);set("--bg",d.bg);set("--panel",d.panel);set("--panel-solid",d.panel_solid);set("--border",d.border);set("--border-bright",d.border_bright);set("--text",d.text);set("--muted",d.muted);set("--accent",d.accent);set("--accent-2",d.accent_2);set("--glow",d.glow);set("--sidebar-w",d.sidebar_w);set("--edge-docs",d.edge_docs);set("--edge-code",d.edge_code);set("--edge-toml",d.edge_toml);set("--ext-md",d.ext_md);set("--ext-rs",d.ext_rs);set("--ext-json",d.ext_json);set("--ext-toml",d.ext_toml);set("--sprint",d.sprint);set("--bg-tone",d.bg_tone);set("--galaxy-bg-opacity",d.galaxy_bg_opacity);(d.layers||[]).forEach(l=>set("--"+l.id,l.color));(d.layers_dim||[]).forEach(l=>set("--"+l.id+"-dim",l.color))}catch(e){}}
+async function loadRssTicker(){try{const d=await get("api/vision/feed?status=all");const items=d.feed&&d.feed.items||[];if(!items.length){$("rssTicker").style.display="none";return}$("rssTicker").style.display="flex";const li=items.slice(0,30).map(i=>"<li class='rss-ticker-item "+(i.status==="closed"?"closed":"open")+"' title='"+esc(i.id+": "+(i.title||""))+"'><strong>"+esc(i.id)+"</strong><span>"+esc(i.title||"")+"</span></li>").join("");$("rssTickerTrack").innerHTML=li+li}catch(e){$("rssTicker").style.display="none"}}
 function renderOmni(d) {
   $("b-omni-summary").innerHTML = "providers " + (d.providers || []).length + " · models " + (d.models || []).length +
     " · default <kbd>" + esc(d.routing.default_provider) + "</kbd>";
@@ -437,10 +459,9 @@ function connectSse() {
   es.addEventListener("update_available", () => { $("updateBadge").style.display = "inline-block"; });
   es.addEventListener("ready", () => resync());
 }
-resync();
-loadSprintTheme();
-connectSse();
+resync();loadSprintTheme();loadGalaxyPalette();loadRssTicker();connectSse();
 setInterval(() => get("api/health").then(renderHealth).catch(() => setOffline(true)), 30000);
+setInterval(() => { if (autoReload) resync(); }, 60000);
 </script>
 </body>
 </html>

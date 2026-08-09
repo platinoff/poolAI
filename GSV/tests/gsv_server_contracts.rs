@@ -430,3 +430,91 @@ async fn vision_sprint_focus_svg_endpoint() {
     assert!(svg.contains("sprint focus: PH-S146"));
     assert!(svg.contains("#a78bfa"));
 }
+
+#[tokio::test]
+async fn vision_palette_endpoint() {
+    let (app, _state) = app();
+    let (status, json) = get(&app, "/api/vision/palette").await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(json["ok"], true);
+    assert!(json["revision"].as_u64().unwrap_or(0) > 0);
+    assert_eq!(json["bg_deep"], "#06080f");
+    assert_eq!(json["bg"], "#0a0e18");
+    assert_eq!(json["panel"], "rgba(18, 26, 42, 0.72)");
+    assert_eq!(json["panel_solid"], "#141c2e");
+    assert_eq!(json["border_bright"], "rgba(138, 180, 248, 0.45)");
+    assert_eq!(json["accent"], "#7eb8ff");
+    assert_eq!(json["accent_2"], "#c4a5ff");
+    assert_eq!(json["glow"], "rgba(126, 184, 255, 0.35)");
+    assert_eq!(json["sidebar_w"], "272px");
+    assert_eq!(json["edge_docs"], "#90c490");
+    assert_eq!(json["ext_rs"], "#f0883e");
+    assert_eq!(json["sprint"], "#a78bfa");
+    assert_eq!(json["bg_tone"], "0.8");
+    assert_eq!(json["galaxy_bg_opacity"], "0.15");
+    assert!(json["layers"].as_array().map(|a| a.len()).unwrap_or(0) >= 6);
+    assert!(json["layers_dim"].as_array().map(|a| a.len()).unwrap_or(0) >= 6);
+}
+
+#[tokio::test]
+async fn vision_starfield_svg_endpoint() {
+    let (app, _state) = app();
+    let (status, svg) = get_text(&app, "/api/vision/starfield.svg?mode=fx").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(svg.starts_with("<svg"));
+    assert!(svg.contains("starfield · FX · 160 stars"));
+    assert!(svg.contains("rgba(126, 184, 255, 0.14)"));
+
+    let (status, eco) = get_text(&app, "/api/vision/starfield.svg?mode=eco").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(eco.contains("starfield · Eco · 48 stars"));
+    assert!(!eco.contains("rgba(126, 184, 255, 0.14)"));
+
+    let (status, default) = get_text(&app, "/api/vision/starfield.svg").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(
+        default.contains("starfield · FX · 160 stars"),
+        "default → FX"
+    );
+}
+
+#[tokio::test]
+async fn vision_galaxy_svg_endpoint() {
+    let (app, _state) = app();
+    let (status, svg) = get_text(&app, "/api/vision/galaxy.svg").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(svg.starts_with("<svg"));
+    assert!(svg.contains("radialGradient"));
+    assert!(svg.contains("galaxy backdrop"));
+}
+
+#[tokio::test]
+async fn starfield_galaxy_svg_have_svg_content_type() {
+    let (app, _state) = app();
+    for path in [
+        "/api/vision/starfield.svg?mode=fx",
+        "/api/vision/galaxy.svg",
+    ] {
+        let res = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .uri(path)
+                    .method(Method::GET)
+                    .body(Body::empty())
+                    .expect("request"),
+            )
+            .await
+            .expect("response");
+        assert_eq!(res.status(), StatusCode::OK, "path {path}");
+        let ct = res
+            .headers()
+            .get(header::CONTENT_TYPE)
+            .and_then(|v| v.to_str().ok());
+        assert!(
+            ct.is_some_and(|v| v.contains("image/svg+xml")),
+            "path {path} content-type: {:?}",
+            ct
+        );
+    }
+}

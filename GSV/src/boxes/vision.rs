@@ -2005,6 +2005,349 @@ pub fn sprint_focus_svg(repo_root: &Path, data_dir: &Path, sprint: &str) -> Stri
     )
 }
 
+// ---------------------------------------------------------------------------
+// Galaxy UI full parity (band 119): full legacy `:root` palette wire plus
+// server-rendered starfield / galaxy backdrop SVGs. All colors are the exact
+// values from `docs/vision/vision.css` :root (deactivated band 117), so the
+// GSV interface reproduces the Galaxy StarWalker look 1:1 while staying
+// ratio-safe (no client JS/CSS palette or canvas code).
+// ---------------------------------------------------------------------------
+
+/// Starfield render mode (legacy `btn-eco` cycle Eco → FX → Ms).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum StarfieldMode {
+    /// `Eco` — low GPU: sparse static stars, no glow.
+    Eco,
+    /// `FX` — full glow: dense stars with accent glow halos.
+    Fx,
+    /// `Ms` — mid: medium density, static (1-hop hover trace not applicable).
+    Ms,
+}
+
+impl StarfieldMode {
+    /// Parse a query-string mode; unknown/empty falls back to `Fx`.
+    pub fn parse(raw: Option<&str>) -> StarfieldMode {
+        match raw.map(str::trim).map(str::to_ascii_lowercase).as_deref() {
+            Some("eco") => StarfieldMode::Eco,
+            Some("fx") => StarfieldMode::Fx,
+            Some("ms") => StarfieldMode::Ms,
+            _ => StarfieldMode::Fx,
+        }
+    }
+
+    /// Star count per mode (legacy `STAR_COUNT_FX` density scale).
+    pub fn star_count(self) -> usize {
+        match self {
+            StarfieldMode::Eco => 48,
+            StarfieldMode::Fx => 160,
+            StarfieldMode::Ms => 96,
+        }
+    }
+
+    /// Whether glow halos render (legacy FX glow / Eco+Ms low-GPU).
+    pub fn has_glow(self) -> bool {
+        matches!(self, StarfieldMode::Fx)
+    }
+
+    /// SVG footer label.
+    pub fn label(self) -> &'static str {
+        match self {
+            StarfieldMode::Eco => "Eco",
+            StarfieldMode::Fx => "FX",
+            StarfieldMode::Ms => "Ms",
+        }
+    }
+}
+
+/// Full legacy Galaxy palette (`vision.css` `:root`), wired verbatim.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct GalaxyPalette {
+    pub bg_deep: String,
+    pub bg: String,
+    pub panel: String,
+    pub panel_solid: String,
+    pub border: String,
+    pub border_bright: String,
+    pub text: String,
+    pub muted: String,
+    pub accent: String,
+    pub accent_2: String,
+    pub glow: String,
+    pub sidebar_w: String,
+    pub layers: Vec<SprintLayerColor>,
+    pub layers_dim: Vec<SprintLayerColor>,
+    pub edge_docs: String,
+    pub edge_code: String,
+    pub edge_toml: String,
+    pub ext_md: String,
+    pub ext_rs: String,
+    pub ext_json: String,
+    pub ext_toml: String,
+    pub sprint: String,
+    pub bg_tone: String,
+    pub galaxy_bg_opacity: String,
+}
+
+/// Exact legacy `:root` color values (parity canon, do not tune).
+impl GalaxyPalette {
+    pub fn legacy() -> GalaxyPalette {
+        GalaxyPalette {
+            bg_deep: "#06080f".to_string(),
+            bg: "#0a0e18".to_string(),
+            panel: "rgba(18, 26, 42, 0.72)".to_string(),
+            panel_solid: "#141c2e".to_string(),
+            border: "rgba(120, 160, 220, 0.18)".to_string(),
+            border_bright: "rgba(138, 180, 248, 0.45)".to_string(),
+            text: "#eef2ff".to_string(),
+            muted: "#8b9cb8".to_string(),
+            accent: "#7eb8ff".to_string(),
+            accent_2: "#c4a5ff".to_string(),
+            glow: "rgba(126, 184, 255, 0.35)".to_string(),
+            sidebar_w: "272px".to_string(),
+            layers: vec![
+                SprintLayerColor {
+                    id: "L0".to_string(),
+                    color: "#3d6a9e".to_string(),
+                },
+                SprintLayerColor {
+                    id: "L1".to_string(),
+                    color: "#3d6a4a".to_string(),
+                },
+                SprintLayerColor {
+                    id: "L2".to_string(),
+                    color: "#8a7040".to_string(),
+                },
+                SprintLayerColor {
+                    id: "L3".to_string(),
+                    color: "#8a4068".to_string(),
+                },
+                SprintLayerColor {
+                    id: "L4".to_string(),
+                    color: "#6a5088".to_string(),
+                },
+                SprintLayerColor {
+                    id: "L5".to_string(),
+                    color: "#4a6880".to_string(),
+                },
+            ],
+            layers_dim: vec![
+                SprintLayerColor {
+                    id: "L0".to_string(),
+                    color: "#1e3350".to_string(),
+                },
+                SprintLayerColor {
+                    id: "L1".to_string(),
+                    color: "#243828".to_string(),
+                },
+                SprintLayerColor {
+                    id: "L2".to_string(),
+                    color: "#403520".to_string(),
+                },
+                SprintLayerColor {
+                    id: "L3".to_string(),
+                    color: "#402030".to_string(),
+                },
+                SprintLayerColor {
+                    id: "L4".to_string(),
+                    color: "#302040".to_string(),
+                },
+                SprintLayerColor {
+                    id: "L5".to_string(),
+                    color: "#203038".to_string(),
+                },
+            ],
+            edge_docs: "#90c490".to_string(),
+            edge_code: "#c49ab0".to_string(),
+            edge_toml: "#7eb8c4".to_string(),
+            ext_md: "#58a6ff".to_string(),
+            ext_rs: "#f0883e".to_string(),
+            ext_json: "#3fb950".to_string(),
+            ext_toml: "#7eb8c4".to_string(),
+            sprint: SPRINT_ACCENT.to_string(),
+            bg_tone: "0.8".to_string(),
+            galaxy_bg_opacity: "0.15".to_string(),
+        }
+    }
+
+    /// Flatten every variable as `"--name: value;"` (legacy `:root` block).
+    pub fn as_css_root(&self) -> String {
+        let mut vars = String::from("--bg-deep:");
+        vars.push_str(&self.bg_deep);
+        vars.push(';');
+        vars.push_str("--bg:");
+        vars.push_str(&self.bg);
+        vars.push(';');
+        vars.push_str("--panel:");
+        vars.push_str(&self.panel);
+        vars.push(';');
+        vars.push_str("--panel-solid:");
+        vars.push_str(&self.panel_solid);
+        vars.push(';');
+        vars.push_str("--border:");
+        vars.push_str(&self.border);
+        vars.push(';');
+        vars.push_str("--border-bright:");
+        vars.push_str(&self.border_bright);
+        vars.push(';');
+        vars.push_str("--text:");
+        vars.push_str(&self.text);
+        vars.push(';');
+        vars.push_str("--muted:");
+        vars.push_str(&self.muted);
+        vars.push(';');
+        vars.push_str("--accent:");
+        vars.push_str(&self.accent);
+        vars.push(';');
+        vars.push_str("--accent-2:");
+        vars.push_str(&self.accent_2);
+        vars.push(';');
+        vars.push_str("--glow:");
+        vars.push_str(&self.glow);
+        vars.push(';');
+        vars.push_str("--sidebar-w:");
+        vars.push_str(&self.sidebar_w);
+        vars.push(';');
+        for layer in &self.layers {
+            vars.push_str("--");
+            vars.push_str(&layer.id);
+            vars.push(':');
+            vars.push_str(&layer.color);
+            vars.push(';');
+        }
+        for layer in &self.layers_dim {
+            vars.push_str("--");
+            vars.push_str(&layer.id);
+            vars.push_str("-dim:");
+            vars.push_str(&layer.color);
+            vars.push(';');
+        }
+        vars.push_str("--edge-docs:");
+        vars.push_str(&self.edge_docs);
+        vars.push(';');
+        vars.push_str("--edge-code:");
+        vars.push_str(&self.edge_code);
+        vars.push(';');
+        vars.push_str("--edge-toml:");
+        vars.push_str(&self.edge_toml);
+        vars.push(';');
+        vars.push_str("--ext-md:");
+        vars.push_str(&self.ext_md);
+        vars.push(';');
+        vars.push_str("--ext-rs:");
+        vars.push_str(&self.ext_rs);
+        vars.push(';');
+        vars.push_str("--ext-json:");
+        vars.push_str(&self.ext_json);
+        vars.push(';');
+        vars.push_str("--ext-toml:");
+        vars.push_str(&self.ext_toml);
+        vars.push(';');
+        vars.push_str("--sprint:");
+        vars.push_str(&self.sprint);
+        vars.push(';');
+        vars.push_str("--bg-tone:");
+        vars.push_str(&self.bg_tone);
+        vars.push(';');
+        vars.push_str("--galaxy-bg-opacity:");
+        vars.push_str(&self.galaxy_bg_opacity);
+        vars.push(';');
+        vars
+    }
+}
+
+/// `GET /api/vision/palette` — full legacy Galaxy palette + revision context.
+pub fn wire_palette(repo_root: &Path, data_dir: &Path) -> Value {
+    let mut v = serde_json::to_value(GalaxyPalette::legacy()).unwrap_or_default();
+    if let serde_json::Value::Object(map) = &mut v {
+        map.insert("ok".to_string(), serde_json::Value::Bool(true));
+        let rev = source_manifest(repo_root, data_dir)
+            .map(|m| m.revision)
+            .unwrap_or(0);
+        map.insert("revision".to_string(), serde_json::Value::from(rev));
+    }
+    v
+}
+
+/// Deterministic starfield for a mode (LCG seeded by mode) — parity-safe render.
+pub fn starfield_svg(mode: StarfieldMode) -> String {
+    let count = mode.star_count();
+    let glow = mode.has_glow();
+    let mut seed: u64 = match mode {
+        StarfieldMode::Eco => 0x4a45_6c6f,
+        StarfieldMode::Fx => 0x4761_6c65,
+        StarfieldMode::Ms => 0x4d69_6c6b,
+    };
+    let mut next = move || {
+        seed = seed
+            .wrapping_mul(636_413_622_384_679_305)
+            .wrapping_add(1_4426_9507);
+        ((seed >> 16) & 0xffff) as f64 / 0x10000 as f64
+    };
+    let mut stars = String::new();
+    for _ in 0..count {
+        let x = next() * 640.0;
+        let y = next() * 160.0;
+        let r = next() * 1.1 + 0.25;
+        let a = next() * 0.4 + 0.12;
+        let fill = format!("rgba(200, 220, 255, {a:.2})");
+        if glow {
+            stars.push_str(&format!(
+                r##"<circle cx="{x:.1}" cy="{y:.1}" r="{r:.2}" fill="{fill}"/>"##
+            ));
+            stars.push_str(&format!(
+                r##"<circle cx="{x:.1}" cy="{y:.1}" r="{:.2}" fill="rgba(126, 184, 255, 0.14)"/>"##,
+                r * 2.6
+            ));
+        } else {
+            stars.push_str(&format!(
+                r##"<circle cx="{x:.1}" cy="{y:.1}" r="{r:.2}" fill="{fill}"/>"##
+            ));
+        }
+    }
+    format!(
+        r##"<svg xmlns="http://www.w3.org/2000/svg" width="640" height="160" viewBox="0 0 640 160" aria-hidden="true">
+<rect width="640" height="160" fill="#06080f"/>
+<text x="12" y="14" font-family="monospace" font-size="11" fill="#7c8ba3">starfield · {label} · {count} stars</text>
+{stars}</svg>"##,
+        label = mode.label()
+    )
+}
+
+/// `GET /api/vision/starfield.svg?mode=` — starfield backdrop (static).
+pub fn starfield_svg_wire(repo_root: &Path, data_dir: &Path, mode: Option<&str>) -> String {
+    if let Ok(m) = source_manifest(repo_root, data_dir) {
+        if m.nodes.is_empty() {
+            return svg_empty("starfield", "no manifest nodes yet");
+        }
+    }
+    starfield_svg(StarfieldMode::parse(mode))
+}
+
+/// Galaxy backdrop SVG — nebula radial gradients + spiral arm hints (parity).
+pub fn galaxy_svg() -> String {
+    r##"<svg xmlns="http://www.w3.org/2000/svg" width="640" height="160" viewBox="0 0 640 160" aria-hidden="true">
+<defs>
+<radialGradient id="g1" cx="30%" cy="40%" r="60%">
+<stop offset="0%" stop-color="#7eb8ff" stop-opacity="0.22"/>
+<stop offset="55%" stop-color="#c4a5ff" stop-opacity="0.08"/>
+<stop offset="100%" stop-color="#06080f" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="g2" cx="72%" cy="62%" r="55%">
+<stop offset="0%" stop-color="#c4a5ff" stop-opacity="0.16"/>
+<stop offset="60%" stop-color="#3d6a9e" stop-opacity="0.07"/>
+<stop offset="100%" stop-color="#0a0e18" stop-opacity="0"/>
+</radialGradient>
+</defs>
+<rect width="640" height="160" fill="#06080f"/>
+<rect width="640" height="160" fill="url(#g1)"/>
+<rect width="640" height="160" fill="url(#g2)"/>
+<ellipse cx="340" cy="88" rx="150" ry="26" fill="none" stroke="#7eb8ff" stroke-opacity="0.14" stroke-width="3" transform="rotate(-14 340 88)"/>
+<ellipse cx="340" cy="88" rx="96" ry="16" fill="none" stroke="#c4a5ff" stroke-opacity="0.12" stroke-width="2" transform="rotate(-14 340 88)"/>
+<text x="12" y="14" font-family="monospace" font-size="11" fill="#7c8ba3">galaxy backdrop</text>
+</svg>"##
+    .to_string()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -2934,11 +3277,32 @@ mod tests {
             next_sprint: "PH-S1830".to_string(),
             sprint: "#a78bfa".to_string(),
             sprint_next: "#c4b5fd".to_string(),
-            pill: SprintPillTheme { bg: "rgba(167, 139, 250, 0.2)".to_string(), border: "rgba(167, 139, 250, 0.4)".to_string(), color: "#d4c4ff".to_string() },
-            chip: SprintChipTheme { bg: "rgba(167, 139, 250, 0.15)".to_string(), border: "rgba(167, 139, 250, 0.3)".to_string(), color: "#c4b5fd".to_string() },
-            queue: SprintQueueStateTheme { open_border: "rgba(167, 139, 250, 0.35)".to_string(), open_bg: "rgba(167, 139, 250, 0.08)".to_string(), open_status: "#a78bfa".to_string(), next_border: "rgba(126, 184, 255, 0.55)".to_string(), next_glow: "rgba(126, 184, 255, 0.15)".to_string(), closed_opacity: "0.55".to_string() },
-            layers: vec![SprintLayerColor { id: "L0".to_string(), color: "#3d6a9e".to_string() }],
-            edge_kinds: vec![SprintEdgeKindColor { kind: "docs".to_string(), color: "#90c490".to_string() }],
+            pill: SprintPillTheme {
+                bg: "rgba(167, 139, 250, 0.2)".to_string(),
+                border: "rgba(167, 139, 250, 0.4)".to_string(),
+                color: "#d4c4ff".to_string(),
+            },
+            chip: SprintChipTheme {
+                bg: "rgba(167, 139, 250, 0.15)".to_string(),
+                border: "rgba(167, 139, 250, 0.3)".to_string(),
+                color: "#c4b5fd".to_string(),
+            },
+            queue: SprintQueueStateTheme {
+                open_border: "rgba(167, 139, 250, 0.35)".to_string(),
+                open_bg: "rgba(167, 139, 250, 0.08)".to_string(),
+                open_status: "#a78bfa".to_string(),
+                next_border: "rgba(126, 184, 255, 0.55)".to_string(),
+                next_glow: "rgba(126, 184, 255, 0.15)".to_string(),
+                closed_opacity: "0.55".to_string(),
+            },
+            layers: vec![SprintLayerColor {
+                id: "L0".to_string(),
+                color: "#3d6a9e".to_string(),
+            }],
+            edge_kinds: vec![SprintEdgeKindColor {
+                kind: "docs".to_string(),
+                color: "#90c490".to_string(),
+            }],
         };
         assert_eq!(theme.revision, 472);
         assert_eq!(theme.active_sprint, "PH-S1829");
@@ -2948,12 +3312,30 @@ mod tests {
 
     #[test]
     fn sprint_theme_layer_color_fallback() {
-        let l0 = SprintLayerColor { id: "L0".to_string(), color: "#3d6a9e".to_string() };
-        let l1 = SprintLayerColor { id: "L1".to_string(), color: "#3d6a4a".to_string() };
-        let l2 = SprintLayerColor { id: "L2".to_string(), color: "#8a7040".to_string() };
-        let l3 = SprintLayerColor { id: "L3".to_string(), color: "#8a4068".to_string() };
-        let l4 = SprintLayerColor { id: "L4".to_string(), color: "#6a5088".to_string() };
-        let l5 = SprintLayerColor { id: "L5".to_string(), color: "#4a6880".to_string() };
+        let l0 = SprintLayerColor {
+            id: "L0".to_string(),
+            color: "#3d6a9e".to_string(),
+        };
+        let l1 = SprintLayerColor {
+            id: "L1".to_string(),
+            color: "#3d6a4a".to_string(),
+        };
+        let l2 = SprintLayerColor {
+            id: "L2".to_string(),
+            color: "#8a7040".to_string(),
+        };
+        let l3 = SprintLayerColor {
+            id: "L3".to_string(),
+            color: "#8a4068".to_string(),
+        };
+        let l4 = SprintLayerColor {
+            id: "L4".to_string(),
+            color: "#6a5088".to_string(),
+        };
+        let l5 = SprintLayerColor {
+            id: "L5".to_string(),
+            color: "#4a6880".to_string(),
+        };
         assert_eq!(l0.id, "L0");
         assert_eq!(l1.id, "L1");
         assert_eq!(l2.id, "L2");
@@ -2978,5 +3360,149 @@ mod tests {
         assert_eq!(q.next_sprint, "PH-S1829");
         assert_eq!(q.open_count, 0);
         assert!(q.entries.is_empty());
+    }
+
+    #[test]
+    fn galaxy_palette_matches_legacy_root() {
+        let p = GalaxyPalette::legacy();
+        assert_eq!(p.bg_deep, "#06080f");
+        assert_eq!(p.bg, "#0a0e18");
+        assert_eq!(p.panel, "rgba(18, 26, 42, 0.72)");
+        assert_eq!(p.panel_solid, "#141c2e");
+        assert_eq!(p.border, "rgba(120, 160, 220, 0.18)");
+        assert_eq!(p.border_bright, "rgba(138, 180, 248, 0.45)");
+        assert_eq!(p.text, "#eef2ff");
+        assert_eq!(p.muted, "#8b9cb8");
+        assert_eq!(p.accent, "#7eb8ff");
+        assert_eq!(p.accent_2, "#c4a5ff");
+        assert_eq!(p.glow, "rgba(126, 184, 255, 0.35)");
+        assert_eq!(p.sidebar_w, "272px");
+        assert_eq!(p.edge_docs, "#90c490");
+        assert_eq!(p.edge_code, "#c49ab0");
+        assert_eq!(p.edge_toml, "#7eb8c4");
+        assert_eq!(p.ext_md, "#58a6ff");
+        assert_eq!(p.ext_rs, "#f0883e");
+        assert_eq!(p.ext_json, "#3fb950");
+        assert_eq!(p.ext_toml, "#7eb8c4");
+        assert_eq!(p.sprint, "#a78bfa");
+        assert_eq!(p.bg_tone, "0.8");
+        assert_eq!(p.galaxy_bg_opacity, "0.15");
+        assert_eq!(p.layers.len(), 6);
+        assert_eq!(p.layers[0].id, "L0");
+        assert_eq!(p.layers[0].color, "#3d6a9e");
+        assert_eq!(p.layers[5].id, "L5");
+        assert_eq!(p.layers[5].color, "#4a6880");
+        assert_eq!(p.layers_dim.len(), 6);
+        assert_eq!(p.layers_dim[0].color, "#1e3350");
+        assert_eq!(p.layers_dim[5].color, "#203038");
+    }
+
+    #[test]
+    fn galaxy_palette_css_root_flattens_all_vars() {
+        let p = GalaxyPalette::legacy();
+        let css = p.as_css_root();
+        for needle in [
+            "--bg-deep:#06080f;",
+            "--border-bright:rgba(138, 180, 248, 0.45);",
+            "--L0:#3d6a9e;",
+            "--L1-dim:#243828;",
+            "--L5-dim:#203038;",
+            "--edge-code:#c49ab0;",
+            "--ext-rs:#f0883e;",
+            "--sprint:#a78bfa;",
+            "--galaxy-bg-opacity:0.15;",
+        ] {
+            assert!(css.contains(needle), "missing {needle}");
+        }
+        assert!(!css.contains("undefined"));
+    }
+
+    #[test]
+    fn starfield_mode_parse_defaults_and_counts() {
+        assert_eq!(StarfieldMode::parse(None), StarfieldMode::Fx);
+        assert_eq!(StarfieldMode::parse(Some("ECO")), StarfieldMode::Eco);
+        assert_eq!(StarfieldMode::parse(Some("fx")), StarfieldMode::Fx);
+        assert_eq!(StarfieldMode::parse(Some("ms")), StarfieldMode::Ms);
+        assert_eq!(StarfieldMode::parse(Some("bogus")), StarfieldMode::Fx);
+        assert!(StarfieldMode::Eco.star_count() < StarfieldMode::Ms.star_count());
+        assert!(StarfieldMode::Ms.star_count() < StarfieldMode::Fx.star_count());
+        assert!(StarfieldMode::Fx.has_glow());
+        assert!(!StarfieldMode::Eco.has_glow());
+        assert!(!StarfieldMode::Ms.has_glow());
+        assert_eq!(StarfieldMode::Eco.label(), "Eco");
+        assert_eq!(StarfieldMode::Fx.label(), "FX");
+        assert_eq!(StarfieldMode::Ms.label(), "Ms");
+    }
+
+    #[test]
+    fn starfield_svg_deterministic_per_mode() {
+        let eco = starfield_svg(StarfieldMode::Eco);
+        let fx = starfield_svg(StarfieldMode::Fx);
+        let ms = starfield_svg(StarfieldMode::Ms);
+        assert!(eco.starts_with("<svg"));
+        assert!(eco.contains("starfield · Eco · 48 stars"));
+        assert!(fx.contains("starfield · FX · 160 stars"));
+        assert!(ms.contains("starfield · Ms · 96 stars"));
+        assert!(eco.contains("rgba(200, 220, 255,"));
+        assert!(fx.contains("rgba(126, 184, 255, 0.14)"));
+        assert!(!eco.contains("rgba(126, 184, 255, 0.14)"));
+        assert_eq!(starfield_svg(StarfieldMode::Eco), eco);
+        assert_eq!(starfield_svg(StarfieldMode::Fx), fx);
+    }
+
+    #[test]
+    fn galaxy_svg_has_nebula_and_arms() {
+        let svg = galaxy_svg();
+        assert!(svg.starts_with("<svg"));
+        assert!(svg.contains("radialGradient"));
+        assert!(svg.contains("url(#g1)"));
+        assert!(svg.contains("url(#g2)"));
+        assert!(svg.contains("galaxy backdrop"));
+        assert!(svg.contains("#7eb8ff"));
+        assert!(svg.contains("#c4a5ff"));
+        assert!(svg.contains("#06080f"));
+    }
+
+    #[test]
+    fn starfield_wire_respects_empty_manifest() {
+        let tmp = std::env::temp_dir().join("gsv_vision_test_starfield");
+        let _ = std::fs::remove_dir_all(&tmp);
+        let src = tmp.join("src");
+        let data = tmp.join("data");
+        std::fs::create_dir_all(&src).unwrap();
+        let vis = src.join("docs/vision");
+        std::fs::create_dir_all(&vis).unwrap();
+        let mut m = sample_manifest();
+        m.nodes.clear();
+        std::fs::write(
+            vis.join("manifest.json"),
+            serde_json::to_string(&m).unwrap(),
+        )
+        .unwrap();
+        let svg = starfield_svg_wire(&src, &data, Some("fx"));
+        assert!(svg.contains("no manifest nodes yet"));
+        let _ = std::fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn wire_palette_reports_revision() {
+        let tmp = std::env::temp_dir().join("gsv_vision_test_palette");
+        let _ = std::fs::remove_dir_all(&tmp);
+        let src = tmp.join("src");
+        let data = tmp.join("data");
+        std::fs::create_dir_all(&src).unwrap();
+        let vis = src.join("docs/vision");
+        std::fs::create_dir_all(&vis).unwrap();
+        std::fs::write(
+            vis.join("manifest.json"),
+            serde_json::to_string(&sample_manifest()).unwrap(),
+        )
+        .unwrap();
+        let w = wire_palette(&src, &data);
+        assert_eq!(w["ok"], true);
+        assert_eq!(w["revision"], 458);
+        assert_eq!(w["accent"], "#7eb8ff");
+        assert_eq!(w["sprint"], "#a78bfa");
+        let _ = std::fs::remove_dir_all(&tmp);
     }
 }

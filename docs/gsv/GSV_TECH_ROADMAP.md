@@ -7,11 +7,14 @@ band 109 (Vision sync/migration) **✅** + band 110 (Vision map UI) **✅** + ba
 band 112 (Vision auto-sync + sprint-queue planning) **✅** + band 113 (Node search + interactive map) **✅** +
 band 114 (GSV Sprint-board + progress UI) **✅** · band 115 (GSV migration completion) **✅** ·
 band 116 (GSV history charts — speed/rust analytics) **✅** · band 117 (GSV legacy vision deactivation) **✅** ·
+band 118 (GSV sprint UI migration — theme + focus map) **✅** ·
+band 119 (GSV Galaxy UI full parity — colors + box behaviors) **✅** · **band 120 (future — за пріоритетом власника) 🔜** ·
 **Спринти:** `PH-S1659…S1668` (FM §5.12 §5.83 ✅) · `PH-S1719…S1728` (FM §5.12 §5.89 ✅) ·
 `PH-S1729…S1738` (FM §5.12 §5.90 ✅) · `PH-S1739…S1748` (FM §5.12 §5.91 ✅) ·
 `PH-S1749…S1758` (FM §5.12 §5.92 ✅) · `PH-S1759…S1768` (FM §5.12 §5.93 ✅) ·
 `PH-S1769…S1778` (FM §5.12 §5.94 ✅) · `PH-S1789…S1798` (FM §5.12 §5.96 ✅) ·
-`PH-S1799…S1808` (FM §5.12 §5.97 ✅) · `PH-S1809…S1818` (FM §5.12 §5.98 ✅).
+`PH-S1799…S1808` (FM §5.12 §5.97 ✅) · `PH-S1809…S1818` (FM §5.12 §5.98 ✅) ·
+`PH-S1819…S1828` (FM §5.12 §5.99 ✅) · `PH-S1829…S1838` (FM §5.12 §5.100 ✅).
 
 ## Логічний порядок (залежності)
 
@@ -212,20 +215,20 @@ docs/architecture (✅ ця сесія)
 | **PH-S1827** | poolai-vision-sync close | `poolai-vision-sync` rev **471** (band 118); `--check` ok; sprint-queue/feed updated |
 | **PH-S1828** | Band close | ratio hold; fmt/clippy/test (**163**); docs canon; vision-sync rev 471; push |
 
-## Спринти (band 119) — GSV Telemetry Mesh & Ratio 96% stretch horizon
+## Спринти (band 119) — Galaxy UI full parity: colors + box behaviors
 
 | Sprint | Фокус | Acceptance (ключ) |
 |--------|-------|-------------------|
-| **PH-S1829** | Telemetry Mesh spec | `GSV/docs/TELEMETRY_MESH.md` — multi-node state sync & cluster metrics schema |
-| **PH-S1830** | Mesh state aggregation wire | `GET /api/vision/mesh` — aggregated node/edge cluster telemetry in Rust |
-| **PH-S1831** | Ratio 96% stretch audit | `gsv-loc-audit --stretch-96` — advisory threshold check for 96% rust ratio target |
-| **PH-S1832** | SSE streaming telemetry | Enhanced `/events` broadcast for real-time cluster telemetry updates |
-| **PH-S1833** | Mesh contracts | `gsv_mesh_contracts.rs` — integration tests for cluster telemetry aggregation |
-| **PH-S1834** | UI mesh status card | `GSV/ui/index.html` — live cluster mesh status widget |
-| **PH-S1835** | GSV docs canon sync | `GSV_TECH_ROADMAP.md` + `MEMORY.md` band 119 rows |
-| **PH-S1836** | poolAI vision parity | `docs/vision/README.md` & FM §5.12 sync for band 119 |
-| **PH-S1837** | Ratio hold verification | `rust_ratio.json` update and hold check (≥95%) |
-| **PH-S1838** | Band 119 close | fmt/clippy/test green; vision-sync rev bump; push |
+| **PH-S1829** | Scope + queue | FM §5.12 band 119 (PH-S1829…S1838) + manifest sync; legacy parity scope: full `vision.css` `:root` palette + header chrome (ticker, GPU modes, power-menu buttons) + panel dock/collapse/fullscreen + starfield/galaxy backdrop |
+| **PH-S1830** | `GalaxyPalette` wire | `GalaxyPalette` struct (bg-deep/bg/panel/panel-solid/border/border-bright/text/muted/accent/accent-2/glow/sidebar-w/L0–L5+dim/edge-*/ext-*/sprint/bg-tone/galaxy-bg-opacity) + `wire_palette` → `GET /api/vision/palette` (exact legacy `:root` values) |
+| **PH-S1831** | Starfield SVG generator | `starfield_svg(mode)` in `boxes/vision.rs` → `GET /api/vision/starfield.svg?mode=eco\|fx\|ms` (Rust-rendered deterministic stars; eco sparse/static, fx dense+glow, ms medium; `image/svg+xml`) |
+| **PH-S1832** | Galaxy backdrop SVG | `galaxy_svg()` → `GET /api/vision/galaxy.svg` (radial nebula gradient + galaxy arms using `--glow`/`--accent-2`/`--bg-tone`; `image/svg+xml`) |
+| **PH-S1833** | Header chrome + ticker | `ui/index.html`: RSS ticker (label + viewport + track from `/api/vision/feed` items), GPU mode buttons (Eco/FX/Ms cycle via `btn-eco`), Auto toggle, Reload, Power menu buttons (shutdown/reboot/soft → `/api/vision/sync`), meta-rev + meta-trail (git HEAD + next sprint) |
+| **PH-S1834** | Panel dock + Esc-fullscreen | collapse → panel dock row (restore on click), fullscreen via `⛶` + `Esc` exits fullscreen; `body.panel-fs-active` z-index layering; starfield/galaxy backdrop `<img>` (ratio-safe `.svg`) |
+| **PH-S1835** | Contracts | `gsv_vision_contracts.rs`: palette values == legacy `:root`, starfield/galaxy svg shape (width/height, mode variance), starfield empty-state; `gsv_server_contracts.rs`: `/api/vision/palette` + `/api/vision/starfield.svg?mode=` + `/api/vision/galaxy.svg` 200 + `image/svg+xml` |
+| **PH-S1836** | GSV docs canon | `VISION.md` +band 119 (palette/starfield/galaxy/header UI); MEMORY band 119; HANDOFF/NEXT band 119 |
+| **PH-S1837** | Ratio hold + rev prep | `gsv-loc-audit` ≥95% (**95.18%** ✅; UI non-rust delta compensated by Rust tests + compact JS); vision-sync rev **472** (poolai + gsv + `--check`) |
+| **PH-S1838** | Band close | ratio hold; fmt/clippy/test; docs canon; vision-sync rev 473; push |
 
 ## Ключові UX-вимоги (узагальнення ТЗ)
 

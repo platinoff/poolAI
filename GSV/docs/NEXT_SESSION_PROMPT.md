@@ -1,6 +1,6 @@
 # Промпт наступної сесії (GSV)
 
-**Оновлено:** 2026-08-08 (band 118 **PH-S1819…S1828** ✅ · ratio **95.35%** · tests **163**)
+**Оновлено:** 2026-08-08 (band 119 **PH-S1829…S1838** ✅ · ratio **95.18%** · tests **183**)
 
 ```
 абракадабра
@@ -8,7 +8,7 @@
 
 **Порядок:** **S0 диск** (`df -h /s` + `check_target_disk.sh` → `cargo clean` за потреби) →
 project scan (**warnings first** — `cargo clippy --all-targets` у GSV, `poolai-rust-diagnostics` у poolAI) →
-drain наступного band (черга — FM §5.12 §5.98 / GSV_TECH_ROADMAP; **без** mid-push) →
+drain наступного band (черга — FM §5.12 §5.100 / GSV_TECH_ROADMAP; **без** mid-push) →
 Speeds · Rust panel → vision-sync (`poolai-vision-sync`) → **один** commit → **`git push` + самарі**.
 
 **⚠️ Зупинити `gsv-server` перед `cargo test`/`build`** (блокує `target/debug/gsv-server.exe`);
@@ -87,7 +87,18 @@ Speeds · Rust panel → vision-sync (`poolai-vision-sync`) → **один** com
   Sprint Focus card + `--sprint*` CSS-змінні + sprint-pill/queue chips у Sprint Queue/Board
   cards; contracts **163** (44 vision + 25 server); GSV ratio **95.35%** gate ✅;
   poolAI vision rev **471**; FM §5.12 §5.99.
-  **Наступний band 119**: master backlog (Ratio96 phase F) або GSV future — за пріоритетом власника.
+- **band 119** (PH-S1829…S1838) ✅ — GSV Galaxy UI full parity (colors + box behaviors):
+  `GalaxyPalette` struct + `wire_palette` → `GET /api/vision/palette` (повний legacy `:root`
+  palette: bg-deep/bg/panel/panel-solid/border/border-bright/text/muted/accent/accent-2/glow/
+  sidebar-w, layers+layers_dim L0–L5, edge-docs/code/toml, ext-md/rs/json/toml, sprint,
+  bg-tone, galaxy-bg-opacity + `ok`/`revision`); `starfield_svg(mode)` (deterministic LCG:
+  eco sparse/static, fx dense+glow, ms medium) → `GET /api/vision/starfield.svg?mode=eco|fx|ms`;
+  `galaxy_svg()` (radial nebula + spiral arms) → `GET /api/vision/galaxy.svg`; header chrome
+  (RSS ticker `loadRssTicker`, GPU mode button Eco/FX/Ms cycle → `body.vision-(eco|fx|ms)`,
+  power menu soft sync/reload/force offline); panel dock + Esc-fullscreen (`syncDock`,
+  `.card.fullscreen`); contracts **183** (50 vision + 29 server); GSV ratio **95.18%** gate ✅;
+  poolAI vision rev **472**; FM §5.12 §5.100.
+  **Наступний band 120**: master backlog (за пріоритетом власника) — FM §5.12 / GSV_TECH_ROADMAP.
 
 ## Канон GSV
 
@@ -104,6 +115,7 @@ band 110 ✅ (GSV vision map UI) · band 111 ✅ (GSV sprint-map + doc-preview) 
 band 113 ✅ (GSV node search + interactive map) · band 114 ✅ (GSV sprint-board + progress UI) ·
 band 115 ✅ (GSV migration completion — legacy vision supersession) · band 116 ✅ (GSV history charts — speed/rust analytics) ·
 band 117 ✅ (GSV legacy vision deactivation) · band 118 ✅ (GSV sprint UI migration — theme + focus map) ·
+band 119 ✅ (GSV Galaxy UI full parity — colors + box behaviors) ·
 staging `GSV/data/*` / `certs/*.pem` /
 `.env` · mid-push · build/test при запущеному `gsv-server` · обхід ratio-смуги Rust-кодом замість compact UI ·
 перенесення legacy `vision.js`/`vision.css` у `GSV/ui/` (знищило б ratio canon).
