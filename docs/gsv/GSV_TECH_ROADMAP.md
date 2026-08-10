@@ -8,13 +8,14 @@ band 112 (Vision auto-sync + sprint-queue planning) **✅** + band 113 (Node sea
 band 114 (GSV Sprint-board + progress UI) **✅** · band 115 (GSV migration completion) **✅** ·
 band 116 (GSV history charts — speed/rust analytics) **✅** · band 117 (GSV legacy vision deactivation) **✅** ·
 band 118 (GSV sprint UI migration — theme + focus map) **✅** ·
-band 119 (GSV Galaxy UI full parity — colors + box behaviors) **✅** · **band 120 (future — за пріоритетом власника) 🔜** ·
+band 119 (GSV Galaxy UI full parity — colors + box behaviors) **✅** · band 120 (GSV Ratio 96% stretch) **✅** ·
 **Спринти:** `PH-S1659…S1668` (FM §5.12 §5.83 ✅) · `PH-S1719…S1728` (FM §5.12 §5.89 ✅) ·
 `PH-S1729…S1738` (FM §5.12 §5.90 ✅) · `PH-S1739…S1748` (FM §5.12 §5.91 ✅) ·
 `PH-S1749…S1758` (FM §5.12 §5.92 ✅) · `PH-S1759…S1768` (FM §5.12 §5.93 ✅) ·
 `PH-S1769…S1778` (FM §5.12 §5.94 ✅) · `PH-S1789…S1798` (FM §5.12 §5.96 ✅) ·
 `PH-S1799…S1808` (FM §5.12 §5.97 ✅) · `PH-S1809…S1818` (FM §5.12 §5.98 ✅) ·
-`PH-S1819…S1828` (FM §5.12 §5.99 ✅) · `PH-S1829…S1838` (FM §5.12 §5.100 ✅).
+`PH-S1819…S1828` (FM §5.12 §5.99 ✅) · `PH-S1829…S1838` (FM §5.12 §5.100 ✅) ·
+`PH-S1839…S1848` (FM §5.12 §5.101 ✅).
 
 ## Логічний порядок (залежності)
 
@@ -228,7 +229,22 @@ docs/architecture (✅ ця сесія)
 | **PH-S1835** | Contracts | `gsv_vision_contracts.rs`: palette values == legacy `:root`, starfield/galaxy svg shape (width/height, mode variance), starfield empty-state; `gsv_server_contracts.rs`: `/api/vision/palette` + `/api/vision/starfield.svg?mode=` + `/api/vision/galaxy.svg` 200 + `image/svg+xml` |
 | **PH-S1836** | GSV docs canon | `VISION.md` +band 119 (palette/starfield/galaxy/header UI); MEMORY band 119; HANDOFF/NEXT band 119 |
 | **PH-S1837** | Ratio hold + rev prep | `gsv-loc-audit` ≥95% (**95.18%** ✅; UI non-rust delta compensated by Rust tests + compact JS); vision-sync rev **472** (poolai + gsv + `--check`) |
-| **PH-S1838** | Band close | ratio hold; fmt/clippy/test; docs canon; vision-sync rev 473; push |
+| **PH-S1838** | Band close | ratio hold; fmt/clippy/test; docs canon; vision-sync rev 472; push |
+
+## Спринти (band 120) — Ratio 96% stretch (server-rendered UI fragments + compact UI) ✅
+
+| Sprint | Фокус | Acceptance (ключ) |
+|--------|-------|-------------------|
+| **PH-S1839** | Scope + queue | FM §5.101 band 120 (PH-S1839…S1848) + §5.12 header (master horizon); roadmap band 120 rows — **✅** |
+| **PH-S1840** | `--stretch-96` advisory | `gsv-loc-audit --stretch-96` — 96% advisory threshold check (report + exit code); `boxes/ratio.rs` stretch support; unit tests — **✅** |
+| **PH-S1841** | Ratio96 contracts | `gsv_ratio_contracts`: stretch-96 advisory + `rust_ratio.json` stretch fields + `/api/ratio` shape — **✅** |
+| **PH-S1842** | UI fragment module | `GSV/src/boxes/ui.rs`: `esc`/`tab`/`bar` + per-card HTML renderers (vision cards) + unit tests — **✅** |
+| **PH-S1843** | Render endpoint | `GET /api/ui/card/:name` — Rust-rendered card body HTML; dispatch у `server/mod.rs` — **✅** |
+| **PH-S1844** | UI thin glue | `ui/index.html`: `render*` fns → `getText` injection; compact CSS/JS (thin glue, ratio-safe) — **✅** |
+| **PH-S1845** | Contracts | `gsv_ui_contracts.rs` (render HTML markers) + `gsv_server_contracts.rs` (card endpoints) — **✅** |
+| **PH-S1846** | Ratio 96% measurement | `gsv-loc-audit --stretch-96` green **≥96%** (**96.51%** ✅); compact/tests adjust to hold — **✅** |
+| **PH-S1847** | GSV docs canon | MEMORY band 120; HANDOFF/NEXT band 120; VISION.md; `GSV_TECH_ROADMAP.md` band 120 — **✅** |
+| **PH-S1848** | Band close | ratio **≥96%**; fmt/clippy/test; docs canon; vision-sync rev bump; push — **✅** |
 
 ## Ключові UX-вимоги (узагальнення ТЗ)
 

@@ -23,6 +23,7 @@ fn parse_args() -> (AuditConfig, PathBuf) {
             }
             "--no-write" => config.write_output = false,
             "--advisory" => config.advisory = true,
+            "--stretch-96" => config.stretch_96 = true,
             "--min-ratio" => {
                 config.min_ratio = args
                     .next()
@@ -36,7 +37,7 @@ fn parse_args() -> (AuditConfig, PathBuf) {
             "--data-dir" => data_dir = args.next().map(PathBuf::from),
             "--help" | "-h" => {
                 println!(
-                    "Usage: gsv-loc-audit [--print] [--no-write] [--advisory] [--min-ratio 0.95] [--output PATH] [--data-dir PATH]"
+                    "Usage: gsv-loc-audit [--print] [--no-write] [--advisory] [--stretch-96] [--min-ratio 0.95] [--output PATH] [--data-dir PATH]"
                 );
                 std::process::exit(0);
             }
@@ -87,7 +88,22 @@ fn main() -> ExitCode {
                     report.rust_ratio_pct, report.rust_loc, report.product_loc_total
                 );
             }
-            if !ratio_ok {
+            if config.stretch_96 {
+                if report.meets_stretch_96 {
+                    println!(
+                        "stretch-96: meets >= {:.2}%",
+                        ratio::STRETCH_96_TARGET * 100.0
+                    );
+                    ExitCode::SUCCESS
+                } else {
+                    println!(
+                        "stretch-96 advisory: rust_ratio {:.2}% below {:.2}%",
+                        report.rust_ratio_pct,
+                        ratio::STRETCH_96_TARGET * 100.0
+                    );
+                    ExitCode::SUCCESS
+                }
+            } else if !ratio_ok {
                 let msg = format!(
                     "rust_ratio {:.2}% below min {:.2}%",
                     report.rust_ratio_pct,

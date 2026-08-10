@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (GSV)
 
-**Оновлено:** 2026-08-08 (band 119 **PH-S1829…S1838** ✅ · ratio **95.18%** · tests **183** · clippy **0**)
+**Оновлено:** 2026-08-08 (band 120 **PH-S1839…S1848** ✅ · ratio **96.51%** · tests **204** · clippy **0**)
 
 **Наступна сесія:** **`абракадабра`** → S0 диск/git → project scan (warnings first) → drain ≤10 PH-S*
 → Speeds + Rust panel → vision-sync → **один commit** → **`git push` + самарі**. Канон:
@@ -8,11 +8,11 @@
 
 ## Стан зараз
 
-- **GSV** — окремий Rust-first проєкт (`GSV/`), bands 102 · 108 · 109 · 110 · 111 · 112 · 113 · 114 · 115 · 116 · 117 · 118 · 119 **✅**.
-- **Ratio:** `cargo run --bin gsv-loc-audit` → **95.18%** (rust 9148 / product 9611, gate ≥95% ✅) → `GSV/data/rust_ratio.json`.
-- **Тести:** `cargo test` → **183** green · **clippy 0** · **fmt clean**.
+- **GSV** — окремий Rust-first проєкт (`GSV/`), bands 102 · 108 · 109 · 110 · 111 · 112 · 113 · 114 · 115 · 116 · 117 · 118 · 119 · 120 **✅**.
+- **Ratio:** `cargo run --bin gsv-loc-audit -- --stretch-96` → **96.51%** (rust 10027 / product 10390, gate ≥95% ✅, stretch-96 ≥96% ✅) → `GSV/data/rust_ratio.json`.
+- **Тести:** `cargo test` → **204** green · **clippy 0** · **fmt clean**.
 - **Сервер:** порт 8870 (8891 транзитивно зарезервований Windows dynamic exclusion; canon порт **8891**).
-- **FM:** band 119 = §5.100 (PH-S1829…S1838 ✅). Master horizon poolAI: band 120.
+- **FM:** band 120 = §5.101 (PH-S1839…S1848 ✅). Master horizon poolAI: band 121.
 - **Vision rev:** 472 (band 119 vision-sync close). Vision box: `boxes/vision.rs` + `gsv-vision-sync` bin +
   `GET /api/vision*`; snapshot `GSV/data/gsv_manifest.json` + `gsv_feed.json` + `gsv_extensions.json` (rev 472).
   Band 110: `GET /api/vision/map`, `GET /assets/vision.svg`, `GET /api/vision/feed?status=`, Vision Map card.
@@ -55,6 +55,9 @@
   recreated в Rust (`vision.rs`), не legacy JS. **band 119: Galaxy UI full parity
   (colors + box behaviors) migrated** — legacy `:root` palette = Rust wire, starfield/galaxy
   backdrop = Rust SVG, header chrome/dock/fullscreen = compact UI glue (не legacy JS/CSS).
+  **band 120: Ratio 96% stretch** — `GET /api/ui/card/{name}` (Rust-rendered card body HTML:
+  `boxes/ui.rs` `esc`/`tab`/`bar` + 12 renderers + `CARD_NAMES`); `ui/index.html` thin glue
+  (`getText` → `rustCards`); `gsv-loc-audit --stretch-96` advisory (**96.51%** ≥96% ✅).
 - **poolAI ratio:** **95.04%** (advisory hold, `--ratio96-docs-canon --advisory --min-ratio 0.95`).
 
 ## S0 (кожна сесія, disk/git first)

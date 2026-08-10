@@ -153,20 +153,6 @@ function renderHealth(d) {
     ["ok", "<span class='ok'>" + d.ok + "</span>"], ["update_available", d.update_available],
   ]);
 }
-function renderTracker(d) {
-  const sp = d.sprints || {};
-  $("b-tracker").innerHTML = "<div class='dim'>open " + (sp.open || []).length + " · closed " + (sp.closed || []).length +
-    " · total " + (sp.total ?? 0) + " · next <kbd>" + esc(sp.next || "—") + "</kbd></div>" +
-    tab(["kind", "label", "status", "at"], (d.records || []).map(r => [esc(r.kind), esc(r.label), esc(r.status), "<span class='dim'>" + esc(r.at) + "</span>"]));
-}
-function renderSli(d) {
-  const c = d.catalog || {};
-  $("b-sli").innerHTML = "<div class='dim'>used " + (c.used_count ?? 0) + " · unused (new SLI candidates) " + (c.unused_count ?? 0) + "</div>" +
-    tab(["", "cmd", "kind", "desc"], (c.entries || []).map(e => [e.used ? "<span class='ok'>●</span>" : "<span class='dim'>○</span>", "<kbd>" + esc(e.name) + "</kbd>", esc(e.kind), "<span class='dim'>" + esc(e.description) + "</span>"]));
-}
-function renderToolchain(d) {
-  $("b-toolchain").innerHTML = tab(["tool", "version", "source"], (d.entries || []).map(e => ["<kbd>" + esc(e.tool) + "</kbd>", esc(e.version), "<span class='dim'>" + esc(e.source) + "</span>"]));
-}
 function renderIde(d) {
   const sel = d.selection;
   $("b-ide").innerHTML = (sel ? "<div class='dim'>selected: <kbd>" + esc(sel.tool) + " / " + esc(sel.session) + "</kbd></div>" : "") +
@@ -181,24 +167,6 @@ function renderUpdate(d) {
     ["binary_mtime", d.binary_mtime], ["newest_src_mtime", d.newest_src_mtime],
   ]);
 }
-function renderHooksTests(d) {
-  const diag = d.diagnostics;
-  $("b-hooks-t").innerHTML = "<div class='dim'>status: <kbd>" + esc(d.status) + "</kbd> · test bins: " + (d.test_bins || []).length + "</div>" +
-    (diag ? "<div>diagnostics: <span class='" + (diag.errors > 0 ? "err" : "ok") + "'>warnings " + diag.warnings + " · errors " + diag.errors + "</span></div>" : "") +
-    "<div style='margin-top:6px' class='dim'>" + (d.test_bins || []).slice(0, 30).join(" · ") + "</div>";
-}
-function renderHooksBench(d) {
-  const sp = d.speed_index;
-  $("b-hooks-b").innerHTML = "<div class='dim'>status: <kbd>" + esc(d.status) + "</kbd> · criterion dirs: " + (d.criterion_dirs || []).length + "</div>" +
-    (sp ? "<div>test-ci wall: <span class='" + (sp.test_ci_ok ? "ok" : "err") + "'>" + sp.test_ci_wall_secs + "s</span></div>" : "") +
-    "<div style='margin-top:6px' class='dim'>" + (d.criterion_dirs || []).join(" · ") + "</div>";
-}
-function renderRatio(d) {
-  if (!d.ok) { $("b-ratio").innerHTML = "<span class='err'>" + esc(d.error || "missing rust_ratio.json") + "</span>"; return; }
-  $("b-ratio").innerHTML = "<div>Rust ratio <span class='" + (d.meets_min_ratio ? "ok" : "err") + "'>" + d.rust_ratio_pct.toFixed(2) + "%</span> · band min " + (d.formal_band_min * 100).toFixed(0) + "%</div>" +
-    "<div class='dim'>rust " + d.rust_loc + " / non-rust " + d.non_rust_product_loc + " · product " + d.product_loc_total + "</div>" +
-    tab(["category", "files", "loc"], Object.entries(d.by_category || {}).map(([k, v]) => [k, v.files, v.loc]));
-}
 function renderVision(d) {
   if (!d.ok) { $("b-vision").innerHTML = "<span class='err'>" + esc(d.error || "vision unavailable") + "</span>"; return; }
   $("metaTrail").textContent = "rev " + d.revision + " · next " + (d.next_sprint || "—") + " · " + (d.git_head || "");
@@ -208,18 +176,6 @@ function renderVision(d) {
     "</kbd> · last closed <kbd>" + esc(d.last_sprint_closed) + "</kbd></div>" +
     tab(["id", "status", "title"], (d.feed_items || []).map(i =>
       ["<kbd>" + esc(i.id) + "</kbd>", "<span class='" + (i.status === "closed" ? "ok" : "warn") + "'>" + esc(i.status) + "</span>", esc(i.title)]));
-}
-function renderSprintMap(d) {
-  if (!d.ok) { $("b-sprint-map").innerHTML = "<span class='err'>" + esc(d.error || "sprint map unavailable") + "</span>"; return; }
-  $("b-sprint-map").innerHTML = "<div class='dim'>rev <kbd>" + d.revision + "</kbd> · nodes " + d.nodes_count +
-    " · next <kbd>" + esc(d.next_sprint) + "</kbd> · last closed <kbd>" + esc(d.last_sprint_closed) + "</kbd></div>" +
-    tab(["module", "layer", "targets"], (d.modules || []).map(m =>
-      ["<kbd>" + esc(m.id) + "</kbd>", esc(m.layer), "<span class='ok'>" + m.targets + "</span>"])) +
-    "<div class='dim' style='margin-top:6px'>kinds: " +
-    (d.kinds || []).map(e => "<kbd>" + esc(e.kind) + "</kbd>×" + e.count).join(" ") + "</div>" +
-    "<details style='margin-top:6px'><summary>links (" + (d.links || []).length + ")</summary>" +
-    tab(["kind", "from", "→", "to"], (d.links || []).map(l =>
-      ["<kbd>" + esc(l.kind) + "</kbd>", esc(l.from.id), "→", esc(l.to.id)])) + "</details>";
 }
 function renderDocPreview(d) {
   if (!d.ok) { $("b-doc-preview").innerHTML = "<span class='err'>" + esc(d.error || "doc preview unavailable") + "</span>"; return; }
@@ -233,66 +189,6 @@ function renderDocPreview(d) {
     "</details><details style='margin-top:6px'><summary>in</summary>" +
     tab(["kind", "target"], (d.links_in || []).map(l => ["<kbd>" + esc(l.kind) + "</kbd>", "<kbd>" + esc(l.node.id) + "</kbd>" + " <span class='dim'>" + esc(l.node.label) + "</span>"])) +
     "</details>";
-}
-function renderSprintQueue(d) {
-  if (!d.ok) { $("b-sprint-queue").innerHTML = "<span class='err'>" + esc(d.error || "sprint queue unavailable") + "</span>"; return; }
-  $("b-sprint-queue").innerHTML = "<div class='dim'>rev <kbd>" + d.revision + "</kbd> · next <span class='sprint-pill'>" + esc(d.next_sprint) +
-    "</span> · last closed <kbd>" + esc(d.last_sprint_closed) + "</kbd></div>" +
-    "<div>active <span class='sprint-pill'>" + esc(d.active_sprint) + "</span> · open <span class='ok'>" + d.open_count + "</span></div>" +
-    "<details style='margin-top:6px'><summary>planned (" + (d.planned || []).length + ")</summary>" +
-    tab(["id", "status", "category", "title"], (d.planned || []).map(p =>
-      ["<span class='squeue " + (p.id === d.active_sprint ? "open" : (p.id === d.next_sprint ? "next" : "closed")) + "'>" + esc(p.id) + "</span>",
-       "<span class='squeue-st'>" + esc(p.status) + "</span>", esc(p.category), esc(p.title)])) +
-    "</details>";
-}
-function bar(pct) {
-  const w = Math.max(0, Math.min(100, pct));
-  return "<div style='background:var(--line);border-radius:6px;height:10px;margin:6px 0;overflow:hidden'>" +
-    "<div style='width:" + w + "%;height:100%;background:var(--accent)'></div></div>" +
-    "<div class='dim'>" + w + "% closed</div>";
-}
-function renderSprintBoard(d) {
-  if (!d.ok) { $("b-sprint-board").innerHTML = "<span class='err'>" + esc(d.error || "sprint board unavailable") + "</span>"; return; }
-  let out = "<div class='dim'>rev <kbd>" + d.revision + "</kbd> · next <span class='sprint-pill'>" + esc(d.next_sprint) +
-    "</span> · active <span class='sprint-pill'>" + esc(d.active_sprint) + "</span></div>" +
-    "<div>open <span class='warn'>" + d.open_count + "</span> · closed <span class='ok'>" + d.closed_count +
-    "</span> · total <span class='dim'>" + d.total + "</span></div>" + bar(d.progress_pct);
-  for (const c of (d.columns || [])) {
-    out += "<details style='margin-top:6px'><summary>" + esc(c.name) + " (" + c.count + ")</summary>" +
-      tab(["id", "status", "title"], (c.entries || []).map(e =>
-        ["<span class='squeue " + (e.id === d.active_sprint ? "open" : (e.status === "closed" ? "closed" : "")) + "'>" + esc(e.id) + "</span>", "<span class='squeue-st'>" + esc(e.status) + "</span>", esc(e.title)])) +
-      "</details>";
-  }
-  $("b-sprint-board").innerHTML = out;
-}
-function renderSprintProgress(d) {
-  if (!d.ok) { $("b-sprint-progress").innerHTML = "<span class='err'>" + esc(d.error || "sprint progress unavailable") + "</span>"; return; }
-  let out = "<div class='dim'>rev <kbd>" + d.revision + "</kbd></div>" +
-    "<div>open <span class='warn'>" + d.open_count + "</span> · closed <span class='ok'>" + d.closed_count +
-    "</span> · planned <span class='dim'>" + d.planned_count + "</span> · total <span class='dim'>" + d.total + "</span></div>" +
-    bar(d.progress_pct) +
-    tab(["layer", "z", "nodes", "linked"], (d.layers || []).map(l =>
-      ["<kbd>" + esc(l.id) + "</kbd>", l.z, "<span class='dim'>" + l.node_count + "</span>", "<span class='ok'>" + l.linked_count + "</span>"]));
-  $("b-sprint-progress").innerHTML = out;
-}
-function renderSpeedIndex(d) {
-  if (!d.ok) { $("b-speed-index").innerHTML = "<span class='err'>" + esc(d.error || "unavailable") + "</span>"; return; }
-  const s = d.speed_index || {}, l = s.latest || {};
-  $("b-speed-index").innerHTML = !d.present ? "<div class='dim'>no speed_index.json — run bin/record-test-ci-speed.sh</div>" :
-    "<div class='dim'>" + esc(s.host_label || "—") + " · " + esc(s.generated_at || "—") + " · git " + esc(s.git_head || "—") + "</div>" +
-    "<div>test-ci <kbd>" + (l.test_ci_wall_secs || 0).toFixed(1) + "s</kbd>" + (l.test_ci_ok ? " <span class='ok'>ok</span>" : " <span class='err'>fail</span>") +
-    " · bench <kbd>" + (l.last_bench_median_ns ? (l.last_bench_median_ns / 1e6).toFixed(2) + " ms" : "—") + "</kbd></div>" +
-    "<div class='dim'>" + (s.test_ci_count || 0) + " test-ci rows · " + (s.bench_count || 0) + " bench rows</div>";
-}
-function renderRustDiagnostics(d) {
-  if (!d.ok) { $("b-rust-diagnostics").innerHTML = "<span class='err'>" + esc(d.error || "unavailable") + "</span>"; return; }
-  const r = d.rust_diagnostics || {}, l = r.latest || {};
-  let out = !d.present ? "<div class='dim'>no rust_diagnostics.json — run bin/record-rust-clippy.sh</div>" :
-    "<div class='dim'>" + esc(r.host_label || "—") + " · " + esc(r.generated_at || "—") + " · git " + esc(r.git_head || "—") + "</div>" +
-    "<div>warnings <span class='" + (l.warnings > 0 ? "warn" : "ok") + "'>" + l.warnings + "</span> · errors <span class='" + (l.errors > 0 ? "err" : "ok") + "'>" + l.errors + "</span>" +
-    (l.ok ? " <span class='ok'>clean</span>" : " <span class='err'>fail</span>") + " · <span class='dim'>" + (r.history_count || 0) + " history rows</span></div>";
-  if ((l.top_codes || []).length) out += "<div class='dim'>top: " + (l.top_codes || []).slice(0, 5).map(c => "<kbd>" + esc(c) + "</kbd>").join(" ") + "</div>";
-  $("b-rust-diagnostics").innerHTML = out;
 }
 function renderVisionSync(d) {
   const s = $("b-vision-sync-status");
@@ -408,21 +304,25 @@ async function resyncVision() {
   try { renderVisionSync(await get("api/vision/sync")); await resync(); }
   catch (e) { $("b-vision-sync-status").textContent = "error"; $("b-vision-sync").innerHTML = "<span class='err'>" + esc(e.message) + "</span>"; }
 }
+async function getText(card) {
+  const target = "b-" + card;
+  try {
+    const d = await get("api/ui/card/" + card);
+    $(target).innerHTML = d.ok ? d.html : "<span class='err'>" + esc(d.error || "card error") + "</span>";
+  } catch (e) { $(target).innerHTML = "<span class='err'>" + esc(e.message) + "</span>"; }
+}
+const rustCards = ["tracker", "sli", "toolchain", "ratio", "hooks-tests", "hooks-bench", "sprint-map", "sprint-queue", "sprint-progress", "sprint-board", "speed-index", "rust-diagnostics"];
 async function resync() {
   const urls = [
-    ["api/health", renderHealth], ["api/tracker", renderTracker], ["api/sli", renderSli],
-    ["api/toolchain", renderToolchain], ["api/ide/sessions", renderIde], ["api/update", renderUpdate],
-    ["api/hooks/tests", renderHooksTests], ["api/hooks/bench", renderHooksBench], ["api/ratio", renderRatio],
+    ["api/health", renderHealth],
+    ["api/ide/sessions", renderIde], ["api/update", renderUpdate],
     ["api/vision", renderVision], ["api/vision/map", renderVisionMap],
-    ["api/vision/sprint-map", renderSprintMap],
-    ["api/vision/sprint-queue", renderSprintQueue],
-    ["api/vision/sprint-board", renderSprintBoard],
-    ["api/vision/sprint-progress", renderSprintProgress],
-    ["api/vision/speeds", renderSpeedIndex],
-    ["api/vision/rust-diagnostics", renderRustDiagnostics],
     ["api/omni", renderOmni],
   ];
-  const results = await Promise.allSettled(urls.map(([u, f]) => get(u).then(f)));
+  const results = await Promise.allSettled([
+    ...urls.map(([u, f]) => get(u).then(f)),
+    ...rustCards.map(getText),
+  ]);
   const failed = results.filter(r => r.status === "rejected").length;
   setOffline(failed > 0);
   if (failed > 0) toast(failed + " box(es) failed — offline mode");

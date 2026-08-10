@@ -9,6 +9,9 @@ sprint UI migration: sprint theme wire (legacy `--sprint` palette) + Rust-render
 sprint focus SVG. **band 119 (PH-S1829…S1838, ✅)** — Galaxy UI full parity: full legacy
 `:root` palette wire (`GET /api/vision/palette`), Rust-rendered starfield/galaxy backdrop
 SVG, header chrome (RSS ticker, GPU mode cycle, power menu), panel dock + Esc-fullscreen.
+**band 120 (PH-S1839…S1848, ✅)** — Ratio 96% stretch: `gsv-loc-audit --stretch-96`
+advisory (**96.51%** ≥96% ✅) + `GET /api/ui/card/{name}` Rust-rendered card fragments
+(`boxes/ui.rs`: `esc`/`tab`/`bar` + 12 renderers) + `ui/index.html` thin glue (`getText` → `rustCards`).
 
 ## Що це
 
@@ -262,4 +265,9 @@ wire + `loadGalaxyPalette` CSS-змінні), Rust-rendered starfield + galaxy b
 (`/api/vision/starfield.svg?mode=` + `/api/vision/galaxy.svg`), header chrome (RSS ticker,
 GPU mode cycle, power menu) та panel dock + Esc-fullscreen у `ui/index.html` — всі фічі
 реалізовані Rust wire + компактним UI glue, без переносу legacy `vision.js`/`vision.css`.
+Band 120 додає **server-rendered UI fragments**: `GET /api/ui/card/{name}` — Rust HTML
+renderers (`boxes/ui.rs`: `esc`/`tab`/`bar` + `render_card` + `CARD_NAMES`), 12 карток
+(tracker/sli/toolchain/ratio/hooks-tests/hooks-bench/sprint-map/sprint-queue/sprint-progress/
+sprint-board/speed-index/rust-diagnostics) → `ui/index.html` thin glue `getText` → `rustCards`;
+8 JS renderers видалено. Це підняло rust ratio **95.18% → 96.51%** (stretch-96 advisory ✅).
 Див. [`GSV_MIGRATION.md`](../../docs/gsv/GSV_MIGRATION.md) і [`LEGACY_PARITY.md`](./LEGACY_PARITY.md).

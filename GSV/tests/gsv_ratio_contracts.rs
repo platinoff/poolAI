@@ -84,6 +84,8 @@ fn ratio_save_load_roundtrip_preserves_fields() {
     assert_eq!(loaded.product_loc_total, report.product_loc_total);
     assert!((loaded.rust_ratio - report.rust_ratio).abs() < f64::EPSILON);
     assert_eq!(loaded.meets_min_ratio, report.meets_min_ratio);
+    assert_eq!(loaded.stretch_target, report.stretch_target);
+    assert_eq!(loaded.meets_stretch_96, report.meets_stretch_96);
     let _ = std::fs::remove_dir_all(&dir);
 }
 
@@ -105,6 +107,8 @@ fn ratio_wire_reports_ok_true_with_ratio() {
     assert!(v["rust_ratio"].is_number());
     assert!(v["rust_ratio_pct"].is_number());
     assert!(v["meets_min_ratio"].is_boolean());
+    assert!(v["meets_stretch_96"].is_boolean());
+    assert_eq!(v["stretch_target"].as_f64(), Some(0.96));
     let _ = std::fs::remove_dir_all(&dir);
 }
 
@@ -150,6 +154,8 @@ fn ratio_report_json_shape_is_stable() {
         "formal_band_min",
         "min_ratio",
         "meets_min_ratio",
+        "stretch_target",
+        "meets_stretch_96",
         "by_category",
         "notes",
     ] {

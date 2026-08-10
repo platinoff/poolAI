@@ -3228,7 +3228,7 @@
       "signature": "queue: FM §5.12 next band 107"
     }
   ],
-  "last_sprint_closed": "PH-S1828",
+  "last_sprint_closed": "PH-S1848",
   "layers": [
     {
       "id": "L0",
@@ -3261,7 +3261,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1829",
+  "next_sprint": "PH-S1839",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -12414,7 +12414,7 @@
       "path": ".cursor/rules/scripts.mdc"
     }
   ],
-  "revision": 472,
+  "revision": 473,
   "sprint_queue": [],
   "sprint_queue_open_count": 0,
   "updated_at": "2026-06-20",

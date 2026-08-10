@@ -1,6 +1,6 @@
 # Промпт наступної сесії (GSV)
 
-**Оновлено:** 2026-08-08 (band 119 **PH-S1829…S1838** ✅ · ratio **95.18%** · tests **183**)
+**Оновлено:** 2026-08-08 (band 120 **PH-S1839…S1848** ✅ · ratio **96.51%** · tests **204**)
 
 ```
 абракадабра
@@ -98,7 +98,13 @@ Speeds · Rust panel → vision-sync (`poolai-vision-sync`) → **один** com
   power menu soft sync/reload/force offline); panel dock + Esc-fullscreen (`syncDock`,
   `.card.fullscreen`); contracts **183** (50 vision + 29 server); GSV ratio **95.18%** gate ✅;
   poolAI vision rev **472**; FM §5.12 §5.100.
-  **Наступний band 120**: master backlog (за пріоритетом власника) — FM §5.12 / GSV_TECH_ROADMAP.
+- **band 120** (PH-S1839…S1848) ✅ — GSV Ratio 96% stretch:
+  `gsv-loc-audit --stretch-96` advisory (`ratio.rs` `STRETCH_96_TARGET`/`stretch_target`/
+  `meets_stretch_96`, `#[serde(default)]` compat) → **96.51%** (rust 10027 / product 10390) ✅;
+  `boxes/ui.rs` (`esc`/`tab`/`bar` + 12 Rust card renderers + `render_card` + `CARD_NAMES` 12) →
+  `GET /api/ui/card/{name}`; `ui/index.html` thin glue (`getText` → `rustCards` 12, 8 JS renderers
+  видалено); contracts **204** (95 unit + 30 server + 6 ui); FM §5.12 §5.101.
+  **Наступний band 121**: master backlog (за пріоритетом власника) — FM §5.12 / GSV_TECH_ROADMAP.
 
 ## Канон GSV
 
@@ -115,7 +121,7 @@ band 110 ✅ (GSV vision map UI) · band 111 ✅ (GSV sprint-map + doc-preview) 
 band 113 ✅ (GSV node search + interactive map) · band 114 ✅ (GSV sprint-board + progress UI) ·
 band 115 ✅ (GSV migration completion — legacy vision supersession) · band 116 ✅ (GSV history charts — speed/rust analytics) ·
 band 117 ✅ (GSV legacy vision deactivation) · band 118 ✅ (GSV sprint UI migration — theme + focus map) ·
-band 119 ✅ (GSV Galaxy UI full parity — colors + box behaviors) ·
+band 119 ✅ (GSV Galaxy UI full parity — colors + box behaviors) · band 120 ✅ (GSV Ratio 96% stretch) ·
 staging `GSV/data/*` / `certs/*.pem` /
 `.env` · mid-push · build/test при запущеному `gsv-server` · обхід ratio-смуги Rust-кодом замість compact UI ·
 перенесення legacy `vision.js`/`vision.css` у `GSV/ui/` (знищило б ratio canon).

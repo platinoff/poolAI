@@ -3,111 +3,111 @@
   "items": [
     {
       "category": "closed",
-      "id": "PH-S1828",
+      "id": "PH-S1848",
       "link": "http://127.0.0.1:8891/#b-sprint-board",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "ratio hold; fmt/clippy/test (poolAI test-ci + GSV 153); docs canon; vision-sync rev 471; push",
+      "summary": "ratio ≥96%; fmt/clippy/test; docs canon; vision-sync rev bump; push",
       "title": "Band close"
     },
     {
       "category": "closed",
-      "id": "PH-S1827",
+      "id": "PH-S1847",
       "link": "http://127.0.0.1:8891/#b-sprint-board",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "poolai-vision-sync` rev 471 (band 118); `--check` ok; sprint-queue/feed updated",
-      "title": "poolai-vision-sync close"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1826",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "gsv-loc-audit --min-ratio 0.95 --advisory` ≥95% + poolAI ratio96 advisory hold",
-      "title": "Ratio hold advisory"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1825",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "docs/vision/README.md`; FM §5.12 §5.99; `GSV_TECH_ROADMAP.md` band 118",
-      "title": "poolAI vision parity"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1824",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "VISION.md` +band 118 (theme + focus endpoints); MEMORY band 118; GSV HANDOFF/NEXT band 118",
+      "summary": "MEMORY band 120; HANDOFF/NEXT band 120; VISION.md; `GSV_TECH_ROADMAP.md` band 120",
       "title": "GSV docs canon"
     },
     {
       "category": "closed",
-      "id": "PH-S1823",
+      "id": "PH-S1846",
       "link": "http://127.0.0.1:8891/#b-sprint-board",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "GSV/ui/index.html`: sprint-pill + queue open/next/closed colors (theme wire) + focus `<img>` in Sprint cards",
-      "title": "UI sprint colors"
+      "summary": "gsv-loc-audit --stretch-96` green ≥96%; compact/tests adjust to hold",
+      "title": "Ratio 96% measurement"
     },
     {
       "category": "closed",
-      "id": "PH-S1822",
+      "id": "PH-S1845",
       "link": "http://127.0.0.1:8891/#b-sprint-board",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "gsv_vision_contracts` (theme colors + focus svg real-workspace) + `gsv_server_contracts` (theme + focus endpoints)",
+      "summary": "gsv_ui_contracts` + `gsv_server_contracts`: card render HTML markers + endpoints",
       "title": "Contracts"
     },
     {
       "category": "closed",
-      "id": "PH-S1821",
+      "id": "PH-S1844",
       "link": "http://127.0.0.1:8891/#b-sprint-board",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "Rust `sprint_focus_svg()` → `GET /api/vision/sprint-focus.svg?sprint=` — sprint-dim style (sprint nodes highlighted, others opacity 0.22); default active sprint; empty-state svg",
-      "title": "Sprint focus SVG"
+      "summary": "ui/index.html`: `render*` → `getText` injection; compact CSS/JS",
+      "title": "UI thin glue"
     },
     {
       "category": "closed",
-      "id": "PH-S1820",
+      "id": "PH-S1843",
       "link": "http://127.0.0.1:8891/#b-sprint-board",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "SprintThemeReport` + `sprint_theme_report()` + `wire_sprint_theme` → `GET /api/vision/sprint-theme`: sprint `#a78bfa`, next `#c4b5fd`, open/next/closed queue colors, layer L0–L5, edge-kind colors",
-      "title": "Sprint theme wire"
+      "summary": "GET /api/ui/card/:name` — Rust-rendered card body HTML + dispatch у `server/mod.rs",
+      "title": "Render endpoint"
     },
     {
       "category": "closed",
-      "id": "PH-S1819",
+      "id": "PH-S1842",
       "link": "http://127.0.0.1:8891/#b-sprint-board",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "Define band 118 (GSV sprint UI migration) у FM §5.99 + §5.12 header (master horizon)",
+      "summary": "boxes/ui.rs`: `esc`/`tab`/`bar` + per-card HTML renderers (vision cards) + unit tests",
+      "title": "UI fragment module"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1841",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "gsv_ratio_contracts`: stretch-96 advisory + `rust_ratio.json` stretch fields + API shape",
+      "title": "Ratio96 contracts"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1840",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "gsv-loc-audit --stretch-96` — 96% advisory threshold check (report + exit code) + `ratio.rs` support + unit tests",
+      "title": "--stretch-96` advisory"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1839",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "Define band 120 (Ratio 96% stretch) у FM §5.101 + §5.12 header (master horizon)",
       "title": "Scope + queue"
     },
     {
       "category": "closed",
-      "id": "PH-S1818",
+      "id": "PH-S1838",
       "link": "http://127.0.0.1:8891/#b-sprint-board",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "ratio hold; fmt/clippy/test (poolAI test-ci + GSV 153+); docs canon; vision-sync rev 470; push",
+      "summary": "ratio hold (95.18%); fmt/clippy/test (183); docs canon; vision-sync rev 472; push",
       "title": "Band close"
     },
     {
       "category": "closed",
-      "id": "PH-S1817",
+      "id": "PH-S1837",
       "link": "http://127.0.0.1:8891/#b-sprint-board",
       "published": "2026-05-28",
       "status": "closed",
-      "summary": "gsv-loc-audit --min-ratio 0.95 --advisory` ≥95% + poolAI ratio96 advisory hold; vision-sync rev 470 (poolai + gsv + --check)",
-      "title": "Ratio hold advisory"
+      "summary": "gsv-loc-audit` 95.18% ≥95% ✅; UI delta компенсовано Rust tests + compact JS; vision-sync rev 472",
+      "title": "Ratio hold + rev prep"
     }
   ],
   "link": "http://127.0.0.1:8891/",

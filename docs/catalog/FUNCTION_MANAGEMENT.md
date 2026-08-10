@@ -265,7 +265,7 @@ FM-xxx (з таблиці нижче)
 
 **VDT:** §5.12 = **журнал PH-S*** (≤10 відкритих). Якщо **< 10** — **`абракадабра`** / project scan **всього проєкту**: concept → FM **§5.1** → roadmaps → architect → DOCS_LEGACY → code → §5.13 fallback. Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Project scan». **Rust-first:** API → `tests/`; Playwright лише browser scope.
 
-**Відкритих у §5.12:** **0** (band 118 ✅). **Master horizon:** PH-S1829…S1838 (band 119). Vision rev **472**.
+**Відкритих у §5.12:** **0** (band 120 ✅ · §5.101 PH-S1839…S1848). **Master horizon:** PH-S1839…S1848 (band 120). Vision rev **473**.
 
 **Историчний research backlog (PH-S65+):**
 
@@ -1510,6 +1510,40 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1761 | **PH-S1826** | Ratio hold advisory | GSV_ROLES | `gsv-loc-audit --min-ratio 0.95 --advisory` ≥95% + poolAI ratio96 advisory hold | **[x]** |
 | 1762 | **PH-S1827** | poolai-vision-sync close | docs canon | `poolai-vision-sync` rev **471** (band 118); `--check` ok; sprint-queue/feed updated | **[x]** |
 | 1763 | **PH-S1828** | Band close | GSV_ROLES | ratio hold; fmt/clippy/test (poolAI test-ci + GSV 153); docs canon; vision-sync rev 471; push | **[x]** |
+
+### 5.100 GSV Galaxy UI full parity queue — band 119 (PH-S1829…S1838, 2026-08-08) · **✅**
+
+**Джерело:** owner priority (master horizon band 119): Galaxy UI full parity — colors + box behaviors. Повний legacy `:root` palette wire, Rust-rendered starfield/galaxy backdrop SVG, header chrome (RSS ticker, GPU mode cycle, power menu), panel dock + Esc-fullscreen. Legacy: [`docs/vision/vision.css`](../vision/vision.css) `:root` + header/starfield chrome · [`docs/vision/vision.js`](../vision/vision.js). GSV: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV/docs/LEGACY_PARITY.md`](../../GSV/docs/LEGACY_PARITY.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1764 | **PH-S1829** | Scope + queue | owner priority | Define band 119 (Galaxy UI full parity) у `GSV_TECH_ROADMAP.md` (rows PH-S1829…S1838) | **[x]** |
+| 1765 | **PH-S1830** | GalaxyPalette wire | GSV canon | `GalaxyPalette` struct + `wire_palette` → `GET /api/vision/palette` (exact legacy `:root` values + `ok`/`revision`) | **[x]** |
+| 1766 | **PH-S1831** | Starfield SVG | GSV canon | `starfield_svg(mode)` → `GET /api/vision/starfield.svg?mode=eco-fx-ms` (deterministic LCG; eco sparse, fx glow, ms medium) | **[x]** |
+| 1767 | **PH-S1832** | Galaxy backdrop SVG | GSV canon | `galaxy_svg()` → `GET /api/vision/galaxy.svg` (nebula gradients + spiral arms) | **[x]** |
+| 1768 | **PH-S1833** | Header chrome + ticker | GSV canon | `ui/index.html`: RSS ticker, GPU mode cycle, power menu (soft sync/reload/offline), meta-rev/meta-trail | **[x]** |
+| 1769 | **PH-S1834** | Panel dock + Esc-fullscreen | GSV canon | collapse → dock chips (restore on click); fullscreen + Esc exits; starfield/galaxy backdrop `<img>` | **[x]** |
+| 1770 | **PH-S1835** | Contracts | GSV tests | `gsv_vision_contracts` (**50**: palette/starfield/galaxy) + `gsv_server_contracts` (**29**: endpoints 200 + `image/svg+xml`) | **[x]** |
+| 1771 | **PH-S1836** | GSV docs canon | GSV canon | `VISION.md` +band 119; `LEGACY_PARITY.md` rows migrated; MEMORY band 119; HANDOFF/NEXT band 119 | **[x]** |
+| 1772 | **PH-S1837** | Ratio hold + rev prep | GSV_ROLES | `gsv-loc-audit` **95.18%** ≥95% ✅; UI delta компенсовано Rust tests + compact JS; vision-sync rev **472** | **[x]** |
+| 1773 | **PH-S1838** | Band close | GSV_ROLES | ratio hold (95.18%); fmt/clippy/test (**183**); docs canon; vision-sync rev 472; push | **[x]** |
+
+### 5.101 GSV Ratio 96% stretch queue — band 120 (PH-S1839…S1848, 2026-08-08) · **✅**
+
+**Джерело:** owner priority (master horizon band 120): Ratio 96% stretch — raise GSV rust ratio **95.18% → ≥96%** via `gsv-loc-audit --stretch-96` advisory + server-rendered UI card fragments (`GET /api/ui/card/:name`, Rust HTML renderers) + compact UI (JS/CSS). Canon: [`GSV/docs/LEGACY_PARITY.md`](../../GSV/docs/LEGACY_PARITY.md) (ratio-safe) · [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV/docs/GSV_ROLES.md`](../../GSV/docs/GSV_ROLES.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1774 | **PH-S1839** | Scope + queue | owner priority | Define band 120 (Ratio 96% stretch) у FM §5.101 + §5.12 header (master horizon) | **[x]** |
+| 1775 | **PH-S1840** | `--stretch-96` advisory | GSV canon | `gsv-loc-audit --stretch-96` — 96% advisory threshold check (report + exit code) + `ratio.rs` support + unit tests | **[x]** |
+| 1776 | **PH-S1841** | Ratio96 contracts | GSV tests | `gsv_ratio_contracts`: stretch-96 advisory + `rust_ratio.json` stretch fields + API shape | **[x]** |
+| 1777 | **PH-S1842** | UI fragment module | GSV canon | `boxes/ui.rs`: `esc`/`tab`/`bar` + per-card HTML renderers (vision cards) + unit tests | **[x]** |
+| 1778 | **PH-S1843** | Render endpoint | GSV canon | `GET /api/ui/card/:name` — Rust-rendered card body HTML + dispatch у `server/mod.rs` | **[x]** |
+| 1779 | **PH-S1844** | UI thin glue | GSV canon | `ui/index.html`: `render*` → `getText` injection; compact CSS/JS | **[x]** |
+| 1780 | **PH-S1845** | Contracts | GSV tests | `gsv_ui_contracts` + `gsv_server_contracts`: card render HTML markers + endpoints | **[x]** |
+| 1781 | **PH-S1846** | Ratio 96% measurement | GSV_ROLES | `gsv-loc-audit --stretch-96` green **≥96%**; compact/tests adjust to hold | **[x]** |
+| 1782 | **PH-S1847** | GSV docs canon | GSV canon | MEMORY band 120; HANDOFF/NEXT band 120; VISION.md; `GSV_TECH_ROADMAP.md` band 120 | **[x]** |
+| 1783 | **PH-S1848** | Band close | GSV_ROLES | ratio **≥96%**; fmt/clippy/test; docs canon; vision-sync rev bump; push | **[x]** |
 
 ### 5.88 Ratio96 docs canon queue — band 107 (PH-S1709…S1718, 2026-08-02) · **✅**
 

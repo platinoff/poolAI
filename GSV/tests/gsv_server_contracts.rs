@@ -518,3 +518,17 @@ async fn starfield_galaxy_svg_have_svg_content_type() {
         );
     }
 }
+
+#[tokio::test]
+async fn ui_card_endpoint_renders_fragment_and_rejects_unknown() {
+    let (app, _state) = app();
+    let (status, json) = get(&app, "/api/ui/card/sprint-progress").await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(json["ok"], true);
+    assert_eq!(json["card"], "sprint-progress");
+    let html = json["html"].as_str().expect("html");
+    assert!(html.contains("rev <kbd>"));
+    let (bad_status, bad_json) = get(&app, "/api/ui/card/nope").await;
+    assert_eq!(bad_status, StatusCode::NOT_FOUND);
+    assert_eq!(bad_json["ok"], false);
+}

@@ -4,7 +4,7 @@ use std::convert::Infallible;
 use std::time::Duration;
 
 use axum::body::Bytes;
-use axum::extract::{Query, State};
+use axum::extract::{Path, Query, State};
 use axum::http::{HeaderMap, StatusCode};
 use axum::response::sse::{Event, KeepAlive, Sse};
 use axum::response::{Html, IntoResponse, Response};
@@ -68,6 +68,7 @@ pub fn router(state: AppState) -> Router {
         .route("/api/hooks/tests", get(api_hooks_tests))
         .route("/api/hooks/bench", get(api_hooks_bench))
         .route("/api/ratio", get(api_ratio))
+        .route("/api/ui/card/{name}", get(api_ui_card))
         .route("/api/vision", get(api_vision))
         .route("/api/vision/manifest", get(api_vision_manifest))
         .route("/api/vision/map", get(api_vision_map))
@@ -242,6 +243,44 @@ async fn api_hooks_bench(State(state): State<AppState>) -> Json<Value> {
 
 async fn api_ratio(State(state): State<AppState>) -> Json<Value> {
     Json(crate::boxes::ratio::wire(&state.data_dir))
+}
+
+/// `GET /api/ui/card/:name` — server-rendered card body HTML fragment.
+///
+/// Fetches the card's wire payload, renders it with the Rust UI fragment box,
+/// and returns `{ok, card, html}`. Unknown cards return `ok:false` (404).
+async fn api_ui_card(State(state): State<AppState>, Path(name): Path<String>) -> Response {
+    let wire = match name.as_str() {
+        "tracker" => tracker_wire(&state),
+        "sli" => json!(sli::wire(&state.repo_root)),
+        "toolchain" => json!(toolchain::wire(&state.repo_root)),
+        "ratio" => crate::boxes::ratio::wire(&state.data_dir),
+        "hooks-tests" => json!(hooks::tests_wire(&state.repo_root)),
+        "hooks-bench" => json!(hooks::bench_wire(&state.repo_root)),
+        "sprint-map" => crate::boxes::vision::wire_sprint_map(&state.repo_root, &state.data_dir),
+        "sprint-queue" => {
+            crate::boxes::vision::wire_sprint_queue(&state.repo_root, &state.data_dir)
+        }
+        "sprint-progress" => {
+            crate::boxes::vision::wire_sprint_progress(&state.repo_root, &state.data_dir)
+        }
+        "sprint-board" => {
+            crate::boxes::vision::wire_sprint_board(&state.repo_root, &state.data_dir)
+        }
+        "speed-index" => crate::boxes::vision::wire_speed_index(&state.repo_root, &state.data_dir),
+        "rust-diagnostics" => {
+            crate::boxes::vision::wire_rust_diagnostics(&state.repo_root, &state.data_dir)
+        }
+        _ => {
+            return (
+                StatusCode::NOT_FOUND,
+                Json(json!({ "ok": false, "error": format!("unknown card: {name}") })),
+            )
+                .into_response();
+        }
+    };
+    let html = crate::boxes::ui::render_card(&name, &wire).unwrap_or_default();
+    Json(json!({ "ok": true, "card": name, "html": html })).into_response()
 }
 
 async fn api_vision(State(state): State<AppState>) -> Json<Value> {

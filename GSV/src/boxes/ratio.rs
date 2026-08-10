@@ -19,6 +19,8 @@ use serde::{Deserialize, Serialize};
 pub const FORMAL_BAND_MIN: f64 = 0.95;
 /// Default advisory/regression floor.
 pub const DEFAULT_MIN_RATIO: f64 = 0.95;
+/// Stretch horizon target (band 120): 96% rust ratio advisory.
+pub const STRETCH_96_TARGET: f64 = 0.96;
 
 /// Product categories for the GSV ratio audit (git-tracked files only).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize)]
@@ -65,6 +67,8 @@ pub struct AuditConfig {
     pub min_ratio: f64,
     /// Warn and exit 0 when ratio below `min_ratio` (CI advisory).
     pub advisory: bool,
+    /// Stretch-96 advisory: report 96% target, warn (exit 0) when not met.
+    pub stretch_96: bool,
     pub write_output: bool,
     pub print: bool,
     pub output: Option<PathBuf>,
@@ -75,6 +79,7 @@ impl Default for AuditConfig {
         Self {
             min_ratio: DEFAULT_MIN_RATIO,
             advisory: false,
+            stretch_96: false,
             write_output: true,
             print: false,
             output: None,
@@ -99,6 +104,10 @@ pub struct RustRatioReport {
     pub formal_band_min: f64,
     pub min_ratio: f64,
     pub meets_min_ratio: bool,
+    #[serde(default)]
+    pub stretch_target: f64,
+    #[serde(default)]
+    pub meets_stretch_96: bool,
     pub by_category: BTreeMap<String, CategoryLoc>,
     pub notes: Vec<String>,
 }
@@ -243,6 +252,8 @@ pub fn audit(root: &Path) -> Result<RustRatioReport, String> {
         formal_band_min: FORMAL_BAND_MIN,
         min_ratio: DEFAULT_MIN_RATIO,
         meets_min_ratio: rust_ratio >= DEFAULT_MIN_RATIO,
+        stretch_target: STRETCH_96_TARGET,
+        meets_stretch_96: rust_ratio >= STRETCH_96_TARGET,
         by_category,
         notes,
     })
@@ -355,5 +366,53 @@ mod tests {
         let total = rust_loc + non_rust;
         let ratio = rust_loc as f64 / total as f64;
         assert!(ratio >= 0.95);
+    }
+
+    #[test]
+    fn stretch_96_target_above_formal_band() {
+        const { assert!(STRETCH_96_TARGET > FORMAL_BAND_MIN) };
+        assert_eq!(STRETCH_96_TARGET, 0.96);
+        assert!(!AuditConfig::default().stretch_96);
+        let c = AuditConfig {
+            stretch_96: true,
+            ..AuditConfig::default()
+        };
+        assert!(c.stretch_96);
+    }
+
+    #[test]
+    fn stretch_96_flag_gates_report_fields() {
+        let cfg = AuditConfig {
+            stretch_96: true,
+            ..AuditConfig::default()
+        };
+        assert!(cfg.stretch_96);
+        let report = RustRatioReport {
+            generated_at: "t".to_string(),
+            rust_loc: 96,
+            non_rust_product_loc: 4,
+            product_loc_total: 100,
+            rust_ratio: 0.96,
+            rust_ratio_pct: 96.0,
+            formal_band_min: FORMAL_BAND_MIN,
+            min_ratio: DEFAULT_MIN_RATIO,
+            meets_min_ratio: true,
+            stretch_target: STRETCH_96_TARGET,
+            meets_stretch_96: true,
+            by_category: BTreeMap::new(),
+            notes: Vec::new(),
+        };
+        assert!(report.meets_min_ratio);
+        assert!(report.meets_stretch_96);
+        assert_eq!(report.stretch_target, 0.96);
+        let below = RustRatioReport {
+            rust_ratio: 0.958,
+            rust_ratio_pct: 95.8,
+            meets_min_ratio: true,
+            meets_stretch_96: false,
+            ..report
+        };
+        assert!(below.meets_min_ratio);
+        assert!(!below.meets_stretch_96);
     }
 }

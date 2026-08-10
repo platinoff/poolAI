@@ -4,18 +4,20 @@
 Оновлюється в кінці кожного band. Лічильники — вимірювані (`wc -l`, `cargo test`,
 `cargo run --bin gsv-loc-audit`), не з пам'яті.
 
-## Стан (2026-08-08 · band 119 ✅)
+## Стан (2026-08-08 · band 120 ✅)
 
 - **Канон:** Rust **95–100%** / wasm **0–5%** (завжди), без Python/Java; bins — лише `src/bin/`.
-- **Ratio (виміряно):** `cargo run --bin gsv-loc-audit` → **95.18%** (rust 9148 / product 9611) — gate ≥95% ✅.
+- **Ratio (виміряно):** `cargo run --bin gsv-loc-audit -- --stretch-96` → **96.51%** (rust 10027 / product 10390) —
+  gate ≥95% ✅, stretch-96 ≥96% ✅.
   Звіт: `GSV/data/rust_ratio.json` (gitignored).
-- **Тести (виміряно):** `cargo test` → **183** (81 unit + 8 `gsv_omni_contracts` + 7 `gsv_ratio_contracts`
-  + 29 `gsv_server_contracts` + 8 `gsv_update_flow` + 50 `gsv_vision_contracts`).
+- **Тести (виміряно):** `cargo test` → **204** (95 unit + 8 `gsv_omni_contracts` + 7 `gsv_ratio_contracts`
+  + 30 `gsv_server_contracts` + 6 `gsv_ui_contracts` + 8 `gsv_update_flow` + 50 `gsv_vision_contracts`).
   `cargo clippy --all-targets` → **0** warnings. `cargo fmt` clean.
 - **Бокси:** Tracker · SLI console · Toolchain · IDE · Update/offline · Box preview · SLI terminal ·
   Tests/bench hooks · **Ratio** · **Vision** · **Vision Map** · **Sprint Map** · **Doc Preview** ·
   **Vision Sync** · **Sprint Queue** · **Sprint Board** · **Sprint Progress** · **Sprint Focus** ·
-  **Galaxy UI parity** (band 119) · **OmniRouter** (Rust AI-проксі/роутер).
+  **Galaxy UI parity** (band 119) · **UI fragments** (band 120: `GET /api/ui/card/:name`, 12 Rust renderers) ·
+  **OmniRouter** (Rust AI-проксі/роутер).
 
 ## Що зроблено
 
@@ -279,6 +281,25 @@
   tests; JS compact); vision-sync rev **472** (poolai + gsv + `--check`).
 - **PH-S1838** Band close: ratio hold (95.18%), fmt, clippy 0, cargo test (**183**), docs canon,
   vision-sync rev 472, push.
+
+### Band 120 (PH-S1839…S1848, ✅ 2026-08-08) — GSV Ratio 96% stretch
+- **PH-S1839** `docs/gsv/GSV_TECH_ROADMAP.md` band 120 (PH-S1839…S1848): ratio **95.18% → ≥96%**
+  via `gsv-loc-audit --stretch-96` advisory + server-rendered UI card fragments
+  (`GET /api/ui/card/:name`, Rust HTML renderers) + compact UI (JS/CSS).
+- **PH-S1840** `--stretch-96` advisory: `ratio.rs` `STRETCH_96_TARGET = 0.96` + `AuditConfig.stretch_96`
+  + `RustRatioReport.stretch_target`/`meets_stretch_96` (`#[serde(default)]` — старий `rust_ratio.json`
+  читається); `gsv_loc_audit.rs` `--stretch-96` flag → advisory (exit 0).
+- **PH-S1841** `gsv_ratio_contracts` — roundtrip + JSON shape + wire stretch fields.
+- **PH-S1842** `boxes/ui.rs`: `esc`/`tab`/`bar` helpers + 12 Rust renderers (tracker/sli/toolchain/
+  ratio/hooks-tests/hooks-bench/sprint-map/sprint-queue/sprint-progress/sprint-board/speed-index/
+  rust-diagnostics) + `render_card` dispatch + `CARD_NAMES` (12).
+- **PH-S1843** `GET /api/ui/card/{name}` в `server/mod.rs` (`api_ui_card` handler; 404 unknown).
+- **PH-S1844** `ui/index.html` thin glue: `getText(card)` → `api/ui/card/:name` + `rustCards` (12);
+  8 JS renderers видалено.
+- **PH-S1845** `gsv_ui_contracts` (6) + `gsv_server_contracts` (**30**, `ui_card_endpoint_renders_fragment_and_rejects_unknown`).
+- **PH-S1846** Ratio 96% measurement: `gsv-loc-audit --stretch-96` → **96.51%** (rust 10027 / product 10390) ✅.
+- **PH-S1847** GSV docs canon: MEMORY band 120; HANDOFF/NEXT band 120; `GSV_TECH_ROADMAP.md` band 120.
+- **PH-S1848** Band close: ratio **≥96%**; fmt/clippy 0; cargo test (**204**); docs canon; vision-sync rev bump; push.
 
 ## Важливі факти (не забувати)
 
