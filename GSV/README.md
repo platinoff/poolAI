@@ -88,7 +88,7 @@ cargo run --bin gsv-server -- --port 8890   # live smoke
 ## Запуск
 
 ```
-cargo run --bin gsv-server -- --host 127.0.0.1 --port 8765 --repo-root S:/rust/poolAI --data-dir GSV/data
+cargo run --bin gsv-server -- --host 127.0.0.1 --port 9999 --repo-root S:/rust/poolAI --data-dir GSV/data
 ```
 
 Endpoints: `GET /` (UI), `/api/health`, `/api/tracker`, `/api/sli`, `/api/toolchain`, `/api/ide/sessions`, `POST /api/ide/select`, `/api/update`, `POST /api/update/notify`, `/api/preview?file=…`, `POST /api/terminal`, `/api/hooks/tests`, `/api/hooks/bench`, `/api/ratio`, `/api/omni`, `/api/omni/config` (GET/POST), `/api/omni/v1/models`, `POST /api/omni/v1/chat/completions`, `POST /api/omni/test`, `GET /events` (SSE).

@@ -82,8 +82,8 @@ fn vision_feed_reads_real_workspace() {
         f.items.len()
     );
     assert!(
-        f.items.iter().any(|i| i.id == "PH-S1828"),
-        "feed must include the band-118 close entry"
+        f.items.iter().any(|i| i.id == "PH-S1848"),
+        "feed must include the band-120 close entry"
     );
     for item in &f.items {
         assert!(!item.id.is_empty());

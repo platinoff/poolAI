@@ -34,7 +34,7 @@ pub const GSV_SERVER_NAME: &str = "Galaxy StarWalker Vision";
 pub const DEFAULT_HOST: &str = "127.0.0.1";
 
 /// Default listen port.
-pub const DEFAULT_PORT: u16 = 8765;
+pub const DEFAULT_PORT: u16 = 9999;
 
 /// Build-time version of the GSV server binary.
 pub fn gsv_version() -> &'static str {

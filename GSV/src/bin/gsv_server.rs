@@ -5,7 +5,7 @@
 //!
 //! ```text
 //! cargo run --manifest-path GSV/Cargo.toml --bin gsv-server
-//! cargo run --manifest-path GSV/Cargo.toml --bin gsv-server -- --port 8765
+//! cargo run --manifest-path GSV/Cargo.toml --bin gsv-server -- --port 9999
 //! cargo run --manifest-path GSV/Cargo.toml --bin gsv-server -- --repo-root /s/rust/poolAI
 //! ```
 
