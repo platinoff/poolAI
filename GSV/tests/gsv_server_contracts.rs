@@ -528,6 +528,13 @@ async fn ui_card_endpoint_renders_fragment_and_rejects_unknown() {
     assert_eq!(json["card"], "sprint-progress");
     let html = json["html"].as_str().expect("html");
     assert!(html.contains("rev <kbd>"));
+    let (omni_status, omni_json) = get(&app, "/api/ui/card/omni").await;
+    assert_eq!(omni_status, StatusCode::OK);
+    assert_eq!(omni_json["ok"], true);
+    assert!(omni_json["html"]
+        .as_str()
+        .expect("omni html")
+        .contains("providers "));
     let (bad_status, bad_json) = get(&app, "/api/ui/card/nope").await;
     assert_eq!(bad_status, StatusCode::NOT_FOUND);
     assert_eq!(bad_json["ok"], false);

@@ -271,6 +271,8 @@ async fn api_ui_card(State(state): State<AppState>, Path(name): Path<String>) ->
         "rust-diagnostics" => {
             crate::boxes::vision::wire_rust_diagnostics(&state.repo_root, &state.data_dir)
         }
+        "omni" => serde_json::to_value(crate::boxes::omni::wire(&state.omni).await)
+            .unwrap_or(serde_json::Value::Null),
         _ => {
             return (
                 StatusCode::NOT_FOUND,

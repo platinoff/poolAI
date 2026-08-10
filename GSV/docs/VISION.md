@@ -12,6 +12,9 @@ SVG, header chrome (RSS ticker, GPU mode cycle, power menu), panel dock + Esc-fu
 **band 120 (PH-S1839…S1848, ✅)** — Ratio 96% stretch: `gsv-loc-audit --stretch-96`
 advisory (**96.51%** ≥96% ✅) + `GET /api/ui/card/{name}` Rust-rendered card fragments
 (`boxes/ui.rs`: `esc`/`tab`/`bar` + 12 renderers) + `ui/index.html` thin glue (`getText` → `rustCards`).
+**band 121 (PH-S1849…S1855, ✅)** — OmniRouter box parity: останній hand-rolled JS renderer
+`renderOmni` → Rust `boxes/ui.rs` `render_omni` (`GET /api/ui/card/omni`, `CARD_NAMES` 13) —
+ratio **96.73%** ≥96% ✅; всі 13 карток server-rendered, `renderOmni` JS видалено.
 
 ## Що це
 
@@ -270,4 +273,9 @@ renderers (`boxes/ui.rs`: `esc`/`tab`/`bar` + `render_card` + `CARD_NAMES`), 12 
 (tracker/sli/toolchain/ratio/hooks-tests/hooks-bench/sprint-map/sprint-queue/sprint-progress/
 sprint-board/speed-index/rust-diagnostics) → `ui/index.html` thin glue `getText` → `rustCards`;
 8 JS renderers видалено. Це підняло rust ratio **95.18% → 96.51%** (stretch-96 advisory ✅).
+Band 121 додає **OmniRouter card** (`GET /api/ui/card/omni`): `render_omni` у `boxes/ui.rs`
+(summary/routing + recommended + providers table + models table + `format_number` grouping),
+`server/mod.rs` `"omni"` arm → `boxes::omni::wire`, `CARD_NAMES` 13; `renderOmni` JS видалено,
+`rustCards` 13 → rust ratio **96.73%** (stretch-96 advisory ✅). Тепер усі 13 UI-карток —
+Rust-rendered (`boxes/ui.rs`), жодного JS-рендера карток не залишилось.
 Див. [`GSV_MIGRATION.md`](../../docs/gsv/GSV_MIGRATION.md) і [`LEGACY_PARITY.md`](./LEGACY_PARITY.md).

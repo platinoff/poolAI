@@ -4,20 +4,20 @@
 Оновлюється в кінці кожного band. Лічильники — вимірювані (`wc -l`, `cargo test`,
 `cargo run --bin gsv-loc-audit`), не з пам'яті.
 
-## Стан (2026-08-08 · band 120 ✅)
+## Стан (2026-08-10 · band 121 ✅)
 
 - **Канон:** Rust **95–100%** / wasm **0–5%** (завжди), без Python/Java; bins — лише `src/bin/`.
-- **Ratio (виміряно):** `cargo run --bin gsv-loc-audit -- --stretch-96` → **96.51%** (rust 10027 / product 10390) —
+- **Ratio (виміряно):** `cargo run --bin gsv-loc-audit -- --stretch-96` → **96.73%** (rust 10191 / product 10536) —
   gate ≥95% ✅, stretch-96 ≥96% ✅.
   Звіт: `GSV/data/rust_ratio.json` (gitignored).
-- **Тести (виміряно):** `cargo test` → **204** (95 unit + 8 `gsv_omni_contracts` + 7 `gsv_ratio_contracts`
-  + 30 `gsv_server_contracts` + 6 `gsv_ui_contracts` + 8 `gsv_update_flow` + 50 `gsv_vision_contracts`).
+- **Тести (виміряно):** `cargo test` → **207** (97 unit + 8 `gsv_omni_contracts` + 7 `gsv_ratio_contracts`
+  + 30 `gsv_server_contracts` + 7 `gsv_ui_contracts` + 8 `gsv_update_flow` + 50 `gsv_vision_contracts`).
   `cargo clippy --all-targets` → **0** warnings. `cargo fmt` clean.
 - **Бокси:** Tracker · SLI console · Toolchain · IDE · Update/offline · Box preview · SLI terminal ·
   Tests/bench hooks · **Ratio** · **Vision** · **Vision Map** · **Sprint Map** · **Doc Preview** ·
   **Vision Sync** · **Sprint Queue** · **Sprint Board** · **Sprint Progress** · **Sprint Focus** ·
-  **Galaxy UI parity** (band 119) · **UI fragments** (band 120: `GET /api/ui/card/:name`, 12 Rust renderers) ·
-  **OmniRouter** (Rust AI-проксі/роутер).
+  **Galaxy UI parity** (band 119) · **UI fragments** (band 121: `GET /api/ui/card/:name`, 13 Rust renderers) ·
+  **OmniRouter** (Rust AI-проксі/роутер; card `omni` band 121).
 
 ## Що зроблено
 
@@ -300,6 +300,21 @@
 - **PH-S1846** Ratio 96% measurement: `gsv-loc-audit --stretch-96` → **96.51%** (rust 10027 / product 10390) ✅.
 - **PH-S1847** GSV docs canon: MEMORY band 120; HANDOFF/NEXT band 120; `GSV_TECH_ROADMAP.md` band 120.
 - **PH-S1848** Band close: ratio **≥96%**; fmt/clippy 0; cargo test (**204**); docs canon; vision-sync rev bump; push.
+
+### Band 121 (PH-S1849…S1855, ✅ 2026-08-10) — GSV OmniRouter box parity
+- **PH-S1849** `docs/gsv/GSV_TECH_ROADMAP.md` band 121 (PH-S1849…S1855): port the last hand-rolled
+  JS card renderer (`renderOmni`) to the Rust UI fragment box — `GET /api/ui/card/omni`, `CARD_NAMES` 13.
+- **PH-S1850** `boxes/ui.rs`: `render_omni` (summary/routing + recommended + providers table +
+  models table) + `format_number` (grouping) + `render_card`/`CARD_NAMES` 13 + 2 unit tests.
+- **PH-S1851** `server/mod.rs` `api_ui_card`: `"omni"` → `boxes::omni::wire`; `ui/index.html`:
+  `renderOmni` JS видалено, `rustCards` 13, `resync()` url drop (test control залишено).
+- **PH-S1852** `gsv_ui_contracts` (7: `ui_card_omni_renders_summary_providers_models`) +
+  `gsv_server_contracts` (omni card endpoint 200 + markers).
+- **PH-S1853** Ratio hold: `gsv-loc-audit --stretch-96` → **96.73%** (rust 10191 / product 10536) ✅;
+  cargo test (**207**); clippy 0; fmt clean.
+- **PH-S1854** GSV docs canon: MEMORY band 121; HANDOFF/NEXT band 121; VISION.md omni card section;
+  `GSV_TECH_ROADMAP.md` band 121.
+- **PH-S1855** Band close: ratio **≥96%**; fmt/clippy 0; cargo test (**207**); docs canon; vision-sync rev bump; push.
 
 ## Важливі факти (не забувати)
 

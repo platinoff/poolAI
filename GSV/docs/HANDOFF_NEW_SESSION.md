@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (GSV)
 
-**Оновлено:** 2026-08-08 (band 120 **PH-S1839…S1848** ✅ · ratio **96.51%** · tests **204** · clippy **0**)
+**Оновлено:** 2026-08-10 (band 121 **PH-S1849…S1855** ✅ · ratio **96.73%** · tests **207** · clippy **0**)
 
 **Наступна сесія:** **`абракадабра`** → S0 диск/git → project scan (warnings first) → drain ≤10 PH-S*
 → Speeds + Rust panel → vision-sync → **один commit** → **`git push` + самарі**. Канон:
@@ -8,13 +8,15 @@
 
 ## Стан зараз
 
-- **GSV** — окремий Rust-first проєкт (`GSV/`), bands 102 · 108 · 109 · 110 · 111 · 112 · 113 · 114 · 115 · 116 · 117 · 118 · 119 · 120 **✅**.
-- **Ratio:** `cargo run --bin gsv-loc-audit -- --stretch-96` → **96.51%** (rust 10027 / product 10390, gate ≥95% ✅, stretch-96 ≥96% ✅) → `GSV/data/rust_ratio.json`.
-- **Тести:** `cargo test` → **204** green · **clippy 0** · **fmt clean**.
-- **Сервер:** порт 8870 (8891 транзитивно зарезервований Windows dynamic exclusion; canon порт **8891**).
-- **FM:** band 120 = §5.101 (PH-S1839…S1848 ✅). Master horizon poolAI: band 121.
-- **Vision rev:** 472 (band 119 vision-sync close). Vision box: `boxes/vision.rs` + `gsv-vision-sync` bin +
-  `GET /api/vision*`; snapshot `GSV/data/gsv_manifest.json` + `gsv_feed.json` + `gsv_extensions.json` (rev 472).
+- **GSV** — окремий Rust-first проєкт (`GSV/`), bands 102 · 108 · 109 · 110 · 111 · 112 · 113 · 114 · 115 · 116 · 117 · 118 · 119 · 120 · 121 **✅**.
+- **Ratio:** `cargo run --bin gsv-loc-audit -- --stretch-96` → **96.73%** (rust 10191 / product 10536, gate ≥95% ✅, stretch-96 ≥96% ✅) → `GSV/data/rust_ratio.json`.
+- **Тести:** `cargo test` → **207** green · **clippy 0** · **fmt clean**.
+- **Сервер:** canon порт **9999** (`DEFAULT_PORT`; 8765 — Hyper-V reserved range). Стара нотатка
+  8870/8891 — історична; див. `GSV/src/lib.rs`.
+- **FM:** band 121 = §5.102 (PH-S1849…S1855 ✅). Master horizon poolAI: band 122.
+- **Vision rev:** 473 (band 120 vision-sync close; band 121 bump — на кроці band close).
+  Vision box: `boxes/vision.rs` + `gsv-vision-sync` bin +
+  `GET /api/vision*`; snapshot `GSV/data/gsv_manifest.json` + `gsv_feed.json` + `gsv_extensions.json` (rev 473).
   Band 110: `GET /api/vision/map`, `GET /assets/vision.svg`, `GET /api/vision/feed?status=`, Vision Map card.
   Band 111: `GET /api/vision/sprint-map` (sprint-scope/queue/session-tracks links + modules + kinds) та
   `GET /api/vision/doc-preview?id=` (node + 1-hop neighbors) — Sprint Map + Doc Preview UI cards.
@@ -55,9 +57,13 @@
   recreated в Rust (`vision.rs`), не legacy JS. **band 119: Galaxy UI full parity
   (colors + box behaviors) migrated** — legacy `:root` palette = Rust wire, starfield/galaxy
   backdrop = Rust SVG, header chrome/dock/fullscreen = compact UI glue (не legacy JS/CSS).
-  **band 120: Ratio 96% stretch** — `GET /api/ui/card/{name}` (Rust-rendered card body HTML:
-  `boxes/ui.rs` `esc`/`tab`/`bar` + 12 renderers + `CARD_NAMES`); `ui/index.html` thin glue
-  (`getText` → `rustCards`); `gsv-loc-audit --stretch-96` advisory (**96.51%** ≥96% ✅).
+   **band 120: Ratio 96% stretch** — `GET /api/ui/card/{name}` (Rust-rendered card body HTML:
+   `boxes/ui.rs` `esc`/`tab`/`bar` + 12 renderers + `CARD_NAMES`); `ui/index.html` thin glue
+   (`getText` → `rustCards`); `gsv-loc-audit --stretch-96` advisory (**96.51%** ≥96% ✅).
+   **band 121: OmniRouter box parity** — `boxes/ui.rs` `render_omni` (summary/routing +
+   recommended + providers + models tables) + `format_number`; `CARD_NAMES` 13;
+   `server/mod.rs` `api_ui_card` `"omni"` → `boxes::omni::wire`; `renderOmni` JS видалено,
+   `rustCards` 13; `gsv-loc-audit --stretch-96` → **96.73%** (rust 10191 / product 10536) ≥96% ✅.
 - **poolAI ratio:** **95.04%** (advisory hold, `--ratio96-docs-canon --advisory --min-ratio 0.95`).
 
 ## S0 (кожна сесія, disk/git first)

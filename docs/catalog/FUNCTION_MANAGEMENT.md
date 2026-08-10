@@ -265,7 +265,7 @@ FM-xxx (з таблиці нижче)
 
 **VDT:** §5.12 = **журнал PH-S*** (≤10 відкритих). Якщо **< 10** — **`абракадабра`** / project scan **всього проєкту**: concept → FM **§5.1** → roadmaps → architect → DOCS_LEGACY → code → §5.13 fallback. Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Project scan». **Rust-first:** API → `tests/`; Playwright лише browser scope.
 
-**Відкритих у §5.12:** **0** (band 120 ✅ · §5.101 PH-S1839…S1848). **Master horizon:** PH-S1839…S1848 (band 120). Vision rev **473**.
+**Відкритих у §5.12:** **0** (band 121 ✅ · §5.102 PH-S1849…S1855). **Master horizon:** PH-S1849…S1855 (band 121). Vision rev **474**.
 
 **Историчний research backlog (PH-S65+):**
 
@@ -1544,6 +1544,20 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1781 | **PH-S1846** | Ratio 96% measurement | GSV_ROLES | `gsv-loc-audit --stretch-96` green **≥96%**; compact/tests adjust to hold | **[x]** |
 | 1782 | **PH-S1847** | GSV docs canon | GSV canon | MEMORY band 120; HANDOFF/NEXT band 120; VISION.md; `GSV_TECH_ROADMAP.md` band 120 | **[x]** |
 | 1783 | **PH-S1848** | Band close | GSV_ROLES | ratio **≥96%**; fmt/clippy/test; docs canon; vision-sync rev bump; push | **[x]** |
+
+### 5.102 GSV OmniRouter box parity queue — band 121 (PH-S1849…S1855, 2026-08-10) · **✅**
+
+**Джерело:** master backlog band 121 (OmniRouter box parity): port the OmniRouter card from JS `renderOmni` to the Rust UI fragment box (`GET /api/ui/card/omni`, 12→13 `CARD_NAMES`), so the last hand-rolled JS card renderer becomes Rust-rendered (ratio-safe). Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV/docs/GSV_ROLES.md`](../../GSV/docs/GSV_ROLES.md) · [`GSV/docs/LEGACY_PARITY.md`](../../GSV/docs/LEGACY_PARITY.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1784 | **PH-S1849** | Scope + queue | owner priority | Define band 121 (OmniRouter box parity) у FM §5.102 + §5.12 header (master horizon) | **[x]** |
+| 1785 | **PH-S1850** | `render_omni` | GSV canon | `boxes/ui.rs`: `render_omni` (summary/routing + recommended + providers table + models table) + `render_card`/`CARD_NAMES` 13 + unit tests | **[x]** |
+| 1786 | **PH-S1851** | Wire omni card | GSV canon | `server/mod.rs` `api_ui_card`: `"omni"` → `boxes::omni::wire`; UI thin glue: remove `renderOmni` JS, `rustCards` 13, `resync()` url drop | **[x]** |
+| 1787 | **PH-S1852** | Contracts | GSV tests | `gsv_ui_contracts` (render_omni HTML markers: summary/routing/recommended/providers/models) + `gsv_server_contracts` (`/api/ui/card/omni` 200 + shape) | **[x]** |
+| 1788 | **PH-S1853** | Ratio hold + tests | GSV_ROLES | `gsv-loc-audit --stretch-96` green **≥96%**; full GSV tests green; clippy 0 | **[x]** |
+| 1789 | **PH-S1854** | GSV docs canon | GSV canon | MEMORY band 121; HANDOFF/NEXT band 121; VISION.md omni card section; `GSV_TECH_ROADMAP.md` band 121 | **[x]** |
+| 1790 | **PH-S1855** | Band close | GSV_ROLES | ratio **≥96%**; fmt/clippy/test; docs canon; vision-sync rev bump; push | **[x]** |
 
 ### 5.88 Ratio96 docs canon queue — band 107 (PH-S1709…S1718, 2026-08-02) · **✅**
 

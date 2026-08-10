@@ -1,6 +1,6 @@
 # Промпт наступної сесії (GSV)
 
-**Оновлено:** 2026-08-08 (band 120 **PH-S1839…S1848** ✅ · ratio **96.51%** · tests **204**)
+**Оновлено:** 2026-08-10 (band 121 **PH-S1849…S1855** ✅ · ratio **96.73%** · tests **207**)
 
 ```
 абракадабра
@@ -8,11 +8,11 @@
 
 **Порядок:** **S0 диск** (`df -h /s` + `check_target_disk.sh` → `cargo clean` за потреби) →
 project scan (**warnings first** — `cargo clippy --all-targets` у GSV, `poolai-rust-diagnostics` у poolAI) →
-drain наступного band (черга — FM §5.12 §5.100 / GSV_TECH_ROADMAP; **без** mid-push) →
-Speeds · Rust panel → vision-sync (`poolai-vision-sync`) → **один** commit → **`git push` + самарі**.
+drain наступного band (черга — FM §5.12 §5.102 / GSV_TECH_ROADMAP; **без** mid-push) →
+Speeds · Rust panel → vision-sync (`poolai-vision-sync`) → **один** commit → **`git push` + самарі`.
 
 **⚠️ Зупинити `gsv-server` перед `cargo test`/`build`** (блокує `target/debug/gsv-server.exe`);
-після тестів перезапустити на порт 8891.
+після тестів перезапустити на порт 9999.
 
 ## Band стан
 
@@ -104,7 +104,14 @@ Speeds · Rust panel → vision-sync (`poolai-vision-sync`) → **один** com
   `boxes/ui.rs` (`esc`/`tab`/`bar` + 12 Rust card renderers + `render_card` + `CARD_NAMES` 12) →
   `GET /api/ui/card/{name}`; `ui/index.html` thin glue (`getText` → `rustCards` 12, 8 JS renderers
   видалено); contracts **204** (95 unit + 30 server + 6 ui); FM §5.12 §5.101.
-  **Наступний band 121**: master backlog (за пріоритетом власника) — FM §5.12 / GSV_TECH_ROADMAP.
+- **band 121** (PH-S1849…S1855) ✅ — GSV OmniRouter box parity:
+  `boxes/ui.rs` `render_omni` (summary/routing + recommended + providers table + models table +
+  `format_number` grouping) + `render_card`/`CARD_NAMES` 13 + 2 unit tests →
+  `GET /api/ui/card/omni` (`server/mod.rs` `"omni"` → `boxes::omni::wire`);
+  `ui/index.html` `renderOmni` JS видалено, `rustCards` 13, `resync()` url drop;
+  contracts **207** (97 unit + 30 server + 7 ui); ratio **96.73%** (rust 10191 / product 10536) ✅;
+  FM §5.12 §5.102.
+  **Наступний band 122**: master backlog (за пріоритетом власника) — FM §5.12 / GSV_TECH_ROADMAP.
 
 ## Канон GSV
 
@@ -122,6 +129,7 @@ band 113 ✅ (GSV node search + interactive map) · band 114 ✅ (GSV sprint-boa
 band 115 ✅ (GSV migration completion — legacy vision supersession) · band 116 ✅ (GSV history charts — speed/rust analytics) ·
 band 117 ✅ (GSV legacy vision deactivation) · band 118 ✅ (GSV sprint UI migration — theme + focus map) ·
 band 119 ✅ (GSV Galaxy UI full parity — colors + box behaviors) · band 120 ✅ (GSV Ratio 96% stretch) ·
+band 121 ✅ (GSV OmniRouter box parity) ·
 staging `GSV/data/*` / `certs/*.pem` /
 `.env` · mid-push · build/test при запущеному `gsv-server` · обхід ratio-смуги Rust-кодом замість compact UI ·
 перенесення legacy `vision.js`/`vision.css` у `GSV/ui/` (знищило б ratio canon).

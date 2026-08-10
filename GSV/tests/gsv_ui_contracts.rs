@@ -109,5 +109,20 @@ fn ui_helpers_match_js_semantics() {
     assert!(tab(&["a"], Vec::new()).contains("<span class='dim'>—</span>"));
     assert!(bar(50.0).contains("width:50%"));
     assert!(bar(120.0).contains("width:100%"));
-    assert_eq!(CARD_NAMES.len(), 12);
+    assert_eq!(CARD_NAMES.len(), 13);
+}
+
+#[tokio::test]
+async fn ui_card_omni_renders_summary_providers_models() {
+    let (app, _state) = app();
+    let (status, json) = get_card(&app, "omni").await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(json["ok"], true);
+    assert_eq!(json["card"], "omni");
+    let html = json["html"].as_str().expect("html");
+    assert!(html.contains("providers "), "summary: {html}");
+    assert!(html.contains("default <kbd>"));
+    assert!(html.contains("<summary>Providers ("));
+    assert!(html.contains("<summary>Models ("));
+    assert!(html.contains("<th>id</th><th>name</th><th>state</th><th>key</th><th>base_url</th>"));
 }

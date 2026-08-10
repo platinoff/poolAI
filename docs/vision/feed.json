@@ -3,6 +3,69 @@
   "items": [
     {
       "category": "closed",
+      "id": "PH-S1855",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "ratio ≥96%; fmt/clippy/test; docs canon; vision-sync rev bump; push",
+      "title": "Band close"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1854",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "MEMORY band 121; HANDOFF/NEXT band 121; VISION.md omni card section; `GSV_TECH_ROADMAP.md` band 121",
+      "title": "GSV docs canon"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1853",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "gsv-loc-audit --stretch-96` green ≥96%; full GSV tests green; clippy 0",
+      "title": "Ratio hold + tests"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1852",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "gsv_ui_contracts` (render_omni HTML markers: summary/routing/recommended/providers/models) + `gsv_server_contracts` (`/api/ui/card/omni` 200 + shape)",
+      "title": "Contracts"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1851",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "server/mod.rs` `api_ui_card`: `\"omni\"` → `boxes::omni::wire`; UI thin glue: remove `renderOmni` JS, `rustCards` 13, `resync()` url drop",
+      "title": "Wire omni card"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1850",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "boxes/ui.rs`: `render_omni` (summary/routing + recommended + providers table + models table) + `render_card`/`CARD_NAMES` 13 + unit tests",
+      "title": "render_omni"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1849",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "Define band 121 (OmniRouter box parity) у FM §5.102 + §5.12 header (master horizon)",
+      "title": "Scope + queue"
+    },
+    {
+      "category": "closed",
       "id": "PH-S1848",
       "link": "http://127.0.0.1:8891/#b-sprint-board",
       "published": "2026-05-28",
@@ -45,69 +108,6 @@
       "status": "closed",
       "summary": "ui/index.html`: `render*` → `getText` injection; compact CSS/JS",
       "title": "UI thin glue"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1843",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "GET /api/ui/card/:name` — Rust-rendered card body HTML + dispatch у `server/mod.rs",
-      "title": "Render endpoint"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1842",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "boxes/ui.rs`: `esc`/`tab`/`bar` + per-card HTML renderers (vision cards) + unit tests",
-      "title": "UI fragment module"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1841",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "gsv_ratio_contracts`: stretch-96 advisory + `rust_ratio.json` stretch fields + API shape",
-      "title": "Ratio96 contracts"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1840",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "gsv-loc-audit --stretch-96` — 96% advisory threshold check (report + exit code) + `ratio.rs` support + unit tests",
-      "title": "--stretch-96` advisory"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1839",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "Define band 120 (Ratio 96% stretch) у FM §5.101 + §5.12 header (master horizon)",
-      "title": "Scope + queue"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1838",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "ratio hold (95.18%); fmt/clippy/test (183); docs canon; vision-sync rev 472; push",
-      "title": "Band close"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1837",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "gsv-loc-audit` 95.18% ≥95% ✅; UI delta компенсовано Rust tests + compact JS; vision-sync rev 472",
-      "title": "Ratio hold + rev prep"
     }
   ],
   "link": "http://127.0.0.1:8891/",

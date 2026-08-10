@@ -490,6 +490,109 @@ pub fn render_sprint_board(d: &Value) -> String {
     out
 }
 
+/// OmniRouter card (`/api/omni`).
+pub fn render_omni(d: &Value) -> String {
+    let providers = arr(&d["providers"]);
+    let models = arr(&d["models"]);
+    let rec = arr(&d["recommended"]);
+    let routing = &d["routing"];
+    let default_provider = s(&routing["default_provider"]);
+    let mut out = format!(
+        "<div class='dim'>providers {} · models {} · default <kbd>{}</kbd></div>",
+        providers.len(),
+        models.len(),
+        esc(&default_provider),
+    );
+    if default_provider.is_empty() {
+        out.push_str("<span class='err'>omni unavailable</span>");
+        return out;
+    }
+    let rec_ids: Vec<String> = rec
+        .iter()
+        .map(|m| format!("<kbd>{}</kbd>", esc(&s(&m["id"]))))
+        .collect();
+    out.push_str(&format!(
+        "<div style='margin-top:6px'>recommended: {}</div>",
+        if rec_ids.is_empty() {
+            "—".to_string()
+        } else {
+            rec_ids.join(" ")
+        }
+    ));
+    out.push_str(&format!(
+        "<details style='margin-top:6px'><summary>Providers ({})</summary>",
+        providers.len()
+    ));
+    let rows: Vec<Vec<String>> = providers
+        .iter()
+        .map(|p| {
+            vec![
+                format!("<kbd>{}</kbd>", esc(&s(&p["id"]))),
+                esc(&s(&p["name"])),
+                if b(&p["enabled"]) {
+                    "<span class='ok'>on</span>".to_string()
+                } else {
+                    "<span class='err'>off</span>".to_string()
+                },
+                if b(&p["key_set"]) {
+                    "<span class='ok'>key</span>".to_string()
+                } else {
+                    "<span class='dim'>no key</span>".to_string()
+                },
+                format!("<span class='dim'>{}</span>", esc(&s(&p["base_url"]))),
+            ]
+        })
+        .collect();
+    out.push_str(&tab(&["id", "name", "state", "key", "base_url"], rows));
+    out.push_str("</details>");
+    out.push_str(&format!(
+        "<details style='margin-top:6px'><summary>Models ({})</summary>",
+        models.len()
+    ));
+    let rows: Vec<Vec<String>> = models
+        .iter()
+        .map(|m| {
+            let ctx = m["context_window"]
+                .as_u64()
+                .map(format_number)
+                .unwrap_or_else(|| "varies".to_string());
+            let out_max = m["max_output"]
+                .as_u64()
+                .map(format_number)
+                .unwrap_or_else(|| "varies".to_string());
+            vec![
+                format!("<kbd>{}</kbd>", esc(&s(&m["id"]))),
+                esc(&s(&m["provider"])),
+                ctx,
+                out_max,
+                if b(&m["free"]) {
+                    "free".to_string()
+                } else {
+                    String::new()
+                },
+                if b(&m["recommended"]) {
+                    "<span class='ok'>★</span>".to_string()
+                } else {
+                    String::new()
+                },
+            ]
+        })
+        .collect();
+    out.push_str(&tab(&["id", "provider", "ctx", "out", "", ""], rows));
+    out.push_str("</details>");
+    out
+}
+
+fn format_number(n: u64) -> String {
+    let mut s = n.to_string();
+    let mut i = s.len();
+    while i > 3 {
+        i -= 3;
+        s.insert(i, ',');
+    }
+    s
+}
+
 /// Render a named card's body HTML, or `None` for an unknown card name.
 pub fn render_card(name: &str, d: &Value) -> Option<String> {
     match name {
@@ -505,12 +608,13 @@ pub fn render_card(name: &str, d: &Value) -> Option<String> {
         "sprint-board" => Some(render_sprint_board(d)),
         "speed-index" => Some(render_speed_index(d)),
         "rust-diagnostics" => Some(render_rust_diagnostics(d)),
+        "omni" => Some(render_omni(d)),
         _ => None,
     }
 }
 
 /// Server-rendered card names (stable contract for `/api/ui/card/:name`).
-pub const CARD_NAMES: [&str; 12] = [
+pub const CARD_NAMES: [&str; 13] = [
     "tracker",
     "sli",
     "toolchain",
@@ -523,6 +627,7 @@ pub const CARD_NAMES: [&str; 12] = [
     "sprint-board",
     "speed-index",
     "rust-diagnostics",
+    "omni",
 ];
 
 #[cfg(test)]
@@ -674,7 +779,47 @@ mod tests {
         let d = serde_json::json!({ "ok": true, "revision": "472", "open_count": 0, "closed_count": 0, "planned_count": 0, "total": 0, "progress_pct": 0.0, "layers": [] });
         assert!(render_card("sprint-progress", &d).is_some());
         assert!(render_card("hooks-tests", &d).is_some());
+        assert!(render_card("omni", &d).is_some());
         assert!(render_card("nope", &d).is_none());
-        assert_eq!(CARD_NAMES.len(), 12);
+        assert_eq!(CARD_NAMES.len(), 13);
+    }
+
+    #[test]
+    fn render_omni_renders_summary_recommended_providers_models() {
+        let d = serde_json::json!({
+            "providers": [
+                { "id": "openai", "name": "OpenAI", "enabled": true, "key_set": true, "base_url": "https://api.openai.com/v1" },
+                { "id": "free-h", "name": "Free Host", "enabled": false, "key_set": false, "base_url": "" }
+            ],
+            "models": [
+                { "id": "gpt-5.2", "provider": "openai", "context_window": 400000, "max_output": 128000, "free": false, "recommended": true }
+            ],
+            "recommended": [
+                { "id": "gpt-5.2", "provider": "openai" }
+            ],
+            "routing": { "default_provider": "openai", "auto": true }
+        });
+        let html = render_omni(&d);
+        assert!(html.contains("providers 2 · models 1"));
+        assert!(html.contains("default <kbd>openai</kbd>"));
+        assert!(html.contains("recommended: <kbd>gpt-5.2</kbd>"));
+        assert!(html.contains("Providers (2)"));
+        assert!(html.contains("Models (1)"));
+        assert!(html.contains("400,000"));
+        assert!(html.contains("128,000"));
+        assert!(html.contains("<span class='ok'>★</span>"));
+        assert!(html.contains("<span class='err'>off</span>"));
+        assert!(html.contains("no key"));
+    }
+
+    #[test]
+    fn render_omni_empty_state_marks_unavailable() {
+        let d = serde_json::json!({
+            "providers": [], "models": [], "recommended": [],
+            "routing": { "default_provider": "", "auto": false }
+        });
+        let html = render_omni(&d);
+        assert!(html.contains("providers 0 · models 0"));
+        assert!(html.contains("omni unavailable"));
     }
 }

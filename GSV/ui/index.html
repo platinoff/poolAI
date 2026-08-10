@@ -100,13 +100,7 @@ body.panel-fs-active .card{display:none!important}body.panel-fs-active .card.ful
   <section class="card"><h2>Sprint Progress <span class="hint">/api/vision/sprint-progress</span></h2><div class="body" id="b-sprint-progress">…</div></section>
   <section class="card"><h2>Speed Index <span class="hint">/api/vision/speeds</span></h2><div class="body" id="b-speed-index">…</div><img id="i-speed-chart" src="/api/vision/speeds.svg" alt="speed history" style="display:block;width:100%;margin-top:6px;border-radius:8px"></section>
   <section class="card"><h2>Rust Diagnostics <span class="hint">/api/vision/rust-diagnostics</span></h2><div class="body" id="b-rust-diagnostics">…</div><img id="i-rust-chart" src="/api/vision/rust-diagnostics.svg" alt="rust diagnostics history" style="display:block;width:100%;margin-top:6px;border-radius:8px"></section>
-  <section class="card"><h2>OmniRouter <span class="hint">/api/omni</span></h2><div class="body">
-    <div class="dim" id="b-omni-summary">…</div>
-    <div style="margin-top:6px">recommended: <span id="b-omni-rec">…</span></div>
-    <details style="margin-top:6px"><summary>Providers</summary><div id="b-omni-prov"></div></details>
-    <details style="margin-top:6px"><summary>Models</summary><div id="b-omni-models"></div></details>
-    <div style="margin-top:8px"><input id="omniTestProvider" type="text" value="openai" placeholder="provider id" style="width:140px"><button onclick="testOmniProvider()">Test</button><span id="b-omni-test" class="dim"></span></div>
-  </div></section>
+  <section class="card"><h2>OmniRouter <span class="hint">/api/omni</span></h2><div class="body" id="b-omni">…</div><div style="margin-top:8px;padding:0 12px 12px"><input id="omniTestProvider" type="text" value="openai" placeholder="provider id" style="width:140px"><button onclick="testOmniProvider()">Test</button><span id="b-omni-test" class="dim"></span></div></section>
 </main>
 <div id="toast"></div>
 
@@ -259,18 +253,6 @@ function powerOffline(){$("powerMenu").classList.remove("open");setOffline(true)
 function syncDock(){const dock=$("panelDock");dock.innerHTML="<span class='dock-title'>docked</span>";let n=0;document.querySelectorAll(".card.collapsed").forEach(card=>{const id=card.getAttribute("data-id")||card.querySelector("h2").childNodes[0].textContent.trim();const chip=document.createElement("span");chip.className="dock-chip";chip.textContent=id;chip.title="restore "+id;chip.onclick=()=>{card.classList.remove("collapsed");const b=card.querySelector(".actions button");if(b)b.textContent="_";syncDock()};dock.appendChild(chip);n++});dock.classList.toggle("visible",n>0)}
 async function loadGalaxyPalette(){try{const d=await get("api/vision/palette");if(!d.ok)return;const set=(k,v)=>{if(v)document.documentElement.style.setProperty(k,v)};set("--bg-deep",d.bg_deep);set("--bg",d.bg);set("--panel",d.panel);set("--panel-solid",d.panel_solid);set("--border",d.border);set("--border-bright",d.border_bright);set("--text",d.text);set("--muted",d.muted);set("--accent",d.accent);set("--accent-2",d.accent_2);set("--glow",d.glow);set("--sidebar-w",d.sidebar_w);set("--edge-docs",d.edge_docs);set("--edge-code",d.edge_code);set("--edge-toml",d.edge_toml);set("--ext-md",d.ext_md);set("--ext-rs",d.ext_rs);set("--ext-json",d.ext_json);set("--ext-toml",d.ext_toml);set("--sprint",d.sprint);set("--bg-tone",d.bg_tone);set("--galaxy-bg-opacity",d.galaxy_bg_opacity);(d.layers||[]).forEach(l=>set("--"+l.id,l.color));(d.layers_dim||[]).forEach(l=>set("--"+l.id+"-dim",l.color))}catch(e){}}
 async function loadRssTicker(){try{const d=await get("api/vision/feed?status=all");const items=d.feed&&d.feed.items||[];if(!items.length){$("rssTicker").style.display="none";return}$("rssTicker").style.display="flex";const li=items.slice(0,30).map(i=>"<li class='rss-ticker-item "+(i.status==="closed"?"closed":"open")+"' title='"+esc(i.id+": "+(i.title||""))+"'><strong>"+esc(i.id)+"</strong><span>"+esc(i.title||"")+"</span></li>").join("");$("rssTickerTrack").innerHTML=li+li}catch(e){$("rssTicker").style.display="none"}}
-function renderOmni(d) {
-  $("b-omni-summary").innerHTML = "providers " + (d.providers || []).length + " · models " + (d.models || []).length +
-    " · default <kbd>" + esc(d.routing.default_provider) + "</kbd>";
-  $("b-omni-rec").innerHTML = (d.recommended || []).map(m => "<kbd>" + esc(m.id) + "</kbd>").join(" ") || "—";
-  $("b-omni-prov").innerHTML = tab(["id", "name", "state", "key", "base_url"], (d.providers || []).map(p =>
-    ["<kbd>" + esc(p.id) + "</kbd>", esc(p.name), p.enabled ? "<span class='ok'>on</span>" : "<span class='err'>off</span>",
-     p.key_set ? "<span class='ok'>key</span>" : "<span class='dim'>no key</span>", "<span class='dim'>" + esc(p.base_url) + "</span>"]));
-  $("b-omni-models").innerHTML = tab(["id", "provider", "ctx", "out", "", ""], (d.models || []).map(m =>
-    ["<kbd>" + esc(m.id) + "</kbd>", esc(m.provider), m.context_window ? m.context_window.toLocaleString() : "varies",
-     m.max_output ? m.max_output.toLocaleString() : "varies", m.free ? "free" : "", m.recommended ? "<span class='ok'>★</span>" : ""]));
-}
-
 async function testOmniProvider() {
   try {
     const res = await fetch("api/omni/test", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ provider: $("omniTestProvider").value }) });
@@ -311,13 +293,12 @@ async function getText(card) {
     $(target).innerHTML = d.ok ? d.html : "<span class='err'>" + esc(d.error || "card error") + "</span>";
   } catch (e) { $(target).innerHTML = "<span class='err'>" + esc(e.message) + "</span>"; }
 }
-const rustCards = ["tracker", "sli", "toolchain", "ratio", "hooks-tests", "hooks-bench", "sprint-map", "sprint-queue", "sprint-progress", "sprint-board", "speed-index", "rust-diagnostics"];
+const rustCards = ["tracker", "sli", "toolchain", "ratio", "hooks-tests", "hooks-bench", "sprint-map", "sprint-queue", "sprint-progress", "sprint-board", "speed-index", "rust-diagnostics", "omni"];
 async function resync() {
   const urls = [
     ["api/health", renderHealth],
     ["api/ide/sessions", renderIde], ["api/update", renderUpdate],
     ["api/vision", renderVision], ["api/vision/map", renderVisionMap],
-    ["api/omni", renderOmni],
   ];
   const results = await Promise.allSettled([
     ...urls.map(([u, f]) => get(u).then(f)),
