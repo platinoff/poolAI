@@ -40,6 +40,9 @@ use poolai_ui_core::ci_canon_depth::{ci_canon_criteria_total, CI_CANON_CASES, CI
 use poolai_ui_core::galaxy_edge_verification_depth::{
     edge_verification_criteria_total, EDGE_VERIFICATION_CASES, EDGE_VERIFICATION_CRITERIA,
 };
+use poolai_ui_core::gpu_limits_api_depth::{
+    gpu_limits_api_criteria_total, GPU_LIMITS_API_CASES, GPU_LIMITS_API_CRITERIA,
+};
 use poolai_ui_core::gpu_limits_depth::{
     gpu_limits_criteria_total, GPU_LIMITS_CASES, GPU_LIMITS_CRITERIA,
 };
@@ -384,6 +387,8 @@ struct AuditConfig {
     ratio96_docs_canon: bool,
     /// Emit band-122 GPU limits store/wire fields (PH-S1862).
     gpu_limits: bool,
+    /// Emit band-123 GPU limits API fields (PH-S1872).
+    gpu_limits_api: bool,
 }
 
 impl Default for AuditConfig {
@@ -455,6 +460,7 @@ impl Default for AuditConfig {
             ratio96_loc_audit: false,
             ratio96_docs_canon: false,
             gpu_limits: false,
+            gpu_limits_api: false,
         }
     }
 }
@@ -878,6 +884,12 @@ struct RustRatioReport {
     gpu_limits_criteria_total: usize,
     /// GPU limits criteria met count (PH-S1862).
     gpu_limits_criteria_met_count: usize,
+    /// Band-123 GPU limits API mode (PH-S1872).
+    gpu_limits_api_mode: bool,
+    /// GPU limits API criteria registry size (PH-S1872).
+    gpu_limits_api_criteria_total: usize,
+    /// GPU limits API criteria met count (PH-S1872).
+    gpu_limits_api_criteria_met_count: usize,
     by_category: BTreeMap<String, CategoryLoc>,
     notes: Vec<&'static str>,
 }
@@ -1430,6 +1442,22 @@ fn gpu_limits_criteria_met(root: &Path) -> (usize, usize) {
     let total = gpu_limits_criteria_total();
     let mut met = 0usize;
     for (_, marker, rel) in GPU_LIMITS_CRITERIA {
+        let path = root.join(rel);
+        if path.is_file() {
+            if let Ok(content) = fs::read_to_string(&path) {
+                if content.contains(marker) {
+                    met += 1;
+                }
+            }
+        }
+    }
+    (met, total)
+}
+
+fn gpu_limits_api_criteria_met(root: &Path) -> (usize, usize) {
+    let total = gpu_limits_api_criteria_total();
+    let mut met = 0usize;
+    for (_, marker, rel) in GPU_LIMITS_API_CRITERIA {
         let path = root.join(rel);
         if path.is_file() {
             if let Ok(content) = fs::read_to_string(&path) {
@@ -2026,6 +2054,7 @@ fn parse_cli() -> Result<AuditCli, String> {
             "--ratio96-loc-audit" => config.ratio96_loc_audit = true,
             "--ratio96-docs-canon" => config.ratio96_docs_canon = true,
             "--gpu-limits" => config.gpu_limits = true,
+            "--gpu-limits-api" => config.gpu_limits_api = true,
             "--strict" => config.advisory = false,
             "--help" | "-h" => {
                 print_help();
@@ -2106,7 +2135,7 @@ fn print_help() {
             --ratio96-admin-ops         band-104 ratio96 admin/ops glue fields (PH-S1684)\n\
             --ratio96-stand-smoke        band-105 ratio96 stand smoke fields (PH-S1694)\n\
             --ratio96-loc-audit          band-106 ratio96 loc-audit fields (PH-S1703)\n\
-            --ratio96-docs-canon         band-107 ratio96 docs-canon fields (PH-S1714)\n            --gpu-limits                band-122 GPU limits store/wire fields (PH-S1862)\n\n            --monitoring-loc-audit      band-96 monitoring loc-audit aggregate fields (PH-S1604)\n\
+            --ratio96-docs-canon         band-107 ratio96 docs-canon fields (PH-S1714)\n            --gpu-limits                band-122 GPU limits store/wire fields (PH-S1862)\n            --gpu-limits-api            band-123 GPU limits API fields (PH-S1872)\n\n            --monitoring-loc-audit      band-96 monitoring loc-audit aggregate fields (PH-S1604)\n\
            --strict              fail when ratio < --warn-below (default without --advisory)\n\
            -h, --help            show help\n\
          \n\
@@ -2891,6 +2920,19 @@ fn build_report(
         notes.push("PH-S1866: band 122 GPU limits — criteria met vs registry");
     }
 
+    let (gpu_limits_api_criteria_met_count, gpu_limits_api_criteria_total_count) =
+        if config.gpu_limits_api {
+            gpu_limits_api_criteria_met(root)
+        } else {
+            (0, gpu_limits_api_criteria_total())
+        };
+    if config.gpu_limits_api {
+        notes.push(
+            "PH-S1872: gpu_limits_api_mode — GPULimits API contracts + GET /api/v1/gpu-limits (band 123)",
+        );
+        notes.push("PH-S1876: band 123 GPU limits API — criteria met vs registry");
+    }
+
     Ok(RustRatioReport {
         generated_at: chrono::Utc::now().format("%Y-%m-%d").to_string(),
         sprint: SPRINT,
@@ -3104,6 +3146,9 @@ fn build_report(
         gpu_limits_mode: config.gpu_limits,
         gpu_limits_criteria_total: gpu_limits_criteria_total_count,
         gpu_limits_criteria_met_count,
+        gpu_limits_api_mode: config.gpu_limits_api,
+        gpu_limits_api_criteria_total: gpu_limits_api_criteria_total_count,
+        gpu_limits_api_criteria_met_count,
         by_category,
         notes,
     })
@@ -3775,6 +3820,17 @@ fn print_summary(report: &RustRatioReport) {
         println!(
             "  gpu_limits_cases:           {}",
             GPU_LIMITS_CASES.join(", ")
+        );
+    }
+    if report.gpu_limits_api_mode {
+        println!("  gpu_limits_api:             true (PH-S1872 band 123)");
+        println!(
+            "  gpu_limits_api_criteria:    {}/{} met",
+            report.gpu_limits_api_criteria_met_count, report.gpu_limits_api_criteria_total
+        );
+        println!(
+            "  gpu_limits_api_cases:       {}",
+            GPU_LIMITS_API_CASES.join(", ")
         );
     }
     for (name, loc) in &report.by_category {

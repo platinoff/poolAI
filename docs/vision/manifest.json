@@ -3218,6 +3218,12 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_development_GPU_LIMITS_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_gpu_limits_api_depth_rs"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -3246,7 +3252,7 @@
       "signature": "queue: FM §5.12 next band 107"
     }
   ],
-  "last_sprint_closed": "PH-S1868",
+  "last_sprint_closed": "PH-S1878",
   "layers": [
     {
       "id": "L0",
@@ -3279,7 +3285,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1859",
+  "next_sprint": "PH-S1879",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -12465,11 +12471,123 @@
       "label": "gpu_limits_integration.rs",
       "layer": "L3",
       "path": "tests/gpu_limits_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_gpu_limits_api_depth_rs",
+      "label": "gpu_limits_api_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/gpu_limits_api_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1869_integration_rs",
+      "label": "galaxy_horizon_s1869_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1869_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_gpu_limits_api_contracts_integration_rs",
+      "label": "gpu_limits_api_contracts_integration.rs",
+      "layer": "L3",
+      "path": "tests/gpu_limits_api_contracts_integration.rs"
     }
   ],
-  "revision": 475,
-  "sprint_queue": [],
-  "sprint_queue_open_count": 0,
+  "revision": 477,
+  "sprint_queue": [
+    {
+      "acceptance": "ui-core depth enum + criteria registry",
+      "deps": "gpu_limits_depth.rs",
+      "id": "PH-S1879",
+      "open": true,
+      "row": 1811,
+      "status": "open",
+      "title": "gpu_limits_depth` scaffold"
+    },
+    {
+      "acceptance": "durable path or production verify stub + unit test",
+      "deps": "gpu_limits_store.rs",
+      "id": "PH-S1880",
+      "open": true,
+      "row": 1812,
+      "status": "open",
+      "title": "gpu_limits` store/wire slice"
+    },
+    {
+      "acceptance": "contract test",
+      "deps": "tests/*_integration.rs",
+      "id": "PH-S1881",
+      "open": true,
+      "row": 1813,
+      "status": "open",
+      "title": "gpu_limits` API contracts"
+    },
+    {
+      "acceptance": "verify-dev-stand or admin strip",
+      "deps": "verify-dev-stand",
+      "id": "PH-S1882",
+      "open": true,
+      "row": 1814,
+      "status": "open",
+      "title": "gpu_limits` admin/ops glue"
+    },
+    {
+      "acceptance": "export shape unit test",
+      "deps": "stand smoke",
+      "id": "PH-S1883",
+      "open": true,
+      "row": 1815,
+      "status": "open",
+      "title": "Stand smoke `gpu_limits` export"
+    },
+    {
+      "acceptance": "rust_ratio.json` zriz",
+      "deps": "loc-audit",
+      "id": "PH-S1884",
+      "open": true,
+      "row": 1816,
+      "status": "open",
+      "title": "poolai-loc-audit` PH-S1884"
+    },
+    {
+      "acceptance": "docs matrix + FM §5.12 header",
+      "deps": "RUN_LOCAL/INDEX/HANDOFF/NEXT",
+      "id": "PH-S1885",
+      "open": true,
+      "row": 1817,
+      "status": "open",
+      "title": "Docs canon sync"
+    },
+    {
+      "acceptance": "drift gate green",
+      "deps": "vision",
+      "id": "PH-S1886",
+      "open": true,
+      "row": 1818,
+      "status": "open",
+      "title": "poolai-vision-sync --check"
+    },
+    {
+      "acceptance": "--min-ratio 0.95 --advisory",
+      "deps": "loc-audit",
+      "id": "PH-S1887",
+      "open": true,
+      "row": 1819,
+      "status": "open",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "acceptance": "band close",
+      "deps": "tests/docs",
+      "id": "PH-S1888",
+      "open": true,
+      "row": 1820,
+      "status": "open",
+      "title": "galaxy_horizon_s1879_integration"
+    }
+  ],
+  "sprint_queue_open_count": 10,
   "updated_at": "2026-06-20",
   "vision_ui_rev": 59
 }

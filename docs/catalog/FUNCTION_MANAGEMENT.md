@@ -265,7 +265,7 @@ FM-xxx (з таблиці нижче)
 
 **VDT:** §5.12 = **журнал PH-S*** (≤10 відкритих). Якщо **< 10** — **`абракадабра`** / project scan **всього проєкту**: concept → FM **§5.1** → roadmaps → architect → DOCS_LEGACY → code → §5.13 fallback. Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Project scan». **Rust-first:** API → `tests/`; Playwright лише browser scope.
 
-**Відкритих у §5.12:** **0** (band 122 ✅ · §5.103 PH-S1859…S1868). **Master horizon:** PH-S1859…S1868 (band 122). Vision rev **475**.
+**Відкритих у §5.12:** **0** (band 123 ✅ · §5.104 PH-S1869…S1878). **Master horizon:** PH-S1879…S1888 (band 124). Vision rev **477**.
 
 **Историчний research backlog (PH-S65+):**
 
@@ -1575,6 +1575,40 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1798 | **PH-S1866** | vision-sync --check | vision | drift gate green (rev bump) | **[x]** |
 | 1799 | **PH-S1867** | Ratio hold advisory | loc-audit | `--gpu-limits --advisory --min-ratio 0.95` | **[x]** |
 | 1800 | **PH-S1868** | GPULimits band close | tests/docs | `galaxy_horizon_s1859_integration`; FM ✅ · HANDOFF · NEXT_SESSION | **[x]** |
+
+### 5.104 GPULimits API contracts queue — band 123 (PH-S1869…S1878, 2026-08-11) · **✅**
+
+**Джерело:** master backlog band 123 (H GPULimits · API contracts) — enterprise phase H (GPU admission + worker limits, single-host). Pattern mirror: band 122 (§5.103) поверх durable `gpu_limits.json`; HTTP surface: `src/network/api/system.rs` `GET /api/v1/gpu-limits`. Canon: [`GPU_LIMITS.md`](../development/GPU_LIMITS.md) · [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md) · [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1801 | **PH-S1869** | `gpu_limits_api` ui-core module | `gpu_limits_api_depth.rs` | depth enum + GPU-limits API criteria registry (10) | **[x]** |
+| 1802 | **PH-S1870** | `gpu-limits` HTTP route | `src/network/api/system.rs` | `GET /api/v1/gpu-limits` → durable store wire shape | **[x]** |
+| 1803 | **PH-S1871** | `gpu_limits_api` API contracts | `tests/*_integration.rs` | `gpu_limits_api_contracts_integration`: 200 + wire markers | **[x]** |
+| 1804 | **PH-S1872** | `VERIFY_GPU_LIMITS_API` + quick `--gpu-limits-api` | verify-dev-stand | verify-dev-stand gate + `run-poolai.sh --gpu-limits-api` | **[x]** |
+| 1805 | **PH-S1873** | Stand smoke `gpu_limits_api` export | stand smoke | `gpu_limits_api_band123_export_shape_ph_s1869` unit export shape | **[x]** |
+| 1806 | **PH-S1874** | `poolai-loc-audit --gpu-limits-api` | loc-audit | `rust_ratio.json` fields (`gpu_limits_api_mode`/criteria total/met) | **[x]** |
+| 1807 | **PH-S1875** | Docs `GPU_LIMITS.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | docs matrix + FM §5.12 header | **[x]** |
+| 1808 | **PH-S1876** | vision-sync --check | vision | drift gate green (rev bump) | **[x]** |
+| 1809 | **PH-S1877** | Ratio hold advisory | loc-audit | `--gpu-limits-api --advisory --min-ratio 0.95` | **[x]** |
+| 1810 | **PH-S1878** | GPULimits API band close | tests/docs | `galaxy_horizon_s1869_integration`; FM ✅ · HANDOFF · NEXT_SESSION | **[x]** |
+
+### 5.105 GPULimits admin/ops glue queue — band 124 (PH-S1879…S1888, 2026-08-11) · **🔜**
+
+**Джерело:** master backlog band 124 (H GPULimits · admin/ops glue) — enterprise phase H (GPU admission + worker limits, single-host). Pattern mirror: band 122 (§5.103) поверх durable `gpu_limits.json`; admin/ops glue: `bin/verify-dev-stand.sh` + `bin/run-poolai.sh`. Canon: [`GPU_LIMITS.md`](../development/GPU_LIMITS.md) · [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md) · [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1811 | **PH-S1879** | `gpu_limits_depth` scaffold | `gpu_limits_depth.rs` | ui-core depth enum + criteria registry | **[ ]** |
+| 1812 | **PH-S1880** | `gpu_limits` store/wire slice | `gpu_limits_store.rs` | durable path or production verify stub + unit test | **[ ]** |
+| 1813 | **PH-S1881** | `gpu_limits` API contracts | `tests/*_integration.rs` | contract test | **[ ]** |
+| 1814 | **PH-S1882** | `gpu_limits` admin/ops glue | verify-dev-stand | verify-dev-stand or admin strip | **[ ]** |
+| 1815 | **PH-S1883** | Stand smoke `gpu_limits` export | stand smoke | export shape unit test | **[ ]** |
+| 1816 | **PH-S1884** | `poolai-loc-audit` PH-S1884 | loc-audit | `rust_ratio.json` zriz | **[ ]** |
+| 1817 | **PH-S1885** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | docs matrix + FM §5.12 header | **[ ]** |
+| 1818 | **PH-S1886** | poolai-vision-sync --check | vision | drift gate green | **[ ]** |
+| 1819 | **PH-S1887** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **[ ]** |
+| 1820 | **PH-S1888** | galaxy_horizon_s1879_integration | tests/docs | band close | **[ ]** |
 
 ### 5.88 Ratio96 docs canon queue — band 107 (PH-S1709…S1718, 2026-08-02) · **✅**
 

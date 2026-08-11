@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 189641,
-  "non_rust_product_loc": 9887,
-  "product_loc_total": 199528,
-  "rust_ratio": 0.9504480574155005,
-  "rust_ratio_pct": 95.04480574155005,
+  "rust_loc": 190302,
+  "non_rust_product_loc": 9904,
+  "product_loc_total": 200206,
+  "rust_ratio": 0.9505309531182882,
+  "rust_ratio_pct": 95.05309531182881,
   "in_formal_band": false,
   "below_warn_threshold": false,
   "below_target": false,
@@ -208,9 +208,12 @@
   "ratio96_docs_canon_mode": false,
   "ratio96_docs_canon_criteria_total": 10,
   "ratio96_docs_canon_criteria_met_count": 0,
-  "gpu_limits_mode": true,
+  "gpu_limits_mode": false,
   "gpu_limits_criteria_total": 10,
-  "gpu_limits_criteria_met_count": 10,
+  "gpu_limits_criteria_met_count": 0,
+  "gpu_limits_api_mode": true,
+  "gpu_limits_api_criteria_total": 10,
+  "gpu_limits_api_criteria_met_count": 10,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -222,23 +225,23 @@
     },
     "ops_shell": {
       "files": 41,
-      "loc": 4221
+      "loc": 4238
     },
     "rust_benches": {
       "files": 7,
       "loc": 606
     },
     "rust_crates": {
-      "files": 125,
-      "loc": 26826
+      "files": 127,
+      "loc": 27207
     },
     "rust_src": {
       "files": 302,
-      "loc": 117645
+      "loc": 117752
     },
     "rust_tests": {
-      "files": 354,
-      "loc": 44564
+      "files": 356,
+      "loc": 44737
     },
     "ui_css": {
       "files": 2,
@@ -267,7 +270,7 @@
     "PH-S1008: multi-module band 35 hold advisory — in_formal_band true; target 95% hold until PH-S1010",
     "PH-S1010: product-complete band 36 — ratio_95_formal_gate_met; stretch 96% advisory if below_stretch_spirit",
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
-    "PH-S1862: gpu_limits_mode — GPULimits store/wire + durable gpu_limits.json (band 122)",
-    "PH-S1866: band 122 GPU limits — criteria met vs registry"
+    "PH-S1872: gpu_limits_api_mode — GPULimits API contracts + GET /api/v1/gpu-limits (band 123)",
+    "PH-S1876: band 123 GPU limits API — criteria met vs registry"
   ]
 }

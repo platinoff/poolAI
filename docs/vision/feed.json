@@ -2,6 +2,187 @@
   "description": "RSS-style ticker of FM §5.12 sprint queue (open + recent closed)",
   "items": [
     {
+      "category": "open",
+      "id": "PH-S1879",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "next": true,
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "ui-core depth enum + criteria registry",
+      "title": "gpu_limits_depth` scaffold"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1880",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "durable path or production verify stub + unit test",
+      "title": "gpu_limits` store/wire slice"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1881",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "contract test",
+      "title": "gpu_limits` API contracts"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1882",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "verify-dev-stand or admin strip",
+      "title": "gpu_limits` admin/ops glue"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1883",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "export shape unit test",
+      "title": "Stand smoke `gpu_limits` export"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1884",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "rust_ratio.json` zriz",
+      "title": "poolai-loc-audit` PH-S1884"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1885",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "docs matrix + FM §5.12 header",
+      "title": "Docs canon sync"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1886",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "drift gate green",
+      "title": "poolai-vision-sync --check"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1887",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "--min-ratio 0.95 --advisory",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "category": "open",
+      "id": "PH-S1888",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "open",
+      "summary": "band close",
+      "title": "galaxy_horizon_s1879_integration"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1878",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "galaxy_horizon_s1869_integration`; FM ✅ · HANDOFF · NEXT_SESSION",
+      "title": "GPULimits API band close"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1877",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "--gpu-limits-api --advisory --min-ratio 0.95",
+      "title": "Ratio hold advisory"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1876",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "drift gate green (rev bump)",
+      "title": "vision-sync --check"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1875",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "docs matrix + FM §5.12 header",
+      "title": "Docs `GPU_LIMITS.md` + canon"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1874",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "rust_ratio.json` fields (`gpu_limits_api_mode`/criteria total/met)",
+      "title": "poolai-loc-audit --gpu-limits-api"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1873",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "gpu_limits_api_band123_export_shape_ph_s1869` unit export shape",
+      "title": "Stand smoke `gpu_limits_api` export"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1872",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "verify-dev-stand gate + `run-poolai.sh --gpu-limits-api",
+      "title": "VERIFY_GPU_LIMITS_API` + quick `--gpu-limits-api"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1871",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "gpu_limits_api_contracts_integration`: 200 + wire markers",
+      "title": "gpu_limits_api` API contracts"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1870",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "GET /api/v1/gpu-limits` → durable store wire shape",
+      "title": "gpu-limits` HTTP route"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1869",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "depth enum + GPU-limits API criteria registry (10)",
+      "title": "gpu_limits_api` ui-core module"
+    },
+    {
       "category": "closed",
       "id": "PH-S1868",
       "link": "http://127.0.0.1:8891/#b-sprint-board",
@@ -18,96 +199,6 @@
       "status": "closed",
       "summary": "--gpu-limits --advisory --min-ratio 0.95",
       "title": "Ratio hold advisory"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1866",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "drift gate green (rev bump)",
-      "title": "vision-sync --check"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1865",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "docs matrix + FM §5.12 header",
-      "title": "Docs `GPU_LIMITS.md` + canon"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1864",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "rust_ratio.json` fields (`gpu_limits_mode`/criteria total/met)",
-      "title": "poolai-loc-audit --gpu-limits"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1863",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "gpu_limits_band122_export_shape_ph_s1859` unit export shape",
-      "title": "Stand smoke `gpu_limits` export"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1862",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "verify-dev-stand gate + `run-poolai.sh --gpu-limits",
-      "title": "VERIFY_GPU_LIMITS` + quick `--gpu-limits"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1861",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "gpu_limits_integration`: store roundtrip + wire shape markers",
-      "title": "gpu_limits` API contracts"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1860",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "GpuLimits` config (max_gpus/gpu_memory_mb/admission) durable JSON store + save/load/wire + unit test",
-      "title": "gpu_limits` store/wire slice"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1859",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "depth enum + GPU-limits criteria registry (10)",
-      "title": "gpu_limits_depth` ui-core module"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1855",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "ratio ≥96%; fmt/clippy/test; docs canon; vision-sync rev bump; push",
-      "title": "Band close"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1854",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "MEMORY band 121; HANDOFF/NEXT band 121; VISION.md omni card section; `GSV_TECH_ROADMAP.md` band 121",
-      "title": "GSV docs canon"
     }
   ],
   "link": "http://127.0.0.1:8891/",

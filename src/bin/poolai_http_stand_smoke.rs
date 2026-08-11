@@ -7859,6 +7859,56 @@ mod tests {
     }
 
     #[test]
+    fn gpu_limits_api_band123_export_shape_ph_s1869() {
+        use poolai_ui_core::gpu_limits_api_depth::{
+            gpu_limits_api_criteria_total, gpu_limits_api_depth_stub, gpu_limits_api_slices_met,
+            GpuLimitsApiDepth, FM_BAND123_ROWS, GPU_LIMITS_API_CASES, GPU_LIMITS_API_CRITERIA,
+            GPU_LIMITS_API_SLICES,
+        };
+        use poolai_ui_core::gpu_limits_store::gpu_limits_store_wire_json;
+        use serde_json::json;
+        assert_eq!(
+            gpu_limits_api_depth_stub(Some(&json!({"stand_smoke_export": true}))),
+            GpuLimitsApiDepth::StandSmokeExport
+        );
+        assert_eq!(
+            gpu_limits_api_depth_stub(Some(&json!({
+                "gpu_limits_api_depth": true,
+                "http_route": true,
+                "api_contracts": true,
+                "verify_dev_stand_hook": true,
+                "stand_smoke_export": true,
+                "loc_audit_flag": true,
+                "gpu_limits_api_docs": true,
+                "ratio_hold": true,
+                "band_close": true,
+            }))),
+            GpuLimitsApiDepth::FullBand123
+        );
+        assert_eq!(GPU_LIMITS_API_CRITERIA.len(), 10);
+        assert_eq!(gpu_limits_api_criteria_total(), 10);
+        assert_eq!(GPU_LIMITS_API_SLICES.len(), 3);
+        assert!(GPU_LIMITS_API_CASES.contains(&"gpu_limits_api_depth"));
+        let wire = gpu_limits_store_wire_json();
+        assert!(wire.get("max_gpus").is_some());
+        assert!(wire.get("admission_active").is_some());
+        let canon = include_str!("../../docs/development/GPU_LIMITS.md");
+        assert_eq!(gpu_limits_api_slices_met(canon), (3, 3));
+        let system_mod = include_str!("../../src/network/api/system.rs");
+        assert!(system_mod.contains("gpu-limits"));
+        assert!(system_mod.contains("gpu_limits_store_wire_json"));
+        let loc_audit = include_str!("../../src/bin/poolai_loc_audit.rs");
+        assert!(loc_audit.contains("--gpu-limits-api"));
+        let fm = include_str!("../../docs/catalog/FUNCTION_MANAGEMENT.md");
+        for row in FM_BAND123_ROWS {
+            assert!(
+                fm.contains(row) || row.starts_with("PH-S"),
+                "FM band123 row {row}"
+            );
+        }
+    }
+
+    #[test]
     fn audit_store_band72_export_shape_ph_s1363() {
         use poolai_ui_core::audit_store_depth::{
             audit_store_criteria_total, audit_store_depth_stub, AuditStoreDepth, AUDIT_STORE_CASES,

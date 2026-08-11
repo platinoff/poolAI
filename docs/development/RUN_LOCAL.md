@@ -402,6 +402,7 @@ VERIFY_STAND_SMOKE=1 bash bin/verify-dev-stand.sh
 | `VERIFY_RATIO96_LOC_AUDIT=1` | `verify-dev-stand.sh` → `poolai-loc-audit --ratio96-loc-audit` (PH-S1704) |
 | `VERIFY_RATIO96_DOCS_CANON=1` | `verify-dev-stand.sh` → `poolai-loc-audit --ratio96-docs-canon` (PH-S1712) |
 | `VERIFY_GPU_LIMITS=1` | `verify-dev-stand.sh` → `poolai-loc-audit --gpu-limits` (PH-S1862) |
+| `VERIFY_GPU_LIMITS_API=1` | `verify-dev-stand.sh` → `poolai-loc-audit --gpu-limits-api` (PH-S1872) |
 | `POOLAI_VISION_BASE_URL` | Vision static server for PH-S208 header check (default `http://127.0.0.1:8765`; `open-docs-vision.ps1`) |
 
 ### PH-S1100: Rust migration advisory (band 46)
@@ -1578,6 +1579,23 @@ cargo run --bin poolai-loc-audit -- --gpu-limits --advisory --min-ratio 0.95
 | `gpu_limits_criteria_met_count` | Criteria with marker present in canonical doc paths |
 
 Module: [`gpu_limits_depth.rs`](../../crates/poolai-ui-core/src/gpu_limits_depth.rs) · tests: `galaxy_horizon_s1859_integration.rs` · docs: [`GPU_LIMITS.md`](./GPU_LIMITS.md).
+
+### GPULimits API contracts (band 123, PH-S1872)
+
+```bash
+VERIFY_GPU_LIMITS_API=1 bash bin/verify-dev-stand.sh
+/usr/bin/bash bin/run-poolai.sh quick --gpu-limits-api
+cargo run --bin poolai-loc-audit -- --gpu-limits-api --advisory --min-ratio 0.95
+```
+
+| Field (`rust_ratio.json`) | Призначення |
+|---------------------------|-------------|
+| `gpu_limits_api_mode` | `true` when `--gpu-limits-api` (PH-S1872) |
+| `gpu_limits_api_criteria_total` | Registry size (10) |
+| `gpu_limits_api_criteria_met_count` | Criteria with marker present in canonical doc paths |
+
+HTTP surface: `GET /api/v1/gpu-limits` (`src/network/api/system.rs`) → durable store wire shape.
+Module: [`gpu_limits_api_depth.rs`](../../crates/poolai-ui-core/src/gpu_limits_api_depth.rs) · tests: `galaxy_horizon_s1869_integration.rs` · docs: [`GPU_LIMITS.md`](./GPU_LIMITS.md).
 
 ---
 
