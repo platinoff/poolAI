@@ -1,17 +1,17 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-08-02 (band 121 **PH-S1849…S1855, 2026-08-10** ✅ · horizon band 121)
+**Оновлено:** 2026-08-02 (band 122 **PH-S1859…S1868, 2026-08-10** ✅ · horizon band 122)
 
-Maintenance mode (FM §5.15) · band 121 drained.
+Maintenance mode (FM §5.15) · band 122 drained.
 
 Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.18 @ S2278).
 
-| **← наступний** | **`абракадабра`** (project scan → band 121) |
-| **§5.12 active** | **0** (band 121 ✅) |
+| **← наступний** | **`абракадабра`** (project scan → band 122) |
+| **§5.12 active** | **0** (band 122 ✅) |
 | **P0 open** | **PH-SVC34** re-verify GH · **PH-SVC35** OWNER |
 | **Completion pending** | **560** sprints PH-S1739…S2278 · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) |
-| **Horizon** | band 121 → **PH-S1849…S1855** |
-| **Vision** | rev **474** |
+| **Horizon** | band 122 → **PH-S1859…S1868** |
+| **Vision** | rev **475** |
 | **GSV** | окремий проєкт Rust-first (bands 102+108+109+110+111+112+113+114+115+116+117+118 ✅, ratio 95.35%, tests 163) · [`GSV/README.md`](../../GSV/README.md) · [`docs/gsv/`](../../gsv/README.md) · ролі [`GSV/docs/GSV_ROLES.md`](../../GSV/docs/GSV_ROLES.md) · Vision box [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) |
 | **Cursor / GH** | local **3.13.21** · Auto-review · Router Balance/Intelligence · Actions `GITHUB_TOKEN` opaque/JWT · [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](./CURSOR_UPDATE_RESEARCH_2026-07-27.md) |
 
@@ -29,7 +29,19 @@ Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.1
 
 ---
 
-## Band 121 (очікуваний фокус — project scan)
+## Band 122 (очікуваний фокус — project scan)
+
+**PH-S1859…S1868 ✅ (2026-08-11)** (enterprise phase H «GPU admission + worker limits, single-host»).
+Pattern mirror: band 107 `RATIO96_DOCS_CANON` docs canon. Смуга: `gpu_limits_depth`
+ui-core module (depth enum + criteria registry, 10) → `gpu_limits_store` store/wire
+slice (`docs/development/gpu_limits.json` durable store) → API contracts
+(`gpu_limits_integration`) → admin/ops glue (`VERIFY_GPU_LIMITS` + quick
+`--gpu-limits`) → stand smoke export shape (`gpu_limits_band122_export_shape_ph_s1859`)
+→ loc-audit `--gpu-limits` → docs `GPU_LIMITS.md` canon → vision-sync → ratio hold
+advisory → band close (`galaxy_horizon_s1859_integration`, FM §5.103). Канон:
+[`GPU_LIMITS.md`](./GPU_LIMITS.md) · [`FUNCTION_MANAGEMENT.md §5.103`](../catalog/FUNCTION_MANAGEMENT.md).
+
+## Band 122 (очікуваний фокус — project scan)
 
 Окремий проєкт **Galaxy StarWalker Vision** — **bands 102 + 108 + 109 + 110 + 111 + 112 + 113 + 114 + 115 + 116 + 117 + 118 ✅**: Rust-first bin-сервер `gsv-server`
 з боксами (Tracker · SLI console · Toolchain · IDE · Update/offline · Box preview · SLI terminal ·

@@ -3200,6 +3200,24 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "_cursor_rules_scripts_mdc"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_gpu_limits_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_gpu_limits_store_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_GPU_LIMITS_md"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -3228,7 +3246,7 @@
       "signature": "queue: FM §5.12 next band 107"
     }
   ],
-  "last_sprint_closed": "PH-S1855",
+  "last_sprint_closed": "PH-S1868",
   "layers": [
     {
       "id": "L0",
@@ -3261,7 +3279,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1849",
+  "next_sprint": "PH-S1859",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -12412,9 +12430,44 @@
       "label": "scripts.mdc",
       "layer": "L1",
       "path": ".cursor/rules/scripts.mdc"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_gpu_limits_depth_rs",
+      "label": "gpu_limits_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/gpu_limits_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_gpu_limits_store_rs",
+      "label": "gpu_limits_store.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/gpu_limits_store.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_GPU_LIMITS_md",
+      "label": "GPU_LIMITS.md",
+      "layer": "L1",
+      "path": "docs/development/GPU_LIMITS.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_horizon_s1859_integration_rs",
+      "label": "galaxy_horizon_s1859_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_horizon_s1859_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_gpu_limits_integration_rs",
+      "label": "gpu_limits_integration.rs",
+      "layer": "L3",
+      "path": "tests/gpu_limits_integration.rs"
     }
   ],
-  "revision": 474,
+  "revision": 475,
   "sprint_queue": [],
   "sprint_queue_open_count": 0,
   "updated_at": "2026-06-20",

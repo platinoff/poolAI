@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-08",
+  "generated_at": "2026-08-11",
   "sprint": "PH-S1010",
   "formal_band_min": 0.9,
   "formal_band_max": 0.95,
@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": true,
   "min_ratio": 0.95,
-  "rust_loc": 189540,
-  "non_rust_product_loc": 9870,
-  "product_loc_total": 199410,
-  "rust_ratio": 0.9505039867609448,
-  "rust_ratio_pct": 95.05039867609449,
+  "rust_loc": 189641,
+  "non_rust_product_loc": 9887,
+  "product_loc_total": 199528,
+  "rust_ratio": 0.9504480574155005,
+  "rust_ratio_pct": 95.04480574155005,
   "in_formal_band": false,
   "below_warn_threshold": false,
   "below_target": false,
@@ -27,7 +27,7 @@
   "e2e_ts_band29_baseline_loc": 1155,
   "e2e_ts_loc_reduction": -5,
   "ops_shell_canon_met": true,
-  "migration_advisory_mode": true,
+  "migration_advisory_mode": false,
   "migration_candidate_total": 14,
   "migration_ui_js_candidate_count": 6,
   "migration_e2e_archived_count": 8,
@@ -205,9 +205,12 @@
   "ratio96_loc_audit_mode": false,
   "ratio96_loc_audit_criteria_total": 10,
   "ratio96_loc_audit_criteria_met_count": 0,
-  "ratio96_docs_canon_mode": true,
+  "ratio96_docs_canon_mode": false,
   "ratio96_docs_canon_criteria_total": 10,
-  "ratio96_docs_canon_criteria_met_count": 10,
+  "ratio96_docs_canon_criteria_met_count": 0,
+  "gpu_limits_mode": true,
+  "gpu_limits_criteria_total": 10,
+  "gpu_limits_criteria_met_count": 10,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -219,7 +222,7 @@
     },
     "ops_shell": {
       "files": 41,
-      "loc": 4204
+      "loc": 4221
     },
     "rust_benches": {
       "files": 7,
@@ -227,11 +230,11 @@
     },
     "rust_crates": {
       "files": 125,
-      "loc": 26824
+      "loc": 26826
     },
     "rust_src": {
       "files": 302,
-      "loc": 117546
+      "loc": 117645
     },
     "rust_tests": {
       "files": 354,
@@ -264,9 +267,7 @@
     "PH-S1008: multi-module band 35 hold advisory — in_formal_band true; target 95% hold until PH-S1010",
     "PH-S1010: product-complete band 36 — ratio_95_formal_gate_met; stretch 96% advisory if below_stretch_spirit",
     "PH-S1018: owner ops band 37 — run-poolai quick/light + ops power; formal gate held from PH-S1010 zriz",
-    "PH-S1100: migration_advisory_mode — ui_js + archived e2e registry for stretch 96%",
-    "PH-S1108: band 46 ratio/rust migration advisory — formal gate held; stretch pending",
-    "PH-S1714: ratio96_docs_canon_mode — aggregate band 101–106 RATIO96_*.md canon docs",
-    "PH-S1718: band 107 ratio96 docs canon — criteria met vs registry"
+    "PH-S1862: gpu_limits_mode — GPULimits store/wire + durable gpu_limits.json (band 122)",
+    "PH-S1866: band 122 GPU limits — criteria met vs registry"
   ]
 }

@@ -1,0 +1,6 @@
+{
+  "max_gpus": 0,
+  "gpu_memory_mb": null,
+  "admission_enabled": false,
+  "utilization_threshold": null
+}

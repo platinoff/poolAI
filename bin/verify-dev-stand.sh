@@ -68,6 +68,7 @@ VERIFY_RATIO96_ADMIN_OPS="${VERIFY_RATIO96_ADMIN_OPS:-0}"
 VERIFY_RATIO96_STAND_SMOKE="${VERIFY_RATIO96_STAND_SMOKE:-0}"
 VERIFY_RATIO96_LOC_AUDIT="${VERIFY_RATIO96_LOC_AUDIT:-0}"
 VERIFY_RATIO96_DOCS_CANON="${VERIFY_RATIO96_DOCS_CANON:-0}"
+VERIFY_GPU_LIMITS="${VERIFY_GPU_LIMITS:-0}"
 VERIFY_SSO_LOC_AUDIT="${VERIFY_SSO_LOC_AUDIT:-0}"
 VERIFY_SSO_DOCS_CANON="${VERIFY_SSO_DOCS_CANON:-0}"
 VERIFY_SSO_VISION_SYNC="${VERIFY_SSO_VISION_SYNC:-0}"
@@ -882,6 +883,16 @@ if [[ "$VERIFY_RATIO96_DOCS_CANON" == "1" ]]; then
     echo "OK  ratio96 docs-canon gate"
   else
     echo "FAIL ratio96 docs-canon gate"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_GPU_LIMITS" == "1" ]]; then
+  echo "Running poolai-loc-audit --gpu-limits (PH-S1862)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --gpu-limits); then
+    echo "OK  GPU limits gate"
+  else
+    echo "FAIL GPU limits gate"
     fail=1
   fi
 fi

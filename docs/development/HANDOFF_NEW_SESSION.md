@@ -1,9 +1,9 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-08-08 (band 118 **GSV sprint UI migration** PH-S1819…S1828 **✅** · band 119 open PH-S1829…S1838 · Vision rev 471)
+**Оновлено:** 2026-08-11 (band 121 **GSV OmniRouter box parity** PH-S1849…S1855 **✅** · band 122 open PH-S1859…S1868 · Vision rev 474)
 
 **Наступна сесія:** **`абракадабра`** — див. **канон воркфлоу в [AGENTS.md](../../AGENTS.md §100–113)**.
-**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1829…S1838; черга — FM §5.12 → band 119) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1859…S1868; черга — FM §5.12 → band 122) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
 
 --- 
 
@@ -41,6 +41,31 @@
 - Не паралелити `cargo test-ci`.
 - Warnings > 0 або errors > 0 → 1–3 PH-S* **на початок смуги** (Джерело: `rust_diagnostics` / lint code).
 - Fallback-смуга: galaxy metrics stubs, wasm glue, stand smoke, concept wire, loc-audit, docs canon, vision sync, INDEX.
+
+## Band 122 — GPULimits store/wire (PH-S1859…S1868, **🔜**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1859** | `gpu_limits_depth` ui-core module (`gpu_limits_depth.rs`; depth enum + criteria registry, 10) |
+| **PH-S1860** | Store/wire slice (`gpu_limits_store.rs`; durable `docs/development/gpu_limits.json`) |
+| **PH-S1861** | API contracts (`gpu_limits_integration`; store roundtrip + wire shape markers) |
+| **PH-S1862** | `VERIFY_GPU_LIMITS` + quick `--gpu-limits` (`verify-dev-stand` gate; `bin/run-poolai.sh`) |
+| **PH-S1863** | Stand smoke export shape band 122 (`gpu_limits_band122_export_shape_ph_s1859`) |
+| **PH-S1864** | `poolai-loc-audit --gpu-limits` (`rust_ratio.json` fields) |
+| **PH-S1865** | Docs `GPU_LIMITS.md` + canon (RUN_LOCAL/INDEX/HANDOFF/NEXT) |
+| **PH-S1866** | vision-sync --check (drift gate green) |
+| **PH-S1867** | Ratio hold advisory (`--gpu-limits --advisory --min-ratio 0.95`) |
+| **PH-S1868** | GPULimits band close (`galaxy_horizon_s1859_integration`; FM §5.103; HANDOFF/NEXT band 123) |
+
+**PH-S1859…S1868 🔜 (2026-08-11):** enterprise phase H «GPU admission + worker limits
+(single-host)». Pattern mirror: band 107 `RATIO96_DOCS_CANON`. `gpu_limits_depth.rs`
+(enum `None..FullBand122`, 3 slices, 10 criteria, 10 cases, `FM_BAND122_ROWS`,
+`depth_stub`); `gpu_limits_store.rs` (load/save/wire, `GpuLimitsStoreState`,
+`admission_active`); `tests/gpu_limits_integration.rs`; `bin/verify-dev-stand.sh`
+`VERIFY_GPU_LIMITS` + `bin/run-poolai.sh --gpu-limits`;
+`gpu_limits_band122_export_shape_ph_s1859` stand smoke; `poolai-loc-audit
+--gpu-limits`; `GPU_LIMITS.md` + `gpu_limits.json`. Band-close test:
+`tests/galaxy_horizon_s1859_integration.rs`.
 
 ## Band 110 — GSV vision map UI (PH-S1739…S1748, **✅**)
 

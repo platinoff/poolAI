@@ -265,7 +265,7 @@ FM-xxx (з таблиці нижче)
 
 **VDT:** §5.12 = **журнал PH-S*** (≤10 відкритих). Якщо **< 10** — **`абракадабра`** / project scan **всього проєкту**: concept → FM **§5.1** → roadmaps → architect → DOCS_LEGACY → code → §5.13 fallback. Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Project scan». **Rust-first:** API → `tests/`; Playwright лише browser scope.
 
-**Відкритих у §5.12:** **0** (band 121 ✅ · §5.102 PH-S1849…S1855). **Master horizon:** PH-S1849…S1855 (band 121). Vision rev **474**.
+**Відкритих у §5.12:** **0** (band 122 ✅ · §5.103 PH-S1859…S1868). **Master horizon:** PH-S1859…S1868 (band 122). Vision rev **475**.
 
 **Историчний research backlog (PH-S65+):**
 
@@ -1558,6 +1558,23 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1788 | **PH-S1853** | Ratio hold + tests | GSV_ROLES | `gsv-loc-audit --stretch-96` green **≥96%**; full GSV tests green; clippy 0 | **[x]** |
 | 1789 | **PH-S1854** | GSV docs canon | GSV canon | MEMORY band 121; HANDOFF/NEXT band 121; VISION.md omni card section; `GSV_TECH_ROADMAP.md` band 121 | **[x]** |
 | 1790 | **PH-S1855** | Band close | GSV_ROLES | ratio **≥96%**; fmt/clippy/test; docs canon; vision-sync rev bump; push | **[x]** |
+
+### 5.103 GPULimits store/wire queue — band 122 (PH-S1859…S1868, 2026-08-10) · **✅**
+
+**Джерело:** master backlog band 122 (H GPULimits · store wire) — enterprise phase H (GPU admission + worker limits, single-host). Pattern mirror: band 107 (Ratio96 docs canon, §5.88). Canon: [`GPU_LIMITS.md`](../development/GPU_LIMITS.md) · [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md) · [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1791 | **PH-S1859** | `gpu_limits_depth` ui-core module | `gpu_limits_depth.rs` | depth enum + GPU-limits criteria registry (10) | **[x]** |
+| 1792 | **PH-S1860** | `gpu_limits` store/wire slice | durable store + wire | `GpuLimits` config (max_gpus/gpu_memory_mb/admission) durable JSON store + save/load/wire + unit test | **[x]** |
+| 1793 | **PH-S1861** | `gpu_limits` API contracts | `tests/*_integration.rs` | `gpu_limits_integration`: store roundtrip + wire shape markers | **[x]** |
+| 1794 | **PH-S1862** | `VERIFY_GPU_LIMITS` + quick `--gpu-limits` | verify-dev-stand | verify-dev-stand gate + `run-poolai.sh --gpu-limits` | **[x]** |
+| 1795 | **PH-S1863** | Stand smoke `gpu_limits` export | stand smoke | `gpu_limits_band122_export_shape_ph_s1859` unit export shape | **[x]** |
+| 1796 | **PH-S1864** | `poolai-loc-audit --gpu-limits` | loc-audit | `rust_ratio.json` fields (`gpu_limits_mode`/criteria total/met) | **[x]** |
+| 1797 | **PH-S1865** | Docs `GPU_LIMITS.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | docs matrix + FM §5.12 header | **[x]** |
+| 1798 | **PH-S1866** | vision-sync --check | vision | drift gate green (rev bump) | **[x]** |
+| 1799 | **PH-S1867** | Ratio hold advisory | loc-audit | `--gpu-limits --advisory --min-ratio 0.95` | **[x]** |
+| 1800 | **PH-S1868** | GPULimits band close | tests/docs | `galaxy_horizon_s1859_integration`; FM ✅ · HANDOFF · NEXT_SESSION | **[x]** |
 
 ### 5.88 Ratio96 docs canon queue — band 107 (PH-S1709…S1718, 2026-08-02) · **✅**
 

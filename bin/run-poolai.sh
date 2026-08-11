@@ -114,7 +114,8 @@ Options (quick):
   --ratio96-admin-ops After health wait, loc-audit --ratio96-admin-ops (PH-S1684)
   --ratio96-stand-smoke After health wait, loc-audit --ratio96-stand-smoke (PH-S1694)
   --ratio96-loc-audit  After health wait, loc-audit --ratio96-loc-audit (PH-S1703)
- --ratio96-docs-canon After health wait, loc-audit --ratio96-docs-canon (PH-S1712)
+  --ratio96-docs-canon After health wait, loc-audit --ratio96-docs-canon (PH-S1712)
+  --gpu-limits     After health wait, loc-audit --gpu-limits (PH-S1862)
   --skip-build    Skip cargo build
   --port N        HTTP port (default 8080)
 
@@ -350,6 +351,7 @@ cmd_quick() {
   local ratio96_admin_ops=0
   local ratio96_loc_audit=0
   local ratio96_docs_canon=0
+  local gpu_limits=0
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --skip-build) SKIP_BUILD=1; shift ;;
@@ -411,7 +413,8 @@ cmd_quick() {
       --ratio96-admin-ops) ratio96_admin_ops=1; shift ;;
       --ratio96-stand-smoke) ratio96_stand_smoke=1; shift ;;
       --ratio96-loc-audit) ratio96_loc_audit=1; shift ;;
-     --ratio96-docs-canon) ratio96_docs_canon=1; shift ;;
+      --ratio96-docs-canon) ratio96_docs_canon=1; shift ;;
+      --gpu-limits) gpu_limits=1; shift ;;
       --policy-store) policy_store=1; shift ;;
       --policy-api) policy_api=1; shift ;;
       --port) PORT="$2"; shift 2 ;;
@@ -681,6 +684,10 @@ cmd_quick() {
   if [[ "$ratio96_docs_canon" == "1" ]]; then
     echo "Running poolai-loc-audit --ratio96-docs-canon (PH-S1712)..."
     cargo run --quiet --bin poolai-loc-audit -- --ratio96-docs-canon
+  fi
+  if [[ "$gpu_limits" == "1" ]]; then
+    echo "Running poolai-loc-audit --gpu-limits (PH-S1862)..."
+    cargo run --quiet --bin poolai-loc-audit -- --gpu-limits
   fi
 }
 
