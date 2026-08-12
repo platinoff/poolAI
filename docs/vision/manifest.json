@@ -3236,6 +3236,30 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_development_GPU_LIMITS_ADMIN_OPS_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_gpu_limits_migration2_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_gpu_limits_migration3_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_gpu_limits_migration4_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_gpu_limits_migration_depth_rs"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -12532,9 +12556,58 @@
       "label": "gpu_limits_admin_ops_integration.rs",
       "layer": "L3",
       "path": "tests/gpu_limits_admin_ops_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_gpu_limits_migration2_depth_rs",
+      "label": "gpu_limits_migration2_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/gpu_limits_migration2_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_gpu_limits_migration3_depth_rs",
+      "label": "gpu_limits_migration3_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/gpu_limits_migration3_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_gpu_limits_migration4_depth_rs",
+      "label": "gpu_limits_migration4_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/gpu_limits_migration4_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_gpu_limits_migration_depth_rs",
+      "label": "gpu_limits_migration_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/gpu_limits_migration_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_gpu_limits_migration2_integration_rs",
+      "label": "gpu_limits_migration2_integration.rs",
+      "layer": "L3",
+      "path": "tests/gpu_limits_migration2_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_gpu_limits_migration3_integration_rs",
+      "label": "gpu_limits_migration3_integration.rs",
+      "layer": "L3",
+      "path": "tests/gpu_limits_migration3_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_gpu_limits_migration4_integration_rs",
+      "label": "gpu_limits_migration4_integration.rs",
+      "layer": "L3",
+      "path": "tests/gpu_limits_migration4_integration.rs"
     }
   ],
-  "revision": 478,
+  "revision": 479,
   "sprint_queue": [],
   "sprint_queue_open_count": 0,
   "updated_at": "2026-06-20",
