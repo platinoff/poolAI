@@ -1,9 +1,9 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-08-11 (band 122 **GPULimits store/wire** PH-S1859…S1868 **✅** · band 123 open PH-S1869…S1878 · Vision rev 477)
+**Оновлено:** 2026-08-11 (band 123 **GPULimits API contracts** PH-S1869…S1878 **✅** · band 124 open PH-S1879…S1888 · Vision rev 477)
 
 **Наступна сесія:** **`абракадабра`** — див. **канон воркфлоу в [AGENTS.md](../../AGENTS.md §100–113)**.
-**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1869…S1878; черга — FM §5.12 → band 123) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1879…S1888; черга — FM §5.12 → band 124) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
 
 --- 
 
@@ -42,7 +42,33 @@
 - Warnings > 0 або errors > 0 → 1–3 PH-S* **на початок смуги** (Джерело: `rust_diagnostics` / lint code).
 - Fallback-смуга: galaxy metrics stubs, wasm glue, stand smoke, concept wire, loc-audit, docs canon, vision sync, INDEX.
 
-## Band 123 — GPULimits API contracts (PH-S1869…S1878, **🔜**)
+## Band 124 — GPULimits admin/ops glue (PH-S1879…S1888, **🔜**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1879** | `gpu_limits_admin_ops_depth` ui-core module (`gpu_limits_admin_ops_depth.rs`; depth enum + criteria registry, 10) |
+| **PH-S1880** | Store-wire slice glue (`gpu_limits_store_wire_json`; `#gpu-limits-store-badge` dashboard strip reads `GET /api/v1/gpu-limits`) |
+| **PH-S1881** | HTML contracts (`gpu_limits_admin_ops_integration`; dashboard markers + i18n `admin.gpuLimits.*`) |
+| **PH-S1882** | `VERIFY_GPU_LIMITS_ADMIN_OPS` + quick `--gpu-limits-admin-ops` (`verify-dev-stand` gate; `bin/run-poolai.sh`) |
+| **PH-S1883** | Stand smoke export shape band 124 (`gpu_limits_admin_ops_band124_export_shape_ph_s1883`) |
+| **PH-S1884** | `poolai-loc-audit --gpu-limits-admin-ops` (`rust_ratio.json` fields) |
+| **PH-S1885** | Docs `GPU_LIMITS_ADMIN_OPS.md` + canon (RUN_LOCAL/INDEX/HANDOFF/NEXT) |
+| **PH-S1886** | vision-sync --check (drift gate green) |
+| **PH-S1887** | Ratio hold advisory (`--gpu-limits-admin-ops --advisory --min-ratio 0.95`) |
+| **PH-S1888** | GPULimits admin/ops band close (`galaxy_horizon_s1879_integration`; FM §5.105; HANDOFF/NEXT band 125) |
+
+**PH-S1879…S1888 🔜 (2026-08-11):** enterprise phase H «GPU admission + worker limits
+(single-host)». Pattern mirror: band 104 `ratio96_admin_ops_depth`. `gpu_limits_admin_ops_depth.rs`
+(enum `None..FullBand124`, 10 criteria, 10 cases, `FM_BAND124_ROWS`, `depth_stub`);
+`#gpu-limits-store-badge` + `loadGpuLimitsStoreWire` + `refreshGpuLimits` in
+`src/ui/admin/dashboard.rs` (reads `GET /api/v1/gpu-limits`); i18n `admin.gpuLimits.*`
+EN/UK in `crates/poolai-ui-core/src/i18n.rs`; `tests/gpu_limits_admin_ops_integration.rs`;
+`bin/verify-dev-stand.sh` `VERIFY_GPU_LIMITS_ADMIN_OPS` + `bin/run-poolai.sh
+--gpu-limits-admin-ops`; `gpu_limits_admin_ops_band124_export_shape_ph_s1883` stand smoke;
+`poolai-loc-audit --gpu-limits-admin-ops`; `GPU_LIMITS_ADMIN_OPS.md` band-124 canon.
+Band-close test: `tests/galaxy_horizon_s1879_integration.rs`.
+
+## Band 123 — GPULimits API contracts (PH-S1869…S1878, **✅**)
 
 | Sprint | Фокус |
 |--------|--------|
@@ -57,7 +83,7 @@
 | **PH-S1877** | Ratio hold advisory (`--gpu-limits-api --advisory --min-ratio 0.95`) |
 | **PH-S1878** | GPULimits API band close (`galaxy_horizon_s1869_integration`; FM §5.104; HANDOFF/NEXT band 124) |
 
-**PH-S1869…S1878 🔜 (2026-08-11):** enterprise phase H «GPU admission + worker limits
+**PH-S1869…S1878 ✅ (2026-08-11):** enterprise phase H «GPU admission + worker limits
 (single-host)». Pattern mirror: band 122 `gpu_limits_depth`. `gpu_limits_api_depth.rs`
 (enum `None..FullBand123`, 3 slices, 10 criteria, 10 cases, `FM_BAND123_ROWS`,
 `depth_stub`); `GET /api/v1/gpu-limits` in `src/network/api/system.rs`

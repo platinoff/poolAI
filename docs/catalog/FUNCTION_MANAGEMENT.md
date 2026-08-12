@@ -265,7 +265,7 @@ FM-xxx (з таблиці нижче)
 
 **VDT:** §5.12 = **журнал PH-S*** (≤10 відкритих). Якщо **< 10** — **`абракадабра`** / project scan **всього проєкту**: concept → FM **§5.1** → roadmaps → architect → DOCS_LEGACY → code → §5.13 fallback. Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Project scan». **Rust-first:** API → `tests/`; Playwright лише browser scope.
 
-**Відкритих у §5.12:** **0** (band 123 ✅ · §5.104 PH-S1869…S1878). **Master horizon:** PH-S1879…S1888 (band 124). Vision rev **477**.
+**Відкритих у §5.12:** **0** (band 124 ✅ · §5.105 PH-S1879…S1888). **Master horizon:** PH-S1889…S1898 (band 125). Vision rev **478**.
 
 **Историчний research backlog (PH-S65+):**
 
@@ -1593,22 +1593,22 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1809 | **PH-S1877** | Ratio hold advisory | loc-audit | `--gpu-limits-api --advisory --min-ratio 0.95` | **[x]** |
 | 1810 | **PH-S1878** | GPULimits API band close | tests/docs | `galaxy_horizon_s1869_integration`; FM ✅ · HANDOFF · NEXT_SESSION | **[x]** |
 
-### 5.105 GPULimits admin/ops glue queue — band 124 (PH-S1879…S1888, 2026-08-11) · **🔜**
+### 5.105 GPULimits admin/ops glue queue — band 124 (PH-S1879…S1888, 2026-08-11) · **✅**
 
 **Джерело:** master backlog band 124 (H GPULimits · admin/ops glue) — enterprise phase H (GPU admission + worker limits, single-host). Pattern mirror: band 122 (§5.103) поверх durable `gpu_limits.json`; admin/ops glue: `bin/verify-dev-stand.sh` + `bin/run-poolai.sh`. Canon: [`GPU_LIMITS.md`](../development/GPU_LIMITS.md) · [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md) · [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
-| 1811 | **PH-S1879** | `gpu_limits_depth` scaffold | `gpu_limits_depth.rs` | ui-core depth enum + criteria registry | **[ ]** |
-| 1812 | **PH-S1880** | `gpu_limits` store/wire slice | `gpu_limits_store.rs` | durable path or production verify stub + unit test | **[ ]** |
-| 1813 | **PH-S1881** | `gpu_limits` API contracts | `tests/*_integration.rs` | contract test | **[ ]** |
-| 1814 | **PH-S1882** | `gpu_limits` admin/ops glue | verify-dev-stand | verify-dev-stand or admin strip | **[ ]** |
-| 1815 | **PH-S1883** | Stand smoke `gpu_limits` export | stand smoke | export shape unit test | **[ ]** |
-| 1816 | **PH-S1884** | `poolai-loc-audit` PH-S1884 | loc-audit | `rust_ratio.json` zriz | **[ ]** |
-| 1817 | **PH-S1885** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | docs matrix + FM §5.12 header | **[ ]** |
-| 1818 | **PH-S1886** | poolai-vision-sync --check | vision | drift gate green | **[ ]** |
-| 1819 | **PH-S1887** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **[ ]** |
-| 1820 | **PH-S1888** | galaxy_horizon_s1879_integration | tests/docs | band close | **[ ]** |
+| 1811 | **PH-S1879** | `gpu_limits_admin_ops_depth` scaffold | `gpu_limits_admin_ops_depth.rs` | ui-core depth enum + criteria registry | **[x]** |
+| 1812 | **PH-S1880** | `gpu_limits` store/wire slice | `gpu_limits_store.rs` | durable path or production verify stub + unit test | **[x]** |
+| 1813 | **PH-S1881** | `gpu_limits` API contracts | `tests/*_integration.rs` | contract test | **[x]** |
+| 1814 | **PH-S1882** | `gpu_limits` admin/ops glue | verify-dev-stand | verify-dev-stand or admin strip | **[x]** |
+| 1815 | **PH-S1883** | Stand smoke `gpu_limits` export | stand smoke | export shape unit test | **[x]** |
+| 1816 | **PH-S1884** | `poolai-loc-audit` PH-S1884 | loc-audit | `rust_ratio.json` zriz | **[x]** |
+| 1817 | **PH-S1885** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | docs matrix + FM §5.12 header | **[x]** |
+| 1818 | **PH-S1886** | poolai-vision-sync --check | vision | drift gate green | **[x]** |
+| 1819 | **PH-S1887** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **[x]** |
+| 1820 | **PH-S1888** | galaxy_horizon_s1879_integration | tests/docs | band close | **[x]** |
 
 ### 5.88 Ratio96 docs canon queue — band 107 (PH-S1709…S1718, 2026-08-02) · **✅**
 

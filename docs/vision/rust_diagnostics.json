@@ -1,20 +1,23 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-04",
+  "generated_at": "2026-08-12",
   "host_label": "PLATINOV",
-  "git_head": "cd5ae5b97",
+  "git_head": "acc155542",
   "source": "local",
   "notes": [
     "Machine-readable Rust/Clippy warning+error index for vision Rust panel.",
     "Record via poolai-rust-diagnostics or bin/record-rust-diagnostics.sh (abrakadabra drain + CI)."
   ],
   "latest": {
-    "warnings": 0,
+    "warnings": 1,
     "errors": 0,
     "ok": true,
-    "recorded_at": "2026-08-04T11:35:05Z",
+    "recorded_at": "2026-08-12T15:33:39Z",
     "command": "cargo clippy --message-format=json --all-targets --features ml,enterprise,cloud,test-utils,job-store-sqlite,prometheus",
-    "wall_secs": 98.3154365
+    "wall_secs": 232.7219626,
+    "top_codes": [
+      "clippy::useless_format×1"
+    ]
   },
   "history": [
     {
@@ -454,6 +457,21 @@
       "host_label": "PLATINOV",
       "git_head": "cd5ae5b97",
       "source": "local"
+    },
+    {
+      "kind": "rust_diagnostics",
+      "command": "cargo clippy --message-format=json --all-targets --features ml,enterprise,cloud,test-utils,job-store-sqlite,prometheus",
+      "warnings": 1,
+      "errors": 0,
+      "ok": true,
+      "recorded_at": "2026-08-12T15:33:39Z",
+      "wall_secs": 232.7219626,
+      "host_label": "PLATINOV",
+      "git_head": "acc155542",
+      "source": "local",
+      "top_codes": [
+        "clippy::useless_format×1"
+      ]
     }
   ]
 }

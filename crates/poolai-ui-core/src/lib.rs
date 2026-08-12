@@ -30,6 +30,7 @@ pub mod format;
 pub mod galaxy_edge_verification_depth;
 pub mod galaxy_telegram_seats;
 pub mod galaxy_virtual_nodes;
+pub mod gpu_limits_admin_ops_depth;
 pub mod gpu_limits_api_depth;
 pub mod gpu_limits_depth;
 pub mod gpu_limits_store;

@@ -70,6 +70,7 @@ VERIFY_RATIO96_LOC_AUDIT="${VERIFY_RATIO96_LOC_AUDIT:-0}"
 VERIFY_RATIO96_DOCS_CANON="${VERIFY_RATIO96_DOCS_CANON:-0}"
 VERIFY_GPU_LIMITS="${VERIFY_GPU_LIMITS:-0}"
 VERIFY_GPU_LIMITS_API="${VERIFY_GPU_LIMITS_API:-0}"
+VERIFY_GPU_LIMITS_ADMIN_OPS="${VERIFY_GPU_LIMITS_ADMIN_OPS:-0}"
 VERIFY_SSO_LOC_AUDIT="${VERIFY_SSO_LOC_AUDIT:-0}"
 VERIFY_SSO_DOCS_CANON="${VERIFY_SSO_DOCS_CANON:-0}"
 VERIFY_SSO_VISION_SYNC="${VERIFY_SSO_VISION_SYNC:-0}"
@@ -904,6 +905,16 @@ if [[ "$VERIFY_GPU_LIMITS_API" == "1" ]]; then
     echo "OK  GPU limits API gate"
   else
     echo "FAIL GPU limits API gate"
+    fail=1
+  fi
+fi
+
+if [[ "$VERIFY_GPU_LIMITS_ADMIN_OPS" == "1" ]]; then
+  echo "Running poolai-loc-audit --gpu-limits-admin-ops (PH-S1884)..."
+  if (cd "$ROOT" && cargo run --quiet --bin poolai-loc-audit -- --migration-advisory --gpu-limits-admin-ops); then
+    echo "OK  GPU limits admin/ops glue gate"
+  else
+    echo "FAIL GPU limits admin/ops glue gate"
     fail=1
   fi
 fi

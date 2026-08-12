@@ -147,3 +147,5 @@ bash bin/run-poolai.sh quick --gpu-limits-api
 - Markers: PH-S1869 · gpu_limits_api_depth · PH-S1870 · gpu-limits · PH-S1871 ·
   gpu_limits_api_contracts_integration · PH-S1872 · VERIFY_GPU_LIMITS_API ·
   PH-S1874 · `--gpu-limits-api` · PH-S1878
+- Band 124 (admin/ops glue, PH-S1879…S1888): [`GPU_LIMITS_ADMIN_OPS.md`](./GPU_LIMITS_ADMIN_OPS.md) ·
+  `gpu-limits-store-badge` · `refreshGpuLimits` · `VERIFY_GPU_LIMITS_ADMIN_OPS`

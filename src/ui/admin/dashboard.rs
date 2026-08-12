@@ -240,10 +240,52 @@ pub async fn admin_dashboard() -> Html<String> {
         showNotification(T('admin.ratio96.refreshErr', 'Ratio store refresh failed: ') + e.message, 'error');
       }
     }
+
+    function renderGpuLimitsStoreBadge(wire) {
+      const el = document.getElementById('gpu-limits-store-badge');
+      if (!el) return;
+      const avail = !!(wire && wire.available);
+      const active = !!(wire && wire.admission_active);
+      const hint = T('admin.gpuLimits.storeHint', 'GPU admission limits read from gpu_limits.json');
+      const state = avail
+        ? T('admin.gpuLimits.storeLabel', 'GPU limits:') + ' ' +
+          (active ? T('admin.gpuLimits.admissionOn', 'admission on') : T('admin.gpuLimits.admissionOff', 'admission off'))
+        : T('admin.gpuLimits.storeMissing', 'store unavailable');
+      const badge = avail ? (active ? 'active' : 'inactive') : 'error';
+      el.innerHTML =
+        '<span class="status-badge ' + badge + '" title="' + escapeHtml(hint) + '">' +
+        escapeHtml(state) + '</span>';
+    }
+
+    async function loadGpuLimitsStoreWire() {
+      const el = document.getElementById('gpu-limits-store-badge');
+      if (el) {
+        el.textContent = T('admin.gpuLimits.storeLoading', 'Loading GPU limits…');
+      }
+      try {
+        const wire = await fetchJson('/api/v1/gpu-limits');
+        renderGpuLimitsStoreBadge(wire);
+      } catch (e) {
+        if (el) {
+          el.innerHTML = '<span class="status-badge error">' +
+            escapeHtml(T('admin.gpuLimits.storeErr', 'GPU limits store wire unavailable')) + '</span>';
+        }
+      }
+    }
+
+    async function refreshGpuLimits() {
+      try {
+        await loadGpuLimitsStoreWire();
+        showNotification(T('admin.gpuLimits.refreshOk', 'GPU limits refreshed'), 'success');
+      } catch (e) {
+        showNotification(T('admin.gpuLimits.refreshErr', 'GPU limits refresh failed: ') + e.message, 'error');
+      }
+    }
     
     loadSystemOverview();
     renderMetricsChart();
     loadRatio96StoreWire();
+    loadGpuLimitsStoreWire();
     poolaiStartMetricsPolling(loadSystemOverview, 10000);
     poolaiStartMetricsPolling(renderMetricsChart, 30000);
     "#;
@@ -279,6 +321,11 @@ pub async fn admin_dashboard() -> Html<String> {
             <span id="ratio96-store-badge" class="muted" data-i18n="admin.ratio96.storeLoading">Loading ratio store…</span>
             <button type="button" class="btn" onclick="refreshRatio96()" data-i18n="admin.ratio96.btn.refresh" data-i18n-aria="admin.ratio96.btn.refresh">Refresh</button>
           </div>
+          <div class="admin-card">
+            <h3 data-i18n="admin.gpuLimits.cardTitle">GPU Limits (Phase H)</h3>
+            <span id="gpu-limits-store-badge" class="muted" data-i18n="admin.gpuLimits.storeLoading">Loading GPU limits…</span>
+            <button type="button" class="btn" onclick="refreshGpuLimits()" data-i18n="admin.gpuLimits.btn.refresh" data-i18n-aria="admin.gpuLimits.btn.refresh">Refresh</button>
+          </div>
         </div>
         "#,
         script,
@@ -304,4 +351,15 @@ async fn admin_dashboard_ratio96_store_strip_ph_s1682() {
     assert!(html.contains("refreshRatio96"));
     assert!(html.contains("admin.ratio96.storeLabel"));
     assert!(html.contains("admin.ratio96.btn.refresh"));
+}
+
+#[tokio::test]
+async fn admin_dashboard_gpu_limits_store_strip_ph_s1882() {
+    let html = admin_dashboard().await.0;
+    assert!(html.contains("gpu-limits-store-badge"));
+    assert!(html.contains("loadGpuLimitsStoreWire"));
+    assert!(html.contains("/api/v1/gpu-limits"));
+    assert!(html.contains("refreshGpuLimits"));
+    assert!(html.contains("admin.gpuLimits.storeLabel"));
+    assert!(html.contains("admin.gpuLimits.btn.refresh"));
 }

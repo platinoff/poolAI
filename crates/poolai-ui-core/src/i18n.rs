@@ -651,6 +651,23 @@ pub const ADMIN_DASHBOARD_EN: &[I18nRow<'_>] = &[
     ("admin.ratio96.btn.refresh", "Refresh"),
     ("admin.ratio96.refreshOk", "Ratio store refreshed"),
     ("admin.ratio96.refreshErr", "Ratio store refresh failed: "),
+    ("admin.gpuLimits.cardTitle", "GPU Limits (Phase H)"),
+    ("admin.gpuLimits.storeLoading", "Loading GPU limits…"),
+    ("admin.gpuLimits.storeLabel", "GPU limits:"),
+    (
+        "admin.gpuLimits.storeHint",
+        "GPU admission limits read from gpu_limits.json",
+    ),
+    ("admin.gpuLimits.admissionOn", "admission on"),
+    ("admin.gpuLimits.admissionOff", "admission off"),
+    ("admin.gpuLimits.storeMissing", "store unavailable"),
+    (
+        "admin.gpuLimits.storeErr",
+        "GPU limits store wire unavailable",
+    ),
+    ("admin.gpuLimits.btn.refresh", "Refresh"),
+    ("admin.gpuLimits.refreshOk", "GPU limits refreshed"),
+    ("admin.gpuLimits.refreshErr", "GPU limits refresh failed: "),
 ];
 
 /// Ukrainian admin dashboard keys (PH-S228).
@@ -691,6 +708,26 @@ pub const ADMIN_DASHBOARD_UK: &[I18nRow<'_>] = &[
     (
         "admin.ratio96.refreshErr",
         "Помилка оновлення сховища ratio: ",
+    ),
+    ("admin.gpuLimits.cardTitle", "GPU ліміти (Phase H)"),
+    ("admin.gpuLimits.storeLoading", "Завантаження GPU лімітів…"),
+    ("admin.gpuLimits.storeLabel", "GPU ліміти:"),
+    (
+        "admin.gpuLimits.storeHint",
+        "GPU-ліміти адмісії з gpu_limits.json",
+    ),
+    ("admin.gpuLimits.admissionOn", "адмісія увімкнена"),
+    ("admin.gpuLimits.admissionOff", "адмісія вимкнена"),
+    ("admin.gpuLimits.storeMissing", "сховище недоступне"),
+    (
+        "admin.gpuLimits.storeErr",
+        "GPU limits store wire недоступний",
+    ),
+    ("admin.gpuLimits.btn.refresh", "Оновити"),
+    ("admin.gpuLimits.refreshOk", "GPU ліміти оновлено"),
+    (
+        "admin.gpuLimits.refreshErr",
+        "Помилка оновлення GPU лімітів: ",
     ),
 ];
 
