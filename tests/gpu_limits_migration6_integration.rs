@@ -2,8 +2,8 @@
 //! Marker: `gpu_limits_migration6_contracts` · Module: `gpu_limits_migration6_integration`.
 
 use poolai_ui_core::gpu_limits_migration6_depth::{
-    gpu_limits_migration6_criteria_total, gpu_limits_migration_depth6_stub, GpuLimitsMigrationDepth6,
-    GPU_LIMITS_MIGRATION6_CASES, GPU_LIMITS_MIGRATION6_CRITERIA,
+    gpu_limits_migration6_criteria_total, gpu_limits_migration_depth6_stub,
+    GpuLimitsMigrationDepth6, GPU_LIMITS_MIGRATION6_CASES, GPU_LIMITS_MIGRATION6_CRITERIA,
 };
 use serde_json::json;
 
