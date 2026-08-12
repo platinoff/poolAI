@@ -3294,4 +3294,8 @@ git log -S "PutArtifact" --oneline -n 20 -- src/
 **????????? ? 5.12:** \u00cf\u00cf\u00cf\u00cf 0 (band 128 ✅ · §5.129 PH-S1929.S1938). \u00d7\u00d7\u00d7\u00d7 Vision rev 480.
 
 ### 5.109 GPULimits migration 5 queue - band 129 (PH-S1929.S1938, 2026-08-15) ✅
-\u00d8\u00d8\u00d8\u00d8 master backlog band 129 (H GPULimits ✅ · migration 5) - enterprise phase H (GPU admission + worker limits, single-host). Pattern mirror: band 127 (§a75.107) durable gpu_limits.json; migration 5 glue: bin/verify-dev-stand.sh + bin/run-poolai.sh. Canon: GPU_LIMITS.md ✅ PH_S_MASTER_BACKLOG_1000.md ✅ PH_S_ENTERPRISE_ROADMAP_2026-07-19.md.
+\u00d8\u00d8\u00d8\u00d8 master backlog band 129 (H GPULimits ✅ · migration 5) - enterprise phase H (GPU admission + worker limits, single-host). Pattern mirror: band 127 (§a75.107) durable gpu_limits.json; migration 5 glue: bin/verify-dev-stand.sh + bin/run-poolai.sh. Canon: GPU_LIMITS.md ✅ PH_S_MASTER_BACKLOG_1000.md ✅ PH_S_ENTERPRISE_ROADMAP_2026-07-19.md.### 5.130 GPULimits migration 6 (PH-S1939.S1948, band 130, 2026-08-16) ✅
+**????????? ? 5.12:** \u00cf\u00cf\u00cf\u00cf 0 (band 129 ✅ · §5.130 PH-S1939.S1948). \u00d7\u00d7\u00d7\u00d7 Vision rev 480.
+
+### 5.109 GPULimits migration 6 queue - band 130 (PH-S1939.S1948, 2026-08-16) ✅
+\u00d8\u00d8\u00d8\u00d8 master backlog band 130 (H GPULimits ✅ · migration 6) - enterprise phase H (GPU admission + worker limits, single-host). Pattern mirror: band 127 (�xa75.107) durable gpu_limits.json; migration 6 glue: bin/verify-dev-stand.sh + bin/run-poolai.sh. Canon: GPU_LIMITS.md ✅ PH_S_MASTER_BACKLOG_1000.md ✅ PH_S_ENTERPRISE_ROADMAP_2026-07-19.md.
