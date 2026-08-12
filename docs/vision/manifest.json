@@ -3260,6 +3260,12 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_gpu_limits_migration_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_gpu_limits_migration5_depth_rs"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -12605,9 +12611,23 @@
       "label": "gpu_limits_migration4_integration.rs",
       "layer": "L3",
       "path": "tests/gpu_limits_migration4_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_gpu_limits_migration5_depth_rs",
+      "label": "gpu_limits_migration5_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/gpu_limits_migration5_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_gpu_limits_migration5_integration_rs",
+      "label": "gpu_limits_migration5_integration.rs",
+      "layer": "L3",
+      "path": "tests/gpu_limits_migration5_integration.rs"
     }
   ],
-  "revision": 479,
+  "revision": 480,
   "sprint_queue": [],
   "sprint_queue_open_count": 0,
   "updated_at": "2026-06-20",
