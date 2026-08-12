@@ -1,9 +1,9 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-08-11 (band 123 **GPULimits API contracts** PH-S1869…S1878 **✅** · band 124 open PH-S1879…S1888 · Vision rev 477)
+**Оновлено:** 2026-08-12 (band 124 **GPULimits admin/ops glue** PH-S1879…S1888 **✅** · band 125 open PH-S1889…S1898 · Vision rev 478)
 
 **Наступна сесія:** **`абракадабра`** — див. **канон воркфлоу в [AGENTS.md](../../AGENTS.md §100–113)**.
-**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1879…S1888; черга — FM §5.12 → band 124) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1889…S1898; черга — FM §5.12 → band 125) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
 
 --- 
 
@@ -55,7 +55,7 @@
 | **PH-S1885** | Docs `GPU_LIMITS_ADMIN_OPS.md` + canon (RUN_LOCAL/INDEX/HANDOFF/NEXT) |
 | **PH-S1886** | vision-sync --check (drift gate green) |
 | **PH-S1887** | Ratio hold advisory (`--gpu-limits-admin-ops --advisory --min-ratio 0.95`) |
-| **PH-S1888** | GPULimits admin/ops band close (`galaxy_horizon_s1879_integration`; FM §5.105; HANDOFF/NEXT band 125) |
+| **PH-S1888** | GPULimits admin/ops band close (`## Band 127 - GPULimits migration 3 (PH-S1909.S1918, 42b75)\n| PH-S1914 | HTML contracts (gpu_limits_migration3_integration; dashboard markers + i18n admin.gpuLimits.migrationLabel) |\n| PH-S1916 | Stand smoke export shape band 127 (gpu_limits_migration3_band127_export_shape_ph_s1916) |\n| PH-S1918 | GPULimits migration 3 band close (## Band 128 - GPULimits migration 4 (PH-S1919.S1928, 42b75)\n| PH-S1923 | HTML contracts (gpu_limits_migration4_integration; dashboard markers + i18n admin.gpuLimits.migrationLabel) |\n| PH-S1925 | Stand smoke export shape band 128 (gpu_limits_migration4_band128_export_shape_ph_s1925) |\n| PH-S1928 | GPULimits migration 4 band close (galaxy_horizon_s1919_integration; FM 5.128; HANDOFF/NEXT band 129) |\n#gpu-limits-store-badge + loadGpuLimitsStoreWire + refreshGpuLimits in\nsrc/ui/admin/dashboard.rs (reads GET /api/v1/gpu-limits); i18n admin.gpuLimits.*\ngalaxy_horizon_s1909_integration; FM 5.127; HANDOFF/NEXT band 128) |\n#gpu-limits-store-badge + loadGpuLimitsStoreWire + refreshGpuLimits in\nsrc/ui/admin/dashboard.rs (reads GET /api/v1/gpu-limits); i18n admin.gpuLimits.*\ngalaxy_horizon_s1879_integration`; FM §5.105; HANDOFF/NEXT band 125) |
 
 **PH-S1879…S1888 🔜 (2026-08-11):** enterprise phase H «GPU admission + worker limits
 (single-host)». Pattern mirror: band 104 `ratio96_admin_ops_depth`. `gpu_limits_admin_ops_depth.rs`

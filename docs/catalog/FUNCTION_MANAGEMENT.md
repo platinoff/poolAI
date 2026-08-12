@@ -265,7 +265,7 @@ FM-xxx (з таблиці нижче)
 
 **VDT:** §5.12 = **журнал PH-S*** (≤10 відкритих). Якщо **< 10** — **`абракадабра`** / project scan **всього проєкту**: concept → FM **§5.1** → roadmaps → architect → DOCS_LEGACY → code → §5.13 fallback. Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Project scan». **Rust-first:** API → `tests/`; Playwright лише browser scope.
 
-**Відкритих у §5.12:** **0** (band 124 ✅ · §5.105 PH-S1879…S1888). **Master horizon:** PH-S1889…S1898 (band 125). Vision rev **478**.
+**Відкритих у §5.12:** **0** (band 124 ✅ · §5.105 PH-S1879…S1888). **Master horizon:** PH-S1899.S1908 (band 126). Vision rev **479**.
 
 **Историчний research backlog (PH-S65+):**
 
@@ -3281,4 +3281,13 @@ git log -S "PutArtifact" --oneline -n 20 -- src/
 
 - [FUNCTIONALITY_DIGEST_2026-04-06.md](./FUNCTIONALITY_DIGEST_2026-04-06.md)  
 - [STABLE_STATE_SUMMARY.md](../status/STABLE_STATE_SUMMARY.md)  
-- [STRUCTURE.md](../STRUCTURE.md) (таксономія `docs/`)
+- [STRUCTURE.md](../STRUCTURE.md) (таксономія `docs/`)### 5.127 GPULimits migration 3 (PH-S1909.S1918, band 127, 2026-08-12) ✅
+**Истояне 5.12:** πόρόмая 0 (band 126 ✅ · §5.127 PH-S1909.S1918). \master horizon: PH-S1909.S1918 (band 127). Vision rev 479.
+
+### 5.107 GPULimits migration 3 queue - band 127 (PH-S1909.S1918, 2026-08-12) ✅
+**Истояне:** master backlog band 127 (H GPULimits ✅ · migration 3) - enterprise phase H (GPU admission + worker limits, single-host). Pattern mirror: band 125 (�xa75.106) durable gpu_limits.json; migration 3 glue: bin/verify-dev-stand.sh + bin/run-poolai.sh. Canon: GPU_LIMITS.md ✅ PH_S_MASTER_BACKLOG_1000.md ✅ PH_S_ENTERPRISE_ROADMAP_2026-07-19.md.
+### 5.128 GPULimits migration 4 (PH-S1919.S1928, band 128, 2026-08-14) ✅
+**????????? ? 5.12:** \u00cf\u00cf\u00cf\u00cf 0 (band 127 ✅ · §5.128 PH-S1919.S1928). \u00d7\u00d7\u00d7\u00d7 Vision rev 479.
+
+### 5.108 GPULimits migration 4 queue - band 128 (PH-S1919.S1928, 2026-08-14) ✅
+\u00d8\u00d8\u00d8\u00d8 master backlog band 128 (H GPULimits ✅ · migration 4) - enterprise phase H (GPU admission + worker limits, single-host). Pattern mirror: band 126 (�xa75.106) durable gpu_limits.json; migration 4 glue: bin/verify-dev-stand.sh + bin/run-poolai.sh. Canon: GPU_LIMITS.md ✅ PH_S_MASTER_BACKLOG_1000.md ✅ PH_S_ENTERPRISE_ROADMAP_2026-07-19.md.

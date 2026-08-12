@@ -281,13 +281,95 @@ pub async fn admin_dashboard() -> Html<String> {
         showNotification(T('admin.gpuLimits.refreshErr', 'GPU limits refresh failed: ') + e.message, 'error');
       }
     }
-    
+
+    function renderGpuLimitsMigrationBadge(wire) {
+      const el = document.getElementById('gpu-limits-migration-badge');
+      if (!el) return;
+      const avail = !!(wire && wire.available);
+      const active = !!(wire && wire.admission_active);
+      const hint = T('admin.gpuLimits.migrationHint', 'GPU limits migration read from gpu_limits.json');
+      const state = avail
+        ? T('admin.gpuLimits.migrationLabel', 'GPU limits migration:') + ' ' +
+          (active ? T('admin.gpuLimits.migrationOn', 'migration on') : T('admin.gpuLimits.migrationOff', 'migration off'))
+        : T('admin.gpuLimits.migrationMissing', 'migration unavailable');
+      const badge = avail ? (active ? 'active' : 'inactive') : 'error';
+      el.innerHTML =
+        '<span class="status-badge ' + badge + '" title="' + escapeHtml(hint) + '">' +
+        escapeHtml(state) + '</span>';
+    }
+
+    async function loadGpuLimitsMigrationWire() {
+      const el = document.getElementById('gpu-limits-migration-badge');
+      if (el) {
+        el.textContent = T('admin.gpuLimits.migrationLoading', 'Loading migration…');
+      }
+      try {
+        const wire = await fetchJson('/api/v1/gpu-limits-migration');
+        renderGpuLimitsMigrationBadge(wire);
+      } catch (e) {
+        if (el) {
+          el.innerHTML = '<span class="status-badge error">' +
+            escapeHtml(T('admin.gpuLimits.migrationErr', 'GPU limits migration wire unavailable')) + '</span>';
+        }
+      }
+}
+
+    async function refreshGpuLimitsMigration() {
+      try {
+        await loadGpuLimitsMigrationWire();
+        showNotification(T('admin.gpuLimits.migrationRefreshOk', 'GPU limits migration refreshed'), 'success');
+      } catch (e) {
+        showNotification(T('admin.gpuLimits.migrationRefreshErr', 'GPU limits migration refresh failed: ') + e.message, 'error');
+      }
+    }
+
+    function renderGpuLimitsMigrationBadge(u wire) {
+      const el = document.getElementById('gpu-limits-migration-badge');
+      if (!el) return;
+      const avail = !!(wire && wire.available);
+      const active = !!(wire && wire.admission_active);
+      const hint = T('admin.gpuLimits.migrationHint', 'GPU limits migration read from gpu_limits.json');
+      const state = avail
+        ? T('admin.gpuLimits.migrationLabel', 'GPU limits migration:') + ' ' +
+          (active ? T('admin.gpuLimits.migrationOn', 'migration on') : T('admin.gpuLimits.migrationOff', 'migration off'))
+        : T('admin.gpuLimits.migrationMissing', 'migration unavailable');
+      const badge = avail ? (active ? 'active' : 'inactive') : 'error';
+      el.innerHTML =
+        '<span class="status-badge ' + badge + '" title="' + escapeHtml(hint) + '">' +
+        escapeHtml(state) + '</span>';
+    }
+
+    async function loadGpuLimitsMigrationWire() {
+      const el = document.getElementById('gpu-limits-migration-badge');
+      if (el) {
+        el.textContent = T('admin.gpuLimits.migrationLoading', 'Loading migration…');
+      }
+      try {
+        const wire = await fetchJson('/api/v1/gpu-limits-migration');
+        renderGpuLimitsMigrationBadge(wire);
+      } catch (e) {
+        if (el) {
+          el.innerHTML = '<span class="status-badge error">' +
+            escapeHtml(T('admin.gpuLimits.migrationErr', 'GPU limits migration wire unavailable')) + '</span>';
+        }
+      }
+    }
+
+    async function refreshGpuLimitsMigration() {
+      try {
+        await loadGpuLimitsMigrationWire();
+        showNotification(T('admin.gpuLimits.migrationRefreshOk', 'GPU limits migration refreshed'), 'success');
+      } catch (e) {
+        showNotification(T('admin.gpuLimits.migrationRefreshErr', 'GPU limits migration refresh failed: ') + e.message, 'error');
+      }
+    }
+
     loadSystemOverview();
     renderMetricsChart();
     loadRatio96StoreWire();
     loadGpuLimitsStoreWire();
-    poolaiStartMetricsPolling(loadSystemOverview, 10000);
-    poolaiStartMetricsPolling(renderMetricsChart, 30000);
+    loadGpuLimitsMigrationWire();
+    poolaiStartMetricsPolling(loadSystemOverview, 30000);
     "#;
 
     admin_layout_dashboard(
@@ -327,7 +409,12 @@ pub async fn admin_dashboard() -> Html<String> {
             <button type="button" class="btn" onclick="refreshGpuLimits()" data-i18n="admin.gpuLimits.btn.refresh" data-i18n-aria="admin.gpuLimits.btn.refresh">Refresh</button>
           </div>
         </div>
-        "#,
+        <div class="admin-card">
+            <h3 data-i18n="admin.gpuLimits.cardTitle">GPU Limits Migration (Phase H)</h3>
+            <span id="gpu-limits-migration-badge" class="muted" data-i18n="admin.gpuLimits.migrationLoading">Loading migration…</span>
+            <button type="button" class="btn" onclick="refreshGpuLimitsMigration()" data-i18n="admin.gpuLimits.btn.refresh" data-i18n-aria="admin.gpuLimits.btn.refresh">Refresh</button>
+          </div>
+          "#,
         script,
     )
 }
