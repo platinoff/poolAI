@@ -668,7 +668,10 @@ pub const ADMIN_DASHBOARD_EN: &[I18nRow<'_>] = &[
     ("admin.gpuLimits.btn.refresh", "Refresh"),
     ("admin.gpuLimits.refreshOk", "GPU limits refreshed"),
     ("admin.gpuLimits.refreshErr", "GPU limits refresh failed: "),
-    ("admin.gpuLimits.migrationTitle", "GPU Limits Migration (Phase H)"),
+    (
+        "admin.gpuLimits.migrationTitle",
+        "GPU Limits Migration (Phase H)",
+    ),
     ("admin.gpuLimits.migrationLoading", "Loading migration…"),
     ("admin.gpuLimits.migrationLabel", "GPU limits migration:"),
     (
@@ -678,8 +681,14 @@ pub const ADMIN_DASHBOARD_EN: &[I18nRow<'_>] = &[
     ("admin.gpuLimits.migrationOn", "migration on"),
     ("admin.gpuLimits.migrationOff", "migration off"),
     ("admin.gpuLimits.migrationMissing", "migration unavailable"),
-    ("admin.gpuLimits.migrationRefreshOk", "GPU limits migration refreshed"),
-    ("admin.gpuLimits.migrationRefreshErr", "GPU limits migration refresh failed: "),
+    (
+        "admin.gpuLimits.migrationRefreshOk",
+        "GPU limits migration refreshed",
+    ),
+    (
+        "admin.gpuLimits.migrationRefreshErr",
+        "GPU limits migration refresh failed: ",
+    ),
 ];
 
 /// Ukrainian admin dashboard keys (PH-S228).

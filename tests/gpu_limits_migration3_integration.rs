@@ -2,8 +2,8 @@
 //! Marker: `gpu_limits_migration3_contracts` · Module: `gpu_limits_migration3_integration`.
 
 use poolai_ui_core::gpu_limits_migration3_depth::{
-    gpu_limits_migration3_criteria_total, gpu_limits_migration_depth3_stub, GpuLimitsMigrationDepth3,
-    GPU_LIMITS_MIGRATION3_CASES, GPU_LIMITS_MIGRATION3_CRITERIA,
+    gpu_limits_migration3_criteria_total, gpu_limits_migration_depth3_stub,
+    GpuLimitsMigrationDepth3, GPU_LIMITS_MIGRATION3_CASES, GPU_LIMITS_MIGRATION3_CRITERIA,
 };
 use serde_json::json;
 
