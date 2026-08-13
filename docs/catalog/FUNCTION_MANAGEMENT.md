@@ -3302,8 +3302,8 @@ git log -S "PutArtifact" --oneline -n 20 -- src/
 **????????? ? 5.12:** \u00cf\u00cf\u00cf\u00cf 0 (band 130 ✅ · §5.131 PH-S1949.S1958). \u00d7\u00d7\u00d7\u00d7 Vision rev 481.
 
 ### 5.109 GPULimits UI debug 1 queue - band 131 (PH-S1949.S1958, 2026-08-17) ✅
-\u00d8\u00d8\u00d8\u00d8 master backlog band 131 (H GPULimits ✅ · UI debug 5) - enterprise phase H (GPU admission + worker limits, single-host). Pattern mirror: band 128 (�xa75.108) durable gpu_limits.json; UI debug 5 glue: bin/verify-dev-stand.sh + bin/run-poolai.sh. Canon: GPU_LIMITS.md ✅ PH_S_MASTER_BACKLOG_1000.md ✅ PH_S_ENTERPRISE_ROADMAP_2026-07-19.md.### 5.132 GPULimits UI debug 2 (PH-S1959.S1968, band 132, 2026-08-18) ✅
+\u00d8\u00d8\u00d8\u00d8 master backlog band 131 (H GPULimits ✅ · UI debug 5) - enterprise phase H (GPU admission + worker limits, single-host). Pattern mirror: band 128 (§a75.108) durable gpu_limits.json; UI debug 5 glue: bin/verify-dev-stand.sh + bin/run-poolai.sh. Canon: GPU_LIMITS.md ✅ PH_S_MASTER_BACKLOG_1000.md ✅ PH_S_ENTERPRISE_ROADMAP_2026-07-19.md.### 5.132 GPULimits UI debug 2 (PH-S1959.S1968, band 132, 2026-08-18) ✅
 **????????? ? 5.12:** \u00cf\u00cf\u00cf\u00cf 0 (band 131 ✅ · §5.132 PH-S1959.S1968). \u00d7\u00d7\u00d7\u00d7 Vision rev 481.
 
 ### 5.110 GPULimits UI debug 2 queue - band 132 (PH-S1959.S1968, 2026-08-18) ✅
-\u00d8\u00d8\u00d8\u00d8 master backlog band 132 (H GPULimits ✅ · UI debug 6) - enterprise phase H (GPU admission + worker limits, single-host). Pattern mirror: band 129 (�xa75.110) durable gpu_limits.json; UI debug 6 glue: bin/verify-dev-stand.sh + bin/run-poolai.sh. Canon: GPU_LIMITS.md ✅ PH_S_MASTER_BACKLOG_1000.md ✅ PH_S_ENTERPRISE_ROADMAP_2026-07-19.md.
+\u00d8\u00d8\u00d8\u00d8 master backlog band 132 (H GPULimits ✅ · UI debug 6) - enterprise phase H (GPU admission + worker limits, single-host). Pattern mirror: band 129 (§a75.110) durable gpu_limits.json; UI debug 6 glue: bin/verify-dev-stand.sh + bin/run-poolai.sh. Canon: GPU_LIMITS.md ✅ PH_S_MASTER_BACKLOG_1000.md ✅ PH_S_ENTERPRISE_ROADMAP_2026-07-19.md.
