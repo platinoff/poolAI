@@ -34,6 +34,7 @@ pub mod gpu_limits_admin_ops_depth;
 pub mod gpu_limits_api_depth;
 pub mod gpu_limits_debug1_depth;
 pub mod gpu_limits_debug2_depth;
+pub mod gpu_limits_debug3_depth;
 pub mod gpu_limits_depth;
 pub mod gpu_limits_migration2_depth;
 pub mod gpu_limits_migration3_depth;
