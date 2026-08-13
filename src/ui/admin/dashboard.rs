@@ -242,13 +242,13 @@ pub async fn admin_dashboard() -> Html<String> {
     }
 
     function renderGpuLimitsStoreBadge(wire) {
-      const el = document.getElementById('gpu-limits-store-badge');
+      const el = document.getElementById('debug-limits-store-badge');
       if (!el) return;
       const avail = !!(wire && wire.available);
       const active = !!(wire && wire.admission_active);
       const hint = T('admin.gpuLimits.storeHint', 'GPU admission limits read from gpu_limits.json');
       const state = avail
-        ? T('admin.gpuLimits.storeLabel', 'GPU limits:') + ' ' +
+        ? T('admin.debug.migrationLabel', 'GPU limits:') + ' ' +
           (active ? T('admin.gpuLimits.admissionOn', 'admission on') : T('admin.gpuLimits.admissionOff', 'admission off'))
         : T('admin.gpuLimits.storeMissing', 'store unavailable');
       const badge = avail ? (active ? 'active' : 'inactive') : 'error';
@@ -257,13 +257,13 @@ pub async fn admin_dashboard() -> Html<String> {
         escapeHtml(state) + '</span>';
     }
 
-    async function loadGpuLimitsStoreWire() {
-      const el = document.getElementById('gpu-limits-store-badge');
+    async function loadDebugLimitsStoreWire() {
+      const el = document.getElementById('debug-limits-store-badge');
       if (el) {
         el.textContent = T('admin.gpuLimits.storeLoading', 'Loading GPU limits…');
       }
       try {
-        const wire = await fetchJson('/api/v1/gpu-limits');
+        const wire = await fetchJson('/api/v1/debug/ui');
         renderGpuLimitsStoreBadge(wire);
       } catch (e) {
         if (el) {
@@ -273,9 +273,9 @@ pub async fn admin_dashboard() -> Html<String> {
       }
     }
 
-    async function refreshGpuLimits() {
+    async function refreshDebugLimits() {
       try {
-        await loadGpuLimitsStoreWire();
+        await loadDebugLimitsStoreWire();
         showNotification(T('admin.gpuLimits.refreshOk', 'GPU limits refreshed'), 'success');
       } catch (e) {
         showNotification(T('admin.gpuLimits.refreshErr', 'GPU limits refresh failed: ') + e.message, 'error');
@@ -304,7 +304,7 @@ pub async fn admin_dashboard() -> Html<String> {
         el.textContent = T('admin.gpuLimits.migrationLoading', 'Loading migration…');
       }
       try {
-        const wire = await fetchJson('/api/v1/gpu-limits-migration');
+        const wire = await fetchJson('/api/v1/debug/ui-migration');
         renderGpuLimitsMigrationBadge(wire);
       } catch (e) {
         if (el) {
@@ -314,7 +314,7 @@ pub async fn admin_dashboard() -> Html<String> {
       }
 }
 
-    async function refreshGpuLimitsMigration() {
+    async function refreshDebugLimitsMigration() {
       try {
         await loadGpuLimitsMigrationWire();
         showNotification(T('admin.gpuLimits.migrationRefreshOk', 'GPU limits migration refreshed'), 'success');
@@ -345,7 +345,7 @@ pub async fn admin_dashboard() -> Html<String> {
         el.textContent = T('admin.gpuLimits.migrationLoading', 'Loading migration…');
       }
       try {
-        const wire = await fetchJson('/api/v1/gpu-limits-migration');
+        const wire = await fetchJson('/api/v1/debug/ui-migration');
         renderGpuLimitsMigrationBadge(wire);
       } catch (e) {
         if (el) {
@@ -355,7 +355,7 @@ pub async fn admin_dashboard() -> Html<String> {
       }
     }
 
-    async function refreshGpuLimitsMigration() {
+    async function refreshDebugLimitsMigration() {
       try {
         await loadGpuLimitsMigrationWire();
         showNotification(T('admin.gpuLimits.migrationRefreshOk', 'GPU limits migration refreshed'), 'success');
@@ -367,7 +367,7 @@ pub async fn admin_dashboard() -> Html<String> {
     loadSystemOverview();
     renderMetricsChart();
     loadRatio96StoreWire();
-    loadGpuLimitsStoreWire();
+    loadDebugLimitsStoreWire();
     loadGpuLimitsMigrationWire();
     poolaiStartMetricsPolling(loadSystemOverview, 30000);
     "#;
@@ -405,14 +405,14 @@ pub async fn admin_dashboard() -> Html<String> {
           </div>
           <div class="admin-card">
             <h3 data-i18n="admin.gpuLimits.cardTitle">GPU Limits (Phase H)</h3>
-            <span id="gpu-limits-store-badge" class="muted" data-i18n="admin.gpuLimits.storeLoading">Loading GPU limits…</span>
-            <button type="button" class="btn" onclick="refreshGpuLimits()" data-i18n="admin.gpuLimits.btn.refresh" data-i18n-aria="admin.gpuLimits.btn.refresh">Refresh</button>
+            <span id="debug-limits-store-badge" class="muted" data-i18n="admin.gpuLimits.storeLoading">Loading GPU limits…</span>
+            <button type="button" class="btn" onclick="refreshDebugLimits()" data-i18n="admin.debug.btn.refresh" data-i18n-aria="admin.debug.btn.refresh">Refresh</button>
           </div>
         </div>
         <div class="admin-card">
             <h3 data-i18n="admin.gpuLimits.cardTitle">GPU Limits Migration (Phase H)</h3>
             <span id="gpu-limits-migration-badge" class="muted" data-i18n="admin.gpuLimits.migrationLoading">Loading migration…</span>
-            <button type="button" class="btn" onclick="refreshGpuLimitsMigration()" data-i18n="admin.gpuLimits.btn.refresh" data-i18n-aria="admin.gpuLimits.btn.refresh">Refresh</button>
+            <button type="button" class="btn" onclick="refreshDebugLimitsMigration()" data-i18n="admin.debug.btn.refresh" data-i18n-aria="admin.debug.btn.refresh">Refresh</button>
           </div>
           "#,
         script,
@@ -443,10 +443,10 @@ async fn admin_dashboard_ratio96_store_strip_ph_s1682() {
 #[tokio::test]
 async fn admin_dashboard_gpu_limits_store_strip_ph_s1882() {
     let html = admin_dashboard().await.0;
-    assert!(html.contains("gpu-limits-store-badge"));
-    assert!(html.contains("loadGpuLimitsStoreWire"));
-    assert!(html.contains("/api/v1/gpu-limits"));
-    assert!(html.contains("refreshGpuLimits"));
-    assert!(html.contains("admin.gpuLimits.storeLabel"));
-    assert!(html.contains("admin.gpuLimits.btn.refresh"));
+    assert!(html.contains("debug-limits-store-badge"));
+    assert!(html.contains("loadDebugLimitsStoreWire"));
+    assert!(html.contains("/api/v1/debug/ui"));
+    assert!(html.contains("refreshDebugLimits"));
+    assert!(html.contains("admin.debug.migrationLabel"));
+    assert!(html.contains("admin.debug.btn.refresh"));
 }

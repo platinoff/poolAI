@@ -1,0 +1,4232 @@
+﻿//! UI i18n subsets moved from `i18n_core.js` (PH-S154 admin jobs/grid; PH-S162 auth/dash shell; PH-S197 updates-compat; PH-S207 monitoring; PH-S211 jobs-only patch; PH-S214 raid-only patch; PH-S217 grid-pricing-only patch).
+//!
+//! UI i18n subsets moved from `i18n_core.js` (PH-S154 admin jobs/grid; PH-S162 auth/dash shell; PH-S197 updates-compat; PH-S207 monitoring; PH-S211 jobs-only patch; PH-S214 raid-only patch; PH-S217 grid-pricing-only patch).
+//!
+//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154); jobs â€” `admin_jobs_patch` (PH-S211); raid â€” `admin_raid_patch` (PH-S214); dashboard â€” `admin_dashboard_patch` (PH-S228); audit â€” `admin_audit_patch` (PH-S229); tenants â€” `admin_tenants_patch` (PH-S230); security â€” `admin_security_patch` (PH-S231); topology â€” `admin_topology_patch` (PH-S234); instances â€” `admin_instances_patch` (PH-S236); vm â€” `admin_vm_patch` (PH-S237); vm modal â€” `vm_modal_patch` (PH-S248); users â€” `admin_users_patch` (PH-S238); config â€” `admin_config_patch` (PH-S239); table toolbar â€” `admin_table_patch` (PH-S240); shared status â€” `admin_status_patch` (PH-S245); err hints â€” `admin_err_patch` (PH-S246/S259); ui.confirm glue â€” `admin_ui_confirm_patch` (PH-S252); form â€” `admin_form_patch` (PH-S259); ui toolbar â€” `admin_ui_toolbar_patch` (PH-S260); home â€” `admin_home_patch` (PH-S258); workers panel â€” `workers_panel_patch` (PH-S257); monitoring â€” `admin_monitoring_patch` (PH-S220); updates-compat â€” `admin_updates_compat_patch` (PH-S221); workers â€” `admin_workers_patch` (PH-S222/S257); libs â€” `admin_libs_patch` (PH-S223).
+//! Auth + dashboard shell: `window.__poolaiAuthDashI18nRust` on login, dashboard layout, admin layout (PH-S162).
+
+use std::collections::BTreeMap;
+
+/// Single locale row: `(i18n key, translated value)`.
+pub type I18nRow<'a> = (&'a str, &'a str);
+
+/// English admin jobs keys (subset moved from `i18n_core.js`; PH-S211).
+pub const ADMIN_JOBS_EN: &[I18nRow<'_>] = &[
+    ("admin.page.jobs", "Jobs"),
+    ("admin.jobs.section", "Jobs"),
+    ("admin.jobs.loading", "Loading jobsâ€¦"),
+    ("admin.jobs.empty", "No jobs yet"),
+    ("admin.jobs.errLoad", "Error loading jobs: "),
+    ("admin.jobs.storeLoading", "Loading storeâ€¦"),
+    ("admin.jobs.storeLabel", "Store:"),
+    (
+        "admin.jobs.storeHint",
+        "Job persistence backend (POOLAI_JOB_STORE)",
+    ),
+    (
+        "admin.jobs.hint",
+        "Job queue from the coordinator store. Backend is set at startup via POOLAI_JOB_STORE. Lease columns are read-only; lease state badge is derived from lease_expires_at (Galaxy Â§4.3.1).",
+    ),
+    ("admin.jobs.store.json", "JSON"),
+    ("admin.jobs.store.sqlite", "SQLite"),
+    ("admin.jobs.store.raid", "RAID"),
+    ("admin.jobs.col.id", "ID"),
+    ("admin.jobs.col.kind", "Kind"),
+    ("admin.jobs.col.status", "Status"),
+    ("admin.jobs.col.created", "Created"),
+    ("admin.jobs.col.worker", "Worker"),
+    ("admin.jobs.col.vm", "VM"),
+    ("admin.jobs.col.leaseOwner", "Lease owner"),
+    ("admin.jobs.col.leaseEpoch", "Epoch"),
+    ("admin.jobs.col.leaseState", "Lease state"),
+    ("admin.jobs.col.leaseExpires", "Lease expires"),
+    (
+        "admin.jobs.tooltip.leaseOwnerCol",
+        "Galaxy Â§4.3.1: holder of the active job lease",
+    ),
+    (
+        "admin.jobs.tooltip.leaseEpochCol",
+        "Monotonic CAS counter for renew / PATCH / grid result",
+    ),
+    (
+        "admin.jobs.tooltip.leaseStateCol",
+        "Derived from lease_expires_at vs coordinator clock",
+    ),
+    (
+        "admin.jobs.tooltip.leaseExpiresCol",
+        "UTC expiry; worker renew extends this timestamp",
+    ),
+    (
+        "admin.jobs.tooltip.leaseOwner",
+        "Galaxy Â§4.3.1: worker or peer id holding the active lease (acquire/renew CAS owner).",
+    ),
+    (
+        "admin.jobs.tooltip.leaseEpoch",
+        "Monotonic CAS generation; PATCH, renew, and grid result must match this epoch.",
+    ),
+    ("admin.jobs.leaseState.active", "Active"),
+    ("admin.jobs.leaseState.expired", "Expired"),
+    ("admin.jobs.status.migrating", "Migrating"),
+    (
+        "admin.jobs.tooltip.statusMigrating",
+        "Galaxy re-migrate: worker handoff in progress (PH-S104).",
+    ),
+];
+
+/// English grid-pricing keys (subset moved from `i18n_core.js`; PH-S217 slim patch).
+pub const ADMIN_GRID_PRICING_EN: &[I18nRow<'_>] = &[
+    ("admin.page.gridPricing", "Grid pricing"),
+    ("admin.gridPricing.section", "Grid pricing"),
+    (
+        "admin.gridPricing.hint",
+        "Read-only Galaxy pricing oracle snapshot. Configure L2 fallback via POOLAI_GALAXY_PRICING_FALLBACK_JSON when providers are unavailable.",
+    ),
+    ("admin.gridPricing.fetch", "Fetch snapshot"),
+    ("admin.gridPricing.taskProfile", "Task profile"),
+    ("admin.gridPricing.modelProfile", "Model profile"),
+    ("admin.gridPricing.unitKey", "Unit key"),
+    ("admin.gridPricing.loading", "Loading pricingâ€¦"),
+    ("admin.gridPricing.errLoad", "Error loading pricing: "),
+    ("admin.gridPricing.result", "Pricing snapshot"),
+    ("admin.gridPricing.col.task", "Task profile"),
+    ("admin.gridPricing.col.model", "Model profile"),
+    ("admin.gridPricing.col.unit", "Unit key"),
+    ("admin.gridPricing.col.price", "Price (USD)"),
+    ("admin.gridPricing.col.updated", "Updated at"),
+    ("admin.gridPricing.col.source", "Source"),
+    ("admin.gridPricing.col.freshness", "Freshness"),
+    ("admin.gridPricing.feeSplitTitle", "Fee split (Galaxy Â§1.2)"),
+    (
+        "admin.gridPricing.feeSplitHint",
+        "Read-only strip from GET /api/v1/grid/fee-split-metrics reconciled with /metrics (PH-S780â€¦S781).",
+    ),
+    (
+        "admin.gridPricing.feeSplitLoading",
+        "Loading fee split metricsâ€¦",
+    ),
+];
+
+/// Ukrainian admin jobs keys (PH-S211).
+pub const ADMIN_JOBS_UK: &[I18nRow<'_>] = &[
+    ("admin.page.jobs", "Ð—Ð°Ð´Ð°Ñ‡Ñ–"),
+    ("admin.jobs.section", "Ð—Ð°Ð´Ð°Ñ‡Ñ–"),
+    ("admin.jobs.loading", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ Ð·Ð°Ð´Ð°Ñ‡â€¦"),
+    ("admin.jobs.empty", "Ð—Ð°Ð´Ð°Ñ‡ Ñ‰Ðµ Ð½ÐµÐ¼Ð°Ñ”"),
+    ("admin.jobs.errLoad", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ Ð·Ð°Ð´Ð°Ñ‡: "),
+    ("admin.jobs.storeLoading", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ ÑÑ…Ð¾Ð²Ð¸Ñ‰Ð°â€¦"),
+    ("admin.jobs.storeLabel", "Ð¡Ñ…Ð¾Ð²Ð¸Ñ‰Ðµ:"),
+    (
+        "admin.jobs.storeHint",
+        "Ð‘ÐµÐºÐµÐ½Ð´ Ð¿ÐµÑ€ÑÐ¸ÑÑ‚ÐµÐ½Ñ†Ñ–Ñ— Ð·Ð°Ð´Ð°Ñ‡ (POOLAI_JOB_STORE)",
+    ),
+    (
+        "admin.jobs.hint",
+        "Ð§ÐµÑ€Ð³Ð° Ð·Ð°Ð´Ð°Ñ‡ ÐºÐ¾Ð¾Ñ€Ð´Ð¸Ð½Ð°Ñ‚Ð¾Ñ€Ð°. Ð‘ÐµÐºÐµÐ½Ð´ â€” POOLAI_JOB_STORE. ÐšÐ¾Ð»Ð¾Ð½ÐºÐ¸ lease read-only; badge ÑÑ‚Ð°Ð½Ñƒ lease Ñ„Ð¾Ñ€Ð¼ÑƒÑ”Ñ‚ÑŒÑÑ Ð· lease_expires_at (Galaxy Â§4.3.1).",
+    ),
+    ("admin.jobs.store.json", "JSON"),
+    ("admin.jobs.store.sqlite", "SQLite"),
+    ("admin.jobs.store.raid", "RAID"),
+    ("admin.jobs.col.id", "ID"),
+    ("admin.jobs.col.kind", "Ð¢Ð¸Ð¿"),
+    ("admin.jobs.col.status", "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ"),
+    ("admin.jobs.col.created", "Ð¡Ñ‚Ð²Ð¾Ñ€ÐµÐ½Ð¾"),
+    ("admin.jobs.col.worker", "Ð’Ð¾Ñ€ÐºÐµÑ€"),
+    ("admin.jobs.col.vm", "VM"),
+    ("admin.jobs.col.leaseOwner", "Ð’Ð»Ð°ÑÐ½Ð¸Ðº lease"),
+    ("admin.jobs.col.leaseEpoch", "Epoch"),
+    ("admin.jobs.col.leaseState", "Ð¡Ñ‚Ð°Ð½ lease"),
+    ("admin.jobs.col.leaseExpires", "Lease Ð´Ð¾"),
+    (
+        "admin.jobs.tooltip.leaseOwnerCol",
+        "Galaxy Â§4.3.1: Ñ…Ñ‚Ð¾ Ñ‚Ñ€Ð¸Ð¼Ð°Ñ” Ð°ÐºÑ‚Ð¸Ð²Ð½Ð¸Ð¹ lease Ð·Ð°Ð´Ð°Ñ‡Ñ–",
+    ),
+    (
+        "admin.jobs.tooltip.leaseEpochCol",
+        "ÐœÐ¾Ð½Ð¾Ñ‚Ð¾Ð½Ð½Ð¸Ð¹ CAS Ð´Ð»Ñ renew / PATCH / grid result",
+    ),
+    (
+        "admin.jobs.tooltip.leaseStateCol",
+        "Ð— lease_expires_at Ð²Ñ–Ð´Ð½Ð¾ÑÐ½Ð¾ Ð³Ð¾Ð´Ð¸Ð½Ð½Ð¸ÐºÐ° ÐºÐ¾Ð¾Ñ€Ð´Ð¸Ð½Ð°Ñ‚Ð¾Ñ€Ð°",
+    ),
+    (
+        "admin.jobs.tooltip.leaseExpiresCol",
+        "UTC Ð·Ð°ÐºÑ–Ð½Ñ‡ÐµÐ½Ð½Ñ; worker renew Ð¿Ð¾Ð´Ð¾Ð²Ð¶ÑƒÑ” timestamp",
+    ),
+    (
+        "admin.jobs.tooltip.leaseOwner",
+        "Galaxy Â§4.3.1: id Ð²Ð¾Ñ€ÐºÐµÑ€Ð° Ð°Ð±Ð¾ peer Ð· Ð°ÐºÑ‚Ð¸Ð²Ð½Ð¸Ð¼ lease (acquire/renew CAS).",
+    ),
+    (
+        "admin.jobs.tooltip.leaseEpoch",
+        "ÐœÐ¾Ð½Ð¾Ñ‚Ð¾Ð½Ð½Ð¸Ð¹ CAS; PATCH, renew Ñ– grid result Ð¼Ð°ÑŽÑ‚ÑŒ Ð·Ð±Ñ–Ð³Ð°Ñ‚Ð¸ÑÑ Ð· Ñ†Ð¸Ð¼ epoch.",
+    ),
+    ("admin.jobs.leaseState.active", "ÐÐºÑ‚Ð¸Ð²Ð½Ð¸Ð¹"),
+    ("admin.jobs.leaseState.expired", "ÐŸÑ€Ð¾Ñ‚ÐµÑ€Ð¼Ñ–Ð½Ð¾Ð²Ð°Ð½Ð¸Ð¹"),
+    ("admin.jobs.status.migrating", "ÐœÑ–Ð³Ñ€Ð°Ñ†Ñ–Ñ"),
+    (
+        "admin.jobs.tooltip.statusMigrating",
+        "Galaxy re-migrate: Ð¿ÐµÑ€ÐµÐ´Ð°Ñ‡Ð° Ð²Ð¾Ñ€ÐºÐµÑ€Ð° Ð² Ð¿Ñ€Ð¾Ñ†ÐµÑÑ– (PH-S104).",
+    ),
+];
+
+/// English RAID admin keys (subset moved from `i18n_core.js`; PH-S214).
+pub const ADMIN_RAID_EN: &[I18nRow<'_>] = &[
+    ("admin.page.raid", "RAID Management"),
+    ("admin.raidadm.loading", "Loading RAID adminâ€¦"),
+    ("admin.raidadm.loadingArt", "Loading artifactsâ€¦"),
+    ("admin.raidadm.errLoad", "Error loading RAID data: "),
+    ("admin.raidadm.unknown", "Unknown"),
+    ("admin.raidadm.strategyTitle", "RAID Strategy Status"),
+    ("admin.raidadm.clusterTitle", "Cluster status"),
+    ("admin.raidadm.raftTitle", "Raft consensus"),
+    ("admin.raidadm.label.cluster", "Cluster:"),
+    ("admin.raidadm.label.nodes", "Nodes:"),
+    ("admin.raidadm.label.artCount", "Artifacts:"),
+    ("admin.raidadm.label.storageUse", "Storage used:"),
+    ("admin.raidadm.label.replStatus", "Replication:"),
+    ("admin.raidadm.label.raftRole", "Role:"),
+    ("admin.raidadm.label.raftTerm", "Term:"),
+    ("admin.raidadm.label.raftLeader", "Leader ID:"),
+    (
+        "admin.raidadm.raftAbsent",
+        "Raft not attached (build without consensus or node not initialized).",
+    ),
+    ("admin.raidadm.label.mode", "Mode:"),
+    ("admin.raidadm.label.init", "Initialized:"),
+    ("admin.raidadm.label.active", "Active:"),
+    ("admin.raidadm.label.rebal", "Rebalancing Enabled:"),
+    ("admin.raidadm.burstTitle", "BurstRAID Metrics"),
+    ("admin.raidadm.label.totalArt", "Total Artifacts:"),
+    ("admin.raidadm.label.artBurst", "Artifacts in Burst:"),
+    ("admin.raidadm.label.repl", "Replication (base / max):"),
+    ("admin.raidadm.label.totalReq", "Total Requests:"),
+    ("admin.raidadm.label.burstRps", "Burst threshold (RPS):"),
+    ("admin.raidadm.label.swRepl", "Base replication:"),
+    (
+        "admin.raidadm.burstInactive",
+        "BurstRAID strategy not active on this node.",
+    ),
+    (
+        "admin.raidadm.swInactive",
+        "SmallWorld strategy not active on this node.",
+    ),
+    ("admin.raidadm.sparkBurstPct", "Burst load %"),
+    ("admin.raidadm.sparkClust", "Avg clustering Ã—100"),
+    ("admin.raidadm.btn.rebalance", "Rebalance"),
+    ("admin.raidadm.swTitle", "SmallWorld Network Metrics"),
+    ("admin.raidadm.label.totalNodes", "Total Nodes:"),
+    (
+        "admin.raidadm.label.avgClust",
+        "Avg Clustering Coefficient:",
+    ),
+    ("admin.raidadm.label.tgtClust", "Target Clustering:"),
+    (
+        "admin.raidadm.confirmRebal",
+        "Are you sure you want to trigger RAID rebalancing? This may impact system performance.",
+    ),
+    ("admin.raidadm.rebalOk", "Rebalancing triggered successfully"),
+    ("admin.raidadm.emptyArt", "No artifacts found"),
+    ("admin.raidadm.col.id", "ID"),
+    ("admin.raidadm.col.name", "Name"),
+    ("admin.raidadm.col.size", "Size"),
+    ("admin.raidadm.snapshotTitle", "Current Snapshot"),
+    ("admin.raidadm.seq", "Sequence:"),
+    ("admin.raidadm.created", "Created:"),
+    ("admin.raidadm.restoreBtn", "Restore from Snapshot"),
+    ("admin.raidadm.noSnap", "No snapshot available"),
+    ("admin.raidadm.artTitle", "Artifacts"),
+    ("admin.raidadm.section", "RAID Artifacts"),
+    ("admin.raidadm.btn.upload", "Upload Artifact"),
+    ("admin.raidadm.btn.snapshot", "Create Snapshot"),
+    ("admin.raidadm.btn.sync", "Sync Artifacts"),
+    ("admin.raidadm.btn.gc", "Run GC"),
+    ("admin.raidadm.uploadTitle", "Upload Artifact"),
+    ("admin.raidadm.label.artName", "Artifact Name"),
+    ("admin.raidadm.ph.artName", "my-artifact"),
+    ("admin.raidadm.label.artData", "Artifact Data (Base64)"),
+    ("admin.raidadm.ph.b64", "Paste base64-encoded data here"),
+    (
+        "admin.raidadm.hint.b64",
+        "Paste base64-encoded artifact data",
+    ),
+    ("admin.raidadm.uploading", "Uploadingâ€¦"),
+    ("admin.raidadm.reqNameData", "Name and data are required"),
+    ("admin.raidadm.uploadOk", "Artifact uploaded successfully"),
+    (
+        "admin.raidadm.confirmDelArt",
+        "Delete artifact \"{id}\"? This action cannot be undone.",
+    ),
+    ("admin.raidadm.delOk", "Artifact deleted successfully"),
+    (
+        "admin.raidadm.confirmSnap",
+        "Create a new snapshot? This will capture the current state of all artifacts.",
+    ),
+    ("admin.raidadm.snapOk", "Snapshot created successfully"),
+    ("admin.raidadm.errSnap", "Error creating snapshot: "),
+    (
+        "admin.raidadm.confirmRestore",
+        "Restore from snapshot? This will restore the RAID state from the latest snapshot. This action cannot be undone.",
+    ),
+    ("admin.raidadm.restoring", "Restoring from snapshotâ€¦"),
+    ("admin.raidadm.restoreOk", "Restored from snapshot successfully"),
+    ("admin.raidadm.errRestore", "Error restoring from snapshot: "),
+    ("admin.raidadm.syncOk", "Artifacts sync started"),
+    ("admin.raidadm.errSync", "Error syncing artifacts: "),
+    (
+        "admin.raidadm.confirmGc",
+        "Run garbage collection? This will remove old artifacts that are no longer referenced.",
+    ),
+    (
+        "admin.raidadm.gcOk",
+        "Garbage collection completed. Removed {n} artifacts.",
+    ),
+    ("admin.raidadm.errGc", "Error running GC: "),
+];
+
+/// Ukrainian RAID admin keys (PH-S214).
+pub const ADMIN_RAID_UK: &[I18nRow<'_>] = &[
+    ("admin.page.raid", "ÐšÐµÑ€ÑƒÐ²Ð°Ð½Ð½Ñ RAID"),
+    ("admin.raidadm.loading", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ RAIDâ€¦"),
+    ("admin.raidadm.loadingArt", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ Ð°Ñ€Ñ‚ÐµÑ„Ð°ÐºÑ‚Ñ–Ð²â€¦"),
+    ("admin.raidadm.errLoad", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ RAID: "),
+    ("admin.raidadm.unknown", "ÐÐµÐ²Ñ–Ð´Ð¾Ð¼Ð¾"),
+    ("admin.raidadm.strategyTitle", "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ ÑÑ‚Ñ€Ð°Ñ‚ÐµÐ³Ñ–Ñ— RAID"),
+    ("admin.raidadm.clusterTitle", "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ ÐºÐ»Ð°ÑÑ‚ÐµÑ€Ð°"),
+    ("admin.raidadm.raftTitle", "Raft ÐºÐ¾Ð½ÑÐµÐ½ÑÑƒÑ"),
+    ("admin.raidadm.label.cluster", "ÐšÐ»Ð°ÑÑ‚ÐµÑ€:"),
+    ("admin.raidadm.label.nodes", "Ð’ÑƒÐ·Ð»Ð¸:"),
+    ("admin.raidadm.label.artCount", "ÐÑ€Ñ‚ÐµÑ„Ð°ÐºÑ‚Ð¸:"),
+    ("admin.raidadm.label.storageUse", "Ð¡Ñ…Ð¾Ð²Ð¸Ñ‰Ðµ:"),
+    ("admin.raidadm.label.replStatus", "Ð ÐµÐ¿Ð»Ñ–ÐºÐ°Ñ†Ñ–Ñ:"),
+    ("admin.raidadm.label.raftRole", "Ð Ð¾Ð»ÑŒ:"),
+    ("admin.raidadm.label.raftTerm", "Ð¢ÐµÑ€Ð¼Ñ–Ð½:"),
+    ("admin.raidadm.label.raftLeader", "ID Ð»Ñ–Ð´ÐµÑ€Ð°:"),
+    (
+        "admin.raidadm.raftAbsent",
+        "Raft Ð½Ðµ Ð¿Ñ–Ð´ÐºÐ»ÑŽÑ‡ÐµÐ½Ð¾ (Ð·Ð±Ñ–Ñ€ÐºÐ° Ð±ÐµÐ· ÐºÐ¾Ð½ÑÐµÐ½ÑÑƒÑÑƒ Ð°Ð±Ð¾ Ð²ÑƒÐ·Ð¾Ð» Ð½Ðµ Ñ–Ð½Ñ–Ñ†Ñ–Ð°Ð»Ñ–Ð·Ð¾Ð²Ð°Ð½Ð¾).",
+    ),
+    ("admin.raidadm.label.mode", "Ð ÐµÐ¶Ð¸Ð¼:"),
+    ("admin.raidadm.label.init", "Ð†Ð½Ñ–Ñ†Ñ–Ð°Ð»Ñ–Ð·Ð¾Ð²Ð°Ð½Ð¾:"),
+    ("admin.raidadm.label.active", "ÐÐºÑ‚Ð¸Ð²Ð½Ð¾:"),
+    ("admin.raidadm.label.rebal", "Ð ÐµÐ±Ð°Ð»Ð°Ð½ÑÑƒÐ²Ð°Ð½Ð½Ñ:"),
+    ("admin.raidadm.burstTitle", "ÐœÐµÑ‚Ñ€Ð¸ÐºÐ¸ BurstRAID"),
+    ("admin.raidadm.label.totalArt", "Ð£ÑÑŒÐ¾Ð³Ð¾ Ð°Ñ€Ñ‚ÐµÑ„Ð°ÐºÑ‚Ñ–Ð²:"),
+    ("admin.raidadm.label.artBurst", "Ð£ burst:"),
+    ("admin.raidadm.label.repl", "Ð ÐµÐ¿Ð»Ñ–ÐºÐ°Ñ†Ñ–Ñ (Ð±Ð°Ð·Ð° / Ð¼Ð°ÐºÑ):"),
+    ("admin.raidadm.label.totalReq", "Ð£ÑÑŒÐ¾Ð³Ð¾ Ð·Ð°Ð¿Ð¸Ñ‚Ñ–Ð²:"),
+    ("admin.raidadm.label.burstRps", "ÐŸÐ¾Ñ€Ñ–Ð³ burst (RPS):"),
+    ("admin.raidadm.label.swRepl", "Ð‘Ð°Ð·Ð¾Ð²Ð° Ñ€ÐµÐ¿Ð»Ñ–ÐºÐ°Ñ†Ñ–Ñ:"),
+    (
+        "admin.raidadm.burstInactive",
+        "Ð¡Ñ‚Ñ€Ð°Ñ‚ÐµÐ³Ñ–Ñ BurstRAID Ð½Ðµ Ð°ÐºÑ‚Ð¸Ð²Ð½Ð° Ð½Ð° Ñ†ÑŒÐ¾Ð¼Ñƒ Ð²ÑƒÐ·Ð»Ñ–.",
+    ),
+    (
+        "admin.raidadm.swInactive",
+        "Ð¡Ñ‚Ñ€Ð°Ñ‚ÐµÐ³Ñ–Ñ SmallWorld Ð½Ðµ Ð°ÐºÑ‚Ð¸Ð²Ð½Ð° Ð½Ð° Ñ†ÑŒÐ¾Ð¼Ñƒ Ð²ÑƒÐ·Ð»Ñ–.",
+    ),
+    ("admin.raidadm.sparkBurstPct", "ÐÐ°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ burst %"),
+    ("admin.raidadm.sparkClust", "Ð¡ÐµÑ€ÐµÐ´Ð½Ñ–Ð¹ clustering Ã—100"),
+    ("admin.raidadm.btn.rebalance", "Ð ÐµÐ±Ð°Ð»Ð°Ð½Ñ"),
+    ("admin.raidadm.swTitle", "ÐœÐµÑ€ÐµÐ¶Ð° SmallWorld"),
+    ("admin.raidadm.label.totalNodes", "Ð£ÑÑŒÐ¾Ð³Ð¾ Ð²ÑƒÐ·Ð»Ñ–Ð²:"),
+    ("admin.raidadm.label.avgClust", "Ð¡ÐµÑ€. ÐºÐ¾ÐµÑ„. ÐºÐ»Ð°ÑÑ‚ÐµÑ€Ð¸Ð·Ð°Ñ†Ñ–Ñ—:"),
+    ("admin.raidadm.label.tgtClust", "Ð¦Ñ–Ð»ÑŒÐ¾Ð²Ð¸Ð¹ ÐºÐ¾ÐµÑ„.:"),
+    (
+        "admin.raidadm.confirmRebal",
+        "Ð—Ð°Ð¿ÑƒÑÑ‚Ð¸Ñ‚Ð¸ Ñ€ÐµÐ±Ð°Ð»Ð°Ð½ÑÑƒÐ²Ð°Ð½Ð½Ñ RAID? ÐœÐ¾Ð¶Ð»Ð¸Ð²Ðµ Ð½Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ Ð½Ð° ÑÐ¸ÑÑ‚ÐµÐ¼Ñƒ.",
+    ),
+    ("admin.raidadm.rebalOk", "Ð ÐµÐ±Ð°Ð»Ð°Ð½ÑÑƒÐ²Ð°Ð½Ð½Ñ Ð·Ð°Ð¿ÑƒÑ‰ÐµÐ½Ð¾"),
+    ("admin.raidadm.emptyArt", "ÐÑ€Ñ‚ÐµÑ„Ð°ÐºÑ‚Ñ–Ð² Ð½Ðµ Ð·Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾"),
+    ("admin.raidadm.col.id", "ID"),
+    ("admin.raidadm.col.name", "ÐÐ°Ð·Ð²Ð°"),
+    ("admin.raidadm.col.size", "Ð Ð¾Ð·Ð¼Ñ–Ñ€"),
+    ("admin.raidadm.snapshotTitle", "ÐŸÐ¾Ñ‚Ð¾Ñ‡Ð½Ð¸Ð¹ Ð·Ð½Ñ–Ð¼Ð¾Ðº"),
+    ("admin.raidadm.seq", "ÐŸÐ¾ÑÐ»Ñ–Ð´Ð¾Ð²Ð½Ñ–ÑÑ‚ÑŒ:"),
+    ("admin.raidadm.created", "Ð¡Ñ‚Ð²Ð¾Ñ€ÐµÐ½Ð¾:"),
+    ("admin.raidadm.restoreBtn", "Ð’Ñ–Ð´Ð½Ð¾Ð²Ð¸Ñ‚Ð¸ Ð·Ñ– Ð·Ð½Ñ–Ð¼ÐºÐ°"),
+    ("admin.raidadm.noSnap", "Ð—Ð½Ñ–Ð¼ÐºÐ° Ð½ÐµÐ´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ð°"),
+    ("admin.raidadm.artTitle", "ÐÑ€Ñ‚ÐµÑ„Ð°ÐºÑ‚Ð¸"),
+    ("admin.raidadm.section", "ÐÑ€Ñ‚ÐµÑ„Ð°ÐºÑ‚Ð¸ RAID"),
+    ("admin.raidadm.btn.upload", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶Ð¸Ñ‚Ð¸ Ð°Ñ€Ñ‚ÐµÑ„Ð°ÐºÑ‚"),
+    ("admin.raidadm.btn.snapshot", "Ð¡Ñ‚Ð²Ð¾Ñ€Ð¸Ñ‚Ð¸ Ð·Ð½Ñ–Ð¼Ð¾Ðº"),
+    ("admin.raidadm.btn.sync", "Ð¡Ð¸Ð½Ñ…Ñ€Ð¾Ð½Ñ–Ð·ÑƒÐ²Ð°Ñ‚Ð¸"),
+    ("admin.raidadm.btn.gc", "Ð—Ð±Ñ–Ñ€ ÑÐ¼Ñ–Ñ‚Ñ‚Ñ"),
+    ("admin.raidadm.uploadTitle", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶Ð¸Ñ‚Ð¸ Ð°Ñ€Ñ‚ÐµÑ„Ð°ÐºÑ‚"),
+    ("admin.raidadm.label.artName", "ÐÐ°Ð·Ð²Ð° Ð°Ñ€Ñ‚ÐµÑ„Ð°ÐºÑ‚Ñƒ"),
+    ("admin.raidadm.ph.artName", "my-artifact"),
+    ("admin.raidadm.label.artData", "Ð”Ð°Ð½Ñ– (Base64)"),
+    ("admin.raidadm.ph.b64", "Ð’ÑÑ‚Ð°Ð²Ñ‚Ðµ Ð´Ð°Ð½Ñ– Ð² Base64"),
+    (
+        "admin.raidadm.hint.b64",
+        "Ð”Ð°Ð½Ñ– Ð°Ñ€Ñ‚ÐµÑ„Ð°ÐºÑ‚Ñƒ Ð² ÐºÐ¾Ð´ÑƒÐ²Ð°Ð½Ð½Ñ– Base64",
+    ),
+    ("admin.raidadm.uploading", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñâ€¦"),
+    ("admin.raidadm.reqNameData", "ÐŸÐ¾Ñ‚Ñ€Ñ–Ð±Ð½Ñ– Ð½Ð°Ð·Ð²Ð° Ñ– Ð´Ð°Ð½Ñ–"),
+    ("admin.raidadm.uploadOk", "ÐÑ€Ñ‚ÐµÑ„Ð°ÐºÑ‚ Ð·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð¾"),
+    (
+        "admin.raidadm.confirmDelArt",
+        "Ð’Ð¸Ð´Ð°Ð»Ð¸Ñ‚Ð¸ Ð°Ñ€Ñ‚ÐµÑ„Ð°ÐºÑ‚ Â«{id}Â»? Ð”Ñ–ÑŽ Ð½Ðµ ÑÐºÐ°ÑÑƒÐ²Ð°Ñ‚Ð¸.",
+    ),
+    ("admin.raidadm.delOk", "ÐÑ€Ñ‚ÐµÑ„Ð°ÐºÑ‚ Ð²Ð¸Ð´Ð°Ð»ÐµÐ½Ð¾"),
+    (
+        "admin.raidadm.confirmSnap",
+        "Ð¡Ñ‚Ð²Ð¾Ñ€Ð¸Ñ‚Ð¸ Ð·Ð½Ñ–Ð¼Ð¾Ðº Ð¿Ð¾Ñ‚Ð¾Ñ‡Ð½Ð¾Ð³Ð¾ ÑÑ‚Ð°Ð½Ñƒ Ð²ÑÑ–Ñ… Ð°Ñ€Ñ‚ÐµÑ„Ð°ÐºÑ‚Ñ–Ð²?",
+    ),
+    ("admin.raidadm.snapOk", "Ð—Ð½Ñ–Ð¼Ð¾Ðº ÑÑ‚Ð²Ð¾Ñ€ÐµÐ½Ð¾"),
+    ("admin.raidadm.errSnap", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° ÑÑ‚Ð²Ð¾Ñ€ÐµÐ½Ð½Ñ Ð·Ð½Ñ–Ð¼ÐºÐ°: "),
+    (
+        "admin.raidadm.confirmRestore",
+        "Ð’Ñ–Ð´Ð½Ð¾Ð²Ð¸Ñ‚Ð¸ Ð·Ñ– Ð·Ð½Ñ–Ð¼ÐºÐ°? Ð¡Ñ‚Ð°Ð½ RAID Ð±ÑƒÐ´Ðµ Ð·Ð°Ð¼Ñ–Ð½ÐµÐ½Ð¾. Ð”Ñ–ÑŽ Ð½Ðµ ÑÐºÐ°ÑÑƒÐ²Ð°Ñ‚Ð¸.",
+    ),
+    ("admin.raidadm.restoring", "Ð’Ñ–Ð´Ð½Ð¾Ð²Ð»ÐµÐ½Ð½Ñ Ð·Ñ– Ð·Ð½Ñ–Ð¼ÐºÐ°â€¦"),
+    ("admin.raidadm.restoreOk", "Ð’Ñ–Ð´Ð½Ð¾Ð²Ð»ÐµÐ½Ð¾ Ð·Ñ– Ð·Ð½Ñ–Ð¼ÐºÐ°"),
+    ("admin.raidadm.errRestore", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð²Ñ–Ð´Ð½Ð¾Ð²Ð»ÐµÐ½Ð½Ñ: "),
+    ("admin.raidadm.syncOk", "Ð¡Ð¸Ð½Ñ…Ñ€Ð¾Ð½Ñ–Ð·Ð°Ñ†Ñ–ÑŽ Ñ€Ð¾Ð·Ð¿Ð¾Ñ‡Ð°Ñ‚Ð¾"),
+    ("admin.raidadm.errSync", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° ÑÐ¸Ð½Ñ…Ñ€Ð¾Ð½Ñ–Ð·Ð°Ñ†Ñ–Ñ—: "),
+    (
+        "admin.raidadm.confirmGc",
+        "Ð—Ð°Ð¿ÑƒÑÑ‚Ð¸Ñ‚Ð¸ Ð·Ð±Ñ–Ñ€ ÑÐ¼Ñ–Ñ‚Ñ‚Ñ? Ð¡Ñ‚Ð°Ñ€Ñ– Ð½ÐµÐ¿Ð¾Ñ‚Ñ€Ñ–Ð±Ð½Ñ– Ð°Ñ€Ñ‚ÐµÑ„Ð°ÐºÑ‚Ð¸ Ð±ÑƒÐ´ÑƒÑ‚ÑŒ Ð²Ð¸Ð´Ð°Ð»ÐµÐ½Ñ–.",
+    ),
+    (
+        "admin.raidadm.gcOk",
+        "Ð—Ð±Ñ–Ñ€ ÑÐ¼Ñ–Ñ‚Ñ‚Ñ Ð·Ð°Ð²ÐµÑ€ÑˆÐµÐ½Ð¾. Ð’Ð¸Ð´Ð°Ð»ÐµÐ½Ð¾ Ð°Ñ€Ñ‚ÐµÑ„Ð°ÐºÑ‚Ñ–Ð²: {n}.",
+    ),
+    ("admin.raidadm.errGc", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° GC: "),
+];
+
+/// Ukrainian grid-pricing keys (PH-S217 slim patch).
+pub const ADMIN_GRID_PRICING_UK: &[I18nRow<'_>] = &[
+    ("admin.page.gridPricing", "Ð¦Ñ–Ð½Ð¸ Grid"),
+    ("admin.gridPricing.section", "Ð¦Ñ–Ð½Ð¸ Grid"),
+    (
+        "admin.gridPricing.hint",
+        "Read-only Ð·Ð½Ñ–Ð¼Ð¾Ðº Galaxy pricing oracle. L2 fallback â€” POOLAI_GALAXY_PRICING_FALLBACK_JSON, ÑÐºÑ‰Ð¾ Ð¿Ñ€Ð¾Ð²Ð°Ð¹Ð´ÐµÑ€Ð¸ Ð½ÐµÐ´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ–.",
+    ),
+    ("admin.gridPricing.fetch", "ÐžÑ‚Ñ€Ð¸Ð¼Ð°Ñ‚Ð¸ Ð·Ð½Ñ–Ð¼Ð¾Ðº"),
+    ("admin.gridPricing.taskProfile", "Task profile"),
+    ("admin.gridPricing.modelProfile", "Model profile"),
+    ("admin.gridPricing.unitKey", "Unit key"),
+    ("admin.gridPricing.loading", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ Ð·Ð½Ñ–Ð¼ÐºÐ° Ñ†Ñ–Ð½â€¦"),
+    ("admin.gridPricing.errLoad", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ Ñ†Ñ–Ð½: "),
+    ("admin.gridPricing.result", "Ð—Ð½Ñ–Ð¼Ð¾Ðº Ñ†Ñ–Ð½"),
+    ("admin.gridPricing.col.task", "Task profile"),
+    ("admin.gridPricing.col.model", "Model profile"),
+    ("admin.gridPricing.col.unit", "Unit key"),
+    ("admin.gridPricing.col.price", "Ð¦Ñ–Ð½Ð° (USD)"),
+    ("admin.gridPricing.col.updated", "ÐžÐ½Ð¾Ð²Ð»ÐµÐ½Ð¾"),
+    ("admin.gridPricing.col.source", "Ð”Ð¶ÐµÑ€ÐµÐ»Ð¾"),
+    ("admin.gridPricing.col.freshness", "Ð¡Ð²Ñ–Ð¶Ñ–ÑÑ‚ÑŒ"),
+    ("admin.gridPricing.feeSplitTitle", "Fee split (Galaxy Â§1.2)"),
+    (
+        "admin.gridPricing.feeSplitHint",
+        "Read-only strip Ð· GET /api/v1/grid/fee-split-metrics ÑƒÐ·Ð³Ð¾Ð´Ð¶ÐµÐ½Ð¾ Ð· /metrics (PH-S780â€¦S781).",
+    ),
+    (
+        "admin.gridPricing.feeSplitLoading",
+        "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ fee split metricsâ€¦",
+    ),
+];
+
+/// English updates & compatibility admin keys (PH-S197; moved from `i18n_core.js`).
+pub const ADMIN_UPDATES_COMPAT_EN: &[I18nRow<'_>] = &[
+    ("admin.page.updatesCompat", "Updates & compatibility"),
+    ("admin.updatesCompat.section", "Updates & compatibility"),
+    (
+        "admin.updatesCompat.hint",
+        "Read-only Galaxy governance pointers. Policy prose lives in docs â€” not duplicated here.",
+    ),
+    ("admin.updatesCompat.protocolTitle", "Protocol version"),
+    (
+        "admin.updatesCompat.protocolHint",
+        "Coordinator wire baseline (PH-S65 protocol_compat). Workers send protocol_version on POST /api/v1/discovery/register-remote.",
+    ),
+    ("admin.updatesCompat.col.coordinator", "Coordinator protocol"),
+    ("admin.updatesCompat.col.build", "Coordinator build"),
+    ("admin.updatesCompat.col.env", "Env override"),
+    (
+        "admin.updatesCompat.col.negotiation",
+        "Default negotiation (no worker version)",
+    ),
+    (
+        "admin.updatesCompat.compatStatusHint",
+        "Registration may return compat_status with HTTP 403/426 when the worker is outside the matrix window.",
+    ),
+    ("admin.updatesCompat.verifyTitle", "Verify signed release"),
+    (
+        "admin.updatesCompat.verifyHint",
+        "Operator quickstart â€” poolai-verify-release (PH-S66/S85). See SECURITY_HARDENING for the full checklist.",
+    ),
+    ("admin.updatesCompat.link.security", "SECURITY_HARDENING.md"),
+    (
+        "admin.updatesCompat.link.verifyQuickstart",
+        "Verify-release quickstart (PH-S71)",
+    ),
+    ("admin.updatesCompat.link.manifest", "RELEASE_MANIFEST_SAMPLE.md"),
+    ("admin.updatesCompat.link.fixtures", "Dev fixtures README"),
+    ("admin.updatesCompat.matrixTitle", "Protocol compatibility matrix"),
+    (
+        "admin.updatesCompat.matrixHint",
+        "Canonical compat matrix and negotiation rules â€” Galaxy Â§9.3. Implementation: src/grid/protocol_compat.rs.",
+    ),
+    (
+        "admin.updatesCompat.link.matrix",
+        "Galaxy Â§9.3 compat matrix (docs)",
+    ),
+    ("admin.updatesCompat.capabilityTitle", "Signed capability documents"),
+    (
+        "admin.updatesCompat.capabilityHint",
+        "Galaxy Â§6.6 â€” telegram_edge workers must send a signed capability_document on register-remote (PH-S740).",
+    ),
+    ("admin.updatesCompat.col.devVerifyPk", "Dev verify public key"),
+    ("admin.updatesCompat.col.capEnv", "Env override"),
+    (
+        "admin.updatesCompat.link.galaxy66",
+        "Galaxy Â§6.6 untrusted telegram_edge",
+    ),
+    (
+        "admin.updatesCompat.link.capFixture",
+        "Dev capability verify key fixture",
+    ),
+    (
+        "admin.updatesCompat.prefetchTitle",
+        "Prefetch live pull metrics",
+    ),
+    (
+        "admin.updatesCompat.prefetchHint",
+        "Galaxy Â§5.5 â€” read-only strip from GET /api/v1/grid/prefetch-metrics reconciled with /metrics (PH-S750â€¦S752).",
+    ),
+    (
+        "admin.updatesCompat.prefetchLoading",
+        "Loading prefetch metricsâ€¦",
+    ),
+    (
+        "admin.updatesCompat.link.galaxy55",
+        "Galaxy Â§5.5 task-driven prefetch",
+    ),
+    (
+        "admin.updatesCompat.localityTitle",
+        "Locality / hot-tier metrics",
+    ),
+    (
+        "admin.updatesCompat.localityHint",
+        "Galaxy Â§5.2â€“5.4 â€” read-only strip from GET /api/v1/grid/locality-metrics reconciled with /metrics (PH-S760â€¦S762).",
+    ),
+    (
+        "admin.updatesCompat.localityLoading",
+        "Loading locality metricsâ€¦",
+    ),
+    (
+        "admin.updatesCompat.link.galaxy52",
+        "Galaxy Â§5.2 locality placement",
+    ),
+];
+
+/// Ukrainian updates & compatibility admin keys (PH-S197).
+pub const ADMIN_UPDATES_COMPAT_UK: &[I18nRow<'_>] = &[
+    ("admin.page.updatesCompat", "ÐžÐ½Ð¾Ð²Ð»ÐµÐ½Ð½Ñ Ñ‚Ð° ÑÑƒÐ¼Ñ–ÑÐ½Ñ–ÑÑ‚ÑŒ"),
+    ("admin.updatesCompat.section", "ÐžÐ½Ð¾Ð²Ð»ÐµÐ½Ð½Ñ Ñ‚Ð° ÑÑƒÐ¼Ñ–ÑÐ½Ñ–ÑÑ‚ÑŒ"),
+    (
+        "admin.updatesCompat.hint",
+        "Read-only Ð²ÐºÐ°Ð·Ñ–Ð²Ð½Ð¸ÐºÐ¸ Galaxy governance. ÐŸÐ¾Ð²Ð½Ð° Ð¿Ð¾Ð»Ñ–Ñ‚Ð¸ÐºÐ° â€” Ñƒ docs, Ð±ÐµÐ· Ð´ÑƒÐ±Ð»ÑŽÐ²Ð°Ð½Ð½Ñ Ñ‚ÑƒÑ‚.",
+    ),
+    ("admin.updatesCompat.protocolTitle", "Ð’ÐµÑ€ÑÑ–Ñ Ð¿Ñ€Ð¾Ñ‚Ð¾ÐºÐ¾Ð»Ñƒ"),
+    (
+        "admin.updatesCompat.protocolHint",
+        "Ð‘Ð°Ð·Ð¾Ð²Ð¸Ð¹ wire coordinator (PH-S65 protocol_compat). Ð’Ð¾Ñ€ÐºÐµÑ€Ð¸ Ð½Ð°Ð´ÑÐ¸Ð»Ð°ÑŽÑ‚ÑŒ protocol_version Ð½Ð° POST /api/v1/discovery/register-remote.",
+    ),
+    ("admin.updatesCompat.col.coordinator", "ÐŸÑ€Ð¾Ñ‚Ð¾ÐºÐ¾Ð» coordinator"),
+    ("admin.updatesCompat.col.build", "Ð—Ð±Ñ–Ñ€ÐºÐ° coordinator"),
+    ("admin.updatesCompat.col.env", "Env override"),
+    (
+        "admin.updatesCompat.col.negotiation",
+        "Negotiation Ð·Ð° Ð·Ð°Ð¼Ð¾Ð²Ñ‡ÑƒÐ²Ð°Ð½Ð½ÑÐ¼ (Ð±ÐµÐ· Ð²ÐµÑ€ÑÑ–Ñ— Ð²Ð¾Ñ€ÐºÐµÑ€Ð°)",
+    ),
+    (
+        "admin.updatesCompat.compatStatusHint",
+        "Ð ÐµÑ”ÑÑ‚Ñ€Ð°Ñ†Ñ–Ñ Ð¼Ð¾Ð¶Ðµ Ð¿Ð¾Ð²ÐµÑ€Ð½ÑƒÑ‚Ð¸ compat_status Ð· HTTP 403/426, ÑÐºÑ‰Ð¾ Ð²Ð¾Ñ€ÐºÐµÑ€ Ð¿Ð¾Ð·Ð° Ð²Ñ–ÐºÐ½Ð¾Ð¼ Ð¼Ð°Ñ‚Ñ€Ð¸Ñ†Ñ–.",
+    ),
+    ("admin.updatesCompat.verifyTitle", "ÐŸÐµÑ€ÐµÐ²Ñ–Ñ€ÐºÐ° Ð¿Ñ–Ð´Ð¿Ð¸ÑÐ°Ð½Ð¾Ð³Ð¾ Ñ€ÐµÐ»Ñ–Ð·Ñƒ"),
+    (
+        "admin.updatesCompat.verifyHint",
+        "Operator quickstart â€” poolai-verify-release (PH-S66/S85). ÐŸÐ¾Ð²Ð½Ð¸Ð¹ Ñ‡ÐµÐºÐ»Ñ–ÑÑ‚ â€” SECURITY_HARDENING.",
+    ),
+    ("admin.updatesCompat.link.security", "SECURITY_HARDENING.md"),
+    (
+        "admin.updatesCompat.link.verifyQuickstart",
+        "Verify-release quickstart (PH-S71)",
+    ),
+    ("admin.updatesCompat.link.manifest", "RELEASE_MANIFEST_SAMPLE.md"),
+    ("admin.updatesCompat.link.fixtures", "Dev fixtures README"),
+    ("admin.updatesCompat.matrixTitle", "ÐœÐ°Ñ‚Ñ€Ð¸Ñ†Ñ ÑÑƒÐ¼Ñ–ÑÐ½Ð¾ÑÑ‚Ñ– Ð¿Ñ€Ð¾Ñ‚Ð¾ÐºÐ¾Ð»Ñƒ"),
+    (
+        "admin.updatesCompat.matrixHint",
+        "ÐšÐ°Ð½Ð¾Ð½Ñ–Ñ‡Ð½Ð° Ð¼Ð°Ñ‚Ñ€Ð¸Ñ†Ñ Ñ‚Ð° Ð¿Ñ€Ð°Ð²Ð¸Ð»Ð° negotiation â€” Galaxy Â§9.3. ÐšÐ¾Ð´: src/grid/protocol_compat.rs.",
+    ),
+    (
+        "admin.updatesCompat.link.matrix",
+        "Galaxy Â§9.3 compat matrix (docs)",
+    ),
+    ("admin.updatesCompat.capabilityTitle", "ÐŸÑ–Ð´Ð¿Ð¸ÑÐ°Ð½Ñ– capability documents"),
+    (
+        "admin.updatesCompat.capabilityHint",
+        "Galaxy Â§6.6 â€” telegram_edge Ð²Ð¾Ñ€ÐºÐµÑ€Ð¸ Ð¼Ð°ÑŽÑ‚ÑŒ Ð½Ð°Ð´ÑÐ¸Ð»Ð°Ñ‚Ð¸ Ð¿Ñ–Ð´Ð¿Ð¸ÑÐ°Ð½Ð¸Ð¹ capability_document Ð½Ð° register-remote (PH-S740).",
+    ),
+    ("admin.updatesCompat.col.devVerifyPk", "Dev verify public key"),
+    ("admin.updatesCompat.col.capEnv", "Env override"),
+    (
+        "admin.updatesCompat.link.galaxy66",
+        "Galaxy Â§6.6 untrusted telegram_edge",
+    ),
+    (
+        "admin.updatesCompat.link.capFixture",
+        "Dev capability verify key fixture",
+    ),
+    (
+        "admin.updatesCompat.prefetchTitle",
+        "Prefetch live pull metrics",
+    ),
+    (
+        "admin.updatesCompat.prefetchHint",
+        "Galaxy Â§5.5 â€” read-only strip from GET /api/v1/grid/prefetch-metrics reconciled with /metrics (PH-S750â€¦S752).",
+    ),
+    (
+        "admin.updatesCompat.prefetchLoading",
+        "Loading prefetch metricsâ€¦",
+    ),
+    (
+        "admin.updatesCompat.link.galaxy55",
+        "Galaxy Â§5.5 task-driven prefetch",
+    ),
+    (
+        "admin.updatesCompat.localityTitle",
+        "Locality / hot-tier metrics",
+    ),
+    (
+        "admin.updatesCompat.localityHint",
+        "Galaxy Â§5.2â€“5.4 â€” read-only strip from GET /api/v1/grid/locality-metrics reconciled with /metrics (PH-S760â€¦S762).",
+    ),
+    (
+        "admin.updatesCompat.localityLoading",
+        "Loading locality metricsâ€¦",
+    ),
+    (
+        "admin.updatesCompat.link.galaxy52",
+        "Galaxy Â§5.2 locality placement",
+    ),
+];
+
+/// English admin dashboard keys (PH-S228; moved from `i18n_core.js`).
+pub const ADMIN_DASHBOARD_EN: &[I18nRow<'_>] = &[
+    ("admin.page.dashboard", "Admin Dashboard"),
+    ("admin.dash.card.overview", "System Overview"),
+    ("admin.dash.card.quickStats", "Quick Stats"),
+    ("admin.dash.card.alerts", "Active Alerts"),
+    ("admin.dash.card.activity", "Recent Activity"),
+    ("admin.dash.card.metrics", "Metrics Overview (Last Hour)"),
+    ("admin.dash.label.status", "Status:"),
+    ("admin.dash.label.uptime", "Uptime:"),
+    ("admin.dash.quick.workers", "Workers (active):"),
+    ("admin.dash.quick.vm", "VM Instances:"),
+    ("admin.dash.quick.cpu", "CPU Usage:"),
+    ("admin.dash.quick.memory", "Memory (tracked):"),
+    ("admin.dash.spark.cpu", "CPU Usage"),
+    ("admin.dash.spark.memory", "Memory Usage"),
+    ("admin.dash.avg", "Avg:"),
+    ("admin.dash.noAlerts", "No active alerts"),
+    ("admin.dash.noActivity", "No recent activity"),
+    ("admin.dash.errLoad", "Error loading dashboard: "),
+    ("admin.ratio96.cardTitle", "Rust Ratio (Phase F)"),
+    ("admin.ratio96.storeLoading", "Loading ratio storeâ€¦"),
+    ("admin.ratio96.storeLabel", "Rust ratio (96% stretch):"),
+    (
+        "admin.ratio96.storeHint",
+        "Phase-F stretch gate read from rust_ratio.json",
+    ),
+    ("admin.ratio96.stretchMet", "stretch met"),
+    ("admin.ratio96.stretchPending", "below stretch"),
+    ("admin.ratio96.holdMet", "hold met"),
+    ("admin.ratio96.holdPending", "below hold"),
+    ("admin.ratio96.storeMissing", "store unavailable"),
+    ("admin.ratio96.storeErr", "Ratio store wire unavailable"),
+    ("admin.ratio96.btn.refresh", "Refresh"),
+    ("admin.ratio96.refreshOk", "Ratio store refreshed"),
+    ("admin.ratio96.refreshErr", "Ratio store refresh failed: "),
+    ("admin.gpuLimits.cardTitle", "GPU Limits (Phase H)"),
+    ("admin.gpuLimits.storeLoading", "Loading GPU limitsâ€¦"),
+    ("admin.gpuLimits.storeLabel", "GPU limits:"),
+    (
+        "admin.gpuLimits.storeHint",
+        "GPU admission limits read from gpu_limits.json",
+    ),
+    ("admin.gpuLimits.admissionOn", "admission on"),
+    ("admin.gpuLimits.admissionOff", "admission off"),
+    ("admin.gpuLimits.storeMissing", "store unavailable"),
+    (
+        "admin.gpuLimits.storeErr",
+        "GPU limits store wire unavailable",
+    ),
+    ("admin.gpuLimits.btn.refresh", "Refresh"),
+    ("admin.gpuLimits.refreshOk", "GPU limits refreshed"),
+    ("admin.gpuLimits.refreshErr", "GPU limits refresh failed: "),
+    (
+        "admin.gpuLimits.migrationTitle",
+        "GPU Limits Migration (Phase H)",
+    ),
+    ("admin.gpuLimits.migrationLoading", "Loading migrationâ€¦"),
+    ("admin.gpuLimits.migrationLabel", "GPU limits migration:"),
+    (
+        "admin.gpuLimits.migrationHint",
+        "GPU limits migration read from gpu_limits.json",
+    ),
+    ("admin.gpuLimits.migrationOn", "migration on"),
+    ("admin.gpuLimits.migrationOff", "migration off"),
+    ("admin.gpuLimits.migrationMissing", "migration unavailable"),
+    (
+        "admin.gpuLimits.migrationRefreshOk",
+        "GPU limits migration refreshed",
+    ),
+    (
+        "admin.gpuLimits.migrationRefreshErr",
+        "GPU limits migration refresh failed: ",
+    ),
+];
+
+/// Ukrainian admin dashboard keys (PH-S228).
+pub const ADMIN_DASHBOARD_UK: &[I18nRow<'_>] = &[
+    ("admin.page.dashboard", "ÐÐ´Ð¼Ñ–Ð½-Ð¿Ð°Ð½ÐµÐ»ÑŒ"),
+    ("admin.dash.card.overview", "ÐžÐ³Ð»ÑÐ´ ÑÐ¸ÑÑ‚ÐµÐ¼Ð¸"),
+    ("admin.dash.card.quickStats", "Ð¨Ð²Ð¸Ð´ÐºÐ° ÑÑ‚Ð°Ñ‚Ð¸ÑÑ‚Ð¸ÐºÐ°"),
+    ("admin.dash.card.alerts", "ÐÐºÑ‚Ð¸Ð²Ð½Ñ– ÑÐ¿Ð¾Ð²Ñ–Ñ‰ÐµÐ½Ð½Ñ"),
+    ("admin.dash.card.activity", "ÐžÑÑ‚Ð°Ð½Ð½Ñ Ð°ÐºÑ‚Ð¸Ð²Ð½Ñ–ÑÑ‚ÑŒ"),
+    ("admin.dash.card.metrics", "ÐœÐµÑ‚Ñ€Ð¸ÐºÐ¸ (Ð¾ÑÑ‚Ð°Ð½Ð½Ñ Ð³Ð¾Ð´Ð¸Ð½Ð°)"),
+    ("admin.dash.label.status", "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ:"),
+    ("admin.dash.label.uptime", "Ð§Ð°Ñ Ñ€Ð¾Ð±Ð¾Ñ‚Ð¸:"),
+    ("admin.dash.quick.workers", "Ð’Ð¾Ñ€ÐºÐµÑ€Ð¸ (Ð°ÐºÑ‚Ð¸Ð²Ð½Ñ–):"),
+    ("admin.dash.quick.vm", "Ð†Ð½ÑÑ‚Ð°Ð½ÑÐ¸ VM:"),
+    ("admin.dash.quick.cpu", "Ð’Ð¸ÐºÐ¾Ñ€Ð¸ÑÑ‚Ð°Ð½Ð½Ñ CPU:"),
+    ("admin.dash.quick.memory", "ÐŸÐ°Ð¼â€™ÑÑ‚ÑŒ (Ð²Ñ–Ð´ÑÑ‚ÐµÐ¶.):"),
+    ("admin.dash.spark.cpu", "Ð’Ð¸ÐºÐ¾Ñ€Ð¸ÑÑ‚Ð°Ð½Ð½Ñ CPU"),
+    ("admin.dash.spark.memory", "Ð’Ð¸ÐºÐ¾Ñ€Ð¸ÑÑ‚Ð°Ð½Ð½Ñ Ð¿Ð°Ð¼â€™ÑÑ‚Ñ–"),
+    ("admin.dash.avg", "Ð¡ÐµÑ€.:"),
+    ("admin.dash.noAlerts", "ÐÐµÐ¼Ð°Ñ” Ð°ÐºÑ‚Ð¸Ð²Ð½Ð¸Ñ… ÑÐ¿Ð¾Ð²Ñ–Ñ‰ÐµÐ½ÑŒ"),
+    ("admin.dash.noActivity", "ÐÐµÐ¼Ð°Ñ” Ð½ÐµÐ´Ð°Ð²Ð½ÑŒÐ¾Ñ— Ð°ÐºÑ‚Ð¸Ð²Ð½Ð¾ÑÑ‚Ñ–"),
+    ("admin.dash.errLoad", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ Ð¿Ð°Ð½ÐµÐ»Ñ–: "),
+    ("admin.ratio96.cardTitle", "Rust ÑÐ¿Ñ–Ð²Ð²Ñ–Ð´Ð½Ð¾ÑˆÐµÐ½Ð½Ñ (Phase F)"),
+    ("admin.ratio96.storeLoading", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ ÑÑ…Ð¾Ð²Ð¸Ñ‰Ð° ratioâ€¦"),
+    ("admin.ratio96.storeLabel", "Rust ratio (96% stretch):"),
+    (
+        "admin.ratio96.storeHint",
+        "Ð¤Ð°Ð·Ð¾Ð²Ð¸Ð¹ stretch-Ð³ÐµÐ¹Ñ‚ Ð· rust_ratio.json",
+    ),
+    ("admin.ratio96.stretchMet", "stretch Ð´Ð¾ÑÑÐ³Ð½ÑƒÑ‚Ð¾"),
+    ("admin.ratio96.stretchPending", "Ð½Ð¸Ð¶Ñ‡Ðµ stretch"),
+    ("admin.ratio96.holdMet", "hold Ð´Ð¾ÑÑÐ³Ð½ÑƒÑ‚Ð¾"),
+    ("admin.ratio96.holdPending", "Ð½Ð¸Ð¶Ñ‡Ðµ hold"),
+    ("admin.ratio96.storeMissing", "ÑÑ…Ð¾Ð²Ð¸Ñ‰Ðµ Ð½ÐµÐ´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ðµ"),
+    ("admin.ratio96.storeErr", "Ratio store wire Ð½ÐµÐ´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ð¸Ð¹"),
+    ("admin.ratio96.btn.refresh", "ÐžÐ½Ð¾Ð²Ð¸Ñ‚Ð¸"),
+    ("admin.ratio96.refreshOk", "Ð¡Ñ…Ð¾Ð²Ð¸Ñ‰Ðµ ratio Ð¾Ð½Ð¾Ð²Ð»ÐµÐ½Ð¾"),
+    (
+        "admin.ratio96.refreshErr",
+        "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð¾Ð½Ð¾Ð²Ð»ÐµÐ½Ð½Ñ ÑÑ…Ð¾Ð²Ð¸Ñ‰Ð° ratio: ",
+    ),
+    ("admin.gpuLimits.cardTitle", "GPU Ð»Ñ–Ð¼Ñ–Ñ‚Ð¸ (Phase H)"),
+    ("admin.gpuLimits.storeLoading", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ GPU Ð»Ñ–Ð¼Ñ–Ñ‚Ñ–Ð²â€¦"),
+    ("admin.gpuLimits.storeLabel", "GPU Ð»Ñ–Ð¼Ñ–Ñ‚Ð¸:"),
+    (
+        "admin.gpuLimits.storeHint",
+        "GPU-Ð»Ñ–Ð¼Ñ–Ñ‚Ð¸ Ð°Ð´Ð¼Ñ–ÑÑ–Ñ— Ð· gpu_limits.json",
+    ),
+    ("admin.gpuLimits.admissionOn", "Ð°Ð´Ð¼Ñ–ÑÑ–Ñ ÑƒÐ²Ñ–Ð¼ÐºÐ½ÐµÐ½Ð°"),
+    ("admin.gpuLimits.admissionOff", "Ð°Ð´Ð¼Ñ–ÑÑ–Ñ Ð²Ð¸Ð¼ÐºÐ½ÐµÐ½Ð°"),
+    ("admin.gpuLimits.storeMissing", "ÑÑ…Ð¾Ð²Ð¸Ñ‰Ðµ Ð½ÐµÐ´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ðµ"),
+    (
+        "admin.gpuLimits.storeErr",
+        "GPU limits store wire Ð½ÐµÐ´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ð¸Ð¹",
+    ),
+    ("admin.gpuLimits.btn.refresh", "ÐžÐ½Ð¾Ð²Ð¸Ñ‚Ð¸"),
+    ("admin.gpuLimits.refreshOk", "GPU Ð»Ñ–Ð¼Ñ–Ñ‚Ð¸ Ð¾Ð½Ð¾Ð²Ð»ÐµÐ½Ð¾"),
+    (
+        "admin.gpuLimits.refreshErr",
+        "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð¾Ð½Ð¾Ð²Ð»ÐµÐ½Ð½Ñ GPU Ð»Ñ–Ð¼Ñ–Ñ‚Ñ–Ð²: ",
+    ),
+];
+
+/// English audit admin keys (PH-S229; moved from `i18n_core.js`).
+pub const ADMIN_AUDIT_EN: &[I18nRow<'_>] = &[
+    ("admin.page.audit", "Audit Logs"),
+    ("admin.audit.sectionTitle", "Audit Events"),
+    ("admin.audit.searchPh", "Searchâ€¦"),
+    ("admin.audit.label.search", "Search"),
+    ("admin.audit.label.level", "Level"),
+    ("admin.audit.label.startDate", "Start date"),
+    ("admin.audit.label.endDate", "End date"),
+    ("admin.audit.levelAll", "All Levels"),
+    ("admin.audit.levelInfo", "Info"),
+    ("admin.audit.levelWarning", "Warning"),
+    ("admin.audit.levelError", "Error"),
+    ("admin.audit.levelCritical", "Critical"),
+    ("admin.audit.query", "Query"),
+    ("admin.audit.col.time", "Timestamp"),
+    ("admin.audit.col.level", "Level"),
+    ("admin.audit.col.user", "User"),
+    ("admin.audit.col.action", "Action"),
+    ("admin.audit.col.resource", "Resource"),
+    ("admin.audit.col.result", "Result"),
+    ("admin.audit.empty", "No audit events found"),
+    ("admin.audit.loading", "Loading audit eventsâ€¦"),
+    ("admin.audit.errLoad", "Error loading audit logs: "),
+    ("admin.audit.storeLoading", "Loading storeâ€¦"),
+    ("admin.audit.storeLabel", "Audit store:"),
+    (
+        "admin.audit.storeHint",
+        "Audit persistence backend (POOLAI_AUDIT_STORE / POOLAI_AUDIT_DATA_DIR)",
+    ),
+    ("admin.audit.store.memory", "memory"),
+    ("admin.audit.store.file", "file"),
+    ("admin.audit.store.sqlite", "sqlite"),
+    ("admin.audit.store.configured", "configured"),
+    ("admin.audit.store.unconfigured", "unconfigured"),
+    ("admin.audit.storeErr", "Audit store wire unavailable"),
+    ("admin.audit.btn.refresh", "Refresh"),
+    ("admin.audit.refreshOk", "Audit events refreshed"),
+    ("admin.audit.refreshErr", "Audit refresh failed: "),
+];
+
+/// Ukrainian audit admin keys (PH-S229; ops keys PH-S1383 band 74).
+pub const ADMIN_AUDIT_UK: &[I18nRow<'_>] = &[
+    ("admin.page.audit", "Ð–ÑƒÑ€Ð½Ð°Ð» Ð°ÑƒÐ´Ð¸Ñ‚Ñƒ"),
+    ("admin.audit.sectionTitle", "ÐŸÐ¾Ð´Ñ–Ñ— Ð°ÑƒÐ´Ð¸Ñ‚Ñƒ"),
+    ("admin.audit.searchPh", "ÐŸÐ¾ÑˆÑƒÐºâ€¦"),
+    ("admin.audit.label.search", "ÐŸÐ¾ÑˆÑƒÐº"),
+    ("admin.audit.label.level", "Ð Ñ–Ð²ÐµÐ½ÑŒ"),
+    ("admin.audit.label.startDate", "Ð”Ð°Ñ‚Ð° Ð¿Ð¾Ñ‡Ð°Ñ‚ÐºÑƒ"),
+    ("admin.audit.label.endDate", "Ð”Ð°Ñ‚Ð° ÐºÑ–Ð½Ñ†Ñ"),
+    ("admin.audit.levelAll", "Ð£ÑÑ– Ñ€Ñ–Ð²Ð½Ñ–"),
+    ("admin.audit.levelInfo", "Info"),
+    ("admin.audit.levelWarning", "Warning"),
+    ("admin.audit.levelError", "Error"),
+    ("admin.audit.levelCritical", "Critical"),
+    ("admin.audit.query", "Ð—Ð°Ð¿Ð¸Ñ‚"),
+    ("admin.audit.col.time", "Ð§Ð°Ñ"),
+    ("admin.audit.col.level", "Ð Ñ–Ð²ÐµÐ½ÑŒ"),
+    ("admin.audit.col.user", "ÐšÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡"),
+    ("admin.audit.col.action", "Ð”Ñ–Ñ"),
+    ("admin.audit.col.resource", "Ð ÐµÑÑƒÑ€Ñ"),
+    ("admin.audit.col.result", "Ð ÐµÐ·ÑƒÐ»ÑŒÑ‚Ð°Ñ‚"),
+    ("admin.audit.empty", "ÐŸÐ¾Ð´Ñ–Ð¹ Ð°ÑƒÐ´Ð¸Ñ‚Ñƒ Ð½Ðµ Ð·Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾"),
+    ("admin.audit.loading", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ Ð¿Ð¾Ð´Ñ–Ð¹ Ð°ÑƒÐ´Ð¸Ñ‚Ñƒâ€¦"),
+    ("admin.audit.errLoad", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ Ð¶ÑƒÑ€Ð½Ð°Ð»Ñƒ: "),
+    ("admin.audit.storeLoading", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ ÑÑ…Ð¾Ð²Ð¸Ñ‰Ð°â€¦"),
+    ("admin.audit.storeLabel", "Ð¡Ñ…Ð¾Ð²Ð¸Ñ‰Ðµ Ð°ÑƒÐ´Ð¸Ñ‚Ñƒ:"),
+    (
+        "admin.audit.storeHint",
+        "Ð‘ÐµÐºÐµÐ½Ð´ Ð¿ÐµÑ€ÑÐ¸ÑÑ‚ÐµÐ½Ñ‚Ð½Ð¾ÑÑ‚Ñ– Ð°ÑƒÐ´Ð¸Ñ‚Ñƒ (POOLAI_AUDIT_STORE / POOLAI_AUDIT_DATA_DIR)",
+    ),
+    ("admin.audit.store.memory", "memory"),
+    ("admin.audit.store.file", "file"),
+    ("admin.audit.store.sqlite", "sqlite"),
+    ("admin.audit.store.configured", "Ð½Ð°Ð»Ð°ÑˆÑ‚Ð¾Ð²Ð°Ð½Ð¾"),
+    ("admin.audit.store.unconfigured", "Ð½Ðµ Ð½Ð°Ð»Ð°ÑˆÑ‚Ð¾Ð²Ð°Ð½Ð¾"),
+    ("admin.audit.storeErr", "Audit store wire Ð½ÐµÐ´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ð¸Ð¹"),
+    ("admin.audit.btn.refresh", "ÐžÐ½Ð¾Ð²Ð¸Ñ‚Ð¸"),
+    ("admin.audit.refreshOk", "ÐŸÐ¾Ð´Ñ–Ñ— Ð°ÑƒÐ´Ð¸Ñ‚Ñƒ Ð¾Ð½Ð¾Ð²Ð»ÐµÐ½Ð¾"),
+    ("admin.audit.refreshErr", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð¾Ð½Ð¾Ð²Ð»ÐµÐ½Ð½Ñ Ð°ÑƒÐ´Ð¸Ñ‚Ñƒ: "),
+];
+
+/// English tenants admin keys (PH-S230; moved from `i18n_core.js`).
+pub const ADMIN_TENANTS_EN: &[I18nRow<'_>] = &[
+    ("admin.page.tenants", "Tenant Management"),
+    ("admin.tenants.loading", "Loading tenantsâ€¦"),
+    ("admin.tenants.errLoad", "Error loading tenants: "),
+    ("admin.tenants.empty", "No tenants found"),
+    ("admin.tenants.col.name", "Name"),
+    ("admin.tenants.col.id", "ID"),
+    ("admin.tenants.col.status", "Status"),
+    ("admin.tenants.col.resources", "Resources"),
+    ("admin.tenants.col.actions", "Actions"),
+    ("admin.tenants.resWorkers", "Workers:"),
+    ("admin.tenants.resMemory", "Memory:"),
+    ("admin.tenants.section", "Tenants"),
+    ("admin.tenants.createBtn", "Create Tenant"),
+    ("admin.tenants.createTitle", "Create Tenant"),
+    ("admin.tenants.editTitle", "Edit Tenant"),
+    ("admin.tenants.label.name", "Tenant Name"),
+    ("admin.tenants.label.maxWorkers", "Max Workers"),
+    ("admin.tenants.hint.unlimited", "Leave empty for unlimited"),
+    ("admin.tenants.label.maxMem", "Max Memory (MB)"),
+    ("admin.tenants.label.maxCpu", "Max CPU Cores"),
+    ("admin.tenants.label.maxStorage", "Max Storage (MB)"),
+    ("admin.tenants.label.maxVm", "Max VM Instances"),
+    ("admin.tenants.active", "Active"),
+    ("admin.tenants.ph.name", "tenant-abc"),
+    ("admin.tenants.creating", "Creatingâ€¦"),
+    ("admin.tenants.updating", "Updatingâ€¦"),
+    ("admin.tenants.createdOk", "Tenant created successfully"),
+    ("admin.tenants.updatedOk", "Tenant updated successfully"),
+    ("admin.tenants.deletedOk", "Tenant deleted successfully"),
+    ("admin.tenants.loadErr", "Error loading tenant: "),
+    (
+        "admin.tenants.confirmDel",
+        "Are you sure you want to delete this tenant? This action cannot be undone.",
+    ),
+    ("admin.tenants.storeLoading", "Loading storeâ€¦"),
+    ("admin.tenants.storeLabel", "Store:"),
+    (
+        "admin.tenants.storeHint",
+        "Tenant persistence backend (POOLAI_TENANT_STORE / POOLAI_TENANT_DATA_DIR)",
+    ),
+    ("admin.tenants.store.memory", "memory"),
+    ("admin.tenants.store.sqlite", "sqlite"),
+    ("admin.tenants.store.configured", "configured"),
+    ("admin.tenants.store.unconfigured", "unconfigured"),
+    ("admin.tenants.storeErr", "Store wire unavailable"),
+    ("admin.tenants.btn.usage", "Usage"),
+    ("admin.tenants.btn.quota", "Quota"),
+    ("admin.tenants.usageOk", "Usage:"),
+    ("admin.tenants.usageErr", "Usage refresh failed: "),
+    ("admin.tenants.quotaAllow", "Quota probe: allow"),
+    ("admin.tenants.quotaDeny", "Quota probe: deny"),
+    ("admin.tenants.quotaErr", "Quota probe failed: "),
+];
+
+/// Ukrainian tenants admin keys (PH-S230; store/usage/quota ops PH-S1180/S1181).
+pub const ADMIN_TENANTS_UK: &[I18nRow<'_>] = &[
+    ("admin.page.tenants", "ÐšÐµÑ€ÑƒÐ²Ð°Ð½Ð½Ñ Ð¾Ñ€ÐµÐ½Ð´Ð°Ñ€ÑÐ¼Ð¸"),
+    ("admin.tenants.loading", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ Ð¾Ñ€ÐµÐ½Ð´Ð°Ñ€Ñ–Ð²â€¦"),
+    ("admin.tenants.errLoad", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ Ð¾Ñ€ÐµÐ½Ð´Ð°Ñ€Ñ–Ð²: "),
+    ("admin.tenants.empty", "ÐžÑ€ÐµÐ½Ð´Ð°Ñ€Ñ–Ð² Ð½Ðµ Ð·Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾"),
+    ("admin.tenants.col.name", "ÐÐ°Ð·Ð²Ð°"),
+    ("admin.tenants.col.id", "ID"),
+    ("admin.tenants.col.status", "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ"),
+    ("admin.tenants.col.resources", "Ð ÐµÑÑƒÑ€ÑÐ¸"),
+    ("admin.tenants.col.actions", "Ð”Ñ–Ñ—"),
+    ("admin.tenants.resWorkers", "Ð’Ð¾Ñ€ÐºÐµÑ€Ð¸:"),
+    ("admin.tenants.resMemory", "ÐŸÐ°Ð¼â€™ÑÑ‚ÑŒ:"),
+    ("admin.tenants.section", "ÐžÑ€ÐµÐ½Ð´Ð°Ñ€Ñ–"),
+    ("admin.tenants.createBtn", "Ð¡Ñ‚Ð²Ð¾Ñ€Ð¸Ñ‚Ð¸ Ð¾Ñ€ÐµÐ½Ð´Ð°Ñ€Ñ"),
+    ("admin.tenants.createTitle", "Ð¡Ñ‚Ð²Ð¾Ñ€Ð¸Ñ‚Ð¸ Ð¾Ñ€ÐµÐ½Ð´Ð°Ñ€Ñ"),
+    ("admin.tenants.editTitle", "Ð ÐµÐ´Ð°Ð³ÑƒÐ²Ð°Ñ‚Ð¸ Ð¾Ñ€ÐµÐ½Ð´Ð°Ñ€Ñ"),
+    ("admin.tenants.label.name", "ÐÐ°Ð·Ð²Ð° Ð¾Ñ€ÐµÐ½Ð´Ð°Ñ€Ñ"),
+    ("admin.tenants.label.maxWorkers", "ÐœÐ°ÐºÑ. Ð²Ð¾Ñ€ÐºÐµÑ€Ñ–Ð²"),
+    ("admin.tenants.hint.unlimited", "ÐŸÐ¾Ñ€Ð¾Ð¶Ð½ÑŒÐ¾ â€” Ð±ÐµÐ· Ð¾Ð±Ð¼ÐµÐ¶ÐµÐ½ÑŒ"),
+    ("admin.tenants.label.maxMem", "ÐœÐ°ÐºÑ. Ð¿Ð°Ð¼â€™ÑÑ‚ÑŒ (ÐœÐ‘)"),
+    ("admin.tenants.label.maxCpu", "ÐœÐ°ÐºÑ. ÑÐ´ÐµÑ€ CPU"),
+    ("admin.tenants.label.maxStorage", "ÐœÐ°ÐºÑ. ÑÑ…Ð¾Ð²Ð¸Ñ‰Ðµ (ÐœÐ‘)"),
+    ("admin.tenants.label.maxVm", "ÐœÐ°ÐºÑ. Ñ–Ð½ÑÑ‚Ð°Ð½ÑÑ–Ð² VM"),
+    ("admin.tenants.active", "ÐÐºÑ‚Ð¸Ð²Ð½Ð¸Ð¹"),
+    ("admin.tenants.ph.name", "tenant-abc"),
+    ("admin.tenants.creating", "Ð¡Ñ‚Ð²Ð¾Ñ€ÐµÐ½Ð½Ñâ€¦"),
+    ("admin.tenants.updating", "ÐžÐ½Ð¾Ð²Ð»ÐµÐ½Ð½Ñâ€¦"),
+    ("admin.tenants.createdOk", "ÐžÑ€ÐµÐ½Ð´Ð°Ñ€Ñ ÑÑ‚Ð²Ð¾Ñ€ÐµÐ½Ð¾"),
+    ("admin.tenants.updatedOk", "ÐžÑ€ÐµÐ½Ð´Ð°Ñ€Ñ Ð¾Ð½Ð¾Ð²Ð»ÐµÐ½Ð¾"),
+    ("admin.tenants.deletedOk", "ÐžÑ€ÐµÐ½Ð´Ð°Ñ€Ñ Ð²Ð¸Ð´Ð°Ð»ÐµÐ½Ð¾"),
+    ("admin.tenants.loadErr", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ Ð¾Ñ€ÐµÐ½Ð´Ð°Ñ€Ñ: "),
+    (
+        "admin.tenants.confirmDel",
+        "Ð’Ð¸Ð´Ð°Ð»Ð¸Ñ‚Ð¸ Ñ†ÑŒÐ¾Ð³Ð¾ Ð¾Ñ€ÐµÐ½Ð´Ð°Ñ€Ñ? Ð”Ñ–ÑŽ Ð½Ðµ ÑÐºÐ°ÑÑƒÐ²Ð°Ñ‚Ð¸.",
+    ),
+    ("admin.tenants.storeLoading", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ ÑÑ…Ð¾Ð²Ð¸Ñ‰Ð°â€¦"),
+    ("admin.tenants.storeLabel", "Ð¡Ñ…Ð¾Ð²Ð¸Ñ‰Ðµ:"),
+    (
+        "admin.tenants.storeHint",
+        "Ð‘ÐµÐºÐµÐ½Ð´ Ð¿ÐµÑ€ÑÐ¸ÑÑ‚ÐµÐ½Ñ‚Ð½Ð¾ÑÑ‚Ñ– Ð¾Ñ€ÐµÐ½Ð´Ð°Ñ€Ñ–Ð² (POOLAI_TENANT_STORE / POOLAI_TENANT_DATA_DIR)",
+    ),
+    ("admin.tenants.store.memory", "memory"),
+    ("admin.tenants.store.sqlite", "sqlite"),
+    ("admin.tenants.store.configured", "Ð½Ð°Ð»Ð°ÑˆÑ‚Ð¾Ð²Ð°Ð½Ð¾"),
+    ("admin.tenants.store.unconfigured", "Ð½Ðµ Ð½Ð°Ð»Ð°ÑˆÑ‚Ð¾Ð²Ð°Ð½Ð¾"),
+    ("admin.tenants.storeErr", "Store wire Ð½ÐµÐ´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ð¸Ð¹"),
+    ("admin.tenants.btn.usage", "Usage"),
+    ("admin.tenants.btn.quota", "Quota"),
+    ("admin.tenants.usageOk", "Usage:"),
+    ("admin.tenants.usageErr", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð¾Ð½Ð¾Ð²Ð»ÐµÐ½Ð½Ñ usage: "),
+    ("admin.tenants.quotaAllow", "Quota probe: allow"),
+    ("admin.tenants.quotaDeny", "Quota probe: deny"),
+    ("admin.tenants.quotaErr", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° quota probe: "),
+];
+
+/// English SSO admin/ops keys (PH-S1283 band 64).
+pub const ADMIN_SSO_EN: &[I18nRow<'_>] = &[
+    ("admin.sso.storeLoading", "Loading storeâ€¦"),
+    ("admin.sso.storeLabel", "SSO store:"),
+    (
+        "admin.sso.storeHint",
+        "SSO persistence backend (POOLAI_SSO_STORE / POOLAI_SSO_DATA_DIR)",
+    ),
+    ("admin.sso.store.memory", "memory"),
+    ("admin.sso.store.sqlite", "sqlite"),
+    ("admin.sso.store.configured", "configured"),
+    ("admin.sso.store.unconfigured", "unconfigured"),
+    ("admin.sso.storeErr", "SSO store wire unavailable"),
+    ("admin.sso.btn.refreshOauth", "Refresh"),
+    ("admin.sso.btn.refreshSaml", "Refresh"),
+    ("admin.sso.refreshOauthOk", "OAuth2 providers refreshed"),
+    ("admin.sso.refreshOauthErr", "OAuth2 refresh failed: "),
+    ("admin.sso.refreshSamlOk", "SAML providers refreshed"),
+    ("admin.sso.refreshSamlErr", "SAML refresh failed: "),
+];
+
+/// Ukrainian SSO admin/ops keys (PH-S1283 band 64).
+pub const ADMIN_SSO_UK: &[I18nRow<'_>] = &[
+    ("admin.sso.storeLoading", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ ÑÑ…Ð¾Ð²Ð¸Ñ‰Ð°â€¦"),
+    ("admin.sso.storeLabel", "SSO ÑÑ…Ð¾Ð²Ð¸Ñ‰Ðµ:"),
+    (
+        "admin.sso.storeHint",
+        "Ð‘ÐµÐºÐµÐ½Ð´ Ð¿ÐµÑ€ÑÐ¸ÑÑ‚ÐµÐ½Ñ‚Ð½Ð¾ÑÑ‚Ñ– SSO (POOLAI_SSO_STORE / POOLAI_SSO_DATA_DIR)",
+    ),
+    ("admin.sso.store.memory", "memory"),
+    ("admin.sso.store.sqlite", "sqlite"),
+    ("admin.sso.store.configured", "Ð½Ð°Ð»Ð°ÑˆÑ‚Ð¾Ð²Ð°Ð½Ð¾"),
+    ("admin.sso.store.unconfigured", "Ð½Ðµ Ð½Ð°Ð»Ð°ÑˆÑ‚Ð¾Ð²Ð°Ð½Ð¾"),
+    ("admin.sso.storeErr", "SSO store wire Ð½ÐµÐ´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ð¸Ð¹"),
+    ("admin.sso.btn.refreshOauth", "ÐžÐ½Ð¾Ð²Ð¸Ñ‚Ð¸"),
+    ("admin.sso.btn.refreshSaml", "ÐžÐ½Ð¾Ð²Ð¸Ñ‚Ð¸"),
+    ("admin.sso.refreshOauthOk", "OAuth2 Ð¿Ñ€Ð¾Ð²Ð°Ð¹Ð´ÐµÑ€Ð¸ Ð¾Ð½Ð¾Ð²Ð»ÐµÐ½Ð¾"),
+    ("admin.sso.refreshOauthErr", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð¾Ð½Ð¾Ð²Ð»ÐµÐ½Ð½Ñ OAuth2: "),
+    ("admin.sso.refreshSamlOk", "SAML Ð¿Ñ€Ð¾Ð²Ð°Ð¹Ð´ÐµÑ€Ð¸ Ð¾Ð½Ð¾Ð²Ð»ÐµÐ½Ð¾"),
+    ("admin.sso.refreshSamlErr", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð¾Ð½Ð¾Ð²Ð»ÐµÐ½Ð½Ñ SAML: "),
+];
+
+/// English policies admin/ops keys (PH-S1483 band 84).
+pub const ADMIN_POLICY_EN: &[I18nRow<'_>] = &[
+    ("admin.policy.storeLoading", "Loading storeâ€¦"),
+    ("admin.policy.storeLabel", "Policy store:"),
+    (
+        "admin.policy.storeHint",
+        "Policy persistence backend (POOLAI_POLICY_STORE / POOLAI_POLICY_DATA_DIR)",
+    ),
+    ("admin.policy.store.memory", "memory"),
+    ("admin.policy.store.sqlite", "sqlite"),
+    ("admin.policy.store.file", "file"),
+    ("admin.policy.store.configured", "configured"),
+    ("admin.policy.store.unconfigured", "unconfigured"),
+    ("admin.policy.storeErr", "Policy store wire unavailable"),
+    ("admin.policy.btn.refresh", "Refresh"),
+    ("admin.policy.refreshOk", "Security policies refreshed"),
+    (
+        "admin.policy.refreshErr",
+        "Security policies refresh failed: ",
+    ),
+];
+
+/// Ukrainian policies admin/ops keys (PH-S1483 band 84).
+pub const ADMIN_POLICY_UK: &[I18nRow<'_>] = &[
+    ("admin.policy.storeLoading", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ ÑÑ…Ð¾Ð²Ð¸Ñ‰Ð°â€¦"),
+    ("admin.policy.storeLabel", "Ð¡Ñ…Ð¾Ð²Ð¸Ñ‰Ðµ Ð¿Ð¾Ð»Ñ–Ñ‚Ð¸Ðº:"),
+    (
+        "admin.policy.storeHint",
+        "Ð‘ÐµÐºÐµÐ½Ð´ Ð¿ÐµÑ€ÑÐ¸ÑÑ‚ÐµÐ½Ñ‚Ð½Ð¾ÑÑ‚Ñ– Ð¿Ð¾Ð»Ñ–Ñ‚Ð¸Ðº (POOLAI_POLICY_STORE / POOLAI_POLICY_DATA_DIR)",
+    ),
+    ("admin.policy.store.memory", "memory"),
+    ("admin.policy.store.sqlite", "sqlite"),
+    ("admin.policy.store.file", "file"),
+    ("admin.policy.store.configured", "Ð½Ð°Ð»Ð°ÑˆÑ‚Ð¾Ð²Ð°Ð½Ð¾"),
+    ("admin.policy.store.unconfigured", "Ð½Ðµ Ð½Ð°Ð»Ð°ÑˆÑ‚Ð¾Ð²Ð°Ð½Ð¾"),
+    ("admin.policy.storeErr", "Policy store wire Ð½ÐµÐ´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ð¸Ð¹"),
+    ("admin.policy.btn.refresh", "ÐžÐ½Ð¾Ð²Ð¸Ñ‚Ð¸"),
+    ("admin.policy.refreshOk", "ÐŸÐ¾Ð»Ñ–Ñ‚Ð¸ÐºÐ¸ Ð±ÐµÐ·Ð¿ÐµÐºÐ¸ Ð¾Ð½Ð¾Ð²Ð»ÐµÐ½Ð¾"),
+    (
+        "admin.policy.refreshErr",
+        "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð¾Ð½Ð¾Ð²Ð»ÐµÐ½Ð½Ñ Ð¿Ð¾Ð»Ñ–Ñ‚Ð¸Ðº Ð±ÐµÐ·Ð¿ÐµÐºÐ¸: ",
+    ),
+];
+
+/// English security admin keys (PH-S231; moved from `i18n_core.js`).
+pub const ADMIN_SECURITY_EN: &[I18nRow<'_>] = &[
+    ("admin.page.security", "Security Management"),
+    ("admin.sec.col.name", "Name"),
+    ("admin.sec.tab.oauth", "OAuth2 Providers"),
+    ("admin.sec.tab.saml", "SAML Providers"),
+    ("admin.sec.tab.policies", "Security Policies"),
+    ("admin.sec.tab.rotation", "Secret rotation"),
+    ("admin.sec.rot.loading", "Loading secret rotation statusâ€¦"),
+    ("admin.sec.rot.heading", "Secret rotation"),
+    ("admin.sec.rot.col.kind", "Secret"),
+    ("admin.sec.rot.col.hooks", "Hooks"),
+    ("admin.sec.rot.col.last", "Last rotated"),
+    ("admin.sec.rot.col.count", "Count"),
+    ("admin.sec.rot.col.grace", "JWT grace"),
+    ("admin.sec.rot.kind.jwt", "JWT signing secret"),
+    ("admin.sec.rot.kind.tls", "TLS certificate"),
+    ("admin.sec.rot.kind.telegram", "Telegram webhook secret"),
+    ("admin.sec.rot.never", "Never"),
+    ("admin.sec.rot.configured", "Configured"),
+    ("admin.sec.rot.notConfigured", "Not configured"),
+    ("admin.sec.rot.reloadJwt", "Reload JWT from env"),
+    ("admin.sec.rot.run", "Run rotation"),
+    (
+        "admin.sec.rot.hint",
+        "Rotation runs registered hooks only; env vars must be set on the coordinator host.",
+    ),
+    ("admin.sec.rot.ok", "Secret rotation completed"),
+    (
+        "admin.sec.rot.partial",
+        "Rotation finished with hook errors",
+    ),
+    ("admin.sec.oauthCreateTitle", "Register OAuth2 Provider"),
+    ("admin.sec.oauthEditTitle", "Edit OAuth2 Provider"),
+    ("admin.sec.loadingOauth", "Loading OAuth2 providersâ€¦"),
+    ("admin.sec.loadingSaml", "Loading SAML providersâ€¦"),
+    ("admin.sec.loadingPolicies", "Loading security policiesâ€¦"),
+    ("admin.sec.oauthHeading", "OAuth2 Providers"),
+    ("admin.sec.samlHeading", "SAML Providers"),
+    ("admin.sec.policiesHeading", "Security Policies"),
+    ("admin.sec.registerProv", "Register Provider"),
+    ("admin.sec.createPolicyBtn", "Create Policy"),
+    ("admin.sec.noOAuth", "No OAuth2 providers registered"),
+    ("admin.sec.noSaml", "No SAML providers registered"),
+    ("admin.sec.noPolicies", "No security policies defined"),
+    ("admin.sec.col.clientId", "Client ID"),
+    ("admin.sec.col.authUrl", "Authorization URL"),
+    ("admin.sec.col.entityId", "Entity ID"),
+    ("admin.sec.col.ssoUrl", "SSO URL"),
+    ("admin.sec.col.policyDesc", "Description"),
+    ("admin.sec.col.mfa", "MFA Required"),
+    ("admin.sec.col.sessionTo", "Session Timeout"),
+    ("admin.sec.col.maxFailed", "Max Failed Attempts"),
+    (
+        "admin.sec.oauthRegOk",
+        "OAuth2 provider registered successfully",
+    ),
+    (
+        "admin.sec.oauthUpdOk",
+        "OAuth2 provider updated successfully",
+    ),
+    (
+        "admin.sec.oauthDelOk",
+        "OAuth2 provider deleted successfully",
+    ),
+    (
+        "admin.sec.confirmDelOauth",
+        "Delete OAuth2 provider \"{name}\"? This action cannot be undone.",
+    ),
+    ("admin.sec.errLoadOauth", "Error loading provider: "),
+    (
+        "admin.sec.samlRegOk",
+        "SAML provider registered successfully",
+    ),
+    ("admin.sec.samlUpdOk", "SAML provider updated successfully"),
+    ("admin.sec.samlDelOk", "SAML provider deleted successfully"),
+    (
+        "admin.sec.confirmDelSaml",
+        "Delete SAML provider \"{name}\"? This action cannot be undone.",
+    ),
+    (
+        "admin.sec.policyCreatedOk",
+        "Security policy created successfully",
+    ),
+    (
+        "admin.sec.policyUpdOk",
+        "Security policy updated successfully",
+    ),
+    (
+        "admin.sec.policyDelOk",
+        "Security policy deleted successfully",
+    ),
+    (
+        "admin.sec.confirmDelPolicy",
+        "Delete security policy \"{name}\"? This action cannot be undone.",
+    ),
+    ("admin.sec.errLoadPolicy", "Error loading policy: "),
+    ("admin.sec.registering", "Registeringâ€¦"),
+    ("admin.sec.updating", "Updatingâ€¦"),
+    ("admin.sec.creating", "Creatingâ€¦"),
+    ("admin.sec.samlCreateTitle", "Register SAML Provider"),
+    ("admin.sec.samlEditTitle", "Edit SAML Provider"),
+    ("admin.sec.policyCreateTitle", "Create Security Policy"),
+    ("admin.sec.policyEditTitle", "Edit Security Policy"),
+    ("admin.sec.lbl.providerName", "Provider Name"),
+    ("admin.sec.lbl.clientId", "Client ID"),
+    ("admin.sec.lbl.authUrl", "Authorization URL"),
+    ("admin.sec.lbl.clientSecret", "Client Secret"),
+    ("admin.sec.lbl.tokenUrl", "Token URL"),
+    ("admin.sec.lbl.redirectUri", "Redirect URI"),
+    ("admin.sec.lbl.scopesCsv", "Scopes (comma-separated)"),
+    ("admin.sec.lbl.entityId", "Entity ID"),
+    ("admin.sec.lbl.ssoUrl", "SSO URL"),
+    ("admin.sec.lbl.sloUrl", "SLO URL (optional)"),
+    ("admin.sec.lbl.cert", "X.509 Certificate"),
+    (
+        "admin.sec.lbl.attrMap",
+        "Attribute Mapping (one per line, format: saml_attribute: user_field)",
+    ),
+    ("admin.sec.lbl.policyName", "Policy Name"),
+    ("admin.sec.lbl.policyDesc", "Description"),
+    (
+        "admin.sec.lbl.ipRanges",
+        "Allowed IP Ranges (CIDR, comma-separated)",
+    ),
+    ("admin.sec.lbl.requireMfa", "Require MFA"),
+    ("admin.sec.lbl.sessionTimeout", "Session Timeout (seconds)"),
+    ("admin.sec.lbl.maxFailed", "Max Failed Login Attempts"),
+    ("admin.sec.ph.google", "google"),
+    ("admin.sec.ph.okta", "okta"),
+    ("admin.sec.ph.policy", "strict-policy"),
+    (
+        "admin.sec.ph.policyDesc",
+        "Strict security policy for admin access",
+    ),
+    ("admin.sec.ph.ipRanges", "192.168.1.0/24, 10.0.0.0/8"),
+    ("admin.sec.ph.cert", "-----BEGIN CERTIFICATE-----..."),
+    ("admin.sec.emDash", "â€”"),
+];
+
+/// Ukrainian security admin keys (PH-S231).
+pub const ADMIN_SECURITY_UK: &[I18nRow<'_>] = &[
+    ("admin.page.security", "Ð‘ÐµÐ·Ð¿ÐµÐºÐ°"),
+    ("admin.sec.col.name", "ÐÐ°Ð·Ð²Ð°"),
+    ("admin.sec.tab.oauth", "OAuth2 Ð¿Ñ€Ð¾Ð²Ð°Ð¹Ð´ÐµÑ€Ð¸"),
+    ("admin.sec.tab.saml", "SAML Ð¿Ñ€Ð¾Ð²Ð°Ð¹Ð´ÐµÑ€Ð¸"),
+    ("admin.sec.tab.policies", "ÐŸÐ¾Ð»Ñ–Ñ‚Ð¸ÐºÐ¸ Ð±ÐµÐ·Ð¿ÐµÐºÐ¸"),
+    ("admin.sec.tab.rotation", "Ð Ð¾Ñ‚Ð°Ñ†Ñ–Ñ ÑÐµÐºÑ€ÐµÑ‚Ñ–Ð²"),
+    ("admin.sec.rot.loading", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ ÑÑ‚Ð°Ñ‚ÑƒÑÑƒ Ñ€Ð¾Ñ‚Ð°Ñ†Ñ–Ñ—â€¦"),
+    ("admin.sec.rot.heading", "Ð Ð¾Ñ‚Ð°Ñ†Ñ–Ñ ÑÐµÐºÑ€ÐµÑ‚Ñ–Ð²"),
+    ("admin.sec.rot.col.kind", "Ð¡ÐµÐºÑ€ÐµÑ‚"),
+    ("admin.sec.rot.col.hooks", "Ð¥ÑƒÐºÐ¸"),
+    ("admin.sec.rot.col.last", "ÐžÑÑ‚Ð°Ð½Ð½Ñ Ñ€Ð¾Ñ‚Ð°Ñ†Ñ–Ñ"),
+    ("admin.sec.rot.col.count", "Ð›Ñ–Ñ‡Ð¸Ð»ÑŒÐ½Ð¸Ðº"),
+    ("admin.sec.rot.col.grace", "JWT grace"),
+    ("admin.sec.rot.kind.jwt", "JWT ÑÐµÐºÑ€ÐµÑ‚ Ð¿Ñ–Ð´Ð¿Ð¸ÑÑƒ"),
+    ("admin.sec.rot.kind.tls", "TLS ÑÐµÑ€Ñ‚Ð¸Ñ„Ñ–ÐºÐ°Ñ‚"),
+    ("admin.sec.rot.kind.telegram", "Telegram webhook ÑÐµÐºÑ€ÐµÑ‚"),
+    ("admin.sec.rot.never", "ÐÑ–ÐºÐ¾Ð»Ð¸"),
+    ("admin.sec.rot.configured", "ÐÐ°Ð»Ð°ÑˆÑ‚Ð¾Ð²Ð°Ð½Ð¾"),
+    ("admin.sec.rot.notConfigured", "ÐÐµ Ð½Ð°Ð»Ð°ÑˆÑ‚Ð¾Ð²Ð°Ð½Ð¾"),
+    ("admin.sec.rot.reloadJwt", "ÐŸÐµÑ€ÐµÐ·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶Ð¸Ñ‚Ð¸ JWT Ð· env"),
+    ("admin.sec.rot.run", "Ð—Ð°Ð¿ÑƒÑÑ‚Ð¸Ñ‚Ð¸ Ñ€Ð¾Ñ‚Ð°Ñ†Ñ–ÑŽ"),
+    (
+        "admin.sec.rot.hint",
+        "Ð Ð¾Ñ‚Ð°Ñ†Ñ–Ñ Ð»Ð¸ÑˆÐµ Ñ‡ÐµÑ€ÐµÐ· Ð·Ð°Ñ€ÐµÑ”ÑÑ‚Ñ€Ð¾Ð²Ð°Ð½Ñ– Ñ…ÑƒÐºÐ¸; Ð·Ð¼Ñ–Ð½Ð½Ñ– ÑÐµÑ€ÐµÐ´Ð¾Ð²Ð¸Ñ‰Ð° Ð½Ð° ÐºÐ¾Ð¾Ñ€Ð´Ð¸Ð½Ð°Ñ‚Ð¾Ñ€Ñ–.",
+    ),
+    ("admin.sec.rot.ok", "Ð Ð¾Ñ‚Ð°Ñ†Ñ–ÑŽ ÑÐµÐºÑ€ÐµÑ‚Ñƒ Ð·Ð°Ð²ÐµÑ€ÑˆÐµÐ½Ð¾"),
+    (
+        "admin.sec.rot.partial",
+        "Ð Ð¾Ñ‚Ð°Ñ†Ñ–ÑŽ Ð·Ð°Ð²ÐµÑ€ÑˆÐµÐ½Ð¾ Ð· Ð¿Ð¾Ð¼Ð¸Ð»ÐºÐ°Ð¼Ð¸ Ñ…ÑƒÐºÑ–Ð²",
+    ),
+    ("admin.sec.oauthCreateTitle", "Ð ÐµÑ”ÑÑ‚Ñ€Ð°Ñ†Ñ–Ñ OAuth2"),
+    ("admin.sec.oauthEditTitle", "Ð ÐµÐ´Ð°Ð³ÑƒÐ²Ð°Ð½Ð½Ñ OAuth2"),
+    ("admin.sec.loadingOauth", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ OAuth2â€¦"),
+    ("admin.sec.loadingSaml", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ SAMLâ€¦"),
+    ("admin.sec.loadingPolicies", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ Ð¿Ð¾Ð»Ñ–Ñ‚Ð¸Ðºâ€¦"),
+    ("admin.sec.oauthHeading", "ÐŸÑ€Ð¾Ð²Ð°Ð¹Ð´ÐµÑ€Ð¸ OAuth2"),
+    ("admin.sec.samlHeading", "ÐŸÑ€Ð¾Ð²Ð°Ð¹Ð´ÐµÑ€Ð¸ SAML"),
+    ("admin.sec.policiesHeading", "ÐŸÐ¾Ð»Ñ–Ñ‚Ð¸ÐºÐ¸ Ð±ÐµÐ·Ð¿ÐµÐºÐ¸"),
+    ("admin.sec.registerProv", "Ð—Ð°Ñ€ÐµÑ”ÑÑ‚Ñ€ÑƒÐ²Ð°Ñ‚Ð¸ Ð¿Ñ€Ð¾Ð²Ð°Ð¹Ð´ÐµÑ€Ð°"),
+    ("admin.sec.createPolicyBtn", "Ð¡Ñ‚Ð²Ð¾Ñ€Ð¸Ñ‚Ð¸ Ð¿Ð¾Ð»Ñ–Ñ‚Ð¸ÐºÑƒ"),
+    ("admin.sec.noOAuth", "ÐŸÑ€Ð¾Ð²Ð°Ð¹Ð´ÐµÑ€Ñ–Ð² OAuth2 Ð½Ðµ Ð·Ð°Ñ€ÐµÑ”ÑÑ‚Ñ€Ð¾Ð²Ð°Ð½Ð¾"),
+    ("admin.sec.noSaml", "ÐŸÑ€Ð¾Ð²Ð°Ð¹Ð´ÐµÑ€Ñ–Ð² SAML Ð½Ðµ Ð·Ð°Ñ€ÐµÑ”ÑÑ‚Ñ€Ð¾Ð²Ð°Ð½Ð¾"),
+    ("admin.sec.noPolicies", "ÐŸÐ¾Ð»Ñ–Ñ‚Ð¸Ðº Ð½Ðµ Ð²Ð¸Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¾"),
+    ("admin.sec.col.clientId", "Client ID"),
+    ("admin.sec.col.authUrl", "URL Ð°Ð²Ñ‚Ð¾Ñ€Ð¸Ð·Ð°Ñ†Ñ–Ñ—"),
+    ("admin.sec.col.entityId", "Entity ID"),
+    ("admin.sec.col.ssoUrl", "URL SSO"),
+    ("admin.sec.col.policyDesc", "ÐžÐ¿Ð¸Ñ"),
+    ("admin.sec.col.mfa", "ÐŸÐ¾Ñ‚Ñ€Ñ–Ð±ÐµÐ½ MFA"),
+    ("admin.sec.col.sessionTo", "Ð¢Ð°Ð¹Ð¼Ð°ÑƒÑ‚ ÑÐµÑÑ–Ñ—"),
+    ("admin.sec.col.maxFailed", "ÐœÐ°ÐºÑ. Ð½ÐµÐ²Ð´Ð°Ð»Ð¸Ñ… ÑÐ¿Ñ€Ð¾Ð±"),
+    ("admin.sec.oauthRegOk", "ÐŸÑ€Ð¾Ð²Ð°Ð¹Ð´ÐµÑ€Ð° OAuth2 Ð·Ð°Ñ€ÐµÑ”ÑÑ‚Ñ€Ð¾Ð²Ð°Ð½Ð¾"),
+    ("admin.sec.oauthUpdOk", "ÐŸÑ€Ð¾Ð²Ð°Ð¹Ð´ÐµÑ€Ð° OAuth2 Ð¾Ð½Ð¾Ð²Ð»ÐµÐ½Ð¾"),
+    ("admin.sec.oauthDelOk", "ÐŸÑ€Ð¾Ð²Ð°Ð¹Ð´ÐµÑ€Ð° OAuth2 Ð²Ð¸Ð´Ð°Ð»ÐµÐ½Ð¾"),
+    (
+        "admin.sec.confirmDelOauth",
+        "Ð’Ð¸Ð´Ð°Ð»Ð¸Ñ‚Ð¸ Ð¿Ñ€Ð¾Ð²Ð°Ð¹Ð´ÐµÑ€Ð° OAuth2 Â«{name}Â»? Ð”Ñ–ÑŽ Ð½Ðµ ÑÐºÐ°ÑÑƒÐ²Ð°Ñ‚Ð¸.",
+    ),
+    (
+        "admin.sec.errLoadOauth",
+        "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ Ð¿Ñ€Ð¾Ð²Ð°Ð¹Ð´ÐµÑ€Ð°: ",
+    ),
+    ("admin.sec.samlRegOk", "ÐŸÑ€Ð¾Ð²Ð°Ð¹Ð´ÐµÑ€Ð° SAML Ð·Ð°Ñ€ÐµÑ”ÑÑ‚Ñ€Ð¾Ð²Ð°Ð½Ð¾"),
+    ("admin.sec.samlUpdOk", "ÐŸÑ€Ð¾Ð²Ð°Ð¹Ð´ÐµÑ€Ð° SAML Ð¾Ð½Ð¾Ð²Ð»ÐµÐ½Ð¾"),
+    ("admin.sec.samlDelOk", "ÐŸÑ€Ð¾Ð²Ð°Ð¹Ð´ÐµÑ€Ð° SAML Ð²Ð¸Ð´Ð°Ð»ÐµÐ½Ð¾"),
+    (
+        "admin.sec.confirmDelSaml",
+        "Ð’Ð¸Ð´Ð°Ð»Ð¸Ñ‚Ð¸ Ð¿Ñ€Ð¾Ð²Ð°Ð¹Ð´ÐµÑ€Ð° SAML Â«{name}Â»? Ð”Ñ–ÑŽ Ð½Ðµ ÑÐºÐ°ÑÑƒÐ²Ð°Ñ‚Ð¸.",
+    ),
+    ("admin.sec.policyCreatedOk", "ÐŸÐ¾Ð»Ñ–Ñ‚Ð¸ÐºÑƒ ÑÑ‚Ð²Ð¾Ñ€ÐµÐ½Ð¾"),
+    ("admin.sec.policyUpdOk", "ÐŸÐ¾Ð»Ñ–Ñ‚Ð¸ÐºÑƒ Ð¾Ð½Ð¾Ð²Ð»ÐµÐ½Ð¾"),
+    ("admin.sec.policyDelOk", "ÐŸÐ¾Ð»Ñ–Ñ‚Ð¸ÐºÑƒ Ð²Ð¸Ð´Ð°Ð»ÐµÐ½Ð¾"),
+    (
+        "admin.sec.confirmDelPolicy",
+        "Ð’Ð¸Ð´Ð°Ð»Ð¸Ñ‚Ð¸ Ð¿Ð¾Ð»Ñ–Ñ‚Ð¸ÐºÑƒ Â«{name}Â»? Ð”Ñ–ÑŽ Ð½Ðµ ÑÐºÐ°ÑÑƒÐ²Ð°Ñ‚Ð¸.",
+    ),
+    ("admin.sec.errLoadPolicy", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ Ð¿Ð¾Ð»Ñ–Ñ‚Ð¸ÐºÐ¸: "),
+    ("admin.sec.registering", "Ð ÐµÑ”ÑÑ‚Ñ€Ð°Ñ†Ñ–Ñâ€¦"),
+    ("admin.sec.updating", "ÐžÐ½Ð¾Ð²Ð»ÐµÐ½Ð½Ñâ€¦"),
+    ("admin.sec.creating", "Ð¡Ñ‚Ð²Ð¾Ñ€ÐµÐ½Ð½Ñâ€¦"),
+    ("admin.sec.samlCreateTitle", "Ð ÐµÑ”ÑÑ‚Ñ€Ð°Ñ†Ñ–Ñ SAML"),
+    ("admin.sec.samlEditTitle", "Ð ÐµÐ´Ð°Ð³ÑƒÐ²Ð°Ð½Ð½Ñ SAML"),
+    ("admin.sec.policyCreateTitle", "Ð¡Ñ‚Ð²Ð¾Ñ€Ð¸Ñ‚Ð¸ Ð¿Ð¾Ð»Ñ–Ñ‚Ð¸ÐºÑƒ Ð±ÐµÐ·Ð¿ÐµÐºÐ¸"),
+    ("admin.sec.policyEditTitle", "Ð ÐµÐ´Ð°Ð³ÑƒÐ²Ð°Ñ‚Ð¸ Ð¿Ð¾Ð»Ñ–Ñ‚Ð¸ÐºÑƒ"),
+    ("admin.sec.lbl.providerName", "ÐÐ°Ð·Ð²Ð° Ð¿Ñ€Ð¾Ð²Ð°Ð¹Ð´ÐµÑ€Ð°"),
+    ("admin.sec.lbl.clientId", "Client ID"),
+    ("admin.sec.lbl.authUrl", "URL Ð°Ð²Ñ‚Ð¾Ñ€Ð¸Ð·Ð°Ñ†Ñ–Ñ—"),
+    ("admin.sec.lbl.clientSecret", "Client Secret"),
+    ("admin.sec.lbl.tokenUrl", "URL Ñ‚Ð¾ÐºÐµÐ½Ð°"),
+    ("admin.sec.lbl.redirectUri", "Redirect URI"),
+    ("admin.sec.lbl.scopesCsv", "Scopes (Ñ‡ÐµÑ€ÐµÐ· ÐºÐ¾Ð¼Ñƒ)"),
+    ("admin.sec.lbl.entityId", "Entity ID"),
+    ("admin.sec.lbl.ssoUrl", "URL SSO"),
+    ("admin.sec.lbl.sloUrl", "URL SLO (Ð½ÐµÐ¾Ð±Ð¾Ð²â€™ÑÐ·ÐºÐ¾Ð²Ð¾)"),
+    ("admin.sec.lbl.cert", "Ð¡ÐµÑ€Ñ‚Ð¸Ñ„Ñ–ÐºÐ°Ñ‚ X.509"),
+    (
+        "admin.sec.lbl.attrMap",
+        "ÐœÐ°Ð¿Ñ–Ð½Ð³ Ð°Ñ‚Ñ€Ð¸Ð±ÑƒÑ‚Ñ–Ð² (Ñ€ÑÐ´Ð¾Ðº: saml: Ð¿Ð¾Ð»Ðµ_ÐºÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ð°)",
+    ),
+    ("admin.sec.lbl.policyName", "ÐÐ°Ð·Ð²Ð° Ð¿Ð¾Ð»Ñ–Ñ‚Ð¸ÐºÐ¸"),
+    ("admin.sec.lbl.policyDesc", "ÐžÐ¿Ð¸Ñ"),
+    ("admin.sec.lbl.ipRanges", "Ð”Ð¾Ð·Ð²Ð¾Ð»ÐµÐ½Ñ– IP (CIDR, Ñ‡ÐµÑ€ÐµÐ· ÐºÐ¾Ð¼Ñƒ)"),
+    ("admin.sec.lbl.requireMfa", "Ð’Ð¸Ð¼Ð°Ð³Ð°Ñ‚Ð¸ MFA"),
+    ("admin.sec.lbl.sessionTimeout", "Ð¢Ð°Ð¹Ð¼Ð°ÑƒÑ‚ ÑÐµÑÑ–Ñ— (Ñ)"),
+    ("admin.sec.lbl.maxFailed", "ÐœÐ°ÐºÑ. Ð½ÐµÐ²Ð´Ð°Ð»Ð¸Ñ… Ð²Ñ…Ð¾Ð´Ñ–Ð²"),
+    ("admin.sec.ph.google", "google"),
+    ("admin.sec.ph.okta", "okta"),
+    ("admin.sec.ph.policy", "strict-policy"),
+    ("admin.sec.ph.policyDesc", "Ð¡ÑƒÐ²Ð¾Ñ€Ð° Ð¿Ð¾Ð»Ñ–Ñ‚Ð¸ÐºÐ° Ð´Ð»Ñ Ð°Ð´Ð¼Ñ–Ð½Ñ–Ð²"),
+    ("admin.sec.ph.ipRanges", "192.168.1.0/24, 10.0.0.0/8"),
+    ("admin.sec.ph.cert", "-----BEGIN CERTIFICATE-----..."),
+    ("admin.sec.emDash", "â€”"),
+];
+
+/// English topology admin keys (PH-S234; moved from `i18n_core.js`).
+pub const ADMIN_TOPOLOGY_EN: &[I18nRow<'_>] = &[
+    ("admin.page.topology", "Topology"),
+    ("admin.topo.title", "Network Topology"),
+    (
+        "admin.topo.intro",
+        "View network topology, latency matrix, and node resources.",
+    ),
+    ("admin.topo.stat.nodes", "Nodes"),
+    ("admin.topo.stat.latencyMs", "Latency Measurements"),
+    ("admin.topo.stat.lastUpd", "Last Updated"),
+    ("admin.topo.sectionOverview", "Topology Overview"),
+    ("admin.topo.sectionGraph", "Cluster Graph"),
+    ("admin.topo.sectionHeatmap", "Latency Heatmap"),
+    ("admin.topo.graphTitle", "Cluster topology graph"),
+    (
+        "admin.topo.graphLegend",
+        "Edge color: lower latency (greener) â†’ higher (warmer). Node size: load.",
+    ),
+    ("admin.topo.refresh", "Refresh"),
+    ("admin.topo.sectionLatency", "Latency Matrix"),
+    ("admin.topo.loading", "Loadingâ€¦"),
+    ("admin.topo.noNodes", "No nodes found"),
+    ("admin.topo.errNodesRow", "Error loading nodes"),
+    ("admin.topo.noLatency", "No latency measurements available"),
+    ("admin.topo.errLatencyRow", "Error loading latency matrix"),
+    ("admin.topo.viewDetails", "View Details"),
+    ("admin.topo.modalNodeTitle", "Node Resources"),
+    ("admin.topo.errLoad", "Error loading topology: "),
+    ("admin.topo.errNodeRes", "Error loading node resources: "),
+    ("admin.topo.refreshInfo", "Topology refresh initiated"),
+    ("admin.topo.col.nodeId", "Node ID"),
+    ("admin.topo.col.gpuMem", "Available GPU Memory"),
+    ("admin.topo.col.cpu", "Available CPU Cores"),
+    ("admin.topo.col.load", "Current Load"),
+    ("admin.topo.col.actions", "Actions"),
+    ("admin.topo.col.from", "From Node"),
+    ("admin.topo.col.to", "To Node"),
+    ("admin.topo.col.latency", "Latency (ms)"),
+    ("admin.topo.lbl.gpu", "GPU Memory:"),
+    ("admin.topo.lbl.cpu", "CPU Cores:"),
+    ("admin.topo.lbl.sysMem", "System Memory:"),
+    ("admin.topo.lbl.load", "Current Load:"),
+];
+
+/// Ukrainian topology admin keys (PH-S234).
+pub const ADMIN_TOPOLOGY_UK: &[I18nRow<'_>] = &[
+    ("admin.page.topology", "Ð¢Ð¾Ð¿Ð¾Ð»Ð¾Ð³Ñ–Ñ"),
+    ("admin.topo.title", "Ð¢Ð¾Ð¿Ð¾Ð»Ð¾Ð³Ñ–Ñ Ð¼ÐµÑ€ÐµÐ¶Ñ–"),
+    (
+        "admin.topo.intro",
+        "Ð¢Ð¾Ð¿Ð¾Ð»Ð¾Ð³Ñ–Ñ, Ð¼Ð°Ñ‚Ñ€Ð¸Ñ†Ñ Ð·Ð°Ñ‚Ñ€Ð¸Ð¼Ð¾Ðº Ñ– Ñ€ÐµÑÑƒÑ€ÑÐ¸ Ð²ÑƒÐ·Ð»Ñ–Ð².",
+    ),
+    ("admin.topo.stat.nodes", "Ð’ÑƒÐ·Ð»Ð¸"),
+    ("admin.topo.stat.latencyMs", "Ð’Ð¸Ð¼Ñ–Ñ€Ð¸ Ð·Ð°Ñ‚Ñ€Ð¸Ð¼ÐºÐ¸"),
+    ("admin.topo.stat.lastUpd", "ÐžÐ½Ð¾Ð²Ð»ÐµÐ½Ð¾"),
+    ("admin.topo.sectionOverview", "ÐžÐ³Ð»ÑÐ´ Ñ‚Ð¾Ð¿Ð¾Ð»Ð¾Ð³Ñ–Ñ—"),
+    ("admin.topo.sectionGraph", "Ð“Ñ€Ð°Ñ„ ÐºÐ»Ð°ÑÑ‚ÐµÑ€Ð°"),
+    ("admin.topo.sectionHeatmap", "Ð¢ÐµÐ¿Ð»Ð¾Ð²Ð° ÐºÐ°Ñ€Ñ‚Ð° Ð·Ð°Ñ‚Ñ€Ð¸Ð¼Ð¾Ðº"),
+    ("admin.topo.graphTitle", "Ð“Ñ€Ð°Ñ„ Ñ‚Ð¾Ð¿Ð¾Ð»Ð¾Ð³Ñ–Ñ— ÐºÐ»Ð°ÑÑ‚ÐµÑ€Ð°"),
+    (
+        "admin.topo.graphLegend",
+        "ÐšÐ¾Ð»Ñ–Ñ€ Ñ€ÐµÐ±Ñ€Ð°: Ð¼ÐµÐ½ÑˆÐ° Ð·Ð°Ñ‚Ñ€Ð¸Ð¼ÐºÐ° (Ð·ÐµÐ»ÐµÐ½Ñ–ÑˆÐµ) â†’ Ð±Ñ–Ð»ÑŒÑˆÐ° (Ñ‚ÐµÐ¿Ð»Ñ–ÑˆÐµ). Ð Ð¾Ð·Ð¼Ñ–Ñ€ Ð²ÑƒÐ·Ð»Ð°: Ð½Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ.",
+    ),
+    ("admin.topo.refresh", "ÐžÐ½Ð¾Ð²Ð¸Ñ‚Ð¸"),
+    ("admin.topo.sectionLatency", "ÐœÐ°Ñ‚Ñ€Ð¸Ñ†Ñ Ð·Ð°Ñ‚Ñ€Ð¸Ð¼Ð¾Ðº"),
+    ("admin.topo.loading", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñâ€¦"),
+    ("admin.topo.noNodes", "Ð’ÑƒÐ·Ð»Ñ–Ð² Ð½Ðµ Ð·Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾"),
+    ("admin.topo.errNodesRow", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ Ð²ÑƒÐ·Ð»Ñ–Ð²"),
+    ("admin.topo.noLatency", "Ð’Ð¸Ð¼Ñ–Ñ€Ñ–Ð² Ð·Ð°Ñ‚Ñ€Ð¸Ð¼ÐºÐ¸ Ð½ÐµÐ¼Ð°Ñ”"),
+    ("admin.topo.errLatencyRow", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð¼Ð°Ñ‚Ñ€Ð¸Ñ†Ñ– Ð·Ð°Ñ‚Ñ€Ð¸Ð¼Ð¾Ðº"),
+    ("admin.topo.viewDetails", "Ð”ÐµÑ‚Ð°Ð»Ñ–"),
+    ("admin.topo.modalNodeTitle", "Ð ÐµÑÑƒÑ€ÑÐ¸ Ð²ÑƒÐ·Ð»Ð°"),
+    ("admin.topo.errLoad", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ Ñ‚Ð¾Ð¿Ð¾Ð»Ð¾Ð³Ñ–Ñ—: "),
+    ("admin.topo.errNodeRes", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ñ€ÐµÑÑƒÑ€ÑÑ–Ð² Ð²ÑƒÐ·Ð»Ð°: "),
+    ("admin.topo.refreshInfo", "ÐžÐ½Ð¾Ð²Ð»ÐµÐ½Ð½Ñ Ñ‚Ð¾Ð¿Ð¾Ð»Ð¾Ð³Ñ–Ñ— Ñ€Ð¾Ð·Ð¿Ð¾Ñ‡Ð°Ñ‚Ð¾"),
+    ("admin.topo.col.nodeId", "ID Ð²ÑƒÐ·Ð»Ð°"),
+    ("admin.topo.col.gpuMem", "Ð”Ð¾ÑÑ‚ÑƒÐ¿Ð½Ð° Ð¿Ð°Ð¼â€™ÑÑ‚ÑŒ GPU"),
+    ("admin.topo.col.cpu", "Ð”Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ– ÑÐ´Ñ€Ð° CPU"),
+    ("admin.topo.col.load", "ÐŸÐ¾Ñ‚Ð¾Ñ‡Ð½Ðµ Ð½Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ"),
+    ("admin.topo.col.actions", "Ð”Ñ–Ñ—"),
+    ("admin.topo.col.from", "Ð— Ð²ÑƒÐ·Ð»Ð°"),
+    ("admin.topo.col.to", "Ð”Ð¾ Ð²ÑƒÐ·Ð»Ð°"),
+    ("admin.topo.col.latency", "Ð—Ð°Ñ‚Ñ€Ð¸Ð¼ÐºÐ° (Ð¼Ñ)"),
+    ("admin.topo.lbl.gpu", "ÐŸÐ°Ð¼â€™ÑÑ‚ÑŒ GPU:"),
+    ("admin.topo.lbl.cpu", "Ð¯Ð´Ñ€Ð° CPU:"),
+    ("admin.topo.lbl.sysMem", "Ð¡Ð¸ÑÑ‚ÐµÐ¼Ð½Ð° Ð¿Ð°Ð¼â€™ÑÑ‚ÑŒ:"),
+    ("admin.topo.lbl.load", "ÐÐ°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ:"),
+];
+
+/// English instances admin keys (PH-S236; moved from `i18n_core.js`).
+pub const ADMIN_INSTANCES_EN: &[I18nRow<'_>] = &[
+    ("admin.page.instances", "Model Instances"),
+    ("admin.inst.title", "Model Instances"),
+    (
+        "admin.inst.intro",
+        "Manage AI model instances, placement, and lifecycle.",
+    ),
+    ("admin.inst.sectionInst", "Instances"),
+    ("admin.inst.createBtn", "Create Instance"),
+    ("admin.inst.sectionPreview", "Placement Preview"),
+    ("admin.inst.modelIdLbl", "Model ID:"),
+    ("admin.inst.previewBtn", "Preview Placement"),
+    ("admin.inst.loadingRow", "Loadingâ€¦"),
+    ("admin.inst.empty", "No instances found"),
+    (
+        "admin.inst.previewHint",
+        "Enter a model ID and click Preview",
+    ),
+    ("admin.inst.col.instanceId", "Instance ID"),
+    ("admin.inst.col.modelId", "Model ID"),
+    ("admin.inst.col.status", "Status"),
+    ("admin.inst.col.strategy", "Strategy"),
+    ("admin.inst.col.nodes", "Nodes"),
+    ("admin.inst.col.created", "Created"),
+    ("admin.inst.col.actions", "Actions"),
+    ("admin.inst.col.memDelta", "Memory Delta"),
+    ("admin.inst.col.placementErr", "Error"),
+    ("admin.inst.viewBtn", "View"),
+    ("admin.inst.errLoad", "Error loading instances: "),
+    ("admin.inst.needModelId", "Please enter a model ID"),
+    ("admin.inst.previewEmpty", "No placement options available"),
+    (
+        "admin.inst.previewErr",
+        "Error getting placement previews: ",
+    ),
+    ("admin.inst.modalTitle", "Instance Details"),
+    ("admin.inst.modalCreateTitle", "Create Instance"),
+    (
+        "admin.inst.confirmDel",
+        "Are you sure you want to delete instance {id}?",
+    ),
+    ("admin.inst.deletedOk", "Instance deleted successfully"),
+    ("admin.inst.errDel", "Error deleting instance: "),
+    ("admin.inst.createdOk", "Instance created successfully: "),
+    ("admin.inst.errCreate", "Error creating instance: "),
+    ("admin.inst.errLoadOne", "Error loading instance: "),
+    ("admin.inst.lbl.modelId", "Model ID:"),
+    ("admin.inst.lbl.placementJson", "Placement (JSON):"),
+    (
+        "admin.inst.ph.placement",
+        r#"{"model_id": "", "strategy": "Single", "node_ids": ["local"]}"#,
+    ),
+    ("admin.inst.ph.modelId", "Enter model ID"),
+];
+
+/// Ukrainian instances admin keys (PH-S236).
+pub const ADMIN_INSTANCES_UK: &[I18nRow<'_>] = &[
+    ("admin.page.instances", "Ð†Ð½ÑÑ‚Ð°Ð½ÑÐ¸ Ð¼Ð¾Ð´ÐµÐ»ÐµÐ¹"),
+    ("admin.inst.title", "Ð†Ð½ÑÑ‚Ð°Ð½ÑÐ¸ Ð¼Ð¾Ð´ÐµÐ»ÐµÐ¹"),
+    (
+        "admin.inst.intro",
+        "ÐšÐµÑ€ÑƒÐ²Ð°Ð½Ð½Ñ Ñ–Ð½ÑÑ‚Ð°Ð½ÑÐ°Ð¼Ð¸ Ð¨Ð†, Ñ€Ð¾Ð·Ð¼Ñ–Ñ‰ÐµÐ½Ð½ÑÐ¼ Ñ– Ð¶Ð¸Ñ‚Ñ‚Ñ”Ð²Ð¸Ð¼ Ñ†Ð¸ÐºÐ»Ð¾Ð¼.",
+    ),
+    ("admin.inst.sectionInst", "Ð†Ð½ÑÑ‚Ð°Ð½ÑÐ¸"),
+    ("admin.inst.createBtn", "Ð¡Ñ‚Ð²Ð¾Ñ€Ð¸Ñ‚Ð¸ Ñ–Ð½ÑÑ‚Ð°Ð½Ñ"),
+    (
+        "admin.inst.sectionPreview",
+        "ÐŸÐ¾Ð¿ÐµÑ€ÐµÐ´Ð½Ñ–Ð¹ Ð¿ÐµÑ€ÐµÐ³Ð»ÑÐ´ Ñ€Ð¾Ð·Ð¼Ñ–Ñ‰ÐµÐ½Ð½Ñ",
+    ),
+    ("admin.inst.modelIdLbl", "ID Ð¼Ð¾Ð´ÐµÐ»Ñ–:"),
+    ("admin.inst.previewBtn", "ÐŸÐµÑ€ÐµÐ³Ð»ÑÐ½ÑƒÑ‚Ð¸ Ñ€Ð¾Ð·Ð¼Ñ–Ñ‰ÐµÐ½Ð½Ñ"),
+    ("admin.inst.loadingRow", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñâ€¦"),
+    ("admin.inst.empty", "Ð†Ð½ÑÑ‚Ð°Ð½ÑÑ–Ð² Ð½Ðµ Ð·Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾"),
+    (
+        "admin.inst.previewHint",
+        "Ð’Ð²ÐµÐ´Ñ–Ñ‚ÑŒ ID Ð¼Ð¾Ð´ÐµÐ»Ñ– Ñ‚Ð° Ð½Ð°Ñ‚Ð¸ÑÐ½Ñ–Ñ‚ÑŒ Ð¿ÐµÑ€ÐµÐ³Ð»ÑÐ´",
+    ),
+    ("admin.inst.col.instanceId", "ID Ñ–Ð½ÑÑ‚Ð°Ð½ÑÑƒ"),
+    ("admin.inst.col.modelId", "ID Ð¼Ð¾Ð´ÐµÐ»Ñ–"),
+    ("admin.inst.col.status", "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ"),
+    ("admin.inst.col.strategy", "Ð¡Ñ‚Ñ€Ð°Ñ‚ÐµÐ³Ñ–Ñ"),
+    ("admin.inst.col.nodes", "Ð’ÑƒÐ·Ð»Ð¸"),
+    ("admin.inst.col.created", "Ð¡Ñ‚Ð²Ð¾Ñ€ÐµÐ½Ð¾"),
+    ("admin.inst.col.actions", "Ð”Ñ–Ñ—"),
+    ("admin.inst.col.memDelta", "Î” Ð¿Ð°Ð¼â€™ÑÑ‚Ñ–"),
+    ("admin.inst.col.placementErr", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ°"),
+    ("admin.inst.viewBtn", "ÐŸÐµÑ€ÐµÐ³Ð»ÑÐ´"),
+    ("admin.inst.errLoad", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ Ñ–Ð½ÑÑ‚Ð°Ð½ÑÑ–Ð²: "),
+    ("admin.inst.needModelId", "Ð’Ð²ÐµÐ´Ñ–Ñ‚ÑŒ ID Ð¼Ð¾Ð´ÐµÐ»Ñ–"),
+    ("admin.inst.previewEmpty", "Ð’Ð°Ñ€Ñ–Ð°Ð½Ñ‚Ñ–Ð² Ñ€Ð¾Ð·Ð¼Ñ–Ñ‰ÐµÐ½Ð½Ñ Ð½ÐµÐ¼Ð°Ñ”"),
+    ("admin.inst.previewErr", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð¿Ð¾Ð¿ÐµÑ€ÐµÐ´Ð½ÑŒÐ¾Ð³Ð¾ Ð¿ÐµÑ€ÐµÐ³Ð»ÑÐ´Ñƒ: "),
+    ("admin.inst.modalTitle", "Ð”ÐµÑ‚Ð°Ð»Ñ– Ñ–Ð½ÑÑ‚Ð°Ð½ÑÑƒ"),
+    ("admin.inst.modalCreateTitle", "Ð¡Ñ‚Ð²Ð¾Ñ€Ð¸Ñ‚Ð¸ Ñ–Ð½ÑÑ‚Ð°Ð½Ñ"),
+    ("admin.inst.confirmDel", "Ð’Ð¸Ð´Ð°Ð»Ð¸Ñ‚Ð¸ Ñ–Ð½ÑÑ‚Ð°Ð½Ñ {id}?"),
+    ("admin.inst.deletedOk", "Ð†Ð½ÑÑ‚Ð°Ð½Ñ Ð²Ð¸Ð´Ð°Ð»ÐµÐ½Ð¾"),
+    ("admin.inst.errDel", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð²Ð¸Ð´Ð°Ð»ÐµÐ½Ð½Ñ: "),
+    ("admin.inst.createdOk", "Ð†Ð½ÑÑ‚Ð°Ð½Ñ ÑÑ‚Ð²Ð¾Ñ€ÐµÐ½Ð¾: "),
+    ("admin.inst.errCreate", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° ÑÑ‚Ð²Ð¾Ñ€ÐµÐ½Ð½Ñ: "),
+    ("admin.inst.errLoadOne", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ Ñ–Ð½ÑÑ‚Ð°Ð½ÑÑƒ: "),
+    ("admin.inst.lbl.modelId", "ID Ð¼Ð¾Ð´ÐµÐ»Ñ–:"),
+    ("admin.inst.lbl.placementJson", "Ð Ð¾Ð·Ð¼Ñ–Ñ‰ÐµÐ½Ð½Ñ (JSON):"),
+    (
+        "admin.inst.ph.placement",
+        r#"{"model_id": "", "strategy": "Single", "node_ids": ["local"]}"#,
+    ),
+    ("admin.inst.ph.modelId", "ID Ð¼Ð¾Ð´ÐµÐ»Ñ–"),
+];
+
+/// English VM admin keys (PH-S237; moved from `i18n_core.js`).
+pub const ADMIN_VM_EN: &[I18nRow<'_>] = &[
+    ("admin.page.vm", "VM Management"),
+    ("admin.vmadm.loading", "Loading VM instancesâ€¦"),
+    ("admin.vmadm.errLoad", "Error loading VM instances: "),
+    ("admin.vmadm.empty", "No VM instances found"),
+    ("admin.vmadm.col.name", "Name"),
+    ("admin.vmadm.col.status", "Status"),
+    ("admin.vmadm.col.resources", "Resources"),
+    ("admin.vmadm.col.actions", "Actions"),
+    ("admin.vmadm.resCpu", "CPU:"),
+    ("admin.vmadm.resMem", "Memory:"),
+    ("admin.vmadm.section", "VM Instances"),
+    ("admin.vmadm.createBtn", "Create VM Instance"),
+    ("admin.vmadm.actionOk", "VM {action} successful"),
+    ("admin.vmadm.creating", "Creatingâ€¦"),
+];
+
+/// Ukrainian VM admin keys (PH-S237).
+pub const ADMIN_VM_UK: &[I18nRow<'_>] = &[
+    ("admin.page.vm", "ÐšÐµÑ€ÑƒÐ²Ð°Ð½Ð½Ñ VM"),
+    ("admin.vmadm.loading", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ Ñ–Ð½ÑÑ‚Ð°Ð½ÑÑ–Ð² VMâ€¦"),
+    ("admin.vmadm.errLoad", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ VM: "),
+    ("admin.vmadm.empty", "Ð†Ð½ÑÑ‚Ð°Ð½ÑÑ–Ð² VM Ð½Ðµ Ð·Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾"),
+    ("admin.vmadm.col.name", "ÐÐ°Ð·Ð²Ð°"),
+    ("admin.vmadm.col.status", "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ"),
+    ("admin.vmadm.col.resources", "Ð ÐµÑÑƒÑ€ÑÐ¸"),
+    ("admin.vmadm.col.actions", "Ð”Ñ–Ñ—"),
+    ("admin.vmadm.resCpu", "CPU:"),
+    ("admin.vmadm.resMem", "ÐŸÐ°Ð¼â€™ÑÑ‚ÑŒ:"),
+    ("admin.vmadm.section", "Ð†Ð½ÑÑ‚Ð°Ð½ÑÐ¸ VM"),
+    ("admin.vmadm.createBtn", "Ð¡Ñ‚Ð²Ð¾Ñ€Ð¸Ñ‚Ð¸ Ñ–Ð½ÑÑ‚Ð°Ð½Ñ VM"),
+    ("admin.vmadm.actionOk", "VM: Ð´Ñ–Ñ Â«{action}Â» Ð²Ð¸ÐºÐ¾Ð½Ð°Ð½Ð°"),
+    ("admin.vmadm.creating", "Ð¡Ñ‚Ð²Ð¾Ñ€ÐµÐ½Ð½Ñâ€¦"),
+];
+
+/// English users admin keys (PH-S238; moved from `i18n_core.js`).
+pub const ADMIN_USERS_EN: &[I18nRow<'_>] = &[
+    ("admin.page.users", "User Management"),
+    ("admin.usr.loading", "Loading usersâ€¦"),
+    ("admin.usr.errLoad", "Error loading users: "),
+    ("admin.usr.empty", "No users found"),
+    ("admin.usr.col.user", "Username"),
+    ("admin.usr.col.role", "Role"),
+    ("admin.usr.col.status", "Status"),
+    ("admin.usr.col.created", "Created"),
+    ("admin.usr.col.actions", "Actions"),
+    ("admin.usr.section", "Users"),
+    ("admin.usr.createBtn", "Create User"),
+    ("admin.usr.createTitle", "Create New User"),
+    ("admin.usr.editTitle", "Edit User"),
+    ("admin.usr.label.user", "Username"),
+    ("admin.usr.ph.user", "newuser"),
+    ("admin.usr.label.pw", "Password"),
+    (
+        "admin.usr.label.pwNew",
+        "New Password (leave empty to keep current)",
+    ),
+    ("admin.usr.label.role", "Role"),
+    ("admin.usr.ph.pw", "Enter password"),
+    ("admin.usr.ph.pwNew", "Enter new password"),
+    ("admin.usr.creating", "Creatingâ€¦"),
+    ("admin.usr.saving", "Savingâ€¦"),
+    ("admin.usr.createSubmit", "Create User"),
+    ("admin.usr.createdOk", "User created successfully"),
+    ("admin.usr.updatedOk", "User updated successfully"),
+    ("admin.usr.loadEditErr", "Error loading user for edit: "),
+    (
+        "admin.usr.confirmDel",
+        "Are you sure you want to delete this user? This action cannot be undone.",
+    ),
+    ("admin.usr.deletedOk", "User deleted successfully"),
+    ("admin.usr.errDel", "Error deleting user: "),
+];
+
+/// Ukrainian users admin keys (PH-S238).
+pub const ADMIN_USERS_UK: &[I18nRow<'_>] = &[
+    ("admin.page.users", "ÐšÐµÑ€ÑƒÐ²Ð°Ð½Ð½Ñ ÐºÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ð°Ð¼Ð¸"),
+    ("admin.usr.loading", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ ÐºÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ñ–Ð²â€¦"),
+    ("admin.usr.errLoad", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ ÐºÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ñ–Ð²: "),
+    ("admin.usr.empty", "ÐšÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ñ–Ð² Ð½Ðµ Ð·Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾"),
+    ("admin.usr.col.user", "ÐšÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡"),
+    ("admin.usr.col.role", "Ð Ð¾Ð»ÑŒ"),
+    ("admin.usr.col.status", "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ"),
+    ("admin.usr.col.created", "Ð¡Ñ‚Ð²Ð¾Ñ€ÐµÐ½Ð¾"),
+    ("admin.usr.col.actions", "Ð”Ñ–Ñ—"),
+    ("admin.usr.section", "ÐšÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ñ–"),
+    ("admin.usr.createBtn", "Ð¡Ñ‚Ð²Ð¾Ñ€Ð¸Ñ‚Ð¸ ÐºÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ð°"),
+    ("admin.usr.createTitle", "ÐÐ¾Ð²Ð¸Ð¹ ÐºÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡"),
+    ("admin.usr.editTitle", "Ð ÐµÐ´Ð°Ð³ÑƒÐ²Ð°Ñ‚Ð¸ ÐºÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ð°"),
+    ("admin.usr.label.user", "Ð†Ð¼â€™Ñ ÐºÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ð°"),
+    ("admin.usr.ph.user", "newuser"),
+    ("admin.usr.label.pw", "ÐŸÐ°Ñ€Ð¾Ð»ÑŒ"),
+    (
+        "admin.usr.label.pwNew",
+        "ÐÐ¾Ð²Ð¸Ð¹ Ð¿Ð°Ñ€Ð¾Ð»ÑŒ (Ð¿Ð¾Ñ€Ð¾Ð¶Ð½ÑŒÐ¾ â€” Ð±ÐµÐ· Ð·Ð¼Ñ–Ð½)",
+    ),
+    ("admin.usr.label.role", "Ð Ð¾Ð»ÑŒ"),
+    ("admin.usr.ph.pw", "Ð’Ð²ÐµÐ´Ñ–Ñ‚ÑŒ Ð¿Ð°Ñ€Ð¾Ð»ÑŒ"),
+    ("admin.usr.ph.pwNew", "ÐÐ¾Ð²Ð¸Ð¹ Ð¿Ð°Ñ€Ð¾Ð»ÑŒ"),
+    ("admin.usr.creating", "Ð¡Ñ‚Ð²Ð¾Ñ€ÐµÐ½Ð½Ñâ€¦"),
+    ("admin.usr.saving", "Ð—Ð±ÐµÑ€ÐµÐ¶ÐµÐ½Ð½Ñâ€¦"),
+    ("admin.usr.createSubmit", "Ð¡Ñ‚Ð²Ð¾Ñ€Ð¸Ñ‚Ð¸ ÐºÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ð°"),
+    ("admin.usr.createdOk", "ÐšÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ð° ÑÑ‚Ð²Ð¾Ñ€ÐµÐ½Ð¾"),
+    ("admin.usr.updatedOk", "ÐšÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ð° Ð¾Ð½Ð¾Ð²Ð»ÐµÐ½Ð¾"),
+    (
+        "admin.usr.loadEditErr",
+        "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ Ð´Ð»Ñ Ñ€ÐµÐ´Ð°Ð³ÑƒÐ²Ð°Ð½Ð½Ñ: ",
+    ),
+    (
+        "admin.usr.confirmDel",
+        "Ð’Ð¸Ð´Ð°Ð»Ð¸Ñ‚Ð¸ Ñ†ÑŒÐ¾Ð³Ð¾ ÐºÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ð°? Ð”Ñ–ÑŽ Ð½Ðµ ÑÐºÐ°ÑÑƒÐ²Ð°Ñ‚Ð¸.",
+    ),
+    ("admin.usr.deletedOk", "ÐšÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ð° Ð²Ð¸Ð´Ð°Ð»ÐµÐ½Ð¾"),
+    ("admin.usr.errDel", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð²Ð¸Ð´Ð°Ð»ÐµÐ½Ð½Ñ: "),
+];
+
+/// English config admin keys (PH-S239; moved from `i18n_core.js`).
+pub const ADMIN_CONFIG_EN: &[I18nRow<'_>] = &[
+    ("admin.page.config", "System Configuration"),
+    ("admin.cfg.loading", "Loading configurationâ€¦"),
+    ("admin.cfg.unknownTab", "Unknown tab: "),
+    ("admin.cfg.tab.general", "General"),
+    ("admin.cfg.tab.performance", "Performance"),
+    ("admin.cfg.tab.gpu", "GPU"),
+    ("admin.cfg.tab.security", "Security"),
+    ("admin.cfg.tab.monitoring", "Monitoring"),
+    ("admin.cfg.tab.health", "Health"),
+    ("admin.cfg.saveBtn", "Save Configuration"),
+    ("admin.cfg.savedOk", "Configuration saved successfully"),
+    ("admin.cfg.saveErr", "Error saving configuration: "),
+    ("admin.cfg.saving", "Savingâ€¦"),
+    ("admin.cfg.gen.systemName", "System Name"),
+    ("admin.cfg.gen.logLevel", "Log Level"),
+    ("admin.cfg.gen.maxWorkers", "Max Workers"),
+    ("admin.cfg.gen.queueSize", "Queue Size"),
+    (
+        "admin.cfg.gen.metricsInterval",
+        "Metrics Interval (seconds)",
+    ),
+    ("admin.cfg.log.trace", "Trace"),
+    ("admin.cfg.log.debug", "Debug"),
+    ("admin.cfg.log.info", "Info"),
+    ("admin.cfg.log.warn", "Warn"),
+    ("admin.cfg.log.error", "Error"),
+    ("admin.cfg.perf.poolMaxWorkers", "Pool Max Workers"),
+    ("admin.cfg.perf.poolQueue", "Pool Queue Size"),
+    ("admin.cfg.perf.autoScaling", "Auto Scaling"),
+    (
+        "admin.cfg.perf.scalingThreshold",
+        "Scaling Threshold (0.0-1.0)",
+    ),
+    ("admin.cfg.perf.requestTimeout", "Request Timeout (seconds)"),
+    ("admin.cfg.https.enable", "Enable HTTPS"),
+    ("admin.cfg.https.certPath", "Certificate Path"),
+    ("admin.cfg.https.keyPath", "Key Path"),
+    (
+        "admin.cfg.mon.metricsInterval",
+        "Metrics Interval (seconds)",
+    ),
+    ("admin.cfg.mon.alertThreshold", "Alert Threshold (0.0-1.0)"),
+    ("admin.cfg.mon.retentionDays", "Retention Days"),
+    ("admin.cfg.mon.detailedLogging", "Detailed Logging"),
+    ("admin.cfg.gpu.enable", "Enable GPU"),
+    ("admin.cfg.gpu.memLimit", "GPU Memory Limit (MB)"),
+    ("admin.cfg.gpu.tempLimit", "Temperature Limit (Â°C)"),
+    ("admin.cfg.gpu.powerLimit", "Power Limit (Watts)"),
+    ("admin.cfg.gpu.count", "GPU Count"),
+    ("admin.cfg.health.expectedWorkers", "Expected Workers"),
+    (
+        "admin.cfg.health.hint",
+        "Number of workers expected for health checks",
+    ),
+];
+
+/// Ukrainian config admin keys (PH-S239).
+pub const ADMIN_CONFIG_UK: &[I18nRow<'_>] = &[
+    ("admin.page.config", "ÐšÐ¾Ð½Ñ„Ñ–Ð³ÑƒÑ€Ð°Ñ†Ñ–Ñ ÑÐ¸ÑÑ‚ÐµÐ¼Ð¸"),
+    ("admin.cfg.loading", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ ÐºÐ¾Ð½Ñ„Ñ–Ð³ÑƒÑ€Ð°Ñ†Ñ–Ñ—â€¦"),
+    ("admin.cfg.unknownTab", "ÐÐµÐ²Ñ–Ð´Ð¾Ð¼Ð° Ð²ÐºÐ»Ð°Ð´ÐºÐ°: "),
+    ("admin.cfg.tab.general", "Ð—Ð°Ð³Ð°Ð»ÑŒÐ½Ðµ"),
+    ("admin.cfg.tab.performance", "ÐŸÑ€Ð¾Ð´ÑƒÐºÑ‚Ð¸Ð²Ð½Ñ–ÑÑ‚ÑŒ"),
+    ("admin.cfg.tab.gpu", "GPU"),
+    ("admin.cfg.tab.security", "Ð‘ÐµÐ·Ð¿ÐµÐºÐ°"),
+    ("admin.cfg.tab.monitoring", "ÐœÐ¾Ð½Ñ–Ñ‚Ð¾Ñ€Ð¸Ð½Ð³"),
+    ("admin.cfg.tab.health", "Ð—Ð´Ð¾Ñ€Ð¾Ð²â€™Ñ"),
+    ("admin.cfg.saveBtn", "Ð—Ð±ÐµÑ€ÐµÐ³Ñ‚Ð¸ ÐºÐ¾Ð½Ñ„Ñ–Ð³ÑƒÑ€Ð°Ñ†Ñ–ÑŽ"),
+    ("admin.cfg.savedOk", "ÐšÐ¾Ð½Ñ„Ñ–Ð³ÑƒÑ€Ð°Ñ†Ñ–ÑŽ Ð·Ð±ÐµÑ€ÐµÐ¶ÐµÐ½Ð¾"),
+    ("admin.cfg.saveErr", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð·Ð±ÐµÑ€ÐµÐ¶ÐµÐ½Ð½Ñ: "),
+    ("admin.cfg.saving", "Ð—Ð±ÐµÑ€ÐµÐ¶ÐµÐ½Ð½Ñâ€¦"),
+    ("admin.cfg.gen.systemName", "ÐÐ°Ð·Ð²Ð° ÑÐ¸ÑÑ‚ÐµÐ¼Ð¸"),
+    ("admin.cfg.gen.logLevel", "Ð Ñ–Ð²ÐµÐ½ÑŒ Ð»Ð¾Ð³ÑƒÐ²Ð°Ð½Ð½Ñ"),
+    ("admin.cfg.gen.maxWorkers", "ÐœÐ°ÐºÑ. Ð²Ð¾Ñ€ÐºÐµÑ€Ñ–Ð²"),
+    ("admin.cfg.gen.queueSize", "Ð Ð¾Ð·Ð¼Ñ–Ñ€ Ñ‡ÐµÑ€Ð³Ð¸"),
+    ("admin.cfg.gen.metricsInterval", "Ð†Ð½Ñ‚ÐµÑ€Ð²Ð°Ð» Ð¼ÐµÑ‚Ñ€Ð¸Ðº (Ñ)"),
+    ("admin.cfg.log.trace", "Trace"),
+    ("admin.cfg.log.debug", "Debug"),
+    ("admin.cfg.log.info", "Info"),
+    ("admin.cfg.log.warn", "Warn"),
+    ("admin.cfg.log.error", "Error"),
+    ("admin.cfg.perf.poolMaxWorkers", "ÐœÐ°ÐºÑ. Ð²Ð¾Ñ€ÐºÐµÑ€Ñ–Ð² Ð¿ÑƒÐ»Ñƒ"),
+    ("admin.cfg.perf.poolQueue", "Ð§ÐµÑ€Ð³Ð° Ð¿ÑƒÐ»Ñƒ"),
+    ("admin.cfg.perf.autoScaling", "ÐÐ²Ñ‚Ð¾Ð¼Ð°ÑÑˆÑ‚Ð°Ð±ÑƒÐ²Ð°Ð½Ð½Ñ"),
+    (
+        "admin.cfg.perf.scalingThreshold",
+        "ÐŸÐ¾Ñ€Ñ–Ð³ Ð¼Ð°ÑÑˆÑ‚Ð°Ð±ÑƒÐ²Ð°Ð½Ð½Ñ (0.0â€“1.0)",
+    ),
+    ("admin.cfg.perf.requestTimeout", "Ð¢Ð°Ð¹Ð¼Ð°ÑƒÑ‚ Ð·Ð°Ð¿Ð¸Ñ‚Ñƒ (Ñ)"),
+    ("admin.cfg.https.enable", "Ð£Ð²Ñ–Ð¼ÐºÐ½ÑƒÑ‚Ð¸ HTTPS"),
+    ("admin.cfg.https.certPath", "Ð¨Ð»ÑÑ… Ð´Ð¾ ÑÐµÑ€Ñ‚Ð¸Ñ„Ñ–ÐºÐ°Ñ‚Ð°"),
+    ("admin.cfg.https.keyPath", "Ð¨Ð»ÑÑ… Ð´Ð¾ ÐºÐ»ÑŽÑ‡Ð°"),
+    ("admin.cfg.mon.metricsInterval", "Ð†Ð½Ñ‚ÐµÑ€Ð²Ð°Ð» Ð¼ÐµÑ‚Ñ€Ð¸Ðº (Ñ)"),
+    ("admin.cfg.mon.alertThreshold", "ÐŸÐ¾Ñ€Ñ–Ð³ ÑÐ¿Ð¾Ð²Ñ–Ñ‰ÐµÐ½ÑŒ (0.0â€“1.0)"),
+    ("admin.cfg.mon.retentionDays", "Ð”Ð½Ñ–Ð² Ð·Ð±ÐµÑ€Ñ–Ð³Ð°Ð½Ð½Ñ"),
+    ("admin.cfg.mon.detailedLogging", "Ð”ÐµÑ‚Ð°Ð»ÑŒÐ½Ðµ Ð»Ð¾Ð³ÑƒÐ²Ð°Ð½Ð½Ñ"),
+    ("admin.cfg.gpu.enable", "Ð£Ð²Ñ–Ð¼ÐºÐ½ÑƒÑ‚Ð¸ GPU"),
+    ("admin.cfg.gpu.memLimit", "Ð›Ñ–Ð¼Ñ–Ñ‚ Ð¿Ð°Ð¼â€™ÑÑ‚Ñ– GPU (ÐœÐ‘)"),
+    ("admin.cfg.gpu.tempLimit", "Ð›Ñ–Ð¼Ñ–Ñ‚ Ñ‚ÐµÐ¼Ð¿ÐµÑ€Ð°Ñ‚ÑƒÑ€Ð¸ (Â°C)"),
+    ("admin.cfg.gpu.powerLimit", "Ð›Ñ–Ð¼Ñ–Ñ‚ Ð¿Ð¾Ñ‚ÑƒÐ¶Ð½Ð¾ÑÑ‚Ñ– (Ð’Ñ‚)"),
+    ("admin.cfg.gpu.count", "ÐšÑ–Ð»ÑŒÐºÑ–ÑÑ‚ÑŒ GPU"),
+    ("admin.cfg.health.expectedWorkers", "ÐžÑ‡Ñ–ÐºÑƒÐ²Ð°Ð½Ñ– Ð²Ð¾Ñ€ÐºÐµÑ€Ð¸"),
+    (
+        "admin.cfg.health.hint",
+        "ÐšÑ–Ð»ÑŒÐºÑ–ÑÑ‚ÑŒ Ð²Ð¾Ñ€ÐºÐµÑ€Ñ–Ð² Ð´Ð»Ñ health-check",
+    ),
+];
+
+/// English monitoring admin keys (PH-S207; moved from `i18n_core.js`).
+pub const ADMIN_MONITORING_EN: &[I18nRow<'_>] = &[
+    ("admin.page.monitoring", "Monitoring Dashboard"),
+    ("admin.mon.loading", "Loading monitoringâ€¦"),
+    ("admin.mon.errLoad", "Error loading monitoring: "),
+    ("admin.mon.noData", "No data available"),
+    ("admin.mon.noAlerts", "No active alerts"),
+    ("admin.mon.section", "Monitoring"),
+    ("admin.mon.createDashBtn", "Create Dashboard"),
+    ("admin.mon.createRuleBtn", "Create Alert Rule"),
+    (
+        "admin.mon.vizTitle",
+        "Metrics Visualization (Last 24 Hours)",
+    ),
+    ("admin.mon.activeAlertsTitle", "Active Alerts"),
+    ("admin.mon.dashboardsTitle", "Dashboards"),
+    ("admin.mon.alertRulesTitle", "Alert Rules"),
+    ("admin.mon.chartPoints", "{n} points"),
+    ("admin.mon.statMin", "Min:"),
+    ("admin.mon.statMax", "Max:"),
+    ("admin.mon.statAvg", "Avg:"),
+    ("admin.mon.col.severity", "Severity"),
+    ("admin.mon.col.metric", "Metric"),
+    ("admin.mon.col.currentVal", "Current Value"),
+    ("admin.mon.col.threshold", "Threshold"),
+    ("admin.mon.col.triggered", "Triggered"),
+    ("admin.mon.col.statusCol", "Status"),
+    ("admin.mon.col.actions", "Actions"),
+    ("admin.mon.ackBtn", "Acknowledge"),
+    ("admin.mon.statusAck", "Acknowledged"),
+    ("admin.mon.statusActiveLbl", "Active"),
+    ("admin.mon.noDashboards", "No dashboards created"),
+    ("admin.mon.metricsN", "{n} metrics"),
+    ("admin.mon.public", "Public"),
+    ("admin.mon.private", "Private"),
+    ("admin.mon.col.name", "Name"),
+    ("admin.mon.col.description", "Description"),
+    ("admin.mon.col.metrics", "Metrics"),
+    ("admin.mon.col.public", "Public"),
+    ("admin.mon.col.created", "Created"),
+    ("admin.mon.col.operator", "Operator"),
+    ("admin.mon.col.ruleStatus", "Status"),
+    ("admin.mon.enabled", "Enabled"),
+    ("admin.mon.disabled", "Disabled"),
+    ("admin.mon.dashCreatedOk", "Dashboard created successfully"),
+    ("admin.mon.ruleCreatedOk", "Alert rule created successfully"),
+    ("admin.mon.alertAckOk", "Alert acknowledged"),
+    ("admin.mon.creatingDash", "Creatingâ€¦"),
+    ("admin.mon.creatingRule", "Creatingâ€¦"),
+    ("admin.mon.modalCreateDash", "Create Dashboard"),
+    ("admin.mon.modalCreateRule", "Create Alert Rule"),
+    ("admin.mon.lbl.dashName", "Dashboard Name"),
+    ("admin.mon.lbl.dashDesc", "Description"),
+    ("admin.mon.lbl.dashMetrics", "Metrics (comma-separated)"),
+    (
+        "admin.mon.hint.dashMetrics",
+        "Enter metric names separated by commas",
+    ),
+    ("admin.mon.lbl.dashLayout", "Layout (JSON, optional)"),
+    ("admin.mon.lbl.dashPublic", "Public Dashboard"),
+    ("admin.mon.lbl.ruleName", "Rule Name"),
+    ("admin.mon.lbl.metricName", "Metric Name"),
+    ("admin.mon.lbl.operator", "Operator"),
+    ("admin.mon.lbl.threshold", "Threshold"),
+    ("admin.mon.lbl.severity", "Severity"),
+    ("admin.mon.op.gt", "Greater than (>)"),
+    ("admin.mon.op.lt", "Less than (<)"),
+    ("admin.mon.op.ge", "Greater or equal (>=)"),
+    ("admin.mon.op.le", "Less or equal (<=)"),
+    ("admin.mon.op.eq", "Equal (==)"),
+    ("admin.mon.lbl.ruleEnabled", "Enabled"),
+    ("admin.mon.mlTitle", "ML Pipeline Step Metrics"),
+    ("admin.mon.mlEmpty", "No ML pipeline step metrics yet"),
+    (
+        "admin.mon.mlEmptyHint",
+        "Run the demo pipeline or execute a pipeline via the AI/ML API.",
+    ),
+    ("admin.mon.mlUnavailable", "ML pipeline API unavailable"),
+    (
+        "admin.mon.mlUnavailableHint",
+        "Build with enterprise + ml features to enable AI/ML pipelines.",
+    ),
+    ("admin.mon.mlDemoBtn", "Run ML Demo"),
+    ("admin.mon.mlDemoRunning", "Running demoâ€¦"),
+    ("admin.mon.mlDemoOk", "ML demo pipeline completed"),
+    ("admin.mon.mlCol.pipeline", "Pipeline"),
+    ("admin.mon.mlCol.step", "Step"),
+    ("admin.mon.mlCol.kind", "Kind"),
+    ("admin.mon.mlCol.status", "Status"),
+    ("admin.mon.mlCol.metrics", "Metrics"),
+    ("admin.mon.ph.dashboard", "My Dashboard"),
+    ("admin.mon.ph.dashDesc", "Dashboard description"),
+    (
+        "admin.mon.ph.metricsCsv",
+        "cpu_usage, memory_usage, request_rate",
+    ),
+    ("admin.mon.ph.layoutJson", r#"{"widgets": []}"#),
+    ("admin.mon.ph.ruleName", "high-cpu-alert"),
+    ("admin.mon.ph.metric", "cpu_usage"),
+    ("admin.mon.storeLoading", "Loading storeâ€¦"),
+    ("admin.mon.storeLabel", "Monitoring store:"),
+    (
+        "admin.mon.storeHint",
+        "Monitoring persistence backend (POOLAI_MONITORING_STORE / POOLAI_MONITORING_DATA_DIR)",
+    ),
+    ("admin.mon.store.memory", "memory"),
+    ("admin.mon.store.sqlite", "sqlite"),
+    ("admin.mon.store.configured", "configured"),
+    ("admin.mon.store.unconfigured", "unconfigured"),
+    ("admin.mon.storeErr", "Monitoring store wire unavailable"),
+    ("admin.mon.btn.refresh", "Refresh"),
+    ("admin.mon.refreshOk", "Monitoring refreshed"),
+    ("admin.mon.refreshErr", "Monitoring refresh failed: "),
+];
+
+/// Ukrainian monitoring admin keys (PH-S207).
+pub const ADMIN_MONITORING_UK: &[I18nRow<'_>] = &[
+    ("admin.page.monitoring", "ÐœÐ¾Ð½Ñ–Ñ‚Ð¾Ñ€Ð¸Ð½Ð³"),
+    ("admin.mon.loading", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ Ð¼Ð¾Ð½Ñ–Ñ‚Ð¾Ñ€Ð¸Ð½Ð³Ñƒâ€¦"),
+    ("admin.mon.errLoad", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ Ð¼Ð¾Ð½Ñ–Ñ‚Ð¾Ñ€Ð¸Ð½Ð³Ñƒ: "),
+    ("admin.mon.noData", "ÐÐµÐ¼Ð°Ñ” Ð´Ð°Ð½Ð¸Ñ…"),
+    ("admin.mon.noAlerts", "ÐÐµÐ¼Ð°Ñ” Ð°ÐºÑ‚Ð¸Ð²Ð½Ð¸Ñ… ÑÐ¿Ð¾Ð²Ñ–Ñ‰ÐµÐ½ÑŒ"),
+    ("admin.mon.section", "ÐœÐ¾Ð½Ñ–Ñ‚Ð¾Ñ€Ð¸Ð½Ð³"),
+    ("admin.mon.createDashBtn", "Ð¡Ñ‚Ð²Ð¾Ñ€Ð¸Ñ‚Ð¸ Ð´Ð°ÑˆÐ±Ð¾Ñ€Ð´"),
+    ("admin.mon.createRuleBtn", "Ð¡Ñ‚Ð²Ð¾Ñ€Ð¸Ñ‚Ð¸ Ð¿Ñ€Ð°Ð²Ð¸Ð»Ð¾ ÑÐ¿Ð¾Ð²Ñ–Ñ‰ÐµÐ½ÑŒ"),
+    ("admin.mon.vizTitle", "Ð’Ñ–Ð·ÑƒÐ°Ð»Ñ–Ð·Ð°Ñ†Ñ–Ñ Ð¼ÐµÑ‚Ñ€Ð¸Ðº (Ð¾ÑÑ‚Ð°Ð½Ð½Ñ– 24 Ð³Ð¾Ð´)"),
+    ("admin.mon.activeAlertsTitle", "ÐÐºÑ‚Ð¸Ð²Ð½Ñ– ÑÐ¿Ð¾Ð²Ñ–Ñ‰ÐµÐ½Ð½Ñ"),
+    ("admin.mon.dashboardsTitle", "Ð”Ð°ÑˆÐ±Ð¾Ñ€Ð´Ð¸"),
+    ("admin.mon.alertRulesTitle", "ÐŸÑ€Ð°Ð²Ð¸Ð»Ð° ÑÐ¿Ð¾Ð²Ñ–Ñ‰ÐµÐ½ÑŒ"),
+    ("admin.mon.chartPoints", "Ñ‚Ð¾Ñ‡Ð¾Ðº: {n}"),
+    ("admin.mon.statMin", "ÐœÑ–Ð½:"),
+    ("admin.mon.statMax", "ÐœÐ°ÐºÑ:"),
+    ("admin.mon.statAvg", "Ð¡ÐµÑ€:"),
+    ("admin.mon.col.severity", "Ð’Ð°Ð¶Ð»Ð¸Ð²Ñ–ÑÑ‚ÑŒ"),
+    ("admin.mon.col.metric", "ÐœÐµÑ‚Ñ€Ð¸ÐºÐ°"),
+    ("admin.mon.col.currentVal", "ÐŸÐ¾Ñ‚Ð¾Ñ‡Ð½Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð½Ñ"),
+    ("admin.mon.col.threshold", "ÐŸÐ¾Ñ€Ñ–Ð³"),
+    ("admin.mon.col.triggered", "Ð§Ð°Ñ ÑÐ¿Ñ€Ð°Ñ†ÑŽÐ²Ð°Ð½Ð½Ñ"),
+    ("admin.mon.col.statusCol", "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ"),
+    ("admin.mon.col.actions", "Ð”Ñ–Ñ—"),
+    ("admin.mon.ackBtn", "ÐŸÑ–Ð´Ñ‚Ð²ÐµÑ€Ð´Ð¸Ñ‚Ð¸"),
+    ("admin.mon.statusAck", "ÐŸÑ–Ð´Ñ‚Ð²ÐµÑ€Ð´Ð¶ÐµÐ½Ð¾"),
+    ("admin.mon.statusActiveLbl", "ÐÐºÑ‚Ð¸Ð²Ð½Ðµ"),
+    ("admin.mon.noDashboards", "Ð”Ð°ÑˆÐ±Ð¾Ñ€Ð´Ñ–Ð² Ð½Ðµ ÑÑ‚Ð²Ð¾Ñ€ÐµÐ½Ð¾"),
+    ("admin.mon.metricsN", "ÐœÐµÑ‚Ñ€Ð¸Ðº: {n}"),
+    ("admin.mon.public", "ÐŸÑƒÐ±Ð»Ñ–Ñ‡Ð½Ð¸Ð¹"),
+    ("admin.mon.private", "ÐŸÑ€Ð¸Ð²Ð°Ñ‚Ð½Ð¸Ð¹"),
+    ("admin.mon.col.name", "ÐÐ°Ð·Ð²Ð°"),
+    ("admin.mon.col.description", "ÐžÐ¿Ð¸Ñ"),
+    ("admin.mon.col.metrics", "ÐœÐµÑ‚Ñ€Ð¸ÐºÐ¸"),
+    ("admin.mon.col.public", "ÐŸÑƒÐ±Ð»Ñ–Ñ‡Ð½Ð¸Ð¹"),
+    ("admin.mon.col.created", "Ð¡Ñ‚Ð²Ð¾Ñ€ÐµÐ½Ð¾"),
+    ("admin.mon.col.operator", "ÐžÐ¿ÐµÑ€Ð°Ñ‚Ð¾Ñ€"),
+    ("admin.mon.col.ruleStatus", "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ"),
+    ("admin.mon.enabled", "Ð£Ð²Ñ–Ð¼ÐºÐ½ÐµÐ½Ð¾"),
+    ("admin.mon.disabled", "Ð’Ð¸Ð¼ÐºÐ½ÐµÐ½Ð¾"),
+    ("admin.mon.dashCreatedOk", "Ð”Ð°ÑˆÐ±Ð¾Ñ€Ð´ ÑÑ‚Ð²Ð¾Ñ€ÐµÐ½Ð¾"),
+    ("admin.mon.ruleCreatedOk", "ÐŸÑ€Ð°Ð²Ð¸Ð»Ð¾ ÑÐ¿Ð¾Ð²Ñ–Ñ‰ÐµÐ½ÑŒ ÑÑ‚Ð²Ð¾Ñ€ÐµÐ½Ð¾"),
+    ("admin.mon.alertAckOk", "Ð¡Ð¿Ð¾Ð²Ñ–Ñ‰ÐµÐ½Ð½Ñ Ð¿Ñ–Ð´Ñ‚Ð²ÐµÑ€Ð´Ð¶ÐµÐ½Ð¾"),
+    ("admin.mon.creatingDash", "Ð¡Ñ‚Ð²Ð¾Ñ€ÐµÐ½Ð½Ñâ€¦"),
+    ("admin.mon.creatingRule", "Ð¡Ñ‚Ð²Ð¾Ñ€ÐµÐ½Ð½Ñâ€¦"),
+    ("admin.mon.modalCreateDash", "Ð¡Ñ‚Ð²Ð¾Ñ€Ð¸Ñ‚Ð¸ Ð´Ð°ÑˆÐ±Ð¾Ñ€Ð´"),
+    ("admin.mon.modalCreateRule", "Ð¡Ñ‚Ð²Ð¾Ñ€Ð¸Ñ‚Ð¸ Ð¿Ñ€Ð°Ð²Ð¸Ð»Ð¾ ÑÐ¿Ð¾Ð²Ñ–Ñ‰ÐµÐ½ÑŒ"),
+    ("admin.mon.lbl.dashName", "ÐÐ°Ð·Ð²Ð° Ð´Ð°ÑˆÐ±Ð¾Ñ€Ð´Ñƒ"),
+    ("admin.mon.lbl.dashDesc", "ÐžÐ¿Ð¸Ñ"),
+    ("admin.mon.lbl.dashMetrics", "ÐœÐµÑ‚Ñ€Ð¸ÐºÐ¸ (Ñ‡ÐµÑ€ÐµÐ· ÐºÐ¾Ð¼Ñƒ)"),
+    ("admin.mon.hint.dashMetrics", "ÐÐ°Ð·Ð²Ð¸ Ð¼ÐµÑ‚Ñ€Ð¸Ðº Ñ‡ÐµÑ€ÐµÐ· ÐºÐ¾Ð¼Ñƒ"),
+    ("admin.mon.lbl.dashLayout", "ÐœÐ°ÐºÐµÑ‚ (JSON, Ð½ÐµÐ¾Ð±Ð¾Ð²â€™ÑÐ·ÐºÐ¾Ð²Ð¾)"),
+    ("admin.mon.lbl.dashPublic", "ÐŸÑƒÐ±Ð»Ñ–Ñ‡Ð½Ð¸Ð¹ Ð´Ð°ÑˆÐ±Ð¾Ñ€Ð´"),
+    ("admin.mon.lbl.ruleName", "ÐÐ°Ð·Ð²Ð° Ð¿Ñ€Ð°Ð²Ð¸Ð»Ð°"),
+    ("admin.mon.lbl.metricName", "ÐÐ°Ð·Ð²Ð° Ð¼ÐµÑ‚Ñ€Ð¸ÐºÐ¸"),
+    ("admin.mon.lbl.operator", "ÐžÐ¿ÐµÑ€Ð°Ñ‚Ð¾Ñ€"),
+    ("admin.mon.lbl.threshold", "ÐŸÐ¾Ñ€Ñ–Ð³"),
+    ("admin.mon.lbl.severity", "Ð’Ð°Ð¶Ð»Ð¸Ð²Ñ–ÑÑ‚ÑŒ"),
+    ("admin.mon.op.gt", "Ð‘Ñ–Ð»ÑŒÑˆÐµ Ð½Ñ–Ð¶ (>)"),
+    ("admin.mon.op.lt", "ÐœÐµÐ½ÑˆÐµ Ð½Ñ–Ð¶ (<)"),
+    ("admin.mon.op.ge", "Ð‘Ñ–Ð»ÑŒÑˆÐµ Ð°Ð±Ð¾ Ð´Ð¾Ñ€Ñ–Ð²Ð½ÑŽÑ” (>=)"),
+    ("admin.mon.op.le", "ÐœÐµÐ½ÑˆÐµ Ð°Ð±Ð¾ Ð´Ð¾Ñ€Ñ–Ð²Ð½ÑŽÑ” (<=)"),
+    ("admin.mon.op.eq", "Ð”Ð¾Ñ€Ñ–Ð²Ð½ÑŽÑ” (==)"),
+    ("admin.mon.lbl.ruleEnabled", "Ð£Ð²Ñ–Ð¼ÐºÐ½ÐµÐ½Ð¾"),
+    ("admin.mon.mlTitle", "ÐœÐµÑ‚Ñ€Ð¸ÐºÐ¸ ÐºÑ€Ð¾ÐºÑ–Ð² ML pipeline"),
+    ("admin.mon.mlEmpty", "ÐœÐµÑ‚Ñ€Ð¸Ðº ÐºÑ€Ð¾ÐºÑ–Ð² ML pipeline Ñ‰Ðµ Ð½ÐµÐ¼Ð°Ñ”"),
+    (
+        "admin.mon.mlEmptyHint",
+        "Ð—Ð°Ð¿ÑƒÑÑ‚Ñ–Ñ‚ÑŒ demo pipeline Ð°Ð±Ð¾ Ð²Ð¸ÐºÐ¾Ð½Ð°Ð¹Ñ‚Ðµ pipeline Ñ‡ÐµÑ€ÐµÐ· AI/ML API.",
+    ),
+    ("admin.mon.mlUnavailable", "ML pipeline API Ð½ÐµÐ´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ð¸Ð¹"),
+    (
+        "admin.mon.mlUnavailableHint",
+        "Ð—Ð±ÐµÑ€Ñ–Ñ‚ÑŒ Ð· features enterprise + ml Ð´Ð»Ñ AI/ML pipelines.",
+    ),
+    ("admin.mon.mlDemoBtn", "Ð—Ð°Ð¿ÑƒÑÑ‚Ð¸Ñ‚Ð¸ ML Demo"),
+    ("admin.mon.mlDemoRunning", "Demo Ð²Ð¸ÐºÐ¾Ð½ÑƒÑ”Ñ‚ÑŒÑÑâ€¦"),
+    ("admin.mon.mlDemoOk", "ML demo pipeline Ð·Ð°Ð²ÐµÑ€ÑˆÐµÐ½Ð¾"),
+    ("admin.mon.mlCol.pipeline", "Pipeline"),
+    ("admin.mon.mlCol.step", "ÐšÑ€Ð¾Ðº"),
+    ("admin.mon.mlCol.kind", "Ð¢Ð¸Ð¿"),
+    ("admin.mon.mlCol.status", "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ"),
+    ("admin.mon.mlCol.metrics", "ÐœÐµÑ‚Ñ€Ð¸ÐºÐ¸"),
+    ("admin.mon.ph.dashboard", "ÐœÑ–Ð¹ Ð´Ð°ÑˆÐ±Ð¾Ñ€Ð´"),
+    ("admin.mon.ph.dashDesc", "ÐžÐ¿Ð¸Ñ Ð´Ð°ÑˆÐ±Ð¾Ñ€Ð´Ñƒ"),
+    (
+        "admin.mon.ph.metricsCsv",
+        "cpu_usage, memory_usage, request_rate",
+    ),
+    ("admin.mon.ph.layoutJson", r#"{"widgets": []}"#),
+    ("admin.mon.ph.ruleName", "high-cpu-alert"),
+    ("admin.mon.ph.metric", "cpu_usage"),
+    ("admin.mon.storeLoading", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ ÑÑ…Ð¾Ð²Ð¸Ñ‰Ð°â€¦"),
+    ("admin.mon.storeLabel", "Ð¡Ñ…Ð¾Ð²Ð¸Ñ‰Ðµ Ð¼Ð¾Ð½Ñ–Ñ‚Ð¾Ñ€Ð¸Ð½Ð³Ñƒ:"),
+    (
+        "admin.mon.storeHint",
+        "Ð‘ÐµÐºÐµÐ½Ð´ Ð¿ÐµÑ€ÑÐ¸ÑÑ‚ÐµÐ½Ñ‚Ð½Ð¾ÑÑ‚Ñ– Ð¼Ð¾Ð½Ñ–Ñ‚Ð¾Ñ€Ð¸Ð½Ð³Ñƒ (POOLAI_MONITORING_STORE / POOLAI_MONITORING_DATA_DIR)",
+    ),
+    ("admin.mon.store.memory", "memory"),
+    ("admin.mon.store.sqlite", "sqlite"),
+    ("admin.mon.store.configured", "Ð½Ð°Ð»Ð°ÑˆÑ‚Ð¾Ð²Ð°Ð½Ð¾"),
+    ("admin.mon.store.unconfigured", "Ð½Ðµ Ð½Ð°Ð»Ð°ÑˆÑ‚Ð¾Ð²Ð°Ð½Ð¾"),
+    ("admin.mon.storeErr", "Monitoring store wire Ð½ÐµÐ´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ð¸Ð¹"),
+    ("admin.mon.btn.refresh", "ÐžÐ½Ð¾Ð²Ð¸Ñ‚Ð¸"),
+    ("admin.mon.refreshOk", "ÐœÐ¾Ð½Ñ–Ñ‚Ð¾Ñ€Ð¸Ð½Ð³ Ð¾Ð½Ð¾Ð²Ð»ÐµÐ½Ð¾"),
+    ("admin.mon.refreshErr", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð¾Ð½Ð¾Ð²Ð»ÐµÐ½Ð½Ñ Ð¼Ð¾Ð½Ñ–Ñ‚Ð¾Ñ€Ð¸Ð½Ð³Ñƒ: "),
+];
+
+/// English workers admin keys (PH-S222; moved from `i18n_core.js`).
+pub const ADMIN_WORKERS_EN: &[I18nRow<'_>] = &[
+    ("admin.page.workers", "Worker Management"),
+    ("admin.wrk.loading", "Loading workersâ€¦"),
+    ("admin.wrk.errLoad", "Error loading workers: "),
+    ("admin.wrk.empty", "No workers found"),
+    ("admin.wrk.col.id", "ID"),
+    ("admin.wrk.col.status", "Status"),
+    ("admin.wrk.col.metrics", "Metrics"),
+    ("admin.wrk.col.actions", "Actions"),
+    ("admin.wrk.reqLabel", "Requests:"),
+    ("admin.wrk.confirmDel", "Delete worker {id}?"),
+    ("admin.wrk.deletedOk", "Worker deleted"),
+    ("admin.wrk.section", "Workers"),
+    ("admin.wrk.createBtn", "Create Worker"),
+    ("admin.wrk.title", "Create Worker"),
+    (
+        "admin.wrk.hintId",
+        "Alphanumeric, hyphens, and underscores only",
+    ),
+    ("admin.wrk.autoRestart", "Auto Restart"),
+    ("admin.wrk.resourceMon", "Resource Monitoring"),
+];
+
+/// Ukrainian workers admin keys (PH-S222).
+pub const ADMIN_WORKERS_UK: &[I18nRow<'_>] = &[
+    ("admin.page.workers", "ÐšÐµÑ€ÑƒÐ²Ð°Ð½Ð½Ñ Ð²Ð¾Ñ€ÐºÐµÑ€Ð°Ð¼Ð¸"),
+    ("admin.wrk.loading", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ Ð²Ð¾Ñ€ÐºÐµÑ€Ñ–Ð²â€¦"),
+    ("admin.wrk.errLoad", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ Ð²Ð¾Ñ€ÐºÐµÑ€Ñ–Ð²: "),
+    ("admin.wrk.empty", "Ð’Ð¾Ñ€ÐºÐµÑ€Ñ–Ð² Ð½Ðµ Ð·Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾"),
+    ("admin.wrk.col.id", "ID"),
+    ("admin.wrk.col.status", "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ"),
+    ("admin.wrk.col.metrics", "ÐœÐµÑ‚Ñ€Ð¸ÐºÐ¸"),
+    ("admin.wrk.col.actions", "Ð”Ñ–Ñ—"),
+    ("admin.wrk.reqLabel", "Ð—Ð°Ð¿Ð¸Ñ‚Ð¸:"),
+    ("admin.wrk.confirmDel", "Ð’Ð¸Ð´Ð°Ð»Ð¸Ñ‚Ð¸ Ð²Ð¾Ñ€ÐºÐµÑ€ {id}?"),
+    ("admin.wrk.deletedOk", "Ð’Ð¾Ñ€ÐºÐµÑ€ Ð²Ð¸Ð´Ð°Ð»ÐµÐ½Ð¾"),
+    ("admin.wrk.section", "Ð’Ð¾Ñ€ÐºÐµÑ€Ð¸"),
+    ("admin.wrk.createBtn", "Ð¡Ñ‚Ð²Ð¾Ñ€Ð¸Ñ‚Ð¸ Ð²Ð¾Ñ€ÐºÐµÑ€"),
+    ("admin.wrk.title", "Ð¡Ñ‚Ð²Ð¾Ñ€Ð¸Ñ‚Ð¸ Ð²Ð¾Ñ€ÐºÐµÑ€"),
+    ("admin.wrk.hintId", "Ð›Ñ–Ñ‚ÐµÑ€Ð¸, Ñ†Ð¸Ñ„Ñ€Ð¸, Ð´ÐµÑ„Ñ–Ñ Ñ– Ð¿Ñ–Ð´ÐºÑ€ÐµÑÐ»ÐµÐ½Ð½Ñ"),
+    ("admin.wrk.autoRestart", "ÐÐ²Ñ‚Ð¾Ð¿ÐµÑ€ÐµÐ·Ð°Ð¿ÑƒÑÐº"),
+    ("admin.wrk.resourceMon", "ÐœÐ¾Ð½Ñ–Ñ‚Ð¾Ñ€Ð¸Ð½Ð³ Ñ€ÐµÑÑƒÑ€ÑÑ–Ð²"),
+];
+
+/// English libraries admin keys (PH-S223; moved from `i18n_core.js`).
+pub const ADMIN_LIBS_EN: &[I18nRow<'_>] = &[
+    ("admin.page.libs", "Library Management"),
+    ("admin.lib.loading", "Loading librariesâ€¦"),
+    ("admin.lib.errLoad", "Error loading libraries: "),
+    ("admin.lib.empty", "No libraries found"),
+    ("admin.lib.installed", "Installed"),
+    ("admin.lib.notInstalled", "Not Installed"),
+    (
+        "admin.lib.promptInstall",
+        "Enter version to install (leave empty for latest):",
+    ),
+    (
+        "admin.lib.promptUpdate",
+        "Enter version to update to (leave empty for latest):",
+    ),
+    ("admin.lib.installStart", "Library installation started"),
+    ("admin.lib.errInstall", "Error installing library: "),
+    (
+        "admin.lib.confirmUn",
+        "Uninstall library \"{name}\"? This action cannot be undone.",
+    ),
+    ("admin.lib.uninstOk", "Library uninstalled successfully"),
+    ("admin.lib.updateStart", "Library update started"),
+    ("admin.lib.errUpdate", "Error updating library: "),
+    ("admin.lib.section", "Libraries"),
+    ("admin.lib.uploadBtn", "Upload Library"),
+    ("admin.lib.uploadTitle", "Upload Library"),
+    ("admin.lib.label.name", "Library Name"),
+    ("admin.lib.label.version", "Version"),
+    ("admin.lib.label.file", "Library File (e.g., .zip, .tar.gz)"),
+    ("admin.lib.ph.name", "my-model-lib"),
+    ("admin.lib.ph.version", "1.0.0"),
+    ("admin.lib.uploading", "Uploadingâ€¦"),
+    (
+        "admin.lib.reqFields",
+        "Name, version, and file are required",
+    ),
+    ("admin.lib.uploadOk", "Library uploaded successfully"),
+    ("admin.lib.errUpload", "Error uploading library: "),
+];
+
+/// Ukrainian libraries admin keys (PH-S223).
+pub const ADMIN_LIBS_UK: &[I18nRow<'_>] = &[
+    ("admin.page.libs", "ÐšÐµÑ€ÑƒÐ²Ð°Ð½Ð½Ñ Ð±Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºÐ°Ð¼Ð¸"),
+    ("admin.lib.loading", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ Ð±Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºâ€¦"),
+    ("admin.lib.errLoad", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ Ð±Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐº: "),
+    ("admin.lib.empty", "Ð‘Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐº Ð½Ðµ Ð·Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾"),
+    ("admin.lib.installed", "Ð’ÑÑ‚Ð°Ð½Ð¾Ð²Ð»ÐµÐ½Ð¾"),
+    ("admin.lib.notInstalled", "ÐÐµ Ð²ÑÑ‚Ð°Ð½Ð¾Ð²Ð»ÐµÐ½Ð¾"),
+    (
+        "admin.lib.promptInstall",
+        "Ð’ÐµÑ€ÑÑ–Ñ Ð´Ð»Ñ Ð²ÑÑ‚Ð°Ð½Ð¾Ð²Ð»ÐµÐ½Ð½Ñ (Ð¿Ð¾Ñ€Ð¾Ð¶Ð½ÑŒÐ¾ â€” Ð¾ÑÑ‚Ð°Ð½Ð½Ñ):",
+    ),
+    (
+        "admin.lib.promptUpdate",
+        "Ð’ÐµÑ€ÑÑ–Ñ Ð´Ð»Ñ Ð¾Ð½Ð¾Ð²Ð»ÐµÐ½Ð½Ñ (Ð¿Ð¾Ñ€Ð¾Ð¶Ð½ÑŒÐ¾ â€” Ð¾ÑÑ‚Ð°Ð½Ð½Ñ):",
+    ),
+    (
+        "admin.lib.installStart",
+        "Ð’ÑÑ‚Ð°Ð½Ð¾Ð²Ð»ÐµÐ½Ð½Ñ Ð±Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºÐ¸ Ñ€Ð¾Ð·Ð¿Ð¾Ñ‡Ð°Ñ‚Ð¾",
+    ),
+    ("admin.lib.errInstall", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð²ÑÑ‚Ð°Ð½Ð¾Ð²Ð»ÐµÐ½Ð½Ñ: "),
+    (
+        "admin.lib.confirmUn",
+        "Ð’Ð¸Ð´Ð°Ð»Ð¸Ñ‚Ð¸ Ð±Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºÑƒ Â«{name}Â»? Ð”Ñ–ÑŽ Ð½Ðµ ÑÐºÐ°ÑÑƒÐ²Ð°Ñ‚Ð¸.",
+    ),
+    ("admin.lib.uninstOk", "Ð‘Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºÑƒ Ð²Ð¸Ð´Ð°Ð»ÐµÐ½Ð¾"),
+    ("admin.lib.updateStart", "ÐžÐ½Ð¾Ð²Ð»ÐµÐ½Ð½Ñ Ð±Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºÐ¸ Ñ€Ð¾Ð·Ð¿Ð¾Ñ‡Ð°Ñ‚Ð¾"),
+    ("admin.lib.errUpdate", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð¾Ð½Ð¾Ð²Ð»ÐµÐ½Ð½Ñ: "),
+    ("admin.lib.section", "Ð‘Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºÐ¸"),
+    ("admin.lib.uploadBtn", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶Ð¸Ñ‚Ð¸ Ð±Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºÑƒ"),
+    ("admin.lib.uploadTitle", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶Ð¸Ñ‚Ð¸ Ð±Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºÑƒ"),
+    ("admin.lib.label.name", "ÐÐ°Ð·Ð²Ð° Ð±Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºÐ¸"),
+    ("admin.lib.label.version", "Ð’ÐµÑ€ÑÑ–Ñ"),
+    (
+        "admin.lib.label.file",
+        "Ð¤Ð°Ð¹Ð» Ð±Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºÐ¸ (.zip, .tar.gz Ñ‚Ð¾Ñ‰Ð¾)",
+    ),
+    ("admin.lib.ph.name", "my-model-lib"),
+    ("admin.lib.ph.version", "1.0.0"),
+    ("admin.lib.uploading", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñâ€¦"),
+    ("admin.lib.reqFields", "ÐŸÐ¾Ñ‚Ñ€Ñ–Ð±Ð½Ñ– Ð½Ð°Ð·Ð²Ð°, Ð²ÐµÑ€ÑÑ–Ñ Ñ– Ñ„Ð°Ð¹Ð»"),
+    ("admin.lib.uploadOk", "Ð‘Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºÑƒ Ð·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð¾"),
+    ("admin.lib.errUpload", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ: "),
+];
+
+/// English admin table toolbar keys (PH-S240; shared across admin pages).
+pub const ADMIN_TABLE_EN: &[I18nRow<'_>] = &[
+    ("admin.table.empty", "No data to display"),
+    ("admin.table.searchPh", "Filter tableâ€¦"),
+    ("admin.table.exportCsv", "Export CSV"),
+    ("admin.table.exportJson", "Export JSON"),
+    ("admin.table.exportCsvAria", "Export visible rows as CSV"),
+    ("admin.table.exportJsonAria", "Export visible rows as JSON"),
+    ("admin.table.exportedCsv", "Table exported as CSV"),
+    ("admin.table.exportedJson", "Table exported as JSON"),
+    ("admin.table.sortedBy", "Sorted by {column} {direction}"),
+];
+
+/// Ukrainian admin table toolbar keys (PH-S240).
+pub const ADMIN_TABLE_UK: &[I18nRow<'_>] = &[
+    ("admin.table.empty", "ÐÐµÐ¼Ð°Ñ” Ð´Ð°Ð½Ð¸Ñ… Ð´Ð»Ñ Ð²Ñ–Ð´Ð¾Ð±Ñ€Ð°Ð¶ÐµÐ½Ð½Ñ"),
+    ("admin.table.searchPh", "Ð¤Ñ–Ð»ÑŒÑ‚Ñ€ Ñ‚Ð°Ð±Ð»Ð¸Ñ†Ñ–â€¦"),
+    ("admin.table.exportCsv", "Ð•ÐºÑÐ¿Ð¾Ñ€Ñ‚ CSV"),
+    ("admin.table.exportJson", "Ð•ÐºÑÐ¿Ð¾Ñ€Ñ‚ JSON"),
+    (
+        "admin.table.exportCsvAria",
+        "Ð•ÐºÑÐ¿Ð¾Ñ€Ñ‚ÑƒÐ²Ð°Ñ‚Ð¸ Ð²Ð¸Ð´Ð¸Ð¼Ñ– Ñ€ÑÐ´ÐºÐ¸ ÑÐº CSV",
+    ),
+    (
+        "admin.table.exportJsonAria",
+        "Ð•ÐºÑÐ¿Ð¾Ñ€Ñ‚ÑƒÐ²Ð°Ñ‚Ð¸ Ð²Ð¸Ð´Ð¸Ð¼Ñ– Ñ€ÑÐ´ÐºÐ¸ ÑÐº JSON",
+    ),
+    ("admin.table.exportedCsv", "Ð¢Ð°Ð±Ð»Ð¸Ñ†ÑŽ ÐµÐºÑÐ¿Ð¾Ñ€Ñ‚Ð¾Ð²Ð°Ð½Ð¾ Ñƒ CSV"),
+    ("admin.table.exportedJson", "Ð¢Ð°Ð±Ð»Ð¸Ñ†ÑŽ ÐµÐºÑÐ¿Ð¾Ñ€Ñ‚Ð¾Ð²Ð°Ð½Ð¾ Ñƒ JSON"),
+    ("admin.table.sortedBy", "Ð¡Ð¾Ñ€Ñ‚ÑƒÐ²Ð°Ð½Ð½Ñ: {column} {direction}"),
+];
+
+/// English shared admin status / action keys (PH-S245; all admin layouts).
+pub const ADMIN_STATUS_EN: &[I18nRow<'_>] = &[
+    ("admin.status.active", "Active"),
+    ("admin.status.inactive", "Inactive"),
+    ("admin.status.yes", "Yes"),
+    ("admin.status.no", "No"),
+    ("admin.btn.edit", "Edit"),
+    ("admin.na", "N/A"),
+];
+
+/// Ukrainian shared admin status / action keys (PH-S245).
+pub const ADMIN_STATUS_UK: &[I18nRow<'_>] = &[
+    ("admin.status.active", "ÐÐºÑ‚Ð¸Ð²Ð½Ð¸Ð¹"),
+    ("admin.status.inactive", "ÐÐµÐ°ÐºÑ‚Ð¸Ð²Ð½Ð¸Ð¹"),
+    ("admin.status.yes", "Ð¢Ð°Ðº"),
+    ("admin.status.no", "ÐÑ–"),
+    ("admin.btn.edit", "Ð—Ð¼Ñ–Ð½Ð¸Ñ‚Ð¸"),
+    ("admin.na", "Ð/Ð”"),
+];
+
+/// English admin error hint / access keys (PH-S246; shared via admin_common.js).
+pub const ADMIN_ERR_EN: &[I18nRow<'_>] = &[
+    (
+        "err.insufficientAdmin",
+        "Insufficient permissions. Admin role required.",
+    ),
+    ("admin.accessRequired", "Admin access required"),
+    (
+        "err.hint403",
+        "You may need Admin or Operator role, or sign in again.",
+    ),
+    (
+        "err.hint503.generic",
+        "A subsystem may still be starting or unavailable.",
+    ),
+    (
+        "err.hint503.raid",
+        "RAID manager is not initialized on this server.",
+    ),
+    (
+        "err.hint503.library",
+        "Library subsystem may not be initialized.",
+    ),
+    ("err.hint503.vm", "VM manager may not be attached."),
+    (
+        "err.hint404.enterprise",
+        "Build and run the server with the enterprise feature for this API.",
+    ),
+];
+
+/// Ukrainian admin error hint / access keys (PH-S246).
+pub const ADMIN_ERR_UK: &[I18nRow<'_>] = &[
+    (
+        "err.insufficientAdmin",
+        "ÐÐµÐ´Ð¾ÑÑ‚Ð°Ñ‚Ð½ÑŒÐ¾ Ð¿Ñ€Ð°Ð². ÐŸÐ¾Ñ‚Ñ€Ñ–Ð±Ð½Ð° Ñ€Ð¾Ð»ÑŒ Admin.",
+    ),
+    ("admin.accessRequired", "ÐŸÐ¾Ñ‚Ñ€Ñ–Ð±Ð½Ñ– Ð¿Ñ€Ð°Ð²Ð° Ð°Ð´Ð¼Ñ–Ð½Ñ–ÑÑ‚Ñ€Ð°Ñ‚Ð¾Ñ€Ð°"),
+    (
+        "err.hint403",
+        "ÐœÐ¾Ð¶Ð»Ð¸Ð²Ð¾, Ð¿Ð¾Ñ‚Ñ€Ñ–Ð±Ð½Ð° Ñ€Ð¾Ð»ÑŒ Admin Ð°Ð±Ð¾ Operator, Ð°Ð±Ð¾ ÑƒÐ²Ñ–Ð¹Ð´Ñ–Ñ‚ÑŒ Ð·Ð½Ð¾Ð²Ñƒ.",
+    ),
+    (
+        "err.hint503.generic",
+        "ÐŸÑ–Ð´ÑÐ¸ÑÑ‚ÐµÐ¼Ð° Ñ‰Ðµ ÑÑ‚Ð°Ñ€Ñ‚ÑƒÑ” Ð°Ð±Ð¾ Ñ‚Ð¸Ð¼Ñ‡Ð°ÑÐ¾Ð²Ð¾ Ð½ÐµÐ´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ð°.",
+    ),
+    (
+        "err.hint503.raid",
+        "RAID-Ð¼ÐµÐ½ÐµÐ´Ð¶ÐµÑ€ Ð½Ð° Ñ†ÑŒÐ¾Ð¼Ñƒ ÑÐµÑ€Ð²ÐµÑ€Ñ– Ð½Ðµ Ñ–Ð½Ñ–Ñ†Ñ–Ð°Ð»Ñ–Ð·Ð¾Ð²Ð°Ð½Ð¾.",
+    ),
+    (
+        "err.hint503.library",
+        "ÐŸÑ–Ð´ÑÐ¸ÑÑ‚ÐµÐ¼Ñƒ Ð±Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐº Ð¼Ð¾Ð¶Ðµ Ð±ÑƒÑ‚Ð¸ Ð½Ðµ Ñ–Ð½Ñ–Ñ†Ñ–Ð°Ð»Ñ–Ð·Ð¾Ð²Ð°Ð½Ð¾.",
+    ),
+    ("err.hint503.vm", "VM-Ð¼ÐµÐ½ÐµÐ´Ð¶ÐµÑ€ Ð¼Ð¾Ð¶Ðµ Ð±ÑƒÑ‚Ð¸ Ð½Ðµ Ð¿Ñ–Ð´ÐºÐ»ÑŽÑ‡ÐµÐ½Ð¾."),
+    (
+        "err.hint404.enterprise",
+        "Ð—Ð±ÐµÑ€Ñ–Ñ‚ÑŒ Ñ– Ð·Ð°Ð¿ÑƒÑÑ‚Ñ–Ñ‚ÑŒ ÑÐµÑ€Ð²ÐµÑ€ Ð· Ñ„ÑƒÐ½ÐºÑ†Ñ–Ñ”ÑŽ enterprise Ð´Ð»Ñ Ñ†ÑŒÐ¾Ð³Ð¾ API.",
+    ),
+];
+
+/// English workers panel keys (PH-S257; moved from `i18n_core.js`).
+pub const WORKERS_PANEL_EN: &[I18nRow<'_>] = &[
+    ("workers.empty", "No workers available."),
+    ("workers.listAria", "Workers list"),
+    (
+        "workers.tableDesc",
+        "Table showing workers: id, health, state, task, metrics, actions",
+    ),
+    ("workers.col.id", "ID"),
+    ("workers.col.health", "Health"),
+    ("workers.col.state", "State"),
+    ("workers.col.task", "Current task"),
+    ("workers.col.requests", "Requests"),
+    ("workers.col.queue", "Queue"),
+    ("workers.col.actions", "Actions"),
+    ("workers.healthy", "Healthy"),
+    ("workers.unhealthy", "Unhealthy"),
+    ("workers.rowAriaPrefix", "Worker"),
+    ("workers.deleteAria", "Delete worker {id}"),
+    ("workers.permDeleteDesc", "Permanently delete worker {id}"),
+    (
+        "workers.noActionsRole",
+        "No actions available for your role",
+    ),
+    ("workers.createBtn", "Create Worker"),
+    ("workers.createBtnAria", "Create new worker"),
+    ("workers.modalTitle", "Create Worker"),
+    ("workers.label.id", "Worker ID"),
+    ("workers.label.maxConcurrent", "Max concurrent requests"),
+    ("workers.label.timeout", "Request timeout (ms)"),
+    ("workers.label.healthInterval", "Health check interval (ms)"),
+    ("workers.label.maxMemory", "Max memory (MB)"),
+    ("workers.label.cpuPriority", "CPU priority (1â€“10)"),
+    ("workers.label.gpuDevice", "GPU device ID (optional)"),
+    ("workers.label.cacheSize", "Cache size"),
+    ("workers.ph.id", "worker-1"),
+    ("workers.ph.gpu", "Leave empty for no GPU"),
+    ("workers.enableCache", "Enable caching"),
+    ("workers.autoRestart", "Auto restart on failure"),
+    ("workers.resourceMonitoring", "Resource monitoring"),
+    ("workers.creatingSubmit", "Creatingâ€¦"),
+    ("workers.createdOk", "Worker created successfully"),
+    ("workers.deletedOk", "Worker deleted successfully"),
+    ("workers.deletingLoad", "Deleting workerâ€¦"),
+    (
+        "workers.confirmDelete",
+        "Are you sure you want to delete worker \"{id}\"? This action cannot be undone.",
+    ),
+];
+
+/// Ukrainian workers panel keys (PH-S257).
+pub const WORKERS_PANEL_UK: &[I18nRow<'_>] = &[
+    ("workers.empty", "ÐÐµÐ¼Ð°Ñ” Ð´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ð¸Ñ… Ð²Ð¾Ñ€ÐºÐµÑ€Ñ–Ð²."),
+    ("workers.listAria", "Ð¡Ð¿Ð¸ÑÐ¾Ðº Ð²Ð¾Ñ€ÐºÐµÑ€Ñ–Ð²"),
+    (
+        "workers.tableDesc",
+        "Ð¢Ð°Ð±Ð»Ð¸Ñ†Ñ Ð²Ð¾Ñ€ÐºÐµÑ€Ñ–Ð²: id, ÑÑ‚Ð°Ð½ Ð·Ð´Ð¾Ñ€Ð¾Ð²â€™Ñ, ÑÑ‚Ð°Ñ‚ÑƒÑ, Ð¿Ð¾Ñ‚Ð¾Ñ‡Ð½Ðµ Ð·Ð°Ð²Ð´Ð°Ð½Ð½Ñ, Ð¼ÐµÑ‚Ñ€Ð¸ÐºÐ¸, Ð´Ñ–Ñ—",
+    ),
+    ("workers.col.id", "ID"),
+    ("workers.col.health", "Ð—Ð´Ð¾Ñ€Ð¾Ð²â€™Ñ"),
+    ("workers.col.state", "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ"),
+    ("workers.col.task", "ÐŸÐ¾Ñ‚Ð¾Ñ‡Ð½Ðµ Ð·Ð°Ð²Ð´Ð°Ð½Ð½Ñ"),
+    ("workers.col.requests", "Ð—Ð°Ð¿Ð¸Ñ‚Ð¸"),
+    ("workers.col.queue", "Ð§ÐµÑ€Ð³Ð°"),
+    ("workers.col.actions", "Ð”Ñ–Ñ—"),
+    ("workers.healthy", "OK"),
+    ("workers.unhealthy", "ÐŸÑ€Ð¾Ð±Ð»ÐµÐ¼Ð°"),
+    ("workers.rowAriaPrefix", "Ð’Ð¾Ñ€ÐºÐµÑ€"),
+    ("workers.deleteAria", "Ð’Ð¸Ð´Ð°Ð»Ð¸Ñ‚Ð¸ Ð²Ð¾Ñ€ÐºÐµÑ€ {id}"),
+    ("workers.permDeleteDesc", "ÐžÑÑ‚Ð°Ñ‚Ð¾Ñ‡Ð½Ð¾ Ð²Ð¸Ð´Ð°Ð»Ð¸Ñ‚Ð¸ Ð²Ð¾Ñ€ÐºÐµÑ€ {id}"),
+    ("workers.noActionsRole", "Ð”Ð»Ñ Ð²Ð°ÑˆÐ¾Ñ— Ñ€Ð¾Ð»Ñ– Ð´Ñ–Ñ— Ð½ÐµÐ´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ–"),
+    ("workers.createBtn", "Ð¡Ñ‚Ð²Ð¾Ñ€Ð¸Ñ‚Ð¸ Ð²Ð¾Ñ€ÐºÐµÑ€"),
+    ("workers.createBtnAria", "Ð¡Ñ‚Ð²Ð¾Ñ€Ð¸Ñ‚Ð¸ Ð½Ð¾Ð²Ð¾Ð³Ð¾ Ð²Ð¾Ñ€ÐºÐµÑ€Ð°"),
+    ("workers.modalTitle", "Ð¡Ñ‚Ð²Ð¾Ñ€Ð¸Ñ‚Ð¸ Ð²Ð¾Ñ€ÐºÐµÑ€"),
+    ("workers.label.id", "ID Ð²Ð¾Ñ€ÐºÐµÑ€Ð°"),
+    ("workers.label.maxConcurrent", "ÐœÐ°ÐºÑ. Ð¾Ð´Ð½Ð¾Ñ‡Ð°ÑÐ½Ð¸Ñ… Ð·Ð°Ð¿Ð¸Ñ‚Ñ–Ð²"),
+    ("workers.label.timeout", "Ð¢Ð°Ð¹Ð¼Ð°ÑƒÑ‚ Ð·Ð°Ð¿Ð¸Ñ‚Ñƒ (Ð¼Ñ)"),
+    ("workers.label.healthInterval", "Ð†Ð½Ñ‚ÐµÑ€Ð²Ð°Ð» health-check (Ð¼Ñ)"),
+    ("workers.label.maxMemory", "ÐœÐ°ÐºÑ. Ð¿Ð°Ð¼â€™ÑÑ‚ÑŒ (ÐœÐ‘)"),
+    ("workers.label.cpuPriority", "ÐŸÑ€Ñ–Ð¾Ñ€Ð¸Ñ‚ÐµÑ‚ CPU (1â€“10)"),
+    ("workers.label.gpuDevice", "ID GPU-Ð¿Ñ€Ð¸ÑÑ‚Ñ€Ð¾ÑŽ (Ð½ÐµÐ¾Ð±Ð¾Ð²â€™ÑÐ·ÐºÐ¾Ð²Ð¾)"),
+    ("workers.label.cacheSize", "Ð Ð¾Ð·Ð¼Ñ–Ñ€ ÐºÐµÑˆÑƒ"),
+    ("workers.ph.id", "worker-1"),
+    ("workers.ph.gpu", "ÐŸÐ¾Ñ€Ð¾Ð¶Ð½ÑŒÐ¾, ÑÐºÑ‰Ð¾ Ð±ÐµÐ· GPU"),
+    ("workers.enableCache", "Ð£Ð²Ñ–Ð¼ÐºÐ½ÑƒÑ‚Ð¸ ÐºÐµÑˆÑƒÐ²Ð°Ð½Ð½Ñ"),
+    ("workers.autoRestart", "ÐÐ²Ñ‚Ð¾Ð¿ÐµÑ€ÐµÐ·Ð°Ð¿ÑƒÑÐº Ð¿Ñ€Ð¸ Ð·Ð±Ð¾Ñ—"),
+    ("workers.resourceMonitoring", "ÐœÐ¾Ð½Ñ–Ñ‚Ð¾Ñ€Ð¸Ð½Ð³ Ñ€ÐµÑÑƒÑ€ÑÑ–Ð²"),
+    ("workers.creatingSubmit", "Ð¡Ñ‚Ð²Ð¾Ñ€ÐµÐ½Ð½Ñâ€¦"),
+    ("workers.createdOk", "Ð’Ð¾Ñ€ÐºÐµÑ€ ÑƒÑÐ¿Ñ–ÑˆÐ½Ð¾ ÑÑ‚Ð²Ð¾Ñ€ÐµÐ½Ð¾"),
+    ("workers.deletedOk", "Ð’Ð¾Ñ€ÐºÐµÑ€ ÑƒÑÐ¿Ñ–ÑˆÐ½Ð¾ Ð²Ð¸Ð´Ð°Ð»ÐµÐ½Ð¾"),
+    ("workers.deletingLoad", "Ð’Ð¸Ð´Ð°Ð»ÐµÐ½Ð½Ñ Ð²Ð¾Ñ€ÐºÐµÑ€Ð°â€¦"),
+    (
+        "workers.confirmDelete",
+        "Ð’Ð¸Ð´Ð°Ð»Ð¸Ñ‚Ð¸ Ð²Ð¾Ñ€ÐºÐµÑ€Ð° Â«{id}Â»? Ð¦ÑŽ Ð´Ñ–ÑŽ Ð½Ðµ Ð¼Ð¾Ð¶Ð½Ð° ÑÐºÐ°ÑÑƒÐ²Ð°Ñ‚Ð¸.",
+    ),
+];
+
+/// English home shell keys (PH-S258).
+pub const HOME_SHELL_EN: &[I18nRow<'_>] = &[
+    ("home.apiTitle", "API"),
+    ("home.apiBase", "Base:"),
+    ("home.uiTitle", "UI"),
+    ("home.uiHint", "Pages under"),
+    ("home.openDashboard", "Open read-only dashboard"),
+    ("home.quickLinks", "Quick links"),
+    ("home.notesTitle", "Notes"),
+    (
+        "home.notesBody",
+        "Write operations are available for authenticated users with appropriate permissions.",
+    ),
+    ("home.powerTitle", "PoolAI power"),
+    (
+        "home.powerHint",
+        "Dev-stand shutdown/reboot (no host reboot).",
+    ),
+    ("home.powerShutdown", "Shutdown"),
+    ("home.powerReboot", "Reboot"),
+    ("home.power.accepted", "accepted"),
+    ("home.power.result", "Power {action}: {note}"),
+    ("home.power.failed", "Power action failed"),
+];
+
+/// Ukrainian home shell keys (PH-S258).
+pub const HOME_SHELL_UK: &[I18nRow<'_>] = &[
+    ("home.apiTitle", "API"),
+    ("home.apiBase", "Ð‘Ð°Ð·Ð°:"),
+    ("home.uiTitle", "UI"),
+    ("home.uiHint", "Ð¡Ñ‚Ð¾Ñ€Ñ–Ð½ÐºÐ¸ Ð¿Ñ–Ð´"),
+    ("home.openDashboard", "Ð’Ñ–Ð´ÐºÑ€Ð¸Ñ‚Ð¸ Ð¿Ð°Ð½ÐµÐ»ÑŒ Ð»Ð¸ÑˆÐµ Ð´Ð»Ñ Ñ‡Ð¸Ñ‚Ð°Ð½Ð½Ñ"),
+    ("home.quickLinks", "Ð¨Ð²Ð¸Ð´ÐºÑ– Ð¿Ð¾ÑÐ¸Ð»Ð°Ð½Ð½Ñ"),
+    ("home.notesTitle", "ÐÐ¾Ñ‚Ð°Ñ‚ÐºÐ¸"),
+    (
+        "home.notesBody",
+        "ÐžÐ¿ÐµÑ€Ð°Ñ†Ñ–Ñ— Ð·Ð°Ð¿Ð¸ÑÑƒ Ð´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ– Ð°Ð²Ñ‚ÐµÐ½Ñ‚Ð¸Ñ„Ñ–ÐºÐ¾Ð²Ð°Ð½Ð¸Ð¼ ÐºÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ð°Ð¼ Ð· Ð²Ñ–Ð´Ð¿Ð¾Ð²Ñ–Ð´Ð½Ð¸Ð¼Ð¸ Ð¿Ñ€Ð°Ð²Ð°Ð¼Ð¸.",
+    ),
+    ("home.powerTitle", "Ð–Ð¸Ð²Ð»ÐµÐ½Ð½Ñ PoolAI"),
+    (
+        "home.powerHint",
+        "Ð’Ð¸Ð¼ÐºÐ½ÐµÐ½Ð½Ñ/Ð¿ÐµÑ€ÐµÐ·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ dev-ÑÑ‚ÐµÐ½Ð´Ñƒ (Ð±ÐµÐ· reboot Ñ…Ð¾ÑÑ‚Ð°).",
+    ),
+    ("home.powerShutdown", "Ð’Ð¸ÐºÐ»ÑŽÑ‡Ð¸Ñ‚Ð¸"),
+    ("home.powerReboot", "ÐŸÐµÑ€ÐµÐ·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶Ð¸Ñ‚Ð¸"),
+    ("home.power.accepted", "Ð¿Ñ€Ð¸Ð¹Ð½ÑÑ‚Ð¾"),
+    ("home.power.result", "Ð–Ð¸Ð²Ð»ÐµÐ½Ð½Ñ {action}: {note}"),
+    ("home.power.failed", "ÐÐµ Ð²Ð´Ð°Ð»Ð¾ÑÑ Ð²Ð¸ÐºÐ¾Ð½Ð°Ñ‚Ð¸ Ð´Ñ–ÑŽ Ð¶Ð¸Ð²Ð»ÐµÐ½Ð½Ñ"),
+];
+
+/// English admin power modal keys (PH-S1020).
+pub const ADMIN_POWER_EN: &[I18nRow<'_>] = &[
+    ("admin.power.btn", "Power"),
+    ("admin.power.btnTitle", "PoolAI power"),
+    ("admin.power.btnAria", "PoolAI power controls"),
+    ("admin.power.title", "PoolAI power"),
+    ("admin.power.close", "Close"),
+    (
+        "admin.power.body",
+        "Choose an action for the local stand (dev guard â€” no host reboot).",
+    ),
+    ("admin.power.shutdown", "Shutdown"),
+    ("admin.power.reboot", "Reboot"),
+    ("admin.power.cancel", "Cancel"),
+    ("admin.power.accepted", "accepted"),
+    ("admin.power.result", "Power {action}: {note}"),
+    ("admin.power.failed", "Power action failed"),
+];
+
+/// Ukrainian admin power modal keys (PH-S1020).
+pub const ADMIN_POWER_UK: &[I18nRow<'_>] = &[
+    ("admin.power.btn", "Ð–Ð¸Ð²Ð»ÐµÐ½Ð½Ñ"),
+    ("admin.power.btnTitle", "Ð–Ð¸Ð²Ð»ÐµÐ½Ð½Ñ PoolAI"),
+    ("admin.power.btnAria", "ÐšÐµÑ€ÑƒÐ²Ð°Ð½Ð½Ñ Ð¶Ð¸Ð²Ð»ÐµÐ½Ð½ÑÐ¼ PoolAI"),
+    ("admin.power.title", "Ð–Ð¸Ð²Ð»ÐµÐ½Ð½Ñ PoolAI"),
+    ("admin.power.close", "Ð—Ð°ÐºÑ€Ð¸Ñ‚Ð¸"),
+    (
+        "admin.power.body",
+        "ÐžÐ±ÐµÑ€Ñ–Ñ‚ÑŒ Ð´Ñ–ÑŽ Ð´Ð»Ñ Ð»Ð¾ÐºÐ°Ð»ÑŒÐ½Ð¾Ð³Ð¾ ÑÑ‚ÐµÐ½Ð´Ñƒ (dev guard â€” Ð±ÐµÐ· reboot Ñ…Ð¾ÑÑ‚Ð°).",
+    ),
+    ("admin.power.shutdown", "Ð’Ð¸ÐºÐ»ÑŽÑ‡Ð¸Ñ‚Ð¸"),
+    ("admin.power.reboot", "ÐŸÐµÑ€ÐµÐ·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶Ð¸Ñ‚Ð¸"),
+    ("admin.power.cancel", "Ð¡ÐºÐ°ÑÑƒÐ²Ð°Ñ‚Ð¸"),
+    ("admin.power.accepted", "Ð¿Ñ€Ð¸Ð¹Ð½ÑÑ‚Ð¾"),
+    ("admin.power.result", "Ð–Ð¸Ð²Ð»ÐµÐ½Ð½Ñ {action}: {note}"),
+    ("admin.power.failed", "ÐÐµ Ð²Ð´Ð°Ð»Ð¾ÑÑ Ð²Ð¸ÐºÐ¾Ð½Ð°Ñ‚Ð¸ Ð´Ñ–ÑŽ Ð¶Ð¸Ð²Ð»ÐµÐ½Ð½Ñ"),
+];
+
+/// English form validation keys (PH-S259).
+pub const FORM_SHELL_EN: &[I18nRow<'_>] = &[
+    ("form.fieldRequired", "This field is required"),
+    ("form.validNumber", "Please enter a valid number"),
+    ("form.valueMin", "Value must be at least {min}"),
+    ("form.valueMax", "Value must be at most {max}"),
+    ("form.validEmail", "Please enter a valid email address"),
+    ("form.invalidFormat", "Invalid format"),
+];
+
+/// Ukrainian form validation keys (PH-S259).
+pub const FORM_SHELL_UK: &[I18nRow<'_>] = &[
+    ("form.fieldRequired", "Ð¦Ðµ Ð¿Ð¾Ð»Ðµ Ð¾Ð±Ð¾Ð²â€™ÑÐ·ÐºÐ¾Ð²Ðµ"),
+    ("form.validNumber", "Ð’Ð²ÐµÐ´Ñ–Ñ‚ÑŒ ÐºÐ¾Ñ€ÐµÐºÑ‚Ð½Ðµ Ñ‡Ð¸ÑÐ»Ð¾"),
+    ("form.valueMin", "Ð—Ð½Ð°Ñ‡ÐµÐ½Ð½Ñ Ð¼Ð°Ñ” Ð±ÑƒÑ‚Ð¸ Ð½Ðµ Ð¼ÐµÐ½ÑˆÐµ {min}"),
+    ("form.valueMax", "Ð—Ð½Ð°Ñ‡ÐµÐ½Ð½Ñ Ð¼Ð°Ñ” Ð±ÑƒÑ‚Ð¸ Ð½Ðµ Ð±Ñ–Ð»ÑŒÑˆÐµ {max}"),
+    (
+        "form.validEmail",
+        "Ð’Ð²ÐµÐ´Ñ–Ñ‚ÑŒ ÐºÐ¾Ñ€ÐµÐºÑ‚Ð½Ñƒ Ð°Ð´Ñ€ÐµÑÑƒ ÐµÐ»ÐµÐºÑ‚Ñ€Ð¾Ð½Ð½Ð¾Ñ— Ð¿Ð¾ÑˆÑ‚Ð¸",
+    ),
+    ("form.invalidFormat", "ÐÐµÐºÐ¾Ñ€ÐµÐºÑ‚Ð½Ð¸Ð¹ Ñ„Ð¾Ñ€Ð¼Ð°Ñ‚"),
+];
+
+/// English residual error / role keys (PH-S259; shared via admin_common.js).
+pub const FORM_ERR_RESIDUAL_EN: &[I18nRow<'_>] = &[
+    ("err.errorPrefix", "Error: "),
+    ("err.title", "Error"),
+    ("err.showDetails", "Show details"),
+    ("err.suggestions", "Suggestions:"),
+    ("err.insufficientPermissions", "Insufficient permissions."),
+    (
+        "err.insufficientPermissionsAdminOp",
+        "Insufficient permissions. Admin or Operator role required.",
+    ),
+    (
+        "err.fillRequiredFields",
+        "Please fill in all required fields correctly.",
+    ),
+    (
+        "err.insufficientRole",
+        "Insufficient permissions. Required role: ",
+    ),
+    ("role.admin", "Admin"),
+    ("role.operator", "Operator"),
+    ("role.viewer", "Viewer"),
+    ("err.selectFileUpload", "Please select a file to upload."),
+    ("err.readFileFailed", "Error reading file"),
+    ("err.unauthorized", "Unauthorized"),
+];
+
+/// Ukrainian residual error / role keys (PH-S259).
+pub const FORM_ERR_RESIDUAL_UK: &[I18nRow<'_>] = &[
+    ("err.errorPrefix", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ°: "),
+    ("err.title", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ°"),
+    ("err.showDetails", "ÐŸÐ¾ÐºÐ°Ð·Ð°Ñ‚Ð¸ Ð´ÐµÑ‚Ð°Ð»Ñ–"),
+    ("err.suggestions", "ÐŸÑ–Ð´ÐºÐ°Ð·ÐºÐ¸:"),
+    ("err.insufficientPermissions", "ÐÐµÐ´Ð¾ÑÑ‚Ð°Ñ‚Ð½ÑŒÐ¾ Ð¿Ñ€Ð°Ð²."),
+    (
+        "err.insufficientPermissionsAdminOp",
+        "ÐÐµÐ´Ð¾ÑÑ‚Ð°Ñ‚Ð½ÑŒÐ¾ Ð¿Ñ€Ð°Ð². ÐŸÐ¾Ñ‚Ñ€Ñ–Ð±Ð½Ð° Ñ€Ð¾Ð»ÑŒ Admin Ð°Ð±Ð¾ Operator.",
+    ),
+    (
+        "err.fillRequiredFields",
+        "Ð—Ð°Ð¿Ð¾Ð²Ð½Ñ–Ñ‚ÑŒ ÑƒÑÑ– Ð¾Ð±Ð¾Ð²â€™ÑÐ·ÐºÐ¾Ð²Ñ– Ð¿Ð¾Ð»Ñ ÐºÐ¾Ñ€ÐµÐºÑ‚Ð½Ð¾.",
+    ),
+    ("err.insufficientRole", "ÐÐµÐ´Ð¾ÑÑ‚Ð°Ñ‚Ð½ÑŒÐ¾ Ð¿Ñ€Ð°Ð². ÐŸÐ¾Ñ‚Ñ€Ñ–Ð±Ð½Ð° Ñ€Ð¾Ð»ÑŒ: "),
+    ("role.admin", "ÐÐ´Ð¼Ñ–Ð½Ñ–ÑÑ‚Ñ€Ð°Ñ‚Ð¾Ñ€"),
+    ("role.operator", "ÐžÐ¿ÐµÑ€Ð°Ñ‚Ð¾Ñ€"),
+    ("role.viewer", "Ð¡Ð¿Ð¾ÑÑ‚ÐµÑ€Ñ–Ð³Ð°Ñ‡"),
+    ("err.selectFileUpload", "ÐžÐ±ÐµÑ€Ñ–Ñ‚ÑŒ Ñ„Ð°Ð¹Ð» Ð´Ð»Ñ Ð·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ."),
+    ("err.readFileFailed", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ñ‡Ð¸Ñ‚Ð°Ð½Ð½Ñ Ñ„Ð°Ð¹Ð»Ñƒ"),
+    ("err.unauthorized", "ÐÐµÐ°Ð²Ñ‚Ð¾Ñ€Ð¸Ð·Ð¾Ð²Ð°Ð½Ð¾"),
+];
+
+/// English shared UI toolbar glue (PH-S260).
+pub const UI_TOOLBAR_EN: &[I18nRow<'_>] = &[
+    ("ui.save", "Save Changes"),
+    ("ui.searchTableAria", "Search table"),
+    ("ui.searchStatusFound", "{visible} of {total} results found"),
+    ("ui.searchStatusSimple", "{visible} of {total} results"),
+    ("ui.searchStatusAll", "All results shown"),
+    ("ui.searchNoResultsFor", "No results found for \"{query}\""),
+    ("ui.retry", "Retry"),
+    ("ui.retryFailedOpAria", "Retry the operation that failed"),
+    ("ui.retryUnit.one", "retry"),
+    ("ui.retryUnit.many", "retries"),
+    (
+        "ui.requestSucceededAfter",
+        "Request succeeded after {count} {unit}",
+    ),
+    (
+        "ui.requestRetrying",
+        "Request failed. Retrying in {seconds}s... ({attempt}/{max})",
+    ),
+    (
+        "ui.requestFailedAllRetries",
+        "Request failed after all retries",
+    ),
+];
+
+/// English common + residual ui keys (PH-S263; shared dashboard + admin glue).
+pub const UI_COMMON_SHELL_EN: &[I18nRow<'_>] = &[
+    ("common.loading", "Loadingâ€¦"),
+    (
+        "common.unauthorized",
+        "Unauthorized â€” session expired. Please sign in again.",
+    ),
+    ("ui.upload", "Upload"),
+    ("ui.register", "Register"),
+    ("ui.create", "Create"),
+    ("ui.install", "Install"),
+    ("ui.delete", "Delete"),
+    ("ui.update", "Update"),
+    ("ui.uninstall", "Uninstall"),
+    ("ui.closeNotificationAria", "Close notification"),
+    ("ui.clearSearchAria", "Clear search"),
+    ("ui.stepOfTotal", "Step {current} of {total}"),
+    ("ui.tabsAria", "Tabs"),
+    (
+        "ui.suggestion.checkInternet",
+        "Check your internet connection",
+    ),
+    ("ui.suggestion.verifyServer", "Verify the server is running"),
+    ("ui.suggestion.refreshPage", "Try refreshing the page"),
+    (
+        "ui.suggestion.contactSupport",
+        "Contact support if the problem persists",
+    ),
+    ("ui.noItems", "No items."),
+    ("ui.sourceLabel", "Source:"),
+    ("ui.artifactsLabel", "Artifacts:"),
+    ("ui.nodesLabel", "Nodes:"),
+    ("ui.creating", "Creatingâ€¦"),
+    ("ui.installing", "Installingâ€¦"),
+    ("ui.deleting", "Deletingâ€¦"),
+];
+
+/// Ukrainian common + residual ui keys (PH-S263).
+pub const UI_COMMON_SHELL_UK: &[I18nRow<'_>] = &[
+    ("common.loading", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñâ€¦"),
+    (
+        "common.unauthorized",
+        "ÐÐµÐ°Ð²Ñ‚Ð¾Ñ€Ð¸Ð·Ð¾Ð²Ð°Ð½Ð¾ â€” ÑÐµÑÑ–ÑŽ Ð·Ð°Ð²ÐµÑ€ÑˆÐµÐ½Ð¾. Ð£Ð²Ñ–Ð¹Ð´Ñ–Ñ‚ÑŒ Ð·Ð½Ð¾Ð²Ñƒ.",
+    ),
+    ("ui.upload", "Ð—Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶Ð¸Ñ‚Ð¸"),
+    ("ui.register", "Ð—Ð°Ñ€ÐµÑ”ÑÑ‚Ñ€ÑƒÐ²Ð°Ñ‚Ð¸"),
+    ("ui.create", "Ð¡Ñ‚Ð²Ð¾Ñ€Ð¸Ñ‚Ð¸"),
+    ("ui.install", "Ð’ÑÑ‚Ð°Ð½Ð¾Ð²Ð¸Ñ‚Ð¸"),
+    ("ui.delete", "Ð’Ð¸Ð´Ð°Ð»Ð¸Ñ‚Ð¸"),
+    ("ui.update", "ÐžÐ½Ð¾Ð²Ð¸Ñ‚Ð¸"),
+    ("ui.uninstall", "Ð’Ð¸Ð´Ð°Ð»Ð¸Ñ‚Ð¸ (Ð±Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºÑƒ)"),
+    ("ui.closeNotificationAria", "Ð—Ð°ÐºÑ€Ð¸Ñ‚Ð¸ ÑÐ¿Ð¾Ð²Ñ–Ñ‰ÐµÐ½Ð½Ñ"),
+    ("ui.clearSearchAria", "ÐžÑ‡Ð¸ÑÑ‚Ð¸Ñ‚Ð¸ Ð¿Ð¾ÑˆÑƒÐº"),
+    ("ui.stepOfTotal", "ÐšÑ€Ð¾Ðº {current} Ð· {total}"),
+    ("ui.tabsAria", "Ð’ÐºÐ»Ð°Ð´ÐºÐ¸"),
+    (
+        "ui.suggestion.checkInternet",
+        "ÐŸÐµÑ€ÐµÐ²Ñ–Ñ€Ñ‚Ðµ Ð¿Ñ–Ð´ÐºÐ»ÑŽÑ‡ÐµÐ½Ð½Ñ Ð´Ð¾ Ñ–Ð½Ñ‚ÐµÑ€Ð½ÐµÑ‚Ñƒ",
+    ),
+    (
+        "ui.suggestion.verifyServer",
+        "ÐŸÐµÑ€ÐµÐºÐ¾Ð½Ð°Ð¹Ñ‚ÐµÑÑ, Ñ‰Ð¾ ÑÐµÑ€Ð²ÐµÑ€ Ð·Ð°Ð¿ÑƒÑ‰ÐµÐ½Ð¾",
+    ),
+    ("ui.suggestion.refreshPage", "Ð¡Ð¿Ñ€Ð¾Ð±ÑƒÐ¹Ñ‚Ðµ Ð¾Ð½Ð¾Ð²Ð¸Ñ‚Ð¸ ÑÑ‚Ð¾Ñ€Ñ–Ð½ÐºÑƒ"),
+    (
+        "ui.suggestion.contactSupport",
+        "Ð—Ð²ÐµÑ€Ð½Ñ–Ñ‚ÑŒÑÑ Ð´Ð¾ Ð¿Ñ–Ð´Ñ‚Ñ€Ð¸Ð¼ÐºÐ¸, ÑÐºÑ‰Ð¾ Ð¿Ñ€Ð¾Ð±Ð»ÐµÐ¼Ð° Ð½Ðµ Ð·Ð½Ð¸ÐºÐ°Ñ”",
+    ),
+    ("ui.noItems", "ÐÐµÐ¼Ð°Ñ” Ð·Ð°Ð¿Ð¸ÑÑ–Ð²."),
+    ("ui.sourceLabel", "Ð”Ð¶ÐµÑ€ÐµÐ»Ð¾:"),
+    ("ui.artifactsLabel", "ÐÑ€Ñ‚ÐµÑ„Ð°ÐºÑ‚Ð¸:"),
+    ("ui.nodesLabel", "Ð’ÑƒÐ·Ð»Ð¸:"),
+    ("ui.creating", "Ð¡Ñ‚Ð²Ð¾Ñ€ÐµÐ½Ð½Ñâ€¦"),
+    ("ui.installing", "Ð’ÑÑ‚Ð°Ð½Ð¾Ð²Ð»ÐµÐ½Ð½Ñâ€¦"),
+    ("ui.deleting", "Ð’Ð¸Ð´Ð°Ð»ÐµÐ½Ð½Ñâ€¦"),
+];
+
+/// English dashboard libs panel keys (PH-S264; moved from `i18n_core.js`).
+pub const LIBS_PANEL_EN: &[I18nRow<'_>] = &[
+    ("libs.empty", "No libraries installed."),
+    ("libs.col.name", "Name"),
+    ("libs.col.version", "Version"),
+    ("libs.col.type", "Type"),
+    ("libs.col.status", "Status"),
+    ("libs.col.actions", "Actions"),
+    ("libs.updateAria", "Update library {name}"),
+    ("libs.uninstallAria", "Uninstall library {name}"),
+    ("libs.installBtn", "Install Library"),
+    ("libs.modalTitle", "Install Library"),
+    ("libs.label.name", "Library name"),
+    (
+        "libs.label.version",
+        "Version (optional, defaults to latest)",
+    ),
+    ("libs.ph.name", "libtorch"),
+    ("libs.ph.version", "1.13.0"),
+    ("libs.installingSubmit", "Installingâ€¦"),
+    ("libs.installedOk", "Library installed successfully"),
+    ("libs.uninstalledOk", "Library uninstalled successfully"),
+    ("libs.uninstallingLoad", "Uninstalling libraryâ€¦"),
+    ("libs.updatingLoad", "Updating libraryâ€¦"),
+    ("libs.processingLoad", "Processing libraryâ€¦"),
+    ("libs.updatedOk", "Library updated successfully"),
+    ("libs.processingOk", "Operation completed successfully"),
+    (
+        "libs.confirmUninstall",
+        "Are you sure you want to uninstall library \"{name}\"? This action cannot be undone.",
+    ),
+];
+
+/// Ukrainian dashboard libs panel keys (PH-S264).
+pub const LIBS_PANEL_UK: &[I18nRow<'_>] = &[
+    ("libs.empty", "Ð‘Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºÐ¸ Ð½Ðµ Ð²ÑÑ‚Ð°Ð½Ð¾Ð²Ð»ÐµÐ½Ð¾."),
+    ("libs.col.name", "ÐÐ°Ð·Ð²Ð°"),
+    ("libs.col.version", "Ð’ÐµÑ€ÑÑ–Ñ"),
+    ("libs.col.type", "Ð¢Ð¸Ð¿"),
+    ("libs.col.status", "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ"),
+    ("libs.col.actions", "Ð”Ñ–Ñ—"),
+    ("libs.updateAria", "ÐžÐ½Ð¾Ð²Ð¸Ñ‚Ð¸ Ð±Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºÑƒ {name}"),
+    ("libs.uninstallAria", "Ð’Ð¸Ð´Ð°Ð»Ð¸Ñ‚Ð¸ Ð±Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºÑƒ {name}"),
+    ("libs.installBtn", "Ð’ÑÑ‚Ð°Ð½Ð¾Ð²Ð¸Ñ‚Ð¸ Ð±Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºÑƒ"),
+    ("libs.modalTitle", "Ð’ÑÑ‚Ð°Ð½Ð¾Ð²Ð¸Ñ‚Ð¸ Ð±Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºÑƒ"),
+    ("libs.label.name", "ÐÐ°Ð·Ð²Ð° Ð±Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºÐ¸"),
+    (
+        "libs.label.version",
+        "Ð’ÐµÑ€ÑÑ–Ñ (Ð½ÐµÐ¾Ð±Ð¾Ð²â€™ÑÐ·ÐºÐ¾Ð²Ð¾, Ð·Ð° Ð·Ð°Ð¼Ð¾Ð²Ñ‡ÑƒÐ²Ð°Ð½Ð½ÑÐ¼ Ð¾ÑÑ‚Ð°Ð½Ð½Ñ)",
+    ),
+    ("libs.ph.name", "libtorch"),
+    ("libs.ph.version", "1.13.0"),
+    ("libs.installingSubmit", "Ð’ÑÑ‚Ð°Ð½Ð¾Ð²Ð»ÐµÐ½Ð½Ñâ€¦"),
+    ("libs.installedOk", "Ð‘Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºÑƒ Ð²ÑÑ‚Ð°Ð½Ð¾Ð²Ð»ÐµÐ½Ð¾"),
+    ("libs.uninstalledOk", "Ð‘Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºÑƒ Ð²Ð¸Ð´Ð°Ð»ÐµÐ½Ð¾"),
+    ("libs.uninstallingLoad", "Ð’Ð¸Ð´Ð°Ð»ÐµÐ½Ð½Ñ Ð±Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºÐ¸â€¦"),
+    ("libs.updatingLoad", "ÐžÐ½Ð¾Ð²Ð»ÐµÐ½Ð½Ñ Ð±Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºÐ¸â€¦"),
+    ("libs.processingLoad", "ÐžÐ±Ñ€Ð¾Ð±ÐºÐ° Ð±Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºÐ¸â€¦"),
+    ("libs.updatedOk", "Ð‘Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºÑƒ Ð¾Ð½Ð¾Ð²Ð»ÐµÐ½Ð¾"),
+    ("libs.processingOk", "ÐžÐ¿ÐµÑ€Ð°Ñ†Ñ–ÑŽ Ð²Ð¸ÐºÐ¾Ð½Ð°Ð½Ð¾"),
+    (
+        "libs.confirmUninstall",
+        "Ð’Ð¸Ð´Ð°Ð»Ð¸Ñ‚Ð¸ Ð±Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºÑƒ Â«{name}Â»? Ð¦ÑŽ Ð´Ñ–ÑŽ Ð½Ðµ Ð¼Ð¾Ð¶Ð½Ð° ÑÐºÐ°ÑÑƒÐ²Ð°Ñ‚Ð¸.",
+    ),
+];
+
+/// English dashboard RAID panel keys (PH-S265; moved from `i18n_core.js`).
+pub const RAID_PANEL_EN: &[I18nRow<'_>] = &[
+    ("raid.empty", "No artifacts stored."),
+    ("raid.col.id", "ID"),
+    ("raid.col.name", "Name"),
+    ("raid.col.storedAt", "Stored at"),
+    ("raid.col.actions", "Actions"),
+    ("raid.createBtn", "Create Artifact"),
+    ("raid.createBtnAria", "Create new artifact"),
+    ("raid.modalTitle", "Create Artifact"),
+    ("raid.label.name", "Artifact name"),
+    ("raid.label.file", "File"),
+    ("raid.ph.name", "my-artifact"),
+    ("raid.sectionArtifacts", "Artifacts:"),
+    ("raid.sectionNodes", "Nodes:"),
+    ("raid.deleteAria", "Delete artifact {name}"),
+    ("raid.creatingSubmit", "Creatingâ€¦"),
+    ("raid.createdOk", "Artifact created successfully"),
+    ("raid.deletedOk", "Artifact deleted successfully"),
+    ("raid.deletingLoad", "Deleting artifactâ€¦"),
+    (
+        "raid.confirmDelete",
+        "Are you sure you want to delete artifact \"{name}\" ({id})? This action cannot be undone.",
+    ),
+];
+
+/// Ukrainian dashboard RAID panel keys (PH-S265).
+pub const RAID_PANEL_UK: &[I18nRow<'_>] = &[
+    ("raid.empty", "ÐÑ€Ñ‚ÐµÑ„Ð°ÐºÑ‚Ñ–Ð² Ð½Ðµ Ð·Ð±ÐµÑ€ÐµÐ¶ÐµÐ½Ð¾."),
+    ("raid.col.id", "ID"),
+    ("raid.col.name", "ÐÐ°Ð·Ð²Ð°"),
+    ("raid.col.storedAt", "Ð—Ð±ÐµÑ€ÐµÐ¶ÐµÐ½Ð¾"),
+    ("raid.col.actions", "Ð”Ñ–Ñ—"),
+    ("raid.createBtn", "Ð¡Ñ‚Ð²Ð¾Ñ€Ð¸Ñ‚Ð¸ Ð°Ñ€Ñ‚ÐµÑ„Ð°ÐºÑ‚"),
+    ("raid.createBtnAria", "Ð¡Ñ‚Ð²Ð¾Ñ€Ð¸Ñ‚Ð¸ Ð½Ð¾Ð²Ð¸Ð¹ Ð°Ñ€Ñ‚ÐµÑ„Ð°ÐºÑ‚"),
+    ("raid.modalTitle", "Ð¡Ñ‚Ð²Ð¾Ñ€Ð¸Ñ‚Ð¸ Ð°Ñ€Ñ‚ÐµÑ„Ð°ÐºÑ‚"),
+    ("raid.label.name", "ÐÐ°Ð·Ð²Ð° Ð°Ñ€Ñ‚ÐµÑ„Ð°ÐºÑ‚Ñƒ"),
+    ("raid.label.file", "Ð¤Ð°Ð¹Ð»"),
+    ("raid.ph.name", "my-artifact"),
+    ("raid.sectionArtifacts", "ÐÑ€Ñ‚ÐµÑ„Ð°ÐºÑ‚Ð¸:"),
+    ("raid.sectionNodes", "Ð’ÑƒÐ·Ð»Ð¸:"),
+    ("raid.deleteAria", "Ð’Ð¸Ð´Ð°Ð»Ð¸Ñ‚Ð¸ Ð°Ñ€Ñ‚ÐµÑ„Ð°ÐºÑ‚ {name}"),
+    ("raid.creatingSubmit", "Ð¡Ñ‚Ð²Ð¾Ñ€ÐµÐ½Ð½Ñâ€¦"),
+    ("raid.createdOk", "ÐÑ€Ñ‚ÐµÑ„Ð°ÐºÑ‚ ÑÑ‚Ð²Ð¾Ñ€ÐµÐ½Ð¾"),
+    ("raid.deletedOk", "ÐÑ€Ñ‚ÐµÑ„Ð°ÐºÑ‚ Ð²Ð¸Ð´Ð°Ð»ÐµÐ½Ð¾"),
+    ("raid.deletingLoad", "Ð’Ð¸Ð´Ð°Ð»ÐµÐ½Ð½Ñ Ð°Ñ€Ñ‚ÐµÑ„Ð°ÐºÑ‚Ñƒâ€¦"),
+    (
+        "raid.confirmDelete",
+        "Ð’Ð¸Ð´Ð°Ð»Ð¸Ñ‚Ð¸ Ð°Ñ€Ñ‚ÐµÑ„Ð°ÐºÑ‚ Â«{name}Â» ({id})? Ð¦ÑŽ Ð´Ñ–ÑŽ Ð½Ðµ Ð¼Ð¾Ð¶Ð½Ð° ÑÐºÐ°ÑÑƒÐ²Ð°Ñ‚Ð¸.",
+    ),
+];
+
+/// Ukrainian shared UI toolbar glue (PH-S260).
+pub const UI_TOOLBAR_UK: &[I18nRow<'_>] = &[
+    ("ui.save", "Ð—Ð±ÐµÑ€ÐµÐ³Ñ‚Ð¸ Ð·Ð¼Ñ–Ð½Ð¸"),
+    ("ui.searchTableAria", "ÐŸÐ¾ÑˆÑƒÐº Ñƒ Ñ‚Ð°Ð±Ð»Ð¸Ñ†Ñ–"),
+    (
+        "ui.searchStatusFound",
+        "Ð—Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾ {visible} Ð· {total} Ñ€ÐµÐ·ÑƒÐ»ÑŒÑ‚Ð°Ñ‚Ñ–Ð²",
+    ),
+    (
+        "ui.searchStatusSimple",
+        "ÐŸÐ¾ÐºÐ°Ð·Ð°Ð½Ð¾ {visible} Ð· {total} Ñ€ÐµÐ·ÑƒÐ»ÑŒÑ‚Ð°Ñ‚Ñ–Ð²",
+    ),
+    ("ui.searchStatusAll", "ÐŸÐ¾ÐºÐ°Ð·Ð°Ð½Ð¾ Ð²ÑÑ– Ñ€ÐµÐ·ÑƒÐ»ÑŒÑ‚Ð°Ñ‚Ð¸"),
+    (
+        "ui.searchNoResultsFor",
+        "Ð—Ð° Ð·Ð°Ð¿Ð¸Ñ‚Ð¾Ð¼ \"{query}\" Ð½Ñ–Ñ‡Ð¾Ð³Ð¾ Ð½Ðµ Ð·Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾",
+    ),
+    ("ui.retry", "ÐŸÐ¾Ð²Ñ‚Ð¾Ñ€Ð¸Ñ‚Ð¸"),
+    (
+        "ui.retryFailedOpAria",
+        "ÐŸÐ¾Ð²Ñ‚Ð¾Ñ€Ð¸Ñ‚Ð¸ Ð¾Ð¿ÐµÑ€Ð°Ñ†Ñ–ÑŽ, Ñ‰Ð¾ Ð·Ð°Ð²ÐµÑ€ÑˆÐ¸Ð»Ð°ÑÑŒ Ð¿Ð¾Ð¼Ð¸Ð»ÐºÐ¾ÑŽ",
+    ),
+    ("ui.retryUnit.one", "Ð¿Ð¾Ð²Ñ‚Ð¾Ñ€Ñƒ"),
+    ("ui.retryUnit.many", "Ð¿Ð¾Ð²Ñ‚Ð¾Ñ€Ñ–Ð²"),
+    (
+        "ui.requestSucceededAfter",
+        "Ð—Ð°Ð¿Ð¸Ñ‚ ÑƒÑÐ¿Ñ–ÑˆÐ½Ð¸Ð¹ Ð¿Ñ–ÑÐ»Ñ {count} {unit}",
+    ),
+    (
+        "ui.requestRetrying",
+        "Ð—Ð°Ð¿Ð¸Ñ‚ Ð½Ðµ Ð²Ð´Ð°Ð²ÑÑ. ÐŸÐ¾Ð²Ñ‚Ð¾Ñ€ Ñ‡ÐµÑ€ÐµÐ· {seconds} Ñ... ({attempt}/{max})",
+    ),
+    (
+        "ui.requestFailedAllRetries",
+        "Ð—Ð°Ð¿Ð¸Ñ‚ Ð½Ðµ Ð²Ð´Ð°Ð²ÑÑ Ð¿Ñ–ÑÐ»Ñ Ð²ÑÑ–Ñ… Ð¿Ð¾Ð²Ñ‚Ð¾Ñ€Ñ–Ð²",
+    ),
+];
+
+/// English VM modal keys (PH-S248; shared admin + dashboard VM pages).
+pub const VM_MODAL_EN: &[I18nRow<'_>] = &[
+    ("vm.createBtn", "Create VM Instance"),
+    ("vm.createBtnAria", "Create new VM instance"),
+    ("vm.modalTitle", "Create VM Instance"),
+    ("vm.label.name", "Instance name"),
+    ("vm.label.cpu", "CPU cores"),
+    ("vm.label.memory", "Memory (MB)"),
+    ("vm.label.gpu", "GPU required"),
+    ("vm.label.isolation", "Isolation type"),
+    ("vm.iso.process", "Process sandbox"),
+    ("vm.iso.hardware", "Hardware VM"),
+    ("vm.ph.name", "my-vm-instance"),
+    ("vm.start", "Start"),
+    ("vm.stop", "Stop"),
+    ("vm.restart", "Restart"),
+    ("vm.startAria", "Start VM instance {id}"),
+    ("vm.stopAria", "Stop VM instance {id}"),
+    ("vm.restartAria", "Restart VM instance {id}"),
+    ("vm.deleteAria", "Delete VM instance {id}"),
+    ("vm.loadingStart", "Starting VM instanceâ€¦"),
+    ("vm.loadingStop", "Stopping VM instanceâ€¦"),
+    ("vm.loadingRestart", "Restarting VM instanceâ€¦"),
+    ("vm.loadingGeneric", "Processing VM instanceâ€¦"),
+    ("vm.deletingLoad", "Deleting VM instanceâ€¦"),
+    ("vm.createdOk", "VM instance created successfully"),
+    ("vm.deletedOk", "VM instance deleted successfully"),
+    ("vm.successStart", "VM instance started successfully"),
+    ("vm.successStop", "VM instance stopped successfully"),
+    ("vm.successRestart", "VM instance restarted successfully"),
+    ("vm.successGeneric", "Operation completed successfully"),
+    (
+        "vm.confirmDelete",
+        "Are you sure you want to delete VM instance \"{name}\" ({id})? This action cannot be undone.",
+    ),
+];
+
+/// Ukrainian VM modal keys (PH-S248).
+pub const VM_MODAL_UK: &[I18nRow<'_>] = &[
+    ("vm.createBtn", "Ð¡Ñ‚Ð²Ð¾Ñ€Ð¸Ñ‚Ð¸ Ñ–Ð½ÑÑ‚Ð°Ð½Ñ VM"),
+    ("vm.createBtnAria", "Ð¡Ñ‚Ð²Ð¾Ñ€Ð¸Ñ‚Ð¸ Ð½Ð¾Ð²Ð¸Ð¹ Ñ–Ð½ÑÑ‚Ð°Ð½Ñ VM"),
+    ("vm.modalTitle", "Ð¡Ñ‚Ð²Ð¾Ñ€Ð¸Ñ‚Ð¸ Ñ–Ð½ÑÑ‚Ð°Ð½Ñ VM"),
+    ("vm.label.name", "ÐÐ°Ð·Ð²Ð° Ñ–Ð½ÑÑ‚Ð°Ð½ÑÑƒ"),
+    ("vm.label.cpu", "Ð¯Ð´Ñ€Ð° CPU"),
+    ("vm.label.memory", "ÐŸÐ°Ð¼â€™ÑÑ‚ÑŒ (ÐœÐ‘)"),
+    ("vm.label.gpu", "ÐŸÐ¾Ñ‚Ñ€Ñ–Ð±ÐµÐ½ GPU"),
+    ("vm.label.isolation", "Ð¢Ð¸Ð¿ Ñ–Ð·Ð¾Ð»ÑÑ†Ñ–Ñ—"),
+    ("vm.iso.process", "ÐŸÑ–ÑÐ¾Ñ‡Ð½Ð¸Ñ†Ñ Ð¿Ñ€Ð¾Ñ†ÐµÑÑƒ"),
+    ("vm.iso.hardware", "ÐÐ¿Ð°Ñ€Ð°Ñ‚Ð½Ð° VM"),
+    ("vm.ph.name", "my-vm-instance"),
+    ("vm.start", "Ð—Ð°Ð¿ÑƒÑÑ‚Ð¸Ñ‚Ð¸"),
+    ("vm.stop", "Ð—ÑƒÐ¿Ð¸Ð½Ð¸Ñ‚Ð¸"),
+    ("vm.restart", "ÐŸÐµÑ€ÐµÐ·Ð°Ð¿ÑƒÑÑ‚Ð¸Ñ‚Ð¸"),
+    ("vm.startAria", "Ð—Ð°Ð¿ÑƒÑÑ‚Ð¸Ñ‚Ð¸ Ñ–Ð½ÑÑ‚Ð°Ð½Ñ VM {id}"),
+    ("vm.stopAria", "Ð—ÑƒÐ¿Ð¸Ð½Ð¸Ñ‚Ð¸ Ñ–Ð½ÑÑ‚Ð°Ð½Ñ VM {id}"),
+    ("vm.restartAria", "ÐŸÐµÑ€ÐµÐ·Ð°Ð¿ÑƒÑÑ‚Ð¸Ñ‚Ð¸ Ñ–Ð½ÑÑ‚Ð°Ð½Ñ VM {id}"),
+    ("vm.deleteAria", "Ð’Ð¸Ð´Ð°Ð»Ð¸Ñ‚Ð¸ Ñ–Ð½ÑÑ‚Ð°Ð½Ñ VM {id}"),
+    ("vm.loadingStart", "Ð—Ð°Ð¿ÑƒÑÐº Ñ–Ð½ÑÑ‚Ð°Ð½ÑÑƒ VMâ€¦"),
+    ("vm.loadingStop", "Ð—ÑƒÐ¿Ð¸Ð½ÐºÐ° Ñ–Ð½ÑÑ‚Ð°Ð½ÑÑƒ VMâ€¦"),
+    ("vm.loadingRestart", "ÐŸÐµÑ€ÐµÐ·Ð°Ð¿ÑƒÑÐº Ñ–Ð½ÑÑ‚Ð°Ð½ÑÑƒ VMâ€¦"),
+    ("vm.loadingGeneric", "ÐžÐ±Ñ€Ð¾Ð±ÐºÐ° Ñ–Ð½ÑÑ‚Ð°Ð½ÑÑƒ VMâ€¦"),
+    ("vm.deletingLoad", "Ð’Ð¸Ð´Ð°Ð»ÐµÐ½Ð½Ñ Ñ–Ð½ÑÑ‚Ð°Ð½ÑÑƒ VMâ€¦"),
+    ("vm.createdOk", "Ð†Ð½ÑÑ‚Ð°Ð½Ñ VM ÑÑ‚Ð²Ð¾Ñ€ÐµÐ½Ð¾"),
+    ("vm.deletedOk", "Ð†Ð½ÑÑ‚Ð°Ð½Ñ VM Ð²Ð¸Ð´Ð°Ð»ÐµÐ½Ð¾"),
+    ("vm.successStart", "Ð†Ð½ÑÑ‚Ð°Ð½Ñ VM Ð·Ð°Ð¿ÑƒÑ‰ÐµÐ½Ð¾"),
+    ("vm.successStop", "Ð†Ð½ÑÑ‚Ð°Ð½Ñ VM Ð·ÑƒÐ¿Ð¸Ð½ÐµÐ½Ð¾"),
+    ("vm.successRestart", "Ð†Ð½ÑÑ‚Ð°Ð½Ñ VM Ð¿ÐµÑ€ÐµÐ·Ð°Ð¿ÑƒÑ‰ÐµÐ½Ð¾"),
+    ("vm.successGeneric", "ÐžÐ¿ÐµÑ€Ð°Ñ†Ñ–ÑŽ Ð²Ð¸ÐºÐ¾Ð½Ð°Ð½Ð¾"),
+    (
+        "vm.confirmDelete",
+        "Ð’Ð¸Ð´Ð°Ð»Ð¸Ñ‚Ð¸ Ñ–Ð½ÑÑ‚Ð°Ð½Ñ VM Â«{name}Â» ({id})? Ð¦ÑŽ Ð´Ñ–ÑŽ Ð½Ðµ Ð¼Ð¾Ð¶Ð½Ð° ÑÐºÐ°ÑÑƒÐ²Ð°Ñ‚Ð¸.",
+    ),
+];
+
+/// English shared confirm-dialog / modal glue keys (PH-S252).
+pub const ADMIN_UI_CONFIRM_EN: &[I18nRow<'_>] = &[
+    ("ui.confirmTitle", "Confirm action"),
+    ("ui.confirmBtn", "Confirm"),
+    ("ui.cancel", "Cancel"),
+    ("ui.closeDialogAria", "Close dialog"),
+];
+
+/// Ukrainian shared confirm-dialog / modal glue keys (PH-S252).
+pub const ADMIN_UI_CONFIRM_UK: &[I18nRow<'_>] = &[
+    ("ui.confirmTitle", "ÐŸÑ–Ð´Ñ‚Ð²ÐµÑ€Ð´Ð¶ÐµÐ½Ð½Ñ"),
+    ("ui.confirmBtn", "ÐŸÑ–Ð´Ñ‚Ð²ÐµÑ€Ð´Ð¸Ñ‚Ð¸"),
+    ("ui.cancel", "Ð¡ÐºÐ°ÑÑƒÐ²Ð°Ñ‚Ð¸"),
+    ("ui.closeDialogAria", "Ð—Ð°ÐºÑ€Ð¸Ñ‚Ð¸ Ð´Ñ–Ð°Ð»Ð¾Ð³"),
+];
+
+/// English auth keys (login, OAuth, bootstrap banner, lang toggle).
+pub const AUTH_SHELL_EN: &[I18nRow<'_>] = &[
+    ("auth.pageTitle", "Login - PoolAI"),
+    ("auth.cardTitle", "Login"),
+    ("auth.username", "Username"),
+    ("auth.password", "Password"),
+    ("auth.submit", "Login"),
+    ("auth.loggingIn", "Logging inâ€¦"),
+    ("auth.loginFailed", "Login failed"),
+    ("auth.oauthStartFail", "Failed to start OAuth2 login: "),
+    ("auth.oauthFail", "OAuth2 authentication failed: "),
+    ("auth.oauthTokenFail", "Failed to process OAuth2 token: "),
+    ("auth.signInWithAria", "Sign in with {provider}"),
+    ("auth.oauthOr", "Or sign in with:"),
+    ("auth.providerTelegram", "Telegram"),
+    ("auth.telegramPageTitle", "Telegram sign-in"),
+    ("auth.telegramSignIn", "Sign in with Telegram"),
+    ("auth.telegramCloseHint", "You can close this page after signing in."),
+    ("auth.testAccounts", "Test accounts:"),
+    ("auth.testAdmin", "Admin: admin / admin123"),
+    ("auth.testOperator", "Operator: operator / op123"),
+    ("auth.testViewer", "Viewer: viewer / view123"),
+    (
+        "auth.bootstrapLine1",
+        "First launch: you are signed in as the built-in administrator. Login: admin â€” password: admin123.",
+    ),
+    (
+        "auth.bootstrapLine2",
+        "Change the password in Admin â†’ Users, or continue with the default and update it anytime in settings.",
+    ),
+    ("auth.bootstrapUsersLink", "Admin â†’ Users"),
+    ("auth.bootstrapDismiss", "Got it"),
+    ("auth.lang.en", "EN"),
+    ("auth.lang.uk", "UA"),
+];
+
+/// Ukrainian auth keys.
+pub const AUTH_SHELL_UK: &[I18nRow<'_>] = &[
+    ("auth.pageTitle", "Ð’Ñ…Ñ–Ð´ - PoolAI"),
+    ("auth.cardTitle", "Ð’Ñ…Ñ–Ð´"),
+    ("auth.username", "ÐšÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡"),
+    ("auth.password", "ÐŸÐ°Ñ€Ð¾Ð»ÑŒ"),
+    ("auth.submit", "Ð£Ð²Ñ–Ð¹Ñ‚Ð¸"),
+    ("auth.loggingIn", "Ð’Ñ…Ñ–Ð´â€¦"),
+    ("auth.loginFailed", "ÐÐµ Ð²Ð´Ð°Ð»Ð¾ÑÑ ÑƒÐ²Ñ–Ð¹Ñ‚Ð¸"),
+    ("auth.oauthStartFail", "ÐÐµ Ð²Ð´Ð°Ð»Ð¾ÑÑ Ñ€Ð¾Ð·Ð¿Ð¾Ñ‡Ð°Ñ‚Ð¸ OAuth2: "),
+    ("auth.oauthFail", "ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° OAuth2: "),
+    ("auth.oauthTokenFail", "ÐÐµ Ð²Ð´Ð°Ð»Ð¾ÑÑ Ð¾Ð±Ñ€Ð¾Ð±Ð¸Ñ‚Ð¸ Ñ‚Ð¾ÐºÐµÐ½ OAuth2: "),
+    ("auth.signInWithAria", "Ð£Ð²Ñ–Ð¹Ñ‚Ð¸ Ñ‡ÐµÑ€ÐµÐ· {provider}"),
+    ("auth.oauthOr", "ÐÐ±Ð¾ ÑƒÐ²Ñ–Ð¹Ð´Ñ–Ñ‚ÑŒ Ñ‡ÐµÑ€ÐµÐ·:"),
+    ("auth.providerTelegram", "Telegram"),
+    ("auth.telegramPageTitle", "Ð’Ñ…Ñ–Ð´ Ñ‡ÐµÑ€ÐµÐ· Telegram"),
+    ("auth.telegramSignIn", "Ð£Ð²Ñ–Ð¹Ð´Ñ–Ñ‚ÑŒ Ñ‡ÐµÑ€ÐµÐ· Telegram"),
+    ("auth.telegramCloseHint", "ÐŸÑ–ÑÐ»Ñ Ð²Ñ…Ð¾Ð´Ñƒ Ñ†ÑŽ ÑÑ‚Ð¾Ñ€Ñ–Ð½ÐºÑƒ Ð¼Ð¾Ð¶Ð½Ð° Ð·Ð°ÐºÑ€Ð¸Ñ‚Ð¸."),
+    ("auth.testAccounts", "Ð¢ÐµÑÑ‚Ð¾Ð²Ñ– Ð¾Ð±Ð»Ñ–ÐºÐ¾Ð²ÐºÐ¸:"),
+    ("auth.testAdmin", "ÐÐ´Ð¼Ñ–Ð½: admin / admin123"),
+    ("auth.testOperator", "ÐžÐ¿ÐµÑ€Ð°Ñ‚Ð¾Ñ€: operator / op123"),
+    ("auth.testViewer", "Ð“Ð»ÑÐ´Ð°Ñ‡: viewer / view123"),
+    (
+        "auth.bootstrapLine1",
+        "ÐŸÐµÑ€ÑˆÐ¸Ð¹ Ð·Ð°Ð¿ÑƒÑÐº: Ð²Ð¸ ÑƒÐ²Ñ–Ð¹ÑˆÐ»Ð¸ ÑÐº Ð²Ð±ÑƒÐ´Ð¾Ð²Ð°Ð½Ð¸Ð¹ Ð°Ð´Ð¼Ñ–Ð½Ñ–ÑÑ‚Ñ€Ð°Ñ‚Ð¾Ñ€. Ð›Ð¾Ð³Ñ–Ð½: admin â€” Ð¿Ð°Ñ€Ð¾Ð»ÑŒ: admin123.",
+    ),
+    (
+        "auth.bootstrapLine2",
+        "Ð—Ð¼Ñ–Ð½Ñ–Ñ‚ÑŒ Ð¿Ð°Ñ€Ð¾Ð»ÑŒ Ñƒ ÐÐ´Ð¼Ñ–Ð½ÐºÐ° â†’ ÐšÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ñ– Ð°Ð±Ð¾ Ð¿Ñ€Ð¾Ð´Ð¾Ð²Ð¶ÑƒÐ¹Ñ‚Ðµ Ð·Ñ– ÑˆÑ‚Ð°Ñ‚Ð½Ð¸Ð¼ Ð¿Ð°Ñ€Ð¾Ð»ÐµÐ¼ Ñ– Ð¾Ð½Ð¾Ð²Ñ–Ñ‚ÑŒ Ð¹Ð¾Ð³Ð¾ Ð±ÑƒÐ´ÑŒ-ÐºÐ¾Ð»Ð¸ Ð² Ð½Ð°Ð»Ð°ÑˆÑ‚ÑƒÐ²Ð°Ð½Ð½ÑÑ….",
+    ),
+    ("auth.bootstrapUsersLink", "ÐÐ´Ð¼Ñ–Ð½ÐºÐ° â†’ ÐšÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ñ–"),
+    ("auth.bootstrapDismiss", "Ð—Ñ€Ð¾Ð·ÑƒÐ¼Ñ–Ð»Ð¾"),
+    ("auth.lang.en", "EN"),
+    ("auth.lang.uk", "UA"),
+];
+
+/// English admin sidebar nav labels (PH-S242; merged into auth_dash shell patch).
+pub const ADMIN_NAV_EN: &[I18nRow<'_>] = &[
+    ("admin.nav.dashboard", "Dashboard"),
+    ("admin.nav.tenants", "Tenants"),
+    ("admin.nav.security", "Security"),
+    ("admin.nav.audit", "Audit Logs"),
+    ("admin.nav.monitoring", "Monitoring"),
+    ("admin.nav.vm", "VM Instances"),
+    ("admin.nav.workers", "Workers"),
+    ("admin.nav.jobs", "Jobs"),
+    ("admin.nav.gridPricing", "Grid pricing"),
+    ("admin.nav.updatesCompat", "Updates"),
+    ("admin.nav.libs", "Libraries"),
+    ("admin.nav.raid", "RAID"),
+    ("admin.nav.instances", "Model Instances"),
+    ("admin.nav.topology", "Topology"),
+    ("admin.nav.users", "Users"),
+    ("admin.nav.config", "Configuration"),
+];
+
+/// Ukrainian admin sidebar nav labels (PH-S242).
+pub const ADMIN_NAV_UK: &[I18nRow<'_>] = &[
+    ("admin.nav.dashboard", "ÐŸÐ°Ð½ÐµÐ»ÑŒ"),
+    ("admin.nav.tenants", "ÐžÑ€ÐµÐ½Ð´Ð°Ñ€Ñ–"),
+    ("admin.nav.security", "Ð‘ÐµÐ·Ð¿ÐµÐºÐ°"),
+    ("admin.nav.audit", "Ð–ÑƒÑ€Ð½Ð°Ð» Ð°ÑƒÐ´Ð¸Ñ‚Ñƒ"),
+    ("admin.nav.monitoring", "ÐœÐ¾Ð½Ñ–Ñ‚Ð¾Ñ€Ð¸Ð½Ð³"),
+    ("admin.nav.vm", "VM"),
+    ("admin.nav.workers", "Ð’Ð¾Ñ€ÐºÐµÑ€Ð¸"),
+    ("admin.nav.jobs", "Ð—Ð°Ð´Ð°Ñ‡Ñ–"),
+    ("admin.nav.gridPricing", "Ð¦Ñ–Ð½Ð¸ Grid"),
+    ("admin.nav.updatesCompat", "ÐžÐ½Ð¾Ð²Ð»ÐµÐ½Ð½Ñ"),
+    ("admin.nav.libs", "Ð‘Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºÐ¸"),
+    ("admin.nav.raid", "RAID"),
+    ("admin.nav.instances", "Ð†Ð½ÑÑ‚Ð°Ð½ÑÐ¸ Ð¼Ð¾Ð´ÐµÐ»ÐµÐ¹"),
+    ("admin.nav.topology", "Ð¢Ð¾Ð¿Ð¾Ð»Ð¾Ð³Ñ–Ñ"),
+    ("admin.nav.users", "ÐšÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ñ–"),
+    ("admin.nav.config", "ÐšÐ¾Ð½Ñ„Ñ–Ð³ÑƒÑ€Ð°Ñ†Ñ–Ñ"),
+];
+
+/// English admin chrome shell keys (PH-S243; merged into auth_dash shell patch).
+pub const ADMIN_CHROME_EN: &[I18nRow<'_>] = &[
+    ("admin.brand", "PoolAI Admin"),
+    ("admin.skipMain", "Skip to main content"),
+    ("admin.skipNav", "Skip to navigation"),
+    ("admin.lang.label", "Language"),
+    ("admin.logout", "Log out"),
+    ("admin.browserSuffix", " - PoolAI Admin"),
+];
+
+/// Ukrainian admin chrome shell keys (PH-S243).
+pub const ADMIN_CHROME_UK: &[I18nRow<'_>] = &[
+    ("admin.brand", "PoolAI ÐÐ´Ð¼Ñ–Ð½"),
+    ("admin.skipMain", "ÐŸÐµÑ€ÐµÐ¹Ñ‚Ð¸ Ð´Ð¾ Ð¾ÑÐ½Ð¾Ð²Ð½Ð¾Ð³Ð¾ Ð²Ð¼Ñ–ÑÑ‚Ñƒ"),
+    ("admin.skipNav", "ÐŸÐµÑ€ÐµÐ¹Ñ‚Ð¸ Ð´Ð¾ Ð½Ð°Ð²Ñ–Ð³Ð°Ñ†Ñ–Ñ—"),
+    ("admin.lang.label", "ÐœÐ¾Ð²Ð°"),
+    ("admin.logout", "Ð’Ð¸Ð¹Ñ‚Ð¸"),
+    ("admin.browserSuffix", " â€” PoolAI ÐÐ´Ð¼Ñ–Ð½"),
+];
+
+/// English dashboard shell keys (nav, theme, search, titles).
+pub const DASH_SHELL_EN: &[I18nRow<'_>] = &[
+    ("dash.brand", "PoolAI UI"),
+    ("dash.subtitle", "Dashboard with write operations (Stage 3)"),
+    ("dash.skipMain", "Skip to main content"),
+    ("dash.skipNav", "Skip to navigation"),
+    ("dash.nav.home", "Home"),
+    ("dash.nav.status", "Status"),
+    ("dash.nav.health", "Health"),
+    ("dash.nav.metrics", "Metrics"),
+    ("dash.nav.workers", "Workers"),
+    ("dash.nav.libs", "Libs"),
+    ("dash.nav.vm", "VM"),
+    ("dash.nav.raid", "RAID"),
+    ("dash.nav.admin", "Admin"),
+    ("dash.aria.admin", "Enterprise admin panel"),
+    ("dash.aria.mainNav", "Main navigation"),
+    ("dash.aria.home", "Home page"),
+    ("dash.aria.status", "System status"),
+    ("dash.aria.health", "Health check"),
+    ("dash.aria.metrics", "System metrics"),
+    ("dash.aria.workers", "Worker management"),
+    ("dash.aria.libs", "Library management"),
+    ("dash.aria.vm", "VM instance management"),
+    ("dash.aria.raid", "RAID artifact management"),
+    ("dash.aria.mobileNav", "Mobile navigation"),
+    ("dash.aria.openMenu", "Open navigation menu"),
+    ("dash.aria.closeMenu", "Close navigation menu"),
+    ("dash.menuTitle", "Menu"),
+    ("dash.themeLabel", "Theme:"),
+    ("dash.aria.theme", "Select theme"),
+    ("dash.themeOptDark", "ðŸŒ™ Dark"),
+    ("dash.themeOptLight", "â˜€ï¸ Light"),
+    ("dash.themeOptHC", "ðŸ”† High Contrast"),
+    ("dash.login", "Login"),
+    ("dash.logout", "Logout"),
+    (
+        "dash.pageAutoRefresh",
+        "Auto-refresh is enabled (5s). Write operations are available for authenticated users with appropriate permissions.",
+    ),
+    ("dash.title.home", "Home"),
+    ("dash.title.status", "Status"),
+    ("dash.title.health", "Health"),
+    ("dash.title.metrics", "Metrics"),
+    ("dash.title.workers", "Workers"),
+    ("dash.title.libraries", "Libraries"),
+    ("dash.title.vm", "VM Instances"),
+    ("dash.title.raid", "RAID"),
+    ("dash.updatedPrefix", "Updated:"),
+    ("dash.search.title", "Search"),
+    ("dash.search.closeAria", "Close search dialog"),
+    ("dash.search.placeholder", "Search pages, workers, artifacts..."),
+    ("dash.search.inputAria", "Search input"),
+    ("dash.search.category.page", "Page"),
+    ("dash.search.item.home", "Home"),
+    ("dash.search.item.status", "Status"),
+    ("dash.search.item.health", "Health"),
+    ("dash.search.item.metrics", "Metrics"),
+    ("dash.search.item.workers", "Workers"),
+    ("dash.search.item.libs", "Libraries"),
+    ("dash.search.item.vm", "VM Instances"),
+    ("dash.search.item.raid", "RAID"),
+    ("dash.search.typeToSearch", "Type to search..."),
+    ("dash.search.noResults", "No results found"),
+    ("dash.search.resultsAria", "Search results"),
+    ("dash.search.oneResult", "1 result found"),
+    ("dash.search.manyResults", "{count} results found"),
+    ("dash.search.resultsWithCount", "Search results: {status}"),
+];
+
+/// Ukrainian dashboard shell keys.
+pub const DASH_SHELL_UK: &[I18nRow<'_>] = &[
+    ("dash.brand", "PoolAI UI"),
+    ("dash.subtitle", "ÐŸÐ°Ð½ÐµÐ»ÑŒ Ð· Ð¾Ð¿ÐµÑ€Ð°Ñ†Ñ–ÑÐ¼Ð¸ Ð·Ð°Ð¿Ð¸ÑÑƒ (ÐµÑ‚Ð°Ð¿ 3)"),
+    ("dash.skipMain", "ÐŸÐµÑ€ÐµÐ¹Ñ‚Ð¸ Ð´Ð¾ Ð¾ÑÐ½Ð¾Ð²Ð½Ð¾Ð³Ð¾ Ð²Ð¼Ñ–ÑÑ‚Ñƒ"),
+    ("dash.skipNav", "ÐŸÐµÑ€ÐµÐ¹Ñ‚Ð¸ Ð´Ð¾ Ð½Ð°Ð²Ñ–Ð³Ð°Ñ†Ñ–Ñ—"),
+    ("dash.nav.home", "Ð“Ð¾Ð»Ð¾Ð²Ð½Ð°"),
+    ("dash.nav.status", "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ"),
+    ("dash.nav.health", "Ð—Ð´Ð¾Ñ€Ð¾Ð²\u{2019}Ñ"),
+    ("dash.nav.metrics", "ÐœÐµÑ‚Ñ€Ð¸ÐºÐ¸"),
+    ("dash.nav.workers", "Ð’Ð¾Ñ€ÐºÐµÑ€Ð¸"),
+    ("dash.nav.libs", "Ð‘Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºÐ¸"),
+    ("dash.nav.vm", "VM"),
+    ("dash.nav.raid", "RAID"),
+    ("dash.nav.admin", "ÐÐ´Ð¼Ñ–Ð½ÐºÐ°"),
+    ("dash.aria.admin", "ÐŸÐ°Ð½ÐµÐ»ÑŒ Ð°Ð´Ð¼Ñ–Ð½Ñ–ÑÑ‚Ñ€Ð°Ñ‚Ð¾Ñ€Ð° (enterprise)"),
+    ("dash.aria.mainNav", "Ð“Ð¾Ð»Ð¾Ð²Ð½Ð° Ð½Ð°Ð²Ñ–Ð³Ð°Ñ†Ñ–Ñ"),
+    ("dash.aria.home", "Ð“Ð¾Ð»Ð¾Ð²Ð½Ð° ÑÑ‚Ð¾Ñ€Ñ–Ð½ÐºÐ°"),
+    ("dash.aria.status", "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ ÑÐ¸ÑÑ‚ÐµÐ¼Ð¸"),
+    ("dash.aria.health", "ÐŸÐµÑ€ÐµÐ²Ñ–Ñ€ÐºÐ° Ð·Ð´Ð¾Ñ€Ð¾Ð²\u{2019}Ñ"),
+    ("dash.aria.metrics", "ÐœÐµÑ‚Ñ€Ð¸ÐºÐ¸ ÑÐ¸ÑÑ‚ÐµÐ¼Ð¸"),
+    ("dash.aria.workers", "ÐšÐµÑ€ÑƒÐ²Ð°Ð½Ð½Ñ Ð²Ð¾Ñ€ÐºÐµÑ€Ð°Ð¼Ð¸"),
+    ("dash.aria.libs", "ÐšÐµÑ€ÑƒÐ²Ð°Ð½Ð½Ñ Ð±Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºÐ°Ð¼Ð¸"),
+    ("dash.aria.vm", "ÐšÐµÑ€ÑƒÐ²Ð°Ð½Ð½Ñ Ñ–Ð½ÑÑ‚Ð°Ð½ÑÐ°Ð¼Ð¸ VM"),
+    ("dash.aria.raid", "ÐšÐµÑ€ÑƒÐ²Ð°Ð½Ð½Ñ Ð°Ñ€Ñ‚ÐµÑ„Ð°ÐºÑ‚Ð°Ð¼Ð¸ RAID"),
+    ("dash.aria.mobileNav", "ÐœÐ¾Ð±Ñ–Ð»ÑŒÐ½Ð° Ð½Ð°Ð²Ñ–Ð³Ð°Ñ†Ñ–Ñ"),
+    ("dash.aria.openMenu", "Ð’Ñ–Ð´ÐºÑ€Ð¸Ñ‚Ð¸ Ð¼ÐµÐ½ÑŽ Ð½Ð°Ð²Ñ–Ð³Ð°Ñ†Ñ–Ñ—"),
+    ("dash.aria.closeMenu", "Ð—Ð°ÐºÑ€Ð¸Ñ‚Ð¸ Ð¼ÐµÐ½ÑŽ Ð½Ð°Ð²Ñ–Ð³Ð°Ñ†Ñ–Ñ—"),
+    ("dash.menuTitle", "ÐœÐµÐ½ÑŽ"),
+    ("dash.themeLabel", "Ð¢ÐµÐ¼Ð°:"),
+    ("dash.aria.theme", "ÐžÐ±Ñ€Ð°Ñ‚Ð¸ Ñ‚ÐµÐ¼Ñƒ"),
+    ("dash.themeOptDark", "ðŸŒ™ Ð¢ÐµÐ¼Ð½Ð°"),
+    ("dash.themeOptLight", "â˜€ï¸ Ð¡Ð²Ñ–Ñ‚Ð»Ð°"),
+    ("dash.themeOptHC", "ðŸ”† Ð’Ð¸ÑÐ¾ÐºÐ¸Ð¹ ÐºÐ¾Ð½Ñ‚Ñ€Ð°ÑÑ‚"),
+    ("dash.login", "Ð£Ð²Ñ–Ð¹Ñ‚Ð¸"),
+    ("dash.logout", "Ð’Ð¸Ð¹Ñ‚Ð¸"),
+    (
+        "dash.pageAutoRefresh",
+        "ÐÐ²Ñ‚Ð¾Ð¾Ð½Ð¾Ð²Ð»ÐµÐ½Ð½Ñ ÐºÐ¾Ð¶Ð½Ñ– 5 Ñ. ÐžÐ¿ÐµÑ€Ð°Ñ†Ñ–Ñ— Ð·Ð°Ð¿Ð¸ÑÑƒ Ð´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ– Ð°Ð²Ñ‚ÐµÐ½Ñ‚Ð¸Ñ„Ñ–ÐºÐ¾Ð²Ð°Ð½Ð¸Ð¼ ÐºÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ð°Ð¼ Ð· Ð²Ñ–Ð´Ð¿Ð¾Ð²Ñ–Ð´Ð½Ð¸Ð¼Ð¸ Ð¿Ñ€Ð°Ð²Ð°Ð¼Ð¸.",
+    ),
+    ("dash.title.home", "Ð“Ð¾Ð»Ð¾Ð²Ð½Ð°"),
+    ("dash.title.status", "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ"),
+    ("dash.title.health", "Ð—Ð´Ð¾Ñ€Ð¾Ð²\u{2019}Ñ"),
+    ("dash.title.metrics", "ÐœÐµÑ‚Ñ€Ð¸ÐºÐ¸"),
+    ("dash.title.workers", "Ð’Ð¾Ñ€ÐºÐµÑ€Ð¸"),
+    ("dash.title.libraries", "Ð‘Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºÐ¸"),
+    ("dash.title.vm", "Ð†Ð½ÑÑ‚Ð°Ð½ÑÐ¸ VM"),
+    ("dash.title.raid", "RAID"),
+    ("dash.updatedPrefix", "ÐžÐ½Ð¾Ð²Ð»ÐµÐ½Ð¾:"),
+    ("dash.search.title", "ÐŸÐ¾ÑˆÑƒÐº"),
+    ("dash.search.closeAria", "Ð—Ð°ÐºÑ€Ð¸Ñ‚Ð¸ Ð´Ñ–Ð°Ð»Ð¾Ð³ Ð¿Ð¾ÑˆÑƒÐºÑƒ"),
+    ("dash.search.placeholder", "ÐŸÐ¾ÑˆÑƒÐº ÑÑ‚Ð¾Ñ€Ñ–Ð½Ð¾Ðº, Ð²Ð¾Ñ€ÐºÐµÑ€Ñ–Ð², Ð°Ñ€Ñ‚ÐµÑ„Ð°ÐºÑ‚Ñ–Ð²..."),
+    ("dash.search.inputAria", "ÐŸÐ¾Ð»Ðµ Ð¿Ð¾ÑˆÑƒÐºÑƒ"),
+    ("dash.search.category.page", "Ð¡Ñ‚Ð¾Ñ€Ñ–Ð½ÐºÐ°"),
+    ("dash.search.item.home", "Ð“Ð¾Ð»Ð¾Ð²Ð½Ð°"),
+    ("dash.search.item.status", "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ"),
+    ("dash.search.item.health", "Ð—Ð´Ð¾Ñ€Ð¾Ð²\u{02BC}Ñ"),
+    ("dash.search.item.metrics", "ÐœÐµÑ‚Ñ€Ð¸ÐºÐ¸"),
+    ("dash.search.item.workers", "Ð’Ð¾Ñ€ÐºÐµÑ€Ð¸"),
+    ("dash.search.item.libs", "Ð‘Ñ–Ð±Ð»Ñ–Ð¾Ñ‚ÐµÐºÐ¸"),
+    ("dash.search.item.vm", "Ð†Ð½ÑÑ‚Ð°Ð½ÑÐ¸ VM"),
+    ("dash.search.item.raid", "RAID"),
+    ("dash.search.typeToSearch", "Ð’Ð²ÐµÐ´Ñ–Ñ‚ÑŒ Ð·Ð°Ð¿Ð¸Ñ‚ Ð´Ð»Ñ Ð¿Ð¾ÑˆÑƒÐºÑƒ..."),
+    ("dash.search.noResults", "ÐÑ–Ñ‡Ð¾Ð³Ð¾ Ð½Ðµ Ð·Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾"),
+    ("dash.search.resultsAria", "Ð ÐµÐ·ÑƒÐ»ÑŒÑ‚Ð°Ñ‚Ð¸ Ð¿Ð¾ÑˆÑƒÐºÑƒ"),
+    ("dash.search.oneResult", "Ð—Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾ 1 Ñ€ÐµÐ·ÑƒÐ»ÑŒÑ‚Ð°Ñ‚"),
+    ("dash.search.manyResults", "Ð—Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾ Ñ€ÐµÐ·ÑƒÐ»ÑŒÑ‚Ð°Ñ‚Ñ–Ð²: {count}"),
+    ("dash.search.resultsWithCount", "Ð ÐµÐ·ÑƒÐ»ÑŒÑ‚Ð°Ñ‚Ð¸ Ð¿Ð¾ÑˆÑƒÐºÑƒ: {status}"),
+];
+
+fn rows_to_map(rows: &[I18nRow<'_>]) -> BTreeMap<String, String> {
+    rows.iter()
+        .map(|(k, v)| ((*k).to_string(), (*v).to_string()))
+        .collect()
+}
+
+/// `{"en":{...},"uk":{...}}` patch â€” jobs page only (PH-S211).
+pub fn admin_jobs_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_JOBS_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_JOBS_UK));
+    root
+}
+
+/// JSON literal for jobs-only admin patch.
+pub fn admin_jobs_patch_json() -> String {
+    serde_json::to_string(&admin_jobs_patch()).expect("admin jobs i18n patch serializes")
+}
+
+/// Inline script for jobs admin layout (PH-S211).
+pub fn admin_jobs_patch_script() -> String {
+    format!("window.__poolaiAdminI18nRust={};", admin_jobs_patch_json())
+}
+
+/// `{"en":{...},"uk":{...}}` patch â€” raid page only (PH-S214).
+pub fn admin_raid_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_RAID_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_RAID_UK));
+    root
+}
+
+/// JSON literal for raid-only admin patch.
+pub fn admin_raid_patch_json() -> String {
+    serde_json::to_string(&admin_raid_patch()).expect("admin raid i18n patch serializes")
+}
+
+/// Inline script for raid admin layout (PH-S214).
+pub fn admin_raid_patch_script() -> String {
+    format!("window.__poolaiAdminI18nRust={};", admin_raid_patch_json())
+}
+
+/// `{"en":{...},"uk":{...}}` patch â€” grid-pricing page only (PH-S217).
+pub fn admin_grid_pricing_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_GRID_PRICING_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_GRID_PRICING_UK));
+    root
+}
+
+/// JSON literal for grid-pricing-only admin patch.
+pub fn admin_grid_pricing_patch_json() -> String {
+    serde_json::to_string(&admin_grid_pricing_patch())
+        .expect("admin grid-pricing i18n patch serializes")
+}
+
+/// Inline script for grid-pricing admin layout (PH-S217).
+pub fn admin_grid_pricing_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminI18nRust={};",
+        admin_grid_pricing_patch_json()
+    )
+}
+
+/// Dashboard admin page â€” slim `admin.dash.*` patch only (PH-S228).
+pub fn admin_dashboard_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_DASHBOARD_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_DASHBOARD_UK));
+    root
+}
+
+pub fn admin_dashboard_patch_json() -> String {
+    serde_json::to_string(&admin_dashboard_patch()).expect("admin dashboard i18n patch serializes")
+}
+
+pub fn admin_dashboard_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminI18nRust={};",
+        admin_dashboard_patch_json()
+    )
+}
+
+/// Audit admin page â€” slim `admin.audit.*` patch only (PH-S229).
+pub fn admin_audit_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_AUDIT_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_AUDIT_UK));
+    root
+}
+
+pub fn admin_audit_patch_json() -> String {
+    serde_json::to_string(&admin_audit_patch()).expect("admin audit i18n patch serializes")
+}
+
+pub fn admin_audit_patch_script() -> String {
+    format!("window.__poolaiAdminI18nRust={};", admin_audit_patch_json())
+}
+
+/// Tenants admin page â€” slim `admin.tenants.*` patch only (PH-S230).
+pub fn admin_tenants_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_TENANTS_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_TENANTS_UK));
+    root
+}
+
+pub fn admin_tenants_patch_json() -> String {
+    serde_json::to_string(&admin_tenants_patch()).expect("admin tenants i18n patch serializes")
+}
+
+pub fn admin_tenants_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminI18nRust={};",
+        admin_tenants_patch_json()
+    )
+}
+
+/// Security admin page â€” slim security/SSO/policy patch (PH-S231; PH-S1283; PH-S1483).
+pub fn admin_security_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut en = rows_to_map(ADMIN_SECURITY_EN);
+    en.extend(rows_to_map(ADMIN_SSO_EN));
+    en.extend(rows_to_map(ADMIN_POLICY_EN));
+    let mut uk = rows_to_map(ADMIN_SECURITY_UK);
+    uk.extend(rows_to_map(ADMIN_SSO_UK));
+    uk.extend(rows_to_map(ADMIN_POLICY_UK));
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), en);
+    root.insert("uk".into(), uk);
+    root
+}
+
+pub fn admin_security_patch_json() -> String {
+    serde_json::to_string(&admin_security_patch()).expect("admin security i18n patch serializes")
+}
+
+pub fn admin_security_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminI18nRust={};",
+        admin_security_patch_json()
+    )
+}
+
+/// Topology admin page â€” slim `admin.topo.*` patch only (PH-S234).
+pub fn admin_topology_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_TOPOLOGY_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_TOPOLOGY_UK));
+    root
+}
+
+pub fn admin_topology_patch_json() -> String {
+    serde_json::to_string(&admin_topology_patch()).expect("admin topology i18n patch serializes")
+}
+
+pub fn admin_topology_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminI18nRust={};",
+        admin_topology_patch_json()
+    )
+}
+
+/// Instances admin page â€” slim `admin.inst.*` patch only (PH-S236).
+pub fn admin_instances_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_INSTANCES_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_INSTANCES_UK));
+    root
+}
+
+pub fn admin_instances_patch_json() -> String {
+    serde_json::to_string(&admin_instances_patch()).expect("admin instances i18n patch serializes")
+}
+
+pub fn admin_instances_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminI18nRust={};",
+        admin_instances_patch_json()
+    )
+}
+
+/// VM admin page â€” slim `admin.vmadm.*` patch only (PH-S237).
+pub fn admin_vm_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_VM_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_VM_UK));
+    root
+}
+
+pub fn admin_vm_patch_json() -> String {
+    serde_json::to_string(&admin_vm_patch()).expect("admin vm i18n patch serializes")
+}
+
+pub fn admin_vm_patch_script() -> String {
+    format!("window.__poolaiAdminI18nRust={};", admin_vm_patch_json())
+}
+
+/// Users admin page â€” slim `admin.usr.*` patch only (PH-S238).
+pub fn admin_users_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_USERS_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_USERS_UK));
+    root
+}
+
+pub fn admin_users_patch_json() -> String {
+    serde_json::to_string(&admin_users_patch()).expect("admin users i18n patch serializes")
+}
+
+pub fn admin_users_patch_script() -> String {
+    format!("window.__poolaiAdminI18nRust={};", admin_users_patch_json())
+}
+
+/// Config admin page â€” slim `admin.cfg.*` patch only (PH-S239).
+pub fn admin_config_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_CONFIG_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_CONFIG_UK));
+    root
+}
+
+pub fn admin_config_patch_json() -> String {
+    serde_json::to_string(&admin_config_patch()).expect("admin config i18n patch serializes")
+}
+
+pub fn admin_config_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminI18nRust={};",
+        admin_config_patch_json()
+    )
+}
+
+/// Monitoring admin page â€” slim `admin.mon.*` patch only (PH-S220).
+pub fn admin_monitoring_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_MONITORING_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_MONITORING_UK));
+    root
+}
+
+pub fn admin_monitoring_patch_json() -> String {
+    serde_json::to_string(&admin_monitoring_patch())
+        .expect("admin monitoring i18n patch serializes")
+}
+
+pub fn admin_monitoring_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminI18nRust={};",
+        admin_monitoring_patch_json()
+    )
+}
+
+/// Updates-compat admin page â€” slim `admin.updatesCompat.*` patch only (PH-S221).
+pub fn admin_updates_compat_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_UPDATES_COMPAT_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_UPDATES_COMPAT_UK));
+    root
+}
+
+pub fn admin_updates_compat_patch_json() -> String {
+    serde_json::to_string(&admin_updates_compat_patch())
+        .expect("admin updates-compat i18n patch serializes")
+}
+
+pub fn admin_updates_compat_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminI18nRust={};",
+        admin_updates_compat_patch_json()
+    )
+}
+
+/// Workers admin page â€” slim `admin.wrk.*` + `workers.*` patch (PH-S222, PH-S257).
+pub fn admin_workers_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut en = rows_to_map(ADMIN_WORKERS_EN);
+    merge_rows(&mut en, WORKERS_PANEL_EN);
+    let mut uk = rows_to_map(ADMIN_WORKERS_UK);
+    merge_rows(&mut uk, WORKERS_PANEL_UK);
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), en);
+    root.insert("uk".into(), uk);
+    root
+}
+
+pub fn admin_workers_patch_json() -> String {
+    serde_json::to_string(&admin_workers_patch()).expect("admin workers i18n patch serializes")
+}
+
+pub fn admin_workers_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminI18nRust={};",
+        admin_workers_patch_json()
+    )
+}
+
+/// Libraries admin page â€” slim `admin.lib.*` patch only (PH-S223).
+pub fn admin_libs_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_LIBS_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_LIBS_UK));
+    root
+}
+
+pub fn admin_libs_patch_json() -> String {
+    serde_json::to_string(&admin_libs_patch()).expect("admin libs i18n patch serializes")
+}
+
+pub fn admin_libs_patch_script() -> String {
+    format!("window.__poolaiAdminI18nRust={};", admin_libs_patch_json())
+}
+
+/// Default admin layout â€” slim `admin.jobs.*` patch only (PH-S221; updates-compat on dedicated page).
+pub fn admin_jobs_grid_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_JOBS_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_JOBS_UK));
+    root
+}
+
+/// JSON literal assigned to `window.__poolaiAdminI18nRust`.
+pub fn admin_jobs_grid_patch_json() -> String {
+    serde_json::to_string(&admin_jobs_grid_patch()).expect("admin i18n patch serializes")
+}
+
+/// Inline script body (no `<script>` wrapper) for admin layout injection.
+pub fn admin_jobs_grid_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminI18nRust={};",
+        admin_jobs_grid_patch_json()
+    )
+}
+
+fn merge_rows(map: &mut BTreeMap<String, String>, rows: &[I18nRow<'_>]) {
+    for (k, v) in rows {
+        map.insert((*k).to_string(), (*v).to_string());
+    }
+}
+
+/// Admin table toolbar â€” slim `admin.table.*` patch for all admin layouts (PH-S240).
+pub fn admin_table_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_TABLE_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_TABLE_UK));
+    root
+}
+
+pub fn admin_table_patch_json() -> String {
+    serde_json::to_string(&admin_table_patch()).expect("admin table i18n patch serializes")
+}
+
+pub fn admin_table_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminTableI18nRust={};",
+        admin_table_patch_json()
+    )
+}
+
+/// Admin shared status / action keys â€” slim `admin.status.*` patch (PH-S245).
+pub fn admin_status_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_STATUS_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_STATUS_UK));
+    root
+}
+
+pub fn admin_status_patch_json() -> String {
+    serde_json::to_string(&admin_status_patch()).expect("admin status i18n patch serializes")
+}
+
+pub fn admin_status_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminStatusI18nRust={};",
+        admin_status_patch_json()
+    )
+}
+
+/// Admin error hint / access keys â€” slim `err.hint*` + residual `err.*` (PH-S246, PH-S259).
+pub fn admin_err_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut en = rows_to_map(ADMIN_ERR_EN);
+    merge_rows(&mut en, FORM_ERR_RESIDUAL_EN);
+    let mut uk = rows_to_map(ADMIN_ERR_UK);
+    merge_rows(&mut uk, FORM_ERR_RESIDUAL_UK);
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), en);
+    root.insert("uk".into(), uk);
+    root
+}
+
+pub fn admin_err_patch_json() -> String {
+    serde_json::to_string(&admin_err_patch()).expect("admin err i18n patch serializes")
+}
+
+pub fn admin_err_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminErrI18nRust={};",
+        admin_err_patch_json()
+    )
+}
+
+/// VM create/manage modal keys â€” slim `vm.*` patch (PH-S248).
+pub fn vm_modal_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(VM_MODAL_EN));
+    root.insert("uk".into(), rows_to_map(VM_MODAL_UK));
+    root
+}
+
+pub fn vm_modal_patch_json() -> String {
+    serde_json::to_string(&vm_modal_patch()).expect("vm modal i18n patch serializes")
+}
+
+pub fn vm_modal_patch_script() -> String {
+    format!("window.__poolaiVmModalI18nRust={};", vm_modal_patch_json())
+}
+
+/// Shared confirm-dialog keys â€” slim `ui.confirm*` patch (PH-S252).
+pub fn admin_ui_confirm_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_UI_CONFIRM_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_UI_CONFIRM_UK));
+    root
+}
+
+pub fn admin_ui_confirm_patch_json() -> String {
+    serde_json::to_string(&admin_ui_confirm_patch())
+        .expect("admin ui confirm i18n patch serializes")
+}
+
+pub fn admin_ui_confirm_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminUiConfirmI18nRust={};",
+        admin_ui_confirm_patch_json()
+    )
+}
+
+/// Dashboard workers panel â€” slim `workers.*` patch (PH-S257).
+pub fn workers_panel_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(WORKERS_PANEL_EN));
+    root.insert("uk".into(), rows_to_map(WORKERS_PANEL_UK));
+    root
+}
+
+pub fn workers_panel_patch_json() -> String {
+    serde_json::to_string(&workers_panel_patch()).expect("workers panel i18n patch serializes")
+}
+
+pub fn workers_panel_patch_script() -> String {
+    format!(
+        "window.__poolaiWorkersPanelI18nRust={};",
+        workers_panel_patch_json()
+    )
+}
+
+/// Home shell â€” slim `home.*` patch (PH-S258).
+pub fn admin_home_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(HOME_SHELL_EN));
+    root.insert("uk".into(), rows_to_map(HOME_SHELL_UK));
+    root
+}
+
+pub fn admin_home_patch_json() -> String {
+    serde_json::to_string(&admin_home_patch()).expect("home i18n patch serializes")
+}
+
+pub fn admin_home_patch_script() -> String {
+    format!("window.__poolaiHomeI18nRust={};", admin_home_patch_json())
+}
+
+/// Admin power modal â€” slim `admin.power.*` patch (PH-S1020).
+pub fn admin_power_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(ADMIN_POWER_EN));
+    root.insert("uk".into(), rows_to_map(ADMIN_POWER_UK));
+    root
+}
+
+pub fn admin_power_patch_json() -> String {
+    serde_json::to_string(&admin_power_patch()).expect("admin power i18n patch serializes")
+}
+
+pub fn admin_power_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminPowerI18nRust={};",
+        admin_power_patch_json()
+    )
+}
+
+/// Shared form validation â€” slim `form.*` patch (PH-S259).
+pub fn admin_form_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(FORM_SHELL_EN));
+    root.insert("uk".into(), rows_to_map(FORM_SHELL_UK));
+    root
+}
+
+pub fn admin_form_patch_json() -> String {
+    serde_json::to_string(&admin_form_patch()).expect("form i18n patch serializes")
+}
+
+pub fn admin_form_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminFormI18nRust={};",
+        admin_form_patch_json()
+    )
+}
+
+/// Shared UI toolbar glue â€” slim `ui.save` / `ui.search*` / `ui.retry*` (PH-S260).
+pub fn admin_ui_toolbar_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(UI_TOOLBAR_EN));
+    root.insert("uk".into(), rows_to_map(UI_TOOLBAR_UK));
+    root
+}
+
+pub fn admin_ui_toolbar_patch_json() -> String {
+    serde_json::to_string(&admin_ui_toolbar_patch()).expect("ui toolbar i18n patch serializes")
+}
+
+pub fn admin_ui_toolbar_patch_script() -> String {
+    format!(
+        "window.__poolaiAdminUiToolbarI18nRust={};",
+        admin_ui_toolbar_patch_json()
+    )
+}
+
+/// Shared common + residual ui keys â€” slim `common.*` / `ui.upload`â€¦`ui.deleting` (PH-S263).
+pub fn admin_ui_common_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(UI_COMMON_SHELL_EN));
+    root.insert("uk".into(), rows_to_map(UI_COMMON_SHELL_UK));
+    root
+}
+
+pub fn admin_ui_common_patch_json() -> String {
+    serde_json::to_string(&admin_ui_common_patch()).expect("ui common i18n patch serializes")
+}
+
+pub fn admin_ui_common_patch_script() -> String {
+    format!(
+        "window.__poolaiUiCommonI18nRust={};",
+        admin_ui_common_patch_json()
+    )
+}
+
+/// Dashboard libs panel â€” slim `libs.*` patch (PH-S264).
+pub fn libs_panel_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(LIBS_PANEL_EN));
+    root.insert("uk".into(), rows_to_map(LIBS_PANEL_UK));
+    root
+}
+
+pub fn libs_panel_patch_json() -> String {
+    serde_json::to_string(&libs_panel_patch()).expect("libs panel i18n patch serializes")
+}
+
+pub fn libs_panel_patch_script() -> String {
+    format!(
+        "window.__poolaiLibsPanelI18nRust={};",
+        libs_panel_patch_json()
+    )
+}
+
+/// Dashboard RAID panel â€” slim `raid.*` patch (PH-S265).
+pub fn raid_panel_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), rows_to_map(RAID_PANEL_EN));
+    root.insert("uk".into(), rows_to_map(RAID_PANEL_UK));
+    root
+}
+
+pub fn raid_panel_patch_json() -> String {
+    serde_json::to_string(&raid_panel_patch()).expect("raid panel i18n patch serializes")
+}
+
+pub fn raid_panel_patch_script() -> String {
+    format!(
+        "window.__poolaiRaidPanelI18nRust={};",
+        raid_panel_patch_json()
+    )
+}
+
+/// `{"en":{...},"uk":{...}}` patch for auth + dashboard + admin nav/chrome shell keys (PH-S162, PH-S242, PH-S243).
+pub fn auth_dash_shell_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut en = BTreeMap::new();
+    merge_rows(&mut en, AUTH_SHELL_EN);
+    merge_rows(&mut en, ADMIN_NAV_EN);
+    merge_rows(&mut en, ADMIN_CHROME_EN);
+    merge_rows(&mut en, DASH_SHELL_EN);
+    let mut uk = BTreeMap::new();
+    merge_rows(&mut uk, AUTH_SHELL_UK);
+    merge_rows(&mut uk, ADMIN_NAV_UK);
+    merge_rows(&mut uk, ADMIN_CHROME_UK);
+    merge_rows(&mut uk, DASH_SHELL_UK);
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), en);
+    root.insert("uk".into(), uk);
+    root
+}
+
+/// JSON literal assigned to `window.__poolaiAuthDashI18nRust`.
+pub fn auth_dash_shell_patch_json() -> String {
+    serde_json::to_string(&auth_dash_shell_patch()).expect("auth/dash i18n patch serializes")
+}
+
+/// Inline script for login, dashboard layout, and admin layout (auth bootstrap + lang toggle).
+pub fn auth_dash_shell_patch_script() -> String {
+    format!(
+        "window.__poolaiAuthDashI18nRust={};",
+        auth_dash_shell_patch_json()
+    )
+}
+
+/// Lookup EN string by key (tests / server-side parity).
+pub fn t_en(key: &str) -> Option<&'static str> {
+    for rows in [
+        ADMIN_JOBS_EN,
+        ADMIN_GRID_PRICING_EN,
+        ADMIN_UPDATES_COMPAT_EN,
+        ADMIN_DASHBOARD_EN,
+        ADMIN_AUDIT_EN,
+        ADMIN_TENANTS_EN,
+        ADMIN_SECURITY_EN,
+        ADMIN_SSO_EN,
+        ADMIN_POLICY_EN,
+        ADMIN_TOPOLOGY_EN,
+        ADMIN_INSTANCES_EN,
+        ADMIN_VM_EN,
+        ADMIN_USERS_EN,
+        ADMIN_CONFIG_EN,
+        ADMIN_MONITORING_EN,
+    ] {
+        if let Some((_, v)) = rows.iter().find(|(k, _)| *k == key) {
+            return Some(*v);
+        }
+    }
+    None
+}
+
+/// Lookup UK string by key (tests / server-side parity).
+pub fn t_uk(key: &str) -> Option<&'static str> {
+    for rows in [
+        ADMIN_JOBS_UK,
+        ADMIN_GRID_PRICING_UK,
+        ADMIN_UPDATES_COMPAT_UK,
+        ADMIN_DASHBOARD_UK,
+        ADMIN_AUDIT_UK,
+        ADMIN_TENANTS_UK,
+        ADMIN_SECURITY_UK,
+        ADMIN_SSO_UK,
+        ADMIN_POLICY_UK,
+        ADMIN_TOPOLOGY_UK,
+        ADMIN_INSTANCES_UK,
+        ADMIN_VM_UK,
+        ADMIN_USERS_UK,
+        ADMIN_CONFIG_UK,
+        ADMIN_MONITORING_UK,
+    ] {
+        if let Some((_, v)) = rows.iter().find(|(k, _)| *k == key) {
+            return Some(*v);
+        }
+    }
+    None
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn patch_has_matching_en_uk_key_counts() {
+        assert_eq!(ADMIN_JOBS_EN.len(), ADMIN_JOBS_UK.len());
+        assert_eq!(ADMIN_GRID_PRICING_EN.len(), ADMIN_GRID_PRICING_UK.len());
+        assert_eq!(ADMIN_UPDATES_COMPAT_EN.len(), ADMIN_UPDATES_COMPAT_UK.len());
+        assert_eq!(ADMIN_MONITORING_EN.len(), ADMIN_MONITORING_UK.len());
+        assert_eq!(ADMIN_WORKERS_EN.len(), ADMIN_WORKERS_UK.len());
+        assert_eq!(ADMIN_LIBS_EN.len(), ADMIN_LIBS_UK.len());
+        let patch = admin_jobs_grid_patch();
+        assert_eq!(patch["en"].len(), ADMIN_JOBS_EN.len());
+        assert_eq!(patch["uk"].len(), ADMIN_JOBS_UK.len());
+    }
+
+    #[test]
+    fn jobs_patch_json_jobs_only_ph_s211() {
+        let json = admin_jobs_patch_json();
+        assert!(json.contains(r#""admin.jobs.leaseState.active""#));
+        assert!(json.contains(r#""admin.page.jobs""#));
+        assert!(!json.contains(r#""admin.gridPricing.col.price""#));
+        assert!(!json.contains(r#""admin.mon.mlTitle""#));
+    }
+
+    #[test]
+    fn raid_patch_has_matching_en_uk_key_counts_ph_s214() {
+        assert_eq!(ADMIN_RAID_EN.len(), ADMIN_RAID_UK.len());
+    }
+
+    #[test]
+    fn raid_patch_json_raid_only_ph_s214() {
+        let json = admin_raid_patch_json();
+        assert!(json.contains(r#""admin.page.raid""#));
+        assert!(json.contains(r#""admin.raidadm.section""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+        assert!(!json.contains(r#""admin.gridPricing.col.price""#));
+    }
+
+    #[test]
+    fn raid_patch_script_assigns_window_patch_ph_s214() {
+        let script = admin_raid_patch_script();
+        assert!(script.starts_with("window.__poolaiAdminI18nRust="));
+        assert!(script.ends_with(';'));
+    }
+
+    #[test]
+    fn grid_pricing_patch_has_matching_en_uk_key_counts_ph_s217() {
+        assert_eq!(ADMIN_GRID_PRICING_EN.len(), ADMIN_GRID_PRICING_UK.len());
+    }
+
+    #[test]
+    fn grid_pricing_patch_json_grid_only_ph_s217() {
+        let json = admin_grid_pricing_patch_json();
+        assert!(json.contains(r#""admin.page.gridPricing""#));
+        assert!(json.contains(r#""admin.gridPricing.col.price""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+        assert!(!json.contains(r#""admin.mon.mlTitle""#));
+    }
+
+    #[test]
+    fn patch_json_contains_jobs_only_not_grid_or_updates_ph_s221() {
+        let json = admin_jobs_grid_patch_json();
+        assert!(json.contains(r#""admin.jobs.leaseState.active""#));
+        assert!(!json.contains(r#""admin.gridPricing.col.price""#));
+        assert!(json.contains(r#""admin.jobs.status.migrating""#));
+        assert!(!json.contains(r#""admin.updatesCompat.section""#));
+        assert!(!json.contains(r#""admin.mon.mlTitle""#));
+        assert!(!json.contains(r#""admin.page.monitoring""#));
+    }
+
+    #[test]
+    fn tenants_patch_has_matching_en_uk_key_counts_ph_s230() {
+        assert_eq!(ADMIN_TENANTS_EN.len(), ADMIN_TENANTS_UK.len());
+    }
+
+    #[test]
+    fn tenants_patch_json_tenants_only_ph_s230() {
+        let json = admin_tenants_patch_json();
+        assert!(json.contains(r#""admin.page.tenants""#));
+        assert!(json.contains(r#""admin.tenants.section""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+        assert!(!json.contains(r#""admin.audit.sectionTitle""#));
+    }
+
+    #[test]
+    fn security_patch_has_matching_en_uk_key_counts_ph_s231() {
+        assert_eq!(ADMIN_SECURITY_EN.len(), ADMIN_SECURITY_UK.len());
+        assert_eq!(ADMIN_SSO_EN.len(), ADMIN_SSO_UK.len());
+        assert_eq!(ADMIN_POLICY_EN.len(), ADMIN_POLICY_UK.len());
+    }
+
+    #[test]
+    fn security_patch_json_security_only_ph_s231() {
+        let json = admin_security_patch_json();
+        assert!(json.contains(r#""admin.page.security""#));
+        assert!(json.contains(r#""admin.sec.tab.oauth""#));
+        assert!(json.contains(r#""admin.sec.col.name""#));
+        assert!(json.contains(r#""admin.sso.storeLabel""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+        assert!(!json.contains(r#""admin.tenants.section""#));
+    }
+
+    #[test]
+    fn jobs_grid_patch_excludes_tenants_shim_ph_s231() {
+        let json = admin_jobs_grid_patch_json();
+        assert!(!json.contains(r#""admin.tenants.col.name""#));
+    }
+
+    #[test]
+    fn topology_patch_has_matching_en_uk_key_counts_ph_s234() {
+        assert_eq!(ADMIN_TOPOLOGY_EN.len(), ADMIN_TOPOLOGY_UK.len());
+    }
+
+    #[test]
+    fn topology_patch_json_topology_only_ph_s234() {
+        let json = admin_topology_patch_json();
+        assert!(json.contains(r#""admin.page.topology""#));
+        assert!(json.contains(r#""admin.topo.title""#));
+        assert!(json.contains(r#""admin.topo.graphLegend""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+        assert!(!json.contains(r#""admin.sec.tab.oauth""#));
+    }
+
+    #[test]
+    fn instances_patch_has_matching_en_uk_key_counts_ph_s236() {
+        assert_eq!(ADMIN_INSTANCES_EN.len(), ADMIN_INSTANCES_UK.len());
+    }
+
+    #[test]
+    fn instances_patch_json_instances_only_ph_s236() {
+        let json = admin_instances_patch_json();
+        assert!(json.contains(r#""admin.page.instances""#));
+        assert!(json.contains(r#""admin.inst.title""#));
+        assert!(json.contains(r#""admin.inst.ph.placement""#));
+        assert!(!json.contains(r#""admin.topo.title""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+    }
+
+    #[test]
+    fn vm_patch_has_matching_en_uk_key_counts_ph_s237() {
+        assert_eq!(ADMIN_VM_EN.len(), ADMIN_VM_UK.len());
+    }
+
+    #[test]
+    fn vm_patch_json_vm_only_ph_s237() {
+        let json = admin_vm_patch_json();
+        assert!(json.contains(r#""admin.page.vm""#));
+        assert!(json.contains(r#""admin.vmadm.section""#));
+        assert!(json.contains(r#""admin.vmadm.createBtn""#));
+        assert!(!json.contains(r#""admin.inst.title""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+    }
+
+    #[test]
+    fn users_patch_has_matching_en_uk_key_counts_ph_s238() {
+        assert_eq!(ADMIN_USERS_EN.len(), ADMIN_USERS_UK.len());
+    }
+
+    #[test]
+    fn users_patch_json_users_only_ph_s238() {
+        let json = admin_users_patch_json();
+        assert!(json.contains(r#""admin.page.users""#));
+        assert!(json.contains(r#""admin.usr.section""#));
+        assert!(json.contains(r#""admin.usr.confirmDel""#));
+        assert!(!json.contains(r#""admin.vmadm.section""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+    }
+
+    #[test]
+    fn config_patch_has_matching_en_uk_key_counts_ph_s239() {
+        assert_eq!(ADMIN_CONFIG_EN.len(), ADMIN_CONFIG_UK.len());
+    }
+
+    #[test]
+    fn config_patch_json_config_only_ph_s239() {
+        let json = admin_config_patch_json();
+        assert!(json.contains(r#""admin.page.config""#));
+        assert!(json.contains(r#""admin.cfg.tab.general""#));
+        assert!(json.contains(r#""admin.cfg.health.hint""#));
+        assert!(!json.contains(r#""admin.usr.section""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+    }
+
+    #[test]
+    fn table_patch_has_matching_en_uk_key_counts_ph_s240() {
+        assert_eq!(ADMIN_TABLE_EN.len(), ADMIN_TABLE_UK.len());
+    }
+
+    #[test]
+    fn table_patch_json_table_only_ph_s240() {
+        let json = admin_table_patch_json();
+        assert!(json.contains(r#""admin.table.empty""#));
+        assert!(json.contains(r#""admin.table.sortedBy""#));
+        assert!(!json.contains(r#""admin.cfg.tab.general""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+    }
+
+    #[test]
+    fn table_patch_script_assigns_window_patch_ph_s240() {
+        let script = admin_table_patch_script();
+        assert!(script.starts_with("window.__poolaiAdminTableI18nRust="));
+    }
+
+    #[test]
+    fn status_patch_has_matching_en_uk_key_counts_ph_s245() {
+        assert_eq!(ADMIN_STATUS_EN.len(), ADMIN_STATUS_UK.len());
+    }
+
+    #[test]
+    fn status_patch_json_status_only_ph_s245() {
+        let json = admin_status_patch_json();
+        assert!(json.contains(r#""admin.status.active""#));
+        assert!(json.contains(r#""admin.btn.edit""#));
+        assert!(json.contains(r#""admin.na""#));
+        assert!(!json.contains(r#""admin.table.empty""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+    }
+
+    #[test]
+    fn status_patch_script_assigns_window_patch_ph_s245() {
+        let script = admin_status_patch_script();
+        assert!(script.starts_with("window.__poolaiAdminStatusI18nRust="));
+    }
+
+    #[test]
+    fn err_patch_has_matching_en_uk_key_counts_ph_s246() {
+        assert_eq!(ADMIN_ERR_EN.len(), ADMIN_ERR_UK.len());
+    }
+
+    #[test]
+    fn err_patch_json_err_only_ph_s246() {
+        let json = admin_err_patch_json();
+        assert!(json.contains(r#""err.hint403""#));
+        assert!(json.contains(r#""err.hint503.raid""#));
+        assert!(json.contains(r#""err.insufficientAdmin""#));
+        assert!(json.contains(r#""admin.accessRequired""#));
+        assert!(!json.contains(r#""admin.status.active""#));
+        assert!(!json.contains(r#""admin.table.empty""#));
+    }
+
+    #[test]
+    fn err_patch_script_assigns_window_patch_ph_s246() {
+        let script = admin_err_patch_script();
+        assert!(script.starts_with("window.__poolaiAdminErrI18nRust="));
+    }
+
+    #[test]
+    fn vm_modal_patch_has_matching_en_uk_key_counts_ph_s248() {
+        assert_eq!(VM_MODAL_EN.len(), VM_MODAL_UK.len());
+    }
+
+    #[test]
+    fn vm_modal_patch_json_vm_only_ph_s248() {
+        let json = vm_modal_patch_json();
+        assert!(json.contains(r#""vm.modalTitle""#));
+        assert!(json.contains(r#""vm.confirmDelete""#));
+        assert!(!json.contains(r#""admin.vmadm.section""#));
+        assert!(!json.contains(r#""raid.modalTitle""#));
+    }
+
+    #[test]
+    fn vm_modal_patch_script_assigns_window_patch_ph_s248() {
+        let script = vm_modal_patch_script();
+        assert!(script.starts_with("window.__poolaiVmModalI18nRust="));
+    }
+
+    #[test]
+    fn ui_confirm_patch_has_matching_en_uk_key_counts_ph_s252() {
+        assert_eq!(ADMIN_UI_CONFIRM_EN.len(), ADMIN_UI_CONFIRM_UK.len());
+    }
+
+    #[test]
+    fn ui_confirm_patch_json_confirm_only_ph_s252() {
+        let json = admin_ui_confirm_patch_json();
+        assert!(json.contains(r#""ui.confirmTitle""#));
+        assert!(json.contains(r#""ui.closeDialogAria""#));
+        assert!(!json.contains(r#""ui.create""#));
+        assert!(!json.contains(r#""vm.modalTitle""#));
+    }
+
+    #[test]
+    fn ui_confirm_patch_script_assigns_window_patch_ph_s252() {
+        let script = admin_ui_confirm_patch_script();
+        assert!(script.starts_with("window.__poolaiAdminUiConfirmI18nRust="));
+    }
+
+    #[test]
+    fn audit_patch_has_matching_en_uk_key_counts_ph_s229() {
+        assert_eq!(ADMIN_AUDIT_EN.len(), ADMIN_AUDIT_UK.len());
+    }
+
+    #[test]
+    fn audit_patch_json_audit_only_ph_s229() {
+        let json = admin_audit_patch_json();
+        assert!(json.contains(r#""admin.page.audit""#));
+        assert!(json.contains(r#""admin.audit.sectionTitle""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+        assert!(!json.contains(r#""admin.dash.card.overview""#));
+    }
+
+    #[test]
+    fn dashboard_patch_has_matching_en_uk_key_counts_ph_s228() {
+        assert_eq!(ADMIN_DASHBOARD_EN.len(), ADMIN_DASHBOARD_UK.len());
+    }
+
+    #[test]
+    fn dashboard_patch_json_dashboard_only_ph_s228() {
+        let json = admin_dashboard_patch_json();
+        assert!(json.contains(r#""admin.page.dashboard""#));
+        assert!(json.contains(r#""admin.dash.card.overview""#));
+        assert!(json.contains(r#""admin.dash.avg""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+        assert!(!json.contains(r#""admin.mon.mlTitle""#));
+    }
+
+    #[test]
+    fn monitoring_patch_has_matching_en_uk_key_counts_ph_s220() {
+        assert_eq!(ADMIN_MONITORING_EN.len(), ADMIN_MONITORING_UK.len());
+    }
+
+    #[test]
+    fn monitoring_patch_json_monitoring_only_ph_s220() {
+        let json = admin_monitoring_patch_json();
+        assert!(json.contains(r#""admin.page.monitoring""#));
+        assert!(json.contains(r#""admin.mon.mlTitle""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+        assert!(!json.contains(r#""admin.updatesCompat.section""#));
+    }
+
+    #[test]
+    fn libs_patch_has_matching_en_uk_key_counts_ph_s223() {
+        assert_eq!(ADMIN_LIBS_EN.len(), ADMIN_LIBS_UK.len());
+    }
+
+    #[test]
+    fn libs_patch_json_libs_only_ph_s223() {
+        let json = admin_libs_patch_json();
+        assert!(json.contains(r#""admin.page.libs""#));
+        assert!(json.contains(r#""admin.lib.section""#));
+        assert!(json.contains(r#""admin.lib.uploadBtn""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+        assert!(!json.contains(r#""admin.wrk.loading""#));
+    }
+
+    #[test]
+    fn workers_patch_has_matching_en_uk_key_counts_ph_s222() {
+        assert_eq!(ADMIN_WORKERS_EN.len(), ADMIN_WORKERS_UK.len());
+    }
+
+    #[test]
+    fn workers_patch_json_workers_only_ph_s222() {
+        let json = admin_workers_patch_json();
+        assert!(json.contains(r#""admin.page.workers""#));
+        assert!(json.contains(r#""admin.wrk.section""#));
+        assert!(json.contains(r#""admin.wrk.createBtn""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+        assert!(!json.contains(r#""admin.lib.section""#));
+    }
+
+    #[test]
+    fn updates_compat_patch_has_matching_en_uk_key_counts_ph_s221() {
+        assert_eq!(ADMIN_UPDATES_COMPAT_EN.len(), ADMIN_UPDATES_COMPAT_UK.len());
+    }
+
+    #[test]
+    fn updates_compat_patch_json_updates_only_ph_s221() {
+        let json = admin_updates_compat_patch_json();
+        assert!(json.contains(r#""admin.page.updatesCompat""#));
+        assert!(json.contains(r#""admin.updatesCompat.section""#));
+        assert!(!json.contains(r#""admin.jobs.leaseState.active""#));
+        assert!(!json.contains(r#""admin.mon.mlTitle""#));
+    }
+
+    #[test]
+    fn script_assigns_window_patch() {
+        let script = admin_jobs_grid_patch_script();
+        assert!(script.starts_with("window.__poolaiAdminI18nRust="));
+        assert!(script.ends_with(';'));
+    }
+
+    #[test]
+    fn t_en_uk_lease_labels() {
+        assert_eq!(t_en("admin.jobs.leaseState.active"), Some("Active"));
+        assert_eq!(
+            t_uk("admin.jobs.leaseState.expired"),
+            Some("ÐŸÑ€Ð¾Ñ‚ÐµÑ€Ð¼Ñ–Ð½Ð¾Ð²Ð°Ð½Ð¸Ð¹")
+        );
+        assert_eq!(t_en("admin.gridPricing.result"), Some("Pricing snapshot"));
+    }
+
+    #[test]
+    fn auth_dash_patch_has_matching_en_uk_key_counts() {
+        assert_eq!(AUTH_SHELL_EN.len(), AUTH_SHELL_UK.len());
+        assert_eq!(ADMIN_NAV_EN.len(), ADMIN_NAV_UK.len());
+        assert_eq!(ADMIN_CHROME_EN.len(), ADMIN_CHROME_UK.len());
+        assert_eq!(DASH_SHELL_EN.len(), DASH_SHELL_UK.len());
+        let patch = auth_dash_shell_patch();
+        let expected =
+            AUTH_SHELL_EN.len() + ADMIN_NAV_EN.len() + ADMIN_CHROME_EN.len() + DASH_SHELL_EN.len();
+        assert_eq!(patch["en"].len(), expected);
+        assert_eq!(patch["uk"].len(), expected);
+    }
+
+    #[test]
+    fn auth_dash_patch_json_contains_admin_nav_keys_ph_s242() {
+        let json = auth_dash_shell_patch_json();
+        assert!(json.contains(r#""admin.nav.dashboard""#));
+        assert!(json.contains(r#""admin.nav.jobs""#));
+        assert!(json.contains(r#""admin.nav.config""#));
+    }
+
+    #[test]
+    fn auth_dash_patch_json_contains_admin_chrome_keys_ph_s243() {
+        let json = auth_dash_shell_patch_json();
+        assert!(json.contains(r#""admin.brand""#));
+        assert!(json.contains(r#""admin.skipMain""#));
+        assert!(json.contains(r#""admin.skipNav""#));
+        assert!(json.contains(r#""admin.lang.label""#));
+        assert!(json.contains(r#""admin.logout""#));
+        assert!(json.contains(r#""admin.browserSuffix""#));
+    }
+
+    #[test]
+    fn auth_dash_patch_json_contains_auth_and_dash_keys() {
+        let json = auth_dash_shell_patch_json();
+        assert!(json.contains(r#""auth.pageTitle""#));
+        assert!(json.contains(r#""auth.bootstrapDismiss""#));
+        assert!(json.contains(r#""dash.nav.workers""#));
+        assert!(json.contains(r#""dash.search.manyResults""#));
+    }
+
+    #[test]
+    fn auth_dash_script_assigns_window_patch() {
+        let script = auth_dash_shell_patch_script();
+        assert!(script.starts_with("window.__poolaiAuthDashI18nRust="));
+        assert!(script.ends_with(';'));
+    }
+
+    #[test]
+    fn ui_common_patch_has_matching_en_uk_key_counts_ph_s263() {
+        assert_eq!(UI_COMMON_SHELL_EN.len(), UI_COMMON_SHELL_UK.len());
+    }
+
+    #[test]
+    fn ui_common_patch_json_common_and_ui_only_ph_s263() {
+        let json = admin_ui_common_patch_json();
+        assert!(json.contains(r#""common.loading""#));
+        assert!(json.contains(r#""ui.create""#));
+        assert!(json.contains(r#""ui.suggestion.checkInternet""#));
+        assert!(!json.contains(r#""ui.save""#));
+        assert!(!json.contains(r#""libs.empty""#));
+    }
+
+    #[test]
+    fn ui_common_patch_script_assigns_window_patch_ph_s263() {
+        let script = admin_ui_common_patch_script();
+        assert!(script.starts_with("window.__poolaiUiCommonI18nRust="));
+    }
+
+    #[test]
+    fn libs_panel_patch_has_matching_en_uk_key_counts_ph_s264() {
+        assert_eq!(LIBS_PANEL_EN.len(), LIBS_PANEL_UK.len());
+    }
+
+    #[test]
+    fn libs_panel_patch_json_libs_only_ph_s264() {
+        let json = libs_panel_patch_json();
+        assert!(json.contains(r#""libs.empty""#));
+        assert!(json.contains(r#""libs.confirmUninstall""#));
+        assert!(!json.contains(r#""raid.empty""#));
+        assert!(!json.contains(r#""admin.lib.section""#));
+    }
+
+    #[test]
+    fn libs_panel_patch_script_assigns_window_patch_ph_s264() {
+        let script = libs_panel_patch_script();
+        assert!(script.starts_with("window.__poolaiLibsPanelI18nRust="));
+    }
+
+    #[test]
+    fn raid_panel_patch_has_matching_en_uk_key_counts_ph_s265() {
+        assert_eq!(RAID_PANEL_EN.len(), RAID_PANEL_UK.len());
+    }
+
+    #[test]
+    fn raid_panel_patch_json_raid_only_ph_s265() {
+        let json = raid_panel_patch_json();
+        assert!(json.contains(r#""raid.empty""#));
+        assert!(json.contains(r#""raid.confirmDelete""#));
+        assert!(!json.contains(r#""libs.empty""#));
+        assert!(!json.contains(r#""admin.raidadm.section""#));
+    }
+
+    #[test]
+    fn raid_panel_patch_script_assigns_window_patch_ph_s265() {
+        let script = raid_panel_patch_script();
+        assert!(script.starts_with("window.__poolaiRaidPanelI18nRust="));
+    }
+}
