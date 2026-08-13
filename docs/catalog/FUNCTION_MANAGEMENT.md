@@ -265,7 +265,7 @@ FM-xxx (з таблиці нижче)
 
 **VDT:** §5.12 = **журнал PH-S*** (≤10 відкритих). Якщо **< 10** — **`абракадабра`** / project scan **всього проєкту**: concept → FM **§5.1** → roadmaps → architect → DOCS_LEGACY → code → §5.13 fallback. Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Project scan». **Rust-first:** API → `tests/`; Playwright лише browser scope.
 
-**Відкритих у §5.12:** **0** (band 124 ✅ · §5.105 PH-S1879…S1888). **Master horizon:** PH-S1899.S1908 (band 126). Vision rev **481**.
+**Відкритих у §5.12:** **0** (band 124 ✅ · §5.105 PH-S1879…S1888). **Master horizon:** PH-S1899.S1908 (band 126). Vision rev **482**.
 
 **Историчний research backlog (PH-S65+):**
 
@@ -3282,28 +3282,28 @@ git log -S "PutArtifact" --oneline -n 20 -- src/
 - [FUNCTIONALITY_DIGEST_2026-04-06.md](./FUNCTIONALITY_DIGEST_2026-04-06.md)  
 - [STABLE_STATE_SUMMARY.md](../status/STABLE_STATE_SUMMARY.md)  
 - [STRUCTURE.md](../STRUCTURE.md) (таксономія `docs/`)### 5.127 GPULimits migration 3 (PH-S1909.S1918, band 127, 2026-08-12) ✅
-**Истояне 5.12:** πόρόмая 0 (band 126 ✅ · §5.127 PH-S1909.S1918). \master horizon: PH-S1909.S1918 (band 127). Vision rev 481.
+**Истояне 5.12:** πόρόмая 0 (band 126 ✅ · §5.127 PH-S1909.S1918). \master horizon: PH-S1909.S1918 (band 127). Vision rev 482.
 
 ### 5.107 GPULimits migration 3 queue - band 127 (PH-S1909.S1918, 2026-08-12) ✅
 **Истояне:** master backlog band 127 (H GPULimits ✅ · migration 3) - enterprise phase H (GPU admission + worker limits, single-host). Pattern mirror: band 125 (§a75.106) durable gpu_limits.json; migration 3 glue: bin/verify-dev-stand.sh + bin/run-poolai.sh. Canon: GPU_LIMITS.md ✅ PH_S_MASTER_BACKLOG_1000.md ✅ PH_S_ENTERPRISE_ROADMAP_2026-07-19.md.
 ### 5.128 GPULimits migration 4 (PH-S1919.S1928, band 128, 2026-08-14) ✅
-**????????? ? 5.12:** \u00cf\u00cf\u00cf\u00cf 0 (band 127 ✅ · §5.128 PH-S1919.S1928). \u00d7\u00d7\u00d7\u00d7 Vision rev 481.
+**????????? ? 5.12:** \u00cf\u00cf\u00cf\u00cf 0 (band 127 ✅ · §5.128 PH-S1919.S1928). \u00d7\u00d7\u00d7\u00d7 Vision rev 482.
 
 ### 5.108 GPULimits migration 4 queue - band 128 (PH-S1919.S1928, 2026-08-14) ✅
 \u00d8\u00d8\u00d8\u00d8 master backlog band 128 (H GPULimits ✅ · migration 4) - enterprise phase H (GPU admission + worker limits, single-host). Pattern mirror: band 126 (§a75.106) durable gpu_limits.json; migration 4 glue: bin/verify-dev-stand.sh + bin/run-poolai.sh. Canon: GPU_LIMITS.md ✅ PH_S_MASTER_BACKLOG_1000.md ✅ PH_S_ENTERPRISE_ROADMAP_2026-07-19.md.### 5.129 GPULimits migration 5 (PH-S1929.S1938, band 129, 2026-08-15) ✅
-**????????? ? 5.12:** \u00cf\u00cf\u00cf\u00cf 0 (band 128 ✅ · §5.129 PH-S1929.S1938). \u00d7\u00d7\u00d7\u00d7 Vision rev 481.
+**????????? ? 5.12:** \u00cf\u00cf\u00cf\u00cf 0 (band 128 ✅ · §5.129 PH-S1929.S1938). \u00d7\u00d7\u00d7\u00d7 Vision rev 482.
 
 ### 5.109 GPULimits migration 5 queue - band 129 (PH-S1929.S1938, 2026-08-15) ✅
 \u00d8\u00d8\u00d8\u00d8 master backlog band 129 (H GPULimits ✅ · migration 5) - enterprise phase H (GPU admission + worker limits, single-host). Pattern mirror: band 127 (§a75.107) durable gpu_limits.json; migration 5 glue: bin/verify-dev-stand.sh + bin/run-poolai.sh. Canon: GPU_LIMITS.md ✅ PH_S_MASTER_BACKLOG_1000.md ✅ PH_S_ENTERPRISE_ROADMAP_2026-07-19.md.### 5.130 GPULimits migration 6 (PH-S1939.S1948, band 130, 2026-08-16) ✅
-**????????? ? 5.12:** \u00cf\u00cf\u00cf\u00cf 0 (band 129 ✅ · §5.130 PH-S1939.S1948). \u00d7\u00d7\u00d7\u00d7 Vision rev 481.
+**????????? ? 5.12:** \u00cf\u00cf\u00cf\u00cf 0 (band 129 ✅ · §5.130 PH-S1939.S1948). \u00d7\u00d7\u00d7\u00d7 Vision rev 482.
 
 ### 5.109 GPULimits migration 6 queue - band 130 (PH-S1939.S1948, 2026-08-16) ✅
 \u00d8\u00d8\u00d8\u00d8 master backlog band 130 (H GPULimits ✅ · migration 6) - enterprise phase H (GPU admission + worker limits, single-host). Pattern mirror: band 127 (§a75.107) durable gpu_limits.json; migration 6 glue: bin/verify-dev-stand.sh + bin/run-poolai.sh. Canon: GPU_LIMITS.md ✅ PH_S_MASTER_BACKLOG_1000.md ✅ PH_S_ENTERPRISE_ROADMAP_2026-07-19.md.### 5.131 GPULimits UI debug 1 (PH-S1949.S1958, band 131, 2026-08-17) ✅
-**????????? ? 5.12:** \u00cf\u00cf\u00cf\u00cf 0 (band 130 ✅ · §5.131 PH-S1949.S1958). \u00d7\u00d7\u00d7\u00d7 Vision rev 481.
+**????????? ? 5.12:** \u00cf\u00cf\u00cf\u00cf 0 (band 130 ✅ · §5.131 PH-S1949.S1958). \u00d7\u00d7\u00d7\u00d7 Vision rev 482.
 
 ### 5.109 GPULimits UI debug 1 queue - band 131 (PH-S1949.S1958, 2026-08-17) ✅
 \u00d8\u00d8\u00d8\u00d8 master backlog band 131 (H GPULimits ✅ · UI debug 5) - enterprise phase H (GPU admission + worker limits, single-host). Pattern mirror: band 128 (§a75.108) durable gpu_limits.json; UI debug 5 glue: bin/verify-dev-stand.sh + bin/run-poolai.sh. Canon: GPU_LIMITS.md ✅ PH_S_MASTER_BACKLOG_1000.md ✅ PH_S_ENTERPRISE_ROADMAP_2026-07-19.md.### 5.132 GPULimits UI debug 2 (PH-S1959.S1968, band 132, 2026-08-18) ✅
-**????????? ? 5.12:** \u00cf\u00cf\u00cf\u00cf 0 (band 131 ✅ · §5.132 PH-S1959.S1968). \u00d7\u00d7\u00d7\u00d7 Vision rev 481.
+**????????? ? 5.12:** \u00cf\u00cf\u00cf\u00cf 0 (band 131 ✅ · §5.132 PH-S1959.S1968). \u00d7\u00d7\u00d7\u00d7 Vision rev 482.
 
 ### 5.110 GPULimits UI debug 2 queue - band 132 (PH-S1959.S1968, 2026-08-18) ✅
 \u00d8\u00d8\u00d8\u00d8 master backlog band 132 (H GPULimits ✅ · UI debug 6) - enterprise phase H (GPU admission + worker limits, single-host). Pattern mirror: band 129 (§a75.110) durable gpu_limits.json; UI debug 6 glue: bin/verify-dev-stand.sh + bin/run-poolai.sh. Canon: GPU_LIMITS.md ✅ PH_S_MASTER_BACKLOG_1000.md ✅ PH_S_ENTERPRISE_ROADMAP_2026-07-19.md.
