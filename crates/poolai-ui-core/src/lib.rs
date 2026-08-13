@@ -38,6 +38,8 @@ pub mod gpu_limits_migration3_depth;
 pub mod gpu_limits_migration4_depth;
 pub mod gpu_limits_migration5_depth;
 pub mod gpu_limits_migration6_depth;
+pub mod gpu_limits_debug1_depth;
+pub mod gpu_limits_debug2_depth;
 pub mod gpu_limits_store;
 pub mod grid_metrics_parity_depth;
 pub mod grid_replication_pricing;
