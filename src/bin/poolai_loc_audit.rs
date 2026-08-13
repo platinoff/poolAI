@@ -2603,7 +2603,9 @@ fn build_report(
             (0, audit_vision_sync_criteria_total())
         };
     if config.audit_vision_sync {
-        notes.push("PH-S1424: audit_vision_sync_mode — aggregate GSV/docs/vision/* + AUDIT_DOCS_CANON");
+        notes.push(
+            "PH-S1424: audit_vision_sync_mode — aggregate GSV/docs/vision/* + AUDIT_DOCS_CANON",
+        );
         notes.push("PH-S1428: band 78 audit vision-sync — criteria met vs registry");
     }
 
