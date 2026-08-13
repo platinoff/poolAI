@@ -331,7 +331,7 @@ mod tests {
             ProductCategory::Ignored
         );
         assert_eq!(
-            classify_product_path("docs/gsv/GSV_BOXES.md"),
+            classify_product_path("GSV/docs/gsv/GSV_BOXES.md"),
             ProductCategory::Ignored
         );
         assert_eq!(

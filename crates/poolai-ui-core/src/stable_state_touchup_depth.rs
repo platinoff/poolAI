@@ -47,7 +47,7 @@ pub const STABLE_TOUCHUP_CRITERIA: &[(&str, &str, &str)] = &[
     (
         "vision_sync",
         "poolai-vision-sync",
-        "docs/vision/manifest.json",
+        "GSV/docs/vision/manifest.json",
     ),
     ("ops_test_ci", "test-ci", "bin/verify-dev-stand.sh"),
 ];

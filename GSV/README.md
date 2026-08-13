@@ -8,7 +8,7 @@
 
 Окремий **bin/exe сервер** «Galaxy StarWalker Vision» (`gsv-server`) на Rust, який:
 
-1. Віддає vision UI (доки ↔ код ↔ спринти) — спадкоємець `docs/vision/index.html`.
+1. Віддає vision UI (доки ↔ код ↔ спринти) — спадкоємець `GSV/docs/vision/index.html`.
 2. Виконує **бокси GSV** (панелі/можливості):
    - **Tracker** — технічні параметри виконаного workflow (спринти, команди, часи).
    - **SLI console** — які команди використовуються + усі SLI-функції, які можна створити з наявних скриптів (+ нові).
@@ -61,7 +61,7 @@ GSV/
 └── data/                ← gsv_tracker.json, omni.toml, rust_ratio.json (durable stores, gitignored)
 ```
 
-Канонічна документація проєкту — `docs/gsv/` (див. нижче).
+Канонічна документація проєкту — `GSV/docs/gsv/` (див. нижче).
 
 ## Правила (канон з AGENTS.md)
 
@@ -97,19 +97,19 @@ Endpoints: `GET /` (UI), `/api/health`, `/api/tracker`, `/api/sli`, `/api/toolch
 
 | Файл | Призначення |
 |------|-------------|
-| [`docs/gsv/README.md`](../docs/gsv/README.md) | Індекс docs проєкту GSV |
-| [`docs/gsv/GSV_ARCHITECTURE.md`](../docs/gsv/GSV_ARCHITECTURE.md) | Архітектура сервера + боксів (Rust / wasm split) |
-| [`docs/gsv/GSV_SERVER.md`](../docs/gsv/GSV_SERVER.md) | exe/bin сервер «Galaxy StarWalker Vision» (endpoints, update, offline) |
-| [`docs/gsv/GSV_BOXES.md`](../docs/gsv/GSV_BOXES.md) | Специфікація боксів (Tracker, SLI console, Toolchain, IDE, Update, Preview, SLI terminal, Tests/bench hooks) |
-| [`docs/gsv/GSV_MIGRATION.md`](../docs/gsv/GSV_MIGRATION.md) | Що мігруємо з `docs/vision/` / `src/` у GSV і як |
-| [`docs/gsv/GSV_TECH_ROADMAP.md`](../docs/gsv/GSV_TECH_ROADMAP.md) | **TechPreroadMap** — логічний порядок → future sprints |
+| [`GSV/docs/gsv/README.md`](GSV/docs/gsv/README.md) | Індекс docs проєкту GSV |
+| [`GSV/docs/gsv/GSV_ARCHITECTURE.md`](GSV/docs/gsv/GSV_ARCHITECTURE.md) | Архітектура сервера + боксів (Rust / wasm split) |
+| [`GSV/docs/gsv/GSV_SERVER.md`](GSV/docs/gsv/GSV_SERVER.md) | exe/bin сервер «Galaxy StarWalker Vision» (endpoints, update, offline) |
+| [`GSV/docs/gsv/GSV_BOXES.md`](GSV/docs/gsv/GSV_BOXES.md) | Специфікація боксів (Tracker, SLI console, Toolchain, IDE, Update, Preview, SLI terminal, Tests/bench hooks) |
+| [`GSV/docs/gsv/GSV_MIGRATION.md`](GSV/docs/gsv/GSV_MIGRATION.md) | Що мігруємо з `GSV/docs/vision/` / `src/` у GSV і як |
+| [`GSV/docs/gsv/GSV_TECH_ROADMAP.md`](GSV/docs/gsv/GSV_TECH_ROADMAP.md) | **TechPreroadMap** — логічний порядок → future sprints |
 | [`docs/GSV_ROLES.md`](docs/GSV_ROLES.md) | Ролі GSV VDT (Власник/Оркестратор/Субагенти), канон сесії, ratio gate |
 
 ## Статус
 
 | Етап | Статус |
 |------|--------|
-| Архітектура (цей README + `docs/gsv/`) | **✅** |
+| Архітектура (цей README + `GSV/docs/gsv/`) | **✅** |
 | Реєстрація sprints (FM §5.12 band 102 `PH-S1659…S1668`) | **✅** |
 | gsv-server bin (Cargo/`gsv_server.rs`) | **✅** |
 | Бокси (Tracker, SLI console, Toolchain, IDE, Update, Preview, SLI terminal, Tests/bench) | **✅** |

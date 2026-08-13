@@ -4,7 +4,7 @@ Canonical doc: [`SSO_VISION_SYNC.md`](./SSO_VISION_SYNC.md) (band 68, PH-S1325).
 
 ## Overview
 
-Band 68 consolidates SSO phase-B canon with **`docs/vision/*`** under one vision-sync
+Band 68 consolidates SSO phase-B canon with **`GSV/docs/vision/*`** under one vision-sync
 gate (`--sso-vision-sync` / `VERIFY_SSO_VISION_SYNC`). Prior docs-canon remains
 [`SSO_DOCS_CANON.md`](./SSO_DOCS_CANON.md); this band proves vision artifacts stay
 aligned with the enterprise SSO journal.
@@ -12,7 +12,7 @@ aligned with the enterprise SSO journal.
 | Surface | Where | Notes |
 |---------|-------|-------|
 | Depth module | `sso_vision_sync_depth.rs` | enum + criteria + `SSO_VISION_SYNC_SLICES` |
-| Slice artifacts | `docs/vision/` + `SSO_DOCS_CANON.md` | `manifest.json` · `extensions.json` · `README.md` · `vision.svg` · `index.html` · prior canon |
+| Slice artifacts | `GSV/docs/vision/` + `SSO_DOCS_CANON.md` | `manifest.json` · `extensions.json` · `README.md` · `vision.svg` · `index.html` · prior canon |
 | Aggregate | `--sso-vision-sync` | `sso_vision_sync_*` fields in `rust_ratio.json` |
 | Verify / quick | `VERIFY_SSO_VISION_SYNC` / `--sso-vision-sync` | vision-sync gate only |
 | Contracts | `sso_vision_sync_integration` | slice presence + criteria totals |

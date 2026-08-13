@@ -1,7 +1,7 @@
 # GSV docs — індекс
 
 Канонічна документація проєкту **Galaxy StarWalker Vision** (окремий Rust-first проєкт
-у `GSV/` репо PoolAI). Архітектурні файли `docs/gsv/` живуть у репо PoolAI; внутрішні
+у `GSV/` репо PoolAI). Архітектурні файли `GSV/docs/gsv/` живуть у репо PoolAI; внутрішні
 канон-файли GSV — тут, у `GSV/docs/`.
 
 | Файл | Призначення |
@@ -16,12 +16,12 @@
 
 | Файл | Призначення |
 |------|-------------|
-| [`docs/gsv/README.md`](../../docs/gsv/README.md) | Індекс docs проєкту GSV (зовнішній) |
-| [`docs/gsv/GSV_ARCHITECTURE.md`](../../docs/gsv/GSV_ARCHITECTURE.md) | Архітектура сервера + боксів |
-| [`docs/gsv/GSV_SERVER.md`](../../docs/gsv/GSV_SERVER.md) | exe/bin сервер (endpoints, update, offline) |
-| [`docs/gsv/GSV_BOXES.md`](../../docs/gsv/GSV_BOXES.md) | Специфікація боксів |
-| [`docs/gsv/GSV_MIGRATION.md`](../../docs/gsv/GSV_MIGRATION.md) | Що мігруємо з `docs/vision/` / `src/` у GSV |
-| [`docs/gsv/GSV_TECH_ROADMAP.md`](../../docs/gsv/GSV_TECH_ROADMAP.md) | TechPreroadMap → future sprints |
+| [`GSV/docs/gsv/README.md`](gsv/README.md) | Індекс docs проєкту GSV (зовнішній) |
+| [`GSV/docs/gsv/GSV_ARCHITECTURE.md`](gsv/GSV_ARCHITECTURE.md) | Архітектура сервера + боксів |
+| [`GSV/docs/gsv/GSV_SERVER.md`](gsv/GSV_SERVER.md) | exe/bin сервер (endpoints, update, offline) |
+| [`GSV/docs/gsv/GSV_BOXES.md`](gsv/GSV_BOXES.md) | Специфікація боксів |
+| [`GSV/docs/gsv/GSV_MIGRATION.md`](gsv/GSV_MIGRATION.md) | Що мігруємо з `GSV/docs/vision/` / `src/` у GSV |
+| [`GSV/docs/gsv/GSV_TECH_ROADMAP.md`](gsv/GSV_TECH_ROADMAP.md) | TechPreroadMap → future sprints |
 
 Канон поведінки (roles/ratio/session) — [`GSV_ROLES.md`](GSV_ROLES.md); лічильники
 (кількість тестів, ratio) завжди вимірювати командами, не з пам'яті.

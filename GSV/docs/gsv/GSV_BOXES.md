@@ -127,4 +127,4 @@ Rust модуль: `omni/` (catalog.rs, config.rs, proxy.rs) → `GSV/data/omni.
 | SLI terminal | `terminal/` | `/api/terminal` | SLI-каталог |
 | Tests/bench hooks | `hooks/` | `/api/hooks/…` | `target/` артефакти |
 | OmniRouter | `omni/` | `/api/omni/…` | шіт «AI providers», `omni.toml`, proxy |
-| Vision | `vision/` (`boxes/vision.rs`) | `/api/vision*` · `/assets/vision.svg` | `docs/vision/{manifest,feed,extensions}.json` → `GSV/data/gsv_*.json` |
+| Vision | `vision/` (`boxes/vision.rs`) | `/api/vision*` · `/assets/vision.svg` | `GSV/docs/vision/{manifest,feed,extensions}.json` → `GSV/data/gsv_*.json` |

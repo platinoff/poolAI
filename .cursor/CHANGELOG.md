@@ -5,7 +5,7 @@
 - **Research:** [`docs/development/CURSOR_UPDATE_RESEARCH_2026-07-27.md`](../docs/development/CURSOR_UPDATE_RESEARCH_2026-07-27.md) — local desktop **3.13.21** (was 3.13.10); public changelog still 3.11 + Jul 22 Router; no new numbered IDE features.
 - **`cursor-environment-baseline.mdc`:** 3.13.21; rustup vs MSYS2 pacman note; sandbox.json not required on Windows VDT; Router Balance/Intelligence for long drain.
 - **`poolai-agent-roles.mdc`** + **`autonomous-orchestrator.mdc`:** desktop 3.13.21; vision Speeds/eye pointer; sandbox OWNER gate.
-- **`.cursor/permissions.json`:** vision-sync / Speeds / `docs/vision/` allow; block unsolicited `sandbox.json`; MSYS2 unsandboxed note.
+- **`.cursor/permissions.json`:** vision-sync / Speeds / `GSV/docs/vision/` allow; block unsolicited `sandbox.json`; MSYS2 unsandboxed note.
 - **`docs-vision.mdc`:** Speeds + eye + `--check` service verify.
 - **Vision tools:** Speeds/eye/prune verified (`poolai-vision-sync --check` ok, rev 406) — no code change.
 - **Docs:** HANDOFF/NEXT/README/INDEX/ENV/`file_list.csv`; FM §5.16 PH-SVC75…84.
@@ -64,7 +64,7 @@
 
 - **`cursor-environment-baseline.mdc`**: `cursor` **3.7.42**; Multitask Mode, SwitchMode, нові subagent types.
 - **`poolai-agent-roles.mdc`**: `bugbot`, `security-review`, `best-of-n-runner` (лише за явним запитом).
-- **`poolai-session-iteration.mdc`**: канон drain → **vision close** → **один** `test-ci` → **один** commit (код + `docs/vision/*`); § Vision close band.
+- **`poolai-session-iteration.mdc`**: канон drain → **vision close** → **один** `test-ci` → **один** commit (код + `GSV/docs/vision/*`); § Vision close band.
 - **`virtual-development-team.mdc`**: one-liner `абракадабра` узгоджено з NEXT_SESSION.
 
 ## 2026-06-16 — PH-S201 post-push VDT hook

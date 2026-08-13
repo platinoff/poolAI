@@ -4,7 +4,7 @@ Canonical doc: [`POLICIES_VISION_SYNC.md`](./POLICIES_VISION_SYNC.md) (band 88, 
 
 ## Overview
 
-Band 88 consolidates Policies phase-D docs-canon with **`docs/vision/*`** under one vision-sync
+Band 88 consolidates Policies phase-D docs-canon with **`GSV/docs/vision/*`** under one vision-sync
 gate (`--policy-vision-sync` / `VERIFY_POLICY_VISION_SYNC`). Prior docs-canon remains
 [`POLICIES_DOCS_CANON.md`](./POLICIES_DOCS_CANON.md); this band proves vision artifacts stay
 aligned with the enterprise Policies journal.
@@ -12,7 +12,7 @@ aligned with the enterprise Policies journal.
 | Surface | Where | Notes |
 |---------|-------|-------|
 | Depth module | `policy_vision_sync_depth.rs` | enum + criteria + `POLICY_VISION_SYNC_SLICES` |
-| Slice artifacts | `docs/vision/` + `POLICIES_DOCS_CANON.md` | `manifest.json` · `extensions.json` · `README.md` · `vision.svg` · `index.html` · prior canon |
+| Slice artifacts | `GSV/docs/vision/` + `POLICIES_DOCS_CANON.md` | `manifest.json` · `extensions.json` · `README.md` · `vision.svg` · `index.html` · prior canon |
 | Aggregate | `--policy-vision-sync` | `policy_vision_sync_*` fields in `rust_ratio.json` |
 | Verify / quick | `VERIFY_POLICY_VISION_SYNC` / `--policy-vision-sync` | vision-sync gate only |
 | Contracts | `policy_vision_sync_integration` | slice presence + criteria totals |

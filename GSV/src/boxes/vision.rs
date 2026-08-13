@@ -1,7 +1,7 @@
-//! Vision box — GSV mirror of the poolAI vision canon (`docs/vision/`).
+//! Vision box — GSV mirror of the poolAI vision canon (`GSV/docs/vision/`).
 //!
-//! Ports `docs/vision/manifest.json` (galaxy graph: layers, nodes, edges) and
-//! `docs/vision/feed.json` (sprint ticker) into `GSV/data/` and serves them via
+//! Ports `GSV/docs/vision/manifest.json` (galaxy graph: layers, nodes, edges) and
+//! `GSV/docs/vision/feed.json` (sprint ticker) into `GSV/data/` and serves them via
 //! `/api/vision/*`. The `gsv-vision-sync` bin is the write/drift gate.
 //!
 //! ```text
@@ -118,7 +118,7 @@ pub struct Feed {
     pub items: Vec<FeedItem>,
 }
 
-/// Extension manifest mirror (`docs/vision/extensions.json` → `extensions[]`).
+/// Extension manifest mirror (`GSV/docs/vision/extensions.json` → `extensions[]`).
 ///
 /// Only the planning-relevant fields are typed; `scopes` (scope-id → meta) is
 /// kept opaque so new extension metadata does not break the snapshot.
@@ -196,9 +196,9 @@ pub struct MapReport {
     pub edge_kinds: Vec<EdgeKindStats>,
 }
 
-const MANIFEST_SOURCE: &str = "docs/vision/manifest.json";
-const FEED_SOURCE: &str = "docs/vision/feed.json";
-const EXTENSIONS_SOURCE: &str = "docs/vision/extensions.json";
+const MANIFEST_SOURCE: &str = "GSV/docs/vision/manifest.json";
+const FEED_SOURCE: &str = "GSV/docs/vision/feed.json";
+const EXTENSIONS_SOURCE: &str = "GSV/docs/vision/extensions.json";
 const MANIFEST_TARGET: &str = "gsv_manifest.json";
 const FEED_TARGET: &str = "gsv_feed.json";
 const EXTENSIONS_TARGET: &str = "gsv_extensions.json";
@@ -233,8 +233,8 @@ pub fn extensions_target(data_dir: &Path) -> PathBuf {
     data_dir.join(EXTENSIONS_TARGET)
 }
 
-const SPEED_INDEX_SOURCE: &str = "docs/vision/speed_index.json";
-const RUST_DIAGNOSTICS_SOURCE: &str = "docs/vision/rust_diagnostics.json";
+const SPEED_INDEX_SOURCE: &str = "GSV/docs/vision/speed_index.json";
+const RUST_DIAGNOSTICS_SOURCE: &str = "GSV/docs/vision/rust_diagnostics.json";
 const SPEED_INDEX_TARGET: &str = "gsv_speed_index.json";
 const RUST_DIAGNOSTICS_TARGET: &str = "gsv_rust_diagnostics.json";
 
@@ -1637,7 +1637,7 @@ pub fn wire_sprint_progress(repo_root: &Path, data_dir: &Path) -> Value {
 // ---------------------------------------------------------------------------
 // Sprint UI theme (band 118): colors ported from the legacy vision.css
 // (`--sprint: #a78bfa`, sprint-pill/chip/queue-state rules) so GSV renders the
-// galaxy sprint UI with the same look as the deactivated docs/vision/index.html.
+// galaxy sprint UI with the same look as the deactivated GSV/docs/vision/index.html.
 // ---------------------------------------------------------------------------
 
 /// Sprint-pill theme (legacy `.sprint-pill`).
@@ -2008,7 +2008,7 @@ pub fn sprint_focus_svg(repo_root: &Path, data_dir: &Path, sprint: &str) -> Stri
 // ---------------------------------------------------------------------------
 // Galaxy UI full parity (band 119): full legacy `:root` palette wire plus
 // server-rendered starfield / galaxy backdrop SVGs. All colors are the exact
-// values from `docs/vision/vision.css` :root (deactivated band 117), so the
+// values from `GSV/docs/vision/vision.css` :root (deactivated band 117), so the
 // GSV interface reproduces the Galaxy StarWalker look 1:1 while staying
 // ratio-safe (no client JS/CSS palette or canvas code).
 // ---------------------------------------------------------------------------
@@ -3126,20 +3126,20 @@ mod tests {
     #[test]
     fn path_matches_glob_double_star_and_wildcard() {
         assert!(path_matches_glob(
-            "docs/vision/manifest.json",
-            "docs/vision/**"
+            "GSV/docs/vision/manifest.json",
+            "GSV/docs/vision/**"
         ));
-        assert!(path_matches_glob("docs/vision/feed.json", "docs/vision/**"));
-        assert!(!path_matches_glob("docs/other/feed.json", "docs/vision/**"));
+        assert!(path_matches_glob("GSV/docs/vision/feed.json", "GSV/docs/vision/**"));
+        assert!(!path_matches_glob("docs/other/feed.json", "GSV/docs/vision/**"));
         assert!(path_matches_glob("src/lib/db/mod.rs", "src/**/*.rs"));
         assert!(path_matches_glob("src/lib/db/migrate.rs", "src/**/*.rs"));
         assert!(path_matches_glob(
-            "docs/vision/feed.json",
-            "docs/vision/feed.json"
+            "GSV/docs/vision/feed.json",
+            "GSV/docs/vision/feed.json"
         ));
         assert!(!path_matches_glob(
-            "docs/vision/feed.json",
-            "docs/vision/feed.xml"
+            "GSV/docs/vision/feed.json",
+            "GSV/docs/vision/feed.xml"
         ));
         assert!(!path_matches_glob("src/lib/db/mod.rs", "src/*.rs"));
     }
@@ -3151,7 +3151,7 @@ mod tests {
         let src = tmp.join("src");
         let data = tmp.join("data");
         std::fs::create_dir_all(&src).unwrap();
-        let vis = src.join("docs/vision");
+        let vis = src.join("GSV/docs/vision");
         std::fs::create_dir_all(&vis).unwrap();
         let mut m = sample_manifest();
         m.next_sprint = "PH-S1819".to_string();
@@ -3178,7 +3178,7 @@ mod tests {
         )
         .unwrap();
         std::fs::write(
-            src.join("docs/vision/extensions.json"),
+            src.join("GSV/docs/vision/extensions.json"),
             serde_json::to_string(&Extensions {
                 active_sprint: "PH-S1819".to_string(),
                 scopes: Default::default(),
@@ -3225,7 +3225,7 @@ mod tests {
         let src = tmp.join("src");
         let data = tmp.join("data");
         std::fs::create_dir_all(&src).unwrap();
-        let vis = src.join("docs/vision");
+        let vis = src.join("GSV/docs/vision");
         std::fs::create_dir_all(&vis).unwrap();
         let mut m = sample_manifest();
         m.nodes.push(ManifestNode {
@@ -3470,7 +3470,7 @@ mod tests {
         let src = tmp.join("src");
         let data = tmp.join("data");
         std::fs::create_dir_all(&src).unwrap();
-        let vis = src.join("docs/vision");
+        let vis = src.join("GSV/docs/vision");
         std::fs::create_dir_all(&vis).unwrap();
         let mut m = sample_manifest();
         m.nodes.clear();
@@ -3491,7 +3491,7 @@ mod tests {
         let src = tmp.join("src");
         let data = tmp.join("data");
         std::fs::create_dir_all(&src).unwrap();
-        let vis = src.join("docs/vision");
+        let vis = src.join("GSV/docs/vision");
         std::fs::create_dir_all(&vis).unwrap();
         std::fs::write(
             vis.join("manifest.json"),

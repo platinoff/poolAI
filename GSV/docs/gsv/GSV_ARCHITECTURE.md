@@ -1,6 +1,6 @@
 # GSV Architecture — Galaxy StarWalker Vision
 
-Архітектура окремого проєкту **GSV**. Міграція vision-системи (`docs/vision/`) у самостійний Rust-first проєкт `GSV/` з бінарним сервером та боксами.
+Архітектура окремого проєкту **GSV**. Міграція vision-системи (`GSV/docs/vision/`) у самостійний Rust-first проєкт `GSV/` з бінарним сервером та боксами.
 
 ## Принципи
 

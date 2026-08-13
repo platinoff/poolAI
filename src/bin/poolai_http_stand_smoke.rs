@@ -52,8 +52,8 @@ const DEFAULT_VISION_BASE: &str = "http://127.0.0.1:8765";
 const ENV_BASE: &str = "POOLAI_BASE_URL";
 const ENV_VISION_BASE: &str = "POOLAI_VISION_BASE_URL";
 const ENV_STAND_ROOT: &str = "POOLAI_E2E_STAND_ROOT";
-const MANIFEST_REL: &str = "docs/vision/manifest.json";
-const EXTENSIONS_REL: &str = "docs/vision/extensions.json";
+const MANIFEST_REL: &str = "GSV/docs/vision/manifest.json";
+const EXTENSIONS_REL: &str = "GSV/docs/vision/extensions.json";
 const FM_REL: &str = "docs/catalog/FUNCTION_MANAGEMENT.md";
 const VISION_REV_HEADER: &str = "x-poolai-vision-revision";
 const VALID_PUBKEY: &str = "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU";
@@ -208,7 +208,7 @@ async fn smoke_vision_revision_parity(client: &Client) -> Result<(), String> {
     assert_vision_repo_parity(&root)?;
     let repo_rev = read_manifest_revision(&root)?;
     let vision_base = vision_base_url_from_env();
-    let url = api_url(&vision_base, "/docs/vision/manifest.json");
+    let url = api_url(&vision_base, "/GSV/docs/vision/manifest.json");
     let resp = match client.get(&url).send().await {
         Ok(r) => r,
         Err(e) => {

@@ -56,7 +56,7 @@ description: >-
 
 ## Docs vision (карта зв’язків)
 
-- **`docs/vision/`** — [`vision.svg`](../../docs/vision/vision.svg), [`manifest.json`](../../docs/vision/manifest.json), [`extensions.json`](../../docs/vision/extensions.json), [`index.html`](../../docs/vision/index.html) (4 панелі в браузері / Cursor Simple Browser).
+- **`GSV/docs/vision/`** — [`vision.svg`](../../GSV/docs/vision/vision.svg), [`manifest.json`](../../GSV/docs/vision/manifest.json), [`extensions.json`](../../GSV/docs/vision/extensions.json), [`index.html`](../../GSV/docs/vision/index.html) (4 панелі в браузері / Cursor Simple Browser).
 - Після закриття **PH-S*** + оновлення HANDOFF / FM §5.11 — онови manifest + extensions; правило **`.cursor/rules/docs-vision.mdc`**.
 
 ## Правила для агента

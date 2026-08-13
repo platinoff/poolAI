@@ -1,7 +1,7 @@
 ---
 description: PoolAI docs vision — vision.svg, manifest, extensions, browser map; iterative sync on PH-S* / FM / HANDOFF
 globs:
-  - docs/vision/**
+  - GSV/docs/vision/**
   - docs/concept/POOLAI_GALAXY_GRID.md
   - docs/development/HANDOFF_NEW_SESSION.md
   - docs/development/NEXT_SESSION_PROMPT.md
@@ -11,17 +11,17 @@ alwaysApply: false
 
 # Docs vision (PoolAI)
 
-Карта зв’язків документації та коду: **`docs/vision/`** · правило застосовується при зміні концепт-доків, HANDOFF, FM §5.12 або файлів у `docs/vision/`.
+Карта зв’язків документації та коду: **`GSV/docs/vision/`** · правило застосовується при зміні концепт-доків, HANDOFF, FM §5.12 або файлів у `GSV/docs/vision/`.
 
 ## Канонічні артефакти
 
 | Файл | Коли оновлювати |
 |------|------------------|
-| `docs/vision/manifest.json` | новий doc/code вузол, ребро, закритий PH-S*, зміна `next_sprint` |
-| `docs/vision/extensions.json` | зміна scope спринту, globs, `extension_policy` |
-| `docs/vision/vision.svg` | новий **шар** або **центральний** concept-doc у схемі |
-| `docs/vision/index.html` | нова панель / зміна UX перегляду (рідко) |
-| `docs/vision/README.md` | зміна способу відкриття або структури каталогу |
+| `GSV/docs/vision/manifest.json` | новий doc/code вузол, ребро, закритий PH-S*, зміна `next_sprint` |
+| `GSV/docs/vision/extensions.json` | зміна scope спринту, globs, `extension_policy` |
+| `GSV/docs/vision/vision.svg` | новий **шар** або **центральний** concept-doc у схемі |
+| `GSV/docs/vision/index.html` | нова панель / зміна UX перегляду (рідко) |
+| `GSV/docs/vision/README.md` | зміна способу відкриття або структури каталогу |
 
 ## Ітерація одного PH-S* (разом із VDT)
 
@@ -50,7 +50,7 @@ alwaysApply: false
 ## Перегляд (людина / агент)
 
 - **Не** використовувати `S:/rust/poolAI/...` у Simple Browser (помилка *Unable to resolve resource*).
-- Запуск: **`.\bin\open-docs-vision.ps1`** → URL **`http://127.0.0.1:8765/docs/vision/index.html`** у Simple Browser (див. `.cursor/commands/open-docs-vision.md`).
+- Запуск: **`.\bin\open-docs-vision.ps1`** → URL **`http://127.0.0.1:8765/GSV/docs/vision/index.html`** у Simple Browser (див. `.cursor/commands/open-docs-vision.md`).
 - Кнопка **Reload manifest** — після `git pull` або локального коміту.
 - Чотири панелі: SVG · 3D layer stack · sprint extensions · doc preview.
 - **Speeds panel:** `speed_index.json` + [`SPEED_INDEX.md`](../../docs/development/SPEED_INDEX.md); після `абракадабра` drain — `bash bin/record-test-ci-speed.sh`.

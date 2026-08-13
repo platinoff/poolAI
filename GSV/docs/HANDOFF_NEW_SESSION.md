@@ -50,7 +50,7 @@
   Esc-fullscreen.
   Legacy parity: [`LEGACY_PARITY.md`](LEGACY_PARITY.md) — всі legacy-панелі закриті
   (bands 115–119); `vision.js`/`vision.css` superseded (band 115); **band 117: legacy
-  deactivated** — `docs/vision/index.html` = GSV pointer page, `vision.js`/`vision.css` =
+  deactivated** — `GSV/docs/vision/index.html` = GSV pointer page, `vision.js`/`vision.css` =
   DEACTIVATED banner (архів, не завантажуються); живий UI — `gsv-server` →
   `http://127.0.0.1:8891/`.
   **band 118: sprint UI (theme + focus) migrated** — legacy sprint colors/`sprint-dim`
@@ -76,7 +76,7 @@
 
 - Warnings/diagnostics першими: `cargo run --bin poolai-rust-diagnostics -- --print` (poolAI),
   clippy warnings GSV (`cargo clippy --all-targets`).
-- Роадмапи/архітектор-ряди: `docs/gsv/GSV_TECH_ROADMAP.md`, `GSV/docs/`, FM §5.1.
+- Роадмапи/архітектор-ряди: `GSV/docs/gsv/GSV_TECH_ROADMAP.md`, `GSV/docs/`, FM §5.1.
 - Fallback-смуга: ratio contracts, UI compact, docs canon, vision sync, stand smoke.
 
 ## Build/test (MSYS2 bash)

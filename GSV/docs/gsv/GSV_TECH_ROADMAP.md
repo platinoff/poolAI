@@ -41,7 +41,7 @@ docs/architecture (✅ ця сесія)
 
 | Sprint | Фокус | Acceptance (ключ) |
 |--------|-------|-------------------|
-| **PH-S1659** | GSV docs/architecture + Cargo scaffold | `docs/gsv/` канон; `GSV/Cargo.toml`; empty server builds |
+| **PH-S1659** | GSV docs/architecture + Cargo scaffold | `GSV/docs/gsv/` канон; `GSV/Cargo.toml`; empty server builds |
 | **PH-S1660** | gsv-server bin scaffold | `gsv_server.rs`; `GET /` → UI; `GET /api/health` |
 | **PH-S1661** | Tracker box | `tracker/`; `GET /api/tracker`; `gsv_tracker.json`; параметри останнього workflow |
 | **PH-S1662** | SLI console box | `sli/`; `GET /api/sli`; каталог з `bin/`+`scripts/`+`src/bin/`; використані команди |
@@ -78,7 +78,7 @@ docs/architecture (✅ ця сесія)
 | **PH-S1733** | Vision UI card | summary + sprint ticker |
 | **PH-S1734** | Vision contracts | `tests/gsv_vision_contracts.rs` (7) |
 | **PH-S1735** | GSV vision docs | `VISION.md` + `GSV_MIGRATION.md` rows ✅ + MEMORY mark |
-| **PH-S1736** | poolAI vision parity | `docs/vision/README.md` + cross-check |
+| **PH-S1736** | poolAI vision parity | `GSV/docs/vision/README.md` + cross-check |
 | **PH-S1737** | Ratio hold advisory | `gsv-loc-audit --min-ratio 0.95 --advisory` |
 | **PH-S1738** | Band close | ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync rev 459 |
 
@@ -92,7 +92,7 @@ docs/architecture (✅ ця сесія)
 | **PH-S1742** | Vision map contracts | `tests/gsv_vision_contracts.rs` (10) |
 | **PH-S1743** | Feed status filter | `GET /api/vision/feed?status=closed\|open\|all` |
 | **PH-S1744** | GSV vision docs | `VISION.md` map/feed-filter/svg; `GSV_MIGRATION.md` rows ✅; MEMORY band 110 |
-| **PH-S1745** | poolAI vision parity | `docs/vision/README.md` band 110; roadmap band 110 |
+| **PH-S1745** | poolAI vision parity | `GSV/docs/vision/README.md` band 110; roadmap band 110 |
 | **PH-S1746** | Ratio hold advisory | `gsv-loc-audit --min-ratio 0.95 --advisory` |
 | **PH-S1747** | vision-sync close | `gsv-vision-sync` refresh + poolAI vision rev **461** |
 | **PH-S1748** | Band close | ratio hold (≥95%); fmt/clippy/test; docs canon; push |
@@ -108,7 +108,7 @@ docs/architecture (✅ ця сесія)
 | **PH-S1753** | Sprint Map UI card | modules/kinds/links у `ui/index.html` |
 | **PH-S1754** | Doc Preview UI card | node id input + out/in links + sections у `ui/index.html` |
 | **PH-S1755** | GSV vision docs | `VISION.md` sprint-map/doc-preview; MEMORY band 111; HANDOFF/NEXT band 111 |
-| **PH-S1756** | poolAI vision parity | `GSV_MIGRATION.md` row 21 ✅; `docs/vision/README.md`; roadmap band 111 |
+| **PH-S1756** | poolAI vision parity | `GSV_MIGRATION.md` row 21 ✅; `GSV/docs/vision/README.md`; roadmap band 111 |
 | **PH-S1757** | Ratio hold advisory | `gsv-loc-audit --min-ratio 0.95 --advisory`; poolAI parity hold |
 | **PH-S1758** | Band close | ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync; push |
 
@@ -123,7 +123,7 @@ docs/architecture (✅ ця сесія)
 | **PH-S1763** | Sprint-queue contracts | sync + sprint-queue endpoints + real-workspace report (**19**) |
 | **PH-S1764** | Vision Sync + Sprint Queue UI cards | Resync button + drift status; next/active/open + planned у `ui/index.html` |
 | **PH-S1765** | GSV vision docs | `VISION.md` sync/extensions/sprint-queue; MEMORY band 112; HANDOFF/NEXT band 112 |
-| **PH-S1766** | poolAI vision parity | `GSV_MIGRATION.md` rows ✅; `docs/vision/README.md`; roadmap band 112 |
+| **PH-S1766** | poolAI vision parity | `GSV_MIGRATION.md` rows ✅; `GSV/docs/vision/README.md`; roadmap band 112 |
 | **PH-S1767** | Ratio hold advisory | `gsv-loc-audit --min-ratio 0.95 --advisory` (95.56%) |
 | **PH-S1768** | Band close | ratio hold (≥95%); fmt/clippy/test (118); docs canon; vision-sync rev 463; push |
 
@@ -137,7 +137,7 @@ docs/architecture (✅ ця сесія)
 | **PH-S1772** | Inline SVG map card | Vision Map card рендерить `assets/vision.svg` inline (`<img>`) + chips/kinds |
 | **PH-S1773** | Layer filter + search UX | клікабельні layer chips (active filter) + node-search input + results → doc-preview deep-link у `ui/index.html` |
 | **PH-S1774** | GSV vision docs | `VISION.md` node-search/map UX; MEMORY band 113; HANDOFF/NEXT band 113 |
-| **PH-S1775** | poolAI vision parity | `GSV_MIGRATION.md` rows ✅; `docs/vision/README.md`; цей файл band 113 |
+| **PH-S1775** | poolAI vision parity | `GSV_MIGRATION.md` rows ✅; `GSV/docs/vision/README.md`; цей файл band 113 |
 | **PH-S1776** | Ratio hold advisory | `gsv-loc-audit --min-ratio 0.95 --advisory` (≥95%) |
 | **PH-S1777** | vision-sync close | `gsv-vision-sync` refresh + poolAI vision rev **465** |
 | **PH-S1778** | Band close | ratio hold (≥95%); fmt/clippy/test (122); docs canon; vision-sync; push |
@@ -154,21 +154,21 @@ docs/architecture (✅ ця сесія)
 | **PH-S1784** | Sprint Board card | Sprint Board UI card у `ui/index.html`: progress bar + open/closed/planned колонки-details (`bar()` helper) |
 | **PH-S1785** | Sprint Progress card | Sprint Progress UI card: progress bar + per-layer таблиця nodes/linked |
 | **PH-S1786** | GSV vision docs | `VISION.md` sprint-board/sprint-progress API + band 114 section; MEMORY band 114; HANDOFF/NEXT band 114 |
-| **PH-S1787** | poolAI vision parity | `GSV_MIGRATION.md` rows ✅; `docs/vision/README.md`; цей файл band 114; FM §5.95 |
+| **PH-S1787** | poolAI vision parity | `GSV_MIGRATION.md` rows ✅; `GSV/docs/vision/README.md`; цей файл band 114; FM §5.95 |
 | **PH-S1788** | Band close | ratio hold (**95.02%**); fmt/clippy/test (140); docs canon; vision-sync rev 467; push |
 
 ## Спринти (band 115) — GSV migration completion (legacy vision supersession)
 
 | Sprint | Фокус | Acceptance (ключ) |
 |--------|-------|-------------------|
-| **PH-S1789** | Legacy parity audit | `GSV/docs/LEGACY_PARITY.md`: кожна legacy-панель (`docs/vision/index.html`) → GSV endpoint+card / superseded / out-of-scope |
+| **PH-S1789** | Legacy parity audit | `GSV/docs/LEGACY_PARITY.md`: кожна legacy-панель (`GSV/docs/vision/index.html`) → GSV endpoint+card / superseded / out-of-scope |
 | **PH-S1790** | Speeds wire | `SpeedIndexReport`/`SpeedIndexLatest`/`read_speed_index`/`save`/`load`/`source_speed_index`/`wire_speed_index` → `GET /api/vision/speeds` (empty-tolerant) |
 | **PH-S1791** | Rust diagnostics wire | `RustDiagnosticsReport`/`RustDiagLatest`/`read_rust_diagnostics`/`save`/`load`/`wire_rust_diagnostics` → `GET /api/vision/rust-diagnostics` (empty-tolerant) |
 | **PH-S1792** | Contracts | `gsv_vision_contracts.rs` (real-workspace speed_index/rust_diagnostics + wire shapes) + `gsv_server_contracts.rs` (`/speeds` + `/rust-diagnostics` 200/ok/shape) |
 | **PH-S1793** | Speeds + Rust cards | Speed Index card + Rust Diagnostics card у `ui/index.html` (present/empty states, latest metrics, top clippy codes) |
 | **PH-S1794** | GSV_MIGRATION rows + roadmap | `GSV_MIGRATION.md` rows ✅ (speed_index/rust_diagnostics/vision.js.css superseded); `GSV_TECH_ROADMAP.md` band 115 |
 | **PH-S1795** | GSV vision docs canon | `VISION.md` +band 115 endpoints; MEMORY band 115; HANDOFF/NEXT band 115 |
-| **PH-S1796** | poolAI vision parity | FM §5.12 §5.96; HANDOFF/NEXT band 115; `docs/vision/` canon |
+| **PH-S1796** | poolAI vision parity | FM §5.12 §5.96; HANDOFF/NEXT band 115; `GSV/docs/vision/` canon |
 | **PH-S1797** | Ratio hold advisory | `gsv-loc-audit` ≥95% (**95.04%**); legacy JS не переносимо (superseded) |
 | **PH-S1798** | Band close | ratio hold; fmt/clippy/test (150); docs canon; vision-sync rev 468; push |
 
@@ -184,7 +184,7 @@ docs/architecture (✅ ця сесія)
 | **PH-S1804** | Rust history chart UI | `rust_diagnostics_chart_svg` → `GET /api/vision/rust-diagnostics.svg` (warnings orange + errors red grouped bars, command footer) + `<img id="i-rust-chart">` |
 | **PH-S1805** | Stand smoke + wasm defer | stand smoke: обидва SVG 200 `image/svg+xml`; `poolai-ui-wasm` defer row у `GSV_MIGRATION.md` + roadmap |
 | **PH-S1806** | GSV vision docs canon | `VISION.md` +band 116 section/endpoints; MEMORY band 116; HANDOFF/NEXT band 116 |
-| **PH-S1807** | poolAI vision parity | `docs/vision/README.md`; FM §5.12 §5.97; цей файл band 116; poolAI HANDOFF/NEXT band 116 |
+| **PH-S1807** | poolAI vision parity | `GSV/docs/vision/README.md`; FM §5.12 §5.97; цей файл band 116; poolAI HANDOFF/NEXT band 116 |
 | **PH-S1808** | Band close | ratio hold (**95.26%**); fmt/clippy/test (153); docs canon; vision-sync rev 469; push |
 
 ## Спринти (band 117) — GSV legacy vision deactivation
@@ -192,13 +192,13 @@ docs/architecture (✅ ця сесія)
 | Sprint | Фокус | Acceptance (ключ) |
 |--------|-------|-------------------|
 | **PH-S1809** | Scope + queue | FM §5.98 band 117 (PH-S1809…S1818) + manifest sync |
-| **PH-S1810** | Legacy index deactivation | `docs/vision/index.html` → minimal GSV pointer page (no `vision.js`/`vision.css` refs) |
-| **PH-S1811** | Legacy JS/CSS deactivation | DEACTIVATED banner у `vision.js`/`vision.css`; deactivation note у `docs/vision/README.md` |
+| **PH-S1810** | Legacy index deactivation | `GSV/docs/vision/index.html` → minimal GSV pointer page (no `vision.js`/`vision.css` refs) |
+| **PH-S1811** | Legacy JS/CSS deactivation | DEACTIVATED banner у `vision.js`/`vision.css`; deactivation note у `GSV/docs/vision/README.md` |
 | **PH-S1812** | Live link retarget | `poolai-vision-sync` feed links → `http://127.0.0.1:8891/#b-sprint-board`; GSV `vision.rs` sample links; RUN_LOCAL/GSV_SERVER/gsv README/SPEED_INDEX/RUST_DIAGNOSTICS → GSV |
 | **PH-S1813** | Legacy test retirement | `poolai_vision_sync.rs` unit ×4 + `galaxy_horizon_s1011/s1019/s1039` → deactivated pointer state; e2e pointer assertions |
 | **PH-S1814** | GSV parity docs | `LEGACY_PARITY.md` + `GSV_MIGRATION.md` band 117 |
 | **PH-S1815** | GSV vision docs canon | `VISION.md`/`MEMORY.md`/HANDOFF/NEXT band 117 |
-| **PH-S1816** | poolAI vision parity | `docs/vision/README.md`; FM §5.12 §5.98; цей файл band 117; poolAI HANDOFF/NEXT band 117 |
+| **PH-S1816** | poolAI vision parity | `GSV/docs/vision/README.md`; FM §5.12 §5.98; цей файл band 117; poolAI HANDOFF/NEXT band 117 |
 | **PH-S1817** | Ratio + rev prep | ratio hold advisory (**95.26%**); vision-sync rev 470 (poolai + gsv + --check) |
 | **PH-S1818** | Band close | ratio hold; fmt/clippy/test (poolAI test-ci + GSV 153); docs canon; vision-sync rev 470; push |
 
@@ -212,7 +212,7 @@ docs/architecture (✅ ця сесія)
 | **PH-S1822** | Contracts | `gsv_vision_contracts` (theme real-workspace + wire shapes + focus svg highlight/dim/empty) + `gsv_server_contracts` (theme + focus endpoints) |
 | **PH-S1823** | UI sprint colors | `GSV/ui/index.html`: `--sprint*` CSS-змінні + sprint-pill/queue chips у Sprint Queue/Board cards; Sprint Focus card (`<img id="i-sprint-focus">`) + `loadSprintTheme`/`loadSprintFocus` |
 | **PH-S1824** | GSV vision docs canon | `VISION.md` +band 118 (theme + focus endpoints/section); MEMORY band 118; GSV HANDOFF/NEXT band 118 |
-| **PH-S1825** | poolAI vision parity | `docs/vision/README.md`; FM §5.12 §5.99; цей файл band 118 |
+| **PH-S1825** | poolAI vision parity | `GSV/docs/vision/README.md`; FM §5.12 §5.99; цей файл band 118 |
 | **PH-S1826** | Ratio hold advisory | `gsv-loc-audit --min-ratio 0.95 --advisory` ≥95% (**95.35%**) + poolAI ratio96 advisory hold |
 | **PH-S1827** | poolai-vision-sync close | `poolai-vision-sync` rev **471** (band 118); `--check` ok; sprint-queue/feed updated |
 | **PH-S1828** | Band close | ratio hold; fmt/clippy/test (**163**); docs canon; vision-sync rev 471; push |
@@ -279,4 +279,4 @@ docs/architecture (✅ ця сесія)
 - Сервер: [`GSV_SERVER.md`](./GSV_SERVER.md)
 - Архітектура: [`GSV_ARCHITECTURE.md`](./GSV_ARCHITECTURE.md)
 - Міграція: [`GSV_MIGRATION.md`](./GSV_MIGRATION.md)
-- FM §5.12 band 102: [`../catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md)
+- FM §5.12 band 102: [`../../docs/catalog/FUNCTION_MANAGEMENT.md`](../../docs/catalog/FUNCTION_MANAGEMENT.md)

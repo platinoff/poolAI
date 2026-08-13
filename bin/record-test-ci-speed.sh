@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Record wall-clock for `cargo test-ci` into docs/development/speed_index.json
-# (+ mirror docs/vision/speed_index.json for Galaxy Speeds panel).
+# (+ mirror GSV/docs/vision/speed_index.json for Galaxy Speeds panel).
 #
 # Usage (MSYS2):
 #   bash bin/record-test-ci-speed.sh

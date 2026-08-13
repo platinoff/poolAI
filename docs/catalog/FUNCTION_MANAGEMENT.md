@@ -144,6 +144,7 @@ FM-xxx (з таблиці нижче)
 | FM-045 | UI / Admin | Design system tokens + unified tables/forms (`admin_common.js`) | **Implemented ✅** | `design_tokens.css`, `admin_styles.css`, [`DESIGN_SYSTEM.md`](../development/DESIGN_SYSTEM.md) |
 
 ### 5.1 Пріоритезовані наступні кроки (зведення FM-* і Architect-плану)
+Vision rev 488.
 
 **Канон черги розробки** — таблиця нижче (аудит legacy 2026-05-20, **§5.8**). Post-Horizon закрито — **§5.7**. Не повторювати FM-020…033.
 
@@ -174,6 +175,7 @@ FM-xxx (з таблиці нижче)
 **Якість збірки:** `cargo test-ci`; `cargo bench --no-run --bench http_hotpath_benchmarks` (FM-042).
 
 **Промпт сесії:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+Vision rev 488.
 
 ### 5.9 Post-Horizon PH спринти (maintenance, 2026-05-23)
 
@@ -214,6 +216,7 @@ FM-xxx (з таблиці нижче)
 | **PH-S24** | Security ops (secret rotation hooks, pen-test checklist) | `src/security/`, `docs/security/PEN_TEST_CHECKLIST.md` | **✅** |
 
 **Одна сесія = один PH-S*** (або FM-003/FM-041 за §5.1). Промпт: [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+Vision rev 488.
 
 ### 5.10 Post-PH backlog PH-S35…S44 (legacy audit 2026-05-25)
 
@@ -233,6 +236,7 @@ FM-xxx (з таблиці нижче)
 | **PH-S44** | E2E gate: visual + axe required on UI PRs | DOCS_LEGACY, `AUTO_RUN` a11y merge | **✅** — `e2e/package.json` `test:ci` + `ci.yml` paths-filter |
 
 **Наступна сесія (код/CI):** **PH-S52** (E2E jobs + RAID smoke). **Не стартувати без інфра:** PH-S35/S16/S02 LAN, PH-S36/S01/S15 Cloud SDK.
+Vision rev 488.
 
 ### 5.11 Наступні 10 спринтів PH-S55…S64 (Galaxy Grid + ops/docs, 2026-05-26)
 
@@ -260,12 +264,13 @@ FM-xxx (з таблиці нижче)
 **Черга PH-S55…S64 закрита (2026-05-27).** Наступні спринти — **§5.12** (research).
 
 **Поза чергою:** **PH-S35** / **PH-S16** / **PH-S02** LAN (**BLOCKED**) · **PH-S36** / **PH-S01** / **PH-S15** Cloud SDK (**Deferred**, FM-041).
+Vision rev 489.
 
 ### 5.12 Research backlog PH-S65+ (Galaxy wire / ops, 2026-05-27)
 
 **VDT:** §5.12 = **журнал PH-S*** (≤10 відкритих). Якщо **< 10** — **`абракадабра`** / project scan **всього проєкту**: concept → FM **§5.1** → roadmaps → architect → DOCS_LEGACY → code → §5.13 fallback. Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Project scan». **Rust-first:** API → `tests/`; Playwright лише browser scope.
 
-**Відкритих у §5.12:** **0** (band 124 ✅ · §5.105 PH-S1879…S1888). **Master horizon:** PH-S1899.S1908 (band 126). Vision rev **487**.
+**Відкритих у §5.12:** **0** (band 124 ✅ · §5.105 PH-S1879…S1888). **Master horizon:** PH-S1899.S1908 (band 126). Vision rev **489**.
 
 **Историчний research backlog (PH-S65+):**
 
@@ -319,19 +324,19 @@ FM-xxx (з таблиці нижче)
 | 46 | **PH-S110** | Grid result ingest lease_epoch CAS (code) | `src/grid/dispatch.rs`, Galaxy §4.3.1 | `GridResultBody.lease_epoch`; `check_grid_result_lease_epoch`; `409 lease_epoch_rejected`; unit tests | **✅** |
 | 47 | **PH-S111** | Job lease renew interval env (code) | `src/job/lease_config.rs`, §4.3.1 | `POOLAI_JOB_LEASE_RENEW_INTERVAL_SECS` optional override; unit tests | **✅** |
 | 48 | **PH-S112** | Grid Job envelope E2E smoke (e2e) | `e2e/`, PH-S108 | Playwright grid envelope Job → `leased` + lease fields | **✅** |
-| 49 | **PH-S113** | Vision L4/L5 workspace + lib layers (docs) | `docs/vision/`, manifest | `Cargo.toml` / `.cargo/config.toml` L5; `src/lib.rs` + crates L4; manifest nodes + edges | **✅** |
-| 50 | **PH-S114** | Vision map pan/zoom navigation (docs) | `docs/vision/vision.js` | wheel zoom, drag pan, +/- reset, dblclick focus node; map transform not browser zoom | **✅** |
-| 51 | **PH-S115** | Vision folder-colored edge routing (docs) | `docs/vision/vision.js` | orthogonal paths via folder hub; `edge-docs` / `edge-code` / `edge-toml` / `edge-mixed` | **✅** |
+| 49 | **PH-S113** | Vision L4/L5 workspace + lib layers (docs) | `GSV/docs/vision/`, manifest | `Cargo.toml` / `.cargo/config.toml` L5; `src/lib.rs` + crates L4; manifest nodes + edges | **✅** |
+| 50 | **PH-S114** | Vision map pan/zoom navigation (docs) | `GSV/docs/vision/vision.js` | wheel zoom, drag pan, +/- reset, dblclick focus node; map transform not browser zoom | **✅** |
+| 51 | **PH-S115** | Vision folder-colored edge routing (docs) | `GSV/docs/vision/vision.js` | orthogonal paths via folder hub; `edge-docs` / `edge-code` / `edge-toml` / `edge-mixed` | **✅** |
 | 52 | **PH-S116** | Worker periodic lease renew loop (code) | `src/bin/poolai-worker.rs`, PH-S111 | ticker from `JobLeaseConfig.lease_renew_interval_secs` while task active | **✅** |
 | 53 | **PH-S117** | Grid result lease_epoch E2E (e2e) | `e2e/`, PH-S110 | Playwright stale epoch → `409 lease_epoch_rejected` on grid Result | **✅** |
 | 54 | **PH-S118** | Jobs lease negative paths E2E (e2e) | `e2e/`, PH-S107 | renew w/o acquire 400; expired TTL 409; wrong owner 409; `POOLAI_JOB_LEASE_TTL_SECS=2` on e2e stand | **✅** |
 | 55 | **PH-S119** | Admin jobs lease column polish (code) | `src/ui/admin/jobs.rs` | `#epoch` display; owner/epoch/col tooltips; i18n EN/UK; Playwright PH-S96 extended | **✅** |
-| 56 | **PH-S120** | Solana adapter vision + digest crosslink (docs) | `docs/vision/`, DIGEST | manifest nodes/edges; DIGEST § Solana modules; FM-033 crosslink | **✅** |
+| 56 | **PH-S120** | Solana adapter vision + digest crosslink (docs) | `GSV/docs/vision/`, DIGEST | manifest nodes/edges; DIGEST § Solana modules; FM-033 crosslink | **✅** |
 | 57 | **PH-S121** | Galaxy §4.3 worker heartbeat wire note (docs) | `POOLAI_GALAXY_GRID.md` | §4.3.1.1 worker lease renew vs discovery heartbeat; env + payload + `LeaseRenewGuard` | **✅** |
 | 58 | **PH-S122** | OpenAPI jobs lease schemas audit (docs) | `docs/openapi.yaml`, gap audit | `lease_epoch` on grid result body + examples; gap audit 0 | **✅** |
 | 59 | **PH-S123** | Grid pricing E2E negative fallback (e2e) | `e2e/tests/grid_pricing.spec.ts` | force fallback env → snapshot stable quote | **✅** |
 | 60 | **PH-S124** | OTel lease span attrs docs (docs) | FM-038, HANDOFF | span attributes for acquire/renew/reject paths | **✅** |
-| 61 | **PH-S125** | Vision Galaxy map Eco + click perf (docs) | `docs/vision/` | Eco GPU mode; instant select (no full re-render); Layers/Types fullscreen dock; bottom toolbar layout | **✅** |
+| 61 | **PH-S125** | Vision Galaxy map Eco + click perf (docs) | `GSV/docs/vision/` | Eco GPU mode; instant select (no full re-render); Layers/Types fullscreen dock; bottom toolbar layout | **✅** |
 | 62 | **PH-S126** | OTel lease span instrumentation (code) | FM-038, `src/job/`, `src/observability/` | spans on acquire/renew/reject (`job.lease.*` attrs); `cargo test --features otel`; cross-link OPENTELEMETRY_TRACING | **✅** |
 | 63 | **PH-S127** | Pricing oracle Prometheus export (code) | Galaxy §4.2, `galaxy_pricing_oracle.rs`, FM-043 | export `galaxy_pricing_*_served` + `forced_fallback_total` on `GET /metrics`; unit test | **✅** |
 | 64 | **PH-S128** | Locality score scheduler stub (code) | Galaxy §5.1–5.2, `src/grid/` | `locality_score(worker, task)` pure fn + unit tests; no prefetch wire | **✅** |
@@ -393,8 +398,8 @@ FM-xxx (з таблиці нижче)
 | 120 | **PH-S185** | Galaxy cross region egress mb metrics stub (code) | Galaxy §5.3 | `galaxy_cross_region_egress_mb` gauge stub on rank/prefetch path; unit tests | **✅** |
 | 121 | **PH-S186** | Galaxy verification sample scheduled /metrics export (code) | PH-S164, Galaxy §6.2 | `galaxy_verification_sample_scheduled_total` on `GET /metrics`; unit tests | **✅** |
 | 122 | **PH-S187** | Galaxy settlement cleared total metrics stub (code) | PH-S170, Galaxy §6.4 | `galaxy_settlement_cleared_total` counter on grid result Cleared path; unit tests | **✅** |
-| 123 | **PH-S188** | Vision map filters UX (docs/vision) | `docs/vision/vision.js`, PH-S115 filters | незалежні layer/type toggle; **LAYERS**/**TYPES** select-all/none; decouple 3D stack ↔ chips; `vision.js` + README; rev++ | **✅** |
-| 124 | **PH-S189** | Vision Eco/FX/Ms hover trace (docs/vision) | PH-S188, `docs/vision/README.md` Eco/FX | tri-mode **Eco→FX→Ms**; hover 1-hop edge/node highlight; `localStorage`; rev++ | **✅** |
+| 123 | **PH-S188** | Vision map filters UX (docs/vision) | `GSV/docs/vision/vision.js`, PH-S115 filters | незалежні layer/type toggle; **LAYERS**/**TYPES** select-all/none; decouple 3D stack ↔ chips; `vision.js` + README; rev++ | **✅** |
+| 124 | **PH-S189** | Vision Eco/FX/Ms hover trace (docs/vision) | PH-S188, `GSV/docs/vision/README.md` Eco/FX | tri-mode **Eco→FX→Ms**; hover 1-hop edge/node highlight; `localStorage`; rev++ | **✅** |
 | 125 | **PH-S190** | Vision filter dropdowns + panel collapse (docs/vision) | PH-S188 filters, PH-S115 layout | Layers/Types **dropdown** menus; **−** collapse → title strip; grid auto-fill; `localStorage`; rev++ | **✅** |
 | 126 | **PH-S191** | Vision sprint queue panel (docs/vision) | FM §5.12, `poolai-vision-sync` | Rust parse FM §5.12 → `sprint_queue` panel; rev++ | **✅** |
 | 127 | **PH-S192** | Vision overview LOD + minimap (docs/vision) | PH-S115 map zoom | `map-overview` при low zoom; hub-only labels; viewport inset minimap; rev++ | **✅** |
@@ -474,7 +479,7 @@ FM-xxx (з таблиці нижче)
 | 201 | **PH-S266** | i18n_core.js near-empty gate + loc-audit (ops) | PH-S265 | STRINGS core **0** inline keys; `rust_ratio.json` refresh | **✅** |
 | 202 | **PH-S267** | Docs canon sync band (docs) | PH-S266 | INDEX/HANDOFF/NEXT/STABLE_STATE sync | **✅** |
 | 203 | **PH-S268** | Galaxy prefetch wire horizon doc (docs) | GALAXY §5.5 | roadmap pointer; metrics ✅; live prefetch 94.67% | **✅** |
-| 204 | **PH-S269** | Vision feed.json refresh (docs/vision) | PH-S200 | `docs/vision/feed.json` sprint zriz | **✅** |
+| 204 | **PH-S269** | Vision feed.json refresh (docs/vision) | PH-S200 | `GSV/docs/vision/feed.json` sprint zriz | **✅** |
 | 205 | **PH-S270** | poolai-vision-sync drift gate (ops) | PH-S205 | `--check` green after FM/HANDOFF | **✅** |
 | 206 | **PH-S271** | Rust ratio hold advisory refresh (ops) | PH-S266 | `--min-ratio 0.95` advisory snapshot **94.34%** | **✅** |
 | 207 | **PH-S272** | Docs INDEX sprint zriz (docs) | PH-S267 | INDEX step 8 + §7 ratio pointer | **✅** |
@@ -1222,10 +1227,11 @@ FM-xxx (з таблиці нижче)
 | 949 | **PH-S1014** | Runtime state snapshot persist | `data/dev/last_run.json` | save on stop; restore on quick; unit test | **✅** |
 | 950 | **PH-S1015** | PoolAI admin power panel UI | `src/ui/admin` | toolbar modal Виключити/Перезавантажити | **✅** |
 | 951 | **PH-S1016** | PoolAI power ops wire | `POST /api/v1/ops/power` | shutdown/reboot dev-safe; integration test | **✅** |
-| 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
+| 952 | **PH-S1017** | Vision poweroff/reset controls | `GSV/docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
-**Відкритих у §5.12:** **0** (band 106 PH-S1699…S1708 ✅). **Master horizon:** PH-S1709…S1718 (band 107). **Completion pending:** PH-S1679…S2278 = **580** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **456**. **Наступна сесія:** **`абракадабра`** — project scan → band 107 (PH-S1709…S1718).
+**Відкритих у §5.12:** **0** (band 106 PH-S1699…S1708 ✅). **Master horizon:** PH-S1709…S1718 (band 107). **Completion pending:** PH-S1679…S2278 = **580** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **487**. **Наступна сесія:** **`абракадабра`** — project scan → band 107 (PH-S1709…S1718).
+Vision rev 488.
 
 ### 5.85 Ratio96 admin/ops glue queue — band 104 (PH-S1679…S1688, 2026-08-02) · **✅**
 
@@ -1243,6 +1249,7 @@ FM-xxx (з таблиці нижче)
 | 1621 | **PH-S1686** | poolai-vision-sync --check | master backlog | drift gate green | **[x]** |
 | 1622 | **PH-S1687** | Ratio hold advisory | master backlog | `--ratio96-admin-ops --advisory --min-ratio 0.95` | **[x]** |
 | 1623 | **PH-S1688** | galaxy_horizon_s1679_integration | band close | `galaxy_horizon_s1679_integration`; FM ✅ · HANDOFF · NEXT_SESSION | **[x]** |
+Vision rev 488.
 
 ### 5.86 Ratio96 stand smoke queue — band 105 (PH-S1689…S1698, 2026-08-02) · **✅**
 
@@ -1260,6 +1267,7 @@ FM-xxx (з таблиці нижче)
 | 1631 | **PH-S1696** | poolai-vision-sync --check | master backlog | drift gate green | **[x]** |
 | 1632 | **PH-S1697** | Ratio hold advisory | master backlog | `--ratio96-stand-smoke --advisory --min-ratio 0.95` | **[x]** |
 | 1633 | **PH-S1698** | galaxy_horizon_s1689_integration | band close | `galaxy_horizon_s1689_integration`; FM ✅ · HANDOFF · NEXT_SESSION | **[x]** |
+Vision rev 488.
 
 ### 5.87 Ratio96 loc-audit queue — band 106 (PH-S1699…S1708, 2026-08-02) · **✅**
 
@@ -1276,6 +1284,7 @@ FM-xxx (з таблиці нижче)
 | 1640 | **PH-S1705** | poolai-vision-sync --check | master backlog | drift gate green | **[x]** |
 | 1641 | **PH-S1706** | Ratio hold advisory | master backlog | `--ratio96-loc-audit --advisory --min-ratio 0.95` | **[x]** |
 | 1642 | **PH-S1707** | galaxy_horizon_s1699_integration | band close | `galaxy_horizon_s1699_integration`; FM ✅ · HANDOFF · NEXT_SESSION | **[x]** |
+Vision rev 488.
 | 1643 | **PH-S1708** | Project scan replenish | band close | Replenish §5.12 from master horizon | **[x]** |
 
 ### 5.89 GSV roles/ratio canon queue — band 108 (PH-S1719…S1728, 2026-08-05) · **✅**
@@ -1305,25 +1314,26 @@ HANDOFF/NEXT, FM band реєстрація, poolAI docs parity. Canon: [`GSV_ROL
 `tests/gsv_ratio_contracts.rs` (7); Ratio box + `GET /api/ratio` + UI Ratio card; `ui/index.html`
 компакт (198 LOC); `GSV/docs/{README,MEMORY,HANDOFF_NEW_SESSION,NEXT_SESSION_PROMPT}`;
 `GSV_TECH_ROADMAP.md` band 108; poolAI docs parity + HANDOFF/NEXT; vision-sync rev **458**.
+Vision rev 488.
 Тести GSV **87** (46 unit + 18 + 8 omni + 7 ratio + 8 update), clippy **0**, fmt clean.
 
 ### 5.90 GSV vision sync/migration queue — band 109 (PH-S1729…S1738, 2026-08-05) · **✅**
 
 **Джерело:** власник (GSV перед master-backlog) — GSV_MIGRATION.md future rows: manifest/feed/sync
 port у Rust (boxes/vision + `gsv-vision-sync` bin) + thin ratio-safe UI панелі + docs canon. Canon:
-[`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../gsv/GSV_MIGRATION.md) ·
+[`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../GSV/GSV/docs/gsv/GSV_MIGRATION.md) ·
 [`GSV_ROLES.md`](../../GSV/docs/GSV_ROLES.md).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
 | 1664 | **PH-S1729** | Vision box scaffold | GSV_MIGRATION.md | `GSV/src/boxes/vision.rs` (serde manifest/feed + sync) + `boxes/mod.rs` + Cargo `[[bin]]` | **[x]** |
-| 1665 | **PH-S1730** | Vision manifest wire | GSV_MIGRATION.md | read `docs/vision/manifest.json` → `GSV/data/gsv_manifest.json`; `GET /api/vision/manifest` | **[x]** |
-| 1666 | **PH-S1731** | Vision feed wire | GSV_MIGRATION.md | read `docs/vision/feed.json` → `GSV/data/gsv_feed.json`; `GET /api/vision/feed` | **[x]** |
+| 1665 | **PH-S1730** | Vision manifest wire | GSV_MIGRATION.md | read `GSV/docs/vision/manifest.json` → `GSV/data/gsv_manifest.json`; `GET /api/vision/manifest` | **[x]** |
+| 1666 | **PH-S1731** | Vision feed wire | GSV_MIGRATION.md | read `GSV/docs/vision/feed.json` → `GSV/data/gsv_feed.json`; `GET /api/vision/feed` | **[x]** |
 | 1667 | **PH-S1732** | `gsv-vision-sync` bin | poolai-vision-sync | `GSV/src/bin/gsv_vision_sync.rs`; `--check` drift gate; revision/git_head summary | **[x]** |
 | 1668 | **PH-S1733** | Vision UI panels | GSV_BOXES | `ui/index.html` Vision card (summary + feed ticker); ratio ≥95% | **[x]** |
 | 1669 | **PH-S1734** | Vision contracts | Rust-first (API → tests) | `tests/gsv_vision_contracts.rs` (7) | **[x]** |
 | 1670 | **PH-S1735** | GSV vision docs canon | session canon | `GSV/docs/VISION.md`; `GSV_MIGRATION.md` ✅ rows; MEMORY mark | **[x]** |
-| 1671 | **PH-S1736** | poolAI vision parity | docs canon | `docs/vision/README.md` GSV note; cross-check vs `poolai-vision-sync --check` | **[x]** |
+| 1671 | **PH-S1736** | poolAI vision parity | docs canon | `GSV/docs/vision/README.md` GSV note; cross-check vs `poolai-vision-sync --check` | **[x]** |
 | 1672 | **PH-S1737** | Ratio hold advisory | GSV_ROLES | `gsv-loc-audit --min-ratio 0.95 --advisory` (95.45% ✅) + poolAI ratio96 advisory hold | **[x]** |
 | 1673 | **PH-S1738** | Band close | GSV_ROLES | ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync rev **459**; push | **[x]** |
 
@@ -1335,6 +1345,7 @@ Vision UI card (summary + feed ticker); `tests/gsv_vision_contracts.rs` (7);
 docs canon `GSV/docs/VISION.md` + `GSV_MIGRATION.md` rows ✅ + MEMORY mark; poolAI vision README
 parity; ratio holds: GSV **95.45%** (rust 4387 / product 4596, gate ≥95% ✅) + poolAI **95.02%**
 advisory (`--ratio96-docs-canon --advisory --min-ratio 0.95`); GSV tests **101**
+Vision rev 488.
 (53 unit + 18 omni + 8 server + 8 update + 7 ratio + 7 vision), clippy **0**, fmt clean;
 vision-sync rev **459**.
 
@@ -1342,7 +1353,7 @@ vision-sync rev **459**.
 
 **Джерело:** власник (GSV перед master-backlog) — GSV_MIGRATION.md future rows: `vision.svg` port +
 «Vision UI-логіка (map)» — compact ratio-safe map панель + map wire. Canon:
-[`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../gsv/GSV_MIGRATION.md).
+[`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../GSV/GSV/docs/gsv/GSV_MIGRATION.md).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
@@ -1352,16 +1363,17 @@ vision-sync rev **459**.
 | 1677 | **PH-S1742** | Vision map contracts | Rust-first (API → tests) | `tests/gsv_vision_contracts.rs` map/svg/feed-filter | **✅** |
 | 1678 | **PH-S1743** | Feed status filter | GSV_BOXES | `GET /api/vision/feed?status=closed` | **✅** |
 | 1679 | **PH-S1744** | GSV vision docs canon | session canon | `VISION.md` map; `GSV_MIGRATION.md` rows ✅; MEMORY band 110 | **✅** |
-| 1680 | **PH-S1745** | poolAI vision parity | docs canon | `docs/vision/README.md` band 110; `GSV_TECH_ROADMAP.md` band 110 | **✅** |
+| 1680 | **PH-S1745** | poolAI vision parity | docs canon | `GSV/docs/vision/README.md` band 110; `GSV_TECH_ROADMAP.md` band 110 | **✅** |
 | 1681 | **PH-S1746** | Ratio hold advisory | GSV_ROLES | `gsv-loc-audit --min-ratio 0.95 --advisory` + poolAI ratio96 advisory | **✅** |
 | 1682 | **PH-S1747** | vision-sync close | ops | `gsv-vision-sync` refresh + `poolai-vision-sync` rev **461** | **✅** |
+Vision rev 488.
 | 1683 | **PH-S1748** | Band close | GSV_ROLES | ratio hold (≥95%); fmt/clippy/test; docs canon; push | **✅** |
 
 ### 5.92 GSV sprint-map + doc-preview queue — band 111 (PH-S1749…S1758, 2026-08-05) · **✅**
 
 **Джерело:** власник (GSV перед master-backlog) — GSV_MIGRATION.md «Vision UI-логіка
 (sprint-queue, doc-preview)» — sprint-queue map + docs ↔ code preview wire та UI cards.
-Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../gsv/GSV_MIGRATION.md).
+Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../GSV/GSV/docs/gsv/GSV_MIGRATION.md).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
@@ -1372,15 +1384,16 @@ Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](
 | 1688 | **PH-S1753** | Sprint Map UI card | GSV_BOXES | `ui/index.html` Sprint Map (modules/kinds/links) | **✅** |
 | 1689 | **PH-S1754** | Doc Preview UI card | GSV_BOXES | `ui/index.html` Doc Preview (node id input + out/in links + sections) | **✅** |
 | 1690 | **PH-S1755** | GSV vision docs canon | session canon | `VISION.md` sprint-map/doc-preview; MEMORY band 111; HANDOFF/NEXT band 111 | **✅** |
-| 1691 | **PH-S1756** | poolAI vision parity | docs canon | `GSV_MIGRATION.md` row 21 ✅; `docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 111 | **✅** |
+| 1691 | **PH-S1756** | poolAI vision parity | docs canon | `GSV_MIGRATION.md` row 21 ✅; `GSV/docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 111 | **✅** |
 | 1692 | **PH-S1757** | Ratio hold advisory | GSV_ROLES | `gsv-loc-audit --min-ratio 0.95 --advisory` + poolAI ratio96 advisory | **✅** |
+Vision rev 488.
 | 1693 | **PH-S1758** | Band close | GSV_ROLES | ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync; push | **✅** |
 
 ### 5.93 GSV vision auto-sync + sprint-queue planning queue — band 112 (PH-S1759…S1768, 2026-08-05) · **✅**
 
 **Джерело:** власник (GSV future — `GSV_MIGRATION.md` «vision auto-sync, sprint-queue manifest
 планування») — extension manifest mirror + auto-sync wire + sprint-queue planning report та UI cards.
-Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../gsv/GSV_MIGRATION.md).
+Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../GSV/GSV/docs/gsv/GSV_MIGRATION.md).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
@@ -1391,15 +1404,16 @@ Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](
 | 1698 | **PH-S1763** | Sprint-queue contracts | Rust-first (API → tests) | sync endpoint (ok + empty drift) + sprint-queue endpoint (active == next + planned includes active) + real-workspace report | **✅** |
 | 1699 | **PH-S1764** | Vision Sync + Sprint Queue UI cards | GSV_BOXES | `ui/index.html` Resync button + drift status; next/active/open + planned details | **✅** |
 | 1700 | **PH-S1765** | GSV vision docs canon | session canon | `VISION.md` sync/extensions/sprint-queue; MEMORY band 112; HANDOFF/NEXT band 112 | **✅** |
-| 1701 | **PH-S1766** | poolAI vision parity | docs canon | `GSV_MIGRATION.md` rows ✅; `docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 112 | **✅** |
+| 1701 | **PH-S1766** | poolAI vision parity | docs canon | `GSV_MIGRATION.md` rows ✅; `GSV/docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 112 | **✅** |
 | 1702 | **PH-S1767** | Ratio hold advisory | GSV_ROLES | `gsv-loc-audit --min-ratio 0.95 --advisory` (95.56%) + poolAI ratio96 advisory | **✅** |
+Vision rev 488.
 | 1703 | **PH-S1768** | Band close | GSV_ROLES | ratio hold (≥95%); fmt/clippy/test (118); docs canon; vision-sync; push | **✅** |
 
 ### 5.94 GSV Galaxy UI: node search + interactive map queue — band 113 (PH-S1769…S1778, 2026-08-05) · **✅**
 
 **Джерело:** власник (GSV future — `GSV_MIGRATION.md` «Galaxy UI», key UX-вимоги) — node-search wire
 + inline interactive vision map + layer filter та search-to-preview UX.
-Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../gsv/GSV_MIGRATION.md).
+Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../GSV/GSV/docs/gsv/GSV_MIGRATION.md).
 Виконано: node-search wire + contracts (122) · inline SVG map + layer filter + search UX · docs canon · vision rev 465.
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
@@ -1410,16 +1424,17 @@ Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](
 | 1707 | **PH-S1772** | Inline SVG map card | GSV_BOXES | Vision Map card embeds `assets/vision.svg` inline + chips/kinds | `[x]` |
 | 1708 | **PH-S1773** | Layer filter + search UX | GSV_BOXES | clickable layer chips (active filter) + node-search input + results → doc-preview deep-link | `[x]` |
 | 1709 | **PH-S1774** | GSV vision docs canon | session canon | `VISION.md` node-search/map UX; MEMORY band 113; HANDOFF/NEXT band 113 | `[x]` |
-| 1710 | **PH-S1775** | poolAI vision parity | docs canon | `GSV_MIGRATION.md` rows ✅; `docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 113 | `[x]` |
+| 1710 | **PH-S1775** | poolAI vision parity | docs canon | `GSV_MIGRATION.md` rows ✅; `GSV/docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 113 | `[x]` |
 | 1711 | **PH-S1776** | Ratio hold advisory | GSV_ROLES | `gsv-loc-audit --min-ratio 0.95 --advisory` (≥95%) + poolAI ratio96 advisory hold | `[x]` |
 | 1712 | **PH-S1777** | vision-sync close | vision | `gsv-vision-sync` refresh + poolAI vision rev++ | `[x]` |
+Vision rev 488.
 | 1713 | **PH-S1778** | Band close | GSV_ROLES | ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync; push | `[x]` |
 
 ### 5.95 GSV Sprint-board + progress UI queue — band 114 (PH-S1779…S1788, 2026-08-05) · **✅**
 
 **Джерело:** власник (GSV future — sprint-queue planning data → board + progress UX; base:
 `GET /api/vision/sprint-queue` band 112 + `GET /api/vision/sprint-map` band 111 + manifest layers).
-Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../gsv/GSV_MIGRATION.md).
+Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../GSV/GSV/docs/gsv/GSV_MIGRATION.md).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
@@ -1431,38 +1446,40 @@ Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](
 | 1719 | **PH-S1784** | Sprint Board UI card | GSV_BOXES | board columns open/closed/planned + progress bar + counts у `ui/index.html` | `[x]` |
 | 1720 | **PH-S1785** | Progress UI | GSV_BOXES | per-layer chips + pct + next/active focus card у `ui/index.html` | `[x]` |
 | 1721 | **PH-S1786** | GSV vision docs canon | session canon | `VISION.md` sprint-board/progress; MEMORY band 114; HANDOFF/NEXT band 114 | `[x]` |
-| 1722 | **PH-S1787** | poolAI vision parity | docs canon | `GSV_MIGRATION.md` rows ✅; `docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 114 | `[x]` |
+| 1722 | **PH-S1787** | poolAI vision parity | docs canon | `GSV_MIGRATION.md` rows ✅; `GSV/docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 114 | `[x]` |
 | 1723 | **PH-S1788** | Band close | GSV_ROLES | ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync rev 467; push | `[x]` |
 
 **PH-S1788 ✅ (2026-08-05):** `SprintBoardReport`/`sprint_board_report`/`wire_sprint_board`
 → `GET /api/vision/sprint-board` (open/closed/planned columns + `progress_pct`); `SprintProgressReport`/
 `sprint_progress_report`/`wire_sprint_progress` → `GET /api/vision/sprint-progress` (status counts +
+Vision rev 488.
 per-layer `node_count`/`linked_count`); Sprint Board + Sprint Progress UI cards; vision contracts **38** +
 server contracts **21** (загалом **140**); GSV ratio **95.02%** gate ✅; vision rev **467**; FM §5.12 §5.95 ✅.
 
 ### 5.96 GSV migration completion — legacy vision supersession queue — band 115 (PH-S1789…S1798, 2026-08-05) · **✅**
 
-**Джерело:** власник (GSV migration completion — ratio-safe: supersede legacy `docs/vision/{index.html,vision.js,vision.css}`
+**Джерело:** власник (GSV migration completion — ratio-safe: supersede legacy `GSV/docs/vision/{index.html,vision.js,vision.css}`
 Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Base: `GET /api/vision/*` bands 109–114 +
-`docs/vision/speed_index.json`/`rust_diagnostics.json`. Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) ·
-[`GSV_MIGRATION.md`](../gsv/GSV_MIGRATION.md).
+`GSV/docs/vision/speed_index.json`/`rust_diagnostics.json`. Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) ·
+[`GSV_MIGRATION.md`](../GSV/GSV/docs/gsv/GSV_MIGRATION.md).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
-| 1724 | **PH-S1789** | Legacy parity audit | docs canon | Inventory legacy `docs/vision/{index.html,vision.js,vision.css}` panels (Layers/Queue/Map/Speeds/Rust/Links/Preview + header/Explorer/Power chrome) → map each → GSV endpoint+card / superseded / out-of-scope; `GSV/docs/LEGACY_PARITY.md` | **[x]** |
+| 1724 | **PH-S1789** | Legacy parity audit | docs canon | Inventory legacy `GSV/docs/vision/{index.html,vision.js,vision.css}` panels (Layers/Queue/Map/Speeds/Rust/Links/Preview + header/Explorer/Power chrome) → map each → GSV endpoint+card / superseded / out-of-scope; `GSV/docs/LEGACY_PARITY.md` | **[x]** |
 | 1725 | **PH-S1790** | Speeds wire | GSV_BOXES | `SpeedIndexReport`/`speed_index_report`/`wire_speed_index` → `GET /api/vision/speeds` (latest test_ci wall/ok + bench median + history counts; mirror `gsv_speed_index.json`) | **[x]** |
 | 1726 | **PH-S1791** | Rust diagnostics wire | GSV_BOXES | `RustDiagnosticsReport`/`rust_diagnostics_report`/`wire_rust_diagnostics` → `GET /api/vision/rust-diagnostics` (latest warnings/errors/ok + top_codes; mirror `gsv_rust_diagnostics.json`) | **[x]** |
 | 1727 | **PH-S1792** | Contracts | Rust-first (API → tests) | `tests/gsv_vision_contracts.rs` + `gsv_server_contracts.rs` (speeds + rust-diagnostics ok/shape/empty-tolerant, mirror round-trip) | **[x]** |
 | 1728 | **PH-S1793** | Speeds + Rust cards | GSV_BOXES | compact Speed Index + Rust Diagnostics cards у `ui/index.html` (mirror legacy panels; empty-state hints) | **[x]** |
 | 1729 | **PH-S1794** | GSV_MIGRATION rows | docs canon | `GSV_MIGRATION.md` vision.js/css row → ✅ superseded (ratio-safe canon Rust, legacy JS не переносимо); `poolai-ui-wasm` row defer; roadmap band 115 | **[x]** |
 | 1730 | **PH-S1795** | GSV vision docs canon | session canon | `VISION.md` speeds/rust-diagnostics API + LEGACY_PARITY + band 115 section; MEMORY band 115; HANDOFF/NEXT band 115 | **[x]** |
-| 1731 | **PH-S1796** | poolAI vision parity | docs canon | `docs/vision/README.md`; FM §5.12 §5.96; `GSV_TECH_ROADMAP.md` band 115; poolAI HANDOFF/NEXT band 115 | **[x]** |
+| 1731 | **PH-S1796** | poolAI vision parity | docs canon | `GSV/docs/vision/README.md`; FM §5.12 §5.96; `GSV_TECH_ROADMAP.md` band 115; poolAI HANDOFF/NEXT band 115 | **[x]** |
 | 1732 | **PH-S1797** | Ratio hold advisory | gsv-loc-audit | `gsv-loc-audit --min-ratio 0.95 --advisory` (≥95%) | **[x]** |
+Vision rev 488.
 | 1733 | **PH-S1798** | Band close | GSV_ROLES | ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync rev 468; push | **[x]** |
 
 ### 5.97 GSV history charts queue — band 116 (PH-S1799…S1808, 2026-08-07) · **✅**
 
-**Джерело:** master backlog band 116 (GSV history charts — speed-index history UI + rust-diagnostics history chart) — GSV Speeds/Rust supersession (bands 109–115) + live artifacts `docs/vision/{speed_index,rust_diagnostics}.json` (history arrays). Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../gsv/GSV_MIGRATION.md). Rust-first: charts = Rust-rendered SVG (ratio-safe 95–100%, no UI JS).
+**Джерело:** master backlog band 116 (GSV history charts — speed-index history UI + rust-diagnostics history chart) — GSV Speeds/Rust supersession (bands 109–115) + live artifacts `GSV/docs/vision/{speed_index,rust_diagnostics}.json` (history arrays). Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../GSV/GSV/docs/gsv/GSV_MIGRATION.md). Rust-first: charts = Rust-rendered SVG (ratio-safe 95–100%, no UI JS).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
@@ -1474,29 +1491,31 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1739 | **PH-S1804** | Rust history chart UI | GSV_BOXES | `/api/vision/rust-diagnostics.svg` (Rust-rendered SVG: warnings orange + errors red grouped bars, command footer) + card `<img>` | **[x]** |
 | 1740 | **PH-S1805** | Stand smoke + wasm defer | GSV_ROLES | Stand smoke notes; `poolai-ui-wasm` defer row у `GSV_MIGRATION.md` + roadmap | **[x]** |
 | 1741 | **PH-S1806** | GSV vision docs canon | session canon | `VISION.md` speeds.svg/rust-diagnostics.svg + history API + band 116 section; MEMORY band 116; HANDOFF/NEXT band 116 | **[x]** |
-| 1742 | **PH-S1807** | poolAI vision parity | docs canon | `docs/vision/README.md`; FM §5.12 §5.97; `GSV_TECH_ROADMAP.md` band 116; poolAI HANDOFF/NEXT band 116 | **[x]** |
+| 1742 | **PH-S1807** | poolAI vision parity | docs canon | `GSV/docs/vision/README.md`; FM §5.12 §5.97; `GSV_TECH_ROADMAP.md` band 116; poolAI HANDOFF/NEXT band 116 | **[x]** |
+Vision rev 488.
 | 1743 | **PH-S1808** | Band close | GSV_ROLES | ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync rev 469; push | **[x]** |
 
 ### 5.98 GSV legacy vision deactivation queue — band 117 (PH-S1809…S1818, 2026-08-07) · **✅**
 
-**Джерело:** GSV supersession close (bands 115–116) — legacy `docs/vision/index.html` + `vision.js`/`vision.css` superseded; stand smoke passed (band 116); legacy assets деактивуються (**не видаляємо** — `docs/vision/` лишається канон-джерелом до завершення GSV). Canon: [`GSV/docs/LEGACY_PARITY.md`](../../GSV/docs/LEGACY_PARITY.md) · [`GSV_MIGRATION.md`](../gsv/GSV_MIGRATION.md). Rust-first: UI переходить на GSV (`gsv-server` + `GET /api/vision*`); перенесення legacy JS/CSS у `GSV/ui/` знищило б ratio canon.
+**Джерело:** GSV supersession close (bands 115–116) — legacy `GSV/docs/vision/index.html` + `vision.js`/`vision.css` superseded; stand smoke passed (band 116); legacy assets деактивуються (**не видаляємо** — `GSV/docs/vision/` лишається канон-джерелом до завершення GSV). Canon: [`GSV/docs/LEGACY_PARITY.md`](../../GSV/docs/LEGACY_PARITY.md) · [`GSV_MIGRATION.md`](../GSV/GSV/docs/gsv/GSV_MIGRATION.md). Rust-first: UI переходить на GSV (`gsv-server` + `GET /api/vision*`); перенесення legacy JS/CSS у `GSV/ui/` знищило б ratio canon.
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
 | 1744 | **PH-S1809** | Scope + queue | docs canon | Define band 117 (legacy vision deactivation) у FM §5.98 + §5.12 header (master horizon) | **[x]** |
-| 1745 | **PH-S1810** | Legacy index deactivation | docs canon | Rewrite `docs/vision/index.html` → minimal GSV pointer page (no `vision.js`/`vision.css` refs; canonical GSV links) | **[x]** |
-| 1746 | **PH-S1811** | Legacy JS/CSS deactivation | docs canon | DEACTIVATED banner у `docs/vision/vision.js` + `vision.css`; deactivation note у `docs/vision/README.md` (files лишаються — canon) | **[x]** |
-| 1747 | **PH-S1812** | Live link retarget | docs canon | `poolai-vision-sync` feed links (`docs/vision/index.html#sprint-queue`) → GSV; GSV `vision.rs` sample links; RUN_LOCAL/GSV_SERVER/gsv README/SPEED_INDEX/RUST_DIAGNOSTICS links → GSV | **[x]** |
+| 1745 | **PH-S1810** | Legacy index deactivation | docs canon | Rewrite `GSV/docs/vision/index.html` → minimal GSV pointer page (no `vision.js`/`vision.css` refs; canonical GSV links) | **[x]** |
+| 1746 | **PH-S1811** | Legacy JS/CSS deactivation | docs canon | DEACTIVATED banner у `GSV/docs/vision/vision.js` + `vision.css`; deactivation note у `GSV/docs/vision/README.md` (files лишаються — canon) | **[x]** |
+| 1747 | **PH-S1812** | Live link retarget | docs canon | `poolai-vision-sync` feed links (`GSV/docs/vision/index.html#sprint-queue`) → GSV; GSV `vision.rs` sample links; RUN_LOCAL/GSV_SERVER/gsv README/SPEED_INDEX/RUST_DIAGNOSTICS links → GSV | **[x]** |
 | 1748 | **PH-S1813** | Legacy test retirement | Rust-first (API → tests) | Update legacy-content tests: `poolai_vision_sync.rs` unit ×4 + `galaxy_horizon_s1011/s1019/s1039` → assert deactivated pointer state | **[x]** |
 | 1749 | **PH-S1814** | GSV parity docs | session canon | `LEGACY_PARITY.md` band 117 (index/JS/CSS deactivated); `GSV_MIGRATION.md` vision.js/css row +band 117 | **[x]** |
 | 1750 | **PH-S1815** | GSV vision docs canon | session canon | `VISION.md` +band 117; MEMORY band 117; GSV HANDOFF/NEXT band 117 | **[x]** |
-| 1751 | **PH-S1816** | poolAI vision parity | docs canon | `docs/vision/README.md`; FM §5.12 §5.98; `GSV_TECH_ROADMAP.md` band 117; poolAI HANDOFF/NEXT band 117 | **[x]** |
+| 1751 | **PH-S1816** | poolAI vision parity | docs canon | `GSV/docs/vision/README.md`; FM §5.12 §5.98; `GSV_TECH_ROADMAP.md` band 117; poolAI HANDOFF/NEXT band 117 | **[x]** |
 | 1752 | **PH-S1817** | Ratio hold advisory | GSV_ROLES | `gsv-loc-audit --min-ratio 0.95 --advisory` ≥95% + poolAI ratio96 advisory hold; vision-sync rev 470 (poolai + gsv + --check) | **[x]** |
+Vision rev 488.
 | 1753 | **PH-S1818** | Band close | GSV_ROLES | ratio hold; fmt/clippy/test (poolAI test-ci + GSV 153+); docs canon; vision-sync rev 470; push | **[x]** |
 
 ### 5.99 GSV sprint UI migration queue — band 118 (PH-S1819…S1828, 2026-08-08) · **✅**
 
-**Джерело:** owner priority (master horizon band 118): migrate legacy Galaxy sprint UI colors + behavior into GSV, recreated in Rust — sprint theme wire (colors), Rust-rendered sprint focus SVG, sprint-pill/queue-state colors. Legacy sprint UI: [`docs/vision/vision.css`](../vision/vision.css) (lines 40, 430–450, 2088–2275) · [`docs/vision/vision.js`](../vision/vision.js) (lines ~84, 659–676, 2131–2170). GSV: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV/docs/LEGACY_PARITY.md`](../../GSV/docs/LEGACY_PARITY.md). Cursor rules migration (legacy `.md` → `.mdc`) **deferred** to a later band.
+**Джерело:** owner priority (master horizon band 118): migrate legacy Galaxy sprint UI colors + behavior into GSV, recreated in Rust — sprint theme wire (colors), Rust-rendered sprint focus SVG, sprint-pill/queue-state colors. Legacy sprint UI: [`GSV/docs/vision/vision.css`](../GSV/GSV/docs/vision/vision.css) (lines 40, 430–450, 2088–2275) · [`GSV/docs/vision/vision.js`](../GSV/GSV/docs/vision/vision.js) (lines ~84, 659–676, 2131–2170). GSV: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV/docs/LEGACY_PARITY.md`](../../GSV/docs/LEGACY_PARITY.md). Cursor rules migration (legacy `.md` → `.mdc`) **deferred** to a later band.
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
@@ -1506,14 +1525,15 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1757 | **PH-S1822** | Contracts | GSV tests | `gsv_vision_contracts` (theme colors + focus svg real-workspace) + `gsv_server_contracts` (theme + focus endpoints) | **[x]** |
 | 1758 | **PH-S1823** | UI sprint colors | GSV canon | `GSV/ui/index.html`: sprint-pill + queue open/next/closed colors (theme wire) + focus `<img>` in Sprint cards | **[x]** |
 | 1759 | **PH-S1824** | GSV docs canon | GSV canon | `VISION.md` +band 118 (theme + focus endpoints); MEMORY band 118; GSV HANDOFF/NEXT band 118 | **[x]** |
-| 1760 | **PH-S1825** | poolAI vision parity | docs canon | `docs/vision/README.md`; FM §5.12 §5.99; `GSV_TECH_ROADMAP.md` band 118 | **[x]** |
+| 1760 | **PH-S1825** | poolAI vision parity | docs canon | `GSV/docs/vision/README.md`; FM §5.12 §5.99; `GSV_TECH_ROADMAP.md` band 118 | **[x]** |
 | 1761 | **PH-S1826** | Ratio hold advisory | GSV_ROLES | `gsv-loc-audit --min-ratio 0.95 --advisory` ≥95% + poolAI ratio96 advisory hold | **[x]** |
 | 1762 | **PH-S1827** | poolai-vision-sync close | docs canon | `poolai-vision-sync` rev **471** (band 118); `--check` ok; sprint-queue/feed updated | **[x]** |
+Vision rev 488.
 | 1763 | **PH-S1828** | Band close | GSV_ROLES | ratio hold; fmt/clippy/test (poolAI test-ci + GSV 153); docs canon; vision-sync rev 471; push | **[x]** |
 
 ### 5.100 GSV Galaxy UI full parity queue — band 119 (PH-S1829…S1838, 2026-08-08) · **✅**
 
-**Джерело:** owner priority (master horizon band 119): Galaxy UI full parity — colors + box behaviors. Повний legacy `:root` palette wire, Rust-rendered starfield/galaxy backdrop SVG, header chrome (RSS ticker, GPU mode cycle, power menu), panel dock + Esc-fullscreen. Legacy: [`docs/vision/vision.css`](../vision/vision.css) `:root` + header/starfield chrome · [`docs/vision/vision.js`](../vision/vision.js). GSV: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV/docs/LEGACY_PARITY.md`](../../GSV/docs/LEGACY_PARITY.md).
+**Джерело:** owner priority (master horizon band 119): Galaxy UI full parity — colors + box behaviors. Повний legacy `:root` palette wire, Rust-rendered starfield/galaxy backdrop SVG, header chrome (RSS ticker, GPU mode cycle, power menu), panel dock + Esc-fullscreen. Legacy: [`GSV/docs/vision/vision.css`](../GSV/GSV/docs/vision/vision.css) `:root` + header/starfield chrome · [`GSV/docs/vision/vision.js`](../GSV/GSV/docs/vision/vision.js). GSV: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV/docs/LEGACY_PARITY.md`](../../GSV/docs/LEGACY_PARITY.md).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
@@ -1526,6 +1546,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1770 | **PH-S1835** | Contracts | GSV tests | `gsv_vision_contracts` (**50**: palette/starfield/galaxy) + `gsv_server_contracts` (**29**: endpoints 200 + `image/svg+xml`) | **[x]** |
 | 1771 | **PH-S1836** | GSV docs canon | GSV canon | `VISION.md` +band 119; `LEGACY_PARITY.md` rows migrated; MEMORY band 119; HANDOFF/NEXT band 119 | **[x]** |
 | 1772 | **PH-S1837** | Ratio hold + rev prep | GSV_ROLES | `gsv-loc-audit` **95.18%** ≥95% ✅; UI delta компенсовано Rust tests + compact JS; vision-sync rev **472** | **[x]** |
+Vision rev 488.
 | 1773 | **PH-S1838** | Band close | GSV_ROLES | ratio hold (95.18%); fmt/clippy/test (**183**); docs canon; vision-sync rev 472; push | **[x]** |
 
 ### 5.101 GSV Ratio 96% stretch queue — band 120 (PH-S1839…S1848, 2026-08-08) · **✅**
@@ -1542,6 +1563,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1779 | **PH-S1844** | UI thin glue | GSV canon | `ui/index.html`: `render*` → `getText` injection; compact CSS/JS | **[x]** |
 | 1780 | **PH-S1845** | Contracts | GSV tests | `gsv_ui_contracts` + `gsv_server_contracts`: card render HTML markers + endpoints | **[x]** |
 | 1781 | **PH-S1846** | Ratio 96% measurement | GSV_ROLES | `gsv-loc-audit --stretch-96` green **≥96%**; compact/tests adjust to hold | **[x]** |
+Vision rev 488.
 | 1782 | **PH-S1847** | GSV docs canon | GSV canon | MEMORY band 120; HANDOFF/NEXT band 120; VISION.md; `GSV_TECH_ROADMAP.md` band 120 | **[x]** |
 | 1783 | **PH-S1848** | Band close | GSV_ROLES | ratio **≥96%**; fmt/clippy/test; docs canon; vision-sync rev bump; push | **[x]** |
 
@@ -1556,10 +1578,12 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1786 | **PH-S1851** | Wire omni card | GSV canon | `server/mod.rs` `api_ui_card`: `"omni"` → `boxes::omni::wire`; UI thin glue: remove `renderOmni` JS, `rustCards` 13, `resync()` url drop | **[x]** |
 | 1787 | **PH-S1852** | Contracts | GSV tests | `gsv_ui_contracts` (render_omni HTML markers: summary/routing/recommended/providers/models) + `gsv_server_contracts` (`/api/ui/card/omni` 200 + shape) | **[x]** |
 | 1788 | **PH-S1853** | Ratio hold + tests | GSV_ROLES | `gsv-loc-audit --stretch-96` green **≥96%**; full GSV tests green; clippy 0 | **[x]** |
+Vision rev 488.
 | 1789 | **PH-S1854** | GSV docs canon | GSV canon | MEMORY band 121; HANDOFF/NEXT band 121; VISION.md omni card section; `GSV_TECH_ROADMAP.md` band 121 | **[x]** |
 | 1790 | **PH-S1855** | Band close | GSV_ROLES | ratio **≥96%**; fmt/clippy/test; docs canon; vision-sync rev bump; push | **[x]** |
 
 ### 5.103 GPULimits store/wire queue — band 122 (PH-S1859…S1868, 2026-08-10) · **✅**
+Vision rev 487.
 
 **Джерело:** master backlog band 122 (H GPULimits · store wire) — enterprise phase H (GPU admission + worker limits, single-host). Pattern mirror: band 107 (Ratio96 docs canon, §5.88). Canon: [`GPU_LIMITS.md`](../development/GPU_LIMITS.md) · [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md) · [`PH_S_ENTERPRISE_ROADMAP_2026-07-19.md`](../development/PH_S_ENTERPRISE_ROADMAP_2026-07-19.md).
 
@@ -1573,8 +1597,10 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1796 | **PH-S1864** | `poolai-loc-audit --gpu-limits` | loc-audit | `rust_ratio.json` fields (`gpu_limits_mode`/criteria total/met) | **[x]** |
 | 1797 | **PH-S1865** | Docs `GPU_LIMITS.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | docs matrix + FM §5.12 header | **[x]** |
 | 1798 | **PH-S1866** | vision-sync --check | vision | drift gate green (rev bump) | **[x]** |
+Vision rev 488.
 | 1799 | **PH-S1867** | Ratio hold advisory | loc-audit | `--gpu-limits --advisory --min-ratio 0.95` | **[x]** |
 | 1800 | **PH-S1868** | GPULimits band close | tests/docs | `galaxy_horizon_s1859_integration`; FM ✅ · HANDOFF · NEXT_SESSION | **[x]** |
+Vision rev 487.
 
 ### 5.104 GPULimits API contracts queue — band 123 (PH-S1869…S1878, 2026-08-11) · **✅**
 
@@ -1589,9 +1615,11 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1805 | **PH-S1873** | Stand smoke `gpu_limits_api` export | stand smoke | `gpu_limits_api_band123_export_shape_ph_s1869` unit export shape | **[x]** |
 | 1806 | **PH-S1874** | `poolai-loc-audit --gpu-limits-api` | loc-audit | `rust_ratio.json` fields (`gpu_limits_api_mode`/criteria total/met) | **[x]** |
 | 1807 | **PH-S1875** | Docs `GPU_LIMITS.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | docs matrix + FM §5.12 header | **[x]** |
+Vision rev 488.
 | 1808 | **PH-S1876** | vision-sync --check | vision | drift gate green (rev bump) | **[x]** |
 | 1809 | **PH-S1877** | Ratio hold advisory | loc-audit | `--gpu-limits-api --advisory --min-ratio 0.95` | **[x]** |
 | 1810 | **PH-S1878** | GPULimits API band close | tests/docs | `galaxy_horizon_s1869_integration`; FM ✅ · HANDOFF · NEXT_SESSION | **[x]** |
+Vision rev 487.
 
 ### 5.105 GPULimits admin/ops glue queue — band 124 (PH-S1879…S1888, 2026-08-11) · **✅**
 
@@ -1606,6 +1634,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1815 | **PH-S1883** | Stand smoke `gpu_limits` export | stand smoke | export shape unit test | **[x]** |
 | 1816 | **PH-S1884** | `poolai-loc-audit` PH-S1884 | loc-audit | `rust_ratio.json` zriz | **[x]** |
 | 1817 | **PH-S1885** | Docs canon sync | RUN_LOCAL/INDEX/HANDOFF/NEXT | docs matrix + FM §5.12 header | **[x]** |
+Vision rev 488.
 | 1818 | **PH-S1886** | poolai-vision-sync --check | vision | drift gate green | **[x]** |
 | 1819 | **PH-S1887** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **[x]** |
 | 1820 | **PH-S1888** | galaxy_horizon_s1879_integration | tests/docs | band close | **[x]** |
@@ -1623,6 +1652,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1648 | **PH-S1713** | Stand smoke export shape band 107 | stand smoke | unit export shape | **[x]** |
 | 1649 | **PH-S1714** | `poolai-loc-audit --ratio96-docs-canon` | loc-audit | `rust_ratio.json` fields | **[x]** |
 | 1650 | **PH-S1715** | Docs `RATIO96_DOCS_CANON.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | docs matrix | **[x]** |
+Vision rev 488.
 | 1651 | **PH-S1716** | vision-sync --check | vision | drift gate green | **[x]** |
 | 1652 | **PH-S1717** | Ratio hold advisory | loc-audit | `--ratio96-docs-canon --advisory --min-ratio 0.95` | **[x]** |
 | 1653 | **PH-S1718** | Ratio96 docs-canon band close | tests/docs | `galaxy_horizon_s1709_integration`; FM ✅ · HANDOFF · NEXT_SESSION | **[x]** |
@@ -1641,16 +1671,17 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1609 | **PH-S1674** | `too_many_arguments` + `type_complexity` | rust_diagnostics | ui-core glue fns; `stand_smoke_metrics_parity`; monitoring type aliases | **[x]** |
 | 1610 | **PH-S1675** | misc diagnostics batch | rust_diagnostics | redundant closure/guard · from_ref · unit-value · unused imports · from_str · large Err · loop index | **[x]** |
 | 1611 | **PH-S1676** | Verify re-scan + residuals | rust_diagnostics | clippy (CI set) target ≤ 20 warnings; residuals fixed | **[x]** |
+Vision rev 488.
 | 1612 | **PH-S1677** | loc-audit + vision-sync + record diagnostics | ops | `--ratio96` zriz; vision `--check` green; `record-rust-diagnostics.sh` | **[x]** |
 | 1613 | **PH-S1678** | Band close | tests/docs | `galaxy_horizon_s1669_integration`; FM ✅ · HANDOFF · NEXT_SESSION | **[x]** |
 
 ### 5.83 GSV migration queue — band 102 (PH-S1659…S1668, 2026-08-01) · **✅**
 
-**Джерело:** окремий проєкт GSV (vision migration, Rust 95–100% / wasm 0–5%) — канон міграції vision у самостійний bin-сервер з боксами. Архітектура + docs: [`GSV/README.md`](../../GSV/README.md) · [`GSV_ARCHITECTURE.md`](../../gsv/GSV_ARCHITECTURE.md) · [`GSV_SERVER.md`](../../gsv/GSV_SERVER.md) · [`GSV_BOXES.md`](../../gsv/GSV_BOXES.md) · [`GSV_MIGRATION.md`](../../gsv/GSV_MIGRATION.md) · **TechPreroadMap** [`GSV_TECH_ROADMAP.md`](../../gsv/GSV_TECH_ROADMAP.md). Priority: owner (GSV перед master-backlog Ratio96 phase F).
+**Джерело:** окремий проєкт GSV (vision migration, Rust 95–100% / wasm 0–5%) — канон міграції vision у самостійний bin-сервер з боксами. Архітектура + docs: [`GSV/README.md`](../../GSV/README.md) · [`GSV_ARCHITECTURE.md`](../../GSV/GSV/docs/gsv/GSV_ARCHITECTURE.md) · [`GSV_SERVER.md`](../../GSV/GSV/docs/gsv/GSV_SERVER.md) · [`GSV_BOXES.md`](../../GSV/GSV/docs/gsv/GSV_BOXES.md) · [`GSV_MIGRATION.md`](../../GSV/GSV/docs/gsv/GSV_MIGRATION.md) · **TechPreroadMap** [`GSV_TECH_ROADMAP.md`](../../GSV/GSV/docs/gsv/GSV_TECH_ROADMAP.md). Priority: owner (GSV перед master-backlog Ratio96 phase F).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
-| 1594 | **PH-S1659** | GSV docs/architecture + Cargo scaffold | GSV_TECH_ROADMAP | `docs/gsv/` canon; `GSV/Cargo.toml`; empty server builds | **✅** |
+| 1594 | **PH-S1659** | GSV docs/architecture + Cargo scaffold | GSV_TECH_ROADMAP | `GSV/docs/gsv/` canon; `GSV/Cargo.toml`; empty server builds | **✅** |
 | 1595 | **PH-S1660** | gsv-server bin scaffold | GSV_TECH_ROADMAP | `gsv_server.rs`; `GET /` → UI; `GET /api/health` | **✅** |
 | 1596 | **PH-S1661** | Tracker box | GSV_BOXES §1 | `tracker/`; `GET /api/tracker`; `gsv_tracker.json`; workflow params | **✅** |
 | 1597 | **PH-S1662** | SLI console box | GSV_BOXES §2 | `sli/`; `GET /api/sli`; каталог з `bin/`+`scripts/`+`src/bin/` | **✅** |
@@ -1660,6 +1691,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1601 | **PH-S1666** | Box preview + SLI terminal | GSV_BOXES §6·§7 | `preview/` Rust-кольори; `POST /api/terminal` | **✅** |
 | 1602 | **PH-S1667** | Tests/bench hooks (без перекомпіляції) | GSV_BOXES §8 | `hooks/`; `/api/hooks/tests`; `/api/hooks/bench`; read `target/` | **✅** |
 | 1603 | **PH-S1668** | Band close | GSV_TECH_ROADMAP | offline-стійкість + metrics resync; Rust tests; docs canon; ratio hold | **✅** |
+Vision rev 488.
 
 **PH-S1659…S1668 ✅ (2026-08-02):** GSV реалізовано як окремий Rust-проєкт (`GSV/`, 52 tests green, clippy 0, live-smoke ок). Бокси: Tracker · SLI console · Toolchain · IDE · Update/offline · Box preview · SLI terminal · Tests/bench hooks. Timestamps RFC3339 (chrono).
 
@@ -1678,6 +1710,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1590 | **PH-S1655** | Docs canon sync | `RATIO96_DEPTH.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | **✅** |
 | 1591 | **PH-S1656** | vision-sync --check | ops | drift gate green | **✅** |
 | 1592 | **PH-S1657** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **✅** |
+Vision rev 488.
 | 1593 | **PH-S1658** | Band close | tests/docs | `galaxy_horizon_s1649_integration` | **✅** |
 
 **PH-S1658 ✅ (2026-08-01):** `ratio96_depth.rs`; `RATIO96_PHASE_F_SLICES`; `ratio96_store_depth.rs`; `ratio96_depth_contracts.rs`; `VERIFY_RATIO96`; `ratio96_band101_export_shape`; `--ratio96`; `RATIO96_DEPTH.md` + `RATIO96_RATIO_ADVISORY.md`; `galaxy_horizon_s1649_integration`. Phase F Ratio96 depth scaffold closed.
@@ -1694,6 +1727,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1577 | **PH-S1642** | verify-dev-stand / horizon hook | `VERIFY_MONITORING_HORIZON` | verify-dev-stand gate + quick `--monitoring-horizon` | **✅** |
 | 1578 | **PH-S1643** | Stand smoke export shape | `poolai_http_stand_smoke` | `monitoring_horizon_band100_export_shape` | **✅** |
 | 1579 | **PH-S1644** | `poolai-loc-audit --monitoring-horizon` | loc-audit | `rust_ratio.json` fields | **✅** |
+Vision rev 488.
 | 1580 | **PH-S1645** | Docs canon sync | docs | `MONITORING_HORIZON.md` + canon | **✅** |
 | 1581 | **PH-S1646** | vision-sync --check | ops | drift gate green | **✅** |
 | 1582 | **PH-S1647** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **✅** |
@@ -1711,6 +1745,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1567 | **PH-S1632** | verify-dev-stand / ratio-advisory hook | `VERIFY_MONITORING_RATIO_ADVISORY` | verify-dev-stand gate + quick | **✅** |
 | 1568 | **PH-S1633** | Stand smoke export shape | `poolai_http_stand_smoke` | `monitoring_ratio_advisory_band99_export_shape` | **✅** |
 | 1569 | **PH-S1634** | `poolai-loc-audit --monitoring-ratio-advisory` | loc-audit | `rust_ratio.json` fields | **✅** |
+Vision rev 488.
 | 1570 | **PH-S1635** | Docs canon sync | docs | `MONITORING_RATIO_ADVISORY.md` + canon | **✅** |
 | 1571 | **PH-S1636** | vision-sync --check | ops | drift gate green | **✅** |
 | 1572 | **PH-S1637** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **✅** |
@@ -1727,6 +1762,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1556 | **PH-S1621** | Criteria / export contracts | `monitoring_vision_sync_integration` | criteria totals consistent | **✅** |
 | 1557 | **PH-S1622** | verify-dev-stand / vision-sync hook | `VERIFY_MONITORING_VISION_SYNC` | verify-dev-stand gate + quick | **✅** |
 | 1558 | **PH-S1623** | Stand smoke export shape | `poolai_http_stand_smoke` | `monitoring_vision_sync_band98_export_shape` | **✅** |
+Vision rev 488.
 | 1559 | **PH-S1624** | `poolai-loc-audit --monitoring-vision-sync` | loc-audit | `rust_ratio.json` fields | **✅** |
 | 1560 | **PH-S1625** | Docs canon sync | docs | `MONITORING_VISION_SYNC.md` + canon | **✅** |
 | 1561 | **PH-S1626** | vision-sync --check | ops | drift gate green | **✅** |
@@ -1744,6 +1780,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1546 | **PH-S1611** | Criteria / export contracts | `monitoring_docs_canon_integration` | criteria totals consistent | **✅** |
 | 1547 | **PH-S1612** | verify-dev-stand / docs-canon hook | `VERIFY_MONITORING_DOCS_CANON` | verify-dev-stand gate + quick | **✅** |
 | 1548 | **PH-S1613** | Stand smoke export shape | `poolai_http_stand_smoke` | `monitoring_docs_canon_band97_export_shape` | **✅** |
+Vision rev 488.
 | 1549 | **PH-S1614** | `poolai-loc-audit --monitoring-docs-canon` | loc-audit | `rust_ratio.json` fields | **✅** |
 | 1550 | **PH-S1615** | Docs canon sync | docs | `MONITORING_DOCS_CANON.md` + canon | **✅** |
 | 1551 | **PH-S1616** | vision-sync --check | ops | drift gate green | **✅** |
@@ -1764,6 +1801,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1539 | **PH-S1604** | `poolai-loc-audit --monitoring-loc-audit` | loc-audit | `rust_ratio.json` fields | **✅** |
 | 1540 | **PH-S1605** | Docs `MONITORING_LOC_AUDIT.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | loc-audit matrix | **✅** |
 | 1541 | **PH-S1606** | vision-sync --check + Sprint Queue UX | `vision.js` / sync | empty drained queue ≠ “run sync”; drift gate green | **✅** |
+Vision rev 488.
 | 1542 | **PH-S1607** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **✅** |
 | 1543 | **PH-S1608** | Monitoring loc-audit band close | tests/docs | `galaxy_horizon_s1599_integration`; HANDOFF/NEXT | **✅** |
 
@@ -1783,6 +1821,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1529 | **PH-S1594** | `poolai-loc-audit --monitoring-stand-smoke` | loc-audit | `rust_ratio.json` fields | **✅** |
 | 1530 | **PH-S1595** | `VERIFY_MONITORING_STAND_SMOKE` | verify-dev-stand | live + loc-audit verify | **✅** |
 | 1531 | **PH-S1596** | Docs `MONITORING_STAND_SMOKE.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | stand matrix | **✅** |
+Vision rev 488.
 | 1532 | **PH-S1597** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **✅** |
 | 1533 | **PH-S1598** | Monitoring stand smoke band close | tests/docs | `galaxy_horizon_s1589_integration`; HANDOFF/NEXT | **✅** |
 
@@ -1802,6 +1841,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1519 | **PH-S1584** | `VERIFY_MONITORING_ADMIN_OPS` + `--monitoring-admin-ops` | verify/admin | verify-dev-stand / run-poolai | **✅** |
 | 1520 | **PH-S1585** | Stand smoke + loc-audit `--monitoring-admin-ops` | stand-smoke | export shape + rust_ratio fields | **✅** |
 | 1521 | **PH-S1586** | Docs `MONITORING_ADMIN_OPS.md` + canon | RUN_LOCAL/INDEX | HANDOFF/NEXT sync | **✅** |
+Vision rev 488.
 | 1522 | **PH-S1587** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **✅** |
 | 1523 | **PH-S1588** | galaxy_horizon_s1579_integration | tests/docs | band close | **✅** |
 
@@ -1820,6 +1860,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1508 | **PH-S1573** | alert-rules/validate fixtures | tests | `monitoring_field_fixtures_http_ph_s1573` | **✅** |
 | 1509 | **PH-S1574** | `VERIFY_MONITORING_API` + `--monitoring-api` | verify/admin | verify-dev-stand / run-poolai | **✅** |
 | 1510 | **PH-S1575** | Stand smoke + loc-audit `--monitoring-api` | stand-smoke | export shape + rust_ratio fields | **✅** |
+Vision rev 488.
 | 1511 | **PH-S1576** | Docs `MONITORING_API.md` + canon | RUN_LOCAL/INDEX | HANDOFF/NEXT sync | **✅** |
 | 1512 | **PH-S1577** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **✅** |
 | 1513 | **PH-S1578** | galaxy_horizon_s1569_integration | tests/docs | band close | **✅** |
@@ -1839,6 +1880,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1498 | **PH-S1563** | Stand smoke `monitoring` store export | stand-smoke | export shape unit test | **✅** |
 | 1499 | **PH-S1564** | poolai-loc-audit `--monitoring-store` | loc-audit | `rust_ratio.json` fields | **✅** |
 | 1500 | **PH-S1565** | Docs `MONITORING_STORE.md` + canon | RUN_LOCAL/INDEX | HANDOFF/NEXT sync | **✅** |
+Vision rev 488.
 | 1501 | **PH-S1566** | poolai-vision-sync --check | docs/vision | drift gate green | **✅** |
 | 1502 | **PH-S1567** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **✅** |
 | 1503 | **PH-S1568** | galaxy_horizon_s1559_integration | tests/docs | band close | **✅** |
@@ -1857,6 +1899,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1487 | **PH-S1552** | `monitoring` admin/ops glue | verify/admin | verify-dev-stand or admin strip | **✅** |
 | 1488 | **PH-S1553** | Stand smoke `monitoring` export | stand-smoke | export shape unit test | **✅** |
 | 1489 | **PH-S1554** | poolai-loc-audit PH-S1554 | loc-audit | `rust_ratio.json` zriz | **✅** |
+Vision rev 488.
 | 1490 | **PH-S1555** | Docs canon sync | RUN_LOCAL/INDEX | HANDOFF/NEXT sync | **✅** |
 | 1491 | **PH-S1556** | poolai-vision-sync --check | docs/vision | drift gate green | **✅** |
 | 1492 | **PH-S1557** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **✅** |
@@ -1875,6 +1918,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1476 | **PH-S1541** | Criteria contracts | `policy_horizon_integration` | markers + registry | **✅** |
 | 1477 | **PH-S1542** | `VERIFY_POLICY_HORIZON` + quick | verify-dev-stand / run-poolai | horizon verify gate | **✅** |
 | 1478 | **PH-S1543** | Stand smoke export shape | `poolai_http_stand_smoke` | unit export-shape | **✅** |
+Vision rev 488.
 | 1479 | **PH-S1544** | `poolai-loc-audit --policy-horizon` | loc-audit | `rust_ratio.json` fields | **✅** |
 | 1480 | **PH-S1545** | Docs `POLICIES_HORIZON.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | horizon matrix | **✅** |
 | 1481 | **PH-S1546** | vision-sync --check | docs/vision | drift gate green | **✅** |
@@ -1894,6 +1938,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1468 | **PH-S1533** | Stand smoke export shape | `poolai_http_stand_smoke` | unit export-shape | **✅** |
 | 1469 | **PH-S1534** | `poolai-loc-audit --policy-ratio-advisory` | loc-audit | `rust_ratio.json` fields | **✅** |
 | 1470 | **PH-S1535** | Docs `POLICIES_RATIO_ADVISORY.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | ratio-advisory matrix | **✅** |
+Vision rev 488.
 | 1471 | **PH-S1536** | vision-sync --check | docs/vision | drift gate green | **✅** |
 | 1472 | **PH-S1537** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **✅** |
 | 1473 | **PH-S1538** | Policies ratio-advisory band close | tests/docs | `galaxy_horizon_s1529_integration`; HANDOFF/NEXT | **✅** |
@@ -1902,7 +1947,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 
 ### 5.69 Policies vision sync queue — band 88 (PH-S1519…S1528, 2026-07-27) · **✅**
 
-**Джерело:** project completion / enterprise phase D — Policies vision-sync (`docs/vision/*` + [`POLICIES_DOCS_CANON.md`](../development/POLICIES_DOCS_CANON.md)). Mirror band 78 [`AUDIT_VISION_SYNC.md`](../development/AUDIT_VISION_SYNC.md). Prior docs-canon: [`POLICIES_DOCS_CANON.md`](../development/POLICIES_DOCS_CANON.md) (band 87). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · master [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md).
+**Джерело:** project completion / enterprise phase D — Policies vision-sync (`GSV/docs/vision/*` + [`POLICIES_DOCS_CANON.md`](../development/POLICIES_DOCS_CANON.md)). Mirror band 78 [`AUDIT_VISION_SYNC.md`](../development/AUDIT_VISION_SYNC.md). Prior docs-canon: [`POLICIES_DOCS_CANON.md`](../development/POLICIES_DOCS_CANON.md) (band 87). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · master [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
@@ -1913,6 +1958,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1458 | **PH-S1523** | Stand smoke export shape | `poolai_http_stand_smoke` | unit export-shape | **✅** |
 | 1459 | **PH-S1524** | `poolai-loc-audit --policy-vision-sync` | loc-audit | `rust_ratio.json` fields | **✅** |
 | 1460 | **PH-S1525** | Docs `POLICIES_VISION_SYNC.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | vision-sync matrix | **✅** |
+Vision rev 488.
 | 1461 | **PH-S1526** | vision-sync --check | docs/vision | drift gate green | **✅** |
 | 1462 | **PH-S1527** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **✅** |
 | 1463 | **PH-S1528** | Policies vision-sync band close | tests/docs | `galaxy_horizon_s1519_integration`; HANDOFF/NEXT | **✅** |
@@ -1932,6 +1978,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1448 | **PH-S1513** | Stand smoke export shape | `poolai_http_stand_smoke` | unit export-shape | **✅** |
 | 1449 | **PH-S1514** | `poolai-loc-audit --policy-docs-canon` | loc-audit | `rust_ratio.json` fields | **✅** |
 | 1450 | **PH-S1515** | Docs `POLICIES_DOCS_CANON.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | docs-canon matrix | **✅** |
+Vision rev 488.
 | 1451 | **PH-S1516** | vision-sync --check | docs/vision | drift gate green | **✅** |
 | 1452 | **PH-S1517** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **✅** |
 | 1453 | **PH-S1518** | Policies docs-canon band close | tests/docs | `galaxy_horizon_s1509_integration`; HANDOFF/NEXT | **✅** |
@@ -1948,6 +1995,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1435 | **PH-S1500** | Slice aggregate (phase-D `policy*`) | ui-core slices | `POLICY_LOC_AUDIT_SLICES` | **✅** |
 | 1436 | **PH-S1501** | Criteria contracts | `policy_loc_audit_integration.rs` | registry markers | **✅** |
 | 1437 | **PH-S1502** | `VERIFY_POLICY_LOC_AUDIT` + quick `--policy-loc-audit` | verify-dev-stand | gate + RUN_LOCAL | **✅** |
+Vision rev 488.
 | 1438 | **PH-S1503** | Stand smoke export shape band 86 | stand smoke bin | export shape unit test | **✅** |
 | 1439 | **PH-S1504** | `poolai-loc-audit --policy-loc-audit` | loc-audit | `rust_ratio.json` fields | **✅** |
 | 1440 | **PH-S1505** | Docs `POLICIES_LOC_AUDIT.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | aggregate matrix | **✅** |
@@ -1965,6 +2013,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1425 | **PH-S1490** | Live store wire smoke | `GET /policy/store` | shape + integration | **✅** |
 | 1426 | **PH-S1491** | Live security policies query smoke | `GET /security/policies` | list + filters stub | **✅** |
 | 1427 | **PH-S1492** | Live policy-field fixture smoke | validate fixture | missing name/timeout → 4xx | **✅** |
+Vision rev 488.
 | 1428 | **PH-S1493** | CLI `--policy-stand-smoke` | stand smoke bin | live suite + export shape | **✅** |
 | 1429 | **PH-S1494** | `poolai-loc-audit --policy-stand-smoke` | loc-audit | `rust_ratio.json` fields | **✅** |
 | 1430 | **PH-S1495** | `VERIFY_POLICY_STAND_SMOKE` | verify-dev-stand | live + loc-audit verify | **✅** |
@@ -1985,6 +2034,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1418 | **PH-S1483** | i18n Policies admin ops keys | `i18n.rs` ADMIN_POLICY_* | EN/UK patch keys | **✅** |
 | 1419 | **PH-S1484** | `VERIFY_POLICY_ADMIN_OPS` + quick `--policy-admin-ops` | verify-dev-stand | gate + RUN_LOCAL | **✅** |
 | 1420 | **PH-S1485** | Stand smoke + `poolai-loc-audit --policy-admin-ops` | stand smoke / loc-audit | export shape + rust_ratio fields | **✅** |
+Vision rev 488.
 | 1421 | **PH-S1486** | Docs `POLICIES_ADMIN_OPS.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | ops matrix | **✅** |
 | 1422 | **PH-S1487** | vision-sync --check + ratio hold | vision / loc-audit | drift + `--min-ratio 0.95 --advisory` | **✅** |
 | 1423 | **PH-S1488** | Policies admin/ops band close | tests/docs | `galaxy_horizon_s1479_integration`; HANDOFF/NEXT | **✅** |
@@ -2004,6 +2054,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1408 | **PH-S1473** | Policy field validation fixtures | same suite | missing name/timeout → 4xx | **✅** |
 | 1409 | **PH-S1474** | `VERIFY_POLICY_API` + quick `--policy-api` | verify-dev-stand | API gate | **✅** |
 | 1410 | **PH-S1475** | Stand smoke + `poolai-loc-audit --policy-api` | stand smoke / loc-audit | export shape + rust_ratio fields | **✅** |
+Vision rev 488.
 | 1411 | **PH-S1476** | Docs `POLICIES_API.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | HTTP contract matrix | **✅** |
 | 1412 | **PH-S1477** | vision-sync --check + ratio hold | vision / loc-audit | drift + `--min-ratio 0.95 --advisory` | **✅** |
 | 1413 | **PH-S1478** | Policies API band close | tests/docs | `galaxy_horizon_s1469_integration`; HANDOFF/NEXT | **✅** |
@@ -2021,6 +2072,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1396 | **PH-S1461** | Policies store wire contracts | tests | `policy_store_wire_integration` | **✅** |
 | 1397 | **PH-S1462** | `VERIFY_POLICY_STORE` + `--policy-store` | verify/admin | store gate | **✅** |
 | 1398 | **PH-S1463** | Stand smoke export shape band 82 | stand-smoke | `policy_store_band82_export_shape` | **✅** |
+Vision rev 488.
 | 1399 | **PH-S1464** | `poolai-loc-audit --policy-store` | loc-audit | `rust_ratio.json` fields | **✅** |
 | 1400 | **PH-S1465** | Docs `POLICIES_STORE.md` + canon | RUN_LOCAL/INDEX | docs matrix | **✅** |
 | 1401 | **PH-S1466** | vision-sync --check | docs/vision | drift gate green | **✅** |
@@ -2040,6 +2092,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1386 | **PH-S1451** | `policy` API contracts | tests | `tests/*_integration.rs` or contract test | **✅** |
 | 1387 | **PH-S1452** | `policy` admin/ops glue | verify/admin | verify-dev-stand or admin strip | **✅** |
 | 1388 | **PH-S1453** | Stand smoke `policy` export | stand-smoke | export shape unit test | **✅** |
+Vision rev 488.
 | 1389 | **PH-S1454** | poolai-loc-audit PH-S1454 | loc-audit | `rust_ratio.json` zriz | **✅** |
 | 1390 | **PH-S1455** | Docs canon sync | RUN_LOCAL/INDEX | HANDOFF/NEXT sync | **✅** |
 | 1391 | **PH-S1456** | poolai-vision-sync --check | docs/vision | drift gate green | **✅** |
@@ -2059,6 +2112,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1376 | **PH-S1441** | Criteria contracts | `audit_horizon_integration` | markers + registry | **✅** |
 | 1377 | **PH-S1442** | `VERIFY_AUDIT_HORIZON` + quick | verify-dev-stand / run-poolai | horizon verify gate | **✅** |
 | 1378 | **PH-S1443** | Stand smoke export shape | `poolai_http_stand_smoke` | unit export-shape | **✅** |
+Vision rev 488.
 | 1379 | **PH-S1444** | `poolai-loc-audit --audit-horizon` | loc-audit | `rust_ratio.json` fields | **✅** |
 | 1380 | **PH-S1445** | Docs `AUDIT_HORIZON.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | horizon matrix | **✅** |
 | 1381 | **PH-S1446** | vision-sync --check | docs/vision | drift gate green | **✅** |
@@ -2079,6 +2133,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1367 | **PH-S1432** | `VERIFY_AUDIT_RATIO_ADVISORY` + quick | verify-dev-stand / run-poolai | ratio-advisory verify gate | **✅** |
 | 1368 | **PH-S1433** | Stand smoke export shape | `poolai_http_stand_smoke` | unit export-shape | **✅** |
 | 1369 | **PH-S1434** | `poolai-loc-audit --audit-ratio-advisory` | loc-audit | `rust_ratio.json` fields | **✅** |
+Vision rev 488.
 | 1370 | **PH-S1435** | Docs `AUDIT_RATIO_ADVISORY.md` + canon | RUN_LOCAL/INDEX/HANDOFF/NEXT | ratio-advisory matrix | **✅** |
 | 1371 | **PH-S1436** | vision-sync --check | docs/vision | drift gate green | **✅** |
 | 1372 | **PH-S1437** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **✅** |
@@ -2088,13 +2143,14 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 
 ### 5.59 Audit vision sync queue — band 78 (PH-S1419…S1428, 2026-07-24) · **✅**
 
-**Джерело:** project completion / enterprise phase C — Audit vision-sync (`docs/vision/*` + [`AUDIT_DOCS_CANON.md`](../development/AUDIT_DOCS_CANON.md)). Mirror band 68 [`SSO_VISION_SYNC.md`](../development/SSO_VISION_SYNC.md). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · master [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md).
+**Джерело:** project completion / enterprise phase C — Audit vision-sync (`GSV/docs/vision/*` + [`AUDIT_DOCS_CANON.md`](../development/AUDIT_DOCS_CANON.md)). Mirror band 68 [`SSO_VISION_SYNC.md`](../development/SSO_VISION_SYNC.md). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · master [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
 | 1354 | **PH-S1419** | `audit_vision_sync_depth` ui-core module | `audit_vision_sync_depth.rs` | depth enum + vision/criteria registry | **✅** |
 | 1355 | **PH-S1420** | Vision slice aggregate stub | `AUDIT_VISION_SYNC_SLICES` | six vision slices; unit test | **✅** |
 | 1356 | **PH-S1421** | Criteria contracts | `audit_vision_sync_integration` | markers + registry | **✅** |
+Vision rev 488.
 | 1357 | **PH-S1422** | `VERIFY_AUDIT_VISION_SYNC` + quick | verify-dev-stand / run-poolai | vision-sync verify gate | **✅** |
 | 1358 | **PH-S1423** | Stand smoke export shape | `poolai_http_stand_smoke` | unit export-shape | **✅** |
 | 1359 | **PH-S1424** | `poolai-loc-audit --audit-vision-sync` | loc-audit | `rust_ratio.json` fields | **✅** |
@@ -2112,6 +2168,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1344 | **PH-S1409** | `audit_docs_canon_depth` ui-core module | `audit_docs_canon_depth.rs` | depth enum + docs-canon criteria registry | **✅** |
 | 1345 | **PH-S1410** | Slice aggregate (`AUDIT_*.md`) | docs slices | `AUDIT_DEPTH`…`AUDIT_LOC_AUDIT` under one gate | **✅** |
 | 1346 | **PH-S1411** | Criteria contracts | `audit_docs_canon_integration` | markers + registry | **✅** |
+Vision rev 488.
 | 1347 | **PH-S1412** | `VERIFY_AUDIT_DOCS_CANON` + quick | verify-dev-stand / run-poolai | docs-canon verify gate | **✅** |
 | 1348 | **PH-S1413** | Stand smoke export shape | `poolai_http_stand_smoke` | unit export-shape | **✅** |
 | 1349 | **PH-S1414** | `poolai-loc-audit --audit-docs-canon` | loc-audit | `rust_ratio.json` fields | **✅** |
@@ -2129,6 +2186,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1334 | **PH-S1399** | `audit_loc_audit_depth` ui-core module | `audit_loc_audit_depth.rs` | depth enum + aggregate criteria registry | **✅** |
 | 1335 | **PH-S1400** | Slice aggregate (audit→stand-smoke) | loc-audit slices | `--audit`…`--audit-stand-smoke` under one gate | **✅** |
 | 1336 | **PH-S1401** | Criteria contracts | `audit_loc_audit_integration` | markers + registry | **✅** |
+Vision rev 488.
 | 1337 | **PH-S1402** | `VERIFY_AUDIT_LOC_AUDIT` + quick | verify-dev-stand / run-poolai | aggregate verify gate | **✅** |
 | 1338 | **PH-S1403** | Stand smoke export shape | `poolai_http_stand_smoke` | unit export-shape | **✅** |
 | 1339 | **PH-S1404** | `poolai-loc-audit --audit-loc-audit` | loc-audit | `rust_ratio.json` fields | **✅** |
@@ -2146,6 +2204,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1324 | **PH-S1389** | `audit_stand_smoke_depth` ui-core module | `audit_stand_smoke_depth.rs` | depth enum + stand-smoke criteria registry | **✅** |
 | 1325 | **PH-S1390** | Live store wire smoke | `GET /audit/store` | shape + integration | **✅** |
 | 1326 | **PH-S1391** | Live audit events query smoke | `GET /audit/events` | filters + limit | **✅** |
+Vision rev 488.
 | 1327 | **PH-S1392** | Live event-field fixture smoke | validate fixture | missing action/resource → 4xx | **✅** |
 | 1328 | **PH-S1393** | CLI `--audit-stand-smoke` | stand smoke bin | live suite + export shape | **✅** |
 | 1329 | **PH-S1394** | `poolai-loc-audit --audit-stand-smoke` | loc-audit | `rust_ratio.json` fields | **✅** |
@@ -2164,6 +2223,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1315 | **PH-S1380** | Admin audit store-wire status strip | `src/ui/admin` audit | `#audit-store-badge` ← `GET /audit/store` | **✅** |
 | 1316 | **PH-S1381** | Admin audit query ops glue | same | refresh events from HTTP query contracts | **✅** |
 | 1317 | **PH-S1382** | Admin audit ops HTML contracts | `audit_admin_ops_integration.rs` | store/query markers | **✅** |
+Vision rev 488.
 | 1318 | **PH-S1383** | i18n Audit admin ops keys | `i18n.rs` ADMIN_AUDIT_* | EN/UK patch keys | **✅** |
 | 1319 | **PH-S1384** | `VERIFY_AUDIT_ADMIN_OPS` + quick `--audit-admin-ops` | `bin/verify-dev-stand.sh` | gate + RUN_LOCAL | **✅** |
 | 1320 | **PH-S1385** | Stand smoke + `poolai-loc-audit --audit-admin-ops` | stand smoke / loc-audit | export shape + `rust_ratio.json` fields | **✅** |
@@ -2180,6 +2240,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1304 | **PH-S1369** | `audit_api_contracts_depth` ui-core module | `audit_api_contracts_depth.rs` | depth enum + HTTP API criteria registry | **✅** |
 | 1305 | **PH-S1370** | Audit query HTTP lifecycle | `audit_api_contracts_integration` | GET query filters + pagination stub | **✅** |
 | 1306 | **PH-S1371** | Store-wire status HTTP read | `GET /audit/store` | `{mode,durable_path,configured}` file/sqlite | **✅** |
+Vision rev 488.
 | 1307 | **PH-S1372** | OpenAPI `AuditStoreWire` + errors | `docs/openapi.yaml` | store schema + path; gap-audit 0 | **✅** |
 | 1308 | **PH-S1373** | Event field validation fixtures | same suite | missing action/resource → 4xx | **✅** |
 | 1309 | **PH-S1374** | `VERIFY_AUDIT_API` + quick `--audit-api` | verify-dev-stand | API gate | **✅** |
@@ -2196,6 +2257,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 |---|--------|--------|---------|------------|--------|
 | 1294 | **PH-S1359** | `audit_store_depth` ui-core module | `audit_store_depth.rs` | depth enum + store criteria registry | **✅** |
 | 1295 | **PH-S1360** | Audit store wire durable path | `audit.rs` | `POOLAI_AUDIT_DATA_DIR` + `audit_store_wire()` + unit tests | **✅** |
+Vision rev 488.
 | 1296 | **PH-S1361** | Audit store wire contracts | `audit_store_integration` | wire labels + ui-core depth stub | **✅** |
 | 1297 | **PH-S1362** | `VERIFY_AUDIT_STORE` + quick `--audit-store` | verify-dev-stand | store gate | **✅** |
 | 1298 | **PH-S1363** | Stand smoke export shape band 72 | stand smoke | `audit_store_band72_export_shape` | **✅** |
@@ -2213,6 +2275,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 |---|--------|--------|---------|------------|--------|
 | 1284 | **PH-S1349** | `audit_depth` ui-core module | `audit_depth.rs` | depth enum + criteria registry | **✅** |
 | 1285 | **PH-S1350** | Audit store/wire slice stub | `audit.rs` | `POOLAI_AUDIT_STORE` + `validate_audit_event_fields` unit tests | **✅** |
+Vision rev 488.
 | 1286 | **PH-S1351** | Criteria contracts | `audit_depth_integration` | markers + registry | **✅** |
 | 1287 | **PH-S1352** | `VERIFY_AUDIT` + quick `--audit` | verify-dev-stand | depth gate | **✅** |
 | 1288 | **PH-S1353** | Stand smoke export shape band 71 | stand smoke | `audit_band71_export_shape` | **✅** |
@@ -2230,6 +2293,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 |---|--------|--------|---------|------------|--------|
 | 1274 | **PH-S1339** | `sso_horizon_depth` ui-core module | `sso_horizon_depth.rs` | depth enum + criteria registry | **✅** |
 | 1275 | **PH-S1340** | Horizon slice aggregate stub | `SSO_HORIZON_SLICES` | prior `--sso*` + ratio-advisory slices; unit test | **✅** |
+Vision rev 488.
 | 1276 | **PH-S1341** | Criteria contracts | `sso_horizon_integration` | markers + registry | **✅** |
 | 1277 | **PH-S1342** | `VERIFY_SSO_HORIZON` + quick `--sso-horizon` | verify-dev-stand | horizon gate | **✅** |
 | 1278 | **PH-S1343** | Stand smoke export shape band 70 | stand smoke | `sso_horizon_band70_export_shape` | **✅** |
@@ -2247,6 +2311,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 |---|--------|--------|---------|------------|--------|
 | 1264 | **PH-S1329** | `sso_ratio_advisory_depth` ui-core module | `sso_ratio_advisory_depth.rs` | depth enum + criteria registry | **✅** |
 | 1265 | **PH-S1330** | Ratio-advisory slice aggregate stub | `SSO_RATIO_ADVISORY_SLICES` | prior `--sso*` + vision-sync slices; unit test | **✅** |
+Vision rev 488.
 | 1266 | **PH-S1331** | Criteria contracts | `sso_ratio_advisory_integration` | markers + registry | **✅** |
 | 1267 | **PH-S1332** | `VERIFY_SSO_RATIO_ADVISORY` + quick `--sso-ratio-advisory` | verify-dev-stand | ratio-advisory gate | **✅** |
 | 1268 | **PH-S1333** | Stand smoke export shape band 69 | stand smoke | `sso_ratio_advisory_band69_export_shape` | **✅** |
@@ -2264,6 +2329,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 |---|--------|--------|---------|------------|--------|
 | 1254 | **PH-S1319** | `sso_vision_sync_depth` ui-core module | `sso_vision_sync_depth.rs` | depth enum + vision/criteria registry | **✅** |
 | 1255 | **PH-S1320** | SSO vision-sync slice aggregate stub | `SSO_VISION_SYNC_SLICES` | six vision slices; unit test | **✅** |
+Vision rev 488.
 | 1256 | **PH-S1321** | Criteria contracts | `sso_vision_sync_integration` | markers + registry | **✅** |
 | 1257 | **PH-S1322** | `VERIFY_SSO_VISION_SYNC` + quick `--sso-vision-sync` | verify-dev-stand | vision-sync gate | **✅** |
 | 1258 | **PH-S1323** | Stand smoke export shape band 68 | stand smoke | `sso_vision_sync_band68_export_shape` | **✅** |
@@ -2280,6 +2346,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
 | 1244 | **PH-S1309** | `sso_docs_canon_depth` ui-core module | `sso_docs_canon_depth.rs` | depth enum + docs-canon criteria registry | **✅** |
+Vision rev 488.
 | 1245 | **PH-S1310** | Docs slice aggregate stub | `SSO_DOCS_CANON_SLICES` | six `SSO_*.md` present | **✅** |
 | 1246 | **PH-S1311** | Criteria contracts | `sso_docs_canon_integration` | markers + registry | **✅** |
 | 1247 | **PH-S1312** | `VERIFY_SSO_DOCS_CANON` + quick `--sso-docs-canon` | verify-dev-stand | docs-canon gate | **✅** |
@@ -2297,6 +2364,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
 | 1234 | **PH-S1299** | `sso_loc_audit_depth` ui-core module | `sso_loc_audit_depth.rs` | depth enum + aggregate criteria registry | **✅** |
+Vision rev 488.
 | 1235 | **PH-S1300** | Slice aggregate stub | `SSO_LOC_AUDIT_SLICES` | `--sso`…`--sso-stand-smoke` | **✅** |
 | 1236 | **PH-S1301** | Criteria contracts | `sso_loc_audit_integration` | markers + registry | **✅** |
 | 1237 | **PH-S1302** | `VERIFY_SSO_LOC_AUDIT` + quick `--sso-loc-audit` | verify-dev-stand | aggregate gate | **✅** |
@@ -2314,6 +2382,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
 | 1224 | **PH-S1289** | `sso_stand_smoke_depth` ui-core module | `sso_stand_smoke_depth.rs` | depth enum + stand-smoke criteria registry | **✅** |
+Vision rev 488.
 | 1225 | **PH-S1290** | Live store wire smoke | `GET /security/sso/store` | shape + integration | **✅** |
 | 1226 | **PH-S1291** | Live OAuth2/SAML CRUD smoke | list→create→get→delete | providers lifecycle | **✅** |
 | 1227 | **PH-S1292** | Live callback fixture smoke | OAuth/SAML fixtures | no live IdP | **✅** |
@@ -2332,6 +2401,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 |---|--------|--------|---------|------------|--------|
 | 1214 | **PH-S1279** | `sso_admin_ops_depth` ui-core module | `sso_admin_ops_depth.rs` | depth enum + admin/ops criteria registry | **✅** |
 | 1215 | **PH-S1280** | Admin SSO store-wire status strip | `src/ui/admin` security/SSO | `#sso-store-badge` ← `GET /security/sso/store` | **✅** |
+Vision rev 488.
 | 1216 | **PH-S1281** | Admin OAuth2/SAML ops glue | same | list/refresh providers from HTTP contracts | **✅** |
 | 1217 | **PH-S1282** | Admin SSO ops HTML contracts | `sso_admin_ops_integration.rs` | store/providers markers | **✅** |
 | 1218 | **PH-S1283** | i18n SSO admin ops keys | `i18n.rs` ADMIN_SSO_* | EN/UK patch keys | **✅** |
@@ -2350,6 +2420,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1204 | **PH-S1269** | `sso_api_contracts_depth` ui-core module | `sso_api_contracts_depth.rs` | depth enum + HTTP API criteria registry | **✅** |
 | 1205 | **PH-S1270** | OAuth2 HTTP CRUD lifecycle | `sso_api_contracts_integration.rs` | POST→GET→PUT→DELETE `/security/oauth2/providers` | **✅** |
 | 1206 | **PH-S1271** | SAML HTTP CRUD lifecycle | same suite | POST→GET→PUT→DELETE `/security/saml/providers` | **✅** |
+Vision rev 488.
 | 1207 | **PH-S1272** | Store-wire status HTTP read | `GET /security/sso/store` | `{mode,durable_path,configured}` memory/sqlite | **✅** |
 | 1208 | **PH-S1273** | OpenAPI `SsoStoreWire` + errors | `docs/openapi.yaml` | store schema + path; gap-audit 0 | **✅** |
 | 1209 | **PH-S1274** | Callback fixtures (no live IdP) | same suite | OAuth missing code + SAML invalid + audience stub | **✅** |
@@ -2366,6 +2437,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 |---|--------|--------|---------|------------|--------|
 | 1194 | **PH-S1259** | `sso_store_depth` ui-core module | `sso_store_depth.rs` | depth enum + SSO store criteria registry | **✅** |
 | 1195 | **PH-S1260** | SSO store wire durable path | `security.rs` | `POOLAI_SSO_DATA_DIR` + `sso_store_wire()` + unit tests | **✅** |
+Vision rev 488.
 | 1196 | **PH-S1261** | SSO store wire contracts | `sso_store_wire_integration.rs` | wire labels + ui-core depth stub | **✅** |
 | 1197 | **PH-S1262** | `VERIFY_SSO_STORE` + quick `--sso-store` | RUN_LOCAL / verify-dev-stand | SSO store gate | **✅** |
 | 1198 | **PH-S1263** | Stand smoke SSO store export shape | `poolai_http_stand_smoke` | `sso_store_band62_export_shape` | **✅** |
@@ -2383,6 +2455,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 |---|--------|--------|---------|------------|--------|
 | 1184 | **PH-S1249** | `sso_depth` ui-core module | `sso_depth.rs` | depth enum + SSO criteria registry | **✅** |
 | 1185 | **PH-S1250** | SSO store/verify stub | `security.rs` | `POOLAI_SSO_STORE` + audience/NotOnOrAfter unit tests | **✅** |
+Vision rev 488.
 | 1186 | **PH-S1251** | SSO depth gate audit | `sso_depth_audit.rs` | criteria registry + FM markers | **✅** |
 | 1187 | **PH-S1252** | `VERIFY_SSO` + quick `--sso` | RUN_LOCAL / verify-dev-stand | SSO gate | **✅** |
 | 1188 | **PH-S1253** | Stand smoke SSO export shape | `poolai_http_stand_smoke` | `sso_band61_export_shape` | **✅** |
@@ -2400,6 +2473,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 |---|--------|--------|---------|------------|--------|
 | 1174 | **PH-S1239** | `tenant_horizon_depth` ui-core module | `tenant_horizon_depth.rs` | depth enum + criteria registry | **✅** |
 | 1175 | **PH-S1240** | Phase-A slice aggregate | FM §5.17 / `TENANT_HORIZON_SLICES` | all `--tenant-*` + `tenants.sqlite`; unit test | **✅** |
+Vision rev 488.
 | 1176 | **PH-S1241** | Tenant horizon contracts | FM §5.17 | `tenant_horizon_integration` criteria totals | **✅** |
 | 1177 | **PH-S1242** | `VERIFY_TENANT_HORIZON` + quick flag | RUN_LOCAL / verify-dev-stand | horizon gate | **✅** |
 | 1178 | **PH-S1243** | Stand smoke export shape | `poolai_http_stand_smoke` | `tenant_horizon_band60_export_shape` | **✅** |
@@ -2418,6 +2492,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 1164 | **PH-S1229** | `tenant_ratio_advisory_depth` ui-core module | `tenant_ratio_advisory_depth.rs` | depth enum + criteria registry | **✅** |
 | 1165 | **PH-S1230** | Tenant SQLite restart-safe CRUD + slice aggregate | FM §5.17 / `TENANT_RATIO_ADVISORY_SLICES` | `persist_tenant_to_sqlite`; create/get across recreate | **✅** |
 | 1166 | **PH-S1231** | Tenant ratio-advisory + sqlite durable contracts | FM §5.17 | `tenant_ratio_advisory_integration` + `tenant_sqlite_durable_integration` | **✅** |
+Vision rev 488.
 | 1167 | **PH-S1232** | `VERIFY_TENANT_RATIO_ADVISORY` + quick flag | RUN_LOCAL / verify-dev-stand | ratio-advisory gate | **✅** |
 | 1168 | **PH-S1233** | Stand smoke export shape | `poolai_http_stand_smoke` | `tenant_ratio_advisory_band59_export_shape` | **✅** |
 | 1169 | **PH-S1234** | `poolai-loc-audit --tenant-ratio-advisory` | RUST_RATIO / §5.13 | `tenant_ratio_advisory_*` fields in `rust_ratio.json` | **✅** |
@@ -2428,12 +2503,13 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 
 ### 5.39 Tenant vision sync queue — band 58 (PH-S1219…S1228, 2026-07-21)
 
-**Джерело:** FM-horizon v2 / enterprise phase A — aggregate `docs/vision/*` + `TENANT_DOCS_CANON.md` + verify/loc-audit.
+**Джерело:** FM-horizon v2 / enterprise phase A — aggregate `GSV/docs/vision/*` + `TENANT_DOCS_CANON.md` + verify/loc-audit.
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
 | 1154 | **PH-S1219** | `tenant_vision_sync_depth` ui-core module | `tenant_vision_sync_depth.rs` | depth enum + vision/criteria registry | **✅** |
 | 1155 | **PH-S1220** | Tenant vision-sync slice aggregate stub | RUST_RATIO / `TENANT_VISION_SYNC_SLICES` | six vision slices present; unit test | **✅** |
+Vision rev 488.
 | 1156 | **PH-S1221** | Tenant vision-sync criteria contracts | FM §5.17 | `tenant_vision_sync_integration` totals consistent | **✅** |
 | 1157 | **PH-S1222** | `VERIFY_TENANT_VISION_SYNC` + quick flag | RUN_LOCAL / verify-dev-stand | vision-sync gate | **✅** |
 | 1158 | **PH-S1223** | Stand smoke export shape | `poolai_http_stand_smoke` | `tenant_vision_sync_band58_export_shape` | **✅** |
@@ -2451,6 +2527,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 |---|--------|--------|---------|------------|--------|
 | 1144 | **PH-S1209** | `tenant_docs_canon_depth` ui-core module | `tenant_docs_canon_depth.rs` | depth enum + docs/criteria registry | **✅** |
 | 1145 | **PH-S1210** | Tenant docs-canon slice aggregate stub | RUST_RATIO / `TENANT_DOCS_CANON_SLICES` | six `TENANT_*.md` present; unit test | **✅** |
+Vision rev 488.
 | 1146 | **PH-S1211** | Tenant docs-canon criteria contracts | FM §5.17 | `tenant_docs_canon_integration` totals consistent | **✅** |
 | 1147 | **PH-S1212** | `VERIFY_TENANT_DOCS_CANON` + quick flag | RUN_LOCAL / verify-dev-stand | docs-canon gate | **✅** |
 | 1148 | **PH-S1213** | Stand smoke export shape | `poolai_http_stand_smoke` | `tenant_docs_canon_band57_export_shape` | **✅** |
@@ -2468,6 +2545,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 |---|--------|--------|---------|------------|--------|
 | 1134 | **PH-S1199** | `tenant_loc_audit_depth` ui-core module | `tenant_loc_audit_depth.rs` | depth enum + slice/aggregate criteria registry | **✅** |
 | 1135 | **PH-S1200** | Tenant loc-audit slice aggregate stub | RUST_RATIO / `TENANT_LOC_AUDIT_SLICES` | five `--tenant-*` flags present; unit test | **✅** |
+Vision rev 488.
 | 1136 | **PH-S1201** | Tenant loc-audit criteria contracts | FM §5.17 | `tenant_loc_audit_integration` totals consistent | **✅** |
 | 1137 | **PH-S1202** | `VERIFY_TENANT_LOC_AUDIT` + quick flag | RUN_LOCAL / verify-dev-stand | loc-audit aggregate gate | **✅** |
 | 1138 | **PH-S1203** | Stand smoke export shape | `poolai_http_stand_smoke` | `tenant_loc_audit_band56_export_shape` | **✅** |
@@ -2485,6 +2563,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 |---|--------|--------|---------|------------|--------|
 | 1124 | **PH-S1189** | `tenant_stand_smoke_depth` ui-core module | `tenant_stand_smoke_depth.rs` | depth enum + live/CLI/verify criteria registry | **✅** |
 | 1125 | **PH-S1190** | Live stand smoke `GET /tenants/store` | TENANT_API §store · stand-smoke | `smoke_tenants_store_wire` + `tenant_stand_smoke_integration` | **✅** |
+Vision rev 488.
 | 1126 | **PH-S1191** | Live stand smoke tenant CRUD | EnterpriseTenants HTTP | list→create→get→delete; Rust integration gate | **✅** |
 | 1127 | **PH-S1192** | Live stand smoke usage + quota + isolation | TENANT_API §usage/quota | usage/quota allow/deny + foreign UUID → 404 | **✅** |
 | 1128 | **PH-S1193** | CLI `--tenant-stand-smoke` + export suite | `poolai_http_stand_smoke` | flag/`POOLAI_STAND_SMOKE_TENANT=1` + band55 export shape | **✅** |
@@ -2501,6 +2580,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
 | 1114 | **PH-S1179** | `tenant_admin_ops_depth` ui-core module | `tenant_admin_ops_depth.rs` | depth enum + admin/ops criteria registry | **✅** |
+Vision rev 488.
 | 1115 | **PH-S1180** | Admin store-wire status strip | `src/ui/admin/tenants.rs` | `#tenant-store-badge` ← `GET /tenants/store` | **✅** |
 | 1116 | **PH-S1181** | Admin usage + quota ops glue | same | `refreshTenantUsage` + `probeTenantQuota` | **✅** |
 | 1117 | **PH-S1182** | Admin ops HTML contracts | `tenant_admin_ops_integration.rs` | store/usage/quota markers | **✅** |
@@ -2519,6 +2599,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 |---|--------|--------|---------|------------|--------|
 | 1104 | **PH-S1169** | `tenant_api_contracts_depth` ui-core module | `tenant_api_contracts_depth.rs` | depth enum + HTTP API criteria registry | **✅** |
 | 1105 | **PH-S1170** | HTTP CRUD lifecycle contracts | `tenant_api_contracts_integration.rs` | POST→GET→update→DELETE via AppState router | **✅** |
+Vision rev 488.
 | 1106 | **PH-S1171** | Quota + usage HTTP contracts | same suite | `GET …/usage` + `POST …/quota` allow/deny shapes | **✅** |
 | 1107 | **PH-S1172** | Cross-tenant isolation API | same suite | mutate A; B unchanged; foreign UUID → 404 | **✅** |
 | 1108 | **PH-S1173** | Store-wire status HTTP read | `GET /tenants/store` | `{mode,durable_path,configured}` memory/sqlite | **✅** |
@@ -2535,6 +2616,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
 | 1094 | **PH-S1159** | `tenant_depth` ui-core module | `tenant_depth.rs` | depth enum + tenant store criteria registry | **✅** |
+Vision rev 488.
 | 1095 | **PH-S1160** | `tenant_store_wire` durable path stub | `multi_tenancy.rs` | `POOLAI_TENANT_DATA_DIR` + wire snapshot + unit tests | **✅** |
 | 1096 | **PH-S1161** | Tenant store API contracts | `tenant_store_wire_integration.rs` | wire contract + lifecycle isolation | **✅** |
 | 1097 | **PH-S1162** | `verify-dev-stand` / quick tenant store | `bin/verify-dev-stand.sh` | `VERIFY_TENANT_STORE=1` + `--tenant-store` | **✅** |
@@ -2550,6 +2632,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 **Джерело:** FM-horizon v2 / enterprise phase A — tenant persist depth scaffold (`POOLAI_TENANT_STORE`).
 
 | 1084 | **PH-S1149** | `tenant_persistence_depth` ui-core module | `tenant_persistence_depth.rs` | depth enum + tenant persist criteria registry | **✅** |
+Vision rev 488.
 | 1085 | **PH-S1150** | `poolai-loc-audit --tenant-persist` | `poolai_loc_audit.rs` | tenant_persist fields in `rust_ratio.json` | **✅** |
 | 1086 | **PH-S1151** | Tenant persist gate audit | `tenant_persistence_audit.rs` | criteria registry + FM markers | **✅** |
 | 1087 | **PH-S1152** | `multi_tenancy` store env hint | `multi_tenancy.rs` | `POOLAI_TENANT_STORE` + `tenant_store_mode()` | **✅** |
@@ -2565,6 +2648,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 **Джерело:** project scan band 50 — local dual-gate (test-ci + openapi-gap + rust-ratio advisory) mirroring GitHub CI jobs.
 
 | 1074 | **PH-S1139** | `ci_canon_depth` ui-core module | `ci_canon_depth.rs` | depth enum + CI canon criteria registry constants | **✅** |
+Vision rev 488.
 | 1075 | **PH-S1140** | `poolai-loc-audit --ci-canon` | `poolai_loc_audit.rs` | ci_canon fields in `rust_ratio.json` | **✅** |
 | 1076 | **PH-S1141** | CI canon gate audit | `ci_canon_audit.rs` | criteria registry + maintenance markers | **✅** |
 | 1077 | **PH-S1142** | `verify-dev-stand` CI canon hook | `bin/verify-dev-stand.sh` | `VERIFY_CI_CANON=1`; openapi-gap + loc-audit `--ci-canon` + rust-ratio advisory | **✅** |
@@ -2580,6 +2664,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 **Джерело:** project scan band 49 — git pre-push hook + `poolai-vision-sync` canon doc validation + `cargo fmt` gate.
 
 | 1064 | **PH-S1129** | `pre_push_hook_depth` ui-core module | `pre_push_hook_depth.rs` | depth enum + pre-push canon criteria registry constants | **✅** |
+Vision rev 488.
 | 1065 | **PH-S1130** | `poolai-loc-audit --pre-push-canon` | `poolai_loc_audit.rs` | pre_push fields in `rust_ratio.json` | **✅** |
 | 1066 | **PH-S1131** | Pre-push canon gate audit | `pre_push_hook_audit.rs` | criteria registry + maintenance markers | **✅** |
 | 1067 | **PH-S1132** | `poolai-vision-sync` canon doc validation | `poolai_vision_sync.rs` | README/INDEX/NEXT/vision.svg canon sync + `--check` drift | **✅** |
@@ -2596,6 +2681,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 
 | 1054 | **PH-S1119** | `galaxy_edge_verification_depth` ui-core module | `galaxy_edge_verification_depth.rs` | depth enum + edge verification criteria registry constants | **✅** |
 | 1055 | **PH-S1120** | `poolai-loc-audit --edge-verification-advisory` | `poolai_loc_audit.rs` | edge_verification fields in `rust_ratio.json` | **✅** |
+Vision rev 488.
 | 1056 | **PH-S1121** | Edge verification advisory audit | `galaxy_edge_verification_audit.rs` | criteria registry + maintenance markers | **✅** |
 | 1057 | **PH-S1122** | `GET /api/v1/grid/edge-verification-metrics` | Galaxy §6.6 | JSON snapshot fraud-proof/capability/network/TEE + OpenAPI | **✅** |
 | 1058 | **PH-S1123** | `galaxy_edge_verification_depth` grid stub + parity v4 | `stand_smoke_metrics_parity.rs` | `validate_band6_metrics_parity_v4` + horizon depth wire | **✅** |
@@ -2685,9 +2771,10 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 991 | **PH-S1056** | rust_ratio loc-audit | `rust_ratio.json` | poolai-loc-audit band 41 zriz | **✅** |
 | 992 | **PH-S1057** | ui-core depth stub | `e2e_visual_axe_depth.rs` | depth enum + FM band 41 markers | **✅** |
 | 993 | **PH-S1058** | E2E visual/axe band close | tests/docs | `galaxy_horizon_s1049_integration`; HANDOFF/NEXT | **✅** |
+Vision rev 488.
 
-| 974 | **PH-S1039** | Skip links + landmarks | `docs/vision/index.html` | skip to map/queue/preview; `role="main"` | **✅** |
-| 975 | **PH-S1040** | Icon control aria-label parity | `docs/vision/` | header/map/panel icon buttons labeled; `aria-pressed` toggles | **✅** |
+| 974 | **PH-S1039** | Skip links + landmarks | `GSV/docs/vision/index.html` | skip to map/queue/preview; `role="main"` | **✅** |
+| 975 | **PH-S1040** | Icon control aria-label parity | `GSV/docs/vision/` | header/map/panel icon buttons labeled; `aria-pressed` toggles | **✅** |
 | 976 | **PH-S1041** | Explorer tree keyboard | `vision.js` file-tree | `role="tree"` / `treeitem`; Arrow/Home/End nav | **✅** |
 | 977 | **PH-S1042** | Link graph neighbour a11y | `#link-graph` | focusable neighbours; Enter select; focus restore | **✅** |
 | 978 | **PH-S1043** | Map sprint-dim incremental | `vision.js` | `updateMapSprintDim` without full `renderMap` | **✅** |
@@ -2702,6 +2789,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 **Джерело:** project scan band 46 — stretch 96% spirit hold; ui_js glue + archived e2e migration registry without new Playwright API specs.
 
 | 1034 | **PH-S1099** | `rust_migration_advisory_depth` ui-core module | `rust_migration_advisory_depth.rs` | depth enum + ui_js/e2e registry constants | **✅** |
+Vision rev 488.
 | 1035 | **PH-S1100** | `poolai-loc-audit --migration-advisory` | `poolai_loc_audit.rs` | migration fields in `rust_ratio.json` | **✅** |
 | 1036 | **PH-S1101** | Rust migration advisory audit | `rust_migration_advisory_audit.rs` | ui_js candidates + archived e2e canon paths | **✅** |
 | 1037 | **PH-S1102** | Admin JS migration candidate registry | `rust_migration_advisory_depth.rs` | 6 ui_js → wasm targets | **✅** |
@@ -2717,6 +2805,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 **Джерело:** project scan band 45 — RUN_LOCAL quick/verify hooks without live stand smoke subset; monitoring/vm API gaps.
 
 | 1024 | **PH-S1089** | RUN_LOCAL health export shape | `stand_smoke_run_local_depth.rs` | `RUN_LOCAL_HEALTH_KEYS` + enhanced `smoke_health` | **✅** |
+Vision rev 488.
 | 1025 | **PH-S1090** | Monitoring alerts stand smoke | `poolai_http_stand_smoke.rs` | GET `/api/enterprise/monitoring/alerts` array | **✅** |
 | 1026 | **PH-S1091** | Monitoring dashboards stand smoke | `poolai_http_stand_smoke.rs` | GET `/api/enterprise/monitoring/dashboards` array | **✅** |
 | 1027 | **PH-S1092** | VM instances stand smoke | `poolai_http_stand_smoke.rs` | GET `/api/v1/vm/instances` list shape | **✅** |
@@ -2732,10 +2821,14 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 **Джерело:** project scan band 44 — wasm-first admin panels without `admin_wasm_slim_depth` classification.
 
 | 1014 | **PH-S1079** | Monitoring alerts wasm slim depth | `admin_wasm_slim_depth.rs` | `MonitoringAlertsPanel` flag + renderer smoke | **✅** |
+Vision rev 488.
 | 1015 | **PH-S1080** | Monitoring dashboards wasm slim depth | `admin_wasm_slim_depth.rs` | `MonitoringDashboardsPanel` flag + renderer smoke | **✅** |
+Vision rev 488.
 | 1016 | **PH-S1081** | Instances + Telegram seats depth | `admin_wasm_slim_depth.rs` | `InstancesPanel` + `TelegramSeatsPanel` flags | **✅** |
 | 1017 | **PH-S1082** | Virtual nodes + network profiles depth | `admin_wasm_slim_depth.rs` | `GalaxyVirtualNodesPanel` + `NetworkProfilesPanel` | **✅** |
+Vision rev 488.
 | 1018 | **PH-S1083** | Grid prefetch/locality strips depth | `stand_smoke_metrics.rs` | `GridPrefetchMetricsStrip` + `GridLocalityMetricsStrip` | **✅** |
+Vision rev 488.
 | 1019 | **PH-S1084** | Grid governance/fee-split strips depth | `stand_smoke_metrics.rs` | stand smoke band44 export-shape + strip flags | **✅** |
 | 1020 | **PH-S1085** | `admin/mod.rs` wasm glue regression | `src/ui/admin/mod.rs` | band-44 `poolaiRender*` / `render*` asserts | **✅** |
 | 1021 | **PH-S1086** | `admin_wasm_slim_depth` ui-core module | `admin_wasm_slim_depth.rs` | extract from `grid_replication_pricing` + FM band 44 | **✅** |
@@ -2757,6 +2850,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 ### 5.21 Vision map/a11y/perf queue — band 40 (PH-S1039…S1048, 2026-07-18)
 
 **Джерело:** project scan band 40 — Vision map UX gaps (skip links, tree keyboard, link graph, perf).
+Vision rev 488.
 
 | 964 | **PH-S1029** | Empty-state parity tier 1 | `src/ui/admin` | tenants + security OAuth/SAML/policies → `adminEmptyStateHtml` | **✅** |
 | 965 | **PH-S1030** | Security tables polish | `src/ui/admin/security.rs` | aria-label, container, `adminInitTablesIn`, actions `data-no-sort` | **✅** |
@@ -2770,15 +2864,18 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | 973 | **PH-S1038** | Tables/forms band close | tests/docs | `galaxy_horizon_s1029_integration`; HANDOFF/NEXT | **✅** |
 
 ### 5.20 Admin tables/forms polish queue — band 39 (PH-S1029…S1038, 2026-07-18)
+Vision rev 488.
 
 **Джерело:** project scan band 39 — FM-019 baseline adoption gaps (empty states, table aria-label, form `aria-required`).
 
-| 954 | **PH-S1019** | Vision power menu polish | `docs/vision/` | dropdown shutdown/reboot; localStorage; a11y keyboard | **✅** |
+| 954 | **PH-S1019** | Vision power menu polish | `GSV/docs/vision/` | dropdown shutdown/reboot; localStorage; a11y keyboard | **✅** |
+Vision rev 488.
 | 955 | **PH-S1020** | Admin power modal polish | `src/ui/admin` | showModal parity; labeled Power btn; i18n UA/EN | **✅** |
 | 956 | **PH-S1021** | Home UI power shortcut | `src/ui/` | `/ui` shell power entry → same ops API | **✅** |
 | 957 | **PH-S1022** | Clippy unused imports batch | `src/grid` `src/network` | dispatch/grid/admin unused imports; `cargo clippy -D warnings` scope | **✅** |
 | 958 | **PH-S1023** | chrono deprecations ui-core | `poolai-ui-core/format.rs` | `from_timestamp_opt` → `DateTime::from_timestamp` | **✅** |
 | 959 | **PH-S1024** | admin mod.rs duplicate test attr | `src/ui/admin/mod.rs` | fix `duplicate_macro_attributes` on PH-S920 tests | **✅** |
+Vision rev 488.
 | 960 | **PH-S1025** | Design tokens audit stub | UI_UX plan | `design_tokens` parity note + unit gate | **✅** |
 | 961 | **PH-S1026** | Ops power feedback UX | admin+vision | toast/announce on power action; save last_run | **✅** |
 | 962 | **PH-S1027** | poolai-msys.ps1 hardening | `bin/` | `-lc` + approved verbs; RUN_LOCAL note | **✅** |
@@ -2789,6 +2886,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 **Джерело:** project scan після band 37 — power UX сирий, clippy warnings, Vision/Admin parity.
 
 ### 5.19 Maintenance horizon bands 38–47 (PH-S1019…S1118, 100 спринтів)
+Vision rev 488.
 
 | Band | PH-S range | Фокус |
 |------|------------|--------|
@@ -2834,6 +2932,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | **План фаз** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](../development/PH_S_COMPLETION_ROADMAP_2026-06-20.md) |
 | **Реєстр sprint×acceptance** | [`PH_S_MASTER_BACKLOG_351.md`](../development/PH_S_MASTER_BACKLOG_351.md) |
 | **Regen** | `bash scripts/generate-ph-s-master-backlog-351.sh` |
+Vision rev 488.
 
 **Фази до S1010:**
 
@@ -2856,6 +2955,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 4. **BLOCKED/Deferred** (FM-003 LAN, FM-041 Cloud SDK, ZK/TEE) — поза backlog
 
 **Після PH-S1010 ✅:** FM **§5.15**; maintenance mode; новий scan лише для BLOCKED/Deferred або явного FM-horizon v2.
+Vision rev 488.
 
 ### 5.14b Enterprise master backlog PH-S1149…S2148 + completion extension → S2278 (2026-07-22)
 
@@ -2872,6 +2972,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | **Реєстр** | [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md) |
 | **Regen** | `bash scripts/generate-ph-s-master-backlog-1000.sh` · `bash scripts/generate-ph-s-completion-extension.sh` |
 | **Closures** | FM **§5.17** @ PH-S2148 · FM **§5.18** @ PH-S2278 |
+Vision rev 488.
 
 **Поза backlog:** FM-003 LAN · FM-041 Cloud SDK · mandatory ZK/TEE.
 
@@ -2898,12 +2999,14 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | Galaxy concept gaps (§4–§9 wire) | roadmap + concept ✅ markers |
 | OpenAPI gap | `poolai-openapi-gap-audit` → **0** |
 | Integration coverage | top FM gaps closed (band 34) |
+Vision rev 488.
 | Rust ratio | **≥95%** formal; **96%** stretch advisory logged |
 | Docs canon | STABLE «development complete»; INDEX + DIGEST synced |
 | Vision | `poolai-vision-sync --check` green |
 | Ops | `cargo test-ci` green; HANDOFF → maintenance mode |
 
 **Поза product-complete (не блокує S1010):** FM-003 LAN 2-host · FM-041 Cloud SDK prod · ZK/TEE attestation roadmap.
+Vision rev 488.
 
 ### 5.17 Enterprise-complete closure (PH-S2148 target)
 
@@ -3007,6 +3110,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | **PH-SVC71** | README / INDEX / ENV pointer | Jul 25 GH tokens research | **✅** |
 | **PH-SVC72** | `file_list.csv` + `.cursor/CHANGELOG` | GITHUB_APP_INSTALLATION_TOKENS row | **✅** |
 | **PH-SVC73** | `poolai-vision-sync --check` | drift gate green | **✅** |
+Vision rev 488.
 | **PH-SVC74** | git push + самарі | service commit `main` | **✅** |
 | **PH-SVC75** | Cursor 3.13.21 + toolchain research | `CURSOR_UPDATE_RESEARCH_2026-07-27.md` | **✅** |
 | **PH-SVC76** | `cursor-environment-baseline.mdc` | 3.13.21 + Router/sandbox notes | **✅** |
@@ -3016,6 +3120,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | **PH-SVC80** | README / INDEX / ENV pointer | Jul 27 research | **✅** |
 | **PH-SVC81** | `file_list.csv` + `.cursor/CHANGELOG` | CURSOR_UPDATE_2026-07-27 | **✅** |
 | **PH-SVC82** | docs-vision Speeds cross-link | SPEED_INDEX + 3.13.21 pointer | **✅** |
+Vision rev 488.
 | **PH-SVC83** | `poolai-vision-sync --check` | drift gate green | **✅** |
 | **PH-SVC84** | git push + самарі | service commit `main` | **✅** |
 | **PH-SVC85** | Vision Rust diagnostics panel | `poolai-rust-diagnostics` · `rust_diagnostics.json` · CI job · panel **Rust** | **✅** |
@@ -3089,6 +3194,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | FM-019 | axe Playwright | **✅ S33** | `e2e/tests/a11y.spec.ts` |
 | `docs/archive/*` | Legacy `.md` | **Archive** | [`STRUCTURE.md`](../STRUCTURE.md) |
 | `STATUS_UPDATE_2026-01-16.md` | Cloud SDK `[ ]` | **Stale** | FM-006 Deferred; канон CI |
+Vision rev 488.
 | `RUST_ARCHITECT_STATUS_2026-01-19.md` | BurstRAID metrics `[ ]` | **Stale** | опційно v0.2+ |
 | `STABLE_STATE_UPDATE_2026-01-19.md` | % / cloud tests | **Stale** | → `STABLE_STATE_SUMMARY.md` |
 | `PERCENTAGE_PLAN.md` | GlobalState % | **Stale** | не канон |
@@ -3097,6 +3203,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | `RUST_ARCHITECT_NEXT_STEPS_2026-01-19.md` | Дубль плану | **Superseded** | → Architect 2026-03-17 |
 
 #### Legacy docs (повна таблиця)
+Vision rev 488.
 
 **Канон:** [`DOCS_LEGACY_AUDIT_2026-05-19.md`](../development/DOCS_LEGACY_AUDIT_2026-05-19.md). Історичний S13: [`AUTO_RUN_SESSION_2026-06-23.md`](../development/AUTO_RUN_SESSION_2026-06-23.md).
 
@@ -3117,6 +3224,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 ### 5.6 Horizon — Layer C → 100% (2026-05-19)
 
 **Канон:** [`HORIZON_TO_100_PLAN.md`](../development/HORIZON_TO_100_PLAN.md) · **черга:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](../development/AUTO_RUN_SESSION_2026_HORIZON.md) · **промпт:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+Vision rev 488.
 
 | Спринт | FM / P6 | Статус |
 |--------|---------|--------|
@@ -3136,6 +3244,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 | **A. Продукт (autoprogon)** | **100%** | FM-001…019 (S33) |
 | **B. Architect P1–P5 (autoprogon)** | **100%** | S34; LAN §4 / cloud-sdk deep — ops/Deferred |
 | **A+B autoprogon** | **100%** | офіційний зріз HANDOFF |
+Vision rev 488.
 | **C. Horizon** | **100%** | S35–S40 ✅ |
 | **Проєкт (A+B+C)/3** | **100%** | офіційний зріз S40 |
 
@@ -3153,6 +3262,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 |----|--------|----------|
 | FM-020…023 | **✅** | jobs + memory + grid ingress |
 | FM-024 | **✅** | devnet config + mock RPC (crate only) |
+Vision rev 488.
 | FM-025 | **✅** | `VmTemplate` / `GpuSchedulingPolicy` OpenAPI |
 | FM-026 | **✅** | `tests/jobs_api_contracts.rs` (4 tests) |
 | FM-027 | **Prep ✅** | checklist + verify-lan-prep; §4 sign-off **BLOCKED** |
@@ -3166,6 +3276,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 ### 5.8 Legacy backlog audit (2026-05-20)
 
 **Метод:** менеджер функціоналу — звірка старіших планів (`RUST_ARCHITECT_*`, `PERCENTAGE_PLAN`, `UI_*_PLAN`, `CONCEPT_PENDING_FEATURES`, `OPENAPI_GAP_AUDIT`, `ARCHITECT_PLAN_EXO_INTEGRATION`, `PIPELINE_MANAGEMENT` future) з кодом і FM-001…031. **Не** брати `[ ]` з `docs/archive/` для автопрогону.
+Vision rev 488.
 
 | Результат | Кількість |
 |-----------|-----------|
@@ -3248,8 +3359,10 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 **Поза автопрогоном:** FM-004, FM-006, FM-009, FM-010.
 
 **Канонічний порядок читання доків** (кроки 1–12) — кореневий [`README.md`](../../README.md); цей файл — **крок 12**.
+Vision rev 488.
 
 Нові рядки додавати **вниз таблиці** з наступним вільним `FM-0xx`; дублікати з Issues закривати посиланням на PR.
+Vision rev 488.
 
 ---
 
@@ -3260,6 +3373,7 @@ Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Bas
 rg "\- \[ \]" docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md
 
 # TODO у виконуваному коді (зведення в NEXT_STEPS P5)
+Vision rev 488.
 rg "TODO|FIXME" src/
 
 # Історія за ключовим словом
@@ -3268,42 +3382,57 @@ git log -S "PutArtifact" --oneline -n 20 -- src/
 ```
 
 ---
+Vision rev 488.
 
 ## 7. Підтримка цього файлу
 
 - Оновлювати **дату** у шапці, таблицю **FM-*** і **§5.1** після значних змін плану Architect, витягу функціоналу або релізу.
 - **§5.1** — коротка агрегація; довгі чекбокси й верифікації лишаються в `NEXT_STEPS`; HANDOFF посилається на **§5.1** як на операційний порядок.
+Vision rev 488.
 - Правило для Cursor: [`.cursor/rules/functionality-management.mdc`](../../.cursor/rules/functionality-management.mdc).
 
 ---
 
 ## Див. також
+Vision rev 488.
 
 - [FUNCTIONALITY_DIGEST_2026-04-06.md](./FUNCTIONALITY_DIGEST_2026-04-06.md)  
 - [STABLE_STATE_SUMMARY.md](../status/STABLE_STATE_SUMMARY.md)  
 - [STRUCTURE.md](../STRUCTURE.md) (таксономія `docs/`)### 5.127 GPULimits migration 3 (PH-S1909.S1918, band 127, 2026-08-12) ✅
-**Истояне 5.12:** πόρόмая 0 (band 126 ✅ · §5.127 PH-S1909.S1918). \master horizon: PH-S1909.S1918 (band 127). Vision rev 482.
+Vision rev 487.
+**Истояне 5.12:** πόρόмая 0 (band 126 ✅ · §5.127 PH-S1909.S1918). \master horizon: PH-S1909.S1918 (band 127). Vision rev 487.
+Vision rev 488.
 
 ### 5.107 GPULimits migration 3 queue - band 127 (PH-S1909.S1918, 2026-08-12) ✅
 **Истояне:** master backlog band 127 (H GPULimits ✅ · migration 3) - enterprise phase H (GPU admission + worker limits, single-host). Pattern mirror: band 125 (§a75.106) durable gpu_limits.json; migration 3 glue: bin/verify-dev-stand.sh + bin/run-poolai.sh. Canon: GPU_LIMITS.md ✅ PH_S_MASTER_BACKLOG_1000.md ✅ PH_S_ENTERPRISE_ROADMAP_2026-07-19.md.
+Vision rev 488.
+Vision rev 487.
 ### 5.128 GPULimits migration 4 (PH-S1919.S1928, band 128, 2026-08-14) ✅
-**????????? ? 5.12:** \u00cf\u00cf\u00cf\u00cf 0 (band 127 ✅ · §5.128 PH-S1919.S1928). \u00d7\u00d7\u00d7\u00d7 Vision rev 482.
+**????????? ? 5.12:** \u00cf\u00cf\u00cf\u00cf 0 (band 127 ✅ · §5.128 PH-S1919.S1928). \u00d7\u00d7\u00d7\u00d7 Vision rev 487.
+Vision rev 488.
 
 ### 5.108 GPULimits migration 4 queue - band 128 (PH-S1919.S1928, 2026-08-14) ✅
 \u00d8\u00d8\u00d8\u00d8 master backlog band 128 (H GPULimits ✅ · migration 4) - enterprise phase H (GPU admission + worker limits, single-host). Pattern mirror: band 126 (§a75.106) durable gpu_limits.json; migration 4 glue: bin/verify-dev-stand.sh + bin/run-poolai.sh. Canon: GPU_LIMITS.md ✅ PH_S_MASTER_BACKLOG_1000.md ✅ PH_S_ENTERPRISE_ROADMAP_2026-07-19.md.### 5.129 GPULimits migration 5 (PH-S1929.S1938, band 129, 2026-08-15) ✅
-**????????? ? 5.12:** \u00cf\u00cf\u00cf\u00cf 0 (band 128 ✅ · §5.129 PH-S1929.S1938). \u00d7\u00d7\u00d7\u00d7 Vision rev 482.
+Vision rev 488.
+Vision rev 487.
+**????????? ? 5.12:** \u00cf\u00cf\u00cf\u00cf 0 (band 128 ✅ · §5.129 PH-S1929.S1938). \u00d7\u00d7\u00d7\u00d7 Vision rev 487.
+Vision rev 488.
 
 ### 5.109 GPULimits migration 5 queue - band 129 (PH-S1929.S1938, 2026-08-15) ✅
 \u00d8\u00d8\u00d8\u00d8 master backlog band 129 (H GPULimits ✅ · migration 5) - enterprise phase H (GPU admission + worker limits, single-host). Pattern mirror: band 127 (§a75.107) durable gpu_limits.json; migration 5 glue: bin/verify-dev-stand.sh + bin/run-poolai.sh. Canon: GPU_LIMITS.md ✅ PH_S_MASTER_BACKLOG_1000.md ✅ PH_S_ENTERPRISE_ROADMAP_2026-07-19.md.### 5.130 GPULimits migration 6 (PH-S1939.S1948, band 130, 2026-08-16) ✅
-**????????? ? 5.12:** \u00cf\u00cf\u00cf\u00cf 0 (band 129 ✅ · §5.130 PH-S1939.S1948). \u00d7\u00d7\u00d7\u00d7 Vision rev 482.
+Vision rev 488.
+Vision rev 487.
+**????????? ? 5.12:** \u00cf\u00cf\u00cf\u00cf 0 (band 129 ✅ · §5.130 PH-S1939.S1948). \u00d7\u00d7\u00d7\u00d7 Vision rev 487.
 
 ### 5.109 GPULimits migration 6 queue - band 130 (PH-S1939.S1948, 2026-08-16) ✅
 \u00d8\u00d8\u00d8\u00d8 master backlog band 130 (H GPULimits ✅ · migration 6) - enterprise phase H (GPU admission + worker limits, single-host). Pattern mirror: band 127 (§a75.107) durable gpu_limits.json; migration 6 glue: bin/verify-dev-stand.sh + bin/run-poolai.sh. Canon: GPU_LIMITS.md ✅ PH_S_MASTER_BACKLOG_1000.md ✅ PH_S_ENTERPRISE_ROADMAP_2026-07-19.md.### 5.131 GPULimits UI debug 1 (PH-S1949.S1958, band 131, 2026-08-17) ✅
-**????????? ? 5.12:** \u00cf\u00cf\u00cf\u00cf 0 (band 130 ✅ · §5.131 PH-S1949.S1958). \u00d7\u00d7\u00d7\u00d7 Vision rev 482.
+Vision rev 487.
+**????????? ? 5.12:** \u00cf\u00cf\u00cf\u00cf 0 (band 130 ✅ · §5.131 PH-S1949.S1958). \u00d7\u00d7\u00d7\u00d7 Vision rev 487.
 
 ### 5.109 GPULimits UI debug 1 queue - band 131 (PH-S1949.S1958, 2026-08-17) ✅
 \u00d8\u00d8\u00d8\u00d8 master backlog band 131 (H GPULimits ✅ · UI debug 5) - enterprise phase H (GPU admission + worker limits, single-host). Pattern mirror: band 128 (§a75.108) durable gpu_limits.json; UI debug 5 glue: bin/verify-dev-stand.sh + bin/run-poolai.sh. Canon: GPU_LIMITS.md ✅ PH_S_MASTER_BACKLOG_1000.md ✅ PH_S_ENTERPRISE_ROADMAP_2026-07-19.md.### 5.132 GPULimits UI debug 2 (PH-S1959.S1968, band 132, 2026-08-18) ✅
-**????????? ? 5.12:** \u00cf\u00cf\u00cf\u00cf 0 (band 131 ✅ · §5.132 PH-S1959.S1968). \u00d7\u00d7\u00d7\u00d7 Vision rev 482.
+Vision rev 487.
+**????????? ? 5.12:** \u00cf\u00cf\u00cf\u00cf 0 (band 131 ✅ · §5.132 PH-S1959.S1968). \u00d7\u00d7\u00d7\u00d7 Vision rev 487.
 
 ### 5.110 GPULimits UI debug 2 queue - band 132 (PH-S1959.S1968, 2026-08-18) ✅
 \u00d8\u00d8\u00d8\u00d8 master backlog band 132 (H GPULimits ✅ · UI debug 6) - enterprise phase H (GPU admission + worker limits, single-host). Pattern mirror: band 129 (§a75.110) durable gpu_limits.json; UI debug 6 glue: bin/verify-dev-stand.sh + bin/run-poolai.sh. Canon: GPU_LIMITS.md ✅ PH_S_MASTER_BACKLOG_1000.md ✅ PH_S_ENTERPRISE_ROADMAP_2026-07-19.md.

@@ -3314,6 +3314,60 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_gpu_limits_debug7_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "GSV_docs_vision_README_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "GSV_docs_vision_extensions_json"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "GSV_docs_vision_feed_json"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "GSV_docs_vision_index_html"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "GSV_docs_vision_rust_diagnostics_json"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "GSV_docs_vision_speed_index_json"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "GSV_docs_vision_vision_css"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "GSV_docs_vision_vision_js"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "GSV_docs_vision_vision_svg"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -12785,9 +12839,177 @@
       "label": "gpu_limits_debug7_integration.rs",
       "layer": "L3",
       "path": "tests/gpu_limits_debug7_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "GSV_docs_gsv_MCP_SLI_COMMAND_FRAMEWORK_md",
+      "label": "MCP_SLI_COMMAND_FRAMEWORK.md",
+      "layer": "L1",
+      "path": "GSV/docs/gsv/MCP_SLI_COMMAND_FRAMEWORK.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "GSV_docs_GSV_ROLES_md",
+      "label": "GSV_ROLES.md",
+      "layer": "L1",
+      "path": "GSV/docs/GSV_ROLES.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "GSV_docs_HANDOFF_NEW_SESSION_md",
+      "label": "HANDOFF_NEW_SESSION.md",
+      "layer": "L1",
+      "path": "GSV/docs/HANDOFF_NEW_SESSION.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "GSV_docs_LEGACY_PARITY_md",
+      "label": "LEGACY_PARITY.md",
+      "layer": "L1",
+      "path": "GSV/docs/LEGACY_PARITY.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "GSV_docs_MEMORY_md",
+      "label": "MEMORY.md",
+      "layer": "L1",
+      "path": "GSV/docs/MEMORY.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "GSV_docs_NEXT_SESSION_PROMPT_md",
+      "label": "NEXT_SESSION_PROMPT.md",
+      "layer": "L1",
+      "path": "GSV/docs/NEXT_SESSION_PROMPT.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "GSV_docs_README_md",
+      "label": "README.md",
+      "layer": "L1",
+      "path": "GSV/docs/README.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "GSV_docs_VISION_md",
+      "label": "VISION.md",
+      "layer": "L1",
+      "path": "GSV/docs/VISION.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "GSV_docs_gsv_GSV_ARCHITECTURE_md",
+      "label": "GSV_ARCHITECTURE.md",
+      "layer": "L1",
+      "path": "GSV/docs/gsv/GSV_ARCHITECTURE.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "GSV_docs_gsv_GSV_BOXES_md",
+      "label": "GSV_BOXES.md",
+      "layer": "L1",
+      "path": "GSV/docs/gsv/GSV_BOXES.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "GSV_docs_gsv_GSV_MIGRATION_md",
+      "label": "GSV_MIGRATION.md",
+      "layer": "L1",
+      "path": "GSV/docs/gsv/GSV_MIGRATION.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "GSV_docs_gsv_GSV_SERVER_md",
+      "label": "GSV_SERVER.md",
+      "layer": "L1",
+      "path": "GSV/docs/gsv/GSV_SERVER.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "GSV_docs_gsv_GSV_TECH_ROADMAP_md",
+      "label": "GSV_TECH_ROADMAP.md",
+      "layer": "L1",
+      "path": "GSV/docs/gsv/GSV_TECH_ROADMAP.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "GSV_docs_gsv_README_md",
+      "label": "README.md",
+      "layer": "L1",
+      "path": "GSV/docs/gsv/README.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "GSV_docs_vision_README_md",
+      "label": "README.md",
+      "layer": "L1",
+      "path": "GSV/docs/vision/README.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "GSV_docs_vision_extensions_json",
+      "label": "extensions.json",
+      "layer": "L1",
+      "path": "GSV/docs/vision/extensions.json"
+    },
+    {
+      "auto_synced": true,
+      "id": "GSV_docs_vision_feed_json",
+      "label": "feed.json",
+      "layer": "L1",
+      "path": "GSV/docs/vision/feed.json"
+    },
+    {
+      "auto_synced": true,
+      "id": "GSV_docs_vision_index_html",
+      "label": "index.html",
+      "layer": "L1",
+      "path": "GSV/docs/vision/index.html"
+    },
+    {
+      "auto_synced": true,
+      "id": "GSV_docs_vision_manifest_json",
+      "label": "manifest.json",
+      "layer": "L1",
+      "path": "GSV/docs/vision/manifest.json"
+    },
+    {
+      "auto_synced": true,
+      "id": "GSV_docs_vision_rust_diagnostics_json",
+      "label": "rust_diagnostics.json",
+      "layer": "L1",
+      "path": "GSV/docs/vision/rust_diagnostics.json"
+    },
+    {
+      "auto_synced": true,
+      "id": "GSV_docs_vision_speed_index_json",
+      "label": "speed_index.json",
+      "layer": "L1",
+      "path": "GSV/docs/vision/speed_index.json"
+    },
+    {
+      "auto_synced": true,
+      "id": "GSV_docs_vision_vision_css",
+      "label": "vision.css",
+      "layer": "L1",
+      "path": "GSV/docs/vision/vision.css"
+    },
+    {
+      "auto_synced": true,
+      "id": "GSV_docs_vision_vision_js",
+      "label": "vision.js",
+      "layer": "L1",
+      "path": "GSV/docs/vision/vision.js"
+    },
+    {
+      "auto_synced": true,
+      "id": "GSV_docs_vision_vision_svg",
+      "label": "vision.svg",
+      "layer": "L1",
+      "path": "GSV/docs/vision/vision.svg"
     }
   ],
-  "revision": 487,
+  "revision": 489,
   "sprint_queue": [],
   "sprint_queue_open_count": 0,
   "updated_at": "2026-06-20",

@@ -69,9 +69,9 @@ Speeds · Rust panel → vision-sync (`poolai-vision-sync`) → **один** com
   stand smoke: обидва SVG → 200 `image/svg+xml`; `poolai-ui-wasm` defer; poolAI vision rev
   **469**; FM §5.12 §5.97.
 - **band 117** (PH-S1809…S1818) ✅ — GSV legacy vision deactivation:
-  `docs/vision/index.html` → GSV pointer page (no `vision.js`/`vision.css` refs);
+  `GSV/docs/vision/index.html` → GSV pointer page (no `vision.js`/`vision.css` refs);
   `vision.js`/`vision.css` DEACTIVATED banner (band 117, архів — не видаляємо);
-  `docs/vision/README.md` deactivation note; live link retarget: poolai-vision-sync feed +
+  `GSV/docs/vision/README.md` deactivation note; live link retarget: poolai-vision-sync feed +
   GSV `vision.rs` sample links → `http://127.0.0.1:8891/#b-sprint-board`;
   RUN_LOCAL/GSV_SERVER/docs-gsv README/SPEED_INDEX/RUST_DIAGNOSTICS → GSV;
   legacy test retirement (`poolai_vision_sync.rs` unit ×4, `galaxy_horizon_s1011/s1019/s1039`,
@@ -117,7 +117,7 @@ Speeds · Rust panel → vision-sync (`poolai-vision-sync`) → **один** com
 
 - Rust **95–100%** / wasm 0–5%, без Python/Java; bins — лише `src/bin/`. Ratio: `cargo run --bin gsv-loc-audit`.
 - Ролі/сесія: [`GSV/docs/GSV_ROLES.md`](GSV_ROLES.md) · пам'ять: [`GSV/docs/MEMORY.md`](MEMORY.md).
-- Архітектура: [`docs/gsv/`](../../docs/gsv/README.md) · TechPreroadMap: [`GSV_TECH_ROADMAP.md`](../../docs/gsv/GSV_TECH_ROADMAP.md).
+- Архітектура: [`GSV/docs/gsv/`](gsv/README.md) · TechPreroadMap: [`GSV_TECH_ROADMAP.md`](gsv/GSV_TECH_ROADMAP.md).
 - OmniRouter dry-run у тестах — `X-Omni-Dry-Run: 1` (жодного реального запиту).
 
 ## Не повторювати

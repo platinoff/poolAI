@@ -118,7 +118,7 @@ cd S:\rust\poolAI
 | PowerShell | `.\bin\open-docs-vision.ps1` |
 | MSYS2 | `/usr/bin/bash bin/open-docs-vision.sh` |
 
-URL (GSV, canon): `http://127.0.0.1:8891/` — див. [`GSV_SERVER.md`](../gsv/GSV_SERVER.md) · `GSV/docs/GSV_ROLES.md`. Legacy static server (`open-docs-vision.ps1`, `http://127.0.0.1:8765/docs/vision/index.html`) — деактивований (band 117), лишається архівом.
+URL (GSV, canon): `http://127.0.0.1:8891/` — див. [`GSV_SERVER.md`](../GSV/GSV/docs/gsv/GSV_SERVER.md) · `GSV/docs/GSV_ROLES.md`. Legacy static server (`open-docs-vision.ps1`, `http://127.0.0.1:8765/GSV/docs/vision/index.html`) — деактивований (band 117), лишається архівом.
 
 ### PH-S1015 / PH-S1016: Admin power UI + API
 
@@ -651,7 +651,7 @@ Module: [`tenant_docs_canon_depth.rs`](../../crates/poolai-ui-core/src/tenant_do
 
 ### PH-S1224: Tenant vision sync (band 58)
 
-Enterprise phase A aggregate gate for `docs/vision/*` + prior `TENANT_DOCS_CANON.md`.
+Enterprise phase A aggregate gate for `GSV/docs/vision/*` + prior `TENANT_DOCS_CANON.md`.
 
 ```bash
 cargo run --bin poolai-loc-audit -- --tenant-vision-sync
@@ -854,7 +854,7 @@ Module: [`sso_docs_canon_depth.rs`](../../crates/poolai-ui-core/src/sso_docs_can
 
 ### PH-S1324: SSO vision-sync aggregate (band 68)
 
-Vision-sync gate for `docs/vision/*` + prior [`SSO_DOCS_CANON.md`](./SSO_DOCS_CANON.md).
+Vision-sync gate for `GSV/docs/vision/*` + prior [`SSO_DOCS_CANON.md`](./SSO_DOCS_CANON.md).
 
 ```bash
 cargo run --bin poolai-loc-audit -- --sso-vision-sync
@@ -1055,7 +1055,7 @@ Module: [`audit_docs_canon_depth.rs`](../../crates/poolai-ui-core/src/audit_docs
 
 ### PH-S1424: Audit vision sync (band 78)
 
-Vision-sync matrix gate for `docs/vision/*` + prior [`AUDIT_DOCS_CANON.md`](./AUDIT_DOCS_CANON.md).
+Vision-sync matrix gate for `GSV/docs/vision/*` + prior [`AUDIT_DOCS_CANON.md`](./AUDIT_DOCS_CANON.md).
 
 ```bash
 cargo run --bin poolai-loc-audit -- --audit-vision-sync
@@ -1245,7 +1245,7 @@ Module: [`policy_docs_canon_depth.rs`](../../crates/poolai-ui-core/src/policy_do
 
 ### PH-S1524: Policies vision-sync aggregate (band 88)
 
-Aggregate gate for `docs/vision/*` + prior [`POLICIES_DOCS_CANON.md`](./POLICIES_DOCS_CANON.md).
+Aggregate gate for `GSV/docs/vision/*` + prior [`POLICIES_DOCS_CANON.md`](./POLICIES_DOCS_CANON.md).
 
 ```bash
 cargo run --bin poolai-loc-audit -- --policy-vision-sync
@@ -1402,7 +1402,7 @@ VERIFY_MONITORING_LOC_AUDIT=1 bash bin/verify-dev-stand.sh
 
 Module: [`monitoring_loc_audit_depth.rs`](../../crates/poolai-ui-core/src/monitoring_loc_audit_depth.rs) · tests: `monitoring_loc_audit_integration.rs`, `galaxy_horizon_s1599_integration.rs` · docs: [`MONITORING_LOC_AUDIT.md`](./MONITORING_LOC_AUDIT.md).
 
-Default stand smoke includes **`vision_revision_parity`** (PH-S208, PH-S235): repo `manifest.revision` vs FM §5.12 `Vision rev`, `extensions.active_sprint` vs `manifest.next_sprint`, then `GET /docs/vision/manifest.json` with `X-PoolAI-Vision-Revision` header vs JSON body.
+Default stand smoke includes **`vision_revision_parity`** (PH-S208, PH-S235): repo `manifest.revision` vs FM §5.12 `Vision rev`, `extensions.active_sprint` vs `manifest.next_sprint`, then `GET /GSV/docs/vision/manifest.json` with `X-PoolAI-Vision-Revision` header vs JSON body.
 
 ### Monitoring docs-canon (band 97, PH-S1609…S1618)
 
@@ -1425,7 +1425,7 @@ Module: [`monitoring_docs_canon_depth.rs`](../../crates/poolai-ui-core/src/monit
 
 ### Monitoring vision-sync (band 98, PH-S1619…S1628)
 
-Enterprise phase E monitoring vision-sync — consolidates `docs/vision/*` + prior [`MONITORING_DOCS_CANON.md`](./MONITORING_DOCS_CANON.md).
+Enterprise phase E monitoring vision-sync — consolidates `GSV/docs/vision/*` + prior [`MONITORING_DOCS_CANON.md`](./MONITORING_DOCS_CANON.md).
 
 ```bash
 cargo run --bin poolai-loc-audit -- --monitoring-vision-sync

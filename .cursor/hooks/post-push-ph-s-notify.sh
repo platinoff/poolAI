@@ -111,8 +111,8 @@ VDT docs-sync checklist (same session if not done):
 - docs/catalog/FUNCTION_MANAGEMENT.md — mark ${sprint} ✅ in §5.12
 - docs/development/HANDOFF_NEW_SESSION.md
 - docs/development/NEXT_SESSION_PROMPT.md
-- docs/vision/manifest.json, extensions.json, feed.json (cargo run --bin poolai-vision-sync)
-- docs/vision/vision.svg footer; docs/vision/README.md
+- GSV/docs/vision/manifest.json, extensions.json, feed.json (cargo run --bin poolai-vision-sync)
+- GSV/docs/vision/vision.svg footer; GSV/docs/vision/README.md
 
 Canon: .cursor/commands/git-push.md · poolai-session-iteration.mdc
 ${hint}"

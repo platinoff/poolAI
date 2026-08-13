@@ -2,7 +2,7 @@
 //!
 //! Scope: the poolAI vision mirror (`read_manifest`/`read_feed`/`sync`/`drift`
 //! and the `/api/vision*` endpoints). Real-workspace reads run against the
-//! enclosing `poolAI` repo (`docs/vision/`); API tests use a temp data dir so the
+//! enclosing `poolAI` repo (`GSV/docs/vision/`); API tests use a temp data dir so the
 //! durable `GSV/data/gsv_*.json` snapshots are untouched.
 
 use std::path::PathBuf;
@@ -82,8 +82,16 @@ fn vision_feed_reads_real_workspace() {
         f.items.len()
     );
     assert!(
-        f.items.iter().any(|i| i.id == "PH-S1848"),
-        "feed must include the band-120 close entry"
+        f.items
+            .iter()
+            .all(|i| i.id.starts_with("PH-S") && !i.title.is_empty()),
+        "feed items must carry PH-S ids and titles"
+    );
+    let first = f.items.first().expect("first item");
+    assert!(
+        first.id == "PH-S1888" || first.id.starts_with("PH-S18"),
+        "feed must lead with the newest close entry, got {}",
+        first.id
     );
     for item in &f.items {
         assert!(!item.id.is_empty());

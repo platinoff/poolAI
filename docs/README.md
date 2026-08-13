@@ -27,7 +27,7 @@
 
 - **Де що лежить у `docs/`** — [STRUCTURE.md](./STRUCTURE.md) (каталоги, спадщина плоских `.md`, інвентар, тести vs doctests).
 - **Правила для AI/агента (Cursor)** — [`.cursor/rules/documentation.mdc`](../.cursor/rules/documentation.mdc); skill — [`.cursor/skills/poolai-documentation/SKILL.md`](../.cursor/skills/poolai-documentation/SKILL.md).
-- **Galaxy docs vision** — `.\bin\open-docs-vision.ps1` → [vision/index.html](http://127.0.0.1:8765/docs/vision/index.html) (L0–L5, cluster collapse, pan/zoom, **◎ Sprint** / **⊟ Folders**). Док: [vision/README.md](./vision/README.md) · [`.cursor/rules/docs-vision.mdc`](../.cursor/rules/docs-vision.mdc).
+- **Galaxy docs vision** — `.\bin\open-docs-vision.ps1` → [vision/index.html](http://127.0.0.1:8765/GSV/docs/vision/index.html) (L0–L5, cluster collapse, pan/zoom, **◎ Sprint** / **⊟ Folders**). Док: [vision/README.md](./vision/README.md) · [`.cursor/rules/docs-vision.mdc`](../.cursor/rules/docs-vision.mdc).
 
 ## Short pointers
 

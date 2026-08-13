@@ -1,6 +1,6 @@
 //! Audit vision-sync band depth (PH-S1419…S1428, band 78 — enterprise phase C).
 //!
-//! Consolidates Audit phase-C docs-canon + `docs/vision/*` under one vision-sync gate.
+//! Consolidates Audit phase-C docs-canon + `GSV/docs/vision/*` under one vision-sync gate.
 
 use serde_json::Value;
 
@@ -39,16 +39,16 @@ pub const AUDIT_VISION_SYNC_CRITERIA: &[(&str, &str, &str)] = &[
     (
         "vision_manifest",
         "\"revision\"",
-        "docs/vision/manifest.json",
+        "GSV/docs/vision/manifest.json",
     ),
     (
         "vision_extensions",
         "active_sprint",
-        "docs/vision/extensions.json",
+        "GSV/docs/vision/extensions.json",
     ),
-    ("vision_readme", "docs/vision", "docs/vision/README.md"),
-    ("vision_svg", "svg", "docs/vision/vision.svg"),
-    ("vision_index", "manifest", "docs/vision/index.html"),
+    ("vision_readme", "docs/vision", "GSV/docs/vision/README.md"),
+    ("vision_svg", "svg", "GSV/docs/vision/vision.svg"),
+    ("vision_index", "manifest", "GSV/docs/vision/index.html"),
     (
         "doc_docs_canon",
         "AUDIT_DOCS_CANON.md",

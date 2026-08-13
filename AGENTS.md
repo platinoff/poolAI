@@ -106,7 +106,7 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 3. **Drain:** усі відкриті PH-S* (код → scope-тести; **без** mid-drain push).
 4. **Vision close:** FM §5.12 ✅ + HANDOFF + NEXT → один `poolai-vision-sync` (manifest `revision++`) → FM/NEXT/INDEX rev = `manifest.revision` → `--check`.
 5. **Test:** один `cargo fmt --all` → один `cargo test-ci` → `bash bin/record-test-ci-speed.sh` + `bash bin/record-rust-diagnostics.sh`.
-6. **Git (кінець сесії):** один commit (код + `docs/vision/*` + speed/diagnostics JSON + FM/HANDOFF/NEXT) → **`git push origin main` + самарі** — **завжди останній крок**. Не завершувати сесію без push+самарі, якщо був drain/commit.
+6. **Git (кінець сесії):** один commit (код + `GSV/docs/vision/*` + speed/diagnostics JSON + FM/HANDOFF/NEXT) → **`git push origin main` + самарі** — **завжди останній крок**. Не завершувати сесію без push+самарі, якщо був drain/commit.
 
 - **Не** `git add -A`, **не** push mid-drain/mid-scan, **не** паралелити `cargo test-ci`.
 - Warnings >0 або errors >0 з виправними пакетами → 1–3 PH-S* **на початок** смуги (Джерело: `rust_diagnostics` / lint code).
@@ -120,7 +120,7 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 - Після зміни продукту (модулі, маршрути, features): оновити `FUNCTIONALITY_DIGEST` + `file_list.csv` (при нових шляхах) + README Next Focus.
 - Скрипти: dev/ops launchers → `bin/` (.sh/.ps1), toolchain/deploy → `scripts/` (**.sh лише, без нових .ps1**), Rust CLIs → `src/bin/`.
 - Переліки файлів: тільки описові назви, **не** `.ps1`/`.ps` розширеннями.
-- Vision map (`docs/vision/`): після FM/HANDOFF — `poolai-vision-sync` + `--check`; **live UI (band 117):** `gsv-server` → `http://127.0.0.1:8891/` · [`GSV_SERVER.md`](docs/gsv/GSV_SERVER.md); legacy `bin/open-docs-vision.ps1` → `http://127.0.0.1:8765/docs/vision/index.html` — архів (deactivated, band 117).
+- Vision map (`GSV/docs/vision/`): після FM/HANDOFF — `poolai-vision-sync` + `--check`; **live UI (band 117):** `gsv-server` → `http://127.0.0.1:8891/` · [`GSV_SERVER.md`](GSV/docs/gsv/GSV_SERVER.md); legacy `bin/open-docs-vision.ps1` → `http://127.0.0.1:8765/GSV/docs/vision/index.html` — архів (deactivated, band 117).
 
 ## Безпека та токени
 

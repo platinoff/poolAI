@@ -11,12 +11,12 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 | Що | Де |
 |----|-----|
 | **Запуск** | PowerShell: `.\bin\open-docs-vision.ps1` · MSYS2: `/usr/bin/bash bin/open-docs-vision.sh` |
-| **URL** | `http://127.0.0.1:8765/docs/vision/index.html` (Cursor Simple Browser — лише localhost, не `S:/…`) |
+| **URL** | `http://127.0.0.1:8765/GSV/docs/vision/index.html` (Cursor Simple Browser — лише localhost, не `S:/…`) |
 | **Панелі** | 3D-шари **L0–L5** (concept → workspace TOML) · Galaxy map · граф зв’язків · preview |
 | **Map UX** | pan/zoom · **Eco** (GPU save) · **Layers/Types** filters · **⊟ Folders** · **◎ Sprint** |
 | **Auto-reload** | **Auto** (1.5 s eco / 4 s): manifest без F5 · **Reload** → `__sync` нових файлів |
 
-Деталі: [`docs/vision/README.md`](docs/vision/README.md) · правило агента [`.cursor/rules/docs-vision.mdc`](.cursor/rules/docs-vision.mdc). Статична схема: [`docs/vision/vision.svg`](docs/vision/vision.svg).
+Деталі: [`GSV/docs/vision/README.md`](GSV/docs/vision/README.md) · правило агента [`.cursor/rules/docs-vision.mdc`](.cursor/rules/docs-vision.mdc). Статична схема: [`GSV/docs/vision/vision.svg`](GSV/docs/vision/vision.svg).
 
 ## Documentation map (canonical order)
 
@@ -41,11 +41,11 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 2. **[`docs/INDEX_2026-03-17.md`](docs/INDEX_2026-03-17.md)** — карта всього каталогу `docs/` (концепція, статус, ML, cloud, troubleshooting).
 3. **[`docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md)** — план Rust Architect (P1–P6, TurboQuant, узгодження з CI).
 4. **[`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md)** — старт **нової сесії**: гілка `main`, порядок доків, git-push, зріз зробленого, наступні кроки.
-5. **Концепція** — [`docs/concept/poolAI_concept_root.txt`](docs/concept/poolAI_concept_root.txt); Grid / Memory / Job: [`POOLAI_GRID_NODE.md`](docs/concept/POOLAI_GRID_NODE.md), **[`POOLAI_GALAXY_GRID.md`](docs/concept/POOLAI_GALAXY_GRID.md)** (федеративна мережа), [`POOLAI_MEMORY_LAYER.md`](docs/concept/POOLAI_MEMORY_LAYER.md), [`JOB_LAYER_CONCEPT_2026-03-17.md`](docs/development/JOB_LAYER_CONCEPT_2026-03-17.md), [`GRID_PROTOCOL_CONCEPT_2026-04-06.md`](docs/development/GRID_PROTOCOL_CONCEPT_2026-04-06.md), [`SOLANA_ADAPTER_CONCEPT_2026-04-06.md`](docs/development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md). **Інтерактивна карта:** [Galaxy docs vision](#galaxy-docs-vision-інтерактивна-карта-доків) → [`docs/vision/index.html`](docs/vision/index.html).
+5. **Концепція** — [`docs/concept/poolAI_concept_root.txt`](docs/concept/poolAI_concept_root.txt); Grid / Memory / Job: [`POOLAI_GRID_NODE.md`](docs/concept/POOLAI_GRID_NODE.md), **[`POOLAI_GALAXY_GRID.md`](docs/concept/POOLAI_GALAXY_GRID.md)** (федеративна мережа), [`POOLAI_MEMORY_LAYER.md`](docs/concept/POOLAI_MEMORY_LAYER.md), [`JOB_LAYER_CONCEPT_2026-03-17.md`](docs/development/JOB_LAYER_CONCEPT_2026-03-17.md), [`GRID_PROTOCOL_CONCEPT_2026-04-06.md`](docs/development/GRID_PROTOCOL_CONCEPT_2026-04-06.md), [`SOLANA_ADAPTER_CONCEPT_2026-04-06.md`](docs/development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md). **Інтерактивна карта:** [Galaxy docs vision](#galaxy-docs-vision-інтерактивна-карта-доків) → [`GSV/docs/vision/index.html`](GSV/docs/vision/index.html).
 6. **Архітектура** — [`docs/ARCHITECTURE_REVIEW.md`](docs/ARCHITECTURE_REVIEW.md), [`docs/ARCHITECTURE_BEST_PRACTICES.md`](docs/ARCHITECTURE_BEST_PRACTICES.md).
 7. **Продуктивність** — [`docs/performance/BENCHMARKS.md`](docs/performance/BENCHMARKS.md), [`docs/performance/PROFILING.md`](docs/performance/PROFILING.md); опційні прогони Criterion: [`.github/workflows/benchmarks.yml`](.github/workflows/benchmarks.yml); HTTP health load — in-tree **`poolai_health_load`** (опційно **`--json`** на stdout для baseline; див. `BENCHMARKS.md`).
 8. **CI** — обов’язкові перевірки: [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
-9. **Інвентар** — [`file_list.csv`](file_list.csv) (ручний зріз; оновлюй після змін у `src/services/`, `src/network/`, `.github/workflows/`, `.cursor/`, `docs/catalog/`, **`docs/vision/`**); повний список: `git ls-files`.
+9. **Інвентар** — [`file_list.csv`](file_list.csv) (ручний зріз; оновлюй після змін у `src/services/`, `src/network/`, `.github/workflows/`, `.cursor/`, `docs/catalog/`, **`GSV/docs/vision/`**); повний список: `git ls-files`.
 10. **Git push (Windows)** — [`.cursor/commands/git-push.md`](.cursor/commands/git-push.md) (MSYS2 bash, PATH, змінні для cloud-sdk).
 11. **Витяг функціоналу** — [`docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`](docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md) (зведення можливостей за доками та кодом; OpenAPI може бути неповним).
 12. **Керування функціоналом** — [`docs/catalog/FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) (індекс vs сталевий стан, прогалини, чернетки тікетів `FM-*`); правило агента — [`.cursor/rules/functionality-management.mdc`](.cursor/rules/functionality-management.mdc).
@@ -54,7 +54,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 **Версія в репозиторії:** `0.2.2` (див. `Cargo.toml`). **Робоча гілка:** `main`.
 
-Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S1888 ✅ (phase F Ratio96 stand smoke). **Rust ratio:** **95.06%** (hold **95%** advisory). **Vision:** manifest rev **487**. **§5.12:** **0** відкритих (band 114 ✅ · band 115 next) · tech **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · наступна сесія **`абракадабра`** (band 115) — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
+Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S1888 ✅ (phase F Ratio96 stand smoke). **Rust ratio:** **95.06%** (hold **95%** advisory). **Vision:** manifest rev **489**. **§5.12:** **0** відкритих (band 114 ✅ · band 115 next) · tech **PH-SVC75…SVC84** Cursor **3.13.21** ✅ · наступна сесія **`абракадабра`** (band 115) — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
 **Репозиторій:** [github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)
 
@@ -84,11 +84,11 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 **Product:** наступна сесія **`абракадабра`** → drain band 113 **PH-S1769…S1778** (project scan наступний).
 
-**GSV (новий):** окремий проєкт **Galaxy StarWalker Vision** — vision migration у Rust-first bin-сервер з боксами (95–100% Rust / 0–5% wasm) · [`GSV/README.md`](GSV/README.md) · **TechPreroadMap** [`docs/gsv/GSV_TECH_ROADMAP.md`](docs/gsv/GSV_TECH_ROADMAP.md). Bands 102+108+109+110+111+112 ✅ · tests **118** · ratio **95.56%**.
+**GSV (новий):** окремий проєкт **Galaxy StarWalker Vision** — vision migration у Rust-first bin-сервер з боксами (95–100% Rust / 0–5% wasm) · [`GSV/README.md`](GSV/README.md) · **TechPreroadMap** [`GSV/docs/gsv/GSV_TECH_ROADMAP.md`](GSV/docs/gsv/GSV_TECH_ROADMAP.md). Bands 102+108+109+110+111+112 ✅ · tests **118** · ratio **95.56%**.
 
 **Наступна сесія (owner):** **`абракадабра`** — drain band 115 **PH-S1789…S1798** · [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
 
-**§5.12:** **0** відкритих (band 114 ✅ · band 115 next) · vision **rev 487** · last **PH-S1888** · next **PH-S1879**.
+**§5.12:** **0** відкритих (band 114 ✅ · band 115 next) · vision **rev 489** · last **PH-S1888** · next **PH-S1879**.
 
 **Tech (сьогодні):** Service **PH-SVC75…SVC84** — Cursor **3.13.21** research + rules/agents + vision Speeds/eye verify · [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](docs/development/CURSOR_UPDATE_RESEARCH_2026-07-27.md) · Auto-review · prior GH tokens **PH-SVC65…74** ✅ · open **PH-SVC34** (GH verify) · **PH-SVC35** OWNER Atlassian revoke.
 
@@ -96,7 +96,7 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 **Ops (поза чергою):** **FM-003** LAN §4 **BLOCKED** (2 хости) · **FM-041** Cloud SDK **Deferred**.
 
-**Старт сесії:** [`HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md) · copy-paste — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md) · карта — [`docs/vision/`](docs/vision/) (`.\bin\open-docs-vision.ps1`).
+**Старт сесії:** [`HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md) · copy-paste — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md) · карта — [`GSV/docs/vision/`](GSV/docs/vision/) (`.\bin\open-docs-vision.ps1`).
 
 **Звірка «не зроблено»:** [`FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.3**.
 

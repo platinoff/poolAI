@@ -38,6 +38,7 @@ pub fn create_system_routes() -> Router<ApiContext> {
         .route("/models", get(models_handler))
         .route("/gpu", get(gpu_info))
         .route("/gpu-limits", get(gpu_limits_handler))
+        .route("/debug/ui", get(gpu_debug_ui_handler))
         .route("/ws/metrics", get(websocket_handler))
         .route("/config", get(config_get_handler))
         .route(
@@ -90,6 +91,12 @@ async fn gpu_info() -> Result<Json<crate::platform::GpuInfo>, AppError> {
 async fn gpu_limits_handler() -> Result<Json<serde_json::Value>, AppError> {
     Ok(Json(
         poolai_ui_core::gpu_limits_store::gpu_limits_store_wire_json(),
+    ))
+}
+
+async fn gpu_debug_ui_handler() -> Result<Json<serde_json::Value>, AppError> {
+    Ok(Json(
+        poolai_ui_core::gpu_limits_store::gpu_debug_store_wire_json(),
     ))
 }
 

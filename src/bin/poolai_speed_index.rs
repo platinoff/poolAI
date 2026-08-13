@@ -18,7 +18,7 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, ExitCode};
 
 const DEFAULT_OUTPUT: &str = "docs/development/speed_index.json";
-const VISION_MIRROR: &str = "docs/vision/speed_index.json";
+const VISION_MIRROR: &str = "GSV/docs/vision/speed_index.json";
 const HISTORY_TEST_CI_CAP: usize = 24;
 const HISTORY_BENCH_CAP: usize = 80;
 

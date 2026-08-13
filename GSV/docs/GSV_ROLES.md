@@ -40,8 +40,8 @@
 
 Tracker · SLI console · Toolchain · IDE · Update · Box preview · SLI terminal ·
 Tests/bench hooks · **Ratio** · **OmniRouter** (Rust AI-проксі/роутер). Канон —
-[`docs/gsv/GSV_BOXES.md`](../../docs/gsv/GSV_BOXES.md), архітектура —
-[`docs/gsv/GSV_ARCHITECTURE.md`](../../docs/gsv/GSV_ARCHITECTURE.md).
+[`GSV/docs/gsv/GSV_BOXES.md`](gsv/GSV_BOXES.md), архітектура —
+[`GSV/docs/gsv/GSV_ARCHITECTURE.md`](gsv/GSV_ARCHITECTURE.md).
 
 ## Збірка / тести
 
@@ -59,4 +59,4 @@ Tests/bench hooks · **Ratio** · **OmniRouter** (Rust AI-проксі/роут�
 ## Поза чергою
 
 - **BLOCKED:** ні (band 102 повністю ✅).
-- **Deferred:** Vision docs sync / migration → `docs/gsv/GSV_MIGRATION.md` (future sprints).
+- **Deferred:** Vision docs sync / migration → `GSV/docs/gsv/GSV_MIGRATION.md` (future sprints).

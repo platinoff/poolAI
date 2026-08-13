@@ -4,7 +4,7 @@
 
 The pre-push git hook runs **before every `git push`**:
 
-1. **`cargo run --bin poolai-vision-sync`** — sync manifest/feed/extensions **and** canon docs (`README.md`, `docs/INDEX_2026-03-17.md`, `docs/development/README.md`, `NEXT_SESSION_PROMPT.md`, `docs/vision/vision.svg`)
+1. **`cargo run --bin poolai-vision-sync`** — sync manifest/feed/extensions **and** canon docs (`README.md`, `docs/INDEX_2026-03-17.md`, `docs/development/README.md`, `NEXT_SESSION_PROMPT.md`, `GSV/docs/vision/vision.svg`)
 2. **Fail if sync modified tracked files** — commit canon updates before push
 3. **`poolai-vision-sync --check`** — FM ↔ manifest ↔ extensions ↔ `.mdc` + canon doc drift
 4. **`cargo fmt --all --check`** — Rust formatting gate
@@ -38,8 +38,8 @@ git push
 
 ```bash
 git push
-# vision sync updated README.md, docs/vision/vision.svg, ...
-git add README.md docs/INDEX_2026-03-17.md docs/development/README.md docs/development/NEXT_SESSION_PROMPT.md docs/vision/
+# vision sync updated README.md, GSV/docs/vision/vision.svg, ...
+git add README.md docs/INDEX_2026-03-17.md docs/development/README.md docs/development/NEXT_SESSION_PROMPT.md GSV/docs/vision/
 git commit -m 'docs: vision canon sync'
 git push
 ```

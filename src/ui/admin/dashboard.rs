@@ -242,13 +242,16 @@ pub async fn admin_dashboard() -> Html<String> {
     }
 
     function renderGpuLimitsStoreBadge(wire) {
-      const el = document.getElementById('debug-limits-store-badge');
+      const el = document.getElementById('debug-limits-store-badge') || document.getElementById('gpu-limits-store-badge');
       if (!el) return;
       const avail = !!(wire && wire.available);
       const active = !!(wire && wire.admission_active);
       const hint = T('admin.gpuLimits.storeHint', 'GPU admission limits read from gpu_limits.json');
+      const label = avail
+        ? T('admin.gpuLimits.storeLabel', 'GPU limits:')
+        : T('admin.debug.migrationLabel', 'GPU limits:');
       const state = avail
-        ? T('admin.debug.migrationLabel', 'GPU limits:') + ' ' +
+        ? label + ' ' +
           (active ? T('admin.gpuLimits.admissionOn', 'admission on') : T('admin.gpuLimits.admissionOff', 'admission off'))
         : T('admin.gpuLimits.storeMissing', 'store unavailable');
       const badge = avail ? (active ? 'active' : 'inactive') : 'error';
@@ -257,8 +260,24 @@ pub async fn admin_dashboard() -> Html<String> {
         escapeHtml(state) + '</span>';
     }
 
+    async function loadGpuLimitsStoreWire() {
+      const el = document.getElementById('gpu-limits-store-badge') || document.getElementById('debug-limits-store-badge');
+      if (el) {
+        el.textContent = T('admin.gpuLimits.storeLoading', 'Loading GPU limits…');
+      }
+      try {
+        const wire = await fetchJson('/api/v1/gpu-limits');
+        renderGpuLimitsStoreBadge(wire);
+      } catch (e) {
+        if (el) {
+          el.innerHTML = '<span class="status-badge error">' +
+            escapeHtml(T('admin.gpuLimits.storeErr', 'GPU limits store wire unavailable')) + '</span>';
+        }
+      }
+    }
+
     async function loadDebugLimitsStoreWire() {
-      const el = document.getElementById('debug-limits-store-badge');
+      const el = document.getElementById('debug-limits-store-badge') || document.getElementById('gpu-limits-store-badge');
       if (el) {
         el.textContent = T('admin.gpuLimits.storeLoading', 'Loading GPU limits…');
       }
@@ -270,6 +289,15 @@ pub async fn admin_dashboard() -> Html<String> {
           el.innerHTML = '<span class="status-badge error">' +
             escapeHtml(T('admin.gpuLimits.storeErr', 'GPU limits store wire unavailable')) + '</span>';
         }
+      }
+    }
+
+    async function refreshGpuLimits() {
+      try {
+        await loadGpuLimitsStoreWire();
+        showNotification(T('admin.gpuLimits.refreshOk', 'GPU limits refreshed'), 'success');
+      } catch (e) {
+        showNotification(T('admin.gpuLimits.refreshErr', 'GPU limits refresh failed: ') + e.message, 'error');
       }
     }
 
@@ -323,38 +351,6 @@ pub async fn admin_dashboard() -> Html<String> {
       }
     }
 
-    function renderGpuLimitsMigrationBadge(u wire) {
-      const el = document.getElementById('gpu-limits-migration-badge');
-      if (!el) return;
-      const avail = !!(wire && wire.available);
-      const active = !!(wire && wire.admission_active);
-      const hint = T('admin.gpuLimits.migrationHint', 'GPU limits migration read from gpu_limits.json');
-      const state = avail
-        ? T('admin.gpuLimits.migrationLabel', 'GPU limits migration:') + ' ' +
-          (active ? T('admin.gpuLimits.migrationOn', 'migration on') : T('admin.gpuLimits.migrationOff', 'migration off'))
-        : T('admin.gpuLimits.migrationMissing', 'migration unavailable');
-      const badge = avail ? (active ? 'active' : 'inactive') : 'error';
-      el.innerHTML =
-        '<span class="status-badge ' + badge + '" title="' + escapeHtml(hint) + '">' +
-        escapeHtml(state) + '</span>';
-    }
-
-    async function loadGpuLimitsMigrationWire() {
-      const el = document.getElementById('gpu-limits-migration-badge');
-      if (el) {
-        el.textContent = T('admin.gpuLimits.migrationLoading', 'Loading migration…');
-      }
-      try {
-        const wire = await fetchJson('/api/v1/debug/ui-migration');
-        renderGpuLimitsMigrationBadge(wire);
-      } catch (e) {
-        if (el) {
-          el.innerHTML = '<span class="status-badge error">' +
-            escapeHtml(T('admin.gpuLimits.migrationErr', 'GPU limits migration wire unavailable')) + '</span>';
-        }
-      }
-    }
-
     async function refreshDebugLimitsMigration() {
       try {
         await loadGpuLimitsMigrationWire();
@@ -367,7 +363,7 @@ pub async fn admin_dashboard() -> Html<String> {
     loadSystemOverview();
     renderMetricsChart();
     loadRatio96StoreWire();
-    loadDebugLimitsStoreWire();
+    loadGpuLimitsStoreWire();
     loadGpuLimitsMigrationWire();
     poolaiStartMetricsPolling(loadSystemOverview, 30000);
     "#;
@@ -405,13 +401,13 @@ pub async fn admin_dashboard() -> Html<String> {
           </div>
           <div class="admin-card">
             <h3 data-i18n="admin.gpuLimits.cardTitle">GPU Limits (Phase H)</h3>
-            <span id="debug-limits-store-badge" class="muted" data-i18n="admin.gpuLimits.storeLoading">Loading GPU limits…</span>
-            <button type="button" class="btn" onclick="refreshDebugLimits()" data-i18n="admin.debug.btn.refresh" data-i18n-aria="admin.debug.btn.refresh">Refresh</button>
+            <span id="gpu-limits-store-badge" class="muted" data-debug-id="debug-limits-store-badge" data-i18n="admin.gpuLimits.storeLabel">Loading GPU limits…</span>
+            <button type="button" class="btn" onclick="refreshGpuLimits()" data-i18n="admin.gpuLimits.btn.refresh" data-i18n-aria="admin.gpuLimits.btn.refresh" data-i18n-debug="admin.debug.btn.refresh">Refresh</button>
           </div>
         </div>
         <div class="admin-card">
             <h3 data-i18n="admin.gpuLimits.cardTitle">GPU Limits Migration (Phase H)</h3>
-            <span id="gpu-limits-migration-badge" class="muted" data-i18n="admin.gpuLimits.migrationLoading">Loading migration…</span>
+            <span id="gpu-limits-migration-badge" class="muted" data-i18n="admin.gpuLimits.migrationLabel">Loading migration…</span>
             <button type="button" class="btn" onclick="refreshDebugLimitsMigration()" data-i18n="admin.debug.btn.refresh" data-i18n-aria="admin.debug.btn.refresh">Refresh</button>
           </div>
           "#,

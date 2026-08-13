@@ -2,19 +2,19 @@
 
 План міграції vision-системи в окремий проєкт GSV.
 
-## Що переносимо (з `docs/vision/`)
+## Що переносимо (з `GSV/docs/vision/`)
 
-| Джерело (`docs/vision/`) | У GSV | Статус |
+| Джерело (`GSV/docs/vision/`) | У GSV | Статус |
 |-------------------------|-------|--------|
-| `index.html` (Galaxy UI) | `GSV/ui/index.html` (UI glue поверх Rust) | **✅ (single-page UI: health/tracker/sli/toolchain/ide/update/preview/terminal/hooks, SSE); band 117: legacy `docs/vision/index.html` → GSV pointer page (deactivated)** |
+| `index.html` (Galaxy UI) | `GSV/ui/index.html` (UI glue поверх Rust) | **✅ (single-page UI: health/tracker/sli/toolchain/ide/update/preview/terminal/hooks, SSE); band 117: legacy `GSV/docs/vision/index.html` → GSV pointer page (deactivated)** |
 | `manifest.json` (граф) | `GSV/data/gsv_manifest.json` (генерується Rust) | **✅ (band 109: `boxes/vision`, `gsv-vision-sync`, `GET /api/vision/manifest`; band 110: `GET /api/vision/map`)** |
 | `feed.json` (RSS ticker) | `GSV/data/gsv_feed.json` | **✅ (band 109: `GET /api/vision/feed`, Vision UI card; band 110: `?status=` filter)** |
 | `extensions.json` (active_sprint + planning scopes) | `GSV/data/gsv_extensions.json` | **✅ (band 112: `Extensions` mirror — read/save/load, `GET /api/vision/extensions`, `wire_sync` auto-sync; `sprint-queue` planning `GET /api/vision/sprint-queue`)** |
 | `speed_index.json` (test-CI + bench speed index) | `GSV/data/gsv_speed_index.json` + `GET /api/vision/speeds` + Speed Index card | **✅ (band 115: `SpeedIndexReport` wire, mirror у sync, empty-tolerant; band 116: `GET /api/vision/speeds.svg` + Speed history chart — Rust-rendered SVG)** |
 | `rust_diagnostics.json` (clippy warnings/errors) | `GSV/data/gsv_rust_diagnostics.json` + `GET /api/vision/rust-diagnostics` + Rust Diagnostics card | **✅ (band 115: `RustDiagnosticsReport` wire, mirror у sync, empty-tolerant; band 116: `GET /api/vision/rust-diagnostics.svg` + Rust history chart — Rust-rendered SVG)** |
-| `vision.js` / `vision.css` | `GSV/ui/` (тонкий UI glue) | **✅ (band 115: superseded — див. [`LEGACY_PARITY.md`](../../../GSV/docs/LEGACY_PARITY.md); legacy JS/CSS не переносимо, canon Rust 95–100%; band 117: DEACTIVATED banner, файли лишаються архівом; band 119: повний `:root` palette → `GET /api/vision/palette` (Rust wire), starfield/galaxy backdrop → Rust SVG)** |
+| `vision.js` / `vision.css` | `GSV/ui/` (тонкий UI glue) | **✅ (band 115: superseded — див. [`LEGACY_PARITY.md`](../../LEGACY_PARITY.md); legacy JS/CSS не переносимо, canon Rust 95–100%; band 117: DEACTIVATED banner, файли лишаються архівом; band 119: повний `:root` palette → `GET /api/vision/palette` (Rust wire), starfield/galaxy backdrop → Rust SVG)** |
 | `vision.svg` | `GSV/ui/vision.svg` + `GET /assets/vision.svg` | **✅ (band 110: порт isometric diagram; `.svg` = audit Ignored, ratio-neutral)** |
-| `README.md` (документація vision) | `docs/gsv/` та `GSV/docs/` | **✅ (адаптовано, деактиваційні нотатки band 117)** |
+| `README.md` (документація vision) | `GSV/docs/gsv/` та `GSV/docs/` | **✅ (адаптовано, деактиваційні нотатки band 117)** |
 
 ## Що переносимо (з `src/`)
 
@@ -26,16 +26,16 @@
 
 ## Що лишається в PoolAI
 
-- `docs/vision/` — **не видаляємо** (канон-джерело, діє до завершення GSV); band 117: legacy UI деактивований (index.html = pointer page, vision.js/css = DEACTIVATED banner).
+- `GSV/docs/vision/` — **не видаляємо** (канон-джерело, діє до завершення GSV); band 117: legacy UI деактивований (index.html = pointer page, vision.js/css = DEACTIVATED banner).
 - `src/bin/poolai_vision_sync.rs` — лишається для поточного vision; після міграції — за бажанням.
 - FM §5.12, HANDOFF, NEXT — лишаються в PoolAI (репозиторій один).
 
 ## Як мігруємо (принцип)
 
-1. **Документація** (ця сесія): `docs/gsv/` створено, GSV-архітектура канонізована.
+1. **Документація** (ця сесія): `GSV/docs/gsv/` створено, GSV-архітектура канонізована.
 2. **Сервер scaffold** (PH-S1660): `GSV/Cargo.toml` + `gsv_server.rs` — мінімальний server + static UI.
 3. **Бокси** (PH-S1662…S1667): поступово, кожен — окремий спринт.
-4. **Дублювання vs заміна**: GSV-код пишеться в `GSV/`; `docs/vision/` лишається джерелом, поки GSV не покриє функціонал (vision parity check в band close).
+4. **Дублювання vs заміна**: GSV-код пишеться в `GSV/`; `GSV/docs/vision/` лишається джерелом, поки GSV не покриє функціонал (vision parity check в band close).
 
 ## Критерії готовності (vision parity)
 

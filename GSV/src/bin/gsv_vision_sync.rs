@@ -1,6 +1,6 @@
 //! GSV vision sync bin — mirrors the poolAI vision canon into `GSV/data/`.
 //!
-//! Reads `docs/vision/manifest.json` + `docs/vision/feed.json` at the poolAI
+//! Reads `GSV/docs/vision/manifest.json` + `GSV/docs/vision/feed.json` at the poolAI
 //! root and persists `GSV/data/gsv_manifest.json` + `GSV/data/gsv_feed.json`.
 //!
 //! ```text

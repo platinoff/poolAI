@@ -7,7 +7,7 @@
 | **Completion plan** | [`PH_S_COMPLETION_ROADMAP_2026-06-20.md`](./PH_S_COMPLETION_ROADMAP_2026-06-20.md) · FM **§5.14–§5.15** ✅ |
 | **Master backlog** | [`PH_S_MASTER_BACKLOG_351.md`](./PH_S_MASTER_BACKLOG_351.md) — **351/351** ✅ |
 | **Last closed (band 59)** | PH-S1238 ✅ — Tenant ratio advisory · `tenant_ratio_advisory_depth` + `--tenant-ratio-advisory` · restart-safe SQLite CRUD |
-| **Last closed (band 58)** | PH-S1228 ✅ — Tenant vision sync · `tenant_vision_sync_depth` + `--tenant-vision-sync` · `docs/vision/*` + TENANT_DOCS_CANON gate |
+| **Last closed (band 58)** | PH-S1228 ✅ — Tenant vision sync · `tenant_vision_sync_depth` + `--tenant-vision-sync` · `GSV/docs/vision/*` + TENANT_DOCS_CANON gate |
 | **Last closed (band 57)** | PH-S1218 ✅ — Tenant docs canon · `tenant_docs_canon_depth` + `--tenant-docs-canon` · band 51–56 `TENANT_*.md` gate |
 | **Last closed (band 56)** | PH-S1208 ✅ — Tenant loc-audit aggregate · `tenant_loc_audit_depth` + `--tenant-loc-audit` · band 51–55 slice gate |
 | **Last closed (band 54)** | PH-S1188 ✅ — Tenant admin/ops glue · `tenant_admin_ops_depth` + `--tenant-admin-ops` · store strip + usage/quota |

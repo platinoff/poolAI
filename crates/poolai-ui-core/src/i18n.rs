@@ -689,6 +689,15 @@ pub const ADMIN_DASHBOARD_EN: &[I18nRow<'_>] = &[
         "admin.gpuLimits.migrationRefreshErr",
         "GPU limits migration refresh failed: ",
     ),
+    ("admin.debug.migrationLabel", "GPU limits migration:"),
+    (
+        "admin.debug.migrationRefreshOk",
+        "GPU limits migration refreshed",
+    ),
+    (
+        "admin.debug.migrationRefreshErr",
+        "GPU limits migration refresh failed: ",
+    ),
 ];
 
 /// Ukrainian admin dashboard keys (PH-S228).
@@ -749,6 +758,15 @@ pub const ADMIN_DASHBOARD_UK: &[I18nRow<'_>] = &[
     (
         "admin.gpuLimits.refreshErr",
         "Помилка оновлення GPU лімітів: ",
+    ),
+    ("admin.debug.migrationLabel", "GPU ліміти міграції:"),
+    (
+        "admin.debug.migrationRefreshOk",
+        "GPU ліміти міграції оновлено",
+    ),
+    (
+        "admin.debug.migrationRefreshErr",
+        "Помилка оновлення GPU лімітів міграції: ",
     ),
 ];
 

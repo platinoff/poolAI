@@ -13,7 +13,7 @@ PowerShell у корені репо:
 У **Simple Browser** (`Ctrl+Shift+P` → *Simple Browser: Show*) вставте:
 
 ```text
-http://127.0.0.1:8765/docs/vision/index.html
+http://127.0.0.1:8765/GSV/docs/vision/index.html
 ```
 
 Не `S:/rust/...` — лише цей URL.
@@ -22,18 +22,18 @@ http://127.0.0.1:8765/docs/vision/index.html
 
 ## Спосіб 2 — відкрити файл у редакторі, потім preview
 
-1. У Explorer відкрийте `docs/vision/index.html` (подвійний клік — таб у редакторі).
+1. У Explorer відкрийте `GSV/docs/vision/index.html` (подвійний клік — таб у редакторі).
 2. `Ctrl+Shift+P` → **Simple Browser: Show**.
 3. Якщо запитає URL — введіть відносно workspace:
 
 ```text
-./docs/vision/index.html
+./GSV/docs/vision/index.html
 ```
 
 або
 
 ```text
-docs/vision/index.html
+GSV/docs/vision/index.html
 ```
 
 ## Спосіб 3 — зовнішній браузер
@@ -46,7 +46,7 @@ docs/vision/index.html
 
 ## Спосіб 4 — лише SVG
 
-Відкрийте в IDE: `docs/vision/vision.svg` (без сервера).
+Відкрийте в IDE: `GSV/docs/vision/vision.svg` (без сервера).
 
 ## Після оновлення manifest
 

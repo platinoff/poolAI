@@ -2387,7 +2387,7 @@ fn build_report(
         };
     if config.tenant_vision_sync {
         notes.push(
-            "PH-S1224: tenant_vision_sync_mode — aggregate docs/vision/* + TENANT_DOCS_CANON",
+            "PH-S1224: tenant_vision_sync_mode — aggregate GSV/docs/vision/* + TENANT_DOCS_CANON",
         );
         notes.push("PH-S1228: band 58 tenant vision-sync — criteria met vs registry");
     }
@@ -2493,7 +2493,7 @@ fn build_report(
             (0, sso_vision_sync_criteria_total())
         };
     if config.sso_vision_sync {
-        notes.push("PH-S1324: sso_vision_sync_mode — aggregate docs/vision/* + SSO_DOCS_CANON");
+        notes.push("PH-S1324: sso_vision_sync_mode — aggregate GSV/docs/vision/* + SSO_DOCS_CANON");
         notes.push("PH-S1328: band 68 SSO vision-sync — criteria met vs registry");
     }
     let (sso_ratio_advisory_criteria_met_count, sso_ratio_advisory_criteria_total_count) =
@@ -2603,7 +2603,7 @@ fn build_report(
             (0, audit_vision_sync_criteria_total())
         };
     if config.audit_vision_sync {
-        notes.push("PH-S1424: audit_vision_sync_mode — aggregate docs/vision/* + AUDIT_DOCS_CANON");
+        notes.push("PH-S1424: audit_vision_sync_mode — aggregate GSV/docs/vision/* + AUDIT_DOCS_CANON");
         notes.push("PH-S1428: band 78 audit vision-sync — criteria met vs registry");
     }
 
@@ -2719,7 +2719,7 @@ fn build_report(
         };
     if config.policy_vision_sync {
         notes.push(
-            "PH-S1524: policy_vision_sync_mode — aggregate docs/vision/* + POLICIES_DOCS_CANON",
+            "PH-S1524: policy_vision_sync_mode — aggregate GSV/docs/vision/* + POLICIES_DOCS_CANON",
         );
         notes.push("PH-S1528: band 88 policies vision-sync — criteria met vs registry");
     }
@@ -2840,7 +2840,7 @@ fn build_report(
         };
     if config.monitoring_vision_sync {
         notes.push(
-            "PH-S1624: monitoring_vision_sync_mode — aggregate docs/vision/* + MONITORING_DOCS_CANON",
+            "PH-S1624: monitoring_vision_sync_mode — aggregate GSV/docs/vision/* + MONITORING_DOCS_CANON",
         );
         notes.push("PH-S1628: band 98 monitoring vision-sync — criteria met vs registry");
     }

@@ -96,6 +96,12 @@ pub fn gpu_limits_store_wire_json() -> Value {
     }
 }
 
+/// Debug UI wire: same store surface served under `/api/v1/debug/ui`
+/// (band 136 UI debugging mirror of the GPU-limits store).
+pub fn gpu_debug_store_wire_json() -> Value {
+    gpu_limits_store_wire_json()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

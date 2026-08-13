@@ -1,7 +1,7 @@
 //! Rust compiler / Clippy warning+error index for Galaxy vision **Rust** panel.
 //!
 //! Canonical JSON: [`docs/development/rust_diagnostics.json`](../../docs/development/rust_diagnostics.json)
-//! Vision mirror: `docs/vision/rust_diagnostics.json`.
+//! Vision mirror: `GSV/docs/vision/rust_diagnostics.json`.
 //!
 //! ```text
 //! cargo run --bin poolai-rust-diagnostics -- --print
@@ -20,7 +20,7 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, ExitCode, Stdio};
 
 const DEFAULT_OUTPUT: &str = "docs/development/rust_diagnostics.json";
-const VISION_MIRROR: &str = "docs/vision/rust_diagnostics.json";
+const VISION_MIRROR: &str = "GSV/docs/vision/rust_diagnostics.json";
 const HISTORY_CAP: usize = 32;
 const DEFAULT_SCAN_CMD: &str =
     "cargo clippy --message-format=json --all-targets --features jwt,https";

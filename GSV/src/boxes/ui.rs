@@ -609,12 +609,19 @@ pub fn render_card(name: &str, d: &Value) -> Option<String> {
         "speed-index" => Some(render_speed_index(d)),
         "rust-diagnostics" => Some(render_rust_diagnostics(d)),
         "omni" => Some(render_omni(d)),
+        "galaxy-backdrop" => Some(render_galaxy_backdrop(d)),
+        "starfield" => Some(render_starfield(d)),
+        "rss-ticker" => Some(render_rss_ticker(d)),
+        "gpu-mode" => Some(render_gpu_mode(d)),
+        "power-menu" => Some(render_power_menu(d)),
+        "panel-dock" => Some(render_panel_dock(d)),
+        "fullscreen" => Some(render_fullscreen(d)),
         _ => None,
     }
 }
 
 /// Server-rendered card names (stable contract for `/api/ui/card/:name`).
-pub const CARD_NAMES: [&str; 13] = [
+pub const CARD_NAMES: [&str; 20] = [
     "tracker",
     "sli",
     "toolchain",
@@ -628,7 +635,110 @@ pub const CARD_NAMES: [&str; 13] = [
     "speed-index",
     "rust-diagnostics",
     "omni",
+    "galaxy-backdrop",
+    "starfield",
+    "rss-ticker",
+    "gpu-mode",
+    "power-menu",
+    "panel-dock",
+    "fullscreen",
 ];
+
+/// Galaxy backdrop card body (SVG-backed visual).
+fn render_galaxy_backdrop(d: &Value) -> String {
+    let mode = d.get("mode").and_then(Value::as_str).unwrap_or("dark");
+    let stars = d.get("stars").and_then(Value::as_u64).unwrap_or(0);
+    format!(
+        "<div class='dim'>galaxy backdrop · {mode} mode · {stars} stars</div><div>generated <kbd>{mode}</kbd> svg</div>"
+    )
+}
+
+/// Starfield card body (eco/fx/ms star counts).
+fn render_starfield(d: &Value) -> String {
+    let eco = d.get("eco").and_then(Value::as_u64).unwrap_or(0);
+    let fx = d.get("fx").and_then(Value::as_u64).unwrap_or(0);
+    let ms = d.get("ms").and_then(Value::as_u64).unwrap_or(0);
+    format!(
+        "<div>starfield · Eco <span class='ok'>{eco}</span> · FX <span class='ok'>{fx}</span> · Ms <span class='ok'>{ms}</span> stars</div>"
+    )
+}
+
+/// RSS ticker card body (latest vision/status feed lines).
+fn render_rss_ticker(d: &Value) -> String {
+    let items = d
+        .get("items")
+        .and_then(Value::as_array)
+        .cloned()
+        .unwrap_or_default();
+    let mut out = String::from("<div class='dim'>vision feed · rss ticker</div>");
+    let rows: Vec<Vec<String>> = items
+        .iter()
+        .map(|it| {
+            let label = it.get("label").and_then(Value::as_str).unwrap_or("");
+            let status = it.get("status").and_then(Value::as_str).unwrap_or("");
+            vec![
+                format!("<kbd>{}</kbd>", esc(label)),
+                format!("<span class='ok'>{}</span>", esc(status)),
+            ]
+        })
+        .collect();
+    out.push_str(&tab(&["item", "status"], rows));
+    out
+}
+
+/// GPU mode card body (current accelerator mode).
+fn render_gpu_mode(d: &Value) -> String {
+    let mode = d.get("mode").and_then(Value::as_str).unwrap_or("unknown");
+    let active = d.get("active").and_then(Value::as_bool).unwrap_or(false);
+    format!(
+        "<div>gpu mode <span class='ok'>{}</span> {}</div>",
+        esc(mode),
+        if active { "· active" } else { "· idle" }
+    )
+}
+
+/// Power menu card body (power level).
+fn render_power_menu(d: &Value) -> String {
+    let level = d.get("level").and_then(Value::as_str).unwrap_or("eco");
+    let watts = d.get("watts").and_then(Value::as_u64).unwrap_or(0);
+    format!(
+        "<div>power <span class='ok'>{}</span> · {} W</div>",
+        esc(level),
+        watts
+    )
+}
+
+/// Panel dock card body (docked panel list).
+fn render_panel_dock(d: &Value) -> String {
+    let panels = d
+        .get("panels")
+        .and_then(Value::as_array)
+        .cloned()
+        .unwrap_or_default();
+    let names: Vec<String> = panels
+        .iter()
+        .filter_map(|p| p.as_str())
+        .map(|p| format!("<kbd>{}</kbd>", esc(p)))
+        .collect();
+    let joined = if names.is_empty() {
+        "<span class='dim'>—</span>".to_string()
+    } else {
+        names.join(" ")
+    };
+    format!("<div>panel dock · {joined}</div>")
+}
+
+/// Fullscreen card body (fullscreen toggle state).
+fn render_fullscreen(d: &Value) -> String {
+    let active = d.get("active").and_then(Value::as_bool).unwrap_or(false);
+    let label = d.get("label").and_then(Value::as_str).unwrap_or("fullscreen");
+    format!(
+        "<div>{} <span class='{}'>{}</span></div>",
+        esc(label),
+        if active { "ok" } else { "dim" },
+        if active { "on" } else { "off" }
+    )
+}
 
 #[cfg(test)]
 mod tests {
@@ -780,8 +890,15 @@ mod tests {
         assert!(render_card("sprint-progress", &d).is_some());
         assert!(render_card("hooks-tests", &d).is_some());
         assert!(render_card("omni", &d).is_some());
+        assert!(render_card("galaxy-backdrop", &d).is_some());
+        assert!(render_card("starfield", &d).is_some());
+        assert!(render_card("rss-ticker", &d).is_some());
+        assert!(render_card("gpu-mode", &d).is_some());
+        assert!(render_card("power-menu", &d).is_some());
+        assert!(render_card("panel-dock", &d).is_some());
+        assert!(render_card("fullscreen", &d).is_some());
         assert!(render_card("nope", &d).is_none());
-        assert_eq!(CARD_NAMES.len(), 13);
+        assert_eq!(CARD_NAMES.len(), 20);
     }
 
     #[test]

@@ -58,7 +58,7 @@ fn horizon_s1011_band_owner_ops_close_ph_s1018() {
     assert!(Path::new("bin/open-docs-vision.sh").exists());
     assert!(Path::new("crates/poolai-ui-core/src/owner_ops_depth.rs").exists());
 
-    let vision_js = include_str!("../docs/vision/vision.js");
+    let vision_js = include_str!("../GSV/docs/vision/vision.js");
     assert!(vision_js.contains("bindVisionPowerMenu"));
     assert!(vision_js.contains("vision-power-menu"));
 

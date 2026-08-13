@@ -1,9 +1,9 @@
 # Rust diagnostics — Clippy warning/error index
 
 **Оновлено:** 2026-07-28  
-**Артефакт:** [`rust_diagnostics.json`](./rust_diagnostics.json) · mirror [`../vision/rust_diagnostics.json`](../vision/rust_diagnostics.json)  
+**Артефакт:** [`rust_diagnostics.json`](./rust_diagnostics.json) · mirror [`../GSV/GSV/docs/vision/rust_diagnostics.json`](../GSV/GSV/docs/vision/rust_diagnostics.json)  
 **Bin:** `poolai-rust-diagnostics` · wrapper: `bin/record-rust-diagnostics.sh`  
-**UI:** GSV → panel **Rust** (`http://127.0.0.1:8891/`) · legacy `docs/vision/index.html` deactivated (band 117)  
+**UI:** GSV → panel **Rust** (`http://127.0.0.1:8891/`) · legacy `GSV/docs/vision/index.html` deactivated (band 117)  
 **CI:** job `rust-diagnostics` in [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) (artifact upload)
 
 ---
@@ -65,7 +65,7 @@ Job **`rust-diagnostics`** (ubuntu):
 
 1. `.\bin\open-docs-vision.ps1`
 2. Панель **Rust** — latest warnings/errors + history + top lint codes.
-3. Auto-reload слідкує за `docs/vision/rust_diagnostics.json` і `docs/development/rust_diagnostics.json`.
+3. Auto-reload слідкує за `GSV/docs/vision/rust_diagnostics.json` і `docs/development/rust_diagnostics.json`.
 
 Після drain **`абракадабра`:** `record-rust-diagnostics.sh` → (опційно Speeds) → `poolai-vision-sync` → push.
 

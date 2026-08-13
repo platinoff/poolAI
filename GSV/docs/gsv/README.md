@@ -1,6 +1,6 @@
 # GSV docs — Galaxy StarWalker Vision
 
-Документація окремого проєкту **GSV (Galaxy StarWalker Vision)** — самостійної Rust-first vision-системи, мігрованої з `docs/vision/` у окремий проєкт `GSV/` репо PoolAI.
+Документація окремого проєкту **GSV (Galaxy StarWalker Vision)** — самостійної Rust-first vision-системи, мігрованої з `GSV/docs/vision/` у окремий проєкт `GSV/` репо PoolAI.
 
 **Rust 95–100% · WebAssembly 0–5% (завжди) · без Python/Java.**
 
@@ -11,17 +11,17 @@
 | [`GSV_ARCHITECTURE.md`](./GSV_ARCHITECTURE.md) | Архітектура сервера + боксів; Rust/wasm split; шари L0–L5 |
 | [`GSV_SERVER.md`](./GSV_SERVER.md) | **exe/bin сервер** «Galaxy StarWalker Vision»: endpoints, update-повідомлення, offline-стійкість, metrics resync |
 | [`GSV_BOXES.md`](./GSV_BOXES.md) | **Специфікація боксів**: Tracker · SLI console · Toolchain · IDE · Update · Box preview · SLI terminal · Rust tests/benchmarks hook |
-| [`GSV_MIGRATION.md`](./GSV_MIGRATION.md) | Міграція з `docs/vision/` + `src/` у GSV: що переносимо, що лишається, як |
+| [`GSV_MIGRATION.md`](./GSV_MIGRATION.md) | Міграція з `GSV/docs/vision/` + `src/` у GSV: що переносимо, що лишається, як |
 | [`GSV_TECH_ROADMAP.md`](./GSV_TECH_ROADMAP.md) | **TechPreroadMap**: логічний порядок реалізації → future sprints (bands 102 · 108) |
-| [`../GSV/docs/GSV_ROLES.md`](../../GSV/docs/GSV_ROLES.md) | Ролі GSV VDT + канон сесії + Rust ratio gate (band 108) |
+| [`../GSV/docs/GSV_ROLES.md`](../GSV_ROLES.md) | Ролі GSV VDT + канон сесії + Rust ratio gate (band 108) |
 
 ## Зв’язок з PoolAI docs
 
-- Vision-UI-спадкоємець: **GSV** (`http://127.0.0.1:8891/`) — Rust-сервер з боксами; legacy [`docs/vision/index.html`](../vision/index.html) деактивований (band 117, 2026-08-07) — вказівник на GSV.
-- Черга sprints: [`docs/catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (band 102 ✅ · band 108 ✅ §5.89).
-- Концепт: [`docs/concept/poolAI_concept_root.txt`](../concept/poolAI_concept_root.txt) · [`docs/concept/POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md).
-- Воркфлоу: [`docs/development/HANDOFF_NEW_SESSION.md`](../development/HANDOFF_NEW_SESSION.md) · [`docs/development/NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
-- Пам'ять GSV: [`GSV/docs/MEMORY.md`](../../GSV/docs/MEMORY.md) · HANDOFF/NEXT: [`GSV/docs/`](../../GSV/docs/README.md).
+- Vision-UI-спадкоємець: **GSV** (`http://127.0.0.1:8891/`) — Rust-сервер з боксами; legacy [`GSV/docs/vision/index.html`](../vision/index.html) деактивований (band 117, 2026-08-07) — вказівник на GSV.
+- Черга sprints: [`docs/catalog/FUNCTION_MANAGEMENT.md`](../../docs/catalog/FUNCTION_MANAGEMENT.md) §5.12 (band 102 ✅ · band 108 ✅ §5.89).
+- Концепт: [`docs/concept/poolAI_concept_root.txt`](../../docs/concept/poolAI_concept_root.txt) · [`docs/concept/POOLAI_GALAXY_GRID.md`](../../docs/concept/POOLAI_GALAXY_GRID.md).
+- Воркфлоу: [`docs/development/HANDOFF_NEW_SESSION.md`](../../docs/development/HANDOFF_NEW_SESSION.md) · [`docs/development/NEXT_SESSION_PROMPT.md`](../../docs/development/NEXT_SESSION_PROMPT.md).
+- Пам'ять GSV: [`GSV/docs/MEMORY.md`](../MEMORY.md) · HANDOFF/NEXT: [`GSV/docs/`](../README.md).
 
 ## Правила (коротко)
 

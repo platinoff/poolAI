@@ -51,7 +51,7 @@ fn horizon_s1669_band_lint_cleanup_ph_s1678() {
 
     // rust diagnostics: recorded at band close (0 warnings / 0 errors)
     let diag: serde_json::Value =
-        serde_json::from_str(include_str!("../docs/vision/rust_diagnostics.json"))
+        serde_json::from_str(include_str!("../GSV/docs/vision/rust_diagnostics.json"))
             .expect("rust_diagnostics.json");
     assert_eq!(diag["latest"]["warnings"], 0);
     assert_eq!(diag["latest"]["errors"], 0);

@@ -29,11 +29,11 @@ pub fn git_head(repo_root: &Path) -> Option<String> {
         .filter(|s| !s.is_empty())
 }
 
-/// Read `docs/development/{file}` as JSON (vision canon mirror: `docs/vision/`).
+/// Read `docs/development/{file}` as JSON (vision canon mirror: `GSV/docs/vision/`).
 pub fn read_vision_json(repo_root: &Path, rel: &str) -> Option<Value> {
     for candidate in [
         repo_root.join("docs/development").join(rel),
-        repo_root.join("docs/vision").join(rel),
+        repo_root.join("GSV/docs/vision").join(rel),
     ] {
         if let Ok(raw) = std::fs::read_to_string(&candidate) {
             if let Ok(v) = serde_json::from_str::<Value>(&raw) {

@@ -1,8 +1,8 @@
 # GSV — Vision box (poolAI vision canon mirror)
 
-Дзеркало poolAI vision canon (`docs/vision/manifest.json` + `docs/vision/feed.json` +
-`docs/vision/extensions.json`) у Rust-бокс GSV. Bands 109–116 (PH-S1729…S1808, ✅);
-**band 117 (PH-S1809…S1818, ✅)** — legacy vision deactivation: `docs/vision/index.html` →
+Дзеркало poolAI vision canon (`GSV/docs/vision/manifest.json` + `GSV/docs/vision/feed.json` +
+`GSV/docs/vision/extensions.json`) у Rust-бокс GSV. Bands 109–116 (PH-S1729…S1808, ✅);
+**band 117 (PH-S1809…S1818, ✅)** — legacy vision deactivation: `GSV/docs/vision/index.html` →
 GSV pointer page; `vision.js`/`vision.css` → DEACTIVATED banner (архів, не видаляємо);
 живий UI — `gsv-server` → `http://127.0.0.1:8891/`. **band 118 (PH-S1819…S1828, ✅)** —
 sprint UI migration: sprint theme wire (legacy `--sprint` palette) + Rust-rendered
@@ -20,8 +20,8 @@ ratio **96.73%** ≥96% ✅; всі 13 карток server-rendered, `renderOmni
 
 - **`GSV/src/boxes/vision.rs`** — serde-структури (`Manifest`, `ManifestNode`, `ManifestEdge`,
   `Layer`, `Feed`, `FeedItem`, `Extensions`) + read/save/load/wire.
-- **Джерело:** `docs/vision/manifest.json` (galaxy graph: layers, nodes, edges),
-  `docs/vision/feed.json` (sprint ticker) та `docs/vision/extensions.json`
+- **Джерело:** `GSV/docs/vision/manifest.json` (galaxy graph: layers, nodes, edges),
+  `GSV/docs/vision/feed.json` (sprint ticker) та `GSV/docs/vision/extensions.json`
   (extension manifest: `active_sprint`, `revision`, `ui_version`, planning `scopes`)
   на корені poolAI.
 - **Знімки:** `GSV/data/gsv_manifest.json` + `gsv_feed.json` + `gsv_extensions.json`
@@ -85,7 +85,7 @@ ratio **96.73%** ≥96% ✅; всі 13 карток server-rendered, `renderOmni
   - `GET /api/vision/galaxy.svg` — **band 119**: Rust-rendered galaxy backdrop
     (radial nebula gradients + spiral-arm hints from the legacy `:root` palette;
     `image/svg+xml`, `Cache-Control: no-cache`).
-  - `GET /assets/vision.svg` — **band 110**: порт `docs/vision/vision.svg` (isometric diagram,
+  - `GET /assets/vision.svg` — **band 110**: порт `GSV/docs/vision/vision.svg` (isometric diagram,
     `image/svg+xml`, include_str! з `GSV/ui/vision.svg`).
 
 ## Синхронізація
@@ -139,7 +139,7 @@ UI: **Sprint Board card** (progress bar + open/closed/planned колонки-det
 
 ## Speeds + Rust diagnostics wire (band 115)
 
-`SpeedIndexReport` (band 115) — mirror `docs/vision/speed_index.json`:
+`SpeedIndexReport` (band 115) — mirror `GSV/docs/vision/speed_index.json`:
 
 - `latest` (`SpeedIndexLatest`): `test_ci_wall_secs`/`test_ci_ok`/`test_ci_recorded_at`/
   `test_ci_command` + `last_bench_label`/`last_bench_median_ns`/`last_bench_recorded_at`.
@@ -147,7 +147,7 @@ UI: **Sprint Board card** (progress bar + open/closed/planned колонки-det
 - Mirror у `GSV/data/gsv_speed_index.json` (sync best-effort); `source_speed_index` =
   live → snapshot → empty default. `wire_speed_index` → `{ok, present, speed_index}`.
 
-`RustDiagnosticsReport` (band 115) — mirror `docs/vision/rust_diagnostics.json`:
+`RustDiagnosticsReport` (band 115) — mirror `GSV/docs/vision/rust_diagnostics.json`:
 
 - `latest` (`RustDiagLatest`): `warnings`/`errors`/`ok`/`recorded_at`/`command`/`top_codes`.
 - `history_count` — довжина історичного масиву.
@@ -159,7 +159,7 @@ UI: **Speed Index card** (test-ci wall time + bench median + rows) та
 
 ## Speeds + Rust history charts (band 116)
 
-`speed_index_chart_svg` (band 116) — Rust-rendered SVG з `docs/vision/speed_index.json`
+`speed_index_chart_svg` (band 116) — Rust-rendered SVG з `GSV/docs/vision/speed_index.json`
 `test_ci_history[]`:
 
 - Вертикальні bars тест-CI wall-clock (останні ≤24 записи), **green** = ok / **red** = fail,
@@ -168,7 +168,7 @@ UI: **Speed Index card** (test-ci wall time + bench median + rows) та
 - `#[serde]` типи `SpeedTestCiRecord`/`SpeedBenchRecord`; `read_speed_index` проносить
   `test_ci_history`/`bench_history` через wire (source fallback unchanged).
 
-`rust_diagnostics_chart_svg` (band 116) — Rust-rendered SVG з `docs/vision/rust_diagnostics.json`
+`rust_diagnostics_chart_svg` (band 116) — Rust-rendered SVG з `GSV/docs/vision/rust_diagnostics.json`
 `history[]`:
 
 - Групові bars **warnings** (orange) + **errors** (red) на останніх ≤24 записах,
@@ -278,4 +278,4 @@ Band 121 додає **OmniRouter card** (`GET /api/ui/card/omni`): `render_omni`
 `server/mod.rs` `"omni"` arm → `boxes::omni::wire`, `CARD_NAMES` 13; `renderOmni` JS видалено,
 `rustCards` 13 → rust ratio **96.73%** (stretch-96 advisory ✅). Тепер усі 13 UI-карток —
 Rust-rendered (`boxes/ui.rs`), жодного JS-рендера карток не залишилось.
-Див. [`GSV_MIGRATION.md`](../../docs/gsv/GSV_MIGRATION.md) і [`LEGACY_PARITY.md`](./LEGACY_PARITY.md).
+Див. [`GSV_MIGRATION.md`](gsv/GSV_MIGRATION.md) і [`LEGACY_PARITY.md`](./LEGACY_PARITY.md).

@@ -192,7 +192,7 @@ function StartVisionServerLoop {
         try {
         $path = $ctx.Request.Url.LocalPath.TrimStart('/').TrimEnd('/')
 
-        if ($path -eq 'docs/vision/__watch') {
+        if ($path -eq 'GSV/docs/vision/__watch') {
             $payload = GetVisionWatchPayload -VisionDirectory $VisionDirectory -RepoRootPath $RepoRootPath
             $json = $payload | ConvertTo-Json -Compress
             $bytes = [Text.Encoding]::UTF8.GetBytes($json)
@@ -200,7 +200,7 @@ function StartVisionServerLoop {
             continue
         }
 
-        if ($path -eq 'docs/vision/__sync') {
+        if ($path -eq 'GSV/docs/vision/__sync') {
             Invoke-VisionManifestSync -RepoRootPath $RepoRootPath
             $payload = GetVisionWatchPayload -VisionDirectory $VisionDirectory -RepoRootPath $RepoRootPath
             $json = $payload | ConvertTo-Json -Compress
@@ -211,7 +211,7 @@ function StartVisionServerLoop {
 
         if ([string]::IsNullOrWhiteSpace($path)) {
             $ctx.Response.StatusCode = 302
-            $ctx.Response.RedirectLocation = '/docs/vision/index.html'
+            $ctx.Response.RedirectLocation = '/GSV/docs/vision/index.html'
             $ctx.Response.Close()
             continue
         }
@@ -239,7 +239,7 @@ function StartVisionServerLoop {
         $bytes = [IO.File]::ReadAllBytes($file)
         $noCache = $ext -in '.html', '.css', '.js', '.json', '.svg'
         $visionRev = ''
-        if ($path -eq 'docs/vision/manifest.json') {
+        if ($path -eq 'GSV/docs/vision/manifest.json') {
             try {
                 $manifestJson = [Text.Encoding]::UTF8.GetString($bytes) | ConvertFrom-Json
                 if ($null -ne $manifestJson.revision) {
@@ -269,12 +269,12 @@ function StartVisionServerLoop {
 
 $ErrorActionPreference = 'Stop'
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
-$VisionDir = Join-Path $RepoRoot 'docs\vision'
+$VisionDir = Join-Path $RepoRoot 'GSV\docs\vision'
 if (-not (Test-Path (Join-Path $VisionDir 'index.html'))) {
     throw "Not found: $VisionDir\index.html"
 }
 
-$Url = "http://127.0.0.1:$Port/docs/vision/index.html"
+$Url = "http://127.0.0.1:$Port/GSV/docs/vision/index.html"
 $JsonContentType = 'application/json' + [string][char]59 + ' charset=utf-8'
 $PlainContentType = 'text/plain' + [string][char]59 + ' charset=utf-8'
 
@@ -303,7 +303,7 @@ Invoke-VisionManifestSync -RepoRootPath $RepoRoot
 $listener.Start()
 Write-Host "Serving repo: $RepoRoot"
 Write-Host "Vision UI: $Url"
-Write-Host 'Auto-reload: GET /docs/vision/__watch | manual sync: GET /docs/vision/__sync'
+Write-Host 'Auto-reload: GET /GSV/docs/vision/__watch | manual sync: GET /GSV/docs/vision/__sync'
 Write-Host 'Stop: Ctrl+C'
 
 if (-not $NoBrowser) {

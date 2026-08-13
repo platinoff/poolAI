@@ -1,9 +1,9 @@
 # GSV — Legacy vision app parity (docs/vision)
 
-Inventory of the legacy Galaxy vision app (`docs/vision/index.html` + `docs/vision/vision.js` +
-`docs/vision/vision.css`, 12.2 + 157.3 + 49.7 KB) against the GSV Rust-first UI. Bands 115–116
+Inventory of the legacy Galaxy vision app (`GSV/docs/vision/index.html` + `GSV/docs/vision/vision.js` +
+`GSV/docs/vision/vision.css`, 12.2 + 157.3 + 49.7 KB) against the GSV Rust-first UI. Bands 115–116
 (PH-S1789…S1808, ✅) — supersession; **band 117 (PH-S1809…S1818, ✅) — legacy deactivation**:
-`docs/vision/index.html` → GSV pointer page; `vision.js`/`vision.css` → DEACTIVATED banner
+`GSV/docs/vision/index.html` → GSV pointer page; `vision.js`/`vision.css` → DEACTIVATED banner
 (kept as canon archive, not loaded). **band 119 (PH-S1829…S1838, ✅) — Galaxy UI full parity**
 (colors + box behaviors: full `:root` palette wire, starfield/galaxy backdrop, header chrome,
 panel dock/fullscreen).
@@ -49,9 +49,9 @@ UI-картками `GSV/ui/index.html`. Документ — джерело і�
 - **Out-of-scope:** — (band 119 закрив останні прогалини; `vision.css` `:root` = Rust wire,
   `vision.js`/`vision.css` не переносяться).
 
-**Band 117 (PH-S1809…S1818, ✅):** legacy deactivated — `docs/vision/index.html` переписаний у
+**Band 117 (PH-S1809…S1818, ✅):** legacy deactivated — `GSV/docs/vision/index.html` переписаний у
 GSV pointer page; `vision.js`/`vision.css` отримали DEACTIVATED banner. Файли не видаляємо —
-`docs/vision/` лишається канон-джерелом (manifest/feed/extensions/speed_index/rust_diagnostics/
+`GSV/docs/vision/` лишається канон-джерелом (manifest/feed/extensions/speed_index/rust_diagnostics/
 vision.svg); живий UI — GSV (`gsv-server` → `http://127.0.0.1:8891/`).
 
 **Band 119 (PH-S1829…S1838, ✅):** Galaxy UI full parity — повна legacy-палітра (`/api/vision/palette`),

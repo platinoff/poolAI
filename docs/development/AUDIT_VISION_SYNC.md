@@ -4,7 +4,7 @@ Canonical doc: [`AUDIT_VISION_SYNC.md`](./AUDIT_VISION_SYNC.md) (band 78, PH-S14
 
 ## Overview
 
-Band 78 consolidates Audit phase-C docs-canon with **`docs/vision/*`** under one vision-sync
+Band 78 consolidates Audit phase-C docs-canon with **`GSV/docs/vision/*`** under one vision-sync
 gate (`--audit-vision-sync` / `VERIFY_AUDIT_VISION_SYNC`). Prior docs-canon remains
 [`AUDIT_DOCS_CANON.md`](./AUDIT_DOCS_CANON.md); this band proves vision artifacts stay
 aligned with the enterprise Audit journal.
@@ -12,7 +12,7 @@ aligned with the enterprise Audit journal.
 | Surface | Where | Notes |
 |---------|-------|-------|
 | Depth module | `audit_vision_sync_depth.rs` | enum + criteria + `AUDIT_VISION_SYNC_SLICES` |
-| Slice artifacts | `docs/vision/` + `AUDIT_DOCS_CANON.md` | `manifest.json` · `extensions.json` · `README.md` · `vision.svg` · `index.html` · prior canon |
+| Slice artifacts | `GSV/docs/vision/` + `AUDIT_DOCS_CANON.md` | `manifest.json` · `extensions.json` · `README.md` · `vision.svg` · `index.html` · prior canon |
 | Aggregate | `--audit-vision-sync` | `audit_vision_sync_*` fields in `rust_ratio.json` |
 | Verify / quick | `VERIFY_AUDIT_VISION_SYNC` / `--audit-vision-sync` | vision-sync gate only |
 | Contracts | `audit_vision_sync_integration` | slice presence + criteria totals |
