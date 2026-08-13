@@ -38,6 +38,7 @@ pub mod gpu_limits_debug3_depth;
 pub mod gpu_limits_debug4_depth;
 pub mod gpu_limits_debug5_depth;
 pub mod gpu_limits_debug6_depth;
+pub mod gpu_limits_debug7_depth;
 pub mod gpu_limits_depth;
 pub mod gpu_limits_migration2_depth;
 pub mod gpu_limits_migration3_depth;
