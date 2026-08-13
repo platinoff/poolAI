@@ -3308,6 +3308,12 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_gpu_limits_debug6_depth_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_gpu_limits_debug7_depth_rs"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -12765,9 +12771,23 @@
       "label": "gpu_limits_debug6_integration.rs",
       "layer": "L3",
       "path": "tests/gpu_limits_debug6_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_gpu_limits_debug7_depth_rs",
+      "label": "gpu_limits_debug7_depth.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/gpu_limits_debug7_depth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_gpu_limits_debug7_integration_rs",
+      "label": "gpu_limits_debug7_integration.rs",
+      "layer": "L3",
+      "path": "tests/gpu_limits_debug7_integration.rs"
     }
   ],
-  "revision": 486,
+  "revision": 487,
   "sprint_queue": [],
   "sprint_queue_open_count": 0,
   "updated_at": "2026-06-20",
