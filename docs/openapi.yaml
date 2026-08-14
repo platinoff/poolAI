@@ -2359,6 +2359,40 @@ paths:
               schema:
                 type: object
 
+  /gpu-limits:
+    get:
+      tags:
+        - GPU
+      summary: Get GPU limits store wire snapshot
+      description: Returns the GPU limits admission store snapshot (`mode`, `available`, `max_gpus`, `admission_enabled`, `gpu_memory_mb_cap`, `admission_active`).
+      operationId: getGpuLimits
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: GPU limits store snapshot
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /debug/ui:
+    get:
+      tags:
+        - GPU
+      summary: Get GPU debug UI wire snapshot
+      description: Debug UI mirror of the GPU limits store wire snapshot.
+      operationId: getGpuDebugUi
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: GPU debug UI snapshot
+          content:
+            application/json:
+              schema:
+                type: object
+
   /rewards:
     get:
       tags:
@@ -3717,7 +3751,7 @@ paths:
       tags:
         - RAID Admin
       summary: RAID strategy status (admin)
-      description: Wraps `{ "status": { mode, initialized, active, rebalancing_enabled } }` per admin UI contract.
+      description: 'Wraps `{ "status": { mode, initialized, active, rebalancing_enabled } }` per admin UI contract.'
       operationId: getRaidAdminStatus
       security:
         - bearerAuth: []
@@ -3758,7 +3792,7 @@ paths:
         - bearerAuth: []
       responses:
         '200':
-          description: `{ "metrics": { ... } }`
+          description: '`{ "metrics": { ... } }`'
           content:
             application/json:
               schema:
@@ -3774,7 +3808,7 @@ paths:
         - bearerAuth: []
       responses:
         '200':
-          description: `{ "metrics": { ... } }`
+          description: '`{ "metrics": { ... } }`'
           content:
             application/json:
               schema:
@@ -3908,7 +3942,7 @@ paths:
       tags:
         - RAID Distributed
       summary: Fetch artifact metadata or data (GetArtifact)
-      description: `type: get_artifact` in request body.
+      description: '`type: get_artifact` in request body.'
       operationId: distributedRaidGetArtifact
       requestBody:
         required: true
@@ -3929,7 +3963,7 @@ paths:
       tags:
         - RAID Distributed
       summary: Delete artifact on this node (DeleteArtifact)
-      description: `type: delete_artifact` in request body.
+      description: '`type: delete_artifact` in request body.'
       operationId: distributedRaidDeleteArtifact
       requestBody:
         required: true
@@ -3950,7 +3984,7 @@ paths:
       tags:
         - RAID Distributed
       summary: Synchronize artifacts between nodes (SyncArtifacts)
-      description: `type: sync_artifacts` in request body.
+      description: '`type: sync_artifacts` in request body.'
       operationId: distributedRaidSyncArtifacts
       requestBody:
         required: true
@@ -3971,7 +4005,7 @@ paths:
       tags:
         - RAID Distributed
       summary: Node health probe (HealthCheck)
-      description: `type: health_check` with empty payload object.
+      description: '`type: health_check` with empty payload object.'
       operationId: distributedRaidHealthCheck
       requestBody:
         required: true
@@ -3992,7 +4026,7 @@ paths:
       tags:
         - RAID Distributed
       summary: Join distributed RAID cluster (JoinCluster)
-      description: `type: join_cluster` in request body.
+      description: '`type: join_cluster` in request body.'
       operationId: distributedRaidJoinCluster
       requestBody:
         required: true
@@ -4013,7 +4047,7 @@ paths:
       tags:
         - RAID Distributed
       summary: Leave distributed RAID cluster (LeaveCluster)
-      description: `type: leave_cluster` in request body.
+      description: '`type: leave_cluster` in request body.'
       operationId: distributedRaidLeaveCluster
       requestBody:
         required: true
@@ -7844,7 +7878,7 @@ components:
           format: date-time
         status:
           type: string
-          description: Creating, Running, Stopped, or Failed with reason as `Failed: …`
+          description: 'Creating, Running, Stopped, or Failed with reason as `Failed: …`'
           example: Running
         resources:
           $ref: '#/components/schemas/VmResources'
