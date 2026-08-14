@@ -5,11 +5,9 @@
 
 use crate::core::error::AppError;
 use crate::vm::isolation::{
-    FilesystemIsolationConfig, FilesystemIsolator, NetworkInterfaceMode, NetworkIsolationConfig,
-    NetworkIsolator,
+    FilesystemIsolationConfig, FilesystemIsolator, NetworkIsolationConfig, NetworkIsolator,
 };
 use std::path::PathBuf;
-use std::sync::Mutex;
 use tracing::{info, warn};
 
 /// Stable macvlan device name for a parent interface and process.
@@ -157,6 +155,12 @@ pub struct LinuxNetworkIsolator {
     state: Mutex<LinuxNetworkIsolationState>,
 }
 
+impl Default for LinuxNetworkIsolator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl LinuxNetworkIsolator {
     pub fn new() -> Self {
         Self {
@@ -199,6 +203,7 @@ impl LinuxNetworkIsolator {
     }
 
     #[cfg(not(feature = "vm-isolation-linux"))]
+    #[allow(dead_code)]
     fn setup_loopback_interface() -> Result<(), AppError> {
         // No-op when feature is not enabled
         Ok(())
@@ -362,6 +367,7 @@ impl LinuxNetworkIsolator {
     }
 
     #[cfg(not(feature = "vm-isolation-linux"))]
+    #[allow(dead_code)]
     fn setup_macvlan(
         _interface: &str,
         _process_id: u32,
@@ -464,6 +470,7 @@ impl LinuxNetworkIsolator {
     }
 
     #[cfg(not(feature = "vm-isolation-linux"))]
+    #[allow(dead_code)]
     fn create_veth_pair_on_host(
         _interface_label: &str,
         _process_id: u32,
@@ -490,6 +497,7 @@ impl LinuxNetworkIsolator {
     }
 
     #[cfg(not(feature = "vm-isolation-linux"))]
+    #[allow(dead_code)]
     fn setup_firewall_rules(_ports: &[u16], _process_id: u32) -> Result<(), AppError> {
         // No-op when feature is not enabled
         Ok(())
@@ -535,6 +543,7 @@ impl LinuxNetworkIsolator {
     }
 
     #[cfg(not(feature = "vm-isolation-linux"))]
+    #[allow(dead_code)]
     fn setup_nftables_rules(_ports: &[u16], _process_id: u32) -> Result<(), AppError> {
         Ok(())
     }
@@ -578,6 +587,7 @@ impl LinuxNetworkIsolator {
     }
 
     #[cfg(not(feature = "vm-isolation-linux"))]
+    #[allow(dead_code)]
     fn setup_iptables_rules(_ports: &[u16], _process_id: u32) -> Result<(), AppError> {
         Ok(())
     }
@@ -910,6 +920,12 @@ pub struct LinuxFilesystemIsolator {
     state: Mutex<LinuxFilesystemIsolationState>,
 }
 
+impl Default for LinuxFilesystemIsolator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl LinuxFilesystemIsolator {
     pub fn new() -> Self {
         Self {
@@ -990,6 +1006,7 @@ impl LinuxFilesystemIsolator {
     }
 
     #[cfg(not(feature = "vm-isolation-linux"))]
+    #[allow(dead_code)]
     fn setup_bind_mount(
         _source: &PathBuf,
         _root_dir: Option<&PathBuf>,

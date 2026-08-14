@@ -196,6 +196,7 @@ impl LinuxCgroupLimiter {
     }
 
     /// Get CPU usage from cgroup
+    #[allow(dead_code)]
     async fn get_cpu_usage(&self, process_id: Uuid) -> Result<f64, AppError> {
         let _cgroup_path = self.get_cgroup_path(process_id, "cpu");
 
@@ -232,6 +233,7 @@ impl LinuxCgroupLimiter {
     }
 
     /// Get memory usage from cgroup
+    #[allow(dead_code)]
     async fn get_memory_usage(&self, process_id: Uuid) -> Result<u32, AppError> {
         let cgroup_path = self.get_cgroup_path(process_id, "memory");
 
@@ -302,6 +304,7 @@ impl LinuxCgroupLimiter {
     }
 
     /// Get resource usage for a process
+    #[allow(dead_code)]
     pub async fn get_usage(&self, process_id: Uuid) -> Result<ResourceUsage, AppError> {
         let cpu_percent = self.get_cpu_usage(process_id).await.unwrap_or(0.0);
         let memory_mb = self.get_memory_usage(process_id).await.unwrap_or(0);
