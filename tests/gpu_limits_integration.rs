@@ -42,7 +42,7 @@ fn gpu_limits_store_slice_docs_present_ph_s1860() {
             "missing GPU limits canon marker {name}"
         );
     }
-    let store_path = format!("docs/development/gpu_limits.json");
+    let store_path = "docs/development/gpu_limits.json".to_string();
     assert!(
         Path::new(&store_path).exists(),
         "missing durable store docs/development/gpu_limits.json"
