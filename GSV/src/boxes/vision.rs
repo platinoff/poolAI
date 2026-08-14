@@ -2468,7 +2468,7 @@ mod tests {
         let _ = std::fs::remove_dir_all(&tmp);
         let src = tmp.join("src");
         let data = tmp.join("data");
-        let vis = src.join("docs").join("vision");
+        let vis = src.join("GSV").join("docs").join("vision");
         std::fs::create_dir_all(&vis).unwrap();
         std::fs::write(
             vis.join("manifest.json"),
@@ -2499,7 +2499,7 @@ mod tests {
         let _ = std::fs::remove_dir_all(&tmp);
         let src = tmp.join("src");
         let data = tmp.join("data");
-        let vis = src.join("docs").join("vision");
+        let vis = src.join("GSV").join("docs").join("vision");
         std::fs::create_dir_all(&vis).unwrap();
         std::fs::write(
             vis.join("manifest.json"),
@@ -2524,7 +2524,7 @@ mod tests {
         let _ = std::fs::remove_dir_all(&tmp);
         let src = tmp.join("src");
         let data = tmp.join("data");
-        let vis = src.join("docs").join("vision");
+        let vis = src.join("GSV").join("docs").join("vision");
         std::fs::create_dir_all(&vis).unwrap();
         let mut m = sample_manifest();
         m.revision = 459;
@@ -2553,7 +2553,7 @@ mod tests {
         let _ = std::fs::remove_dir_all(&tmp);
         let src = tmp.join("src");
         let data = tmp.join("data");
-        let vis = src.join("docs").join("vision");
+        let vis = src.join("GSV").join("docs").join("vision");
         std::fs::create_dir_all(&vis).unwrap();
         std::fs::write(
             vis.join("manifest.json"),
@@ -2581,7 +2581,7 @@ mod tests {
         let _ = std::fs::remove_dir_all(&tmp);
         let src = tmp.join("src");
         let data = tmp.join("data");
-        let vis = src.join("docs").join("vision");
+        let vis = src.join("GSV").join("docs").join("vision");
         std::fs::create_dir_all(&vis).unwrap();
 
         let mut m = sample_manifest();
@@ -2642,7 +2642,7 @@ mod tests {
         let _ = std::fs::remove_dir_all(&tmp);
         let src = tmp.join("src");
         let data = tmp.join("data");
-        let vis = src.join("docs").join("vision");
+        let vis = src.join("GSV").join("docs").join("vision");
         std::fs::create_dir_all(&vis).unwrap();
         std::fs::write(
             vis.join("manifest.json"),
@@ -2715,7 +2715,7 @@ mod tests {
     }
 
     fn write_sample(root: &Path, manifest: &Manifest, feed: &Feed) {
-        let vis = root.join("docs").join("vision");
+        let vis = root.join("GSV").join("docs").join("vision");
         std::fs::create_dir_all(&vis).unwrap();
         std::fs::write(
             vis.join("manifest.json"),
@@ -2786,7 +2786,7 @@ mod tests {
     }
 
     fn write_speed_index(repo_root: &Path) {
-        let vis = repo_root.join("docs").join("vision");
+        let vis = repo_root.join("GSV").join("docs").join("vision");
         std::fs::create_dir_all(&vis).unwrap();
         std::fs::write(
             vis.join("speed_index.json"),
@@ -2812,7 +2812,7 @@ mod tests {
     }
 
     fn write_rust_diagnostics(repo_root: &Path) {
-        let vis = repo_root.join("docs").join("vision");
+        let vis = repo_root.join("GSV").join("docs").join("vision");
         std::fs::create_dir_all(&vis).unwrap();
         std::fs::write(
             vis.join("rust_diagnostics.json"),
@@ -2942,7 +2942,7 @@ mod tests {
         write_speed_index(&src);
         let r = read_speed_index(&src).unwrap();
         save_speed_index(&r, &data).unwrap();
-        std::fs::remove_dir_all(src.join("docs")).unwrap();
+        std::fs::remove_dir_all(src.join("GSV")).unwrap();
 
         assert!(read_speed_index(&src).is_err());
         let wire = wire_speed_index(&src, &data);
@@ -2962,7 +2962,7 @@ mod tests {
         write_rust_diagnostics(&src);
         let r = read_rust_diagnostics(&src).unwrap();
         save_rust_diagnostics(&r, &data).unwrap();
-        std::fs::remove_dir_all(src.join("docs")).unwrap();
+        std::fs::remove_dir_all(src.join("GSV")).unwrap();
 
         assert!(read_rust_diagnostics(&src).is_err());
         let wire = wire_rust_diagnostics(&src, &data);
@@ -2977,7 +2977,7 @@ mod tests {
         let tmp = std::env::temp_dir().join("gsv_vision_test_history_typed");
         let _ = std::fs::remove_dir_all(&tmp);
         let src = tmp.join("src");
-        let vis = src.join("docs").join("vision");
+        let vis = src.join("GSV").join("docs").join("vision");
         std::fs::create_dir_all(&vis).unwrap();
         std::fs::write(
             vis.join("speed_index.json"),
@@ -3059,7 +3059,7 @@ mod tests {
         let empty = speed_index_chart_svg(&src, &data);
         assert!(empty.contains("no speed_index.json history"));
 
-        let vis = src.join("docs").join("vision");
+        let vis = src.join("GSV").join("docs").join("vision");
         std::fs::create_dir_all(&vis).unwrap();
         std::fs::write(
             vis.join("speed_index.json"),
