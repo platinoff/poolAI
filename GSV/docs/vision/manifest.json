@@ -1367,24 +1367,6 @@
     },
     {
       "auto_synced": true,
-      "from": "handoff",
-      "kind": "session-tracks",
-      "to": "docs_vision_README_md"
-    },
-    {
-      "auto_synced": true,
-      "from": "handoff",
-      "kind": "session-tracks",
-      "to": "docs_vision_vision_js"
-    },
-    {
-      "auto_synced": true,
-      "from": "grid_dispatch",
-      "kind": "sprint-scope",
-      "to": "e2e_tests_grid_pricing_spec_ts"
-    },
-    {
-      "auto_synced": true,
       "from": "poolai_worker",
       "kind": "implements",
       "to": "poolai_worker"
@@ -1796,36 +1778,6 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "_cursor_rules_virtual_development_team_mdc"
-    },
-    {
-      "auto_synced": true,
-      "from": "handoff",
-      "kind": "session-tracks",
-      "to": "docs_vision_extensions_json"
-    },
-    {
-      "auto_synced": true,
-      "from": "handoff",
-      "kind": "session-tracks",
-      "to": "docs_vision_feed_json"
-    },
-    {
-      "auto_synced": true,
-      "from": "handoff",
-      "kind": "session-tracks",
-      "to": "docs_vision_index_html"
-    },
-    {
-      "auto_synced": true,
-      "from": "handoff",
-      "kind": "session-tracks",
-      "to": "docs_vision_vision_css"
-    },
-    {
-      "auto_synced": true,
-      "from": "handoff",
-      "kind": "session-tracks",
-      "to": "docs_vision_vision_svg"
     },
     {
       "auto_synced": true,
@@ -2873,12 +2825,6 @@
     },
     {
       "auto_synced": true,
-      "from": "handoff",
-      "kind": "session-tracks",
-      "to": "docs_vision_speed_index_json"
-    },
-    {
-      "auto_synced": true,
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_policy_loc_audit_depth_rs"
@@ -2924,12 +2870,6 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_development_RUST_DIAGNOSTICS_md"
-    },
-    {
-      "auto_synced": true,
-      "from": "handoff",
-      "kind": "session-tracks",
-      "to": "docs_vision_rust_diagnostics_json"
     },
     {
       "auto_synced": true,
@@ -4147,69 +4087,6 @@
       "sprints": [
         "PH-S113"
       ]
-    },
-    {
-      "auto_synced": true,
-      "id": "_cursor_rules_ai_assistant_md",
-      "label": "ai-assistant.md",
-      "layer": "L3",
-      "path": ".cursor/rules/ai-assistant.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "_cursor_rules_chat_context_md",
-      "label": "chat-context.md",
-      "layer": "L3",
-      "path": ".cursor/rules/chat-context.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "_cursor_rules_documentation_md",
-      "label": "documentation.md",
-      "layer": "L3",
-      "path": ".cursor/rules/documentation.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "_cursor_rules_git_workflow_md",
-      "label": "git-workflow.md",
-      "layer": "L3",
-      "path": ".cursor/rules/git-workflow.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "_cursor_rules_msys2_windows_md",
-      "label": "msys2-windows.md",
-      "layer": "L3",
-      "path": ".cursor/rules/msys2-windows.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "_cursor_rules_project_structure_md",
-      "label": "project-structure.md",
-      "layer": "L3",
-      "path": ".cursor/rules/project-structure.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "_cursor_rules_rust_architect_md",
-      "label": "rust-architect.md",
-      "layer": "L3",
-      "path": ".cursor/rules/rust-architect.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "_cursor_rules_rust_md",
-      "label": "rust.md",
-      "layer": "L3",
-      "path": ".cursor/rules/rust.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "_cursor_rules_scripts_md",
-      "label": "scripts.md",
-      "layer": "L3",
-      "path": ".cursor/rules/scripts.md"
     },
     {
       "auto_synced": true,
@@ -6390,28 +6267,6 @@
     },
     {
       "auto_synced": true,
-      "id": "docs_vision_README_md",
-      "label": "README.md",
-      "layer": "L1",
-      "path": "docs/vision/README.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_vision_vision_js",
-      "label": "vision.js",
-      "layer": "L1",
-      "path": "docs/vision/vision.js",
-      "sprints": [
-        "PH-S63",
-        "PH-S64",
-        "PH-S115",
-        "PH-S188",
-        "PH-S226",
-        "PH-S233"
-      ]
-    },
-    {
-      "auto_synced": true,
       "id": "docs_vm_ISOLATION_IMPLEMENTATION_md",
       "label": "ISOLATION_IMPLEMENTATION.md",
       "layer": "L2",
@@ -6447,28 +6302,10 @@
     },
     {
       "auto_synced": true,
-      "id": "e2e_tests_grid_pricing_spec_ts",
-      "label": "grid_pricing.spec.ts",
-      "layer": "L3",
-      "path": "e2e/tests/grid_pricing.spec.ts",
-      "sprints": [
-        "PH-S86",
-        "PH-S123"
-      ]
-    },
-    {
-      "auto_synced": true,
       "id": "e2e_tests_helpers_ts",
       "label": "helpers.ts",
       "layer": "L3",
       "path": "e2e/tests/helpers.ts"
-    },
-    {
-      "auto_synced": true,
-      "id": "e2e_tests_jobs_raid_spec_ts",
-      "label": "jobs_raid.spec.ts",
-      "layer": "L3",
-      "path": "e2e/tests/jobs_raid.spec.ts"
     },
     {
       "auto_synced": true,
@@ -6638,16 +6475,6 @@
         "PH-S147",
         "PH-S151",
         "PH-S152"
-      ]
-    },
-    {
-      "auto_synced": true,
-      "id": "bin_build_ui_wasm_sh",
-      "label": "build-ui-wasm.sh",
-      "layer": "L1",
-      "path": "bin/build-ui-wasm.sh",
-      "sprints": [
-        "PH-S147"
       ]
     },
     {
@@ -9244,48 +9071,6 @@
     },
     {
       "auto_synced": true,
-      "id": "docs_vision_extensions_json",
-      "label": "extensions.json",
-      "layer": "L1",
-      "path": "docs/vision/extensions.json"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_vision_feed_json",
-      "label": "feed.json",
-      "layer": "L1",
-      "path": "docs/vision/feed.json"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_vision_index_html",
-      "label": "index.html",
-      "layer": "L1",
-      "path": "docs/vision/index.html"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_vision_manifest_json",
-      "label": "manifest.json",
-      "layer": "L1",
-      "path": "docs/vision/manifest.json"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_vision_vision_css",
-      "label": "vision.css",
-      "layer": "L1",
-      "path": "docs/vision/vision.css"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_vision_vision_svg",
-      "label": "vision.svg",
-      "layer": "L1",
-      "path": "docs/vision/vision.svg"
-    },
-    {
-      "auto_synced": true,
       "id": "crates_poolai_ui_core_src_admin_dom_rs",
       "label": "admin_dom.rs",
       "layer": "L4",
@@ -11869,13 +11654,6 @@
     },
     {
       "auto_synced": true,
-      "id": "docs_vision_speed_index_json",
-      "label": "speed_index.json",
-      "layer": "L1",
-      "path": "docs/vision/speed_index.json"
-    },
-    {
-      "auto_synced": true,
       "id": "src_bin_poolai_speed_index_rs",
       "label": "poolai_speed_index.rs",
       "layer": "L3",
@@ -11978,13 +11756,6 @@
       "label": "RUST_DIAGNOSTICS.md",
       "layer": "L1",
       "path": "docs/development/RUST_DIAGNOSTICS.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_vision_rust_diagnostics_json",
-      "label": "rust_diagnostics.json",
-      "layer": "L1",
-      "path": "docs/vision/rust_diagnostics.json"
     },
     {
       "auto_synced": true,
@@ -12370,48 +12141,6 @@
       "label": "ratio96_depth_contracts.rs",
       "layer": "L3",
       "path": "tests/ratio96_depth_contracts.rs"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_gsv_GSV_ARCHITECTURE_md",
-      "label": "GSV_ARCHITECTURE.md",
-      "layer": "L2",
-      "path": "docs/gsv/GSV_ARCHITECTURE.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_gsv_GSV_BOXES_md",
-      "label": "GSV_BOXES.md",
-      "layer": "L2",
-      "path": "docs/gsv/GSV_BOXES.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_gsv_GSV_MIGRATION_md",
-      "label": "GSV_MIGRATION.md",
-      "layer": "L2",
-      "path": "docs/gsv/GSV_MIGRATION.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_gsv_GSV_SERVER_md",
-      "label": "GSV_SERVER.md",
-      "layer": "L2",
-      "path": "docs/gsv/GSV_SERVER.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_gsv_GSV_TECH_ROADMAP_md",
-      "label": "GSV_TECH_ROADMAP.md",
-      "layer": "L2",
-      "path": "docs/gsv/GSV_TECH_ROADMAP.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_gsv_README_md",
-      "label": "README.md",
-      "layer": "L2",
-      "path": "docs/gsv/README.md"
     },
     {
       "auto_synced": true,
@@ -13009,7 +12738,7 @@
       "path": "GSV/docs/vision/vision.svg"
     }
   ],
-  "revision": 489,
+  "revision": 490,
   "sprint_queue": [],
   "sprint_queue_open_count": 0,
   "updated_at": "2026-06-20",

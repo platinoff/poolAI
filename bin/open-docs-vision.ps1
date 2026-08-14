@@ -1,4 +1,4 @@
-# PoolAI - static server for docs/vision UI + repo files (md preview).
+# PoolAI - static server for GSV/docs/vision UI + repo files (md preview).
 # Usage: .\bin\open-docs-vision.ps1
 #        .\bin\open-docs-vision.ps1 -Port 8765 -NoBrowser
 #Requires -Version 5.1

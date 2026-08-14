@@ -54,6 +54,6 @@ alwaysApply: false
 - **Multitask:** `/multitask` + фонові Task subagents; довгі `cargo test-ci` — через `shell` subagent або background shell; оркестратор не блокується на drain.
 - **Modes (Shift+Tab / mode picker):** Plan — лише для неоднозначного scope; **`абракадабра`** і drain — **Agent** (реалізація + MSYS2). Mode switch = fresh context.
 - Subagent types (лише за явним запитом, не в drain): `bugbot`, `security-review`, `best-of-n-runner`; див. [`poolai-agent-roles.mdc`](poolai-agent-roles.mdc).
-- **PoolAI vision tools:** Speeds panel + eye filter + prune closed ≤2000 — [`docs/vision/README.md`](../../docs/vision/README.md); `poolai-vision-sync --check` before service close.
+- **PoolAI vision tools:** Speeds panel + eye filter + prune closed ≤2000 — [`GSV/docs/vision/README.md`](../../GSV/docs/vision/README.md); `poolai-vision-sync --check` before service close.
 - Prefer rules that are resilient to UI updates: focus on repository conventions, not fragile UI click paths.
 - Skills live under user `~/.cursor/skills-cursor/`; repo rules under `.cursor/rules/` — do not duplicate skill content in rules.

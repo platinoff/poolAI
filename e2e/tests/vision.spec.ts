@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 const visionUrl =
   process.env.POOLAI_VISION_URL ??
-  "http://127.0.0.1:8765/docs/vision/index.html";
+  "http://127.0.0.1:8765/GSV/docs/vision/index.html";
 
 test.describe("Vision legacy pointer page (band 117)", () => {
   test.beforeEach(async ({ page }) => {

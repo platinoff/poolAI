@@ -70,5 +70,5 @@ flowchart LR
 
 - [`functionality-management.mdc`](functionality-management.mdc) — FM-менеджер (§5.1)
 - [`autonomous-orchestrator.mdc`](autonomous-orchestrator.mdc) — AUTO_RUN
-- [`docs-vision.mdc`](docs-vision.mdc) — `docs/vision/` після FM/HANDOFF
+- [`docs-vision.mdc`](docs-vision.mdc) — `GSV/docs/vision/` після FM/HANDOFF
 - [`poolai-testing-policy.mdc`](poolai-testing-policy.mdc) — Rust-first tests vs Playwright

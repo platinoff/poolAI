@@ -493,7 +493,7 @@ poolAI docs parity; vision rev **458**. GSV tests **87** (46 unit + 18 + 8 omni 
 
 ## Band 102 — GSV migration · Galaxy StarWalker Vision (PH-S1659…S1668, **✅**)
 
-Окремий проєкт **GSV** — vision migration у Rust-first bin-сервер з боксами (95–100% Rust / 0–5% wasm). Архітектура + docs: [`GSV/README.md`](../../GSV/README.md) · [`GSV/docs/gsv/`](../../GSV/GSV/docs/gsv/README.md) · **TechPreroadMap** [`GSV_TECH_ROADMAP.md`](../../GSV/GSV/docs/gsv/GSV_TECH_ROADMAP.md). Priority: owner (перед master-backlog Ratio96 phase F).
+Окремий проєкт **GSV** — vision migration у Rust-first bin-сервер з боксами (95–100% Rust / 0–5% wasm). Архітектура + docs: [`GSV/README.md`](../../GSV/README.md) · [`GSV/docs/gsv/`](../../../GSV/docs/gsv/README.md) · **TechPreroadMap** [`GSV_TECH_ROADMAP.md`](../../../GSV/docs/gsv/GSV_TECH_ROADMAP.md). Priority: owner (перед master-backlog Ratio96 phase F).
 
 | Sprint | Фокус |
 |--------|--------|

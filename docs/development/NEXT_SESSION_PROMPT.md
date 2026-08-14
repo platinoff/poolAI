@@ -11,8 +11,8 @@ Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.1
 | **P0 open** | **PH-SVC34** re-verify GH · **PH-SVC35** OWNER |
 | **Completion pending** | **560** sprints PH-S1739…S2278 · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) |
 | **Horizon band 127 PH-S1909.S1918** | band 125 → **PH-S1889…S1898** |
-| **Vision** | rev **489** |
-| **GSV** | окремий проєкт Rust-first (bands 102+108+109+110+111+112+113+114+115+116+117+118 ✅, ratio 95.35%, tests 163) · [`GSV/README.md`](../../GSV/README.md) · [`GSV/docs/gsv/`](../../GSV/GSV/docs/gsv/README.md) · ролі [`GSV/docs/GSV_ROLES.md`](../../GSV/docs/GSV_ROLES.md) · Vision box [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) |
+| **Vision** | rev **490** |
+| **GSV** | окремий проєкт Rust-first (bands 102+108+109+110+111+112+113+114+115+116+117+118 ✅, ratio 95.35%, tests 163) · [`GSV/README.md`](../../GSV/README.md) · [`GSV/docs/gsv/`](../../../GSV/docs/gsv/README.md) · ролі [`GSV/docs/GSV_ROLES.md`](../../GSV/docs/GSV_ROLES.md) · Vision box [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) |
 | **Cursor / GH** | local **3.13.21** · Auto-review · Router Balance/Intelligence · Actions `GITHUB_TOKEN` opaque/JWT · [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](./CURSOR_UPDATE_RESEARCH_2026-07-27.md) |
 
 ---
@@ -72,7 +72,7 @@ advisory → band close (`galaxy_horizon_s1859_integration`, FM §5.103). Кан
 Окремий проєкт **Galaxy StarWalker Vision** — **bands 102 + 108 + 109 + 110 + 111 + 112 + 113 + 114 + 115 + 116 + 117 + 118 ✅**: Rust-first bin-сервер `gsv-server`
 з боксами (Tracker · SLI console · Toolchain · IDE · Update/offline · Box preview · SLI terminal ·
 Tests/bench hooks · Ratio · **Vision** · **Vision Map** · **Sprint Map** · **Doc Preview** · **Vision Sync** · **Sprint Queue** · **Sprint Board** · **Sprint Progress** · **Sprint Focus** · **Node Search** · **Speed Index** · **Rust Diagnostics** · OmniRouter), **163 tests green**, clippy 0, **ratio 95.35%**.
-Канон: ролі [`GSV/docs/GSV_ROLES.md`](../../GSV/docs/GSV_ROLES.md) · пам'ять [`GSV/docs/MEMORY.md`](../../GSV/docs/MEMORY.md) · Vision box [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · TechPreroadMap [`GSV_TECH_ROADMAP.md`](../../GSV/GSV/docs/gsv/GSV_TECH_ROADMAP.md).
+Канон: ролі [`GSV/docs/GSV_ROLES.md`](../../GSV/docs/GSV_ROLES.md) · пам'ять [`GSV/docs/MEMORY.md`](../../GSV/docs/MEMORY.md) · Vision box [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · TechPreroadMap [`GSV_TECH_ROADMAP.md`](../../../GSV/docs/gsv/GSV_TECH_ROADMAP.md).
 
 Band 116 (**PH-S1799…S1808**, GSV history charts) — **drained** ✅:
 `GET /api/vision/speeds.svg` + `GET /api/vision/rust-diagnostics.svg` (Rust-rendered SVG history
@@ -105,7 +105,7 @@ vision rev **488**.
 (scope за project scan).
 Оновлювати FM §5.12 (черга, ≥10 відкритих), HANDOFF, NEXT_SESSION.
 
-Канон GSV: [`GSV/README.md`](../../GSV/README.md) · [`GSV/docs/gsv/GSV_BOXES.md`](../../GSV/GSV/docs/gsv/GSV_BOXES.md) · [`GSV/docs/gsv/GSV_SERVER.md`](../../GSV/GSV/docs/gsv/GSV_SERVER.md) · FM §5.12 §5.83 · §5.89 · §5.90 · §5.91 · §5.92 · §5.93 · §5.94 · §5.95 · §5.96 · §5.97 · §5.98 · §5.99
+Канон GSV: [`GSV/README.md`](../../GSV/README.md) · [`GSV/docs/gsv/GSV_BOXES.md`](../../../GSV/docs/gsv/GSV_BOXES.md) · [`GSV/docs/gsv/GSV_SERVER.md`](../../../GSV/docs/gsv/GSV_SERVER.md) · FM §5.12 §5.83 · §5.89 · §5.90 · §5.91 · §5.92 · §5.93 · §5.94 · §5.95 · §5.96 · §5.97 · §5.98 · §5.99
 
 ---
 

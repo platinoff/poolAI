@@ -268,7 +268,7 @@ jobs:
           name: rust-diagnostics-json
           path: |
             docs/development/rust_diagnostics.json
-            docs/vision/rust_diagnostics.json
+            GSV/docs/vision/rust_diagnostics.json
           if-no-files-found: warn
 
   rust-ratio-audit:

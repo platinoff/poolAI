@@ -6,7 +6,7 @@
 
 Описати **billing / tokenization / on-chain anchoring** як **окремий адаптер** поверх уже реалізованого **PoolAI core** (Rust runtime, RAID, VM, Rewards у сенсі внутрішньої логіки). Цей документ **не** додає залежність `solana-sdk` у дерево `poolai` і **не** фіксує фінальну схему акаунтів — лише межі відповідальності та мапінг доменних подій.
 
-**Galaxy map (PH-S120):** інтерактивний граф — [`GSV/docs/vision/`](../GSV/GSV/docs/vision/) (`solana_concept` → `crate_solana` → `solana_sidecar` / `solana_program`); FM **FM-033** у [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
+**Galaxy map (PH-S120):** інтерактивний граф — [`GSV/docs/vision/`](../../GSV/docs/vision/) (`solana_concept` → `crate_solana` → `solana_sidecar` / `solana_program`); FM **FM-033** у [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
 
 Звʼязані документи:
 

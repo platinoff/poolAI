@@ -40,7 +40,7 @@ alwaysApply: true
 - **`/multitask`:** паралельні фонові Task subagents під час довгого drain (не замість канону MSYS2).
 - **Cloud agent hooks** (`beforeSubmitPrompt`, `afterAgentResponse`, `afterAgentThought`, `stop`, `subagentStart`, …): опційно для cloud; локальний VDT канон — MSYS2 + `poolai-session-iteration.mdc`.
 - Baseline / research: [`cursor-environment-baseline.mdc`](cursor-environment-baseline.mdc) · [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](../../docs/development/CURSOR_UPDATE_RESEARCH_2026-07-27.md) (local **3.13.21**).
-- **Vision tools (PoolAI):** Speeds + eye 👁 + prune ≤2000 — [`docs/vision/README.md`](../../docs/vision/README.md); service/close — `poolai-vision-sync --check`.
+- **Vision tools (PoolAI):** Speeds + eye 👁 + prune ≤2000 — [`GSV/docs/vision/README.md`](../../GSV/docs/vision/README.md); service/close — `poolai-vision-sync --check`.
 - **Ops:** Agents Window Changes (Win) — fix у 3.13 line (verify **3.13.21**); flicker з **Cursor Dark High Contrast** — змінити тему; не блокує drain.
 
 ## Канон черги (FM)

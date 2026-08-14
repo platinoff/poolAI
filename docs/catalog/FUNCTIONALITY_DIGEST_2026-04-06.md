@@ -49,7 +49,7 @@
 | **`poolai-telegram-bot`** (`src/bin/poolai-telegram-bot.rs`) | Telegram bot sidecar (`--features tgbot`); coordinator bridge (FM-016++). |
 | **`poolai-solana-adapter`** (`crates/poolai-solana-adapter/src/bin/`) | NDJSON domain events → mock/devnet RPC ack (FM-024/033). |
 
-**GSV (Galaxy StarWalker Vision)** — окремий Rust-first проєкт у `GSV/` (vision migration): bin-сервер `gsv-server` (axum 0.8, SSE `/events`, single-page UI) з боксами **Tracker · SLI console · Toolchain · IDE · Update/offline · Box preview · SLI terminal · Tests/bench hooks · Ratio · OmniRouter** (Rust AI-проксі/роутер). Rust 95–100% / wasm 0–5%. **87 tests green, clippy 0, ratio 95.52%.** Канон: [`GSV/README.md`](../../GSV/README.md) · docs [`GSV/docs/gsv/`](../GSV/GSV/docs/gsv/README.md) · **TechPreroadMap** [`GSV/docs/gsv/GSV_TECH_ROADMAP.md`](../GSV/GSV/docs/gsv/GSV_TECH_ROADMAP.md) · ролі [`GSV/docs/GSV_ROLES.md`](../../GSV/docs/GSV_ROLES.md) · band 102 `PH-S1659…S1668` **✅** (FM §5.12 §5.83) · band 108 `PH-S1719…S1728` **✅** (FM §5.12 §5.89).
+**GSV (Galaxy StarWalker Vision)** — окремий Rust-first проєкт у `GSV/` (vision migration): bin-сервер `gsv-server` (axum 0.8, SSE `/events`, single-page UI) з боксами **Tracker · SLI console · Toolchain · IDE · Update/offline · Box preview · SLI terminal · Tests/bench hooks · Ratio · OmniRouter** (Rust AI-проксі/роутер). Rust 95–100% / wasm 0–5%. **87 tests green, clippy 0, ratio 95.52%.** Канон: [`GSV/README.md`](../../GSV/README.md) · docs [`GSV/docs/gsv/`](../../GSV/docs/gsv/README.md) · **TechPreroadMap** [`GSV/docs/gsv/GSV_TECH_ROADMAP.md`](../../GSV/docs/gsv/GSV_TECH_ROADMAP.md) · ролі [`GSV/docs/GSV_ROLES.md`](../../GSV/docs/GSV_ROLES.md) · band 102 `PH-S1659…S1668` **✅** (FM §5.12 §5.83) · band 108 `PH-S1719…S1728` **✅** (FM §5.12 §5.89).
 
 ---
 
@@ -126,11 +126,11 @@
 | [`development/JOB_LAYER_CONCEPT_2026-03-17.md`](../development/JOB_LAYER_CONCEPT_2026-03-17.md) | Job / mining layer, життєвий цикл job. |
 | [`development/GRID_PROTOCOL_CONCEPT_2026-04-06.md`](../development/GRID_PROTOCOL_CONCEPT_2026-04-06.md) | Grid protocol: типи повідомлень, Discovery/RAID/тести. |
 | [`development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md`](../development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md) | Solana adapter: core vs on-chain, події Job/Memory. |
-| [`vision/manifest.json`](../GSV/GSV/docs/vision/manifest.json) | **Galaxy map** — вузли `crate_solana`, `job_onchain`, sidecar/program (PH-S120); **Eco/perf UI** PH-S125; `bin/open-docs-vision.ps1`. |
+| [`vision/manifest.json`](../../GSV/docs/vision/manifest.json) | **Galaxy map** — вузли `crate_solana`, `job_onchain`, sidecar/program (PH-S120); **Eco/perf UI** PH-S125; `bin/open-docs-vision.ps1`. |
 
 ### Solana adapter — модулі (FM-010 / FM-024 / FM-033, PH-S120)
 
-Канон концепту: [`SOLANA_ADAPTER_CONCEPT_2026-04-06.md`](../development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md) · FM **FM-033** ✅ · карта: [`GSV/docs/vision/`](../GSV/GSV/docs/vision/) (`solana_concept` → `crate_solana` → sidecar/program).
+Канон концепту: [`SOLANA_ADAPTER_CONCEPT_2026-04-06.md`](../development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md) · FM **FM-033** ✅ · карта: [`GSV/docs/vision/`](../../GSV/docs/vision/) (`solana_concept` → `crate_solana` → sidecar/program).
 
 | Модуль | Шлях | Функція | Wire |
 |--------|------|---------|------|

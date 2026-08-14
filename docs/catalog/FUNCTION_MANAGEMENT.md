@@ -264,13 +264,13 @@ Vision rev 488.
 **Черга PH-S55…S64 закрита (2026-05-27).** Наступні спринти — **§5.12** (research).
 
 **Поза чергою:** **PH-S35** / **PH-S16** / **PH-S02** LAN (**BLOCKED**) · **PH-S36** / **PH-S01** / **PH-S15** Cloud SDK (**Deferred**, FM-041).
-Vision rev 489.
+Vision rev 490.
 
 ### 5.12 Research backlog PH-S65+ (Galaxy wire / ops, 2026-05-27)
 
 **VDT:** §5.12 = **журнал PH-S*** (≤10 відкритих). Якщо **< 10** — **`абракадабра`** / project scan **всього проєкту**: concept → FM **§5.1** → roadmaps → architect → DOCS_LEGACY → code → §5.13 fallback. Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Project scan». **Rust-first:** API → `tests/`; Playwright лише browser scope.
 
-**Відкритих у §5.12:** **0** (band 124 ✅ · §5.105 PH-S1879…S1888). **Master horizon:** PH-S1899.S1908 (band 126). Vision rev **489**.
+**Відкритих у §5.12:** **0** (band 124 ✅ · §5.105 PH-S1879…S1888). **Master horizon:** PH-S1899.S1908 (band 126). Vision rev **490**.
 
 **Историчний research backlog (PH-S65+):**
 
@@ -1321,7 +1321,7 @@ Vision rev 488.
 
 **Джерело:** власник (GSV перед master-backlog) — GSV_MIGRATION.md future rows: manifest/feed/sync
 port у Rust (boxes/vision + `gsv-vision-sync` bin) + thin ratio-safe UI панелі + docs canon. Canon:
-[`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../GSV/GSV/docs/gsv/GSV_MIGRATION.md) ·
+[`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../../GSV/docs/gsv/GSV_MIGRATION.md) ·
 [`GSV_ROLES.md`](../../GSV/docs/GSV_ROLES.md).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
@@ -1353,7 +1353,7 @@ vision-sync rev **459**.
 
 **Джерело:** власник (GSV перед master-backlog) — GSV_MIGRATION.md future rows: `vision.svg` port +
 «Vision UI-логіка (map)» — compact ratio-safe map панель + map wire. Canon:
-[`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../GSV/GSV/docs/gsv/GSV_MIGRATION.md).
+[`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../../GSV/docs/gsv/GSV_MIGRATION.md).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
@@ -1373,7 +1373,7 @@ Vision rev 488.
 
 **Джерело:** власник (GSV перед master-backlog) — GSV_MIGRATION.md «Vision UI-логіка
 (sprint-queue, doc-preview)» — sprint-queue map + docs ↔ code preview wire та UI cards.
-Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../GSV/GSV/docs/gsv/GSV_MIGRATION.md).
+Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../../GSV/docs/gsv/GSV_MIGRATION.md).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
@@ -1393,7 +1393,7 @@ Vision rev 488.
 
 **Джерело:** власник (GSV future — `GSV_MIGRATION.md` «vision auto-sync, sprint-queue manifest
 планування») — extension manifest mirror + auto-sync wire + sprint-queue planning report та UI cards.
-Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../GSV/GSV/docs/gsv/GSV_MIGRATION.md).
+Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../../GSV/docs/gsv/GSV_MIGRATION.md).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
@@ -1413,7 +1413,7 @@ Vision rev 488.
 
 **Джерело:** власник (GSV future — `GSV_MIGRATION.md` «Galaxy UI», key UX-вимоги) — node-search wire
 + inline interactive vision map + layer filter та search-to-preview UX.
-Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../GSV/GSV/docs/gsv/GSV_MIGRATION.md).
+Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../../GSV/docs/gsv/GSV_MIGRATION.md).
 Виконано: node-search wire + contracts (122) · inline SVG map + layer filter + search UX · docs canon · vision rev 465.
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
@@ -1434,7 +1434,7 @@ Vision rev 488.
 
 **Джерело:** власник (GSV future — sprint-queue planning data → board + progress UX; base:
 `GET /api/vision/sprint-queue` band 112 + `GET /api/vision/sprint-map` band 111 + manifest layers).
-Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../GSV/GSV/docs/gsv/GSV_MIGRATION.md).
+Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../../GSV/docs/gsv/GSV_MIGRATION.md).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
@@ -1461,7 +1461,7 @@ server contracts **21** (загалом **140**); GSV ratio **95.02%** gate ✅;
 **Джерело:** власник (GSV migration completion — ratio-safe: supersede legacy `GSV/docs/vision/{index.html,vision.js,vision.css}`
 Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Base: `GET /api/vision/*` bands 109–114 +
 `GSV/docs/vision/speed_index.json`/`rust_diagnostics.json`. Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) ·
-[`GSV_MIGRATION.md`](../GSV/GSV/docs/gsv/GSV_MIGRATION.md).
+[`GSV_MIGRATION.md`](../../GSV/docs/gsv/GSV_MIGRATION.md).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
@@ -1479,7 +1479,7 @@ Vision rev 488.
 
 ### 5.97 GSV history charts queue — band 116 (PH-S1799…S1808, 2026-08-07) · **✅**
 
-**Джерело:** master backlog band 116 (GSV history charts — speed-index history UI + rust-diagnostics history chart) — GSV Speeds/Rust supersession (bands 109–115) + live artifacts `GSV/docs/vision/{speed_index,rust_diagnostics}.json` (history arrays). Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../GSV/GSV/docs/gsv/GSV_MIGRATION.md). Rust-first: charts = Rust-rendered SVG (ratio-safe 95–100%, no UI JS).
+**Джерело:** master backlog band 116 (GSV history charts — speed-index history UI + rust-diagnostics history chart) — GSV Speeds/Rust supersession (bands 109–115) + live artifacts `GSV/docs/vision/{speed_index,rust_diagnostics}.json` (history arrays). Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../../GSV/docs/gsv/GSV_MIGRATION.md). Rust-first: charts = Rust-rendered SVG (ratio-safe 95–100%, no UI JS).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
@@ -1497,7 +1497,7 @@ Vision rev 488.
 
 ### 5.98 GSV legacy vision deactivation queue — band 117 (PH-S1809…S1818, 2026-08-07) · **✅**
 
-**Джерело:** GSV supersession close (bands 115–116) — legacy `GSV/docs/vision/index.html` + `vision.js`/`vision.css` superseded; stand smoke passed (band 116); legacy assets деактивуються (**не видаляємо** — `GSV/docs/vision/` лишається канон-джерелом до завершення GSV). Canon: [`GSV/docs/LEGACY_PARITY.md`](../../GSV/docs/LEGACY_PARITY.md) · [`GSV_MIGRATION.md`](../GSV/GSV/docs/gsv/GSV_MIGRATION.md). Rust-first: UI переходить на GSV (`gsv-server` + `GET /api/vision*`); перенесення legacy JS/CSS у `GSV/ui/` знищило б ratio canon.
+**Джерело:** GSV supersession close (bands 115–116) — legacy `GSV/docs/vision/index.html` + `vision.js`/`vision.css` superseded; stand smoke passed (band 116); legacy assets деактивуються (**не видаляємо** — `GSV/docs/vision/` лишається канон-джерелом до завершення GSV). Canon: [`GSV/docs/LEGACY_PARITY.md`](../../GSV/docs/LEGACY_PARITY.md) · [`GSV_MIGRATION.md`](../../GSV/docs/gsv/GSV_MIGRATION.md). Rust-first: UI переходить на GSV (`gsv-server` + `GET /api/vision*`); перенесення legacy JS/CSS у `GSV/ui/` знищило б ratio canon.
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
@@ -1515,7 +1515,7 @@ Vision rev 488.
 
 ### 5.99 GSV sprint UI migration queue — band 118 (PH-S1819…S1828, 2026-08-08) · **✅**
 
-**Джерело:** owner priority (master horizon band 118): migrate legacy Galaxy sprint UI colors + behavior into GSV, recreated in Rust — sprint theme wire (colors), Rust-rendered sprint focus SVG, sprint-pill/queue-state colors. Legacy sprint UI: [`GSV/docs/vision/vision.css`](../GSV/GSV/docs/vision/vision.css) (lines 40, 430–450, 2088–2275) · [`GSV/docs/vision/vision.js`](../GSV/GSV/docs/vision/vision.js) (lines ~84, 659–676, 2131–2170). GSV: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV/docs/LEGACY_PARITY.md`](../../GSV/docs/LEGACY_PARITY.md). Cursor rules migration (legacy `.md` → `.mdc`) **deferred** to a later band.
+**Джерело:** owner priority (master horizon band 118): migrate legacy Galaxy sprint UI colors + behavior into GSV, recreated in Rust — sprint theme wire (colors), Rust-rendered sprint focus SVG, sprint-pill/queue-state colors. Legacy sprint UI: [`GSV/docs/vision/vision.css`](../../GSV/docs/vision/vision.css) (lines 40, 430–450, 2088–2275) · [`GSV/docs/vision/vision.js`](../../GSV/docs/vision/vision.js) (lines ~84, 659–676, 2131–2170). GSV: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV/docs/LEGACY_PARITY.md`](../../GSV/docs/LEGACY_PARITY.md). Cursor rules migration (legacy `.md` → `.mdc`) **deferred** to a later band.
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
@@ -1533,7 +1533,7 @@ Vision rev 488.
 
 ### 5.100 GSV Galaxy UI full parity queue — band 119 (PH-S1829…S1838, 2026-08-08) · **✅**
 
-**Джерело:** owner priority (master horizon band 119): Galaxy UI full parity — colors + box behaviors. Повний legacy `:root` palette wire, Rust-rendered starfield/galaxy backdrop SVG, header chrome (RSS ticker, GPU mode cycle, power menu), panel dock + Esc-fullscreen. Legacy: [`GSV/docs/vision/vision.css`](../GSV/GSV/docs/vision/vision.css) `:root` + header/starfield chrome · [`GSV/docs/vision/vision.js`](../GSV/GSV/docs/vision/vision.js). GSV: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV/docs/LEGACY_PARITY.md`](../../GSV/docs/LEGACY_PARITY.md).
+**Джерело:** owner priority (master horizon band 119): Galaxy UI full parity — colors + box behaviors. Повний legacy `:root` palette wire, Rust-rendered starfield/galaxy backdrop SVG, header chrome (RSS ticker, GPU mode cycle, power menu), panel dock + Esc-fullscreen. Legacy: [`GSV/docs/vision/vision.css`](../../GSV/docs/vision/vision.css) `:root` + header/starfield chrome · [`GSV/docs/vision/vision.js`](../../GSV/docs/vision/vision.js). GSV: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV/docs/LEGACY_PARITY.md`](../../GSV/docs/LEGACY_PARITY.md).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
@@ -1677,7 +1677,7 @@ Vision rev 488.
 
 ### 5.83 GSV migration queue — band 102 (PH-S1659…S1668, 2026-08-01) · **✅**
 
-**Джерело:** окремий проєкт GSV (vision migration, Rust 95–100% / wasm 0–5%) — канон міграції vision у самостійний bin-сервер з боксами. Архітектура + docs: [`GSV/README.md`](../../GSV/README.md) · [`GSV_ARCHITECTURE.md`](../../GSV/GSV/docs/gsv/GSV_ARCHITECTURE.md) · [`GSV_SERVER.md`](../../GSV/GSV/docs/gsv/GSV_SERVER.md) · [`GSV_BOXES.md`](../../GSV/GSV/docs/gsv/GSV_BOXES.md) · [`GSV_MIGRATION.md`](../../GSV/GSV/docs/gsv/GSV_MIGRATION.md) · **TechPreroadMap** [`GSV_TECH_ROADMAP.md`](../../GSV/GSV/docs/gsv/GSV_TECH_ROADMAP.md). Priority: owner (GSV перед master-backlog Ratio96 phase F).
+**Джерело:** окремий проєкт GSV (vision migration, Rust 95–100% / wasm 0–5%) — канон міграції vision у самостійний bin-сервер з боксами. Архітектура + docs: [`GSV/README.md`](../../GSV/README.md) · [`GSV_ARCHITECTURE.md`](../../../GSV/docs/gsv/GSV_ARCHITECTURE.md) · [`GSV_SERVER.md`](../../../GSV/docs/gsv/GSV_SERVER.md) · [`GSV_BOXES.md`](../../../GSV/docs/gsv/GSV_BOXES.md) · [`GSV_MIGRATION.md`](../../../GSV/docs/gsv/GSV_MIGRATION.md) · **TechPreroadMap** [`GSV_TECH_ROADMAP.md`](../../../GSV/docs/gsv/GSV_TECH_ROADMAP.md). Priority: owner (GSV перед master-backlog Ratio96 phase F).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|

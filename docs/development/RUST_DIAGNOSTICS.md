@@ -1,7 +1,7 @@
 # Rust diagnostics — Clippy warning/error index
 
 **Оновлено:** 2026-07-28  
-**Артефакт:** [`rust_diagnostics.json`](./rust_diagnostics.json) · mirror [`../GSV/GSV/docs/vision/rust_diagnostics.json`](../GSV/GSV/docs/vision/rust_diagnostics.json)  
+**Артефакт:** [`rust_diagnostics.json`](./rust_diagnostics.json) · mirror [`../../GSV/docs/vision/rust_diagnostics.json`](../../GSV/docs/vision/rust_diagnostics.json)  
 **Bin:** `poolai-rust-diagnostics` · wrapper: `bin/record-rust-diagnostics.sh`  
 **UI:** GSV → panel **Rust** (`http://127.0.0.1:8891/`) · legacy `GSV/docs/vision/index.html` deactivated (band 117)  
 **CI:** job `rust-diagnostics` in [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) (artifact upload)

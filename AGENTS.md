@@ -5,9 +5,9 @@
 ## Проєкт
 
 - **Назва:** PoolAI · **Версія:** v0.2.2 (див. `Cargo.toml` / `src/version.rs`) · **Корінь:** `S:\rust\poolAI`
+- **Проєкт GSV:** docs переміщені у `GSV/docs/` (`GSV/docs/gsv/` + `GSV/docs/vision/`); це окремовий проєкт doc-зони, отже шляхи `docs/gsv/`/`docs/vision/` більше не актуальні.
 - **Стек (канон):** Rust `src/`, `tests/`, `crates/`; UI — JS у `src/ui/`; E2E — `e2e/` (TypeScript); **без Python**.
 - **PRIMARY concept:** `docs/concept/poolAI_concept_root.txt` (читати першим).
-- **Helper-файл навігації:** `file_list.csv` (репо-відносні шляхи).
 
 ## Runtime stack — завжди
 
