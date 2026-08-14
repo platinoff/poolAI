@@ -10,9 +10,17 @@
 set -euo pipefail
 
 export PATH="${HOME}/.cargo/bin:/ucrt64/bin:/usr/bin:${PATH:-}"
-export RUSTUP_TOOLCHAIN="${RUSTUP_TOOLCHAIN:-stable-x86_64-pc-windows-gnu}"
 export K8S_OPENAPI_ENABLED_VERSION="${K8S_OPENAPI_ENABLED_VERSION:-1.28}"
-export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-/s/rust/poolAI/target}"
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*)
+    # MSYS2 local dev: force the native Windows GNU toolchain + repo target dir.
+    export RUSTUP_TOOLCHAIN="${RUSTUP_TOOLCHAIN:-stable-x86_64-pc-windows-gnu}"
+    export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-/s/rust/poolAI/target}"
+    ;;
+  *)
+    # Linux/macOS CI: keep the rustup default toolchain + target dir.
+    ;;
+esac
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
