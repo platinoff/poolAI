@@ -21,6 +21,11 @@ Cargo.std.toml
 # --- Secrets / credentials (never commit/push) ---
 .env
 .env.*
+*.env
+.envrc
+.env.local
+.env.production
+.env.staging
 !.env.example
 *.pem
 *.key
