@@ -263,7 +263,7 @@ fn write_json_file(path: &Path, value: &Value) -> Result<(), String> {
     fs::write(path, pretty + "\n").map_err(|e| format!("write {}: {e}", path.display()))
 }
 
-fn sync_manifest(manifest: &mut Value, paths: &[String]) -> (usize, usize) {
+fn sync_manifest(manifest: &mut Value, paths: &[String]) -> (usize, usize, usize, usize) {
     let mut known_paths: BTreeMap<String, String> = BTreeMap::new();
     let mut taken_ids: BTreeSet<String> = BTreeSet::new();
     if let Some(nodes) = manifest.get("nodes").and_then(Value::as_array) {
@@ -275,6 +275,61 @@ fn sync_manifest(manifest: &mut Value, paths: &[String]) -> (usize, usize) {
                 known_paths.insert(normalize_path(p), id.to_string());
                 taken_ids.insert(id.to_string());
             }
+        }
+    }
+
+    let indexable: BTreeSet<String> = paths
+        .iter()
+        .filter(|p| should_index(p))
+        .map(|p| normalize_path(p))
+        .collect();
+
+    let mut pruned_nodes = 0usize;
+    let mut pruned_edges = 0usize;
+    let mut removed_ids: BTreeSet<String> = BTreeSet::new();
+    if let Some(nodes) = manifest.get_mut("nodes").and_then(Value::as_array_mut) {
+        let kept: Vec<Value> = nodes
+            .iter()
+            .filter(|node| {
+                let auto_synced = node
+                    .get("auto_synced")
+                    .and_then(Value::as_bool)
+                    .unwrap_or(false);
+                if !auto_synced {
+                    return true;
+                }
+                let Some(p) = node.get("path").and_then(Value::as_str) else {
+                    return false;
+                };
+                if indexable.contains(&normalize_path(p)) {
+                    return true;
+                }
+                if let Some(id) = node.get("id").and_then(Value::as_str) {
+                    removed_ids.insert(id.to_string());
+                }
+                pruned_nodes += 1;
+                false
+            })
+            .cloned()
+            .collect();
+        *nodes = kept;
+    }
+    if !removed_ids.is_empty() {
+        if let Some(edges) = manifest.get_mut("edges").and_then(Value::as_array_mut) {
+            let kept: Vec<Value> = edges
+                .iter()
+                .filter(|edge| {
+                    let from = edge.get("from").and_then(Value::as_str).unwrap_or("");
+                    let to = edge.get("to").and_then(Value::as_str).unwrap_or("");
+                    if removed_ids.contains(from) || removed_ids.contains(to) {
+                        pruned_edges += 1;
+                        return false;
+                    }
+                    true
+                })
+                .cloned()
+                .collect();
+            *edges = kept;
         }
     }
 
@@ -351,7 +406,7 @@ fn sync_manifest(manifest: &mut Value, paths: &[String]) -> (usize, usize) {
             .extend(new_edges);
     }
 
-    if added_nodes > 0 || added_edges > 0 {
+    if added_nodes > 0 || added_edges > 0 || pruned_nodes > 0 {
         let rev = manifest
             .get("revision")
             .and_then(Value::as_u64)
@@ -361,7 +416,7 @@ fn sync_manifest(manifest: &mut Value, paths: &[String]) -> (usize, usize) {
         manifest["auto_sync_at"] = json!(today_iso());
     }
 
-    (added_nodes, added_edges)
+    (added_nodes, added_edges, pruned_nodes, pruned_edges)
 }
 
 fn strip_md_cell(raw: &str) -> String {
@@ -1568,17 +1623,22 @@ fn main() -> ExitCode {
         }
     };
 
-    let (added_nodes, added_edges) = sync_manifest(&mut manifest, &paths);
+    let (added_nodes, added_edges, pruned_nodes, pruned_edges) =
+        sync_manifest(&mut manifest, &paths);
     let (entries, fm_section) = read_fm_sprint_bundle(&root);
     let queue_changed = sync_fm_sprint_queue(&mut manifest, &entries, Some(&fm_section));
     let feed_changed = sync_sprint_feed(&root, &entries, Some(&fm_section));
     let (next_sprint, _, _) = derive_sprint_meta(&entries, Some(&fm_section));
     let ext_changed = sync_extensions_active_sprint(&root, next_sprint.as_deref());
-    if (queue_changed || feed_changed || ext_changed) && added_nodes == 0 && added_edges == 0 {
+    if (queue_changed || feed_changed || ext_changed)
+        && added_nodes == 0
+        && added_edges == 0
+        && pruned_nodes == 0
+    {
         bump_manifest_revision(&mut manifest);
     }
     println!(
-        "vision sync: +{added_nodes} nodes, +{added_edges} edges, sprint_queue {}, feed {}, extensions {} (revision {})",
+        "vision sync: +{added_nodes} nodes, +{added_edges} edges, -{pruned_nodes} nodes, -{pruned_edges} edges, sprint_queue {}, feed {}, extensions {} (revision {})",
         if queue_changed {
             "updated"
         } else {
@@ -1605,7 +1665,7 @@ fn main() -> ExitCode {
         return ExitCode::SUCCESS;
     }
 
-    if queue_changed || added_nodes > 0 || added_edges > 0 || feed_changed {
+    if queue_changed || added_nodes > 0 || added_edges > 0 || pruned_nodes > 0 || feed_changed {
         if let Err(e) = write_manifest(&manifest_path, &manifest) {
             eprintln!("error: {e}");
             return ExitCode::from(2);
@@ -1846,11 +1906,48 @@ mod tests {
             "edges": []
         });
         let paths = vec!["docs/openapi.yaml".to_string()];
-        let (n, e) = sync_manifest(&mut manifest, &paths);
+        let (n, e, pn, pe) = sync_manifest(&mut manifest, &paths);
         assert_eq!(n, 1);
         assert!(e >= 1);
+        assert_eq!(pn, 0);
+        assert_eq!(pe, 0);
         let nodes = manifest["nodes"].as_array().unwrap();
         assert!(nodes.iter().any(|n| n["path"] == "docs/openapi.yaml"));
+    }
+
+    /// Regression: nodes whose files were moved/deleted must be pruned
+    /// (auto_synced only), together with their edges.
+    #[test]
+    fn sync_prunes_stale_auto_synced_nodes_and_edges() {
+        let mut manifest = json!({
+            "revision": 1,
+            "nodes": [
+                { "id": "fm", "label": "FM", "path": "docs/catalog/FUNCTION_MANAGEMENT.md", "layer": "L2" },
+                { "id": "stale_vision_readme", "label": "README.md", "path": "docs/vision/README.md", "layer": "L1", "auto_synced": true },
+                { "id": "live_doc", "label": "live.md", "path": "docs/development/live.md", "layer": "L2", "auto_synced": true }
+            ],
+            "edges": [
+                { "from": "fm", "to": "stale_vision_readme", "kind": "catalog" },
+                { "from": "fm", "to": "live_doc", "kind": "catalog" }
+            ]
+        });
+        let paths = vec![
+            "docs/catalog/FUNCTION_MANAGEMENT.md".to_string(),
+            "docs/development/live.md".to_string(),
+        ];
+        let (n, e, pn, pe) = sync_manifest(&mut manifest, &paths);
+        assert_eq!(n, 0);
+        assert!(e >= 1);
+        assert_eq!(pn, 1);
+        assert_eq!(pe, 1);
+        let nodes = manifest["nodes"].as_array().unwrap();
+        assert!(!nodes.iter().any(|n| n["id"] == "stale_vision_readme"));
+        assert!(nodes.iter().any(|n| n["id"] == "live_doc"));
+        assert!(nodes.iter().any(|n| n["id"] == "fm"));
+        let edges = manifest["edges"].as_array().unwrap();
+        assert!(!edges.iter().any(|e| e["to"] == "stale_vision_readme"));
+        assert!(edges.iter().any(|e| e["to"] == "live_doc"));
+        assert!(manifest["revision"].as_u64().unwrap() > 1);
     }
 
     /// Regression: vision-close sync runs before `git add`, so drain-created
