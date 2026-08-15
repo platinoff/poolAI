@@ -94,6 +94,7 @@ bash scripts/check_target_disk.sh
 |----------|--------|
 | Scope = лише FM §5.12 / §5.13 | **Project scan** усього репо → 10 gap → запис у §5.12 → drain |
 | §5.12 = джерело пріоритетів | §5.12 = **журнал PH-S*** (≤10 відкритих); пріоритети — concept, FM §5.1, roadmaps, code |
+| Старт без вибору проєкту | **Спочатку** спитати власника: **poolai** чи **gsv** (окремий Rust-first проєкт `GSV/`). gsv → drain band FM §5.102 / `GSV/docs/gsv/GSV_TECH_ROADMAP.md`, канон `GSV/docs/GSV_ROLES.md` |
 
 **Сенс:** VDT по **всьому PoolAI** — не ratio-band. Кожна нова сесія **`абракадабра`** = диск → scan (warnings first) → drain → **один** push + самарі **в кінці**.
 

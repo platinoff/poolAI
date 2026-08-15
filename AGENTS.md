@@ -64,6 +64,15 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 | Таксономія docs | `docs/STRUCTURE.md` |
 | Digest функціоналу | `docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md` |
 | Dev-патерни | `docs/development/AUTO_DEV_PATTERNS.md` |
+| GSV — старт / handoff | `GSV/docs/HANDOFF_NEW_SESSION.md` · `GSV/docs/NEXT_SESSION_PROMPT.md` |
+| GSV — ролі та архітектура | `GSV/docs/GSV_ROLES.md` · `GSV/docs/gsv/GSV_ARCHITECTURE.md` · `GSV/docs/gsv/GSV_TECH_ROADMAP.md` |
+
+## Скіли (`.opencode/skills/` та `.agents/skills/`)
+
+- Встановлені скіли лежать у `.agents/skills/` (mode `copied`): documentation, doc-coauthoring, code-review, architecture, system-design, tech-debt, testing-strategy, debug, search-strategy, sprint-planning, roadmap-update, memory-management, task-management, write-spec, test-driven-development, verification-before-completion, systematic-debugging, writing-plans, executing-plans, rust-skill-creator.
+- **Python-скрипти скілів не комітяться** (канон: `git ls-files '*.py'` = порожнім). Скiли Anthropic із `.py` (docx/pdf/pptx/xlsx/webapp-testing) — не встановлювати; docx/xlsx/pptx-завдання виконувати Rust-утилітами або канонічним flow.
+- Робочі скіли проєкту — у `.opencode/skills/`: `abracadabra` (вибір poolai|gsv + drain), інші за потреби.
+- `skills-lock.json` у корені — lock-файл встановлених скілів (оновлюється через `npx --yes skills add <pkg> -a opencode -s <skill>`).
 
 ## Git — commit / push
 
@@ -99,7 +108,14 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 
 ## Тригер «абракадабра» — drain всього проєкту
 
-Коли власник у новій сесії пише **`абракадабра`** — це VDT-цикл по всьому репо **без підтвердження кожного PH-S***:
+Коли власник у новій сесії пише **`абракадабра`** — це VDT-цикл **без підтвердження кожного PH-S***. **Спочатку** спитати власника через `question` tool: який проєкт — **poolai** чи **gsv** (скiл `abracadabra` в `.opencode/skills/` описує обидва flow).
+
+| Вибір | Проєкт | Канон docs | Flow |
+|-------|--------|-----------|------|
+| **poolai** | корінь репо (`src/`, `tests/`) | `docs/development/NEXT_SESSION_PROMPT.md` · FM §5.12 | кроки 1–6 нижче |
+| **gsv** | `GSV/` — окремий Rust-first проєкт | `GSV/docs/NEXT_SESSION_PROMPT.md` · `GSV/docs/GSV_ROLES.md` · `GSV/docs/gsv/GSV_TECH_ROADMAP.md` | S0 (GSV target) → scan warnings first → drain band (FM §5.102 / GSV roadmap) → Speeds+Rust panel → vision-sync → один commit + push |
+
+### poolai flow
 
 1. **S0:** диск (`df -h /s` + `check_target_disk.sh` → `cargo clean` за потреби) → `git fetch` → HANDOFF → FM §1–§5.1 → NEXT_SESSION → `cargo run --bin poolai-vision-sync -- --check` ok.
 2. **Project scan** (якщо §5.12 <10): **warnings/diagnostics першими** (`rust_diagnostics.json`, `cargo run --bin poolai-rust-diagnostics -- --print`, clippy warnings, compile errors) → потім concept (`docs/concept/POOLAI_GALAXY_GRID.md`), FM §5.1, architect rows (`rg "\- \[ \]"` у `NEXT_STEPS_ARCHITECT_*.md`), roadmaps, gaps (`DOCS_LEGACY_AUDIT`, `OPENAPI_GAP_AUDIT`), `rg "TODO|FIXME" src/`. → **10 PH-S*** у §5.12 (нумерація N+1 від останнього; колонка «Джерело»).
