@@ -7,6 +7,7 @@ use poolai::vm::{validate_resource_limits, ResourceLimiter, ResourceLimits};
 use poolai::vm::{
     PlatformResourceLimiter, VmIsolation, VmManager, VmResources, WindowsJobObjectLimiter,
 };
+#[cfg(target_os = "windows")]
 use uuid::Uuid;
 
 #[cfg(target_os = "windows")]

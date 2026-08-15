@@ -28,7 +28,7 @@ async fn test_platform_resource_limiter_creation() {
         let supported = limiter.is_supported();
         // We can't assert true/false here because it depends on the system
         // Just verify it doesn't panic
-        assert!(supported || !supported); // Always true, just checking it works
+        let _ = supported;
     }
 
     #[cfg(target_os = "windows")]

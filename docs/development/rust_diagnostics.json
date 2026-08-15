@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-14",
+  "generated_at": "2026-08-15",
   "host_label": "PLATINOV",
-  "git_head": "f53c7ccab",
+  "git_head": "4af102f31",
   "source": "local",
   "notes": [
     "Machine-readable Rust/Clippy warning+error index for vision Rust panel.",
@@ -12,9 +12,9 @@
     "warnings": 0,
     "errors": 0,
     "ok": true,
-    "recorded_at": "2026-08-14T18:37:59Z",
+    "recorded_at": "2026-08-15T02:02:07Z",
     "command": "cargo clippy --message-format=json --all-targets --features ml,enterprise,cloud,test-utils,job-store-sqlite,prometheus",
-    "wall_secs": 147.8229098
+    "wall_secs": 88.8092414
   },
   "history": [
     {
@@ -492,6 +492,42 @@
       "wall_secs": 147.8229098,
       "host_label": "PLATINOV",
       "git_head": "f53c7ccab",
+      "source": "local"
+    },
+    {
+      "kind": "rust_diagnostics",
+      "command": "cargo clippy --message-format=json --all-targets --features ml,enterprise,cloud,test-utils,job-store-sqlite,prometheus",
+      "warnings": 0,
+      "errors": 0,
+      "ok": true,
+      "recorded_at": "2026-08-14T20:33:36Z",
+      "wall_secs": 72.2659816,
+      "host_label": "PLATINOV",
+      "git_head": "4af102f31",
+      "source": "ci"
+    },
+    {
+      "kind": "rust_diagnostics",
+      "command": "cargo clippy --message-format=json --all-targets --features ml,enterprise,cloud,test-utils,job-store-sqlite,prometheus",
+      "warnings": 0,
+      "errors": 0,
+      "ok": true,
+      "recorded_at": "2026-08-15T01:59:49Z",
+      "wall_secs": 82.891742,
+      "host_label": "PLATINOV",
+      "git_head": "4af102f31",
+      "source": "ci"
+    },
+    {
+      "kind": "rust_diagnostics",
+      "command": "cargo clippy --message-format=json --all-targets --features ml,enterprise,cloud,test-utils,job-store-sqlite,prometheus",
+      "warnings": 0,
+      "errors": 0,
+      "ok": true,
+      "recorded_at": "2026-08-15T02:02:07Z",
+      "wall_secs": 88.8092414,
+      "host_label": "PLATINOV",
+      "git_head": "4af102f31",
       "source": "local"
     }
   ]

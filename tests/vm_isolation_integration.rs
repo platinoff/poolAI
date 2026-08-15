@@ -9,9 +9,10 @@
 
 use poolai::vm::{
     FilesystemIsolationConfig, FilesystemIsolator, NetworkInterfaceMode, NetworkIsolationConfig,
-    NetworkIsolator, PlatformFilesystemIsolator, PlatformNetworkIsolator, VmIsolation, VmManager,
-    VmResources,
+    NetworkIsolator, PlatformFilesystemIsolator, PlatformNetworkIsolator,
 };
+#[cfg(target_os = "windows")]
+use poolai::vm::{VmIsolation, VmManager, VmResources};
 
 #[tokio::test]
 async fn test_network_isolation_config_default() {
