@@ -1,17 +1,17 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-08-02 (band 124 **PH-S1879…S1888, 2026-08-11** ✅ · horizon band 126)
+**Оновлено:** 2026-08-02 (band 125 **PH-S1889…S1898, 2026-08-15** ✅ · horizon band 126)
 
-Maintenance mode (FM §5.15) · band 124 drained.
+Maintenance mode (FM §5.15) · band 125 drained.
 
 Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.18 @ S2278).
 
 | **← наступний** | **`абракадабра`** (project scan → band 126) |
-| **§5.12 active** | **0** (band 124 ✅) |
+| **§5.12 active** | **0** (band 125 ✅) |
 | **P0 open** | **PH-SVC34** re-verify GH · **PH-SVC35** OWNER |
 | **Completion pending** | **560** sprints PH-S1739…S2278 · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) |
 | **Horizon** | band 126 → **PH-S1899.S1908** |
-| **Vision** | rev **490** |
+| **Vision** | rev **492** |
 | **GSV** | окремий проєкт Rust-first (bands 102+108+109+110+111+112+113+114+115+116+117+118 ✅, ratio 95.35%, tests 163) · [`GSV/README.md`](../../GSV/README.md) · [`GSV/docs/gsv/`](../../../GSV/docs/gsv/README.md) · ролі [`GSV/docs/GSV_ROLES.md`](../../GSV/docs/GSV_ROLES.md) · Vision box [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) |
 | **Cursor / GH** | local **3.13.21** · Auto-review · Router Balance/Intelligence · Actions `GITHUB_TOKEN` opaque/JWT · [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](./CURSOR_UPDATE_RESEARCH_2026-07-27.md) |
 
