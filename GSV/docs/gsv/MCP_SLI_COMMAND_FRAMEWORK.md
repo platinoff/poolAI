@@ -448,8 +448,8 @@ The framework supports adding commands through:
 ---
 
 **Framework Version**: 1.0.0  
-**GSV Version**: band 121 complete  
-**Vision Revision**: 488  
+**GSV Version**: band 125 complete  
+**Vision Revision**: 491  
 **Server Port**: `9999` (active)  
 **Total Commands Framework**: 1,000+ supported  
 **Last Updated**: 2026-08-13

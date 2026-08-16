@@ -48,6 +48,30 @@ pub fn bar(pct: f64) -> String {
     )
 }
 
+/// Consistent error-state marker (HTML fragment).
+fn err_html(msg: &str) -> String {
+    format!("<span class='err'>{}</span>", esc(msg))
+}
+
+/// Consistent empty-state marker (HTML fragment).
+fn empty_html(label: &str) -> String {
+    format!("<div class='dim'>{label} — no data</div>")
+}
+
+/// `Some(msg)` when the wire explicitly reports `ok:false` (missing `ok` = ok).
+fn not_ok(d: &Value) -> Option<String> {
+    if d.get("ok").and_then(Value::as_bool) == Some(false) {
+        Some(
+            d.get("error")
+                .and_then(Value::as_str)
+                .unwrap_or("unavailable")
+                .to_string(),
+        )
+    } else {
+        None
+    }
+}
+
 fn s(v: &Value) -> String {
     v.as_str().unwrap_or("").to_string()
 }
@@ -70,6 +94,9 @@ fn arr(v: &Value) -> Vec<Value> {
 
 /// Tracker card (`/api/tracker`).
 pub fn render_tracker(d: &Value) -> String {
+    if let Some(msg) = not_ok(d) {
+        return err_html(&msg);
+    }
     let sp = &d["sprints"];
     let open = arr(&sp["open"]).len();
     let closed = arr(&sp["closed"]).len();
@@ -83,7 +110,7 @@ pub fn render_tracker(d: &Value) -> String {
     let mut out = format!(
         "<div class='dim'>open {open} · closed {closed} · total {total} · next <kbd>{next}</kbd></div>"
     );
-    let rows = arr(&d["records"])
+    let rows: Vec<Vec<String>> = arr(&d["records"])
         .iter()
         .map(|r| {
             vec![
@@ -94,18 +121,25 @@ pub fn render_tracker(d: &Value) -> String {
             ]
         })
         .collect();
+    if rows.is_empty() {
+        out.push_str(&empty_html("tracker records"));
+        return out;
+    }
     out.push_str(&tab(&["kind", "label", "status", "at"], rows));
     out
 }
 
 /// SLI console card (`/api/sli`).
 pub fn render_sli(d: &Value) -> String {
+    if let Some(msg) = not_ok(d) {
+        return err_html(&msg);
+    }
     let c = &d["catalog"];
     let used = u(&c["used_count"]);
     let unused = u(&c["unused_count"]);
     let mut out =
         format!("<div class='dim'>used {used} · unused (new SLI candidates) {unused}</div>");
-    let rows = arr(&c["entries"])
+    let rows: Vec<Vec<String>> = arr(&c["entries"])
         .iter()
         .map(|e| {
             let mark = if b(&e["used"]) {
@@ -121,13 +155,20 @@ pub fn render_sli(d: &Value) -> String {
             ]
         })
         .collect();
+    if rows.is_empty() {
+        out.push_str(&empty_html("sli entries"));
+        return out;
+    }
     out.push_str(&tab(&["", "cmd", "kind", "desc"], rows));
     out
 }
 
 /// Toolchain card (`/api/toolchain`).
 pub fn render_toolchain(d: &Value) -> String {
-    let rows = arr(&d["entries"])
+    if let Some(msg) = not_ok(d) {
+        return err_html(&msg);
+    }
+    let rows: Vec<Vec<String>> = arr(&d["entries"])
         .iter()
         .map(|e| {
             vec![
@@ -137,14 +178,16 @@ pub fn render_toolchain(d: &Value) -> String {
             ]
         })
         .collect();
+    if rows.is_empty() {
+        return empty_html("toolchain entries");
+    }
     tab(&["tool", "version", "source"], rows)
 }
 
 /// Ratio card (`/api/ratio`).
 pub fn render_ratio(d: &Value) -> String {
-    if !b(&d["ok"]) {
-        let msg = d["error"].as_str().unwrap_or("missing rust_ratio.json");
-        return format!("<span class='err'>{}</span>", esc(msg));
+    if let Some(msg) = not_ok(d) {
+        return err_html(&msg);
     }
     let cls = if b(&d["meets_min_ratio"]) {
         "ok"
@@ -174,15 +217,18 @@ pub fn render_ratio(d: &Value) -> String {
             })
             .collect();
     }
+    if rows.is_empty() {
+        out.push_str(&empty_html("ratio by-category"));
+        return out;
+    }
     out.push_str(&tab(&["category", "files", "loc"], rows));
     out
 }
 
 /// Sprint Queue card (`/api/vision/sprint-queue`).
 pub fn render_sprint_queue(d: &Value) -> String {
-    if !b(&d["ok"]) {
-        let msg = d["error"].as_str().unwrap_or("sprint queue unavailable");
-        return format!("<span class='err'>{}</span>", esc(msg));
+    if let Some(msg) = not_ok(d) {
+        return err_html(&msg);
     }
     let active = esc(&s(&d["active_sprint"]));
     let mut out = format!(
@@ -225,9 +271,8 @@ pub fn render_sprint_queue(d: &Value) -> String {
 
 /// Sprint Progress card (`/api/vision/sprint-progress`).
 pub fn render_sprint_progress(d: &Value) -> String {
-    if !b(&d["ok"]) {
-        let msg = d["error"].as_str().unwrap_or("sprint progress unavailable");
-        return format!("<span class='err'>{}</span>", esc(msg));
+    if let Some(msg) = not_ok(d) {
+        return err_html(&msg);
     }
     let mut out = format!(
         "<div class='dim'>rev <kbd>{}</kbd></div>",
@@ -258,9 +303,8 @@ pub fn render_sprint_progress(d: &Value) -> String {
 
 /// Speed Index card (`/api/vision/speeds`).
 pub fn render_speed_index(d: &Value) -> String {
-    if !b(&d["ok"]) {
-        let msg = d["error"].as_str().unwrap_or("unavailable");
-        return format!("<span class='err'>{}</span>", esc(msg));
+    if let Some(msg) = not_ok(d) {
+        return err_html(&msg);
     }
     if !b(&d["present"]) {
         return "<div class='dim'>no speed_index.json — run bin/record-test-ci-speed.sh</div>"
@@ -298,9 +342,8 @@ pub fn render_speed_index(d: &Value) -> String {
 
 /// Rust Diagnostics card (`/api/vision/rust-diagnostics`).
 pub fn render_rust_diagnostics(d: &Value) -> String {
-    if !b(&d["ok"]) {
-        let msg = d["error"].as_str().unwrap_or("unavailable");
-        return format!("<span class='err'>{}</span>", esc(msg));
+    if let Some(msg) = not_ok(d) {
+        return err_html(&msg);
     }
     if !b(&d["present"]) {
         return "<div class='dim'>no rust_diagnostics.json — run bin/record-rust-clippy.sh</div>"
@@ -341,6 +384,9 @@ pub fn render_rust_diagnostics(d: &Value) -> String {
 
 /// Tests hooks card (`/api/hooks/tests`).
 pub fn render_hooks_tests(d: &Value) -> String {
+    if let Some(msg) = not_ok(d) {
+        return err_html(&msg);
+    }
     let diag = &d["diagnostics"];
     let bins = arr(&d["test_bins"]);
     let mut out = format!(
@@ -366,6 +412,9 @@ pub fn render_hooks_tests(d: &Value) -> String {
 
 /// Bench hooks card (`/api/hooks/bench`).
 pub fn render_hooks_bench(d: &Value) -> String {
+    if let Some(msg) = not_ok(d) {
+        return err_html(&msg);
+    }
     let sp = &d["speed_index"];
     let dirs = arr(&d["criterion_dirs"]);
     let mut out = format!(
@@ -390,9 +439,8 @@ pub fn render_hooks_bench(d: &Value) -> String {
 
 /// Sprint Map card (`/api/vision/sprint-map`).
 pub fn render_sprint_map(d: &Value) -> String {
-    if !b(&d["ok"]) {
-        let msg = d["error"].as_str().unwrap_or("sprint map unavailable");
-        return format!("<span class='err'>{}</span>", esc(msg));
+    if let Some(msg) = not_ok(d) {
+        return err_html(&msg);
     }
     let mut out = format!(
         "<div class='dim'>rev <kbd>{}</kbd> · nodes {} · next <kbd>{}</kbd> · last closed <kbd>{}</kbd></div>",
@@ -443,9 +491,8 @@ pub fn render_sprint_map(d: &Value) -> String {
 
 /// Sprint Board card (`/api/vision/sprint-board`).
 pub fn render_sprint_board(d: &Value) -> String {
-    if !b(&d["ok"]) {
-        let msg = d["error"].as_str().unwrap_or("sprint board unavailable");
-        return format!("<span class='err'>{}</span>", esc(msg));
+    if let Some(msg) = not_ok(d) {
+        return err_html(&msg);
     }
     let mut out = format!(
         "<div class='dim'>rev <kbd>{}</kbd> · next <span class='sprint-pill'>{}</span> · active <span class='sprint-pill'>{}</span></div>",
@@ -492,6 +539,9 @@ pub fn render_sprint_board(d: &Value) -> String {
 
 /// OmniRouter card (`/api/omni`).
 pub fn render_omni(d: &Value) -> String {
+    if let Some(msg) = not_ok(d) {
+        return err_html(&msg);
+    }
     let providers = arr(&d["providers"]);
     let models = arr(&d["models"]);
     let rec = arr(&d["recommended"]);
@@ -504,7 +554,7 @@ pub fn render_omni(d: &Value) -> String {
         esc(&default_provider),
     );
     if default_provider.is_empty() {
-        out.push_str("<span class='err'>omni unavailable</span>");
+        out.push_str(&err_html("omni unavailable"));
         return out;
     }
     let rec_ids: Vec<String> = rec
@@ -731,7 +781,10 @@ fn render_panel_dock(d: &Value) -> String {
 /// Fullscreen card body (fullscreen toggle state).
 fn render_fullscreen(d: &Value) -> String {
     let active = d.get("active").and_then(Value::as_bool).unwrap_or(false);
-    let label = d.get("label").and_then(Value::as_str).unwrap_or("fullscreen");
+    let label = d
+        .get("label")
+        .and_then(Value::as_str)
+        .unwrap_or("fullscreen");
     format!(
         "<div>{} <span class='{}'>{}</span></div>",
         esc(label),
@@ -798,6 +851,58 @@ mod tests {
         let html = render_ratio(&d);
         assert!(html.contains("missing rust_ratio.json"));
         assert!(html.contains("err"));
+    }
+
+    #[test]
+    fn render_ratio_empty_by_category_markers() {
+        let d = serde_json::json!({
+            "ok": true, "meets_min_ratio": true, "rust_ratio_pct": 96.7,
+            "formal_band_min": 0.95, "rust_loc": 1000, "non_rust_product_loc": 40,
+            "product_loc_total": 1040, "by_category": {}
+        });
+        let html = render_ratio(&d);
+        assert!(html.contains("Rust ratio"));
+        assert!(html.contains("by-category — no data"));
+    }
+
+    #[test]
+    fn render_tracker_empty_records_markers() {
+        let d = serde_json::json!({
+            "sprints": { "open": [], "closed": [], "total": 0, "next": "" },
+            "records": []
+        });
+        let html = render_tracker(&d);
+        assert!(html.contains("open 0 · closed 0 · total 0"));
+        assert!(html.contains("tracker records — no data"));
+        let bad = serde_json::json!({ "ok": false, "error": "tracker broken" });
+        assert!(render_tracker(&bad).contains("tracker broken"));
+    }
+
+    #[test]
+    fn render_sli_empty_and_error_markers() {
+        let d = serde_json::json!({
+            "catalog": { "used_count": 0, "unused_count": 0, "entries": [] }
+        });
+        let html = render_sli(&d);
+        assert!(html.contains("sli entries — no data"));
+        let bad = serde_json::json!({ "ok": false, "error": "sli broken" });
+        assert!(render_sli(&bad).contains("sli broken"));
+    }
+
+    #[test]
+    fn render_toolchain_empty_markers() {
+        let d = serde_json::json!({ "entries": [] });
+        let html = render_toolchain(&d);
+        assert!(html.contains("toolchain entries — no data"));
+        let bad = serde_json::json!({ "ok": false, "error": "toolchain broken" });
+        assert!(render_toolchain(&bad).contains("toolchain broken"));
+    }
+
+    #[test]
+    fn render_hooks_error_guards() {
+        let bad = serde_json::json!({ "ok": false, "error": "hooks broken" });
+        assert!(render_hooks_tests(&bad).contains("hooks broken"));
+        assert!(render_hooks_bench(&bad).contains("hooks broken"));
     }
 
     #[test]

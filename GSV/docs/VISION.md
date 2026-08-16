@@ -15,6 +15,11 @@ advisory (**96.51%** ≥96% ✅) + `GET /api/ui/card/{name}` Rust-rendered card 
 **band 121 (PH-S1849…S1855, ✅)** — OmniRouter box parity: останній hand-rolled JS renderer
 `renderOmni` → Rust `boxes/ui.rs` `render_omni` (`GET /api/ui/card/omni`, `CARD_NAMES` 13) —
 ratio **96.73%** ≥96% ✅; всі 13 карток server-rendered, `renderOmni` JS видалено.
+**band 125 (PH-S1889…S1898, ✅)** — Vision/UI polish: 13 renderers error/empty-state HTML
+маркери + stand contracts; canonical server JSON error shape `{ok:false,error}`;
+UI a11y markers + offline-stable cards (`data-card`, keep-last-good, `.card-status`);
+`wire_summary` empty-tolerant (`degraded`) + consistent `ok`/`error` across `/api/vision*`;
+Vision rev **491**; ratio **96.87%** ≥96% ✅.
 
 ## Що це
 
@@ -278,4 +283,9 @@ Band 121 додає **OmniRouter card** (`GET /api/ui/card/omni`): `render_omni`
 `server/mod.rs` `"omni"` arm → `boxes::omni::wire`, `CARD_NAMES` 13; `renderOmni` JS видалено,
 `rustCards` 13 → rust ratio **96.73%** (stretch-96 advisory ✅). Тепер усі 13 UI-карток —
 Rust-rendered (`boxes/ui.rs`), жодного JS-рендера карток не залишилось.
+Band 125 (Vision/UI polish): 13 renderers отримали error/empty-state HTML маркери
+(`err_html`/`empty_html`/`not_ok` — `<span class='err'>` + «— no data»), канонічний серверний
+error shape `{ok:false,error}` (`err_json`), UI a11y markers + offline-stable cards
+(`data-card`/keep-last-good/`.card-status`), `wire_summary` empty-tolerant (`degraded`) —
+rust ratio **96.87%** (stretch-96 advisory ✅); Vision rev **491**.
 Див. [`GSV_MIGRATION.md`](gsv/GSV_MIGRATION.md) і [`LEGACY_PARITY.md`](./LEGACY_PARITY.md).

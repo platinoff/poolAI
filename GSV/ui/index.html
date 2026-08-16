@@ -20,6 +20,8 @@ main{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:
 .card h2{margin:0;padding:8px 14px;font-size:13px;color:var(--rust);background:var(--panel2);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
 .card h2 .hint{color:var(--dim);font-weight:400;font-size:11px}
 .card .body{padding:10px 14px;max-height:340px;overflow:auto;font-size:12px}
+.card-status{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:8px;font-size:10px;font-weight:600;color:var(--err);background:rgba(224,91,91,0.12);border:1px solid rgba(224,91,91,0.35)}
+.card-status.ok{display:none}
 table{border-collapse:collapse;width:100%}
 th,td{text-align:left;padding:3px 8px;border-bottom:1px solid var(--line)}
 th{color:var(--dim);font-weight:500}
@@ -62,47 +64,47 @@ body.panel-fs-active .card{display:none!important}body.panel-fs-active .card.ful
 <div id="rssTicker" class="rss-ticker" aria-label="Sprint feed ticker"><span class="rss-ticker-label" title="FM §5.12 feed from feed.json">Feed</span><div class="rss-ticker-viewport" aria-live="polite"><ul class="rss-ticker-track" id="rssTickerTrack"></ul></div></div>
 <header>
   <h1>Galaxy StarWalker Vision</h1>
-  <span class="meta" id="meta">…</span>
-  <span class="meta" id="metaTrail">…</span>
-  <span id="status" class="badge online">online</span>
-  <span id="updateBadge" class="badge update" style="display:none" onclick="doUpdate()">Update</span>
+  <span class="meta" id="meta" role="status" aria-live="polite">…</span>
+  <span class="meta" id="metaTrail" role="status" aria-live="polite">…</span>
+  <span id="status" class="badge online" role="status" aria-live="polite">online</span>
+  <span id="updateBadge" class="badge update" style="display:none" onclick="doUpdate()" role="status" aria-live="polite" title="GSV binary rebuilt — restart server to apply">Update</span>
   <div class="header-actions" aria-label="Vision controls">
-    <button id="btnGpu" class="badge gpu" title="GPU mode — Eco low GPU, FX full glow, Ms medium. Click → cycle" onclick="cycleGpuMode()">FX</button>
-    <button id="btnAuto" class="badge" title="Auto-reload when vision files change" onclick="toggleAuto()">Auto</button>
+    <button id="btnGpu" class="badge gpu" title="GPU mode — Eco low GPU, FX full glow, Ms medium. Click → cycle" aria-label="GPU mode — cycle Eco, FX, Ms" onclick="cycleGpuMode()">FX</button>
+    <button id="btnAuto" class="badge" title="Auto-reload when vision files change" aria-label="Toggle auto-reload" onclick="toggleAuto()">Auto</button>
     <button onclick="resync()">Resync</button>
     <button onclick="notifyUpdate()">notify update</button>
-    <button id="btnPower" class="badge" title="Vision power — soft sync / reload" aria-haspopup="true" aria-expanded="false" onclick="togglePowerMenu()">⏻ Power</button>
-    <div id="powerMenu" class="power-menu" role="menu" aria-label="Vision power"><button onclick="powerSoft()">Soft sync Vision</button><button onclick="powerReload()">Reload UI</button><button class="err" onclick="powerOffline()">Force offline</button></div>
+    <button id="btnPower" class="badge" title="Vision power — soft sync / reload" aria-haspopup="true" aria-expanded="false" aria-label="Vision power menu" onclick="togglePowerMenu()">⏻ Power</button>
+    <div id="powerMenu" class="power-menu" role="menu" aria-label="Vision power"><button role="menuitem" onclick="powerSoft()">Soft sync Vision</button><button role="menuitem" onclick="powerReload()">Reload UI</button><button role="menuitem" class="err" onclick="powerOffline()">Force offline</button></div>
   </div>
 </header>
 <div id="panelDock" class="panel-dock" aria-label="Collapsed panels — click to restore"></div>
 
 <main id="grid">
   <section class="card"><h2>Health <span class="hint">/api/health</span></h2><div class="body" id="b-health">…</div></section>
-  <section class="card"><h2>Tracker <span class="hint">/api/tracker</span></h2><div class="body" id="b-tracker">…</div></section>
-  <section class="card"><h2>SLI console <span class="hint">/api/sli</span></h2><div class="body" id="b-sli">…</div></section>
-  <section class="card"><h2>Toolchain <span class="hint">/api/toolchain</span></h2><div class="body" id="b-toolchain">…</div></section>
+  <section class="card" data-card="tracker"><h2>Tracker <span class="hint">/api/tracker</span></h2><div class="body" id="b-tracker">…</div></section>
+  <section class="card" data-card="sli"><h2>SLI console <span class="hint">/api/sli</span></h2><div class="body" id="b-sli">…</div></section>
+  <section class="card" data-card="toolchain"><h2>Toolchain <span class="hint">/api/toolchain</span></h2><div class="body" id="b-toolchain">…</div></section>
   <section class="card"><h2>IDE <span class="hint">/api/ide/sessions</span></h2><div class="body" id="b-ide">…</div></section>
   <section class="card"><h2>Update <span class="hint">/api/update</span></h2><div class="body" id="b-update">…</div></section>
   <section class="card"><h2>Box preview <span class="hint">/api/preview</span></h2><div class="body"><input id="pvFile" type="text" value="GSV/src/bin/gsv_server.rs" placeholder="repo-relative file"><br><br><button onclick="loadPreview()">Render</button><div id="b-preview" style="margin-top:8px"></div></div></section>
   <section class="card"><h2>SLI terminal <span class="hint">POST /api/terminal</span></h2><div class="body"><input id="termCmd" type="text" value="echo gsv" placeholder="whitelisted SLI command"><br><br><button onclick="runTerminal()">Run</button><pre class="out" id="b-terminal">…</pre></div></section>
-  <section class="card"><h2>Tests hooks <span class="hint">/api/hooks/tests</span></h2><div class="body" id="b-hooks-t">…</div></section>
-  <section class="card"><h2>Bench hooks <span class="hint">/api/hooks/bench</span></h2><div class="body" id="b-hooks-b">…</div></section>
-  <section class="card"><h2>Ratio <span class="hint">/api/ratio</span></h2><div class="body" id="b-ratio">…</div></section>
+  <section class="card" data-card="hooks-tests"><h2>Tests hooks <span class="hint">/api/hooks/tests</span></h2><div class="body" id="b-hooks-t">…</div></section>
+  <section class="card" data-card="hooks-bench"><h2>Bench hooks <span class="hint">/api/hooks/bench</span></h2><div class="body" id="b-hooks-b">…</div></section>
+  <section class="card" data-card="ratio"><h2>Ratio <span class="hint">/api/ratio</span></h2><div class="body" id="b-ratio">…</div></section>
   <section class="card"><h2>Vision <span class="hint">/api/vision</span></h2><div class="body" id="b-vision">…</div></section>
   <section class="card"><h2>Vision Map <span class="hint">/api/vision/map · /assets/vision.svg</span></h2><div class="body" id="b-vision-map">…</div></section>
-  <section class="card"><h2>Sprint Map <span class="hint">/api/vision/sprint-map</span></h2><div class="body" id="b-sprint-map">…</div></section>
+  <section class="card" data-card="sprint-map"><h2>Sprint Map <span class="hint">/api/vision/sprint-map</span></h2><div class="body" id="b-sprint-map">…</div></section>
   <section class="card"><h2>Sprint Focus <span class="hint">/api/vision/sprint-focus.svg</span></h2><div class="body"><input id="focusSprint" type="text" value="" placeholder="sprint id (default: active)"><br><br><button onclick="loadSprintFocus()">Show focus</button><img id="i-sprint-focus" src="/api/vision/sprint-focus.svg" alt="sprint focus map" style="display:block;width:100%;margin-top:6px;border:1px solid var(--line);border-radius:8px;background:var(--panel2)"></div></section>
   <section class="card"><h2>Doc Preview <span class="hint">/api/vision/doc-preview?id=</span></h2><div class="body"><input id="dpId" type="text" value="galaxy_grid" placeholder="node id"><br><br><button onclick="loadDocPreview()">Show</button><div id="b-doc-preview" style="margin-top:8px">…</div></div></section>
-  <section class="card"><h2>Vision Sync <span class="hint">/api/vision/sync</span></h2><div class="body"><button onclick="resyncVision()">Resync snapshot</button> <span id="b-vision-sync-status" class="dim">…</span><div id="b-vision-sync" style="margin-top:8px">…</div></div></section>
-  <section class="card"><h2>Sprint Queue <span class="hint">/api/vision/sprint-queue</span></h2><div class="body" id="b-sprint-queue">…</div></section>
-  <section class="card"><h2>Sprint Board <span class="hint">/api/vision/sprint-board</span></h2><div class="body" id="b-sprint-board">…</div></section>
-  <section class="card"><h2>Sprint Progress <span class="hint">/api/vision/sprint-progress</span></h2><div class="body" id="b-sprint-progress">…</div></section>
-  <section class="card"><h2>Speed Index <span class="hint">/api/vision/speeds</span></h2><div class="body" id="b-speed-index">…</div><img id="i-speed-chart" src="/api/vision/speeds.svg" alt="speed history" style="display:block;width:100%;margin-top:6px;border-radius:8px"></section>
-  <section class="card"><h2>Rust Diagnostics <span class="hint">/api/vision/rust-diagnostics</span></h2><div class="body" id="b-rust-diagnostics">…</div><img id="i-rust-chart" src="/api/vision/rust-diagnostics.svg" alt="rust diagnostics history" style="display:block;width:100%;margin-top:6px;border-radius:8px"></section>
-  <section class="card"><h2>OmniRouter <span class="hint">/api/omni</span></h2><div class="body" id="b-omni">…</div><div style="margin-top:8px;padding:0 12px 12px"><input id="omniTestProvider" type="text" value="openai" placeholder="provider id" style="width:140px"><button onclick="testOmniProvider()">Test</button><span id="b-omni-test" class="dim"></span></div></section>
+  <section class="card"><h2>Vision Sync <span class="hint">/api/vision/sync</span></h2><div class="body"><button onclick="resyncVision()">Resync snapshot</button> <span id="b-vision-sync-status" class="dim" role="status" aria-live="polite">…</span><div id="b-vision-sync" style="margin-top:8px">…</div></div></section>
+  <section class="card" data-card="sprint-queue"><h2>Sprint Queue <span class="hint">/api/vision/sprint-queue</span></h2><div class="body" id="b-sprint-queue">…</div></section>
+  <section class="card" data-card="sprint-board"><h2>Sprint Board <span class="hint">/api/vision/sprint-board</span></h2><div class="body" id="b-sprint-board">…</div></section>
+  <section class="card" data-card="sprint-progress"><h2>Sprint Progress <span class="hint">/api/vision/sprint-progress</span></h2><div class="body" id="b-sprint-progress">…</div></section>
+  <section class="card" data-card="speed-index"><h2>Speed Index <span class="hint">/api/vision/speeds</span></h2><div class="body" id="b-speed-index">…</div><img id="i-speed-chart" src="/api/vision/speeds.svg" alt="speed history" style="display:block;width:100%;margin-top:6px;border-radius:8px"></section>
+  <section class="card" data-card="rust-diagnostics"><h2>Rust Diagnostics <span class="hint">/api/vision/rust-diagnostics</span></h2><div class="body" id="b-rust-diagnostics">…</div><img id="i-rust-chart" src="/api/vision/rust-diagnostics.svg" alt="rust diagnostics history" style="display:block;width:100%;margin-top:6px;border-radius:8px"></section>
+  <section class="card" data-card="omni"><h2>OmniRouter <span class="hint">/api/omni</span></h2><div class="body" id="b-omni">…</div><div style="margin-top:8px;padding:0 12px 12px"><input id="omniTestProvider" type="text" value="openai" placeholder="provider id" style="width:140px"><button onclick="testOmniProvider()">Test</button><span id="b-omni-test" class="dim"></span></div></section>
 </main>
-<div id="toast"></div>
+<div id="toast" role="status" aria-live="polite"></div>
 
 <script>
 "use strict";
@@ -123,10 +125,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const actions = document.createElement("span");
     actions.className = "actions";
     const minBtn = document.createElement("button");
-    minBtn.textContent = "_"; minBtn.title = "Minimize / Restore";
+    minBtn.textContent = "_"; minBtn.title = "Minimize / Restore"; minBtn.setAttribute("aria-label", "Minimize / Restore card");
     minBtn.onclick = (e) => { e.stopPropagation(); card.classList.toggle("collapsed"); minBtn.textContent = card.classList.contains("collapsed") ? "+" : "_"; syncDock(); };
     const maxBtn = document.createElement("button");
-    maxBtn.textContent = "□"; maxBtn.title = "Fullscreen Toggle (Esc)";
+    maxBtn.textContent = "□"; maxBtn.title = "Fullscreen Toggle (Esc)"; maxBtn.setAttribute("aria-label", "Fullscreen toggle card");
     maxBtn.onclick = (e) => { e.stopPropagation(); const on = card.classList.toggle("fullscreen"); maxBtn.textContent = on ? "×" : "□"; document.body.classList.toggle("panel-fs-active", on); };
     actions.appendChild(minBtn); actions.appendChild(maxBtn);
     h2.appendChild(actions);
@@ -164,7 +166,8 @@ function renderUpdate(d) {
 function renderVision(d) {
   if (!d.ok) { $("b-vision").innerHTML = "<span class='err'>" + esc(d.error || "vision unavailable") + "</span>"; return; }
   $("metaTrail").textContent = "rev " + d.revision + " · next " + (d.next_sprint || "—") + " · " + (d.git_head || "");
-  $("b-vision").innerHTML = "<div>Vision rev <kbd>" + d.revision + "</kbd> · git <span class='dim'>" + esc(d.git_head || "—") +
+  $("b-vision").innerHTML = (d.degraded ? "<span class='err'>degraded — snapshot fallback</span> " : "") +
+    "<div>Vision rev <kbd>" + d.revision + "</kbd> · git <span class='dim'>" + esc(d.git_head || "—") +
     "</span> · updated <span class='dim'>" + esc(d.updated_at || "—") + "</span></div>" +
     "<div class='dim'>nodes " + d.nodes_count + " · edges " + d.edges_count + " · next <kbd>" + esc(d.next_sprint) +
     "</kbd> · last closed <kbd>" + esc(d.last_sprint_closed) + "</kbd></div>" +
@@ -288,10 +291,23 @@ async function resyncVision() {
 }
 async function getText(card) {
   const target = "b-" + card;
+  const markStatus = (msg) => {
+    const sec = document.querySelector('.card[data-card="' + card + '"]');
+    if (!sec) return;
+    let badge = sec.querySelector(".card-status");
+    if (!badge) { badge = document.createElement("span"); badge.className = "card-status"; sec.querySelector("h2").appendChild(badge); }
+    if (msg) { badge.textContent = "⚠ " + msg; badge.className = "card-status"; }
+    else { badge.remove(); }
+  };
   try {
     const d = await get("api/ui/card/" + card);
-    $(target).innerHTML = d.ok ? d.html : "<span class='err'>" + esc(d.error || "card error") + "</span>";
-  } catch (e) { $(target).innerHTML = "<span class='err'>" + esc(e.message) + "</span>"; }
+    if (d.ok) { $(target).innerHTML = d.html; markStatus(null); }
+    else { markStatus(d.error || "card error"); }
+  } catch (e) {
+    // Offline-stable: keep the last-good render, surface a badge instead.
+    if ($(target).innerHTML === "…") $(target).innerHTML = "";
+    markStatus(e.message || "offline");
+  }
 }
 const rustCards = ["tracker", "sli", "toolchain", "ratio", "hooks-tests", "hooks-bench", "sprint-map", "sprint-queue", "sprint-progress", "sprint-board", "speed-index", "rust-diagnostics", "omni"];
 async function resync() {

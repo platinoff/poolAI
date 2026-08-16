@@ -4,20 +4,24 @@
 Оновлюється в кінці кожного band. Лічильники — вимірювані (`wc -l`, `cargo test`,
 `cargo run --bin gsv-loc-audit`), не з пам'яті.
 
-## Стан (2026-08-10 · band 121 ✅)
+## Стан (2026-08-15 · band 125 ✅)
 
 - **Канон:** Rust **95–100%** / wasm **0–5%** (завжди), без Python/Java; bins — лише `src/bin/`.
-- **Ratio (виміряно):** `cargo run --bin gsv-loc-audit -- --stretch-96` → **96.73%** (rust 10191 / product 10536) —
+- **Ratio (виміряно):** `cargo run --bin gsv-loc-audit -- --stretch-96` → **96.87%** (rust 11176 / product 11537) —
   gate ≥95% ✅, stretch-96 ≥96% ✅.
   Звіт: `GSV/data/rust_ratio.json` (gitignored).
-- **Тести (виміряно):** `cargo test` → **207** (97 unit + 8 `gsv_omni_contracts` + 7 `gsv_ratio_contracts`
-  + 30 `gsv_server_contracts` + 7 `gsv_ui_contracts` + 8 `gsv_update_flow` + 50 `gsv_vision_contracts`).
+- **Тести (виміряно):** `cargo test` → **221** (102 unit + 8 `gsv_omni_contracts` + 7 `gsv_ratio_contracts`
+  + 32 `gsv_server_contracts` + 12 `gsv_ui_contracts` + 8 `gsv_update_flow` + 52 `gsv_vision_contracts`).
   `cargo clippy --all-targets` → **0** warnings. `cargo fmt` clean.
 - **Бокси:** Tracker · SLI console · Toolchain · IDE · Update/offline · Box preview · SLI terminal ·
   Tests/bench hooks · **Ratio** · **Vision** · **Vision Map** · **Sprint Map** · **Doc Preview** ·
   **Vision Sync** · **Sprint Queue** · **Sprint Board** · **Sprint Progress** · **Sprint Focus** ·
   **Galaxy UI parity** (band 119) · **UI fragments** (band 121: `GET /api/ui/card/:name`, 13 Rust renderers) ·
   **OmniRouter** (Rust AI-проксі/роутер; card `omni` band 121).
+- **Band 125 (Vision/UI polish):** 13 renderers error/empty HTML markers + stand contracts ·
+  canonical server JSON error shape `{ok:false,error}` + contracts · a11y markers +
+  offline-stable cards у UI · `wire_summary` empty-tolerant (`degraded`) + consistent
+  `/api/vision*` ok/error shapes · **Vision rev 491**.
 
 ## Що зроблено
 
@@ -315,6 +319,25 @@
 - **PH-S1854** GSV docs canon: MEMORY band 121; HANDOFF/NEXT band 121; VISION.md omni card section;
   `GSV_TECH_ROADMAP.md` band 121.
 - **PH-S1855** Band close: ratio **≥96%**; fmt/clippy 0; cargo test (**207**); docs canon; vision-sync rev bump; push.
+
+### Band 125 (PH-S1889…S1898, ✅ 2026-08-15) — GSV Vision/UI polish (a11y/error/offline/stand contracts)
+- **PH-S1889** Scope + queue: FM §5.106 band 125 (PH-S1889…S1898) + §5.12 header (master horizon) + roadmap band 125 rows.
+- **PH-S1890** `boxes/ui.rs`: 13 renderers error/empty-state HTML маркери (`err_html`/`empty_html`/`not_ok`,
+  `<span class='err'>` + «— no data», no panic) + 5 unit tests.
+- **PH-S1891** `gsv_ui_contracts` (12): `RUST_CARDS` 13 + stand contracts (error/empty markers for all renderers).
+- **PH-S1892** `server/mod.rs`: canonical JSON error shape `{ok:false,error}` (`err_json` →
+  preview/ui-card/ui-path/data-file/error-response/omni-test/spawn_cargo); `api_error_response` BAD_REQUEST.
+- **PH-S1893** `gsv_server_contracts` (32): `error_responses_share_canonical_json_shape` +
+  `post_errors_share_canonical_json_shape`.
+- **PH-S1894** `ui/index.html`: a11y markers (role=status, aria-live/aria-label/alt/aria-haspopup) + a11y contracts.
+- **PH-S1895** `ui/index.html`: offline-stable cards — `data-card` hooks, `getText` keep-last-good +
+  `.card-status` badge on fetch fail; offline-stability contract.
+- **PH-S1896** `boxes/vision.rs`: `wire_summary` empty-tolerant (`degraded` flag, error only on fallback) +
+  consistent `ok`/`error` across `/api/vision*`; `gsv_vision_contracts` wire-shape contracts (52).
+- **PH-S1897** Ratio hold: `gsv-loc-audit --stretch-96` → **96.87%** (rust 11176 / product 11537) ✅;
+  cargo test (**221**); clippy 0; fmt clean.
+- **PH-S1898** GSV docs canon: MEMORY/HANDOFF/NEXT/VISION band 125; FM §5.106 ✅ + §5.12 header (0 open);
+  `GSV_TECH_ROADMAP.md` band 125 ✅; vision-sync rev **491**; push.
 
 ## Важливі факти (не забувати)
 

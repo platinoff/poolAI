@@ -30,8 +30,12 @@ fn temp_data_dir(tag: &str) -> PathBuf {
 }
 
 fn app(data_dir: PathBuf) -> axum::Router {
+    app_with(repo_root(), data_dir)
+}
+
+fn app_with(repo_root: PathBuf, data_dir: PathBuf) -> axum::Router {
     let (tx, _rx) = broadcast::channel(64);
-    let state = AppState::new(Some(repo_root()), Some(data_dir), tx);
+    let state = AppState::new(Some(repo_root), Some(data_dir), tx);
     router(state)
 }
 
@@ -162,6 +166,69 @@ async fn vision_api_summary_endpoint() {
     assert!(body["edges_count"].as_u64().unwrap_or(0) >= 500);
     assert!(!body["next_sprint"].as_str().unwrap_or("").is_empty());
     assert!(body["feed_items"].as_array().is_some());
+}
+
+/// Vision wire polish: every `/api/vision*` JSON endpoint shares the canonical
+/// `ok` boolean and, on failure, a string `error` — never a nested/absent shape.
+#[tokio::test]
+async fn vision_wire_endpoints_share_canonical_ok_error_shape() {
+    let dir = temp_data_dir("wire-shape");
+    let paths = [
+        "/api/vision",
+        "/api/vision/manifest",
+        "/api/vision/map",
+        "/api/vision/feed",
+        "/api/vision/sprint-map",
+        "/api/vision/sprint-queue",
+        "/api/vision/sprint-board",
+        "/api/vision/sprint-progress",
+        "/api/vision/sprint-theme",
+        "/api/vision/palette",
+        "/api/vision/speeds",
+        "/api/vision/rust-diagnostics",
+        "/api/vision/extensions",
+        "/api/vision/sync",
+    ];
+    for path in paths {
+        let (status, body) = get(&app(dir.clone()), path).await;
+        assert_eq!(status, StatusCode::OK, "path {path}");
+        assert!(
+            body["ok"].is_boolean(),
+            "{path} must carry ok boolean: {body}"
+        );
+        if body["ok"] == false {
+            assert!(
+                body["error"].is_string() && !body["error"].as_str().unwrap_or("").is_empty(),
+                "{path} ok:false must carry error string: {body}"
+            );
+        }
+    }
+}
+
+/// Vision wire polish: the summary is empty-tolerant — with no snapshot it still
+/// resolves `ok:true` with zero counts and `degraded:true` instead of failing.
+#[tokio::test]
+async fn vision_wire_summary_is_empty_tolerant() {
+    let dir = std::env::temp_dir().join(format!("gsv-vision-empty-{}", std::process::id()));
+    let empty_root =
+        std::env::temp_dir().join(format!("gsv-vision-empty-root-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&dir);
+    let _ = std::fs::remove_dir_all(&empty_root);
+    std::fs::create_dir_all(&dir).expect("empty data dir");
+    std::fs::create_dir_all(&empty_root).expect("empty repo root");
+    // No manifest/feed in the empty repo root → both sources fall back and miss.
+    let (status, body) = get(&app_with(empty_root.clone(), dir.clone()), "/api/vision").await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body["ok"], true, "empty-tolerant: {body}");
+    assert_eq!(body["degraded"], true, "degraded flag: {body}");
+    assert_eq!(body["nodes_count"], 0);
+    assert_eq!(body["edges_count"], 0);
+    assert!(body["feed_items"]
+        .as_array()
+        .unwrap_or(&Vec::new())
+        .is_empty());
+    let _ = std::fs::remove_dir_all(&dir);
+    let _ = std::fs::remove_dir_all(&empty_root);
 }
 
 #[tokio::test]

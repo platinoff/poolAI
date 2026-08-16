@@ -1,6 +1,6 @@
 # Промпт наступної сесії (GSV)
 
-**Оновлено:** 2026-08-10 (band 121 **PH-S1849…S1855** ✅ · ratio **96.73%** · tests **207**)
+**Оновлено:** 2026-08-15 (band 125 **PH-S1889…S1898** ✅ · ratio **96.87%** · tests **221**)
 
 ```
 абракадабра
@@ -8,7 +8,7 @@
 
 **Порядок:** **S0 диск** (`df -h /s` + `check_target_disk.sh` → `cargo clean` за потреби) →
 project scan (**warnings first** — `cargo clippy --all-targets` у GSV, `poolai-rust-diagnostics` у poolAI) →
-drain наступного band (черга — FM §5.12 §5.102 / GSV_TECH_ROADMAP; **без** mid-push) →
+drain наступного band (черга — FM §5.12 §5.106 / GSV_TECH_ROADMAP; **без** mid-push) →
 Speeds · Rust panel → vision-sync (`poolai-vision-sync`) → **один** commit → **`git push` + самарі`.
 
 **⚠️ Зупинити `gsv-server` перед `cargo test`/`build`** (блокує `target/debug/gsv-server.exe`);
@@ -111,7 +111,20 @@ Speeds · Rust panel → vision-sync (`poolai-vision-sync`) → **один** com
   `ui/index.html` `renderOmni` JS видалено, `rustCards` 13, `resync()` url drop;
   contracts **207** (97 unit + 30 server + 7 ui); ratio **96.73%** (rust 10191 / product 10536) ✅;
   FM §5.12 §5.102.
-  **Наступний band 122**: master backlog (за пріоритетом власника) — FM §5.12 / GSV_TECH_ROADMAP.
+- **band 125** (PH-S1889…S1898) ✅ — GSV Vision/UI polish (a11y/error/offline/stand contracts):
+  `boxes/ui.rs` 13 renderers error/empty-state HTML маркери (`err_html`/`empty_html`/`not_ok`,
+  `<span class='err'>` + «— no data», no panic) + `gsv_ui_contracts` stand contracts for all 13
+  (`RUST_CARDS` + error/empty markers) + a11y (`role=status`/`aria-live`/`aria-label`/`alt`/
+  `aria-haspopup`) + offline-stable (`data-card` hooks, `getText` keep-last-good, `.card-status`
+  badge на fetch fail); `server/mod.rs` canonical JSON error shape `{ok:false,error}` (`err_json`
+  → preview/ui-card/ui-path/data-file/error-response/omni-test/spawn_cargo) +
+  `gsv_server_contracts` canonical-shape contracts; `boxes/vision.rs` `wire_summary`
+  empty-tolerant (`degraded` flag, error тільки при fallback) + consistent `ok`/`error` across
+  `/api/vision*` (`gsv_vision_contracts` wire-shape contracts);
+  contracts **221** (102 unit + 8 omni + 7 ratio + 32 server + 12 ui + 8 update + 52 vision);
+  ratio **96.87%** (rust 11176 / product 11537) ✅; vision rev **491**; FM §5.12 §5.106.
+  **Наступний band 126**: master backlog (за пріоритетом власника) — FM §5.12 / GSV_TECH_ROADMAP.
+   **Наступний band 126**: master backlog (за пріоритетом власника) — FM §5.12 / GSV_TECH_ROADMAP.
 
 ## Канон GSV
 
@@ -129,7 +142,7 @@ band 113 ✅ (GSV node search + interactive map) · band 114 ✅ (GSV sprint-boa
 band 115 ✅ (GSV migration completion — legacy vision supersession) · band 116 ✅ (GSV history charts — speed/rust analytics) ·
 band 117 ✅ (GSV legacy vision deactivation) · band 118 ✅ (GSV sprint UI migration — theme + focus map) ·
 band 119 ✅ (GSV Galaxy UI full parity — colors + box behaviors) · band 120 ✅ (GSV Ratio 96% stretch) ·
-band 121 ✅ (GSV OmniRouter box parity) ·
+band 121 ✅ (GSV OmniRouter box parity) · band 125 ✅ (GSV Vision/UI polish — a11y/error/offline/stand contracts) ·
 staging `GSV/data/*` / `certs/*.pem` /
 `.env` · mid-push · build/test при запущеному `gsv-server` · обхід ratio-смуги Rust-кодом замість compact UI ·
 перенесення legacy `vision.js`/`vision.css` у `GSV/ui/` (знищило б ratio canon).

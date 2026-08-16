@@ -642,9 +642,14 @@ pub fn wire_feed(repo_root: &Path, data_dir: &Path) -> Value {
 }
 
 /// `GET /api/vision` — lightweight vision summary for the UI.
+///
+/// Empty-tolerant: if the manifest/feed sources are missing the summary still
+/// resolves with zero counts and `degraded:true` — the UI keeps rendering and
+/// surfaces the degradation instead of failing the whole card.
 pub fn wire_summary(repo_root: &Path, data_dir: &Path) -> Value {
     let manifest = source_manifest(repo_root, data_dir);
     let feed = source_feed(repo_root, data_dir);
+    let degraded = manifest.is_err() || feed.is_err();
     let (revision, git_head, updated_at, last_closed, next_sprint, open_count, ui_rev) =
         match &manifest {
             Ok(m) => (
@@ -670,8 +675,9 @@ pub fn wire_summary(repo_root: &Path, data_dir: &Path) -> Value {
         Ok(f) => f.items.iter().take(10).cloned().collect::<Vec<_>>(),
         Err(_) => Vec::new(),
     };
-    json!({
+    let mut v = json!({
         "ok": true,
+        "degraded": degraded,
         "revision": revision,
         "git_head": git_head,
         "updated_at": updated_at,
@@ -682,8 +688,15 @@ pub fn wire_summary(repo_root: &Path, data_dir: &Path) -> Value {
         "nodes_count": manifest.as_ref().map(|m| m.nodes.len()).unwrap_or(0),
         "edges_count": manifest.as_ref().map(|m| m.edges.len()).unwrap_or(0),
         "feed_items": feed_items,
-        "error": manifest.err().or_else(|| feed.err()),
-    })
+    });
+    if degraded {
+        if let Some(e) = manifest.err().or_else(|| feed.err()) {
+            if let serde_json::Value::Object(map) = &mut v {
+                map.insert("error".to_string(), serde_json::Value::String(e));
+            }
+        }
+    }
+    v
 }
 
 /// Build the lightweight galaxy-map report from the live manifest source.
@@ -3129,8 +3142,14 @@ mod tests {
             "GSV/docs/vision/manifest.json",
             "GSV/docs/vision/**"
         ));
-        assert!(path_matches_glob("GSV/docs/vision/feed.json", "GSV/docs/vision/**"));
-        assert!(!path_matches_glob("docs/other/feed.json", "GSV/docs/vision/**"));
+        assert!(path_matches_glob(
+            "GSV/docs/vision/feed.json",
+            "GSV/docs/vision/**"
+        ));
+        assert!(!path_matches_glob(
+            "docs/other/feed.json",
+            "GSV/docs/vision/**"
+        ));
         assert!(path_matches_glob("src/lib/db/mod.rs", "src/**/*.rs"));
         assert!(path_matches_glob("src/lib/db/migrate.rs", "src/**/*.rs"));
         assert!(path_matches_glob(

@@ -227,7 +227,11 @@ async fn omni_chat_rejects_unknown_provider() {
     )
     .await;
     assert_eq!(status, StatusCode::BAD_REQUEST);
-    assert_eq!(json["error"]["code"], "OMNI_ERROR");
+    assert_eq!(json["ok"], false);
+    assert!(json["error"]
+        .as_str()
+        .unwrap_or_default()
+        .contains("unknown provider"));
     let _ = std::fs::remove_dir_all(&dir);
 }
 
@@ -258,7 +262,7 @@ async fn omni_test_requires_provider() {
         (app(d.clone()), d)
     };
     let (status, json) = post(&app, "/api/omni/test", json!({})).await;
-    assert_eq!(status, StatusCode::OK);
+    assert_eq!(status, StatusCode::BAD_REQUEST);
     assert_eq!(json["ok"], false);
     assert!(json["error"]
         .as_str()

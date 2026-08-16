@@ -15,7 +15,7 @@ use serde_json::{json, Value};
 use tokio_stream::wrappers::BroadcastStream;
 
 use crate::boxes::ide::{IdeSelection, IdeWire};
-use crate::boxes::preview::{resolve as preview_resolve, PreviewParams, PreviewWire};
+use crate::boxes::preview::{resolve as preview_resolve, PreviewParams};
 use crate::boxes::terminal::{run as terminal_run, TerminalRequest, TerminalResponse};
 use crate::boxes::update::UpdateCheckParams;
 use crate::boxes::{hooks, sli, toolchain};
@@ -28,6 +28,11 @@ pub const INDEX_HTML: &str = include_str!("../../ui/index.html");
 
 /// Ported vision diagram (`GSV/ui/vision.svg`), ratio-safe: `.svg` is audit-ignored.
 pub const VISION_SVG: &str = include_str!("../../ui/vision.svg");
+
+/// Canonical JSON error response — every error carries `{ok:false, error}`.
+fn err_json(status: StatusCode, msg: impl Into<String>) -> Response {
+    (status, Json(json!({ "ok": false, "error": msg.into() }))).into_response()
+}
 
 /// `/api/health` payload.
 fn health(state: &AppState) -> Value {
@@ -118,7 +123,10 @@ pub fn router(state: AppState) -> Router {
         .route("/api/vision/starfield.svg", get(api_vision_starfield_svg))
         .route("/api/vision/galaxy.svg", get(api_vision_galaxy_svg))
         .route("/api/vision/theme-svg", get(api_vision_theme_svg))
-        .route("/api/vision/sprint-priority", get(api_vision_sprint_priority))
+        .route(
+            "/api/vision/sprint-priority",
+            get(api_vision_sprint_priority),
+        )
         .route("/api/vision/tracker", get(api_vision_tracker))
         .route("/api/vision/events", get(api_vision_events))
         .route("/api/vision/ide-session", get(api_vision_ide_session))
@@ -303,12 +311,15 @@ async fn api_update_notify(State(state): State<AppState>) -> Json<Value> {
 async fn api_preview(
     State(state): State<AppState>,
     Query(params): Query<PreviewParams>,
-) -> Result<Json<PreviewWire>, (StatusCode, String)> {
-    let path =
-        preview_resolve(&state.repo_root, &params.file).map_err(|e| (StatusCode::NOT_FOUND, e))?;
-    crate::boxes::preview::render(&path, &params.file)
-        .map(Json)
-        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e))
+) -> Response {
+    let path = match preview_resolve(&state.repo_root, &params.file) {
+        Ok(p) => p,
+        Err(e) => return err_json(StatusCode::NOT_FOUND, e),
+    };
+    match crate::boxes::preview::render(&path, &params.file) {
+        Ok(wire) => Json(wire).into_response(),
+        Err(e) => err_json(StatusCode::INTERNAL_SERVER_ERROR, e),
+    }
 }
 
 async fn api_terminal(
@@ -361,10 +372,19 @@ async fn api_ratio_history(State(state): State<AppState>) -> Json<Value> {
 
 async fn api_ratio_compare(State(state): State<AppState>) -> Json<Value> {
     let w = crate::boxes::ratio::wire(&state.data_dir);
-    let current = w.get("rust_ratio_pct").and_then(Value::as_f64).unwrap_or(0.0);
+    let current = w
+        .get("rust_ratio_pct")
+        .and_then(Value::as_f64)
+        .unwrap_or(0.0);
     let min = w.get("min_ratio").and_then(Value::as_f64).unwrap_or(0.0);
-    let stretch = w.get("stretch_target").and_then(Value::as_f64).unwrap_or(0.0);
-    let meets = w.get("meets_min_ratio").and_then(Value::as_bool).unwrap_or(false);
+    let stretch = w
+        .get("stretch_target")
+        .and_then(Value::as_f64)
+        .unwrap_or(0.0);
+    let meets = w
+        .get("meets_min_ratio")
+        .and_then(Value::as_bool)
+        .unwrap_or(false);
     Json(json!({
         "current": current,
         "min": min,
@@ -411,7 +431,10 @@ async fn api_ui_load_palette() -> Response {
 async fn api_ui_load_theme() -> Response {
     (
         StatusCode::OK,
-        [("Content-Type", "text/javascript"), ("Cache-Control", "no-cache")],
+        [
+            ("Content-Type", "text/javascript"),
+            ("Cache-Control", "no-cache"),
+        ],
         "window.GSV_THEME = {name:'galaxy', revision: 488};\n",
     )
         .into_response()
@@ -461,22 +484,16 @@ async fn card_wire(state: &AppState, name: &str) -> Result<Value, ()> {
             json!({ "mode": "dark", "stars": 0 })
         }
         "starfield" => {
-            let svg = crate::boxes::vision::starfield_svg_wire(
-                &state.repo_root,
-                &state.data_dir,
-                None,
-            );
+            let svg =
+                crate::boxes::vision::starfield_svg_wire(&state.repo_root, &state.data_dir, None);
             let eco = if svg.contains("Eco") { 48u64 } else { 0 };
             let fx = if svg.contains("FX") { 160u64 } else { 0 };
             let ms = if svg.contains("Ms") { 96u64 } else { 0 };
             json!({ "eco": eco, "fx": fx, "ms": ms })
         }
         "rss-ticker" => {
-            let feed: Value = crate::boxes::vision::wire_feed_filter(
-                &state.repo_root,
-                &state.data_dir,
-                None,
-            );
+            let feed: Value =
+                crate::boxes::vision::wire_feed_filter(&state.repo_root, &state.data_dir, None);
             let items: Vec<Value> = feed
                 .get("items")
                 .and_then(|v| v.as_array())
@@ -516,13 +533,7 @@ async fn card_wire(state: &AppState, name: &str) -> Result<Value, ()> {
 async fn api_ui_card(State(state): State<AppState>, Path(name): Path<String>) -> Response {
     let wire = match card_wire(&state, &name).await {
         Ok(w) => w,
-        Err(()) => {
-            return (
-                StatusCode::NOT_FOUND,
-                Json(json!({ "ok": false, "error": format!("unknown card: {name}") })),
-            )
-                .into_response();
-        }
+        Err(()) => return err_json(StatusCode::NOT_FOUND, format!("unknown card: {name}")),
     };
     let html = crate::boxes::ui::render_card(&name, &wire).unwrap_or_default();
     Json(json!({ "ok": true, "card": name, "html": html })).into_response()
@@ -541,10 +552,7 @@ fn sprint_counts(state: &AppState) -> Value {
     })
 }
 
-async fn api_ui_path(
-    State(state): State<AppState>,
-    Path(segments): Path<Vec<String>>,
-) -> Response {
+async fn api_ui_path(State(state): State<AppState>, Path(segments): Path<Vec<String>>) -> Response {
     let path = segments.join("/");
     if let Ok(wire) = card_wire(&state, &path).await {
         let html = crate::boxes::ui::render_card(&path, &wire).unwrap_or_default();
@@ -558,15 +566,16 @@ async fn api_ui_path(
         }),
         "ratio/advisory" => json!({ "advisory": "maintain >=95%" }),
         "ratio/goal" => json!({ "goal": 0.95 }),
-        "sprint-columns" | "progress-layers" | "sprint-open-count" | "sprint-closed-count"
-        | "sprint-planned-count" | "sprint-progress-pct" | "sprint-remaining"
+        "sprint-columns"
+        | "progress-layers"
+        | "sprint-open-count"
+        | "sprint-closed-count"
+        | "sprint-planned-count"
+        | "sprint-progress-pct"
+        | "sprint-remaining"
         | "sprint-elapsed" => sprint_counts(&state),
         _ => {
-            return (
-                StatusCode::NOT_FOUND,
-                Json(json!({ "ok": false, "error": format!("unknown ui path: {path}") })),
-            )
-                .into_response();
+            return err_json(StatusCode::NOT_FOUND, format!("unknown ui path: {path}"));
         }
     };
     Json(json!({ "ok": true, "path": path, "data": data })).into_response()
@@ -862,9 +871,9 @@ fn toolchain_entry(wire: &Value, tool: &str) -> Value {
     wire.get("entries")
         .and_then(Value::as_array)
         .and_then(|es| {
-            es.iter().find(|e| {
-                e.get("tool").and_then(Value::as_str).unwrap_or("") == tool
-            }).cloned()
+            es.iter()
+                .find(|e| e.get("tool").and_then(Value::as_str).unwrap_or("") == tool)
+                .cloned()
         })
         .unwrap_or(Value::Null)
 }
@@ -881,33 +890,37 @@ async fn api_toolchain_cargo(State(state): State<AppState>) -> Json<Value> {
 
 async fn api_toolchain_clippy(State(state): State<AppState>) -> Json<Value> {
     let wire = json!(toolchain::wire(&state.repo_root));
-    Json(json!({ "ok": true, "tool": "clippy-driver", "entry": toolchain_entry(&wire, "clippy-driver") }))
+    Json(
+        json!({ "ok": true, "tool": "clippy-driver", "entry": toolchain_entry(&wire, "clippy-driver") }),
+    )
 }
 
 async fn api_toolchain_detailed(State(state): State<AppState>) -> Json<Value> {
     Json(json!({ "ok": true, "toolchain": toolchain::wire(&state.repo_root) }))
 }
 
-fn spawn_cargo(args: &[&str], repo_root: &std::path::Path) -> Json<Value> {
+fn spawn_cargo(args: &[&str], repo_root: &std::path::Path) -> Response {
     match std::process::Command::new("cargo")
         .args(args)
         .current_dir(repo_root)
         .spawn()
     {
-        Ok(child) => Json(json!({ "ok": true, "started": true, "pid": child.id() })),
-        Err(e) => Json(json!({ "ok": false, "error": e.to_string() })),
+        Ok(child) => {
+            Json(json!({ "ok": true, "started": true, "pid": child.id() })).into_response()
+        }
+        Err(e) => err_json(StatusCode::INTERNAL_SERVER_ERROR, e.to_string()),
     }
 }
 
-async fn api_toolchain_build(State(state): State<AppState>) -> Json<Value> {
+async fn api_toolchain_build(State(state): State<AppState>) -> Response {
     spawn_cargo(&["build"], &state.repo_root)
 }
 
-async fn api_toolchain_test(State(state): State<AppState>) -> Json<Value> {
+async fn api_toolchain_test(State(state): State<AppState>) -> Response {
     spawn_cargo(&["test"], &state.repo_root)
 }
 
-async fn api_toolchain_clean(State(state): State<AppState>) -> Json<Value> {
+async fn api_toolchain_clean(State(state): State<AppState>) -> Response {
     spawn_cargo(&["clean"], &state.repo_root)
 }
 
@@ -1011,15 +1024,14 @@ async fn api_data_file(State(state): State<AppState>, Path(file): Path<String>) 
     match tokio::fs::read_to_string(&path).await {
         Ok(content) => (
             StatusCode::OK,
-            [("Content-Type", "application/json"), ("Cache-Control", "no-cache")],
+            [
+                ("Content-Type", "application/json"),
+                ("Cache-Control", "no-cache"),
+            ],
             content,
         )
             .into_response(),
-        Err(_) => (
-            StatusCode::NOT_FOUND,
-            Json(json!({ "ok": false, "error": format!("missing data file: {safe}") })),
-        )
-            .into_response(),
+        Err(_) => err_json(StatusCode::NOT_FOUND, format!("missing data file: {safe}")),
     }
 }
 
@@ -1069,27 +1081,23 @@ async fn api_omni_chat(State(state): State<AppState>, headers: HeaderMap, body: 
         .unwrap_or_else(api_error_response)
 }
 
-async fn api_omni_test(State(state): State<AppState>, Json(body): Json<Value>) -> Json<Value> {
+async fn api_omni_test(State(state): State<AppState>, Json(body): Json<Value>) -> Response {
     let provider = body
         .get("provider")
         .and_then(Value::as_str)
         .unwrap_or_default();
     if provider.is_empty() {
-        return Json(json!({ "ok": false, "error": "provider required" }));
+        return err_json(StatusCode::BAD_REQUEST, "provider required");
     }
     match crate::boxes::omni::proxy::test_provider(&state.omni, provider).await {
-        Ok(res) => Json(json!({ "ok": true, "result": res })),
-        Err(e) => Json(json!({ "ok": false, "error": e.message() })),
+        Ok(res) => Json(json!({ "ok": true, "result": res })).into_response(),
+        Err(e) => err_json(StatusCode::BAD_REQUEST, e.message()),
     }
 }
 
 /// Convert an `AppError` into a 400 JSON response (route/config errors).
 fn api_error_response(err: crate::AppError) -> Response {
-    (
-        StatusCode::BAD_REQUEST,
-        Json(json!({ "error": { "code": "OMNI_ERROR", "message": err.message() } })),
-    )
-        .into_response()
+    err_json(StatusCode::BAD_REQUEST, err.message())
 }
 
 /// Server-Sent Events stream: broadcasts state events + periodic keepalive.

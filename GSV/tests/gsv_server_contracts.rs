@@ -539,3 +539,54 @@ async fn ui_card_endpoint_renders_fragment_and_rejects_unknown() {
     assert_eq!(bad_status, StatusCode::NOT_FOUND);
     assert_eq!(bad_json["ok"], false);
 }
+
+/// Canonical error-shape contract: every 4xx/5xx JSON error carries
+/// `{ok:false, error:"…"}` — never a bare string body or nested `error.code`.
+#[tokio::test]
+async fn error_responses_share_canonical_json_shape() {
+    let (app, _state) = app();
+    for path in [
+        "/api/ui/card/nope",
+        "/ui/nope/widget",
+        "/data/does-not-exist.json",
+        "/api/preview?file=nope/does-not-exist.rs",
+    ] {
+        let (status, json) = get(&app, path).await;
+        assert!(status.is_client_error(), "path {path} status: {status}");
+        assert_eq!(json["ok"], false, "path {path}: {json}");
+        assert!(json["error"].is_string(), "path {path}: {json}");
+    }
+}
+
+#[tokio::test]
+async fn post_errors_share_canonical_json_shape() {
+    let (app, _state) = app();
+    let (status, json) = post(&app, "/api/omni/test", serde_json::json!({})).await;
+    assert_eq!(status, StatusCode::BAD_REQUEST);
+    assert_eq!(json["ok"], false);
+    assert!(json["error"]
+        .as_str()
+        .unwrap_or_default()
+        .contains("provider required"));
+    // Invalid JSON body → 400 canonical JSON error (no network call).
+    let chat_res = app
+        .clone()
+        .oneshot(
+            Request::builder()
+                .uri("/api/omni/v1/chat/completions")
+                .method(Method::POST)
+                .header(header::CONTENT_TYPE, "application/json")
+                .body(Body::from("{\"model\": \"gpt-5.2\", "))
+                .expect("request"),
+        )
+        .await
+        .expect("response");
+    let chat_status = chat_res.status();
+    let bytes = axum::body::to_bytes(chat_res.into_body(), usize::MAX)
+        .await
+        .expect("body");
+    let chat_json: Value = serde_json::from_slice(&bytes).unwrap_or(Value::Null);
+    assert!(chat_status.is_client_error(), "chat status: {chat_status}");
+    assert_eq!(chat_json["ok"], false, "chat json: {chat_json}");
+    assert!(chat_json["error"].is_string(), "chat json: {chat_json}");
+}

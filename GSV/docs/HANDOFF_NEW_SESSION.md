@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (GSV)
 
-**Оновлено:** 2026-08-10 (band 121 **PH-S1849…S1855** ✅ · ratio **96.73%** · tests **207** · clippy **0**)
+**Оновлено:** 2026-08-15 (band 125 **PH-S1889…S1898** ✅ · ratio **96.87%** · tests **221** · clippy **0**)
 
 **Наступна сесія:** **`абракадабра`** → S0 диск/git → project scan (warnings first) → drain ≤10 PH-S*
 → Speeds + Rust panel → vision-sync → **один commit** → **`git push` + самарі**. Канон:
@@ -8,15 +8,15 @@
 
 ## Стан зараз
 
-- **GSV** — окремий Rust-first проєкт (`GSV/`), bands 102 · 108 · 109 · 110 · 111 · 112 · 113 · 114 · 115 · 116 · 117 · 118 · 119 · 120 · 121 **✅**.
-- **Ratio:** `cargo run --bin gsv-loc-audit -- --stretch-96` → **96.73%** (rust 10191 / product 10536, gate ≥95% ✅, stretch-96 ≥96% ✅) → `GSV/data/rust_ratio.json`.
-- **Тести:** `cargo test` → **207** green · **clippy 0** · **fmt clean**.
+- **GSV** — окремий Rust-first проєкт (`GSV/`), bands 102 · 108 · 109 · 110 · 111 · 112 · 113 · 114 · 115 · 116 · 117 · 118 · 119 · 120 · 121 · 125 **✅**.
+- **Ratio:** `cargo run --bin gsv-loc-audit -- --stretch-96` → **96.87%** (rust 11176 / product 11537, gate ≥95% ✅, stretch-96 ≥96% ✅) → `GSV/data/rust_ratio.json`.
+- **Тести:** `cargo test` → **221** green (102 lib + 8 omni + 7 ratio + 32 server + 12 ui + 8 update + 52 vision) · **clippy 0** · **fmt clean**.
 - **Сервер:** canon порт **9999** (`DEFAULT_PORT`; 8765 — Hyper-V reserved range). Стара нотатка
   8870/8891 — історична; див. `GSV/src/lib.rs`.
-- **FM:** band 121 = §5.102 (PH-S1849…S1855 ✅). Master horizon poolAI: band 122.
-- **Vision rev:** 473 (band 120 vision-sync close; band 121 bump — на кроці band close).
+- **FM:** band 125 = §5.106 (PH-S1889…S1898 ✅). Master horizon poolAI: band 126.
+- **Vision rev:** 491 (band 125 vision-sync close).
   Vision box: `boxes/vision.rs` + `gsv-vision-sync` bin +
-  `GET /api/vision*`; snapshot `GSV/data/gsv_manifest.json` + `gsv_feed.json` + `gsv_extensions.json` (rev 473).
+  `GET /api/vision*`; snapshot `GSV/data/gsv_manifest.json` + `gsv_feed.json` + `gsv_extensions.json` (rev 491).
   Band 110: `GET /api/vision/map`, `GET /assets/vision.svg`, `GET /api/vision/feed?status=`, Vision Map card.
   Band 111: `GET /api/vision/sprint-map` (sprint-scope/queue/session-tracks links + modules + kinds) та
   `GET /api/vision/doc-preview?id=` (node + 1-hop neighbors) — Sprint Map + Doc Preview UI cards.
@@ -64,6 +64,18 @@
    recommended + providers + models tables) + `format_number`; `CARD_NAMES` 13;
    `server/mod.rs` `api_ui_card` `"omni"` → `boxes::omni::wire`; `renderOmni` JS видалено,
    `rustCards` 13; `gsv-loc-audit --stretch-96` → **96.73%** (rust 10191 / product 10536) ≥96% ✅.
+   **band 125: Vision/UI polish** — `boxes/ui.rs`: 13 renderers error/empty-state HTML
+   маркери (`err_html`/`empty_html`/`not_ok`, `<span class='err'>` + «— no data», no panic);
+   `gsv_ui_contracts`: stand contracts for all 13 (`RUST_CARDS`) + a11y markers +
+   offline-stable cards; `server/mod.rs`: canonical JSON error shape `{ok:false,error}`
+   (err_json — preview/ui-card/ui-path/data-file/error-response/omni-test/spawn_cargo);
+   `gsv_server_contracts`: `error_responses_share_canonical_json_shape` +
+   `post_errors_share_canonical_json_shape`; `ui/index.html`: a11y (role=status,
+   aria-live/aria-label/alt/aria-haspopup), `data-card` hooks, `getText` keep-last-good +
+   `.card-status` badge на fetch fail; `boxes/vision.rs`: `wire_summary` empty-tolerant
+   (`degraded` flag, error тільки при fallback), consistent `ok`/`error` across
+   `/api/vision*` (`gsv_vision_contracts` wire-shape contracts);
+   `gsv-loc-audit --stretch-96` → **96.87%** (rust 11176 / product 11537) ≥96% ✅.
 - **poolAI ratio:** **95.04%** (advisory hold, `--ratio96-docs-canon --advisory --min-ratio 0.95`).
 
 ## S0 (кожна сесія, disk/git first)

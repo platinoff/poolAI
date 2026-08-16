@@ -270,7 +270,7 @@ Vision rev 490.
 
 **VDT:** §5.12 = **журнал PH-S*** (≤10 відкритих). Якщо **< 10** — **`абракадабра`** / project scan **всього проєкту**: concept → FM **§5.1** → roadmaps → architect → DOCS_LEGACY → code → §5.13 fallback. Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Project scan». **Rust-first:** API → `tests/`; Playwright лише browser scope.
 
-**Відкритих у §5.12:** **0** (band 124 ✅ · §5.105 PH-S1879…S1888). **Master horizon:** PH-S1899.S1908 (band 126). Vision rev **490**.
+**Відкритих у §5.12:** **0** (GSV band 125 · §5.106 PH-S1889…S1898 — Vision/UI polish ✅). **Master horizon:** PH-S1899.S1908 (band 126). Vision rev **491**.
 
 **Историчний research backlog (PH-S65+):**
 
@@ -1638,6 +1638,23 @@ Vision rev 488.
 | 1818 | **PH-S1886** | poolai-vision-sync --check | vision | drift gate green | **[x]** |
 | 1819 | **PH-S1887** | Ratio hold advisory | loc-audit | `--min-ratio 0.95 --advisory` | **[x]** |
 | 1820 | **PH-S1888** | galaxy_horizon_s1879_integration | tests/docs | band close | **[x]** |
+
+### 5.106 GSV Vision/UI polish queue — band 125 (PH-S1889…S1898, 2026-08-15) · **✅**
+
+**Джерело:** owner priority — GSV Galaxy UI polish: a11y/axe contracts, error states, offline-stable cards, stand contracts for all 13 card renderers (`GET /api/ui/card/:name`). Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV/docs/GSV_ROLES.md`](../../GSV/docs/GSV_ROLES.md) · [`GSV/docs/gsv/GSV_TECH_ROADMAP.md`](../../GSV/docs/gsv/GSV_TECH_ROADMAP.md). Pattern mirror: band 121 (§5.102).
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1821 | **PH-S1889** | Scope + queue | owner priority | Define band 125 (Vision/UI polish) у FM §5.106 + §5.12 header (master horizon) | **[x]** |
+| 1822 | **PH-S1890** | Card error/empty states | GSV canon | `boxes/ui.rs`: 13 renderers — consistent empty-state + error-state HTML markers, no panic | **[x]** |
+| 1823 | **PH-S1891** | Card stand contracts | GSV tests | `gsv_ui_contracts`: stand contracts for all 13 renderers (empty + error markers) | **[x]** |
+| 1824 | **PH-S1892** | Server JSON error shape | GSV canon | `server/mod.rs`: consistent 4xx + JSON error shape (`ok:false` + error) across endpoints | **[x]** |
+| 1825 | **PH-S1893** | Server stand contracts | GSV tests | `gsv_server_contracts`: endpoint error/empty shape contracts | **[x]** |
+| 1826 | **PH-S1894** | UI a11y markers | GSV canon | `ui/index.html`: aria/role/alt + focus-visible for all cards (axe markers) | **[x]** |
+| 1827 | **PH-S1895** | Offline-stable cards | GSV canon | `ui/index.html`: last-good render kept on fetch fail, error badges, no blank cards | **[x]** |
+| 1828 | **PH-S1896** | Vision wire polish | GSV canon | `boxes/vision.rs`: consistent `ok`/`error` + empty-tolerant wire shapes | **[x]** |
+| 1829 | **PH-S1897** | Ratio hold + tests | GSV_ROLES | `gsv-loc-audit --stretch-96` green **≥96%**; full GSV tests green; clippy 0 | **[x]** |
+| 1830 | **PH-S1898** | GSV docs canon + band close | GSV_ROLES | MEMORY/HANDOFF/NEXT/VISION/roadmap band 125; FM ✅; vision-sync rev bump; push | **[x]** |
 
 ### 5.88 Ratio96 docs canon queue — band 107 (PH-S1709…S1718, 2026-08-02) · **✅**
 
