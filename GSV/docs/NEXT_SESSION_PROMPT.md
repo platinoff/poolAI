@@ -122,7 +122,7 @@ Speeds · Rust panel → vision-sync (`poolai-vision-sync`) → **один** com
   empty-tolerant (`degraded` flag, error тільки при fallback) + consistent `ok`/`error` across
   `/api/vision*` (`gsv_vision_contracts` wire-shape contracts);
   contracts **221** (102 unit + 8 omni + 7 ratio + 32 server + 12 ui + 8 update + 52 vision);
-  ratio **96.87%** (rust 11176 / product 11537) ✅; vision rev **491**; FM §5.12 §5.106.
+  ratio **96.87%** (rust 11176 / product 11537) ✅; vision rev **492**; FM §5.12 §5.106.
   **Наступний band 126**: master backlog (за пріоритетом власника) — FM §5.12 / GSV_TECH_ROADMAP.
    **Наступний band 126**: master backlog (за пріоритетом власника) — FM §5.12 / GSV_TECH_ROADMAP.
 

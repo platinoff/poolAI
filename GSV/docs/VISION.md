@@ -19,7 +19,7 @@ ratio **96.73%** ≥96% ✅; всі 13 карток server-rendered, `renderOmni
 маркери + stand contracts; canonical server JSON error shape `{ok:false,error}`;
 UI a11y markers + offline-stable cards (`data-card`, keep-last-good, `.card-status`);
 `wire_summary` empty-tolerant (`degraded`) + consistent `ok`/`error` across `/api/vision*`;
-Vision rev **491**; ratio **96.87%** ≥96% ✅.
+Vision rev **492**; ratio **96.87%** ≥96% ✅.
 
 ## Що це
 
@@ -287,5 +287,5 @@ Band 125 (Vision/UI polish): 13 renderers отримали error/empty-state HTM
 (`err_html`/`empty_html`/`not_ok` — `<span class='err'>` + «— no data»), канонічний серверний
 error shape `{ok:false,error}` (`err_json`), UI a11y markers + offline-stable cards
 (`data-card`/keep-last-good/`.card-status`), `wire_summary` empty-tolerant (`degraded`) —
-rust ratio **96.87%** (stretch-96 advisory ✅); Vision rev **491**.
+rust ratio **96.87%** (stretch-96 advisory ✅); Vision rev **492**.
 Див. [`GSV_MIGRATION.md`](gsv/GSV_MIGRATION.md) і [`LEGACY_PARITY.md`](./LEGACY_PARITY.md).

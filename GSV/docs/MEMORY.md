@@ -21,7 +21,7 @@
 - **Band 125 (Vision/UI polish):** 13 renderers error/empty HTML markers + stand contracts ·
   canonical server JSON error shape `{ok:false,error}` + contracts · a11y markers +
   offline-stable cards у UI · `wire_summary` empty-tolerant (`degraded`) + consistent
-  `/api/vision*` ok/error shapes · **Vision rev 491**.
+  `/api/vision*` ok/error shapes · **Vision rev 492**.
 
 ## Що зроблено
 
@@ -337,7 +337,7 @@
 - **PH-S1897** Ratio hold: `gsv-loc-audit --stretch-96` → **96.87%** (rust 11176 / product 11537) ✅;
   cargo test (**221**); clippy 0; fmt clean.
 - **PH-S1898** GSV docs canon: MEMORY/HANDOFF/NEXT/VISION band 125; FM §5.106 ✅ + §5.12 header (0 open);
-  `GSV_TECH_ROADMAP.md` band 125 ✅; vision-sync rev **491**; push.
+  `GSV_TECH_ROADMAP.md` band 125 ✅; vision-sync rev **492**; push.
 
 ## Важливі факти (не забувати)
 

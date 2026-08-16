@@ -3336,7 +3336,7 @@
       "signature": "queue: FM §5.12 next band 107"
     }
   ],
-  "last_sprint_closed": "PH-S1888",
+  "last_sprint_closed": "PH-S1898",
   "layers": [
     {
       "id": "L0",
@@ -3369,7 +3369,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1879",
+  "next_sprint": "PH-S1889",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -12738,7 +12738,7 @@
       "path": "GSV/docs/vision/vision.svg"
     }
   ],
-  "revision": 491,
+  "revision": 492,
   "sprint_queue": [],
   "sprint_queue_open_count": 0,
   "updated_at": "2026-06-20",

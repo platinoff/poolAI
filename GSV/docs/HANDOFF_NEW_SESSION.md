@@ -14,9 +14,9 @@
 - **Сервер:** canon порт **9999** (`DEFAULT_PORT`; 8765 — Hyper-V reserved range). Стара нотатка
   8870/8891 — історична; див. `GSV/src/lib.rs`.
 - **FM:** band 125 = §5.106 (PH-S1889…S1898 ✅). Master horizon poolAI: band 126.
-- **Vision rev:** 491 (band 125 vision-sync close).
+- **Vision rev:** 492 (band 125 vision-sync close).
   Vision box: `boxes/vision.rs` + `gsv-vision-sync` bin +
-  `GET /api/vision*`; snapshot `GSV/data/gsv_manifest.json` + `gsv_feed.json` + `gsv_extensions.json` (rev 491).
+  `GET /api/vision*`; snapshot `GSV/data/gsv_manifest.json` + `gsv_feed.json` + `gsv_extensions.json` (rev 492).
   Band 110: `GET /api/vision/map`, `GET /assets/vision.svg`, `GET /api/vision/feed?status=`, Vision Map card.
   Band 111: `GET /api/vision/sprint-map` (sprint-scope/queue/session-tracks links + modules + kinds) та
   `GET /api/vision/doc-preview?id=` (node + 1-hop neighbors) — Sprint Map + Doc Preview UI cards.
