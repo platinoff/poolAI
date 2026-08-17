@@ -2,19 +2,23 @@
 name: abracadabra
 description: >-
   Trigger word «абракадабра» starts a VDT drain session. FIRST ask the owner to
-  choose the project (poolai | gsv), THEN run project-scan → drain → one commit
-  + push. Use when the owner literally writes «абракадабра» in a new session
-  (Cursor or OpenCode).
+  choose the product (poolai | gsv), THEN run project-scan → drain → one
+  commit + push. Canon host is GSV (`S:\rust\GSV`). This PoolAI copy is a
+  fallback if PoolAI is the only open folder. Use when the owner literally
+  writes «абракадабра» in a new session (Cursor or OpenCode).
 metadata:
-  audience: poolai-vdt
+  audience: poolai-product
   clients: cursor-opencode
 ---
 
-# «абракадабра» — VDT drain session
+# «абракадабра» — VDT drain session (PoolAI fallback)
 
-Works the same in **Cursor** and **OpenCode**. Canon lives here
-(`.agents/skills/abracadabra/`); client copies under `.cursor/skills/` and
-`.opencode/skills/` must stay identical.
+**Git canon:** `S:\rust\GSV\.agents\skills\abracadabra\`. Kit: `S:/rust/GSV/docs/gsv/GSV_VDT_KIT.md`.
+Registry: `S:/rust/GSV/docs/gsv/PRODUCTS.md`. Prefer **File → Open Folder → `S:\rust\GSV`**
+(or `gsv.code-workspace`). This file remains so a PoolAI-only window can still route.
+
+Works the same in **Cursor** and **OpenCode**. Client copies under `.cursor/skills/`
+and `.opencode/skills/` must stay identical **in the open workspace**.
 
 ## Step 0 — Choose the project (ALWAYS first)
 

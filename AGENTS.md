@@ -5,7 +5,7 @@
 ## Проєкт
 
 - **Назва:** PoolAI · **Версія:** v0.2.2 (див. `Cargo.toml` / `src/version.rs`) · **Корінь:** `S:\rust\poolAI`
-- **Проєкт GSV:** окремий git-репозиторій **`S:\rust\GSV`**. PoolAI vision-канон — `docs/vision/`. Вказівник: [`GSV/README.md`](GSV/README.md).
+- **Проєкт GSV / VDT kit:** окремий git-репозиторій **`S:\rust\GSV`** — точка входу (rules/skills/`абракадабра`). PoolAI vision-канон — `docs/vision/`. Вказівник: [`GSV/README.md`](GSV/README.md). Канон: `S:/rust/GSV/docs/gsv/GSV_VDT_KIT.md`.
 - **Стек (канон):** Rust `src/`, `tests/`, `crates/`; UI — JS у `src/ui/`; E2E — `e2e/` (TypeScript); **без Python**.
 - **PRIMARY concept:** `docs/concept/poolAI_concept_root.txt` (читати першим).
 
@@ -73,14 +73,13 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 
 | Шлях | Хто читає | Що класти |
 |------|-----------|-----------|
-| **`.agents/skills/`** | Cursor **і** OpenCode | **Канон.** Marketplace + проєктні `abracadabra`, `poolai-documentation` |
+| **`.agents/skills/`** | Cursor **і** OpenCode | **Продукт:** `poolai-documentation` + fallback `abracadabra`. Shared marketplace canon — `S:\rust\GSV\.agents\skills\` |
 | `.cursor/skills/` | лише Cursor | Дзеркало канону (ідентичний `SKILL.md`) |
 | `.opencode/skills/` | лише OpenCode | Дзеркало канону (ідентичний `SKILL.md`) |
 | `opencode.json` → `skills.paths` | OpenCode | Завжди `.agents/skills` (страховка discovery) |
 
-- Редагуй **спочатку** `.agents/skills/<name>/SKILL.md`, потім скопіюй у клієнтські дзеркала. `name` у frontmatter = ім’я теки; `description` ≤1024 і має WHAT + WHEN.
-- Marketplace (mode `copied` у `.agents/skills/`): documentation, doc-coauthoring, code-review, architecture, system-design, tech-debt, testing-strategy, debug, search-strategy, sprint-planning, roadmap-update, memory-management, task-management, write-spec, test-driven-development, verification-before-completion, systematic-debugging, writing-plans, executing-plans, rust-skill-creator.
-- Проєктні: `abracadabra` (вибір poolai\|gsv + drain), `poolai-documentation` (кроки 1–12).
+- Редагуй **спочатку** shared kit у `S:\rust\GSV\.agents\skills\` (крім `poolai-documentation` — тут). `name` у frontmatter = ім’я теки; `description` ≤1024 і має WHAT + WHEN.
+- Marketplace git-canon: GSV. Тут лишається fallback `abracadabra` + `poolai-documentation` (кроки 1–12).
 - **Python-скрипти скілів не комітяться** (канон: `git ls-files '*.py'` = порожнім). Скіли Anthropic із `.py` (docx/pdf/pptx/xlsx/webapp-testing) — не встановлювати.
 - Lock: `skills-lock.json`. Встановлення в **обидва** клієнти + канон `.agents`:
 

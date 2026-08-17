@@ -270,7 +270,7 @@ Vision rev 490.
 
 **VDT:** §5.12 = **журнал PH-S*** (≤10 відкритих). Якщо **< 10** — **`абракадабра`** / project scan **всього проєкту**: concept → FM **§5.1** → roadmaps → architect → DOCS_LEGACY → code → §5.13 fallback. Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Project scan». **Rust-first:** API → `tests/`; Playwright лише browser scope.
 
-**Відкритих у §5.12:** **0** (band 126 ✅ · §5.107 PH-S1899…S1908 — GSV stand smoke + ops canon). **Master horizon:** PH-S1909.S1918 (band 127). Vision rev **495**.
+**Відкритих у §5.12:** **0** (band 127 ✅ · §5.108 PH-S1909…S1918 — GSV VDT kit). **Master horizon:** band 128. Vision rev **495**.
 
 **Историчний research backlog (PH-S65+):**
 
@@ -1655,6 +1655,23 @@ Vision rev 488.
 | 1828 | **PH-S1896** | Vision wire polish | GSV canon | `boxes/vision.rs`: consistent `ok`/`error` + empty-tolerant wire shapes | **[x]** |
 | 1829 | **PH-S1897** | Ratio hold + tests | GSV_ROLES | `gsv-loc-audit --stretch-96` green **≥96%**; full GSV tests green; clippy 0 | **[x]** |
 | 1830 | **PH-S1898** | GSV docs canon + band close | GSV_ROLES | MEMORY/HANDOFF/NEXT/VISION/roadmap band 125; FM ✅; vision-sync rev bump; push | **[x]** |
+
+### 5.108 GSV VDT kit queue — band 127 (PH-S1909…S1918, 2026-08-17) · **✅**
+
+**Джерело:** owner 2026-08-17 — GSV як точка входу shared VDT (rules/skills) для будь-якого Rust-продукту. Канон: [`GSV/docs/gsv/GSV_VDT_KIT.md`](../../GSV/docs/gsv/GSV_VDT_KIT.md) у репо `S:\rust\GSV` · [`PRODUCTS.md`](../../GSV/docs/gsv/PRODUCTS.md). Work in **`S:\rust\GSV`**, не `poolAI/GSV/`.
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1841 | **PH-S1909** | Canon Accepted | GSV_VDT_KIT | `GSV_VDT_KIT.md` Status=Accepted; HANDOFF/NEXT/README pointers | **[x]** |
+| 1842 | **PH-S1910** | Abracadabra host | kit | `.agents/skills/abracadabra/` роутить продукт (poolai \| gsv); вікно ≠ продукт | **[x]** |
+| 1843 | **PH-S1911** | Generic skills | marketplace | copy skills з PoolAI `.agents/skills/` (без `poolai-documentation`) | **[x]** |
+| 1844 | **PH-S1912** | Generic rules | VDT | `.cursor/rules/` session, roles, MSYS2, git, rust-generic, cursor baseline | **[x]** |
+| 1845 | **PH-S1913** | Client mirrors | Windows copy | `.cursor/skills/` + `.opencode/skills/` identical | **[x]** |
+| 1846 | **PH-S1914** | Product registry | kit | `docs/gsv/PRODUCTS.md` (root, handoff, test, ratio) | **[x]** |
+| 1847 | **PH-S1915** | Workspace | kit | `gsv.code-workspace` (GSV перший + PoolAI) | **[x]** |
+| 1848 | **PH-S1916** | PoolAI thin | kit | product-only rules/skills; pointer «kit = GSV» | **[x]** |
+| 1849 | **PH-S1917** | AGENTS / roles | kit | `AGENTS.md` + `GSV_ROLES.md` = entry-point | **[x]** |
+| 1850 | **PH-S1918** | Band close | GSV_ROLES | `cargo test` + loc-audit ≥96%; vision-sync; один commit + push | **[x]** |
 
 ### 5.107 GSV stand smoke + ops canon queue — band 126 (PH-S1899…S1908, 2026-08-16) · **✅**
 

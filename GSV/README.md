@@ -4,7 +4,9 @@ Galaxy StarWalker Vision is a **standalone project** at:
 
 **`S:\rust\GSV`** (`/s/rust/GSV`)
 
-Open that folder as its own git repo / Cursor workspace. Session canon: `S:\rust\GSV\AGENTS.md`, `docs/HANDOFF_NEW_SESSION.md`, `docs/NEXT_SESSION_PROMPT.md`.
+Open that folder as its own git repo / **Cursor workspace (VDT entry)**. Shared
+rules/skills/`абракадабра` live there: `docs/gsv/GSV_VDT_KIT.md`. Session canon:
+`S:\rust\GSV\AGENTS.md`, `docs/HANDOFF_NEW_SESSION.md`, `docs/NEXT_SESSION_PROMPT.md`.
 
 PoolAI vision map (manifest / feed / Speeds / Rust panel) stays here:
 

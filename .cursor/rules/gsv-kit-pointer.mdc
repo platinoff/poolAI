@@ -1,0 +1,16 @@
+---
+description: Shared VDT kit lives in GSV — PoolAI is product-only
+alwaysApply: true
+---
+
+# Kit pointer (PoolAI)
+
+Git-канон спільного VDT (rules, marketplace skills, `абракадабра` host) —
+**`S:\rust\GSV`**. Open that folder or `S:\rust\GSV\gsv.code-workspace`.
+
+This repo keeps **product** canon only: FM, concept, `cargo test-ci`, Playwright admin, OpenAPI gap, Galaxy, 90–95% ratio, `poolai-documentation`.
+
+When the owner writes `абракадабра` here: still AskQuestion **poolai | gsv**, then follow
+[`.agents/skills/abracadabra/SKILL.md`](../../.agents/skills/abracadabra/SKILL.md) (fallback copy). Prefer draining from the GSV window.
+
+Canon: `S:/rust/GSV/docs/gsv/GSV_VDT_KIT.md` · registry `S:/rust/GSV/docs/gsv/PRODUCTS.md`.

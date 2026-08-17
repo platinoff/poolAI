@@ -1,11 +1,11 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-08-17 (GSV → `S:\rust\GSV` · vision canon `docs/vision/` · vision rev **495** · band 126 ✅ · FM §5.12 0 open)
+**Оновлено:** 2026-08-17 (GSV kit band 127 ✅ · vision canon `docs/vision/` · band 126 ✅ · FM §5.12 0 open · horizon band 128)
 
-**GSV:** код винесено в окремий git-репозиторій **`S:\rust\GSV`**. У PoolAI лишився вказівник [`GSV/README.md`](../../GSV/README.md) і vision-канон [`docs/vision/`](../vision/README.md). Drain GSV — відкрити workspace `S:\rust\GSV` (скіл `abracadabra` → gsv).
+**GSV:** код і **shared VDT kit** — **`S:\rust\GSV`**. У PoolAI лишився вказівник [`GSV/README.md`](../../GSV/README.md), `.cursor/rules/gsv-kit-pointer.mdc`, і vision-канон [`docs/vision/`](../vision/README.md). Drain — відкрити `S:\rust\GSV` (або `gsv.code-workspace`) → `абракадабра` → AskQuestion.
 
-**Наступна сесія:** **`абракадабра`** — див. **канон воркфлоу в [AGENTS.md](../../AGENTS.md §100–113)**.
-**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1909…S1918; черга — FM §5.12 → band 127) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+**Наступна сесія:** **`абракадабра`** з workspace GSV — див. **канон у [AGENTS.md](../../AGENTS.md)** і `S:/rust/GSV/docs/NEXT_SESSION_PROMPT.md`.
+**Коротко:** AskQuestion продукт → S0 диск/clean → project scan (**warnings first**) → drain наступного band · Speeds + Rust → vision → **push + самарі в кінці**.
 
 --- 
 
