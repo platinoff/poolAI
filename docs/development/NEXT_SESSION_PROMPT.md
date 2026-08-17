@@ -11,7 +11,7 @@ Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.1
 | **P0 open** | **PH-SVC34** re-verify GH · **PH-SVC35** OWNER |
 | **Completion pending** | **560** sprints PH-S1739…S2278 · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) |
 | **Horizon** | band 127 → **PH-S1909.S1918** |
-| **Vision** | rev **493** |
+| **Vision** | rev **494** |
 | **GSV** | окремий проєкт Rust-first (bands 102+108…126 ✅, ratio 96.87%, tests 230) · [`GSV/README.md`](../../GSV/README.md) · [`GSV/docs/gsv/`](../../../GSV/docs/gsv/README.md) · ролі [`GSV/docs/GSV_ROLES.md`](../../GSV/docs/GSV_ROLES.md) · Vision box [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) |
 | **Cursor / GH** | local **3.13.21** · Auto-review · Router Balance/Intelligence · Actions `GITHUB_TOKEN` opaque/JWT · [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](./CURSOR_UPDATE_RESEARCH_2026-07-27.md) |
 
@@ -107,7 +107,7 @@ Band 126 (**PH-S1899…S1908**, GSV stand smoke + ops canon) — **drained** ✅
 `tests/gsv_stand_smoke_contracts.rs` (6 contracts); docs canon `GSV_SERVER.md`/`GSV_BOXES.md`/
 GSV README/`GSV_TECH_ROADMAP.md` + GSV MEMORY/HANDOFF/NEXT/VISION; FM §5.107 + §5.12 header
 (0 open, rev 493); poolAI vision README/HANDOFF/NEXT parity; ratio holds GSV **96.87%**
-(rust 11176 / product 11537); FM §5.12 §5.107 ✅; vision rev **493**.
+(rust 11176 / product 11537); FM §5.12 §5.107 ✅; vision rev **494**.
 Далі band 127 — за пріоритетом власника: master backlog (Ratio96 phase F) або GSV future
 (scope за project scan).
 Оновлювати FM §5.12 (черга, ≥10 відкритих), HANDOFF, NEXT_SESSION.

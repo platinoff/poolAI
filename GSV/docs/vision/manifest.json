@@ -12736,9 +12736,16 @@
       "label": "vision.svg",
       "layer": "L1",
       "path": "GSV/docs/vision/vision.svg"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_skills_abracadabra_SKILL_md",
+      "label": "SKILL.md",
+      "layer": "L3",
+      "path": ".cursor/skills/abracadabra/SKILL.md"
     }
   ],
-  "revision": 493,
+  "revision": 494,
   "sprint_queue": [],
   "sprint_queue_open_count": 0,
   "updated_at": "2026-06-20",

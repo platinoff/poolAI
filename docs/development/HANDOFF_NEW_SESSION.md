@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-08-16 (vision rev **493** · band 126 GSV stand smoke + ops canon ✅ · FM §5.12 0 open)
+**Оновлено:** 2026-08-17 (vision rev **494** · skills Cursor/OpenCode canon · band 126 GSV stand smoke + ops canon ✅ · FM §5.12 0 open)
 
 **Наступна сесія:** **`абракадабра`** — див. **канон воркфлоу в [AGENTS.md](../../AGENTS.md §100–113)**.
 **Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1909…S1918; черга — FM §5.12 → band 127) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
@@ -65,7 +65,7 @@ bin: 48 live checks (7 core + 15 vision ok-gate + 6 SVG status + 20 ui cards), `
 FM §5.107 rows ✅ + §5.12 header (0 open, rev 493); poolAI vision README/HANDOFF/NEXT parity;
 ratio **96.87%** (rust 11176 / product 11537, gate ≥95% ✅, stretch ≥96% ✅); tests **230**
 (102 lib + 3 stand-smoke bin + 8 omni + 7 ratio + 32 server + 6 stand-smoke contracts + 12 ui +
-8 update + 52 vision), clippy **0**, fmt clean; vision rev **493**. Horizon: band 127.
+8 update + 52 vision), clippy **0**, fmt clean; vision rev **494**. Horizon: band 127.
 
 ## Band 124 — GPULimits admin/ops glue (PH-S1879…S1888, **🔜**)
 
