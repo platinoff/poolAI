@@ -3308,6 +3308,12 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "GSV_docs_vision_vision_svg"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "_cursor_rules_gsv_kit_pointer_mdc"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -3336,7 +3342,7 @@
       "signature": "queue: FM §5.12 next band 107"
     }
   ],
-  "last_sprint_closed": "PH-S1908",
+  "last_sprint_closed": "PH-S1918",
   "layers": [
     {
       "id": "L0",
@@ -3369,7 +3375,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S1899",
+  "next_sprint": "PH-S1910",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -12645,11 +12651,28 @@
       "label": "SKILL.md",
       "layer": "L3",
       "path": ".cursor/skills/abracadabra/SKILL.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_gsv_kit_pointer_mdc",
+      "label": "gsv-kit-pointer.mdc",
+      "layer": "L1",
+      "path": ".cursor/rules/gsv-kit-pointer.mdc"
     }
   ],
-  "revision": 495,
-  "sprint_queue": [],
-  "sprint_queue_open_count": 0,
+  "revision": 496,
+  "sprint_queue": [
+    {
+      "acceptance": ".agents/skills/abracadabra/` роутить продукт (poolai \\",
+      "deps": "kit",
+      "id": "PH-S1910",
+      "open": true,
+      "row": 1842,
+      "status": "open",
+      "title": "Abracadabra host"
+    }
+  ],
+  "sprint_queue_open_count": 1,
   "updated_at": "2026-06-20",
   "vision_ui_rev": 59
 }

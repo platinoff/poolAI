@@ -1,17 +1,17 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-08-17 (band 127 **PH-S1909…S1918** ✅ GSV VDT kit · horizon **band 128**)
+**Оновлено:** 2026-08-02 (band 127 **PH-S1909…S1918, 2026-08-17** ✅ · horizon band 128)
 
-Maintenance mode (FM §5.15) · band 126 drained.
+Maintenance mode (FM §5.15) · band 127 drained.
 
 Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.18 @ S2278).
 
-| **← наступний** | **`абракадабра`** (project scan → band 127) |
-| **§5.12 active** | **0** (band 126 ✅) |
+| **← наступний** | **`абракадабра`** (project scan → band 128) |
+| **§5.12 active** | **1** (band 127 ✅) |
 | **P0 open** | **PH-SVC34** re-verify GH · **PH-SVC35** OWNER |
 | **Completion pending** | **560** sprints PH-S1739…S2278 · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) |
-| **Horizon** | band 128 (project scan у GSV `абракадабра`) |
-| **Vision** | rev **495** (bump on PoolAI vision-sync if this commit includes FM) |
+| **Horizon** | band 128 → **PH-S1919…S1928** |
+| **Vision** | rev **496** |
 | **GSV** | окремий git **`S:\rust\GSV`** (bands 102+108…**127 VDT kit ✅**) · **точка входу** Cursor: `S:\rust\GSV` / `gsv.code-workspace` · канон `S:/rust/GSV/docs/gsv/GSV_VDT_KIT.md` · реєстр `PRODUCTS.md` · вказівник [`GSV/README.md`](../../GSV/README.md) |
 | **Cursor / GH** | local **3.13.21** · Auto-review · Router Balance/Intelligence · Actions `GITHUB_TOKEN` opaque/JWT · [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](./CURSOR_UPDATE_RESEARCH_2026-07-27.md) |
 
@@ -29,7 +29,7 @@ Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.1
 
 ---
 
-## Band 127 (очікуваний фокус — project scan)
+## Band 128 (очікуваний фокус — project scan)
 
 **PH-S1879…S1888 🔜 (2026-08-11)** (enterprise phase H «GPU admission + worker limits, single-host»).
 Pattern mirror: band 104 `ratio96_admin_ops_depth` admin/ops glue. Смуга: `gpu_limits_admin_ops_depth`
@@ -42,7 +42,7 @@ docs `GPU_LIMITS_ADMIN_OPS.md` canon → vision-sync → ratio hold advisory →
 (`galaxy_horizon_s1879_integration`, FM §5.105). Канон:
 [`GPU_LIMITS_ADMIN_OPS.md`](./GPU_LIMITS_ADMIN_OPS.md) · [`FUNCTION_MANAGEMENT.md §5.105`](../catalog/FUNCTION_MANAGEMENT.md).
 
-## Band 127 (очікуваний фокус — project scan)
+## Band 128 (очікуваний фокус — project scan)
 
 **PH-S1869…S1878 ✅ (2026-08-11)** (enterprise phase H «GPU admission + worker limits, single-host»).
 Pattern mirror: band 122 `gpu_limits_depth` docs canon. Смуга: `gpu_limits_api_depth`
@@ -55,7 +55,7 @@ docs `GPU_LIMITS.md` band-123 canon → vision-sync → ratio hold advisory → 
 (`galaxy_horizon_s1869_integration`, FM §5.104). Канон:
 [`GPU_LIMITS.md`](./GPU_LIMITS.md) · [`FUNCTION_MANAGEMENT.md §5.104`](../catalog/FUNCTION_MANAGEMENT.md).
 
-## Band 127 (очікуваний фокус — project scan)
+## Band 128 (очікуваний фокус — project scan)
 
 **PH-S1859…S1868 ✅ (2026-08-11)** (enterprise phase H «GPU admission + worker limits, single-host»).
 Pattern mirror: band 107 `RATIO96_DOCS_CANON` docs canon. Смуга: `gpu_limits_depth`
