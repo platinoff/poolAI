@@ -1,18 +1,18 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-08-02 (band 125 **PH-S1889…S1898, 2026-08-15** ✅ · horizon band 126)
+**Оновлено:** 2026-08-02 (band 126 **PH-S1899…S1908, 2026-08-16** ✅ · horizon band 127)
 
-Maintenance mode (FM §5.15) · band 125 drained.
+Maintenance mode (FM §5.15) · band 126 drained.
 
 Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.18 @ S2278).
 
-| **← наступний** | **`абракадабра`** (project scan → band 126) |
-| **§5.12 active** | **0** (band 125 ✅) |
+| **← наступний** | **`абракадабра`** (project scan → band 127) |
+| **§5.12 active** | **0** (band 126 ✅) |
 | **P0 open** | **PH-SVC34** re-verify GH · **PH-SVC35** OWNER |
 | **Completion pending** | **560** sprints PH-S1739…S2278 · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) |
-| **Horizon** | band 126 → **PH-S1899.S1908** |
-| **Vision** | rev **492** |
-| **GSV** | окремий проєкт Rust-first (bands 102+108+109+110+111+112+113+114+115+116+117+118 ✅, ratio 95.35%, tests 163) · [`GSV/README.md`](../../GSV/README.md) · [`GSV/docs/gsv/`](../../../GSV/docs/gsv/README.md) · ролі [`GSV/docs/GSV_ROLES.md`](../../GSV/docs/GSV_ROLES.md) · Vision box [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) |
+| **Horizon** | band 127 → **PH-S1909.S1918** |
+| **Vision** | rev **493** |
+| **GSV** | окремий проєкт Rust-first (bands 102+108…126 ✅, ratio 96.87%, tests 230) · [`GSV/README.md`](../../GSV/README.md) · [`GSV/docs/gsv/`](../../../GSV/docs/gsv/README.md) · ролі [`GSV/docs/GSV_ROLES.md`](../../GSV/docs/GSV_ROLES.md) · Vision box [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) |
 | **Cursor / GH** | local **3.13.21** · Auto-review · Router Balance/Intelligence · Actions `GITHUB_TOKEN` opaque/JWT · [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](./CURSOR_UPDATE_RESEARCH_2026-07-27.md) |
 
 ---
@@ -23,13 +23,13 @@ Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.1
 абракадабра
 ```
 
-**Порядок:** **S0 диск** (`df -h /s` + `check_target_disk.sh` → `cargo clean` за потреби) → project scan (**спочатку** `rust_diagnostics` / clippy warnings → виправлення в топ смуги) → drain наступного band (черга — FM §5.12 / completion roadmap; наступний за каноном — band 125 **PH-S1889…S1898**; **без** mid-push) → Speeds (`bash bin/record-test-ci-speed.sh`) · Rust panel (`bash bin/record-rust-diagnostics.sh`) → vision-sync → **один** commit → **`git push` + самарі (завжди кінець сесії)**. Після push — PH-SVC34 GH re-verify (JWT-format `GITHUB_TOKEN` ok). **Не** комітити `certs/*.pem`, `.env`, `data/audit/*`. **Не** валідувати довжину `ghs_*`.
+**Порядок:** **S0 диск** (`df -h /s` + `check_target_disk.sh` → `cargo clean` за потреби) → project scan (**спочатку** `rust_diagnostics` / clippy warnings → виправлення в топ смуги) → drain наступного band (черга — FM §5.12 / completion roadmap; наступний за каноном — band 127 **PH-S1909…S1918**; **без** mid-push) → Speeds (`bash bin/record-test-ci-speed.sh`) · Rust panel (`bash bin/record-rust-diagnostics.sh`) → vision-sync → **один** commit → **`git push` + самарі (завжди кінець сесії)**. Після push — PH-SVC34 GH re-verify (JWT-format `GITHUB_TOKEN` ok). **Не** комітити `certs/*.pem`, `.env`, `data/audit/*`. **Не** валідувати довжину `ghs_*`.
 
 **Cursor:** desktop **3.13.21** · Run Mode **Auto-review** · drain = Agent mode · Router Auto → Balance/Intelligence · research [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](./CURSOR_UPDATE_RESEARCH_2026-07-27.md).
 
 ---
 
-## Band 126 (очікуваний фокус — project scan)
+## Band 127 (очікуваний фокус — project scan)
 
 **PH-S1879…S1888 🔜 (2026-08-11)** (enterprise phase H «GPU admission + worker limits, single-host»).
 Pattern mirror: band 104 `ratio96_admin_ops_depth` admin/ops glue. Смуга: `gpu_limits_admin_ops_depth`
@@ -42,7 +42,7 @@ docs `GPU_LIMITS_ADMIN_OPS.md` canon → vision-sync → ratio hold advisory →
 (`galaxy_horizon_s1879_integration`, FM §5.105). Канон:
 [`GPU_LIMITS_ADMIN_OPS.md`](./GPU_LIMITS_ADMIN_OPS.md) · [`FUNCTION_MANAGEMENT.md §5.105`](../catalog/FUNCTION_MANAGEMENT.md).
 
-## Band 126 (очікуваний фокус — project scan)
+## Band 127 (очікуваний фокус — project scan)
 
 **PH-S1869…S1878 ✅ (2026-08-11)** (enterprise phase H «GPU admission + worker limits, single-host»).
 Pattern mirror: band 122 `gpu_limits_depth` docs canon. Смуга: `gpu_limits_api_depth`
@@ -55,7 +55,7 @@ docs `GPU_LIMITS.md` band-123 canon → vision-sync → ratio hold advisory → 
 (`galaxy_horizon_s1869_integration`, FM §5.104). Канон:
 [`GPU_LIMITS.md`](./GPU_LIMITS.md) · [`FUNCTION_MANAGEMENT.md §5.104`](../catalog/FUNCTION_MANAGEMENT.md).
 
-## Band 126 (очікуваний фокус — project scan)
+## Band 127 (очікуваний фокус — project scan)
 
 **PH-S1859…S1868 ✅ (2026-08-11)** (enterprise phase H «GPU admission + worker limits, single-host»).
 Pattern mirror: band 107 `RATIO96_DOCS_CANON` docs canon. Смуга: `gpu_limits_depth`
@@ -101,7 +101,14 @@ active sprint, empty-state); `--sprint*` CSS-змінні + sprint-pill/queue ch
 Queue/Board cards + Sprint Focus card (`<img id="i-sprint-focus">`); contracts **163**
 (44 vision + 25 server); GSV ratio **95.35%** (rust 8328 / product 8734); FM §5.12 §5.99 ✅;
 vision rev **488**.
-Далі band 119 — за пріоритетом власника: master backlog (Ratio96 phase F) або GSV future
+Band 126 (**PH-S1899…S1908**, GSV stand smoke + ops canon) — **drained** ✅:
+`GSV/src/bin/gsv_http_stand_smoke.rs` (48 live checks: 7 core + 15 vision + 6 SVG + 20 ui cards;
+`--base-url`/`--json`; `SmokeReport`; exit 1 on FAIL; 3 unit tests) +
+`tests/gsv_stand_smoke_contracts.rs` (6 contracts); docs canon `GSV_SERVER.md`/`GSV_BOXES.md`/
+GSV README/`GSV_TECH_ROADMAP.md` + GSV MEMORY/HANDOFF/NEXT/VISION; FM §5.107 + §5.12 header
+(0 open, rev 493); poolAI vision README/HANDOFF/NEXT parity; ratio holds GSV **96.87%**
+(rust 11176 / product 11537); FM §5.12 §5.107 ✅; vision rev **493**.
+Далі band 127 — за пріоритетом власника: master backlog (Ratio96 phase F) або GSV future
 (scope за project scan).
 Оновлювати FM §5.12 (черга, ≥10 відкритих), HANDOFF, NEXT_SESSION.
 
@@ -111,5 +118,5 @@ vision rev **488**.
 
 ## Не повторювати
 
-PH-SVC85 ✅ (Rust diagnostics panel / CI) · PH-SVC75…84 ✅ (Cursor 3.13.21 / vision tools) · PH-SVC65…74 ✅ (GH App / Actions token opaque) · PH-SVC55…64 ✅ · band 118 ✅ (GSV sprint UI migration) · band 117 ✅ (GSV legacy vision deactivation) · band 116 ✅ (GSV history charts) · band 115 ✅ (GSV migration completion) · band 114 ✅ (GSV sprint-board + progress UI) · band 113 ✅ (GSV node search + interactive map) · band 112 ✅ (GSV vision auto-sync + sprint-queue) · band 111 ✅ (GSV sprint-map + doc-preview) · band 110 ✅ (GSV vision map UI) · band 109 ✅ (GSV vision sync/migration) · band 108 ✅ (GSV roles/ratio canon) · band 107 ✅ (Ratio96 docs canon) · band 106 ✅ (Ratio96 loc-audit) · band 105 ✅ (Ratio96 stand smoke) · band 104 ✅ (Ratio96 admin/ops glue) · band 103 ✅ · band 102 ✅ (GSV migration) · band 101 ✅ · band 100 ✅ · band 99 ✅ · band 98 ✅ · band 97 ✅ · band 96 ✅ · band 95 ✅ · band 94 ✅ · band 93 ✅ · band 92 ✅ · band 91 ✅ · band 90 ✅ · band 89 ✅ · band 88 ✅ · band 87 ✅ · band 86 ✅ · band 85 ✅ · band 84 ✅ · band 83 ✅ · band 82 ✅ · band 81 ✅ · band 80 ✅ · band 79 ✅ · PH-SVC45…54 ✅ · PH-SVC41…43 ✅ · band 74 ✅ · FM-003 LAN · FM-041 Cloud SDK · mandatory ZK/TEE · history rewrite без OWNER · staging `certs/*.pem` / `data/audit/*` / `.env` · token length-checks на `ghs_*` · build/test GSV при запущеному `gsv-server` · обхід GSV ratio-смуги Rust-кодом замість compact UI · перенесення legacy `vision.js`/`vision.css` у `GSV/ui/`.
+PH-SVC85 ✅ (Rust diagnostics panel / CI) · PH-SVC75…84 ✅ (Cursor 3.13.21 / vision tools) · PH-SVC65…74 ✅ (GH App / Actions token opaque) · PH-SVC55…64 ✅ · band 126 ✅ (GSV stand smoke + ops canon) · band 125 ✅ (GSV Vision/UI polish) · band 118 ✅ (GSV sprint UI migration) · band 117 ✅ (GSV legacy vision deactivation) · band 116 ✅ (GSV history charts) · band 115 ✅ (GSV migration completion) · band 114 ✅ (GSV sprint-board + progress UI) · band 113 ✅ (GSV node search + interactive map) · band 112 ✅ (GSV vision auto-sync + sprint-queue) · band 111 ✅ (GSV sprint-map + doc-preview) · band 110 ✅ (GSV vision map UI) · band 109 ✅ (GSV vision sync/migration) · band 108 ✅ (GSV roles/ratio canon) · band 107 ✅ (Ratio96 docs canon) · band 106 ✅ (Ratio96 loc-audit) · band 105 ✅ (Ratio96 stand smoke) · band 104 ✅ (Ratio96 admin/ops glue) · band 103 ✅ · band 102 ✅ (GSV migration) · band 101 ✅ · band 100 ✅ · band 99 ✅ · band 98 ✅ · band 97 ✅ · band 96 ✅ · band 95 ✅ · band 94 ✅ · band 93 ✅ · band 92 ✅ · band 91 ✅ · band 90 ✅ · band 89 ✅ · band 88 ✅ · band 87 ✅ · band 86 ✅ · band 85 ✅ · band 84 ✅ · band 83 ✅ · band 82 ✅ · band 81 ✅ · band 80 ✅ · band 79 ✅ · PH-SVC45…54 ✅ · PH-SVC41…43 ✅ · band 74 ✅ · FM-003 LAN · FM-041 Cloud SDK · mandatory ZK/TEE · history rewrite без OWNER · staging `certs/*.pem` / `data/audit/*` / `.env` · token length-checks на `ghs_*` · build/test GSV при запущеному `gsv-server` · обхід GSV ratio-смуги Rust-кодом замість compact UI · перенесення legacy `vision.js`/`vision.css` у `GSV/ui/`.
 

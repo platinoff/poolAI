@@ -33,6 +33,22 @@
 | GET | `/api/health` | health-чек |
 | GET | `/events` | SSE: update · offline/online · metrics resync |
 
+## Stand smoke (`gsv-http-stand-smoke`, band 126)
+
+Live HTTP smoke бінарника сервера — мірор poolAI `poolai-http-stand-smoke` (PH-S1900):
+
+```bash
+# канон-порт 9999:
+cargo run --manifest-path GSV/Cargo.toml --bin gsv-http-stand-smoke
+# JSON-репорт + кастомний base-url:
+cargo run --manifest-path GSV/Cargo.toml --bin gsv-http-stand-smoke -- --base-url http://127.0.0.1:9999 --json
+```
+
+- Перевіряє core boxes (`/api/health`, `/api/tracker`, `/api/sli`, `/api/toolchain`, `/api/update`, `/api/ratio`, `/api/omni/status`), усі `/api/vision*` (ok-гейт), SVG-ассети та **усі 20 зареєстрованих карток** `/api/ui/card/:name` (non-empty `html`).
+- `ok`-гейт лише там, де wire має поле `ok` (vision*/ratio/health/cards); struct-wire endpoints (tracker/sli/toolchain/update/omni) — лише 200 + JSON (empty-tolerant).
+- Вихідний код: `GSV/src/bin/gsv_http_stand_smoke.rs`; контракти: `GSV/tests/gsv_stand_smoke_contracts.rs`.
+- Репорт: `{base_url, ok, passed, failed, cases[], tool}`; exit code 1 при будь-якому FAIL.
+
 ## Update-повідомлення (Update box)
 
 Ключова вимога: **якщо запущено bin-версію, сервер приймає повідомлення про апдейт.**

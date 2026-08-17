@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (GSV)
 
-**Оновлено:** 2026-08-15 (band 125 **PH-S1889…S1898** ✅ · ratio **96.87%** · tests **221** · clippy **0**)
+**Оновлено:** 2026-08-16 (band 126 **PH-S1899…S1908** ✅ · ratio **96.87%** · tests **230** · clippy **0**)
 
 **Наступна сесія:** **`абракадабра`** → S0 диск/git → project scan (warnings first) → drain ≤10 PH-S*
 → Speeds + Rust panel → vision-sync → **один commit** → **`git push` + самарі**. Канон:
@@ -8,13 +8,13 @@
 
 ## Стан зараз
 
-- **GSV** — окремий Rust-first проєкт (`GSV/`), bands 102 · 108 · 109 · 110 · 111 · 112 · 113 · 114 · 115 · 116 · 117 · 118 · 119 · 120 · 121 · 125 **✅**.
+- **GSV** — окремий Rust-first проєкт (`GSV/`), bands 102 · 108 · 109 · 110 · 111 · 112 · 113 · 114 · 115 · 116 · 117 · 118 · 119 · 120 · 121 · 125 · 126 **✅**.
 - **Ratio:** `cargo run --bin gsv-loc-audit -- --stretch-96` → **96.87%** (rust 11176 / product 11537, gate ≥95% ✅, stretch-96 ≥96% ✅) → `GSV/data/rust_ratio.json`.
-- **Тести:** `cargo test` → **221** green (102 lib + 8 omni + 7 ratio + 32 server + 12 ui + 8 update + 52 vision) · **clippy 0** · **fmt clean**.
+- **Тести:** `cargo test` → **230** green (102 lib + 3 stand-smoke bin + 8 omni + 7 ratio + 32 server + 6 stand-smoke contracts + 12 ui + 8 update + 52 vision) · **clippy 0** · **fmt clean**.
 - **Сервер:** canon порт **9999** (`DEFAULT_PORT`; 8765 — Hyper-V reserved range). Стара нотатка
   8870/8891 — історична; див. `GSV/src/lib.rs`.
-- **FM:** band 125 = §5.106 (PH-S1889…S1898 ✅). Master horizon poolAI: band 126.
-- **Vision rev:** 492 (band 125 vision-sync close).
+- **FM:** band 126 = §5.107 (PH-S1899…S1908 ✅). Master horizon poolAI: band 127.
+- **Vision rev:** 493 (band 126 vision-sync close).
   Vision box: `boxes/vision.rs` + `gsv-vision-sync` bin +
   `GET /api/vision*`; snapshot `GSV/data/gsv_manifest.json` + `gsv_feed.json` + `gsv_extensions.json` (rev 492).
   Band 110: `GET /api/vision/map`, `GET /assets/vision.svg`, `GET /api/vision/feed?status=`, Vision Map card.
@@ -75,6 +75,12 @@
    `.card-status` badge на fetch fail; `boxes/vision.rs`: `wire_summary` empty-tolerant
    (`degraded` flag, error тільки при fallback), consistent `ok`/`error` across
    `/api/vision*` (`gsv_vision_contracts` wire-shape contracts);
+   `gsv-loc-audit --stretch-96` → **96.87%** (rust 11176 / product 11537) ≥96% ✅.
+   **band 126: GSV stand smoke + ops canon** — `gsv-http-stand-smoke` bin (мірор poolAI
+   `poolai-http-stand-smoke`): `--base-url`/`--json`, `check_ok`/`check_json`/`check_status`/
+   `check_card`, 48 live checks (core boxes + vision* ok-gate + SVG status + 20 ui cards),
+   exit 1 при FAIL; `tests/gsv_stand_smoke_contracts.rs` (6); docs canon
+   (GSV_SERVER.md stand-smoke section, GSV_BOXES.md row, README 230 tests);
    `gsv-loc-audit --stretch-96` → **96.87%** (rust 11176 / product 11537) ≥96% ✅.
 - **poolAI ratio:** **95.04%** (advisory hold, `--ratio96-docs-canon --advisory --min-ratio 0.95`).
 

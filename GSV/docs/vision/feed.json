@@ -3,6 +3,96 @@
   "items": [
     {
       "category": "closed",
+      "id": "PH-S1908",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "ratio ≥96%; fmt/clippy/test; docs canon; vision-sync rev bump; push",
+      "title": "Band close"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1907",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "poolai-vision-sync` rev bump (band 126); `--check` ok",
+      "title": "vision-sync close"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1906",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "FM §5.12 §5.107; `GSV/docs/vision/README.md`; poolAI HANDOFF/NEXT band 126",
+      "title": "poolAI vision parity"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1905",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "VISION.md` +band 126 (stand smoke); MEMORY band 126; GSV HANDOFF/NEXT band 126",
+      "title": "GSV vision docs canon"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1904",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "gsv-loc-audit --stretch-96` green ≥96%; full GSV tests green; clippy 0",
+      "title": "Ratio hold + tests"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1903",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "GSV/docs/gsv/GSV_SERVER.md` + `GSV/docs/gsv/GSV_BOXES.md` + README: stand smoke row + usage; `GSV/docs/gsv/GSV_TECH_ROADMAP.md` band 126",
+      "title": "GSV docs canon"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1902",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "tests/gsv_stand_smoke_contracts.rs`: report shape (base_url/ok/passed/failed/cases) + exit-code logic + endpoint list",
+      "title": "Stand smoke contracts"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1901",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "per-box checks (ok/error/empty-tolerant): `/api/health`, `/api/tracker`, `/api/sli`, `/api/toolchain`, `/api/ratio`, `/api/ui/card/{name}` (20), `/api/vision*`, `/api/omni/status",
+      "title": "Stand smoke checks"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1900",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "GSV/src/bin/gsv_http_stand_smoke.rs`: live HTTP smoke (health/tracker/sli/toolchain/ratio/ui-card/vision/omni), JSON-репорт + exit code",
+      "title": "gsv-http-stand-smoke` bin"
+    },
+    {
+      "category": "closed",
+      "id": "PH-S1899",
+      "link": "http://127.0.0.1:8891/#b-sprint-board",
+      "published": "2026-05-28",
+      "status": "closed",
+      "summary": "Define band 126 (GSV stand smoke + ops canon) у FM §5.107 + §5.12 header (master horizon)",
+      "title": "Scope + queue"
+    },
+    {
+      "category": "closed",
       "id": "PH-S1898",
       "link": "http://127.0.0.1:8891/#b-sprint-board",
       "published": "2026-05-28",
@@ -18,96 +108,6 @@
       "status": "closed",
       "summary": "gsv-loc-audit --stretch-96` green ≥96%; full GSV tests green; clippy 0",
       "title": "Ratio hold + tests"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1896",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "boxes/vision.rs`: consistent `ok`/`error` + empty-tolerant wire shapes",
-      "title": "Vision wire polish"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1895",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "ui/index.html`: last-good render kept on fetch fail, error badges, no blank cards",
-      "title": "Offline-stable cards"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1894",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "ui/index.html`: aria/role/alt + focus-visible for all cards (axe markers)",
-      "title": "UI a11y markers"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1893",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "gsv_server_contracts`: endpoint error/empty shape contracts",
-      "title": "Server stand contracts"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1892",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "server/mod.rs`: consistent 4xx + JSON error shape (`ok:false` + error) across endpoints",
-      "title": "Server JSON error shape"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1891",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "gsv_ui_contracts`: stand contracts for all 13 renderers (empty + error markers)",
-      "title": "Card stand contracts"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1890",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "boxes/ui.rs`: 13 renderers — consistent empty-state + error-state HTML markers, no panic",
-      "title": "Card error/empty states"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1889",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "Define band 125 (Vision/UI polish) у FM §5.106 + §5.12 header (master horizon)",
-      "title": "Scope + queue"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1888",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "band close",
-      "title": "galaxy_horizon_s1879_integration"
-    },
-    {
-      "category": "closed",
-      "id": "PH-S1887",
-      "link": "http://127.0.0.1:8891/#b-sprint-board",
-      "published": "2026-05-28",
-      "status": "closed",
-      "summary": "--min-ratio 0.95 --advisory",
-      "title": "Ratio hold advisory"
     }
   ],
   "link": "http://127.0.0.1:8891/",

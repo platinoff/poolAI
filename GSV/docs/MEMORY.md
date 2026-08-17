@@ -4,24 +4,24 @@
 Оновлюється в кінці кожного band. Лічильники — вимірювані (`wc -l`, `cargo test`,
 `cargo run --bin gsv-loc-audit`), не з пам'яті.
 
-## Стан (2026-08-15 · band 125 ✅)
+## Стан (2026-08-16 · band 126 ✅)
 
 - **Канон:** Rust **95–100%** / wasm **0–5%** (завжди), без Python/Java; bins — лише `src/bin/`.
 - **Ratio (виміряно):** `cargo run --bin gsv-loc-audit -- --stretch-96` → **96.87%** (rust 11176 / product 11537) —
   gate ≥95% ✅, stretch-96 ≥96% ✅.
   Звіт: `GSV/data/rust_ratio.json` (gitignored).
-- **Тести (виміряно):** `cargo test` → **221** (102 unit + 8 `gsv_omni_contracts` + 7 `gsv_ratio_contracts`
-  + 32 `gsv_server_contracts` + 12 `gsv_ui_contracts` + 8 `gsv_update_flow` + 52 `gsv_vision_contracts`).
+- **Тести (виміряно):** `cargo test` → **230** (102 unit + 3 stand-smoke bin unit + 8 `gsv_omni_contracts`
+  + 7 `gsv_ratio_contracts` + 32 `gsv_server_contracts` + 6 `gsv_stand_smoke_contracts`
+  + 12 `gsv_ui_contracts` + 8 `gsv_update_flow` + 52 `gsv_vision_contracts`).
   `cargo clippy --all-targets` → **0** warnings. `cargo fmt` clean.
 - **Бокси:** Tracker · SLI console · Toolchain · IDE · Update/offline · Box preview · SLI terminal ·
   Tests/bench hooks · **Ratio** · **Vision** · **Vision Map** · **Sprint Map** · **Doc Preview** ·
   **Vision Sync** · **Sprint Queue** · **Sprint Board** · **Sprint Progress** · **Sprint Focus** ·
-  **Galaxy UI parity** (band 119) · **UI fragments** (band 121: `GET /api/ui/card/:name`, 13 Rust renderers) ·
+  **Galaxy UI parity** (band 119) · **UI fragments** (band 121: `GET /api/ui/card/:name`, 20 Rust renderers) ·
   **OmniRouter** (Rust AI-проксі/роутер; card `omni` band 121).
-- **Band 125 (Vision/UI polish):** 13 renderers error/empty HTML markers + stand contracts ·
-  canonical server JSON error shape `{ok:false,error}` + contracts · a11y markers +
-  offline-stable cards у UI · `wire_summary` empty-tolerant (`degraded`) + consistent
-  `/api/vision*` ok/error shapes · **Vision rev 492**.
+- **Band 126 (GSV stand smoke + ops canon):** `gsv-http-stand-smoke` bin (48 live checks: core boxes +
+  vision* ok-gate + SVG status + 20 ui cards) · `gsv_stand_smoke_contracts` (6) · docs canon
+  (GSV_SERVER/GSV_BOXES/README/roadmap band 126) · ratio hold **96.87%** · **Vision rev 493**.
 
 ## Що зроблено
 
@@ -338,6 +338,24 @@
   cargo test (**221**); clippy 0; fmt clean.
 - **PH-S1898** GSV docs canon: MEMORY/HANDOFF/NEXT/VISION band 125; FM §5.106 ✅ + §5.12 header (0 open);
   `GSV_TECH_ROADMAP.md` band 125 ✅; vision-sync rev **492**; push.
+
+### Band 126 (PH-S1899…S1908, ✅ 2026-08-16) — GSV stand smoke + ops canon
+- **PH-S1899** Scope + queue: FM §5.107 band 126 (PH-S1899…S1908) + §5.12 header (master horizon).
+- **PH-S1900** `src/bin/gsv_http_stand_smoke.rs` (мірор poolAI `poolai-http-stand-smoke`): CLI
+  `--base-url`/`--json`, `SmokeCaseResult`/`SmokeReport`, `check_ok`/`check_json`/`check_status`/
+  `check_card`, `CARDS` (20), exit 1 при FAIL + 3 unit tests; `Cargo.toml` `[[bin]] gsv-http-stand-smoke`.
+- **PH-S1901** 48 live checks проти запущеного сервера: health/tracker/sli/toolchain/update/ratio/
+  omni-status (check_json для struct-wire) + vision* ok-gate (15) + SVG status (5) + ui cards (20).
+- **PH-S1902** `tests/gsv_stand_smoke_contracts.rs` (6): vision ok-gate (15), struct-wire JSON (5),
+  status-only 200 (5), cards render ok+html, report shape, card-list matches registry.
+- **PH-S1903** GSV docs canon: `GSV_SERVER.md` stand-smoke section · `GSV_BOXES.md` row ·
+  README (tests 230 / structure / endpoints / status) · `GSV_TECH_ROADMAP.md` band 126.
+- **PH-S1904** Ratio hold: `gsv-loc-audit --stretch-96` → **96.87%** (rust 11176 / product 11537) ✅;
+  cargo test (**230**); clippy 0; fmt clean.
+- **PH-S1905** GSV vision docs canon: MEMORY band 126 + HANDOFF/NEXT band 126 + VISION.md stand smoke.
+- **PH-S1906** poolAI parity: FM §5.12 §5.107 + `GSV/docs/vision/README.md` + poolAI HANDOFF/NEXT.
+- **PH-S1907** vision-sync close: `poolai-vision-sync` rev **493**; `--check` ok.
+- **PH-S1908** Band close: Speeds/Rust panel; один commit; `git push` + самарі; gsv-server restart.
 
 ## Важливі факти (не забувати)
 

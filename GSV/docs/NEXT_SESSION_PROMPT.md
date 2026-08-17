@@ -1,6 +1,6 @@
 # Промпт наступної сесії (GSV)
 
-**Оновлено:** 2026-08-15 (band 125 **PH-S1889…S1898** ✅ · ratio **96.87%** · tests **221**)
+**Оновлено:** 2026-08-16 (band 126 **PH-S1899…S1908** ✅ · ratio **96.87%** · tests **230**)
 
 ```
 абракадабра
@@ -123,8 +123,19 @@ Speeds · Rust panel → vision-sync (`poolai-vision-sync`) → **один** com
   `/api/vision*` (`gsv_vision_contracts` wire-shape contracts);
   contracts **221** (102 unit + 8 omni + 7 ratio + 32 server + 12 ui + 8 update + 52 vision);
   ratio **96.87%** (rust 11176 / product 11537) ✅; vision rev **492**; FM §5.12 §5.106.
-  **Наступний band 126**: master backlog (за пріоритетом власника) — FM §5.12 / GSV_TECH_ROADMAP.
-   **Наступний band 126**: master backlog (за пріоритетом власника) — FM §5.12 / GSV_TECH_ROADMAP.
+- **band 126** (PH-S1899…S1908) ✅ — GSV stand smoke + ops canon:
+  `gsv-http-stand-smoke` bin (`src/bin/gsv_http_stand_smoke.rs`, мірор poolAI
+  `poolai-http-stand-smoke`): CLI `--base-url`/`--json`, `SmokeCaseResult`/`SmokeReport`,
+  `check_ok`/`check_json`/`check_status`/`check_card`, `CARDS` 20, 48 live checks
+  (core boxes + vision* ok-gate + SVG status + 20 ui cards non-empty html), exit 1 при FAIL,
+  3 bin unit tests; `Cargo.toml` `[[bin]]`; `tests/gsv_stand_smoke_contracts.rs` (6):
+  vision ok-gate (15) + struct-wire JSON (5) + status-only 200 (5) + cards render ok+html +
+  report shape + card-list registry parity; docs canon (GSV_SERVER stand-smoke section,
+  GSV_BOXES row, README 230 tests / structure / endpoints / status, roadmap band 126);
+  contracts **230** (102 unit + 3 bin + 8 omni + 7 ratio + 32 server + 6 stand-smoke +
+  12 ui + 8 update + 52 vision); ratio **96.87%** (rust 11176 / product 11537) ✅;
+  vision rev **493**; FM §5.12 §5.107.
+  **Наступний band 127**: master backlog (за пріоритетом власника) — FM §5.12 / GSV_TECH_ROADMAP.
 
 ## Канон GSV
 
@@ -143,6 +154,7 @@ band 115 ✅ (GSV migration completion — legacy vision supersession) · band 1
 band 117 ✅ (GSV legacy vision deactivation) · band 118 ✅ (GSV sprint UI migration — theme + focus map) ·
 band 119 ✅ (GSV Galaxy UI full parity — colors + box behaviors) · band 120 ✅ (GSV Ratio 96% stretch) ·
 band 121 ✅ (GSV OmniRouter box parity) · band 125 ✅ (GSV Vision/UI polish — a11y/error/offline/stand contracts) ·
+band 126 ✅ (GSV stand smoke + ops canon) ·
 staging `GSV/data/*` / `certs/*.pem` /
 `.env` · mid-push · build/test при запущеному `gsv-server` · обхід ratio-смуги Rust-кодом замість compact UI ·
 перенесення legacy `vision.js`/`vision.css` у `GSV/ui/` (знищило б ratio canon).

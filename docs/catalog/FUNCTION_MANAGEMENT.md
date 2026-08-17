@@ -270,7 +270,7 @@ Vision rev 490.
 
 **VDT:** §5.12 = **журнал PH-S*** (≤10 відкритих). Якщо **< 10** — **`абракадабра`** / project scan **всього проєкту**: concept → FM **§5.1** → roadmaps → architect → DOCS_LEGACY → code → §5.13 fallback. Канон: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) § «Project scan». **Rust-first:** API → `tests/`; Playwright лише browser scope.
 
-**Відкритих у §5.12:** **0** (band 125 ✅ · §5.106 PH-S1889…S1898 — Vision/UI polish). **Master horizon:** PH-S1899.S1908 (band 126). Vision rev **492**.
+**Відкритих у §5.12:** **0** (band 126 ✅ · §5.107 PH-S1899…S1908 — GSV stand smoke + ops canon). **Master horizon:** PH-S1909.S1918 (band 127). Vision rev **493**.
 
 **Историчний research backlog (PH-S65+):**
 
@@ -1655,6 +1655,23 @@ Vision rev 488.
 | 1828 | **PH-S1896** | Vision wire polish | GSV canon | `boxes/vision.rs`: consistent `ok`/`error` + empty-tolerant wire shapes | **[x]** |
 | 1829 | **PH-S1897** | Ratio hold + tests | GSV_ROLES | `gsv-loc-audit --stretch-96` green **≥96%**; full GSV tests green; clippy 0 | **[x]** |
 | 1830 | **PH-S1898** | GSV docs canon + band close | GSV_ROLES | MEMORY/HANDOFF/NEXT/VISION/roadmap band 125; FM ✅; vision-sync rev bump; push | **[x]** |
+
+### 5.107 GSV stand smoke + ops canon queue — band 126 (PH-S1899…S1908, 2026-08-16) · **✅**
+
+**Джерело:** master backlog / fallback-band (GSV_ROLES «stand smoke») — у GSV немає live HTTP stand-smoke bin (патерн poolAI `poolai-http-stand-smoke`): `gsv-http-stand-smoke` — живий smoke за усіма ключовими endpoints (health/tracker/sli/toolchain/ratio/ui-card/vision/omni), JSON-репорт + exit code, empty-tolerant. Canon: [`GSV/docs/GSV_ROLES.md`](../../GSV/docs/GSV_ROLES.md) · [`GSV/docs/gsv/GSV_SERVER.md`](../../GSV/docs/gsv/GSV_SERVER.md) · [`GSV/docs/gsv/GSV_TECH_ROADMAP.md`](../../GSV/docs/gsv/GSV_TECH_ROADMAP.md). Pattern mirror: poolAI `src/bin/poolai_http_stand_smoke.rs`.
+
+| # | Sprint | Фокус | Джерело | Acceptance | Status |
+|---|--------|--------|---------|------------|--------|
+| 1831 | **PH-S1899** | Scope + queue | owner priority | Define band 126 (GSV stand smoke + ops canon) у FM §5.107 + §5.12 header (master horizon) | **[x]** |
+| 1832 | **PH-S1900** | `gsv-http-stand-smoke` bin | poolAI mirror | `GSV/src/bin/gsv_http_stand_smoke.rs`: live HTTP smoke (health/tracker/sli/toolchain/ratio/ui-card/vision/omni), JSON-репорт + exit code | **[x]** |
+| 1833 | **PH-S1901** | Stand smoke checks | GSV canon | per-box checks (ok/error/empty-tolerant): `/api/health`, `/api/tracker`, `/api/sli`, `/api/toolchain`, `/api/ratio`, `/api/ui/card/{name}` (20), `/api/vision*`, `/api/omni/status` | **[x]** |
+| 1834 | **PH-S1902** | Stand smoke contracts | GSV tests | `tests/gsv_stand_smoke_contracts.rs`: report shape (base_url/ok/passed/failed/cases) + exit-code logic + endpoint list | **[x]** |
+| 1835 | **PH-S1903** | GSV docs canon | session canon | `GSV/docs/gsv/GSV_SERVER.md` + `GSV/docs/gsv/GSV_BOXES.md` + README: stand smoke row + usage; `GSV/docs/gsv/GSV_TECH_ROADMAP.md` band 126 | **[x]** |
+| 1836 | **PH-S1904** | Ratio hold + tests | GSV_ROLES | `gsv-loc-audit --stretch-96` green **≥96%**; full GSV tests green; clippy 0 | **[x]** |
+| 1837 | **PH-S1905** | GSV vision docs canon | session canon | `VISION.md` +band 126 (stand smoke); MEMORY band 126; GSV HANDOFF/NEXT band 126 | **[x]** |
+| 1838 | **PH-S1906** | poolAI vision parity | docs canon | FM §5.12 §5.107; `GSV/docs/vision/README.md`; poolAI HANDOFF/NEXT band 126 | **[x]** |
+| 1839 | **PH-S1907** | vision-sync close | docs canon | `poolai-vision-sync` rev bump (band 126); `--check` ok | **[x]** |
+| 1840 | **PH-S1908** | Band close | GSV_ROLES | ratio **≥96%**; fmt/clippy/test; docs canon; vision-sync rev bump; push | **[x]** |
 
 ### 5.88 Ratio96 docs canon queue — band 107 (PH-S1709…S1718, 2026-08-02) · **✅**
 

@@ -10,6 +10,7 @@ band 116 (GSV history charts — speed/rust analytics) **✅** · band 117 (GSV 
 band 118 (GSV sprint UI migration — theme + focus map) **✅** ·
 band 119 (GSV Galaxy UI full parity — colors + box behaviors) **✅** · band 120 (GSV Ratio 96% stretch) **✅** ·
 band 121 (GSV OmniRouter box parity) **✅** · band 125 (GSV Vision/UI polish — a11y/error/offline/stand contracts) **✅** ·
+band 126 (GSV stand smoke + ops canon) **✅** ·
 **Спринти:** `PH-S1659…S1668` (FM §5.12 §5.83 ✅) · `PH-S1719…S1728` (FM §5.12 §5.89 ✅) ·
 `PH-S1729…S1738` (FM §5.12 §5.90 ✅) · `PH-S1739…S1748` (FM §5.12 §5.91 ✅) ·
 `PH-S1749…S1758` (FM §5.12 §5.92 ✅) · `PH-S1759…S1768` (FM §5.12 §5.93 ✅) ·
@@ -17,7 +18,7 @@ band 121 (GSV OmniRouter box parity) **✅** · band 125 (GSV Vision/UI polish �
 `PH-S1799…S1808` (FM §5.12 §5.97 ✅) · `PH-S1809…S1818` (FM §5.12 §5.98 ✅) ·
 `PH-S1819…S1828` (FM §5.12 §5.99 ✅) · `PH-S1829…S1838` (FM §5.12 §5.100 ✅) ·
 `PH-S1839…S1848` (FM §5.12 §5.101 ✅) · `PH-S1849…S1855` (FM §5.12 §5.102 ✅) ·
-`PH-S1889…S1898` (FM §5.12 §5.106 ✅).
+`PH-S1889…S1898` (FM §5.12 §5.106 ✅) · `PH-S1899…S1908` (FM §5.12 §5.107 ✅).
 
 ## Логічний порядок (залежності)
 
@@ -274,6 +275,21 @@ docs/architecture (✅ ця сесія)
 | **PH-S1896** | Vision wire polish | `boxes/vision.rs`: consistent `ok`/`error` + empty-tolerant wire shapes — **✅** |
 | **PH-S1897** | Ratio hold + tests | `gsv-loc-audit --stretch-96` green **≥96%**; full GSV tests green; clippy 0 — **✅** |
 | **PH-S1898** | GSV docs canon + band close | MEMORY/HANDOFF/NEXT/VISION/roadmap band 125; FM ✅; vision-sync rev bump; push — **✅** |
+
+## Спринти (band 126) — GSV stand smoke + ops canon ✅
+
+| Sprint | Фокус | Acceptance (ключ) |
+|--------|-------|-------------------|
+| **PH-S1899** | Scope + queue | FM §5.107 band 126 (PH-S1899…S1908) + §5.12 header (master horizon) — **✅** |
+| **PH-S1900** | Stand smoke bin | `src/bin/gsv_http_stand_smoke.rs` (мірор poolAI `poolai-http-stand-smoke`) + `Cargo.toml` `[[bin]]` — **✅** |
+| **PH-S1901** | Stand smoke checks | 48 live checks (core boxes + vision* ok-gate + SVG status + 20 ui cards non-empty html) — **✅** |
+| **PH-S1902** | Stand smoke contracts | `gsv_stand_smoke_contracts.rs`: vision ok-gate + struct-wire JSON + status + cards + report shape — **✅** |
+| **PH-S1903** | GSV docs canon | GSV_SERVER.md (stand smoke section), GSV_BOXES.md (row), README (tests/structure/endpoints/status), roadmap band 126 — **✅** |
+| **PH-S1904** | Ratio hold + tests | `gsv-loc-audit --stretch-96` **≥96%** (96.87%); full GSV tests green (230); clippy 0 — **✅** |
+| **PH-S1905** | GSV vision docs canon | VISION.md / MEMORY / GSV HANDOFF / NEXT_SESSION band 126 — **✅** |
+| **PH-S1906** | poolAI vision parity | FM §5.12 §5.107 + GSV vision README + poolAI HANDOFF/NEXT — **✅** |
+| **PH-S1907** | Vision-sync close | `poolai-vision-sync` rev bump band 126, `--check` ok — **✅** |
+| **PH-S1908** | Band close | Speeds/Rust panel; один commit; `git push` + самарі; gsv-server restart — **✅** |
 
 ## Ключові UX-вимоги (узагальнення ТЗ)
 

@@ -1,9 +1,9 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-08-12 (vision rev **488** · bands 124-137 GPULimits complete ✅ · all feature groups vision sync)
+**Оновлено:** 2026-08-16 (vision rev **493** · band 126 GSV stand smoke + ops canon ✅ · FM §5.12 0 open)
 
 **Наступна сесія:** **`абракадабра`** — див. **канон воркфлоу в [AGENTS.md](../../AGENTS.md §100–113)**.
-**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1889…S1898; черга — FM §5.12 → band 125) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
+**Коротко:** S0 диск/clean → project scan (**warnings first** з `rust_diagnostics`) → drain наступного band (PH-S1909…S1918; черга — FM §5.12 → band 127) · Speeds + Rust diagnostics → vision → **push + самарі в кінці**.
 
 --- 
 
@@ -41,6 +41,31 @@
 - Не паралелити `cargo test-ci`.
 - Warnings > 0 або errors > 0 → 1–3 PH-S* **на початок смуги** (Джерело: `rust_diagnostics` / lint code).
 - Fallback-смуга: galaxy metrics stubs, wasm glue, stand smoke, concept wire, loc-audit, docs canon, vision sync, INDEX.
+
+## Band 126 — GSV stand smoke + ops canon (PH-S1899…S1908, **✅**)
+
+| Sprint | Фокус |
+|--------|--------|
+| **PH-S1899** | FM §5.107 band 126 (rows 1831–1840) + §5.12 header |
+| **PH-S1900** | `gsv_http_stand_smoke` bin (`GSV/src/bin/gsv_http_stand_smoke.rs`; `--base-url`/`--json`; `SmokeCaseResult`/`SmokeReport`; 3 unit tests; `GSV/Cargo.toml` `[[bin]]`) |
+| **PH-S1901** | Live smoke 48/48 (7 core + 15 vision + 6 SVG + 20 ui cards; check_ok vs check_json за наявністю `ok` поля) |
+| **PH-S1902** | Contracts (`GSV/tests/gsv_stand_smoke_contracts.rs`, 6: vision ok-gate 15, struct-wire JSON 5, status 200 5, cards render, report shape, card-list↔registry parity) |
+| **PH-S1903** | GSV docs canon (`GSV_SERVER.md` stand smoke; `GSV_BOXES.md`; GSV README; `GSV_TECH_ROADMAP.md` band 126) |
+| **PH-S1904** | Ratio hold 96.87% (`gsv-loc-audit --stretch-96`; tests **230**; clippy 0; fmt clean) |
+| **PH-S1905** | GSV vision docs canon (MEMORY/HANDOFF/NEXT/VISION band 126; rev 493; horizon band 127) |
+| **PH-S1906** | poolAI vision parity (FM §5.107 + §5.12 header; `GSV/docs/vision/README.md`; poolAI HANDOFF/NEXT band 126) |
+| **PH-S1907** | vision-sync rev 493 (manifest `revision++`; `poolai-vision-sync` → snapshot update; `--check` ok) |
+| **PH-S1908** | Band close (Speeds/Rust panel; один commit; `git push` + самарі; `gsv-server` restart) |
+
+**PH-S1899…S1908 ✅ (2026-08-16):** GSV stand smoke + ops canon — `gsv_http_stand_smoke`
+bin: 48 live checks (7 core + 15 vision ok-gate + 6 SVG status + 20 ui cards), `--base-url`
+(default `http://127.0.0.1:9999`, env `GSV_BASE_URL`) + `--json`, gates `check_ok`/`check_json`/
+`check_status`/`check_card`, exit 1 on FAIL, 3 unit tests; contracts 6; docs canon
+`GSV_SERVER.md`/`GSV_BOXES.md`/GSV README/`GSV_TECH_ROADMAP.md` + GSV MEMORY/HANDOFF/NEXT/VISION;
+FM §5.107 rows ✅ + §5.12 header (0 open, rev 493); poolAI vision README/HANDOFF/NEXT parity;
+ratio **96.87%** (rust 11176 / product 11537, gate ≥95% ✅, stretch ≥96% ✅); tests **230**
+(102 lib + 3 stand-smoke bin + 8 omni + 7 ratio + 32 server + 6 stand-smoke contracts + 12 ui +
+8 update + 52 vision), clippy **0**, fmt clean; vision rev **493**. Horizon: band 127.
 
 ## Band 124 — GPULimits admin/ops glue (PH-S1879…S1888, **🔜**)
 

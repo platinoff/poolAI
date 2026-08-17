@@ -20,6 +20,9 @@ ratio **96.73%** ≥96% ✅; всі 13 карток server-rendered, `renderOmni
 UI a11y markers + offline-stable cards (`data-card`, keep-last-good, `.card-status`);
 `wire_summary` empty-tolerant (`degraded`) + consistent `ok`/`error` across `/api/vision*`;
 Vision rev **492**; ratio **96.87%** ≥96% ✅.
+**band 126 (PH-S1899…S1908, ✅)** — GSV stand smoke + ops canon: `gsv-http-stand-smoke` bin
+(48 live checks: core boxes + vision* ok-gate + SVG status + 20 ui cards) +
+`gsv_stand_smoke_contracts` (6) + docs canon; Vision rev **493**; ratio **96.87%** ≥96% ✅.
 
 ## Що це
 
@@ -288,4 +291,10 @@ Band 125 (Vision/UI polish): 13 renderers отримали error/empty-state HTM
 error shape `{ok:false,error}` (`err_json`), UI a11y markers + offline-stable cards
 (`data-card`/keep-last-good/`.card-status`), `wire_summary` empty-tolerant (`degraded`) —
 rust ratio **96.87%** (stretch-96 advisory ✅); Vision rev **492**.
+Band 126 (GSV stand smoke + ops canon): `gsv-http-stand-smoke` bin — live HTTP smoke
+(48 checks: health/tracker/sli/toolchain/update/ratio/omni-status + 15 vision* ok-gate +
+5 SVG status + 20 ui cards non-empty html), `check_ok`/`check_json`/`check_status`/
+`check_card` gates, JSON-репорт + exit 1 при FAIL; `gsv_stand_smoke_contracts` (6) —
+vision ok-gate + struct-wire JSON + status-only 200 + cards render + report shape;
+rust ratio **96.87%** (stretch-96 advisory ✅); Vision rev **493**.
 Див. [`GSV_MIGRATION.md`](gsv/GSV_MIGRATION.md) і [`LEGACY_PARITY.md`](./LEGACY_PARITY.md).

@@ -2,7 +2,7 @@
 
 **Канон міграції vision у окремий проєкт.** GSV — самостійний Rust-first проєкт у фолдері `GSV/` репо PoolAI. Працює **95–100% на Rust**, **0–5% WebAssembly** (завжди), UI — тонкий JS/DOM glue у `src/ui/` (без Python).
 
-**Версія:** v0.1.0 · **Стан:** band 102 реалізовано (FM §5.12 §5.83 **✅** `PH-S1659…S1668`) · band 108 (**✅** `PH-S1719…S1728`: roles/ratio/roles canon, `gsv-loc-audit`, Ratio box).
+**Версія:** v0.1.0 · **Стан:** band 125 реалізовано (FM §5.12 §5.106 **✅** `PH-S1889…S1898` — Vision/UI polish) · band 126 **in progress** (§5.107 `PH-S1899…S1908` — GSV stand smoke + ops canon). Vision rev **492**.
 
 ## Суть
 
@@ -27,12 +27,14 @@
 ```
 GSV/
 ├── README.md            ← цей файл (архітектура / entry)
-├── Cargo.toml           ← gsv package (workspace members=["."]; bin `gsv-server`)
+├── Cargo.toml           ← gsv package (workspace members=["."]; bins: gsv-server, gsv-loc-audit, gsv-vision-sync, gsv-http-stand-smoke)
 ├── .cargo/config.toml   ← [build] target-dir="target"
 ├── src/
 │   ├── bin/
-│   │   ├── gsv_server.rs    ← exe/bin «Galaxy StarWalker Vision» (CLI --host/--port/--repo-root/--data-dir)
-│   │   └── gsv_loc_audit.rs ← Rust/LOC ratio audit bin (→ GSV/data/rust_ratio.json, --min-ratio/--advisory)
+│   │   ├── gsv_server.rs        ← exe/bin «Galaxy StarWalker Vision» (CLI --host/--port/--repo-root/--data-dir)
+│   │   ├── gsv_loc_audit.rs     ← Rust/LOC ratio audit bin (→ GSV/data/rust_ratio.json, --min-ratio/--advisory/--stretch-96)
+│   │   ├── gsv_vision_sync.rs   ← vision manifest/feed/extensions sync bin
+│   │   └── gsv_http_stand_smoke.rs ← live HTTP stand smoke (48 checks, JSON report, exit code; band 126)
 │   ├── lib.rs           ← модулі (app_error, boxes, server, state, tracker, vision)
 │   ├── app_error.rs     ← AppError (Display + From + IntoResponse JSON)
 │   ├── state.rs         ← AppState (tracker, ide_selection, update_flag, events broadcast)
@@ -54,10 +56,13 @@ GSV/
 │                          proxy.rs (OpenAI-сумісний chat completions / models)
 ├── ui/index.html        ← single-page UI (SSE, offline/update/resync)
 ├── tests/
-│   ├── gsv_server_contracts.rs  ← 18 integration tests
+│   ├── gsv_server_contracts.rs  ← 32 integration tests
 │   ├── gsv_omni_contracts.rs    ← 8 OmniRouter integration tests
 │   ├── gsv_ratio_contracts.rs   ← 7 ratio box integration tests
-│   └── gsv_update_flow.rs       ← 8 update/SSE tests
+│   ├── gsv_update_flow.rs       ← 8 update/SSE tests
+│   ├── gsv_ui_contracts.rs      ← 12 UI fragment tests
+│   ├── gsv_vision_contracts.rs  ← 52 vision tests
+│   └── gsv_stand_smoke_contracts.rs ← 6 stand smoke contracts (band 126)
 └── data/                ← gsv_tracker.json, omni.toml, rust_ratio.json (durable stores, gitignored)
 ```
 
@@ -79,10 +84,11 @@ export PATH="/c/Users/${USER}/.cargo/bin:$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$
 export RUSTUP_TOOLCHAIN="stable-x86_64-pc-windows-gnu"
 cd GSV
 cargo build --all-targets
-cargo test          # 87 tests (46 unit + 18 contracts + 8 omni + 7 ratio + 8 update-flow)
+cargo test          # 230 tests (102 unit + contracts + omni + ratio + update + ui + vision + stand smoke)
 cargo clippy --all-targets   # 0 warnings/errors
-cargo run --bin gsv-loc-audit   # Rust/LOC ratio → GSV/data/rust_ratio.json (≥95%)
+cargo run --bin gsv-loc-audit -- --stretch-96   # Rust/LOC ratio → GSV/data/rust_ratio.json (≥95%, stretch-96 ≥96%)
 cargo run --bin gsv-server -- --port 8890   # live smoke
+cargo run --bin gsv-http-stand-smoke        # live stand smoke (48 checks) проти запущеного сервера
 ```
 
 ## Запуск
@@ -91,7 +97,7 @@ cargo run --bin gsv-server -- --port 8890   # live smoke
 cargo run --bin gsv-server -- --host 127.0.0.1 --port 9999 --repo-root S:/rust/poolAI --data-dir GSV/data
 ```
 
-Endpoints: `GET /` (UI), `/api/health`, `/api/tracker`, `/api/sli`, `/api/toolchain`, `/api/ide/sessions`, `POST /api/ide/select`, `/api/update`, `POST /api/update/notify`, `/api/preview?file=…`, `POST /api/terminal`, `/api/hooks/tests`, `/api/hooks/bench`, `/api/ratio`, `/api/omni`, `/api/omni/config` (GET/POST), `/api/omni/v1/models`, `POST /api/omni/v1/chat/completions`, `POST /api/omni/test`, `GET /events` (SSE).
+Endpoints: `GET /` (UI), `/api/health`, `/api/tracker`, `/api/sli`, `/api/toolchain`, `/api/ide/sessions`, `POST /api/ide/select`, `/api/update`, `POST /api/update/notify`, `/api/preview?file=…`, `POST /api/terminal`, `/api/hooks/tests`, `/api/hooks/bench`, `/api/ratio`, `/api/omni`, `/api/omni/status`, `/api/omni/config` (GET/POST), `/api/omni/v1/models`, `POST /api/omni/v1/chat/completions`, `POST /api/omni/test`, `/api/ui/card/:name` (20 cards), `/api/vision*` + SVG, `GET /events` (SSE).
 
 ## Docs (канон)
 
@@ -116,5 +122,7 @@ Endpoints: `GET /` (UI), `/api/health`, `/api/tracker`, `/api/sli`, `/api/toolch
 | OmniRouter (Rust AI-проксі/роутер, catalog/config/proxy) | **✅** |
 | Roles + ratio canon (`docs/GSV_ROLES.md`, band 108) | **✅** |
 | `gsv-loc-audit` + Ratio box + `GET /api/ratio` (Rust ≥95%) | **✅** |
-| Тести (87: 46 unit + contracts + omni + ratio + update-flow) | **✅** |
+| Vision boxes + `/api/vision*` + SVG (band 119–125) | **✅** |
+| Stand smoke (`gsv-http-stand-smoke`, 48 checks) + contracts (band 126) | **✅** |
+| Тести (230: 102 unit + contracts + omni + ratio + update + ui + vision + stand smoke) | **✅** |
 | Vision docs sync / migration | **⏳ future** |
