@@ -52,8 +52,8 @@
 <a href=#52 id=52 data-nosnippet>52</a><span class="kw">const </span>ENV_BASE: <span class="kw-2">&amp;</span>str = <span class="string">"POOLAI_BASE_URL"</span>;
 <a href=#53 id=53 data-nosnippet>53</a><span class="kw">const </span>ENV_VISION_BASE: <span class="kw-2">&amp;</span>str = <span class="string">"POOLAI_VISION_BASE_URL"</span>;
 <a href=#54 id=54 data-nosnippet>54</a><span class="kw">const </span>ENV_STAND_ROOT: <span class="kw-2">&amp;</span>str = <span class="string">"POOLAI_E2E_STAND_ROOT"</span>;
-<a href=#55 id=55 data-nosnippet>55</a><span class="kw">const </span>MANIFEST_REL: <span class="kw-2">&amp;</span>str = <span class="string">"GSV/docs/vision/manifest.json"</span>;
-<a href=#56 id=56 data-nosnippet>56</a><span class="kw">const </span>EXTENSIONS_REL: <span class="kw-2">&amp;</span>str = <span class="string">"GSV/docs/vision/extensions.json"</span>;
+<a href=#55 id=55 data-nosnippet>55</a><span class="kw">const </span>MANIFEST_REL: <span class="kw-2">&amp;</span>str = <span class="string">"docs/vision/manifest.json"</span>;
+<a href=#56 id=56 data-nosnippet>56</a><span class="kw">const </span>EXTENSIONS_REL: <span class="kw-2">&amp;</span>str = <span class="string">"docs/vision/extensions.json"</span>;
 <a href=#57 id=57 data-nosnippet>57</a><span class="kw">const </span>FM_REL: <span class="kw-2">&amp;</span>str = <span class="string">"docs/catalog/FUNCTION_MANAGEMENT.md"</span>;
 <a href=#58 id=58 data-nosnippet>58</a><span class="kw">const </span>VISION_REV_HEADER: <span class="kw-2">&amp;</span>str = <span class="string">"x-poolai-vision-revision"</span>;
 <a href=#59 id=59 data-nosnippet>59</a><span class="kw">const </span>VALID_PUBKEY: <span class="kw-2">&amp;</span>str = <span class="string">"7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU"</span>;
@@ -208,7 +208,7 @@
 <a href=#208 id=208 data-nosnippet>208</a>    assert_vision_repo_parity(<span class="kw-2">&amp;</span>root)<span class="question-mark">?</span>;
 <a href=#209 id=209 data-nosnippet>209</a>    <span class="kw">let </span>repo_rev = read_manifest_revision(<span class="kw-2">&amp;</span>root)<span class="question-mark">?</span>;
 <a href=#210 id=210 data-nosnippet>210</a>    <span class="kw">let </span>vision_base = vision_base_url_from_env();
-<a href=#211 id=211 data-nosnippet>211</a>    <span class="kw">let </span>url = api_url(<span class="kw-2">&amp;</span>vision_base, <span class="string">"/GSV/docs/vision/manifest.json"</span>);
+<a href=#211 id=211 data-nosnippet>211</a>    <span class="kw">let </span>url = api_url(<span class="kw-2">&amp;</span>vision_base, <span class="string">"/docs/vision/manifest.json"</span>);
 <a href=#212 id=212 data-nosnippet>212</a>    <span class="kw">let </span>resp = <span class="kw">match </span>client.get(<span class="kw-2">&amp;</span>url).send().<span class="kw">await </span>{
 <a href=#213 id=213 data-nosnippet>213</a>        <span class="prelude-val">Ok</span>(r) =&gt; r,
 <a href=#214 id=214 data-nosnippet>214</a>        <span class="prelude-val">Err</span>(e) =&gt; {
