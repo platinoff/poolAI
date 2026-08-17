@@ -435,7 +435,7 @@ Grid / Job / Memory / Tokenization (Priority 6)
 ## Верифікація 2026-04-07 (доки — канонічний порядок 1–12 і P4 HTTP)
 
 - **Код**: `src/bin/poolai_health_load.rs` — Rust load tool для health endpoint; `src/runtime/process.rs` — приклади `ProcessConfig` без Python у док-коментах.
-- **Доки**: кореневий **`README.md`**, **`docs/README.md`**, **`docs/INDEX_2026-03-17.md`**, **`docs/STRUCTURE.md`**, **`docs/development/README.md`**, **`docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`**, **`.cursor/skills/poolai-documentation/SKILL.md`** — узгоджено з **`BENCHMARKS.md`** (Criterion + `poolai_health_load`).
+- **Доки**: кореневий **`README.md`**, **`docs/README.md`**, **`docs/INDEX_2026-03-17.md`**, **`docs/STRUCTURE.md`**, **`docs/development/README.md`**, **`docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`**, **`.agents/skills/poolai-documentation/SKILL.md`** — узгоджено з **`BENCHMARKS.md`** (Criterion + `poolai_health_load`).
 - **Інвентар**: **`file_list.csv`** — `poolai_health_load.rs`.
 
 ## Верифікація 2026-04-06 (P3 — `http_status_for_app_error`)
@@ -462,7 +462,7 @@ Grid / Job / Memory / Tokenization (Priority 6)
 ## Верифікація 2026-04-06 (доки — порядок «наступних кроків» за FM-*)
 
 - **Канон**: [`docs/catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.1** — пріоритезована таблиця (FM-003 … FM-010); **FM-005** ✅ (актуалізація **2026-04-10**; історично Partial після `rewards.rs`).
-- **Узгоджено**: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) §4, кореневий [`README.md`](../../README.md) (*Next Focus*), [`docs/README.md`](../README.md) (крок 12, Short pointers), [`FUNCTIONALITY_DIGEST_2026-04-06.md`](../catalog/FUNCTIONALITY_DIGEST_2026-04-06.md), [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md) (посилання після таблиці пріоритетів), [`.cursor/rules/functionality-management.mdc`](../../.cursor/rules/functionality-management.mdc), [`.cursor/skills/poolai-documentation/SKILL.md`](../../.cursor/skills/poolai-documentation/SKILL.md).
+- **Узгоджено**: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) §4, кореневий [`README.md`](../../README.md) (*Next Focus*), [`docs/README.md`](../README.md) (крок 12, Short pointers), [`FUNCTIONALITY_DIGEST_2026-04-06.md`](../catalog/FUNCTIONALITY_DIGEST_2026-04-06.md), [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md) (посилання після таблиці пріоритетів), [`.cursor/rules/functionality-management.mdc`](../../.cursor/rules/functionality-management.mdc), [`.agents/skills/poolai-documentation/SKILL.md`](../../.agents/skills/poolai-documentation/SKILL.md).
 
 ## Верифікація 2026-04-06 (планові доки — операційний порядок §5.1)
 

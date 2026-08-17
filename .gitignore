@@ -91,6 +91,9 @@ docs/marketing/
 .DS_Store
 Thumbs.db
 
+# OpenCode plugin install (keep .opencode/package.json; never commit node_modules)
+.opencode/node_modules/
+
 # Playwright E2E (S23)
 e2e/node_modules/
 e2e/test-results/

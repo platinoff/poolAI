@@ -38,7 +38,7 @@ alwaysApply: false
 | **Git push** | `.cursor/commands/git-push.md`, `docs/troubleshooting/GIT_PUSH_FAILED.md` |
 | **Помічник по файлах** | `file_list.csv` |
 
-**Правила Cursor:** `.cursor/rules/autonomous-orchestrator.mdc`, `.cursor/rules/functionality-management.mdc`, skill `.cursor/skills/poolai-documentation/SKILL.md`
+**Правила Cursor:** `.cursor/rules/autonomous-orchestrator.mdc`, `.cursor/rules/functionality-management.mdc`, skill `.agents/skills/poolai-documentation/SKILL.md` (дзеркало `.cursor/skills/`)
 
 ---
 

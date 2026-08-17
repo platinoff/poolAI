@@ -109,6 +109,12 @@
       "skillPath": "skills/verification-before-completion/SKILL.md",
       "computedHash": "b529822bdac4b197b180fe12225cff86b930b65910435103c10622df7f041651"
     },
+    "write-spec": {
+      "source": "local",
+      "sourceType": "local",
+      "skillPath": ".agents/skills/write-spec/SKILL.md",
+      "computedHash": "ca6670913878b4ac4582727562bfced5271492a5a800d934f68c9e7bc1cd4dcc"
+    },
     "writing-plans": {
       "source": "obra/superpowers",
       "sourceType": "github",

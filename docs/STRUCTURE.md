@@ -19,7 +19,7 @@
 | **`.cursor/rules/functionality-management.mdc`** | Менеджер функціоналу: FM-*, охоплення docs за `STRUCTURE.md`. |
 | **`.cursor/rules/autonomous-orchestrator.mdc`** | Оркестратор авторозробки: субагенти, AUTO_RUN, push. |
 | **`.cursor/rules/documentation.mdc`** | Правила для агента: куди класти нові `.md`. |
-| **`.cursor/skills/poolai-documentation/SKILL.md`** | Складений skill з тим самим порядком 1–12 + AUTO_RUN / патерни. |
+| **`.agents/skills/poolai-documentation/SKILL.md`** | Складений skill (кроки 1–12 + AUTO_RUN); дзеркала `.cursor/skills/` і `.opencode/skills/`. |
 
 ---
 

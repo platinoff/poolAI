@@ -56,4 +56,4 @@ alwaysApply: false
 - Subagent types (лише за явним запитом, не в drain): `bugbot`, `security-review`, `best-of-n-runner`; див. [`poolai-agent-roles.mdc`](poolai-agent-roles.mdc).
 - **PoolAI vision tools:** Speeds panel + eye filter + prune closed ≤2000 — [`GSV/docs/vision/README.md`](../../GSV/docs/vision/README.md); `poolai-vision-sync --check` before service close.
 - Prefer rules that are resilient to UI updates: focus on repository conventions, not fragile UI click paths.
-- Skills live under user `~/.cursor/skills-cursor/`; repo rules under `.cursor/rules/` — do not duplicate skill content in rules.
+- **Skills (dual Cursor + OpenCode):** project canon is [`.agents/skills/`](../../.agents/skills/) ([Agent Skills](https://agentskills.io) / [skills.sh](https://skills.sh)). Cursor also loads `.cursor/skills/` and `~/.cursor/skills/`; OpenCode also loads `.opencode/skills/` and `~/.config/opencode/skills/`. Built-in Cursor skills stay in `~/.cursor/skills-cursor/` (do not edit). Repo rules stay under `.cursor/rules/` — do not paste full skill bodies into rules.

@@ -38,9 +38,12 @@ alwaysApply: false
 - `bin/` - Dev/ops shell scripts (launch, LAN stand, verify, cargo helpers)
 - `scripts/` - Toolchain, MSYS setup, deployment helpers
 - `docker/` - Docker files (Dockerfile, docker-compose.yml)
-- `.cursor/` - Cursor agent configuration (rules, commands, plans, project skills)
+- `.agents/skills/` - **Canon** Agent Skills (Cursor + OpenCode): marketplace copies + `abracadabra`, `poolai-documentation`
+- `.cursor/` - Cursor agent configuration (rules, commands, plans, native skill mirrors)
   - `.cursor/rules/` - All Cursor rules (including `.cursorrules` moved here)
-  - `.cursor/skills/` - Project Agent Skills (e.g. `poolai-documentation/SKILL.md` — карта доків 1–11 та витяг функціоналу)
+  - `.cursor/skills/` - Cursor-native mirrors of project skills (keep identical to `.agents/skills/`)
+- `.opencode/skills/` - OpenCode-native mirrors of project skills (keep identical to `.agents/skills/`)
+- `AGENTS.md` - OpenCode always-on canon (same VDT as alwaysApply Cursor rules)
 
 ## File Naming
 

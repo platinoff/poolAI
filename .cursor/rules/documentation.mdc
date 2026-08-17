@@ -15,7 +15,7 @@ alwaysApply: false
 
 Каталог `docs/catalog/` призначений для зведень і індексів, які не є «планом розробки» (`docs/development/`) і не «статусом» (`docs/status/`).
 
-**Project skill:** `.cursor/skills/poolai-documentation/SKILL.md` — стислі інструкції для агента з цього порядку та витягу.
+**Project skill:** `.agents/skills/poolai-documentation/SKILL.md` (mirrors: `.cursor/skills/`, `.opencode/skills/`) — стислі інструкції для агента з цього порядку та витягу.
 
 **Runtime stack:** `.cursor/rules/runtime-stack-policy.mdc` — Rust primary; Python заборонено в продукті (архівні docs не канон).
 

@@ -67,12 +67,27 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 | GSV — старт / handoff | `GSV/docs/HANDOFF_NEW_SESSION.md` · `GSV/docs/NEXT_SESSION_PROMPT.md` |
 | GSV — ролі та архітектура | `GSV/docs/GSV_ROLES.md` · `GSV/docs/gsv/GSV_ARCHITECTURE.md` · `GSV/docs/gsv/GSV_TECH_ROADMAP.md` |
 
-## Скіли (`.opencode/skills/` та `.agents/skills/`)
+## Скіли (канон Cursor + OpenCode)
 
-- Встановлені скіли лежать у `.agents/skills/` (mode `copied`): documentation, doc-coauthoring, code-review, architecture, system-design, tech-debt, testing-strategy, debug, search-strategy, sprint-planning, roadmap-update, memory-management, task-management, write-spec, test-driven-development, verification-before-completion, systematic-debugging, writing-plans, executing-plans, rust-skill-creator.
-- **Python-скрипти скілів не комітяться** (канон: `git ls-files '*.py'` = порожнім). Скiли Anthropic із `.py` (docx/pdf/pptx/xlsx/webapp-testing) — не встановлювати; docx/xlsx/pptx-завдання виконувати Rust-утилітами або канонічним flow.
-- Робочі скіли проєкту — у `.opencode/skills/`: `abracadabra` (вибір poolai|gsv + drain), інші за потреби.
-- `skills-lock.json` у корені — lock-файл встановлених скілів (оновлюється через `npx --yes skills add <pkg> -a opencode -s <skill>`).
+Спільний формат — [Agent Skills](https://agentskills.io) / каталог [skills.sh](https://skills.sh). Windows: **copy**, не symlink.
+
+| Шлях | Хто читає | Що класти |
+|------|-----------|-----------|
+| **`.agents/skills/`** | Cursor **і** OpenCode | **Канон.** Marketplace + проєктні `abracadabra`, `poolai-documentation` |
+| `.cursor/skills/` | лише Cursor | Дзеркало канону (ідентичний `SKILL.md`) |
+| `.opencode/skills/` | лише OpenCode | Дзеркало канону (ідентичний `SKILL.md`) |
+| `opencode.json` → `skills.paths` | OpenCode | Завжди `.agents/skills` (страховка discovery) |
+
+- Редагуй **спочатку** `.agents/skills/<name>/SKILL.md`, потім скопіюй у клієнтські дзеркала. `name` у frontmatter = ім’я теки; `description` ≤1024 і має WHAT + WHEN.
+- Marketplace (mode `copied` у `.agents/skills/`): documentation, doc-coauthoring, code-review, architecture, system-design, tech-debt, testing-strategy, debug, search-strategy, sprint-planning, roadmap-update, memory-management, task-management, write-spec, test-driven-development, verification-before-completion, systematic-debugging, writing-plans, executing-plans, rust-skill-creator.
+- Проєктні: `abracadabra` (вибір poolai\|gsv + drain), `poolai-documentation` (кроки 1–12).
+- **Python-скрипти скілів не комітяться** (канон: `git ls-files '*.py'` = порожнім). Скіли Anthropic із `.py` (docx/pdf/pptx/xlsx/webapp-testing) — не встановлювати.
+- Lock: `skills-lock.json`. Встановлення в **обидва** клієнти + канон `.agents`:
+
+```bash
+npx --yes skills add <owner/repo> --skill <name> -a cursor -a opencode -y
+# якщо CLI кладе лише в .cursor/.opencode — скопіюй SKILL.md також у .agents/skills/<name>/
+```
 
 ## Git — commit / push
 
@@ -108,7 +123,7 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 
 ## Тригер «абракадабра» — drain всього проєкту
 
-Коли власник у новій сесії пише **`абракадабра`** — це VDT-цикл **без підтвердження кожного PH-S***. **Спочатку** спитати власника через `question` tool: який проєкт — **poolai** чи **gsv** (скiл `abracadabra` в `.opencode/skills/` описує обидва flow).
+Коли власник у новій сесії пише **`абракадабра`** — це VDT-цикл **без підтвердження кожного PH-S***. **Спочатку** спитати власника (Cursor `AskQuestion` / OpenCode `question`): який проєкт — **poolai** чи **gsv** (скіл `.agents/skills/abracadabra/` описує обидва flow).
 
 | Вибір | Проєкт | Канон docs | Flow |
 |-------|--------|-----------|------|
