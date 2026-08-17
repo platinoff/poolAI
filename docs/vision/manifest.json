@@ -12571,104 +12571,6 @@
     },
     {
       "auto_synced": true,
-      "id": "GSV_docs_gsv_MCP_SLI_COMMAND_FRAMEWORK_md",
-      "label": "MCP_SLI_COMMAND_FRAMEWORK.md",
-      "layer": "L1",
-      "path": "GSV/docs/gsv/MCP_SLI_COMMAND_FRAMEWORK.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "GSV_docs_GSV_ROLES_md",
-      "label": "GSV_ROLES.md",
-      "layer": "L1",
-      "path": "GSV/docs/GSV_ROLES.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "GSV_docs_HANDOFF_NEW_SESSION_md",
-      "label": "HANDOFF_NEW_SESSION.md",
-      "layer": "L1",
-      "path": "GSV/docs/HANDOFF_NEW_SESSION.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "GSV_docs_LEGACY_PARITY_md",
-      "label": "LEGACY_PARITY.md",
-      "layer": "L1",
-      "path": "GSV/docs/LEGACY_PARITY.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "GSV_docs_MEMORY_md",
-      "label": "MEMORY.md",
-      "layer": "L1",
-      "path": "GSV/docs/MEMORY.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "GSV_docs_NEXT_SESSION_PROMPT_md",
-      "label": "NEXT_SESSION_PROMPT.md",
-      "layer": "L1",
-      "path": "GSV/docs/NEXT_SESSION_PROMPT.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "GSV_docs_README_md",
-      "label": "README.md",
-      "layer": "L1",
-      "path": "GSV/docs/README.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "GSV_docs_VISION_md",
-      "label": "VISION.md",
-      "layer": "L1",
-      "path": "GSV/docs/VISION.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "GSV_docs_gsv_GSV_ARCHITECTURE_md",
-      "label": "GSV_ARCHITECTURE.md",
-      "layer": "L1",
-      "path": "GSV/docs/gsv/GSV_ARCHITECTURE.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "GSV_docs_gsv_GSV_BOXES_md",
-      "label": "GSV_BOXES.md",
-      "layer": "L1",
-      "path": "GSV/docs/gsv/GSV_BOXES.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "GSV_docs_gsv_GSV_MIGRATION_md",
-      "label": "GSV_MIGRATION.md",
-      "layer": "L1",
-      "path": "GSV/docs/gsv/GSV_MIGRATION.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "GSV_docs_gsv_GSV_SERVER_md",
-      "label": "GSV_SERVER.md",
-      "layer": "L1",
-      "path": "GSV/docs/gsv/GSV_SERVER.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "GSV_docs_gsv_GSV_TECH_ROADMAP_md",
-      "label": "GSV_TECH_ROADMAP.md",
-      "layer": "L1",
-      "path": "GSV/docs/gsv/GSV_TECH_ROADMAP.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "GSV_docs_gsv_README_md",
-      "label": "README.md",
-      "layer": "L1",
-      "path": "GSV/docs/gsv/README.md"
-    },
-    {
-      "auto_synced": true,
       "id": "GSV_docs_vision_README_md",
       "label": "README.md",
       "layer": "L1",
@@ -12745,7 +12647,7 @@
       "path": ".cursor/skills/abracadabra/SKILL.md"
     }
   ],
-  "revision": 494,
+  "revision": 495,
   "sprint_queue": [],
   "sprint_queue_open_count": 0,
   "updated_at": "2026-06-20",
