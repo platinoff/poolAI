@@ -1,6 +1,6 @@
 # PoolAI documentation vision
 
-> **DEACTIVATED (band 117, 2026-08-07):** legacy Galaxy UI (`index.html` + `vision.js`/`vision.css`) визнаний superseded (bands 115–116). `GSV/docs/vision/index.html` тепер — вказівник на GSV; `vision.js`/`vision.css` лишаються як canon-архів (**не видаляємо**), але більше не завантажуються. Живий UI: **GSV** — `gsv-server` → `http://127.0.0.1:8891/` · [`GSV/docs/VISION.md`](../VISION.md) · [`GSV/docs/LEGACY_PARITY.md`](../LEGACY_PARITY.md) · [`GSV_MIGRATION.md`](../gsv/GSV_MIGRATION.md).
+> **DEACTIVATED (band 117, 2026-08-07):** legacy Galaxy UI (`index.html` + `vision.js`/`vision.css`) визнаний superseded (bands 115–116). `docs/vision/index.html` тепер — вказівник на GSV; `vision.js`/`vision.css` лишаються як canon-архів (**не видаляємо**), але більше не завантажуються. Живий UI: **GSV** — `gsv-server` → `http://127.0.0.1:8891/` · [`GSV/docs/VISION.md`](../VISION.md) · [`GSV/docs/LEGACY_PARITY.md`](../LEGACY_PARITY.md) · [`GSV_MIGRATION.md`](../gsv/GSV_MIGRATION.md).
 
 Ізометрична карта зв’язків **доків ↔ код ↔ спринти** для ітераційної розробки (VDT). Оновлюється разом із закриттям PH-S* / змінами FM §5.11.
 
@@ -18,7 +18,7 @@
 
 ## Як відкрити в Cursor / браузері
 
-> **Live UI (band 117):** `gsv-server` → **`http://127.0.0.1:8891/`** · [`GSV_SERVER.md`](../gsv/GSV_SERVER.md) · [`GSV/docs/VISION.md`](../VISION.md). Нижче — застарілі інструкції для legacy-архіву: `GSV/docs/vision/index.html` тепер вказівник на GSV, `vision.js`/`vision.css` не завантажуються.
+> **Live UI (band 117):** `gsv-server` → **`http://127.0.0.1:8891/`** · [`GSV_SERVER.md`](../gsv/GSV_SERVER.md) · [`GSV/docs/VISION.md`](../VISION.md). Нижче — застарілі інструкції для legacy-архіву: `docs/vision/index.html` тепер вказівник на GSV, `vision.js`/`vision.css` не завантажуються.
 
 ### Помилка `Unable to resolve resource S:/rust/poolAI/...`
 
@@ -35,14 +35,14 @@ PowerShell у корені репо:
 Потім **Simple Browser** → URL:
 
 ```text
-http://127.0.0.1:8765/GSV/docs/vision/index.html
+http://127.0.0.1:8765/docs/vision/index.html
 ```
 
 Деталі: [`.cursor/commands/open-docs-vision.md`](../../.cursor/commands/open-docs-vision.md).
 
 ### Альтернативи
 
-1. Відкрити `GSV/docs/vision/index.html` у табі редактора → Simple Browser → `./GSV/docs/vision/index.html`
+1. Відкрити `docs/vision/index.html` у табі редактора → Simple Browser → `./docs/vision/index.html`
 2. **Зовнішній браузер** — той самий `open-docs-vision.ps1`
 3. **Лише SVG** — `vision.svg` у IDE (без JS/manifest)
 
@@ -63,9 +63,9 @@ http://127.0.0.1:8765/GSV/docs/vision/index.html
 
 **Rust panel:** Clippy warning/error counts from [`../../docs/development/rust_diagnostics.json`](../../docs/development/rust_diagnostics.json) (mirror `rust_diagnostics.json`). Canon: [`../../docs/development/RUST_DIAGNOSTICS.md`](../../docs/development/RUST_DIAGNOSTICS.md) · `bash bin/record-rust-diagnostics.sh` · CI job `rust-diagnostics` (artifact). Service **PH-SVC85**.
 
-**Auto-reload:** кнопка **Auto** у шапці; сервер `GET /GSV/docs/vision/__watch` — зміни `manifest.json` / `extensions.json` / **`speed_index.json`** / **`rust_diagnostics.json`** оновлюють граф без F5; **`git_head`** (короткий hash) оновлює cyan pill у шапці без F5; зміни `index.html` / `vision.css` / `vision.js` — повне перезавантаження сторінки.
+**Auto-reload:** кнопка **Auto** у шапці; сервер `GET /docs/vision/__watch` — зміни `manifest.json` / `extensions.json` / **`speed_index.json`** / **`rust_diagnostics.json`** оновлюють граф без F5; **`git_head`** (короткий hash) оновлює cyan pill у шапці без F5; зміни `index.html` / `vision.css` / `vision.js` — повне перезавантаження сторінки.
 
-**Auto-sync (інкрементальна карта):** `cargo run --bin poolai-vision-sync` або `GET /GSV/docs/vision/__sync` — додає нові/змінені git-tracked файли (`docs/`, `src/`, `e2e/`, …) у `manifest.json` з ребрами до hub-вузлів (`galaxy_grid`, `fm`, `handoff`, …). **Drift gate:** `cargo run --bin poolai-vision-sync -- --check` (FM §5.12 vs manifest + **PH-S227** `.mdc` cross-links; CI job `vision-manifest-drift`). `open-docs-vision.ps1` викликає sync при старті; **Reload manifest** у UI — теж через `__sync`.
+**Auto-sync (інкрементальна карта):** `cargo run --bin poolai-vision-sync` або `GET /docs/vision/__sync` — додає нові/змінені git-tracked файли (`docs/`, `src/`, `e2e/`, …) у `manifest.json` з ребрами до hub-вузлів (`galaxy_grid`, `fm`, `handoff`, …). **Drift gate:** `cargo run --bin poolai-vision-sync -- --check` (FM §5.12 vs manifest + **PH-S227** `.mdc` cross-links; CI job `vision-manifest-drift`). `open-docs-vision.ps1` викликає sync при старті; **Reload manifest** у UI — теж через `__sync`.
 
 **Шапка:** `rev N · PH-S*` (закритий спринт) · **git HEAD** pill · `→ PH-S*` (наступний з `manifest.next_sprint`).
 
@@ -130,7 +130,7 @@ http://127.0.0.1:8765/GSV/docs/vision/index.html
 | **PH-S192** ✅ | Overview LOD + minimap | `vision.js`, `vision.css`, `index.html` |
 | **PH-S193** ✅ | Dashboard wasm formatters | `poolai-ui-core`, `poolai-ui-wasm`, `src/ui/mod.rs` |
 | **PH-S194** ✅ (vision UX rev 132) | Panel dock bar + map bottom bar | `vision.js`, `vision.css`, `index.html` v61 |
-| **PH-S199** | `feed.json` RSS ticker | `GSV/docs/vision/` |
+| **PH-S199** | `feed.json` RSS ticker | `docs/vision/` |
 | **PH-S200** ✅ | `feed.json` RSS ticker panel | `poolai-vision-sync`, `feed.json`, `index.html` |
 | **PH-S201** ✅ | Cursor post-push hook | `.cursor/hooks/post-push-ph-s-notify.sh` |
 | **PH-S202** ✅ | Sprint queue → map focus | `vision.js` `focusSprintOnMap` |

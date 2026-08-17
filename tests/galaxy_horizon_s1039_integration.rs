@@ -36,12 +36,12 @@ fn horizon_s1039_band_vision_map_close_ph_s1048() {
     let next = include_str!("../docs/development/NEXT_SESSION_PROMPT.md");
     assert!(next.contains("абракадабра"));
 
-    let index = include_str!("../GSV/docs/vision/index.html");
+    let index = include_str!("../docs/vision/index.html");
     assert!(index.contains("superseded by GSV"));
     assert!(!index.contains("vision-skip-link"));
     assert!(!index.contains("role=\"tree\""));
 
-    let vision_js = include_str!("../GSV/docs/vision/vision.js");
+    let vision_js = include_str!("../docs/vision/vision.js");
     assert!(vision_js.contains("updateMapSprintDim"));
     assert!(vision_js.contains("initTreeKeyboardNav"));
     assert!(vision_js.contains("link-neighbor"));

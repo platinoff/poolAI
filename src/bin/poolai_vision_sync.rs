@@ -1,4 +1,4 @@
-//! Merge git-tracked repo files into `GSV/docs/vision/manifest.json` (incremental map growth).
+//! Merge git-tracked repo files into `docs/vision/manifest.json` (incremental map growth).
 //!
 //! ```text
 //! cargo run --bin poolai-vision-sync
@@ -15,10 +15,10 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::{Command, ExitCode};
 
-const MANIFEST_REL: &str = "GSV/docs/vision/manifest.json";
-const FEED_REL: &str = "GSV/docs/vision/feed.json";
+const MANIFEST_REL: &str = "docs/vision/manifest.json";
+const FEED_REL: &str = "docs/vision/feed.json";
 const FM_REL: &str = "docs/catalog/FUNCTION_MANAGEMENT.md";
-const EXTENSIONS_REL: &str = "GSV/docs/vision/extensions.json";
+const EXTENSIONS_REL: &str = "docs/vision/extensions.json";
 const FEED_CLOSED_CAP: usize = 12;
 /// Closed `PH-S*` with serial ≤ this are omitted from `manifest.sprint_queue` (vision UI prune).
 /// Meta (`last_sprint_closed`, feed) still derives from the full FM parse.
@@ -27,10 +27,10 @@ const SPRINT_QUEUE_CLOSED_PRUNE_MAX: u32 = 2000;
 const DOCS_VISION_MDC: &str = ".cursor/rules/docs-vision.mdc";
 
 const DOCS_VISION_CANON_PATHS: &[&str] = &[
-    "GSV/docs/vision/extensions.json",
-    "GSV/docs/vision/vision.svg",
-    "GSV/docs/vision/index.html",
-    "GSV/docs/vision/README.md",
+    "docs/vision/extensions.json",
+    "docs/vision/vision.svg",
+    "docs/vision/index.html",
+    "docs/vision/README.md",
 ];
 
 // KIVI: 3-box status for any IDE/provider/model (populated as JSON literal in sync)
@@ -134,7 +134,7 @@ fn should_index(path: &str) -> bool {
     }
 
     let lower = p.to_ascii_lowercase();
-    let vision_artifact = p.starts_with("GSV/docs/vision/")
+    let vision_artifact = p.starts_with("docs/vision/")
         && (lower.ends_with(".html")
             || lower.ends_with(".css")
             || lower.ends_with(".svg")
@@ -154,7 +154,6 @@ fn should_index(path: &str) -> bool {
     }
 
     p.starts_with("docs/")
-        || p.starts_with("GSV/docs/")
         || p.starts_with("src/")
         || p.starts_with("e2e/")
         || p.starts_with("crates/")
@@ -171,7 +170,7 @@ fn infer_layer(path: &str) -> &'static str {
         return "L0";
     }
     if p.starts_with("docs/development/")
-        || p.starts_with("GSV/docs/")
+        || p.starts_with("docs/vision/")
         || p.starts_with(".cursor/commands/")
         || p.starts_with(".cursor/rules/")
     {
@@ -212,7 +211,7 @@ fn hub_links(path: &str) -> Vec<(&'static str, &'static str)> {
             vec![("fm", "catalog"), ("galaxy_grid", "implements")]
         }
         p if p.starts_with("docs/development/") => vec![("handoff", "session-tracks")],
-        p if p.starts_with("GSV/docs/vision/") && p != "GSV/docs/vision/manifest.json" => {
+        p if p.starts_with("docs/vision/") && p != "docs/vision/manifest.json" => {
             vec![("handoff", "session-tracks")]
         }
         p if p.starts_with("docs/concept/") => vec![("galaxy_grid", "concept-ref")],
@@ -1035,7 +1034,7 @@ const VISION_CANON_DOC_PATHS: &[&str] = &[
     "docs/INDEX_2026-03-17.md",
     "docs/development/README.md",
     "docs/development/NEXT_SESSION_PROMPT.md",
-    "GSV/docs/vision/vision.svg",
+    "docs/vision/vision.svg",
 ];
 
 const RUST_RATIO_REL: &str = "docs/development/rust_ratio.json";
@@ -1481,7 +1480,7 @@ fn apply_canon_snapshot(
         "docs/development/NEXT_SESSION_PROMPT.md" => {
             sync_next_session_canon(content, snap, fm_content)
         }
-        "GSV/docs/vision/vision.svg" => sync_vision_svg_canon(content, snap),
+        "docs/vision/vision.svg" => sync_vision_svg_canon(content, snap),
         _ => content.to_string(),
     }
 }
@@ -2096,7 +2095,7 @@ mod tests {
             nodes.push(json!({
                 "id": path_slug(canon),
                 "path": canon,
-                "layer": if canon.starts_with("GSV/docs/vision/") { "L1" } else { "L2" }
+                "layer": if canon.starts_with("docs/vision/") { "L1" } else { "L2" }
             }));
         }
         let manifest = json!({ "nodes": nodes });
@@ -2113,7 +2112,7 @@ mod tests {
 
     #[test]
     fn vision_js_map_sprint_chips_aria_label_ph_s233() {
-        let js = std::fs::read_to_string("GSV/docs/vision/vision.js").expect("vision.js");
+        let js = std::fs::read_to_string("docs/vision/vision.js").expect("vision.js");
         assert!(
             js.contains("function bindMapLinkedSprintChip"),
             "missing bindMapLinkedSprintChip"
@@ -2138,7 +2137,7 @@ mod tests {
 
     #[test]
     fn vision_js_map_orbit_3d_ph_s555() {
-        let js = std::fs::read_to_string("GSV/docs/vision/vision.js").expect("vision.js");
+        let js = std::fs::read_to_string("docs/vision/vision.js").expect("vision.js");
         assert!(
             js.contains("function initMapOrbitControls"),
             "missing initMapOrbitControls"
@@ -2151,7 +2150,7 @@ mod tests {
             js.contains("map-orbit-pad") && js.contains("MAP_ORBIT_DEFAULT"),
             "missing orbit pad + defaults"
         );
-        let html = std::fs::read_to_string("GSV/docs/vision/index.html").expect("index.html");
+        let html = std::fs::read_to_string("docs/vision/index.html").expect("index.html");
         assert!(
             html.contains("superseded by GSV") && !html.contains("map-scene-3d"),
             "index.html should be a GSV pointer page (legacy 3D scene removed)"
@@ -2160,7 +2159,7 @@ mod tests {
 
     #[test]
     fn vision_js_map_layer_z_projection_ph_s556() {
-        let js = std::fs::read_to_string("GSV/docs/vision/vision.js").expect("vision.js");
+        let js = std::fs::read_to_string("docs/vision/vision.js").expect("vision.js");
         assert!(
             js.contains("function applyMap3DProjection"),
             "missing applyMap3DProjection"
@@ -2169,7 +2168,7 @@ mod tests {
             js.contains("function rotateProject3D") && js.contains("MAP_LAYER_Z_STEP"),
             "missing layer Z projection"
         );
-        let css = std::fs::read_to_string("GSV/docs/vision/vision.css").expect("vision.css");
+        let css = std::fs::read_to_string("docs/vision/vision.css").expect("vision.css");
         assert!(
             css.contains(".map-orbit-pad") && css.contains("bottom:"),
             "orbit pad should anchor above bottom bar"
@@ -2182,7 +2181,7 @@ mod tests {
 
     #[test]
     fn vision_js_gravity_solar_layout_ph_s557() {
-        let js = std::fs::read_to_string("GSV/docs/vision/vision.js").expect("vision.js");
+        let js = std::fs::read_to_string("docs/vision/vision.js").expect("vision.js");
         assert!(
             js.contains("function layoutOrphanStars")
                 && js.contains("function nudgeSolarSystemsApart")

@@ -12,7 +12,7 @@ Enterprise horizon v2 (FM §5.14b / §5.17) · Project close extension (FM §5.1
 | **Completion pending** | **560** sprints PH-S1739…S2278 · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](./PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) |
 | **Horizon** | band 127 → **PH-S1909.S1918** |
 | **Vision** | rev **494** |
-| **GSV** | окремий проєкт Rust-first (bands 102+108…126 ✅, ratio 96.87%, tests 230) · [`GSV/README.md`](../../GSV/README.md) · [`GSV/docs/gsv/`](../../../GSV/docs/gsv/README.md) · ролі [`GSV/docs/GSV_ROLES.md`](../../GSV/docs/GSV_ROLES.md) · Vision box [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) |
+| **GSV** | окремий git-репозиторій **`S:\rust\GSV`** (bands 102+108…126 ✅) · вказівник [`GSV/README.md`](../../GSV/README.md) · ролі `S:/rust/GSV/docs/GSV_ROLES.md` · PoolAI vision-канон [`docs/vision/`](../vision/README.md) |
 | **Cursor / GH** | local **3.13.21** · Auto-review · Router Balance/Intelligence · Actions `GITHUB_TOKEN` opaque/JWT · [`CURSOR_UPDATE_RESEARCH_2026-07-27.md`](./CURSOR_UPDATE_RESEARCH_2026-07-27.md) |
 
 ---
@@ -84,8 +84,8 @@ defer (`GSV_MIGRATION.md`); `GSV/docs/VISION.md` + MEMORY/HANDOFF/NEXT/LEGACY_PA
 poolAI vision README/GSV_MIGRATION/TECH_ROADMAP parity; ratio holds GSV **95.26%**
 (rust 7663 / product 8044); FM §5.12 §5.97 ✅; vision rev **488**.
 Band 117 (**PH-S1809…S1818**, GSV legacy vision deactivation) — **drained** ✅:
-`GSV/docs/vision/index.html` → GSV pointer page (no `vision.js`/`vision.css` refs); `vision.js`/
-`vision.css` DEACTIVATED banner (band 117, архів — не видаляємо); `GSV/docs/vision/README.md`
+`docs/vision/index.html` → GSV pointer page (no `vision.js`/`vision.css` refs); `vision.js`/
+`vision.css` DEACTIVATED banner (band 117, архів — не видаляємо); `docs/vision/README.md`
 deactivation note; live link retarget: poolai-vision-sync feed + GSV `vision.rs` sample links →
 `http://127.0.0.1:8891/#b-sprint-board`; RUN_LOCAL/GSV_SERVER/docs-gsv README/SPEED_INDEX/
 RUST_DIAGNOSTICS → GSV; legacy test retirement (`poolai_vision_sync.rs` unit ×4,

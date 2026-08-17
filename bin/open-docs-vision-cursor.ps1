@@ -1,6 +1,6 @@
 # Open docs vision in Cursor Simple Browser (http://127.0.0.1:8765).
 #Requires -Version 5.1
-$Url = "http://127.0.0.1:8765/GSV/docs/vision/index.html"
+$Url = "http://127.0.0.1:8765/docs/vision/index.html"
 $Enc = [uri]::EscapeDataString($Url)
 $VscodeUri = "vscode://vscode.simple-browser/show?url=$Enc"
 

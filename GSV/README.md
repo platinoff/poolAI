@@ -1,128 +1,13 @@
-# GSV — Galaxy StarWalker Vision (окремий проєкт)
+# GSV has moved
 
-**Канон міграції vision у окремий проєкт.** GSV — самостійний Rust-first проєкт у фолдері `GSV/` репо PoolAI. Працює **95–100% на Rust**, **0–5% WebAssembly** (завжди), UI — тонкий JS/DOM glue у `src/ui/` (без Python).
+Galaxy StarWalker Vision is a **standalone project** at:
 
-**Версія:** v0.1.0 · **Стан:** band 125 реалізовано (FM §5.12 §5.106 **✅** `PH-S1889…S1898` — Vision/UI polish) · band 126 **in progress** (§5.107 `PH-S1899…S1908` — GSV stand smoke + ops canon). Vision rev **492**.
+**`S:\rust\GSV`** (`/s/rust/GSV`)
 
-## Суть
+Open that folder as its own git repo / Cursor workspace. Session canon: `S:\rust\GSV\AGENTS.md`, `docs/HANDOFF_NEW_SESSION.md`, `docs/NEXT_SESSION_PROMPT.md`.
 
-Окремий **bin/exe сервер** «Galaxy StarWalker Vision» (`gsv-server`) на Rust, який:
+PoolAI vision map (manifest / feed / Speeds / Rust panel) stays here:
 
-1. Віддає vision UI (доки ↔ код ↔ спринти) — спадкоємець `GSV/docs/vision/index.html`.
-2. Виконує **бокси GSV** (панелі/можливості):
-   - **Tracker** — технічні параметри виконаного workflow (спринти, команди, часи).
-   - **SLI console** — які команди використовуються + усі SLI-функції, які можна створити з наявних скриптів (+ нові).
-   - **Toolchain** — які тулси використовуються (rustc/cargo/clippy/MSYS2/…).
-   - **IDE** — портовані opencode + cursor чати; вибір, з чим працювати.
-   - **Update** — якщо запущено bin-версію, сервер приймає **повідомлення про апдейт** (перекомпіляція → у UI «Update» замість reload); вебсторінка **не падає при офлайн**; після реконекту всі метрики синхронізуються.
-   - **Box preview** — Rust-кольори відповідно до синтаксису.
-   - **SLI terminal** — щоб AI міг посилати команди.
-   - **Rust tests / benchmarks hook** — запуск без перекомпіляції.
-   - **Ratio** — Rust/LOC ratio аудит (Rust 95–100%), `gsv-loc-audit` → `GSV/data/rust_ratio.json`, live `GET /api/ratio`.
-   - **OmniRouter** — Rust AI-проксі/роутер за каталогом «AI providers» (Aug 2026): рекомендований список GPT 5.2 · GPT 5.2 Codex · Claude Opus 4.5 · Claude Sonnet 4.5 · Gemini 3 Pro · MiniMax M2.1 + китайські (DeepSeek V4, Kimi K3, GLM-4.6, Qwen3 Coder) та free-хости (OpenRouter, Groq, Cerebras, NVIDIA, Hugging Face). OpenAI-сумісний proxy (`/api/omni/v1/chat/completions`), каталог моделей з токен-вікнами зі шіта, конфіг `GSV/data/omni.toml` (redacted у UI).
-3. Дотримується правила: **Rust-only** для runtime/API/ML/tools; bins — лише Rust (`src/bin/`), жодного Python/Java.
+**`docs/vision/`**
 
-## Структура
-
-```
-GSV/
-├── README.md            ← цей файл (архітектура / entry)
-├── Cargo.toml           ← gsv package (workspace members=["."]; bins: gsv-server, gsv-loc-audit, gsv-vision-sync, gsv-http-stand-smoke)
-├── .cargo/config.toml   ← [build] target-dir="target"
-├── src/
-│   ├── bin/
-│   │   ├── gsv_server.rs        ← exe/bin «Galaxy StarWalker Vision» (CLI --host/--port/--repo-root/--data-dir)
-│   │   ├── gsv_loc_audit.rs     ← Rust/LOC ratio audit bin (→ GSV/data/rust_ratio.json, --min-ratio/--advisory/--stretch-96)
-│   │   ├── gsv_vision_sync.rs   ← vision manifest/feed/extensions sync bin
-│   │   └── gsv_http_stand_smoke.rs ← live HTTP stand smoke (48 checks, JSON report, exit code; band 126)
-│   ├── lib.rs           ← модулі (app_error, boxes, server, state, tracker, vision)
-│   ├── app_error.rs     ← AppError (Display + From + IntoResponse JSON)
-│   ├── state.rs         ← AppState (tracker, ide_selection, update_flag, events broadcast)
-│   ├── tracker.rs       ← TrackerStore + FM §5.12 sprint snapshot parse
-│   ├── vision.rs        ← RFC3339 timestamps, git_head, vision JSON read
-│   ├── server/mod.rs    ← router (/, /api/*, /events SSE)
-│   └── boxes/
-│       ├── mod.rs
-│       ├── sli.rs       ← SLI каталог з bin/ + scripts/ + src/bin/
-│       ├── toolchain.rs ← інвентар тулсів
-│       ├── ide.rs       ← opencode + cursor сесії
-│       ├── update.rs    ← pending rebuild detection
-│       ├── preview.rs   ← Rust syntax highlight + traversal guard
-│       ├── terminal.rs  ← whitelist + injection guard
-│       ├── hooks.rs     ← tests/bench (read-only target/ + rust_diagnostics)
-│       ├── ratio.rs     ← LOC ratio audit + wire (Rust 95–100% band)
-│       └── omni/        ← OmniRouter: catalog.rs (providers/models зі шіта),
-│                          config.rs (omni.toml + env overrides),
-│                          proxy.rs (OpenAI-сумісний chat completions / models)
-├── ui/index.html        ← single-page UI (SSE, offline/update/resync)
-├── tests/
-│   ├── gsv_server_contracts.rs  ← 32 integration tests
-│   ├── gsv_omni_contracts.rs    ← 8 OmniRouter integration tests
-│   ├── gsv_ratio_contracts.rs   ← 7 ratio box integration tests
-│   ├── gsv_update_flow.rs       ← 8 update/SSE tests
-│   ├── gsv_ui_contracts.rs      ← 12 UI fragment tests
-│   ├── gsv_vision_contracts.rs  ← 52 vision tests
-│   └── gsv_stand_smoke_contracts.rs ← 6 stand smoke contracts (band 126)
-└── data/                ← gsv_tracker.json, omni.toml, rust_ratio.json (durable stores, gitignored)
-```
-
-Канонічна документація проєкту — `GSV/docs/gsv/` (див. нижче).
-
-## Правила (канон з AGENTS.md)
-
-- **Rust-only** runtime/API/ML/RAID/VM/tools. Python заборонено (0× `.py`). Java немає.
-- Бinaries — лише `src/bin/` (`cargo run --bin …`).
-- UI — vanilla HTML+CSS+JS у `src/ui/`; WASM — лише горизонт (0–5%).
-- Термінал — MSYS2 bash (не PowerShell) для `cargo`/`git`.
-- Rust стиль: `AppError`, `?`, без `unwrap()`/`expect()` у продукті, `Arc<RwLock<T>>`, `tokio`, `tracing`, модулі через `mod.rs`.
-
-## Збірка / тести
-
-```
-# з кореня репо (unset CARGO_TARGET_DIR — GSV має свій target/):
-export PATH="/c/Users/${USER}/.cargo/bin:$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"
-export RUSTUP_TOOLCHAIN="stable-x86_64-pc-windows-gnu"
-cd GSV
-cargo build --all-targets
-cargo test          # 230 tests (102 unit + contracts + omni + ratio + update + ui + vision + stand smoke)
-cargo clippy --all-targets   # 0 warnings/errors
-cargo run --bin gsv-loc-audit -- --stretch-96   # Rust/LOC ratio → GSV/data/rust_ratio.json (≥95%, stretch-96 ≥96%)
-cargo run --bin gsv-server -- --port 8890   # live smoke
-cargo run --bin gsv-http-stand-smoke        # live stand smoke (48 checks) проти запущеного сервера
-```
-
-## Запуск
-
-```
-cargo run --bin gsv-server -- --host 127.0.0.1 --port 9999 --repo-root S:/rust/poolAI --data-dir GSV/data
-```
-
-Endpoints: `GET /` (UI), `/api/health`, `/api/tracker`, `/api/sli`, `/api/toolchain`, `/api/ide/sessions`, `POST /api/ide/select`, `/api/update`, `POST /api/update/notify`, `/api/preview?file=…`, `POST /api/terminal`, `/api/hooks/tests`, `/api/hooks/bench`, `/api/ratio`, `/api/omni`, `/api/omni/status`, `/api/omni/config` (GET/POST), `/api/omni/v1/models`, `POST /api/omni/v1/chat/completions`, `POST /api/omni/test`, `/api/ui/card/:name` (20 cards), `/api/vision*` + SVG, `GET /events` (SSE).
-
-## Docs (канон)
-
-| Файл | Призначення |
-|------|-------------|
-| [`GSV/docs/gsv/README.md`](GSV/docs/gsv/README.md) | Індекс docs проєкту GSV |
-| [`GSV/docs/gsv/GSV_ARCHITECTURE.md`](GSV/docs/gsv/GSV_ARCHITECTURE.md) | Архітектура сервера + боксів (Rust / wasm split) |
-| [`GSV/docs/gsv/GSV_SERVER.md`](GSV/docs/gsv/GSV_SERVER.md) | exe/bin сервер «Galaxy StarWalker Vision» (endpoints, update, offline) |
-| [`GSV/docs/gsv/GSV_BOXES.md`](GSV/docs/gsv/GSV_BOXES.md) | Специфікація боксів (Tracker, SLI console, Toolchain, IDE, Update, Preview, SLI terminal, Tests/bench hooks) |
-| [`GSV/docs/gsv/GSV_MIGRATION.md`](GSV/docs/gsv/GSV_MIGRATION.md) | Що мігруємо з `GSV/docs/vision/` / `src/` у GSV і як |
-| [`GSV/docs/gsv/GSV_TECH_ROADMAP.md`](GSV/docs/gsv/GSV_TECH_ROADMAP.md) | **TechPreroadMap** — логічний порядок → future sprints |
-| [`docs/GSV_ROLES.md`](docs/GSV_ROLES.md) | Ролі GSV VDT (Власник/Оркестратор/Субагенти), канон сесії, ratio gate |
-
-## Статус
-
-| Етап | Статус |
-|------|--------|
-| Архітектура (цей README + `GSV/docs/gsv/`) | **✅** |
-| Реєстрація sprints (FM §5.12 band 102 `PH-S1659…S1668`) | **✅** |
-| gsv-server bin (Cargo/`gsv_server.rs`) | **✅** |
-| Бокси (Tracker, SLI console, Toolchain, IDE, Update, Preview, SLI terminal, Tests/bench) | **✅** |
-| OmniRouter (Rust AI-проксі/роутер, catalog/config/proxy) | **✅** |
-| Roles + ratio canon (`docs/GSV_ROLES.md`, band 108) | **✅** |
-| `gsv-loc-audit` + Ratio box + `GET /api/ratio` (Rust ≥95%) | **✅** |
-| Vision boxes + `/api/vision*` + SVG (band 119–125) | **✅** |
-| Stand smoke (`gsv-http-stand-smoke`, 48 checks) + contracts (band 126) | **✅** |
-| Тести (230: 102 unit + contracts + omni + ratio + update + ui + vision + stand smoke) | **✅** |
-| Vision docs sync / migration | **⏳ future** |
+Live GSV UI: `cargo run --bin gsv-server` from `S:\rust\GSV` → `http://127.0.0.1:9999/`

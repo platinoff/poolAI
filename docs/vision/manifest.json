@@ -12672,70 +12672,70 @@
       "id": "GSV_docs_vision_README_md",
       "label": "README.md",
       "layer": "L1",
-      "path": "GSV/docs/vision/README.md"
+      "path": "docs/vision/README.md"
     },
     {
       "auto_synced": true,
       "id": "GSV_docs_vision_extensions_json",
       "label": "extensions.json",
       "layer": "L1",
-      "path": "GSV/docs/vision/extensions.json"
+      "path": "docs/vision/extensions.json"
     },
     {
       "auto_synced": true,
       "id": "GSV_docs_vision_feed_json",
       "label": "feed.json",
       "layer": "L1",
-      "path": "GSV/docs/vision/feed.json"
+      "path": "docs/vision/feed.json"
     },
     {
       "auto_synced": true,
       "id": "GSV_docs_vision_index_html",
       "label": "index.html",
       "layer": "L1",
-      "path": "GSV/docs/vision/index.html"
+      "path": "docs/vision/index.html"
     },
     {
       "auto_synced": true,
       "id": "GSV_docs_vision_manifest_json",
       "label": "manifest.json",
       "layer": "L1",
-      "path": "GSV/docs/vision/manifest.json"
+      "path": "docs/vision/manifest.json"
     },
     {
       "auto_synced": true,
       "id": "GSV_docs_vision_rust_diagnostics_json",
       "label": "rust_diagnostics.json",
       "layer": "L1",
-      "path": "GSV/docs/vision/rust_diagnostics.json"
+      "path": "docs/vision/rust_diagnostics.json"
     },
     {
       "auto_synced": true,
       "id": "GSV_docs_vision_speed_index_json",
       "label": "speed_index.json",
       "layer": "L1",
-      "path": "GSV/docs/vision/speed_index.json"
+      "path": "docs/vision/speed_index.json"
     },
     {
       "auto_synced": true,
       "id": "GSV_docs_vision_vision_css",
       "label": "vision.css",
       "layer": "L1",
-      "path": "GSV/docs/vision/vision.css"
+      "path": "docs/vision/vision.css"
     },
     {
       "auto_synced": true,
       "id": "GSV_docs_vision_vision_js",
       "label": "vision.js",
       "layer": "L1",
-      "path": "GSV/docs/vision/vision.js"
+      "path": "docs/vision/vision.js"
     },
     {
       "auto_synced": true,
       "id": "GSV_docs_vision_vision_svg",
       "label": "vision.svg",
       "layer": "L1",
-      "path": "GSV/docs/vision/vision.svg"
+      "path": "docs/vision/vision.svg"
     },
     {
       "auto_synced": true,

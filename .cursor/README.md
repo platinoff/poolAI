@@ -13,7 +13,7 @@
 | [`git-commit-msys.mdc`](rules/git-commit-msys.mdc) | globs | Hook, `amend-head-msg.sh` |
 | [`functionality-management.mdc`](rules/functionality-management.mdc) | on-demand | FM-менеджер |
 | [`autonomous-orchestrator.mdc`](rules/autonomous-orchestrator.mdc) | on-demand | AUTO_RUN |
-| [`docs-vision.mdc`](rules/docs-vision.mdc) | globs | `GSV/docs/vision/` sync |
+| [`docs-vision.mdc`](rules/docs-vision.mdc) | globs | `docs/vision/` sync |
 | [`chat-context.mdc`](rules/chat-context.mdc) | globs | Стартовий контекст чату; ключові документи |
 | [`ai-assistant.mdc`](rules/ai-assistant.mdc) | globs | AI-асистент: ключові документи, sync концепт→статус |
 | [`documentation.mdc`](rules/documentation.mdc) | globs | Куди писати доки (кроки 11–12), структура `docs/` |

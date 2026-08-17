@@ -32,11 +32,11 @@ fn monitoring_vision_sync_slice_docs_present_ph_s1620() {
     for name in MONITORING_VISION_SYNC_SLICES {
         assert!(canon.contains(name), "missing vision-sync slice {name}");
     }
-    assert!(std::path::Path::new("GSV/docs/vision/manifest.json").exists());
-    assert!(std::path::Path::new("GSV/docs/vision/extensions.json").exists());
-    assert!(std::path::Path::new("GSV/docs/vision/README.md").exists());
-    assert!(std::path::Path::new("GSV/docs/vision/vision.svg").exists());
-    assert!(std::path::Path::new("GSV/docs/vision/index.html").exists());
+    assert!(std::path::Path::new("docs/vision/manifest.json").exists());
+    assert!(std::path::Path::new("docs/vision/extensions.json").exists());
+    assert!(std::path::Path::new("docs/vision/README.md").exists());
+    assert!(std::path::Path::new("docs/vision/vision.svg").exists());
+    assert!(std::path::Path::new("docs/vision/index.html").exists());
     assert!(std::path::Path::new("docs/development/MONITORING_DOCS_CANON.md").exists());
     let loc_audit = include_str!("../src/bin/poolai_loc_audit.rs");
     assert!(loc_audit.contains("--monitoring-vision-sync"));

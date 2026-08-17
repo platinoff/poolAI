@@ -1,6 +1,6 @@
 //! Policies vision-sync band depth (PH-S1519…S1528, band 88 — enterprise phase D).
 //!
-//! Consolidates Policies phase-D docs-canon + `GSV/docs/vision/*` under one vision-sync gate.
+//! Consolidates Policies phase-D docs-canon + `docs/vision/*` under one vision-sync gate.
 
 use serde_json::Value;
 
@@ -39,16 +39,16 @@ pub const POLICY_VISION_SYNC_CRITERIA: &[(&str, &str, &str)] = &[
     (
         "vision_manifest",
         "\"revision\"",
-        "GSV/docs/vision/manifest.json",
+        "docs/vision/manifest.json",
     ),
     (
         "vision_extensions",
         "active_sprint",
-        "GSV/docs/vision/extensions.json",
+        "docs/vision/extensions.json",
     ),
-    ("vision_readme", "docs/vision", "GSV/docs/vision/README.md"),
-    ("vision_svg", "svg", "GSV/docs/vision/vision.svg"),
-    ("vision_index", "manifest", "GSV/docs/vision/index.html"),
+    ("vision_readme", "docs/vision", "docs/vision/README.md"),
+    ("vision_svg", "svg", "docs/vision/vision.svg"),
+    ("vision_index", "manifest", "docs/vision/index.html"),
     (
         "doc_docs_canon",
         "POLICIES_DOCS_CANON.md",

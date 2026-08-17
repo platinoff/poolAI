@@ -1,9 +1,9 @@
 # Speed index — test-ci & Criterion wall times
 
 **Оновлено:** 2026-07-27  
-**Артефакт:** [`speed_index.json`](./speed_index.json) · mirror [`../../GSV/docs/vision/speed_index.json`](../../GSV/docs/vision/speed_index.json)  
+**Артефакт:** [`speed_index.json`](./speed_index.json) · mirror [`../../docs/vision/speed_index.json`](../../docs/vision/speed_index.json)  
 **Bin:** `poolai-speed-index` · wrapper: `bin/record-test-ci-speed.sh`  
-**UI:** GSV → panel **Speeds** (`http://127.0.0.1:8891/`) · legacy `GSV/docs/vision/index.html` deactivated (band 117)
+**UI:** GSV → panel **Speeds** (`http://127.0.0.1:8891/`) · legacy `docs/vision/index.html` deactivated (band 117)
 
 ---
 
@@ -51,7 +51,7 @@ cargo bench -j 1 --bench runtime_benchmarks -- \
 
 1. `.\bin\open-docs-vision.ps1`
 2. Панель **Speeds** — latest `test-ci` wall time + Criterion history.
-3. Auto-reload слідкує за `GSV/docs/vision/speed_index.json` і `docs/development/speed_index.json`.
+3. Auto-reload слідкує за `docs/vision/speed_index.json` і `docs/development/speed_index.json`.
 
 Після drain **`абракадабра`:** record → `poolai-vision-sync` → Speeds panel оновлюється.
 

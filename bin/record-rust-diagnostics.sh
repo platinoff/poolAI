@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Scan Clippy JSON messages → docs/development/rust_diagnostics.json
-# (+ mirror GSV/docs/vision/rust_diagnostics.json for Galaxy Rust panel).
+# (+ mirror docs/vision/rust_diagnostics.json for Galaxy Rust panel).
 #
 # Usage (MSYS2 / CI):
 #   bash bin/record-rust-diagnostics.sh

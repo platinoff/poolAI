@@ -122,7 +122,7 @@ test.describe("axe high-contrast color-contrast (PH-S14)", () => {
 
 const visionUrl =
   process.env.POOLAI_VISION_URL ??
-  "http://127.0.0.1:8765/GSV/docs/vision/index.html";
+  "http://127.0.0.1:8765/docs/vision/index.html";
 
 test.describe("axe vision map (PH-S1051)", () => {
   test("vision index — no critical/serious violations", async ({ page }) => {

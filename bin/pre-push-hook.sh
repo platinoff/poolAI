@@ -34,10 +34,10 @@ CANON_PATHS=(
     docs/INDEX_2026-03-17.md
     docs/development/README.md
     docs/development/NEXT_SESSION_PROMPT.md
-    GSV/docs/vision/manifest.json
-    GSV/docs/vision/feed.json
-    GSV/docs/vision/extensions.json
-    GSV/docs/vision/vision.svg
+    docs/vision/manifest.json
+    docs/vision/feed.json
+    docs/vision/extensions.json
+    docs/vision/vision.svg
 )
 
 for f in "${CANON_PATHS[@]}"; do
@@ -50,7 +50,7 @@ done
 if [ "$CANON_CHANGED" -eq 1 ]; then
     echo ""
     echo "❌ Vision/canon files were updated. Stage and commit before push:"
-    echo "   git add README.md docs/INDEX_2026-03-17.md docs/development/README.md docs/development/NEXT_SESSION_PROMPT.md GSV/docs/vision/"
+    echo "   git add README.md docs/INDEX_2026-03-17.md docs/development/README.md docs/development/NEXT_SESSION_PROMPT.md docs/vision/"
     echo "   git commit -m 'docs: vision canon sync'"
     echo "   git push"
     exit 1

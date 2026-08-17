@@ -5,7 +5,7 @@
 ## Проєкт
 
 - **Назва:** PoolAI · **Версія:** v0.2.2 (див. `Cargo.toml` / `src/version.rs`) · **Корінь:** `S:\rust\poolAI`
-- **Проєкт GSV:** docs переміщені у `GSV/docs/` (`GSV/docs/gsv/` + `GSV/docs/vision/`); це окремовий проєкт doc-зони, отже шляхи `docs/gsv/`/`docs/vision/` більше не актуальні.
+- **Проєкт GSV:** окремий git-репозиторій **`S:\rust\GSV`**. PoolAI vision-канон — `docs/vision/`. Вказівник: [`GSV/README.md`](GSV/README.md).
 - **Стек (канон):** Rust `src/`, `tests/`, `crates/`; UI — JS у `src/ui/`; E2E — `e2e/` (TypeScript); **без Python**.
 - **PRIMARY concept:** `docs/concept/poolAI_concept_root.txt` (читати першим).
 
@@ -64,8 +64,8 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 | Таксономія docs | `docs/STRUCTURE.md` |
 | Digest функціоналу | `docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md` |
 | Dev-патерни | `docs/development/AUTO_DEV_PATTERNS.md` |
-| GSV — старт / handoff | `GSV/docs/HANDOFF_NEW_SESSION.md` · `GSV/docs/NEXT_SESSION_PROMPT.md` |
-| GSV — ролі та архітектура | `GSV/docs/GSV_ROLES.md` · `GSV/docs/gsv/GSV_ARCHITECTURE.md` · `GSV/docs/gsv/GSV_TECH_ROADMAP.md` |
+| GSV — старт / handoff | `S:/rust/GSV/docs/HANDOFF_NEW_SESSION.md` · `S:/rust/GSV/docs/NEXT_SESSION_PROMPT.md` |
+| GSV — ролі та архітектура | `S:/rust/GSV/docs/GSV_ROLES.md` · `S:/rust/GSV/docs/gsv/GSV_ARCHITECTURE.md` · `S:/rust/GSV/docs/gsv/GSV_TECH_ROADMAP.md` |
 
 ## Скіли (канон Cursor + OpenCode)
 
@@ -128,7 +128,7 @@ npx --yes skills add <owner/repo> --skill <name> -a cursor -a opencode -y
 | Вибір | Проєкт | Канон docs | Flow |
 |-------|--------|-----------|------|
 | **poolai** | корінь репо (`src/`, `tests/`) | `docs/development/NEXT_SESSION_PROMPT.md` · FM §5.12 | кроки 1–6 нижче |
-| **gsv** | `GSV/` — окремий Rust-first проєкт | `GSV/docs/NEXT_SESSION_PROMPT.md` · `GSV/docs/GSV_ROLES.md` · `GSV/docs/gsv/GSV_TECH_ROADMAP.md` | S0 (GSV target) → scan warnings first → drain band (FM §5.102 / GSV roadmap) → Speeds+Rust panel → vision-sync → один commit + push |
+| **gsv** | `S:\rust\GSV` — окремий git-репозиторій | `S:/rust/GSV/docs/NEXT_SESSION_PROMPT.md` · `S:/rust/GSV/docs/GSV_ROLES.md` · `S:/rust/GSV/docs/gsv/GSV_TECH_ROADMAP.md` | S0 (GSV target) → scan warnings first → drain band (`GSV_TECH_ROADMAP`) → Speeds+Rust panel → `gsv-vision-sync` → один commit |
 
 ### poolai flow
 
@@ -137,7 +137,7 @@ npx --yes skills add <owner/repo> --skill <name> -a cursor -a opencode -y
 3. **Drain:** усі відкриті PH-S* (код → scope-тести; **без** mid-drain push).
 4. **Vision close:** FM §5.12 ✅ + HANDOFF + NEXT → один `poolai-vision-sync` (manifest `revision++`) → FM/NEXT/INDEX rev = `manifest.revision` → `--check`.
 5. **Test:** один `cargo fmt --all` → один `cargo test-ci` → `bash bin/record-test-ci-speed.sh` + `bash bin/record-rust-diagnostics.sh`.
-6. **Git (кінець сесії):** один commit (код + `GSV/docs/vision/*` + speed/diagnostics JSON + FM/HANDOFF/NEXT) → **`git push origin main` + самарі** — **завжди останній крок**. Не завершувати сесію без push+самарі, якщо був drain/commit.
+6. **Git (кінець сесії):** один commit (код + `docs/vision/*` + speed/diagnostics JSON + FM/HANDOFF/NEXT) → **`git push origin main` + самарі** — **завжди останній крок**. Не завершувати сесію без push+самарі, якщо був drain/commit.
 
 - **Не** `git add -A`, **не** push mid-drain/mid-scan, **не** паралелити `cargo test-ci`.
 - Warnings >0 або errors >0 з виправними пакетами → 1–3 PH-S* **на початок** смуги (Джерело: `rust_diagnostics` / lint code).
@@ -151,7 +151,7 @@ npx --yes skills add <owner/repo> --skill <name> -a cursor -a opencode -y
 - Після зміни продукту (модулі, маршрути, features): оновити `FUNCTIONALITY_DIGEST` + `file_list.csv` (при нових шляхах) + README Next Focus.
 - Скрипти: dev/ops launchers → `bin/` (.sh/.ps1), toolchain/deploy → `scripts/` (**.sh лише, без нових .ps1**), Rust CLIs → `src/bin/`.
 - Переліки файлів: тільки описові назви, **не** `.ps1`/`.ps` розширеннями.
-- Vision map (`GSV/docs/vision/`): після FM/HANDOFF — `poolai-vision-sync` + `--check`; **live UI (band 117):** `gsv-server` → `http://127.0.0.1:8891/` · [`GSV_SERVER.md`](GSV/docs/gsv/GSV_SERVER.md); legacy `bin/open-docs-vision.ps1` → `http://127.0.0.1:8765/GSV/docs/vision/index.html` — архів (deactivated, band 117).
+- Vision map (`docs/vision/`): після FM/HANDOFF — `poolai-vision-sync` + `--check`; **live UI:** `gsv-server` з `S:/rust/GSV` → `http://127.0.0.1:9999/`; legacy `bin/open-docs-vision.ps1` → `http://127.0.0.1:8765/docs/vision/index.html` — архів (deactivated, band 117).
 
 ## Безпека та токени
 

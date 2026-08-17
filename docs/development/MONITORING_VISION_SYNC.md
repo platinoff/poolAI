@@ -4,7 +4,7 @@ Canonical doc: [`MONITORING_VISION_SYNC.md`](./MONITORING_VISION_SYNC.md) (band 
 
 ## Overview
 
-Band 98 consolidates Monitoring phase-E docs-canon with **`GSV/docs/vision/*`** under one vision-sync
+Band 98 consolidates Monitoring phase-E docs-canon with **`docs/vision/*`** under one vision-sync
 gate (`--monitoring-vision-sync` / `VERIFY_MONITORING_VISION_SYNC`). Prior docs-canon remains
 [`MONITORING_DOCS_CANON.md`](./MONITORING_DOCS_CANON.md); this band proves vision artifacts stay
 aligned with the enterprise Monitoring journal.
@@ -12,7 +12,7 @@ aligned with the enterprise Monitoring journal.
 | Surface | Where | Notes |
 |---------|-------|-------|
 | Depth module | `monitoring_vision_sync_depth.rs` | enum + criteria + `MONITORING_VISION_SYNC_SLICES` |
-| Slice artifacts | `GSV/docs/vision/` + `MONITORING_DOCS_CANON.md` | `manifest.json` · `extensions.json` · `README.md` · `vision.svg` · `index.html` · prior canon |
+| Slice artifacts | `docs/vision/` + `MONITORING_DOCS_CANON.md` | `manifest.json` · `extensions.json` · `README.md` · `vision.svg` · `index.html` · prior canon |
 | Aggregate | `--monitoring-vision-sync` | `monitoring_vision_sync_*` fields in `rust_ratio.json` |
 | Verify / quick | `VERIFY_MONITORING_VISION_SYNC` / `--monitoring-vision-sync` | vision-sync gate only |
 | Contracts | `monitoring_vision_sync_integration` | slice presence + criteria totals |

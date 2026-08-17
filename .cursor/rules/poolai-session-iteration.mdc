@@ -117,7 +117,7 @@ flowchart LR
 | 3 Drain | Усі відкриті PH-S* (код → scope-тести → docs **без** vision rev footer); **без** mid-drain `git push` |
 | 4 Vision close | FM §5.12 ✅ + HANDOFF + NEXT → **один** `poolai-vision-sync` → rev з `manifest.json` → `--check` |
 | 5 Test | `cargo fmt --all` → **один** `cargo test-ci` (**після** vision close) → **`bash bin/record-test-ci-speed.sh`** · Speeds [`SPEED_INDEX.md`](../../docs/development/SPEED_INDEX.md) · **`bash bin/record-rust-diagnostics.sh`** · Rust [`RUST_DIAGNOSTICS.md`](../../docs/development/RUST_DIAGNOSTICS.md) |
-| 6 Git (**кінець сесії**) | **один** commit (`git-commit-tree-msg.sh`: код + `GSV/docs/vision/*` + `speed_index.json` + `rust_diagnostics.json` + FM/HANDOFF/NEXT) → **`git push origin main` + самарі в чат** — **завжди останній крок**; після самарі сесія завершена |
+| 6 Git (**кінець сесії**) | **один** commit (`git-commit-tree-msg.sh`: код + `docs/vision/*` + `speed_index.json` + `rust_diagnostics.json` + FM/HANDOFF/NEXT) → **`git push origin main` + самарі в чат** — **завжди останній крок**; після самарі сесія завершена |
 
 **CI після push:** Actions `GITHUB_TOKEN` може бути JWT-format (`ghs_` ~520) — workflows уже передають opaque; не додавати length-checks у drain. Див. PH-SVC65 · [`SECRETS_MANAGEMENT.md`](../../docs/security/SECRETS_MANAGEMENT.md) §5.
 
@@ -219,14 +219,14 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 
 1. Оновити FM **§5.12** (рядки спринтів ✅) + HANDOFF + NEXT (без жорсткого vision rev у footer до sync).
 2. `cargo run --bin poolai-vision-sync` (manifest `revision++`, `sprint_queue` з FM).
-3. FM / NEXT / INDEX: **vision rev = `manifest.revision`** (читати з `GSV/docs/vision/manifest.json`).
+3. FM / NEXT / INDEX: **vision rev = `manifest.revision`** (читати з `docs/vision/manifest.json`).
 4. `cargo run --bin poolai-vision-sync -- --check` → має бути **ok**.
 5. Потім — фінальний `cargo test-ci` (див. Drain § вище).
 
 ### Git (один commit + push — **завжди кінець сесії**)
 
 1. Staging лише файлів смуги (`git diff --cached --stat`); не `comitmsg/`, не `data/audit/`.
-2. У commit: код + `GSV/docs/vision/*` + FM/HANDOFF/NEXT (+ speed/diagnostics JSON) — після vision close + test-ci green.
+2. У commit: код + `docs/vision/*` + FM/HANDOFF/NEXT (+ speed/diagnostics JSON) — після vision close + test-ci green.
 3. Текст: `comitmsg/.commit-msg-ph-sNNN-NNN.txt`.
 4. **Канон (новий код + docs):** `bash bin/git-commit-tree-msg.sh comitmsg/.commit-msg-ph-sNNN-NNN.txt <paths…>` — `write-tree` зі staged файлів.
 5. **Лише subject hook-fix** (без нових файлів): `bash bin/amend-head-msg.sh comitmsg/…` — **не** включає unstaged/staged diff у tree.

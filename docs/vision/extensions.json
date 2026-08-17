@@ -123,8 +123,8 @@
         "docs/development/HANDOFF_NEW_SESSION.md",
         "docs/development/NEXT_SESSION_PROMPT.md",
         "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md",
-        "GSV/docs/vision/manifest.json",
-        "GSV/docs/vision/extensions.json"
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json"
       ],
       "code_globs": [
         "crates/poolai-ui-core/src/digest_depth.rs",
@@ -187,7 +187,7 @@
     },
     "docs_vision_meta": {
       "docs": [
-        "GSV/docs/vision/**",
+        "docs/vision/**",
         ".cursor/rules/docs-vision.mdc"
       ],
       "extensions": [
@@ -211,8 +211,8 @@
         "docs/catalog/FUNCTION_MANAGEMENT.md",
         "docs/development/HANDOFF_NEW_SESSION.md",
         "docs/development/NEXT_SESSION_PROMPT.md",
-        "GSV/docs/vision/manifest.json",
-        "GSV/docs/vision/extensions.json",
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json",
         "README.md"
       ],
       "code_globs": [
@@ -370,7 +370,7 @@
         "docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md",
         "docs/development/HANDOFF_NEW_SESSION.md",
         "docs/development/NEXT_SESSION_PROMPT.md",
-        "GSV/docs/vision/manifest.json"
+        "docs/vision/manifest.json"
       ],
       "code_globs": [
         "src/bin/poolai-worker.rs",
@@ -433,7 +433,7 @@
         "docs/catalog/FUNCTION_MANAGEMENT.md",
         "docs/development/HANDOFF_NEW_SESSION.md",
         "docs/development/NEXT_SESSION_PROMPT.md",
-        "GSV/docs/vision/manifest.json"
+        "docs/vision/manifest.json"
       ],
       "code_globs": [
         "e2e/tests/grid_job_lease.spec.ts",
@@ -459,8 +459,8 @@
         "docs/development/HANDOFF_NEW_SESSION.md",
         "docs/development/NEXT_SESSION_PROMPT.md",
         "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md",
-        "GSV/docs/vision/manifest.json",
-        "GSV/docs/vision/extensions.json"
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json"
       ],
       "code_globs": [
         "e2e/tests/grid_pricing.spec.ts",
@@ -506,7 +506,7 @@
         "docs/catalog/FUNCTION_MANAGEMENT.md",
         "docs/development/HANDOFF_NEW_SESSION.md",
         "docs/development/NEXT_SESSION_PROMPT.md",
-        "GSV/docs/vision/manifest.json"
+        "docs/vision/manifest.json"
       ],
       "code_globs": [
         "e2e/tests/grid_result_lease.spec.ts",
@@ -531,8 +531,8 @@
         "docs/catalog/FUNCTION_MANAGEMENT.md",
         "docs/development/HANDOFF_NEW_SESSION.md",
         "docs/development/NEXT_SESSION_PROMPT.md",
-        "GSV/docs/vision/manifest.json",
-        "GSV/docs/vision/extensions.json"
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json"
       ],
       "code_globs": [
         "src/job/store.rs",
@@ -622,8 +622,8 @@
         "docs/catalog/FUNCTION_MANAGEMENT.md",
         "docs/development/HANDOFF_NEW_SESSION.md",
         "docs/development/NEXT_SESSION_PROMPT.md",
-        "GSV/docs/vision/manifest.json",
-        "GSV/docs/vision/extensions.json"
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json"
       ],
       "code_globs": [
         "src/job/types.rs",
@@ -649,8 +649,8 @@
         "docs/catalog/FUNCTION_MANAGEMENT.md",
         "docs/development/HANDOFF_NEW_SESSION.md",
         "docs/development/NEXT_SESSION_PROMPT.md",
-        "GSV/docs/vision/manifest.json",
-        "GSV/docs/vision/extensions.json"
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json"
       ],
       "code_globs": [
         "src/job/types.rs",
@@ -707,7 +707,7 @@
         "docs/catalog/FUNCTION_MANAGEMENT.md",
         "docs/development/HANDOFF_NEW_SESSION.md",
         "docs/development/NEXT_SESSION_PROMPT.md",
-        "GSV/docs/vision/manifest.json",
+        "docs/vision/manifest.json",
         "bin/open-docs-vision.ps1"
       ],
       "code_globs": [
@@ -732,8 +732,8 @@
         "docs/development/HANDOFF_NEW_SESSION.md",
         "docs/development/NEXT_SESSION_PROMPT.md",
         "docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md",
-        "GSV/docs/vision/manifest.json",
-        "GSV/docs/vision/extensions.json"
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json"
       ],
       "code_globs": [
         "e2e/tests/jobs_migrating.spec.ts",
@@ -757,8 +757,8 @@
         "docs/catalog/FUNCTION_MANAGEMENT.md",
         "docs/development/HANDOFF_NEW_SESSION.md",
         "docs/development/NEXT_SESSION_PROMPT.md",
-        "GSV/docs/vision/manifest.json",
-        "GSV/docs/vision/extensions.json"
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json"
       ],
       "code_globs": [
         "crates/poolai-ui-core/src/multi_module_depth.rs",
@@ -799,8 +799,8 @@
         "docs/development/HANDOFF_NEW_SESSION.md",
         "docs/development/NEXT_SESSION_PROMPT.md",
         "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md",
-        "GSV/docs/vision/manifest.json",
-        "GSV/docs/vision/extensions.json",
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json",
         "bin/open-docs-vision.ps1"
       ],
       "code_globs": [
@@ -827,8 +827,8 @@
         "docs/catalog/FUNCTION_MANAGEMENT.md",
         "docs/development/HANDOFF_NEW_SESSION.md",
         "docs/development/NEXT_SESSION_PROMPT.md",
-        "GSV/docs/vision/manifest.json",
-        "GSV/docs/vision/extensions.json"
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json"
       ],
       "code_globs": [
         "src/grid/galaxy_pricing_oracle.rs",
@@ -852,8 +852,8 @@
         "docs/catalog/FUNCTION_MANAGEMENT.md",
         "docs/development/HANDOFF_NEW_SESSION.md",
         "docs/development/NEXT_SESSION_PROMPT.md",
-        "GSV/docs/vision/manifest.json",
-        "GSV/docs/vision/extensions.json"
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json"
       ],
       "code_globs": [
         "src/network/api/protocol_middleware.rs",
@@ -882,9 +882,9 @@
         "docs/development/HANDOFF_NEW_SESSION.md",
         "docs/development/NEXT_SESSION_PROMPT.md",
         "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md",
-        "GSV/docs/vision/manifest.json",
-        "GSV/docs/vision/extensions.json",
-        "GSV/docs/vision/vision.svg"
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json",
+        "docs/vision/vision.svg"
       ],
       "code_globs": [
         "src/bin/poolai_loc_audit.rs",
@@ -989,8 +989,8 @@
         "docs/catalog/FUNCTION_MANAGEMENT.md",
         "docs/development/HANDOFF_NEW_SESSION.md",
         "docs/development/NEXT_SESSION_PROMPT.md",
-        "GSV/docs/vision/manifest.json",
-        "GSV/docs/vision/extensions.json"
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json"
       ],
       "code_globs": [
         "src/release/**",
@@ -1022,8 +1022,8 @@
         "docs/catalog/FUNCTION_MANAGEMENT.md",
         "docs/development/HANDOFF_NEW_SESSION.md",
         "docs/development/NEXT_SESSION_PROMPT.md",
-        "GSV/docs/vision/manifest.json",
-        "GSV/docs/vision/extensions.json"
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json"
       ],
       "code_globs": [
         "crates/poolai-solana-adapter/**",
@@ -1074,19 +1074,19 @@
         "docs/catalog/FUNCTION_MANAGEMENT.md",
         "docs/development/HANDOFF_NEW_SESSION.md",
         "docs/development/NEXT_SESSION_PROMPT.md",
-        "GSV/docs/vision/manifest.json",
-        "GSV/docs/vision/extensions.json",
-        "GSV/docs/vision/README.md"
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json",
+        "docs/vision/README.md"
       ],
       "code_globs": [
-        "GSV/docs/vision/vision.js",
-        "GSV/docs/vision/vision.css",
-        "GSV/docs/vision/index.html",
+        "docs/vision/vision.js",
+        "docs/vision/vision.css",
+        "docs/vision/index.html",
         "src/bin/poolai_vision_sync.rs",
         ".cursor/hooks/**"
       ],
       "docs": [
-        "GSV/docs/vision/**",
+        "docs/vision/**",
         "docs/catalog/FUNCTION_MANAGEMENT.md",
         "docs/development/NEXT_SESSION_PROMPT.md"
       ],
@@ -1123,8 +1123,8 @@
         "docs/catalog/FUNCTION_MANAGEMENT.md",
         "docs/development/HANDOFF_NEW_SESSION.md",
         "docs/development/NEXT_SESSION_PROMPT.md",
-        "GSV/docs/vision/manifest.json",
-        "GSV/docs/vision/extensions.json"
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json"
       ],
       "code_globs": [
         "src/bin/poolai-worker.rs"
@@ -1147,8 +1147,8 @@
         "docs/catalog/FUNCTION_MANAGEMENT.md",
         "docs/development/HANDOFF_NEW_SESSION.md",
         "docs/development/NEXT_SESSION_PROMPT.md",
-        "GSV/docs/vision/manifest.json",
-        "GSV/docs/vision/extensions.json"
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json"
       ],
       "code_globs": [
         "src/bin/poolai-worker.rs",

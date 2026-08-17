@@ -324,19 +324,19 @@ Vision rev 490.
 | 46 | **PH-S110** | Grid result ingest lease_epoch CAS (code) | `src/grid/dispatch.rs`, Galaxy §4.3.1 | `GridResultBody.lease_epoch`; `check_grid_result_lease_epoch`; `409 lease_epoch_rejected`; unit tests | **✅** |
 | 47 | **PH-S111** | Job lease renew interval env (code) | `src/job/lease_config.rs`, §4.3.1 | `POOLAI_JOB_LEASE_RENEW_INTERVAL_SECS` optional override; unit tests | **✅** |
 | 48 | **PH-S112** | Grid Job envelope E2E smoke (e2e) | `e2e/`, PH-S108 | Playwright grid envelope Job → `leased` + lease fields | **✅** |
-| 49 | **PH-S113** | Vision L4/L5 workspace + lib layers (docs) | `GSV/docs/vision/`, manifest | `Cargo.toml` / `.cargo/config.toml` L5; `src/lib.rs` + crates L4; manifest nodes + edges | **✅** |
-| 50 | **PH-S114** | Vision map pan/zoom navigation (docs) | `GSV/docs/vision/vision.js` | wheel zoom, drag pan, +/- reset, dblclick focus node; map transform not browser zoom | **✅** |
-| 51 | **PH-S115** | Vision folder-colored edge routing (docs) | `GSV/docs/vision/vision.js` | orthogonal paths via folder hub; `edge-docs` / `edge-code` / `edge-toml` / `edge-mixed` | **✅** |
+| 49 | **PH-S113** | Vision L4/L5 workspace + lib layers (docs) | `docs/vision/`, manifest | `Cargo.toml` / `.cargo/config.toml` L5; `src/lib.rs` + crates L4; manifest nodes + edges | **✅** |
+| 50 | **PH-S114** | Vision map pan/zoom navigation (docs) | `docs/vision/vision.js` | wheel zoom, drag pan, +/- reset, dblclick focus node; map transform not browser zoom | **✅** |
+| 51 | **PH-S115** | Vision folder-colored edge routing (docs) | `docs/vision/vision.js` | orthogonal paths via folder hub; `edge-docs` / `edge-code` / `edge-toml` / `edge-mixed` | **✅** |
 | 52 | **PH-S116** | Worker periodic lease renew loop (code) | `src/bin/poolai-worker.rs`, PH-S111 | ticker from `JobLeaseConfig.lease_renew_interval_secs` while task active | **✅** |
 | 53 | **PH-S117** | Grid result lease_epoch E2E (e2e) | `e2e/`, PH-S110 | Playwright stale epoch → `409 lease_epoch_rejected` on grid Result | **✅** |
 | 54 | **PH-S118** | Jobs lease negative paths E2E (e2e) | `e2e/`, PH-S107 | renew w/o acquire 400; expired TTL 409; wrong owner 409; `POOLAI_JOB_LEASE_TTL_SECS=2` on e2e stand | **✅** |
 | 55 | **PH-S119** | Admin jobs lease column polish (code) | `src/ui/admin/jobs.rs` | `#epoch` display; owner/epoch/col tooltips; i18n EN/UK; Playwright PH-S96 extended | **✅** |
-| 56 | **PH-S120** | Solana adapter vision + digest crosslink (docs) | `GSV/docs/vision/`, DIGEST | manifest nodes/edges; DIGEST § Solana modules; FM-033 crosslink | **✅** |
+| 56 | **PH-S120** | Solana adapter vision + digest crosslink (docs) | `docs/vision/`, DIGEST | manifest nodes/edges; DIGEST § Solana modules; FM-033 crosslink | **✅** |
 | 57 | **PH-S121** | Galaxy §4.3 worker heartbeat wire note (docs) | `POOLAI_GALAXY_GRID.md` | §4.3.1.1 worker lease renew vs discovery heartbeat; env + payload + `LeaseRenewGuard` | **✅** |
 | 58 | **PH-S122** | OpenAPI jobs lease schemas audit (docs) | `docs/openapi.yaml`, gap audit | `lease_epoch` on grid result body + examples; gap audit 0 | **✅** |
 | 59 | **PH-S123** | Grid pricing E2E negative fallback (e2e) | `e2e/tests/grid_pricing.spec.ts` | force fallback env → snapshot stable quote | **✅** |
 | 60 | **PH-S124** | OTel lease span attrs docs (docs) | FM-038, HANDOFF | span attributes for acquire/renew/reject paths | **✅** |
-| 61 | **PH-S125** | Vision Galaxy map Eco + click perf (docs) | `GSV/docs/vision/` | Eco GPU mode; instant select (no full re-render); Layers/Types fullscreen dock; bottom toolbar layout | **✅** |
+| 61 | **PH-S125** | Vision Galaxy map Eco + click perf (docs) | `docs/vision/` | Eco GPU mode; instant select (no full re-render); Layers/Types fullscreen dock; bottom toolbar layout | **✅** |
 | 62 | **PH-S126** | OTel lease span instrumentation (code) | FM-038, `src/job/`, `src/observability/` | spans on acquire/renew/reject (`job.lease.*` attrs); `cargo test --features otel`; cross-link OPENTELEMETRY_TRACING | **✅** |
 | 63 | **PH-S127** | Pricing oracle Prometheus export (code) | Galaxy §4.2, `galaxy_pricing_oracle.rs`, FM-043 | export `galaxy_pricing_*_served` + `forced_fallback_total` on `GET /metrics`; unit test | **✅** |
 | 64 | **PH-S128** | Locality score scheduler stub (code) | Galaxy §5.1–5.2, `src/grid/` | `locality_score(worker, task)` pure fn + unit tests; no prefetch wire | **✅** |
@@ -398,8 +398,8 @@ Vision rev 490.
 | 120 | **PH-S185** | Galaxy cross region egress mb metrics stub (code) | Galaxy §5.3 | `galaxy_cross_region_egress_mb` gauge stub on rank/prefetch path; unit tests | **✅** |
 | 121 | **PH-S186** | Galaxy verification sample scheduled /metrics export (code) | PH-S164, Galaxy §6.2 | `galaxy_verification_sample_scheduled_total` on `GET /metrics`; unit tests | **✅** |
 | 122 | **PH-S187** | Galaxy settlement cleared total metrics stub (code) | PH-S170, Galaxy §6.4 | `galaxy_settlement_cleared_total` counter on grid result Cleared path; unit tests | **✅** |
-| 123 | **PH-S188** | Vision map filters UX (docs/vision) | `GSV/docs/vision/vision.js`, PH-S115 filters | незалежні layer/type toggle; **LAYERS**/**TYPES** select-all/none; decouple 3D stack ↔ chips; `vision.js` + README; rev++ | **✅** |
-| 124 | **PH-S189** | Vision Eco/FX/Ms hover trace (docs/vision) | PH-S188, `GSV/docs/vision/README.md` Eco/FX | tri-mode **Eco→FX→Ms**; hover 1-hop edge/node highlight; `localStorage`; rev++ | **✅** |
+| 123 | **PH-S188** | Vision map filters UX (docs/vision) | `docs/vision/vision.js`, PH-S115 filters | незалежні layer/type toggle; **LAYERS**/**TYPES** select-all/none; decouple 3D stack ↔ chips; `vision.js` + README; rev++ | **✅** |
+| 124 | **PH-S189** | Vision Eco/FX/Ms hover trace (docs/vision) | PH-S188, `docs/vision/README.md` Eco/FX | tri-mode **Eco→FX→Ms**; hover 1-hop edge/node highlight; `localStorage`; rev++ | **✅** |
 | 125 | **PH-S190** | Vision filter dropdowns + panel collapse (docs/vision) | PH-S188 filters, PH-S115 layout | Layers/Types **dropdown** menus; **−** collapse → title strip; grid auto-fill; `localStorage`; rev++ | **✅** |
 | 126 | **PH-S191** | Vision sprint queue panel (docs/vision) | FM §5.12, `poolai-vision-sync` | Rust parse FM §5.12 → `sprint_queue` panel; rev++ | **✅** |
 | 127 | **PH-S192** | Vision overview LOD + minimap (docs/vision) | PH-S115 map zoom | `map-overview` при low zoom; hub-only labels; viewport inset minimap; rev++ | **✅** |
@@ -479,7 +479,7 @@ Vision rev 490.
 | 201 | **PH-S266** | i18n_core.js near-empty gate + loc-audit (ops) | PH-S265 | STRINGS core **0** inline keys; `rust_ratio.json` refresh | **✅** |
 | 202 | **PH-S267** | Docs canon sync band (docs) | PH-S266 | INDEX/HANDOFF/NEXT/STABLE_STATE sync | **✅** |
 | 203 | **PH-S268** | Galaxy prefetch wire horizon doc (docs) | GALAXY §5.5 | roadmap pointer; metrics ✅; live prefetch 94.67% | **✅** |
-| 204 | **PH-S269** | Vision feed.json refresh (docs/vision) | PH-S200 | `GSV/docs/vision/feed.json` sprint zriz | **✅** |
+| 204 | **PH-S269** | Vision feed.json refresh (docs/vision) | PH-S200 | `docs/vision/feed.json` sprint zriz | **✅** |
 | 205 | **PH-S270** | poolai-vision-sync drift gate (ops) | PH-S205 | `--check` green after FM/HANDOFF | **✅** |
 | 206 | **PH-S271** | Rust ratio hold advisory refresh (ops) | PH-S266 | `--min-ratio 0.95` advisory snapshot **94.34%** | **✅** |
 | 207 | **PH-S272** | Docs INDEX sprint zriz (docs) | PH-S267 | INDEX step 8 + §7 ratio pointer | **✅** |
@@ -1227,7 +1227,7 @@ Vision rev 490.
 | 949 | **PH-S1014** | Runtime state snapshot persist | `data/dev/last_run.json` | save on stop; restore on quick; unit test | **✅** |
 | 950 | **PH-S1015** | PoolAI admin power panel UI | `src/ui/admin` | toolbar modal Виключити/Перезавантажити | **✅** |
 | 951 | **PH-S1016** | PoolAI power ops wire | `POST /api/v1/ops/power` | shutdown/reboot dev-safe; integration test | **✅** |
-| 952 | **PH-S1017** | Vision poweroff/reset controls | `GSV/docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
+| 952 | **PH-S1017** | Vision poweroff/reset controls | `docs/vision/index.html` | power menu; localStorage; soft/hard reload | **✅** |
 | 953 | **PH-S1018** | Ops power band close | tests/docs band 37 | `galaxy_horizon_s1011_integration`; RUN_LOCAL sync | **✅** |
 
 **Відкритих у §5.12:** **0** (band 106 PH-S1699…S1708 ✅). **Master horizon:** PH-S1709…S1718 (band 107). **Completion pending:** PH-S1679…S2278 = **580** · [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md). Vision rev **487**. **Наступна сесія:** **`абракадабра`** — project scan → band 107 (PH-S1709…S1718).
@@ -1327,13 +1327,13 @@ port у Rust (boxes/vision + `gsv-vision-sync` bin) + thin ratio-safe UI пан�
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
 | 1664 | **PH-S1729** | Vision box scaffold | GSV_MIGRATION.md | `GSV/src/boxes/vision.rs` (serde manifest/feed + sync) + `boxes/mod.rs` + Cargo `[[bin]]` | **[x]** |
-| 1665 | **PH-S1730** | Vision manifest wire | GSV_MIGRATION.md | read `GSV/docs/vision/manifest.json` → `GSV/data/gsv_manifest.json`; `GET /api/vision/manifest` | **[x]** |
-| 1666 | **PH-S1731** | Vision feed wire | GSV_MIGRATION.md | read `GSV/docs/vision/feed.json` → `GSV/data/gsv_feed.json`; `GET /api/vision/feed` | **[x]** |
+| 1665 | **PH-S1730** | Vision manifest wire | GSV_MIGRATION.md | read `docs/vision/manifest.json` → `GSV/data/gsv_manifest.json`; `GET /api/vision/manifest` | **[x]** |
+| 1666 | **PH-S1731** | Vision feed wire | GSV_MIGRATION.md | read `docs/vision/feed.json` → `GSV/data/gsv_feed.json`; `GET /api/vision/feed` | **[x]** |
 | 1667 | **PH-S1732** | `gsv-vision-sync` bin | poolai-vision-sync | `GSV/src/bin/gsv_vision_sync.rs`; `--check` drift gate; revision/git_head summary | **[x]** |
 | 1668 | **PH-S1733** | Vision UI panels | GSV_BOXES | `ui/index.html` Vision card (summary + feed ticker); ratio ≥95% | **[x]** |
 | 1669 | **PH-S1734** | Vision contracts | Rust-first (API → tests) | `tests/gsv_vision_contracts.rs` (7) | **[x]** |
 | 1670 | **PH-S1735** | GSV vision docs canon | session canon | `GSV/docs/VISION.md`; `GSV_MIGRATION.md` ✅ rows; MEMORY mark | **[x]** |
-| 1671 | **PH-S1736** | poolAI vision parity | docs canon | `GSV/docs/vision/README.md` GSV note; cross-check vs `poolai-vision-sync --check` | **[x]** |
+| 1671 | **PH-S1736** | poolAI vision parity | docs canon | `docs/vision/README.md` GSV note; cross-check vs `poolai-vision-sync --check` | **[x]** |
 | 1672 | **PH-S1737** | Ratio hold advisory | GSV_ROLES | `gsv-loc-audit --min-ratio 0.95 --advisory` (95.45% ✅) + poolAI ratio96 advisory hold | **[x]** |
 | 1673 | **PH-S1738** | Band close | GSV_ROLES | ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync rev **459**; push | **[x]** |
 
@@ -1363,7 +1363,7 @@ vision-sync rev **459**.
 | 1677 | **PH-S1742** | Vision map contracts | Rust-first (API → tests) | `tests/gsv_vision_contracts.rs` map/svg/feed-filter | **✅** |
 | 1678 | **PH-S1743** | Feed status filter | GSV_BOXES | `GET /api/vision/feed?status=closed` | **✅** |
 | 1679 | **PH-S1744** | GSV vision docs canon | session canon | `VISION.md` map; `GSV_MIGRATION.md` rows ✅; MEMORY band 110 | **✅** |
-| 1680 | **PH-S1745** | poolAI vision parity | docs canon | `GSV/docs/vision/README.md` band 110; `GSV_TECH_ROADMAP.md` band 110 | **✅** |
+| 1680 | **PH-S1745** | poolAI vision parity | docs canon | `docs/vision/README.md` band 110; `GSV_TECH_ROADMAP.md` band 110 | **✅** |
 | 1681 | **PH-S1746** | Ratio hold advisory | GSV_ROLES | `gsv-loc-audit --min-ratio 0.95 --advisory` + poolAI ratio96 advisory | **✅** |
 | 1682 | **PH-S1747** | vision-sync close | ops | `gsv-vision-sync` refresh + `poolai-vision-sync` rev **461** | **✅** |
 Vision rev 488.
@@ -1384,7 +1384,7 @@ Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](
 | 1688 | **PH-S1753** | Sprint Map UI card | GSV_BOXES | `ui/index.html` Sprint Map (modules/kinds/links) | **✅** |
 | 1689 | **PH-S1754** | Doc Preview UI card | GSV_BOXES | `ui/index.html` Doc Preview (node id input + out/in links + sections) | **✅** |
 | 1690 | **PH-S1755** | GSV vision docs canon | session canon | `VISION.md` sprint-map/doc-preview; MEMORY band 111; HANDOFF/NEXT band 111 | **✅** |
-| 1691 | **PH-S1756** | poolAI vision parity | docs canon | `GSV_MIGRATION.md` row 21 ✅; `GSV/docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 111 | **✅** |
+| 1691 | **PH-S1756** | poolAI vision parity | docs canon | `GSV_MIGRATION.md` row 21 ✅; `docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 111 | **✅** |
 | 1692 | **PH-S1757** | Ratio hold advisory | GSV_ROLES | `gsv-loc-audit --min-ratio 0.95 --advisory` + poolAI ratio96 advisory | **✅** |
 Vision rev 488.
 | 1693 | **PH-S1758** | Band close | GSV_ROLES | ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync; push | **✅** |
@@ -1404,7 +1404,7 @@ Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](
 | 1698 | **PH-S1763** | Sprint-queue contracts | Rust-first (API → tests) | sync endpoint (ok + empty drift) + sprint-queue endpoint (active == next + planned includes active) + real-workspace report | **✅** |
 | 1699 | **PH-S1764** | Vision Sync + Sprint Queue UI cards | GSV_BOXES | `ui/index.html` Resync button + drift status; next/active/open + planned details | **✅** |
 | 1700 | **PH-S1765** | GSV vision docs canon | session canon | `VISION.md` sync/extensions/sprint-queue; MEMORY band 112; HANDOFF/NEXT band 112 | **✅** |
-| 1701 | **PH-S1766** | poolAI vision parity | docs canon | `GSV_MIGRATION.md` rows ✅; `GSV/docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 112 | **✅** |
+| 1701 | **PH-S1766** | poolAI vision parity | docs canon | `GSV_MIGRATION.md` rows ✅; `docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 112 | **✅** |
 | 1702 | **PH-S1767** | Ratio hold advisory | GSV_ROLES | `gsv-loc-audit --min-ratio 0.95 --advisory` (95.56%) + poolAI ratio96 advisory | **✅** |
 Vision rev 488.
 | 1703 | **PH-S1768** | Band close | GSV_ROLES | ratio hold (≥95%); fmt/clippy/test (118); docs canon; vision-sync; push | **✅** |
@@ -1424,7 +1424,7 @@ Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](
 | 1707 | **PH-S1772** | Inline SVG map card | GSV_BOXES | Vision Map card embeds `assets/vision.svg` inline + chips/kinds | `[x]` |
 | 1708 | **PH-S1773** | Layer filter + search UX | GSV_BOXES | clickable layer chips (active filter) + node-search input + results → doc-preview deep-link | `[x]` |
 | 1709 | **PH-S1774** | GSV vision docs canon | session canon | `VISION.md` node-search/map UX; MEMORY band 113; HANDOFF/NEXT band 113 | `[x]` |
-| 1710 | **PH-S1775** | poolAI vision parity | docs canon | `GSV_MIGRATION.md` rows ✅; `GSV/docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 113 | `[x]` |
+| 1710 | **PH-S1775** | poolAI vision parity | docs canon | `GSV_MIGRATION.md` rows ✅; `docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 113 | `[x]` |
 | 1711 | **PH-S1776** | Ratio hold advisory | GSV_ROLES | `gsv-loc-audit --min-ratio 0.95 --advisory` (≥95%) + poolAI ratio96 advisory hold | `[x]` |
 | 1712 | **PH-S1777** | vision-sync close | vision | `gsv-vision-sync` refresh + poolAI vision rev++ | `[x]` |
 Vision rev 488.
@@ -1446,7 +1446,7 @@ Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](
 | 1719 | **PH-S1784** | Sprint Board UI card | GSV_BOXES | board columns open/closed/planned + progress bar + counts у `ui/index.html` | `[x]` |
 | 1720 | **PH-S1785** | Progress UI | GSV_BOXES | per-layer chips + pct + next/active focus card у `ui/index.html` | `[x]` |
 | 1721 | **PH-S1786** | GSV vision docs canon | session canon | `VISION.md` sprint-board/progress; MEMORY band 114; HANDOFF/NEXT band 114 | `[x]` |
-| 1722 | **PH-S1787** | poolAI vision parity | docs canon | `GSV_MIGRATION.md` rows ✅; `GSV/docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 114 | `[x]` |
+| 1722 | **PH-S1787** | poolAI vision parity | docs canon | `GSV_MIGRATION.md` rows ✅; `docs/vision/README.md`; `GSV_TECH_ROADMAP.md` band 114 | `[x]` |
 | 1723 | **PH-S1788** | Band close | GSV_ROLES | ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync rev 467; push | `[x]` |
 
 **PH-S1788 ✅ (2026-08-05):** `SprintBoardReport`/`sprint_board_report`/`wire_sprint_board`
@@ -1458,28 +1458,28 @@ server contracts **21** (загалом **140**); GSV ratio **95.02%** gate ✅;
 
 ### 5.96 GSV migration completion — legacy vision supersession queue — band 115 (PH-S1789…S1798, 2026-08-05) · **✅**
 
-**Джерело:** власник (GSV migration completion — ratio-safe: supersede legacy `GSV/docs/vision/{index.html,vision.js,vision.css}`
+**Джерело:** власник (GSV migration completion — ratio-safe: supersede legacy `docs/vision/{index.html,vision.js,vision.css}`
 Galaxy app panels; canon Rust 95–100%, без переносу legacy JS). Base: `GET /api/vision/*` bands 109–114 +
-`GSV/docs/vision/speed_index.json`/`rust_diagnostics.json`. Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) ·
+`docs/vision/speed_index.json`/`rust_diagnostics.json`. Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) ·
 [`GSV_MIGRATION.md`](../../GSV/docs/gsv/GSV_MIGRATION.md).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
-| 1724 | **PH-S1789** | Legacy parity audit | docs canon | Inventory legacy `GSV/docs/vision/{index.html,vision.js,vision.css}` panels (Layers/Queue/Map/Speeds/Rust/Links/Preview + header/Explorer/Power chrome) → map each → GSV endpoint+card / superseded / out-of-scope; `GSV/docs/LEGACY_PARITY.md` | **[x]** |
+| 1724 | **PH-S1789** | Legacy parity audit | docs canon | Inventory legacy `docs/vision/{index.html,vision.js,vision.css}` panels (Layers/Queue/Map/Speeds/Rust/Links/Preview + header/Explorer/Power chrome) → map each → GSV endpoint+card / superseded / out-of-scope; `GSV/docs/LEGACY_PARITY.md` | **[x]** |
 | 1725 | **PH-S1790** | Speeds wire | GSV_BOXES | `SpeedIndexReport`/`speed_index_report`/`wire_speed_index` → `GET /api/vision/speeds` (latest test_ci wall/ok + bench median + history counts; mirror `gsv_speed_index.json`) | **[x]** |
 | 1726 | **PH-S1791** | Rust diagnostics wire | GSV_BOXES | `RustDiagnosticsReport`/`rust_diagnostics_report`/`wire_rust_diagnostics` → `GET /api/vision/rust-diagnostics` (latest warnings/errors/ok + top_codes; mirror `gsv_rust_diagnostics.json`) | **[x]** |
 | 1727 | **PH-S1792** | Contracts | Rust-first (API → tests) | `tests/gsv_vision_contracts.rs` + `gsv_server_contracts.rs` (speeds + rust-diagnostics ok/shape/empty-tolerant, mirror round-trip) | **[x]** |
 | 1728 | **PH-S1793** | Speeds + Rust cards | GSV_BOXES | compact Speed Index + Rust Diagnostics cards у `ui/index.html` (mirror legacy panels; empty-state hints) | **[x]** |
 | 1729 | **PH-S1794** | GSV_MIGRATION rows | docs canon | `GSV_MIGRATION.md` vision.js/css row → ✅ superseded (ratio-safe canon Rust, legacy JS не переносимо); `poolai-ui-wasm` row defer; roadmap band 115 | **[x]** |
 | 1730 | **PH-S1795** | GSV vision docs canon | session canon | `VISION.md` speeds/rust-diagnostics API + LEGACY_PARITY + band 115 section; MEMORY band 115; HANDOFF/NEXT band 115 | **[x]** |
-| 1731 | **PH-S1796** | poolAI vision parity | docs canon | `GSV/docs/vision/README.md`; FM §5.12 §5.96; `GSV_TECH_ROADMAP.md` band 115; poolAI HANDOFF/NEXT band 115 | **[x]** |
+| 1731 | **PH-S1796** | poolAI vision parity | docs canon | `docs/vision/README.md`; FM §5.12 §5.96; `GSV_TECH_ROADMAP.md` band 115; poolAI HANDOFF/NEXT band 115 | **[x]** |
 | 1732 | **PH-S1797** | Ratio hold advisory | gsv-loc-audit | `gsv-loc-audit --min-ratio 0.95 --advisory` (≥95%) | **[x]** |
 Vision rev 488.
 | 1733 | **PH-S1798** | Band close | GSV_ROLES | ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync rev 468; push | **[x]** |
 
 ### 5.97 GSV history charts queue — band 116 (PH-S1799…S1808, 2026-08-07) · **✅**
 
-**Джерело:** master backlog band 116 (GSV history charts — speed-index history UI + rust-diagnostics history chart) — GSV Speeds/Rust supersession (bands 109–115) + live artifacts `GSV/docs/vision/{speed_index,rust_diagnostics}.json` (history arrays). Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../../GSV/docs/gsv/GSV_MIGRATION.md). Rust-first: charts = Rust-rendered SVG (ratio-safe 95–100%, no UI JS).
+**Джерело:** master backlog band 116 (GSV history charts — speed-index history UI + rust-diagnostics history chart) — GSV Speeds/Rust supersession (bands 109–115) + live artifacts `docs/vision/{speed_index,rust_diagnostics}.json` (history arrays). Canon: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV_MIGRATION.md`](../../GSV/docs/gsv/GSV_MIGRATION.md). Rust-first: charts = Rust-rendered SVG (ratio-safe 95–100%, no UI JS).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
@@ -1491,31 +1491,31 @@ Vision rev 488.
 | 1739 | **PH-S1804** | Rust history chart UI | GSV_BOXES | `/api/vision/rust-diagnostics.svg` (Rust-rendered SVG: warnings orange + errors red grouped bars, command footer) + card `<img>` | **[x]** |
 | 1740 | **PH-S1805** | Stand smoke + wasm defer | GSV_ROLES | Stand smoke notes; `poolai-ui-wasm` defer row у `GSV_MIGRATION.md` + roadmap | **[x]** |
 | 1741 | **PH-S1806** | GSV vision docs canon | session canon | `VISION.md` speeds.svg/rust-diagnostics.svg + history API + band 116 section; MEMORY band 116; HANDOFF/NEXT band 116 | **[x]** |
-| 1742 | **PH-S1807** | poolAI vision parity | docs canon | `GSV/docs/vision/README.md`; FM §5.12 §5.97; `GSV_TECH_ROADMAP.md` band 116; poolAI HANDOFF/NEXT band 116 | **[x]** |
+| 1742 | **PH-S1807** | poolAI vision parity | docs canon | `docs/vision/README.md`; FM §5.12 §5.97; `GSV_TECH_ROADMAP.md` band 116; poolAI HANDOFF/NEXT band 116 | **[x]** |
 Vision rev 488.
 | 1743 | **PH-S1808** | Band close | GSV_ROLES | ratio hold (≥95%); fmt/clippy/test; docs canon; vision-sync rev 469; push | **[x]** |
 
 ### 5.98 GSV legacy vision deactivation queue — band 117 (PH-S1809…S1818, 2026-08-07) · **✅**
 
-**Джерело:** GSV supersession close (bands 115–116) — legacy `GSV/docs/vision/index.html` + `vision.js`/`vision.css` superseded; stand smoke passed (band 116); legacy assets деактивуються (**не видаляємо** — `GSV/docs/vision/` лишається канон-джерелом до завершення GSV). Canon: [`GSV/docs/LEGACY_PARITY.md`](../../GSV/docs/LEGACY_PARITY.md) · [`GSV_MIGRATION.md`](../../GSV/docs/gsv/GSV_MIGRATION.md). Rust-first: UI переходить на GSV (`gsv-server` + `GET /api/vision*`); перенесення legacy JS/CSS у `GSV/ui/` знищило б ratio canon.
+**Джерело:** GSV supersession close (bands 115–116) — legacy `docs/vision/index.html` + `vision.js`/`vision.css` superseded; stand smoke passed (band 116); legacy assets деактивуються (**не видаляємо** — `docs/vision/` лишається канон-джерелом до завершення GSV). Canon: [`GSV/docs/LEGACY_PARITY.md`](../../GSV/docs/LEGACY_PARITY.md) · [`GSV_MIGRATION.md`](../../GSV/docs/gsv/GSV_MIGRATION.md). Rust-first: UI переходить на GSV (`gsv-server` + `GET /api/vision*`); перенесення legacy JS/CSS у `GSV/ui/` знищило б ratio canon.
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
 | 1744 | **PH-S1809** | Scope + queue | docs canon | Define band 117 (legacy vision deactivation) у FM §5.98 + §5.12 header (master horizon) | **[x]** |
-| 1745 | **PH-S1810** | Legacy index deactivation | docs canon | Rewrite `GSV/docs/vision/index.html` → minimal GSV pointer page (no `vision.js`/`vision.css` refs; canonical GSV links) | **[x]** |
-| 1746 | **PH-S1811** | Legacy JS/CSS deactivation | docs canon | DEACTIVATED banner у `GSV/docs/vision/vision.js` + `vision.css`; deactivation note у `GSV/docs/vision/README.md` (files лишаються — canon) | **[x]** |
-| 1747 | **PH-S1812** | Live link retarget | docs canon | `poolai-vision-sync` feed links (`GSV/docs/vision/index.html#sprint-queue`) → GSV; GSV `vision.rs` sample links; RUN_LOCAL/GSV_SERVER/gsv README/SPEED_INDEX/RUST_DIAGNOSTICS links → GSV | **[x]** |
+| 1745 | **PH-S1810** | Legacy index deactivation | docs canon | Rewrite `docs/vision/index.html` → minimal GSV pointer page (no `vision.js`/`vision.css` refs; canonical GSV links) | **[x]** |
+| 1746 | **PH-S1811** | Legacy JS/CSS deactivation | docs canon | DEACTIVATED banner у `docs/vision/vision.js` + `vision.css`; deactivation note у `docs/vision/README.md` (files лишаються — canon) | **[x]** |
+| 1747 | **PH-S1812** | Live link retarget | docs canon | `poolai-vision-sync` feed links (`docs/vision/index.html#sprint-queue`) → GSV; GSV `vision.rs` sample links; RUN_LOCAL/GSV_SERVER/gsv README/SPEED_INDEX/RUST_DIAGNOSTICS links → GSV | **[x]** |
 | 1748 | **PH-S1813** | Legacy test retirement | Rust-first (API → tests) | Update legacy-content tests: `poolai_vision_sync.rs` unit ×4 + `galaxy_horizon_s1011/s1019/s1039` → assert deactivated pointer state | **[x]** |
 | 1749 | **PH-S1814** | GSV parity docs | session canon | `LEGACY_PARITY.md` band 117 (index/JS/CSS deactivated); `GSV_MIGRATION.md` vision.js/css row +band 117 | **[x]** |
 | 1750 | **PH-S1815** | GSV vision docs canon | session canon | `VISION.md` +band 117; MEMORY band 117; GSV HANDOFF/NEXT band 117 | **[x]** |
-| 1751 | **PH-S1816** | poolAI vision parity | docs canon | `GSV/docs/vision/README.md`; FM §5.12 §5.98; `GSV_TECH_ROADMAP.md` band 117; poolAI HANDOFF/NEXT band 117 | **[x]** |
+| 1751 | **PH-S1816** | poolAI vision parity | docs canon | `docs/vision/README.md`; FM §5.12 §5.98; `GSV_TECH_ROADMAP.md` band 117; poolAI HANDOFF/NEXT band 117 | **[x]** |
 | 1752 | **PH-S1817** | Ratio hold advisory | GSV_ROLES | `gsv-loc-audit --min-ratio 0.95 --advisory` ≥95% + poolAI ratio96 advisory hold; vision-sync rev 470 (poolai + gsv + --check) | **[x]** |
 Vision rev 488.
 | 1753 | **PH-S1818** | Band close | GSV_ROLES | ratio hold; fmt/clippy/test (poolAI test-ci + GSV 153+); docs canon; vision-sync rev 470; push | **[x]** |
 
 ### 5.99 GSV sprint UI migration queue — band 118 (PH-S1819…S1828, 2026-08-08) · **✅**
 
-**Джерело:** owner priority (master horizon band 118): migrate legacy Galaxy sprint UI colors + behavior into GSV, recreated in Rust — sprint theme wire (colors), Rust-rendered sprint focus SVG, sprint-pill/queue-state colors. Legacy sprint UI: [`GSV/docs/vision/vision.css`](../../GSV/docs/vision/vision.css) (lines 40, 430–450, 2088–2275) · [`GSV/docs/vision/vision.js`](../../GSV/docs/vision/vision.js) (lines ~84, 659–676, 2131–2170). GSV: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV/docs/LEGACY_PARITY.md`](../../GSV/docs/LEGACY_PARITY.md). Cursor rules migration (legacy `.md` → `.mdc`) **deferred** to a later band.
+**Джерело:** owner priority (master horizon band 118): migrate legacy Galaxy sprint UI colors + behavior into GSV, recreated in Rust — sprint theme wire (colors), Rust-rendered sprint focus SVG, sprint-pill/queue-state colors. Legacy sprint UI: [`docs/vision/vision.css`](../../docs/vision/vision.css) (lines 40, 430–450, 2088–2275) · [`docs/vision/vision.js`](../../docs/vision/vision.js) (lines ~84, 659–676, 2131–2170). GSV: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV/docs/LEGACY_PARITY.md`](../../GSV/docs/LEGACY_PARITY.md). Cursor rules migration (legacy `.md` → `.mdc`) **deferred** to a later band.
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
@@ -1525,7 +1525,7 @@ Vision rev 488.
 | 1757 | **PH-S1822** | Contracts | GSV tests | `gsv_vision_contracts` (theme colors + focus svg real-workspace) + `gsv_server_contracts` (theme + focus endpoints) | **[x]** |
 | 1758 | **PH-S1823** | UI sprint colors | GSV canon | `GSV/ui/index.html`: sprint-pill + queue open/next/closed colors (theme wire) + focus `<img>` in Sprint cards | **[x]** |
 | 1759 | **PH-S1824** | GSV docs canon | GSV canon | `VISION.md` +band 118 (theme + focus endpoints); MEMORY band 118; GSV HANDOFF/NEXT band 118 | **[x]** |
-| 1760 | **PH-S1825** | poolAI vision parity | docs canon | `GSV/docs/vision/README.md`; FM §5.12 §5.99; `GSV_TECH_ROADMAP.md` band 118 | **[x]** |
+| 1760 | **PH-S1825** | poolAI vision parity | docs canon | `docs/vision/README.md`; FM §5.12 §5.99; `GSV_TECH_ROADMAP.md` band 118 | **[x]** |
 | 1761 | **PH-S1826** | Ratio hold advisory | GSV_ROLES | `gsv-loc-audit --min-ratio 0.95 --advisory` ≥95% + poolAI ratio96 advisory hold | **[x]** |
 | 1762 | **PH-S1827** | poolai-vision-sync close | docs canon | `poolai-vision-sync` rev **471** (band 118); `--check` ok; sprint-queue/feed updated | **[x]** |
 Vision rev 488.
@@ -1533,7 +1533,7 @@ Vision rev 488.
 
 ### 5.100 GSV Galaxy UI full parity queue — band 119 (PH-S1829…S1838, 2026-08-08) · **✅**
 
-**Джерело:** owner priority (master horizon band 119): Galaxy UI full parity — colors + box behaviors. Повний legacy `:root` palette wire, Rust-rendered starfield/galaxy backdrop SVG, header chrome (RSS ticker, GPU mode cycle, power menu), panel dock + Esc-fullscreen. Legacy: [`GSV/docs/vision/vision.css`](../../GSV/docs/vision/vision.css) `:root` + header/starfield chrome · [`GSV/docs/vision/vision.js`](../../GSV/docs/vision/vision.js). GSV: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV/docs/LEGACY_PARITY.md`](../../GSV/docs/LEGACY_PARITY.md).
+**Джерело:** owner priority (master horizon band 119): Galaxy UI full parity — colors + box behaviors. Повний legacy `:root` palette wire, Rust-rendered starfield/galaxy backdrop SVG, header chrome (RSS ticker, GPU mode cycle, power menu), panel dock + Esc-fullscreen. Legacy: [`docs/vision/vision.css`](../../docs/vision/vision.css) `:root` + header/starfield chrome · [`docs/vision/vision.js`](../../docs/vision/vision.js). GSV: [`GSV/docs/VISION.md`](../../GSV/docs/VISION.md) · [`GSV/docs/LEGACY_PARITY.md`](../../GSV/docs/LEGACY_PARITY.md).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
@@ -1669,7 +1669,7 @@ Vision rev 488.
 | 1835 | **PH-S1903** | GSV docs canon | session canon | `GSV/docs/gsv/GSV_SERVER.md` + `GSV/docs/gsv/GSV_BOXES.md` + README: stand smoke row + usage; `GSV/docs/gsv/GSV_TECH_ROADMAP.md` band 126 | **[x]** |
 | 1836 | **PH-S1904** | Ratio hold + tests | GSV_ROLES | `gsv-loc-audit --stretch-96` green **≥96%**; full GSV tests green; clippy 0 | **[x]** |
 | 1837 | **PH-S1905** | GSV vision docs canon | session canon | `VISION.md` +band 126 (stand smoke); MEMORY band 126; GSV HANDOFF/NEXT band 126 | **[x]** |
-| 1838 | **PH-S1906** | poolAI vision parity | docs canon | FM §5.12 §5.107; `GSV/docs/vision/README.md`; poolAI HANDOFF/NEXT band 126 | **[x]** |
+| 1838 | **PH-S1906** | poolAI vision parity | docs canon | FM §5.12 §5.107; `docs/vision/README.md`; poolAI HANDOFF/NEXT band 126 | **[x]** |
 | 1839 | **PH-S1907** | vision-sync close | docs canon | `poolai-vision-sync` rev bump (band 126); `--check` ok | **[x]** |
 | 1840 | **PH-S1908** | Band close | GSV_ROLES | ratio **≥96%**; fmt/clippy/test; docs canon; vision-sync rev bump; push | **[x]** |
 
@@ -1981,7 +1981,7 @@ Vision rev 488.
 
 ### 5.69 Policies vision sync queue — band 88 (PH-S1519…S1528, 2026-07-27) · **✅**
 
-**Джерело:** project completion / enterprise phase D — Policies vision-sync (`GSV/docs/vision/*` + [`POLICIES_DOCS_CANON.md`](../development/POLICIES_DOCS_CANON.md)). Mirror band 78 [`AUDIT_VISION_SYNC.md`](../development/AUDIT_VISION_SYNC.md). Prior docs-canon: [`POLICIES_DOCS_CANON.md`](../development/POLICIES_DOCS_CANON.md) (band 87). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · master [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md).
+**Джерело:** project completion / enterprise phase D — Policies vision-sync (`docs/vision/*` + [`POLICIES_DOCS_CANON.md`](../development/POLICIES_DOCS_CANON.md)). Mirror band 78 [`AUDIT_VISION_SYNC.md`](../development/AUDIT_VISION_SYNC.md). Prior docs-canon: [`POLICIES_DOCS_CANON.md`](../development/POLICIES_DOCS_CANON.md) (band 87). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · master [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
@@ -2177,7 +2177,7 @@ Vision rev 488.
 
 ### 5.59 Audit vision sync queue — band 78 (PH-S1419…S1428, 2026-07-24) · **✅**
 
-**Джерело:** project completion / enterprise phase C — Audit vision-sync (`GSV/docs/vision/*` + [`AUDIT_DOCS_CANON.md`](../development/AUDIT_DOCS_CANON.md)). Mirror band 68 [`SSO_VISION_SYNC.md`](../development/SSO_VISION_SYNC.md). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · master [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md).
+**Джерело:** project completion / enterprise phase C — Audit vision-sync (`docs/vision/*` + [`AUDIT_DOCS_CANON.md`](../development/AUDIT_DOCS_CANON.md)). Mirror band 68 [`SSO_VISION_SYNC.md`](../development/SSO_VISION_SYNC.md). Plan: [`PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md`](../development/PH_S_PROJECT_COMPLETION_ROADMAP_2026-07-22.md) · master [`PH_S_MASTER_BACKLOG_1000.md`](../development/PH_S_MASTER_BACKLOG_1000.md).
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
@@ -2537,7 +2537,7 @@ Vision rev 488.
 
 ### 5.39 Tenant vision sync queue — band 58 (PH-S1219…S1228, 2026-07-21)
 
-**Джерело:** FM-horizon v2 / enterprise phase A — aggregate `GSV/docs/vision/*` + `TENANT_DOCS_CANON.md` + verify/loc-audit.
+**Джерело:** FM-horizon v2 / enterprise phase A — aggregate `docs/vision/*` + `TENANT_DOCS_CANON.md` + verify/loc-audit.
 
 | # | Sprint | Фокус | Джерело | Acceptance | Status |
 |---|--------|--------|---------|------------|--------|
@@ -2807,8 +2807,8 @@ Vision rev 488.
 | 993 | **PH-S1058** | E2E visual/axe band close | tests/docs | `galaxy_horizon_s1049_integration`; HANDOFF/NEXT | **✅** |
 Vision rev 488.
 
-| 974 | **PH-S1039** | Skip links + landmarks | `GSV/docs/vision/index.html` | skip to map/queue/preview; `role="main"` | **✅** |
-| 975 | **PH-S1040** | Icon control aria-label parity | `GSV/docs/vision/` | header/map/panel icon buttons labeled; `aria-pressed` toggles | **✅** |
+| 974 | **PH-S1039** | Skip links + landmarks | `docs/vision/index.html` | skip to map/queue/preview; `role="main"` | **✅** |
+| 975 | **PH-S1040** | Icon control aria-label parity | `docs/vision/` | header/map/panel icon buttons labeled; `aria-pressed` toggles | **✅** |
 | 976 | **PH-S1041** | Explorer tree keyboard | `vision.js` file-tree | `role="tree"` / `treeitem`; Arrow/Home/End nav | **✅** |
 | 977 | **PH-S1042** | Link graph neighbour a11y | `#link-graph` | focusable neighbours; Enter select; focus restore | **✅** |
 | 978 | **PH-S1043** | Map sprint-dim incremental | `vision.js` | `updateMapSprintDim` without full `renderMap` | **✅** |
@@ -2902,7 +2902,7 @@ Vision rev 488.
 
 **Джерело:** project scan band 39 — FM-019 baseline adoption gaps (empty states, table aria-label, form `aria-required`).
 
-| 954 | **PH-S1019** | Vision power menu polish | `GSV/docs/vision/` | dropdown shutdown/reboot; localStorage; a11y keyboard | **✅** |
+| 954 | **PH-S1019** | Vision power menu polish | `docs/vision/` | dropdown shutdown/reboot; localStorage; a11y keyboard | **✅** |
 Vision rev 488.
 | 955 | **PH-S1020** | Admin power modal polish | `src/ui/admin` | showModal parity; labeled Power btn; i18n UA/EN | **✅** |
 | 956 | **PH-S1021** | Home UI power shortcut | `src/ui/` | `/ui` shell power entry → same ops API | **✅** |

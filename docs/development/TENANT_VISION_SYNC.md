@@ -4,7 +4,7 @@ Canonical doc: [`TENANT_VISION_SYNC.md`](./TENANT_VISION_SYNC.md) (band 58, PH-S
 
 ## Overview
 
-Band 58 consolidates tenant phase-A canon with **`GSV/docs/vision/*`** under one vision-sync
+Band 58 consolidates tenant phase-A canon with **`docs/vision/*`** under one vision-sync
 gate (`--tenant-vision-sync` / `VERIFY_TENANT_VISION_SYNC`). Prior docs-canon remains
 [`TENANT_DOCS_CANON.md`](./TENANT_DOCS_CANON.md); this band proves vision artifacts stay
 aligned with the enterprise tenant journal.
@@ -12,7 +12,7 @@ aligned with the enterprise tenant journal.
 | Surface | Where | Notes |
 |---------|-------|-------|
 | Depth module | `tenant_vision_sync_depth.rs` | enum + criteria + `TENANT_VISION_SYNC_SLICES` |
-| Slice artifacts | `GSV/docs/vision/` + `TENANT_DOCS_CANON.md` | `manifest.json` · `extensions.json` · `README.md` · `vision.svg` · `index.html` · prior canon |
+| Slice artifacts | `docs/vision/` + `TENANT_DOCS_CANON.md` | `manifest.json` · `extensions.json` · `README.md` · `vision.svg` · `index.html` · prior canon |
 | Aggregate | `--tenant-vision-sync` | `tenant_vision_sync_*` fields in `rust_ratio.json` |
 | Verify / quick | `VERIFY_TENANT_VISION_SYNC` / `--tenant-vision-sync` | vision-sync gate only |
 | Contracts | `tenant_vision_sync_integration` | slice presence + criteria totals |

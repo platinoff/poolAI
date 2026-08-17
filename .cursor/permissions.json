@@ -4,7 +4,7 @@
       "Allow MSYS2 bash invocations under C:\\msys64\\usr\\bin\\bash.exe for PoolAI git, cargo, and bin/ scripts (Windows VDT often needs unsandboxed shell via classifier).",
       "Allow cargo fmt, cargo test-ci, cargo test-raft-ci, cargo check, and cargo run --bin poolai-vision-sync / poolai-openapi-gap-audit / poolai-loc-audit / poolai-speed-index / poolai-rust-diagnostics in this workspace.",
       "Allow git fetch, git status, git diff, git log, git add of scoped paths, git commit via bin/git-commit-tree-msg.sh or bin/amend-head-msg.sh, and git push origin main.",
-      "Allow reading and editing files under src/, tests/, crates/, docs/, GSV/docs/vision/, e2e/, bin/, scripts/, and .cursor/ for PoolAI VDT drain and vision Speeds/Rust/queue checks.",
+      "Allow reading and editing files under src/, tests/, crates/, docs/, docs/vision/, e2e/, bin/, scripts/, and .cursor/ for PoolAI VDT drain and vision Speeds/Rust/queue checks.",
       "Allow WebFetch and WebSearch for Cursor changelog, Run Modes docs, Cursor Router docs, and PoolAI GitHub status checks."
     ],
     "block_instructions": [

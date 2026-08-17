@@ -51,7 +51,7 @@
 
 ---
 
-## 4. Vision tools state (PoolAI `GSV/docs/vision/`)
+## 4. Vision tools state (PoolAI `docs/vision/`)
 
 Перевірено 2026-07-27 (`poolai-vision-sync --check` → **ok**, rev **407**):
 
@@ -107,6 +107,6 @@
 - [`.cursor/permissions.json`](../../.cursor/permissions.json)
 - [Cursor Run Modes](https://cursor.com/docs/agent/security/run-modes)
 - [Cursor changelog](https://cursor.com/changelog)
-- [`GSV/docs/vision/README.md`](../../GSV/docs/vision/README.md) · [`SPEED_INDEX.md`](./SPEED_INDEX.md)
+- [`docs/vision/README.md`](../../docs/vision/README.md) · [`SPEED_INDEX.md`](./SPEED_INDEX.md)
 - [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md)
 - [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.16

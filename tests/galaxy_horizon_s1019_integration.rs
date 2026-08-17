@@ -57,12 +57,12 @@ fn horizon_s1019_band_ui_debug_close_ph_s1028() {
     assert!(power_script.contains("adminAnnounceLive"));
     assert!(power_script.contains("admin.power.result"));
 
-    let vision_js = include_str!("../GSV/docs/vision/vision.js");
+    let vision_js = include_str!("../docs/vision/vision.js");
     assert!(vision_js.contains("visionPowerMenuItems"));
     assert!(vision_js.contains("visionAnnouncePower"));
     assert!(vision_js.contains("ArrowDown"));
 
-    let vision_html = include_str!("../GSV/docs/vision/index.html");
+    let vision_html = include_str!("../docs/vision/index.html");
     assert!(vision_html.contains("superseded by GSV"));
     assert!(!vision_html.contains("vision-power-status"));
 

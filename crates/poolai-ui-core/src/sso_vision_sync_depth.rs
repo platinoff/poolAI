@@ -1,6 +1,6 @@
 //! SSO vision-sync band depth (PH-S1319…S1328, band 68 — enterprise phase B).
 //!
-//! Consolidates SSO phase-B canon + `GSV/docs/vision/*` under one vision-sync gate.
+//! Consolidates SSO phase-B canon + `docs/vision/*` under one vision-sync gate.
 
 use serde_json::Value;
 
@@ -39,16 +39,16 @@ pub const SSO_VISION_SYNC_CRITERIA: &[(&str, &str, &str)] = &[
     (
         "vision_manifest",
         "\"revision\"",
-        "GSV/docs/vision/manifest.json",
+        "docs/vision/manifest.json",
     ),
     (
         "vision_extensions",
         "active_sprint",
-        "GSV/docs/vision/extensions.json",
+        "docs/vision/extensions.json",
     ),
-    ("vision_readme", "docs/vision", "GSV/docs/vision/README.md"),
-    ("vision_svg", "svg", "GSV/docs/vision/vision.svg"),
-    ("vision_index", "manifest", "GSV/docs/vision/index.html"),
+    ("vision_readme", "docs/vision", "docs/vision/README.md"),
+    ("vision_svg", "svg", "docs/vision/vision.svg"),
+    ("vision_index", "manifest", "docs/vision/index.html"),
     (
         "doc_docs_canon",
         "SSO_DOCS_CANON.md",

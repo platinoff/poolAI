@@ -27,7 +27,7 @@ to drain. Use the host question UI (one click, two options):
 | Option | Project | Canon docs | Flow |
 |--------|---------|-----------|------|
 | **poolai** | PoolAI (repo root, `src/`, `tests/`) | `docs/development/NEXT_SESSION_PROMPT.md`, `docs/catalog/FUNCTION_MANAGEMENT.md` §5.12 | S0 disk → project scan → drain band (FM §5.12) → vision close → test → one commit + push |
-| **gsv** | GSV (`GSV/` — separate Rust-first project) | `GSV/docs/NEXT_SESSION_PROMPT.md`, `GSV/docs/GSV_ROLES.md`, `GSV/docs/gsv/GSV_TECH_ROADMAP.md` | S0 disk (GSV target) → project scan (warnings first) → drain next band (FM §5.102 / GSV roadmap) → Speeds + Rust panel → vision-sync → one commit + push |
+| **gsv** | GSV (`S:\rust\GSV` — separate git repo) | `S:/rust/GSV/docs/NEXT_SESSION_PROMPT.md`, `S:/rust/GSV/docs/GSV_ROLES.md`, `S:/rust/GSV/docs/gsv/GSV_TECH_ROADMAP.md` | S0 disk (GSV target) → project scan (warnings first) → drain next band (`GSV_TECH_ROADMAP`) → Speeds + Rust panel → `gsv-vision-sync` → one commit (+ push if remote exists) |
 
 ## poolai flow
 
@@ -40,12 +40,12 @@ to drain. Use the host question UI (one click, two options):
 
 ## gsv flow
 
-1. S0 disk (GSV has its own `target/`): disk check + `git fetch` + GSV HANDOFF + FM §5.102.
-2. Project scan: warnings/diagnostics first (`poolai-rust-diagnostics --print` covers whole repo incl. GSV, clippy) → `GSV/docs/gsv/GSV_TECH_ROADMAP.md` unchecked rows → FM §5.102 → concept `GSV/docs/gsv/` → gaps → 10 PH-S* into FM §5.102 (GSV band numbering).
-3. Drain next band (≤10 open PH-S*; no mid-drain push).
-4. Vision close: FM §5.102 ✅ + GSV HANDOFF + GSV NEXT → one `poolai-vision-sync` → rev from manifest → `--check`.
-5. Test: GSV test flow (`cargo test` in `GSV/` — stop `gsv-server` first) → Speeds + Rust panel.
-6. Git (end of session): one commit → `git push origin main` + summary.
+1. S0 disk (GSV has its own `target/` at `S:/rust/GSV`): disk check + `git fetch` + GSV HANDOFF.
+2. Project scan: warnings first (`cargo clippy --all-targets` in `S:/rust/GSV`) → `docs/gsv/GSV_TECH_ROADMAP.md` unchecked rows → gaps → next band.
+3. Drain next band (≤10 open PH-S*; no mid-drain push). Work in **`S:/rust/GSV`**, not `poolAI/GSV/`.
+4. Vision close: GSV HANDOFF + GSV NEXT → `cargo run --bin gsv-vision-sync` → `--check`.
+5. Test: `cargo test` in `S:/rust/GSV` — stop `gsv-server` first.
+6. Git (end of session): one commit in the GSV repo. GitHub remote is optional until the owner adds one.
 
 ## Hard rules (both projects)
 
@@ -53,7 +53,7 @@ to drain. Use the host question UI (one click, two options):
 - **No** push mid-drain / mid-scan; push + summary always last step.
 - **No** parallel `cargo` (file lock).
 - **Never** stage: `.env*`, `*.pem`/`*.key`, `certs/*.pem`, `data/audit/*` (except `.gitkeep`), `comitmsg/*.txt`.
-- Vision rev read from `GSV/docs/vision/manifest.json` after `poolai-vision-sync`.
+- Vision rev read from `docs/vision/manifest.json` after `poolai-vision-sync`.
 - Warnings >0 or errors >0 fixable → 1–3 PH-S* at the top of the band (Source: `rust_diagnostics` / lint code).
 - Shell is **MSYS2 bash**, not PowerShell: `C:\msys64\usr\bin\bash.exe -lc '…'`.
 
@@ -63,4 +63,4 @@ to drain. Use the host question UI (one click, two options):
 - `.cursor/rules/poolai-session-iteration.mdc` § «Тригер абракадабра» (Cursor)
 - `.cursor/rules/virtual-development-team.mdc` (always-on VDT)
 - poolai: `docs/development/NEXT_SESSION_PROMPT.md`, `docs/catalog/FUNCTION_MANAGEMENT.md`
-- gsv: `GSV/docs/NEXT_SESSION_PROMPT.md`, `GSV/docs/GSV_ROLES.md`, `GSV/docs/gsv/GSV_TECH_ROADMAP.md`
+- gsv: `S:/rust/GSV/docs/NEXT_SESSION_PROMPT.md`, `S:/rust/GSV/docs/GSV_ROLES.md`, `S:/rust/GSV/docs/gsv/GSV_TECH_ROADMAP.md`
