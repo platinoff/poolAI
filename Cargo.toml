@@ -99,7 +99,7 @@ flate2 = "1.0"
 tar = "0.4"
 # zip default features enable bzip2 + zstd, which require a C toolchain (gcc.exe) on windows-gnu.
 # Keep it minimal/pure-Rust for now.
-zip = { version = "7.0", default-features = false, features = ["deflate", "time"] }
+zip = { version = "8.6", default-features = false, features = ["deflate", "time"] }
 
 # Checksum verification
 sha2 = "0.10"
