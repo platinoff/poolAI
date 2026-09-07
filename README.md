@@ -488,19 +488,23 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Issues**: [GitHub Issues](https://github.com/platinoff/poolAI/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/platinoff/poolAI/discussions)
 
-## 💰 Support the Project (Solana Donations)
+## ❤️ Support / Donate
 
-**Madevinc** welcomes donations in Solana (SOL) to support the development of this crypto project.
+PoolAI is MIT and maintained in the open. If the dashboard or the kit saves you a session, here is how to keep it independent — pick whatever fits. Sponsorship never changes development priority.
 
-**Solana Address**: `GcdgNtdE8NEk3z9sQ5jXv2tqguZjSYqPqNAtjsjPNJx8`
+<p align="center">
+  <a href="https://github.com/platinoff/poolAI/stargazers"><img src="https://img.shields.io/badge/⭐_Star_the_repo-black?style=for-the-badge" alt="Star"></a>
+  <a href="https://github.com/sponsors/platinoff"><img src="https://img.shields.io/badge/GitHub_Sponsors-ea4aaa?style=for-the-badge&logo=github-sponsors&logoColor=white" alt="GitHub Sponsors"></a>
+</p>
 
-All donations help fund:
-- Continued development and maintenance
-- Infrastructure costs
-- Feature enhancements
-- Community support
+| | |
+|---|---|
+| ⭐ **Star** | Free, and it actually helps people find the repo |
+| 🐙 **[GitHub Sponsors](https://github.com/sponsors/platinoff)** | One-off or monthly · [github.com/sponsors/platinoff](https://github.com/sponsors/platinoff) |
+| 💰 **Solana (SOL)** | `GcdgNtdE8NEk3z9sQ5jXv2tqguZjSYqPqNAtjsjPNJx8` |
+| 🐛 **Issues** | Bugs and ideas: [github.com/platinoff/poolAI/issues](https://github.com/platinoff/poolAI/issues) |
 
-Thank you for supporting PoolAI! 🙏
+---
 
 ## 🙏 Acknowledgments
 
