@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 400" width="1280" height="400" role="img">
+  <title>PoolAI — AI Mining Pool Management System</title>
+  <desc>Distributed AI mining pool management. Rust-first. SMIL, no JavaScript.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#080c04"/>
+      <stop offset="55%" stop-color="#0e1206"/>
+      <stop offset="100%" stop-color="#141a0a"/>
+    </linearGradient>
+    <radialGradient id="nebA" cx="28%" cy="42%" r="48%">
+      <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.22"/>
+      <stop offset="55%" stop-color="#4ade80" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#0e1206" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="nebB" cx="74%" cy="58%" r="46%">
+      <stop offset="0%" stop-color="#34d399" stop-opacity="0.16"/>
+      <stop offset="60%" stop-color="#fbbf24" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#141a0a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="word" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="50%" stop-color="#f0f6e8"/>
+      <stop offset="100%" stop-color="#4ade80"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="400" fill="url(#sky)"/>
+  <rect width="1280" height="400" fill="url(#nebA)">
+    <animate attributeName="opacity" values="1;0.7;1" dur="8s" repeatCount="indefinite"/>
+  </rect>
+  <rect width="1280" height="400" fill="url(#nebB)">
+    <animate attributeName="opacity" values="0.85;1;0.85" dur="9s" repeatCount="indefinite"/>
+  </rect>
+  <g opacity="0.5" transform="translate(1020 212)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate" from="-16 0 0" to="344 0 0" dur="46s" repeatCount="indefinite"/>
+      <ellipse cx="0" cy="0" rx="230" ry="96" fill="none" stroke="#fbbf24" stroke-opacity="0.22" stroke-width="2.5"/>
+      <ellipse cx="0" cy="0" rx="150" ry="58" fill="none" stroke="#4ade80" stroke-opacity="0.18" stroke-width="1.8"/>
+      <ellipse cx="0" cy="0" rx="76" ry="28" fill="none" stroke="#34d399" stroke-opacity="0.15" stroke-width="1.3"/>
+    </g>
+  </g>
+  <g fill="#c8dcff">
+    <circle cx="86" cy="42" r="1.4"><animate attributeName="opacity" values="0.15;0.85;0.15" dur="3.4s" begin="0.1s" repeatCount="indefinite"/></circle>
+    <circle cx="164" cy="88" r="1.1"><animate attributeName="opacity" values="0.12;0.9;0.12" dur="4.1s" begin="0.4s" repeatCount="indefinite"/></circle>
+    <circle cx="240" cy="36" r="1.6"><animate attributeName="opacity" values="0.18;1;0.18" dur="2.8s" begin="0.7s" repeatCount="indefinite"/></circle>
+    <circle cx="318" cy="118" r="1.2"><animate attributeName="opacity" values="0.1;0.8;0.1" dur="3.7s" begin="0.2s" repeatCount="indefinite"/></circle>
+    <circle cx="402" cy="58" r="1.0"><animate attributeName="opacity" values="0.2;0.95;0.2" dur="4.6s" begin="1.1s" repeatCount="indefinite"/></circle>
+    <circle cx="486" cy="96" r="1.5"><animate attributeName="opacity" values="0.12;0.88;0.12" dur="3.2s" begin="0.5s" repeatCount="indefinite"/></circle>
+    <circle cx="572" cy="28" r="1.3"><animate attributeName="opacity" values="0.16;1;0.16" dur="5.0s" begin="0.9s" repeatCount="indefinite"/></circle>
+    <circle cx="658" cy="74" r="1.1"><animate attributeName="opacity" values="0.14;0.82;0.14" dur="3.9s" begin="0.3s" repeatCount="indefinite"/></circle>
+    <circle cx="744" cy="44" r="1.7"><animate attributeName="opacity" values="0.1;0.92;0.1" dur="2.6s" begin="1.4s" repeatCount="indefinite"/></circle>
+    <circle cx="830" cy="102" r="1.2"><animate attributeName="opacity" values="0.18;0.86;0.18" dur="4.3s" begin="0.6s" repeatCount="indefinite"/></circle>
+    <circle cx="916" cy="52" r="1.4"><animate attributeName="opacity" values="0.12;1;0.12" dur="3.5s" begin="0.8s" repeatCount="indefinite"/></circle>
+    <circle cx="1002" cy="86" r="1.0"><animate attributeName="opacity" values="0.2;0.78;0.2" dur="4.8s" begin="0.15s" repeatCount="indefinite"/></circle>
+  </g>
+  <text x="80" y="168" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="92" font-weight="700" fill="url(#word)" letter-spacing="3">PoolAI</text>
+  <text x="80" y="214" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="22" fill="#fbbf24" letter-spacing="3.2">AI MINING POOL MANAGEMENT</text>
+  <text x="80" y="252" font-family="ui-sans-serif, Segoe UI, sans-serif" font-size="18" fill="#9aa8bd">Rust-first  |  distributed pool + GPU  |  enterprise + cloud/ML</text>
+  <g transform="translate(80 286)">
+    <rect width="210" height="36" rx="18" fill="#0e1624" stroke="#4ade80" stroke-opacity="0.45"/>
+    <circle cx="22" cy="18" r="6" fill="#4ade80">
+      <animate attributeName="opacity" values="1;0.25;1" dur="6s" repeatCount="indefinite"/>
+    </circle>
+    <text x="40" y="24" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="14" fill="#e8eef8">live 127.0.0.1:8080</text>
+  </g>
+  <g transform="translate(310 286)">
+    <rect width="168" height="36" rx="18" fill="#121826" stroke="#fbbf24" stroke-opacity="0.35"/>
+    <text x="18" y="24" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="14" fill="#fbbf24">Rust 90-95%</text>
+  </g>
+  <g transform="translate(498 286)">
+    <rect width="136" height="36" rx="18" fill="#121826" stroke="#7eb8ff" stroke-opacity="0.35"/>
+    <text x="18" y="24" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="14" fill="#7eb8ff">MIT licensed</text>
+  </g>
+  <g transform="translate(80 350)" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="15">
+    <text fill="#5b6b82">$</text>
+    <text x="18" fill="#7c8ba3">./bin/run-poolai.ps1 single -Background</text>
+    <rect x="278" y="-12" width="8" height="16" fill="#4ade80">
+      <animate attributeName="opacity" values="1;1;0;0" keyTimes="0;0.48;0.5;1" dur="1.2s" calcMode="discrete" repeatCount="indefinite"/>
+    </rect>
+    <text x="900" fill="#5b6b82">SMIL  |  no JS  |  no filter</text>
+  </g>
+</svg>

@@ -1,3 +1,14 @@
+<p align="center">
+  <img src="docs/assets/presentations/poolai-hero.svg" alt="PoolAI — AI Mining Pool Management System, Rust-first." width="100%">
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-yellow.svg" alt="MIT"></a>
+  <a href="https://www.rust-lang.org/"><img src="https://img.shields.io/badge/rust-90%E2%80%9395%25-orange?logo=rust" alt="Rust 90–95%"></a>
+  <a href="https://github.com/sponsors/platinoff"><img src="https://img.shields.io/badge/sponsor-GitHub-ea4aaa?logo=github-sponsors" alt="Sponsor"></a>
+  <img src="https://img.shields.io/badge/live_UI-127.0.0.1%3A8080-22d3ee" alt="Live UI port 8080">
+</p>
+
 # PoolAI - AI Mining Pool Management System
 
 > 🇺🇦 Українськомовні матеріали: концепція та індекс у [`docs/concept/`](docs/concept/) та [`docs/INDEX_2026-03-17.md`](docs/INDEX_2026-03-17.md) (окремого `README.uk.md` у корені немає).
