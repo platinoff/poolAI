@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["DEFAULT_DEV_ADMIN_PASSWORD","DEFAULT_DEV_ADMIN_USERNAME"],"enum":["UserRole"],"struct":["User","UserInfo","UserManager"]};
+window.SIDEBAR_ITEMS = {"constant":["DEFAULT_DEV_ADMIN_PASSWORD","DEFAULT_DEV_ADMIN_USERNAME","DEFAULT_SERVICE_ACCOUNT_USERNAME"],"enum":["UserRole"],"fn":["env_service_account"],"struct":["User","UserInfo","UserManager"]};
