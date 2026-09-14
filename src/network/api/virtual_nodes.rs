@@ -5,7 +5,7 @@
 //! Discovery/admin routes use structured JSON errors per FM-005.
 
 use axum::{
-    extract::{Path, State},
+    extract::{Path, Query, State},
     http::{HeaderMap, StatusCode},
     response::IntoResponse,
     routing::{get, post},
@@ -161,6 +161,10 @@ pub fn create_virtual_node_routes() -> Router<ApiContext> {
             "/virtual-nodes/{peer_id}/tasks/status",
             get(task_status_handler),
         )
+        .route(
+            "/virtual-nodes/{peer_id}/tasks/result",
+            get(task_result_handler),
+        )
         .route("/virtual-nodes/telegram/bind", post(bind_telegram_handler))
         .route(
             "/virtual-nodes/telegram/wallet",
@@ -298,6 +302,26 @@ async fn task_status_handler(Path(peer_id): Path<String>) -> impl IntoResponse {
             completed,
         }),
     )
+}
+
+/// Answer retrieval for the chat loop: latest completion, or one task when
+/// `?task_id=` is given. 404 when nothing completed yet (poll again).
+async fn task_result_handler(
+    Path(peer_id): Path<String>,
+    Query(q): Query<std::collections::HashMap<String, String>>,
+) -> impl IntoResponse {
+    let found = match q.get("task_id") {
+        Some(id) => VirtualNodeTaskService::completion(&peer_id, id),
+        None => VirtualNodeTaskService::latest_completion(&peer_id),
+    };
+    match found {
+        Some(r) => (StatusCode::OK, Json(json!({"ok": true, "result": r}))).into_response(),
+        None => (
+            StatusCode::NOT_FOUND,
+            Json(json!({"ok": false, "error": "no completion yet"})),
+        )
+            .into_response(),
+    }
 }
 
 async fn bind_telegram_wallet_handler(

@@ -180,6 +180,24 @@ impl VirtualNodeTaskService {
         guard.get(peer_id).map(|v| v.len()).unwrap_or(0)
     }
 
+    /// Latest completion record for a peer (chat-loop answer retrieval).
+    pub fn latest_completion(peer_id: &str) -> Option<TaskCompletionRecord> {
+        ensure_peer_loaded(peer_id);
+        let guard = completions().lock().expect("virtual node completions lock");
+        guard.get(peer_id)?.last().cloned()
+    }
+
+    /// Completion record for one task id.
+    pub fn completion(peer_id: &str, task_id: &str) -> Option<TaskCompletionRecord> {
+        ensure_peer_loaded(peer_id);
+        let guard = completions().lock().expect("virtual node completions lock");
+        guard
+            .get(peer_id)?
+            .iter()
+            .find(|r| r.task_id == task_id)
+            .cloned()
+    }
+
     /// Test helper — reset queue state for a peer.
     pub fn clear_peer(peer_id: &str) {
         let mut q = queues().lock().expect("lock");
@@ -205,6 +223,23 @@ mod tests {
         assert_eq!(t.task_type, "ping");
         VirtualNodeTaskService::complete(peer, &t.id, "ok", None);
         assert_eq!(VirtualNodeTaskService::completed_count(peer), 1);
+        VirtualNodeTaskService::clear_peer(peer);
+    }
+
+    #[test]
+    fn completion_records_readable() {
+        let peer = "test-peer-result";
+        VirtualNodeTaskService::clear_peer(peer);
+        assert!(VirtualNodeTaskService::latest_completion(peer).is_none());
+        VirtualNodeTaskService::enqueue(peer, "llama_chat", Value::Null);
+        let t = VirtualNodeTaskService::poll(peer).expect("task");
+        VirtualNodeTaskService::complete(peer, &t.id, "completed", Some("hi".into()));
+        let latest = VirtualNodeTaskService::latest_completion(peer).expect("latest");
+        assert_eq!(latest.task_id, t.id);
+        assert_eq!(latest.detail.as_deref(), Some("hi"));
+        let one = VirtualNodeTaskService::completion(peer, &t.id).expect("one");
+        assert_eq!(one.status, "completed");
+        assert!(VirtualNodeTaskService::completion(peer, "nope").is_none());
         VirtualNodeTaskService::clear_peer(peer);
     }
 }
