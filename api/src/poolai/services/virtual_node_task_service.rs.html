@@ -180,31 +180,66 @@
 <a href=#180 id=180 data-nosnippet>180</a>        guard.get(peer_id).map(|v| v.len()).unwrap_or(<span class="number">0</span>)
 <a href=#181 id=181 data-nosnippet>181</a>    }
 <a href=#182 id=182 data-nosnippet>182</a>
-<a href=#183 id=183 data-nosnippet>183</a>    <span class="doccomment">/// Test helper — reset queue state for a peer.
-<a href=#184 id=184 data-nosnippet>184</a>    </span><span class="kw">pub fn </span>clear_peer(peer_id: <span class="kw-2">&amp;</span>str) {
-<a href=#185 id=185 data-nosnippet>185</a>        <span class="kw">let </span><span class="kw-2">mut </span>q = queues().lock().expect(<span class="string">"lock"</span>);
-<a href=#186 id=186 data-nosnippet>186</a>        q.remove(peer_id);
-<a href=#187 id=187 data-nosnippet>187</a>        <span class="kw">let </span><span class="kw-2">mut </span>c = completions().lock().expect(<span class="string">"lock"</span>);
-<a href=#188 id=188 data-nosnippet>188</a>        c.remove(peer_id);
-<a href=#189 id=189 data-nosnippet>189</a>        <span class="kw">if let </span><span class="prelude-val">Some</span>(path) = virtual_node_store::peer_tasks_path(peer_id) {
-<a href=#190 id=190 data-nosnippet>190</a>            <span class="kw">let _ </span>= std::fs::remove_file(path);
-<a href=#191 id=191 data-nosnippet>191</a>        }
-<a href=#192 id=192 data-nosnippet>192</a>    }
-<a href=#193 id=193 data-nosnippet>193</a>}
-<a href=#194 id=194 data-nosnippet>194</a>
-<a href=#195 id=195 data-nosnippet>195</a><span class="attr">#[cfg(test)]
-<a href=#196 id=196 data-nosnippet>196</a></span><span class="kw">mod </span>tests {
-<a href=#197 id=197 data-nosnippet>197</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
-<a href=#198 id=198 data-nosnippet>198</a>
-<a href=#199 id=199 data-nosnippet>199</a>    <span class="attr">#[test]
-<a href=#200 id=200 data-nosnippet>200</a>    </span><span class="kw">fn </span>poll_fifo_and_complete() {
-<a href=#201 id=201 data-nosnippet>201</a>        <span class="kw">let </span>peer = <span class="string">"test-peer-tasks"</span>;
-<a href=#202 id=202 data-nosnippet>202</a>        VirtualNodeTaskService::clear_peer(peer);
-<a href=#203 id=203 data-nosnippet>203</a>        VirtualNodeTaskService::enqueue(peer, <span class="string">"ping"</span>, Value::Null);
-<a href=#204 id=204 data-nosnippet>204</a>        <span class="kw">let </span>t = VirtualNodeTaskService::poll(peer).expect(<span class="string">"task"</span>);
-<a href=#205 id=205 data-nosnippet>205</a>        <span class="macro">assert_eq!</span>(t.task_type, <span class="string">"ping"</span>);
-<a href=#206 id=206 data-nosnippet>206</a>        VirtualNodeTaskService::complete(peer, <span class="kw-2">&amp;</span>t.id, <span class="string">"ok"</span>, <span class="prelude-val">None</span>);
-<a href=#207 id=207 data-nosnippet>207</a>        <span class="macro">assert_eq!</span>(VirtualNodeTaskService::completed_count(peer), <span class="number">1</span>);
-<a href=#208 id=208 data-nosnippet>208</a>        VirtualNodeTaskService::clear_peer(peer);
-<a href=#209 id=209 data-nosnippet>209</a>    }
-<a href=#210 id=210 data-nosnippet>210</a>}</code></pre></div></section></main></body></html>
+<a href=#183 id=183 data-nosnippet>183</a>    <span class="doccomment">/// Latest completion record for a peer (chat-loop answer retrieval).
+<a href=#184 id=184 data-nosnippet>184</a>    </span><span class="kw">pub fn </span>latest_completion(peer_id: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;TaskCompletionRecord&gt; {
+<a href=#185 id=185 data-nosnippet>185</a>        ensure_peer_loaded(peer_id);
+<a href=#186 id=186 data-nosnippet>186</a>        <span class="kw">let </span>guard = completions().lock().expect(<span class="string">"virtual node completions lock"</span>);
+<a href=#187 id=187 data-nosnippet>187</a>        guard.get(peer_id)<span class="question-mark">?</span>.last().cloned()
+<a href=#188 id=188 data-nosnippet>188</a>    }
+<a href=#189 id=189 data-nosnippet>189</a>
+<a href=#190 id=190 data-nosnippet>190</a>    <span class="doccomment">/// Completion record for one task id.
+<a href=#191 id=191 data-nosnippet>191</a>    </span><span class="kw">pub fn </span>completion(peer_id: <span class="kw-2">&amp;</span>str, task_id: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;TaskCompletionRecord&gt; {
+<a href=#192 id=192 data-nosnippet>192</a>        ensure_peer_loaded(peer_id);
+<a href=#193 id=193 data-nosnippet>193</a>        <span class="kw">let </span>guard = completions().lock().expect(<span class="string">"virtual node completions lock"</span>);
+<a href=#194 id=194 data-nosnippet>194</a>        guard
+<a href=#195 id=195 data-nosnippet>195</a>            .get(peer_id)<span class="question-mark">?
+<a href=#196 id=196 data-nosnippet>196</a>            </span>.iter()
+<a href=#197 id=197 data-nosnippet>197</a>            .find(|r| r.task_id == task_id)
+<a href=#198 id=198 data-nosnippet>198</a>            .cloned()
+<a href=#199 id=199 data-nosnippet>199</a>    }
+<a href=#200 id=200 data-nosnippet>200</a>
+<a href=#201 id=201 data-nosnippet>201</a>    <span class="doccomment">/// Test helper — reset queue state for a peer.
+<a href=#202 id=202 data-nosnippet>202</a>    </span><span class="kw">pub fn </span>clear_peer(peer_id: <span class="kw-2">&amp;</span>str) {
+<a href=#203 id=203 data-nosnippet>203</a>        <span class="kw">let </span><span class="kw-2">mut </span>q = queues().lock().expect(<span class="string">"lock"</span>);
+<a href=#204 id=204 data-nosnippet>204</a>        q.remove(peer_id);
+<a href=#205 id=205 data-nosnippet>205</a>        <span class="kw">let </span><span class="kw-2">mut </span>c = completions().lock().expect(<span class="string">"lock"</span>);
+<a href=#206 id=206 data-nosnippet>206</a>        c.remove(peer_id);
+<a href=#207 id=207 data-nosnippet>207</a>        <span class="kw">if let </span><span class="prelude-val">Some</span>(path) = virtual_node_store::peer_tasks_path(peer_id) {
+<a href=#208 id=208 data-nosnippet>208</a>            <span class="kw">let _ </span>= std::fs::remove_file(path);
+<a href=#209 id=209 data-nosnippet>209</a>        }
+<a href=#210 id=210 data-nosnippet>210</a>    }
+<a href=#211 id=211 data-nosnippet>211</a>}
+<a href=#212 id=212 data-nosnippet>212</a>
+<a href=#213 id=213 data-nosnippet>213</a><span class="attr">#[cfg(test)]
+<a href=#214 id=214 data-nosnippet>214</a></span><span class="kw">mod </span>tests {
+<a href=#215 id=215 data-nosnippet>215</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+<a href=#216 id=216 data-nosnippet>216</a>
+<a href=#217 id=217 data-nosnippet>217</a>    <span class="attr">#[test]
+<a href=#218 id=218 data-nosnippet>218</a>    </span><span class="kw">fn </span>poll_fifo_and_complete() {
+<a href=#219 id=219 data-nosnippet>219</a>        <span class="kw">let </span>peer = <span class="string">"test-peer-tasks"</span>;
+<a href=#220 id=220 data-nosnippet>220</a>        VirtualNodeTaskService::clear_peer(peer);
+<a href=#221 id=221 data-nosnippet>221</a>        VirtualNodeTaskService::enqueue(peer, <span class="string">"ping"</span>, Value::Null);
+<a href=#222 id=222 data-nosnippet>222</a>        <span class="kw">let </span>t = VirtualNodeTaskService::poll(peer).expect(<span class="string">"task"</span>);
+<a href=#223 id=223 data-nosnippet>223</a>        <span class="macro">assert_eq!</span>(t.task_type, <span class="string">"ping"</span>);
+<a href=#224 id=224 data-nosnippet>224</a>        VirtualNodeTaskService::complete(peer, <span class="kw-2">&amp;</span>t.id, <span class="string">"ok"</span>, <span class="prelude-val">None</span>);
+<a href=#225 id=225 data-nosnippet>225</a>        <span class="macro">assert_eq!</span>(VirtualNodeTaskService::completed_count(peer), <span class="number">1</span>);
+<a href=#226 id=226 data-nosnippet>226</a>        VirtualNodeTaskService::clear_peer(peer);
+<a href=#227 id=227 data-nosnippet>227</a>    }
+<a href=#228 id=228 data-nosnippet>228</a>
+<a href=#229 id=229 data-nosnippet>229</a>    <span class="attr">#[test]
+<a href=#230 id=230 data-nosnippet>230</a>    </span><span class="kw">fn </span>completion_records_readable() {
+<a href=#231 id=231 data-nosnippet>231</a>        <span class="kw">let </span>peer = <span class="string">"test-peer-result"</span>;
+<a href=#232 id=232 data-nosnippet>232</a>        VirtualNodeTaskService::clear_peer(peer);
+<a href=#233 id=233 data-nosnippet>233</a>        <span class="macro">assert!</span>(VirtualNodeTaskService::latest_completion(peer).is_none());
+<a href=#234 id=234 data-nosnippet>234</a>        VirtualNodeTaskService::enqueue(peer, <span class="string">"llama_chat"</span>, Value::Null);
+<a href=#235 id=235 data-nosnippet>235</a>        <span class="kw">let </span>t = VirtualNodeTaskService::poll(peer).expect(<span class="string">"task"</span>);
+<a href=#236 id=236 data-nosnippet>236</a>        VirtualNodeTaskService::complete(peer, <span class="kw-2">&amp;</span>t.id, <span class="string">"completed"</span>, <span class="prelude-val">Some</span>(<span class="string">"hi"</span>.into()));
+<a href=#237 id=237 data-nosnippet>237</a>        <span class="kw">let </span>latest = VirtualNodeTaskService::latest_completion(peer).expect(<span class="string">"latest"</span>);
+<a href=#238 id=238 data-nosnippet>238</a>        <span class="macro">assert_eq!</span>(latest.task_id, t.id);
+<a href=#239 id=239 data-nosnippet>239</a>        <span class="macro">assert_eq!</span>(latest.detail.as_deref(), <span class="prelude-val">Some</span>(<span class="string">"hi"</span>));
+<a href=#240 id=240 data-nosnippet>240</a>        <span class="kw">let </span>one = VirtualNodeTaskService::completion(peer, <span class="kw-2">&amp;</span>t.id).expect(<span class="string">"one"</span>);
+<a href=#241 id=241 data-nosnippet>241</a>        <span class="macro">assert_eq!</span>(one.status, <span class="string">"completed"</span>);
+<a href=#242 id=242 data-nosnippet>242</a>        <span class="macro">assert!</span>(VirtualNodeTaskService::completion(peer, <span class="string">"nope"</span>).is_none());
+<a href=#243 id=243 data-nosnippet>243</a>        VirtualNodeTaskService::clear_peer(peer);
+<a href=#244 id=244 data-nosnippet>244</a>    }
+<a href=#245 id=245 data-nosnippet>245</a>}</code></pre></div></section></main></body></html>
