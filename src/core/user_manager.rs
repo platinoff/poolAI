@@ -82,6 +82,27 @@ impl From<User> for UserInfo {
 pub const DEFAULT_DEV_ADMIN_USERNAME: &str = "admin";
 /// Built-in administrator password (dev / first-run; in-memory store uses plaintext today).
 pub const DEFAULT_DEV_ADMIN_PASSWORD: &str = "admin123";
+/// Default username for the env-seeded Telenetis edge service account.
+pub const DEFAULT_SERVICE_ACCOUNT_USERNAME: &str = "telenetis";
+
+/// Env-seeded read-only service account: `(user, pass, Viewer)` when
+/// `POOLAI_SERVICE_PASS` is present and non-blank; username from
+/// `POOLAI_SERVICE_USER` (default [`DEFAULT_SERVICE_ACCOUNT_USERNAME`]).
+pub fn env_service_account() -> Option<(String, String, UserRole)> {
+    let pass = std::env::var("POOLAI_SERVICE_PASS")
+        .ok()?
+        .trim()
+        .to_string();
+    if pass.is_empty() {
+        return None;
+    }
+    let user = std::env::var("POOLAI_SERVICE_USER")
+        .ok()
+        .map(|u| u.trim().to_string())
+        .filter(|u| !u.is_empty())
+        .unwrap_or_else(|| DEFAULT_SERVICE_ACCOUNT_USERNAME.to_string());
+    Some((user, pass, UserRole::Viewer))
+}
 
 /// User manager for user account management
 pub struct UserManager {
@@ -105,15 +126,35 @@ impl UserManager {
             return Ok(());
         }
 
-        let default_users = vec![
+        let mut default_users = vec![
             (
-                DEFAULT_DEV_ADMIN_USERNAME,
-                DEFAULT_DEV_ADMIN_PASSWORD,
+                DEFAULT_DEV_ADMIN_USERNAME.to_string(),
+                DEFAULT_DEV_ADMIN_PASSWORD.to_string(),
                 UserRole::Admin,
             ),
-            ("operator", "op123", UserRole::Operator),
-            ("viewer", "view123", UserRole::Viewer),
+            (
+                "operator".to_string(),
+                "op123".to_string(),
+                UserRole::Operator,
+            ),
+            (
+                "viewer".to_string(),
+                "view123".to_string(),
+                UserRole::Viewer,
+            ),
         ];
+        // Band 233: dedicated read-only service account for the Telenetis
+        // edge proxy (ticket "grid: service account for Telenetis edge
+        // calls"). Seeded from env so it survives poolAI restarts without
+        // rotating the bootstrap admin. `POOLAI_SERVICE_PASS` unset (or
+        // blank) → no extra account; username `POOLAI_SERVICE_USER`
+        // (default "telenetis"), role Viewer (least privilege for
+        // VM/binding/task reads).
+        if let Some(account) = env_service_account() {
+            if !default_users.iter().any(|(u, _, _)| *u == account.0) {
+                default_users.push(account);
+            }
+        }
 
         let mut users = self.users.write().await;
         let mut username_index = self.username_index.write().await;
@@ -123,15 +164,15 @@ impl UserManager {
             let id = Uuid::new_v4();
             let user = User {
                 id,
-                username: username.to_string(),
-                password_hash: password.to_string(),
+                username: username.clone(),
+                password_hash: password,
                 role,
                 active: true,
                 created_at: now,
                 updated_at: now,
             };
             users.insert(id, user.clone());
-            username_index.insert(username.to_string(), id);
+            username_index.insert(username, id);
         }
 
         *initialized = true;
@@ -288,5 +329,67 @@ impl UserManager {
 impl Default for UserManager {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Env is process-global: serialize the service-account tests so a plain
+    /// multi-threaded `cargo test` is as safe as the `test-ci` (threads=1)
+    /// canon run.
+    static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
+    #[tokio::test]
+    async fn initialize_seeds_three_without_service_env() {
+        let _guard = ENV_LOCK.lock().unwrap_or_else(|p| p.into_inner());
+        std::env::remove_var("POOLAI_SERVICE_PASS");
+        std::env::remove_var("POOLAI_SERVICE_USER");
+        let m = UserManager::new();
+        m.initialize().await.expect("init");
+        assert_eq!(m.list_users().await.unwrap().len(), 3);
+        assert!(m.get_user_by_username("telenetis").await.unwrap().is_none());
+    }
+
+    #[tokio::test]
+    async fn initialize_seeds_env_service_account_read_only() {
+        let _guard = ENV_LOCK.lock().unwrap_or_else(|p| p.into_inner());
+        std::env::set_var("POOLAI_SERVICE_PASS", " s3rv-pass ");
+        std::env::remove_var("POOLAI_SERVICE_USER");
+        assert_eq!(
+            env_service_account().map(|(u, p, r)| (u, p, format!("{:?}", r))),
+            Some((
+                "telenetis".to_string(),
+                "s3rv-pass".to_string(),
+                "Viewer".to_string()
+            ))
+        );
+        let m = UserManager::new();
+        m.initialize().await.expect("init");
+        assert_eq!(m.list_users().await.unwrap().len(), 4);
+        let svc = m
+            .get_user_by_username("telenetis")
+            .await
+            .unwrap()
+            .expect("svc");
+        assert_eq!(svc.role, UserRole::Viewer);
+        assert!(m.verify_password("telenetis", "s3rv-pass").await.unwrap());
+        std::env::remove_var("POOLAI_SERVICE_PASS");
+    }
+
+    #[test]
+    fn env_service_account_requires_nonblank_pass_and_trims_user() {
+        let _guard = ENV_LOCK.lock().unwrap_or_else(|p| p.into_inner());
+        std::env::set_var("POOLAI_SERVICE_PASS", "   ");
+        assert!(env_service_account().is_none());
+        std::env::set_var("POOLAI_SERVICE_PASS", "p");
+        std::env::set_var("POOLAI_SERVICE_USER", " my-bot ");
+        assert_eq!(
+            env_service_account().map(|(u, _, _)| u),
+            Some("my-bot".to_string())
+        );
+        std::env::remove_var("POOLAI_SERVICE_PASS");
+        std::env::remove_var("POOLAI_SERVICE_USER");
     }
 }
