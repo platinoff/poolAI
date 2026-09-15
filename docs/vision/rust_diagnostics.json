@@ -1,33 +1,28 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-15",
-  "host_label": "github-actions-ubuntu",
-  "git_head": "564b947",
-  "source": "ci",
+  "generated_at": "2026-09-15",
+  "host_label": "PLATINOV",
+  "git_head": "8f32f9f34",
+  "source": "local",
   "notes": [
     "Machine-readable Rust/Clippy warning+error index for vision Rust panel.",
     "Record via poolai-rust-diagnostics or bin/record-rust-diagnostics.sh (abrakadabra drain + CI)."
   ],
   "latest": {
-    "warnings": 0,
+    "warnings": 202,
     "errors": 0,
     "ok": true,
-    "recorded_at": "2026-08-15T02:08:37Z",
+    "recorded_at": "2026-09-15T03:25:08Z",
     "command": "cargo clippy --message-format=json --all-targets --features ml,enterprise,cloud,test-utils,job-store-sqlite,prometheus",
-    "wall_secs": 152.185445753
+    "wall_secs": 206.241061,
+    "top_codes": [
+      "clippy::result_large_err×182",
+      "clippy::unnecessary_sort_by×12",
+      "clippy::for_kv_map×6",
+      "clippy::await_holding_lock×2"
+    ]
   },
   "history": [
-    {
-      "kind": "rust_diagnostics",
-      "command": "bootstrap",
-      "warnings": 0,
-      "errors": 0,
-      "ok": true,
-      "recorded_at": "2026-07-28T01:10:23Z",
-      "host_label": "bootstrap-ph-svc85",
-      "git_head": "b46b16c98",
-      "source": "local"
-    },
     {
       "kind": "rust_diagnostics",
       "command": "cargo",
@@ -541,6 +536,24 @@
       "host_label": "github-actions-ubuntu",
       "git_head": "564b947",
       "source": "ci"
+    },
+    {
+      "kind": "rust_diagnostics",
+      "command": "cargo clippy --message-format=json --all-targets --features ml,enterprise,cloud,test-utils,job-store-sqlite,prometheus",
+      "warnings": 202,
+      "errors": 0,
+      "ok": true,
+      "recorded_at": "2026-09-15T03:25:08Z",
+      "wall_secs": 206.241061,
+      "host_label": "PLATINOV",
+      "git_head": "8f32f9f34",
+      "source": "local",
+      "top_codes": [
+        "clippy::result_large_err×182",
+        "clippy::unnecessary_sort_by×12",
+        "clippy::for_kv_map×6",
+        "clippy::await_holding_lock×2"
+      ]
     }
   ]
 }
