@@ -8,9 +8,10 @@ alwaysApply: true
 Git-канон спільного VDT (rules, marketplace skills, `абракадабра` host) —
 **`S:\rust\GSV`**. Open that folder or `S:\rust\GSV\gsv.code-workspace`.
 
-This repo keeps **product** canon only: FM, concept, `cargo test-ci`, Playwright admin, OpenAPI gap, Galaxy, 90–95% ratio, `poolai-documentation`.
+**Global first:** `S:/rust/GSV/AGENTS.md` · `S:/rust/GSV/docs/gsv/GSV_AGI_PATH.md`. Local rules below and in this `.cursor/rules/` tree cover **PoolAI product only** (FM, concept, `cargo test-ci`, Playwright admin, OpenAPI gap, Galaxy, 90–95% ratio, `poolai-documentation`).
 
-When the owner writes `абракадабра` here: still AskQuestion **poolai | gsv**, then follow
-[`.agents/skills/abracadabra/SKILL.md`](../../.agents/skills/abracadabra/SKILL.md) (fallback copy). Prefer draining from the GSV window.
+PoolAI is the **genetic parent** for multi-agent workflow DNA (roles, PH-S* bands, session iteration, marshal/squad). Other plugins copy the **idea** from here when that pattern dominates — they do not copy this kit.
 
-Canon: `S:/rust/GSV/docs/gsv/GSV_VDT_KIT.md` · registry `S:/rust/GSV/docs/gsv/PRODUCTS.md`.
+When the owner writes `абракадабра` / `agi` here: prefer draining from the GSV window (`gsv.code-workspace`, GSV first) so hub MCP stays wired. Do **not** hardcode `poolai | gsv`. Follow GSV [`.agents/skills/abracadabra/SKILL.md`](../../.agents/skills/abracadabra/SKILL.md) (fallback copy in this tree).
+
+Canon: `S:/rust/GSV/docs/gsv/GSV_VDT_KIT.md` · registry `S:/rust/GSV/docs/gsv/PRODUCTS.md` · template `S:/rust/GSV/docs/gsv/PLUGIN_AGENTS.md`.

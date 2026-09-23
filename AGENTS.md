@@ -5,7 +5,7 @@
 ## Проєкт
 
 - **Назва:** PoolAI · **Версія:** v0.2.2 (див. `Cargo.toml` / `src/version.rs`) · **Корінь:** `S:\rust\poolAI`
-- **Проєкт GSV / VDT kit:** окремий git-репозиторій **`S:\rust\GSV`** — точка входу (rules/skills/`абракадабра`). PoolAI vision-канон — `docs/vision/`. Вказівник: [`GSV/README.md`](GSV/README.md). Канон: `S:/rust/GSV/docs/gsv/GSV_VDT_KIT.md`.
+- **Проєкт GSV / VDT kit:** окремий git-репозиторій **`S:\rust\GSV`** — точка входу (rules/skills/`абракадабра`). **Global first:** `S:/rust/GSV/AGENTS.md` + `GSV_AGI_PATH.md`. PoolAI is the genetic parent for multi-agent DNA; local rules here are product-only. Open `gsv.code-workspace` (GSV first). PoolAI vision-канон — `docs/vision/`. Вказівник: [`GSV/README.md`](GSV/README.md). Канон: `S:/rust/GSV/docs/gsv/GSV_VDT_KIT.md`.
 - **Стек (канон):** Rust `src/`, `tests/`, `crates/`; UI — JS у `src/ui/`; E2E — `e2e/` (TypeScript); **без Python**.
 - **PRIMARY concept:** `docs/concept/poolAI_concept_root.txt` (читати першим).
 
