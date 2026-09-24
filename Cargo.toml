@@ -108,7 +108,7 @@ hex = "0.4"
 ed25519-dalek = { version = "2.1", default-features = false, features = ["std"] }
 
 # SQLite database for enterprise monitoring persistence
-rusqlite = { version = "0.32", features = ["bundled"] }
+rusqlite = { version = "0.40", features = ["bundled"] }
 
 # Raft consensus (optional - enabled with feature "raft")
 # Use: cargo build --features raft
