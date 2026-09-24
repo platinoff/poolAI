@@ -46,7 +46,7 @@ tokio-stream = "0.1"
 # Use: cargo build --features jwt
 # Note: Requires native toolchain (gcc/dlltool on Windows GNU)
 # Without this feature, uses fallback base64 encoding (dev only, NOT SECURE)
-jsonwebtoken = { version = "10.2", optional = true, features = ["rust_crypto"] }
+jsonwebtoken = { version = "11.0", optional = true, features = ["rust_crypto"] }
 
 # HTTPS/TLS support (optional - enabled with feature "https")
 # Use: cargo build --features https
