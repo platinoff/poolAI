@@ -1,0 +1,13 @@
+# Plugin project overlay for Grok CLI (`grok inspect`) — Kit-Eco 2, kit-wiring band.
+# One MCP for all clients: stdio live copy (cargo xtask live keeps it fresh).
+# Sandbox stays the GSV crate (--repo-root S:/rust/GSV); skills canon is read in
+# place — no copies under .grok, mirrors stay cursor+opencode only.
+
+[mcp_servers.gsv_mcp_openbot]
+command = "S:/rust/GSV/target/live/gsv-mcp.exe"
+args = ["--repo-root", "S:/rust/GSV"]
+enabled = true
+startup_timeout_sec = 15
+
+[skills]
+paths = ["S:/rust/GSV/.agents/skills"]
