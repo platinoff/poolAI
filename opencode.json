@@ -1,6 +1,17 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    "S:/rust/GSV/AGENTS.md",
+    "AGENTS.md"
+  ],
   "skills": {
-    "paths": [".agents/skills"]
+    "paths": [".agents/skills", "S:/rust/GSV/.agents/skills"]
+  },
+  "mcp": {
+    "gsv_mcp_openbot": {
+      "type": "local",
+      "command": ["S:/rust/GSV/target/live/gsv-mcp.exe", "--repo-root", "S:/rust/GSV"],
+      "cwd": "S:/rust/GSV"
+    }
   }
 }
