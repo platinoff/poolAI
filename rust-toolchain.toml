@@ -1,4 +1,6 @@
+# Ecosystem toolchain policy (owner 2026-11-04): stay on the latest stable rust,
+# gnu triple (MSYS2 builds). Floats with stable: 1.99.1 → 1.100 → …
 [toolchain]
-channel = "1.92.0"
+channel = "stable-x86_64-pc-windows-gnu"
 targets = ["x86_64-pc-windows-gnu"]
 components = ["rustfmt", "clippy"]
