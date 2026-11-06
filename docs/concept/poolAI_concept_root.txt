@@ -1,0 +1,1027 @@
+# PoolAI Concept (v6, 2026) - Complete Rust Architecture! 🚀 PRO Edition
+
+## 🎯 Architecture sync 2026-05-19 (код + docs; A+B+C **100%** — DEVELOPMENT_PROGRESS_2026-05-19.md)
+
+## Zriz de-hype (PH-S962, band 31)
+
+**Канон прогресу:** autoprogon A+B **100%**; Horizon Layer C **100%**; rust_ratio **94.91%** (formal 90–95% band). Рядки «PROJECT 100% COMPLETE» / «Production Ready» нижче — **історичний маркетинг v0.2.x**, не операційний зріз. Див. `status/STABLE_STATE_SUMMARY.md`, FM §5.1, `HANDOFF_NEW_SESSION.md`.
+
+**Прогрес:** autoprogon A+B **100%** (S34); Horizon Layer C **100%** (S35–S40). **Maintenance** — NEXT_SESSION_PROMPT.md. **BLOCKED (ops):** FM-003 §4 LAN (2 хости).
+
+- **FM-016 Virtual nodes ✅:** `poolai-worker`, `poolai-telegram-bot` (`--features tgbot`); coordinator API — discovery `register-remote` / `heartbeat-remote`, `GET /discovery/virtual-nodes`; `virtual_nodes` tasks, Telegram bind/webhook, `pool/join`, bootstrap + `raid_artifact_probe`; services `virtual_node_store`, `virtual_node_task_service`, `virtual_node_telegram_binding_service`; dev stand `bin/run-virtual-node-dev.*`, `bin/verify-dev-stand.*`, `core::dev_stand`.
+- **Galaxy Grid (fee split + Telegram edge mining + locality seeds)**: описано в `concept/POOLAI_GALAXY_GRID.md`. **Job lease wire (PH-S94…S109 ✅):** lease MVP + grid ingest→`leased` + E2E — `POOLAI_GALAXY_GRID.md` §4.3. **Horizon band PH-S524…S533 ✅ (2026-06-19):** worker-unhealthy failover, governance Prometheus, settlement offline_batch wire, wasm admin charts slim — FM §5.12 **0** · наступна сесія **`абракадабра`**.
+- **Service layer (P2) ✅:** тонкі handlers у `src/network/api/*` → `src/services/*` (system, discovery, ui, raid, enterprise, cloud, virtual nodes, …).
+- **FM-005 REST errors ✅:** `src/network/json_errors.rs` — `{ "error": { "code", "message" }, "context"?: … }` по REST, enterprise, auth, raid.
+- **OpenAPI S14–S21 ✅:** v1 + `/api/enterprise/*` у `docs/openapi.yaml` (optimization/automl/federated ML.1–ML.3).
+- **UI_QUALITY P1 ✅ (S25–S26):** admin JSON contract tests (27) — v1 + enterprise tenants/security/monitoring (`tests/admin_ui_api_contracts.rs`, `ADMIN_UI_JSON_CONTRACTS.md`).
+- **FM-019 a11y Partial ✅:** pa11y 18 auth URLs, `PA11Y_WCAG22`; `ci.yml` `pa11y-contract` + `pa11y-wcag22` (S22 merge gate).
+- **P4 ✅:** `poolai_health_load` → `docs/performance/BENCHMARKS.md` (2026-05-18).
+- **Horizon ✅ (S35–S40):** FM-004 SIMD (`turboquant-simd`), FM-009 `src/grid/`, FM-010 `poolai-solana-adapter`, Job/Memory wire, FM-006 cloud REST scope.
+- **BLOCKED:** FM-003 §4 real LAN (2 фізичні хости).
+
+## 🎯 Current Status: **PROJECT 100% COMPLETE!** 🎉 **v0.2.2 RELEASED!** 🚀 **All 15 Modules 100%!** **437+ Tests Passing!** (102 unit + 335+ integration) **Rust 1.92.0** **All Major Modules Completed!** **UI/UX Validation 100% Complete!** **Deployment Testing Complete!** **Release Readiness Achieved!** **Production Ready!** **CI/CD 100% Passing!** (Ubuntu + Windows) **Code Quality 100%!** (Formatting, Linting, Compilation) **First Day of PRO Package: 2026-01-16** 🚀 **Security Hardening 100% Complete!** (Security audit ✅, Headers ✅, Input validation ✅, Rate limiting ✅, Secrets management ✅, Certificate management ✅, OWASP Top 10 ✅) **Cloud SDK Implementation 100% Complete!** (AWS ✅, GCP ✅, Azure ✅, Auto-scaling Metrics + Scaling Rules ✅, Load Balancing routing rules + Cloud LB init ✅, HPA init ✅ 2026-01-22) **Performance Optimization 80% Complete!** (Memory pools ✅, LRU cache ✅, Benchmarks ✅, Connection pooling ✅) **Distributed AI Features 99.6% Complete!** (Worker Pool 100% ✅, Device Discovery 100% ✅, Instance API 98% ✅, Topology-Aware Load Balancing 95% ✅, Real Model Integration 90% ✅, Streaming 95% ✅, Node Load Tracking 100% ✅, Capabilities Detection 100% ✅) **RAID Strategy Enhancements 100% Complete!** (BurstRAID 100% ✅, SmallWorld 100% ✅, Metrics 100% ✅, Integration tests 100% ✅, Administrative Control Plane 100% ✅) **Enterprise Features 100% Complete!** (SQLite persistence ✅, GitHub OAuth2 ✅, SAML SSO ✅) **Context Memory Monitoring 100% Complete!** (ContextMemoryMonitor ✅, file tracking ✅, metrics collection ✅, optimization suggestions ✅, integration tests ✅ 2026-01-22) **ML.2 AutoML 100% Complete!** (AutoMLPipeline ✅, model selection ✅, hyperparameter optimization ✅, ensemble methods ✅, aggregation ✅, integration tests ✅ 2026-01-22) **ML.3 Federated Learning 100% Complete!** (FederatedLearningPipeline ✅, FedAvg/FedProx aggregation ✅, round management ✅, client updates ✅, integration tests ✅ 2026-01-22) **ML.1 Pruning Strategies 100% Complete!** (Magnitude-based ✅, Structured ✅, Unstructured ✅, Iterative ✅, evaluation ✅, integration tests ✅ 2026-01-22) **exo Integration: Device Discovery Complete!** (UDP broadcast, heartbeat, auto-sync) **Model Instance Management: 98% Complete!** (Instance preview API, OpenAI-compatible `/v1/chat/completions`, streaming support through real models, ModelManager integration) **Concept Analysis Complete!** **65+ Planned Features Documented!** (`CONCEPT_PENDING_FEATURES.md` created) **Next Steps Plan Created!** (`NEXT_STEPS_2026-01-19.md`) **exo Integration Plan Created!** (2026-01-17) **Windows MSYS2 Setup Scripts & Documentation Added!** **Documentation Organized!** (FEATURES_COMMANDS.md moved to docs/) **GitHub Pages CI/CD Fixed!** (Permissions added, continue-on-error) **Cloud SDK Compilation Fixed!** (DefaultAzureCredential removed, REST API approach) **All Tests Passing on Both Platforms!** **Kubernetes API Integration Complete!** **Progress Report with Percentages Created!** Enterprise Features 100% Complete! **51+ Enterprise Integration Tests Passing!** Admin Panel UI 100% Complete! **Architecture Review Complete!** **20+ Commits on 2026-01-16** (First Day of PRO Package) **Formatting Fixed!** (cargo fmt applied, CI checks passing) **Cursor Agent Configuration Complete!** (Rules, commands, plans) **SmallWorld Network Strategy 100% Complete!** (Base structure ✅, topology-based replication ✅, clustering coefficient ✅, short-path routing ✅, RaidManager integration ✅, integration tests ✅) **RAID Strategy 100% Complete!** (BurstRAID ✅, SmallWorld ✅, Metrics ✅, Integration tests ✅, Administrative Control Plane ✅) **Bin Scripts Added!** (bash scripts for git, cargo, tests - no PowerShell) **2026-01-22**
+
+### ✅ What's Implemented:
+
+#### MVP (Stage 1) - COMPLETED ✅
+- ✅ **Core Module** - Base structures and traits
+- ✅ **Pool Module** - Worker pool management
+- ✅ **Monitoring Module** - Basic metrics and monitoring
+
+#### Stage 2 - COMPLETED ✅
+- ✅ **Network Module** - REST API and WebSocket with HTTPS/TLS
+- ✅ **REST error envelope (FM-005, 2026-04-10)** — JSON `{ "error": { "code", "message" }, "context"?: … }` у `src/network/json_errors.rs`: `AppError`, `HttpAppError`, стабільні клієнтські коди через `AppError::RestError`; покриття: основний `api/*.rs`, **`raid`/`raid_http`/`raid_admin`**, **`enterprise_api/`**, **`login`/`refresh`**, **`check_permission`**, auth middleware. Канон: `docs/catalog/FUNCTION_MANAGEMENT.md` (FM-005 ✅), `docs/ARCHITECTURE_BEST_PRACTICES.md`.
+- ✅ **Platform Module** - GPU management and optimization
+- ✅ **TGBot Module** - Telegram bot for management
+- ✅ **Security Module** - JWT authentication, rate limiting, RBAC
+
+#### Stage 3 - MOSTLY COMPLETED ✅
+- ✅ **Runtime Module** - Process lifecycle management
+- ✅ **Rewards System** - Achievement-based reward system
+- ✅ **WebSocket Security** - Secure real-time updates
+- ✅ **Enhanced API** - Extended endpoints (67+ endpoints)
+- ✅ **Libs Module** - Model library management (100% complete)
+  - ✅ Enhanced Rustdoc documentation with examples
+- ✅ **VM Module** - Virtualization and isolation (100% complete) 🎉
+  - ✅ Process runner integration
+  - ✅ Resource limits (Linux cgroups, Windows Job Objects)
+  - ✅ Health checks with auto-recovery (exponential backoff)
+  - ✅ Resource monitoring (history tracking, alerts)
+  - ✅ Isolation module structure (Linux system calls implemented)
+  - ✅ Loopback interface setup (`ip link set lo up`)
+  - ✅ Bind mounts implementation (`nix::mount::mount` with `MS_BIND`)
+  - ✅ Read-only mounts implementation (`MS_RDONLY` flag)
+  - ✅ Network interface configuration (veth pairs) - **НОВЕ ЗАВЕРШЕННЯ** 🎉
+  - ✅ Firewall rules setup (nftables/iptables) - **НОВЕ ЗАВЕРШЕННЯ** 🎉
+  - ✅ 24 integration tests passing
+  - 🔄 Full namespace integration (setns - requires process creation in namespace)
+  - 🔄 macvlan support (planned for future)
+  - 🔄 Windows isolation (AppContainer - planned)
+- ✅ **RAID Module** - Fault tolerance and replication (100% complete) 🎉
+  - ✅ Local artifact storage
+  - ✅ Distributed RAID protocol
+  - ✅ Raft consensus (all 6 phases complete)
+  - ✅ Event sourcing
+  - ✅ Circuit breaker pattern
+  - ✅ Replication strategies (BurstRAID ✅, SmallWorld ✅)
+  - ✅ BurstRAID Strategy (100% complete)
+    - ✅ Burst detection with metrics
+    - ✅ Adaptive replication factor
+    - ✅ Automatic rebalancing
+    - ✅ Metrics collection (BurstRaidMetrics, ArtifactBurstStats)
+    - ✅ Integration tests with real artifacts
+  - ✅ SmallWorld Network Strategy (100% complete)
+    - ✅ Network topology-based replication
+    - ✅ Clustering coefficient calculation
+    - ✅ Short-path routing
+    - ✅ Metrics collection (SmallWorldMetrics)
+    - ✅ Integration tests with real artifacts
+  - ✅ Cross-strategy integration tests
+  - ✅ Administrative Control Plane (100% complete) 🎉
+    - ✅ `src/raid/admin.rs` module with RaidAdmin
+    - ✅ Admin API endpoints (`/raid/admin/*`)
+    - ✅ Integration tests (6 tests passing)
+  - ✅ 145+ tests passing (122+ base + 23+ integration tests)
+- ✅ **UI Module** - Web interface (100% complete) 🎉
+  - ✅ Enhanced Rustdoc documentation with examples
+  - ✅ Dashboard pages (Home, Status, Health, Metrics, Workers, Libs, VM, RAID)
+  - ✅ JWT authentication with login page
+  - ✅ Write operations (Create/Delete Workers, Artifacts, VM Instances)
+  - ✅ RBAC integration (Admin, Operator, Viewer)
+  - ✅ UI Components Library (buttons, cards, forms, modals, badges, tables, notifications)
+  - ✅ Theme customization (dark, light, high-contrast with persistence)
+  - ✅ **Accessibility Features** - **COMPLETED** 🎉
+    - ✅ Keyboard navigation (Tab, Esc, Ctrl+K shortcuts)
+    - ✅ ARIA labels & roles for all interactive elements
+    - ✅ Skip links for quick navigation
+    - ✅ Semantic HTML (header, nav, main, footer)
+    - ✅ Focus indicators (outline styles)
+    - ✅ Modal focus trap
+    - ✅ ARIA live regions for notifications
+  - ✅ **Additional UI Components** - **COMPLETED** 🎉
+    - ✅ Dropdowns, tooltips, progress bars, tabs, accordion
+  - ✅ **UX Improvements** - **COMPLETED** 🎉
+    - ✅ Skeleton loaders, enhanced error handling with retry
+    - ✅ Search & filtering, form improvements (auto-save, real-time validation, wizard)
+  - ✅ **Responsive Design** - **COMPLETED** 🎉
+    - ✅ Mobile navigation (hamburger menu, drawer)
+    - ✅ Responsive layouts (grid, flexbox, stack on mobile)
+    - ✅ Touch optimizations (swipe gestures, touch feedback)
+  - ✅ **UI Alignment Improvements** - **COMPLETED** 🎉
+    - ✅ Box-sizing, table containers, proper spacing, auto-alignment to borders
+  - ✅ **Global Search** - **COMPLETED** 🎉
+    - ✅ Ctrl+K/Cmd+K shortcut for global search
+    - ✅ Modal window with keyboard navigation
+    - ✅ ARIA labels and roles for accessibility
+- ✅ **Raft Consensus** - Distributed RAID consensus (all 6 phases complete)
+- ✅ **Documentation Improvements** - **COMPLETED** 🎉
+  - ✅ Enhanced TODO comments in runtime module (Windows process priority, restart logic)
+  - ✅ Enhanced TODO comments in platform module (GPU info retrieval)
+  - ✅ Enhanced TODO comments in RAID distributed handlers (artifact metadata, sync logic, health checks)
+  - ✅ Improved documentation in Telegram bot module (module-level and function-level docs with examples)
+  - ✅ Enhanced TODO comments in VM isolation modules (Linux/Windows isolation details)
+  - ✅ Enhanced TODO comments in VM resources module (Windows Job Objects, Linux cgroups)
+  - ✅ **Comprehensive Rustdoc Documentation** - Complete documentation for all core modules (config, error, monitoring, pool, vm, raid) with usage examples
+  - ✅ **Runtime Module Documentation** - Enhanced Rustdoc for worker and process modules with comprehensive examples
+  - ✅ **Network Module Documentation** - Enhanced Rustdoc for WebSocket and auth modules with comprehensive examples
+  - ✅ **Rewards Module Documentation** - Enhanced Rustdoc for rewards module with comprehensive examples
+  - ✅ **Error Message Improvements** - Enhanced error messages with context and suggestions across all modules (monitoring, pool, libs, raid, vm, network, runtime, cloud)
+  - ✅ **RAID Module Error Handling** - Enhanced error handling in all RAID submodules (events, manifest, raft, raft_transport, replication) with context and suggestions
+  - ✅ **Runtime Module Error Handling** - Enhanced error handling in runtime submodules (process, health) with context and suggestions
+  - ✅ **Cloud Module Error Handling** - Enhanced error handling in all cloud submodules (Kubernetes, Auto-scaling, Load Balancing) with context and suggestions
+  - ✅ **Cloud Module Documentation** - Comprehensive Rustdoc documentation with usage examples for all cloud submodules
+  - ✅ **Kubernetes API Integration** - Real HTTP calls to Kubernetes API via reqwest (Deployments, Pods, Services)
+  - ✅ **Kubernetes kubeconfig Loading** - Improved kubeconfig loading with file and in-cluster config support
+  - ✅ **Kubernetes Operator Structure** - PoolAIOperator with CRD definitions (PoolAIWorker, PoolAIVM, PoolAITenant)
+  - ✅ **CRD Watching** - HTTP polling-based watchers for PoolAIWorker, PoolAIVM, PoolAITenant CRDs
+  - ✅ **Event Handling** - CrdEvent and CrdEventType for processing CRD changes (Added, Modified, Deleted)
+  - ✅ **Reconciliation Functions** - reconcile_worker, reconcile_vm, and reconcile_tenant with full implementation
+  - ✅ **Deployment Update Methods** - update_worker_deployment and update_vm_deployment with PATCH support
+  - ✅ **Build Deployment Helpers** - build_deployment and build_vm_deployment for Kubernetes JSON creation
+  - ✅ **CRD Resource Management** - get_crd_resource, list_crd_resources, update_crd_status methods
+  - ✅ **ResourceQuota Management** - create_or_update_resource_quota for tenant reconciliation
+  - ✅ **Full Reconciliation Loop** - parse CRD resources, call reconcile functions, update CRD status
+  - ✅ **CRD Event Handling** - resource type detection (Worker, Vm, Tenant) and event processing
+  - ✅ **Real Metrics Collection** - Kubernetes Pod metrics integration for auto-scaling decisions
+  - ✅ **Real Health Checks** - Kubernetes pod status + HTTP health checks for load balancing
+  - ✅ **Auto-scaling Integration** - scale_up/scale_down with real Kubernetes API calls
+  - ✅ **Load Balancer Health Tracking** - consecutive failures tracking, health status per backend
+  - ✅ **Improved CRD Watching** - enhanced polling logic with resourceVersion tracking, watch API placeholder for future optimization
+  - ✅ **Environment Variables Support** - parse and apply env vars from worker CRD spec in reconciliation
+  - ✅ **Network Ports Support** - parse and apply ports from VM CRD spec in reconciliation
+  - ✅ **Complete Cleanup** - VM deployment deletion and ResourceQuota deletion for deleted CRD resources
+  - ✅ **Enhanced Error Handling** - CRD status updates on reconciliation errors, better error messages and logging
+  - ✅ **Service Creation** - Automatic Kubernetes Service creation for workers and VMs
+  - ✅ **PVC Creation** - Automatic PersistentVolumeClaim creation for VM storage
+  - ✅ **Improved CRD Watching** - Actual resource listing and comparison with better error handling
+  - ✅ **Service Management** - Complete CRUD operations for Kubernetes Services (create, update, delete, exists)
+  - ✅ **PVC Management** - Complete CRUD operations for PersistentVolumeClaims (create, update, delete, exists)
+  - ✅ **Smart Reconciliation** - Check Service/PVC existence before create/update operations in reconciliation
+  - ✅ **Complete Cleanup** - Automatic Service and PVC deletion when CRD resources are deleted
+  - ✅ **Deployment Status Monitoring** - get_deployment_status method for monitoring deployment health and replica status
+  - ✅ **Deployment Pods Listing** - list_deployment_pods method for getting pods managed by a specific deployment
+  - ✅ **Real Deployment Status in CRD** - Use actual deployment status for accurate CRD Ready condition updates
+  - ✅ **Detailed Deployment Info in CRD** - Include replicas, availableReplicas, readyReplicas in CRD status for comprehensive monitoring
+  - ✅ **Deployment Events Monitoring** - get_deployment_events method for retrieving deployment events for debugging and diagnostics
+  - ✅ **Retry Logic with Exponential Backoff** - Automatic retry with exponential backoff for transient Kubernetes API errors (3 retries)
+  - ✅ **Reconciliation Loop** - Event-driven reconciliation loop for desired vs actual state
+  - ✅ **Reconciliation Functions** - Real implementation for reconcile_worker and reconcile_vm using KubernetesManager
+  - ✅ **Deployment Management** - Check existence and create deployments for workers and VMs
+  - ✅ **Error Handling** - Improved error handling and logging in reconciliation functions
+  - ✅ **Graceful Shutdown** - Proper shutdown of watchers and reconciliation loops
+  - ✅ **CRD Definitions** - YAML files for PoolAIWorker, PoolAIVM, PoolAITenant with OpenAPI schema validation
+  - ✅ **Helm Charts** - Complete Helm chart for PoolAI deployment (Chart.yaml, values.yaml, templates, README.md)
+  - ✅ **VM Deployment Implementation** - Real Kubernetes API calls for VM deployments with storage and network support
+  - ✅ **Service Endpoints Implementation** - Real Kubernetes API calls for querying service endpoints
+  - ✅ **Operator Reconciliation Structure** - Basic structure for watchers and reconciliation loops
+  - ✅ **Providers Module Documentation** - Enhanced documentation with multi-cloud usage examples
+  - ✅ **Scaling Policies** - Added ScalingPolicy struct with metric-based scaling rules (CPU, Memory, RequestRate)
+  - ✅ **Load Balancing Configuration** - Added LoadBalancingStrategy enum (RoundRobin, WeightedRoundRobin, LeastConnections, IpHash) and HealthCheckConfig
+  - ✅ **Scaling Policy Management** - Methods for adding policies, setting replica limits (min/max)
+  - ✅ **Load Balancing Management** - Methods for setting strategy and health check configuration
+  - ✅ **Progress Report** - Detailed progress report with percentages for all modules (PROGRESS_REPORT.md)
+  - ✅ **Enterprise Module Documentation** - Enhanced Rustdoc documentation with usage examples for EnterpriseManager
+  - ✅ **Unit Tests** - Comprehensive unit tests for versioning, config, pool, raid, vm modules
+  - ✅ **Integration Tests** - 39 new integration tests (7 worker + 7 process + 8 rewards + 9 auth + 8 websocket)
+  - ✅ **Core Module Integration Tests** - 14 new integration tests (12 state + 12 model_interface)
+
+#### Stage 4.1: Advanced Runtime - COMPLETED ✅
+- ✅ **Process Management** - Advanced process management
+- ✅ **Resource Orchestration** - Resource orchestration
+- ✅ **Task Scheduling** - Advanced task scheduling
+- ✅ **Caching System** - Multi-level caching
+- ✅ **Storage Management** - Storage optimization
+- ✅ **Health Monitoring** - Comprehensive health checks
+- ✅ **Auto-scaling** - Automatic scaling capabilities
+
+#### Stage 4.2: Enterprise Features - COMPLETED ✅ 🎉
+- ✅ **Enterprise Module Structure** - Complete module architecture
+- ✅ **Audit Logging** - File-based logging, rotation, query, cleanup (4 tests)
+- ✅ **Multi-tenancy** - Resource quotas, usage tracking, validation (4 tests)
+- ✅ **Advanced Security** - OAuth2, SAML, security policies (3 tests)
+- ✅ **Advanced Monitoring** - Dashboards, alerts, metrics aggregation (3 tests)
+- ✅ **Admin Panel** - Comprehensive admin interface with full functionality
+  - ✅ Dashboard with system overview, quick stats, active alerts, recent activity
+  - ✅ Tenant Management UI (list, create, edit, delete, quota management)
+  - ✅ Security Management UI (OAuth2, SAML, security policies with tabs)
+  - ✅ Audit Logs viewer with advanced filtering
+  - ✅ Monitoring dashboard (alerts, dashboards, metrics)
+  - ✅ VM/Worker/Library/RAID/User management UIs
+  - ✅ System configuration with tabs
+- ✅ **Enterprise API Endpoints** - REST API for all enterprise features
+- ✅ **Authentication Integration** - Synchronized user storage format
+- **Total: 16 enterprise tests passing**
+- ✅ **Enterprise Module Structure** - Module foundation created
+- ✅ **Audit Logging** - File-based logging with rotation, query, and cleanup (100% complete)
+- ✅ **Multi-tenancy** - Multi-client support with resource quotas and usage tracking (100% complete)
+- ✅ **Advanced Security** - OAuth2, SAML, security policies (100% complete)
+- ✅ **Advanced Monitoring** - Real-time dashboards, alerts, metrics aggregation (100% complete)
+
+#### Stage 4.4: AI/ML Enhancement — IN PROGRESS 🔄 (core scaffolding shipped 2026-01-22; pipeline & API extended 2026-03-25)
+- ✅ **Model Optimization** - Model performance optimization (ML.1: Profiling ✅, Tuning ✅, Quantization ✅, Pruning ✅)
+- ✅ **AutoML Integration** - Automated machine learning (ML.2: Model selection ✅, Hyperparameter optimization ✅, Ensemble ✅)
+- ✅ **Federated Learning** - Distributed learning (ML.3: FedAvg ✅, FedProx ✅, Round management ✅); **pipeline step `FederatedAggregation`** для агрегації в середині ML.6
+- ✅ **Context Memory Monitoring** - AI context tracking and optimization (File tracking ✅, Metrics ✅, Optimization ✅)
+- ✅ **Model Versioning** - Model lifecycle management (ML.4: Version tracking ✅, Registration ✅, Comparison ✅, Tagging ✅)
+- ✅ **Experiment Tracking** - ML experiment management (ML.5: Registration ✅, Metrics ✅, Comparison ✅, Best selection ✅)
+- ✅ **Pipeline Management (ML.6)** - Orchestration: steps include Profiling, HyperparameterTuning, Quantization, Pruning, AutoML, **FederatedAggregation**, тощо; після AutoML за замовчуванням **реєстрація моделі та запис експерименту** (`ModelVersionManager` / `ExperimentTracker`; прапор **`automl_skip_registry`** вимикає цей крок для тестів/ізоляції)
+- ✅ **Enterprise HTTP API (`enterprise` + `ml`)** - `GET/POST /api/enterprise/ai-ml/pipeline`, `GET /pipeline/{id}`, `POST /pipeline/{id}/execute`, `GET /pipeline/demo`; спільний **`MLPipelineManager`** у **`ApiContext` / `AppState`**
+- 🔄 **Welcome TurboQuant (план 2026-04)** — екстремальне стиснення **KV cache / ваг / векторів** (Google Research: TurboQuant + PolarQuant + QJL; див. `docs/ml/TURBOQUANT_INTEGRATION.md`). Інтеграція в PoolAI: **виключно Rust** (`src/ml/…`), **після** стабільних Rust-бекендів кроків pipeline; метрики + менший обсяг артефактів для **RAID/мережі**; **без Python**; не замінює окрему оптимізацію транспорту.
+
+## 🚀 Next Phase: Stage 4.3
+
+### **Stage 4.3: Cloud Integration** - IN PROGRESS 🔄 (Infrastructure 100% ✅, Error Handling Enhanced ✅, Documentation Enhanced ✅, CRD Definitions Created ✅)
+- ✅ **Module Structure** - Complete cloud module architecture created
+- ✅ **Kubernetes Support** - Infrastructure ready (operator, CRDs, service discovery placeholders)
+- ✅ **Cloud Providers** - AWS, Azure, GCP integration infrastructure ready
+- ✅ **Auto-scaling** - Auto-scaling module structure ready
+- ✅ **Load Balancing** - Load balancing module structure ready
+- ✅ **Enhanced Error Handling** - Context and suggestions in all cloud submodules (Kubernetes, Auto-scaling, Load Balancing)
+- ✅ **Comprehensive Documentation** - Rustdoc documentation with usage examples for all cloud submodules
+- ✅ **SDK Dependencies** - k8s-openapi, Azure SDK added as optional features (cloud-sdk feature)
+- ✅ **Kubernetes API Integration** - Real HTTP calls via reqwest (Deployments, Pods)
+- ✅ **Kubeconfig Loading** - Improved loading with file and in-cluster config support
+- ✅ **Kubernetes Operator Structure** - PoolAIOperator with CRD definitions
+- ✅ **CRD Definitions** - YAML files for PoolAIWorker, PoolAIVM, PoolAITenant with OpenAPI schema
+- ✅ **Unit Tests** - 66 comprehensive tests passing (8 integration + 8 config validation + 9 autoscaling + 12 loadbalancing + 10 kubernetes + 12 providers + 7 cloud integration)
+- ✅ **Kubernetes Operator Implementation** - Watchers and reconciliation loops (structure ready, implementation ~50%)
+- ✅ **Helm Charts** - Deployment templates (100% complete)
+- ✅ **Cloud Provider Real Implementations** - AWS, Azure, GCP (100% REST/SDK; Metrics API ✅, Auto-scaling evaluate_and_scale ✅)
+
+### **Admin Panel** - COMPLETED ✅ 🎉
+- ✅ **Comprehensive Admin Interface** - Full system management UI with sidebar navigation
+- ✅ **Enterprise Features Management** - Tenant, Security, Audit, Monitoring UI
+- ✅ **System Configuration** - Advanced settings and policies tabs
+- ✅ **Real-time Monitoring Dashboard** - Live metrics and alerts
+- ✅ **VM/Worker/Library/RAID Management** - Full CRUD operations UI
+- ✅ **User Management** - User administration interface
+- ✅ **Enterprise API Endpoints** - REST API for all enterprise features
+
+## 🏗️ Rust Architecture Principles (Updated for Rust 1.83+)
+
+### **Zero-Cost Abstractions**
+- Trait-based polymorphism without runtime overhead
+- Compiler optimizes abstractions to native code (LLVM optimizations)
+- Zero-copy operations where possible (serde, bytes)
+- Generic programming with monomorphization
+
+### **Memory Safety without GC**
+- Ownership and Borrowing for safe memory management
+- Arc<RwLock<T>> for shared mutable state (thread-safe)
+- Lifetimes prevent dangling pointers (compile-time checks)
+- No null pointer exceptions (Option<T> instead)
+- Stack-based allocation with automatic cleanup (RAII)
+
+### **Concurrency-First Design**
+- Async/await for non-blocking operations (Tokio runtime)
+- Tokio runtime for multithreading (work-stealing scheduler)
+- Actor model for state isolation (message passing)
+- Channels for communication (mpsc, oneshot, broadcast)
+- Lock-free data structures where possible (atomic operations)
+
+### **Type Safety**
+- Strong typing prevents runtime errors (compile-time checks)
+- Pattern matching for exhaustive handling (match expressions)
+- Option<T> and Result<T, E> for error handling (no exceptions)
+- Type inference reduces boilerplate (let bindings)
+- Generic constraints ensure correctness (trait bounds)
+
+### **Modern Rust Features (1.83+)**
+- **Async traits** - Native async trait support (no async-trait crate needed)
+- **Generic associated types (GATs)** - More flexible trait definitions
+- **Const generics** - Compile-time constants in generic parameters
+- **Improved error messages** - Better diagnostics and suggestions
+- **Performance improvements** - Faster compilation and runtime
+- **Enhanced tooling** - Better rust-analyzer, clippy, and cargo support
+
+## 🔧 Modular Architecture
+
+### **Current Project Structure**
+
+The project follows Rust module conventions where each module directory contains:
+- `mod.rs` - Main module file with public API
+- Sub-modules as separate `.rs` files
+- Re-exports for convenient access
+
+**Actual Project Structure** (as of Stage 4.1):
+```
+poolAI/src/
+├── main.rs                    # Application entry point
+├── lib.rs                     # Library root with re-exports
+├── version.rs                 # Version and build time information
+├── core/
+│   ├── mod.rs                 # Core module initialization
+│   ├── config.rs              # System configuration (PoolAIConfig, SystemConfig, GpuConfig)
+│   ├── error.rs               # Error handling (AppError, ErrorMetrics)
+│   ├── state.rs               # Application state (AppState, Worker, SystemState)
+│   └── model_interface.rs     # Model interface (ModelInterface trait, ModelManager)
+├── pool/
+│   ├── mod.rs                 # Pool management (Pool, PoolConfig, PoolMetrics, LoadBalancingStrategy)
+│   └── worker.rs              # Worker management (Worker, WorkerConfig, WorkerMetrics)
+├── monitoring/
+│   ├── mod.rs                 # Monitoring system (Monitoring, Alert, SystemStatus, HistoricalData)
+│   └── metrics.rs             # Metrics collection (Metrics, MetricsCollector)
+├── network/
+│   ├── mod.rs                 # Network server initialization
+│   ├── api.rs                 # REST API endpoints (67+ endpoints)
+│   ├── auth.rs                # Authentication and authorization (JWT, RBAC)
+│   └── ws.rs                  # WebSocket connections
+├── platform/
+│   ├── mod.rs                 # Cross-platform interface (GpuInfo, get_gpu_info)
+│   ├── windows.rs             # Windows-specific functionality
+│   └── linux.rs               # Linux-specific functionality
+├── runtime/
+│   ├── mod.rs                 # Runtime manager (RuntimeManager, RuntimeConfig, RuntimeStatus)
+│   ├── worker.rs              # Runtime workers
+│   ├── scheduler.rs           # Task scheduler
+│   ├── queue.rs               # Task queue
+│   ├── cache.rs               # Multi-level caching
+│   ├── storage.rs             # Storage management
+│   ├── process.rs             # Process management
+│   ├── orchestrator.rs         # Resource orchestration
+│   └── health.rs               # Health monitoring
+├── rewards/
+│   └── mod.rs                 # Reward system (RewardSystem, RewardType, RewardLevel, UserProgress)
+└── tgbot/
+    └── mod.rs                 # Telegram bot integration (start_bot, send_notification)
+```
+
+**Implemented Modules** (as of Stage 4.1):
+- ✅ `core/` - Core functionality (config, error, state, model_interface)
+- ✅ `pool/` - Worker pool management (worker, Pool, PoolConfig)
+- ✅ `monitoring/` - Metrics and monitoring (metrics, Monitoring, Alert)
+- ✅ `network/` - REST API and WebSocket (api, ws, auth)
+- ✅ `platform/` - Platform-specific code (linux, windows, GPU info)
+- ✅ `runtime/` - Advanced runtime management (worker, scheduler, queue, cache, storage, process, orchestrator, health)
+- ✅ `rewards/` - Reward system (RewardSystem, RewardType, RewardLevel)
+- ✅ `tgbot/` - Telegram bot integration (basic implementation)
+- ✅ `version.rs` - Version information
+
+**Completed Modules** (Stage 3):
+- ✅ `libs/` - Library management (100% complete)
+  - ✅ Manager, registry, versioning, dependencies
+  - ✅ HTTP download, archive extraction, checksum verification
+  - ✅ Constraint-based dependency selection
+  - ✅ Auto-update policies
+- ✅ `vm/` - Virtualization (100% complete) 🎉
+  - ✅ Manager, instance, process runner
+  - ✅ Resource limits, health checks, auto-recovery
+  - ✅ Resource monitoring, isolation module
+  - ✅ Linux system calls (network namespaces, chroot)
+  - ✅ Network interface configuration (veth pairs)
+  - ✅ Firewall rules setup (nftables/iptables)
+- ✅ `raid/` - RAID system (90% complete)
+  - ✅ Local artifacts, distributed protocol
+  - ✅ Raft consensus, event sourcing
+  - ✅ Circuit breaker, replication strategies
+- ✅ `ui/` - Web interface (100% complete) 🎉
+  - ✅ Dashboard, components, themes
+  - ✅ Authentication, write operations, RBAC
+  - ✅ Accessibility features (keyboard navigation, ARIA, screen reader support)
+  - ✅ UX improvements (polling optimization, error handling, search & filtering)
+  - ✅ Responsive design (mobile navigation, touch optimizations)
+  - ✅ Admin Panel (UI 100%, functionality ~90% - User CRUD, Tenant CRUD, Worker CRUD, VM CRUD complete)
+  - ✅ Comprehensive UI/UX validation complete
+  - ✅ Enhanced Rustdoc documentation
+
+**Enterprise Modules** (Stage 4.2 - COMPLETED ✅ 🎉):
+- ✅ `enterprise/` - Enterprise features module (100% complete)
+  - ✅ `audit.rs` - Audit logging (file-based, rotation, query, cleanup, 4 tests)
+  - ✅ `multi_tenancy.rs` - Multi-tenancy (quotas, usage tracking, validation, 4 tests)
+  - ✅ `security.rs` - Advanced security (OAuth2, SAML, policies, 3 tests)
+  - ✅ `monitoring.rs` - Advanced monitoring (dashboards, alerts, metrics, 3 tests)
+  - **Total: 16 enterprise tests passing**
+
+## 📦 Module Details
+
+### **Core Module** - `src/core/`
+```rust
+pub mod config;      // System configuration
+pub mod error;       // Error handling
+pub mod state;       // Application state
+pub mod model_interface; // AI model interface
+```
+
+### **Pool Module** - `src/pool/`
+```rust
+pub mod worker;      // Worker processes
+// mod.rs            // Main worker pool (Pool, PoolConfig, LoadBalancingStrategy)
+```
+
+### **Network Module** - `src/network/`
+```rust
+pub mod api;         // REST API endpoints (67+ endpoints)
+pub mod ws;          // WebSocket connections
+pub mod auth;        // Authentication and authorization
+// mod.rs            // Network server initialization
+```
+
+### **Monitoring Module** - `src/monitoring/`
+```rust
+pub mod metrics;     // Metrics collection
+// mod.rs            // Main monitoring (Monitoring, Alert, SystemStatus, HistoricalData)
+```
+
+### **Platform Module** - `src/platform/`
+```rust
+pub mod linux;       // Linux-specific functionality
+pub mod windows;     // Windows-specific functionality
+// mod.rs            // Cross-platform interface (GpuInfo, get_gpu_info)
+```
+
+### **Runtime Module** - `src/runtime/`
+```rust
+pub mod worker;      // Runtime workers
+pub mod scheduler;   // Task scheduler
+pub mod queue;       // Task queue
+pub mod cache;       // Caching system
+pub mod storage;     // Storage management
+pub mod process;     // Process management
+pub mod orchestrator; // Resource orchestration
+pub mod health;      // Health monitoring
+// mod.rs            // Main runtime manager (RuntimeManager, RuntimeConfig)
+```
+
+### **Rewards Module** - `src/rewards/`
+```rust
+// mod.rs            // Reward system (RewardSystem, RewardType, RewardLevel, UserProgress)
+```
+
+### **TGBot Module** - `src/tgbot/`
+```rust
+// mod.rs            // Telegram bot integration
+```
+
+### **Version Module** - `src/version.rs`
+```rust
+// Version information (APP_VERSION, BUILD_TIME)
+```
+
+## 🔮 Planned Modules (Stage 4.3+)
+
+### **Libs Module** - `src/libs/` (Planned)
+```rust
+pub mod manager;     // Library manager
+pub mod registry;    // Library registry
+pub mod versioning;  // Version management
+pub mod dependencies; // Dependency management
+// mod.rs            // Main interface
+```
+
+### **VM Module** - `src/vm/` (Planned)
+```rust
+pub mod manager;     // VM manager
+pub mod instance;    // VM instances
+pub mod template;    // VM templates
+pub mod networking;  // VM networking
+// mod.rs            // Main interface
+```
+
+### **RAID Module** - `src/raid/` (Planned)
+```rust
+pub mod burst_raid;  // BurstRAID implementation
+pub mod small_world; // Small World network
+pub mod admin;       // Administration
+pub mod vm;          // VM integration
+pub mod worker_interface; // Worker interface
+pub mod config;      // RAID configuration
+pub mod network;     // Network layer
+pub mod storage;     // Storage management
+pub mod worker;      // RAID workers
+pub mod mount;       // Mounting
+pub mod manager;     // RAID manager
+// mod.rs            // Main interface
+```
+
+### **UI Module** - `src/ui/` (Planned)
+```rust
+pub mod dashboard;   // Dashboards
+pub mod components;  // UI components
+pub mod api;         // UI API
+pub mod static_files; // Static files
+pub mod manager;     // UI manager
+// mod.rs            // Main interface
+```
+
+### **Enterprise Module** - `src/enterprise/` (Planned)
+```rust
+pub mod multi_tenancy; // Multi-tenancy
+pub mod security;    // Security
+pub mod audit;       // Audit logging
+pub mod monitoring;  // Advanced monitoring
+pub mod ai_ml;       // AI/ML features
+// mod.rs            // Main manager
+```
+
+## 🔄 Architectural Patterns
+
+### **Actor Model**
+```rust
+pub struct ModuleActor {
+    state: Arc<RwLock<ModuleState>>,
+    message_queue: mpsc::UnboundedReceiver<Message>,
+}
+```
+
+### **Repository Pattern**
+```rust
+pub trait Repository<T> {
+    async fn get(&self, id: &str) -> Result<Option<T>, AppError>;
+    async fn save(&self, entity: T) -> Result<(), AppError>;
+    async fn delete(&self, id: &str) -> Result<(), AppError>;
+}
+```
+
+### **CQRS Pattern**
+```rust
+pub trait Command {
+    async fn execute(&self) -> Result<(), AppError>;
+}
+
+pub trait Query {
+    type Result;
+    async fn execute(&self) -> Result<Self::Result, AppError>;
+}
+```
+
+## 🎯 Rust Best Practices (Rust Book 2024/2025 Edition)
+
+### **Module Organization** (Following Rust Book Chapter 7)
+- Each module has a `mod.rs` file as the entry point (or `mod.rs` in directory)
+- Sub-modules are declared in `mod.rs` and implemented in separate `.rs` files
+- Public API is re-exported through `pub use` statements (convenience)
+- Private implementation details are kept in sub-modules (encapsulation)
+- Use `pub(crate)` for crate-internal visibility
+- Use `pub(super)` for parent module visibility
+
+### **Error Handling** (Following Rust Book Chapter 9)
+- All functions that can fail return `Result<T, AppError>`
+- Error types are defined in `core::error` module (centralized)
+- Errors are propagated using `?` operator (ergonomic)
+- Panic is only used for unrecoverable errors (`unwrap()` in tests only)
+- Use `thiserror` or `anyhow` for error handling (if needed)
+- Custom error types implement `std::error::Error` trait
+
+### **Concurrency** (Following Rust Book Chapter 16)
+- Shared state uses `Arc<RwLock<T>>` for thread-safe access (sync)
+- Async functions use `tokio::sync::RwLock` for async contexts (async)
+- Message passing via channels (`mpsc`, `oneshot`, `broadcast`) for communication
+- Background tasks spawned with `tokio::spawn` (async runtime)
+- Use `tokio::select!` for concurrent operations (async select)
+- Prefer message passing over shared state (actor model)
+
+### **Memory Management** (Following Rust Book Chapter 4)
+- Ownership is explicit and checked at compile time (zero-cost)
+- Borrowing is used for temporary access (references)
+- `Arc` is used for shared ownership across threads (reference counting)
+- `Rc` is used for single-threaded shared ownership (if needed)
+- Lifetimes prevent dangling references (`'static`, `'a`, etc.)
+- Use `Box<T>` for heap allocation when size is unknown at compile time
+
+### **Testing** (Following Rust Book Chapter 11)
+- Unit tests in `#[cfg(test)]` modules (same file or `tests/` submodule)
+- Integration tests in `tests/` directory (separate compilation)
+- Doc tests in documentation comments (`/// # Examples`)
+- Mocking for external dependencies (mockall, mockito)
+- Property-based testing with `proptest` (fuzzing)
+- Use `#[should_panic]` for panic tests (expected panics)
+- Test private functions through public API (best practice)
+
+### **Documentation** (Following Rust Book Chapter 14)
+- Use `///` for public API documentation (rustdoc)
+- Use `//!` for module-level documentation (inner doc)
+- Include code examples in documentation (`# Examples`)
+- Use `#[doc(hidden)]` for internal APIs (hide from docs)
+- Generate docs with `cargo doc --open` (local docs)
+- Publish docs with `cargo doc --no-deps` (for crates.io)
+
+### **MSRV & Edition Policy** (2026 Best Practice)
+- Pin MSRV in `rust-toolchain.toml` and document it in `README`
+- Upgrade MSRV only with CI verification
+- Plan Rust 2024 edition migration as a tracked task
+
+### **Dependency Hygiene & Supply Chain**
+- Run `cargo audit` regularly and fix vulnerabilities promptly
+- Use `cargo deny` to enforce license and dependency policies
+- Minimize default features and prefer feature-gated dependencies
+
+### **Observability & Diagnostics**
+- Use `tracing` spans with request IDs for correlation
+- Keep structured logs in JSON for production ingestion
+- Track metrics for latency, error rate, and saturation
+
+## 🚀 Performance Features
+
+### **Memory Management**
+- Zero-copy deserialization with `serde`
+- Object pooling for frequently created objects
+- Lazy loading for large resources
+
+### **Concurrency**
+- Async/await for I/O bound operations
+- Rayon for CPU bound operations
+- Lock-free data structures where possible
+
+### **Caching**
+- Multi-level caching (L1, L2, L3)
+- LRU eviction policy
+- Cache warming strategies
+
+## 🔒 Security Features
+
+### **Type Safety**
+- Compile-time type checking
+- No null pointer exceptions
+- Memory safety guarantees
+
+### **Error Handling**
+- `Result<T, E>` for recoverable errors
+- `panic!` only for unrecoverable errors
+- Structured error types
+
+### **Security**
+- JWT for authentication
+- RBAC for authorization
+- Input validation and sanitization
+
+### **HTTPS/TLS Architecture**
+
+#### Deployment Variants
+
+**Variant A: Embedded HTTPS (Recommended for production)**
+```
+Internet → PoolAI (HTTPS:443) → Internal Services
+         ↑
+   TLS termination in PoolAI
+   - Let's Encrypt automatic renewal
+   - Self-signed for development
+   - Wildcard certificates for subdomains
+```
+
+**Variant B: Reverse Proxy (Recommended for enterprise)**
+```
+Internet → Nginx/Apache (HTTPS:443) → PoolAI (HTTP:8080)
+         ↑
+   TLS termination in Nginx
+   - Centralized certificate management
+   - Load balancing
+   - Additional protection layers
+```
+
+#### Implementation Stages
+
+**Stage 1: HTTP for Development (MVP)**
+- HTTP on localhost:8080
+- Basic authentication
+- Architecture preparation for HTTPS
+
+**Stage 2: HTTPS for Testing (Stage 2)**
+- Self-signed certificates
+- Embedded TLS support
+- Testing in staging environment
+
+**Stage 3: Production HTTPS (Stage 3)**
+- Let's Encrypt automatic certificates
+- HSTS headers
+- Perfect Forward Secrecy
+- Certificate Transparency
+
+#### Security Configuration
+
+```toml
+[security]
+# TLS/HTTPS settings
+enable_https = true
+cert_path = "/etc/poolai/certs/cert.pem"
+key_path = "/etc/poolai/certs/key.pem"
+redirect_http_to_https = true
+
+# Authentication
+jwt_secret = "your-super-secret-key"
+jwt_expiration = 3600  # 1 hour
+rate_limit_requests = 100  # requests per minute
+rate_limit_window = 60  # seconds
+
+# CORS settings
+cors_origins = ["https://poolai.example.com"]
+cors_methods = ["GET", "POST", "PUT", "DELETE"]
+cors_headers = ["Authorization", "Content-Type"]
+
+# Security headers
+security_headers = true
+hsts_max_age = 31536000  # 1 year
+content_security_policy = "default-src 'self'"
+```
+
+#### WebSocket Security
+- WSS (WebSocket Secure) for real-time updates
+- Authentication via JWT in WebSocket handshake
+- Rate limiting for WebSocket connections
+- Heartbeat for connection monitoring
+
+## 📊 Monitoring & Observability
+
+### **Metrics**
+- Prometheus-compatible metrics
+- Custom business metrics
+- Real-time dashboards
+
+### **Logging**
+- Structured logging with `tracing`
+- Log levels (ERROR, WARN, INFO, DEBUG, TRACE)
+- Correlation IDs for tracing
+
+### **Health Checks**
+- Liveness probes
+- Readiness probes
+- Dependency health checks
+
+## 🌐 API Endpoints
+
+**Current Implementation**: Core API endpoints are implemented. Stage 3 endpoints for Libraries/VM/RAID/UI are now partially implemented.
+
+### **Core API**
+- `/api/status` — System status ✅
+- `/api/health` — Health check ✅
+- `/api/metrics` — System metrics ✅
+- `/api/models` — AI models ✅
+- `/api/workers` — Worker management ✅
+- `/api/gpu` — GPU information ✅
+- `/api/rewards` — Reward system ✅
+- `/ws/metrics` — Live metrics (WebSocket) ✅
+
+### **Enterprise API** (Stage 3 — In Progress)
+- `/api/enterprise/tenants` — Multi-tenancy ✅
+- `/api/enterprise/security` — Security management ✅
+- `/api/enterprise/audit` — Audit logging ✅
+- `/api/enterprise/monitoring` — Advanced monitoring ✅
+- `/api/enterprise/ai-ml` — AI/ML features 🔄
+
+### **Library Management API** (Stage 3 — In Progress)
+- `/api/v1/libraries` — Library list ✅
+- `/api/v1/libraries/:name` — Library info ✅
+- `/api/v1/libraries/:name/install` — Install ✅
+- `/api/v1/libraries/:name/uninstall` — Uninstall ✅
+- `/api/v1/libraries/:name/update` — Update ✅
+
+### **VM Management API** (Stage 3 — In Progress)
+- `/api/v1/vm/instances` — VM instances (read-only) ✅
+- `/api/vm/templates` — VM templates 🔄
+- `/api/vm/networks` — VM networks 🔄
+
+### **RAID System API** (Stage 3 — In Progress)
+- `/api/v1/raid/nodes` — RAID nodes (read-only) ✅
+- `/api/v1/raid/artifacts` — RAID artifacts (read-only) ✅
+- `/api/v1/raid/workers` — RAID workers CRUD ✅
+- `/api/v1/raid/status` — RAID / cluster status ✅
+- `/api/v1/raid/snapshot` (+ create/restore), `/api/v1/raid/gc`, `/api/v1/raid/events` — snapshot / GC / events ✅
+- `/api/v1/raid/distributed/*` — distributed RAID protocol ✅
+- `/api/v1/raid/admin/*` — admin control plane (BurstRAID / SmallWorld metrics) ✅
+
+### **UI Management API** (Planned)
+### **UI (Stage 3 — Read-only implemented)**
+- `/ui` — Dashboard Home ✅
+- `/ui/status` — Status ✅
+- `/ui/health` — Health ✅
+- `/ui/metrics` — Metrics ✅
+- `/ui/workers` — Workers ✅
+- `/ui/libs` — Libraries ✅
+- `/ui/vm` — VM ✅
+- `/ui/raid` — RAID ✅
+- `/api/v1/ui/dashboards` — Dashboard management (enterprise) 🔄
+- `/api/v1/ui/components` — UI components ✅
+- `/api/v1/ui/themes` — Theme management ✅
+
+## 📡 REST API: client error contract (update 2026-04-10)
+
+- **Body shape**: `{ "error": { "code", "message" }, "context"?: … }` — implemented in `src/network/json_errors.rs` (`api_error_response`, `HttpAppError`, `IntoResponse` for `AppError`).
+- **Stable machine-readable `error.code`**: `AppError::RestError { code, message }` with HTTP status via `HttpAppError::with_status` where not the default mapping (see **FM-005** in `docs/catalog/FUNCTION_MANAGEMENT.md`).
+- **Coverage**: `src/network/api/*.rs`, RAID modules (**`raid_api_err`**), **`enterprise_api/`**, UI/users/ML pipeline, **`login`/`refresh`**, **`check_permission`**, auth middleware — **FM-005 закрито (2026-04-10)**.
+- **FM-012 ✅ (2026-05-16)**: i18n UA/EN + Telegram OAuth (HMAC, `auth_date`, allowlist, audit, Viewer RBAC) — див. **FM-012** у `FUNCTION_MANAGEMENT.md`.
+- **Implementation detail**: `docs/ARCHITECTURE_BEST_PRACTICES.md` — *Structured Error Model*; documentation steps 11–12 in root `README.md`.
+
+## 🚀 Deployment
+
+### **Containerization**
+- Docker containers
+- Multi-stage builds
+- Minimal attack surface
+
+### **Orchestration**
+- Kubernetes ready
+- Health checks
+- Rolling updates
+
+## 🧪 Testing
+
+### **Unit Tests**
+- 100% coverage for critical paths
+- Mocking for external dependencies
+- Property-based testing
+
+### **Integration Tests**
+- End-to-end testing
+- Database integration
+- API testing
+
+### **Performance Tests**
+- Load testing
+- Stress testing
+- Memory leak detection
+
+## 📈 Success Metrics
+
+- **Throughput**: Tasks per second
+- **Latency**: P95 response time
+- **Availability**: 99.9% uptime
+- **Resource Utilization**: CPU/GPU/Memory efficiency
+- **Error Rate**: < 0.1%
+
+## 🛠️ Technology Stack
+
+- **Language**: Rust (latest stable)
+- **Runtime**: Tokio
+- **Web Framework**: Axum
+- **Serialization**: Serde
+- **Database**: PostgreSQL + Redis
+- **Monitoring**: Prometheus + Grafana
+- **Logging**: Tracing
+- **Testing**: Cargo test + Criterion
+
+## 🛠️ Development Environment & Build System
+
+### **MSYS2 UCRT64 (Recommended for Windows)**
+
+PoolAI is configured to use **MSYS2 UCRT64** as the primary development and compilation environment on Windows.
+
+#### **Requirements**
+- **MSYS2 UCRT64** - Primary development environment
+- **Rust toolchain**: `stable-x86_64-pc-windows-gnu` (GNU toolchain)
+- **MSYS2 UCRT64 shell** - Automatically used in Cursor/VS Code terminal
+- **GCC/MinGW-w64** - Provided by MSYS2 UCRT64
+
+#### **Terminal Configuration**
+The project is configured for automatic MSYS2 UCRT64 shell usage:
+- `.vscode/settings.json` contains terminal settings
+- Terminal automatically launches in MSYS2 UCRT64 when opening a new terminal
+- Environment variables `MSYSTEM=UCRT64` and `CHERE_INVOKING=1` are set automatically
+
+#### **Rust Toolchain Setup**
+
+**If Rust is not found in MSYS2 UCRT64** (`cargo: command not found`):
+
+**Quick Fix** (Recommended - Automatic):
+```bash
+cd /s/rust/poolAI
+bash setup_rust_path.sh
+source ~/.bashrc
+cargo --version
+```
+
+**Manual Setup**:
+
+1. **Add Rust to PATH** (if Rust is already installed on Windows):
+```bash
+# Add to ~/.bashrc or ~/.bash_profile
+echo 'export PATH="/c/Users/$USER/.cargo/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+2. **Or install Rust via rustup in MSYS2**:
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+export PATH="$HOME/.cargo/bin:$PATH"
+```
+
+3. **Install GNU toolchain**:
+```bash
+# Install GNU toolchain for MSYS2
+rustup default stable-x86_64-pc-windows-gnu
+
+# Or for this project only
+rustup override set stable-x86_64-pc-windows-gnu
+```
+
+4. **Verify installation**:
+```bash
+cargo --version
+rustc --version
+rustup show
+```
+
+**Note**: VS Code/Cursor settings include Rust PATH for terminal environment. See `scripts/setup_rust_path.sh` for automated setup.
+
+#### **Project Structure**
+```
+poolAI/
+├── .vscode/
+│   └── settings.json          # MSYS2 UCRT64 terminal settings
+├── docs/
+│   └── development/
+│       └── TERMINAL_SETUP.md  # MSYS2 setup for Cursor/VS Code
+├── .cargo/
+│   └── config.toml            # Linker configuration for GNU toolchain
+├── src/                       # Source code
+├── Cargo.toml                 # Project dependencies
+└── build.rs                   # Build script for build_time.rs
+```
+
+#### **Benefits of MSYS2 UCRT64**
+- **Compatibility**: Full Windows API compatibility through UCRT (Universal C Runtime)
+- **Performance**: Optimized binaries for Windows
+- **Libraries**: Easy access to libraries via pacman (MSYS2 package manager)
+- **Integration**: Smooth integration with modern development tools
+- **Debugging**: Support for GDB and other debugging tools
+
+#### **Alternative Environments**
+- **Linux**: Native compilation via standard Rust toolchain
+- **WSL**: Can be used, but MSYS2 UCRT64 is recommended for Windows
+- **MSVC**: Not recommended due to dependency issues (ring, gcc.exe)
+
+#### **MSYS2 Commands & Tools**
+**CRITICAL**: Always use MSYS2 bash (`C:\msys64\usr\bin\bash.exe`), NOT PowerShell
+
+**Basic MSYS2 UCRT64 Commands**:
+```bash
+# Setup PATH for MSYS2
+export PATH="/c/msys64/ucrt64/bin:/c/msys64/usr/bin:$PATH"
+
+# Set compilation variables
+export CC="gcc"
+export CC_x86_64_pc_windows_gnu="gcc"
+export AR="ar"
+export AR_x86_64_pc_windows_gnu="ar"
+
+# Verify tools
+command -v gcc
+command -v dlltool
+command -v ar
+
+# Install toolchain if needed
+pacman -S --needed base-devel mingw-w64-ucrt-x86_64-toolchain
+```
+
+**Detailed Instructions**: `docs/troubleshooting/QUICK_FIX_MSYS2.md`
+
+#### **Helper Files for Development**
+
+**file_list.csv** - Complete project file inventory:
+- **Location**: `S:\rust\poolAI\file_list.csv`
+- **Format**: CSV with columns `FullName`, `Length`, `LastWriteTime`
+- **Purpose**: Quick navigation through project structure, file search
+- **Size**: 108254+ lines (complete file inventory)
+- **Status**: Excluded from git (via `.gitignore`)
+
+**Usage**:
+- Search files by name or path
+- Check file modification dates
+- Analyze project structure
+- Generate file reports
+
+**Concept Files** - Primary project documentation:
+- **Location**: `S:\rust\poolAI\docs/concept/`
+- **Primary Files**:
+  - `poolAI_concept_root.txt` - PRIMARY concept document (USE FIRST)
+  - `poolAI_concept.txt` - Alternative concept document (Ukrainian, detailed)
+  - `poolAI_concept_workspace.txt` - Workspace-specific concept
+  - `CONCEPT_UPDATE_2026-01-19.md` - Concept updates
+- **Purpose**: Detailed architecture description, status, and plans
+
+## 🚀 Quick Start
+
+```bash
+# Clone repository
+git clone https://github.com/platinoff/poolAI.git
+cd poolAI
+
+# Setup Rust toolchain (if not already set)
+rustup default stable-x86_64-pc-windows-gnu
+
+# Build and run (in MSYS2 UCRT64 terminal)
+cargo build
+cargo run
+
+# Access API
+curl http://localhost:8080/api/status
+```
+
+## 📚 Documentation
+
+- [README.md](./README.md) (EN) - Updated for Stage 4
+- [README.uk.md](./README.uk.md) (UA) - Updated for Stage 4
+- [API Documentation](./docs/api.md) - Complete API reference
+- [Architecture Guide](./docs/architecture.md) - Detailed architecture
+
+---
+
+**PoolAI** — AI Mining Pool Management System  
+**Status**: v0.2.2 PRODUCTION READY baseline ✅ **First Day of PRO Package: 2026-01-16** 🚀  
+**Tests**: Large integration suite; перевіряти актуальний лічильник командою `cargo test --all-features` на цій гілці  
+**Rust Version**: 1.92.x+ recommended (Edition 2021)  
+**Next Goal**: Stage 4.4 AI/ML hardening (реальні бекенди кроків пайплайну, спостережуваність); **TurboQuant track** (Priority 2b — ML data-plane стиснення); Stage 4.3 operator/SDK polish  
+**Architecture**: All 15 modules baseline complete; ML/enterprise features за feature flags  
+**Version**: v6, 2026 (PRO Edition)  
+**Creator**: Madevinc (one developer with Cursor AI)  
+**Repository**: https://github.com/platinoff/poolAI  
+**Solana Donations**: GcdgNtdE8NEk3z9sQ5jXv2tqguZjSYqPqNAtjsjPNJx8 (Madevinc welcomes donations to support this crypto project)  
+**Latest Update**: 2026-04-04 — **Welcome TurboQuant**: лише **Rust**-імплементація, Priority 2b + таблиця пріоритетів у `NEXT_STEPS_ARCHITECT_2026-03-17.md`; `docs/ml/TURBOQUANT_INTEGRATION.md`
