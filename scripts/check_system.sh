@@ -20,7 +20,7 @@ fi
 
 echo ""
 echo "=== Git Config ==="
-if git config --global --list 2>/dev/null | grep -E "(credential|user|remote)"; then
+if git config --global --list 2>/dev/null | rg -i -e "(credential|user|remote)"; then
     echo ""
 else
     echo "No relevant git config found"

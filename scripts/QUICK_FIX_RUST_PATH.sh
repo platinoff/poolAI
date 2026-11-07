@@ -8,7 +8,7 @@ echo "🔧 Adding Rust to MSYS2 UCRT64 PATH..."
 export PATH="/c/Users/$USER/.cargo/bin:$PATH"
 
 # Add to ~/.bashrc for permanent setup
-if ! grep -q "\.cargo/bin" ~/.bashrc 2>/dev/null; then
+if ! rg -q "\.cargo/bin" ~/.bashrc 2>/dev/null; then
     echo "" >> ~/.bashrc
     echo "# Rust/Cargo PATH for MSYS2 UCRT64" >> ~/.bashrc
     echo 'if [ -d "/c/Users/$USER/.cargo/bin" ]; then' >> ~/.bashrc

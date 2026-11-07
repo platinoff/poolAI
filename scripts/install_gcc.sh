@@ -39,7 +39,7 @@ fi
 echo ""
 echo "📝 Adding GCC to PATH..."
 BASHRC="$HOME/.bashrc"
-if ! grep -q "ucrt64/bin" "$BASHRC" 2>/dev/null; then
+if ! rg -q "ucrt64/bin" "$BASHRC" 2>/dev/null; then
     echo "" >> "$BASHRC"
     echo "# GCC/MinGW-w64 PATH for MSYS2 UCRT64" >> "$BASHRC"
     echo 'export PATH="/c/msys64/ucrt64/bin:$PATH"' >> "$BASHRC"
@@ -49,7 +49,7 @@ else
 fi
 
 # Set CC environment variables
-if ! grep -q "CC=" "$BASHRC" 2>/dev/null; then
+if ! rg -q "CC=" "$BASHRC" 2>/dev/null; then
     echo 'export CC="gcc"' >> "$BASHRC"
     echo 'export CC_x86_64_pc_windows_gnu="gcc"' >> "$BASHRC"
     echo "✅ Added CC environment variables"

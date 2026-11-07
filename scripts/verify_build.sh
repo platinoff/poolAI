@@ -30,9 +30,9 @@ echo ""
 
 # Check toolchain
 echo "📋 Checking toolchain..."
-TOOLCHAIN=$(rustup show | grep -i "default\|active" | head -n1)
+TOOLCHAIN=$(rustup show | rg -i "default|active" | head -n1)
 echo "   $TOOLCHAIN"
-if echo "$TOOLCHAIN" | grep -qi "x86_64-pc-windows-gnu"; then
+if echo "$TOOLCHAIN" | rg -qi "x86_64-pc-windows-gnu"; then
     echo "✅ GNU toolchain detected"
 else
     echo "⚠️  WARNING: Not using GNU toolchain (expected: x86_64-pc-windows-gnu)"
@@ -89,7 +89,7 @@ echo ""
 
 # Check for warnings
 echo "📋 Checking for warnings..."
-if cargo build --all-features 2>&1 | grep -i "warning" | head -n5; then
+if cargo build --all-features 2>&1 | rg -i "warning" | head -n5; then
     echo "⚠️  Warnings found (review above)"
 else
     echo "✅ No warnings"

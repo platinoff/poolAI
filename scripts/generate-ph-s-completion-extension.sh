@@ -43,7 +43,7 @@ slice_name() {
 }
 
 # Remove previous extension marker if re-run
-if grep -q 'PROJECT COMPLETION EXTENSION' "$OUT" 2>/dev/null; then
+if rg -q 'PROJECT COMPLETION EXTENSION' "$OUT" 2>/dev/null; then
   # keep file up to line before marker
   awk '/^<!-- PROJECT COMPLETION EXTENSION/{exit} {print}' "$OUT" > "${OUT}.tmp"
   mv "${OUT}.tmp" "$OUT"

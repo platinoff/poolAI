@@ -25,17 +25,17 @@ read_stdin() {
 
 is_git_push_success() {
   local payload=$1
-  if ! grep -qiE 'git[[:space:]]+push' <<<"$payload"; then
+  if ! rg -qi 'git\s+push' <<<"$payload"; then
     return 1
   fi
-  if grep -qE '"exitCode"[[:space:]]*:[[:space:]]*0' <<<"$payload"; then
+  if rg -q '"exitCode"\s*:\s*0' <<<"$payload"; then
     return 0
   fi
-  if grep -qE '"exit_code"[[:space:]]*:[[:space:]]*0' <<<"$payload"; then
+  if rg -q '"exit_code"\s*:\s*0' <<<"$payload"; then
     return 0
   fi
   # tool_output may be escaped; loose match when push ran and no explicit failure
-  if grep -qiE 'git[[:space:]]+push' <<<"$payload" && ! grep -qE '"exitCode"[[:space:]]*:[[:space:]]*[1-9]' <<<"$payload"; then
+  if rg -qi 'git\s+push' <<<"$payload" && ! rg -q '"exitCode"\s*:\s*[1-9]' <<<"$payload"; then
     return 0
   fi
   return 1
@@ -43,7 +43,7 @@ is_git_push_success() {
 
 detect_sprint_id() {
   local subject=$1
-  grep -oE 'PH-S[0-9]+' <<<"$subject" | head -1
+  rg -o -e 'PH-S[0-9]+' <<<"$subject" | head -1
 }
 
 read_next_sprint_hint() {
@@ -51,7 +51,7 @@ read_next_sprint_hint() {
   if [[ ! -f "$f" ]]; then
     return
   fi
-  grep -m1 'наступний' "$f" 2>/dev/null | grep -oE 'PH-S[0-9]+' | head -1 || true
+  rg -m1 -i 'наступний' "$f" 2>/dev/null | rg -o -e 'PH-S[0-9]+' | head -1 || true
 }
 
 run_self_test() {
@@ -59,12 +59,12 @@ run_self_test() {
   export POOLAI_HOOK_TEST_SUBJECT='feat(vision): PH-S201 post-push hook'
   local out
   out="$(main_logic)"
-  if ! grep -q 'additional_context' <<<"$out"; then
+  if ! rg -q 'additional_context' <<<"$out"; then
     echo "self-test failed: expected additional_context" >&2
     echo "$out" >&2
     return 1
   fi
-  if ! grep -q 'PH-S201' <<<"$out"; then
+  if ! rg -q 'PH-S201' <<<"$out"; then
     echo "self-test failed: expected PH-S201 in context" >&2
     return 1
   fi
@@ -77,7 +77,7 @@ main_logic() {
   input="$(read_stdin)"
   payload="$input"
 
-  if ! grep -qE '"tool_name"[[:space:]]*:[[:space:]]*"Shell"' <<<"$payload"; then
+  if ! rg -q '"tool_name"\s*:\s*"Shell"' <<<"$payload"; then
     emit_empty
     return 0
   fi

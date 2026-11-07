@@ -144,8 +144,8 @@ kill_listener_on_port() {
   if command -v netstat >/dev/null 2>&1; then
     pid="$(
       netstat -ano 2>/dev/null \
-        | grep -E ":${port}[[:space:]]" \
-        | grep -Ei 'LISTEN' \
+        | rg -i -e ":${port}\s" \
+        | rg -i 'LISTEN' \
         | awk '{print $NF}' \
         | head -1
     )"
@@ -227,9 +227,9 @@ verify_raid_job_store() {
 
   detail_json="$(curl -sf --max-time "$TIMEOUT" "${COORD_URL}/api/v1/jobs/${job_id}" || true)"
   if [[ -z "$detail_json" ]] \
-    || ! echo "$detail_json" | grep -q "\"id\":\"${job_id}\"" \
-    || ! echo "$detail_json" | grep -q '"kind":"inference"' \
-    || ! echo "$detail_json" | grep -q '"status":"scheduled"'; then
+    || ! echo "$detail_json" | rg -q "\"id\":\"${job_id}\"" \
+    || ! echo "$detail_json" | rg -q '"kind":"inference"' \
+    || ! echo "$detail_json" | rg -q '"status":"scheduled"'; then
     echo "FAIL RAID job persist after restart (GET /jobs/${job_id})"
     return 1
   fi
@@ -251,7 +251,7 @@ echo "Waiting ${WARMUP_SECS}s for worker bootstrap tasks..."
 sleep "$WARMUP_SECS"
 
 vn_json="$(curl -sf --max-time "$TIMEOUT" "${COORD_URL}/api/v1/discovery/virtual-nodes" || true)"
-if echo "$vn_json" | grep -q "\"peer_id\":\"${WORKER_ID}\""; then
+if echo "$vn_json" | rg -q "\"peer_id\":\"${WORKER_ID}\""; then
   echo "OK  discovery virtual-node -> ${WORKER_ID}"
 else
   echo "FAIL discovery virtual-node missing ${WORKER_ID}"
@@ -259,7 +259,7 @@ else
 fi
 
 workers_json="$(curl -sf --max-time "$TIMEOUT" "${COORD_URL}/api/v1/workers" || true)"
-if echo "$workers_json" | grep -q "\"id\":\"${WORKER_ID}\""; then
+if echo "$workers_json" | rg -q "\"id\":\"${WORKER_ID}\""; then
   echo "OK  pool join -> worker ${WORKER_ID} in /workers"
 else
   echo "FAIL pool join: ${WORKER_ID} not listed in /api/v1/workers"
@@ -305,8 +305,8 @@ if [[ "$VERIFY_ML_PIPELINE" == "1" ]]; then
   ml_demo="$(curl -sf --max-time "$TIMEOUT" "$ML_DEMO_URL" 2>/dev/null || true)"
   if [[ -z "$ml_demo" ]]; then
     echo "SKIP ML pipeline demo -> ${ML_DEMO_URL} (endpoint unavailable; build with enterprise+ml or set VERIFY_ML_PIPELINE=0)"
-  elif echo "$ml_demo" | grep -q '"step_kind":"profiling"' \
-    && echo "$ml_demo" | grep -q '"status":"completed"'; then
+  elif echo "$ml_demo" | rg -q '"step_kind":"profiling"' \
+    && echo "$ml_demo" | rg -q '"status":"completed"'; then
     echo "OK  ML pipeline demo -> step_kind=profiling status=completed"
   else
     echo "FAIL ML pipeline demo: missing profiling step metrics in response"

@@ -48,7 +48,7 @@ check_peers() {
     return 0
   fi
   local count
-  count="$(echo "$body" | grep -o '"peer_id"' | wc -l | tr -d ' ')"
+  count="$(echo "$body" | rg -o '"peer_id"' | wc -l | tr -d ' ')"
   echo "OK  $name discovery/peers -> ${count} peer(s)"
 }
 

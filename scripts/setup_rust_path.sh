@@ -39,7 +39,7 @@ BASHRC="$HOME/.bashrc"
 RUST_PATH_ADDED=false
 
 # Check if already added
-if grep -q "\.cargo/bin" "$BASHRC" 2>/dev/null; then
+if rg -q "\.cargo/bin" "$BASHRC" 2>/dev/null; then
     echo "ℹ️  Rust PATH already configured in ~/.bashrc"
     RUST_PATH_ADDED=true
 else
