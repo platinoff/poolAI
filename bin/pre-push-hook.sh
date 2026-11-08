@@ -9,7 +9,11 @@ echo "🔍 Running pre-push checks..."
 PROJECT_ROOT="$(git rev-parse --show-toplevel)"
 cd "$PROJECT_ROOT"
 
-export PATH="${HOME}/.cargo/bin:/ucrt64/bin:/usr/bin:${PATH:-}"
+# NOTE: git-hook env has HOME=/home/plati (MSYS default) which is NOT the real
+# user profile — ${HOME}/.cargo/bin would be dead and cargo falls back to the
+# ucrt64 system cargo (1.87, no rustup shim, rust-toolchain.toml pin bypassed).
+# Hard-code the real profile path like rebook/poolAI box scripts (ECO-6.8).
+export PATH="/c/Users/plati/.cargo/bin:${HOME}/.cargo/bin:/ucrt64/bin:/usr/bin:${PATH:-}"
 export RUSTUP_TOOLCHAIN="${RUSTUP_TOOLCHAIN:-stable-x86_64-pc-windows-gnu}"
 
 if ! command -v cargo >/dev/null 2>&1; then
