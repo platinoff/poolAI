@@ -52,7 +52,7 @@ pub fn record_replay_pending_scheduled() {
 
 /// Clear one replay verification hold when verdict arrives.
 pub fn record_replay_pending_resolved() {
-    let _ = REPLAY_PENDING.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
+    let _ = REPLAY_PENDING.try_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
         Some(n.saturating_sub(1))
     });
     REPLAY_PENDING_RESOLVED_TOTAL.fetch_add(1, Ordering::Relaxed);

@@ -107,7 +107,7 @@ impl WebSocketManager {
 
                 let subs = metrics_subs.read().await;
                 let senders = senders_metrics.read().await;
-                for (connection_id, _) in subs.iter() {
+                for connection_id in subs.keys() {
                     if let Some(sender) = senders.get(connection_id) {
                         let metrics = get_current_metrics().await;
                         let ws_message = WebSocketMessage {
@@ -133,7 +133,7 @@ impl WebSocketManager {
 
                 let subs = events_subs.read().await;
                 let senders = senders_events.read().await;
-                for (connection_id, _) in subs.iter() {
+                for connection_id in subs.keys() {
                     if senders.get(connection_id).is_some() {
                         // Placeholder: real impl would drain event store
                     }
@@ -304,7 +304,7 @@ impl WebSocketManager {
         };
 
         let senders = self.senders.read().await;
-        for (connection_id, _) in subs.iter() {
+        for connection_id in subs.keys() {
             if let Some(sender) = senders.get(connection_id) {
                 if let Err(e) = sender.send(Message::Text(message_json.clone().into())) {
                     tracing::warn!(

@@ -661,7 +661,7 @@ impl AuditLogger {
         }
 
         // Sort by timestamp (newest first) and apply limit
-        all_events.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
+        all_events.sort_by_key(|a| std::cmp::Reverse(a.timestamp));
         all_events.truncate(limit);
 
         Ok(all_events)
@@ -822,7 +822,7 @@ impl AuditLogger {
         }
 
         // Sort by modification time (newest first)
-        log_files.sort_by(|a, b| b.1.cmp(&a.1));
+        log_files.sort_by_key(|a| std::cmp::Reverse(a.1));
 
         // Delete old files beyond max_files
         if log_files.len() > self.config.max_files {

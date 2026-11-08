@@ -806,7 +806,7 @@ impl MonitoringManager {
             .collect();
 
         // Sort by triggered_at (newest first)
-        filtered.sort_by(|a, b| b.triggered_at.cmp(&a.triggered_at));
+        filtered.sort_by_key(|a| std::cmp::Reverse(a.triggered_at));
         Ok(filtered)
     }
 
@@ -1082,7 +1082,7 @@ impl MonitoringManager {
             .collect();
 
         // Sort by timestamp (newest first)
-        filtered.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
+        filtered.sort_by_key(|a| std::cmp::Reverse(a.timestamp));
 
         // Apply limit
         if let Some(limit) = limit {

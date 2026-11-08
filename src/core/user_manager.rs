@@ -342,6 +342,7 @@ mod tests {
     static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
 
     #[tokio::test]
+    #[allow(clippy::await_holding_lock)]
     async fn initialize_seeds_three_without_service_env() {
         let _guard = ENV_LOCK.lock().unwrap_or_else(|p| p.into_inner());
         std::env::remove_var("POOLAI_SERVICE_PASS");
@@ -353,6 +354,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[allow(clippy::await_holding_lock)]
     async fn initialize_seeds_env_service_account_read_only() {
         let _guard = ENV_LOCK.lock().unwrap_or_else(|p| p.into_inner());
         std::env::set_var("POOLAI_SERVICE_PASS", " s3rv-pass ");

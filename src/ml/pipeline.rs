@@ -1243,7 +1243,7 @@ impl MLPipelineManager {
     pub async fn list_pipelines(&self) -> Vec<MLPipeline> {
         let pipelines = self.pipelines.read().await;
         let mut list: Vec<_> = pipelines.values().cloned().collect();
-        list.sort_by(|a, b| b.created_at.cmp(&a.created_at));
+        list.sort_by_key(|a| std::cmp::Reverse(a.created_at));
         list
     }
 
