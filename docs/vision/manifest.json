@@ -3314,6 +3314,12 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "_cursor_rules_gsv_kit_pointer_mdc"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_WSP_WEIGHT_SPACE_PROGRAMMING_BRIEF_md"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -12658,9 +12664,16 @@
       "label": "gsv-kit-pointer.mdc",
       "layer": "L1",
       "path": ".cursor/rules/gsv-kit-pointer.mdc"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_WSP_WEIGHT_SPACE_PROGRAMMING_BRIEF_md",
+      "label": "WSP_WEIGHT_SPACE_PROGRAMMING_BRIEF.md",
+      "layer": "L1",
+      "path": "docs/development/WSP_WEIGHT_SPACE_PROGRAMMING_BRIEF.md"
     }
   ],
-  "revision": 496,
+  "revision": 497,
   "sprint_queue": [
     {
       "acceptance": ".agents/skills/abracadabra/` роутить продукт (poolai \\",
