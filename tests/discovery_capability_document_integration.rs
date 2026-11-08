@@ -58,6 +58,10 @@ async fn post_register(app: &Router, body: Value) -> (StatusCode, Value) {
 
 #[tokio::test]
 async fn register_remote_capability_document_accepted_ph_s448() {
+    // Env hygiene: clear leaked LAN-stand capability overrides so the dev/production
+    // key switches stay deterministic in integration tests.
+    std::env::remove_var(poolai::grid::galaxy_capability_doc::ENV_CAPABILITY_VERIFY_KEY);
+    std::env::remove_var(poolai::grid::galaxy_capability_doc::ENV_CAPABILITY_VERIFY_PK_HEX);
     let app = app_with_discovery().await;
     let peer_id = format!("ph-s448-cap-{}", uuid::Uuid::new_v4());
     let (status, body) = post_register(
@@ -80,6 +84,8 @@ async fn register_remote_capability_document_accepted_ph_s448() {
 
 #[tokio::test]
 async fn register_remote_invalid_capability_document_returns_400_ph_s448() {
+    std::env::remove_var(poolai::grid::galaxy_capability_doc::ENV_CAPABILITY_VERIFY_KEY);
+    std::env::remove_var(poolai::grid::galaxy_capability_doc::ENV_CAPABILITY_VERIFY_PK_HEX);
     let app = app_with_discovery().await;
     let peer_id = format!("ph-s448-bad-{}", uuid::Uuid::new_v4());
     let (status, body) = post_register(

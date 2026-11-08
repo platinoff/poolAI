@@ -92,6 +92,8 @@ fn signed_capability_doc(peer_id: &str) -> Value {
 async fn register_remote_telegram_edge_requires_signed_capability_ph_s504() {
     static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
     let _guard = ENV_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+    std::env::remove_var(poolai::grid::galaxy_capability_doc::ENV_CAPABILITY_VERIFY_KEY);
+    std::env::remove_var(poolai::grid::galaxy_capability_doc::ENV_CAPABILITY_VERIFY_PK_HEX);
     reset_telegram_seats_for_test();
     std::env::set_var(ENV_TELEGRAM_SEAT_LIMIT, "10");
 

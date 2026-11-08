@@ -253,6 +253,19 @@ mod tests {
         SigningKey::from_bytes(&[7u8; 32])
     }
 
+    /// Host envs (`POOLAI_CAPABILITY_VERIFY_KEY` / `..._VERIFY_PK_HEX`) leak into the
+    /// test binary on LAN stands (production verify key seeded in the shell profile).
+    /// Tests signing with the dev fixture key must clear both overrides deterministically
+    /// (same env-hygiene law as the band-234 bus-flake hardening).
+    static CAP_ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
+    fn lock_dev_verify_env() -> std::sync::MutexGuard<'static, ()> {
+        let guard = CAP_ENV_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+        std::env::remove_var(ENV_CAPABILITY_VERIFY_KEY);
+        std::env::remove_var(ENV_CAPABILITY_VERIFY_PK_HEX);
+        guard
+    }
+
     #[test]
     fn parse_capability_document_ph_s439() {
         let doc = parse_capability_document(&json!({
@@ -280,6 +293,7 @@ mod tests {
 
     #[test]
     fn verify_capability_signature_stub_ph_s466() {
+        let _guard = lock_dev_verify_env();
         let sk = dev_signing_key();
         let pk_hex = hex::encode(sk.verifying_key().to_bytes());
         assert_eq!(pk_hex, DEV_CAPABILITY_VERIFY_PK_HEX);
@@ -303,8 +317,7 @@ mod tests {
 
     #[test]
     fn capability_expires_at_enforced_ph_s527() {
-        static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
-        let _guard = ENV_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+        let _guard = lock_dev_verify_env();
         let sk = dev_signing_key();
         let unsigned = GalaxyCapabilityDocument {
             peer_id: "edge-worker-1".into(),
@@ -329,8 +342,7 @@ mod tests {
 
     #[test]
     fn tee_attestation_required_ph_s572() {
-        static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
-        let _guard = ENV_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+        let _guard = lock_dev_verify_env();
         std::env::set_var(ENV_TEE_ATTEST_REQUIRED, "1");
         let sk = dev_signing_key();
         let unsigned = GalaxyCapabilityDocument {
