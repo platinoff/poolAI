@@ -3320,6 +3320,12 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_development_WSP_WEIGHT_SPACE_PROGRAMMING_BRIEF_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_WSP_HYBRID_ARCHITECTURE_SKETCH_md"
     }
   ],
   "galaxy_background": "vision2.webp",
@@ -12671,9 +12677,16 @@
       "label": "WSP_WEIGHT_SPACE_PROGRAMMING_BRIEF.md",
       "layer": "L1",
       "path": "docs/development/WSP_WEIGHT_SPACE_PROGRAMMING_BRIEF.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_WSP_HYBRID_ARCHITECTURE_SKETCH_md",
+      "label": "WSP_HYBRID_ARCHITECTURE_SKETCH.md",
+      "layer": "L1",
+      "path": "docs/development/WSP_HYBRID_ARCHITECTURE_SKETCH.md"
     }
   ],
-  "revision": 497,
+  "revision": 498,
   "sprint_queue": [
     {
       "acceptance": ".agents/skills/abracadabra/` роутить продукт (poolai \\",
