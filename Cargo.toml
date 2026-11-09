@@ -20,6 +20,12 @@ keywords = ["ai", "mining", "pool", "gpu", "blockchain", "distributed"]
 categories = ["distributed-computing", "ai", "blockchain"]
 default-run = "poolai"
 
+# ECO-8.5: HttpAppError is past clippy's result_large_err threshold. The lib
+# crate allow does not cover bins or integration tests; this package lint does.
+# Boxing the error type stays an architectural follow-up.
+[lints.clippy]
+result_large_err = "allow"
+
 [dependencies]
 # Serialization
 serde = { version = "1.0", features = ["derive"] }
@@ -682,6 +688,171 @@ required-features = ["https"]
 name = "secret_rotation_integration"
 path = "tests/secret_rotation_integration.rs"
 required-features = ["enterprise"]
+
+# ECO-8.5: these integration tests call `#[cfg(test-utils)]` helpers and, where
+# noted, the prometheus scrape surface. Without required-features, clippy
+# `--features jwt,https` (CI) compiles them and fails on missing imports.
+# `cargo test-ci` enables both features, so the tests still run there.
+
+[[test]]
+name = "discovery_heartbeat_unhealthy_integration"
+path = "tests/discovery_heartbeat_unhealthy_integration.rs"
+required-features = ["test-utils"]
+
+[[test]]
+name = "jobs_failover_budget_integration"
+path = "tests/jobs_failover_budget_integration.rs"
+required-features = ["test-utils"]
+
+[[test]]
+name = "admin_ui_api_contracts"
+path = "tests/admin_ui_api_contracts.rs"
+required-features = ["test-utils"]
+
+[[test]]
+name = "grid_pricing_integration"
+path = "tests/grid_pricing_integration.rs"
+required-features = ["test-utils"]
+
+[[test]]
+name = "galaxy_verify_sampling_integration"
+path = "tests/galaxy_verify_sampling_integration.rs"
+required-features = ["test-utils"]
+
+[[test]]
+name = "grid_verification_replay_integration"
+path = "tests/grid_verification_replay_integration.rs"
+required-features = ["test-utils"]
+
+[[test]]
+name = "galaxy_settlement_human_review_integration"
+path = "tests/galaxy_settlement_human_review_integration.rs"
+required-features = ["test-utils"]
+
+[[test]]
+name = "galaxy_replication_quorum_integration"
+path = "tests/galaxy_replication_quorum_integration.rs"
+required-features = ["test-utils"]
+
+[[test]]
+name = "galaxy_verification_sample_scheduled_integration"
+path = "tests/galaxy_verification_sample_scheduled_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
+name = "galaxy_verification_sample_integration"
+path = "tests/galaxy_verification_sample_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
+name = "galaxy_verification_mismatch_integration"
+path = "tests/galaxy_verification_mismatch_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
+name = "galaxy_verification_match_integration"
+path = "tests/galaxy_verification_match_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
+name = "galaxy_trust_metrics_integration"
+path = "tests/galaxy_trust_metrics_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
+name = "galaxy_shard_local_hit_ratio_integration"
+path = "tests/galaxy_shard_local_hit_ratio_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
+name = "galaxy_settlement_pending_verification_integration"
+path = "tests/galaxy_settlement_pending_verification_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
+name = "galaxy_settlement_cleared_integration"
+path = "tests/galaxy_settlement_cleared_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
+name = "galaxy_replication_strict_integration"
+path = "tests/galaxy_replication_strict_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
+name = "galaxy_replay_pending_integration"
+path = "tests/galaxy_replay_pending_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
+name = "galaxy_pricing_quote_usd_micro_integration"
+path = "tests/galaxy_pricing_quote_usd_micro_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
+name = "galaxy_pricing_provider_timeout_integration"
+path = "tests/galaxy_pricing_provider_timeout_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
+name = "galaxy_pricing_provider_errors_integration"
+path = "tests/galaxy_pricing_provider_errors_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
+name = "galaxy_pricing_provider_catalog_metrics_integration"
+path = "tests/galaxy_pricing_provider_catalog_metrics_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
+name = "galaxy_pricing_market_min_usd_micro_integration"
+path = "tests/galaxy_pricing_market_min_usd_micro_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
+name = "galaxy_pricing_cache_age_integration"
+path = "tests/galaxy_pricing_cache_age_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
+name = "galaxy_prefetch_metrics_integration"
+path = "tests/galaxy_prefetch_metrics_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
+name = "galaxy_horizon_s910_integration"
+path = "tests/galaxy_horizon_s910_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
+name = "galaxy_horizon_s900_integration"
+path = "tests/galaxy_horizon_s900_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
+name = "galaxy_horizon_s558_integration"
+path = "tests/galaxy_horizon_s558_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
+name = "galaxy_horizon_s545_integration"
+path = "tests/galaxy_horizon_s545_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
+name = "galaxy_horizon_s514_integration"
+path = "tests/galaxy_horizon_s514_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
+name = "galaxy_fee_split_applied_integration"
+path = "tests/galaxy_fee_split_applied_integration.rs"
+required-features = ["test-utils", "prometheus"]
+
+[[test]]
+name = "galaxy_cross_region_egress_mb_integration"
+path = "tests/galaxy_cross_region_egress_mb_integration.rs"
+required-features = ["test-utils", "prometheus"]
 
 [features]
 default = []

@@ -103,6 +103,11 @@ async fn metrics_text(app: &Router) -> String {
 async fn horizon_s740_band_signed_capability_admission_ph_s749() {
     static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
     let _guard = ENV_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+    // Dev-fixture signing hygiene (same law as unit tests + discovery_signed_capability_dev_fixture):
+    // host envs (POOLAI_*_CAPABILITY_VERIFY_KEY / ..._VERIFY_PK_HEX) leak into the test binary on LAN stands
+    // and would make dev-key-signed docs fail signature verify -> capability 403.
+    std::env::remove_var(poolai::grid::galaxy_capability_doc::ENV_CAPABILITY_VERIFY_KEY);
+    std::env::remove_var(poolai::grid::galaxy_capability_doc::ENV_CAPABILITY_VERIFY_PK_HEX);
     reset_telegram_seats_for_test();
     reset_capability_admission_metrics_for_test();
     std::env::set_var(ENV_TELEGRAM_SEAT_LIMIT, "10");

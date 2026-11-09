@@ -123,10 +123,9 @@
 //! - [`ml`] - Stage 4.4 AI/ML (Model Optimization, AutoML, Federated Learning; optional, feature `ml`)
 //! - [`cloud`] - Cloud integration (Kubernetes, AWS, Azure, GCP)
 
-// ECO-8.5 (clippy-debt sweep): HttpAppError grows past clippy::result_large_err
-// threshold (Err >= 168 bytes) across ~80 service/API handlers that carry rich
-// error context; boxing the error type is an architectural follow-up, so the lint
-// is allow-listed until that redesign lands (band precedent: rebook #[allow]).
+// ECO-8.5: same allow as `[lints.clippy] result_large_err` in Cargo.toml, which
+// is what bins and integration tests actually inherit. Boxing HttpAppError stays
+// an architectural follow-up.
 #![allow(clippy::result_large_err)]
 
 // Core modules

@@ -92,6 +92,11 @@ fn signed_capability_doc(peer_id: &str) -> Value {
 async fn register_remote_telegram_edge_seat_exhausted_ph_s475() {
     static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
     let _guard = ENV_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+    // Dev-fixture signing hygiene (same law as unit tests + discovery_signed_capability_dev_fixture):
+    // host envs (POOLAI_*_CAPABILITY_VERIFY_KEY / ..._VERIFY_PK_HEX) leak into the test binary on LAN stands
+    // and would make dev-key-signed docs fail signature verify -> capability 403.
+    std::env::remove_var(poolai::grid::galaxy_capability_doc::ENV_CAPABILITY_VERIFY_KEY);
+    std::env::remove_var(poolai::grid::galaxy_capability_doc::ENV_CAPABILITY_VERIFY_PK_HEX);
     reset_telegram_seats_for_test();
     std::env::set_var(ENV_TELEGRAM_SEAT_LIMIT, "1");
 
