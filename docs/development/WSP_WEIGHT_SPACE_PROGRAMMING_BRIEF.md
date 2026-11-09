@@ -35,4 +35,4 @@ Any WSP code path must stay behind a **feasibility gate** (ECO-9.1) before touch
 
 ## Verdict (fill after ECO-9.1)
 
-_Pending._
+**ECO-9.1 verdict (2026-11-09, GLM 5.3):** гібрид замість заміни. Пряма заміна RL→WSP ~20–25% (груба локалізація на one-pass Decision-моделях: медіаційні шляхи колапсують → патч = sparse-mask fine-tune, не хірургія). **Гібридний сценарій ~55%** (на межі owner-порогу) → ECO-9.2 відкрито як arch-sketch-only: WSP вводиться як `WeightPatch`/`ActivationAudit` job-kind поверх наявного Job lifecycle + Solana verify→reward (on-chain тільки hash патча + кворум 2/3, тіла — через RAID/MemoryShard). Жорсткі умови: блокова гранулярність патчів у GGUF (Q4_K_M/Q8_0 — dequant(256)/requant блоку, одиночний FP16 запис неможливий); patch-at-dequant з block-bitmap у rusty-engine (zero-downtime), llama-rs — тільки offline rewrite + restart; freeze router/gate ваг; український golden eval — обов'язковий гейт кожного патча (кириличні/MoE-меншинні кластери — найбільший ризик пошкодження). Повний вердикт: `GSV/docs/superpowers/plans/2026-11-08-poolai-wsp-feasibility.md## Verdict (ECO-9.1)`.
