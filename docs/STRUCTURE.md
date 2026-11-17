@@ -1,7 +1,7 @@
 # Структура та таксономія документації PoolAI
 
-**Оновлено:** 2026-11-17 (archive sweep: 35 одноразових сесійних нотаток → `docs/archive/2026-11/`; плоскі `docs/*.md` 61 → 26 канонічних; симбіоз з GSV — [`../../GSV/docs/gsv/GSV_ECOSYSTEM_SYMBIOSIS.md`](../../GSV/docs/gsv/GSV_ECOSYSTEM_SYMBIOSIS.md))  
-**Джерело правди для порядку читання:** кроки **1–12** у кореневому [`README.md`](../README.md), [`docs/README.md`](./README.md) та [`INDEX_2026-03-17.md`](./archive/2026-11/INDEX_2026-03-17.md). **Legacy / stale плани:** [`development/DOCS_LEGACY_AUDIT_2026-05-19.md`](./development/DOCS_LEGACY_AUDIT_2026-05-19.md).
+**Оновлено:** 2026-11-17 (archive sweep: 34 одноразові сесійні нотатки → `docs/archive/2026-11/`; плоскі `docs/*.md` 61 → 27 канонічних; `INDEX_2026-03-17.md` лишено на місці (читається pre-push `poolai-vision-sync`); симбіоз з GSV — [`../../GSV/docs/gsv/GSV_ECOSYSTEM_SYMBIOSIS.md`](../../GSV/docs/gsv/GSV_ECOSYSTEM_SYMBIOSIS.md))  
+**Джерело правди для порядку читання:** кроки **1–12** у кореневому [`README.md`](../README.md), [`docs/README.md`](./README.md) та [`INDEX_2026-03-17.md`](./INDEX_2026-03-17.md). **Legacy / stale плани:** [`development/DOCS_LEGACY_AUDIT_2026-05-19.md`](./development/DOCS_LEGACY_AUDIT_2026-05-19.md).
 
 ---
 
@@ -11,7 +11,7 @@
 |-----|-------------|
 | **Кореневий README** | Збірка, CI, карта доків 1–12, Next Focus. |
 | **`docs/README.md`** | Короткий індекс + посилання на таксономію (цей файл). |
-| **`docs/archive/2026-11/INDEX_2026-03-17.md`** | Повна навігація по `docs/` за темами (архів після 2026-11 sweep). |
+| **`docs/INDEX_2026-03-17.md`** | Повна навігація по `docs/` за темами (канон на місці; перенесення відкочено 2026-11-17 — `poolai-vision-sync` хук читає його обов'язково). |
 | **`docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`** | Покровий план Architect (P1–P6). |
 | **`docs/development/HANDOFF_NEW_SESSION.md`** | Старт нової сесії: гілка, тести, git-push. |
 | **`docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`** | Витяг функціоналу (крок 11). |
@@ -51,7 +51,7 @@ docs/
 
 ## 3. Плоскі файли в `docs/*.md` — 2026-11-17 sweep
 
-**2026-11-17:** 35 одноразових сесійних файлів (`*_2026-01-22`, `*_2026-03-04`, `PUSH_*`, `FINAL_*`, `EXECUTE_*`, `FIX_*`, `ROOT_CLEANUP`, `GIT_PUSH_NOW_*`, `INDEX_2026-03-17.md`) перенесено однією пачкою в **`docs/archive/2026-11/`** (`git mv`, нічого не видалено). Плоских канонічних `docs/*.md` лишилось **26**. Політика: нові одноразові нотатки — одразу в `docs/archive/<date>/`; плоскі файли в корені `docs/` лишаються лише для канонічних точок входу, FM, roadmap, concept, HANDOFF/NEXT, release notes, runbook.
+**2026-11-17:** 34 одноразові сесійні файли (`*_2026-01-22`, `*_2026-03-04`, `PUSH_*`, `FINAL_*`, `EXECUTE_*`, `FIX_*`, `ROOT_CLEANUP`, `GIT_PUSH_NOW_*`) перенесено однією пачкою в **`docs/archive/2026-11/`** (`git mv`, нічого не видалено); `INDEX_2026-03-17.md` лишено в корені — його читає pre-push `poolai-vision-sync` хук. Плоских канонічних `docs/*.md` лишилось **27**. Політика: нові одноразові нотатки — одразу в `docs/archive/<date>/`; плоскі файли в корені `docs/` лишаються лише для канонічних точок входу, FM, roadmap, concept, HANDOFF/NEXT, release notes, runbook, `INDEX_*`.
 
 **Аудит stale (FM):** таблиця файлів січень–квітень 2026 і backlog «не зроблено» — [`development/DOCS_LEGACY_AUDIT_2026-05-19.md`](./development/DOCS_LEGACY_AUDIT_2026-05-19.md) (після S29).
 

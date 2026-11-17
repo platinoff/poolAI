@@ -4234,55 +4234,6 @@
     },
     {
       "auto_synced": true,
-      "id": "docs_ARCHITECTURE_UPDATE_2026_01_22_md",
-      "label": "ARCHITECTURE_UPDATE_2026-01-22.md",
-      "layer": "L2",
-      "path": "docs/ARCHITECTURE_UPDATE_2026-01-22.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_AUTOMATION_COMPLETE_md",
-      "label": "AUTOMATION_COMPLETE.md",
-      "layer": "L2",
-      "path": "docs/AUTOMATION_COMPLETE.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_AUTOMATION_REVIEW_md",
-      "label": "AUTOMATION_REVIEW.md",
-      "layer": "L2",
-      "path": "docs/AUTOMATION_REVIEW.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_AUTONOMOUS_DEVELOPMENT_FINAL_SUMMARY_2026_01_22_md",
-      "label": "AUTONOMOUS_DEVELOPMENT_FINAL_SUMMARY_2026-01-22.md",
-      "layer": "L2",
-      "path": "docs/AUTONOMOUS_DEVELOPMENT_FINAL_SUMMARY_2026-01-22.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_AUTONOMOUS_DEVELOPMENT_SUMMARY_2026_01_22_md",
-      "label": "AUTONOMOUS_DEVELOPMENT_SUMMARY_2026-01-22.md",
-      "layer": "L2",
-      "path": "docs/AUTONOMOUS_DEVELOPMENT_SUMMARY_2026-01-22.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_AUTONOMOUS_SESSION_COMPLETE_2026_01_22_md",
-      "label": "AUTONOMOUS_SESSION_COMPLETE_2026-01-22.md",
-      "layer": "L2",
-      "path": "docs/AUTONOMOUS_SESSION_COMPLETE_2026-01-22.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_AUTO_PUSH_EXECUTION_md",
-      "label": "AUTO_PUSH_EXECUTION.md",
-      "layer": "L2",
-      "path": "docs/AUTO_PUSH_EXECUTION.md"
-    },
-    {
-      "auto_synced": true,
       "id": "docs_BUILD_HTTPS_md",
       "label": "BUILD_HTTPS.md",
       "layer": "L2",
@@ -4294,34 +4245,6 @@
       "label": "CHANGELOG.md",
       "layer": "L2",
       "path": "docs/CHANGELOG.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_CHAT_SUMMARY_2026_01_22_md",
-      "label": "CHAT_SUMMARY_2026-01-22.md",
-      "layer": "L2",
-      "path": "docs/CHAT_SUMMARY_2026-01-22.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_CHECK_SYSTEM_NOW_md",
-      "label": "CHECK_SYSTEM_NOW.md",
-      "layer": "L2",
-      "path": "docs/CHECK_SYSTEM_NOW.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_CONTEXT_SNAPSHOT_2026_03_04_md",
-      "label": "CONTEXT_SNAPSHOT_2026-03-04.md",
-      "layer": "L2",
-      "path": "docs/CONTEXT_SNAPSHOT_2026-03-04.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_CURSOR_AND_NEXT_STEPS_VERIFICATION_2026_03_04_md",
-      "label": "CURSOR_AND_NEXT_STEPS_VERIFICATION_2026-03-04.md",
-      "layer": "L2",
-      "path": "docs/CURSOR_AND_NEXT_STEPS_VERIFICATION_2026-03-04.md"
     },
     {
       "auto_synced": true,
@@ -4346,45 +4269,10 @@
     },
     {
       "auto_synced": true,
-      "id": "docs_DEVELOPMENT_SESSION_SUMMARY_2026_01_22_md",
-      "label": "DEVELOPMENT_SESSION_SUMMARY_2026-01-22.md",
-      "layer": "L2",
-      "path": "docs/DEVELOPMENT_SESSION_SUMMARY_2026-01-22.md"
-    },
-    {
-      "auto_synced": true,
       "id": "docs_DISTRIBUTED_RAID_PROTOCOL_md",
       "label": "DISTRIBUTED_RAID_PROTOCOL.md",
       "layer": "L2",
       "path": "docs/DISTRIBUTED_RAID_PROTOCOL.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_DOCUMENTATION_ADAPTATION_SUMMARY_2026_01_22_md",
-      "label": "DOCUMENTATION_ADAPTATION_SUMMARY_2026-01-22.md",
-      "layer": "L2",
-      "path": "docs/DOCUMENTATION_ADAPTATION_SUMMARY_2026-01-22.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_DOCUMENTATION_CLEANUP_PLAN_2026_01_22_md",
-      "label": "DOCUMENTATION_CLEANUP_PLAN_2026-01-22.md",
-      "layer": "L2",
-      "path": "docs/DOCUMENTATION_CLEANUP_PLAN_2026-01-22.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_DOCUMENTATION_CLEANUP_SUMMARY_md",
-      "label": "DOCUMENTATION_CLEANUP_SUMMARY.md",
-      "layer": "L2",
-      "path": "docs/DOCUMENTATION_CLEANUP_SUMMARY.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_EXECUTE_NOW_md",
-      "label": "EXECUTE_NOW.md",
-      "layer": "L2",
-      "path": "docs/EXECUTE_NOW.md"
     },
     {
       "auto_synced": true,
@@ -4395,62 +4283,6 @@
     },
     {
       "auto_synced": true,
-      "id": "docs_FILE_CLEANUP_NOTES_md",
-      "label": "FILE_CLEANUP_NOTES.md",
-      "layer": "L2",
-      "path": "docs/FILE_CLEANUP_NOTES.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_FINAL_PUSH_READY_md",
-      "label": "FINAL_PUSH_READY.md",
-      "layer": "L2",
-      "path": "docs/FINAL_PUSH_READY.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_FINAL_SUMMARY_2026_01_22_md",
-      "label": "FINAL_SUMMARY_2026-01-22.md",
-      "layer": "L2",
-      "path": "docs/FINAL_SUMMARY_2026-01-22.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_FIX_AND_PUSH_NOW_md",
-      "label": "FIX_AND_PUSH_NOW.md",
-      "layer": "L2",
-      "path": "docs/FIX_AND_PUSH_NOW.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_FIX_AUTH_AND_PUSH_md",
-      "label": "FIX_AUTH_AND_PUSH.md",
-      "layer": "L2",
-      "path": "docs/FIX_AUTH_AND_PUSH.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_GIT_COMMIT_GUIDELINES_md",
-      "label": "GIT_COMMIT_GUIDELINES.md",
-      "layer": "L2",
-      "path": "docs/GIT_COMMIT_GUIDELINES.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_GIT_PUSH_NOW_2026_01_22_md",
-      "label": "GIT_PUSH_NOW_2026-01-22.md",
-      "layer": "L2",
-      "path": "docs/GIT_PUSH_NOW_2026-01-22.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_GIT_WORKFLOW_2026_01_22_md",
-      "label": "GIT_WORKFLOW_2026-01-22.md",
-      "layer": "L2",
-      "path": "docs/GIT_WORKFLOW_2026-01-22.md"
-    },
-    {
-      "auto_synced": true,
       "id": "docs_HOW_TO_RUN_md",
       "label": "HOW_TO_RUN.md",
       "layer": "L2",
@@ -4458,24 +4290,10 @@
     },
     {
       "auto_synced": true,
-      "id": "docs_NEXT_STEPS_AFTER_PUSH_2026_01_22_md",
-      "label": "NEXT_STEPS_AFTER_PUSH_2026-01-22.md",
-      "layer": "L2",
-      "path": "docs/NEXT_STEPS_AFTER_PUSH_2026-01-22.md"
-    },
-    {
-      "auto_synced": true,
       "id": "docs_PROJECT_STRUCTURE_md",
       "label": "PROJECT_STRUCTURE.md",
       "layer": "L2",
       "path": "docs/PROJECT_STRUCTURE.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_PUSH_AND_DEPENDABOT_PREREQUISITE_2026_03_04_md",
-      "label": "PUSH_AND_DEPENDABOT_PREREQUISITE_2026-03-04.md",
-      "layer": "L2",
-      "path": "docs/PUSH_AND_DEPENDABOT_PREREQUISITE_2026-03-04.md"
     },
     {
       "auto_synced": true,
@@ -4521,20 +4339,6 @@
     },
     {
       "auto_synced": true,
-      "id": "docs_ROOT_CLEANUP_md",
-      "label": "ROOT_CLEANUP.md",
-      "layer": "L2",
-      "path": "docs/ROOT_CLEANUP.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_ROOT_CLEANUP_2026_01_22_md",
-      "label": "ROOT_CLEANUP_2026-01-22.md",
-      "layer": "L2",
-      "path": "docs/ROOT_CLEANUP_2026-01-22.md"
-    },
-    {
-      "auto_synced": true,
       "id": "docs_RUN_PARAMETERS_md",
       "label": "RUN_PARAMETERS.md",
       "layer": "L2",
@@ -4542,31 +4346,10 @@
     },
     {
       "auto_synced": true,
-      "id": "docs_RUST_ARCHITECT_FINAL_COMMANDS_md",
-      "label": "RUST_ARCHITECT_FINAL_COMMANDS.md",
-      "layer": "L2",
-      "path": "docs/RUST_ARCHITECT_FINAL_COMMANDS.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_RUST_ARCHITECT_ITERATIVE_PLAN_2026_01_22_md",
-      "label": "RUST_ARCHITECT_ITERATIVE_PLAN_2026-01-22.md",
-      "layer": "L2",
-      "path": "docs/RUST_ARCHITECT_ITERATIVE_PLAN_2026-01-22.md"
-    },
-    {
-      "auto_synced": true,
       "id": "docs_RUST_BOOK_ALIGNMENT_md",
       "label": "RUST_BOOK_ALIGNMENT.md",
       "layer": "L2",
       "path": "docs/RUST_BOOK_ALIGNMENT.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_RUST_UPDATE_SUMMARY_md",
-      "label": "RUST_UPDATE_SUMMARY.md",
-      "layer": "L2",
-      "path": "docs/RUST_UPDATE_SUMMARY.md"
     },
     {
       "auto_synced": true,
@@ -4591,31 +4374,10 @@
     },
     {
       "auto_synced": true,
-      "id": "docs_STRUCTURE_VERIFICATION_md",
-      "label": "STRUCTURE_VERIFICATION.md",
-      "layer": "L2",
-      "path": "docs/STRUCTURE_VERIFICATION.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_SYSTEM_CHECK_REPORT_md",
-      "label": "SYSTEM_CHECK_REPORT.md",
-      "layer": "L2",
-      "path": "docs/SYSTEM_CHECK_REPORT.md"
-    },
-    {
-      "auto_synced": true,
       "id": "docs_UI_IMPROVEMENTS_PLAN_md",
       "label": "UI_IMPROVEMENTS_PLAN.md",
       "layer": "L2",
       "path": "docs/UI_IMPROVEMENTS_PLAN.md"
-    },
-    {
-      "auto_synced": true,
-      "id": "docs_WORKSPACE_CLEANUP_md",
-      "label": "WORKSPACE_CLEANUP.md",
-      "layer": "L2",
-      "path": "docs/WORKSPACE_CLEANUP.md"
     },
     {
       "auto_synced": true,
@@ -12686,7 +12448,7 @@
       "path": "docs/development/WSP_HYBRID_ARCHITECTURE_SKETCH.md"
     }
   ],
-  "revision": 498,
+  "revision": 499,
   "sprint_queue": [
     {
       "acceptance": ".agents/skills/abracadabra/` роутить продукт (poolai \\",
