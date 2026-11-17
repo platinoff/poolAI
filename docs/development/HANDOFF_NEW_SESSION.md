@@ -1,5 +1,7 @@
 # Передача контексту новій сесії (PoolAI)
 
+> **Екосистемний канон (2026-11-17):** [`../../../GSV/docs/gsv/GSV_ECOSYSTEM_SYMBIOSIS.md`](../../../GSV/docs/gsv/GSV_ECOSYSTEM_SYMBIOSIS.md) — GSV «тато» (операційний план) · poolAI «мама» (FM/management план); повний стан усіх 17 дерев, дублі poolAI↔GSV, адаптований план розвантаження poolAI (P0–P4), протокол пошуку зламаних функцій/дублів. До P1-owner-go poolAI-trunk не рухати; лише вказівник тут.
+
 **Оновлено:** 2026-08-17 (GSV kit band 127 ✅ · vision canon `docs/vision/` · band 126 ✅ · FM §5.12 0 open · horizon band 128)
 
 **GSV:** код і **shared VDT kit** — **`S:\rust\GSV`**. У PoolAI лишився вказівник [`GSV/README.md`](../../GSV/README.md), `.cursor/rules/gsv-kit-pointer.mdc`, і vision-канон [`docs/vision/`](../vision/README.md). Drain — відкрити `S:\rust\GSV` (або `gsv.code-workspace`) → `абракадабра` → AskQuestion.
