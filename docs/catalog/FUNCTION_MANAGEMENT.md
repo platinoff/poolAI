@@ -2,6 +2,8 @@
 
 **Оновлено:** 2026-08-02 (band 106 **Ratio96 loc-audit** PH-S1699…S1708 ✅)
 
+**Symbiosis P3-eco 2026-11-17 (evidence, `t-1794880501219432800`):** екосистемна верифікація пройшла — GSV stand-smoke проти живого `:9999`: локальний запуск 85/86 (один Telegram 429 `retry after 5`), повторний прогін після паузи — **exit=0, 87/87 ok**; `cargo xtask products --state` + `--wiring` — усі дерева чисті, wiring `ok` усі; GSV hub впав 6× за сесію (RAM 750–810 MB) і щоразу піднімали `--host 0.0.0.0 --allow-lan` + watchdog; blk.2/3/4 shared-expert 35B-A3B розселено на 3 піри (g-128..g-136, 36/36 `done`, `max_err_model ≤ 2.5e-6`; артефакти → [`../../../GSV/target/live/stand_smoke_2026-11-17*.json`](../../../GSV/target/live/) у GSV).
+
 **Симбіоз з GSV (2026-11-17):** GSV = «тато» (операційна дошка — [`GSV docs/gsv/tickets.jsonl`](../../../GSV/docs/gsv/tickets.jsonl), claim/done через `gsv_tickets*` / hub `/api/tickets/*`); poolAI FM = «мама» (архівно-архітектурний журнал: FM-*, bands, ризики). **Нові одиниці роботи = квитки в GSV**; FM-рядок посилається на їх `t-*`, а не дублює борд. vision rev внутріній (`docs/vision/manifest.json`, pre-push `poolai-vision-sync` хук); екосистемний rev — GSV `docs/vision/`. Канон: [`docs/gsv/GSV_ECOSYSTEM_SYMBIOSIS.md`](../../../GSV/docs/gsv/GSV_ECOSYSTEM_SYMBIOSIS.md).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
