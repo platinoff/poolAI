@@ -43,6 +43,8 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 
 ## S0 — початок сесії (спочатку диск, потім git + docs)
 
+0. **Стан екосистеми:** GSV `cargo xtask products --state` (+ `--wiring`) у дереві GSV (`S:/rust/GSV`) — усі дерева чисті, wiring `ok`; порушення = попередити до дреначу (GSV «тато» / poolAI «мама», [`symbiosis canon`](../GSV/docs/gsv/GSV_ECOSYSTEM_SYMBIOSIS.md) у GSV).
+
 1. **Диск S:** `df -h /s | tail -1` + `bash scripts/check_target_disk.sh`
    - avail **<5G** або warn → `cargo clean` (потім знову `df`).
    - avail **<12G** або `target/` роздутий (>48G) → чистити перед важкими збірками.
@@ -66,6 +68,7 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 | Dev-патерни | `docs/development/AUTO_DEV_PATTERNS.md` |
 | GSV — старт / handoff | `S:/rust/GSV/docs/HANDOFF_NEW_SESSION.md` · `S:/rust/GSV/docs/NEXT_SESSION_PROMPT.md` |
 | GSV — ролі та архітектура | `S:/rust/GSV/docs/GSV_ROLES.md` · `S:/rust/GSV/docs/gsv/GSV_ARCHITECTURE.md` · `S:/rust/GSV/docs/gsv/GSV_TECH_ROADMAP.md` |
+| **Symbiosis canon (GSV «тато» / poolAI «мама»)** | `S:/rust/GSV/docs/gsv/GSV_ECOSYSTEM_SYMBIOSIS.md` (канон екосистеми: стани, дублі, протокол пошуку, P0–P4) |
 
 ## Скіли (канон Cursor + OpenCode)
 

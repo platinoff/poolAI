@@ -2,6 +2,8 @@
 
 **Оновлено:** 2026-08-02 (band 106 **Ratio96 loc-audit** PH-S1699…S1708 ✅)
 
+**Симбіоз з GSV (2026-11-17):** GSV = «тато» (операційна дошка — [`GSV docs/gsv/tickets.jsonl`](../../../GSV/docs/gsv/tickets.jsonl), claim/done через `gsv_tickets*` / hub `/api/tickets/*`); poolAI FM = «мама» (архівно-архітектурний журнал: FM-*, bands, ризики). **Нові одиниці роботи = квитки в GSV**; FM-рядок посилається на їх `t-*`, а не дублює борд. vision rev внутріній (`docs/vision/manifest.json`, pre-push `poolai-vision-sync` хук); екосистемний rev — GSV `docs/vision/`. Канон: [`docs/gsv/GSV_ECOSYSTEM_SYMBIOSIS.md`](../../../GSV/docs/gsv/GSV_ECOSYSTEM_SYMBIOSIS.md).
+
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
 **Horizon (Layer C):** **100%** ✅ S35–S40 — [`HORIZON_TO_100_PLAN.md`](../development/HORIZON_TO_100_PLAN.md). **Поза кодом:** FM-003 §4 LAN (**BLOCKED**, 2 хости).
