@@ -13,19 +13,21 @@ pub enum DocsLegacyDepth {
     FullLegacy,
 }
 
-/// Flat `docs/*.md` session snapshots that received PH-S961 stale banners.
+/// Flat session snapshots that received PH-S961 stale banners.
+/// Paths reflect the 2026-11 archive sweep: 11 moved under `docs/archive/2026-11/`;
+/// `QUICK_START.md` stays flat in `docs/`. Banner content verified for all 12.
 pub const FLAT_LEGACY_DOC_SAMPLES: &[&str] = &[
-    "EXECUTE_NOW.md",
-    "GIT_PUSH_NOW_2026-01-22.md",
-    "FIX_AND_PUSH_NOW.md",
-    "AUTO_PUSH_EXECUTION.md",
-    "FINAL_PUSH_READY.md",
-    "AUTONOMOUS_SESSION_COMPLETE_2026-01-22.md",
-    "CHAT_SUMMARY_2026-01-22.md",
-    "CONTEXT_SNAPSHOT_2026-03-04.md",
-    "DOCUMENTATION_CLEANUP_SUMMARY.md",
-    "ROOT_CLEANUP.md",
-    "WORKSPACE_CLEANUP.md",
+    "archive/2026-11/EXECUTE_NOW.md",
+    "archive/2026-11/GIT_PUSH_NOW_2026-01-22.md",
+    "archive/2026-11/FIX_AND_PUSH_NOW.md",
+    "archive/2026-11/AUTO_PUSH_EXECUTION.md",
+    "archive/2026-11/FINAL_PUSH_READY.md",
+    "archive/2026-11/AUTONOMOUS_SESSION_COMPLETE_2026-01-22.md",
+    "archive/2026-11/CHAT_SUMMARY_2026-01-22.md",
+    "archive/2026-11/CONTEXT_SNAPSHOT_2026-03-04.md",
+    "archive/2026-11/DOCUMENTATION_CLEANUP_SUMMARY.md",
+    "archive/2026-11/ROOT_CLEANUP.md",
+    "archive/2026-11/WORKSPACE_CLEANUP.md",
     "QUICK_START.md",
 ];
 
