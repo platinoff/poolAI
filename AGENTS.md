@@ -37,7 +37,7 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 
 - Шлях у MSYS2: `/s/rust/poolAI` = `S:\rust\poolAI`.
 - Toolchain: `rust-toolchain.toml` — rustc/cargo **1.100.0** (стабільний `stable-x86_64-pc-windows-gnu`, плаває автоматично), target `x86_64-pc-windows-gnu`, rustfmt, clippy.
-- **Локальний гейт ≠ test-ci (owner policy 2026-11-18):** `cargo test-ci` (matrix `ml,enterprise,cloud,test-utils,job-store-sqlite,prometheus`) на цьому боксі **не запускається** (RAM ~7.7 GB / EDR). Авторитетний гейт — GitHub Actions (`ubuntu-latest` + `windows-latest`, кроки 94–99 `.github/workflows/ci.yml`, еквівалентні `test-ci`, `toolchain: stable` = 1.100.0). Локально достатньо: `cargo fmt --all` → `cargo clippy --all-targets` → `cargo check`. Цільовий каталог тут чистити (`cargo clean` / `check_target_disk.sh`) перед важкими збірками — `target/` не повинен розростати довірено в ГБ.
+- **Локальний гейт ≠ test-ci (owner policy 2026-11-18):** `cargo test-ci` (matrix `ml,enterprise,cloud,test-utils,job-store-sqlite,prometheus`) на цьому боксі **не запускається** (RAM ~7.7 GB / EDR). Авторитетний гейт — GitHub Actions (`ubuntu-latest` + `windows-latest`, кроки 94–99 `.github/workflows/ci.yml`, еквівалентні `test-ci`, `toolchain: stable` = 1.100.0). Локально достатньо: `cargo fmt --all` → `cargo clippy --all-targets` → `cargo check`. Цільовий каталог тут чистити (`cargo clean` / `check_target_disk.sh`) перед важкими збірками — `target/` не повинен розростати до десятків ГБ.
 - **Не** використовувати PowerShell для `git`/`cargo`; не запускати кілька `cargo` паралельно (file lock).
 - `npm` — через `/ucrt64/bin` (інакше `npm: command not found`).
 - Помилки → `docs/troubleshooting/` (`QUICK_FIX_MSYS2.md`, `GCC_DLLTOOL_NOT_FOUND.md`, `RUST_VERSION_ISSUE.md`, `GIT_PUSH_FAILED.md`).
@@ -107,7 +107,7 @@ npx --yes skills add <owner/repo> --skill <name> -a cursor -a opencode -y
 
 | Scope | Команда |
 |---|---|
-| API / grid / job / telegram wire | `cargo fmt --all` → `cargo test-ci` (+ після API: `cargo run --bin poolai-openapi-gap-audit` — 0 missing) |
+| API / grid / job / telegram wire | `cargo fmt --all` → `cargo clippy --all-targets` → `cargo check` (повний `cargo test-ci` — GitHub Actions; цей бокс його не запускає, див. policy 2026-11-18) (+ після API: `cargo run --bin poolai-openapi-gap-audit` — 0 missing) |
 | Admin UI / axe / visual | + `bash bin/e2e-playwright.sh --start` (PATH з `/ucrt64/bin`) |
 | Raft | `cargo test-raft-ci` |
 | Cloud | `cargo test --test cloud_mock_integration --features cloud,cloud-sdk -- --test-threads=1` |
@@ -115,13 +115,13 @@ npx --yes skills add <owner/repo> --skill <name> -a cursor -a opencode -y
 - **API-only acceptance** (HTTP/4xx/JSON) → Rust `tests/*_integration.rs` / `tests/*_contracts.rs`, **не** новий Playwright spec. Playwright лише для браузера (DOM, axe, visual, admin click-flow).
 - Існуючі Playwright API-smoke — legacy; не дублювати новими TS.
 - Rust стиль: `AppError` (`src/core/error.rs`), `?`, без `unwrap()`/`expect()` у продукті, `Arc<RwLock<T>>`, `tokio`, `tracing`. Модулі через `mod.rs` (як `src/raid/mod.rs`).
-- Перед важкими матрицями: `bash scripts/check_target_disk.sh` (пороги `POOLAI_MIN_FREE_DISK_GB`=12, `POOLAI_MAX_TARGET_DIR_GB`=48).
+- Перед важкими збірками: `bash scripts/check_target_disk.sh` (диск: `POOLAI_MIN_FREE_DISK_GB`=12, `POOLAI_MAX_TARGET_DIR_GB`=48; RAM: `POOLAI_MIN_FREE_RAM_GB`=3, інакше warning).
 
 ## Ітераційна розробка (один PH-S*)
 
 - Черга: FM **§5.12** (журнал, ≤10 відкритих) + `NEXT_SESSION_PROMPT.md`; пріоритети — `docs/concept/`, FM **§5.1**, roadmaps, код.
 - Scope — лише файли поточного PH-S*; не повторювати закрите з «Не повторювати» у NEXT_SESSION.
-- Завершення PH-S*: `cargo fmt` → `cargo test-ci` → ✅ у §5.12 → HANDOFF → NEXT_SESSION → наступний PH-S*.
+- Завершення PH-S*: `cargo fmt` → `cargo clippy --all-targets` + `cargo check` (повний `cargo test-ci` — у CI; цей бокс його не запускає) → ✅ у §5.12 → HANDOFF → NEXT_SESSION → наступний PH-S*.
 - FM §5.12 < 10 відкритих → project scan (нижче).
 
 ## Тригер «абракадабра» — drain всього проєкту
@@ -139,7 +139,7 @@ npx --yes skills add <owner/repo> --skill <name> -a cursor -a opencode -y
 2. **Project scan** (якщо §5.12 <10): **warnings/diagnostics першими** (`rust_diagnostics.json`, `cargo run --bin poolai-rust-diagnostics -- --print`, clippy warnings, compile errors) → потім concept (`docs/concept/POOLAI_GALAXY_GRID.md`), FM §5.1, architect rows (`rg "\- \[ \]"` у `NEXT_STEPS_ARCHITECT_*.md`), roadmaps, gaps (`DOCS_LEGACY_AUDIT`, `OPENAPI_GAP_AUDIT`), `rg "TODO|FIXME" src/`. → **10 PH-S*** у §5.12 (нумерація N+1 від останнього; колонка «Джерело»).
 3. **Drain:** усі відкриті PH-S* (код → scope-тести; **без** mid-drain push).
 4. **Vision close:** FM §5.12 ✅ + HANDOFF + NEXT → один `poolai-vision-sync` (manifest `revision++`) → FM/NEXT/INDEX rev = `manifest.revision` → `--check`.
-5. **Test:** один `cargo fmt --all` → один `cargo test-ci` → `bash bin/record-test-ci-speed.sh` + `bash bin/record-rust-diagnostics.sh`.
+5. **Test:** один `cargo fmt --all` → один локальный гейт (`cargo clippy --all-targets` + `cargo check`; повний `cargo test-ci` живе у GitHub Actions — цей бокс його не запускає, owner policy 2026-11-18) → `bash bin/record-test-ci-speed.sh` + `bash bin/record-rust-diagnostics.sh` (записи — про останній CI-прогін).
 6. **Git (кінець сесії):** один commit (код + `docs/vision/*` + speed/diagnostics JSON + FM/HANDOFF/NEXT) → **`git push origin main` + самарі** — **завжди останній крок**. Не завершувати сесію без push+самарі, якщо був drain/commit.
 
 - **Не** `git add -A`, **не** push mid-drain/mid-scan, **не** паралелити `cargo test-ci`.

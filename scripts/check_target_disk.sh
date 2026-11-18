@@ -9,6 +9,7 @@
 # Env (опційно):
 #   POOLAI_MIN_FREE_DISK_GB   — мінімум вільних ГБ на томі (default: 12; 0 = не перевіряти)
 #   POOLAI_MAX_TARGET_DIR_GB  — попередження/фейл, якщо target більший за N ГБ (default: 48; 0 = не перевіряти)
+#   POOLAI_MIN_FREE_RAM_GB    — мінімум вільної RAM (MemFree) у ГБ (default: 3; 0 = не перевіряти)
 #   POOLAI_ENFORCE_DISK_LIMIT=1 — те саме, що --enforce
 #   CARGO_TARGET_DIR          — каталог артефактів (як у Cargo); інакше <repo>/target
 
@@ -19,8 +20,10 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 MIN_FREE_GB="${POOLAI_MIN_FREE_DISK_GB:-12}"
 MAX_TARGET_GB="${POOLAI_MAX_TARGET_DIR_GB:-48}"
+MIN_RAM_GB="${POOLAI_MIN_FREE_RAM_GB:-3}"
 [[ "$MIN_FREE_GB" =~ ^[0-9]+$ ]] || MIN_FREE_GB=12
 [[ "$MAX_TARGET_GB" =~ ^[0-9]+$ ]] || MAX_TARGET_GB=48
+[[ "$MIN_RAM_GB" =~ ^[0-9]+$ ]] || MIN_RAM_GB=3
 ENFORCE=0
 if [ "${POOLAI_ENFORCE_DISK_LIMIT:-0}" = "1" ]; then
   ENFORCE=1
@@ -62,6 +65,19 @@ if [ -d "$TARGET_DIR" ]; then
   fi
 fi
 
+# RAM guard: this box's hub dies silently when free memory drops to ~0.7 GiB
+# (Firefox + Telegram + heavy builds). MemFree (not MemAvailable) is what
+# MSYS2 exposes; the number is conservative on purpose.
+FREE_RAM_GB=0
+RAM_KNOWN=0
+if [ -r /proc/meminfo ]; then
+  RAM_KB="$(grep -m1 '^MemFree:' /proc/meminfo | awk '{print $2}')"
+  if [[ "$RAM_KB" =~ ^[0-9]+$ ]]; then
+    FREE_RAM_GB=$((RAM_KB / 1024 / 1024))
+    RAM_KNOWN=1
+  fi
+fi
+
 VIOLATION=0
 
 echo "check_target_disk: repo=$REPO_ROOT" >&2
@@ -70,6 +86,11 @@ if [ -n "$FREE_KB" ]; then
   echo "check_target_disk: free on volume ~${FREE_GB} GiB (min configured: ${MIN_FREE_GB} GiB)" >&2
 else
   echo "check_target_disk: free space unknown" >&2
+fi
+if [ "$RAM_KNOWN" -eq 1 ]; then
+  echo "check_target_disk: free RAM ~${FREE_RAM_GB} GiB (min configured: ${MIN_RAM_GB} GiB)" >&2
+else
+  echo "check_target_disk: free RAM unknown (/proc/meminfo unreadable)" >&2
 fi
 
 if [ -n "$FREE_KB" ] && [ "${MIN_FREE_GB}" -gt 0 ] && [ "$FREE_GB" -lt "$MIN_FREE_GB" ]; then
@@ -81,6 +102,12 @@ fi
 if [ "${MAX_TARGET_GB}" -gt 0 ] && [ "$TARGET_GB" -gt "$MAX_TARGET_GB" ]; then
   echo "check_target_disk: WARNING: target dir (~${TARGET_GB} GiB) > POOLAI_MAX_TARGET_DIR_GB (${MAX_TARGET_GB})." >&2
   echo "check_target_disk: hint: cargo clean, or prune old feature builds." >&2
+  VIOLATION=1
+fi
+
+if [ "$RAM_KNOWN" -eq 1 ] && [ "${MIN_RAM_GB}" -gt 0 ] && [ "$FREE_RAM_GB" -lt "$MIN_RAM_GB" ]; then
+  echo "check_target_disk: WARNING: free RAM (${FREE_RAM_GB} GiB) < POOLAI_MIN_FREE_RAM_GB (${MIN_RAM_GB})." >&2
+  echo "check_target_disk: hint: poolAI test-ci is NOT for this box (RAM/EDR) — it lives in GitHub Actions; close Firefox/Telegram or reboot before heavy builds." >&2
   VIOLATION=1
 fi
 
