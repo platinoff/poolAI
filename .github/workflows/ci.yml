@@ -64,7 +64,8 @@ jobs:
         run: |
           git config core.autocrlf false
           git config core.eol lf
-          git add --renormalize .
+          git rm --cached -r -q .
+          git reset --hard HEAD
       
       - name: Check code formatting
         run: cargo fmt --all -- --check
