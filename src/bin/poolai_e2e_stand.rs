@@ -370,7 +370,20 @@ async fn start_stand(cli: &Cli) -> Result<StandReport, String> {
     let pid = spawn_poolai(&paths)?;
     write_pid(&paths.stand_root, pid)?;
     let base = base_url(paths.port);
-    wait_health(&base, cli.health_tries).await?;
+    if let Err(e) = wait_health(&base, cli.health_tries).await {
+        let log = fs::read_to_string(paths.stand_root.join("poolai.log")).unwrap_or_default();
+        let tail: String = log
+            .lines()
+            .rev()
+            .take(200)
+            .collect::<Vec<_>>()
+            .into_iter()
+            .rev()
+            .collect::<Vec<_>>()
+            .join("\n");
+        eprintln!("----- poolai.log (tail) -----\n{tail}\n----- end poolai.log -----");
+        return Err(e);
+    }
 
     Ok(StandReport {
         ok: true,
@@ -402,7 +415,20 @@ async fn restart_stand(cli: &Cli) -> Result<StandReport, String> {
     let pid = spawn_poolai(&paths)?;
     write_pid(&paths.stand_root, pid)?;
     let base = base_url(paths.port);
-    wait_health(&base, cli.health_tries).await?;
+    if let Err(e) = wait_health(&base, cli.health_tries).await {
+        let log = fs::read_to_string(paths.stand_root.join("poolai.log")).unwrap_or_default();
+        let tail: String = log
+            .lines()
+            .rev()
+            .take(200)
+            .collect::<Vec<_>>()
+            .into_iter()
+            .rev()
+            .collect::<Vec<_>>()
+            .join("\n");
+        eprintln!("----- poolai.log (tail) -----\n{tail}\n----- end poolai.log -----");
+        return Err(e);
+    }
     Ok(StandReport {
         ok: true,
         command: "restart",

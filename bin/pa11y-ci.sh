@@ -116,6 +116,11 @@ wait_health() {
     sleep 2
   done
   echo "FAIL health not ready on ${BASE}"
+  if [[ -n "${STAND_ROOT:-}" && -f "${STAND_ROOT}/poolai.log" ]]; then
+    echo "----- poolai.log (tail) -----"
+    tail -n 200 "${STAND_ROOT}/poolai.log" || true
+    echo "----- end poolai.log -----"
+  fi
   return 1
 }
 
