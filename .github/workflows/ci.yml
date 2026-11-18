@@ -16,6 +16,10 @@ permissions:
 env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
+  # Repo pins stable-x86_64-pc-windows-gnu in rust-toolchain.toml; on Linux
+  # runners rustup refuses that host and EVERY cargo invocation fails
+  # instantly. workflow env overrides the pin: linux runners get linux-gnu.
+  RUSTUP_TOOLCHAIN: stable
 
 jobs:
   test:
@@ -24,11 +28,13 @@ jobs:
     env:
       CARGO_BUILD_JOBS: "1"
       CARGO_INCREMENTAL: "0"
+      # Windows keeps its MSYS2/GNU host (matches rust-toolchain.toml exactly).
+      RUSTUP_TOOLCHAIN: ${{ matrix.os == 'windows-latest' && 'stable-x86_64-pc-windows-gnu' || 'stable' }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
         rust: [stable]
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
