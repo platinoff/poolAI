@@ -101,6 +101,14 @@ impl LibraryManager {
 
     /// Get default library path
     fn get_default_library_path() -> PathBuf {
+        // Prefer the operator-configured data path when set (e.g. CI stands
+        // use a writable STAND_ROOT; `/var/lib/poolai` needs root otherwise).
+        if let Some(base) = std::env::var_os("POOLAI_DATA_PATH") {
+            if !base.is_empty() {
+                return PathBuf::from(base).join("libs");
+            }
+        }
+
         // Use platform-specific paths
         #[cfg(target_os = "windows")]
         {

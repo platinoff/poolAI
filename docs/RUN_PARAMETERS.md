@@ -29,7 +29,7 @@ $env:POOLAI_CONFIG_PATH=".\custom_config.toml"; cargo run
 ```
 
 #### `POOLAI_DATA_PATH`
-Шлях до директорії для зберігання даних (за замовчуванням: `./data`)
+Шлях до директорії для зберігання даних (за замовчуванням: `./data`). Також визначає **директорію бібліотек**: типовий `base_path` менеджера бібліотек = `$POOLAI_DATA_PATH/libs` (без цієї змінної — `C:\poolai\libs` на Windows / `/var/lib/poolai/libs` на Linux).
 
 ```bash
 POOLAI_DATA_PATH=/var/lib/poolai cargo run
