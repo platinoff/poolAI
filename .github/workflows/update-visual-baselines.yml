@@ -13,6 +13,9 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  # Repo pins stable-x86_64-pc-windows-gnu in rust-toolchain.toml; on Linux
+  # runners rustup refuses that host and EVERY cargo invocation fails instantly.
+  RUSTUP_TOOLCHAIN: stable
   K8S_OPENAPI_ENABLED_VERSION: "1.28"
   POOLAI_HTTP_PORT: "8080"
   POOLAI_E2E_USER: admin
