@@ -2,9 +2,16 @@ name: CI
 
 on:
   push:
-    branches: [ main, stage3/* ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 env:
   CARGO_TERM_COLOR: always
@@ -42,9 +49,9 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/
-          key: ${{ runner.os }}-cargo-test-ph-s47f-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-ci-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
-            ${{ runner.os }}-cargo-test-ph-s47f-
+            ${{ runner.os }}-ci-
             ${{ runner.os }}-cargo-
       
       - name: Normalize line endings
@@ -61,7 +68,7 @@ jobs:
         continue-on-error: true
       
       - name: Build (no features) - Required
-        run: cargo build --verbose --no-default-features --lib
+        run: cargo build --no-default-features --lib
       
       - name: Lint with clippy (with features)
         run: cargo clippy --all-targets --features jwt,https -- -D warnings
@@ -76,30 +83,30 @@ jobs:
           K8S_OPENAPI_ENABLED_VERSION: "1.28"
       
       - name: Build (with features)
-        run: cargo build --verbose --features jwt,https
+        run: cargo build --features jwt,https
         continue-on-error: true
         env:
           K8S_OPENAPI_ENABLED_VERSION: "1.28"
       
       - name: Build (cloud-sdk feature)
-        run: cargo build --verbose --features cloud,cloud-sdk
+        run: cargo build --features cloud,cloud-sdk
         continue-on-error: true
         env:
           K8S_OPENAPI_ENABLED_VERSION: "1.28"
       
       - name: Run tests (no features)
-        run: cargo test --verbose --no-default-features
+        run: cargo test --no-default-features
         continue-on-error: true
       
       - name: Run tests (default) - Required
-        # FM-011 / PH-S47: same as `cargo test-ci` (.cargo/config.toml); --verbose must be before `--`
-        run: cargo test -j 1 --verbose --lib --tests --features ml,enterprise,cloud,test-utils,job-store-sqlite,prometheus -- --test-threads=1
+        # FM-011: same as `cargo test-ci` (.cargo/config.toml); keep flags before `--`
+        run: cargo test -j 1 --lib --tests --features ml,enterprise,cloud,test-utils,job-store-sqlite,prometheus -- --test-threads=1
         env:
           K8S_OPENAPI_ENABLED_VERSION: "1.28"
           CARGO_BUILD_JOBS: "1"
       
       - name: Run tests (cloud-sdk feature)
-        run: cargo test --verbose --features cloud,cloud-sdk
+        run: cargo test --features cloud,cloud-sdk
         continue-on-error: true
         env:
           K8S_OPENAPI_ENABLED_VERSION: "1.28"
