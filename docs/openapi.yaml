@@ -1760,6 +1760,35 @@ paths:
         '200':
           description: Completion recorded
 
+  /virtual-nodes/{peer_id}/tasks/result:
+    get:
+      tags:
+        - VirtualNodes
+      summary: Latest completed task result for a peer
+      description: Returns the most recent completion for a peer. Pass `?task_id=` to fetch one specific completion. 404 until the first completion arrives — poll again.
+      operationId: virtualNodeTaskResult
+      parameters:
+        - $ref: '#/components/parameters/PeerId'
+        - name: task_id
+          in: query
+          required: false
+          description: Optional task id; latest completion when absent.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Completion result payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VirtualNodeTaskResultResponse'
+        '404':
+          description: No completion yet
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VirtualNodeTaskResultError'
+
   /virtual-nodes/{peer_id}/pool/join:
     post:
       tags:
@@ -9020,6 +9049,46 @@ components:
           type: integer
         completed:
           type: integer
+
+    VirtualNodeTaskResultResponse:
+      type: object
+      required:
+        - ok
+        - result
+      properties:
+        ok:
+          type: boolean
+          example: true
+        result:
+          $ref: '#/components/schemas/VirtualNodeTaskCompletion'
+
+    VirtualNodeTaskResultError:
+      type: object
+      required:
+        - ok
+        - error
+      properties:
+        ok:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: no completion yet
+
+    VirtualNodeTaskCompletion:
+      type: object
+      properties:
+        task_id:
+          type: string
+        status:
+          type: string
+          example: done
+        detail:
+          type: object
+          nullable: true
+        completed_at:
+          type: string
+          format: date-time
 
     EnqueueVirtualNodeTaskRequest:
       type: object
