@@ -36,7 +36,8 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 ```
 
 - Шлях у MSYS2: `/s/rust/poolAI` = `S:\rust\poolAI`.
-- Toolchain: `rust-toolchain.toml` — rustc/cargo **1.92.0**, target `x86_64-pc-windows-gnu`, rustfmt, clippy.
+- Toolchain: `rust-toolchain.toml` — rustc/cargo **1.100.0** (стабільний `stable-x86_64-pc-windows-gnu`, плаває автоматично), target `x86_64-pc-windows-gnu`, rustfmt, clippy.
+- **Локальний гейт ≠ test-ci (owner policy 2026-11-18):** `cargo test-ci` (matrix `ml,enterprise,cloud,test-utils,job-store-sqlite,prometheus`) на цьому боксі **не запускається** (RAM ~7.7 GB / EDR). Авторитетний гейт — GitHub Actions (`ubuntu-latest` + `windows-latest`, кроки 94–99 `.github/workflows/ci.yml`, еквівалентні `test-ci`, `toolchain: stable` = 1.100.0). Локально достатньо: `cargo fmt --all` → `cargo clippy --all-targets` → `cargo check`. Цільовий каталог тут чистити (`cargo clean` / `check_target_disk.sh`) перед важкими збірками — `target/` не повинен розростати довірено в ГБ.
 - **Не** використовувати PowerShell для `git`/`cargo`; не запускати кілька `cargo` паралельно (file lock).
 - `npm` — через `/ucrt64/bin` (інакше `npm: command not found`).
 - Помилки → `docs/troubleshooting/` (`QUICK_FIX_MSYS2.md`, `GCC_DLLTOOL_NOT_FOUND.md`, `RUST_VERSION_ISSUE.md`, `GIT_PUSH_FAILED.md`).
