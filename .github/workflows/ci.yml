@@ -31,6 +31,9 @@ jobs:
       # Windows keeps its MSYS2/GNU host (matches rust-toolchain.toml exactly).
       RUSTUP_TOOLCHAIN: ${{ matrix.os == 'windows-latest' && 'stable-x86_64-pc-windows-gnu' || 'stable' }}
     strategy:
+      # Keep the windows-latest leg alive when ubuntu fails (and vice versa):
+      # one-OS failures shouldn't hide the other platform's state.
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
         rust: [ stable ]
