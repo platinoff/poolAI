@@ -245,7 +245,7 @@ function showNotification(message, type = 'info') {
     top: 20px;
     right: 20px;
     padding: 15px 20px;
-    background: ${type === 'error' ? '#ff5555' : type === 'success' ? '#67e480' : '#8be9fd'};
+    background: ${type === 'error' ? '#de3434' : type === 'success' ? '#67e480' : '#8be9fd'};
     color: ${type === 'error' ? 'white' : '#0f1216'};
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
