@@ -1154,7 +1154,7 @@ function showNotification(message, type = 'info', duration = 3000, actions = nul
   notification.style.cssText = `
     position: fixed; top: ${top}px; right: 20px; z-index: ${10000 + notificationStack.length};
     padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    background: ${type === 'success' ? '#50fa7b' : type === 'error' ? '#ff5555' : type === 'warning' ? '#f1fa8c' : '#8be9fd'};
+    background: ${type === 'success' ? '#50fa7b' : type === 'error' ? '#de3434' : type === 'warning' ? '#f1fa8c' : '#8be9fd'};
     color: ${type === 'error' ? '#fff' : '#0f1216'};
     font-weight: 500; max-width: 400px; word-wrap: break-word;
     animation: slideIn 0.3s ease-out;
@@ -2922,7 +2922,7 @@ function applyTheme(themeName) {
       text: '#e8e8e8', textMuted: '#a8b0bf', border: '#262b36',
       primary: '#50fa7b', primaryHover: '#67e480',
       danger: '#c62828', dangerHover: '#e53935',
-      secondary: '#6272a4', secondaryHover: '#7a8bc4',
+      secondary: '#6272a4', secondaryHover: '#5566a0',
       success: '#50fa7b', warning: '#f1fa8c', info: '#8be9fd',
       link: '#77c7ff', linkHover: '#8bd5ff'
     },

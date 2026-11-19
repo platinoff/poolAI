@@ -47,7 +47,7 @@ pub const DARK_THEME: Theme = Theme {
     danger: "#c62828",
     danger_hover: "#e53935",
     secondary: "#6272a4",
-    secondary_hover: "#7a8bc4",
+    secondary_hover: "#5566a0", // was #7a8bc4 (3.32:1 with white) — WCAG 2.2 AA 5.57:1
     success: "#50fa7b",
     warning: "#f1fa8c",
     info: "#8be9fd",
@@ -197,10 +197,12 @@ impl Theme {
   .btn-secondary {{
     background: var(--secondary);
     border-color: var(--secondary);
-    color: var(--bg);
+    color: #ffffff; /* WCAG 2.2 AA: white on Dracula #6272a4 = 4.70:1 */
   }}
   .btn-secondary:hover {{
     background: var(--secondary-hover);
+    border-color: var(--secondary-hover);
+    color: #ffffff;
   }}
   .pill-success {{
     background: var(--success);

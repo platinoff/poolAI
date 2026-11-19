@@ -45,7 +45,7 @@ pub const BUTTON_STYLES: &str = r#"
     border-color: var(--secondary, #6272a4);
   }
   .btn-secondary:hover {
-    background: var(--secondary-hover, #7a8bc4);
+    background: var(--secondary-hover, #5566a0);
   }
   .btn-small {
     padding: 4px 8px;
@@ -396,7 +396,7 @@ pub const NOTIFICATION_STYLES: &str = r#"
     color: #0f1216;
   }
   .notification-error {
-    background: #ff5555;
+    background: #de3434; /* was #ff5555 (3.14:1 with white) — WCAG 2.2 AA 4.59:1 */
     color: #fff;
   }
   .notification-info {
