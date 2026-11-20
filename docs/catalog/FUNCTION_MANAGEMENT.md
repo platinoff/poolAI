@@ -254,7 +254,7 @@ Vision rev 488.
 
 | # | Sprint | Фокус | Джерело | Acceptance (скорочено) | Стан |
 |---|--------|--------|---------|-------------------------|------|
-| 1 | **PH-S55** | `run-poolai` preset для RAID jobs (операторський quick start) | `RUN_LOCAL.md`, `bin/run-poolai.sh`, `bin/run-poolai.ps1` | documented `single`/`lan` one-liner з `POOLAI_JOB_STORE=raid` + `POOLAI_RAID_BASE_PATH`; `single` preset (`--raid-jobs` / `-RaidJobs`) | **✅** |
+| 1 | **PH-S55** | `run-poolai` preset для RAID jobs (операторський quick start) | `RUN_LOCAL.md`, `bin/run-poolai.sh`, `bin/run-poolai.sh` | documented `single`/`lan` one-liner з `POOLAI_JOB_STORE=raid` + `POOLAI_RAID_BASE_PATH`; `single` preset (`--raid-jobs` / `-RaidJobs`) | **✅** |
 | 2 | **PH-S56** | Galaxy Grid: job lease + re-migrate policy (концепт) | `concept/POOLAI_GALAXY_GRID.md` | зафіксовано lease/TTL + `lease_epoch`, CAS по result, failover triggers, retry budget, мінімальна state-модель job | **✅** |
 | 3 | **PH-S57** | Galaxy Grid: unified worker entity (local/cloud/telegram) (концепт + DTO sketch) | `concept/POOLAI_GALAXY_GRID.md`, FM-016 | зафіксовано DTO sketch (`origin/admin_id/capabilities/network_profile/limits`) + мінімальні UI labels/filter/sort правила | **✅** |
 | 4 | **PH-S58** | Fee split: primary 0.1% dev wallet + secondary 1–5% admin (концепт) | `concept/POOLAI_GALAXY_GRID.md`, Solana concept | `src/grid/galaxy_fee_split.rs` + formula/docs + UX hint + unit tests + Criterion bench | **✅** |
@@ -2707,7 +2707,7 @@ Vision rev 488.
 | 1075 | **PH-S1140** | `poolai-loc-audit --ci-canon` | `poolai_loc_audit.rs` | ci_canon fields in `rust_ratio.json` | **✅** |
 | 1076 | **PH-S1141** | CI canon gate audit | `ci_canon_audit.rs` | criteria registry + maintenance markers | **✅** |
 | 1077 | **PH-S1142** | `verify-dev-stand` CI canon hook | `bin/verify-dev-stand.sh` | `VERIFY_CI_CANON=1`; openapi-gap + loc-audit `--ci-canon` + rust-ratio advisory | **✅** |
-| 1078 | **PH-S1143** | `run-poolai quick --ci-canon` | `bin/run-poolai.sh`, `bin/run-poolai.ps1` | post-health `--ci-canon` + openapi-gap-audit | **✅** |
+| 1078 | **PH-S1143** | `run-poolai quick --ci-canon` | `bin/run-poolai.sh`, `bin/run-poolai.sh` | post-health `--ci-canon` + openapi-gap-audit | **✅** |
 | 1079 | **PH-S1144** | Stand smoke CI canon export shape | `poolai_http_stand_smoke.rs` | `ci_canon_depth` JSON field on export shape test | **✅** |
 | 1080 | **PH-S1145** | RUN_LOCAL.md band 50 ops sync | docs | `--ci-canon`, `VERIFY_CI_CANON` | **✅** |
 | 1081 | **PH-S1146** | RUST_RATIO + GALAXY_GRID_ROADMAP band 50 sync | docs | `--ci-canon` pointer + loc-audit flag | **✅** |

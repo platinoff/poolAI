@@ -202,7 +202,7 @@ poolAI/
 - `docs/FEATURES_COMMANDS.md` - Moved from root ✅
 
 ### Build & Setup
-- `scripts/setup_msys2_path.ps1` - Windows MSYS2 PATH setup ✅
+- `scripts/setup_msys2_path.sh` - Windows MSYS2 PATH setup ✅
 - `README.md`, `docs/QUICK_START.md` - Windows setup instructions ✅
 - `FEATURES_COMMANDS.md` → `docs/FEATURES_COMMANDS.md` - Reorganization ✅
 

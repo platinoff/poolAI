@@ -1903,11 +1903,11 @@ poolAI docs parity; vision rev **458**. GSV tests **87** (46 unit + 18 + 8 omni 
 
 | Скрипт | Призначення |
 |--------|-------------|
-| `bin/run-lan-nodes.ps1` / `.sh` | Два `poolai` на 8080+8081 |
-| `bin/run-virtual-node-dev.ps1` / `.sh` | Coordinator + `poolai-worker` |
-| `bin/verify-dev-stand.ps1` / `.sh` | Health + discovery + pool join + bootstrap tasks (>=4) + ML pipeline demo (PH-S17); опційно `VERIFY_RAID_JOB_STORE=1` — RAID job persist після restart (PH-S54) |
-| `bin/verify-lan-prep.ps1` / `.sh` | FM-027: dual-port or `POOLAI_NODE_*_URL` health + discovery peers |
-| `bin/capture-p2b-single-host-metrics.ps1` / `.sh` | FM-028: `run-lan-nodes` + health_load ×2 + TQ01 snapshot → `data/lan-stand/metrics-fm028-*.json` |
+| `bin/run-lan-nodes.sh` / `.sh` | Два `poolai` на 8080+8081 |
+| `bin/run-virtual-node-dev.sh` / `.sh` | Coordinator + `poolai-worker` |
+| `bin/verify-dev-stand.sh` / `.sh` | Health + discovery + pool join + bootstrap tasks (>=4) + ML pipeline demo (PH-S17); опційно `VERIFY_RAID_JOB_STORE=1` — RAID job persist після restart (PH-S54) |
+| `bin/verify-lan-prep.sh` / `.sh` | FM-027: dual-port or `POOLAI_NODE_*_URL` health + discovery peers |
+| `bin/capture-p2b-single-host-metrics.sh` / `.sh` | FM-028: `run-lan-nodes` + health_load ×2 + TQ01 snapshot → `data/lan-stand/metrics-fm028-*.json` |
 
 Runbook: [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) §5–5.1. **Запуск усього проєкту:** [`RUN_LOCAL.md`](./RUN_LOCAL.md) (`bin/run-poolai.sh`).
 

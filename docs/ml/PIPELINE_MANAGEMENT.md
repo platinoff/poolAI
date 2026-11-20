@@ -195,7 +195,7 @@ assert!(out.contains_key("step_kind")); // turboquant | quantization | training 
 
 ```bash
 bash bin/verify-dev-stand.sh
-# Windows: .\bin\verify-dev-stand.ps1
+# Windows: bash bin/verify-dev-stand.sh
 # Вимкнути ML demo: VERIFY_ML_PIPELINE=0 bash bin/verify-dev-stand.sh
 ```
 

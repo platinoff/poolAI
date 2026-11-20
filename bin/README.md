@@ -19,7 +19,7 @@ bash bin/run-poolai.sh stop
 bash bin/run-poolai.sh status
 ```
 
-PowerShell: `.\bin\run-poolai.ps1 single`
+PowerShell: `bash bin/run-poolai.sh single`
 
 ## Dev tools (Rust bins)
 

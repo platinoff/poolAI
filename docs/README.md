@@ -27,11 +27,11 @@
 
 - **Де що лежить у `docs/`** — [STRUCTURE.md](./STRUCTURE.md) (каталоги, спадщина плоских `.md`, інвентар, тести vs doctests).
 - **Правила для AI/агента (Cursor + OpenCode)** — [`.cursor/rules/documentation.mdc`](../.cursor/rules/documentation.mdc); skill — [`.agents/skills/poolai-documentation/SKILL.md`](../.agents/skills/poolai-documentation/SKILL.md).
-- **Galaxy docs vision** — `.\bin\open-docs-vision.ps1` → [vision/index.html](http://127.0.0.1:8765/docs/vision/index.html) (L0–L5, cluster collapse, pan/zoom, **◎ Sprint** / **⊟ Folders**). Док: [vision/README.md](./vision/README.md) · [`.cursor/rules/docs-vision.mdc`](../.cursor/rules/docs-vision.mdc).
+- **Galaxy docs vision** — `bash bin/open-docs-vision.sh` → [vision/index.html](http://127.0.0.1:8765/docs/vision/index.html) (L0–L5, cluster collapse, pan/zoom, **◎ Sprint** / **⊟ Folders**). Док: [vision/README.md](./vision/README.md) · [`.cursor/rules/docs-vision.mdc`](../.cursor/rules/docs-vision.mdc).
 
 ## Short pointers
 
-- **Galaxy docs vision (рекомендовано)** — [vision/index.html](./vision/index.html) + `manifest.json` (rev **242**, git HEAD pill); `../bin/open-docs-vision.ps1`.
+- **Galaxy docs vision (рекомендовано)** — [vision/index.html](./vision/index.html) + `manifest.json` (rev **242**, git HEAD pill); `../bin/open-docs-vision.sh`.
 - **Galaxy Grid (концепт)** — [concept/POOLAI_GALAXY_GRID.md](./concept/POOLAI_GALAXY_GRID.md) (§4.2 pricing + `/metrics`, §4.3 lease + OTel spans, §5.2 locality_score, §6 verification metrics); код: `src/grid/galaxy_*`, `src/job/lease_*`.
 - **Solana adapter** — [development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md](./development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md) · `crates/poolai-solana-adapter/` (FM-033; без `solana-sdk` у main).
 - **Commit-msg чернетки** — `comitmsg/README.md` (не комітити `comitmsg/*.txt`).

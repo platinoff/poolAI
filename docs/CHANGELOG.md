@@ -24,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **FM-031 WCAG admin URL expand (2026-05-20)** — `bin/pa11y-ci.sh`: `/ui/admin/{vm,workers,libs,raid}` (21 auth URLs); Playwright `a11y.spec.ts` axe matrix + `wcag22aa`; `tests/pa11y_ci_script.rs` contract.
 - **FM-030 Monitoring persistence MVP (2026-05-20)** — `POOLAI_MONITORING_DATA_DIR` → `monitoring.db`; coordinator `MonitoringManager::new_from_env()`; SQLite metrics (existing) + persist/reload dashboards and alert_rules; `data/monitoring/` gitignored.
 - **FM-029 Job store SQLite (2026-05-20)** — `feature job-store-sqlite`; `POOLAI_JOB_STORE=sqlite` + `POOLAI_JOB_DATA_DIR` → `jobs.db`; auto-migrate `jobs.json` → `jobs.json.migrated`; `src/job/store_sqlite.rs`; `test-ci` includes feature.
-- **Repository layout (2026-05-20)** — `docs/development/REPOSITORY_LAYOUT.md`; канон `bin/` (ops) vs `src/bin/` (Cargo) vs `scripts/` (toolchain); `scripts/` знято з `.gitignore`; forwarder `scripts/run-lan-nodes.ps1` → `bin/`.
+- **Repository layout (2026-05-20)** — `docs/development/REPOSITORY_LAYOUT.md`; канон `bin/` (ops) vs `src/bin/` (Cargo) vs `scripts/` (toolchain); `scripts/` знято з `.gitignore`; forwarder `scripts/run-lan-nodes.sh` → `bin/`.
 - **FM-028 P2b single-host metrics (2026-05-20)** — `bin/capture-p2b-single-host-metrics.*`, `poolai-p2b-tq01-snapshot`; dual-port `poolai_health_load` + TQ01/wire JSON table in `BENCHMARKS.md`; artifact `data/lan-stand/metrics-fm028-*.json`.
 - **FM-027 LAN sign-off prep (2026-05-20)** — `docs/performance/LAN_SIGNOFF_CHECKLIST.md`; `bin/verify-lan-prep.sh` / `.ps1`; runbook §4 pre-flight; FM-003 §4 sign-off still **BLOCKED** without 2 physical hosts.
 - **FM-026 Jobs API contracts (2026-05-20)** — `tests/jobs_api_contracts.rs`: list/create/get/PATCH lifecycle, schedule tick, 400/404; no jobs UI → contract-only (not Playwright).
@@ -153,7 +153,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **FM-016 фаза 3** — `GET/POST /virtual-nodes/{id}/tasks/*`, bootstrap `ping` + `raid_health_check`; `poolai-worker` виконує tasks.
 - **FM-016 фаза 2** — `heartbeat-remote`, `GET /discovery/virtual-nodes`, probe health; `poolai-worker` HTTP `/health` + перевірка pool API.
 - **FM-016 фаза 1** — `POST /api/v1/discovery/register-remote`; `poolai-worker` реєстрація на coordinator (`POOLAI_COORDINATOR_URL`); тест `discovery_remote_register_integration`.
-- **FM-003 dev stand (одна машина)** — `POOLAI_HTTP_PORT`, `POOLAI_RAID_BASE_PATH`; `bin/run-lan-nodes.ps1` / `bin/run-lan-nodes.sh`; §5 у [`LAN_BENCHMARK_RUNBOOK.md`](performance/LAN_BENCHMARK_RUNBOOK.md).
+- **FM-003 dev stand (одна машина)** — `POOLAI_HTTP_PORT`, `POOLAI_RAID_BASE_PATH`; `bin/run-lan-nodes.sh` / `bin/run-lan-nodes.sh`; §5 у [`LAN_BENCHMARK_RUNBOOK.md`](performance/LAN_BENCHMARK_RUNBOOK.md).
 - **Автопрогін 2026-05-20 (AUTO_RUN_SESSION)** — **FM-015 ✅**: admin contracts фаза 3 (`/instance`, `/raid/artifacts`, smallworld metrics; 20 tests).
 - **Автопрогін 2026-05-19 (AUTO_RUN_SESSION)** — **FM-014 ✅**: admin contracts (config, users, topology/nodes; 15 tests); `rewards.rs` → `HttpAppError` (FM-005).
 - **Автопрогін 2026-05-18 (AUTO_RUN_SESSION)** — **FM-013 ✅**: розширено `tests/admin_ui_api_contracts.rs` (libraries, topology, VM, workers; 12 tests); admin libs UI — статус «Installed» з `metadata.installed_at`.

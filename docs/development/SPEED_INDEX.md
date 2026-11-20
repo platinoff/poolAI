@@ -49,7 +49,7 @@ cargo bench -j 1 --bench runtime_benchmarks -- \
 
 ## Vision
 
-1. `.\bin\open-docs-vision.ps1`
+1. `bash bin/open-docs-vision.sh`
 2. Панель **Speeds** — latest `test-ci` wall time + Criterion history.
 3. Auto-reload слідкує за `docs/vision/speed_index.json` і `docs/development/speed_index.json`.
 

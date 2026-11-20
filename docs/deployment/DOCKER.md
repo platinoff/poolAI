@@ -24,7 +24,7 @@ Before building, you can test the deployment files:
 
 **On Windows (PowerShell):**
 ```powershell
-.\scripts\test_deployment.ps1
+bash scripts/test_deployment.sh
 ```
 
 **Using Rust tests:**

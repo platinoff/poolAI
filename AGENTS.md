@@ -154,7 +154,7 @@ npx --yes skills add <owner/repo> --skill <name> -a cursor -a opencode -y
 - Після зміни продукту (модулі, маршрути, features): оновити `FUNCTIONALITY_DIGEST` + `file_list.csv` (при нових шляхах) + README Next Focus.
 - Скрипти: dev/ops launchers → `bin/` (.sh/.ps1), toolchain/deploy → `scripts/` (**.sh лише, без нових .ps1**), Rust CLIs → `src/bin/`.
 - Переліки файлів: тільки описові назви, **не** `.ps1`/`.ps` розширеннями.
-- Vision map (`docs/vision/`): після FM/HANDOFF — `poolai-vision-sync` + `--check`; **live UI:** `gsv-server` з `S:/rust/GSV` → `http://127.0.0.1:9999/`; legacy `bin/open-docs-vision.ps1` → `http://127.0.0.1:8765/docs/vision/index.html` — архів (deactivated, band 117).
+- Vision map (`docs/vision/`): після FM/HANDOFF — `poolai-vision-sync` + `--check`; **live UI:** `gsv-server` з `S:/rust/GSV` → `http://127.0.0.1:9999/`; legacy `bin/open-docs-vision.sh` → `http://127.0.0.1:8765/docs/vision/index.html` — архів (deactivated, band 117).
 
 ## Безпека та токени
 

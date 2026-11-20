@@ -11,7 +11,7 @@
 ## Dev launch (use `bin/`, not here)
 
 - `bin/run-poolai.sh` / `.ps1` — single, lan, virtual-node
-- `bin/run-lan-nodes.sh` — FM-003 dual-port (канон; `scripts/run-lan-nodes.ps1` лише forwarder)
+- `bin/run-lan-nodes.sh` — FM-003 dual-port (канон; `scripts/run-lan-nodes.sh` лише forwarder)
 - `bin/verify-dev-stand.sh`, `bin/verify-lan-prep.sh`, `bin/capture-p2b-single-host-metrics.sh`
 
 ---
@@ -27,7 +27,7 @@
   - Опис: Автоматично налаштовує PATH для Rust та Cargo в MSYS2 UCRT64
 
 - **`setup_msys2_path.ps1`** - Налаштування MSYS2 PATH для Windows (PowerShell)
-  - Використання: `.\scripts\setup_msys2_path.ps1`
+  - Використання: `source scripts/setup_msys2_path.sh`
   - Опис: Додає `C:\msys64\usr\bin` до PATH для доступу до `dlltool.exe` та інших MinGW інструментів
   - Призначення: Необхідно для компіляції Rust крейтів з нативними Windows залежностями (windows-sys, chrono)
   - Коли використовувати: Перед `cargo build` або `cargo test` на Windows, якщо виникає помилка "dlltool.exe: program not found"

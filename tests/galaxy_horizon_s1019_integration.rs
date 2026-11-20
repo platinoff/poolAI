@@ -41,7 +41,7 @@ fn horizon_s1019_band_ui_debug_close_ph_s1028() {
             "RUN_LOCAL missing band-38 marker {row}"
         );
     }
-    assert!(run_local.contains("poolai-msys.ps1"));
+    assert!(run_local.contains("poolai-msys.sh"));
     assert!(run_local.contains("-Command") || run_local.contains("-lc"));
 
     let handoff = include_str!("../docs/development/HANDOFF_NEW_SESSION.md");
@@ -74,9 +74,9 @@ fn horizon_s1019_band_ui_debug_close_ph_s1028() {
     assert!(home.contains("home-power-shutdown"));
     assert!(home.contains("home_power_shell_script"));
 
-    let msys = include_str!("../bin/poolai-msys.ps1");
-    assert!(msys.contains("[CmdletBinding()]"));
-    assert!(msys.contains("-Command"));
+    let msys = include_str!("../bin/poolai-msys.sh");
+    assert!(msys.contains("set -euo pipefail"));
+    assert!(msys.contains("-Command") || msys.contains("-lc"));
 
     assert!(Path::new("crates/poolai-ui-core/src/ui_debug_depth.rs").exists());
 }

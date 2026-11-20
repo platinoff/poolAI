@@ -29,7 +29,7 @@ Cursor Simple Browser **не** приймає абсолютний диск `S:/
 PowerShell у корені репо:
 
 ```powershell
-.\bin\open-docs-vision.ps1
+bash bin/open-docs-vision.sh
 ```
 
 Потім **Simple Browser** → URL:

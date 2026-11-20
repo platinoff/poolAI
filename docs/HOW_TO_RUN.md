@@ -117,13 +117,13 @@ RUST_LOG=debug cargo run --features enterprise
 ### Windows PowerShell скрипт
 ```powershell
 # Запуск з enterprise features
-.\scripts\run.ps1 -Enterprise
+bash scripts/run.sh -Enterprise
 
 # Запуск з debug режимом
-.\scripts\run.ps1 -Enterprise -Debug
+bash scripts/run.sh -Enterprise -Debug
 
 # Запуск з кастомними features
-.\scripts\run.ps1 -Features "enterprise,https,jwt"
+bash scripts/run.sh -Features "enterprise,https,jwt"
 ```
 
 ### Bash скрипт (Linux/macOS)
@@ -217,7 +217,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ### Помилка: "dlltool.exe: program not found" (Windows)
 **Рішення:** Додайте MSYS2 до PATH:
 ```powershell
-.\scripts\setup_msys2_path.ps1
+source scripts/setup_msys2_path.sh
 ```
 
 ### Порт 8080 зайнятий

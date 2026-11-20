@@ -63,7 +63,7 @@ poolAI/
 
 - Один сценарій — **один канонічний файл** у `bin/` або `scripts/`.
 - Застарілий шлях — thin forwarder з `DEPRECATED: use bin/...` (не повна копія).
-- Приклад: `scripts/run-lan-nodes.ps1` → викликає `bin/run-lan-nodes.ps1`.
+- Приклад: `scripts/run-lan-nodes.sh` → викликає `bin/run-lan-nodes.sh`.
 
 ---
 

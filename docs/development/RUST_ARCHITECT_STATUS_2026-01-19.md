@@ -65,8 +65,8 @@
 #### ✅ Environment Setup Automation
 - ✅ Toolchain conflict resolved (MSVC toolchain configured)
 - ✅ PowerShell scripts для автоматичного налаштування:
-  - `scripts/setup_msvc_environment.ps1`
-  - `scripts/setup_rust_environment.ps1`
+  - `scripts/setup_msvc_environment.sh`
+  - `scripts/setup_rust_environment.sh`
 - ✅ PATH конфігурація виправлена
 
 #### ✅ Cursor Rules Organization

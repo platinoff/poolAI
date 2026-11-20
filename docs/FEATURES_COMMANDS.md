@@ -120,7 +120,7 @@ cargo build --release --features cloud,cloud-sdk
 ### PowerShell (рекомендовано)
 ```powershell
 # Додати MSYS2 до PATH для поточної сесії
-.\scripts\setup_msys2_path.ps1
+source scripts/setup_msys2_path.sh
 
 # Після цього можна компілювати
 cargo build --features jwt,https
@@ -143,7 +143,7 @@ dlltool --version
 ## Примітки
 
 - `jwt` та `https` потребують native toolchain (gcc/dlltool) на Windows GNU
-  - Використайте `scripts/setup_msys2_path.ps1` для налаштування PATH на Windows
+  - Використайте `scripts/setup_msys2_path.sh` для налаштування PATH на Windows
   - Або додайте `C:\msys64\usr\bin` до системного PATH вручну
 - `vm-isolation-linux` потребує root або CAP_NET_ADMIN, CAP_SYS_ADMIN
 - `cloud-sdk` додає важкі SDK залежності

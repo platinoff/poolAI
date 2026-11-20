@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # PoolAI — єдиний локальний лаунчер (MSYS2 UCRT64; не WSL / не Windows Store bash).
 # Документація: docs/development/RUN_LOCAL.md
-# Windows PowerShell: .\bin\run-poolai.ps1  або  .\bin\poolai-msys.ps1 bin/run-poolai.sh …
+# Windows (MSYS2 bash): bash bin/poolai-msys.sh bin/run-poolai.sh …
 set -euo pipefail
 
 # MSYS2: /usr/bin/bash first — інакше `bash` може викликати WSL stub (немає дистрибутива).
@@ -19,7 +19,7 @@ if [[ ! -x "$POOLAI_BASH" ]]; then
   POOLAI_BASH="$(command -v bash 2>/dev/null || true)"
 fi
 [[ -n "$POOLAI_BASH" ]] || {
-  echo "bash not found; use MSYS2 UCRT64 or .\\bin\\run-poolai.ps1" >&2
+  echo "bash not found; use MSYS2 UCRT64 or bash bin/poolai-msys.sh" >&2
   exit 1
 }
 export K8S_OPENAPI_ENABLED_VERSION="${K8S_OPENAPI_ENABLED_VERSION:-1.28}"
@@ -40,7 +40,7 @@ LAST_RUN_PATH="$ROOT/data/dev/last_run.json"
 usage() {
   cat <<'EOF'
 Usage: /usr/bin/bash bin/run-poolai.sh <command> [options]
-       (PowerShell: .\bin\run-poolai.ps1 single -Background)
+       (MSYS2 bash wrapper: bash bin/poolai-msys.sh bin/run-poolai.sh single --bg)
 
 Commands:
   single          One coordinator (default). UI: http://127.0.0.1:8080/ui
@@ -137,7 +137,7 @@ Environment:
 Examples:
   /usr/bin/bash bin/run-poolai.sh single
   /usr/bin/bash bin/run-poolai.sh single --bg
-  .\bin\run-poolai.ps1 single -Background -SkipBuild   # PowerShell (no WSL)
+  bash bin/poolai-msys.sh bin/run-poolai.sh single --bg --skip-build  # MSYS2 wrapper
 EOF
 }
 

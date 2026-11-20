@@ -63,7 +63,7 @@ Job **`rust-diagnostics`** (ubuntu):
 
 ## Vision
 
-1. `.\bin\open-docs-vision.ps1`
+1. `bash bin/open-docs-vision.sh`
 2. Панель **Rust** — latest warnings/errors + history + top lint codes.
 3. Auto-reload слідкує за `docs/vision/rust_diagnostics.json` і `docs/development/rust_diagnostics.json`.
 

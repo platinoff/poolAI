@@ -20,7 +20,7 @@ If you're building on Windows with `jwt` or `https` features, you need MSYS2 too
 
 ```powershell
 # Run setup script to add MSYS2 to PATH
-.\scripts\setup_msys2_path.ps1
+source scripts/setup_msys2_path.sh
 
 # Verify dlltool is available
 dlltool --version
@@ -42,7 +42,7 @@ cd poolai
 **Before building with jwt or https features on Windows:**
 
 ```powershell
-.\scripts\setup_msys2_path.ps1
+source scripts/setup_msys2_path.sh
 ```
 
 This adds `C:\msys64\usr\bin` to PATH for access to `dlltool.exe` and other MinGW tools.

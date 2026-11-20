@@ -61,7 +61,7 @@
 | Prune closed PH-S ≤2000 | ✅ | `poolai-vision-sync` → `manifest.sprint_queue` |
 | Speeds panel | ✅ | `speed_index.json` + [`SPEED_INDEX.md`](./SPEED_INDEX.md); record після drain |
 | Auto-reload / `__watch` | ✅ | manifest + speed_index + git_head |
-| Open URL | ✅ | `http://127.0.0.1:8765/…` · `bin/open-docs-vision.ps1` — **не** `S:/` |
+| Open URL | ✅ | `http://127.0.0.1:8765/…` · `bin/open-docs-vision.sh` — **не** `S:/` |
 | Vision close band | ✅ | sync → FM rev = manifest → `--check` → test-ci |
 
 Окремих code-змін vision у цій service-сесії **немає** — стан інструментів уже на main; оновлено лише правила/docs pointers на Cursor **3.13.21**.

@@ -7,7 +7,7 @@ Cursor **не** відкриває `S:/rust/poolAI/...` у Simple Browser (`Unab
 PowerShell у корені репо:
 
 ```powershell
-.\bin\open-docs-vision.ps1
+bash bin/open-docs-vision.sh
 ```
 
 У **Simple Browser** (`Ctrl+Shift+P` → *Simple Browser: Show*) вставте:
@@ -39,7 +39,7 @@ docs/vision/index.html
 ## Спосіб 3 — зовнішній браузер
 
 ```powershell
-.\bin\open-docs-vision.ps1
+bash bin/open-docs-vision.sh
 ```
 
 Відкриється системний браузер на той самий URL.

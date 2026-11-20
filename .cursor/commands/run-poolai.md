@@ -12,10 +12,10 @@
 ```powershell
 cd S:\rust\poolAI
 
-.\bin\run-poolai.ps1 build
-.\bin\run-poolai.ps1 single -Background -SkipBuild
-.\bin\run-poolai.ps1 status
-.\bin\run-poolai.ps1 stop
+bash bin/run-poolai.sh build
+bash bin/run-poolai.sh single -Background -SkipBuild
+bash bin/run-poolai.sh status
+bash bin/run-poolai.sh stop
 ```
 
 Якщо ExecutionPolicy блокує скрипти:
@@ -23,7 +23,7 @@ cd S:\rust\poolAI
 ```powershell
 Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 # або разово:
-powershell -ExecutionPolicy Bypass -File .\bin\run-poolai.ps1 single -Background -SkipBuild
+powershell -ExecutionPolicy Bypass -File bash bin/run-poolai.sh single -Background -SkipBuild
 ```
 
 | URL | |
@@ -35,10 +35,10 @@ powershell -ExecutionPolicy Bypass -File .\bin\run-poolai.ps1 single -Background
 ## Bash-скрипти з PowerShell (e2e, verify, cargo test-ci)
 
 ```powershell
-.\bin\poolai-msys.ps1 bin/run-poolai.sh status
-.\bin\poolai-msys.ps1 bin/e2e-playwright.sh --start
-.\bin\e2e-playwright.ps1 -Start
-.\bin\poolai-msys.ps1 -lc 'export K8S_OPENAPI_ENABLED_VERSION=1.28; cargo test-ci'
+bash bin/poolai-msys.sh bin/run-poolai.sh status
+bash bin/poolai-msys.sh bin/e2e-playwright.sh --start
+bash bin/e2e-playwright.sh -Start
+bash bin/poolai-msys.sh -lc 'export K8S_OPENAPI_ENABLED_VERSION=1.28; cargo test-ci'
 ```
 
 ## MSYS2 UCRT64 (зовнішнє вікно з меню Пуск)
@@ -52,7 +52,7 @@ cd /s/rust/poolAI
 /usr/bin/bash bin/run-poolai.sh stop
 ```
 
-**Не** використовуй голе слово `bash` — лише `/usr/bin/bash` або `.\bin\poolai-msys.ps1`.
+**Не** використовуй голе слово `bash` — лише `/usr/bin/bash` або `bash bin/poolai-msys.sh`.
 
 ## Git / push
 

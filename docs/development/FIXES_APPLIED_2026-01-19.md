@@ -62,12 +62,12 @@ default = true
 **Виправлення:**
 Створено скрипти для автоматичного налаштування:
 
-1. **`scripts/setup_msvc_environment.ps1`**
+1. **`scripts/setup_msvc_environment.sh`**
    - Автоматично знаходить Visual Studio
    - Налаштовує PATH, LIB, INCLUDE
    - Перевіряє доступність tools
 
-2. **`scripts/setup_rust_environment.ps1`**
+2. **`scripts/setup_rust_environment.sh`**
    - Автоматично визначає toolchain з `rust-toolchain.toml`
    - Налаштовує MSVC або GNU/MSYS2 environment
    - Перевіряє Rust tools
@@ -86,8 +86,8 @@ default = true
 - ✅ `.vscode/settings.json` - виправлено PATH конфігурацію
 
 ### Нові файли:
-- ✅ `scripts/setup_msvc_environment.ps1` - налаштування MSVC
-- ✅ `scripts/setup_rust_environment.ps1` - автоматичне налаштування
+- ✅ `scripts/setup_msvc_environment.sh` - налаштування MSVC
+- ✅ `scripts/setup_rust_environment.sh` - автоматичне налаштування
 - ✅ `docs/development/NATIVECOMMANDERROR_ANALYSIS_2026-01-19.md` - аналіз помилки
 - ✅ `docs/development/TEST_CONFIGURATION_STATUS_2026-01-19.md` - статус тестів
 - ✅ `docs/development/TEST_TIMEOUT_RESEARCH_2026-01-19.md` - research про timeout
@@ -103,12 +103,12 @@ default = true
 
 1. **Автоматичне налаштування:**
    ```powershell
-   .\scripts\setup_rust_environment.ps1
+   source scripts/setup_rust_environment.sh
    ```
 
 2. **Або вручну MSVC:**
    ```powershell
-   .\scripts\setup_msvc_environment.ps1
+   source scripts/setup_msvc_environment.sh
    ```
 
 3. **Перевірити:**
@@ -127,7 +127,7 @@ default = true
 
 2. **Запустити setup:**
    ```powershell
-   .\scripts\setup_rust_environment.ps1
+   source scripts/setup_rust_environment.sh
    ```
 
 ---

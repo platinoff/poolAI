@@ -4,8 +4,8 @@
 
 | Що | Команда |
 |----|---------|
-| **Запуск / stop** (PowerShell) | `.\bin\run-poolai.ps1` |
-| **Bash-скрипти** з PowerShell | `.\bin\poolai-msys.ps1 …` (inline: `-lc` або `-Command "cargo test-ci"`) |
+| **Запуск / stop** (PowerShell) | `bash bin/run-poolai.sh` |
+| **Bash-скрипти** з PowerShell | `bash bin/poolai-msys.sh …` (inline: `-lc` або `-Command "cargo test-ci"`) |
 | **MSYS2 UCRT64** (зовнішнє вікно) | `/usr/bin/bash bin/run-poolai.sh …` |
 | **Git / cargo test-ci** | зовнішнє MSYS2 — [`.cursor/commands/git-push.md`](../../.cursor/commands/git-push.md) |
 
@@ -18,10 +18,10 @@
 ```powershell
 cd S:\rust\poolAI
 
-.\bin\run-poolai.ps1 build
-.\bin\run-poolai.ps1 single -Background -SkipBuild
-.\bin\run-poolai.ps1 status
-.\bin\run-poolai.ps1 stop
+bash bin/run-poolai.sh build
+bash bin/run-poolai.sh single -Background -SkipBuild
+bash bin/run-poolai.sh status
+bash bin/run-poolai.sh stop
 ```
 
 **Last updated:** 2026-07-28 (PH-S1608 band 96 · `--monitoring-loc-audit` · `VERIFY_MONITORING_LOC_AUDIT`)
@@ -30,11 +30,11 @@ cd S:\rust\poolAI
 
 ```powershell
 # fastest dev loop — light features + background + health wait
-.\bin\run-poolai.ps1 quick
+bash bin/run-poolai.sh quick
 
 # explicit light build
-.\bin\run-poolai.ps1 build -Light
-.\bin\run-poolai.ps1 single -Background -SkipBuild -Light
+bash bin/run-poolai.sh build -Light
+bash bin/run-poolai.sh single -Background -SkipBuild -Light
 ```
 
 ```bash
@@ -103,19 +103,19 @@ cd S:\rust\poolAI
 /usr/bin/bash bin/run-poolai.sh quick --ratio96-loc-audit
 /usr/bin/bash bin/run-poolai.sh quick --ratio96-docs-canon
 # PowerShell:
-.\bin\run-poolai.ps1 quick -StandSmoke
-.\bin\run-poolai.ps1 quick -MigrationAdvisory
-.\bin\run-poolai.ps1 quick -StableTouchup
-.\bin\run-poolai.ps1 quick -TenantStandSmoke
-.\bin\run-poolai.ps1 quick -TenantVisionSync
-.\bin\run-poolai.ps1 quick -TenantRatioAdvisory
+bash bin/run-poolai.sh quick -StandSmoke
+bash bin/run-poolai.sh quick -MigrationAdvisory
+bash bin/run-poolai.sh quick -StableTouchup
+bash bin/run-poolai.sh quick -TenantStandSmoke
+bash bin/run-poolai.sh quick -TenantVisionSync
+bash bin/run-poolai.sh quick -TenantRatioAdvisory
 ```
 
 ### PH-S1013: Vision easy launch
 
 | Shell | Command |
 |-------|---------|
-| PowerShell | `.\bin\open-docs-vision.ps1` |
+| PowerShell | `bash bin/open-docs-vision.sh` |
 | MSYS2 | `/usr/bin/bash bin/open-docs-vision.sh` |
 
 URL (GSV, canon): `http://127.0.0.1:8891/` — див. [`GSV_SERVER.md`](../../GSV/docs/gsv/GSV_SERVER.md) · `GSV/docs/GSV_ROLES.md`. Legacy static server (`open-docs-vision.ps1`, `http://127.0.0.1:8765/docs/vision/index.html`) — деактивований (band 117), лишається архівом.
@@ -128,10 +128,10 @@ Admin toolbar **⏻** → modal «Виключити» / «Перезавант�
 
 ```powershell
 # single node + RAID job store preset
-.\bin\run-poolai.ps1 single -Background -SkipBuild -RaidJobs
+bash bin/run-poolai.sh single -Background -SkipBuild -RaidJobs
 
 # lan: one-liner with explicit env (node 1; repeat with another RAID path for node 2)
-$env:POOLAI_RAID_BASE_PATH = "$PWD\data\dev\lan\node1\raid"; $env:POOLAI_JOB_STORE = "raid"; .\bin\run-poolai.ps1 lan
+$env:POOLAI_RAID_BASE_PATH = "$PWD\data\dev\lan\node1\raid"; $env:POOLAI_JOB_STORE = "raid"; bash bin/run-poolai.sh lan
 ```
 
 | URL | Призначення |
@@ -253,7 +253,7 @@ cargo run --bin poolai-verify-release -- \
   --artifact-name poolai
 ```
 
-PowerShell (після `.\bin\run-poolai.ps1 build`):
+PowerShell (після `bash bin/run-poolai.sh build`):
 
 ```powershell
 $fix = "tests/fixtures/release/dev"
@@ -1637,9 +1637,9 @@ bash bin/build-ui-wasm.sh
 
 ```powershell
 # PowerShell:
-.\bin\e2e-playwright.ps1 -Start
+bash bin/e2e-playwright.sh -Start
 # або:
-.\bin\poolai-msys.ps1 bin/e2e-playwright.sh --start
+bash bin/poolai-msys.sh bin/e2e-playwright.sh --start
 ```
 
 ```bash
@@ -1654,12 +1654,12 @@ bash bin/build-ui-wasm.sh
 
 | Симптом | Дія |
 |---------|-----|
-| WSL / «no installed distributions» на `bash` | PowerShell: `.\bin\run-poolai.ps1`; bash-скрипти: `.\bin\poolai-msys.ps1` або `/usr/bin/bash` у MSYS2 |
-| `link.exe` / `link: extra operand` у PowerShell `cargo` | Не `cargo` з PS — `.\bin\run-poolai.ps1 build` (MSYS2 GNU) або зовнішнє MSYS2 |
-| `poolai.exe` не знайдено | `.\bin\run-poolai.ps1 build` |
-| Порт зайнятий | `.\bin\run-poolai.ps1 stop` або `-Port 8082` |
+| WSL / «no installed distributions» на `bash` | PowerShell: `bash bin/run-poolai.sh`; bash-скрипти: `bash bin/poolai-msys.sh` або `/usr/bin/bash` у MSYS2 |
+| `link.exe` / `link: extra operand` у PowerShell `cargo` | Не `cargo` з PS — `bash bin/run-poolai.sh build` (MSYS2 GNU) або зовнішнє MSYS2 |
+| `poolai.exe` не знайдено | `bash bin/run-poolai.sh build` |
+| Порт зайнятий | `bash bin/run-poolai.sh stop` або `-Port 8082` |
 | `/ui/admin` порожній / редірект | Спочатку http://127.0.0.1:8080/ui/login (`admin` / `admin123`) |
-| OOM при тестах Windows | `.\bin\poolai-msys.ps1 -lc 'cargo test-ci'` з `-j 1` (див. README) |
+| OOM при тестах Windows | `bash bin/poolai-msys.sh -lc 'cargo test-ci'` з `-j 1` (див. README) |
 | Admin 404 / порожній API | Запуск з `enterprise` (лаунчер робить це за замовчуванням) |
 
 **Last updated:** 2026-06-21 (PH-S156 `--raid-restart` · PH-S853 `jobs_store_backend` smoke)

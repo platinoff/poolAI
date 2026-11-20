@@ -140,7 +140,7 @@
 ### PowerShell Scripts
 
 **Доступні скрипти:**
-- `scripts/setup_msys2_path.ps1` - налаштування MSYS2 PATH
+- `scripts/setup_msys2_path.sh` - налаштування MSYS2 PATH
 - `scripts/build-with-https.sh` - компіляція з HTTPS features
 
 **Функціональність:**

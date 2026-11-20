@@ -35,7 +35,7 @@
 //! # or: POOLAI_STAND_SMOKE_AUDIT=1
 //!
 //! # Vision revision parity (PH-S208, PH-S235):
-//! export POOLAI_VISION_BASE_URL=http://127.0.0.1:8765   # open-docs-vision.ps1
+//! export POOLAI_VISION_BASE_URL=http://127.0.0.1:8765   # open-docs-vision.sh
 //! cargo run --bin poolai-http-stand-smoke   # repo manifest vs FM footer + extensions + optional HTTP header
 //! ```
 
@@ -213,7 +213,7 @@ async fn smoke_vision_revision_parity(client: &Client) -> Result<(), String> {
         Ok(r) => r,
         Err(e) => {
             return Err(format!(
-                "vision server unreachable at {url} ({e}); start open-docs-vision.ps1 or set {ENV_VISION_BASE}"
+                "vision server unreachable at {url} ({e}); start open-docs-vision.sh or set {ENV_VISION_BASE}"
             ));
         }
     };

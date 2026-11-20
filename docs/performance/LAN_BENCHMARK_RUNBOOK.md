@@ -77,7 +77,7 @@ bash bin/verify-lan-prep.sh
 ```powershell
 $env:POOLAI_NODE_A_URL = "http://192.168.1.10:8080"
 $env:POOLAI_NODE_B_URL = "http://192.168.1.11:8080"
-.\bin\verify-lan-prep.ps1
+bash bin/verify-lan-prep.sh
 ```
 
 **Single-machine dual-port (dev, не замінює §4):** `bash bin/run-lan-nodes.sh` → `bash bin/verify-lan-prep.sh` (default `127.0.0.1:8080` + `:8081`).
@@ -104,7 +104,7 @@ $env:POOLAI_NODE_B_URL = "http://192.168.1.11:8080"
 **Windows (PowerShell, repo root):**
 
 ```powershell
-.\bin\run-lan-nodes.ps1
+bash bin/run-lan-nodes.sh
 # health after ~15s:
 Invoke-WebRequest http://127.0.0.1:8080/api/v1/health
 Invoke-WebRequest http://127.0.0.1:8081/api/v1/health
@@ -129,13 +129,13 @@ Coordinator + `poolai-worker` (реєстрація, tasks, RAID wire) без д
 
 | Процес | URL | Скрипт |
 |--------|-----|--------|
-| Coordinator | `http://127.0.0.1:8080` | `bin/run-virtual-node-dev.ps1` / `.sh` |
+| Coordinator | `http://127.0.0.1:8080` | `bin/run-virtual-node-dev.sh` / `.sh` |
 | Worker health | `http://127.0.0.1:9090/health` | те саме |
 | Telegram bot (опційно) | long-poll → coordinator | `poolai-telegram-bot --features tgbot` + `TELEGRAM_BOT_TOKEN` |
 
 ```powershell
-.\bin\run-virtual-node-dev.ps1
-.\bin\verify-dev-stand.ps1   # default warmup 50s + bootstrap task retries
+bash bin/run-virtual-node-dev.sh
+bash bin/verify-dev-stand.sh   # default warmup 50s + bootstrap task retries
 ```
 
 ```bash

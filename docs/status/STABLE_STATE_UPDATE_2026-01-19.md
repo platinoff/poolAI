@@ -19,8 +19,8 @@
   - Додано PowerShell скрипти для MSVC та Rust environment setup
 
 - ✅ **Environment Setup Automation**
-  - `scripts/setup_msvc_environment.ps1` - автоматичне налаштування MSVC
-  - `scripts/setup_rust_environment.ps1` - автоматичне визначення та налаштування toolchain
+  - `scripts/setup_msvc_environment.sh` - автоматичне налаштування MSVC
+  - `scripts/setup_rust_environment.sh` - автоматичне визначення та налаштування toolchain
   - Виправлено PATH конфігурацію в `.vscode/settings.json`
 
 ### ✅ Cloud SDK Implementation Progress

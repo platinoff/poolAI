@@ -25,7 +25,7 @@ pub const UI_DEBUG_BAND38_ROWS: &[&str] = &[
     "PH-S1019",
     "PH-S1020",
     "PH-S1021",
-    "poolai-msys.ps1",
+    "poolai-msys.sh",
     "PH-S1028",
 ];
 

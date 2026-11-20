@@ -38,7 +38,7 @@ Test-Path "C:\msys64\ucrt64\bin\gcc.exe"
 
 **Для поточної сесії PowerShell:**
 ```powershell
-.\scripts\setup_msys2_path.ps1
+source scripts/setup_msys2_path.sh
 ```
 
 **Або вручну:**
@@ -91,7 +91,7 @@ cargo build
 ### З cloud-sdk feature (потребує MSYS2/gcc):
 ```bash
 # Спочатку налаштуйте PATH
-.\scripts\setup_msys2_path.ps1
+source scripts/setup_msys2_path.sh
 
 # Потім компілюйте
 cargo check --features cloud,cloud-sdk

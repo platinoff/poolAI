@@ -96,7 +96,7 @@
 
 **Перевірки**:
 - ✅ Bash script існує (`scripts/test_deployment.sh`)
-- ✅ PowerShell script існує (`scripts/test_deployment.ps1`)
+- ✅ PowerShell script існує (`scripts/test_deployment.sh`)
 - ✅ Скрипти перевіряють всі deployment файли
 - ✅ Скрипти валідують syntax
 

@@ -606,7 +606,7 @@
 - **FM:** FM-028 ✅
 
 ### [Ops] LAN sign-off prep (FM-027)
-- **Де:** `docs/performance/LAN_SIGNOFF_CHECKLIST.md`, `bin/verify-lan-prep.sh`, `bin/verify-lan-prep.ps1`, `LAN_BENCHMARK_RUNBOOK.md` §4
+- **Де:** `docs/performance/LAN_SIGNOFF_CHECKLIST.md`, `bin/verify-lan-prep.sh`, `bin/verify-lan-prep.sh`, `LAN_BENCHMARK_RUNBOOK.md` §4
 - **Сигнал:** `rg "verify-lan-prep|LAN_SIGNOFF" docs/performance`
 - **Патерн:** 2-host: `POOLAI_NODE_A_URL` + `POOLAI_NODE_B_URL` → health + optional `discovery/peers`; 1-host: default `8080`/`8081` після `run-lan-nodes`; **§4 sign-off BLOCKED** без 2 фізичних хостів
 - **Перевірка:** `bash bin/verify-lan-prep.sh` (після `run-lan-nodes` або на стенді)
@@ -709,7 +709,7 @@
 - **FM:** FM-019 ✅ (scope A)
 
 ### [Ops] Локальний запуск — `run-poolai` (S32)
-- **Де:** `bin/run-poolai.sh`, `bin/run-poolai.ps1`, `docs/development/RUN_LOCAL.md`
+- **Де:** `bin/run-poolai.sh`, `bin/run-poolai.sh`, `docs/development/RUN_LOCAL.md`
 - **Сигнал:** `bash bin/run-poolai.sh help`
 - **Патерн:** `single` (1× poolai :8080) | `virtual-node` | `lan` | `docker` | `stop` | `status`; dev features `enterprise,ml,cloud,test-utils`
 - **Не стаджити:** `data/dev/` (runtime), `data/audit/*.log*`

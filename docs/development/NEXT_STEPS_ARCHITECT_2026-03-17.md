@@ -40,7 +40,7 @@
 
 Таблиця **P1–P7** вище — архітектурні пріоритети й залежності; **конкретна черга робіт** для сесії/спринту — у **`FUNCTION_MANAGEMENT.md` §5.1** та **§5.11** (10 спринтів PH-S37…S46). Коротко той самий порядок (історичний FM-035…036; актуальна PH-черга — §5.11):
 
-1. **FM-003 §4 / FM-027** — LAN sign-off (**BLOCKED**, 2 хости); dev stand ✅; `bin/run-lan-nodes.ps1`.
+1. **FM-003 §4 / FM-027** — LAN sign-off (**BLOCKED**, 2 хости); dev stand ✅; `bin/run-lan-nodes.sh`.
 2. **FM-032** — OpenAPI `VmNetwork` / `NetworkIsolationConfig` schemas (перша в черзі розробки).
 3. **FM-033** — Solana on-chain program + real devnet RPC (post FM-024 stub).
 4. **FM-035** → **FM-034** → **FM-036** — model load, job→VM bind, tensor sharding (EXO / P6).

@@ -708,7 +708,7 @@
         "docs/development/HANDOFF_NEW_SESSION.md",
         "docs/development/NEXT_SESSION_PROMPT.md",
         "docs/vision/manifest.json",
-        "bin/open-docs-vision.ps1"
+        "bin/open-docs-vision.sh"
       ],
       "code_globs": [
         "e2e/tests/jobs_lease.spec.ts",
@@ -801,7 +801,7 @@
         "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md",
         "docs/vision/manifest.json",
         "docs/vision/extensions.json",
-        "bin/open-docs-vision.ps1"
+        "bin/open-docs-vision.sh"
       ],
       "code_globs": [
         "src/bin/poolai_openapi_gap_audit.rs",

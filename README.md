@@ -23,7 +23,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 | Що | Де |
 |----|-----|
-| **Запуск** | PowerShell: `.\bin\open-docs-vision.ps1` · MSYS2: `/usr/bin/bash bin/open-docs-vision.sh` |
+| **Запуск** | PowerShell: `bash bin/open-docs-vision.sh` · MSYS2: `/usr/bin/bash bin/open-docs-vision.sh` |
 | **URL** | `http://127.0.0.1:8765/docs/vision/index.html` (Cursor Simple Browser — лише localhost, не `S:/…`) |
 | **Панелі** | 3D-шари **L0–L5** (concept → workspace TOML) · Galaxy map · граф зв’язків · preview |
 | **Map UX** | pan/zoom · **Eco** (GPU save) · **Layers/Types** filters · **⊟ Folders** · **◎ Sprint** |
@@ -109,7 +109,7 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 **Ops (поза чергою):** **FM-003** LAN §4 **BLOCKED** (2 хости) · **FM-041** Cloud SDK **Deferred**.
 
-**Старт сесії:** [`HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md) · copy-paste — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md) · карта — [`docs/vision/`](docs/vision/) (`.\bin\open-docs-vision.ps1`).
+**Старт сесії:** [`HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md) · copy-paste — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md) · карта — [`docs/vision/`](docs/vision/) (`bash bin/open-docs-vision.sh`).
 
 **Звірка «не зроблено»:** [`FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.3**.
 
@@ -320,8 +320,8 @@ Then restart your terminal.
    ```powershell
    # Windows PowerShell (без WSL)
    cd S:\rust\poolAI
-   .\bin\run-poolai.ps1 build
-   .\bin\run-poolai.ps1 single -Background -SkipBuild
+   bash bin/run-poolai.sh build
+   bash bin/run-poolai.sh single -Background -SkipBuild
    # Login http://127.0.0.1:8080/ui/login  →  admin / admin123
    ```
    ```bash
@@ -338,10 +338,10 @@ Then restart your terminal.
 **Єдиний лаунчер** (single / LAN / virtual-node / Docker):
 
 ```powershell
-.\bin\run-poolai.ps1 help
-.\bin\run-poolai.ps1 single -Background
-.\bin\run-poolai.ps1 stop
-.\bin\poolai-msys.ps1 bin/e2e-playwright.sh --start   # bash-скрипти з PS
+bash bin/run-poolai.sh help
+bash bin/run-poolai.sh single -Background
+bash bin/run-poolai.sh stop
+bash bin/poolai-msys.sh bin/e2e-playwright.sh --start   # bash-скрипти з PS
 ```
 
 MSYS2: `/usr/bin/bash bin/run-poolai.sh …` — див. [`.cursor/commands/run-poolai.md`](.cursor/commands/run-poolai.md).

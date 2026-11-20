@@ -46,7 +46,7 @@ cargo build
 
 ```powershell
 # Додати MSYS2 до PATH для поточної сесії
-.\scripts\setup_msys2_path.ps1
+source scripts/setup_msys2_path.sh
 
 # Після цього запустити cargo build знову
 cargo build

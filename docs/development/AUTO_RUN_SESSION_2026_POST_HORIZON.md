@@ -48,7 +48,7 @@ cd /s/rust/poolAI
 cargo test job --lib --features ml,enterprise,cloud,test-utils
 cargo test-ci
 # LAN dev (1 host):
-# .\bin\run-lan-nodes.ps1 -SkipBuild
+# bash bin/run-lan-nodes.sh -SkipBuild
 ```
 
 ---

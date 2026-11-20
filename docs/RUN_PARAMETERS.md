@@ -50,7 +50,7 @@ cargo run --features enterprise,ml,cloud,test-utils
 POOLAI_HTTP_PORT=8080 POOLAI_RAID_BASE_PATH=./data/lan-stand/node-A/raid cargo run --features enterprise,ml,cloud,test-utils
 ```
 
-Або скрипт: **`bin/run-lan-nodes.ps1`** (PowerShell) / **`bin/run-lan-nodes.sh`** (bash).
+Або скрипт: **`bin/run-lan-nodes.sh`** (PowerShell) / **`bin/run-lan-nodes.sh`** (bash).
 
 **Virtual node worker (`poolai-worker`, FM-016):**
 
