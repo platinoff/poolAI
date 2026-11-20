@@ -35,7 +35,7 @@
 <a href=#35 id=35 data-nosnippet>35</a>//! # or: POOLAI_STAND_SMOKE_AUDIT=1
 <a href=#36 id=36 data-nosnippet>36</a>//!
 <a href=#37 id=37 data-nosnippet>37</a>//! # Vision revision parity (PH-S208, PH-S235):
-<a href=#38 id=38 data-nosnippet>38</a>//! export POOLAI_VISION_BASE_URL=http://127.0.0.1:8765   # open-docs-vision.ps1
+<a href=#38 id=38 data-nosnippet>38</a>//! export POOLAI_VISION_BASE_URL=http://127.0.0.1:8765   # open-docs-vision.sh
 <a href=#39 id=39 data-nosnippet>39</a>//! cargo run --bin poolai-http-stand-smoke   # repo manifest vs FM footer + extensions + optional HTTP header
 <a href=#40 id=40 data-nosnippet>40</a>//! ```
 <a href=#41 id=41 data-nosnippet>41</a>
@@ -213,7 +213,7 @@
 <a href=#213 id=213 data-nosnippet>213</a>        <span class="prelude-val">Ok</span>(r) =&gt; r,
 <a href=#214 id=214 data-nosnippet>214</a>        <span class="prelude-val">Err</span>(e) =&gt; {
 <a href=#215 id=215 data-nosnippet>215</a>            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">format!</span>(
-<a href=#216 id=216 data-nosnippet>216</a>                <span class="string">"vision server unreachable at {url} ({e}); start open-docs-vision.ps1 or set {ENV_VISION_BASE}"
+<a href=#216 id=216 data-nosnippet>216</a>                <span class="string">"vision server unreachable at {url} ({e}); start open-docs-vision.sh or set {ENV_VISION_BASE}"
 <a href=#217 id=217 data-nosnippet>217</a>            </span>));
 <a href=#218 id=218 data-nosnippet>218</a>        }
 <a href=#219 id=219 data-nosnippet>219</a>    };
